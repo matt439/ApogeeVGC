@@ -27,6 +27,7 @@
     <ClInclude Include="battle.h" />
     <ClInclude Include="dex-conditions.h" />
     <ClInclude Include="dex-formats.h" />
+    <ClInclude Include="field.h" />
     <ClInclude Include="global-types.h" />
     <ClInclude Include="dex-moves.h" />
     <ClInclude Include="pokemon.h" />

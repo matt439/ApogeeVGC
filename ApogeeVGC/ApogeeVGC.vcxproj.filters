@@ -19,5 +19,6 @@
     <ClInclude Include="global-types.h" />
     <ClInclude Include="dex-abilities.h" />
     <ClInclude Include="dex-conditions.h" />
+    <ClInclude Include="field.h" />
   </ItemGroup>
 </Project>

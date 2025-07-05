@@ -2,6 +2,7 @@
 
 #include "global-types.h"
 #include "dex-moves.h"
+#include "field.h"
 #include <functional>
 #include <optional>
 #include <variant>
@@ -932,4 +933,77 @@ struct PokemonEventMethods : public EventMethods
 	std::optional<OnAllyWeatherModifyDamageFunc> on_ally_weather_modify_damage;
 	std::optional<OnAllyModifyDamagePhase1Func> on_ally_modify_damage_phase_1;
 	std::optional<OnAllyModifyDamagePhase2Func> on_ally_modify_damage_phase_2;
+};
+
+using OnSideStartFunc = std::function<void(Battle*, Side*, Pokemon*, Effect)>;
+using OnSideRestartFunc = std::function<void(Battle*, Side*, Pokemon*, Effect)>;
+using OnSideResidualFunc = std::function<void(Battle*, Side&, Pokemon*, Effect)>;
+using OnSideEndFunc = std::function<void(Battle*, Side*)>;
+
+struct SideEventMethods : public EventMethods
+{
+	std::optional<OnSideStartFunc> on_side_start;
+	std::optional<OnSideRestartFunc> on_side_restart;
+	std::optional<OnSideResidualFunc> on_side_residual;
+	std::optional<OnSideEndFunc> on_side_end;
+	std::optional<int> on_side_residual_order;
+	std::optional<int> on_side_residual_priority;
+	std::optional<int> on_side_residual_sub_order;
+};
+
+using OnFieldStartFunc = std::function<void(Battle*, Field*, Pokemon*, Effect)>;
+using OnFieldRestartFunc = std::function<void(Battle*, Field*, Pokemon*, Effect)>;
+using OnFieldResidualFunc = std::function<void(Battle*, Field&, Pokemon*, Effect)>;
+using OnFieldEndFunc = std::function<void(Battle*, Field*)>;
+
+struct FieldEventMethods : public EventMethods
+{
+	std::optional<OnFieldStartFunc> on_field_start;
+	std::optional<OnFieldRestartFunc> on_field_restart;
+	std::optional<OnFieldResidualFunc> on_field_residual;
+	std::optional<OnFieldEndFunc> on_field_end;
+	std::optional<int> on_field_residual_order;
+	std::optional<int> on_field_residual_priority;
+	std::optional<int> on_field_residual_sub_order;
+};
+
+struct Condition; // forward declaration
+
+struct PokemonConditionData : public Condition, public PokemonEventMethods
+{
+};
+
+struct SideConditionData : public Condition, public SideEventMethods
+{
+	// TODO: try to shadow these 3 functions
+	std::optional<OnSideStartFunc> on_start;
+	std::optional<OnSideRestartFunc> on_restart;
+	std::optional<OnSideEndFunc> on_end;
+};
+
+struct FieldConditionData : public Condition, public FieldEventMethods
+{
+	// TODO: try to shadow these 3 functions
+	std::optional<OnSideStartFunc> on_start;
+	std::optional<OnSideRestartFunc> on_restart;
+	std::optional<OnSideEndFunc> on_end;
+};
+
+using ConditionData = std::variant<PokemonConditionData, SideConditionData, FieldConditionData>;
+
+struct Condition : public BasicEffect {
+	// Effect type (Condition, Weather, Status, Terrain)
+	EffectType effect_type = EffectType::CONDITION;
+
+	std::optional<int> counter_max;
+	std::optional<int> effect_order;
+
+	std::optional<std::function<int(Battle*, Pokemon*, Pokemon*, std::optional<Effect*>)>> duration_callback;
+	std::optional<std::function<void(Battle*, Pokemon*)>> on_copy;
+	std::optional<std::function<void(Battle*, Pokemon*)>> on_end;
+	std::optional<std::function<std::optional<bool>(Battle*, Pokemon*, Pokemon*, Effect*)>> on_restart;
+	std::optional<std::function<std::optional<bool>(Battle*, Pokemon*, Pokemon*, Effect*)>> on_start;
+
+	Condition() = default;
+	// TODO: Implement a constructor that initializes the fields based on input data
 };
