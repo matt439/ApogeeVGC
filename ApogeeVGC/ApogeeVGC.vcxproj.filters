@@ -27,7 +27,6 @@
     <ClInclude Include="MoveSlot.h" />
     <ClInclude Include="Attacker.h" />
     <ClInclude Include="PokemonSet.h" />
-    <ClInclude Include="StatsTable.h" />
     <ClInclude Include="SpeciesData.h" />
     <ClInclude Include="Species.h" />
     <ClInclude Include="BasicEffect.h" />
@@ -41,5 +40,6 @@
     <ClInclude Include="MoveEventMethods.h" />
     <ClInclude Include="ActiveMove.h" />
     <ClInclude Include="HitEffect.h" />
+    <ClInclude Include="GlobalTypes.h" />
   </ItemGroup>
 </Project>

@@ -39,6 +39,7 @@
     <ClInclude Include="EventTarget.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Format.h" />
+    <ClInclude Include="GlobalTypes.h" />
     <ClInclude Include="HitEffect.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveData.h" />
@@ -50,7 +51,6 @@
     <ClInclude Include="Side.h" />
     <ClInclude Include="Species.h" />
     <ClInclude Include="SpeciesData.h" />
-    <ClInclude Include="StatsTable.h" />
     <ClInclude Include="Team.h" />
     <ClInclude Include="Trainer.h" />
   </ItemGroup>
