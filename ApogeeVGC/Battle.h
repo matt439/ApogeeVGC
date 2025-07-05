@@ -3,9 +3,8 @@
 #include "Field.h"
 #include "Format.h"
 #include "Side.h"
-#include "EventTarget.h"
 #include "Move.h"
-#include "rapidjson/document.h"
+// #include "rapidjson/document.h"
 #include <variant>
 #include <string>
 #include <optional>
@@ -43,14 +42,15 @@ class Battle
 {
 public:
 	Battle();
-	void* single_event(const std::string& eventid,
+	void* single_event(
+		const std::string& event_id,
 		const Effect& effect,
-		EffectState* state, // can be null
+		std::optional<EffectState*> state, // nullable
 		Target& target,
-		Source& source,
-		Effect* source_effect, // can be null
-		void* relay_var, // was type 'any'
-		void* custom_callback); // was type 'unknown'
+		std::optional<Source> source = std::nullopt,
+		std::optional<std::variant<Effect*, std::string, std::monostate>> source_effect = std::nullopt,
+		std::optional<std::any> relay_var = std::nullopt,
+		std::optional<std::any> custom_callback = std::nullopt);
 private:
 	unsigned int _id = 0;
 	unsigned int _seed = 0;
@@ -62,4 +62,15 @@ private:
 	int _event_depth = 0;
 
 	// std::unordered_map<std::string, std::string> _event = { "id", "" };
+
+	//add
+	//suppressing_ability
+	//debug
+	//init_effect_state
+	//args.unshift
+	//callback.apply
+
+	//target.ignoringItem
+	//target.ignoringAbility
+	//field.suppressingWeather
 };

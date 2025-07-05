@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BasicEffect.h"
+#include "GlobalTypes.h"
 
 class Species : public BasicEffect
 {

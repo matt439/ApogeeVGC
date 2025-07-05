@@ -3,9 +3,10 @@
 #include "GlobalTypes.h"
 #include "MoveEventMethods.h"
 
-struct HitEffect {  
+struct HitEffect
+{  
    // Optional function, type depends on MoveEventMethods::on_hit signature  
-   std::optional<std::function<BoolOrNullOrStringOrVoid(Battle*, Pokemon*, Pokemon*, ActiveMove*)>> on_hit;
+   std::optional<OnHitFunc> on_hit;
 
    // set pokemon conditions  
    std::optional<SparseBoostsTable> boosts;

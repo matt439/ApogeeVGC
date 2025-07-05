@@ -29,16 +29,16 @@
     <ClInclude Include="PokemonSet.h" />
     <ClInclude Include="SpeciesData.h" />
     <ClInclude Include="Species.h" />
-    <ClInclude Include="BasicEffect.h" />
     <ClInclude Include="Nature.h" />
-    <ClInclude Include="EffectData.h" />
-    <ClInclude Include="EventTarget.h" />
-    <ClInclude Include="EventSource.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveData.h" />
     <ClInclude Include="MoveEventMethods.h" />
     <ClInclude Include="ActiveMove.h" />
     <ClInclude Include="HitEffect.h" />
     <ClInclude Include="GlobalTypes.h" />
+    <ClInclude Include="EventMethods.h" />
+    <ClInclude Include="SecondaryEffect.h" />
+    <ClInclude Include="Ability.h" />
+    <ClInclude Include="Condition.h" />
   </ItemGroup>
 </Project>

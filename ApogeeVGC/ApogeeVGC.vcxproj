@@ -28,14 +28,13 @@
     <ClCompile Include="Trainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ability.h" />
     <ClInclude Include="ActiveMove.h" />
     <ClInclude Include="Attacker.h" />
-    <ClInclude Include="BasicEffect.h" />
     <ClInclude Include="Battle.h" />
-    <ClInclude Include="EffectData.h" />
+    <ClInclude Include="Condition.h" />
     <ClInclude Include="EffectState.h" />
-    <ClInclude Include="EventSource.h" />
-    <ClInclude Include="EventTarget.h" />
+    <ClInclude Include="EventMethods.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Format.h" />
     <ClInclude Include="GlobalTypes.h" />
@@ -47,6 +46,7 @@
     <ClInclude Include="Nature.h" />
     <ClInclude Include="Pokemon.h" />
     <ClInclude Include="PokemonSet.h" />
+    <ClInclude Include="SecondaryEffect.h" />
     <ClInclude Include="Side.h" />
     <ClInclude Include="Species.h" />
     <ClInclude Include="SpeciesData.h" />

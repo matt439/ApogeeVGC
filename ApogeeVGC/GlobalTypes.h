@@ -123,33 +123,6 @@ using Effect = std::variant<
     Format*
 >;
 
-//interface CommonHandlers{
-//    ModifierEffect: (this: Battle, relayVar : number, target : Pokemon, source : Pokemon, effect : Effect) = > number | void;
-//    ModifierMove: (this: Battle, relayVar : number, target : Pokemon, source : Pokemon, move : ActiveMove) = > number | void;
-//    ResultMove: boolean | (
-//        (this: Battle, target : Pokemon, source : Pokemon, move : ActiveMove) = > boolean | null | "" | void
-//    );
-//    ExtResultMove: boolean | (
-//        (this: Battle, target : Pokemon, source : Pokemon, move : ActiveMove) = > boolean | null | number | "" | void
-//    );
-//    VoidEffect: (this: Battle, target : Pokemon, source : Pokemon, effect : Effect) = > void;
-//    VoidMove: (this: Battle, target : Pokemon, source : Pokemon, move : ActiveMove) = > void;
-//    ModifierSourceEffect: (
-//        this: Battle, relayVar : number, source : Pokemon, target : Pokemon, effect : Effect
-//    ) = > number | void;
-//    ModifierSourceMove: (
-//        this: Battle, relayVar : number, source : Pokemon, target : Pokemon, move : ActiveMove
-//    ) = > number | void;
-//    ResultSourceMove: boolean | (
-//        (this: Battle, source : Pokemon, target : Pokemon, move : ActiveMove) = > boolean | null | "" | void
-//    );
-//    ExtResultSourceMove: boolean | (
-//        (this: Battle, source : Pokemon, target : Pokemon, move : ActiveMove) = > boolean | null | number | "" | void
-//    );
-//    VoidSourceEffect: (this: Battle, source : Pokemon, target : Pokemon, effect : Effect) = > void;
-//    VoidSourceMove: (this: Battle, source : Pokemon, target : Pokemon, move : ActiveMove) = > void;
-//}
-
 // // Forward declarations for Battle and Pokemon
 class Battle;
 class Pokemon;
@@ -183,4 +156,98 @@ struct CommonHandlers
     std::variant<bool, ExtResultSourceMoveFunc> ExtResultSourceMove;
     VoidSourceEffectFunc VoidSourceEffect;
     VoidSourceMoveFunc VoidSourceMove;
+};
+
+struct EffectData
+{
+    std::optional<std::string> name;
+    std::optional<std::string> desc;
+    std::optional<int> duration;
+    std::optional<std::function<int(Battle*, Pokemon*, Pokemon*, std::optional<Effect>)>> duration_callback;
+    std::optional<std::string> effect_type;
+    std::optional<bool> infiltrates;
+    std::optional<NonStandard> is_nonstandard;
+    std::optional<std::string> short_desc;
+};
+
+struct ModdedEffectData : public EffectData
+{
+    bool inherit = false;
+};
+
+enum class EffectType {
+    CONDITION,
+    POKEMON,
+    MOVE,
+    ITEM,
+    ABILITY,
+    FORMAT,
+    NATURE,
+    RULESET,
+    WEATHER,
+    STATUS,
+    TERRAIN,
+    RULE,
+    VALIDATOR_RULE
+};
+
+struct BasicEffect : public EffectData
+{
+    ID id;
+    EffectType effect_type;
+    bool exists;
+    std::string fullname;
+    int gen;
+    std::string source_effect;
+
+    virtual std::string to_string() const {
+        return fullname;
+    }
+};
+
+//type GameType = 'singles' | 'doubles' | 'triples' | 'rotation' | 'multi' | 'freeforall';
+//type SideID = 'p1' | 'p2' | 'p3' | 'p4';
+//
+//type SpreadMoveTargets = (Pokemon | false | null)[];
+//type SpreadMoveDamage = (number | boolean | undefined)[];
+//type ZMoveOptions = ({ move: string, target : MoveTarget } | null)[];
+//
+//interface BattleScriptsData{
+//    gen: number;
+//}
+
+enum class GameType
+{
+    SINGLES,
+    DOUBLES,
+    TRIPLES,
+    ROTATION,
+    MULTI,
+    FREEFORALL
+};
+
+enum class SideID
+{
+    P1,
+    P2,
+    P3,
+    P4
+};
+
+#include <vector>
+
+using SpreadMoveTargets = std::vector<std::variant<Pokemon*, bool, std::monostate>>;
+using SpreadMoveDamage = std::vector<std::variant<int, bool, std::monostate>>;
+
+struct ZMoveOption
+{
+    std::string move;
+    // MoveTarget target; // Define MoveTarget as needed
+};
+
+using ZMoveOptions = std::vector<std::optional<ZMoveOption>>;
+
+struct BattleScriptsData
+{
+    int gen;
 };
