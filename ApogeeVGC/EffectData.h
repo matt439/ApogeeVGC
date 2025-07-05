@@ -9,7 +9,6 @@
 
 class Battle; // Forward declaration
 class Pokemon; // Forward declaration
-class Effect; // Forward declaration
 
 struct EffectData
 {

@@ -32,7 +32,6 @@
     <ClInclude Include="Attacker.h" />
     <ClInclude Include="BasicEffect.h" />
     <ClInclude Include="Battle.h" />
-    <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectData.h" />
     <ClInclude Include="EffectState.h" />
     <ClInclude Include="EventSource.h" />

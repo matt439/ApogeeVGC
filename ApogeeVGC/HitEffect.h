@@ -1,31 +1,23 @@
 #pragma once
 
+#include "GlobalTypes.h"
 #include "MoveEventMethods.h"
 
-//export interface HitEffect{
-//	onHit ? : MoveEventMethods['onHit'];
-//
-//	// set pokemon conditions
-//	boosts ? : SparseBoostsTable | null;
-//	status ? : string;
-//	volatileStatus ? : string;
-//
-//	// set side/slot conditions
-//	sideCondition ? : string;
-//	slotCondition ? : string;
-//
-//	// set field conditions
-//	pseudoWeather ? : string;
-//	terrain ? : string;
-//	weather ? : string;
-//}
+struct HitEffect {  
+   // Optional function, type depends on MoveEventMethods::on_hit signature  
+   std::optional<std::function<BoolOrNullOrStringOrVoid(Battle*, Pokemon*, Pokemon*, ActiveMove*)>> on_hit;
 
-//type StatIDExceptHP = 'atk' | 'def' | 'spa' | 'spd' | 'spe';
-//type BoostID = StatIDExceptHP | 'accuracy' | 'evasion';
-//type BoostsTable = { [boost in BoostID] : number };
-//type SparseBoostsTable = Partial<BoostsTable>;
+   // set pokemon conditions  
+   std::optional<SparseBoostsTable> boosts;
+   std::optional<std::string> status;  
+   std::optional<std::string> volatile_status;  
 
-struct HitEffect
-{
+   // set side/slot conditions  
+   std::optional<std::string> side_condition;  
+   std::optional<std::string> slot_condition;  
 
+   // set field conditions  
+   std::optional<std::string> pseudo_weather;  
+   std::optional<std::string> terrain;  
+   std::optional<std::string> weather;  
 };

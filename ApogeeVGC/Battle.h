@@ -5,7 +5,6 @@
 #include "Side.h"
 #include "EventTarget.h"
 #include "Move.h"
-#include "Effect.h"
 #include "rapidjson/document.h"
 #include <variant>
 #include <string>
