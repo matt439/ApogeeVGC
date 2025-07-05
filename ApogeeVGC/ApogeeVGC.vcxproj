@@ -19,39 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Battle.cpp" />
-    <ClCompile Include="Field.cpp" />
-    <ClCompile Include="Pokemon.cpp" />
+    <ClCompile Include="battle.cpp" />
     <ClCompile Include="program.cpp" />
-    <ClCompile Include="Side.cpp" />
-    <ClCompile Include="Team.cpp" />
-    <ClCompile Include="Trainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Ability.h" />
-    <ClInclude Include="ActiveMove.h" />
-    <ClInclude Include="Attacker.h" />
-    <ClInclude Include="Battle.h" />
-    <ClInclude Include="Condition.h" />
-    <ClInclude Include="EffectState.h" />
-    <ClInclude Include="EventMethods.h" />
-    <ClInclude Include="Field.h" />
-    <ClInclude Include="Format.h" />
-    <ClInclude Include="GlobalTypes.h" />
-    <ClInclude Include="HitEffect.h" />
-    <ClInclude Include="Move.h" />
-    <ClInclude Include="MoveData.h" />
-    <ClInclude Include="MoveEventMethods.h" />
-    <ClInclude Include="MoveSlot.h" />
-    <ClInclude Include="Nature.h" />
-    <ClInclude Include="Pokemon.h" />
-    <ClInclude Include="PokemonSet.h" />
-    <ClInclude Include="SecondaryEffect.h" />
-    <ClInclude Include="Side.h" />
-    <ClInclude Include="Species.h" />
-    <ClInclude Include="SpeciesData.h" />
-    <ClInclude Include="Team.h" />
-    <ClInclude Include="Trainer.h" />
+    <ClInclude Include="dex-abilities.h" />
+    <ClInclude Include="battle.h" />
+    <ClInclude Include="dex-conditions.h" />
+    <ClInclude Include="dex-formats.h" />
+    <ClInclude Include="global-types.h" />
+    <ClInclude Include="dex-moves.h" />
+    <ClInclude Include="pokemon.h" />
+    <ClInclude Include="teams.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

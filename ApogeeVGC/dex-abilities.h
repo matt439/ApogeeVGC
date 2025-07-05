@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GlobalTypes.h"
 #include <optional>
 
 struct AbilityFlags

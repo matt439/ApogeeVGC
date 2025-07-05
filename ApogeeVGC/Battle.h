@@ -1,13 +1,19 @@
 #pragma once
 
-#include "Field.h"
-#include "Format.h"
-#include "Side.h"
-#include "Move.h"
+//#include "side.h"
+#include "dex-moves.h"
+#include "global-types.h"
 // #include "rapidjson/document.h"
 #include <variant>
 #include <string>
 #include <optional>
+
+// Forward declarations
+class Battle;
+class Field;
+class Pokemon;
+class EffectState;
+class Format;
 
 using Part = std::variant<
 	std::monostate,           // for null/undefined
@@ -18,8 +24,6 @@ using Part = std::variant<
 	Side*,
 	Effect*,
 	Move*>;
-
-class Battle; // Forward declaration
 
 // For target
 using Target = std::variant<
@@ -54,10 +58,10 @@ public:
 private:
 	unsigned int _id = 0;
 	unsigned int _seed = 0;
-	Field _field;
-	Format _format;
-	Side _side_a;
-	Side _side_b;
+	//Field _field;
+	//Format _format;
+	//Side _side_a;
+	//Side _side_b;
 
 	int _event_depth = 0;
 

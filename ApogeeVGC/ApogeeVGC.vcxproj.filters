@@ -7,38 +7,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Trainer.cpp" />
     <ClCompile Include="program.cpp" />
-    <ClCompile Include="Pokemon.cpp" />
-    <ClCompile Include="Field.cpp" />
-    <ClCompile Include="Battle.cpp" />
-    <ClCompile Include="Team.cpp" />
-    <ClCompile Include="Side.cpp" />
+    <ClCompile Include="battle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Trainer.h" />
-    <ClInclude Include="Pokemon.h" />
-    <ClInclude Include="Field.h" />
-    <ClInclude Include="Battle.h" />
-    <ClInclude Include="Team.h" />
-    <ClInclude Include="Format.h" />
-    <ClInclude Include="Side.h" />
-    <ClInclude Include="EffectState.h" />
-    <ClInclude Include="MoveSlot.h" />
-    <ClInclude Include="Attacker.h" />
-    <ClInclude Include="PokemonSet.h" />
-    <ClInclude Include="SpeciesData.h" />
-    <ClInclude Include="Species.h" />
-    <ClInclude Include="Nature.h" />
-    <ClInclude Include="Move.h" />
-    <ClInclude Include="MoveData.h" />
-    <ClInclude Include="MoveEventMethods.h" />
-    <ClInclude Include="ActiveMove.h" />
-    <ClInclude Include="HitEffect.h" />
-    <ClInclude Include="GlobalTypes.h" />
-    <ClInclude Include="EventMethods.h" />
-    <ClInclude Include="SecondaryEffect.h" />
-    <ClInclude Include="Ability.h" />
-    <ClInclude Include="Condition.h" />
+    <ClInclude Include="pokemon.h" />
+    <ClInclude Include="battle.h" />
+    <ClInclude Include="dex-formats.h" />
+    <ClInclude Include="teams.h" />
+    <ClInclude Include="dex-moves.h" />
+    <ClInclude Include="global-types.h" />
+    <ClInclude Include="dex-abilities.h" />
+    <ClInclude Include="dex-conditions.h" />
   </ItemGroup>
 </Project>

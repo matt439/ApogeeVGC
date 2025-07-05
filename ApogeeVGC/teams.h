@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GlobalTypes.h"
+#include "global-types.h"
 #include <string>
 #include <vector>
 

@@ -1,12 +1,14 @@
 #pragma once
 
-#include "GlobalTypes.h"
-#include "MoveEventMethods.h"
+#include "global-types.h"
+#include "dex-moves.h"
 #include <functional>
 #include <optional>
 #include <variant>
 #include <string>
 #include <vector>
+
+struct SecondaryEffect;
 
 using OnDeductPPFunc = std::function<std::variant<int, std::monostate>(Battle*, Pokemon*, Pokemon*)>;
 using OnDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
@@ -63,13 +65,13 @@ struct EventMethods {
     std::optional<std::function<void(Battle*, Item*, Pokemon*)>> on_after_take_item;
     std::optional<std::function<void(Battle*, const SparseBoostsTable&, Pokemon*, Pokemon*, Effect)>> on_after_boost;
     std::optional<std::function<void(Battle*, int, Pokemon*, Pokemon*, Effect)>> on_after_faint;
-	OnAfterMoveSecondarySelfFunc on_after_move_secondary_self;
-	OnAfterMoveSecondaryFunc on_after_move_secondary;
-	OnAfterMoveFunc on_after_move;
-	VoidSourceMoveFunc on_after_move_self;
+    OnAfterMoveSecondarySelfFunc on_after_move_secondary_self;
+    OnAfterMoveSecondaryFunc on_after_move_secondary;
+    OnAfterMoveFunc on_after_move;
+    VoidSourceMoveFunc on_after_move_self;
     std::optional<std::function<void(Battle*, Pokemon*, Pokemon*)>> on_attract;
     std::optional<std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>> on_accuracy;
-	ModifierSourceMoveFunc on_base_power;
+    ModifierSourceMoveFunc on_base_power;
     std::optional<std::function<void(Battle*, Pokemon*, Effect)>> on_before_faint;
     VoidSourceMoveFunc on_before_move;
     std::optional<std::function<void(Battle*, Pokemon*)>> on_before_switch_in;
@@ -77,7 +79,7 @@ struct EventMethods {
     std::optional<std::function<void(Battle*, Pokemon*)>> on_before_turn;
     std::optional<std::function<void(Battle*, const SparseBoostsTable&, Pokemon*, Pokemon*, Effect)>> on_change_boost;
     std::optional<std::function<void(Battle*, const SparseBoostsTable&, Pokemon*, Pokemon*, Effect)>> on_try_boost;
-	VoidSourceMoveFunc on_charge_move;
+    VoidSourceMoveFunc on_charge_move;
     std::variant<bool, std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*, std::nullptr_t, ActiveMove*)>> on_critical_hit;
     std::optional<std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, Effect)>> on_damage;
 
