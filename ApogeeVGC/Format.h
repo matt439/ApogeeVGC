@@ -46,7 +46,7 @@ const Format RandomGen9Format =
 
 #include <stdexcept>
 
-const Format& get_format(FormatType format_type)
+inline Format get_format(FormatType format_type)
 {
 	switch (format_type)
 	{

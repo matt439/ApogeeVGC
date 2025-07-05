@@ -34,5 +34,12 @@
     <ClInclude Include="Nature.h" />
     <ClInclude Include="EffectData.h" />
     <ClInclude Include="Effect.h" />
+    <ClInclude Include="EventTarget.h" />
+    <ClInclude Include="EventSource.h" />
+    <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveData.h" />
+    <ClInclude Include="MoveEventMethods.h" />
+    <ClInclude Include="ActiveMove.h" />
+    <ClInclude Include="HitEffect.h" />
   </ItemGroup>
 </Project>

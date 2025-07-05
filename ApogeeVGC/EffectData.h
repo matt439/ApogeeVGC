@@ -1,10 +1,14 @@
 #pragma once
 
-#include "Battle.h"
-#include "Pokemon.h"
-#include "Effect.h"
+// #include "Battle.h"
+// #include "Pokemon.h"
+// #include "Effect.h"
 #include <string>
 #include <functional>
+
+class Battle; // Forward declaration
+class Pokemon; // Forward declaration
+class Effect; // Forward declaration
 
 struct EffectData
 {

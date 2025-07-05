@@ -1,3 +1,5 @@
+#include "Battle.h"
+
 
 int main()
 {

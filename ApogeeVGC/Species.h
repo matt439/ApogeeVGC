@@ -4,3 +4,6 @@
 
 class Species : public BasicEffect
 {
+public:
+	Species() = default;
+};

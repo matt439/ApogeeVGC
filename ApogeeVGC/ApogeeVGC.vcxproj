@@ -28,14 +28,21 @@
     <ClCompile Include="Trainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActiveMove.h" />
     <ClInclude Include="Attacker.h" />
     <ClInclude Include="BasicEffect.h" />
     <ClInclude Include="Battle.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectData.h" />
     <ClInclude Include="EffectState.h" />
+    <ClInclude Include="EventSource.h" />
+    <ClInclude Include="EventTarget.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Format.h" />
+    <ClInclude Include="HitEffect.h" />
+    <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveData.h" />
+    <ClInclude Include="MoveEventMethods.h" />
     <ClInclude Include="MoveSlot.h" />
     <ClInclude Include="Nature.h" />
     <ClInclude Include="Pokemon.h" />
@@ -99,6 +106,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\VSIncludes;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\VSIncludes;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -148,6 +161,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
