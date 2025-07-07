@@ -191,30 +191,19 @@ enum class EffectType {
     VALIDATOR_RULE
 };
 
-struct BasicEffect : public EffectData
+struct IBasicEffect : public EffectData
 {
     ID id;
     EffectType effect_type;
     bool exists;
     std::string fullname;
-    int gen;
+    int gen = -1;
     std::string source_effect;
 
     virtual std::string to_string() const {
         return fullname;
     }
 };
-
-//type GameType = 'singles' | 'doubles' | 'triples' | 'rotation' | 'multi' | 'freeforall';
-//type SideID = 'p1' | 'p2' | 'p3' | 'p4';
-//
-//type SpreadMoveTargets = (Pokemon | false | null)[];
-//type SpreadMoveDamage = (number | boolean | undefined)[];
-//type ZMoveOptions = ({ move: string, target : MoveTarget } | null)[];
-//
-//interface BattleScriptsData{
-//    gen: number;
-//}
 
 enum class GameType
 {

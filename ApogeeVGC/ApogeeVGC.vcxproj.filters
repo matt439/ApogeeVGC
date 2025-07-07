@@ -9,6 +9,10 @@
   <ItemGroup>
     <ClCompile Include="program.cpp" />
     <ClCompile Include="battle.cpp" />
+    <ClCompile Include="dex.cpp" />
+    <ClCompile Include="dex-abilities.cpp" />
+    <ClCompile Include="dex-data.cpp" />
+    <ClCompile Include="dex-items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pokemon.h" />
@@ -20,5 +24,12 @@
     <ClInclude Include="dex-abilities.h" />
     <ClInclude Include="dex-conditions.h" />
     <ClInclude Include="field.h" />
+    <ClInclude Include="dex-data.h" />
+    <ClInclude Include="dex.h" />
+    <ClInclude Include="dex-items.h" />
+    <ClInclude Include="dex-species.h" />
+    <ClInclude Include="side.h" />
+    <ClInclude Include="state.h" />
+    <ClInclude Include="IModdedDex.h" />
   </ItemGroup>
 </Project>

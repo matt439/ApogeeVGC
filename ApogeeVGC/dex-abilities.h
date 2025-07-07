@@ -1,5 +1,7 @@
 #pragma once
 
+#include "dex-conditions.h"
+#include "dex-data.h"
 #include <optional>
 
 struct AbilityFlags
@@ -14,4 +16,21 @@ struct AbilityFlags
     std::optional<bool> notransform;    // Disables the Ability if the user is Transformed
 };
 
-// conditiondata
+struct AbilityData : public BasicEffectData
+{
+    std::optional<bool> suppress_weather;
+    std::optional<AbilityFlags> flags;
+    std::optional<int> rating;
+    std::optional<ConditionData> condition;
+};
+
+struct Ability : public BasicEffect
+{
+    static constexpr const char* effect_type = "Ability";
+    int rating = 0;
+    bool suppress_weather = false;
+    AbilityFlags flags;
+    std::optional<ConditionData> condition;
+
+    Ability(const AbilityData& data);
+};

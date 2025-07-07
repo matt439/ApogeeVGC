@@ -991,7 +991,8 @@ struct FieldConditionData : public Condition, public FieldEventMethods
 
 using ConditionData = std::variant<PokemonConditionData, SideConditionData, FieldConditionData>;
 
-struct Condition : public BasicEffect {
+struct Condition : public BasicEffect
+{
 	// Effect type (Condition, Weather, Status, Terrain)
 	EffectType effect_type = EffectType::CONDITION;
 
