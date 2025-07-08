@@ -10,8 +10,6 @@
     <ClCompile Include="program.cpp" />
     <ClCompile Include="battle\Battle.cpp" />
     <ClCompile Include="dex.cpp" />
-    <ClCompile Include="dex-abilities.cpp" />
-    <ClCompile Include="dex-items.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
     <ClCompile Include="dex-data\to_id.cpp" />
@@ -23,21 +21,14 @@
     <ClCompile Include="dex-data\ModdedNatureData.cpp" />
     <ClCompile Include="dex-data\DexNatures.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
+    <ClCompile Include="dex-abilities\Ability.cpp" />
+    <ClCompile Include="dex-items\ItemInitData.cpp" />
+    <ClCompile Include="dex-items\Item.cpp" />
+    <ClCompile Include="dex-items\DexItems.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pokemon.h" />
     <ClInclude Include="battle\Battle.h" />
-    <ClInclude Include="dex-formats.h" />
-    <ClInclude Include="teams.h" />
-    <ClInclude Include="dex-moves.h" />
-    <ClInclude Include="dex-abilities.h" />
-    <ClInclude Include="dex-conditions.h" />
-    <ClInclude Include="field.h" />
     <ClInclude Include="dex.h" />
-    <ClInclude Include="dex-items.h" />
-    <ClInclude Include="dex-species.h" />
-    <ClInclude Include="side.h" />
-    <ClInclude Include="state.h" />
     <ClInclude Include="dex\IModdedDex.h" />
     <ClInclude Include="global-types\GenderName.h" />
     <ClInclude Include="global-types\StatIDExceptHP.h" />
@@ -90,5 +81,41 @@
     <ClInclude Include="dex-data\NatureDataTable.h" />
     <ClInclude Include="dex-data\DexTypes.h" />
     <ClInclude Include="dex-data\DexStats.h" />
+    <ClInclude Include="dex-moves\function_type_aliases.h" />
+    <ClInclude Include="dex-moves\type_aliases.h" />
+    <ClInclude Include="dex-moves\SecondaryEffect.h" />
+    <ClInclude Include="dex-moves\MoveEventMethods.h" />
+    <ClInclude Include="dex-moves\ZMoveData.h" />
+    <ClInclude Include="dex-moves\MaxMoveData.h" />
+    <ClInclude Include="dex-moves\SelfBoost.h" />
+    <ClInclude Include="dex-moves\MoveData.h" />
+    <ClInclude Include="dex-moves\Move.h" />
+    <ClInclude Include="dex-moves\DexMoves.h" />
+    <ClInclude Include="dex-abilities\AbilityFlags.h" />
+    <ClInclude Include="dex-abilities\AbilityData.h" />
+    <ClInclude Include="dex-conditions\PokemonConditionData.h" />
+    <ClInclude Include="dex-conditions\SideConditionData.h" />
+    <ClInclude Include="dex-conditions\FieldConditionData.h" />
+    <ClInclude Include="dex-conditions\ConditionData.h" />
+    <ClInclude Include="dex-conditions\DexConditions.h" />
+    <ClInclude Include="dex-abilities\Ability.h" />
+    <ClInclude Include="dex-abilities\DexAbilities.h" />
+    <ClInclude Include="dex-format\Format.h" />
+    <ClInclude Include="dex-format\DexFormats.h" />
+    <ClInclude Include="dex-format\DEFAULT_MOD.h" />
+    <ClInclude Include="dex-items\FlingData.h" />
+    <ClInclude Include="dex-items\ItemData.h" />
+    <ClInclude Include="dex-items\ModdedItemData.h" />
+    <ClInclude Include="dex-items\ItemDataTable.h" />
+    <ClInclude Include="dex-items\ModdedItemDataTable.h" />
+    <ClInclude Include="dex-items\ItemInitData.h" />
+    <ClInclude Include="dex-items\Item.h" />
+    <ClInclude Include="dex-items\DexItems.h" />
+    <ClInclude Include="dex-species\DexSpecies.h" />
+    <ClInclude Include="field\Field.h" />
+    <ClInclude Include="teams\PokemonSet.h" />
+    <ClInclude Include="pokemon\MoveSlot.h" />
+    <ClInclude Include="pokemon\EffectState.h" />
+    <ClInclude Include="pokemon\Pokemon.h" />
   </ItemGroup>
 </Project>

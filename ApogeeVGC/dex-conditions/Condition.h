@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../global-types/ba"
+#include "../dex-data/BasicEffect.h"
 
 class Condition : public BasicEffect
 {

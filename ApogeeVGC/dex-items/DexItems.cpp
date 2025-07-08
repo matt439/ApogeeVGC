@@ -1,10 +1,6 @@
-#include "dex-items.h"
+#include "DexItems.h"
 
-ItemInitData::ItemInitData(const std::string& name, bool exists)
-    : BasicEffectData(name, exists),
-    plus(std::nullopt), minus(std::nullopt)
-{
-}
+#include "../dex-data/to_id.h"
 
 explicit DexItems::DexItems(IModdedDex* dex_ptr)
     : dex(dex_ptr), all_cache(std::nullopt)

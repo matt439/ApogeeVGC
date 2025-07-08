@@ -1,4 +1,4 @@
-#include "dex-abilities.h"
+#include "Ability.h"
 
 Ability::Ability(const AbilityData& data) : BasicEffect(data)
 {
