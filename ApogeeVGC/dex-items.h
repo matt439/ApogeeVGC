@@ -34,8 +34,10 @@ struct ModdedItemData : public PokemonEventMethods
 using ItemDataTable = std::unordered_map<std::string, ItemData>;
 using ModdedItemDataTable = std::unordered_map<std::string, ModdedItemData>;
 
-struct ItemData : public BasicEffectData
+struct ItemInitData : public BasicEffectData
 {
+    ItemInitData(const std::string& name, bool exists);
+    
     std::optional<FlingData> fling;
     std::optional<std::string> on_drive;
     std::optional<std::string> on_memory;
@@ -146,7 +148,7 @@ struct Item : public BasicEffect
     std::optional<std::function<void(Battle*, Pokemon*)>> on_start;
     std::optional<std::function<void(Battle*, Pokemon*)>> on_end;
 
-	Item(const ItemData& data) :
+	Item(const ItemInitData& data) :
         BasicEffect(data),
         fling(data.fling),
         on_drive(data.on_drive),

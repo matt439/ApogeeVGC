@@ -1,18 +1,9 @@
-#include "dex-data.h"
+#include "DexNatures.h"
 
-BasicEffectData::BasicEffectData(const std::string& name, bool exists)
-	: name(name), exists(exists)
-{
-}
+#include "to_id.h"
 
 explicit DexNatures::DexNatures(IModdedDex* dex_ptr)
     : dex(dex_ptr), all_cache(std::nullopt)
-{
-}
-
-NatureData::NatureData(const std::string& name, bool exists)
-	: BasicEffectData(name, exists),
-	plus(std::nullopt), minus(std::nullopt)
 {
 }
 
@@ -27,7 +18,7 @@ const Nature& DexNatures::get(const std::string& name)
     return get_by_id(id);
 }
 
-static const Nature EMPTY_NATURE(NatureData( "", false ));
+static const Nature EMPTY_NATURE = Nature();
 
 const Nature& DexNatures::get_by_id(const std::string& id)
 {
@@ -52,8 +43,10 @@ const Nature& DexNatures::get_by_id(const std::string& id)
     auto& natures_map = dex->get_data_cache() ? dex->get_data_cache()->natures : dex->data().natures;
     auto data_it = natures_map.find(id);
     Nature nature = (data_it != natures_map.end())
-        ? Nature(data_it->second)
-        : Nature(NatureData(id, false));
+        ? Nature(BasicEffect(BasicEffectData(data_it->second.name, true)), data_it->second)
+        : Nature(BasicEffect(BasicEffectData(id, false)), NatureData{});
+
+
 
     // If the nature's gen is greater than the dex's gen, mark as nonstandard (pseudo-code)
     if (nature.gen > dex->get_gen())
@@ -66,10 +59,8 @@ const Nature& DexNatures::get_by_id(const std::string& id)
         nature_cache[id] = nature;
         return nature_cache[id];
     }
-    // Return the temporary/dummy nature (not cached)
-    static Nature dummy_nature(NatureData("", false));
-    dummy_nature = nature;
-    return dummy_nature;
+
+    return Nature(); // return an empty nature if not found
 }
 
 const std::vector<Nature>& DexNatures::all()

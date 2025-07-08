@@ -34,3 +34,8 @@ struct Ability : public BasicEffect
 
     Ability(const AbilityData& data);
 };
+
+class DexAbilities
+{
+    int x;
+};

@@ -2,11 +2,6 @@
 
 // using namespace rapidjson;
 
-Battle::Battle()
-{
-	//this->_event.insert({ "id", "" });
-}
-
 //add(...parts: (Part | (() = > { side: SideID, secret : string, shared : string }))[]) {
 //	if (!parts.some(part = > typeof part == = 'function')) {
 //		this.log.push(`|${ parts.join('|') }`);

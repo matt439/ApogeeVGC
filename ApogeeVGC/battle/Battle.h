@@ -1,8 +1,7 @@
 #pragma once
 
-//#include "side.h"
-#include "dex-moves.h"
-#include "global-types.h"
+
+
 // #include "rapidjson/document.h"
 #include <variant>
 #include <string>
@@ -15,37 +14,11 @@ class Pokemon;
 class EffectState;
 class Format;
 
-using Part = std::variant<
-	std::monostate,           // for null/undefined
-	std::string,
-	int,                   // for number
-	bool,
-	Pokemon*,
-	Side*,
-	Effect*,
-	Move*>;
-
-// For target
-using Target = std::variant<
-	std::monostate,           // for null
-	std::string,
-	Pokemon*,
-	Side*,
-	Field*,
-	Battle*>;
-
-// For source
-using Source = std::variant<
-	std::monostate,           // for null
-	std::string,
-	Pokemon*,
-	Effect*,
-	bool>;                     // only 'false' is valid, document this
-
 class Battle
 {
 public:
-	Battle();
+	Battle() = default;
+	Battle(const Battle&) = default;
 	void* single_event(
 		const std::string& event_id,
 		const Effect& effect,

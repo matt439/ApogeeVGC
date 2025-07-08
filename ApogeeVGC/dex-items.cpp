@@ -1,5 +1,11 @@
 #include "dex-items.h"
 
+ItemInitData::ItemInitData(const std::string& name, bool exists)
+    : BasicEffectData(name, exists),
+    plus(std::nullopt), minus(std::nullopt)
+{
+}
+
 explicit DexItems::DexItems(IModdedDex* dex_ptr)
     : dex(dex_ptr), all_cache(std::nullopt)
 {

@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <array>
 
 struct ModdedDex;
 
@@ -29,24 +30,6 @@ const std::filesystem::path DATA_DIR = std::filesystem::path(__FILE__).parent_pa
 const std::filesystem::path MODS_DIR = DATA_DIR / "mods";
 
 std::unordered_map<std::string, ModdedDex> dexes;
-
-enum class DataType
-{
-    ABILITIES,
-    RULESETS,
-    FORMATS_DATA,
-    ITEMS,
-    LEARNSETS,
-    MOVES,
-    NATURES,
-    POKEDEX,
-    SCRIPTS,
-    CONDITIONS,
-    TYPE_CHART,
-    POKEMON_GO_DATA,
-};
-
-#include <array>
 
 constexpr std::array<DataType, 12> DATA_TYPES =
 {
@@ -125,8 +108,6 @@ struct DescriptionResult
 //struct DexNatures;
 //struct DexTypes;
 //struct DexStats;
-
-
 
 struct ModdedDex : public IModdedDex
 {

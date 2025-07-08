@@ -56,6 +56,26 @@ using OnTryImmunityFunc = std::function<BoolOrNullOrStringOrVoid(Battle*, Pokemo
 using OnTryMoveFunc = std::function<BoolOrNullOrStringOrVoid(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnUseMoveMessageFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 
+
+
+struct SecondaryEffect : public HitEffect
+{
+    std::optional<int> chance = std::nullopt;
+
+    // Used to flag a secondary effect as added by Poison Touch
+    std::optional<Ability*> ability = std::nullopt;
+
+    /**
+     * Gen 2 specific mechanics: Bypasses Substitute only on Twineedle,
+     * and allows it to flinch sleeping/frozen targets
+     */
+    std::optional<bool> kingsrock = std::nullopt;
+    std::optional<HitEffect> self = std::nullopt;
+
+    SecondaryEffect() = default;
+    SecondaryEffect(const SecondaryEffect&) = default;
+};
+
 struct MoveEventMethods
 {
     BasePowerCallbackFunc base_power_callback;
@@ -94,52 +114,33 @@ struct MoveEventMethods
     OnUseMoveMessageFunc on_use_move_message;
 };
 
-struct HitEffect
-{
-    // Optional function, type depends on MoveEventMethods::on_hit signature  
-    std::optional<OnHitFunc> on_hit;
+//struct HitEffect
+//{
+//    // Optional function, type depends on MoveEventMethods::on_hit signature  
+//    std::optional<OnHitFunc> on_hit;
+//
+//    // set pokemon conditions  
+//    std::optional<SparseBoostsTable> boosts;
+//    std::optional<std::string> status;
+//    std::optional<std::string> volatile_status;
+//
+//    // set side/slot conditions  
+//    std::optional<std::string> side_condition;
+//    std::optional<std::string> slot_condition;
+//
+//    // set field conditions  
+//    std::optional<std::string> pseudo_weather;
+//    std::optional<std::string> terrain;
+//    std::optional<std::string> weather;
+//};
 
-    // set pokemon conditions  
-    std::optional<SparseBoostsTable> boosts;
-    std::optional<std::string> status;
-    std::optional<std::string> volatile_status;
-
-    // set side/slot conditions  
-    std::optional<std::string> side_condition;
-    std::optional<std::string> slot_condition;
-
-    // set field conditions  
-    std::optional<std::string> pseudo_weather;
-    std::optional<std::string> terrain;
-    std::optional<std::string> weather;
-};
-
-struct SecondaryEffect : public HitEffect
-{
-    std::optional<int> chance;                  // Probability of the effect
-    std::optional<Ability*> ability;            // Pointer to Ability, optional
-    std::optional<bool> kingsrock;              // Gen 2 specific mechanics flag
-    std::optional<HitEffect> self;              // Nested HitEffect, optional
-};
-
-enum class MoveCategory
-{
-    PHYSICAL,
-    SPECIAL,
-    STATUS,
-};
-
-enum class SelfSwitchType
-{
-    COPY_VOLATILE,
-    SHED_TAIL,
-};
-
-enum class SelfDestructType
-{
-    ALWAYS,
-    IF_HIT,
-};
+//struct SecondaryEffect : public HitEffect
+//{
+//    std::optional<int> chance;                  // Probability of the effect
+//    std::optional<Ability*> ability;            // Pointer to Ability, optional
+//    std::optional<bool> kingsrock;              // Gen 2 specific mechanics flag
+//    std::optional<HitEffect> self;              // Nested HitEffect, optional
+//};
 
 struct ZMoveData
 {
@@ -211,7 +212,8 @@ struct MoveData : public EffectData, MoveEventMethods, HitEffect
     std::optional<int> crit_modifier;
     std::optional<int> crit_ratio;
     std::optional<std::string> override_offensive_pokemon; // 'target' | 'source'
-    std::optional<StatIDExceptHP> override_offensive_stat;
+    std::optional<
+    > override_offensive_stat;
     std::optional<std::string> override_defensive_pokemon; // 'target' | 'source'
     std::optional<StatIDExceptHP> override_defensive_stat;
     std::optional<bool> force_stab;
@@ -255,4 +257,9 @@ struct MoveData : public EffectData, MoveEventMethods, HitEffect
 struct Move
 {
 	Move() = default;
+};
+
+class DexMoves
+{
+    int x;
 };

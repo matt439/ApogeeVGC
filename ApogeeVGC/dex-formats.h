@@ -22,17 +22,14 @@ const std::string DEFAULT_MOD = "gen9";
 // Set
 // AnyObject
 
-enum class FormatEffectType
-{
-	FORMAT,
-	RULESET,
-	RULE,
-	VALIDATOR_RULE,
-};
-
 class Format
 {
 public:
 	Format() = default;
+	int x;
+};
+
+class DexFormats
+{
 	int x;
 };
