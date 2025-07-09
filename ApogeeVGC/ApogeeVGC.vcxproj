@@ -103,7 +103,10 @@
     <ClInclude Include="dex-moves\ZMoveData.h" />
     <ClInclude Include="dex-species\DexSpecies.h" />
     <ClInclude Include="dex.h" />
+    <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DataType.h" />
+    <ClInclude Include="dex\DATA_FILES.h" />
+    <ClInclude Include="dex\DATA_TYPES.h" />
     <ClInclude Include="field\Field.h" />
     <ClInclude Include="global-types\BattleScriptsData.h" />
     <ClInclude Include="global-types\BoostID.h" />

@@ -117,5 +117,8 @@
     <ClInclude Include="pokemon\MoveSlot.h" />
     <ClInclude Include="pokemon\EffectState.h" />
     <ClInclude Include="pokemon\Pokemon.h" />
+    <ClInclude Include="dex\DATA_TYPES.h" />
+    <ClInclude Include="dex\constants.h" />
+    <ClInclude Include="dex\DATA_FILES.h" />
   </ItemGroup>
 </Project>
