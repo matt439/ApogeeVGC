@@ -2,20 +2,17 @@
 
 #include "../global-types/type_aliases.h"
 #include "../dex-conditions/ConditionData.h"
+#include "../dex-abilities/AbilityData.h"
+#include "../dex-format/FormatData.h"
+#include "../dex-items/ItemData.h"
+#include "../dex-species/LearnsetData.h"
+#include "../dex-moves/MoveData.h"
+#include "../dex-data/NatureData.h"
+#include "../dex-species/SpeciesData.h"
+#include "../dex-species/SpeciesFormatsData.h"
+#include "../dex-species/PokemonGoData.h"
 #include "DexTable.h"
-
-// forward declarations
-struct AbilityData;
-struct FormatData;
-struct ItemData;
-struct LearnsetData;
-struct MoveData;
-struct NatureData;
-struct SpeciesData;
-struct SpeciesFormatsData;
-struct PokemonGoData;
-
-struct TypeData;
+#include "TypeData.h"
 
 struct DexTableData
 {

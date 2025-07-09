@@ -1,11 +1,10 @@
 #pragma once
 
 #include "../global-types/Effect.h"
+#include "../battle/Battle.h"
+#include "../side/Side.h"
+#include "../pokemon/Pokemon.h"
 #include <functional>
-
-class Battle;
-class Side;
-class Pokemon;
 
 using OnSideStartFunc = std::function<void(Battle*, Side*, Pokemon*, Effect)>;
 using OnSideRestartFunc = std::function<void(Battle*, Side*, Pokemon*, Effect)>;

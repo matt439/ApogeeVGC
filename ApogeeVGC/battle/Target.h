@@ -1,12 +1,12 @@
 #pragma once
 
+#include "../pokemon/Pokemon.h"
+#include "../side/Side.h"
+#include "../field/Field.h"
+#include "Battle.h"
 #include <variant>
 #include <string>
-
-class Pokemon;
-class Side;
-class Field;
-class Battle;
+#include <xutility>
 
 // For target
 using Target = std::variant<

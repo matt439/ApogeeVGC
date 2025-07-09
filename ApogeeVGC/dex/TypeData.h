@@ -6,5 +6,5 @@
 // helper structs for ModdedDex
 struct TypeData
 {
-    std::unordered_map<std::string, int> damage_taken;
+    std::unordered_map<std::string, int> damage_taken = {};
 };

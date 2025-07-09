@@ -1,13 +1,12 @@
 #pragma once
 
+#include "../battle/Battle.h"
+#include "../pokemon/Pokemon.h"
 #include "NonStandard.h"
 #include "Effect.h"
 #include <optional>
 #include <string>
 #include <functional>
-
-class Battle;
-class Pokemon;
 
 struct EffectData
 {

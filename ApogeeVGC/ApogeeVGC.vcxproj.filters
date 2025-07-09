@@ -128,5 +128,22 @@
     <ClInclude Include="dex\DescriptionResult.h" />
     <ClInclude Include="dex\ModdedDex.h" />
     <ClInclude Include="dex\dexes.h" />
+    <ClInclude Include="dex-items\EMPTY_ITEM.h" />
+    <ClInclude Include="dex-moves\MutableMove.h" />
+    <ClInclude Include="dex-moves\ActiveMove.h" />
+    <ClInclude Include="dex-moves\MoveHitData.h" />
+    <ClInclude Include="dex-moves\MoveHitResult.h" />
+    <ClInclude Include="side\Side.h" />
+    <ClInclude Include="global-types\AbilityText.h" />
+    <ClInclude Include="global-types\MoveText.h" />
+    <ClInclude Include="global-types\ItemText.h" />
+    <ClInclude Include="global-types\PokedexText.h" />
+    <ClInclude Include="global-types\DefaultText.h" />
+    <ClInclude Include="dex-species\Species.h" />
+    <ClInclude Include="dex-format\FormatData.h" />
+    <ClInclude Include="dex-species\LearnsetData.h" />
+    <ClInclude Include="dex-species\SpeciesData.h" />
+    <ClInclude Include="dex-species\SpeciesFormatsData.h" />
+    <ClInclude Include="dex-species\PokemonGoData.h" />
   </ItemGroup>
 </Project>

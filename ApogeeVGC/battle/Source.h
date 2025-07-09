@@ -1,11 +1,10 @@
 #pragma once
 
-
+#include "../pokemon/Pokemon.h"
 #include "../global-types/Effect.h"
 #include <variant>
 #include <string>
-
-class Pokemon;
+#include <xutility>
 
 using Source = std::variant<
 	std::monostate,           // for null

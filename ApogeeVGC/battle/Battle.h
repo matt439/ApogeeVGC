@@ -7,11 +7,6 @@
 #include <optional>
 #include <any>
 
-//// Forward declarations
-//class Field;
-//class Pokemon;
-//class Format;
-
 class Battle
 {
 public:

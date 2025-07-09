@@ -4,6 +4,6 @@
 
 struct DescriptionResult
 {
-    std::string desc;
-    std::string short_desc;
+	std::string desc = "";
+	std::string short_desc = "";
 };

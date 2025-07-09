@@ -1,13 +1,11 @@
 #pragma once
 
+#include "../global-types/AbilityText.h"
+#include "../global-types/ItemText.h"
+#include "../global-types/MoveText.h"
+#include "../global-types/PokedexText.h"
+#include "../global-types/DefaultText.h"
 #include "DexTable.h"
-
-// Forward declarations
-class AbilityText;
-class ItemText;
-class MoveText;
-class PokedexText;
-class DefaultText;
 
 struct TextTableData
 {

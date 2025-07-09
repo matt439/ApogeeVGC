@@ -1,13 +1,13 @@
 #pragma once
 
+#include "../battle/Battle.h"
+#include "../pokemon/Pokemon.h"
+#include "../dex-moves/ActiveMove.h"
 #include "Effect.h"
 #include <functional>
 #include <optional>
 #include <string>
 #include <variant>
-
-class Battle;
-class Pokemon;
 
 // Function type aliases
 using ModifierEffectFunc = std::function<std::optional<int>(Battle*, int, Pokemon*, Pokemon*, Effect)>;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "function_type_aliases.h"
+#include "../global-types/type_aliases.h"
 #include <optional>
 #include <string>
 

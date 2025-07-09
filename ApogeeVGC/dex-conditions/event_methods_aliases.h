@@ -4,17 +4,17 @@
 #include "../global-types/type_aliases.h"
 #include "../global-types/function_type_aliases.h"
 #include "../dex-moves/SecondaryEffect.h"
+#include "../battle/Battle.h"
+#include "../pokemon/Pokemon.h"
+#include "../dex-items/Item.h"
+#include "../dex-moves/ActiveMove.h"
+#include "../side/Side.h"
+#include "Condition.h"
 #include <functional>
 #include <variant>
 #include <optional>
 #include <string>
 #include <vector>
-
-class Battle;
-class Pokemon;
-class Condition;
-class Item;
-class Side;
 
 using OnDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnEmergencyExitFunc = std::function<void(Battle*, Pokemon*)>;

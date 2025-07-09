@@ -76,8 +76,10 @@
     <ClInclude Include="dex-format\DEFAULT_MOD.h" />
     <ClInclude Include="dex-format\DexFormats.h" />
     <ClInclude Include="dex-format\Format.h" />
+    <ClInclude Include="dex-format\FormatData.h" />
     <ClInclude Include="dex-format\FormatEffectType.h" />
     <ClInclude Include="dex-items\DexItems.h" />
+    <ClInclude Include="dex-items\EMPTY_ITEM.h" />
     <ClInclude Include="dex-items\FlingData.h" />
     <ClInclude Include="dex-items\Item.h" />
     <ClInclude Include="dex-items\ItemData.h" />
@@ -85,6 +87,7 @@
     <ClInclude Include="dex-items\ItemInitData.h" />
     <ClInclude Include="dex-items\ModdedItemData.h" />
     <ClInclude Include="dex-items\ModdedItemDataTable.h" />
+    <ClInclude Include="dex-moves\ActiveMove.h" />
     <ClInclude Include="dex-moves\DexMoves.h" />
     <ClInclude Include="dex-moves\function_type_aliases.h" />
     <ClInclude Include="dex-moves\HitEffect.h" />
@@ -94,7 +97,10 @@
     <ClInclude Include="dex-moves\MoveData.h" />
     <ClInclude Include="dex-moves\MoveEventMethods.h" />
     <ClInclude Include="dex-moves\MoveFlags.h" />
+    <ClInclude Include="dex-moves\MoveHitData.h" />
+    <ClInclude Include="dex-moves\MoveHitResult.h" />
     <ClInclude Include="dex-moves\MoveTarget.h" />
+    <ClInclude Include="dex-moves\MutableMove.h" />
     <ClInclude Include="dex-moves\SecondaryEffect.h" />
     <ClInclude Include="dex-moves\SelfBoost.h" />
     <ClInclude Include="dex-moves\SelfDestructType.h" />
@@ -102,6 +108,11 @@
     <ClInclude Include="dex-moves\type_aliases.h" />
     <ClInclude Include="dex-moves\ZMoveData.h" />
     <ClInclude Include="dex-species\DexSpecies.h" />
+    <ClInclude Include="dex-species\LearnsetData.h" />
+    <ClInclude Include="dex-species\PokemonGoData.h" />
+    <ClInclude Include="dex-species\Species.h" />
+    <ClInclude Include="dex-species\SpeciesData.h" />
+    <ClInclude Include="dex-species\SpeciesFormatsData.h" />
     <ClInclude Include="dex\AliasesTable.h" />
     <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DataType.h" />
@@ -116,9 +127,11 @@
     <ClInclude Include="dex\TypeData.h" />
     <ClInclude Include="dex\TypesManager.h" />
     <ClInclude Include="field\Field.h" />
+    <ClInclude Include="global-types\AbilityText.h" />
     <ClInclude Include="global-types\BattleScriptsData.h" />
     <ClInclude Include="global-types\BoostID.h" />
     <ClInclude Include="global-types\CommonHandlers.h" />
+    <ClInclude Include="global-types\DefaultText.h" />
     <ClInclude Include="global-types\DoublesTier.h" />
     <ClInclude Include="global-types\Effect.h" />
     <ClInclude Include="global-types\EffectData.h" />
@@ -126,9 +139,12 @@
     <ClInclude Include="global-types\function_type_aliases.h" />
     <ClInclude Include="global-types\GameType.h" />
     <ClInclude Include="global-types\GenderName.h" />
+    <ClInclude Include="global-types\ItemText.h" />
     <ClInclude Include="global-types\ModdedEffectData.h" />
+    <ClInclude Include="global-types\MoveText.h" />
     <ClInclude Include="global-types\NonStandard.h" />
     <ClInclude Include="global-types\OtherTier.h" />
+    <ClInclude Include="global-types\PokedexText.h" />
     <ClInclude Include="global-types\SideID.h" />
     <ClInclude Include="global-types\SinglesTier.h" />
     <ClInclude Include="global-types\StatID.h" />
@@ -139,6 +155,7 @@
     <ClInclude Include="pokemon\EffectState.h" />
     <ClInclude Include="pokemon\MoveSlot.h" />
     <ClInclude Include="pokemon\Pokemon.h" />
+    <ClInclude Include="side\Side.h" />
     <ClInclude Include="teams\PokemonSet.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

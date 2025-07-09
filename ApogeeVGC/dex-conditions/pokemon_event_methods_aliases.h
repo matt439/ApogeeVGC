@@ -2,18 +2,17 @@
 
 #include "../global-types/Effect.h"
 #include "../global-types/type_aliases.h"
+#include "../battle/Battle.h"
+#include "../pokemon/Pokemon.h"
+#include "../dex-moves/ActiveMove.h"
+#include "../dex-items/Item.h"
+#include "../dex-conditions/Condition.h"
+#include "../side/Side.h"
 #include <functional>
 #include <optional>
 #include <string>
 #include <variant>
 #include <vector>
-
-class Battle;
-class Pokemon;
-class ActiveMove;
-class Item;
-class Condition;
-class Side;
 
 using OnAllyDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnAllyAfterEachBoostFunc = std::function<void(Battle*, SparseBoostsTable, Pokemon*, Pokemon*)>;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../pokemon/Pokemon.h"
 #include "StatID.h"
 #include "StatIDExceptHP.h"
 #include "BoostID.h"
@@ -11,9 +12,6 @@
 #include <any>
 #include <optional>
 #include <variant>
-
-class Pokemon; // Forward declaration
-
 
 using ID = std::string; // Lowercase alphanumeric string, can be empty
 using IDEntry = std::string; // Lowercase alphanumeric string, can be empty

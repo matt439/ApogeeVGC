@@ -99,5 +99,6 @@ struct Item : public BasicEffect
 	std::optional<std::function<void(Battle*, Pokemon*)>> on_start = std::nullopt;
 	std::optional<std::function<void(Battle*, Pokemon*)>> on_end = std::nullopt;
 
+	Item() = default;
     Item(const ItemInitData& data);
 };
