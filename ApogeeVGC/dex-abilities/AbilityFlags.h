@@ -5,26 +5,26 @@
 struct AbilityFlags
 {
     // Can be suppressed by Mold Breaker and related effects
-    std::optional<bool> breakable = std::nullopt;
+    bool* breakable = nullptr; // optional
 
     // Ability can't be suppressed by e.g. Gastro Acid or Neutralizing Gas
-    std::optional<bool> cantsuppress = std::nullopt;
+    bool* cantsuppress = nullptr; // optional
 
     // Role Play fails if target has this Ability
-    std::optional<bool> failroleplay = std::nullopt;
+    bool* failroleplay = nullptr; // optional
 
     // Skill Swap fails if either the user or target has this Ability
-    std::optional<bool> failskillswap = std::nullopt;
+    bool* failskillswap = nullptr; // optional
 
     // Entrainment fails if user has this Ability
-    std::optional<bool> noentrain = std::nullopt;
+    bool* noentrain = nullptr; // optional
 
     // Receiver and Power of Alchemy will not activate if an ally faints with this Ability
-    std::optional<bool> noreceiver = std::nullopt;
+    bool* noreceiver = nullptr; // optional
 
     // Trace cannot copy this Ability
-    std::optional<bool> notrace = std::nullopt;
+    bool* notrace = nullptr; // optional
 
     // Disables the Ability if the user is Transformed
-    std::optional<bool> notransform = std::nullopt;
+    bool* notransform = nullptr; // optional
 };

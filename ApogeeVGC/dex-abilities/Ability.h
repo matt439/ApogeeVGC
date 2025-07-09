@@ -10,7 +10,7 @@ struct Ability : public BasicEffect
     int rating = 0;
     bool suppress_weather = false;
 	AbilityFlags flags = AbilityFlags{};
-	std::optional<ConditionData> condition = std::nullopt;
+	ConditionData* condition = nullptr; // optional
 
 	Ability() = default;
 	Ability(const Ability&) = default;

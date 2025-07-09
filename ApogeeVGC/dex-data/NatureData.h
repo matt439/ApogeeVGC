@@ -8,15 +8,15 @@
 struct NatureData
 {
     std::string name = ""; // also in BasicEffect
-	std::optional<StatIDExceptHP> plus = std::nullopt;
-    std::optional<StatIDExceptHP> minus = std::nullopt;
+	const StatIDExceptHP* plus = nullptr; // optional
+    const StatIDExceptHP* minus = nullptr; // optional
 
     NatureData() = default;
     NatureData(const NatureData&) = default;
-    NatureData(const std::string& name, const std::optional<StatIDExceptHP>& plus = std::nullopt,
-        const std::optional<StatIDExceptHP>& minus = std::nullopt);
+    NatureData(const std::string& name, const StatIDExceptHP* plus = nullptr,
+        const StatIDExceptHP* minus = nullptr);
 
     NatureData(const BasicEffectData& basic_effect_data,
-        const std::optional<StatIDExceptHP>& plus = std::nullopt,
-        const std::optional<StatIDExceptHP>& minus = std::nullopt);
+        const StatIDExceptHP* plus = nullptr,
+        const StatIDExceptHP* minus = nullptr);
 };

@@ -1,12 +1,17 @@
 #pragma once
 
-#include "../pokemon/Pokemon.h"
-#include "../side/Side.h"
-#include "../field/Field.h"
-#include "Battle.h"
+//#include "../pokemon/Pokemon.h"
+//#include "../side/Side.h"
+//#include "../field/Field.h"
+//#include "Battle.h"
 #include <variant>
 #include <string>
-#include <xutility>
+
+// forward declarations
+class Pokemon;
+class Side;
+class Field;
+class Battle;
 
 // For target
 using Target = std::variant<

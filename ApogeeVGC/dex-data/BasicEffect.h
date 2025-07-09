@@ -5,7 +5,6 @@
 #include "../global-types/EffectData.h"
 #include "BasicEffectData.h"
 #include <string>
-#include <optional>
 
 struct BasicEffect : public EffectData
 {
@@ -61,17 +60,17 @@ struct BasicEffect : public EffectData
      * that have no use in standard formats: made-up pokemon (CAP),
      * glitches (MissingNo etc), Pokestar pokemon, etc.
      */
-    std::optional<NonStandard> is_nonstandard = std::nullopt;
+    NonStandard* is_nonstandard = nullptr; // optional
     /** The duration of the condition - only for pure conditions. */
-    std::optional<int> duration = std::nullopt;
+    int* duration = nullptr; // optional
     /** Whether or not the condition is ignored by Baton Pass - only for pure conditions. */
     bool no_copy = false;
     /** Whether or not the condition affects fainted Pokemon. */
     bool affects_fainted = false;
     /** Moves only: what status does it set? */
-    std::optional<std::string> status = std::nullopt;
+    std::string* status = nullptr; // optional
     /** Moves only: what weather does it set? */
-    std::optional<std::string> weather = std::nullopt;
+    std::string* weather = nullptr; // optional
     /** ??? */
     std::string source_effect = "";
 

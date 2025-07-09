@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../global-types/type_aliases.h"
+#include "../global-types/IDEntry.h"
 #include <unordered_map>
 #include <string>
 

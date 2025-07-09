@@ -4,7 +4,6 @@
 #include "../pokemon/EffectState.h"
 #include "Target.h"
 #include "Source.h"
-#include <optional>
 #include <any>
 
 class Battle
@@ -16,12 +15,12 @@ public:
 	void* single_event(
 		const std::string& event_id,
 		const Effect& effect,
-		std::optional<EffectState*> state, // nullable
 		Target& target,
-		std::optional<Source> source = std::nullopt,
-		std::optional<std::variant<Effect*, std::string, std::monostate>> source_effect = std::nullopt,
-		std::optional<std::any> relay_var = std::nullopt,
-		std::optional<std::any> custom_callback = std::nullopt);
+		EffectState* state = nullptr, // optional, nullable
+		Source* source = nullptr, // optional
+		std::variant<Effect*, std::string, std::monostate>* source_effect = nullptr, // optional
+		std::any* relay_var = nullptr, // optional
+		std::any* custom_callback = nullptr); // optional
 private:
 	unsigned int _id = 0;
 	unsigned int _seed = 0;

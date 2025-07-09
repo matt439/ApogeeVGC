@@ -8,7 +8,7 @@ class DexNatures
 public:
     IModdedDex* dex = nullptr;
     std::unordered_map<std::string, Nature> nature_cache = {};
-    std::optional<std::vector<Nature>> all_cache = std::nullopt;
+    std::vector<Nature>* all_cache = nullptr; // optional
 
     DexNatures() = default;
     DexNatures(const DexNatures&) = default;

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35913.81 d17.13
+VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.vcxproj", "{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEnvironment", "TestEnvironment\TestEnvironment.vcxproj", "{176B85FF-843B-4902-BE1E-DF91366B347A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x64.Build.0 = Release|x64
 		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x86.ActiveCfg = Release|Win32
 		{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}.Release|x86.Build.0 = Release|Win32
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x64.ActiveCfg = Debug|x64
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x64.Build.0 = Debug|x64
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x86.ActiveCfg = Debug|Win32
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Debug|x86.Build.0 = Debug|Win32
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x64.ActiveCfg = Release|x64
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x64.Build.0 = Release|x64
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x86.ActiveCfg = Release|Win32
+		{176B85FF-843B-4902-BE1E-DF91366B347A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

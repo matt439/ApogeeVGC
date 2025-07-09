@@ -5,11 +5,11 @@
 
 struct FieldEventMethods : public EventMethods
 {
-	std::optional<OnFieldStartFunc> on_field_start = std::nullopt;
-	std::optional<OnFieldRestartFunc> on_field_restart = std::nullopt;
-	std::optional<OnFieldResidualFunc> on_field_residual = std::nullopt;
-	std::optional<OnFieldEndFunc> on_field_end = std::nullopt;
-	std::optional<int> on_field_residual_order = std::nullopt;
-	std::optional<int> on_field_residual_priority = std::nullopt;
-	std::optional<int> on_field_residual_sub_order = std::nullopt;
+	OnFieldStartFunc* on_field_start = nullptr; // optional
+	OnFieldRestartFunc* on_field_restart = nullptr; // optional
+	OnFieldResidualFunc* on_field_residual = nullptr; // optional
+	OnFieldEndFunc* on_field_end = nullptr; // optional
+	int* on_field_residual_order = nullptr; // optional
+	int* on_field_residual_priority = nullptr; // optional
+	int* on_field_residual_sub_order = nullptr; // optional
 };

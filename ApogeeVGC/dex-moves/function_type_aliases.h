@@ -1,15 +1,21 @@
 #pragma once
 
 #include "../global-types/Effect.h"
-#include "../battle/Battle.h"
-#include "../pokemon/Pokemon.h"
-#include "../side/Side.h"
+//#include "../battle/Battle.h"
+//#include "../pokemon/Pokemon.h"
+//#include "../side/Side.h"
 #include "type_aliases.h"
-#include "ActiveMove.h"
+//#include "ActiveMove.h"
 #include <rapidjson/document.h>
 #include <functional>
 #include <variant>
-#include <optional>
+
+class Battle;
+class Pokemon;
+class Side;
+class ActiveMove;
+class Item;
+class Condition;
 
 // Callback function type aliases for MoveEventMethods
 using BasePowerCallbackFunc = std::function<std::variant<int, bool, std::monostate>(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;

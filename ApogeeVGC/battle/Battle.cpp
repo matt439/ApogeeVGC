@@ -31,12 +31,12 @@
 void* Battle::single_event(
 	const std::string& event_id,
 	const Effect& effect,
-	std::optional<EffectState*> state, // nullable
 	Target& target,
-	std::optional<Source> source,
-	std::optional<std::variant<Effect*, std::string, std::monostate>> source_effect,
-	std::optional<std::any> relay_var,
-	std::optional<std::any> custom_callback)
+	EffectState* state,
+	Source* source,
+	std::variant<Effect*, std::string, std::monostate>* source_effect,
+	std::any* relay_var,
+	std::any* custom_callback)
 {
 	//if (this.eventDepth >= 8) {
 	//	// oh fuck

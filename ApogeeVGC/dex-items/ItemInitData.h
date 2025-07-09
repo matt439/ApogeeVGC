@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../dex-data/BasicEffectData.h"
-#include "FlingData.h"
+// #include "FlingData.h"
+
+struct FlightData;
 
 struct ItemInitData : public BasicEffectData
 {
@@ -10,19 +12,19 @@ struct ItemInitData : public BasicEffectData
     ItemInitData(const ItemInitData&) = default;
     ItemInitData(const std::string& name, bool exists);
 
-	std::optional<FlingData> fling = std::nullopt;
-	std::optional<std::string> on_drive = std::nullopt;
-	std::optional<std::string> on_memory = std::nullopt;
-	std::optional<std::string> mega_stone = std::nullopt;
-	std::optional<std::string> mega_evolves = std::nullopt;
-	std::optional<std::variant<bool, std::string>> z_move = std::nullopt;
-	std::optional<std::string> z_move_type = std::nullopt;
-	std::optional<std::string> z_move_from = std::nullopt;
-	std::optional<std::vector<std::string>> item_user = std::nullopt;
-	std::optional<bool> is_berry = std::nullopt;
-	std::optional<bool> ignore_klutz = std::nullopt;
-	std::optional<std::string> on_plate = std::nullopt;
-	std::optional<bool> is_gem = std::nullopt;
-	std::optional<bool> is_pokeball = std::nullopt;
-	std::optional<bool> is_primal_orb = std::nullopt;
+	FlingData* fling = nullptr; // optional
+	std::string* on_drive = nullptr; // optional
+	std::string* on_memory = nullptr; // optional
+	std::string* mega_stone = nullptr; // optional
+	std::string* mega_evolves = nullptr; // optional
+	std::variant<bool, std::string>* z_move = nullptr; // optional
+	std::string* z_move_type = nullptr; // optional
+	std::string* z_move_from = nullptr; // optional
+	std::vector<std::string>* item_user = nullptr; // optional
+	bool* is_berry = nullptr; // optional
+	bool* ignore_klutz = nullptr; // optional
+	std::string* on_plate = nullptr; // optional
+	bool* is_gem = nullptr; // optional
+	bool* is_pokeball = nullptr; // optional
+	bool* is_primal_orb = nullptr; // optional
 };

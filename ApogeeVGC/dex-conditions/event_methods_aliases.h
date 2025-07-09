@@ -1,20 +1,28 @@
 #pragma once
 
 #include "../global-types/Effect.h"
-#include "../global-types/type_aliases.h"
-#include "../global-types/function_type_aliases.h"
-#include "../dex-moves/SecondaryEffect.h"
-#include "../battle/Battle.h"
-#include "../pokemon/Pokemon.h"
-#include "../dex-items/Item.h"
-#include "../dex-moves/ActiveMove.h"
-#include "../side/Side.h"
-#include "Condition.h"
+#include "../global-types/SparseBoostsTable.h"
+//#include "../global-types/function_type_aliases.h"
+//#include "../dex-moves/SecondaryEffect.h"
+//#include "../battle/Battle.h"
+//#include "../pokemon/Pokemon.h"
+//#include "../dex-items/Item.h"
+//#include "../dex-moves/ActiveMove.h"
+//#include "../side/Side.h"
+//#include "Condition.h"
 #include <functional>
 #include <variant>
-#include <optional>
+// #include <optional>
 #include <string>
 #include <vector>
+
+// forward declarations
+class Battle;
+class Pokemon;
+class Item;
+class ActiveMove;
+class Condition;
+class Side;
 
 using OnDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnEmergencyExitFunc = std::function<void(Battle*, Pokemon*)>;
@@ -41,7 +49,7 @@ using OnDamageFunc = std::function<std::variant<int, bool, std::monostate>(Battl
 
 using OnDeductPPFunc = std::function<std::variant<int, std::monostate>(Battle*, Pokemon*, Pokemon*)>;
 using OnDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
-using OnDragOutFunc = std::function<void(Battle*, Pokemon*, std::optional<Pokemon*>, std::optional<ActiveMove*>)>;
+using OnDragOutFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 // using OnEffectivenessFunc = OnEffectivenessFunc; // from MoveEventMethods
 using OnEntryHazardFunc = std::function<void(Battle*, Pokemon*)>;
@@ -84,7 +92,7 @@ using OnStallMoveFunc = std::function<std::variant<bool, std::monostate>(Battle*
 using OnSwitchInFunc = std::function<void(Battle*, Pokemon*)>;
 using OnSwitchOutFunc = std::function<void(Battle*, Pokemon*)>;
 using OnSwapFunc = std::function<void(Battle*, Pokemon*, Pokemon*)>;
-using OnTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, std::optional<ActiveMove*>)>, bool>;
+using OnTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, ActiveMove*)>, bool>;
 using OnWeatherChangeFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnTerrainChangeFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
@@ -127,7 +135,7 @@ using OnFoeCriticalHitFunc = std::variant<bool, std::function<std::variant<bool,
 using OnFoeDamageFunc = std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, Effect)>;
 using OnFoeDeductPPFunc = std::function<std::variant<int, std::monostate>(Battle*, Pokemon*, Pokemon*)>;
 using OnFoeDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
-using OnFoeDragOutFunc = std::function<void(Battle*, Pokemon*, std::optional<Pokemon*>, std::optional<ActiveMove*>)>;
+using OnFoeDragOutFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnFoeEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 // using OnFoeEffectivenessFunc = OnEffectivenessFunc; // from MoveEventMethods
 using OnFoeFaintFunc = VoidEffectFunc; // from CommonHandlers
@@ -166,7 +174,7 @@ using OnFoeSideConditionStartFunc = std::function<void(Battle*, Side*, Pokemon*,
 using OnFoeStallMoveFunc = std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*)>;
 using OnFoeSwitchOutFunc = std::function<void(Battle*, Pokemon*)>;
 using OnFoeSwapFunc = std::function<void(Battle*, Pokemon*, Pokemon*)>;
-using OnFoeTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, std::optional<ActiveMove*>)>, bool>;
+using OnFoeTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, ActiveMove*)>, bool>;
 using OnFoeWeatherChangeFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnFoeTerrainChangeFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnFoeTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
@@ -211,7 +219,7 @@ using OnSourceCriticalHitFunc = std::variant<bool, std::function<std::variant<bo
 using OnSourceDamageFunc = std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, Effect)>;
 using OnSourceDeductPPFunc = std::function<std::variant<int, std::monostate>(Battle*, Pokemon*, Pokemon*)>;
 using OnSourceDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
-using OnSourceDragOutFunc = std::function<void(Battle*, Pokemon*, std::optional<Pokemon*>, std::optional<ActiveMove*>)>;
+using OnSourceDragOutFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnSourceEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 // using OnSourceEffectivenessFunc = OnEffectivenessFunc; // from MoveEventMethods
 // using OnSourceFaintFunc = VoidEffectFunc; // from CommonHandlers
@@ -250,7 +258,7 @@ using OnSourceSetStatusFunc = std::function<std::variant<bool, std::monostate>(B
 using OnSourceSetWeatherFunc = std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*, Pokemon*, Condition*)>;
 using OnSourceStallMoveFunc = std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*)>;
 using OnSourceSwitchOutFunc = std::function<void(Battle*, Pokemon*)>;
-using OnSourceTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, std::optional<ActiveMove*>)>, bool>;
+using OnSourceTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, ActiveMove*)>, bool>;
 using OnSourceTerrainFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnSourceTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
 using OnSourceTryAddVolatileFunc = std::function<std::variant<bool, std::nullptr_t, std::monostate>(Battle*, Condition*, Pokemon*, Pokemon*, Effect)>;
@@ -296,7 +304,7 @@ using OnAnyCriticalHitFunc = std::variant<bool, std::function<std::variant<bool,
 using OnAnyDamageFunc = std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, Effect)>;
 using OnAnyDeductPPFunc = std::function<std::variant<int, std::monostate>(Battle*, Pokemon*, Pokemon*)>;
 using OnAnyDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
-using OnAnyDragOutFunc = std::function<void(Battle*, Pokemon*, std::optional<Pokemon*>, std::optional<ActiveMove*>)>;
+using OnAnyDragOutFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnAnyEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 // using OnAnyEffectivenessFunc = OnEffectivenessFunc; // from MoveEventMethods
 // using OnAnyFaintFunc = VoidEffectFunc; // from CommonHandlers
@@ -336,7 +344,7 @@ using OnAnySetWeatherFunc = std::function<std::variant<bool, std::monostate>(Bat
 using OnAnyStallMoveFunc = std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*)>;
 using OnAnySwitchInFunc = std::function<void(Battle*, Pokemon*)>;
 using OnAnySwitchOutFunc = std::function<void(Battle*, Pokemon*)>;
-using OnAnyTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, std::optional<ActiveMove*>)>, bool>;
+using OnAnyTakeItemFunc = std::variant<std::function<std::variant<bool, std::monostate>(Battle*, Item*, Pokemon*, Pokemon*, ActiveMove*)>, bool>;
 
 using OnAnyTerrainFunc = std::function<void(Battle*, Pokemon*, Pokemon*, Effect)>;
 using OnAnyTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;

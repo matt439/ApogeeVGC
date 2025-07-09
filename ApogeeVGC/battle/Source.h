@@ -1,10 +1,13 @@
 #pragma once
 
-#include "../pokemon/Pokemon.h"
-#include "../global-types/Effect.h"
+//#include "../pokemon/Pokemon.h"
+//#include "../global-types/Effect.h"
 #include <variant>
 #include <string>
-#include <xutility>
+
+// forward declarations
+class Pokemon;
+class Effect;
 
 using Source = std::variant<
 	std::monostate,           // for null

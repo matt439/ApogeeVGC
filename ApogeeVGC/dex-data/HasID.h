@@ -1,19 +1,16 @@
 #pragma once
 
-#include <optional>
 #include <string>
 
 struct HasID
 {
-	std::optional<std::string> id = std::nullopt;
-	std::optional<std::string> userid = std::nullopt;
-	std::optional<std::string> roomid = std::nullopt;
+	const std::string* id = nullptr; // optional
+	const std::string* userid = nullptr; // optional
+	const std::string* roomid = nullptr; // optional
 
 	HasID() = default;
 	HasID(const HasID&) = default;
-	HasID(const std::string& id);
-	HasID(const std::optional<std::string>& id);
-	HasID(const std::optional<std::string>& userid, const std::optional<std::string>& roomid);
-	HasID(const std::optional<std::string>& id, const std::optional<std::string>& userid,
-		const std::optional<std::string>& roomid);
+	HasID(const std::string* id);
+	HasID(const std::string* userid, const std::string* roomid);
+	HasID(const std::string* id, const std::string* userid, const std::string* roomid);
 };

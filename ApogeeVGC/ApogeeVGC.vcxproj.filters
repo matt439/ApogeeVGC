@@ -56,7 +56,6 @@
     <ClInclude Include="global-types\ModdedEffectData.h" />
     <ClInclude Include="global-types\ZMoveOption.h" />
     <ClInclude Include="global-types\BattleScriptsData.h" />
-    <ClInclude Include="global-types\type_aliases.h" />
     <ClInclude Include="dex-moves\MoveFlags.h" />
     <ClInclude Include="dex-moves\HitEffect.h" />
     <ClInclude Include="dex-conditions\EventMethods.h" />
@@ -145,5 +144,17 @@
     <ClInclude Include="dex-species\SpeciesData.h" />
     <ClInclude Include="dex-species\SpeciesFormatsData.h" />
     <ClInclude Include="dex-species\PokemonGoData.h" />
+    <ClInclude Include="global-types\ID.h" />
+    <ClInclude Include="global-types\IDEntry.h" />
+    <ClInclude Include="global-types\PokemonSlot.h" />
+    <ClInclude Include="global-types\AnyObject.h" />
+    <ClInclude Include="global-types\StatsExceptHPTable.h" />
+    <ClInclude Include="global-types\StatsTable.h" />
+    <ClInclude Include="global-types\SparseStatsTable.h" />
+    <ClInclude Include="global-types\BoostsTable.h" />
+    <ClInclude Include="global-types\SparseBoostsTable.h" />
+    <ClInclude Include="global-types\SpreadMoveTargets.h" />
+    <ClInclude Include="global-types\SpreadMoveDamage.h" />
+    <ClInclude Include="global-types\ZMoveOptions.h" />
   </ItemGroup>
 </Project>

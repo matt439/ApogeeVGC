@@ -1,27 +1,33 @@
 #pragma once
 
 #include "../global-types/Effect.h"
-#include "../global-types/type_aliases.h"
-#include "../battle/Battle.h"
-#include "../pokemon/Pokemon.h"
-#include "../dex-moves/ActiveMove.h"
-#include "../dex-items/Item.h"
-#include "../dex-conditions/Condition.h"
-#include "../side/Side.h"
+#include "../global-types/SparseBoostsTable.h"
+//#include "../battle/Battle.h"
+//#include "../pokemon/Pokemon.h"
+//#include "../dex-moves/ActiveMove.h"
+//#include "../dex-items/Item.h"
+//#include "../dex-conditions/Condition.h"
+//#include "../side/Side.h"
 #include <functional>
-#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
 
+class Battle;
+class Pokemon;
+class Item;
+class ActiveMove;
+class Condition;
+class Side;
+
 using OnAllyDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;
-using OnAllyAfterEachBoostFunc = std::function<void(Battle*, SparseBoostsTable, Pokemon*, Pokemon*)>;
+using OnAllyAfterEachBoostFunc = std::function<void(Battle*, SparseBoostsTable*, Pokemon*, Pokemon*)>;
 // using OnAllyAfterHitFunc = OnAfterHitFunc; // from MoveEventMethods
 using OnAllyAfterSetStatusFunc = std::function<void(Battle*, Condition*, Pokemon*, Pokemon*, Effect)>;
 // using OnAllyAfterSubDamageFunc = OnAfterSubDamageFunc; // from MoveEventMethods
 using OnAllyAfterSwitchInSelfFunc = std::function<void(Battle*, Pokemon*)>;
 using OnAllyAfterUseItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
-using OnAllyAfterBoostFunc = std::function<void(Battle*, SparseBoostsTable, Pokemon*, Pokemon*, Effect)>;
+using OnAllyAfterBoostFunc = std::function<void(Battle*, SparseBoostsTable*, Pokemon*, Pokemon*, Effect)>;
 using OnAllyAfterFaintFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, Effect)>;
 // using OnAllyAfterMoveSecondarySelfFunc = OnAfterMoveSecondarySelfFunc; // from MoveEventMethods
 // using OnAllyAfterMoveSecondaryFunc = OnAfterMoveSecondaryFunc; // from MoveEventMethods
@@ -35,13 +41,13 @@ using OnAllyBeforeFaintFunc = std::function<void(Battle*, Pokemon*, Effect)>;
 // using OnAllyBeforeMoveFunc = VoidSourceMoveFunc; // from CommonHandlers
 using OnAllyBeforeSwitchInFunc = std::function<void(Battle*, Pokemon*)>;
 using OnAllyBeforeSwitchOutFunc = std::function<void(Battle*, Pokemon*)>;
-using OnAllyTryBoostFunc = std::function<void(Battle*, SparseBoostsTable, Pokemon*, Pokemon*, Effect)>;
+using OnAllyTryBoostFunc = std::function<void(Battle*, SparseBoostsTable*, Pokemon*, Pokemon*, Effect)>;
 // using OnAllyChargeMoveFunc = VoidSourceMoveFunc; // from CommonHandlers
 using OnAllyCriticalHitFunc = std::function<std::variant<bool, std::nullptr_t>(Battle*, Pokemon*, std::nullptr_t, ActiveMove*)>;
 using OnAllyDamageFunc = std::function<std::variant<int, bool, std::nullptr_t, void>(Battle*, int, Pokemon*, Pokemon*, Effect)>;
 using OnAllyDeductPPFunc = std::function<std::variant<int, void>(Battle*, Pokemon*, Pokemon*)>;
 using OnAllyDisableMoveFunc = std::function<void(Battle*, Pokemon*)>;
-using OnAllyDragOutFunc = std::function<void(Battle*, Pokemon*, std::optional<Pokemon*>, std::optional<ActiveMove*>)>;
+using OnAllyDragOutFunc = std::function<void(Battle*, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnAllyEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 // using OnAllyEffectivenessFunc = OnEffectivenessFunc; // from MoveEventMethods
 
@@ -53,7 +59,7 @@ using OnAllyLockMoveFunc = std::variant<std::string, std::function<std::variant<
 using OnAllyMaybeTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
 // using OnAllyModifyAccuracyFunc = ModifierMoveFunc; // from CommonHandlers
 // using OnAllyModifyAtkFunc = ModifierSourceMoveFunc; // from CommonHandlers
-using OnAllyModifyBoostFunc = std::function<std::variant<SparseBoostsTable, void>(Battle*, SparseBoostsTable, Pokemon*)>;
+using OnAllyModifyBoostFunc = std::function<std::variant<SparseBoostsTable*, void>(Battle*, SparseBoostsTable*, Pokemon*)>;
 // using OnAllyModifyCritRatioFunc = ModifierSourceMoveFunc; // from CommonHandlers
 // using OnAllyModifyDamageFunc = ModifierSourceMoveFunc; // from CommonHandlers
 // using OnAllyModifyDefFunc = ModifierMoveFunc; // from CommonHandlers
