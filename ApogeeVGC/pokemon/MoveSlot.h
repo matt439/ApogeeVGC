@@ -6,13 +6,13 @@
 
 struct MoveSlot
 {
-	std::string id;
-	std::string move;
-	int pp;
-	int maxpp;
-	std::optional<std::string> target;
-	std::variant<bool, std::string> disabled; // std::variant for union type
-	std::optional<std::string> disabled_source; // std::optional for optional field
-	bool used;
-	std::optional<bool> is_virtual;
+	std::string id = "";
+	std::string move = "";
+	int pp = 0;
+	int maxpp = 0;
+	std::optional<std::string> target = std::nullopt;
+	std::variant<bool, std::string> disabled = false; // std::variant for union type
+	std::optional<std::string> disabled_source = std::nullopt; // std::optional for optional field
+	bool used = false;
+	std::optional<bool> is_virtual = std::nullopt;
 };

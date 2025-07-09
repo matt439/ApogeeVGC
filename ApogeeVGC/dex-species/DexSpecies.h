@@ -2,5 +2,6 @@
 
 class DexSpecies
 {
+public:
 	int x;
 };

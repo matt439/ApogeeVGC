@@ -9,7 +9,6 @@
   <ItemGroup>
     <ClCompile Include="program.cpp" />
     <ClCompile Include="battle\Battle.cpp" />
-    <ClCompile Include="dex.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
     <ClCompile Include="dex-data\to_id.cpp" />
@@ -25,10 +24,10 @@
     <ClCompile Include="dex-items\ItemInitData.cpp" />
     <ClCompile Include="dex-items\Item.cpp" />
     <ClCompile Include="dex-items\DexItems.cpp" />
+    <ClCompile Include="dex\ModdedDex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
-    <ClInclude Include="dex.h" />
     <ClInclude Include="dex\IModdedDex.h" />
     <ClInclude Include="global-types\GenderName.h" />
     <ClInclude Include="global-types\StatIDExceptHP.h" />
@@ -120,5 +119,14 @@
     <ClInclude Include="dex\DATA_TYPES.h" />
     <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DATA_FILES.h" />
+    <ClInclude Include="dex\TextTableData.h" />
+    <ClInclude Include="dex\DexTable.h" />
+    <ClInclude Include="dex\DexTableData.h" />
+    <ClInclude Include="dex\AliasesTable.h" />
+    <ClInclude Include="dex\TypeData.h" />
+    <ClInclude Include="dex\TypesManager.h" />
+    <ClInclude Include="dex\DescriptionResult.h" />
+    <ClInclude Include="dex\ModdedDex.h" />
+    <ClInclude Include="dex\dexes.h" />
   </ItemGroup>
 </Project>

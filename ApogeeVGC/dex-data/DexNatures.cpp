@@ -2,7 +2,7 @@
 
 #include "to_id.h"
 
-explicit DexNatures::DexNatures(IModdedDex* dex_ptr)
+DexNatures::DexNatures(IModdedDex* dex_ptr)
     : dex(dex_ptr), all_cache(std::nullopt)
 {
 }

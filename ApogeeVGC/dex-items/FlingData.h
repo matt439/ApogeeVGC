@@ -6,8 +6,8 @@
 
 struct FlingData
 {
-	int base_power;
-	std::optional<std::string> status;
-	std::optional<std::string> volatile_status;
-	std::optional<ResultMoveFunc> effect;
+	int base_power = 0;
+	std::optional<std::string> status = std::nullopt;
+	std::optional<std::string> volatile_status = std::nullopt;
+	std::optional<ResultMoveFunc> effect = std::nullopt;
 };

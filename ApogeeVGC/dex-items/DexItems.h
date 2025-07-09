@@ -5,9 +5,9 @@
 
 struct DexItems
 {
-    IModdedDex* dex;
-    std::unordered_map<std::string, Item> item_cache;
-    std::optional<std::vector<Item>> all_cache;
+	IModdedDex* dex = nullptr;
+	std::unordered_map<std::string, Item> item_cache = {};
+	std::optional<std::vector<Item>> all_cache = std::nullopt;
 
     explicit DexItems(IModdedDex* dex_ptr);
 

@@ -2,5 +2,6 @@
 
 class DexAbilities
 {
-    int x;
+public:
+    int x = -1;
 };

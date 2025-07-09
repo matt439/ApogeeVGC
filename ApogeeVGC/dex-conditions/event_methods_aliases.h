@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../global-types/Effect.h"
+#include "../global-types/type_aliases.h"
+#include "../global-types/function_type_aliases.h"
+#include "../dex-moves/SecondaryEffect.h"
 #include <functional>
 #include <variant>
 #include <optional>

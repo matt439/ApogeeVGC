@@ -2,5 +2,6 @@
 
 class DexFormats
 {
+public:
 	int x;
 };

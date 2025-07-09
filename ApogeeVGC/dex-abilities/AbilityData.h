@@ -5,9 +5,9 @@
 
 struct AbilityData : public BasicEffectData
 {
-    std::optional<bool> suppress_weather;
-    std::optional<AbilityFlags> flags;
-    std::optional<int> rating;
+    std::optional<bool> suppress_weather = std::nullopt;
+	std::optional<AbilityFlags> flags = std::nullopt;
+	std::optional<int> rating = std::nullopt;
 	// TODO: link to ConditionData
-    std::optional<ConditionData> condition;
+	std::optional<ConditionData> condition = std::nullopt;
 };

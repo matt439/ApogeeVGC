@@ -2,5 +2,6 @@
 
 class DexMoves
 {
+public:
     int x;
 };

@@ -2,7 +2,7 @@
 
 #include "../dex-data/to_id.h"
 
-explicit DexItems::DexItems(IModdedDex* dex_ptr)
+DexItems::DexItems(IModdedDex* dex_ptr)
     : dex(dex_ptr), all_cache(std::nullopt)
 {
 }

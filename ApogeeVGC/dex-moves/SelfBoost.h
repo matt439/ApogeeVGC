@@ -5,5 +5,5 @@
 
 struct SelfBoost
 {
-    std::optional<SparseBoostsTable> boosts;
+	std::optional<SparseBoostsTable> boosts = std::nullopt; // Boosts to apply to the user
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../global-types/Effect.h"
+#include "../global-types/type_aliases.h"
 #include <functional>
 #include <optional>
 #include <string>
@@ -11,7 +13,6 @@ class Pokemon;
 class ActiveMove;
 class Item;
 class Condition;
-class Effect;
 class Side;
 
 using OnAllyDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;

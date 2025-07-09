@@ -9,5 +9,5 @@
  * Modifies self in-place.
  */
 template<typename ValueType>
-static void assign_missing_fields(std::map<std::string, ValueType>& self,
+void assign_missing_fields(std::map<std::string, ValueType>& self,
     const std::map<std::string, ValueType>& data);

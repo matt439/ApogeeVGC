@@ -2,5 +2,6 @@
 
 class DexStats
 {
+public:
     int x;
 };

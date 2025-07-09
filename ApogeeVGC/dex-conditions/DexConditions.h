@@ -2,5 +2,6 @@
 
 class DexConditions
 {
+public:
 	int x;
 };

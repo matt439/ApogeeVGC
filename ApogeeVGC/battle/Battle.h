@@ -1,24 +1,23 @@
 #pragma once
 
-
-
-// #include "rapidjson/document.h"
-#include <variant>
-#include <string>
+#include "../global-types/Effect.h"
+#include "../pokemon/EffectState.h"
+#include "Target.h"
+#include "Source.h"
 #include <optional>
+#include <any>
 
-// Forward declarations
-class Battle;
-class Field;
-class Pokemon;
-class EffectState;
-class Format;
+//// Forward declarations
+//class Field;
+//class Pokemon;
+//class Format;
 
 class Battle
 {
 public:
 	Battle() = default;
 	Battle(const Battle&) = default;
+
 	void* single_event(
 		const std::string& event_id,
 		const Effect& effect,

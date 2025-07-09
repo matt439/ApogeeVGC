@@ -7,8 +7,8 @@
 
 struct EffectState
 {
-	std::string id;
-	int effect_order;
-	std::optional<double> duration;
-	std::unordered_map<std::string, std::any> extra_properties;
+	std::string id = "";
+	int effect_order = 0;
+	std::optional<double> duration = std::nullopt;
+	std::unordered_map<std::string, std::any> extra_properties = {};
 };

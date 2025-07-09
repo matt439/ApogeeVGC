@@ -2,5 +2,5 @@
 
 struct MaxMoveData
 {
-    int base_power;
+	int base_power = 0;
 };

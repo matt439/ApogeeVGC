@@ -1,93 +1,35 @@
 #pragma once
 
-#include "global-types.h"
-#include "IModdedDex.h"
-#include "dex-abilities.h"
-#include "dex-conditions.h"
-#include "dex-data.h"
-#include "dex-formats.h"
-#include "dex-items.h"
-#include "dex-moves.h"
-#include "dex-species.h"
-// #include "dex-module.h"
+#include "../dex-format/DexFormats.h"
+#include "../dex-abilities/DexAbilities.h"
+#include "../dex-items/DexItems.h"
+#include "../dex-moves/DexMoves.h"
+#include "../dex-species/DexSpecies.h"
+#include "../dex-conditions/DexConditions.h"
+#include "../dex-data/DexNatures.h"
+#include "../dex-data/DexTypes.h"
+#include "../dex-data/DexStats.h"
+#include "../dex-data/to_id.h"
 
 #include <rapidjson/document.h>
-#include <rapidjson/istreamwrapper.h>
 
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <array>
+#include "TextTableData.h"
+#include "AliasesTable.h"
+#include "DataType.h"
+#include "IModdedDex.h"
+#include "TypesManager.h"
 
-struct ModdedDex;
-
-
-
-std::unordered_map<std::string, ModdedDex> dexes;
-
-
-
-
-using AliasesTable = std::unordered_map<IDEntry, std::string>;
-
-// forward declarations
-struct AbilityText;
-struct ItemText;
-struct MoveText;
-struct PokedexText;
-struct DefaultText;
-
-struct TextTableData
+class ModdedDex : public IModdedDex
 {
-    DexTable<AbilityText> abilities;
-	DexTable<ItemText> items;
-	DexTable<MoveText> moves;
-	DexTable<PokedexText> pokedex;
-	DexTable<DefaultText> default_text; // cant use default as a variable name in C++
-};
-
-// helper structs for ModdedDex
-struct TypeData
-{
-    std::unordered_map<std::string, int> damage_taken;
-};
-
-struct TypesManager
-{
-    std::optional<TypeData> get(const std::string& type) const;
-};
-
-struct DescriptionResult
-{
-    std::string desc;
-    std::string short_desc;
-};
-
-//// forward declarations
-//struct DexFormats;
-//struct DexAbilities;
-//struct DexItems;
-//struct DexMoves;
-//struct DexSpecies;
-//struct DexConditions;
-//struct DexNatures;
-//struct DexTypes;
-//struct DexStats;
-
-struct ModdedDex : public IModdedDex
-{
+public:
     // Data type/class references (could be type aliases or static methods)
     // For C++, these are typically not needed, but you can provide static access if desired.
 
     // Metadata
     std::string name = "[ModdedDex]";
     bool is_base = false;
-    std::string current_mod;
-    std::string data_dir;
+    std::string current_mod = "";
+    std::string data_dir = "";
 
     // Utility function alias
     using ToIDFunc = std::string(*)(const std::string&);
@@ -95,12 +37,12 @@ struct ModdedDex : public IModdedDex
 
     // State
     int gen = 0;
-    std::string parent_mod;
+    std::string parent_mod = "";
     bool mods_loaded = false;
 
     // Data caches
-    std::optional<DexTableData> data_cache;
-    std::optional<TextTableData> text_cache;
+	std::optional<DexTableData> data_cache = std::nullopt;
+	std::optional<TextTableData> text_cache = std::nullopt;
 
     // Utility functions (placeholders, define as needed)
     // For deepClone, deepFreeze, Multiset, use std::function or static methods
@@ -108,20 +50,20 @@ struct ModdedDex : public IModdedDex
     // std::function<ReturnType(Args...)> deepFreeze;
     // MultisetType Multiset;
 
-     std::unique_ptr<DexFormats> formats;
-     std::unique_ptr<DexAbilities> abilities;
-     std::unique_ptr<DexItems> items;
-     std::unique_ptr<DexMoves> moves;
-     std::unique_ptr<DexSpecies> species;
-     std::unique_ptr<DexConditions> conditions;
-     std::unique_ptr<DexNatures> natures;
-     std::unique_ptr<DexTypes> types;
-     std::unique_ptr<DexStats> stats;
+	std::unique_ptr<DexFormats> formats = nullptr;
+	std::unique_ptr<DexAbilities> abilities = nullptr;
+	std::unique_ptr<DexItems> items = nullptr;
+	std::unique_ptr<DexMoves> moves = nullptr;
+	std::unique_ptr<DexSpecies> species = nullptr;
+	std::unique_ptr<DexConditions> conditions = nullptr;
+	std::unique_ptr<DexNatures> natures = nullptr;
+	std::unique_ptr<DexTypes> types = nullptr;
+	std::unique_ptr<DexStats> stats = nullptr;
 
     // Aliases
-    std::optional<AliasesTable> aliases;
+	std::optional<AliasesTable> aliases = std::nullopt;
     // For fuzzyAliases, use a map from ID to vector of IDs
-    std::optional<std::unordered_map<IDEntry, std::vector<IDEntry>>> fuzzy_aliases;
+	std::optional<std::unordered_map<IDEntry, std::vector<IDEntry>>> fuzzy_aliases = std::nullopt;
 
     ModdedDex(const std::string& mod = "base");
 
@@ -148,7 +90,7 @@ struct ModdedDex : public IModdedDex
     std::string effect_to_string() const;
 
     // Helper to trim whitespace from both ends
-	static std::string trim(const std::string& s);
+    static std::string trim(const std::string& s);
 
     /*
      * Sanitizes a username or Pokemon nickname
@@ -173,13 +115,13 @@ struct ModdedDex : public IModdedDex
      */
     static std::string get_name(const std::string& input);
 
-    TypesManager types;
+    TypesManager types_manager = TypesManager();
 
     /**
      * get_immunity() returns false if the target is immune; true otherwise.
      * Also checks immunity to some statuses.
      */
-    // Overload for string source and string target
+     // Overload for string source and string target
     bool get_immunity(const std::string& source_type, const std::string& target_type) const;
 
     // Overload for string source and vector<string> target

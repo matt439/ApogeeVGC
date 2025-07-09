@@ -4,10 +4,10 @@
 #include <string>
 
 // Helper: Remove non-alphanumeric and convert to lowercase
-static std::string to_id(const std::string& text);
+std::string to_id(const std::string& text);
 
 // Overload for int
-static std::string to_id(int num);
+std::string to_id(int num);
 
 /**
 * Converts anything to an ID. An ID must have only lowercase alphanumeric
@@ -22,4 +22,4 @@ static std::string to_id(int num);
 * Generally assigned to the global toID, because of how
 * commonly it's used.
 */
-static std::string to_id(const HasID& obj);
+std::string to_id(const HasID& obj);

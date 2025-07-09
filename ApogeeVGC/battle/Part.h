@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../global-types/Effect.h"
 #include <variant>
 #include <string>
 
 class Pokemon;
 class Side;
-class Effect;
 class Move;
 
 using Part = std::variant<
