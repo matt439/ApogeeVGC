@@ -33,8 +33,11 @@
     <ClCompile Include="dex-items\DexItems.cpp" />
     <ClCompile Include="dex-items\Item.cpp" />
     <ClCompile Include="dex-items\ItemInitData.cpp" />
+    <ClCompile Include="dex-moves\HitEffect.cpp" />
+    <ClCompile Include="dex-moves\MoveData.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
+    <ClCompile Include="global-types\EffectData.cpp" />
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
     <ClCompile Include="program.cpp" />
   </ItemGroup>
@@ -45,6 +48,7 @@
     <ClInclude Include="battle\Battle.h" />
     <ClInclude Include="dex-abilities\Ability.h" />
     <ClInclude Include="dex-abilities\AbilityData.h" />
+    <ClInclude Include="dex-abilities\AbilityEventMethods.h" />
     <ClInclude Include="dex-abilities\AbilityFlags.h" />
     <ClInclude Include="dex-abilities\DexAbilities.h" />
     <ClInclude Include="dex-conditions\Condition.h" />
@@ -64,9 +68,11 @@
     <ClInclude Include="dex-data\assign_missing_fields.h" />
     <ClInclude Include="dex-data\BasicEffect.h" />
     <ClInclude Include="dex-data\BasicEffectData.h" />
+    <ClInclude Include="dex-data\BasicEffectOptionalData.h" />
     <ClInclude Include="dex-data\DexNatures.h" />
     <ClInclude Include="dex-data\DexStats.h" />
     <ClInclude Include="dex-data\DexTypes.h" />
+    <ClInclude Include="dex-data\EMPTY_NATURE.h" />
     <ClInclude Include="dex-data\HasID.h" />
     <ClInclude Include="dex-data\ModdedNatureData.h" />
     <ClInclude Include="dex-data\Nature.h" />

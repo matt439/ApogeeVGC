@@ -9,4 +9,5 @@ enum class NonStandard
     LGPE,
     CUSTOM,
     GIGANTAMAX,
+	NONE, // Default value, indicates standard effect
 };

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "TypeData.h"
-#include <optional>
+#include <memory>
 #include <string>
 
 struct TypesManager
 {
-    std::optional<TypeData> get(const std::string& type) const;
+    std::unique_ptr<TypeData> get(const std::string& type) const;
 };

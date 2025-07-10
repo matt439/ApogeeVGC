@@ -17,7 +17,7 @@ struct MoveEventMethods
 	OnAfterMoveSecondaryFunc on_after_move_secondary = nullptr;
 	OnAfterMoveFunc on_after_move = nullptr;
 
-	std::optional<int> on_damage_priority = std::nullopt; // Optional priority for on_damage function
+	std::unique_ptr<int> on_damage_priority = nullptr; // Optional priority for on_damage function
 	OnDamageFunc on_damage = nullptr;
 
 	OnBasePowerFunc on_base_power = nullptr;

@@ -6,17 +6,17 @@ class Ability;
 
 struct SecondaryEffect : public HitEffect
 {
-    std::optional<int> chance = std::nullopt;
+    int* chance = nullptr; // optional
 
     // Used to flag a secondary effect as added by Poison Touch
-    std::optional<Ability*> ability = std::nullopt;
+    Ability* ability = nullptr; // optional
 
     /**
      * Gen 2 specific mechanics: Bypasses Substitute only on Twineedle,
      * and allows it to flinch sleeping/frozen targets
      */
-    std::optional<bool> kingsrock = std::nullopt;
-    std::optional<HitEffect> self = std::nullopt;
+    bool* kingsrock = nullptr; // optional
+    HitEffect* self = nullptr; // optional
 
     SecondaryEffect() = default;
     SecondaryEffect(const SecondaryEffect&) = default;

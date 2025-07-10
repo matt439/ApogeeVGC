@@ -1,83 +1,81 @@
 #pragma once
 
-#include <optional>
-
 struct MoveFlags
 {
     // The move plays its animation when used on an ally.
-    std::optional<bool> allyanim = false;
+    bool* allyanim = nullptr; // optional
     // Ignores a target's substitute.
-    std::optional<bool> bypasssub = false;
+    bool* bypasssub = nullptr; // optional
     // Power is multiplied by 1.5 when used by a Pokemon with the Ability Strong Jaw.
-    std::optional<bool> bite = false;
+    bool* bite = nullptr; // optional
     // Has no effect on Pokemon with the Ability Bulletproof.
-    std::optional<bool> bullet = false;
+    bool* bullet = nullptr; // optional
     // The user cannot select this move after a previous successful use.
-    std::optional<bool> cantusetwice = false;
+    bool* cantusetwice = nullptr; // optional
     // The user is unable to make a move between turns.
-    std::optional<bool> charge = false;
+    bool* charge = nullptr; // optional
     // Makes contact.
-    std::optional<bool> contact = false;
+    bool* contact = nullptr; // optional
     // When used by a Pokemon, other Pokemon with the Ability Dancer can attempt to execute the same move.
-    std::optional<bool> dance = false;
+    bool* dance = nullptr; // optional
     // Thaws the user if executed successfully while the user is frozen.
-    std::optional<bool> defrost = false;
+    bool* defrost = nullptr; // optional
     // Can target a Pokemon positioned anywhere in a Triple Battle.
-    std::optional<bool> distance = false;
+    bool* distance = nullptr; // optional
     // Cannot be selected by Copycat.
-    std::optional<bool> failcopycat = false;
+    bool* failcopycat = nullptr; // optional
     // Encore fails if target used this move.
-    std::optional<bool> failencore = false;
+    bool* failencore = nullptr; // optional
     // Cannot be repeated by Instruct.
-    std::optional<bool> failinstruct = false;
+    bool* failinstruct = nullptr; // optional
     // Cannot be selected by Me First.
-    std::optional<bool> failmefirst = false;
+    bool* failmefirst = nullptr; // optional
     // Cannot be copied by Mimic.
-    std::optional<bool> failmimic = false;
+    bool* failmimic = nullptr; // optional
     // Targets a slot, and in 2 turns damages that slot.
-    std::optional<bool> futuremove = false;
+    bool* futuremove = nullptr; // optional
     // Prevented from being executed or selected during Gravity's effect.
-    std::optional<bool> gravity = false;
+    bool* gravity = nullptr; // optional
     // Prevented from being executed or selected during Heal Block's effect.
-    std::optional<bool> heal = false;
+    bool* heal = nullptr; // optional
     // Can be selected by Metronome.
-    std::optional<bool> metronome = false;
+    bool* metronome = nullptr; // optional
     // Can be copied by Mirror Move.
-    std::optional<bool> mirror = false;
+    bool* mirror = nullptr; // optional
     // Additional PP is deducted due to Pressure when it ordinarily would not.
-    std::optional<bool> mustpressure = false;
+    bool* mustpressure = nullptr; // optional
     // Cannot be selected by Assist.
-    std::optional<bool> noassist = false;
+    bool* noassist = nullptr; // optional
     // Prevented from being executed or selected in a Sky Battle.
-    std::optional<bool> nonsky = false;
+    bool* nonsky = nullptr; // optional
     // Cannot be made to hit twice via Parental Bond.
-    std::optional<bool> noparentalbond = false;
+    bool* noparentalbond = nullptr; // optional
     // Cannot be copied by Sketch.
-    std::optional<bool> nosketch = false;
+    bool* nosketch = nullptr; // optional
     // Cannot be selected by Sleep Talk.
-    std::optional<bool> nosleeptalk = false;
+    bool* nosleeptalk = nullptr; // optional
     // Gems will not activate. Cannot be redirected by Storm Drain / Lightning Rod.
-    std::optional<bool> pledgecombo = false;
+    bool* pledgecombo = nullptr; // optional
     // Has no effect on Pokemon which are Grass-type, have the Ability Overcoat, or hold Safety Goggles.
-    std::optional<bool> powder = false;
+    bool* powder = nullptr; // optional
     // Blocked by Detect, Protect, Spiky Shield, and if not a Status move, King's Shield.
-    std::optional<bool> protect = false;
+    bool* protect = nullptr; // optional
     // Power is multiplied by 1.5 when used by a Pokemon with the Ability Mega Launcher.
-    std::optional<bool> pulse = false;
+    bool* pulse = nullptr; // optional
     // Power is multiplied by 1.2 when used by a Pokemon with the Ability Iron Fist.
-    std::optional<bool> punch = false;
+    bool* punch = nullptr; // optional
     // If this move is successful, the user must recharge on the following turn and cannot make a move.
-    std::optional<bool> recharge = false;
+    bool* recharge = nullptr; // optional
     // Bounced back to the original user by Magic Coat or the Ability Magic Bounce.
-    std::optional<bool> reflectable = false;
+    bool* reflectable = nullptr; // optional
     // Power is multiplied by 1.5 when used by a Pokemon with the Ability Sharpness.
-    std::optional<bool> slicing = false;
+    bool* slicing = nullptr; // optional
     // Can be stolen from the original user and instead used by another Pokemon using Snatch.
-    std::optional<bool> snatch = false;
+    bool* snatch = nullptr; // optional
     // Has no effect on Pokemon with the Ability Soundproof.
-    std::optional<bool> sound = false;
+    bool* sound = nullptr; // optional
     // Activates the Wind Power and Wind Rider Abilities.
-    std::optional<bool> wind = false;
+    bool* wind = nullptr; // optional
 
     MoveFlags() = default;
     MoveFlags(const MoveFlags&) = default;

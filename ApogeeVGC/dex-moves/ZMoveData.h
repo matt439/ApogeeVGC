@@ -1,11 +1,12 @@
 #pragma once
 
-#include "../global-types/type_aliases.h"
-#include <optional>
+#include "../global-types/IDEntry.h"
+#include "../global-types/SparseBoostsTable.h"
+#include <memory>
 
 struct ZMoveData
 {
-	std::optional<int> base_power = std::nullopt; // Base power of the Z-move
-	std::optional<IDEntry> effect = std::nullopt; // Effect ID for the Z-move
-	std::optional<SparseBoostsTable> boost = std::nullopt; // Boosts to apply when using the Z-move
+	std::unique_ptr<int> base_power = nullptr; // Base power of the Z-move, optional
+	std::unique_ptr<IDEntry> effect = nullptr; // Effect ID for the Z-move, optional
+	std::unique_ptr<SparseBoostsTable> boost = nullptr; // Boosts to apply when using the Z-move, optional
 };

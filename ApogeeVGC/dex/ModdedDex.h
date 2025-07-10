@@ -41,8 +41,8 @@ public:
     bool mods_loaded = false;
 
     // Data caches
-	std::optional<DexTableData> data_cache = std::nullopt;
-	std::optional<TextTableData> text_cache = std::nullopt;
+	std::unique_ptr<DexTableData> data_cache = nullptr;
+	std::unique_ptr<TextTableData> text_cache = nullptr;
 
     // Utility functions (placeholders, define as needed)
     // For deepClone, deepFreeze, Multiset, use std::function or static methods
@@ -61,9 +61,9 @@ public:
 	std::unique_ptr<DexStats> stats = nullptr;
 
     // Aliases
-	std::optional<AliasesTable> aliases = std::nullopt;
+	std::unique_ptr<AliasesTable> aliases = nullptr;
     // For fuzzyAliases, use a map from ID to vector of IDs
-	std::optional<std::unordered_map<IDEntry, std::vector<IDEntry>>> fuzzy_aliases = std::nullopt;
+	std::unique_ptr<std::unordered_map<IDEntry, std::vector<IDEntry>>> fuzzy_aliases = nullptr;
 
     ModdedDex(const std::string& mod = "base");
 
@@ -162,11 +162,11 @@ public:
 
     TextTableData& load_text_data();
 
-    std::optional<std::string> get_alias(const std::string& id) override;
+    std::unique_ptr<std::string> get_alias(const std::string& id) override;
 
     AliasesTable& load_aliases();
 
-    std::optional<DexTableData> get_data_cache() override;
+    std::unique_ptr<DexTableData> get_data_cache() override;
     int get_gen() const override;
 
 };

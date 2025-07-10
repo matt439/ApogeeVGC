@@ -5,6 +5,6 @@
 struct ModdedNatureData : public NatureData
 {
 	ModdedNatureData() = default;
-	ModdedNatureData(const ModdedNatureData&) = default;
-	ModdedNatureData(const NatureData& base);
+	ModdedNatureData(std::unique_ptr<StatIDExceptHP> plus = nullptr,
+		std::unique_ptr<StatIDExceptHP> minus = nullptr);
 };

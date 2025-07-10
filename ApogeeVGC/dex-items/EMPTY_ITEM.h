@@ -2,4 +2,5 @@
 
 #include "Item.h"
 
-static const Item EMPTY_ITEM = Item(); // Provide a default empty item
+// Provide a default empty item
+static const Item EMPTY_ITEM = Item("empty");

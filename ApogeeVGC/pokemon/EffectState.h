@@ -3,12 +3,11 @@
 #include <string>
 #include <unordered_map>
 #include <any>
-#include <optional>
 
 struct EffectState
 {
 	std::string id = "";
 	int effect_order = 0;
-	std::optional<double> duration = std::nullopt;
+	double* duration = nullptr; // optional
 	std::unordered_map<std::string, std::any> extra_properties = {};
 };

@@ -7,7 +7,7 @@ struct DexItems
 {
 	IModdedDex* dex = nullptr;
 	std::unordered_map<std::string, Item> item_cache = {};
-	std::optional<std::vector<Item>> all_cache = std::nullopt;
+	std::unique_ptr<std::vector<Item>> all_cache = nullptr;
 
     explicit DexItems(IModdedDex* dex_ptr);
 

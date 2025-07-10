@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../dex-moves/function_type_aliases.h"
 #include "event_methods_aliases.h"
 
 struct EventMethods

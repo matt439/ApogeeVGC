@@ -25,6 +25,9 @@
     <ClCompile Include="dex-items\Item.cpp" />
     <ClCompile Include="dex-items\DexItems.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
+    <ClCompile Include="global-types\EffectData.cpp" />
+    <ClCompile Include="dex-moves\HitEffect.cpp" />
+    <ClCompile Include="dex-moves\MoveData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -156,5 +159,8 @@
     <ClInclude Include="global-types\SpreadMoveTargets.h" />
     <ClInclude Include="global-types\SpreadMoveDamage.h" />
     <ClInclude Include="global-types\ZMoveOptions.h" />
+    <ClInclude Include="dex-abilities\AbilityEventMethods.h" />
+    <ClInclude Include="dex-data\BasicEffectOptionalData.h" />
+    <ClInclude Include="dex-data\EMPTY_NATURE.h" />
   </ItemGroup>
 </Project>

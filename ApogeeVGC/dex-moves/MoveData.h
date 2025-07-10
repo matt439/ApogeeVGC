@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../global-types/EffectData.h"
-#include "MoveEventMethods.h"
-#include "HitEffect.h"
+#include "../global-types/IDEntry.h"
+#include "../global-types/ID.h"
+#include "../global-types/StatIDExceptHP.h"
+#include "../dex-conditions/ConditionData.h"
 #include "ZMoveData.h"
 #include "MaxMoveData.h"
 #include "MoveCategory.h"
@@ -10,88 +12,194 @@
 #include "SelfSwitchType.h"
 #include "SelfDestructType.h"
 #include "SelfBoost.h"
+#include "MoveTarget.h"
+#include "MoveFlags.h"
+#include "MoveEventMethods.h"
+#include "HitEffect.h"
+
+#include <array>
+
+//struct ZMoveData;
+//struct MaxMoveData;
+//struct SecondaryEffect;
+//struct SelfBoost;
 
 struct MoveData : public EffectData, MoveEventMethods, HitEffect
 {
-	std::string name = "";
-	std::optional<int> num = std::nullopt;
-    // std::optional<ConditionData> condition; // Define ConditionData as needed
+	// std::string name = "";
+	std::unique_ptr<int> num = nullptr; // optional
+    std::unique_ptr<ConditionData> condition; // optional
 	int base_power = 0;
 	std::variant<bool, int> accuracy = false; // boolean | number
     int pp = 0;
 	MoveCategory category = MoveCategory::STATUS;
     std::string type = "";
 	int priority = 0;
-    // MoveTarget target; // Define as needed
-    // MoveFlags flags;   // Define as needed
-	std::optional<std::string> real_move = std::nullopt;
+    MoveTarget target;
+    MoveFlags& flags;
+	std::unique_ptr<std::string> real_move = nullptr; // optional
 
-    std::variant<std::monostate, int, std::string, bool> damage = false; // number | 'level' | false | null
-	std::optional<std::string> contest_type = std::nullopt;
-	std::optional<bool> no_pp_boosts = std::nullopt;
+    std::variant<std::monostate, int, std::string, bool> damage = false; // optional, number | 'level' | false | null
+	std::unique_ptr<std::string> contest_type = nullptr; // optional
+	std::unique_ptr<bool> no_pp_boosts = nullptr; // optional
 
     // Z-move data
-	std::variant<bool, IDEntry> is_z = false; // boolean | IDEntry
-	std::optional<ZMoveData> z_move = std::nullopt;
+	std::unique_ptr<std::variant<bool, IDEntry>> is_z = nullptr; // optional, boolean | IDEntry
+	std::unique_ptr<ZMoveData> z_move = nullptr; // optional
 
     // Max move data
-	std::variant<bool, std::string> is_max = false; // boolean | 'Water' | 'Fire' | etc.
-	std::optional<MaxMoveData> max_move = std::nullopt;
+	std::unique_ptr<std::variant<bool, std::string>> is_max = nullptr; // optional, boolean | type
+	std::unique_ptr<MaxMoveData> max_move = nullptr; // optional
 
     // Hit effects
-    std::variant<bool, std::string> ohko = false; // boolean | 'Ice'
-	std::optional<bool> thaws_target = std::nullopt;
-	std::optional<std::vector<int>> heal = std::nullopt; // [amount, max_amount]
-	std::optional<bool> force_switch = std::nullopt;
-	std::variant<SelfSwitchType, bool> self_switch = false; // SelfSwitchType | boolean
-	std::optional<SelfBoost> self_boost = std::nullopt; // SelfBoost struct
-	std::variant<SelfDestructType, bool> selfdestruct = false; // SelfDestructType | boolean
-	std::optional<bool> breaks_protect = std::nullopt;
-	std::optional<std::array<int, 2>> recoil = std::nullopt; // [amount, max_amount]
-	std::optional<std::array<int, 2>> drain = std::nullopt; // [amount, max_amount]
-	std::optional<bool> mind_blown_recoil = std::nullopt;
-	std::optional<bool> steals_boosts = std::nullopt;
-	std::optional<bool> struggle_recoil = std::nullopt;
-	std::optional<SecondaryEffect> secondary = std::nullopt; // Single secondary effect
-	std::optional<std::vector<SecondaryEffect>> secondaries = std::nullopt; // Multiple secondary effects
-	std::optional<SecondaryEffect> self = std::nullopt; // Self-targeting secondary effect
-	std::optional<bool> has_sheer_force = std::nullopt; // Indicates if the move has Sheer Force effect
+    std::unique_ptr<std::variant<bool, std::string>> ohko = nullptr; // optional, boolean | 'Ice'
+	std::unique_ptr<bool> thaws_target = nullptr; // optional
+	std::unique_ptr<std::vector<int>> heal = nullptr; // optional
+	std::unique_ptr<bool> force_switch = nullptr; // optional
+	std::unique_ptr<std::variant<SelfSwitchType, bool>> self_switch = nullptr; // optional, SelfSwitchType | boolean
+	std::unique_ptr<SelfBoost> self_boost = nullptr; // optional // SelfBoost struct
+	std::unique_ptr<std::variant<SelfDestructType, bool>> selfdestruct = nullptr; // optional, SelfDestructType | boolean
+	std::unique_ptr<bool> breaks_protect = nullptr; // optional
+	std::unique_ptr<std::array<int, 2>> recoil = nullptr; // optional
+	std::unique_ptr<std::array<int, 2>> drain = nullptr; // optional
+	std::unique_ptr<bool> mind_blown_recoil = nullptr; // optional
+	std::unique_ptr<bool> steals_boosts = nullptr; // optional
+	std::unique_ptr<bool> struggle_recoil = nullptr; // optional
+	std::unique_ptr<SecondaryEffect> secondary = nullptr; // optional // Single secondary effect
+	std::unique_ptr<std::vector<SecondaryEffect>> secondaries = nullptr; // optional // Multiple secondary effects
+	std::unique_ptr<SecondaryEffect> self = nullptr; // optional // Self-targeting secondary effect
+	std::unique_ptr<bool> has_sheer_force = nullptr; // optional // Indicates if the move has Sheer Force effect
 
     // Hit effect modifiers
-	std::optional<bool> always_hit = std::nullopt;
-	std::optional<std::string> base_move_type = std::nullopt; // 'Water' | 'Fire' | etc.
-	std::optional<int> base_power_modifier = std::nullopt; // Modifier for base power
-	std::optional<int> crit_modifier = std::nullopt; // Modifier for critical hit power
-	std::optional<int> crit_ratio = std::nullopt; // Critical hit ratio
-    std::optional<std::string> override_offensive_pokemon = std::nullopt; // 'target' | 'source'
-	std::optional<StatIDExceptHP> override_offensive_stat = std::nullopt; // Stat to override for offensive calculations
-    std::optional<std::string> override_defensive_pokemon = std::nullopt; // 'target' | 'source'
-	std::optional<StatIDExceptHP> override_defensive_stat = std::nullopt; // Stat to override for defensive calculations
-	std::optional<bool> force_stab = std::nullopt; // Force STAB (Same Type Attack Bonus)
-	std::optional<bool> ignore_ability = std::nullopt; // Ignore target's ability
-	std::optional<bool> ignore_accuracy = std::nullopt; // Ignore accuracy checks
-	std::optional<bool> ignore_defensive = std::nullopt; // Ignore defensive modifiers
-	std::optional<bool> ignore_evasion = std::nullopt; // Ignore evasion modifiers
-	std::variant<bool, std::unordered_map<std::string, bool>> ignore_immunity = false; // boolean | { 'type': true/false }
-	std::optional<bool> ignore_negative_offensive = std::nullopt; // Ignore negative offensive modifiers
-	std::optional<bool> ignore_offensive = std::nullopt; // Ignore all offensive modifiers
-	std::optional<bool> ignore_positive_defensive = std::nullopt; // Ignore positive defensive modifiers
-	std::optional<bool> ignore_positive_evasion = std::nullopt; // Ignore positive evasion modifiers
-	std::optional<bool> multiaccuracy = std::nullopt; // Multi-hit accuracy check
-	std::variant<int, std::vector<int>> multihit = 1; // number | [min_hits, max_hits] or just number for single hit
-	std::optional<std::string> multihit_type = std::nullopt; // 'parentalbond'
-	std::optional<bool> no_damage_variance = std::nullopt; // No damage variance (e.g., no minimum or maximum damage)
-    // MoveTarget non_ghost_target; // Define as needed
-	std::optional<int> spread_modifier = std::nullopt; // Modifier for spread moves
-	std::optional<bool> sleep_usable = std::nullopt; // Can be used while asleep
-	std::optional<bool> smart_target = std::nullopt; // Smart targeting (e.g., ignores Substitute)
-	std::optional<bool> tracks_target = std::nullopt; // Tracks target's position
-	std::optional<bool> will_crit = std::nullopt; // Will always result in a critical hit
-	std::optional<bool> calls_move = std::nullopt; // Indicates if the move calls another move
+	std::unique_ptr<bool> always_hit = nullptr; // optional
+	std::unique_ptr<std::string> base_move_type = nullptr; // optional // 'Water' | 'Fire' | etc.
+	std::unique_ptr<int> base_power_modifier = nullptr; // optional // Modifier for base power
+	std::unique_ptr<int> crit_modifier = nullptr; // optional // Modifier for critical hit power
+	std::unique_ptr<int> crit_ratio = nullptr; // optional // Critical hit ratio
+	std::unique_ptr<std::string> override_offensive_pokemon = nullptr; // optional // 'target' | 'source'
+	std::unique_ptr<StatIDExceptHP> override_offensive_stat = nullptr; // optional // Stat to override for offensive calculations
+	std::unique_ptr<std::string> override_defensive_pokemon = nullptr; // optional // 'target' | 'source'
+	std::unique_ptr<StatIDExceptHP> override_defensive_stat = nullptr; // optional // Stat to override for defensive calculations
+	std::unique_ptr<bool> force_stab = nullptr; // optional // Force STAB (Same Type Attack Bonus)
+	std::unique_ptr<bool> ignore_ability = nullptr; // optional // Ignore target's ability
+	std::unique_ptr<bool> ignore_accuracy = nullptr; // optional // Ignore accuracy checks
+	std::unique_ptr<bool> ignore_defensive = nullptr; // optional // Ignore defensive modifiers
+	std::unique_ptr<bool> ignore_evasion = nullptr; // optional // Ignore evasion modifiers
+	std::unique_ptr<std::variant<bool, std::unordered_map<std::string, bool>>> ignore_immunity = nullptr; // boolean | { 'type': true/false }
+	std::unique_ptr<bool> ignore_negative_offensive = nullptr; // optional // Ignore negative offensive modifiers
+	std::unique_ptr<bool> ignore_offensive = nullptr; // optional // Ignore all offensive modifiers
+	std::unique_ptr<bool> ignore_positive_defensive = nullptr; // optional // Ignore positive defensive modifiers
+	std::unique_ptr<bool> ignore_positive_evasion = nullptr; // optional // Ignore positive evasion modifiers
+	std::unique_ptr<bool> multiaccuracy = nullptr; // optional // Multi-hit accuracy check
+	std::unique_ptr<std::variant<int, std::vector<int>>> multihit = nullptr; // optional, number | [min_hits, max_hits] or just number for single hit
+	std::unique_ptr<std::string> multihit_type = nullptr; // optional // 'parentalbond'
+	std::unique_ptr<bool> no_damage_variance = nullptr; // optional // No damage variance (e.g., no minimum or maximum damage)
+    std::unique_ptr<MoveTarget> non_ghost_target; // optional, Define as needed
+	std::unique_ptr<int> spread_modifier = nullptr; // optional // Modifier for spread moves
+	std::unique_ptr<bool> sleep_usable = nullptr; // optional // Can be used while asleep
+	std::unique_ptr<bool> smart_target = nullptr; // optional // Smart targeting (e.g., ignores Substitute)
+	std::unique_ptr<bool> tracks_target = nullptr; // optional // Tracks target's position
+	std::unique_ptr<bool> will_crit = nullptr; // optional // Will always result in a critical hit
+	std::unique_ptr<bool> calls_move = nullptr; // optional // Indicates if the move calls another move
 
     // Mechanics flags
-	std::optional<bool> has_crash_damage = std::nullopt; // Indicates if the move has crash damage
-	std::optional<bool> is_confusion_self_hit = std::nullopt; // Indicates if the move is a self-hit due to confusion
-	std::optional<bool> stalling_move = std::nullopt; // Indicates if the move is a stalling move
-	std::optional<ID> base_move = std::nullopt; // Base move ID for moves that are based on another move
+	std::unique_ptr<bool> has_crash_damage = nullptr; // optional // Indicates if the move has crash damage
+	std::unique_ptr<bool> is_confusion_self_hit = nullptr; // optional // Indicates if the move is a self-hit due to confusion
+	std::unique_ptr<bool> stalling_move = nullptr; // optional // Indicates if the move is a stalling move
+	std::unique_ptr<ID> base_move = nullptr; // optional // Base move ID for moves that are based on another move
+
+	MoveData(
+		// MoveData
+		std::string name,
+		MoveTarget target,
+		MoveFlags& flags,
+		int base_power = 0,
+		std::variant<bool, int> accuracy = false,
+		int pp = 0,
+		MoveCategory category = MoveCategory::STATUS,
+		std::string type = "",
+		int priority = 0,
+
+		//// MoveData optional
+		//std::unique_ptr<int> num = nullptr,
+		//std::unique_ptr<ConditionData> condition,
+		//std::unique_ptr<std::string> real_move = nullptr,
+		//std::unique_ptr<std::variant<std::monostate, int, std::string, bool>> damage = nullptr,
+		//std::unique_ptr<std::string> contest_type = nullptr,
+		//std::unique_ptr<bool> no_pp_boosts = nullptr,
+		//std::unique_ptr<std::variant<bool, IDEntry>> is_z = nullptr,
+		//std::unique_ptr<ZMoveData> z_move = nullptr,
+		//std::unique_ptr<std::variant<bool, std::string>> is_max = nullptr,
+		//std::unique_ptr<MaxMoveData> max_move = nullptr,
+		//std::unique_ptr<std::variant<bool, std::string>> ohko = nullptr,
+		//std::unique_ptr<bool> thaws_target = nullptr,
+		//std::unique_ptr<std::vector<int>> heal = nullptr,
+		//std::unique_ptr<bool> force_switch = nullptr,
+		//std::unique_ptr<std::variant<SelfSwitchType, bool>> self_switch = nullptr,
+		//std::unique_ptr<SelfBoost> self_boost = nullptr,
+		//std::unique_ptr<std::variant<SelfDestructType, bool>> selfdestruct = nullptr,
+		//std::unique_ptr<bool> breaks_protect = nullptr,
+		//std::unique_ptr<std::array<int, 2>> recoil = nullptr,
+		//std::unique_ptr<std::array<int, 2>> drain = nullptr,
+		//std::unique_ptr<bool> mind_blown_recoil = nullptr,
+		//std::unique_ptr<bool> steals_boosts = nullptr,
+		//std::unique_ptr<bool> struggle_recoil = nullptr,
+		//std::unique_ptr<SecondaryEffect> secondary = nullptr,
+		//std::unique_ptr<std::vector<SecondaryEffect>> secondaries = nullptr,
+		//std::unique_ptr<SecondaryEffect> self = nullptr,
+		//std::unique_ptr<bool> has_sheer_force = nullptr,
+		//std::unique_ptr<bool> always_hit = nullptr,
+		//std::unique_ptr<std::string> base_move_type = nullptr,
+		//std::unique_ptr<int> base_power_modifier = nullptr,
+		//std::unique_ptr<int> crit_modifier = nullptr,
+		//std::unique_ptr<int> crit_ratio = nullptr,
+		//std::unique_ptr<std::string> override_offensive_pokemon = nullptr,
+		//std::unique_ptr<StatIDExceptHP> override_offensive_stat = nullptr,
+		//std::unique_ptr<std::string> override_defensive_pokemon = nullptr,
+		//std::unique_ptr<StatIDExceptHP> override_defensive_stat = nullptr,
+		//std::unique_ptr<bool> force_stab = nullptr,
+		//std::unique_ptr<bool> ignore_ability = nullptr,
+		//std::unique_ptr<bool> ignore_accuracy = nullptr,
+		//std::unique_ptr<bool> ignore_defensive = nullptr,
+		//std::unique_ptr<bool> ignore_evasion = nullptr,
+		//std::unique_ptr<std::variant<bool, std::unordered_map<std::string, bool>>> ignore_immunity = nullptr,
+		//std::unique_ptr<bool> ignore_negative_offensive = nullptr,
+		//std::unique_ptr<bool> ignore_offensive = nullptr,
+		//std::unique_ptr<bool> ignore_positive_defensive = nullptr,
+		//std::unique_ptr<bool> ignore_positive_evasion = nullptr,
+		//std::unique_ptr<bool> multiaccuracy = nullptr,
+		//std::unique_ptr<std::variant<int, std::vector<int>>> multihit = nullptr,
+		//std::unique_ptr<std::string> multihit_type = nullptr,
+		//std::unique_ptr<bool> no_damage_variance = nullptr,
+		//std::unique_ptr<MoveTarget> non_ghost_target,
+		//std::unique_ptr<int> spread_modifier = nullptr,
+		//std::unique_ptr<bool> sleep_usable = nullptr,
+		//std::unique_ptr<bool> smart_target = nullptr,
+		//std::unique_ptr<bool> tracks_target = nullptr,
+		//std::unique_ptr<bool> will_crit = nullptr,
+		//std::unique_ptr<bool> calls_move = nullptr,
+		//std::unique_ptr<bool> has_crash_damage = nullptr,
+		//std::unique_ptr<bool> is_confusion_self_hit = nullptr,
+		//std::unique_ptr<bool> stalling_move = nullptr,
+		//std::unique_ptr<ID> base_move = nullptr,
+		
+		// EffectData
+		std::unique_ptr<std::string> desc = nullptr,
+		std::unique_ptr<int> duration = nullptr,
+		std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback = nullptr,
+		std::unique_ptr<EffectType> effect_type = nullptr,
+		std::unique_ptr<bool> infiltrates = nullptr,
+		std::unique_ptr<NonStandard> is_nonstandard = nullptr,
+		std::unique_ptr<std::string> short_desc = nullptr,
+		
+		// HitEffect
+		std::unique_ptr<OnHitFunc> on_hit = nullptr,
+		std::unique_ptr<SparseBoostsTable> boosts = nullptr,
+		std::unique_ptr<std::string> status = nullptr,
+		std::unique_ptr<std::string> volatile_status = nullptr,
+		std::unique_ptr<std::string> side_condition = nullptr,
+		std::unique_ptr<std::string> slot_condition = nullptr,
+		std::unique_ptr<std::string> pseudo_weather = nullptr,
+		std::unique_ptr<std::string> terrain = nullptr,
+		std::unique_ptr<std::string> weather = nullptr);
 };

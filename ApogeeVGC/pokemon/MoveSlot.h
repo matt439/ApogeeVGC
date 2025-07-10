@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <optional>
 #include <variant>
 
 struct MoveSlot
@@ -10,9 +9,8 @@ struct MoveSlot
 	std::string move = "";
 	int pp = 0;
 	int maxpp = 0;
-	std::optional<std::string> target = std::nullopt;
+	std::string* target = nullptr; // optional
 	std::variant<bool, std::string> disabled = false; // std::variant for union type
-	std::optional<std::string> disabled_source = std::nullopt; // std::optional for optional field
+	std::string* disabled_source = nullptr; // optional
 	bool used = false;
-	std::optional<bool> is_virtual = std::nullopt;
-};
+	bool* is_virtual = nullptr; // optional

@@ -2,7 +2,7 @@
 
 #include "../global-types/Effect.h"
 #include "../global-types/SparseBoostsTable.h"
-//#include "../global-types/function_type_aliases.h"
+#include "../global-types/function_type_aliases.h"
 //#include "../dex-moves/SecondaryEffect.h"
 //#include "../battle/Battle.h"
 //#include "../pokemon/Pokemon.h"
@@ -12,7 +12,6 @@
 //#include "Condition.h"
 #include <functional>
 #include <variant>
-// #include <optional>
 #include <string>
 #include <vector>
 
@@ -23,6 +22,7 @@ class Item;
 class ActiveMove;
 class Condition;
 class Side;
+struct SecondaryEffect;
 
 using OnDamagingHitFunc = std::function<void(Battle*, int, Pokemon*, Pokemon*, ActiveMove*)>;
 using OnEmergencyExitFunc = std::function<void(Battle*, Pokemon*)>;
