@@ -18,37 +18,30 @@
 #include "DataType.h"
 #include "IModdedDex.h"
 #include "TypesManager.h"
+#include "IDex.h"
+#include <filesystem>
 
 class ModdedDex : public IModdedDex
 {
 public:
-    // Data type/class references (could be type aliases or static methods)
-    // For C++, these are typically not needed, but you can provide static access if desired.
+	IDex* dex_parent = nullptr;
+    std::unordered_map<std::string, ModdedDex>& dexes;
 
-    // Metadata
     std::string name = "[ModdedDex]";
     bool is_base = false;
     std::string current_mod = "";
-    std::string data_dir = "";
+    std::filesystem::path data_dir = "";
 
-    // Utility function alias
-    using ToIDFunc = std::string(*)(const std::string&);
-    ToIDFunc toID = to_id; // from dex-data.h
+    //// Utility function alias
+    //using ToIDFunc = std::string(*)(const std::string&);
+    //ToIDFunc toID = to_id; // from dex-data.h
 
-    // State
     int gen = 0;
     std::string parent_mod = "";
     bool mods_loaded = false;
 
-    // Data caches
 	std::unique_ptr<DexTableData> data_cache = nullptr;
 	std::unique_ptr<TextTableData> text_cache = nullptr;
-
-    // Utility functions (placeholders, define as needed)
-    // For deepClone, deepFreeze, Multiset, use std::function or static methods
-    // std::function<ReturnType(Args...)> deepClone;
-    // std::function<ReturnType(Args...)> deepFreeze;
-    // MultisetType Multiset;
 
 	std::unique_ptr<DexFormats> formats = nullptr;
 	std::unique_ptr<DexAbilities> abilities = nullptr;
@@ -60,21 +53,20 @@ public:
 	std::unique_ptr<DexTypes> types = nullptr;
 	std::unique_ptr<DexStats> stats = nullptr;
 
-    // Aliases
 	std::unique_ptr<AliasesTable> aliases = nullptr;
     // For fuzzyAliases, use a map from ID to vector of IDs
 	std::unique_ptr<std::unordered_map<IDEntry, std::vector<IDEntry>>> fuzzy_aliases = nullptr;
 
-    ModdedDex(const std::string& mod = "base");
+    ModdedDex(IDex* dex_parent, const std::string& mod = "base");
 
     // Returns the loaded data table for this dex
-    DexTableData& data() override;
+    DexTableData& get_data() override;
 
     // Returns the global map of all dexes, ensuring mods are included
-    static std::unordered_map<std::string, ModdedDex>& get_dexes();
+    std::unordered_map<std::string, ModdedDex>& get_dexes();
 
     // Returns a ModdedDex for a given mod name, ensuring data is included
-    static ModdedDex& mod(const std::string& mod = "base");
+    ModdedDex& mod(const std::string& mod = "base");
 
     // Returns a ModdedDex for a given generation, or this if gen is 0
     ModdedDex& for_gen(int gen);

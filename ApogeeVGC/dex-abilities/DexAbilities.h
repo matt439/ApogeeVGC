@@ -1,7 +1,12 @@
 #pragma once
 
+#include "../dex/IModdedDex.h"
+
 class DexAbilities
 {
 public:
-    int x = -1;
+	IModdedDex* dex = nullptr;
+
+	DexAbilities() = default;
+	DexAbilities(IModdedDex* dex_ptr);
 };

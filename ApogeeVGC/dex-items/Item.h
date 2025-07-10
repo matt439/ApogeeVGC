@@ -11,8 +11,9 @@
 #include <functional>
 #include <memory>
 
-struct Item : public BasicEffect
+class Item : public BasicEffect
 {
+public:
     // std::string fullname; // already defined in BasicEffect
 
     // static constexpr EffectType effect_type = EffectType::ITEM;

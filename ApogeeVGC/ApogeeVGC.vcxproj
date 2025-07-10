@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="battle\Battle.cpp" />
     <ClCompile Include="dex-abilities\Ability.cpp" />
+    <ClCompile Include="dex-abilities\AbilityData.cpp" />
+    <ClCompile Include="dex-abilities\DexAbilities.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
     <ClCompile Include="dex-data\BasicEffect.cpp" />
     <ClCompile Include="dex-data\BasicEffectData.cpp" />
@@ -35,6 +37,7 @@
     <ClCompile Include="dex-items\ItemInitData.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
+    <ClCompile Include="dex\Dex.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
     <ClCompile Include="global-types\EffectData.cpp" />
@@ -48,9 +51,12 @@
     <ClInclude Include="battle\Battle.h" />
     <ClInclude Include="dex-abilities\Ability.h" />
     <ClInclude Include="dex-abilities\AbilityData.h" />
+    <ClInclude Include="dex-abilities\AbilityDataTable.h" />
     <ClInclude Include="dex-abilities\AbilityEventMethods.h" />
     <ClInclude Include="dex-abilities\AbilityFlags.h" />
     <ClInclude Include="dex-abilities\DexAbilities.h" />
+    <ClInclude Include="dex-abilities\ModdedAbilityData.h" />
+    <ClInclude Include="dex-abilities\ModdedAbilityDataTable.h" />
     <ClInclude Include="dex-conditions\Condition.h" />
     <ClInclude Include="dex-conditions\ConditionData.h" />
     <ClInclude Include="dex-conditions\DexConditions.h" />
@@ -120,14 +126,16 @@
     <ClInclude Include="dex-species\SpeciesData.h" />
     <ClInclude Include="dex-species\SpeciesFormatsData.h" />
     <ClInclude Include="dex\AliasesTable.h" />
+    <ClInclude Include="dex\BASE_MOD.h" />
     <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DataType.h" />
     <ClInclude Include="dex\DATA_FILES.h" />
     <ClInclude Include="dex\DATA_TYPES.h" />
     <ClInclude Include="dex\DescriptionResult.h" />
-    <ClInclude Include="dex\dexes.h" />
+    <ClInclude Include="dex\Dex.h" />
     <ClInclude Include="dex\DexTable.h" />
     <ClInclude Include="dex\DexTableData.h" />
+    <ClInclude Include="dex\IDex.h" />
     <ClInclude Include="dex\ModdedDex.h" />
     <ClInclude Include="dex\TextTableData.h" />
     <ClInclude Include="dex\TypeData.h" />

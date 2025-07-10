@@ -28,6 +28,9 @@
     <ClCompile Include="global-types\EffectData.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
+    <ClCompile Include="dex-abilities\AbilityData.cpp" />
+    <ClCompile Include="dex-abilities\DexAbilities.cpp" />
+    <ClCompile Include="dex\Dex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -129,7 +132,6 @@
     <ClInclude Include="dex\TypesManager.h" />
     <ClInclude Include="dex\DescriptionResult.h" />
     <ClInclude Include="dex\ModdedDex.h" />
-    <ClInclude Include="dex\dexes.h" />
     <ClInclude Include="dex-items\EMPTY_ITEM.h" />
     <ClInclude Include="dex-moves\MutableMove.h" />
     <ClInclude Include="dex-moves\ActiveMove.h" />
@@ -162,5 +164,11 @@
     <ClInclude Include="dex-abilities\AbilityEventMethods.h" />
     <ClInclude Include="dex-data\BasicEffectOptionalData.h" />
     <ClInclude Include="dex-data\EMPTY_NATURE.h" />
+    <ClInclude Include="dex-abilities\ModdedAbilityData.h" />
+    <ClInclude Include="dex-abilities\AbilityDataTable.h" />
+    <ClInclude Include="dex-abilities\ModdedAbilityDataTable.h" />
+    <ClInclude Include="dex\BASE_MOD.h" />
+    <ClInclude Include="dex\Dex.h" />
+    <ClInclude Include="dex\IDex.h" />
   </ItemGroup>
 </Project>
