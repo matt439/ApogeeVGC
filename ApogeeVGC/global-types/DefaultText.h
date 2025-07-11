@@ -1,6 +1,10 @@
 #pragma once
 
+#include "../dex/Descriptions.h"
+#include "AnyObject.h"
+
 struct DefaultText
 {
-	int x = 0;
+	AnyObject data = {};
+	Descriptions get_descriptions() const;
 };

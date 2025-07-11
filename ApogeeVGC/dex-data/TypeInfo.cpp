@@ -20,33 +20,33 @@ TypeInfo::TypeInfo(const ID& id,
 {
 }
 
-TypeInfo& TypeInfo::operator=(const TypeInfo& other)
-{
-	id = other.id;
-	name = other.name;
-	effect_type = other.effect_type;
-	exists = other.exists;
-	gen = other.gen;
-
-	// Copy TypeData members
-	damage_taken = other.damage_taken;
-	if (other.hp_dvs)
-		hp_dvs = std::make_unique<SparseStatsTable>(*other.hp_dvs);
-	else
-		hp_dvs.reset();
-
-
-	if (other.hp_ivs)
-		hp_ivs = std::make_unique<SparseStatsTable>(*other.hp_ivs);
-	else
-		hp_ivs.reset();
-
-
-	if (other.is_nonstandard)
-		is_nonstandard = std::make_unique<NonStandard>(*other.is_nonstandard);
-	else
-		is_nonstandard.reset();
-}
+//TypeInfo& TypeInfo::operator=(const TypeInfo& other)
+//{
+//	id = other.id;
+//	name = other.name;
+//	effect_type = other.effect_type;
+//	exists = other.exists;
+//	gen = other.gen;
+//
+//	// Copy TypeData members
+//	damage_taken = other.damage_taken;
+//	if (other.hp_dvs)
+//		hp_dvs = std::make_unique<SparseStatsTable>(*other.hp_dvs);
+//	else
+//		hp_dvs.reset();
+//
+//
+//	if (other.hp_ivs)
+//		hp_ivs = std::make_unique<SparseStatsTable>(*other.hp_ivs);
+//	else
+//		hp_ivs.reset();
+//
+//
+//	if (other.is_nonstandard)
+//		is_nonstandard = std::make_unique<NonStandard>(*other.is_nonstandard);
+//	else
+//		is_nonstandard.reset();
+//}
 
 const std::string& TypeInfo::to_string() const
 {

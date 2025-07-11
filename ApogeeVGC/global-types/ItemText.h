@@ -1,6 +1,9 @@
 #pragma once
 
-struct ItemText
+#include "TextFile.h"
+#include "ConditionTextData.h"
+
+struct ItemText : public TextFile<ConditionTextData>
 {
-	int x = 0;
+	Descriptions get_descriptions() const;
 };

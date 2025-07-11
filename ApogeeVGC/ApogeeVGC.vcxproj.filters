@@ -37,6 +37,11 @@
     <ClCompile Include="dex-data\DexTypes.cpp" />
     <ClCompile Include="dex-data\to_lower.cpp" />
     <ClCompile Include="dex\TextTableData.cpp" />
+    <ClCompile Include="global-types\AbilityText.cpp" />
+    <ClCompile Include="global-types\ItemText.cpp" />
+    <ClCompile Include="global-types\MoveText.cpp" />
+    <ClCompile Include="global-types\PokedexText.cpp" />
+    <ClCompile Include="global-types\DefaultText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -201,5 +206,8 @@
     <ClInclude Include="dex-data\to_lower.h" />
     <ClInclude Include="global-types\BasicTextData.h" />
     <ClInclude Include="global-types\ConditionTextData.h" />
+    <ClInclude Include="global-types\MoveTextData.h" />
+    <ClInclude Include="global-types\TextFile.h" />
+    <ClInclude Include="dex-data\EMPTY_TYPE_INFO.h" />
   </ItemGroup>
 </Project>

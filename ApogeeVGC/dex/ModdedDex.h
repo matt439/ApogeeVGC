@@ -27,7 +27,7 @@ class ModdedDex : public IModdedDex
 {
 public:
 	IDex* dex_parent = nullptr;
-    std::unordered_map<std::string, ModdedDex>* dexes;
+	std::unordered_map<std::string, ModdedDex>* dexes = nullptr;
 
     std::string name = "[ModdedDex]";
     bool is_base = false;
@@ -62,13 +62,13 @@ public:
     ModdedDex(IDex* dex_parent, const std::string& mod = "base");
 
     // Returns the loaded data table for this dex
-    DexTableData& get_data() override;
+    DexTableData* get_data() override;
 
     // Returns the global map of all dexes, ensuring mods are included
     std::unordered_map<std::string, ModdedDex>* get_dexes();
 
     // Returns a ModdedDex for a given mod name, ensuring data is included
-    ModdedDex* get_modded_dex(const std::string& mod = "base");
+	ModdedDex* get_modded_dex(const std::string& mod = "base") override;
 
     // Returns a ModdedDex for a given generation, or this if gen is 0
     ModdedDex* get_modded_dex_for_gen(int gen);
@@ -145,15 +145,14 @@ public:
     //template<typename Source>
     //int get_effectiveness(const Source& source, const std::vector<std::string>& target_types) const;
 
-    Descriptions get_descriptions(const std::string& table,
-        const std::string& id, const AnyObject& data_entry);
+	Descriptions get_descriptions(const std::string& table, const std::string& id) override;
 
 	ActiveMove& get_active_move(const std::string& id);
 	ActiveMove& get_active_move(const Move& move);
 
     StatsTable get_hidden_power();
 
-    std::vector<std::any> data_search(const std::string & target, 
+    std::vector<AnyObject> data_search(const std::string & target, 
         const std::vector<std::string>&search_in = {}, bool is_inexact = false);
 
 
@@ -180,7 +179,7 @@ public:
 
     AliasesTable& load_aliases();
 
-	DexTableData& load_data();
+	void load_data();
 
     ModdedDex* include_formats();
 
@@ -188,5 +187,7 @@ public:
 	// without being exposed to ModdedDex specifics
     DexTableData* get_data_cache() override;
     int get_gen() const override;
+
+	const std::string& get_parent_mod() const override;
 
 };

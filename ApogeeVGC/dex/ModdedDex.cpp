@@ -25,9 +25,10 @@ ModdedDex::ModdedDex(IDex* dex_parent, const std::string& mod) :
 		data_dir = MODS_DIR / mod;
 }
 
-DexTableData& ModdedDex::get_data()
+DexTableData* ModdedDex::get_data()
 {
-    return load_data();
+    load_data();
+	return data_cache.get();
 }
 
 std::unordered_map<std::string, ModdedDex>* ModdedDex::get_dexes()
@@ -245,73 +246,15 @@ int ModdedDex::get_effectiveness(const std::string& source_type,
 ////    return type_map.at(data_type);
 ////}
 
-Descriptions ModdedDex::get_descriptions(const std::string& table,
-    const std::string& id, const AnyObject& data_entry)
+Descriptions ModdedDex::get_descriptions(const std::string& table, const std::string& id)
 {
-    // If data_entry has a shortDesc, use it directly
-    if (!data_entry.short_desc.empty()) {
-        return { data_entry.desc, data_entry.short_desc };
-    }
+	if (table.empty() || id.empty())
+		return { "", "" }; // Invalid input
 
     // Look up the entry in the text table
     TextTableData& text_table = load_text_data();
 
-	void* table_ptr = text_table.get_table(table);
-	if (!table_ptr) {
-		return { "", "" }; // Table not found
-	}
-
-	// Use dynamic_cast to convert void* to the correct type
-	if (table == "abilities")
-    {
-		auto& text_table_abilities = *static_cast<DexTable<AbilityText>*>(table_ptr);
-		return get_description_from_table(text_table_abilities, id);
-	}
-	else if (table == "items")
-    {
-		auto& text_table_items = *static_cast<DexTable<ItemText>*>(table_ptr);
-		return get_description_from_table(text_table_items, id);
-	}
-	else if (table == "moves")
-    {
-		auto& text_table_moves = *static_cast<DexTable<MoveText>*>(table_ptr);
-		return get_description_from_table(text_table_moves, id);
-	}
-	else if (table == "pokedex")
-    {
-		auto& text_table_pokedex = *static_cast<DexTable<PokedexText>*>(table_ptr);
-		return get_description_from_table(text_table_pokedex, id);
-	}
-	// If table is not recognized, return empty descriptions
-	return { "", "" };
-
-
-
-    //const auto& entry = text_table.get_table(table).find(id);
-
-
-
-    //if (entry == text_table.get_table(table).end())
-    //    return { "", "" }; // Not found
-
-    //Descriptions descs{ "", "" };
-    //int base_gen = dexes->at("base").gen;
-    //for (int i = gen; i < base_gen; ++i) {
-    //    std::string gen_key = "gen" + std::to_string(i);
-    //    auto gen_entry = entry->second.gen_descs.find(gen_key);
-    //    if (gen_entry != entry->second.gen_descs.end()) {
-    //        if (descs.desc.empty() && !gen_entry->second.desc.empty()) {
-    //            descs.desc = gen_entry->second.desc;
-    //        }
-    //        if (descs.short_desc.empty() && !gen_entry->second.short_desc.empty()) {
-    //            descs.short_desc = gen_entry->second.short_desc;
-    //        }
-    //        if (!descs.desc.empty() && !descs.short_desc.empty()) break;
-    //    }
-    //}
-    //if (descs.short_desc.empty()) descs.short_desc = entry->second.short_desc;
-    //if (descs.desc.empty()) descs.desc = entry->second.desc.empty() ? descs.short_desc : entry->second.desc;
-    //return descs;
+	return text_table.get_description_from_table(table, id);
 }
 
 
@@ -530,3 +473,8 @@ Descriptions ModdedDex::get_descriptions(const std::string& table,
 //{
 //    return gen;
 //}
+
+const std::string& ModdedDex::get_parent_mod() const
+{
+	return parent_mod;
+}

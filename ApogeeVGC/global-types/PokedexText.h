@@ -1,6 +1,9 @@
 #pragma once
 
-struct PokedexText
+#include "TextFile.h"
+#include "BasicTextData.h"
+
+struct PokedexText : public TextFile<BasicTextData>
 {
-	int x = 0;
+	Descriptions get_descriptions() const;
 };

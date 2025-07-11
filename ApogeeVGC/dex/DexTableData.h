@@ -11,10 +11,11 @@
 #include "../dex-species/SpeciesData.h"
 #include "../dex-species/SpeciesFormatsData.h"
 #include "../dex-species/PokemonGoData.h"
+#include "../dex-data/TypeData.h"
 
 #include "../global-types/AnyObject.h"
 #include "DexTable.h"
-#include "TypeData.h"
+// #include "TypeData.h"
 
 //// forward declarations
 //class AbilityData;

@@ -1,6 +1,9 @@
 #pragma once
 
-struct MoveText
+#include "TextFile.h"
+#include "MoveTextData.h"
+
+struct MoveText : public TextFile<MoveTextData>
 {
-	int x = 0;
+	Descriptions get_descriptions() const;
 };

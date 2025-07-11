@@ -7,21 +7,20 @@
 struct DexItems
 {
 	IModdedDex* dex = nullptr;
-	std::unordered_map<std::string, Item> item_cache = {};
-	std::unique_ptr<std::vector<Item>> all_cache = nullptr;
+	std::unordered_map<std::string, std::unique_ptr<Item>> item_cache = {};
+	std::unique_ptr<std::vector<std::unique_ptr<Item>>> all_cache = nullptr;
+
+    // const std::unique_ptr<Item> EMPTY_ITEM = std::make_unique<Item>("empty");
 
 	DexItems() = default;
     DexItems(IModdedDex* dex_ptr);
 
-    // Get by Item (returns reference)
-    const Item& get_item(const Item& item) const;
+    // Item* get_item(const Item& item) const;
 
-    // Get by name (string)
-    const Item& get_item(const std::string& name);
+    Item* get_item(const std::string& name);
 
-    // Get by ID
-    const Item& get_item_by_id(const ID& id);
+    Item* get_item(const ID& id);
 
     // Get all items
-    const std::vector<Item>& get_all_items();
+    std::vector<std::unique_ptr<Item>>* get_all_items();
 };

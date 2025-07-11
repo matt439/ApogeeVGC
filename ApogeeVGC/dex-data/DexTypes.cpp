@@ -1,13 +1,13 @@
 #include "DexTypes.h"
 
-// #include "EMPTY_TYPE_INFO.h"
+#include "EMPTY_TYPE_INFO.h"
 
-TypeInfo EMPTY_TYPE_INFO(
-	ID(""),
-	"",
-	TypeInfoEffectType::EFFECT_TYPE,
-	false
-);
+//TypeInfo EMPTY_TYPE_INFO(
+//	ID(""),
+//	"",
+//	TypeInfoEffectType::EFFECT_TYPE,
+//	false
+//);
 
 DexTypes::DexTypes(IModdedDex* dex_ptr) : dex(dex_ptr)
 {
@@ -16,11 +16,11 @@ DexTypes::DexTypes(IModdedDex* dex_ptr) : dex(dex_ptr)
 TypeInfo* DexTypes::get_type_info(const ID& id)
 {
     if (id.empty())
-        return &EMPTY_TYPE_INFO;
+        return EMPTY_TYPE_INFO.get();
 
     auto it = type_cache.find(id);
     if (it != type_cache.end())
-        return &it->second;
+		return it->second.get();
 
     // Capitalize first letter for display name
     std::string type_name = id;
@@ -28,7 +28,7 @@ TypeInfo* DexTypes::get_type_info(const ID& id)
         type_name[0] = std::toupper(type_name[0]);
 
     // Check if type exists in TypeChart
-    auto& type_chart = dex->get_data().type_chart;
+	auto type_chart = dex->get_data()->type_chart;
     auto chart_it = type_chart.find(id);
     TypeInfo type_info;
     if (chart_it != type_chart.end())
@@ -55,31 +55,40 @@ TypeInfo* DexTypes::get_type_info(const ID& id)
     // Cache if exists
     if (type_info.exists)
     {
-        type_cache[id] = type_info;
-        return &type_cache[id];
+        type_cache[id] = std::make_unique<TypeInfo>(type_info);
+		return type_cache[id].get();
     }
 
-    return &EMPTY_TYPE_INFO;
+	return EMPTY_TYPE_INFO.get();
 }
 
 
 TypeInfo* DexTypes::get_type_info(const TypeInfo& type_info)
 {
 	if (type_info.id.empty())
-		return &EMPTY_TYPE_INFO;
+		return EMPTY_TYPE_INFO.get();
 
 	// Check cache first
 	auto it = type_cache.find(type_info.id);
 	if (it != type_cache.end())
-		return &it->second;
+		return it->second.get();
 
-	// Create a copy of the TypeInfo
-	//TypeInfo new_type_info = type_info;
-	std::unique_ptr<TypeInfo> new_type_info = std::make_unique<TypeInfo>(type_info);
+	// If not in cache, create a new TypeInfo
+	TypeInfo new_type_info(
+		type_info.id,
+		type_info.name,
+		type_info.effect_type,
+		type_info.exists,
+		type_info.gen,
+		type_info.damage_taken,
+		std::make_unique<SparseStatsTable>(*type_info.hp_dvs),
+		std::make_unique<SparseStatsTable>(*type_info.hp_ivs),
+		std::make_unique<NonStandard>(*type_info.is_nonstandard)
+	);
 
-	// Cache the new TypeInfo
-	type_cache[new_type_info->id] = *new_type_info;
-	return &type_cache[new_type_info->id];
+	// Store in cache
+	type_cache[type_info.id] = std::make_unique<TypeInfo>(new_type_info);
+	return type_cache[type_info.id].get();
 }
 
 std::vector<std::string>* DexTypes::get_names()
@@ -90,9 +99,9 @@ std::vector<std::string>* DexTypes::get_names()
 	names_cache = std::make_unique<std::vector<std::string>>();
 	for (const auto& kv : type_cache)
 	{
-		const TypeInfo& type_info = kv.second;
-		if (type_info.exists)
-			names_cache->push_back(type_info.name);
+		auto type_info = kv.second.get();
+		if (type_info->exists)
+			names_cache->push_back(type_info->name);
 	}
 	return names_cache.get();
 }
@@ -108,21 +117,22 @@ bool DexTypes::is_name(const std::string& name) const
 	id[0] = std::toupper(id[0]); // Capitalize first letter
 
 	return type_cache.find(ID(id)) != type_cache.end() &&
-		type_cache.at(ID(id)).exists &&
-		type_cache.at(ID(id)).name == id;
+		type_cache.at(ID(id))->exists &&
+		type_cache.at(ID(id))->name == id;
 }
 
-std::vector<TypeInfo>* DexTypes::get_all_type_infos()
+std::vector<std::unique_ptr<TypeInfo>>* DexTypes::get_all_type_infos()
 {
 	if (all_cache)
 		return all_cache.get();
 
-	all_cache = std::make_unique<std::vector<TypeInfo>>();
+	all_cache = std::make_unique<std::vector<std::unique_ptr<TypeInfo>>>();
 	for (const auto& kv : type_cache)
 	{
-		const TypeInfo& type_info = kv.second;
-		if (type_info.exists)
-			all_cache->push_back(type_info);
+		if (kv.second->exists)
+		{
+			all_cache->emplace_back(std::make_unique<TypeInfo>(*kv.second));
+		}
 	}
 	return all_cache.get();
 }

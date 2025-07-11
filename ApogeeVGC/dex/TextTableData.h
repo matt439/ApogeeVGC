@@ -26,5 +26,5 @@ struct TextTableData
     // Returns a pointer to the requested table, or nullptr if not found
 	void* get_table(const std::string& name);
 
-	Descriptions get_description_from_table(const std::string& table, const std::string& id) const;
+	Descriptions get_description_from_table(const std::string& table, const std::string& id);
 };

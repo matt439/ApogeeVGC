@@ -15,11 +15,11 @@ public:
 	int gen = 0;
 
 	TypeInfo() = default;
-	TypeInfo(const TypeInfo&) = default;
-	
-	TypeInfo(TypeInfo&&) = default; // Add move constructor  
-	TypeInfo& operator=(const TypeInfo& other);
-	TypeInfo& operator=(TypeInfo&& other) = default; // Add move assignment operator
+	//TypeInfo(const TypeInfo&) = default;
+	//
+	//TypeInfo(TypeInfo&&) = default; // Add move constructor  
+	//TypeInfo& operator=(const TypeInfo& other);
+	//TypeInfo& operator=(TypeInfo&& other) = default; // Add move assignment operator
 
 	TypeInfo(const ID& id,
 		const std::string& name,

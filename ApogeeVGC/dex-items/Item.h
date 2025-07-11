@@ -154,4 +154,6 @@ public:
         std::unique_ptr<std::string> weather = nullptr,
         std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback = nullptr,
         std::unique_ptr<bool> infiltrates = nullptr);
+
+    // Item& operator=(const Item& other);
 };

@@ -45,9 +45,14 @@
     <ClCompile Include="dex\Dex.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
     <ClCompile Include="dex\TextTableData.cpp" />
+    <ClCompile Include="global-types\AbilityText.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
+    <ClCompile Include="global-types\DefaultText.cpp" />
     <ClCompile Include="global-types\EffectData.cpp" />
+    <ClCompile Include="global-types\ItemText.cpp" />
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
+    <ClCompile Include="global-types\MoveText.cpp" />
+    <ClCompile Include="global-types\PokedexText.cpp" />
     <ClCompile Include="program.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +91,7 @@
     <ClInclude Include="dex-data\DexStats.h" />
     <ClInclude Include="dex-data\DexTypes.h" />
     <ClInclude Include="dex-data\EMPTY_NATURE.h" />
+    <ClInclude Include="dex-data\EMPTY_TYPE_INFO.h" />
     <ClInclude Include="dex-data\HasID.h" />
     <ClInclude Include="dex-data\ModdedNatureData.h" />
     <ClInclude Include="dex-data\ModdedTypeData.h" />
@@ -189,6 +195,7 @@
     <ClInclude Include="global-types\ModdedEffectData.h" />
     <ClInclude Include="global-types\ModdedField.h" />
     <ClInclude Include="global-types\MoveText.h" />
+    <ClInclude Include="global-types\MoveTextData.h" />
     <ClInclude Include="global-types\NonStandard.h" />
     <ClInclude Include="global-types\OtherTier.h" />
     <ClInclude Include="global-types\PokedexText.h" />
@@ -203,6 +210,7 @@
     <ClInclude Include="global-types\StatIDExceptHP.h" />
     <ClInclude Include="global-types\StatsExceptHPTable.h" />
     <ClInclude Include="global-types\StatsTable.h" />
+    <ClInclude Include="global-types\TextFile.h" />
     <ClInclude Include="global-types\ZMoveOption.h" />
     <ClInclude Include="dex\IModdedDex.h" />
     <ClInclude Include="global-types\ZMoveOptions.h" />
