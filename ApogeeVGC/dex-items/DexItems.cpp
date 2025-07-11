@@ -1,83 +1,78 @@
-#include "DexItems.h"  
-#include "EMPTY_ITEM.h"  
+#include "DexItems.h"
+
 #include "../dex-data/to_id.h"  
-#include "ItemData.h" // Include the definition of ItemData  
+#include "EMPTY_ITEM.h"  
+// #include "ItemData.h"
 
-//DexItems::DexItems(IModdedDex* dex_ptr)  
-//   : dex(dex_ptr), all_cache(std::nullopt)  
-//{  
-//}  
-//
-//const Item& DexItems::get(const Item& item) const  
-//{  
-//   return item;  
-//}  
-//
-//const Item& DexItems::get(const std::string& name)  
-//{  
-//   std::string id = to_id(name); // Assume to_id trims and normalizes  
-//   return get_by_id(id);  
-//}  
+DexItems::DexItems(IModdedDex* dex_ptr)  
+   : dex(dex_ptr)
+{
+}  
 
-//const Item& DexItems::get_by_id(const std::string& id)  
-//{  
-//   if (id.empty()) return EMPTY_ITEM;  
-//
-//   auto it = item_cache.find(id);  
-//   if (it != item_cache.end()) return it->second;  
-//
-//   // Alias resolution (pseudo-code, depends on ModdedDex API)  
-//   std::optional<std::string> alias = dex->get_alias(id);  
-//   if (alias)  
-//   {  
-//       const Item& item = get(*alias);  
-//       if (item.exists) item_cache[id] = item;  
-//       return item;  
-//   }  
-//
-//   // Berry fallback  
-//   if (!dex->data().items.count(id) && dex->data().items.count(id + "berry"))  
-//   {  
-//       const Item& item = get_by_id(id + "berry");  
-//       item_cache[id] = item;  
-//       return item;  
-//   }  
-//
-//   // Normal lookup  
-//   if (dex->data().items.count(id))  
-//   {  
-//       ItemData& itemData = dex->data().items.at(id);  
-//       // Merge with text data if needed (pseudo-code)  
-//       // ItemData itemTextData = dex->getDescs("Items", id, itemData);  
-//       // Merge itemData and itemTextData as needed  
-//
-//       if (itemData.gen > dex->get_gen())  
-//       {  
-//           itemData.is_nonstandard = NonStandard::FUTURE;  
-//       }  
-//       // Parent mod logic omitted for brevity  
-//
-//       item_cache[id] = itemData; // Ensure itemData is properly assigned  
-//       return item_cache[id];  
-//   }  
-//   else  
-//   {  
-//       Item item;  
-//       item.name = id;  
-//       item.exists = false;  
-//       item_cache[id] = item;  
-//       return item_cache[id];  
-//   }  
-//}  
+const Item& DexItems::get_item(const Item& item) const
+{  
+   return item;
+}  
 
-//const std::vector<Item>& DexItems::all()  
-//{  
-//   if (all_cache) return *all_cache;  
-//   std::vector<Item> items;  
-//   for (const auto& kv : dex->data().items)  
-//   {  
-//       items.push_back(get_by_id(kv.first));  
-//   }  
-//   all_cache = std::move(items);  
-//   return *all_cache;  
-//}
+const Item& DexItems::get_item(const std::string& name)
+{  
+   std::string id = to_id(name); // Assume to_id trims and normalizes  
+   return get_item_by_id(id);
+}  
+
+const Item& DexItems::get_item_by_id(const std::string& id)
+{
+    if (id.empty()) return EMPTY_ITEM;
+
+    // 1. Check cache
+    auto it = item_cache.find(id);
+    if (it != item_cache.end()) return it->second;
+
+    // 2. Check for alias
+    auto alias = dex->get_alias(id);
+    if (alias_ptr && !alias_ptr->empty()) {
+        const Item& aliased = get_item_by_id(*alias_ptr);
+        if (aliased.exists) {
+            item_cache[id] = aliased;
+        }
+        return aliased;
+    }
+
+    // 3. Check for berry fallback
+    auto& items_data = dex->get_data().items;
+    if (!items_data.count(id) && items_data.count(id + "berry")) {
+        const Item& berry = get_item_by_id(id + "berry");
+        item_cache[id] = berry;
+        return berry;
+    }
+
+    // 4. Check for existence in data
+    if (items_data.count(id)) {
+        const auto& item_data = items_data.at(id);
+        // Construct Item from item_data (you may need to adapt this)
+        Item item(id /* name */, /* ... fill in other fields from item_data ... */);
+
+        // Optionally handle parent mod logic here if needed
+
+        item_cache[id] = item;
+        return item_cache[id];
+    }
+
+    // 5. Fallback: return dummy item
+    Item dummy(id, false); // exists = false
+    item_cache[id] = dummy;
+    return item_cache[id];
+}
+
+
+const std::vector<Item>& DexItems::get_all_items()
+{  
+   if (all_cache) return *all_cache;  
+   std::vector<Item> items;  
+   for (const auto& kv : dex->data().items)  
+   {  
+       items.push_back(get_by_id(kv.first));  
+   }  
+   all_cache = std::move(items);  
+   return *all_cache;  
+}

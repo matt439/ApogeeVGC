@@ -31,6 +31,12 @@
     <ClCompile Include="dex-abilities\AbilityData.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
     <ClCompile Include="dex\Dex.cpp" />
+    <ClCompile Include="dex-format\Format.cpp" />
+    <ClCompile Include="dex-data\TypeData.cpp" />
+    <ClCompile Include="dex-data\TypeInfo.cpp" />
+    <ClCompile Include="dex-data\DexTypes.cpp" />
+    <ClCompile Include="dex-data\to_lower.cpp" />
+    <ClCompile Include="dex\TextTableData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -128,8 +134,6 @@
     <ClInclude Include="dex\DexTable.h" />
     <ClInclude Include="dex\DexTableData.h" />
     <ClInclude Include="dex\AliasesTable.h" />
-    <ClInclude Include="dex\TypeData.h" />
-    <ClInclude Include="dex\TypesManager.h" />
     <ClInclude Include="dex\DescriptionResult.h" />
     <ClInclude Include="dex\ModdedDex.h" />
     <ClInclude Include="dex-items\EMPTY_ITEM.h" />
@@ -170,5 +174,32 @@
     <ClInclude Include="dex\BASE_MOD.h" />
     <ClInclude Include="dex\Dex.h" />
     <ClInclude Include="dex\IDex.h" />
+    <ClInclude Include="dex-format\FormatList.h" />
+    <ClInclude Include="dex-format\ModdedFormatData.h" />
+    <ClInclude Include="dex-format\FormatDataTable.h" />
+    <ClInclude Include="dex-format\ModdedFormatDataTable.h" />
+    <ClInclude Include="dex-format\ComplexBan.h" />
+    <ClInclude Include="dex-format\ComplexTeamBan.h" />
+    <ClInclude Include="dex-format\GameTimerSettings.h" />
+    <ClInclude Include="dex-format\RuleTable.h" />
+    <ClInclude Include="team-validator\TeamValidator.h" />
+    <ClInclude Include="global-types\ModdedBattleScriptsData.h" />
+    <ClInclude Include="global-types\ModdedBattlePokemon.h" />
+    <ClInclude Include="battle-queue\BattleQueue.h" />
+    <ClInclude Include="global-types\ModdedBattleQueue.h" />
+    <ClInclude Include="global-types\ModdedField.h" />
+    <ClInclude Include="global-types\ModdedBattleActions.h" />
+    <ClInclude Include="global-types\ModdedBattleSide.h" />
+    <ClInclude Include="teams\PokemonSources.h" />
+    <ClInclude Include="dex\Descriptions.h" />
+    <ClInclude Include="dex-data\TypeData.h" />
+    <ClInclude Include="dex-data\ModdedTypeData.h" />
+    <ClInclude Include="dex-data\TypeDataTable.h" />
+    <ClInclude Include="dex-data\ModdedTypeDataTable.h" />
+    <ClInclude Include="dex-data\TypeInfoEffectType.h" />
+    <ClInclude Include="dex-data\TypeInfo.h" />
+    <ClInclude Include="dex-data\to_lower.h" />
+    <ClInclude Include="global-types\BasicTextData.h" />
+    <ClInclude Include="global-types\ConditionTextData.h" />
   </ItemGroup>
 </Project>

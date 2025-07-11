@@ -10,6 +10,7 @@
 #include "../dex-data/DexTypes.h"
 #include "../dex-data/DexStats.h"
 #include "../dex-data/to_id.h"
+#include "../global-types/StatsTable.h"
 
 #include <rapidjson/document.h>
 
@@ -17,15 +18,16 @@
 #include "AliasesTable.h"
 #include "DataType.h"
 #include "IModdedDex.h"
-#include "TypesManager.h"
 #include "IDex.h"
+#include "Descriptions.h"
+
 #include <filesystem>
 
 class ModdedDex : public IModdedDex
 {
 public:
 	IDex* dex_parent = nullptr;
-    std::unordered_map<std::string, ModdedDex>& dexes;
+    std::unordered_map<std::string, ModdedDex>* dexes;
 
     std::string name = "[ModdedDex]";
     bool is_base = false;
@@ -63,23 +65,23 @@ public:
     DexTableData& get_data() override;
 
     // Returns the global map of all dexes, ensuring mods are included
-    std::unordered_map<std::string, ModdedDex>& get_dexes();
+    std::unordered_map<std::string, ModdedDex>* get_dexes();
 
     // Returns a ModdedDex for a given mod name, ensuring data is included
-    ModdedDex& mod(const std::string& mod = "base");
+    ModdedDex* get_modded_dex(const std::string& mod = "base");
 
     // Returns a ModdedDex for a given generation, or this if gen is 0
-    ModdedDex& for_gen(int gen);
+    ModdedDex* get_modded_dex_for_gen(int gen);
 
     // Returns the correct ModdedDex for a given format
-    ModdedDex& for_format(const Format& format);
+    ModdedDex* get_modded_dex_for_format(const Format& format);
 
     // Returns the correct data entry for a given type and id, handling inheritance and deep cloning
     template<typename T>
     T& mod_data(DataType data_type, const std::string& id);
 
     // Returns the name of the dex/effect
-    std::string effect_to_string() const;
+    const std::string& effect_to_string() const;
 
     // Helper to trim whitespace from both ends
     static std::string trim(const std::string& s);
@@ -107,38 +109,57 @@ public:
      */
     static std::string get_name(const std::string& input);
 
-    TypesManager types_manager = TypesManager();
+    // TypesManager types_manager = TypesManager();
 
     /**
      * get_immunity() returns false if the target is immune; true otherwise.
      * Also checks immunity to some statuses.
      */
-     // Overload for string source and string target
-    bool get_immunity(const std::string& source_type, const std::string& target_type) const;
+	bool get_immunity(const std::string& source_type, const std::string& target_type) const;
+    bool get_immunity(const std::string& source_type,
+        const std::vector<const std::string&>& target_types) const;
 
-    // Overload for string source and vector<string> target
-    bool get_immunity(const std::string& source_type, const std::vector<std::string>& target_types) const;
 
-    // Overload for object source (with .type) and string/array target
-    template<typename Source>
-    bool get_immunity(const Source& source, const std::vector<std::string>& target_types) const;
-    template<typename Source>
-    bool get_immunity(const Source& source, const std::string& target_type) const;
+    // // Overload for string source and string target
+    //bool get_immunity(const std::string& source_type, const std::string& target_type) const;
+
+    //// Overload for string source and vector<string> target
+    //bool get_immunity(const std::string& source_type, const std::vector<std::string>& target_types) const;
+
+    //// Overload for object source (with .type) and string/array target
+    //template<typename Source>
+    //bool get_immunity(const Source& source, const std::vector<std::string>& target_types) const;
+    //template<typename Source>
+    //bool get_immunity(const Source& source, const std::string& target_type) const;
 
     // For string source and string target
     int get_effectiveness(const std::string& source_type, const std::string& target_type) const;
 
     // For string source and vector<string> target
-    int get_effectiveness(const std::string& source_type, const std::vector<std::string>& target_types) const;
+    int get_effectiveness(const std::string&
+        source_type, const std::vector<std::string>& target_types) const;
 
-    // For object source (with .type) and string/array target
-    template<typename Source>
-    int get_effectiveness(const Source& source, const std::string& target_type) const;
-    template<typename Source>
-    int get_effectiveness(const Source& source, const std::vector<std::string>& target_types) const;
+    //// For object source (with .type) and string/array target
+    //template<typename Source>
+    //int get_effectiveness(const Source& source, const std::string& target_type) const;
+    //template<typename Source>
+    //int get_effectiveness(const Source& source, const std::vector<std::string>& target_types) const;
 
-    // Helper to map DataType to string key
-    std::string data_type_to_key(DataType data_type);
+    Descriptions get_descriptions(const std::string& table,
+        const std::string& id, const AnyObject& data_entry);
+
+	ActiveMove& get_active_move(const std::string& id);
+	ActiveMove& get_active_move(const Move& move);
+
+    StatsTable get_hidden_power();
+
+    std::vector<std::any> data_search(const std::string & target, 
+        const std::vector<std::string>&search_in = {}, bool is_inexact = false);
+
+
+
+    //// Helper to map DataType to string key
+    //std::string data_type_to_key(DataType data_type);
 
     // Returns a pointer to the relevant RapidJSON value, or nullptr if not found/invalid
     const rapidjson::Value* load_data_file(const std::string& base_path, DataType data_type);
@@ -146,19 +167,26 @@ public:
     // Returns a pointer to the relevant RapidJSON value, or nullptr if not found/invalid
     const rapidjson::Value* load_text_file(const std::string& name, const std::string& export_name);
 
-    void include_mods();
+    ModdedDex* include_mods();
 
-    // TODO
-    // includeModData
-    // includeData
+    ModdedDex* include_mod_data();
+
+    ModdedDex* include_data();
 
     TextTableData& load_text_data();
 
-    std::unique_ptr<std::string> get_alias(const std::string& id) override;
+	// Returns a pointer to the alias for the given ID, or nullptr if not found
+    std::string* get_alias(const ID& id) override;
 
     AliasesTable& load_aliases();
 
-    std::unique_ptr<DexTableData> get_data_cache() override;
+	DexTableData& load_data();
+
+    ModdedDex* include_formats();
+
+	// Extra functions for IDex interface so that other classes can use it
+	// without being exposed to ModdedDex specifics
+    DexTableData* get_data_cache() override;
     int get_gen() const override;
 
 };

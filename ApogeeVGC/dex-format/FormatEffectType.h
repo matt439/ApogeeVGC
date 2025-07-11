@@ -6,4 +6,5 @@ enum class FormatEffectType
     RULESET,
     RULE,
     VALIDATOR_RULE,
+	CONDITION,
 };

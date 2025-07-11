@@ -29,16 +29,16 @@
 
 struct DexTableData
 {
-    DexTable<AbilityData> abilities;
-    DexTable<FormatData> rulesets;
-    DexTable<ItemData> items;
-    DexTable<LearnsetData> learnsets;
-    DexTable<MoveData> moves;
-    DexTable<NatureData> natures;
-    DexTable<SpeciesData> pokedex;
-    DexTable<SpeciesFormatsData> formats_data;
-    DexTable<PokemonGoData> pokemon_go_data;
-    DexTable<AnyObject> scripts;
-    DexTable<ConditionData> conditions;
-    DexTable<TypeData> type_chart;
+	DexTable<AbilityData> abilities = {};
+	DexTable<FormatData> rulesets = {};
+	DexTable<ItemData> items = {};
+	DexTable<LearnsetData> learnsets = {};
+	DexTable<MoveData> moves = {};
+	DexTable<NatureData> natures = {};
+	DexTable<SpeciesData> pokedex = {};
+	DexTable<SpeciesFormatsData> formats_data = {};
+	DexTable<PokemonGoData> pokemon_go_data = {};
+	DexTable<AnyObject> scripts = {}; // generic AnyObject for scripts, can be any type of script data
+	DexTable<ConditionData> conditions = {};
+	DexTable<TypeData> type_chart = {};
 };

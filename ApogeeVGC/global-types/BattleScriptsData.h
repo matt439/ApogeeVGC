@@ -2,7 +2,7 @@
 
 struct BattleScriptsData
 {
-	int gen = -1;
+	int gen = 0;
 
 	BattleScriptsData() = default;
 	BattleScriptsData(const BattleScriptsData&) = default;
