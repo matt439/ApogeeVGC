@@ -42,6 +42,10 @@
     <ClCompile Include="global-types\MoveText.cpp" />
     <ClCompile Include="global-types\PokedexText.cpp" />
     <ClCompile Include="global-types\DefaultText.cpp" />
+    <ClCompile Include="dex-items\ItemData.cpp" />
+    <ClCompile Include="dex-format\DexFormats.cpp" />
+    <ClCompile Include="team-validator\TeamValidator.cpp" />
+    <ClCompile Include="dex-format\RuleTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -178,7 +182,6 @@
     <ClInclude Include="dex-abilities\ModdedAbilityDataTable.h" />
     <ClInclude Include="dex\BASE_MOD.h" />
     <ClInclude Include="dex\Dex.h" />
-    <ClInclude Include="dex\IDex.h" />
     <ClInclude Include="dex-format\FormatList.h" />
     <ClInclude Include="dex-format\ModdedFormatData.h" />
     <ClInclude Include="dex-format\FormatDataTable.h" />
@@ -209,5 +212,6 @@
     <ClInclude Include="global-types\MoveTextData.h" />
     <ClInclude Include="global-types\TextFile.h" />
     <ClInclude Include="dex-data\EMPTY_TYPE_INFO.h" />
+    <ClInclude Include="dex\IDex.h" />
   </ItemGroup>
 </Project>

@@ -1,69 +1,48 @@
 #pragma once
 
-
+#include "../global-types/ID.h"
+#include "../dex/IModdedDex.h"
+#include "RuleTable.h"
 #include "Format.h"
+#include <unordered_map>
+#include <memory>
+#include <vector>
+#include <string>
 
 class DexFormats
 {
 public:
-	int x;
+	IModdedDex* dex = nullptr;
+	std::unordered_map<ID, std::unique_ptr<Format>> ruleset_cache = {};
+	std::unique_ptr<std::vector<std::unique_ptr<Format>>> formats_list_cache = nullptr;
+
+	DexFormats() = default;
+	DexFormats(IModdedDex* dex_ptr);
+
+	void load();
+
+	std::string validate(const std::string& name) const;
 
 	// Get by Format (returns reference)
-	const Format& get_format(const Format& item) const;
+	Format* get_format(const Format& item) const;
 
 	// Get by name (string)
-	const Format& get_format(const std::string& name);
+	Format* get_format(const std::string& name, bool is_trusted = false);
 
-	// Get by ID
-	const Format& get_format_by_id(const ID& id);
+	//// Get by ID
+	//const Format& get_format(const ID& id);
 
 	// Get all formats
-	const std::vector<Format>& get_format_items();
+	std::vector<std::unique_ptr<Format>>* get_all_formats();
 
-	//get(name ? : string | Format, isTrusted = false) : Format{
-	//	if (name&& typeof name != = 'string') return name;
+	bool is_pokemon_rule(const std::string& rule_spec) const;
 
-	//	name = (name || '').trim();
-	//	let id = toID(name);
+	RuleTable get_rule_table(Format* format, int depth = 1, std::unordered_map<std::string, int>* repeals = nullptr);
 
-	//	if (!name.includes('@@@')) {
-	//		const ruleset = this.rulesetCache.get(id);
-	//		if (ruleset) return ruleset;
-	//	}
+	std::variant<std::string, std::vector<std::string>, int>
+		validate_rule(const std::string& rule, Format* format = nullptr) const;
 
-	//	if (this.dex.getAlias(id)) {
-	//		id = this.dex.getAlias(id)!;
-	//		name = id;
-	//	}
-	//	if (this.dex.data.Rulesets.hasOwnProperty(DEFAULT_MOD + id)) {
-	//		id = (DEFAULT_MOD + id) as ID;
-	//	}
-	//	let supplementaryAttributes : AnyObject | null = null;
-	//	if (name.includes('@@@')) {
-	//		if (!isTrusted) {
-	//			try {
-	//				name = this.validate(name);
-	//				isTrusted = true;
-	//			}
-	// catch {}
-	//}
-	//const [newName, customRulesString] = name.split('@@@', 2);
-	//name = newName.trim();
-	//id = toID(name);
-	//if (isTrusted && customRulesString) {
-	//	supplementaryAttributes = {
-	//		customRules: customRulesString.split(','),
-	//		searchShow : false,
-	//	};
-	//}
-	//}
-	//let effect;
-	//if (this.dex.data.Rulesets.hasOwnProperty(id)) {
-	//	effect = new Format({ name, ...this.dex.data.Rulesets[id] as any, ...supplementaryAttributes });
-	//}
-	//else {
-	// effect = new Format({ id, name, exists: false });
-	//}
-	//return effect;
-	//}
+	bool valid_pokemon_tag(const ID& tag_id) const;
+
+	bool validate_rule_ban(const std::string& rule) const;
 };

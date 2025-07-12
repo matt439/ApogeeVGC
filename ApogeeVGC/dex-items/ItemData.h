@@ -9,4 +9,6 @@ struct ItemData : public Item, public PokemonEventMethods
 	std::string name = "";
 
 	ItemData() = default;
+
+	bool operator==(const ItemData& other) const;
 };

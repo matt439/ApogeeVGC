@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../team-validator/TeamValidator.h"
+//#include "../team-validator/TeamValidator.h"
 #include "../dex/IDex.h"
 #include "GameTimerSettings.h"
 #include "ComplexBan.h"
@@ -11,13 +11,16 @@
 #include <utility> // for std::pair
 #include <memory>
 
+class TeamValidator; // Forward declaration
+
 struct RuleTable
 {
 	IDex* dex = nullptr; // Pointer to the parent Dex instance
 	std::map<std::string, std::string> rules = {};
 	std::vector<ComplexBan> complex_bans = {};
 	std::vector<ComplexTeamBan> complex_team_bans = {};
-	std::unique_ptr<std::pair<TeamValidator("check_can_learn", dex), std::string>> check_can_learn = nullptr; // optional
+	//std::unique_ptr<std::pair<TeamValidator("check_can_learn", dex), std::string>> check_can_learn = nullptr; // optional
+	std::unique_ptr<std::pair<std::unique_ptr<TeamValidator>, std::string>> check_can_learn = nullptr; // optional
 	std::unique_ptr<std::pair<GameTimerSettings, std::string>> timer = nullptr; // optional
 	std::vector<std::string> tag_rules = {};
 	std::map<std::string, std::string> value_rules = {};
@@ -34,6 +37,6 @@ struct RuleTable
 	std::unique_ptr<int> adjust_level_down = nullptr; // optional
 	std::unique_ptr<int> ev_limit = nullptr; // optional
 
-    RuleTable() = default;
+	RuleTable() = default;
 };
 

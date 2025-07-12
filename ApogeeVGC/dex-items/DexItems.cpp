@@ -1,7 +1,8 @@
 #include "DexItems.h"
 
 #include "../dex-data/to_id.h"  
-#include "EMPTY_ITEM.h"  
+#include "EMPTY_ITEM.h"
+#include "../dex/DexTableData.h"
 // #include "ItemData.h"
 
 DexItems::DexItems(IModdedDex* dex_ptr)  
@@ -20,7 +21,7 @@ Item* DexItems::get_item(const std::string& name)
    return get_item(id);
 }  
 
-Item* DexItems::get_item(const std::string& id)
+Item* DexItems::get_item_by_id(const ID& id)
 {
 	if (id.empty())
         return EMPTY_ITEM.get();
@@ -38,7 +39,7 @@ Item* DexItems::get_item(const std::string& id)
 	}
 
     // 3. Check for berry fallback
-    auto& items_data = dex->get_data().items;
+    auto& items_data = dex->get_data()->items;
     if (!items_data.count(id) && items_data.count(id + "berry"))
     {
         auto berry = get_item(id + "berry");
@@ -67,8 +68,8 @@ Item* DexItems::get_item(const std::string& id)
         // If parent mod exists, check for identical item and reuse
         if (!dex->get_parent_mod().empty())
         {
-            auto parent = dex->get_modded_dex(dex->get_parent_mod());
-            const auto& parent_items_data = parent->get_data().items;
+            auto parent = dex->get_dex_parent()->get_modded_dex(dex->get_parent_mod());
+            auto& parent_items_data = parent->get_data()->items;
             if (item_data == parent_items_data.at(id))
             {
                 Item* parent_item = parent->items->get_item(id);
@@ -96,11 +97,11 @@ std::vector<std::unique_ptr<Item>>* DexItems::get_all_items()
    if (all_cache)
 	   return all_cache.get();
 
-   std::vector<Item> items;  
-   for (auto kv : dex->get_data().items)
+   std::vector<std::unique_ptr<Item>> items;
+   for (auto& kv : dex->get_data()->items)
    {  
-       items.push_back(get_by_id(kv.first));  
+	   items.push_back(std::make_unique<Item>(kv.second.name));
    }  
-   all_cache = std::move(items);  
-   return *all_cache;  
+   all_cache = std::make_unique<std::vector<std::unique_ptr<Item>>>(items);
+   return all_cache.get();
 }

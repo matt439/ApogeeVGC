@@ -1,6 +1,7 @@
 #include "DexTypes.h"
 
 #include "EMPTY_TYPE_INFO.h"
+#include "../dex/DexTableData.h"
 
 //TypeInfo EMPTY_TYPE_INFO(
 //	ID(""),

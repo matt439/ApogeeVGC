@@ -6,7 +6,7 @@
 
 ModdedDex::ModdedDex(IDex* dex_parent, const std::string& mod) :
     dex_parent(dex_parent),
-	dexes(&dex_parent->get_dexes()),
+	dexes(dex_parent->get_dexes()),
 	is_base(mod == "base"),
     current_mod(mod),
 	formats(std::make_unique<DexFormats>(this)),
@@ -31,7 +31,7 @@ DexTableData* ModdedDex::get_data()
 	return data_cache.get();
 }
 
-std::unordered_map<std::string, ModdedDex>* ModdedDex::get_dexes()
+std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* ModdedDex::get_dexes()
 {
     include_mods();
     return dexes;
@@ -39,8 +39,8 @@ std::unordered_map<std::string, ModdedDex>* ModdedDex::get_dexes()
 
 ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
 {
-    if (!dexes->at("base").mods_loaded)
-        dexes->at("base").include_mods();
+    if (!dexes->at("base")->mods_loaded)
+        dexes->at("base")->include_mods();
 
     std::string mod_name;
 	if (mod.empty() || mod == "base")
@@ -48,7 +48,7 @@ ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
 	else
 		mod_name = mod;
 
-    return dexes->at(mod_name).include_data();
+    return dexes->at(mod_name)->include_data();
 }
 
 ModdedDex* ModdedDex::get_modded_dex_for_gen(int gen)
@@ -64,12 +64,12 @@ ModdedDex* ModdedDex::get_modded_dex_for_format(const Format& format)
     if (!mods_loaded)
 		include_mods();
 
-    std::string mod = formats->get_format(format).mod;
+    std::string mod = formats->get_format(format)->mod;
 	
 	if (mod.empty() || mod == "base")
 		mod = BASE_MOD;
 
-    return dexes->at(mod).include_data();
+    return dexes->at(mod)->include_data();
 }
 
 template<typename T>
@@ -477,4 +477,9 @@ Descriptions ModdedDex::get_descriptions(const std::string& table, const std::st
 const std::string& ModdedDex::get_parent_mod() const
 {
 	return parent_mod;
+}
+
+IDex* ModdedDex::get_dex_parent() const
+{
+    return dex_parent;
 }

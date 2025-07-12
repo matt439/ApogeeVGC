@@ -27,7 +27,7 @@ class ModdedDex : public IModdedDex
 {
 public:
 	IDex* dex_parent = nullptr;
-	std::unordered_map<std::string, ModdedDex>* dexes = nullptr;
+    std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* dexes;
 
     std::string name = "[ModdedDex]";
     bool is_base = false;
@@ -65,10 +65,10 @@ public:
     DexTableData* get_data() override;
 
     // Returns the global map of all dexes, ensuring mods are included
-    std::unordered_map<std::string, ModdedDex>* get_dexes();
+    std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* get_dexes();
 
     // Returns a ModdedDex for a given mod name, ensuring data is included
-	ModdedDex* get_modded_dex(const std::string& mod = "base") override;
+    ModdedDex* get_modded_dex(const std::string& mod = "base");
 
     // Returns a ModdedDex for a given generation, or this if gen is 0
     ModdedDex* get_modded_dex_for_gen(int gen);
@@ -190,4 +190,5 @@ public:
 
 	const std::string& get_parent_mod() const override;
 
+    IDex* get_dex_parent() const override;
 };

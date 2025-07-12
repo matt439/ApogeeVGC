@@ -12,8 +12,9 @@
 class TeamValidator
 {
 public:
+	IDex* dex = nullptr; // Pointer to the parent Dex instance
     Format format;
-    ModdedDex dex;
+    ModdedDex* modded_dex;
     int gen = 0;
     RuleTable rule_table;
     int min_source_gen = 0;

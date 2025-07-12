@@ -105,18 +105,6 @@ public:
     Format() = default;
 
     Format(
-        std::string mod = "gen9",
-        FormatEffectType format_effect_type = FormatEffectType::CONDITION,
-        bool debug = false,
-        std::variant<bool, std::string> rated = true,
-        GameType game_type = GameType::SINGLES,
-        std::vector<std::string> ruleset = {},
-        std::vector<std::string> base_ruleset = {},
-        std::vector<std::string> banlist = {},
-        std::vector<std::string> restricted = {},
-        std::vector<std::string> unbanlist = {},
-        std::unique_ptr<std::vector<std::string>> custom_rules = nullptr,
-        bool no_log = false,
         // BasicEffect non-optional
         const std::string& name,
         const std::string& real_move = "",
@@ -130,5 +118,19 @@ public:
         NonStandard is_nonstandard = NonStandard::NONE,
         bool no_copy = false,
         bool affects_fainted = false,
-        const std::string& source_effect = "");
+        const std::string& source_effect = "",
+		// Format non-optional
+        std::string mod = "gen9",
+        FormatEffectType format_effect_type = FormatEffectType::CONDITION,
+        bool debug = false,
+        std::variant<bool, std::string> rated = true,
+        GameType game_type = GameType::SINGLES,
+        std::vector<std::string> ruleset = {},
+        std::vector<std::string> base_ruleset = {},
+        std::vector<std::string> banlist = {},
+        std::vector<std::string> restricted = {},
+        std::vector<std::string> unbanlist = {},
+        std::unique_ptr<std::vector<std::string>> custom_rules = nullptr,
+        bool no_log = false);
+        
 };

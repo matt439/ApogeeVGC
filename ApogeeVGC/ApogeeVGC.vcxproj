@@ -36,9 +36,12 @@
     <ClCompile Include="dex-data\to_lower.cpp" />
     <ClCompile Include="dex-data\TypeData.cpp" />
     <ClCompile Include="dex-data\TypeInfo.cpp" />
+    <ClCompile Include="dex-format\DexFormats.cpp" />
     <ClCompile Include="dex-format\Format.cpp" />
+    <ClCompile Include="dex-format\RuleTable.cpp" />
     <ClCompile Include="dex-items\DexItems.cpp" />
     <ClCompile Include="dex-items\Item.cpp" />
+    <ClCompile Include="dex-items\ItemData.cpp" />
     <ClCompile Include="dex-items\ItemInitData.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
@@ -54,6 +57,7 @@
     <ClCompile Include="global-types\MoveText.cpp" />
     <ClCompile Include="global-types\PokedexText.cpp" />
     <ClCompile Include="program.cpp" />
+    <ClCompile Include="team-validator\TeamValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle-queue\BattleQueue.h" />
