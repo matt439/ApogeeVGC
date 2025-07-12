@@ -10,7 +10,7 @@
 //#include "../dex-species/SpeciesFormatsData.h"
 //#include "../dex-species/PokemonGoData.h"
 #include "../dex-conditions/ConditionData.h"
-// #include "../dex-data/TypeData.h"
+#include "../dex-data/TypeData.h"
 
 #include "../global-types/AnyObject.h"
 #include "DexTable.h"
@@ -26,7 +26,7 @@ class NatureData;
 class SpeciesData;
 class SpeciesFormatsData;
 class PokemonGoData;
-struct TypeData;
+//struct TypeData;
 
 struct DexTableData
 {

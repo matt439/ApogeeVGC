@@ -31,7 +31,6 @@
     <ClCompile Include="dex-data\DexStats.cpp" />
     <ClCompile Include="dex-data\DexTypes.cpp" />
     <ClCompile Include="dex-data\HasID.cpp" />
-    <ClCompile Include="dex-data\ModdedNatureData.cpp" />
     <ClCompile Include="dex-data\Nature.cpp" />
     <ClCompile Include="dex-data\NatureData.cpp" />
     <ClCompile Include="dex-data\to_id.cpp" />

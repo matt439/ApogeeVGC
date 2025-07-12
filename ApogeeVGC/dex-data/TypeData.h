@@ -15,7 +15,7 @@ struct TypeData
 
 	TypeData() = default;
 	TypeData(const TypeData& other);
-	TypeData(std::unordered_map<std::string, int> damage_taken,
+	TypeData(const std::unordered_map<std::string, int>& damage_taken,
 		std::unique_ptr<SparseStatsTable> hp_dvs = nullptr,
 		std::unique_ptr<SparseStatsTable> hp_ivs = nullptr,
 		std::unique_ptr<NonStandard> is_nonstandard = nullptr);

@@ -17,7 +17,6 @@
     <ClCompile Include="dex-data\BasicEffect.cpp" />
     <ClCompile Include="dex-data\NatureData.cpp" />
     <ClCompile Include="dex-data\Nature.cpp" />
-    <ClCompile Include="dex-data\ModdedNatureData.cpp" />
     <ClCompile Include="dex-data\DexNatures.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
     <ClCompile Include="dex-abilities\Ability.cpp" />

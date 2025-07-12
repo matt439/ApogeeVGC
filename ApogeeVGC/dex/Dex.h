@@ -1,6 +1,6 @@
 #pragma once
 
-// #include "ModdedDex.h"
+#include "IModdedDex.h"
 #include "IDex.h"
 #include <unordered_map>
 #include <string>
