@@ -31,7 +31,7 @@ DexTableData* ModdedDex::get_data()
 	return data_cache.get();
 }
 
-std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* ModdedDex::get_dexes()
+std::unordered_map<std::string, std::unique_ptr<IModdedDex>>* ModdedDex::get_dexes()
 {
     include_mods();
     return dexes;
@@ -39,8 +39,8 @@ std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* ModdedDex::get_dexe
 
 ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
 {
-    if (!dexes->at("base")->mods_loaded)
-        dexes->at("base")->include_mods();
+    if (!dexes->at("base")->cast_to_modded_dex()->mods_loaded)
+        dexes->at("base")->cast_to_modded_dex()->include_mods();
 
     std::string mod_name;
 	if (mod.empty() || mod == "base")
@@ -48,7 +48,7 @@ ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
 	else
 		mod_name = mod;
 
-    return dexes->at(mod_name)->include_data();
+    return dexes->at(mod_name)->cast_to_modded_dex()->include_data();
 }
 
 ModdedDex* ModdedDex::get_modded_dex_for_gen(int gen)
@@ -69,25 +69,25 @@ ModdedDex* ModdedDex::get_modded_dex_for_format(const Format& format)
 	if (mod.empty() || mod == "base")
 		mod = BASE_MOD;
 
-    return dexes->at(mod)->include_data();
+    return dexes->at(mod)->cast_to_modded_dex()->include_data();
 }
 
-template<typename T>
-T& ModdedDex::mod_data(DataType data_type, const std::string& id)
-{
-    // Access the correct DexTable for the data_type
-    DexTable<T>& table = get_table<T>(data_type);
-    if (is_base)
-		return table.at(id);
-
-    DexTable<T>& parent_table = dexes[parent_mod].get_table<T>(data_type);
-    if (table.at(id) != parent_table.at(id))
-		return table.at(id);
-
-    // Deep clone logic (pseudo-code, implement as needed)
-    table[id] = deep_clone(table.at(id));
-    return table.at(id);
-}
+//template<typename T>
+//T& ModdedDex::mod_data(DataType data_type, const std::string& id)
+//{
+//    // Access the correct DexTable for the data_type
+//    DexTable<T>& table = get_table<T>(data_type);
+//    if (is_base)
+//		return table.at(id);
+//
+//    DexTable<T>& parent_table = dexes[parent_mod].get_table<T>(data_type);
+//    if (table.at(id) != parent_table.at(id))
+//		return table.at(id);
+//
+//    // Deep clone logic (pseudo-code, implement as needed)
+//    table[id] = deep_clone(table.at(id));
+//    return table.at(id);
+//}
 
 const std::string& ModdedDex::effect_to_string() const
 {
@@ -482,4 +482,14 @@ const std::string& ModdedDex::get_parent_mod() const
 IDex* ModdedDex::get_dex_parent() const
 {
     return dex_parent;
+}
+
+ModdedDex* ModdedDex::cast_to_modded_dex(IModdedDex* modded_dex) const
+{
+    return dynamic_cast<ModdedDex*>(modded_dex);
+}
+
+ModdedDex* ModdedDex::cast_to_modded_dex()
+{
+	return this;
 }

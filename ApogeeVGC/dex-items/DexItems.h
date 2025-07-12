@@ -1,10 +1,11 @@
 #pragma once
 
 #include "../dex/IModdedDex.h"
+#include "../dex/IDexDataManager.h"
 #include "../global-types/ID.h"
 #include "Item.h"
 
-struct DexItems
+struct DexItems : public IDexDataManager
 {
 	IModdedDex* dex = nullptr;
 	std::unordered_map<ID, std::unique_ptr<Item>> item_cache = {};
@@ -23,4 +24,6 @@ struct DexItems
 
     // Get all items
     std::vector<std::unique_ptr<Item>>* get_all_items();
+
+    DataType get_data_type() const override;
 };

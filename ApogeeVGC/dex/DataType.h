@@ -14,4 +14,5 @@ enum class DataType
     CONDITIONS,
     TYPE_CHART,
     POKEMON_GO_DATA,
+    STATS, // Added for DexStats
 };

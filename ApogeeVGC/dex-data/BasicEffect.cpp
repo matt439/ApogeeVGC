@@ -150,6 +150,21 @@ EffectData(
 		this->exists = exists;
 }
 
+BasicEffect::BasicEffect(const BasicEffect& other) :
+	EffectData(other),
+	id(other.id),
+	fullname(other.fullname),
+	exists(other.exists),
+	num(other.num),
+	gen(other.gen),
+	no_copy(other.no_copy),
+	affects_fainted(other.affects_fainted),
+	status(other.status ? std::make_unique<std::string>(*other.status) : nullptr),
+	weather(other.weather ? std::make_unique<std::string>(*other.weather) : nullptr),
+	source_effect(other.source_effect)
+{
+}
+
 //BasicEffect::BasicEffect(
 //    const std::string& name,
 //    const std::string& real_move,

@@ -15,7 +15,7 @@ public:
 	int gen = 0;
 
 	TypeInfo() = default;
-	//TypeInfo(const TypeInfo&) = default;
+	TypeInfo(const TypeInfo& other);
 	//
 	//TypeInfo(TypeInfo&&) = default; // Add move constructor  
 	//TypeInfo& operator=(const TypeInfo& other);
@@ -29,10 +29,7 @@ public:
 		std::unordered_map<std::string, int> damage_taken = {},
 		std::unique_ptr<SparseStatsTable> hp_dvs = nullptr,
 		std::unique_ptr<SparseStatsTable> hp_ivs = nullptr,
-		std::unique_ptr<NonStandard> is_nonstandard = nullptr)
-		: TypeData(std::move(damage_taken), std::move(hp_dvs), std::move(hp_ivs), std::move(is_nonstandard)),
-		id(id), name(name), effect_type(effect_type), exists(exists), gen(gen) {
-	}
+		std::unique_ptr<NonStandard> is_nonstandard = nullptr);
 
 	const std::string& to_string() const;
 };

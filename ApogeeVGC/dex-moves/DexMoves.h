@@ -1,7 +1,11 @@
 #pragma once
 
-class DexMoves
+#include "../dex/IDexDataManager.h"
+
+class DexMoves : public IDexDataManager
 {
 public:
     int x;
+
+	DataType get_data_type() const override;
 };

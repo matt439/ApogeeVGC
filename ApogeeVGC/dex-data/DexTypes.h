@@ -2,9 +2,10 @@
 
 #include "../global-types/ID.h"
 #include "../dex/IModdedDex.h"
+#include "../dex/IDexDataManager.h"
 #include "TypeInfo.h"
 
-class DexTypes
+class DexTypes : public IDexDataManager
 {
 public:
 	IModdedDex* dex = nullptr;
@@ -22,4 +23,6 @@ public:
 	std::vector<std::string>* get_names();
 	bool is_name(const std::string& name) const;
 	std::vector<std::unique_ptr<TypeInfo>>* get_all_type_infos();
+
+	DataType get_data_type() const override;
 };

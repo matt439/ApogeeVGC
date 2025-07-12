@@ -100,6 +100,8 @@ struct BasicEffect : public EffectData
         std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback = nullptr,
         std::unique_ptr<bool> infiltrates = nullptr);
 
+    BasicEffect(const BasicEffect& other);
+
     //BasicEffect(
     //    const std::string& name,
     //    const std::string& real_move = "",

@@ -31,11 +31,11 @@ TypeInfo* DexTypes::get_type_info(const ID& id)
     // Check if type exists in TypeChart
 	auto type_chart = dex->get_data()->type_chart;
     auto chart_it = type_chart.find(id);
-    TypeInfo type_info;
+	std::unique_ptr<TypeInfo> type_info = nullptr;
     if (chart_it != type_chart.end())
     {
         // Construct TypeInfo from chart data
-        type_info = TypeInfo(
+        type_info = std::make_unique<TypeInfo>(
             id,
             type_name,
             TypeInfoEffectType::TYPE,
@@ -45,7 +45,7 @@ TypeInfo* DexTypes::get_type_info(const ID& id)
     else
     {
         // Type does not exist
-        type_info = TypeInfo(
+        type_info = std::make_unique<TypeInfo>(
             id,
             type_name,
             TypeInfoEffectType::EFFECT_TYPE,
@@ -54,9 +54,9 @@ TypeInfo* DexTypes::get_type_info(const ID& id)
     }
 
     // Cache if exists
-    if (type_info.exists)
+    if (type_info->exists)
     {
-        type_cache[id] = std::make_unique<TypeInfo>(type_info);
+		type_cache[id] = std::move(type_info);
 		return type_cache[id].get();
     }
 
@@ -136,4 +136,9 @@ std::vector<std::unique_ptr<TypeInfo>>* DexTypes::get_all_type_infos()
 		}
 	}
 	return all_cache.get();
+}
+
+DataType DexTypes::get_data_type() const
+{
+	return DataType::TYPE_CHART;
 }

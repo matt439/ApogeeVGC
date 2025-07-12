@@ -147,6 +147,36 @@ BasicEffect(
 
 }
 
+Item::Item(const Item& other) :
+	BasicEffect(other),
+	fling(other.fling ? std::make_unique<FlingData>(*other.fling) : nullptr),
+	on_drive(other.on_drive ? std::make_unique<std::string>(*other.on_drive) : nullptr),
+	on_memory(other.on_memory ? std::make_unique<std::string>(*other.on_memory) : nullptr),
+	mega_stone(other.mega_stone ? std::make_unique<std::string>(*other.mega_stone) : nullptr),
+	mega_evolves(other.mega_evolves ? std::make_unique<std::string>(*other.mega_evolves) : nullptr),
+	z_move(other.z_move ? std::make_unique<std::variant<bool, std::string>>(*other.z_move) : nullptr),
+	z_move_type(other.z_move_type ? std::make_unique<std::string>(*other.z_move_type) : nullptr),
+	z_move_from(other.z_move_from ? std::make_unique<std::string>(*other.z_move_from) : nullptr),
+	item_user(other.item_user ? std::make_unique<std::vector<std::string>>(*other.item_user) : nullptr),
+	is_berry(other.is_berry),
+	ignore_klutz(other.ignore_klutz),
+	on_plate(other.on_plate ? std::make_unique<std::string>(*other.on_plate) : nullptr),
+	is_gem(other.is_gem),
+	is_pokeball(other.is_pokeball),
+	is_primal_orb(other.is_primal_orb),
+	condition(other.condition ? std::make_unique<ConditionData>(*other.condition) : nullptr),
+	forced_forme(other.forced_forme ? std::make_unique<std::string>(*other.forced_forme) : nullptr),
+	is_choice(other.is_choice ? std::make_unique<bool>(*other.is_choice) : nullptr),
+	natural_gift(other.natural_gift ? std::make_unique<NaturalGift>(*other.natural_gift) : nullptr),
+	spritenum(other.spritenum ? std::make_unique<int>(*other.spritenum) : nullptr),
+	boosts(other.boosts ? std::make_unique<std::variant<SparseBoostsTable, bool>>(*other.boosts) : nullptr),
+	on_eat(other.on_eat ? std::make_unique<std::variant<bool, std::function<void(Battle*, Pokemon*)>>>(*other.on_eat) : nullptr),
+	on_use(other.on_use ? std::make_unique<std::variant<bool, std::function<void(Battle*, Pokemon*)>>>(*other.on_use) : nullptr),
+	on_start(other.on_start ? std::make_unique<std::function<void(Battle*, Pokemon*)>>(*other.on_start) : nullptr),
+	on_end(other.on_end ? std::make_unique<std::function<void(Battle*, Pokemon*)>>(*other.on_end) : nullptr)
+{
+}
+
 //Item& Item::operator=(const Item& other)
 //{
 //

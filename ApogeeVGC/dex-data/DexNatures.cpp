@@ -8,6 +8,11 @@ DexNatures::DexNatures(IModdedDex* dex_ptr)
 {
 }
 
+DataType DexNatures::get_data_type() const
+{
+	return DataType::NATURES;
+}
+
 //const Nature& DexNatures::get(const Nature& nature) const
 //{
 //    return nature;

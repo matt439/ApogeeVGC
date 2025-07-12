@@ -27,7 +27,7 @@ class ModdedDex : public IModdedDex
 {
 public:
 	IDex* dex_parent = nullptr;
-    std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* dexes;
+    std::unordered_map<std::string, std::unique_ptr<IModdedDex>>* dexes;
 
     std::string name = "[ModdedDex]";
     bool is_base = false;
@@ -65,7 +65,7 @@ public:
     DexTableData* get_data() override;
 
     // Returns the global map of all dexes, ensuring mods are included
-    std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* get_dexes();
+    std::unordered_map<std::string, std::unique_ptr<IModdedDex>>* get_dexes();
 
     // Returns a ModdedDex for a given mod name, ensuring data is included
     ModdedDex* get_modded_dex(const std::string& mod = "base");
@@ -76,9 +76,9 @@ public:
     // Returns the correct ModdedDex for a given format
     ModdedDex* get_modded_dex_for_format(const Format& format);
 
-    // Returns the correct data entry for a given type and id, handling inheritance and deep cloning
-    template<typename T>
-    T& mod_data(DataType data_type, const std::string& id);
+    //// Returns the correct data entry for a given type and id, handling inheritance and deep cloning
+    //template<typename T>
+    //T& mod_data(DataType data_type, const std::string& id);
 
     // Returns the name of the dex/effect
     const std::string& effect_to_string() const;
@@ -191,4 +191,10 @@ public:
 	const std::string& get_parent_mod() const override;
 
     IDex* get_dex_parent() const override;
+
+    IDexDataManager* get_data_manager(DataType data_type) const;
+
+    ModdedDex* cast_to_modded_dex(IModdedDex* modded_dex) const override;
+
+    ModdedDex* cast_to_modded_dex() override;
 };

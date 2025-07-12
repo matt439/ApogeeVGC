@@ -29,3 +29,15 @@ EffectData::EffectData(
 	short_desc(std::move(short_desc))
 {
 }
+
+EffectData::EffectData(const EffectData& other) :
+	name(other.name ? std::make_unique<std::string>(*other.name) : nullptr),
+	desc(other.desc ? std::make_unique<std::string>(*other.desc) : nullptr),
+	duration(other.duration ? std::make_unique<int>(*other.duration) : nullptr),
+	duration_callback(other.duration_callback ? std::make_unique<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>>(*other.duration_callback) : nullptr),
+	effect_type(other.effect_type ? std::make_unique<EffectType>(*other.effect_type) : nullptr),
+	infiltrates(other.infiltrates ? std::make_unique<bool>(*other.infiltrates) : nullptr),
+	is_nonstandard(other.is_nonstandard ? std::make_unique<NonStandard>(*other.is_nonstandard) : nullptr),
+	short_desc(other.short_desc ? std::make_unique<std::string>(*other.short_desc) : nullptr)
+{
+}

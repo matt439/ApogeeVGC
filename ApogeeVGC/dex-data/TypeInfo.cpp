@@ -20,6 +20,13 @@ TypeInfo::TypeInfo(const ID& id,
 {
 }
 
+TypeInfo::TypeInfo(const TypeInfo& other)
+	: TypeData(*static_cast<const TypeData*>(&other)),
+	id(other.id), name(other.name), effect_type(other.effect_type),
+	exists(other.exists), gen(other.gen)
+{
+}
+
 //TypeInfo& TypeInfo::operator=(const TypeInfo& other)
 //{
 //	id = other.id;

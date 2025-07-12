@@ -9,6 +9,8 @@
 
 class DexTableData;
 class IDex;
+class IDexDataManager;
+class ModdedDex;
 
 struct IModdedDex
 {
@@ -21,6 +23,9 @@ struct IModdedDex
 	virtual int get_gen() const = 0;
 	virtual Descriptions get_descriptions(const std::string& table, const std::string& id) = 0;
 	virtual const std::string& get_parent_mod() const = 0;
+	virtual IDexDataManager* get_data_manager(DataType data_type) const = 0;
+	virtual ModdedDex* cast_to_modded_dex(IModdedDex* modded_dex) const = 0;
+	virtual ModdedDex* cast_to_modded_dex() = 0;
 	
 	//virtual ModdedDex* get_modded_dex(const std::string& mod = "base") = 0;
 };

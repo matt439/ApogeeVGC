@@ -33,4 +33,6 @@ struct EffectData
 		std::unique_ptr<bool> infiltrates = nullptr,
 		std::unique_ptr<NonStandard> is_nonstandard = nullptr,
 		std::unique_ptr<std::string> short_desc = nullptr);
+
+	EffectData(const EffectData& other);
 };

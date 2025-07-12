@@ -1,9 +1,11 @@
 #include "DexItems.h"
 
+#include "../dex/IDex.h"
 #include "../dex-data/to_id.h"  
-#include "EMPTY_ITEM.h"
 #include "../dex/DexTableData.h"
-// #include "ItemData.h"
+#include "ItemData.h"
+#include "Item.h"
+#include "EMPTY_ITEM.h"
 
 DexItems::DexItems(IModdedDex* dex_ptr)  
    : dex(dex_ptr)
@@ -43,7 +45,7 @@ Item* DexItems::get_item_by_id(const ID& id)
     if (!items_data.count(id) && items_data.count(id + "berry"))
     {
         auto berry = get_item(id + "berry");
-		item_cache[id] = std::make_unique<Item>(berry);
+		item_cache[id] = std::make_unique<Item>(*berry);
         return berry;
     }
 
@@ -55,7 +57,7 @@ Item* DexItems::get_item_by_id(const ID& id)
         auto item_descs = dex->get_descriptions("items", id);
 
         // Construct the Item (you may need to adapt the constructor)
-        auto item = std::make_unique<Item>(item_data.name);
+        auto item = std::make_unique<Item>(item_data->name);
         item->desc = std::make_unique<std::string>(item_descs.desc);
 		item->short_desc = std::make_unique<std::string>(item_descs.short_desc);
 
@@ -72,7 +74,10 @@ Item* DexItems::get_item_by_id(const ID& id)
             auto& parent_items_data = parent->get_data()->items;
             if (item_data == parent_items_data.at(id))
             {
-                Item* parent_item = parent->items->get_item(id);
+				IDexDataManager* dex_data_manager_ptr = parent->get_data_manager(DataType::ITEMS);
+				DexItems* dex_items_ptr = dynamic_cast<DexItems*>(dex_data_manager_ptr);
+                
+                Item* parent_item = dex_items_ptr->get_item(id);
                 if (item->is_nonstandard == parent_item->is_nonstandard &&
                     item->desc == parent_item->desc &&
                     item->short_desc == parent_item->short_desc)
@@ -100,8 +105,13 @@ std::vector<std::unique_ptr<Item>>* DexItems::get_all_items()
    std::vector<std::unique_ptr<Item>> items;
    for (auto& kv : dex->get_data()->items)
    {  
-	   items.push_back(std::make_unique<Item>(kv.second.name));
+	   items.push_back(std::make_unique<Item>(kv.second->name));
    }  
    all_cache = std::make_unique<std::vector<std::unique_ptr<Item>>>(items);
    return all_cache.get();
+}
+
+DataType DexItems::get_data_type() const
+{
+	return DataType::ITEMS;
 }

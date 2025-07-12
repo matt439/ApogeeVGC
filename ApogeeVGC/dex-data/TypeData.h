@@ -14,6 +14,7 @@ struct TypeData
 	std::unique_ptr<NonStandard> is_nonstandard = nullptr; // optional
 
 	TypeData() = default;
+	TypeData(const TypeData& other);
 	TypeData(std::unordered_map<std::string, int> damage_taken,
 		std::unique_ptr<SparseStatsTable> hp_dvs = nullptr,
 		std::unique_ptr<SparseStatsTable> hp_ivs = nullptr,

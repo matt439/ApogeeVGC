@@ -2,9 +2,10 @@
 
 #include "Nature.h"
 #include "../dex/IModdedDex.h"
+#include "../dex/IDexDataManager.h"
 #include <memory>
 
-class DexNatures
+class DexNatures : public IDexDataManager
 {
 public:
     IModdedDex* dex = nullptr;
@@ -26,4 +27,6 @@ public:
 
     //// Get all natures
     //const std::vector<Nature>& all();
+
+    DataType get_data_type() const override;
 };

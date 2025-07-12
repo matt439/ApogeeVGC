@@ -2,6 +2,7 @@
 
 #include "../global-types/ID.h"
 #include "../dex/IModdedDex.h"
+#include "../dex/IDexDataManager.h"
 #include "RuleTable.h"
 #include "Format.h"
 #include <unordered_map>
@@ -9,7 +10,7 @@
 #include <vector>
 #include <string>
 
-class DexFormats
+class DexFormats : public IDexDataManager
 {
 public:
 	IModdedDex* dex = nullptr;
@@ -45,4 +46,6 @@ public:
 	bool valid_pokemon_tag(const ID& tag_id) const;
 
 	bool validate_rule_ban(const std::string& rule) const;
+
+	DataType get_data_type() const override;
 };

@@ -23,10 +23,12 @@
     <ClCompile Include="dex-abilities\Ability.cpp" />
     <ClCompile Include="dex-abilities\AbilityData.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
+    <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
     <ClCompile Include="dex-data\BasicEffect.cpp" />
     <ClCompile Include="dex-data\BasicEffectData.cpp" />
     <ClCompile Include="dex-data\DexNatures.cpp" />
+    <ClCompile Include="dex-data\DexStats.cpp" />
     <ClCompile Include="dex-data\DexTypes.cpp" />
     <ClCompile Include="dex-data\HasID.cpp" />
     <ClCompile Include="dex-data\ModdedNatureData.cpp" />
@@ -43,8 +45,10 @@
     <ClCompile Include="dex-items\Item.cpp" />
     <ClCompile Include="dex-items\ItemData.cpp" />
     <ClCompile Include="dex-items\ItemInitData.cpp" />
+    <ClCompile Include="dex-moves\DexMoves.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
+    <ClCompile Include="dex-species\DexSpecies.cpp" />
     <ClCompile Include="dex\Dex.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
     <ClCompile Include="dex\TextTableData.cpp" />
@@ -169,6 +173,7 @@
     <ClInclude Include="dex\DexTable.h" />
     <ClInclude Include="dex\DexTableData.h" />
     <ClInclude Include="dex\IDex.h" />
+    <ClInclude Include="dex\IDexDataManager.h" />
     <ClInclude Include="dex\ModdedDex.h" />
     <ClInclude Include="dex\TextTableData.h" />
     <ClInclude Include="field\Field.h" />

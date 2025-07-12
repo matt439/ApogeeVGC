@@ -46,6 +46,10 @@
     <ClCompile Include="dex-format\DexFormats.cpp" />
     <ClCompile Include="team-validator\TeamValidator.cpp" />
     <ClCompile Include="dex-format\RuleTable.cpp" />
+    <ClCompile Include="dex-moves\DexMoves.cpp" />
+    <ClCompile Include="dex-species\DexSpecies.cpp" />
+    <ClCompile Include="dex-conditions\DexConditions.cpp" />
+    <ClCompile Include="dex-data\DexStats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -213,5 +217,6 @@
     <ClInclude Include="global-types\TextFile.h" />
     <ClInclude Include="dex-data\EMPTY_TYPE_INFO.h" />
     <ClInclude Include="dex\IDex.h" />
+    <ClInclude Include="dex\IDexDataManager.h" />
   </ItemGroup>
 </Project>

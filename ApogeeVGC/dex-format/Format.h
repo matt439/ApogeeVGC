@@ -3,8 +3,15 @@
 #include "../dex-data/BasicEffect.h"
 #include "../global-types/GameType.h"
 #include "../dex/IModdedDex.h"
+#include "../global-types/ModdedBattleSide.h"
+#include "../global-types/ModdedBattleActions.h"
+#include "../global-types/ModdedBattleScriptsData.h"
+#include "../global-types/ModdedBattlePokemon.h"
+#include "../global-types/ModdedBattleQueue.h"
+#include "../global-types/ModdedField.h"
+
 #include "FormatEffectType.h"
-#include "RuleTable.h"
+// #include "RuleTable.h"
 #include <string>
 #include <vector>
 #include <variant>
@@ -13,15 +20,17 @@
 #include <set>
 
 class Battle;
-struct ModdedBattleScriptsData;
-struct ModdedBattlePokemon;
-class ModdedBattleQueue;
-class ModdedField;
-struct ModdedBattleActions;
-struct ModdedBattleSide;
+//struct ModdedBattleScriptsData;
+//struct ModdedBattlePokemon;
+//class ModdedBattleQueue;
+//class ModdedField;
+//struct ModdedBattleActions;
+//struct ModdedBattleSide;
 struct Move;
 struct PokemonSet;
 class PokemonSources;
+class TeamValidator;
+class RuleTable;
 
 class Format : public BasicEffect
 {
@@ -45,7 +54,7 @@ public:
 
     std::unique_ptr<std::variant<bool, std::string>> has_value = nullptr; // optional; bool, "integer", or "positive-integer"
     std::unique_ptr<std::function<std::variant<std::string, void>
-		(const Format&, RuleTable&, IModdedDex*, const std::string&)>> on_validate_rule = nullptr; // optional
+		(const Format&, RuleTable*, IModdedDex*, const std::string&)>> on_validate_rule = nullptr; // optional
 
     std::unique_ptr<std::string> mutually_exclusive_with = nullptr; // optional
 
