@@ -30,7 +30,7 @@ struct Move;
 struct PokemonSet;
 class PokemonSources;
 class TeamValidator;
-class RuleTable;
+// class RuleTable;
 
 class Format : public BasicEffect
 {
@@ -48,13 +48,18 @@ public:
     std::vector<std::string> restricted = {};
     std::vector<std::string> unbanlist = {};
     std::unique_ptr<std::vector<std::string>> custom_rules = nullptr;
-    std::unique_ptr<RuleTable> rule_table = nullptr; // nullable
+
+	// commented out to avoid circular dependency issues
+    //std::unique_ptr<RuleTable> rule_table = nullptr; // nullable
     std::unique_ptr<std::function<void(Battle*)>> on_begin = nullptr; // optional
     bool no_log = false;
 
     std::unique_ptr<std::variant<bool, std::string>> has_value = nullptr; // optional; bool, "integer", or "positive-integer"
-    std::unique_ptr<std::function<std::variant<std::string, void>
-		(const Format&, RuleTable*, IModdedDex*, const std::string&)>> on_validate_rule = nullptr; // optional
+    
+    
+	// commented out to avoid circular dependency issues
+  //  std::unique_ptr<std::function<std::variant<std::string, void>
+		//(const Format&, RuleTable*, IModdedDex*, const std::string&)>> on_validate_rule = nullptr; // optional
 
     std::unique_ptr<std::string> mutually_exclusive_with = nullptr; // optional
 
