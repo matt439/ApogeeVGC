@@ -1,6 +1,7 @@
 #pragma once
 
-struct Move
+class Move
 {
+public:
 	Move() = default;
 };

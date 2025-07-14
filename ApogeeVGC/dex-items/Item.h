@@ -2,9 +2,9 @@
 
 #include "../dex-data/BasicEffect.h"
 #include "../dex-conditions/ConditionData.h"
-// #include "../global-types/type_aliases.h"
+#include "../global-types/SparseBoostsTable.h"
 #include "FlingData.h"
-#include "ItemInitData.h"
+// #include "ItemInitData.h"
 #include <string>
 #include <variant>
 #include <vector>

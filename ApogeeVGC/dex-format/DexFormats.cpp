@@ -1,5 +1,7 @@
 #include "DexFormats.h"
 
+// #include "../dex/IModdedDex.h"
+
 DexFormats::DexFormats(IModdedDex* dex_ptr)
 	: dex(dex_ptr)
 {

@@ -8,8 +8,8 @@
 //#include "../dex-format/Format.h"
 #include <variant>
 
-struct Ability;
-struct Item;
+class Ability;
+class Item;
 class ActiveMove;
 class Species;
 class Condition;

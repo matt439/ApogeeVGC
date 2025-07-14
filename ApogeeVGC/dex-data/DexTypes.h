@@ -18,11 +18,11 @@ public:
 	DexTypes() = default;
 	DexTypes(IModdedDex* dex_ptr);
 
-	TypeInfo* get_type_info(const ID& id);
+	/*TypeInfo* get_type_info(const ID& id);
 	TypeInfo* get_type_info(const TypeInfo& type_info);
 	std::vector<std::string>* get_names();
 	bool is_name(const std::string& name) const;
-	std::vector<std::unique_ptr<TypeInfo>>* get_all_type_infos();
+	std::vector<std::unique_ptr<TypeInfo>>* get_all_type_infos(); */
 
 	DataType get_data_type() const override;
 };

@@ -23,6 +23,7 @@
     <ClCompile Include="dex-abilities\Ability.cpp" />
     <ClCompile Include="dex-abilities\AbilityData.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
+    <ClCompile Include="dex-conditions\Condition.cpp" />
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
     <ClCompile Include="dex-data\BasicEffect.cpp" />
@@ -162,8 +163,8 @@
     <ClInclude Include="dex-species\SpeciesFormatsData.h" />
     <ClInclude Include="dex\AliasesTable.h" />
     <ClInclude Include="dex\BASE_MOD.h" />
-    <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DataType.h" />
+    <ClInclude Include="dex\DATA_DIR.h" />
     <ClInclude Include="dex\DATA_FILES.h" />
     <ClInclude Include="dex\DATA_TYPES.h" />
     <ClInclude Include="dex\Descriptions.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="dex\IDex.h" />
     <ClInclude Include="dex\IDexDataManager.h" />
     <ClInclude Include="dex\ModdedDex.h" />
+    <ClInclude Include="dex\MODS_DIR.h" />
     <ClInclude Include="dex\TextTableData.h" />
     <ClInclude Include="field\Field.h" />
     <ClInclude Include="global-types\AbilityText.h" />

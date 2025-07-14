@@ -18,12 +18,12 @@ struct DexItems : public IDexDataManager
 
     // Item* get_item(const Item& item) const;
 
-    Item* get_item(const std::string& name);
+    // Item* get_item(const std::string& name);
 
-    Item* get_item_by_id(const ID& id);
+    // Item* get_item_by_id(const ID& id);
 
-    // Get all items
-    std::vector<std::unique_ptr<Item>>* get_all_items();
+    //// Get all items
+    //std::vector<std::unique_ptr<Item>>* get_all_items();
 
     DataType get_data_type() const override;
 };

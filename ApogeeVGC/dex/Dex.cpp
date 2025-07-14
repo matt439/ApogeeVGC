@@ -10,7 +10,7 @@ Dex::Dex()
 	dexes[BASE_MOD] = std::make_unique<ModdedDex>(this, BASE_MOD);
 }
 
-std::unordered_map<std::string, std::unique_ptr<IModdedDex>>* Dex::get_dexes()
+std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* Dex::get_dexes()
 {
 	return &dexes;
 }

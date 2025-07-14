@@ -49,6 +49,7 @@
     <ClCompile Include="dex-species\DexSpecies.cpp" />
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-data\DexStats.cpp" />
+    <ClCompile Include="dex-conditions\Condition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -140,7 +141,6 @@
     <ClInclude Include="pokemon\EffectState.h" />
     <ClInclude Include="pokemon\Pokemon.h" />
     <ClInclude Include="dex\DATA_TYPES.h" />
-    <ClInclude Include="dex\constants.h" />
     <ClInclude Include="dex\DATA_FILES.h" />
     <ClInclude Include="dex\TextTableData.h" />
     <ClInclude Include="dex\DexTable.h" />
@@ -217,5 +217,7 @@
     <ClInclude Include="dex-data\EMPTY_TYPE_INFO.h" />
     <ClInclude Include="dex\IDex.h" />
     <ClInclude Include="dex\IDexDataManager.h" />
+    <ClInclude Include="dex\DATA_DIR.h" />
+    <ClInclude Include="dex\MODS_DIR.h" />
   </ItemGroup>
 </Project>

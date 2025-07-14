@@ -1,12 +1,15 @@
 #include "ModdedDex.h"
 
-#include "constants.h"
+#include "DATA_DIR.h"
+#include "MODS_DIR.h"
+#include "BASE_MOD.h"
+#include "Dex.h"
 
 #include <rapidjson/istreamwrapper.h>
 
-ModdedDex::ModdedDex(IDex* dex_parent, const std::string& mod) :
+ModdedDex::ModdedDex(Dex* dex_parent, const std::string& mod) :
     dex_parent(dex_parent),
-	dexes(dex_parent->get_dexes()),
+	//dexes(dex_parent->get_dexes()),
 	is_base(mod == "base"),
     current_mod(mod),
 	formats(std::make_unique<DexFormats>(this)),
@@ -25,52 +28,52 @@ ModdedDex::ModdedDex(IDex* dex_parent, const std::string& mod) :
 		data_dir = MODS_DIR / mod;
 }
 
-DexTableData* ModdedDex::get_data()
-{
-    load_data();
-	return data_cache.get();
-}
+//DexTableData* ModdedDex::get_data()
+//{
+//    load_data();
+//	return data_cache.get();
+//}
+//
+//std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* ModdedDex::get_dexes()
+//{
+//    include_mods();
+//	return dex_parent->get_dexes();
+//}
+//
+//ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
+//{
+//    if (!cast_to_modded_dex(dex_parent->get_modded_dex("base"))->mods_loaded)
+//        cast_to_modded_dex(dex_parent->get_modded_dex("base"))->include_mods();
+//
+//    std::string mod_name;
+//	if (mod.empty() || mod == "base")
+//		mod_name = "base";
+//	else
+//		mod_name = mod;
+//
+//    return cast_to_modded_dex(dex_parent->get_modded_dex(mod_name))->include_data();
+//}
 
-std::unordered_map<std::string, std::unique_ptr<IModdedDex>>* ModdedDex::get_dexes()
-{
-    include_mods();
-    return dexes;
-}
+//ModdedDex* ModdedDex::get_modded_dex_for_gen(int gen)
+//{
+//    if (gen == 0)
+//        return this;
+//
+//    return get_modded_dex("gen" + std::to_string(gen));
+//}
 
-ModdedDex* ModdedDex::get_modded_dex(const std::string& mod)
-{
-    if (!dexes->at("base")->cast_to_modded_dex()->mods_loaded)
-        dexes->at("base")->cast_to_modded_dex()->include_mods();
-
-    std::string mod_name;
-	if (mod.empty() || mod == "base")
-		mod_name = "base";
-	else
-		mod_name = mod;
-
-    return dexes->at(mod_name)->cast_to_modded_dex()->include_data();
-}
-
-ModdedDex* ModdedDex::get_modded_dex_for_gen(int gen)
-{
-    if (gen == 0)
-        return this;
-
-    return get_modded_dex("gen" + std::to_string(gen));
-}
-
-ModdedDex* ModdedDex::get_modded_dex_for_format(const Format& format)
-{
-    if (!mods_loaded)
-		include_mods();
-
-    std::string mod = formats->get_format(format)->mod;
-	
-	if (mod.empty() || mod == "base")
-		mod = BASE_MOD;
-
-    return dexes->at(mod)->cast_to_modded_dex()->include_data();
-}
+//ModdedDex* ModdedDex::get_modded_dex_for_format(const Format& format)
+//{
+//    if (!mods_loaded)
+//		include_mods();
+//
+//    std::string mod = formats->get_format(format)->mod;
+//	
+//	if (mod.empty() || mod == "base")
+//		mod = BASE_MOD;
+//
+//    return cast_to_modded_dex(dex_parent->get_modded_dex(mod))->include_data();
+//}
 
 //template<typename T>
 //T& ModdedDex::mod_data(DataType data_type, const std::string& id)
@@ -133,28 +136,28 @@ std::string ModdedDex::get_name(const std::string& input)
     return name;
 }
 
-bool ModdedDex::get_immunity(const std::string& source_type, const std::string& target_type) const
-{
-	auto type_data = types->get_type_info(target_type);
-	if (!type_data || !type_data->exists)
-		return true; // If type doesn't exist, assume no immunity
-
-	if (type_data->damage_taken.count(source_type) && type_data->damage_taken.at(source_type) == 3)
-		return false; // Immune if damage taken is 3
-
-	return true; // Otherwise, not immune
-}
-
-bool ModdedDex::get_immunity(const std::string& source_type,
-    const std::vector<const std::string&>& target_types) const
-{
-	for (const auto& t : target_types)
-    {
-		if (!get_immunity(source_type, t))
-            return false;
-	}
-	return true;
-}
+//bool ModdedDex::get_immunity(const std::string& source_type, const std::string& target_type) const
+//{
+//	auto type_data = types->get_type_info(target_type);
+//	if (!type_data || !type_data->exists)
+//		return true; // If type doesn't exist, assume no immunity
+//
+//	if (type_data->damage_taken.count(source_type) && type_data->damage_taken.at(source_type) == 3)
+//		return false; // Immune if damage taken is 3
+//
+//	return true; // Otherwise, not immune
+//}
+//
+//bool ModdedDex::get_immunity(const std::string& source_type,
+//    const std::vector<const std::string&>& target_types) const
+//{
+//	for (const auto& t : target_types)
+//    {
+//		if (!get_immunity(source_type, t))
+//            return false;
+//	}
+//	return true;
+//}
 
 //bool ModdedDex::get_immunity(const std::string& source_type, const std::string& target_type) const
 //{
@@ -185,35 +188,35 @@ bool ModdedDex::get_immunity(const std::string& source_type,
 //    return get_immunity(source.type, target_type);
 //}
 
-int ModdedDex::get_effectiveness(const std::string& source_type, const std::string& target_type) const
-{
-    auto type_data = types->get_type_info(target_type);
-
-    if (!type_data)
-        return 0;
-
-    auto it = type_data->damage_taken.find(source_type);
-    if (it == type_data->damage_taken.end())
-        return 0;
-
-    switch (it->second)
-    {
-    case 1: return 1;   // super-effective
-    case 2: return -1;  // resist
-    default: return 0;  // neutral or unknown
-    };
-}
-
-int ModdedDex::get_effectiveness(const std::string& source_type,
-    const std::vector<std::string>& target_types) const
-{
-    int total = 0;
-    for (const auto& t : target_types)
-    {
-        total += get_effectiveness(source_type, t);
-    }
-    return total;
-}
+//int ModdedDex::get_effectiveness(const std::string& source_type, const std::string& target_type) const
+//{
+//    auto type_data = types->get_type_info(target_type);
+//
+//    if (!type_data)
+//        return 0;
+//
+//    auto it = type_data->damage_taken.find(source_type);
+//    if (it == type_data->damage_taken.end())
+//        return 0;
+//
+//    switch (it->second)
+//    {
+//    case 1: return 1;   // super-effective
+//    case 2: return -1;  // resist
+//    default: return 0;  // neutral or unknown
+//    };
+//}
+//
+//int ModdedDex::get_effectiveness(const std::string& source_type,
+//    const std::vector<std::string>& target_types) const
+//{
+//    int total = 0;
+//    for (const auto& t : target_types)
+//    {
+//        total += get_effectiveness(source_type, t);
+//    }
+//    return total;
+//}
 
 //template<typename Source>
 //int ModdedDex::get_effectiveness(const Source& source, const std::string& target_type) const
@@ -246,16 +249,16 @@ int ModdedDex::get_effectiveness(const std::string& source_type,
 ////    return type_map.at(data_type);
 ////}
 
-Descriptions ModdedDex::get_descriptions(const std::string& table, const std::string& id)
-{
-	if (table.empty() || id.empty())
-		return { "", "" }; // Invalid input
-
-    // Look up the entry in the text table
-    TextTableData& text_table = load_text_data();
-
-	return text_table.get_description_from_table(table, id);
-}
+//Descriptions ModdedDex::get_descriptions(const std::string& table, const std::string& id)
+//{
+//	if (table.empty() || id.empty())
+//		return { "", "" }; // Invalid input
+//
+//    // Look up the entry in the text table
+//    TextTableData& text_table = load_text_data();
+//
+//	return text_table.get_description_from_table(table, id);
+//}
 
 
 //const rapidjson::Value* ModdedDex::load_data_file(const std::string& base_path, DataType data_type)
@@ -474,15 +477,15 @@ Descriptions ModdedDex::get_descriptions(const std::string& table, const std::st
 //    return gen;
 //}
 
-const std::string& ModdedDex::get_parent_mod() const
-{
-	return parent_mod;
-}
-
-IDex* ModdedDex::get_dex_parent() const
-{
-    return dex_parent;
-}
+//const std::string& ModdedDex::get_parent_mod() const
+//{
+//	return parent_mod;
+//}
+//
+//IDex* ModdedDex::get_dex_parent() const
+//{
+//    return dex_parent;
+//}
 
 ModdedDex* ModdedDex::cast_to_modded_dex(IModdedDex* modded_dex) const
 {
