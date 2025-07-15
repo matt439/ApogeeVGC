@@ -88,4 +88,7 @@ struct PokemonEventMethods : public EventMethods
 	ModifierSourceMoveFunc on_ally_weather_modify_damage = nullptr; // optional // from CommonHandlers
 	ModifierSourceMoveFunc on_ally_modify_damage_phase_1 = nullptr; // optional // from CommonHandlers
 	ModifierSourceMoveFunc on_ally_modify_damage_phase_2 = nullptr; // optional // from CommonHandlers
+
+	PokemonEventMethods() = default;
+	PokemonEventMethods(const PokemonEventMethods& other);
 };

@@ -24,7 +24,7 @@
 
 #include <filesystem>
 
-struct IDex;
+class IDex;
 class Dex;
 
 class ModdedDex : public IModdedDex

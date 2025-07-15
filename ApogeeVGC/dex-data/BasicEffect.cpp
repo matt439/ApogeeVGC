@@ -107,12 +107,12 @@ BasicEffect::BasicEffect(
     NonStandard is_nonstandard,
     bool no_copy,
     bool affects_fainted,
-	const std::string& source_effect,
-	std::unique_ptr<int> duration,
-    std::unique_ptr<std::string> status,
-    std::unique_ptr<std::string> weather,
-	std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
-	std::unique_ptr<bool> infiltrates) :
+	const std::string& source_effect) :
+	//std::unique_ptr<int> duration,
+ //   std::unique_ptr<std::string> status,
+ //   std::unique_ptr<std::string> weather,
+	//std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
+	//std::unique_ptr<bool> infiltrates) :
 	num(num),
 	gen(gen),
 	no_copy(no_copy),
@@ -120,19 +120,21 @@ BasicEffect::BasicEffect(
 	source_effect(source_effect),
 	status(std::move(status)),
 	weather(std::move(weather)),
-EffectData(
-	std::make_unique<std::string>(name),
-	std::make_unique<std::string>(desc),
-	// can't use std::move here because its already been moved above
-	std::move(duration),
-	std::move(duration_callback),
-	std::make_unique<EffectType>(effect_type),
-	std::move(infiltrates),
-	// can't use std::move here because its already been moved above
-	std::make_unique<NonStandard>(is_nonstandard),
-	std::make_unique<std::string>(short_desc))
+	exists(exists),
+	EffectData(name, desc, effect_type, is_nonstandard, short_desc)
+//EffectData(
+//	std::make_unique<std::string>(name),
+//	std::make_unique<std::string>(desc),
+//	//// can't use std::move here because its already been moved above
+//	//std::move(duration),
+//	//std::move(duration_callback),
+//	std::make_unique<EffectType>(effect_type),
+//	//std::move(infiltrates),
+//	//// can't use std::move here because its already been moved above
+//	std::make_unique<NonStandard>(is_nonstandard),
+//	std::make_unique<std::string>(short_desc))
 {
-	EffectData::name = std::make_unique<std::string>(name);
+	//EffectData::name = std::make_unique<std::string>(name);
 
 	if (!real_move.empty())
 		this->id = to_id(real_move);

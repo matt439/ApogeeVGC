@@ -55,7 +55,7 @@ using OnAllyEatItemFunc = std::function<void(Battle*, Item*, Pokemon*)>;
 using OnAllyFlinchFunc = std::function<std::variant<bool, void>(Battle*, Pokemon*)>;
 // using OnAllyHitFunc = OnHitFunc; // from MoveEventMethods
 using OnAllyImmunityFunc = std::function<void(Battle*, std::string, Pokemon*)>;
-using OnAllyLockMoveFunc = std::variant<std::string, std::function<std::variant<void, std::string>(Battle*, Pokemon*)>>;
+using OnAllyLockMoveFunc = std::variant<std::string, std::function<std::variant<std::monostate, std::string>(Battle*, Pokemon*)>>;
 using OnAllyMaybeTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
 // using OnAllyModifyAccuracyFunc = ModifierMoveFunc; // from CommonHandlers
 // using OnAllyModifyAtkFunc = ModifierSourceMoveFunc; // from CommonHandlers
@@ -92,8 +92,8 @@ using OnAllyTrapPokemonFunc = std::function<void(Battle*, Pokemon*)>;
 using OnAllyTryAddVolatileFunc = std::function<std::variant<bool, std::nullptr_t, void>(Battle*, Condition*, Pokemon*, Pokemon*, Effect)>;
 using OnAllyTryEatItemFunc = std::variant<bool, std::function<std::variant<bool, void>(Battle*, Item*, Pokemon*)>>;
 using OnAllyTryHealFunc = std::variant<
-	std::function<std::variant<int, bool, void>(Battle*, int, Pokemon*, Pokemon*, Effect)>,
-	std::function<std::variant<bool, void>(Battle*, Pokemon*)>,
+	std::function<std::variant<int, bool, std::monostate>(Battle*, int, Pokemon*, Pokemon*, Effect)>,
+	std::function<std::variant<bool, std::monostate>(Battle*, Pokemon*)>,
 	bool>;
 
 // using OnAllyTryHitFunc = OnTryHitFunc; // from MoveEventMethods

@@ -7,13 +7,14 @@
 #include <memory>
 #include <string>
 
-class DexTableData;
+struct DexTableData;
 class IDex;
 class IDexDataManager;
 // class ModdedDex;
 
-struct IModdedDex
+class IModdedDex
 {
+public:
 	virtual ~IModdedDex() = default;
 	//virtual IDex* get_dex_parent() const = 0;
 	//virtual std::string* get_alias(const std::string& id) = 0;

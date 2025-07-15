@@ -29,4 +29,5 @@ struct AbilityFlags
     std::unique_ptr<bool> notransform = nullptr; // optional
 
 	AbilityFlags() = default;
+    AbilityFlags(const AbilityFlags& other);
 };

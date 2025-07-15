@@ -11,7 +11,7 @@
 #include "../dex-species/PokemonGoData.h"
 
 #include "../dex-conditions/ConditionData.h"
-//#include "../dex-data/TypeData.h"
+#include "../dex-data/TypeData.h"
 
 #include "../global-types/AnyObject.h"
 #include "DexTable.h"
@@ -43,5 +43,5 @@ struct DexTableData
 	DexTable<std::unique_ptr<PokemonGoData>> pokemon_go_data = {};
 	DexTable<std::unique_ptr<AnyObject>> scripts = {}; // generic AnyObject for scripts, can be any type of script data
 	DexTable<std::unique_ptr<ConditionData>> conditions = {};
-	//DexTable<std::unique_ptr<TypeData>> type_chart = {};
+	DexTable<std::unique_ptr<TypeData>> type_chart = {};
 };

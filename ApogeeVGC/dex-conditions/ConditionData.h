@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "PokemonConditionData.h"
+#include "PokemonConditionData.h"
 //#include "SideConditionData.h"
 //#include "FieldConditionData.h"
 //#include <variant>
@@ -9,8 +9,11 @@
 
 struct ConditionData
 {
-	//std::unique_ptr<PokemonConditionData> pokemon_condition = nullptr; // optional
+	std::unique_ptr<PokemonConditionData> pokemon_condition = nullptr; // optional
 	//std::unique_ptr<SideConditionData> side_condition = nullptr; // optional
 	//std::unique_ptr<FieldConditionData> field_condition = nullptr; // optional
-	int x = 0;
+	// int x = 0;
+
+	ConditionData() = default;
+	ConditionData(const ConditionData& other);
 };

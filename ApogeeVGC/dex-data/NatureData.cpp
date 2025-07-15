@@ -12,10 +12,22 @@
 //{
 //}
 
+//NatureData::NatureData(const std::string& name) :
+//	name(name)
+//{
+//}
+
 
 NatureData::NatureData(const std::string& name,
     std::unique_ptr<StatIDExceptHP> plus,
     std::unique_ptr<StatIDExceptHP> minus)
 	: name(name), plus(std::move(plus)), minus(std::move(minus))
+{
+}
+
+NatureData::NatureData(const NatureData& other)
+	: name(other.name),
+	plus(other.plus ? std::make_unique<StatIDExceptHP>(*other.plus) : nullptr),
+	minus(other.minus ? std::make_unique<StatIDExceptHP>(*other.minus) : nullptr)
 {
 }

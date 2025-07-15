@@ -15,6 +15,7 @@ struct NatureData
     NatureData(const std::string& name,
         std::unique_ptr<StatIDExceptHP> plus = nullptr,
         std::unique_ptr<StatIDExceptHP> minus = nullptr);
+    NatureData(const NatureData& other);
 
     //NatureData(const BasicEffectData& basic_effect_data,
     //    const StatIDExceptHP* plus = nullptr,

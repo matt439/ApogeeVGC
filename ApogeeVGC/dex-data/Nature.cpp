@@ -26,20 +26,26 @@ Nature::Nature(
 	NonStandard is_nonstandard,
 	bool no_copy,
 	bool affects_fainted,
-	const std::string& source_effect,
-	// optional
-	std::unique_ptr<int> duration,
-	std::unique_ptr<std::string> status,
-	std::unique_ptr<std::string> weather,
-	std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
-	std::unique_ptr<bool> infiltrates,
-	std::unique_ptr<StatIDExceptHP> plus,
-	std::unique_ptr<StatIDExceptHP> minus) :
+	const std::string& source_effect) :
+	//// optional
+	//std::unique_ptr<int> duration,
+	//std::unique_ptr<std::string> status,
+	//std::unique_ptr<std::string> weather,
+	//std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
+	//std::unique_ptr<bool> infiltrates,
+	//std::unique_ptr<StatIDExceptHP> plus,
+	//std::unique_ptr<StatIDExceptHP> minus) :
 	BasicEffect(name, real_move, full_name, EffectType::NATURE, exists, num, 3,
-		short_desc, desc, is_nonstandard, no_copy, affects_fainted, source_effect,
-		std::move(duration), std::move(status), std::move(weather),
-		std::move(duration_callback), std::move(infiltrates)),
-	NatureData(name, std::move(plus), std::move(minus))
+		short_desc, desc, is_nonstandard, no_copy, affects_fainted, source_effect),
+		//std::move(duration), std::move(status), std::move(weather),
+		//std::move(duration_callback), std::move(infiltrates)),
+	NatureData(name)//, std::move(plus), std::move(minus))
 {
 	fullname = "nature: " + name;
+}
+
+Nature::Nature(const Nature& other) :
+	BasicEffect(other),
+	NatureData(other)
+{
 }

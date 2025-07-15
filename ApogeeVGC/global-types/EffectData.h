@@ -34,5 +34,12 @@ struct EffectData
 		std::unique_ptr<NonStandard> is_nonstandard = nullptr,
 		std::unique_ptr<std::string> short_desc = nullptr);
 
+	// This constructor is used by BasicEffect. It only includes the non-optional fields of BasicEffect.
+	EffectData(const std::string& name,
+		const std::string& desc,
+		EffectType effect_type,
+		NonStandard is_nonstandard,
+		std::string short_desc);
+
 	EffectData(const EffectData& other);
 };

@@ -22,9 +22,14 @@
     <ClCompile Include="battle\Battle.cpp" />
     <ClCompile Include="dex-abilities\Ability.cpp" />
     <ClCompile Include="dex-abilities\AbilityData.cpp" />
+    <ClCompile Include="dex-abilities\AbilityFlags.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
     <ClCompile Include="dex-conditions\Condition.cpp" />
+    <ClCompile Include="dex-conditions\ConditionData.cpp" />
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
+    <ClCompile Include="dex-conditions\EventMethods.cpp" />
+    <ClCompile Include="dex-conditions\PokemonConditionData.cpp" />
+    <ClCompile Include="dex-conditions\PokemonEventMethods.cpp" />
     <ClCompile Include="dex-data\assign_missing_fields.cpp" />
     <ClCompile Include="dex-data\BasicEffect.cpp" />
     <ClCompile Include="dex-data\BasicEffectData.cpp" />

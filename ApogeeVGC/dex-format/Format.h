@@ -26,7 +26,7 @@ class Battle;
 //class ModdedField;
 //struct ModdedBattleActions;
 //struct ModdedBattleSide;
-struct Move;
+class Move;
 struct PokemonSet;
 class PokemonSources;
 class TeamValidator;

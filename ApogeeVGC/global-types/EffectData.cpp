@@ -30,6 +30,19 @@ EffectData::EffectData(
 {
 }
 
+EffectData::EffectData(const std::string& name,
+	const std::string& desc,
+	EffectType effect_type,
+	NonStandard is_nonstandard,
+	std::string short_desc) :
+	name(std::make_unique<std::string>(name)),
+	desc(std::make_unique<std::string>(desc)),
+	effect_type(std::make_unique<EffectType>(effect_type)),
+	is_nonstandard(std::make_unique<NonStandard>(is_nonstandard)),
+	short_desc(std::make_unique<std::string>(short_desc))
+{
+}
+
 EffectData::EffectData(const EffectData& other) :
 	name(other.name ? std::make_unique<std::string>(*other.name) : nullptr),
 	desc(other.desc ? std::make_unique<std::string>(*other.desc) : nullptr),

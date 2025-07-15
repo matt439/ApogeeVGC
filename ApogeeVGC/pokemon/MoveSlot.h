@@ -14,3 +14,4 @@ struct MoveSlot
 	std::string* disabled_source = nullptr; // optional
 	bool used = false;
 	bool* is_virtual = nullptr; // optional
+};
