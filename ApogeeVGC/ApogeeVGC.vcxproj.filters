@@ -50,7 +50,6 @@
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-data\DexStats.cpp" />
     <ClCompile Include="dex-conditions\Condition.cpp" />
-    <ClCompile Include="dex-conditions\ConditionData.cpp" />
     <ClCompile Include="dex-conditions\PokemonConditionData.cpp" />
     <ClCompile Include="dex-conditions\EventMethods.cpp" />
     <ClCompile Include="dex-conditions\PokemonEventMethods.cpp" />

@@ -25,7 +25,6 @@
     <ClCompile Include="dex-abilities\AbilityFlags.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
     <ClCompile Include="dex-conditions\Condition.cpp" />
-    <ClCompile Include="dex-conditions\ConditionData.cpp" />
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-conditions\EventMethods.cpp" />
     <ClCompile Include="dex-conditions\PokemonConditionData.cpp" />
