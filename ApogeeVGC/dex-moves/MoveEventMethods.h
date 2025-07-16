@@ -38,4 +38,7 @@ struct MoveEventMethods
 	OnTryImmunityFunc on_try_immunity = nullptr;
 	OnTryMoveFunc on_try_move = nullptr;
 	OnUseMoveMessageFunc on_use_move_message = nullptr;
+
+	MoveEventMethods() = default;
+	MoveEventMethods(const MoveEventMethods& other);
 };

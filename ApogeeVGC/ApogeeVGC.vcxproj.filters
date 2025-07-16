@@ -54,6 +54,16 @@
     <ClCompile Include="dex-conditions\EventMethods.cpp" />
     <ClCompile Include="dex-conditions\PokemonEventMethods.cpp" />
     <ClCompile Include="dex-abilities\AbilityFlags.cpp" />
+    <ClCompile Include="lib\utils.cpp" />
+    <ClCompile Include="dex-format\FormatData.cpp" />
+    <ClCompile Include="dex-species\LearnsetData.cpp" />
+    <ClCompile Include="dex-moves\MoveEventMethods.cpp" />
+    <ClCompile Include="dex-species\SpeciesData.cpp" />
+    <ClCompile Include="dex-species\SpeciesFormatsData.cpp" />
+    <ClCompile Include="dex-species\PokemonGoData.cpp" />
+    <ClCompile Include="dex-conditions\ConditionData.cpp" />
+    <ClCompile Include="dex\DexTableData.cpp" />
+    <ClCompile Include="global-types\AnyObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -223,5 +233,7 @@
     <ClInclude Include="dex\IDexDataManager.h" />
     <ClInclude Include="dex\DATA_DIR.h" />
     <ClInclude Include="dex\MODS_DIR.h" />
+    <ClInclude Include="lib\utils.h" />
+    <ClInclude Include="dex\IDexData.h" />
   </ItemGroup>
 </Project>

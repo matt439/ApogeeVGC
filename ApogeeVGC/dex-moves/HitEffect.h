@@ -32,4 +32,6 @@ struct HitEffect
         std::unique_ptr<std::string> pseudo_weather = nullptr,
         std::unique_ptr<std::string> terrain = nullptr,
         std::unique_ptr<std::string> weather = nullptr);
+
+    HitEffect(const HitEffect& other);
 };

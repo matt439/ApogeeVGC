@@ -41,5 +41,8 @@ struct EffectData
 		NonStandard is_nonstandard,
 		std::string short_desc);
 
+	// This constructor is used by MoveData
+	EffectData(const std::string& name);
+
 	EffectData(const EffectData& other);
 };

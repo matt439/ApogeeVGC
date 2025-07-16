@@ -2,15 +2,15 @@
 
 MoveData::MoveData(
 	// MoveData
-	std::string name,
+	const std::string& name,
 	MoveTarget target,
 	MoveFlags& flags,
 	int base_power,
 	std::variant<bool, int> accuracy,
 	int pp,
 	MoveCategory category,
-	std::string type,
-	int priority,
+	const std::string& type,
+	int priority) :
 
 	//// MoveData optional
 	//std::unique_ptr<int> num,
@@ -75,46 +75,50 @@ MoveData::MoveData(
 	//std::unique_ptr<bool> stalling_move,
 	//std::unique_ptr<ID> base_move,
 
-	// EffectData
-	std::unique_ptr<std::string> desc,
-	std::unique_ptr<int> duration,
-	std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
-	std::unique_ptr<EffectType> effect_type,
-	std::unique_ptr<bool> infiltrates,
-	std::unique_ptr<NonStandard> is_nonstandard,
-	std::unique_ptr<std::string> short_desc,
+	//// EffectData
+	//std::unique_ptr<std::string> desc,
+	//std::unique_ptr<int> duration,
+	//std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback,
+	//std::unique_ptr<EffectType> effect_type,
+	//std::unique_ptr<bool> infiltrates,
+	//std::unique_ptr<NonStandard> is_nonstandard,
+	//std::unique_ptr<std::string> short_desc,
 
-	// HitEffect
-	std::unique_ptr<OnHitFunc> on_hit,
-	std::unique_ptr<SparseBoostsTable> boosts,
-	std::unique_ptr<std::string> status,
-	std::unique_ptr<std::string> volatile_status,
-	std::unique_ptr<std::string> side_condition,
-	std::unique_ptr<std::string> slot_condition,
-	std::unique_ptr<std::string> pseudo_weather,
-	std::unique_ptr<std::string> terrain,
-	std::unique_ptr<std::string> weather) :
+	//// HitEffect
+	//std::unique_ptr<OnHitFunc> on_hit,
+	//std::unique_ptr<SparseBoostsTable> boosts,
+	//std::unique_ptr<std::string> status,
+	//std::unique_ptr<std::string> volatile_status,
+	//std::unique_ptr<std::string> side_condition,
+	//std::unique_ptr<std::string> slot_condition,
+	//std::unique_ptr<std::string> pseudo_weather,
+	//std::unique_ptr<std::string> terrain,
+	//std::unique_ptr<std::string> weather) :
 
-	EffectData(
-		std::make_unique<std::string>(name),
-		std::make_unique<std::string>(desc ? *desc : ""),
-		std::move(duration),
-		std::move(duration_callback),
-		std::move(effect_type),
-		std::move(infiltrates),
-		std::move(is_nonstandard),
-		std::move(short_desc)),
-	HitEffect(
-		std::move(on_hit),
-		std::move(boosts),
-		std::move(status),
-		std::move(volatile_status),
-		std::move(side_condition),
-		std::move(slot_condition),
-		std::move(pseudo_weather),
-		std::move(terrain),
-		std::move(weather)),
+	//EffectData(
+	//	std::make_unique<std::string>(name),
+	//	std::make_unique<std::string>(desc ? *desc : ""),
+	//	std::move(duration),
+	//	std::move(duration_callback),
+	//	std::move(effect_type),
+	//	std::move(infiltrates),
+	//	std::move(is_nonstandard),
+	//	std::move(short_desc)),
+	//HitEffect(
+	//	std::move(on_hit),
+	//	std::move(boosts),
+	//	std::move(status),
+	//	std::move(volatile_status),
+	//	std::move(side_condition),
+	//	std::move(slot_condition),
+	//	std::move(pseudo_weather),
+	//	std::move(terrain),
+	//	std::move(weather)),
 
+
+EffectData(name),
+MoveEventMethods(),
+HitEffect(),
 	target(target),
 	flags(flags),
 	base_power(base_power),
@@ -126,3 +130,22 @@ MoveData::MoveData(
 {
 }
 
+MoveData::MoveData(const MoveData& other) :
+	EffectData(other),
+	MoveEventMethods(other),
+	HitEffect(other),
+	target(other.target),
+	flags(other.flags),
+	base_power(other.base_power),
+	accuracy(other.accuracy),
+	pp(other.pp),
+	category(other.category),
+	type(other.type),
+	priority(other.priority)
+{
+}
+
+DataType MoveData::get_data_type() const
+{
+	return DataType::MOVES;
+}

@@ -15,4 +15,5 @@ enum class DataType
     TYPE_CHART,
     POKEMON_GO_DATA,
     STATS, // Added for DexStats
+	// ANY, // Used for AnyObject
 };

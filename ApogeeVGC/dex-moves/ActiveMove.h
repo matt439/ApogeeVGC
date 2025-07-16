@@ -7,43 +7,44 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <memory>
 
 class ActiveMove : public MutableMove
 {
 public:
 	std::string name = "";
-	std::string effectType = "Move";
+	std::string effect_type = "Move";
     ID id = ID();
 	int num = 0;
-    ID* weather = nullptr; // optional
-    ID* status = nullptr; // optional
-	int hit = 0;
-    MoveHitData* moveHitData = nullptr; // optional
-    std::vector<Pokemon>* hitTargets = nullptr; // optional
-    Ability* ability = nullptr; // optional
-    std::vector<Pokemon>* allies = nullptr; // optional
-    Pokemon* auraBooster = nullptr; // optional
-    bool* causedCrashDamage = nullptr; // optional
-    ID* forceStatus = nullptr; // optional
-    bool* hasAuraBreak = nullptr; // optional
-    bool* hasBounced = nullptr; // optional
-    bool* hasSheerForce = nullptr; // optional
-    bool* isExternal = nullptr; // optional
-    bool* lastHit = nullptr; // optional
-    int* magnitude = nullptr; // optional
-    bool* pranksterBoosted = nullptr; // optional
-    bool* selfDropped = nullptr; // optional
-    std::variant<std::string, bool>* selfSwitch = nullptr; // optional
-    bool* spreadHit = nullptr; // optional
-    std::string* statusRoll = nullptr; // optional
-    bool* stellarBoosted = nullptr; // optional
-    std::variant<int, bool>* totalDamage = nullptr; // optional
-    Effect* typeChangerBoosted = nullptr; // optional
-    bool* willChangeForme = nullptr; // optional
-    bool* infiltrates = nullptr; // optional
-    Pokemon* ruinedAtk = nullptr; // optional
-    Pokemon* ruinedDef = nullptr; // optional
-    Pokemon* ruinedSpA = nullptr; // optional
-    Pokemon* ruinedSpD = nullptr; // optional
-    bool* isZOrMaxPowered = nullptr; // optional
+    int hit = 0;
+	std::unique_ptr<ID> weather = nullptr; // optional
+	std::unique_ptr<ID> status = nullptr; // optional
+	std::unique_ptr<MoveHitData> move_hit_data = nullptr; // optional
+	std::unique_ptr<std::vector<Pokemon>> hit_targets = nullptr; // optional
+	std::unique_ptr<Ability> ability = nullptr; // optional
+	std::unique_ptr<std::vector<Pokemon>> allies = nullptr; // optional
+	std::unique_ptr<Pokemon> aura_booster = nullptr; // optional
+	std::unique_ptr<bool> caused_crash_damage = nullptr; // optional
+	std::unique_ptr<ID> force_status = nullptr; // optional
+	std::unique_ptr<bool> has_aura_break = nullptr; // optional
+	std::unique_ptr<bool> has_bounced = nullptr; // optional
+	std::unique_ptr<bool> has_sheer_force = nullptr; // optional
+	std::unique_ptr<bool> is_external = nullptr; // optional
+	std::unique_ptr<bool> last_hit = nullptr; // optional
+	std::unique_ptr<int> magnitude = nullptr; // optional
+	std::unique_ptr<bool> prankster_boosted = nullptr; // optional
+	std::unique_ptr<bool> self_dropped = nullptr; // optional
+	std::unique_ptr<std::variant<std::string, bool>> self_switch = nullptr; // optional
+	std::unique_ptr<bool> spread_hit = nullptr; // optional
+	std::unique_ptr<std::string> status_roll = nullptr; // optional
+	std::unique_ptr<bool> stellar_boosted = nullptr; // optional
+	std::unique_ptr<std::variant<int, bool>> total_damage = nullptr; // optional
+	std::unique_ptr<Effect> type_changer_boosted = nullptr; // optional
+	std::unique_ptr<bool> will_change_forme = nullptr; // optional
+	std::unique_ptr<bool> infiltrates = nullptr; // optional
+	std::unique_ptr<Pokemon> ruined_atk = nullptr; // optional
+	std::unique_ptr<Pokemon> ruined_def = nullptr; // optional
+	std::unique_ptr<Pokemon> ruined_spa = nullptr; // optional
+	std::unique_ptr<Pokemon> ruined_spd = nullptr; // optional
+	std::unique_ptr<bool> is_z_or_max_powered = nullptr; // optional
 };

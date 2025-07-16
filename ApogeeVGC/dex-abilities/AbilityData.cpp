@@ -23,3 +23,24 @@ AbilityData::AbilityData(
 	PokemonEventMethods()
 {
 }
+
+AbilityData::AbilityData(const Ability& ability,
+	const AbilityEventMethods& ability_events,
+	const PokemonEventMethods& pokemon_events) :
+	Ability(ability),
+	AbilityEventMethods(ability_events),
+	PokemonEventMethods(pokemon_events)
+{
+}
+
+AbilityData::AbilityData(const AbilityData& other) :
+	Ability(other),
+	AbilityEventMethods(other),
+	PokemonEventMethods(other)
+{
+}
+
+DataType AbilityData::get_data_type() const
+{
+	return DataType::ABILITIES;
+}

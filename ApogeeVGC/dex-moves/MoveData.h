@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../dex/IDexData.h"
 #include "../global-types/EffectData.h"
 #include "../global-types/IDEntry.h"
 #include "../global-types/ID.h"
@@ -24,7 +25,7 @@
 //struct SecondaryEffect;
 //struct SelfBoost;
 
-struct MoveData : public EffectData, MoveEventMethods, HitEffect
+struct MoveData : public EffectData, public MoveEventMethods, public HitEffect, public IDexData
 {
 	// std::string name = "";
 	std::unique_ptr<int> num = nullptr; // optional
@@ -108,17 +109,19 @@ struct MoveData : public EffectData, MoveEventMethods, HitEffect
 	std::unique_ptr<bool> stalling_move = nullptr; // optional // Indicates if the move is a stalling move
 	std::unique_ptr<ID> base_move = nullptr; // optional // Base move ID for moves that are based on another move
 
+	MoveData() = default;
+
 	MoveData(
 		// MoveData
-		std::string name,
+		const std::string& name,
 		MoveTarget target,
 		MoveFlags& flags,
 		int base_power = 0,
 		std::variant<bool, int> accuracy = false,
 		int pp = 0,
 		MoveCategory category = MoveCategory::STATUS,
-		std::string type = "",
-		int priority = 0,
+		const std::string& type = "",
+		int priority = 0);
 
 		//// MoveData optional
 		//std::unique_ptr<int> num = nullptr,
@@ -183,23 +186,27 @@ struct MoveData : public EffectData, MoveEventMethods, HitEffect
 		//std::unique_ptr<bool> stalling_move = nullptr,
 		//std::unique_ptr<ID> base_move = nullptr,
 		
-		// EffectData
-		std::unique_ptr<std::string> desc = nullptr,
-		std::unique_ptr<int> duration = nullptr,
-		std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback = nullptr,
-		std::unique_ptr<EffectType> effect_type = nullptr,
-		std::unique_ptr<bool> infiltrates = nullptr,
-		std::unique_ptr<NonStandard> is_nonstandard = nullptr,
-		std::unique_ptr<std::string> short_desc = nullptr,
-		
-		// HitEffect
-		std::unique_ptr<OnHitFunc> on_hit = nullptr,
-		std::unique_ptr<SparseBoostsTable> boosts = nullptr,
-		std::unique_ptr<std::string> status = nullptr,
-		std::unique_ptr<std::string> volatile_status = nullptr,
-		std::unique_ptr<std::string> side_condition = nullptr,
-		std::unique_ptr<std::string> slot_condition = nullptr,
-		std::unique_ptr<std::string> pseudo_weather = nullptr,
-		std::unique_ptr<std::string> terrain = nullptr,
-		std::unique_ptr<std::string> weather = nullptr);
+		//// EffectData
+		//std::unique_ptr<std::string> desc = nullptr,
+		//std::unique_ptr<int> duration = nullptr,
+		//std::unique_ptr<std::function<int(Battle*, Pokemon*, Pokemon*, Effect*)>> duration_callback = nullptr,
+		//std::unique_ptr<EffectType> effect_type = nullptr,
+		//std::unique_ptr<bool> infiltrates = nullptr,
+		//std::unique_ptr<NonStandard> is_nonstandard = nullptr,
+		//std::unique_ptr<std::string> short_desc = nullptr,
+		//
+		//// HitEffect
+		//std::unique_ptr<OnHitFunc> on_hit = nullptr,
+		//std::unique_ptr<SparseBoostsTable> boosts = nullptr,
+		//std::unique_ptr<std::string> status = nullptr,
+		//std::unique_ptr<std::string> volatile_status = nullptr,
+		//std::unique_ptr<std::string> side_condition = nullptr,
+		//std::unique_ptr<std::string> slot_condition = nullptr,
+		//std::unique_ptr<std::string> pseudo_weather = nullptr,
+		//std::unique_ptr<std::string> terrain = nullptr,
+		//std::unique_ptr<std::string> weather = nullptr);
+
+	MoveData(const MoveData& other);
+
+	DataType get_data_type() const override;
 };

@@ -1,6 +1,10 @@
 #pragma once
 
-struct LearnsetData
+#include "../dex/IDexData.h"
+
+struct LearnsetData : public IDexData
 {
 	int x = 0;
+
+	DataType get_data_type() const override;
 };

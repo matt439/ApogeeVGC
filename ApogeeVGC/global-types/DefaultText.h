@@ -5,6 +5,6 @@
 
 struct DefaultText
 {
-	AnyObject data = {};
+	AnyObject text = {};
 	Descriptions get_descriptions() const;
 };

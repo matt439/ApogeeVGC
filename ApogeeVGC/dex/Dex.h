@@ -13,5 +13,8 @@ public:
 	Dex();
 
 	std::unordered_map<std::string, std::unique_ptr<ModdedDex>>* get_dexes();
-	IModdedDex* get_modded_dex(const std::string& mod = "base") override;
+	ModdedDex* get_modded_dex(const std::string& mod = "base");
+
+	// Methods for IDex
+	IModdedDex* get_imodded_dex(const std::string& mod = "base") override;
 };

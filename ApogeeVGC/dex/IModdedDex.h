@@ -16,13 +16,13 @@ class IModdedDex
 {
 public:
 	virtual ~IModdedDex() = default;
-	//virtual IDex* get_dex_parent() const = 0;
+	virtual IDex* get_idex_parent() const = 0;
 	//virtual std::string* get_alias(const std::string& id) = 0;
-    //virtual DexTableData* get_data_cache() = 0;
+    //// virtual DexTableData* get_data_cache() = 0;
 	//// virtual std::unordered_map<std::string, ModdedDex>* get_dexes() = 0;
-	//virtual DexTableData* get_data() = 0;
+	virtual DexTableData* get_data() = 0;
 	//virtual int get_gen() const = 0;
-	//virtual Descriptions get_descriptions(const std::string& table, const std::string& id) = 0;
+	virtual Descriptions get_descriptions(const std::string& table, const std::string& id) = 0;
 	//virtual const std::string& get_parent_mod() const = 0;
 	//virtual IDexDataManager* get_data_manager(DataType data_type) const = 0;
 

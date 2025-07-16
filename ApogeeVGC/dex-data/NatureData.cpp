@@ -31,3 +31,8 @@ NatureData::NatureData(const NatureData& other)
 	minus(other.minus ? std::make_unique<StatIDExceptHP>(*other.minus) : nullptr)
 {
 }
+
+DataType NatureData::get_data_type() const
+{
+	return DataType::NATURES;
+}

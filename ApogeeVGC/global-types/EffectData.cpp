@@ -43,6 +43,11 @@ EffectData::EffectData(const std::string& name,
 {
 }
 
+EffectData::EffectData(const std::string& name) :
+	name(std::make_unique<std::string>(name))
+{
+}
+
 EffectData::EffectData(const EffectData& other) :
 	name(other.name ? std::make_unique<std::string>(*other.name) : nullptr),
 	desc(other.desc ? std::make_unique<std::string>(*other.desc) : nullptr),

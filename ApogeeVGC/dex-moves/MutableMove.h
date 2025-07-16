@@ -5,4 +5,5 @@
 
 struct MutableMove : BasicEffect, MoveData
 {
+	MutableMove() = default;
 };

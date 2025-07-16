@@ -3,14 +3,14 @@
 Descriptions DefaultText::get_descriptions() const
 {
 	std::string desc_str;
-	if (data.HasMember("desc") && data["desc"].IsString())
-		desc_str = data["desc"].GetString();
+	if (text.data.HasMember("desc") && text.data["desc"].IsString())
+		desc_str = text.data["desc"].GetString();
 	else
 		desc_str = ""; // Default to empty if desc is not available
 
 	std::string short_desc_str;
-	if (data.HasMember("shortDesc") && data["shortDesc"].IsString())
-		short_desc_str = data["shortDesc"].GetString();
+	if (text.data.HasMember("shortDesc") && text.data["shortDesc"].IsString())
+		short_desc_str = text.data["shortDesc"].GetString();
 	else
 		short_desc_str = desc_str; // Fallback to desc if shortDesc is not available
 

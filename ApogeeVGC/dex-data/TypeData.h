@@ -1,12 +1,13 @@
 #pragma once
 
+#include "../dex/IDexData.h"
 #include "../global-types/SparseStatsTable.h"
 #include "../global-types/NonStandard.h"
 #include <unordered_map>
 #include <string>
 #include <memory>
 
-struct TypeData
+struct TypeData : public IDexData
 {
 	std::unordered_map<std::string, int> damage_taken = {}; // key (string) is attacking type name or effect ID
 	std::unique_ptr<SparseStatsTable> hp_dvs = nullptr; // optional
@@ -19,4 +20,6 @@ struct TypeData
 		std::unique_ptr<SparseStatsTable> hp_dvs = nullptr,
 		std::unique_ptr<SparseStatsTable> hp_ivs = nullptr,
 		std::unique_ptr<NonStandard> is_nonstandard = nullptr);
+
+	DataType get_data_type() const override;
 };

@@ -25,6 +25,7 @@
     <ClCompile Include="dex-abilities\AbilityFlags.cpp" />
     <ClCompile Include="dex-abilities\DexAbilities.cpp" />
     <ClCompile Include="dex-conditions\Condition.cpp" />
+    <ClCompile Include="dex-conditions\ConditionData.cpp" />
     <ClCompile Include="dex-conditions\DexConditions.cpp" />
     <ClCompile Include="dex-conditions\EventMethods.cpp" />
     <ClCompile Include="dex-conditions\PokemonConditionData.cpp" />
@@ -44,6 +45,7 @@
     <ClCompile Include="dex-data\TypeInfo.cpp" />
     <ClCompile Include="dex-format\DexFormats.cpp" />
     <ClCompile Include="dex-format\Format.cpp" />
+    <ClCompile Include="dex-format\FormatData.cpp" />
     <ClCompile Include="dex-format\RuleTable.cpp" />
     <ClCompile Include="dex-items\DexItems.cpp" />
     <ClCompile Include="dex-items\Item.cpp" />
@@ -52,11 +54,18 @@
     <ClCompile Include="dex-moves\DexMoves.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
+    <ClCompile Include="dex-moves\MoveEventMethods.cpp" />
     <ClCompile Include="dex-species\DexSpecies.cpp" />
+    <ClCompile Include="dex-species\LearnsetData.cpp" />
+    <ClCompile Include="dex-species\PokemonGoData.cpp" />
+    <ClCompile Include="dex-species\SpeciesData.cpp" />
+    <ClCompile Include="dex-species\SpeciesFormatsData.cpp" />
     <ClCompile Include="dex\Dex.cpp" />
+    <ClCompile Include="dex\DexTableData.cpp" />
     <ClCompile Include="dex\ModdedDex.cpp" />
     <ClCompile Include="dex\TextTableData.cpp" />
     <ClCompile Include="global-types\AbilityText.cpp" />
+    <ClCompile Include="global-types\AnyObject.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
     <ClCompile Include="global-types\DefaultText.cpp" />
     <ClCompile Include="global-types\EffectData.cpp" />
@@ -64,6 +73,7 @@
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
     <ClCompile Include="global-types\MoveText.cpp" />
     <ClCompile Include="global-types\PokedexText.cpp" />
+    <ClCompile Include="lib\utils.cpp" />
     <ClCompile Include="program.cpp" />
     <ClCompile Include="team-validator\TeamValidator.cpp" />
   </ItemGroup>
@@ -177,6 +187,7 @@
     <ClInclude Include="dex\DexTable.h" />
     <ClInclude Include="dex\DexTableData.h" />
     <ClInclude Include="dex\IDex.h" />
+    <ClInclude Include="dex\IDexData.h" />
     <ClInclude Include="dex\IDexDataManager.h" />
     <ClInclude Include="dex\ModdedDex.h" />
     <ClInclude Include="dex\MODS_DIR.h" />
@@ -228,6 +239,7 @@
     <ClInclude Include="global-types\ZMoveOption.h" />
     <ClInclude Include="dex\IModdedDex.h" />
     <ClInclude Include="global-types\ZMoveOptions.h" />
+    <ClInclude Include="lib\utils.h" />
     <ClInclude Include="pokemon\EffectState.h" />
     <ClInclude Include="pokemon\MoveSlot.h" />
     <ClInclude Include="pokemon\Pokemon.h" />

@@ -20,3 +20,8 @@ TypeData::TypeData(const TypeData& other)
 {
 
 }
+
+DataType TypeData::get_data_type() const
+{
+	return DataType::TYPE_CHART;
+}

@@ -2,13 +2,16 @@
 
 //#include "../dex-data/BasicEffectData.h"
 #include "../dex-conditions/PokemonEventMethods.h"
+#include "../dex/IDexData.h"
 #include "Ability.h"
 #include "AbilityEventMethods.h"
 #include <string>
 //#include "AbilityFlags.h"
 
-struct AbilityData : public Ability, public AbilityEventMethods, public PokemonEventMethods
+struct AbilityData : public Ability, public AbilityEventMethods,
+    public PokemonEventMethods, public IDexData
 {
+	AbilityData() = default;
     AbilityData(
         // Ability non-optional parameters
         const std::string& name,
@@ -26,4 +29,12 @@ struct AbilityData : public Ability, public AbilityEventMethods, public PokemonE
         bool no_copy = false,
         bool affects_fainted = false,
         const std::string& source_effect = "");
+
+	AbilityData(const Ability& ability,
+		const AbilityEventMethods& ability_events = AbilityEventMethods(),
+		const PokemonEventMethods& pokemon_events = PokemonEventMethods());
+
+    AbilityData(const AbilityData& other);
+
+    DataType get_data_type() const override;
 };

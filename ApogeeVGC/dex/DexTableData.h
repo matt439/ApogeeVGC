@@ -15,6 +15,8 @@
 
 #include "../global-types/AnyObject.h"
 #include "DexTable.h"
+#include "DataType.h"
+#include "IDexData.h"
 // #include "TypeData.h"
 
 // forward declarations
@@ -44,4 +46,10 @@ struct DexTableData
 	DexTable<std::unique_ptr<AnyObject>> scripts = {}; // generic AnyObject for scripts, can be any type of script data
 	DexTable<std::unique_ptr<ConditionData>> conditions = {};
 	DexTable<std::unique_ptr<TypeData>> type_chart = {};
+
+	DexTableData() = default;
+
+	IDexData* get_data(DataType data_type, const std::string& key);
+
+	void set_data(IDexData* data, const std::string& key);
 };
