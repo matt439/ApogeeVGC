@@ -1,6 +1,6 @@
 #include "ModdedDex.h"
 
-#include "../lib/utils.h"
+#include "../../lib/utils.h"
 #include "DATA_DIR.h"
 #include "MODS_DIR.h"
 #include "BASE_MOD.h"
