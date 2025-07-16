@@ -44,3 +44,8 @@ DataType AbilityData::get_data_type() const
 {
 	return DataType::ABILITIES;
 }
+
+std::unique_ptr<IDexData> AbilityData::clone() const
+{
+	return std::make_unique<AbilityData>(*this);
+}

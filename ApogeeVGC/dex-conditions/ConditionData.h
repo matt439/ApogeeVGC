@@ -17,4 +17,6 @@ struct ConditionData : public IDexData
     ConditionData(const FieldConditionData& v);
 
     DataType get_data_type() const override;
+
+	std::unique_ptr<IDexData> clone() const override;
 };

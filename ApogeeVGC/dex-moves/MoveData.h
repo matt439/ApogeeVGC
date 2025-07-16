@@ -209,4 +209,6 @@ struct MoveData : public EffectData, public MoveEventMethods, public HitEffect, 
 	MoveData(const MoveData& other);
 
 	DataType get_data_type() const override;
+
+	std::unique_ptr<IDexData> clone() const override;
 };

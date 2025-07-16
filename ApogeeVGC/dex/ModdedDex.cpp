@@ -87,7 +87,7 @@ IDexData* ModdedDex::mod_data(DataType data_type, const std::string& id)
     if (data_cache->get_data(data_type, id) != parent_data)
         return data_cache->get_data(data_type, id);
 
-    data_cache->set_data(parent_data, id);
+	data_cache->set_data(id, parent_data->clone());
     return data_cache->get_data(data_type, id);
 }
 
@@ -272,76 +272,59 @@ Descriptions ModdedDex::get_descriptions(const std::string& table, const std::st
 
 ActiveMove ModdedDex::get_active_move(const std::string& id)
 {
-    return ActiveMove();
+	// TODO implement this properly
+    MoveFlags flags;
+    return ActiveMove(0, id, MoveTarget::SELF, flags);
 }
 
 ActiveMove ModdedDex::get_active_move(const Move& move)
 {
-
+	// TODO implement this properly
+    MoveFlags flags;
+    return ActiveMove(0, "", MoveTarget::SELF, flags);
 }
 
+StatsTable ModdedDex::get_hidden_power()
+{
+	return StatsTable(); // TODO implement this properly
+}
 
-//const rapidjson::Value* ModdedDex::load_data_file(const std::string& base_path, DataType data_type)
-//{
-//    std::string file_path = base_path + std::string(DATA_FILES.at(data_type)) + ".json";
-//    try
-//    {
-//        std::ifstream ifs(file_path);
-//        if (!ifs)
-//        {
-//            // File not found
-//            return nullptr;
-//        }
-//
-//        rapidjson::IStreamWrapper isw(ifs);
-//        rapidjson::Document doc;
-//        doc.ParseStream(isw);
-//
-//        if (!doc.IsObject())
-//        {
-//            throw std::runtime_error(file_path + " must export a non-null object");
-//        }
-//
-//        std::string key = data_type_to_key(data_type);
-//        if (!doc.HasMember(key.c_str()) || !doc[key.c_str()].IsObject())
-//        {
-//            throw std::runtime_error(file_path + " must export an object whose '" + key + "' property is an Object");
-//        }
-//
-//        return &doc[key.c_str()];
-//    }
-//    catch (const std::exception& e)
-//    {
-//        // Only rethrow if not file-not-found
-//        if (std::string(e.what()).find("No such file") == std::string::npos &&
-//            std::string(e.what()).find("not found") == std::string::npos)
-//        {
-//            throw;
-//        }
-//        // Otherwise, return nullptr
-//        return nullptr;
-//    }
-//}
-//
-//const rapidjson::Value* ModdedDex::load_text_file(const std::string& name, const std::string& export_name) {
-//    std::filesystem::path file_path = DATA_DIR / "text" / (name + ".json");
-//    std::ifstream ifs(file_path);
-//    if (!ifs) {
-//        // File not found
-//        return nullptr;
-//    }
-//
-//    rapidjson::IStreamWrapper isw(ifs);
-//    static rapidjson::Document doc; // static to keep the data alive after return
-//    doc.ParseStream(isw);
-//
-//    if (!doc.IsObject() || !doc.HasMember(export_name.c_str()) || !doc[export_name.c_str()].IsObject()) {
-//        // Invalid file or missing export
-//        return nullptr;
-//    }
-//
-//    return &doc[export_name.c_str()];
-//}
+int ModdedDex::truncate_to_32_bit_int(int value) const
+{
+	// Truncate to 32-bit signed integer range
+	if (value < INT32_MIN)
+		return INT32_MIN;
+	if (value > INT32_MAX)
+		return INT32_MAX;
+	return value;
+}
+
+std::vector<AnyObject> ModdedDex::data_search(const std::string& target,
+    const std::vector<DataSearchOptions>& search_in,
+    bool is_inexact)
+{
+	// TODO implement this properly
+	std::vector<AnyObject> results;
+	// Example search logic (pseudo-code):
+	// for each data type in search_in:
+	//     load the data for that type
+	//     if is_inexact:
+	//         use fuzzy matching to find matches
+	//     else:
+	//         use exact matching to find matches
+	//     add matches to results
+	return results;
+}
+
+AnyObject* ModdedDex::load_data_file(const std::string& base_path, DataType data_type)
+{
+	return nullptr; // TODO implement this properly
+}
+
+DexTable<ITextEntry>* ModdedDex::load_text_file(const std::string& name, const std::string& export_name)
+{
+    return nullptr; // TODO implement this properly
+}
 
 ModdedDex* ModdedDex::include_mods()
 {
@@ -363,38 +346,42 @@ ModdedDex* ModdedDex::include_mods()
 	return this;
 }
 
+ModdedDex* ModdedDex::include_mod_data()
+{
+    auto* dexes_map = get_dexes();
+    for (auto& pair : *dexes_map)
+    {
+        pair.second->include_data();
+    }
+    return this;
+}
+
 ModdedDex* ModdedDex::include_data()
 {
 	load_data();
 	return this;
 }
 
-//TextTableData& ModdedDex::load_text_data()
-//{
-//    // Check if already cached
-//    if (dexes["base"].text_cache.has_value())
-//    {
-//        return dexes["base"].text_cache.value();
-//    }
-//
-//    TextTableData text_data;
-//    // Each load_text_file returns a rapidjson::Value*; you need to convert/deserialize to DexTable<T>
-//    // This is a placeholder for actual deserialization logic
-//    // For real code, implement conversion from rapidjson::Value to DexTable<T>
-//
-//    // TODO
-//    // Example (pseudo-code, you must implement the conversion):
-//    // text_data.pokedex = parse_text_table<PokedexText>(load_text_file("pokedex", "PokedexText"));
-//    // text_data.moves = parse_text_table<MoveText>(load_text_file("moves", "MovesText"));
-//    // text_data.abilities = parse_text_table<AbilityText>(load_text_file("abilities", "AbilitiesText"));
-//    // text_data.items = parse_text_table<ItemText>(load_text_file("items", "ItemsText"));
-//    // text_data.default_text = parse_text_table<DefaultText>(load_text_file("default", "DefaultText"));
-//
-//    // Cache and return
-//    dexes["base"].text_cache = text_data;
-//    return dexes["base"].text_cache.value();
-//}
-//
+TextTableData* ModdedDex::load_text_data()
+{
+    // Only cache in the base dex
+    auto* base_dex = get_dexes()->at("base").get();
+    if (base_dex->text_cache)
+        return base_dex->text_cache.get();
+
+    auto text_data = std::make_unique<TextTableData>();
+	// TODO - implement loading text files properly
+    //text_data->pokedex = *static_cast<DexTable<PokedexText>*>(load_text_file("pokedex", "PokedexText"));
+    //text_data->moves = *static_cast<DexTable<MoveText>*>(load_text_file("moves", "MovesText"));
+    //text_data->abilities = *static_cast<DexTable<AbilityText>*>(load_text_file("abilities", "AbilitiesText"));
+    //text_data->items = *static_cast<DexTable<ItemText>*>(load_text_file("items", "ItemsText"));
+    //text_data->default_text = *static_cast<DexTable<DefaultText>*>(load_text_file("default", "DefaultText"));
+
+    base_dex->text_cache = std::move(text_data);
+    return base_dex->text_cache.get();
+}
+
+
 //std::string* ModdedDex::get_alias(const ID& id)
 //{
 //    auto& aliases_map = load_aliases();

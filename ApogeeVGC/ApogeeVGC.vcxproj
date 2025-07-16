@@ -51,10 +51,12 @@
     <ClCompile Include="dex-items\Item.cpp" />
     <ClCompile Include="dex-items\ItemData.cpp" />
     <ClCompile Include="dex-items\ItemInitData.cpp" />
+    <ClCompile Include="dex-moves\ActiveMove.cpp" />
     <ClCompile Include="dex-moves\DexMoves.cpp" />
     <ClCompile Include="dex-moves\HitEffect.cpp" />
     <ClCompile Include="dex-moves\MoveData.cpp" />
     <ClCompile Include="dex-moves\MoveEventMethods.cpp" />
+    <ClCompile Include="dex-moves\MutableMove.cpp" />
     <ClCompile Include="dex-species\DexSpecies.cpp" />
     <ClCompile Include="dex-species\LearnsetData.cpp" />
     <ClCompile Include="dex-species\PokemonGoData.cpp" />
@@ -66,13 +68,18 @@
     <ClCompile Include="dex\TextTableData.cpp" />
     <ClCompile Include="global-types\AbilityText.cpp" />
     <ClCompile Include="global-types\AnyObject.cpp" />
+    <ClCompile Include="global-types\BasicTextData.cpp" />
     <ClCompile Include="global-types\BattleScriptsData.cpp" />
+    <ClCompile Include="global-types\ConditionTextData.cpp" />
     <ClCompile Include="global-types\DefaultText.cpp" />
     <ClCompile Include="global-types\EffectData.cpp" />
     <ClCompile Include="global-types\ItemText.cpp" />
     <ClCompile Include="global-types\ModdedEffectData.cpp" />
     <ClCompile Include="global-types\MoveText.cpp" />
+    <ClCompile Include="global-types\MoveTextData.cpp" />
     <ClCompile Include="global-types\PokedexText.cpp" />
+    <ClCompile Include="global-types\StatsTable.cpp" />
+    <ClCompile Include="global-types\TextFile.cpp" />
     <ClCompile Include="lib\utils.cpp" />
     <ClCompile Include="program.cpp" />
     <ClCompile Include="team-validator\TeamValidator.cpp" />
@@ -212,6 +219,7 @@
     <ClInclude Include="global-types\ID.h" />
     <ClInclude Include="global-types\IDEntry.h" />
     <ClInclude Include="global-types\ItemText.h" />
+    <ClInclude Include="global-types\ITextEntry.h" />
     <ClInclude Include="global-types\ModdedBattleActions.h" />
     <ClInclude Include="global-types\ModdedBattlePokemon.h" />
     <ClInclude Include="global-types\ModdedBattleQueue.h" />
@@ -235,6 +243,7 @@
     <ClInclude Include="global-types\StatIDExceptHP.h" />
     <ClInclude Include="global-types\StatsExceptHPTable.h" />
     <ClInclude Include="global-types\StatsTable.h" />
+    <ClInclude Include="global-types\TextEntryType.h" />
     <ClInclude Include="global-types\TextFile.h" />
     <ClInclude Include="global-types\ZMoveOption.h" />
     <ClInclude Include="dex\IModdedDex.h" />

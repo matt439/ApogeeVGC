@@ -38,4 +38,6 @@ struct FormatData : public Format, public EventMethods, public IDexData
         bool no_log = false);
 
 	DataType get_data_type() const override;
+
+    std::unique_ptr<IDexData> clone() const override;
 };

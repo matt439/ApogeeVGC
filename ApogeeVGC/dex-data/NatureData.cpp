@@ -36,3 +36,8 @@ DataType NatureData::get_data_type() const
 {
 	return DataType::NATURES;
 }
+
+std::unique_ptr<IDexData> NatureData::clone() const
+{
+	return std::make_unique<NatureData>(*this);
+}

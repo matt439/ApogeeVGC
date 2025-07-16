@@ -16,4 +16,8 @@ struct ConditionTextData : public BasicTextData
 	std::unique_ptr<std::string> move = nullptr;
 	std::unique_ptr<std::string> start = nullptr;
 	std::unique_ptr<std::string> transform = nullptr;
+
+	ConditionTextData() = default;
+	ConditionTextData(const std::string& desc, const std::string& short_desc);
+	ConditionTextData(const ConditionTextData& other);
 };

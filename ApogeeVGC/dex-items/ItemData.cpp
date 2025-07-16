@@ -48,3 +48,8 @@ DataType ItemData::get_data_type() const
 {
 	return DataType::ITEMS;
 }
+
+std::unique_ptr<IDexData> ItemData::clone() const
+{
+    return std::make_unique<ItemData>(*this);
+}

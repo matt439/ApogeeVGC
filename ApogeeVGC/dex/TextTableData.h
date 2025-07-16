@@ -7,6 +7,7 @@
 #include "../global-types/DefaultText.h"
 #include "DexTable.h"
 #include "Descriptions.h"
+#include <memory>
 
 //// forward declarations
 //struct AbilityText;
@@ -17,14 +18,25 @@
 
 struct TextTableData
 {
-	DexTable<AbilityText> abilities = {};
-	DexTable<ItemText> items = {};
-	DexTable<MoveText> moves = {};
-	DexTable<PokedexText> pokedex = {};
-	DexTable<DefaultText> default_text = {}; // can't use default as a variable name in C++
+	DexTable<std::unique_ptr<AbilityText>> abilities = {};
+	DexTable<std::unique_ptr<ItemText>> items = {};
+	DexTable<std::unique_ptr<MoveText>> moves = {};
+	DexTable<std::unique_ptr<PokedexText>> pokedex = {};
+	DexTable<std::unique_ptr<DefaultText>> default_text = {}; // can't use default as a variable name in C++
 
     // Returns a pointer to the requested table, or nullptr if not found
-	void* get_table(const std::string& name);
+	ITextEntry* get_entry(TextEntryType type, const std::string& key);
 
-	Descriptions get_description_from_table(const std::string& table, const std::string& id);
+	void set_entry(const std::string& key, std::unique_ptr<ITextEntry> entry);
+	void set_entry(const std::string& key, ITextEntry* entry);
+
+	// Returns a description from the specified table and ID
+
+	Descriptions get_description(TextEntryType type, const std::string& key);
+
+	DexTable<std::unique_ptr<AbilityText>>* get_abilities();
+	DexTable<std::unique_ptr<ItemText>>* get_items();
+	DexTable<std::unique_ptr<MoveText>>* get_moves();
+	DexTable<std::unique_ptr<PokedexText>>* get_pokedex();
+	DexTable<std::unique_ptr<DefaultText>>* get_default_text();
 };

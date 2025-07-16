@@ -21,4 +21,8 @@ struct MoveTextData : public BasicTextData
 	std::unique_ptr<std::string> take_item = nullptr;
 	std::unique_ptr<std::string> type_change = nullptr;
 	std::unique_ptr<std::string> upkeep = nullptr;
+
+	MoveTextData() = default;
+	MoveTextData(const std::string& desc, const std::string& short_desc);
+	MoveTextData(const MoveTextData& other);
 };

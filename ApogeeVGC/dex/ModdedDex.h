@@ -11,6 +11,8 @@
 #include "../dex-data/DexStats.h"
 #include "../dex-data/to_id.h"
 #include "../global-types/StatsTable.h"
+#include "../dex-moves/ActiveMove.h"
+#include "../global-types/ITextEntry.h"
 
 #include <rapidjson/document.h>
 
@@ -153,29 +155,42 @@ public:
 	ActiveMove get_active_move(const std::string& id);
 	ActiveMove get_active_move(const Move& move);
 
- //   StatsTable get_hidden_power();
+    StatsTable get_hidden_power();
 
- //   std::vector<AnyObject> data_search(const std::string & target, 
- //       const std::vector<std::string>&search_in = {}, bool is_inexact = false);
+	int truncate_to_32_bit_int(int value) const;
+
+    enum class DataSearchOptions
+    {
+        POKEDEX,
+        MOVES,
+		ABILITIES,
+		ITEMS,
+		NATURES,
+		TYPE_CHART,
+    };
+
+    std::vector<AnyObject> data_search(const std::string & target,
+        const std::vector<DataSearchOptions>& search_in = {},
+        bool is_inexact = false);
 
 
 
  //   //// Helper to map DataType to string key
  //   //std::string data_type_to_key(DataType data_type);
 
- //   // Returns a pointer to the relevant RapidJSON value, or nullptr if not found/invalid
- //   const rapidjson::Value* load_data_file(const std::string& base_path, DataType data_type);
+    AnyObject* load_data_file(const std::string& base_path, DataType data_type);
 
- //   // Returns a pointer to the relevant RapidJSON value, or nullptr if not found/invalid
- //   const rapidjson::Value* load_text_file(const std::string& name, const std::string& export_name);
+	ITextEntry* load_text_entry(TextEntryType type, const std::string& name, const std::string& export_name);
+
+    DexTable<ITextEntry>* load_text_file(const std::string& name, const std::string& export_name);
 
     ModdedDex* include_mods();
 
- //   ModdedDex* include_mod_data();
+    ModdedDex* include_mod_data();
 
     ModdedDex* include_data();
 
- //   TextTableData& load_text_data();
+    TextTableData* load_text_data();
 
 	//// Returns a pointer to the alias for the given ID, or nullptr if not found
  //   std::string* get_alias(const ID& id) override;

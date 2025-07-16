@@ -37,4 +37,5 @@ struct AbilityData : public Ability, public AbilityEventMethods,
     AbilityData(const AbilityData& other);
 
     DataType get_data_type() const override;
+	std::unique_ptr<IDexData> clone() const override;
 };

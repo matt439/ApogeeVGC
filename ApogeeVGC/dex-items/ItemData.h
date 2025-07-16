@@ -38,4 +38,6 @@ struct ItemData : public Item, public PokemonEventMethods, public IDexData
 	//bool operator==(const ItemData& other) const;
 
 	DataType get_data_type() const;
+
+    std::unique_ptr<IDexData> clone() const override;
 };

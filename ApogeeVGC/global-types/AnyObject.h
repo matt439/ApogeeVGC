@@ -12,9 +12,13 @@
 
 struct AnyObject : public IDexData
 {
-	rapidjson::Value data = rapidjson::Value(rapidjson::kObjectType); // Default to an empty object
+	std::unique_ptr<rapidjson::Value> data = nullptr;
 
 	AnyObject() = default;
+	AnyObject(const rapidjson::Value& value);
+	AnyObject(const AnyObject& other);
 
 	DataType get_data_type() const override;
+
+	std::unique_ptr<IDexData> clone() const override;
 };

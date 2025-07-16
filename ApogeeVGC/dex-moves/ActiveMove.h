@@ -2,6 +2,8 @@
 
 #include "../global-types/ID.h"
 #include "../global-types/Effect.h"
+#include "../pokemon/Pokemon.h"
+#include "../dex-abilities/Ability.h"
 #include "MutableMove.h"
 #include "MoveHitData.h"
 #include <string>
@@ -9,12 +11,15 @@
 #include <vector>
 #include <memory>
 
+//class Ability;
+//class Pokemon;
+
 class ActiveMove : public MutableMove
 {
 public:
 	std::string name = "";
-	std::string effect_type = "Move";
-    ID id = ID();
+	EffectType effect_type = EffectType::MOVE;
+    //ID id = ID();
 	int num = 0;
     int hit = 0;
 	std::unique_ptr<ID> weather = nullptr; // optional
@@ -47,4 +52,33 @@ public:
 	std::unique_ptr<Pokemon> ruined_spa = nullptr; // optional
 	std::unique_ptr<Pokemon> ruined_spd = nullptr; // optional
 	std::unique_ptr<bool> is_z_or_max_powered = nullptr; // optional
+
+	ActiveMove() = default;
+
+	ActiveMove(
+		int hit,
+		// MoveData
+		const std::string& name,
+		MoveTarget target,
+		MoveFlags& flags,
+		int base_power = 0,
+		std::variant<bool, int> accuracy = false,
+		int pp = 0,
+		MoveCategory category = MoveCategory::STATUS,
+		const std::string& type = "",
+		int priority = 0,
+		// BasicEffect
+		const std::string& real_move = "",
+		const std::string& full_name = "",
+		bool exists = true,
+		int num = 0,
+		int gen = 0,
+		const std::string& short_desc = "",
+		const std::string& desc = "",
+		NonStandard is_nonstandard = NonStandard::NONE,
+		bool no_copy = false,
+		bool affects_fainted = false,
+		const std::string& source_effect = "");
+
+	ActiveMove(const ActiveMove& other);
 };

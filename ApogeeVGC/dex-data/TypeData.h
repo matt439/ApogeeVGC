@@ -22,4 +22,6 @@ struct TypeData : public IDexData
 		std::unique_ptr<NonStandard> is_nonstandard = nullptr);
 
 	DataType get_data_type() const override;
+
+	std::unique_ptr<IDexData> clone() const override;
 };

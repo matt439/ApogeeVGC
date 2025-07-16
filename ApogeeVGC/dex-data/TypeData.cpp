@@ -25,3 +25,8 @@ DataType TypeData::get_data_type() const
 {
 	return DataType::TYPE_CHART;
 }
+
+std::unique_ptr<IDexData> TypeData::clone() const
+{
+	return std::make_unique<TypeData>(*this);
+}

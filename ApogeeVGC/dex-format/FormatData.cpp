@@ -45,3 +45,8 @@ DataType FormatData::get_data_type() const
 {
 	return DataType::FORMATS_DATA;
 }
+
+std::unique_ptr<IDexData> FormatData::clone() const
+{
+    return std::make_unique<FormatData>(*this);
+}

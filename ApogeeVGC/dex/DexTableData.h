@@ -51,5 +51,19 @@ struct DexTableData
 
 	IDexData* get_data(DataType data_type, const std::string& key);
 
-	void set_data(IDexData* data, const std::string& key);
+	void set_data(const std::string& key, std::unique_ptr<IDexData> data);
+	//void set_data(const std::string& key, IDexData* data);
+
+	DexTable<std::unique_ptr<AbilityData>>* get_abilities();
+	DexTable<std::unique_ptr<FormatData>>* get_rulesets();
+	DexTable<std::unique_ptr<ItemData>>* get_items();
+	DexTable<std::unique_ptr<LearnsetData>>* get_learnsets();
+	DexTable<std::unique_ptr<MoveData>>* get_moves();
+	DexTable<std::unique_ptr<NatureData>>* get_natures();
+	DexTable<std::unique_ptr<SpeciesData>>* get_pokedex();
+	DexTable<std::unique_ptr<SpeciesFormatsData>>* get_formats_data();
+	DexTable<std::unique_ptr<PokemonGoData>>* get_pokemon_go_data();
+	DexTable<std::unique_ptr<AnyObject>>* get_scripts();
+	DexTable<std::unique_ptr<ConditionData>>* get_conditions();
+	DexTable<std::unique_ptr<TypeData>>* get_type_chart();
 };

@@ -17,3 +17,8 @@ DataType ConditionData::get_data_type() const
 {
 	return DataType::CONDITIONS;
 }
+
+std::unique_ptr<IDexData> ConditionData::clone() const
+{
+	return std::make_unique<ConditionData>(*this);
+}

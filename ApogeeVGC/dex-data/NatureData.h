@@ -20,6 +20,8 @@ struct NatureData : public IDexData
 
 	DataType get_data_type() const override;
 
+	std::unique_ptr<IDexData> clone() const override;
+
     //NatureData(const BasicEffectData& basic_effect_data,
     //    const StatIDExceptHP* plus = nullptr,
     //    const StatIDExceptHP* minus = nullptr);

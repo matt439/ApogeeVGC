@@ -149,3 +149,8 @@ DataType MoveData::get_data_type() const
 {
 	return DataType::MOVES;
 }
+
+std::unique_ptr<IDexData> MoveData::clone() const
+{
+	return std::make_unique<MoveData>(*this);
+}

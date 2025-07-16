@@ -64,6 +64,13 @@
     <ClCompile Include="dex-conditions\ConditionData.cpp" />
     <ClCompile Include="dex\DexTableData.cpp" />
     <ClCompile Include="global-types\AnyObject.cpp" />
+    <ClCompile Include="dex-moves\MutableMove.cpp" />
+    <ClCompile Include="dex-moves\ActiveMove.cpp" />
+    <ClCompile Include="global-types\StatsTable.cpp" />
+    <ClCompile Include="global-types\TextFile.cpp" />
+    <ClCompile Include="global-types\BasicTextData.cpp" />
+    <ClCompile Include="global-types\ConditionTextData.cpp" />
+    <ClCompile Include="global-types\MoveTextData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battle\Battle.h" />
@@ -235,5 +242,7 @@
     <ClInclude Include="dex\MODS_DIR.h" />
     <ClInclude Include="lib\utils.h" />
     <ClInclude Include="dex\IDexData.h" />
+    <ClInclude Include="global-types\ITextEntry.h" />
+    <ClInclude Include="global-types\TextEntryType.h" />
   </ItemGroup>
 </Project>
