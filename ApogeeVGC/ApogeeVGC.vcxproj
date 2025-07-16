@@ -177,6 +177,7 @@
     <ClInclude Include="sim\dex-moves\type_aliases.h" />
     <ClInclude Include="sim\dex-moves\ZMoveData.h" />
     <ClInclude Include="sim\dex-species\DexSpecies.h" />
+    <ClInclude Include="sim\dex-species\Learnset.h" />
     <ClInclude Include="sim\dex-species\LearnsetData.h" />
     <ClInclude Include="sim\dex-species\PokemonGoData.h" />
     <ClInclude Include="sim\dex-species\Species.h" />

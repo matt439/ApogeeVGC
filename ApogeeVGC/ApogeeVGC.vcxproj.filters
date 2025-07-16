@@ -244,5 +244,6 @@
     <ClInclude Include="sim\dex\IDexData.h" />
     <ClInclude Include="sim\global-types\ITextEntry.h" />
     <ClInclude Include="sim\global-types\TextEntryType.h" />
+    <ClInclude Include="sim\dex-species\Learnset.h" />
   </ItemGroup>
 </Project>
