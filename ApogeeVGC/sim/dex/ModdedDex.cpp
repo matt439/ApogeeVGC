@@ -382,105 +382,28 @@ TextTableData* ModdedDex::load_text_data()
 }
 
 
-//std::string* ModdedDex::get_alias(const ID& id)
-//{
-//    auto& aliases_map = load_aliases();
-//    auto it = aliases_map.find(id);
-//    if (it != aliases_map.end()) {
-//        return &it->second;
-//    }
-//    return nullptr;
-//}
-//
-//AliasesTable& ModdedDex::load_aliases()
-//{
-//    if (!is_base)
-//    {
-//        return dexes["base"].load_aliases();
-//    }
-//    if (aliases.has_value())
-//    {
-//        return aliases.value();
-//    }
-//
-//    // Load aliases JSON file
-//    std::filesystem::path alias_path = DATA_DIR / "aliases.json";
-//    std::ifstream ifs(alias_path);
-//    if (!ifs) throw std::runtime_error("Aliases file not found");
-//    rapidjson::IStreamWrapper isw(ifs);
-//    rapidjson::Document doc;
-//    doc.ParseStream(isw);
-//
-//    AliasesTable aliases_map;
-//    std::unordered_map<std::string, std::string> compound_names;
-//    std::unordered_map<std::string, std::vector<std::string>> fuzzy_aliases;
-//
-//    // Fill aliases_map
-//    const auto& aliases_json = doc["Aliases"];
-//    for (auto it = aliases_json.MemberBegin(); it != aliases_json.MemberEnd(); ++it)
-//    {
-//        std::string alias = it->name.GetString();
-//        std::string target = toID(it->value.GetString());
-//        aliases_map[alias] = target;
-//    }
-//
-//    // Fill compound_names
-//    const auto& compound_json = doc["CompoundWordNames"];
-//    for (auto& v : compound_json.GetArray())
-//    {
-//        std::string name = v.GetString();
-//        compound_names[toID(name)] = name;
-//    }
-//
-//    // Helper lambdas for fuzzy logic
-//    auto addFuzzy = [&](const std::string& alias, const std::string& target)
-//        {
-//            if (alias == target || alias.length() < 2) return;
-//            auto& vec = fuzzy_aliases[alias];
-//            if (std::find(vec.begin(), vec.end(), target) == vec.end())
-//            {
-//                vec.push_back(target);
-//            }
-//        };
-//
-//    auto addFuzzyForme = [&](const std::string& alias, const std::string& target, const std::string& forme, const std::string& formeLetter)
-//        {
-//            addFuzzy(alias + forme, target);
-//            if (forme.empty()) return;
-//            addFuzzy(alias + formeLetter, target);
-//            addFuzzy(formeLetter + alias, target);
-//            if (forme == "alola") addFuzzy("alolan" + alias, target);
-//            else if (forme == "galar") addFuzzy("galarian" + alias, target);
-//            else if (forme == "hisui") addFuzzy("hisuian" + alias, target);
-//            else if (forme == "paldea") addFuzzy("paldean" + alias, target);
-//            else if (forme == "megax") addFuzzy("mega" + alias + "x", target);
-//            else if (forme == "megay") addFuzzy("mega" + alias + "y", target);
-//            else addFuzzy(forme + alias, target);
-//
-//            if (forme == "megax" || forme == "megay")
-//            {
-//                addFuzzy("mega" + alias, target);
-//                addFuzzy(alias + "mega", target);
-//                addFuzzy("m" + alias, target);
-//                addFuzzy(alias + "m", target);
-//            }
-//        };
-//
-//    // TODO
-//    // For each table: items, abilities, moves, pokedex
-//    // You must implement the logic to iterate over each DexTable and process as in the TypeScript code.
-//    // For brevity, this is left as a comment.
-//
-//    // Store results
-//    this->aliases = aliases_map;
-//    this->fuzzy_aliases = fuzzy_aliases;
-//    return this->aliases.value();
-//}
+std::string* ModdedDex::get_alias(const ID& id)
+{
+	// TODO - implement this properly
+    return nullptr;
+}
+
+AliasesTable* ModdedDex::load_aliases()
+{
+	// TODO - implement this properly
+    return aliases.get();
+}
 
 DexTableData* ModdedDex::load_data()
 {
 	// TODO - properly implement this
     return data_cache.get();
+}
+
+ModdedDex* ModdedDex::include_formats()
+{
+	// TODO - implement this properly
+	return this;
 }
 
 //DexTableData* ModdedDex::get_data_cache()

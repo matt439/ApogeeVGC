@@ -180,7 +180,7 @@ public:
 
     AnyObject* load_data_file(const std::string& base_path, DataType data_type);
 
-	ITextEntry* load_text_entry(TextEntryType type, const std::string& name, const std::string& export_name);
+	//ITextEntry* load_text_entry(TextEntryType type, const std::string& name, const std::string& export_name);
 
     DexTable<ITextEntry>* load_text_file(const std::string& name, const std::string& export_name);
 
@@ -192,14 +192,14 @@ public:
 
     TextTableData* load_text_data();
 
-	//// Returns a pointer to the alias for the given ID, or nullptr if not found
- //   std::string* get_alias(const ID& id) override;
+	// Returns a pointer to the alias for the given ID, or nullptr if not found
+    std::string* get_alias(const ID& id);
 
- //   AliasesTable& load_aliases();
+    AliasesTable* load_aliases();
 
     DexTableData* load_data();
 
- //   ModdedDex* include_formats();
+    ModdedDex* include_formats();
 
 	// Extra functions for IDex interface so that other classes can use it
 	// without being exposed to ModdedDex specifics
