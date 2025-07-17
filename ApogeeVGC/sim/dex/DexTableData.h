@@ -50,9 +50,8 @@ struct DexTableData
 	DexTableData() = default;
 
 	IDexData* get_data(DataType data_type, const std::string& key);
-
 	void set_data(const std::string& key, std::unique_ptr<IDexData> data);
-	//void set_data(const std::string& key, IDexData* data);
+	bool exists(DataType data_type, const std::string& key);
 
 	DexTable<std::unique_ptr<AbilityData>>* get_abilities();
 	DexTable<std::unique_ptr<FormatData>>* get_rulesets();

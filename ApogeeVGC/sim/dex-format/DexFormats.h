@@ -30,7 +30,7 @@ public:
 	/**
 	 * Returns a sanitized format ID if valid, or throws if invalid.
 	 */
-	std::string validate(const std::string& name) const;
+	std::string validate(const std::string& name);
 
 	/**
 	 * The default mode is `isTrusted = false`, which is a bit of a

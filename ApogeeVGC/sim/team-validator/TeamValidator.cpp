@@ -6,7 +6,7 @@
 //#include <stdexcept>
 
 TeamValidator::TeamValidator(const std::string& format_name, IModdedDex* dex_instance)
-	: dex(dex_instance)
+	: ITeamValidator(format_name, dex_instance)
 {
 	//if (!dex) {
 	//	throw std::runtime_error("Dex instance is null");
@@ -27,6 +27,16 @@ TeamValidator::TeamValidator(const std::string& format_name, IModdedDex* dex_ins
 }
 
 TeamValidator::TeamValidator(const Format& format_instance, IModdedDex* dex_instance)
+	: ITeamValidator(format_instance, dex_instance)
 {
-
+	//if (!dex) {
+	//	throw std::runtime_error("Dex instance is null");
+	//}
+	//if (!format) {
+	//	throw std::runtime_error("Format instance is null");
+	//}
+	//gen = dex->get_gen();
+	//rule_table = std::make_unique<RuleTable>();
+	//rule_table->dex = dex;
+	//min_source_gen = rule_table->min_source_gen;
 }

@@ -46,6 +46,7 @@
     <ClCompile Include="sim\dex-format\DexFormats.cpp" />
     <ClCompile Include="sim\dex-format\Format.cpp" />
     <ClCompile Include="sim\dex-format\FormatData.cpp" />
+    <ClCompile Include="sim\dex-format\join.cpp" />
     <ClCompile Include="sim\dex-format\RuleTable.cpp" />
     <ClCompile Include="sim\dex-format\SectionInfo.cpp" />
     <ClCompile Include="sim\dex-items\DexItems.cpp" />
@@ -83,6 +84,8 @@
     <ClCompile Include="sim\global-types\TextFile.cpp" />
     <ClCompile Include="lib\utils.cpp" />
     <ClCompile Include="program.cpp" />
+    <ClCompile Include="sim\team-validator\ITeamValidator.cpp" />
+    <ClCompile Include="sim\team-validator\PokemonSources.cpp" />
     <ClCompile Include="sim\team-validator\TeamValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +151,7 @@
     <ClInclude Include="sim\dex-format\FormatListEntryType.h" />
     <ClInclude Include="sim\dex-format\GameTimerSettings.h" />
     <ClInclude Include="sim\dex-format\IFormatListEntry.h" />
+    <ClInclude Include="sim\dex-format\join.h" />
     <ClInclude Include="sim\dex-format\ModdedFormatData.h" />
     <ClInclude Include="sim\dex-format\ModdedFormatDataTable.h" />
     <ClInclude Include="sim\dex-format\RuleTable.h" />
@@ -259,6 +263,9 @@
     <ClInclude Include="sim\pokemon\MoveSlot.h" />
     <ClInclude Include="sim\pokemon\Pokemon.h" />
     <ClInclude Include="sim\side\Side.h" />
+    <ClInclude Include="sim\team-validator\ITeamValidator.h" />
+    <ClInclude Include="sim\team-validator\PokemonSource.h" />
+    <ClInclude Include="sim\team-validator\PokemonSources.h" />
     <ClInclude Include="sim\team-validator\TeamValidator.h" />
     <ClInclude Include="sim\teams\PokemonSet.h" />
     <ClInclude Include="sim\teams\PokemonSources.h" />

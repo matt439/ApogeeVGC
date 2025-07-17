@@ -109,6 +109,25 @@ void TextTableData::set_entry(const std::string& key, ITextEntry* entry)
 	set_entry(key, std::unique_ptr<ITextEntry>(entry->clone()));
 }
 
+bool TextTableData::exists(TextEntryType type, const std::string& key)
+{
+	switch (type)
+	{
+	case TextEntryType::ABILITY:
+		return abilities.find(key) != abilities.end();
+	case TextEntryType::ITEM:
+		return items.find(key) != items.end();
+	case TextEntryType::MOVE:
+		return moves.find(key) != moves.end();
+	case TextEntryType::POKEDEX:
+		return pokedex.find(key) != pokedex.end();
+	case TextEntryType::DEFAULT:
+		return default_text.find(key) != default_text.end();
+	default:
+		throw std::runtime_error("Unknown text entry type: " + std::to_string(static_cast<int>(type)));
+	}
+}
+
 DexTable<std::unique_ptr<AbilityText>>* TextTableData::get_abilities()
 {
 	return &abilities; 

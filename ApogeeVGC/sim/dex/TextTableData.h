@@ -26,9 +26,9 @@ struct TextTableData
 
     // Returns a pointer to the requested table, or nullptr if not found
 	ITextEntry* get_entry(TextEntryType type, const std::string& key);
-
 	void set_entry(const std::string& key, std::unique_ptr<ITextEntry> entry);
 	void set_entry(const std::string& key, ITextEntry* entry);
+	bool exists(TextEntryType type, const std::string& key);
 
 	// Returns a description from the specified table and ID
 

@@ -193,7 +193,7 @@ public:
     TextTableData* load_text_data();
 
 	// Returns a pointer to the alias for the given ID, or nullptr if not found
-    std::string* get_alias(const ID& id);
+	std::string* get_alias(const ID& id) override;
 
     AliasesTable* load_aliases();
 
@@ -211,6 +211,14 @@ public:
     IDex* get_idex_parent() const override;
 
     bool get_is_base() const override;
+
+    IDexData* get_from_dex_table_data(DataType data_type, const std::string& key) override;
+    void set_into_dex_table_data(const std::string& key, std::unique_ptr<IDexData> data) override;
+    bool exists_in_dex_table_data(DataType data_type, const std::string& key) override;
+
+    ITextEntry* get_from_text_table_data(TextEntryType type, const std::string& key) override;
+    void set_into_text_table_data(const std::string& key, std::unique_ptr<ITextEntry> entry) override;
+    bool exists_in_text_table_data(TextEntryType type, const std::string& key) override;
 
 	bool has_mod(const std::string& mod);
 

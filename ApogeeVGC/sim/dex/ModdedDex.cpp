@@ -436,6 +436,80 @@ bool ModdedDex::get_is_base() const
     return is_base;
 }
 
+IDexData* ModdedDex::get_from_dex_table_data(DataType data_type, const std::string& key)
+{
+	if (!data_cache)
+		load_data();
+	if (data_cache->exists(data_type, key))
+		return data_cache->get_data(data_type, key);
+	// If not found, check parent mod
+	if (parent_mod != "base")
+	{
+		auto* parent_dex = get_dexes()->at(parent_mod).get();
+		return parent_dex->get_from_dex_table_data(data_type, key);
+	}
+	return nullptr; // Not found in any mod
+}
+
+void ModdedDex::set_into_dex_table_data(const std::string& key, std::unique_ptr<IDexData> data)
+{
+	if (!data_cache)
+		load_data();
+	if (data_cache->exists(data->get_data_type(), key))
+	{
+		data_cache->set_data(key, std::move(data));
+	}
+	else
+	{
+		// If not found, check parent mod
+		if (parent_mod != "base")
+		{
+			auto* parent_dex = get_dexes()->at(parent_mod).get();
+			parent_dex->set_into_dex_table_data(key, std::move(data));
+		}
+		else
+		{
+			data_cache->set_data(key, std::move(data));
+		}
+	}
+}
+
+bool ModdedDex::exists_in_dex_table_data(DataType data_type, const std::string& key)
+{
+	if (!data_cache)
+		load_data();
+	if (data_cache->exists(data_type, key))
+		return true;
+	// If not found, check parent mod
+	if (parent_mod != "base")
+	{
+		auto* parent_dex = get_dexes()->at(parent_mod).get();
+		return parent_dex->exists_in_dex_table_data(data_type, key);
+	}
+	return false; // Not found in any mod
+}
+
+ITextEntry* ModdedDex::get_from_text_table_data(TextEntryType type, const std::string& key)
+{
+	if (!text_cache)
+		load_text_data();
+	return text_cache->get_entry(type, key);
+}
+
+void ModdedDex::set_into_text_table_data(const std::string& key, std::unique_ptr<ITextEntry> entry)
+{
+	if (!text_cache)
+		load_text_data();
+	text_cache->set_entry(key, std::move(entry));
+}
+
+bool ModdedDex::exists_in_text_table_data(TextEntryType type, const std::string& key)
+{
+	if (!text_cache)
+		load_text_data();
+	return text_cache->exists(type, key);
+}
+
 bool ModdedDex::has_mod(const std::string& mod)
 {
 	if (mod.empty() || mod == "base")

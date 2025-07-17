@@ -72,6 +72,9 @@
     <ClCompile Include="sim\global-types\ConditionTextData.cpp" />
     <ClCompile Include="sim\global-types\MoveTextData.cpp" />
     <ClCompile Include="sim\dex-format\SectionInfo.cpp" />
+    <ClCompile Include="sim\dex-format\join.cpp" />
+    <ClCompile Include="sim\team-validator\ITeamValidator.cpp" />
+    <ClCompile Include="sim\team-validator\PokemonSources.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sim\battle\Battle.h" />
@@ -250,5 +253,9 @@
     <ClInclude Include="sim\dex-format\SectionInfo.h" />
     <ClInclude Include="sim\dex-format\IFormatListEntry.h" />
     <ClInclude Include="sim\dex-format\FormatListEntryType.h" />
+    <ClInclude Include="sim\dex-format\join.h" />
+    <ClInclude Include="sim\team-validator\ITeamValidator.h" />
+    <ClInclude Include="sim\team-validator\PokemonSources.h" />
+    <ClInclude Include="sim\team-validator\PokemonSource.h" />
   </ItemGroup>
 </Project>

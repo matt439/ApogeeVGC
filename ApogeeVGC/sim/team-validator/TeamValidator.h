@@ -3,6 +3,7 @@
 #include "../dex-format/Format.h"
 #include "../dex/IModdedDex.h"
 #include "../dex-format/RuleTable.h"
+#include "ITeamValidator.h"
 // #include "../dex-data/to_id.h"
 // #include "../dex/IDex.h"
 // #include <stdexcept>
@@ -14,12 +15,11 @@
 //class IModdedDex;
 // class RuleTable;
 
-class TeamValidator
+class TeamValidator : public ITeamValidator
 {
 public:
-	// IDex* dex = nullptr; // Pointer to the parent Dex instance
-	std::unique_ptr<Format> format = nullptr;
-	IModdedDex* dex = nullptr; // Pointer to the parent Dex instance
+	//std::unique_ptr<Format> format = nullptr;
+	//IModdedDex* dex = nullptr;
     int gen = 0;
 	std::unique_ptr<RuleTable> rule_table = nullptr;
     int min_source_gen = 0;

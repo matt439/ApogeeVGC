@@ -7,29 +7,29 @@ IDexData* DexTableData::get_data(DataType data_type, const std::string& key)
 	switch (data_type)
 	{
 	case DataType::ABILITIES:
-		return abilities[key].get();
+		return abilities.find(key) != abilities.end() ? abilities[key].get() : nullptr;
 	case DataType::RULESETS:
-		return rulesets[key].get();
+		return rulesets.find(key) != rulesets.end() ? rulesets[key].get() : nullptr;
 	case DataType::ITEMS:
-		return items[key].get();
+		return items.find(key) != items.end() ? items[key].get() : nullptr;
 	case DataType::LEARNSETS:
-		return learnsets[key].get();
+		return learnsets.find(key) != learnsets.end() ? learnsets[key].get() : nullptr;
 	case DataType::MOVES:
-		return moves[key].get();
+		return moves.find(key) != moves.end() ? moves[key].get() : nullptr;
 	case DataType::NATURES:
-		return natures[key].get();
+		return natures.find(key) != natures.end() ? natures[key].get() : nullptr;
 	case DataType::POKEDEX:
-		return pokedex[key].get();
+		return pokedex.find(key) != pokedex.end() ? pokedex[key].get() : nullptr;
 	case DataType::FORMATS_DATA:
-		return formats_data[key].get();
+		return formats_data.find(key) != formats_data.end() ? formats_data[key].get() : nullptr;
 	case DataType::POKEMON_GO_DATA:
-		return pokemon_go_data[key].get();
+		return pokemon_go_data.find(key) != pokemon_go_data.end() ? pokemon_go_data[key].get() : nullptr;
 	case DataType::SCRIPTS:
-		return scripts[key].get();
+		return scripts.find(key) != scripts.end() ? scripts[key].get() : nullptr;
 	case DataType::CONDITIONS:
-		return conditions[key].get();
+		return conditions.find(key) != conditions.end() ? conditions[key].get() : nullptr;
 	case DataType::TYPE_CHART:
-		return type_chart[key].get();
+		return type_chart.find(key) != type_chart.end() ? type_chart[key].get() : nullptr;
 	default:
 		throw std::runtime_error("Unknown data type: " + std::to_string(static_cast<int>(data_type)));
 	};
@@ -113,6 +113,39 @@ void DexTableData::set_data(const std::string& key, std::unique_ptr<IDexData> da
 		type_chart[key] = std::unique_ptr<TypeData>(type_data);
 		break;
 	}
+	default:
+		throw std::runtime_error("Unknown data type: " + std::to_string(static_cast<int>(data_type)));
+	};
+}
+
+bool DexTableData::exists(DataType data_type, const std::string& key)
+{
+	switch (data_type)
+	{
+	case DataType::ABILITIES:
+		return abilities.find(key) != abilities.end();
+	case DataType::RULESETS:
+		return rulesets.find(key) != rulesets.end();
+	case DataType::ITEMS:
+		return items.find(key) != items.end();
+	case DataType::LEARNSETS:
+		return learnsets.find(key) != learnsets.end();
+	case DataType::MOVES:
+		return moves.find(key) != moves.end();
+	case DataType::NATURES:
+		return natures.find(key) != natures.end();
+	case DataType::POKEDEX:
+		return pokedex.find(key) != pokedex.end();
+	case DataType::FORMATS_DATA:
+		return formats_data.find(key) != formats_data.end();
+	case DataType::POKEMON_GO_DATA:
+		return pokemon_go_data.find(key) != pokemon_go_data.end();
+	case DataType::SCRIPTS:
+		return scripts.find(key) != scripts.end();
+	case DataType::CONDITIONS:
+		return conditions.find(key) != conditions.end();
+	case DataType::TYPE_CHART:
+		return type_chart.find(key) != type_chart.end();
 	default:
 		throw std::runtime_error("Unknown data type: " + std::to_string(static_cast<int>(data_type)));
 	};
