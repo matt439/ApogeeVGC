@@ -8,4 +8,4 @@
 #include <memory>
 
 // FormatList type: vector of variant
-using FormatList = std::vector<std::variant<FormatData, SectionInfo>>;
+using FormatList = std::vector<std::variant<std::unique_ptr<FormatData>, std::unique_ptr<SectionInfo>>>;

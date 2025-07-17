@@ -19,56 +19,51 @@ DataType DexFormats::get_data_type() const
 	return DataType::FORMATS_DATA;
 }
 
-std::vector<FormatList> DexFormats::load_formats_from_file(const std::string& file_path)
+FormatList DexFormats::load_formats_from_file(const std::string& file_path)
 {
-	std::vector<FormatList> formats;
+	FormatList list;
 
-	//// 1. Load the JSON file with rapidjson
-	//Document doc;
-	//std::ifstream ifs(file_path);
-	//if (!ifs.is_open())
-	//	throw std::runtime_error("Could not open formats file: " + file_path);
+	// 1. Load the JSON file with rapidjson
+	Document doc;
+	std::ifstream ifs(file_path);
+	if (!ifs.is_open())
+		throw std::runtime_error("Could not open formats file: " + file_path);
 
-	//IStreamWrapper isw(ifs);
- //   doc.ParseStream(isw);
-	//if (doc.HasParseError())
-	//	throw std::runtime_error("Error parsing formats file: " + file_path);
+	IStreamWrapper isw(ifs);
+    doc.ParseStream(isw);
+	if (doc.HasParseError())
+		throw std::runtime_error("Error parsing formats file: " + file_path);
 
-	//// 2. Check if the root is an array
-	//if (!doc.IsArray())
-	//	throw std::runtime_error("Formats file must contain an array at the root: " + file_path);
+	// 2. Check if the root is an array
+	if (!doc.IsArray())
+		throw std::runtime_error("Formats file must contain an array at the root: " + file_path);
 
-	//// 3. Iterate through the array and convert to FormatList objects
-	//for (const auto& item : doc.GetArray()) {
-	//	if (!item.IsObject())
-	//		throw std::runtime_error("Each format must be an object in the array: " + file_path);
+	// 3. Iterate through the array and convert to FormatList objects
+	for (const auto& item : doc.GetArray()) {
+		if (!item.IsObject())
+			throw std::runtime_error("Each format must be an object in the array: " + file_path);
 
-	//	FormatList format;
-	//	if (item.HasMember("name") && item["name"].IsString()) {
-	//		format.name = item["name"].GetString();
-	//	}
-	//	else {
-	//		throw std::runtime_error("Format must have a 'name' string field: " + file_path);
-	//	}
-	//	if (item.HasMember("section") && item["section"].IsString()) {
-	//		format.section = item["section"].GetString();
-	//	}
-	//	if (item.HasMember("column") && item["column"].IsInt()) {
-	//		format.column = item["column"].GetInt();
-	//	}
-	//	if (item.HasMember("ruleset") && item["ruleset"].IsArray()) {
-	//		for (const auto& rule : item["ruleset"].GetArray()) {
-	//			if (rule.IsString()) {
-	//				format.ruleset.push_back(rule.GetString());
-	//			}
-	//			else {
-	//				throw std::runtime_error("Each rule in 'ruleset' must be a string: " + file_path);
-	//			}
-	//		}
-	//	}
-	//	formats.push_back(format);
-	//}
-	return formats;
+		// try to convert SectionInfo from JSON object
+        try
+        {
+			std::unique_ptr<SectionInfo> section = std::make_unique<SectionInfo>(item);
+			list.push_back(std::move(section));
+		}
+        catch (const std::exception& e)
+        {
+			// try to convert FormatData from JSON object
+            try
+            {
+				std::unique_ptr<FormatData> format = std::make_unique<FormatData>(item);
+				list.push_back(std::move(format));
+            }
+            catch (const std::exception& e2)
+            {
+                throw std::runtime_error("Failed to parse format item: " + std::string(e2.what()));
+            }
+        }
+	}
+	return list;
 }
 
 DexFormats* DexFormats::load()

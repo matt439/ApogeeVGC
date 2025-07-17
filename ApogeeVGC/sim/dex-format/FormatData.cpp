@@ -135,23 +135,15 @@ FormatData::FormatData(const rapidjson::Value& value) :
 	// check if "banlist" field exists and is an array
 	if (value.HasMember("banlist") && value["banlist"].IsArray())
 	{
-		// check if it is an empty array
-		if (value["banlist"].Empty())
+		for (const auto& item : value["banlist"].GetArray())
 		{
-			banlist.clear(); // ensure banlist is empty
-		}
-		else
-		{
-			for (const auto& item : value["banlist"].GetArray())
+			if (item.IsString())
 			{
-				if (item.IsString())
-				{
-					banlist.push_back(item.GetString());
-				}
-				else
-				{
-					throw std::runtime_error("FormatData 'banlist' field must be an array of strings");
-				}
+				banlist.push_back(item.GetString());
+			}
+			else
+			{
+				throw std::runtime_error("FormatData 'banlist' field must be an array of strings");
 			}
 		}
 	}
@@ -191,6 +183,26 @@ FormatData::FormatData(const rapidjson::Value& value) :
 	}
 }
 
+FormatData::FormatData(const FormatData& other) :
+	Format(other),
+	EventMethods(other)
+{
+	// Copy the mod, ruleset, banlist, restricted, and unbanlist vectors
+	mod = other.mod;
+	ruleset = other.ruleset;
+	banlist = other.banlist;
+	restricted = other.restricted;
+	unbanlist = other.unbanlist;
+	// Copy the custom rules if they exist
+	if (other.custom_rules)
+	{
+		custom_rules = std::make_unique<std::vector<std::string>>(*other.custom_rules);
+	}
+	else
+	{
+		custom_rules = nullptr;
+	}
+}
 
 DataType FormatData::get_data_type() const
 {

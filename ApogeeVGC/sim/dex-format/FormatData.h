@@ -65,6 +65,7 @@ struct FormatData : public Format, public EventMethods, public IDexData
         bool no_log = false);
 
     FormatData(const rapidjson::Value& value);
+    FormatData(const FormatData& other);
 
 	DataType get_data_type() const override;
 

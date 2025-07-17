@@ -21,7 +21,7 @@ public:
 	DexFormats() = default;
 	DexFormats(IModdedDex* dex_ptr);
 
-	std::vector<FormatList> load_formats_from_file(const std::string& file_path);
+	FormatList load_formats_from_file(const std::string& file_path);
 
 	DexFormats* load();
 

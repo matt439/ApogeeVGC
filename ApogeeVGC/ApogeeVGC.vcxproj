@@ -86,7 +86,6 @@
     <ClCompile Include="sim\team-validator\TeamValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="config\formats.h" />
     <ClInclude Include="sim\battle-queue\BattleQueue.h" />
     <ClInclude Include="sim\battle\Part.h" />
     <ClInclude Include="sim\battle\Source.h" />

@@ -247,7 +247,6 @@
     <ClInclude Include="sim\global-types\TextEntryType.h" />
     <ClInclude Include="sim\dex-species\Learnset.h" />
     <ClInclude Include="sim\dex-data\IDS_CACHE.h" />
-    <ClInclude Include="config\formats.h" />
     <ClInclude Include="sim\dex-format\SectionInfo.h" />
   </ItemGroup>
 </Project>
