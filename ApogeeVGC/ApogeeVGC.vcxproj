@@ -145,7 +145,9 @@
     <ClInclude Include="sim\dex-format\FormatDataTable.h" />
     <ClInclude Include="sim\dex-format\FormatEffectType.h" />
     <ClInclude Include="sim\dex-format\FormatList.h" />
+    <ClInclude Include="sim\dex-format\FormatListEntryType.h" />
     <ClInclude Include="sim\dex-format\GameTimerSettings.h" />
+    <ClInclude Include="sim\dex-format\IFormatListEntry.h" />
     <ClInclude Include="sim\dex-format\ModdedFormatData.h" />
     <ClInclude Include="sim\dex-format\ModdedFormatDataTable.h" />
     <ClInclude Include="sim\dex-format\RuleTable.h" />

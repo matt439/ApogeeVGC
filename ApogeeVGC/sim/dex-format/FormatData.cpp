@@ -213,3 +213,13 @@ std::unique_ptr<IDexData> FormatData::clone() const
 {
     return std::make_unique<FormatData>(*this);
 }
+
+FormatListEntryType FormatData::get_type() const
+{
+	return FormatListEntryType::FORMAT_DATA;
+}
+
+std::unique_ptr<IFormatListEntry> FormatData::clone_list_entry() const
+{
+	return std::make_unique<FormatData>(*this);
+}

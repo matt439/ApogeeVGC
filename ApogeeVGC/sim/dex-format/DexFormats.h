@@ -23,6 +23,8 @@ public:
 
 	FormatList load_formats_from_file(const std::string& file_path);
 
+	FormatList merge_format_lists(const FormatList& list1, const FormatList& list2) const;
+
 	DexFormats* load();
 
 	/**

@@ -210,7 +210,9 @@ public:
 
     IDex* get_idex_parent() const override;
 
-    bool get_is_base() const;
+    bool get_is_base() const override;
+
+	bool has_mod(const std::string& mod);
 
  //   IDexDataManager* get_data_manager(DataType data_type) const;
 

@@ -27,6 +27,7 @@ public:
 	//virtual IDexDataManager* get_data_manager(DataType data_type) const = 0;
 	virtual bool get_is_base() const = 0;
 	virtual IModdedDex* include_mods() = 0;
+	virtual bool has_mod(const std::string& mod) = 0;
 
 
 	//virtual ModdedDex* cast_to_modded_dex(IModdedDex* modded_dex) const = 0;

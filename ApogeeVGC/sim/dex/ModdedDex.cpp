@@ -436,6 +436,14 @@ bool ModdedDex::get_is_base() const
     return is_base;
 }
 
+bool ModdedDex::has_mod(const std::string& mod)
+{
+	if (mod.empty() || mod == "base")
+		return true; // Base mod always exists
+	auto dexes_map = get_dexes();
+	return dexes_map->find(mod) != dexes_map->end();
+}
+
 ModdedDex* ModdedDex::cast_to_modded_dex(IModdedDex* modded_dex) const
 {
     return dynamic_cast<ModdedDex*>(modded_dex);

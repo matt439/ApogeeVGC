@@ -3,9 +3,11 @@
 #include "../dex/IDexData.h"
 #include "../dex-conditions/EventMethods.h"
 #include "Format.h"
+#include "IFormatListEntry.h"
 #include <rapidjson/document.h>
 
-struct FormatData : public Format, public EventMethods, public IDexData
+struct FormatData : public Format, public EventMethods, public IDexData,
+	public IFormatListEntry
 {
 	FormatData() = default;
 
@@ -70,4 +72,8 @@ struct FormatData : public Format, public EventMethods, public IDexData
 	DataType get_data_type() const override;
 
     std::unique_ptr<IDexData> clone() const override;
+
+    FormatListEntryType get_type() const override;
+
+    std::unique_ptr<IFormatListEntry> clone_list_entry() const override;
 };

@@ -37,3 +37,19 @@ SectionInfo::SectionInfo(const rapidjson::Value& value)
 		column = nullptr; // optional field, can be null
 	}
 }
+
+SectionInfo::SectionInfo(const SectionInfo& other) :
+	section(other.section),
+	column(other.column ? std::make_unique<int>(*other.column) : nullptr)
+{
+}
+
+FormatListEntryType SectionInfo::get_type() const
+{
+	return FormatListEntryType::SECTION_INFO;
+}
+
+std::unique_ptr<IFormatListEntry> SectionInfo::clone_list_entry() const
+{
+	return std::make_unique<SectionInfo>(*this);
+}
