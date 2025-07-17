@@ -47,6 +47,7 @@
     <ClCompile Include="sim\dex-format\Format.cpp" />
     <ClCompile Include="sim\dex-format\FormatData.cpp" />
     <ClCompile Include="sim\dex-format\RuleTable.cpp" />
+    <ClCompile Include="sim\dex-format\SectionInfo.cpp" />
     <ClCompile Include="sim\dex-items\DexItems.cpp" />
     <ClCompile Include="sim\dex-items\Item.cpp" />
     <ClCompile Include="sim\dex-items\ItemData.cpp" />
@@ -85,6 +86,7 @@
     <ClCompile Include="sim\team-validator\TeamValidator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config\formats.h" />
     <ClInclude Include="sim\battle-queue\BattleQueue.h" />
     <ClInclude Include="sim\battle\Part.h" />
     <ClInclude Include="sim\battle\Source.h" />
@@ -122,6 +124,7 @@
     <ClInclude Include="sim\dex-data\EMPTY_NATURE.h" />
     <ClInclude Include="sim\dex-data\EMPTY_TYPE_INFO.h" />
     <ClInclude Include="sim\dex-data\HasID.h" />
+    <ClInclude Include="sim\dex-data\IDS_CACHE.h" />
     <ClInclude Include="sim\dex-data\ModdedNatureData.h" />
     <ClInclude Include="sim\dex-data\ModdedTypeData.h" />
     <ClInclude Include="sim\dex-data\ModdedTypeDataTable.h" />
@@ -147,6 +150,7 @@
     <ClInclude Include="sim\dex-format\ModdedFormatData.h" />
     <ClInclude Include="sim\dex-format\ModdedFormatDataTable.h" />
     <ClInclude Include="sim\dex-format\RuleTable.h" />
+    <ClInclude Include="sim\dex-format\SectionInfo.h" />
     <ClInclude Include="sim\dex-items\DexItems.h" />
     <ClInclude Include="sim\dex-items\EMPTY_ITEM.h" />
     <ClInclude Include="sim\dex-items\FlingData.h" />

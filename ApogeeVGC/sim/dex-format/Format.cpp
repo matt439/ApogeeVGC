@@ -5,7 +5,7 @@ Format::Format(
     const std::string& name,
     const std::string& real_move,
     const std::string& full_name,
-    EffectType effect_type,
+    //EffectType effect_type,
     bool exists,
     int num,
     int gen,
@@ -29,7 +29,7 @@ Format::Format(
     std::unique_ptr<std::vector<std::string>> custom_rules,
     bool no_log) :
 
-    BasicEffect(name, real_move, full_name, effect_type, exists,
+    BasicEffect(name, real_move, full_name, EffectType::FORMAT, exists,
         num, gen, short_desc, desc, is_nonstandard, no_copy,
         affects_fainted, source_effect),
 

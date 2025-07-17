@@ -184,7 +184,7 @@ public:
 
     DexTable<ITextEntry>* load_text_file(const std::string& name, const std::string& export_name);
 
-    ModdedDex* include_mods();
+	ModdedDex* include_mods() override;
 
     ModdedDex* include_mod_data();
 
@@ -204,11 +204,13 @@ public:
 	// Extra functions for IDex interface so that other classes can use it
 	// without being exposed to ModdedDex specifics
     //DexTableData* get_data_cache() override;
-    // int get_gen() const override;
+    int get_gen() const override;
 
 	//const std::string& get_parent_mod() const override;
 
     IDex* get_idex_parent() const override;
+
+    bool get_is_base() const;
 
  //   IDexDataManager* get_data_manager(DataType data_type) const;
 

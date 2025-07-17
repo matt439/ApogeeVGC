@@ -71,6 +71,7 @@
     <ClCompile Include="sim\global-types\BasicTextData.cpp" />
     <ClCompile Include="sim\global-types\ConditionTextData.cpp" />
     <ClCompile Include="sim\global-types\MoveTextData.cpp" />
+    <ClCompile Include="sim\dex-format\SectionInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sim\battle\Battle.h" />
@@ -245,5 +246,8 @@
     <ClInclude Include="sim\global-types\ITextEntry.h" />
     <ClInclude Include="sim\global-types\TextEntryType.h" />
     <ClInclude Include="sim\dex-species\Learnset.h" />
+    <ClInclude Include="sim\dex-data\IDS_CACHE.h" />
+    <ClInclude Include="config\formats.h" />
+    <ClInclude Include="sim\dex-format\SectionInfo.h" />
   </ItemGroup>
 </Project>

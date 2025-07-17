@@ -5,6 +5,7 @@
 #include "../dex/IDexDataManager.h"
 #include "RuleTable.h"
 #include "Format.h"
+#include "FormatList.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -19,6 +20,8 @@ public:
 
 	DexFormats() = default;
 	DexFormats(IModdedDex* dex_ptr);
+
+	std::vector<FormatList> load_formats_from_file(const std::string& file_path);
 
 	DexFormats* load();
 

@@ -416,10 +416,10 @@ ModdedDex* ModdedDex::include_formats()
 //	return data_cache.get();
 //}
 
-//int ModdedDex::get_gen() const
-//{
-//    return gen;
-//}
+int ModdedDex::get_gen() const
+{
+    return gen;
+}
 
 //const std::string& ModdedDex::get_parent_mod() const
 //{
@@ -429,6 +429,11 @@ ModdedDex* ModdedDex::include_formats()
 IDex* ModdedDex::get_idex_parent() const
 {
     return dex_parent;
+}
+
+bool ModdedDex::get_is_base() const
+{
+    return is_base;
 }
 
 ModdedDex* ModdedDex::cast_to_modded_dex(IModdedDex* modded_dex) const

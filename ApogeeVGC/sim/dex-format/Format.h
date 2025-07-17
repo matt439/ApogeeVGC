@@ -123,7 +123,7 @@ public:
         const std::string& name,
         const std::string& real_move = "",
         const std::string& full_name = "",
-        EffectType effect_type = EffectType::CONDITION,
+        //EffectType effect_type = EffectType::CONDITION,
         bool exists = true,
         int num = 0,
         int gen = 0,
@@ -135,7 +135,7 @@ public:
         const std::string& source_effect = "",
 		// Format non-optional
         const std::string& mod = "gen9",
-        FormatEffectType format_effect_type = FormatEffectType::CONDITION,
+        FormatEffectType format_effect_type = FormatEffectType::FORMAT,
         bool debug = false,
         std::variant<bool, std::string> rated = true,
         GameType game_type = GameType::SINGLES,
