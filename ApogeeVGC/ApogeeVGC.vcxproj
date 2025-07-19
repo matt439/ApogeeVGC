@@ -276,6 +276,7 @@
     <ProjectGuid>{87a8b26f-9fff-4eec-89d5-58442bf0ef4a}</ProjectGuid>
     <RootNamespace>ApogeeVGC</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ApogeeVGC_CPP</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

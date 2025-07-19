@@ -1,0 +1,31 @@
+    public enum GenderName
+    {
+        M, F, N, Empty
+    }
+
+    public enum StatIDExceptHP
+    {
+        Atk, Def, Spa, Spd, Spe
+    }
+
+    public enum StatID
+    {
+        Hp, Atk, Def, Spa, Spd, Spe
+    }
+
+    public class StatsExceptHPTable : Dictionary<StatIDExceptHP, int> { }
+    public class StatsTable : Dictionary<StatID, int> { }
+    public class SparseStatsTable : Dictionary<StatID, int> { }
+
+    public enum BoostID
+    {
+        Atk, Def, Spa, Spd, Spe, Accuracy, Evasion
+    }
+
+    public class BoostsTable : Dictionary<BoostID, int> { }
+    public class SparseBoostsTable : Dictionary<BoostID, int> { }
+
+    public enum Nonstandard
+    {
+        Past, Future, Unobtainable, CAP, LGPE, Custom, Gigantamax
+    }
