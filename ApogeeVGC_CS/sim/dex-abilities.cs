@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ApogeeVGC_CS.sim;
 
-namespace ApogeeVGC_C_.sim
+namespace ApogeeVGC_CS.sim
 {
     // Interface for ability event methods
     public interface IAbilityEventMethods
@@ -39,7 +39,7 @@ namespace ApogeeVGC_C_.sim
     public class AbilityData : IAbilityData
     {
         public string Name { get; set; } = string.Empty;
-        
+
         // IAbilityEventMethods implementation
         public Action<Battle, Pokemon>? OnCheckShow { get; set; }
         public Action<Battle, Pokemon>? OnEnd { get; set; }
@@ -63,7 +63,7 @@ namespace ApogeeVGC_C_.sim
     public class Ability : IBasicEffect, IAbility
     {
         public string EffectType { get; set; } = "Ability";
-        
+
         // Rating from -1 Detrimental to +5 Essential
         public int Rating { get; set; }
         public bool SuppressWeather { get; set; }
@@ -89,13 +89,13 @@ namespace ApogeeVGC_C_.sim
             // Initialize from data object
             if (data.ContainsKey("name"))
                 Name = data["name"].ToString() ?? string.Empty;
-            
+
             if (data.ContainsKey("rating") && int.TryParse(data["rating"].ToString(), out int rating))
                 Rating = rating;
-            
+
             if (data.ContainsKey("suppressWeather"))
                 SuppressWeather = Convert.ToBoolean(data["suppressWeather"]);
-            
+
             if (data.ContainsKey("flags") && data["flags"] is AbilityFlags flags)
                 Flags = flags;
             else
@@ -136,10 +136,10 @@ namespace ApogeeVGC_C_.sim
             // This would be similar to the TypeScript assignMissingFields function
             if (data.ContainsKey("desc"))
                 Desc = data["desc"].ToString();
-            
+
             if (data.ContainsKey("shortDesc"))
                 ShortDesc = data["shortDesc"].ToString();
-            
+
             if (data.ContainsKey("exists"))
                 Exists = Convert.ToBoolean(data["exists"]);
         }
@@ -182,7 +182,7 @@ namespace ApogeeVGC_C_.sim
         {
             if (nameOrAbility is Ability ability)
                 return ability;
-            
+
             string name = nameOrAbility?.ToString()?.Trim() ?? string.Empty;
             Id id = ToId(name);
             return GetById(id);
@@ -209,14 +209,14 @@ namespace ApogeeVGC_C_.sim
                 // Get ability data from dex
                 var abilityData = Dex.Data.Abilities[id.Value];
                 var abilityTextData = Dex.GetDescriptions("Abilities", id.Value);
-                
+
                 // Create combined data object
                 var combinedData = new DefaultTextData();
                 combinedData["name"] = id.Value;
-                
+
                 // Copy ability data properties
                 // This would need to be implemented based on actual data structure
-                
+
                 // Copy text data
                 combinedData["desc"] = abilityTextData.Desc;
                 combinedData["shortDesc"] = abilityTextData.ShortDesc;
@@ -264,7 +264,7 @@ namespace ApogeeVGC_C_.sim
                 return _allCache;
 
             var abilities = new List<Ability>();
-            
+
             foreach (var id in Dex.Data.Abilities.Keys)
             {
                 abilities.Add(GetById(new Id { Value = id });

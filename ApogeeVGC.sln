@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApogeeVGC_CPP", "ApogeeVGC\ApogeeVGC.vcxproj", "{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApogeeVGC_CPP", "ApogeeVGC_CPP\ApogeeVGC_CPP.vcxproj", "{87A8B26F-9FFF-4EEC-89D5-58442BF0EF4A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEnvironment_CPP", "TestEnvironment\TestEnvironment.vcxproj", "{176B85FF-843B-4902-BE1E-DF91366B347A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEnvironment_CPP", "TestEnvironment_CPP\TestEnvironment_CPP.vcxproj", "{176B85FF-843B-4902-BE1E-DF91366B347A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC_CS", "ApogeeVGC_C#\ApogeeVGC_CS.csproj", "{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC_CS", "ApogeeVGC_CS\ApogeeVGC_CS.csproj", "{01D62CC8-CAFA-42DC-A00A-F5C6A5D71CE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
