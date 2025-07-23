@@ -90,12 +90,12 @@ namespace ApogeeVGC_CS.sim
         P1, P2, P3, P4
     }
 
-    // Move target types
-    public enum MoveTarget
-    {
-        // Add specific move targets as needed
-        Any, Normal, Self, AllAdjacent, AllAdjacentFoes, All, RandomNormal, Scripted
-    }
+    //// Move target types
+    //public enum MoveTarget
+    //{
+    //    // Add specific move targets as needed
+    //    Any, Normal, Self, AllAdjacent, AllAdjacentFoes, All, RandomNormal, Scripted
+    //}
 
     public class EventInfo
     {
@@ -542,29 +542,24 @@ namespace ApogeeVGC_CS.sim
     public interface IPRNGSeed { }
     public interface ITypeInfo { }
 
-    // Additional interfaces needed for Pokemon simulation
-    public interface IPokemonEventMethods
-    {
-        // Define event methods that will be implemented by classes
-    }
 
     // Forward declarations for the main simulation classes
     // public class Battle { }
-    public class Pokemon { }
-    public class Side { }
-    public class Field { }
+    // public class Pokemon { }
+    //public class Side { }
+    //public class Field { }
     public class Effect { }
     public class Ability { }
-    public class Item { }
-    public class ActiveMove { }
-    public class Species { }
-    public class Condition { }
+    // public class Item { }
+    //public class ActiveMove { }
+    // public class Species { }
+    // public class Condition { }
     // public class Format { }
     // public class Nature { }
-    public class Move { }
-    public class PokemonSet { }
-    public class PRNGSeed { }
-    public class PRNG { }
+    // public class Move { }
+    //public class PokemonSet { }
+    //public class PRNGSeed { }
+    //public class PRNG { }
     // public class ModdedDex { }
-    public class Choice { }
+    // public class Choice { }
 }

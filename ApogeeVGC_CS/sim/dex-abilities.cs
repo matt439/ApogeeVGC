@@ -281,12 +281,6 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    // Placeholder interfaces that need to be defined based on actual requirements
-    public interface IPokemonEventMethods
-    {
-        // Define Pokemon event methods here
-    }
-
     public interface IConditionData
     {
         // Define condition data interface

@@ -145,4 +145,16 @@ namespace ApogeeVGC_CS.sim
 
         // TODO: Implement other methods as needed
     }
+
+    public class Dex
+    {
+        public Dictionary<string, ModdedDex> Dexes = new();
+
+        Dex()
+        {
+            // Initialize base dex
+            var baseDex = new ModdedDex("base");
+            Dexes[baseDex.Name] = baseDex;
+        }
+    }
 }
