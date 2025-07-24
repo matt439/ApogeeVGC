@@ -6,9 +6,45 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    // Represents a complex ban (rule, source, limit, bans)
-    public class ComplexBan
+    public class FormatData(IAnyObject data) : Format(data), IEventMethods
     {
+
+    }
+
+    // Represents the element of a "FormatList" type
+    public interface IFormatListEntry { }
+
+    public class FormatDataEntry(IAnyObject data) : FormatData(data), IFormatListEntry
+    {
+    }
+
+    public class SectionEntry : IFormatListEntry
+    {
+        public string Section { get; set; } = string.Empty;
+        public int? Column { get; set; }
+    }
+
+    public class FormatDataTable : Dictionary<IdEntry, FormatData>
+    {
+
+    }
+
+    // Should really use ModdedFormatData instead of FormatData
+    public class ModdedFormatDataTable : Dictionary<IdEntry, FormatData>
+    {
+
+    }
+
+    public enum FormatEffectType
+    {
+        Format,
+        Ruleset,
+        Rule,
+        ValidatorRule
+    }
+
+    public class ComplexBan
+        {
         public string Rule { get; set; } = string.Empty;
         public string Source { get; set; } = string.Empty;
         public int Limit { get; set; }
@@ -28,15 +64,14 @@ namespace ApogeeVGC_CS.sim
         public bool Accelerate { get; set; }
     }
 
-    // RuleTable keeps track of the rules for a format
     public class RuleTable : Dictionary<string, string>
     {
-        public List<ComplexBan> ComplexBans { get; set; } = new();
-        public List<ComplexBan> ComplexTeamBans { get; set; } = new();
+        public List<ComplexBan> ComplexBans { get; set; } = [];
+        public List<ComplexBan> ComplexTeamBans { get; set; } = [];
         public (Func<object, bool> CheckCanLearn, string)? CheckCanLearn { get; set; }
         public (GameTimerSettings Timer, string)? Timer { get; set; }
-        public List<string> TagRules { get; set; } = new();
-        public Dictionary<string, string> ValueRules { get; set; } = new();
+        public List<string> TagRules { get; set; } = [];
+        public Dictionary<string, string> ValueRules { get; set; } = [];
 
         public int MinTeamSize { get; set; }
         public int MaxTeamSize { get; set; }
@@ -53,10 +88,10 @@ namespace ApogeeVGC_CS.sim
 
         public RuleTable()
         {
-            ComplexBans = new List<ComplexBan>();
-            ComplexTeamBans = new List<ComplexBan>();
-            TagRules = new List<string>();
-            ValueRules = new Dictionary<string, string>();
+            ComplexBans = [];
+            ComplexTeamBans = [];
+            TagRules = [];
+            ValueRules = [];
         }
 
         // TODO - add methods

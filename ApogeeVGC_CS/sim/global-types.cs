@@ -121,15 +121,39 @@ namespace ApogeeVGC_CS.sim
         public bool? EmeraldEventEgg { get; set; }
     }
 
-
-    // type Effect = Ability | Item | ActiveMove | Species | Condition | Format;
-    // use polymorphism instead of union types
+    /// <summary>
+    /// Base interface for all effect types.
+    /// </summary>
     public interface IEffect { }
+
+    /// <summary>
+    /// Represents an ability effect.
+    /// </summary>
     public interface IAbility : IEffect { }
+
+    /// <summary>
+    /// Represents an item effect.
+    /// </summary>
     public interface IItem : IEffect { }
+
+    /// <summary>
+    /// Represents an active move effect.
+    /// </summary>
     public interface IActiveMove : IEffect { }
+
+    /// <summary>
+    /// Represents a species effect.
+    /// </summary>
     public interface ISpecies : IEffect { }
+
+    /// <summary>
+    /// Represents a condition effect.
+    /// </summary>
     public interface ICondition : IEffect { }
+
+    /// <summary>
+    /// Represents a format effect.
+    /// </summary>
     public interface IFormat : IEffect { }
 
     public interface ICommonHandlers

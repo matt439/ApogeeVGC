@@ -28,25 +28,29 @@ namespace ApogeeVGC_CS.sim
         
     }
 
-    public class PokemonConditionData : IPokemonEventMethods
+    /// <summary>
+    /// PokemonConditionData, SideConditionData, and FieldConditionData
+    /// inherit from this interface.
+    /// </summary>
+    public interface IConditionData { }
+
+    public class PokemonConditionData : IPokemonEventMethods, IConditionData
     {
         // Add properties from Condition as needed
         public bool? Inherit { get; set; }
     }
 
-    public class SideConditionData : ISideEventMethods
+    public class SideConditionData : ISideEventMethods, IConditionData
     {
         // Add properties from Condition as needed, excluding onStart/onRestart/onEnd
         public bool? Inherit { get; set; }
     }
 
-    public class FieldConditionData : IFieldEventMethods
+    public class FieldConditionData : IFieldEventMethods, IConditionData
     {
         // Add properties from Condition as needed, excluding onStart/onRestart/onEnd
         public bool? Inherit { get; set; }
     }
-
-    public interface IConditionData { }
 
     public class ConditionDataTable : Dictionary<string, IConditionData> { }
     public class ModdedConditionDataTable : Dictionary<string, IConditionData> { }

@@ -4,7 +4,18 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    // Data type enum
+    public class Dex
+    {
+        public Dictionary<string, ModdedDex> Dexes = new();
+
+        Dex()
+        {
+            // Initialize base dex
+            var baseDex = new ModdedDex("base");
+            Dexes[baseDex.Name] = baseDex;
+        }
+    }
+
     public enum DataType
     {
         Abilities,
@@ -41,13 +52,10 @@ namespace ApogeeVGC_CS.sim
         };
     }
 
-    // Generic DexTable
     public class DexTable<T> : Dictionary<string, T> { }
 
-    // Aliases table
     public class AliasesTable : Dictionary<string, string> { }
 
-    // DexTableData structure
     public class DexTableData
     {
         public DexTable<AbilityData> Abilities { get; set; } = new();
@@ -60,7 +68,7 @@ namespace ApogeeVGC_CS.sim
         public DexTable<SpeciesFormatsData> FormatsData { get; set; } = new();
         public DexTable<PokemonGoData> PokemonGoData { get; set; } = new();
         public DexTable<object> Scripts { get; set; } = new();
-        public DexTable<ConditionData> Conditions { get; set; } = new();
+        public DexTable<IConditionData> Conditions { get; set; } = new();
         public DexTable<TypeData> TypeChart { get; set; } = new();
     }
 
@@ -146,15 +154,5 @@ namespace ApogeeVGC_CS.sim
         // TODO: Implement other methods as needed
     }
 
-    public class Dex
-    {
-        public Dictionary<string, ModdedDex> Dexes = new();
-
-        Dex()
-        {
-            // Initialize base dex
-            var baseDex = new ModdedDex("base");
-            Dexes[baseDex.Name] = baseDex;
-        }
-    }
+    
 }

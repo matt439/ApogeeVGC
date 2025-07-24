@@ -281,11 +281,6 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public interface IConditionData
-    {
-        // Define condition data interface
-    }
-
     public interface IModdedDex
     {
         int Gen { get; }

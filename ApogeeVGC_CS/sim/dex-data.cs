@@ -85,7 +85,7 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public abstract class BasicEffect : EffectData
+    public abstract class BasicEffect : IEffectData
     {
         /// <summary>
         /// ID. This will be a lowercase version of the name with all the
