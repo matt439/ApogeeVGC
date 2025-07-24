@@ -9,11 +9,6 @@ namespace ApogeeVGC_CS.sim
         Move, Switch, InstaSwitch, RevivalBlessing, Team, Shift, Pass
     }
 
-    public enum SideID
-    {
-        P1, P2, P3, P4
-    }
-
     // ChosenAction class
     public class ChosenAction
     {

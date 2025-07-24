@@ -13,23 +13,38 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    // Represents an ID (lowercase string, or empty)
+    // must be lowercase alphanumeric
     public class Id
     {
-        public string Value { get; set; } = string.Empty;
+        private string _value = string.Empty;
+        public string Value
+        {
+            get => _value;
+            set => _value = value?.ToLowerInvariant() ?? string.Empty;
+        }
         public bool IsId => true;
     }
 
-    // Represents an IDEntry (lowercase string)
+    // must be lowercase alphanumeric
     public class IdEntry
     {
-        public string Value { get; set; } = string.Empty;
+        private string _value = string.Empty;
+        public string Value
+        {
+            get => _value;
+            set => _value = value?.ToLowerInvariant() ?? string.Empty;
+        }
     }
 
-    // Represents a PokemonSlot (lowercase string, or empty)
+    // must be lowercase alphanumeric
     public class PokemonSlot
     {
-        public string Value { get; set; } = string.Empty;
+        private string _value = string.Empty;
+        public string Value
+        {
+            get => _value;
+            set => _value = value?.ToLowerInvariant() ?? string.Empty;
+        }
         public bool IsSlot => true;
     }
 
@@ -403,7 +418,6 @@ namespace ApogeeVGC_CS.sim
         string? Upkeep { get; set; }
     }
 
-    // Text file wrapper
     public class TextFile<T> where T : class
     {
         public string Name { get; set; } = string.Empty;
@@ -422,7 +436,7 @@ namespace ApogeeVGC_CS.sim
     public class PokedexText : TextFile<PokedexTextData> { }
     public class DefaultText : DefaultTextData { }
 
-    // Random teams types namespace
+    // Use a class instead of namespace
     public static class RandomTeamsTypes
     {
         public class TeamDetails
@@ -688,6 +702,30 @@ namespace ApogeeVGC_CS.sim
     }
 
 
+    public class AnyObjectEmpty : IAnyObject
+    {
+        private readonly Dictionary<string, object> _data = new();
+        public object this[string key]
+        {
+            get => _data[key];
+            set => _data[key] = value;
+        }
+        public ICollection<string> Keys => _data.Keys;
+        public ICollection<object> Values => _data.Values;
+        public int Count => _data.Count;
+        public bool IsReadOnly => false;
+        public void Add(string key, object value) => _data.Add(key, value);
+        public void Add(KeyValuePair<string, object> item) => _data.Add(item.Key, item.Value);
+        public void Clear() => _data.Clear();
+        public bool Contains(KeyValuePair<string, object> item) => _data.Contains(item);
+        public bool ContainsKey(string key) => _data.ContainsKey(key);
+        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) => ((IDictionary<string, object>)_data).CopyTo(array, arrayIndex);
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _data.GetEnumerator();
+        public bool Remove(string key) => _data.Remove(key);
+        public bool Remove(KeyValuePair<string, object> item) => _data.Remove(item.Key);
+        public bool TryGetValue(string key, out object value) => _data.TryGetValue(key, out value);
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _data.GetEnumerator();
+    }
 
 
     //public interface IPokemonSet { }
