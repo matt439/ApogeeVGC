@@ -83,10 +83,10 @@ namespace ApogeeVGC_CS.sim
         public Pokemon? Target { get; set; }
         public int? Index { get; set; }
         public Delegate? Callback { get; set; }
-        public object? State { get; set; }
+        public EffectState? State { get; set; }
         public Delegate? End { get; set; }
         public object[]? EndCallArgs { get; set; }
-        public object EffectHolder { get; set; } = new();
+        public object EffectHolder { get; set; } = new(); // can be Pokemon, Side, Field, or Battle
     }
 
     public class EventListener : EventListenerWithoutPriority
@@ -114,7 +114,7 @@ namespace ApogeeVGC_CS.sim
     }
     public class FaintQueueEntry
     {
-        public Pokemon Target { get; set; }
+        public required Pokemon Target { get; set; }
         public Pokemon? Source { get; set; }
         public IEffect? Effect { get; set; }
     }
