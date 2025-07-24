@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -49,7 +50,14 @@ namespace ApogeeVGC_CS.sim
     }
 
     // Represents a generic object with string keys and any values
-    public interface IAnyObject : IDictionary<string, object> { }
+    public interface IAnyObject : IDictionary<string, object>
+    {
+        public bool TryGetInt(string key, [MaybeNullWhen(false)] out int @int);
+        public bool TryGetBool(string key, [MaybeNullWhen(false)] out bool @bool);
+        public bool TryGetString(string key, [MaybeNullWhen(false)] out string @string);
+        public bool TryGetId(string key, [MaybeNullWhen(false)] out Id id);
+        public bool TryGetEffectType(string key, [MaybeNullWhen(false)] out EffectType effectType);
+    }
 
     public enum GenderName
     {
@@ -178,6 +186,7 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; }
         public int? Duration { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
+        //public string? EffectType { get; set; }
         public string? EffectType { get; set; }
         public bool? Infiltrates { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
@@ -205,7 +214,7 @@ namespace ApogeeVGC_CS.sim
     public interface IBasicEffect : IEffectData
     {
         Id Id { get; set; }
-        EffectType EffectType { get; set; }
+        new EffectType EffectType { get; set; }
         bool Exists { get; set; }
         string Fullname { get; set; }
         int Gen { get; set; }
@@ -721,34 +730,68 @@ namespace ApogeeVGC_CS.sim
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _data.GetEnumerator();
         public bool Remove(string key) => _data.Remove(key);
         public bool Remove(KeyValuePair<string, object> item) => _data.Remove(item.Key);
+
+        public bool TryGetBool(string key, [MaybeNullWhen(false)] out bool @bool)
+        {
+            if (_data.TryGetValue(key, out var value) && value is bool b)
+            {
+                @bool = b;
+                return true;
+            }
+            @bool = default;
+            return false;
+        }
+
+        public bool TryGetEffectType(string key, [MaybeNullWhen(false)] out EffectType effectType)
+        {
+            if (_data.TryGetValue(key, out var value) && value is EffectType et)
+            {
+                effectType = et;
+                return true;
+            }
+            effectType = default;
+            return false;
+        }
+
+        public bool TryGetId(string key, [MaybeNullWhen(false)] out Id id)
+        {
+            if (_data.TryGetValue(key, out var value) && value is Id i)
+            {
+                id = i;
+                return true;
+            }
+            id = default;
+            return false;
+        }
+
+        public bool TryGetInt(string key, [MaybeNullWhen(false)] out int @int)
+        {
+            if (_data.TryGetValue(key, out var value) && value is int i)
+            {
+                @int = i;
+                return true;
+            }
+            @int = default;
+            return false;
+        }
+
+        public bool TryGetString(string key, [MaybeNullWhen(false)] out string @string)
+        {
+            if (_data.TryGetValue(key, out var value) && value is string s)
+            {
+                @string = s;
+                return true;
+            }
+            @string = default;
+            return false;
+        }
+
         public bool TryGetValue(string key, out object value) => _data.TryGetValue(key, out value);
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _data.GetEnumerator();
     }
 
-
-    public class AnyObjectEmpty : IAnyObject
+    public class AnyObjectEmpty : DefaultTextData, IAnyObject
     {
-        private readonly Dictionary<string, object> _data = new();
-        public object this[string key]
-        {
-            get => _data[key];
-            set => _data[key] = value;
-        }
-        public ICollection<string> Keys => _data.Keys;
-        public ICollection<object> Values => _data.Values;
-        public int Count => _data.Count;
-        public bool IsReadOnly => false;
-        public void Add(string key, object value) => _data.Add(key, value);
-        public void Add(KeyValuePair<string, object> item) => _data.Add(item.Key, item.Value);
-        public void Clear() => _data.Clear();
-        public bool Contains(KeyValuePair<string, object> item) => _data.Contains(item);
-        public bool ContainsKey(string key) => _data.ContainsKey(key);
-        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) => ((IDictionary<string, object>)_data).CopyTo(array, arrayIndex);
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _data.GetEnumerator();
-        public bool Remove(string key) => _data.Remove(key);
-        public bool Remove(KeyValuePair<string, object> item) => _data.Remove(item.Key);
-        public bool TryGetValue(string key, out object value) => _data.TryGetValue(key, out value);
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _data.GetEnumerator();
     }
 
 

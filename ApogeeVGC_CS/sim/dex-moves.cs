@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
@@ -113,7 +115,61 @@ namespace ApogeeVGC_CS.sim
 
     public interface IMoveEventMethods
     {
+        // Return int, false (null), or null
+        Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; set; }
 
+        // Return true to stop the move from being used
+        Func<Battle, Pokemon, Pokemon?, ActiveMove, bool?>? BeforeMoveCallback { get; set; }
+
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? BeforeTurnCallback { get; set; }
+
+        // Return int or false (null)
+        Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? DamageCallback { get; set; }
+
+        Action<Battle, Pokemon>? PriorityChargeCallback { get; set; }
+
+        Action<Battle, Pokemon>? OnDisableMove { get; set; }
+
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; set; }
+        Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAfterSubDamage { get; set; }
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondarySelf { get; set; }
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; set; }
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; set; }
+
+        int? OnDamagePriority { get; set; }
+
+        // Return int, bool, or null
+        Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
+
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; set; }
+
+        // Return int or void (null)
+        Func<Battle, int, Pokemon?, string, ActiveMove, int?>? OnEffectiveness { get; set; }
+
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; set; }
+
+        // Return bool, null, empty string, or void
+        Func<Battle, Side, Pokemon, ActiveMove, object?>? OnHitSide { get; set; }
+
+        Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; set; }
+
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; set; }
+
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; set; }
+
+        Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; set; }
+
+        Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; set; }
+
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; set; }
+        Func<Battle, Side, Pokemon, ActiveMove, object?>? OnTryHitSide { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; set; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; set; }
+        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; set; }
     }
 
     public class MoveData : EffectData, IMoveEventMethods
