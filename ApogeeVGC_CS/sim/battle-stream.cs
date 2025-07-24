@@ -4,45 +4,115 @@ using System.IO;
 
 namespace ApogeeVGC_CS.sim
 {
+    // Helper struct to hold player streams
+    public struct PlayerStreams
+    {
+        public Stream Omniscient { get; set; } // Placeholder for omniscient stream
+        public Stream Spectator { get; set; } // Placeholder for spectator stream
+        public Stream Player1 { get; set; }
+        public Stream Player2 { get; set; }
+        public Stream Player3 { get; set; } // Optional, for 3-player battles
+        public Stream Player4 { get; set; } // Optional, for 4-player battles
+    }
+    
+    // Helper class to manage battle-queue functions
+    static public class BattleStreamUtils
+    {
+        public static string[] SplitFirst(string str, string delimiter, int limit = 1)
+        {
+            throw new NotImplementedException("SplitFirst method is not implemented yet.");
+        }
+
+        public static PlayerStreams GetPlayerStreams(BattleStream stream)
+        {
+            throw new Exception("GetPlayerStreams method is not implemented yet.");
+        }
+    }
+
+
     public class BattleStreamOptions
     {
-        public bool Debug { get; set; }
-        public bool NoCatch { get; set; }
-        public bool KeepAlive { get; set; }
+        public bool? Debug { get; set; }
+        public bool? NoCatch { get; set; }
+        public bool? KeepAlive { get; set; }
         public object? Replay { get; set; } // bool or "spectator"
     }
 
-    public class BattleStream // : ObjectReadWriteStream<string> // Implement as needed
+    public class BattleStream(BattleStreamOptions? options = null) // : ObjectReadWriteStream<string> // Implement as needed
     {
-        public bool Debug { get; set; }
-        public bool NoCatch { get; set; }
-        public object? Replay { get; set; } // bool or "spectator"
-        public bool KeepAlive { get; set; }
-        public Battle? Battle { get; set; }
+        public bool Debug { get; set; } = options?.Debug ?? false;
+        public bool NoCatch { get; set; } = options?.NoCatch ?? false;
+        public object Replay { get; set; } = options?.Replay ?? false;
+        public bool KeepAlive { get; set; } = options?.KeepAlive ?? false;
+        public Battle? Battle { get; set; } = null;
 
-        public BattleStream(BattleStreamOptions? options = null)
+        private void Write(string chunk)
         {
-            Debug = options?.Debug ?? false;
-            NoCatch = options?.NoCatch ?? false;
-            Replay = options?.Replay ?? false;
-            KeepAlive = options?.KeepAlive ?? false;
-            Battle = null;
+            throw new NotImplementedException("Write method is not implemented yet.");
         }
-        //TODO
+
+        private void WriteLines(string chunk)
+        {
+            throw new NotImplementedException("WriteLines method is not implemented yet.");
+        }
+
+        public void PushMessage(string type, string data)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void WriteLine(string type, string message)
+        {
+            throw new NotImplementedException("WriteLine method is not implemented yet.");
+        }
+
+        private void WriteEnd()
+        {
+            throw new NotImplementedException("WriteEnd method is not implemented yet.");
+        }
+
+        private void Destroy()
+        {
+            throw new NotImplementedException("Destroy method is not implemented yet.");
+        }
     }
-    public abstract class BattlePlayer
-    {
-        public Stream Stream { get; }
-        public List<string> Log { get; }
-        public bool Debug { get; }
 
-        protected BattlePlayer(Stream playerStream, bool debug = false)
+
+    public abstract class BattlePlayer(Stream playerStream, bool debug = false)
+    {
+        public Stream Stream { get; } = playerStream;
+        public List<string> Log { get; } = [];
+        public bool Debug { get; } = debug;
+
+        public Delegate Start()
         {
-            Stream = playerStream;
-            Log = new List<string>();
-            Debug = debug;
+            throw new NotImplementedException("Start method is not implemented yet.");
         }
-        // TODO
+
+        public void Receive(string chunk)
+        {
+            throw new NotImplementedException("Receive method is not implemented yet.");
+        }
+
+        public void ReceiveLine(string line)
+        {
+            throw new NotImplementedException("ReceiveLine method is not implemented yet.");
+        }
+
+        public void ReceiveRequest(string choice)
+        {
+            throw new NotImplementedException("ReceiveRequest method is not implemented yet.");
+        }
+
+        public void ReceiveError(string error)
+        {
+            throw new NotImplementedException("ReceiveError method is not implemented yet.");
+        }
+
+        public void Choose(string choice)
+        {
+            throw new NotImplementedException("Choose method is not implemented yet.");
+        }
     }
 
     public class BattleTextStream // : Stream or custom ReadWriteStream<string>
@@ -57,10 +127,19 @@ namespace ApogeeVGC_CS.sim
             Listen();
         }
 
-        private void Listen()
+        private Delegate Listen()
         {
-            // TODO: Implement message listening logic
+            throw new NotImplementedException("Listen method is not implemented yet.");
         }
-        // TODO
+        
+        private void Write(string message)
+        {
+            throw new NotImplementedException("Write method is not implemented yet.");
+        }
+
+        private Delegate WriteEnd()
+        {
+            throw new NotImplementedException("WriteEnd method is not implemented yet.");
+        }
     }
 }
