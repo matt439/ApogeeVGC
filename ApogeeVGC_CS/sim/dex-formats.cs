@@ -62,7 +62,7 @@ namespace ApogeeVGC_CS.sim
         // TODO - add methods
     }
 
-    public class Format : BasicEffect
+    public class Format : BasicEffect, IFormat
     {
         public Format(IAnyObject data) : base(data)
         {

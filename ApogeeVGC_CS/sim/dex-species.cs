@@ -106,7 +106,7 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class Species : BasicEffect
+    public class Species : BasicEffect, ISpecies
     {
         public override EffectType EffectType => EffectType.Pokemon;
         public string Id { get; set; } = string.Empty;

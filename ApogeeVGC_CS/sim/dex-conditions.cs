@@ -51,7 +51,8 @@ namespace ApogeeVGC_CS.sim
     public class ConditionDataTable : Dictionary<string, IConditionData> { }
     public class ModdedConditionDataTable : Dictionary<string, IConditionData> { }
 
-    public class Condition : BasicEffect, IPokemonEventMethods, ISideEventMethods, IFieldEventMethods
+    public class Condition : BasicEffect, IPokemonEventMethods, ISideEventMethods, IFieldEventMethods,
+        ICondition
     {
         public string EffectType { get; set; } = "Condition";
         public int? CounterMax { get; set; }

@@ -250,7 +250,7 @@ namespace ApogeeVGC_CS.sim
     public class MoveHitData : Dictionary<string, MoveHitResult> { }
 
     // ActiveMove structure
-    public class ActiveMove : MoveData
+    public class ActiveMove : MoveData, IActiveMove
     {
         public new string Name { get; set; } = string.Empty;
         public override EffectType EffectType => EffectType.Move;

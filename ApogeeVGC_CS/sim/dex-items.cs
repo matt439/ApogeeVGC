@@ -31,7 +31,7 @@ namespace ApogeeVGC_CS.sim
     public class ModdedItemDataTable : Dictionary<string, ModdedItemData> { }
 
     // Item class
-    public class Item : BasicEffect
+    public class Item : BasicEffect, IItem
     {
         public string EffectType { get; set; } = "Item";
         public int Num { get; set; }
