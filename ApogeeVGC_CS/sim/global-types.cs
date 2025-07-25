@@ -125,6 +125,8 @@ namespace ApogeeVGC_CS.sim
         public bool TryGetList<T>(string key, [MaybeNullWhen(false)] out List<T> list) where T : class;
         public bool TryGetDictionary<TKey, TValue>(string key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> dict) where TKey : notnull;
         public bool TryGetNullable<T>(string key, out T? value) where T : struct;
+        public bool TryGetFunction<T>(string key, [MaybeNullWhen(false)] out Func<T> function);
+        public bool TryGetAction<T>(string key, [MaybeNullWhen(false)] out Action<T> action);
     }
 
     public enum GenderName
@@ -290,7 +292,7 @@ namespace ApogeeVGC_CS.sim
 
     public enum GameType
     {
-        Singles, Doubles, Triples, Rotation, Multi, Freeforall
+        Singles, Doubles, Triples, Rotation, Multi, FreeForAll
     }
 
     public enum SideID
@@ -931,6 +933,28 @@ namespace ApogeeVGC_CS.sim
                 return true;
             }
             value = default;
+            return false;
+        }
+
+        public bool TryGetFunction<T>(string key, [MaybeNullWhen(false)] out Func<T> function)
+        {
+            if (_data.TryGetValue(key, out var value) && value is Func<T> func)
+            {
+                function = func;
+                return true;
+            }
+            function = default;
+            return false;
+        }
+
+        public bool TryGetAction<T>(string key, [MaybeNullWhen(false)] out Action<T> action)
+        {
+            if (_data.TryGetValue(key, out var value) && value is Action<T> act)
+            {
+                action = act;
+                return true;
+            }
+            action = default;
             return false;
         }
     }
