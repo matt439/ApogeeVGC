@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
@@ -14,16 +15,77 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    // must be lowercase alphanumeric
+    // An ID must have only lowercase alphanumeric characters
     public class Id
     {
         private string _value = string.Empty;
         public string Value
         {
             get => _value;
-            set => _value = value?.ToLowerInvariant() ?? string.Empty;
+            set
+            {
+                if (_value != value)
+                {
+                    if (IsValid(value))
+                    {
+                        _value = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid ID format. Must be lowercase alphanumeric.");
+                    }
+                }
+            }
         }
         public bool IsId => true;
+        public bool IsEmpty => string.IsNullOrEmpty(Value);
+
+        public Id()
+        {
+            Value = string.Empty; // Default to empty string
+        }
+
+        public Id(string id)
+        {
+            Value = FromString(id);
+        }
+
+        public Id(object obj)
+        {
+            Value = FromObject(obj);
+        }
+
+        // If a string is passed, it will be converted to lowercase and non-alphanumeric characters will be stripped.
+        private static string FromString(string id)
+        {
+            return Regex.Replace(id.ToLowerInvariant(), @"[^a-z0-9]+", "");
+        }
+
+        // If an object with an ID is passed, its ID will be returned. Otherwise, an empty string will be returned.
+        private static string FromObject(object obj)
+        {
+            var type = obj.GetType();
+            var idProp = type.GetProperty("id") ?? type.GetProperty("userId") ?? type.GetProperty("roomId");
+
+            if (idProp != null && idProp.GetValue(obj) is string propValue)
+            {
+                return FromString(propValue);
+            }
+            else
+            {
+                return string.Empty; // Return empty string if no valid ID found
+            }
+        }
+
+        private static bool IsValid(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return false;
+            foreach (char c in id)
+            {
+                if (!char.IsLower(c) && !char.IsDigit(c)) return false;
+            }
+            return true;
+        }
     }
 
     // must be lowercase alphanumeric
@@ -56,7 +118,13 @@ namespace ApogeeVGC_CS.sim
         public bool TryGetBool(string key, [MaybeNullWhen(false)] out bool @bool);
         public bool TryGetString(string key, [MaybeNullWhen(false)] out string @string);
         public bool TryGetId(string key, [MaybeNullWhen(false)] out Id id);
-        public bool TryGetEffectType(string key, [MaybeNullWhen(false)] out EffectType effectType);
+        public bool TryGetEnum<TEnum>(string key, [MaybeNullWhen(false)] out TEnum enumValue) where TEnum : Enum;
+        public bool TryGetStruct<TStruct>(string key, [MaybeNullWhen(false)] out TStruct structValue) where TStruct : struct;
+        public bool TryGetClass<TClass>(string key, [MaybeNullWhen(false)] out TClass? classValue) where TClass : class;
+        public bool TryGetObject(string key, [MaybeNullWhen(false)] out object? obj);
+        public bool TryGetList<T>(string key, [MaybeNullWhen(false)] out List<T> list) where T : class;
+        public bool TryGetDictionary<TKey, TValue>(string key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> dict) where TKey : notnull;
+        public bool TryGetNullable<T>(string key, out T? value) where T : struct;
     }
 
     public enum GenderName
@@ -186,8 +254,7 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; }
         public int? Duration { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        //public string? EffectType { get; set; }
-        public string? EffectType { get; set; }
+        public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
         public string? ShortDesc { get; set; }
@@ -200,7 +267,7 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; } = string.Empty;
         public int? Duration { get; set; } = null;
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-        public string? EffectType { get; set; } = null;
+        public string? EffectTypeString { get; set; } = null;
         public bool? Infiltrates { get; set; } = null;
         public Nonstandard? IsNonstandard { get; set; } = null;
         public string? ShortDesc { get; set; } = string.Empty;
@@ -211,15 +278,15 @@ namespace ApogeeVGC_CS.sim
         Condition, Pokemon, Move, Item, Ability, Format,
         Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule
     }
-    public interface IBasicEffect : IEffectData
-    {
-        Id Id { get; set; }
-        new EffectType EffectType { get; set; }
-        bool Exists { get; set; }
-        string Fullname { get; set; }
-        int Gen { get; set; }
-        string SourceEffect { get; set; }
-    }
+    //public interface IBasicEffect : IEffectData
+    //{
+    //    Id Id { get; set; }
+    //    EffectType EffectType { get; set; }
+    //    bool Exists { get; set; }
+    //    string Fullname { get; set; }
+    //    int Gen { get; set; }
+    //    string SourceEffect { get; set; }
+    //}
 
     public enum GameType
     {
@@ -786,8 +853,86 @@ namespace ApogeeVGC_CS.sim
             return false;
         }
 
+        public bool TryGetEnum<TEnum>(string key, [MaybeNullWhen(false)] out TEnum @enum) where TEnum : Enum
+        {
+            if (_data.TryGetValue(key, out var value) && value is TEnum e)
+            {
+                @enum = e;
+                return true;
+            }
+            @enum = default;
+            return false;
+        }
+
+        // for IDictionary
         public bool TryGetValue(string key, out object value) => _data.TryGetValue(key, out value);
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _data.GetEnumerator();
+
+        public bool TryGetStruct<TStruct>(string key, [MaybeNullWhen(false)] out TStruct structValue) where TStruct : struct
+        {
+            if (_data.TryGetValue(key, out var value) && value is TStruct s)
+            {
+                structValue = s;
+                return true;
+            }
+            structValue = default;
+            return false;
+        }
+
+        public bool TryGetClass<TClass>(string key, [MaybeNullWhen(false)] out TClass? classValue) where TClass : class
+        {
+            if (_data.TryGetValue(key, out var value) && value is TClass c)
+            {
+                classValue = c;
+                return true;
+            }
+            classValue = default;
+            return false;
+        }
+
+        public bool TryGetObject(string key, [MaybeNullWhen(false)] out object? obj)
+        {
+            if (_data.TryGetValue(key, out var value))
+            {
+                obj = value;
+                return true;
+            }
+            obj = default;
+            return false;
+        }
+
+        public bool TryGetList<T>(string key, [MaybeNullWhen(false)] out List<T> list) where T : class
+        {
+            if (_data.TryGetValue(key, out var value) && value is List<T> l)
+            {
+                list = l;
+                return true;
+            }
+            list = default;
+            return false;
+        }
+
+        public bool TryGetDictionary<TKey, TValue>(string key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> dict) where TKey : notnull
+        {
+            if (_data.TryGetValue(key, out var value) && value is Dictionary<TKey, TValue> d)
+            {
+                dict = d;
+                return true;
+            }
+            dict = default;
+            return false;
+        }
+
+        public bool TryGetNullable<T>(string key, [MaybeNullWhen(false)] out T? value) where T : struct
+        {
+            if (_data.TryGetValue(key, out var obj) && obj is T v)
+            {
+                value = v;
+                return true;
+            }
+            value = default;
+            return false;
+        }
     }
 
     public class AnyObjectEmpty : DefaultTextData, IAnyObject

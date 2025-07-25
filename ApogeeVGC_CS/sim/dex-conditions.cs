@@ -577,6 +577,9 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon>? OnEnd { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnRestart { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; set; }
+        
+
+        // Implementation of event methods from interfaces
         public Action<Battle, Side, Pokemon, IEffect>? OnSideStart { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Action<Battle, Side, Pokemon, IEffect>? OnSideRestart { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Action<Battle, Side, Pokemon, IEffect>? OnSideResidual { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -1141,7 +1144,7 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class  ConditionConstants
+    public static class  ConditionConstants
     {
         public static readonly Condition EmptyCondition = new(new DefaultTextData
         {

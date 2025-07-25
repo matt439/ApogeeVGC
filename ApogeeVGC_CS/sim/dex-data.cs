@@ -1,70 +1,64 @@
-﻿/**
- * Dex Data
- * Pokemon Showdown - http://pokemonshowdown.com/
- *
- * @license MIT
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace ApogeeVGC_CS.sim
 {
-    /// <summary>
-    /// Converts anything to an ID. An ID must have only lowercase alphanumeric
-    /// characters.
-    /// 
-    /// If a string is passed, it will be converted to lowercase and
-    /// non-alphanumeric characters will be stripped.
-    /// 
-    /// If an object with an ID is passed, its ID will be returned.
-    /// Otherwise, an empty string will be returned.
-    /// 
-    /// Generally assigned to the global toID, because of how
-    /// commonly it's used.
-    /// </summary>
-    public static class DexUtilities
-    {
-        public static string ToID(object? text)
-        {
-            if (text == null) return string.Empty;
+    ///// <summary>
+    ///// Converts anything to an ID. An ID must have only lowercase alphanumeric
+    ///// characters.
+    ///// 
+    ///// If a string is passed, it will be converted to lowercase and
+    ///// non-alphanumeric characters will be stripped.
+    ///// 
+    ///// If an object with an ID is passed, its ID will be returned.
+    ///// Otherwise, an empty string will be returned.
+    ///// 
+    ///// Generally assigned to the global toID, because of how
+    ///// commonly it's used.
+    ///// </summary>
+    //public static class DexUtilities
+    //{
+    //    public static string ToID(object? text)
+    //    {
+    //        if (text == null) return string.Empty;
             
-            string? textStr = null;
+    //        string? textStr = null;
             
-            if (text is string str)
-            {
-                textStr = str;
-            }
-            else if (text is int number)
-            {
-                textStr = number.ToString();
-            }
-            else
-            {
-                // Try to get ID from object properties
-                var type = text.GetType();
-                var idProp = type.GetProperty("Id") ?? type.GetProperty("ID") ?? 
-                            type.GetProperty("UserId") ?? type.GetProperty("RoomId");
+    //        if (text is string str)
+    //        {
+    //            textStr = str;
+    //        }
+    //        else if (text is int number)
+    //        {
+    //            textStr = number.ToString();
+    //        }
+    //        else
+    //        {
+    //            // Try to get ID from object properties
+    //            var type = text.GetType();
+    //            var idProp = type.GetProperty("Id") ?? type.GetProperty("ID") ?? 
+    //                        type.GetProperty("UserId") ?? type.GetProperty("RoomId");
                 
-                if (idProp != null && idProp.GetValue(text) is string propValue)
-                {
-                    textStr = propValue;
-                }
-                else
-                {
-                    textStr = text.ToString();
-                }
-            }
+    //            if (idProp != null && idProp.GetValue(text) is string propValue)
+    //            {
+    //                textStr = propValue;
+    //            }
+    //            else
+    //            {
+    //                textStr = text.ToString();
+    //            }
+    //        }
 
-            if (string.IsNullOrEmpty(textStr)) return string.Empty;
+    //        if (string.IsNullOrEmpty(textStr)) return string.Empty;
 
-            return Regex.Replace(textStr.ToLowerInvariant(), @"[^a-z0-9]+", "");
-        }
-    }
+    //        return Regex.Replace(textStr.ToLowerInvariant(), @"[^a-z0-9]+", "");
+    //    }
+    //}
 
     /// <summary>
     /// Like Object.assign but only assigns fields missing from self.
@@ -93,13 +87,13 @@ namespace ApogeeVGC_CS.sim
         /// becomes "mrmime", and "Basculin-Blue-Striped" becomes
         /// "basculinbluestriped".
         /// </summary>
-        public string Id { get; set; } = string.Empty;
+        public Id Id { get; set; } = new Id();
 
         /// <summary>
         /// Name. Currently does not support Unicode letters, so "Flabébé"
         /// is "Flabebe" and "Nidoran♀" is "Nidoran-F".
         /// </summary>
-        public new string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Full name. Prefixes the name with the effect type. For instance,
@@ -109,14 +103,14 @@ namespace ApogeeVGC_CS.sim
         public string Fullname { get; set; } = string.Empty;
 
         /// <summary>Effect type.</summary>
-        public new EffectType EffectType { get; set; }
+        public EffectType EffectType { get; set; } = EffectType.Condition;
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
         /// for an effect that doesn't exist, you get a dummy effect that
         /// doesn't do anything, and this field set to false.
         /// </summary>
-        public bool Exists { get; set; }
+        public bool Exists { get; set; } = false;
 
         /// <summary>
         /// Dex number? For a Pokemon, this is the National Dex number. For
@@ -125,112 +119,151 @@ namespace ApogeeVGC_CS.sim
         /// doesn't. Nonstandard effects (e.g. CAP effects) will have
         /// negative numbers.
         /// </summary>
-        public int Num { get; set; }
+        public int Num { get; set; } = 0;
 
         /// <summary>
         /// The generation of Pokemon game this was INTRODUCED (NOT
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; set; }
+        public int Gen { get; set; } = 0;
 
         /// <summary>
         /// A shortened form of the description of this effect.
         /// Not all effects have this.
         /// </summary>
-        public new string? ShortDesc { get; set; }
+        public string? ShortDesc { get; set; } = string.Empty;
 
         /// <summary>The full description for this effect.</summary>
-        public new string? Desc { get; set; }
+        public string? Desc { get; set; } = string.Empty;
 
         /// <summary>
         /// Is this item/move/ability/pokemon nonstandard? Specified for effects
         /// that have no use in standard formats: made-up pokemon (CAP),
         /// glitches (MissingNo etc), Pokestar pokemon, etc.
         /// </summary>
-        public new Nonstandard? IsNonstandard { get; set; }
+        public Nonstandard? IsNonstandard { get; set; } = null;
 
         /// <summary>The duration of the condition - only for pure conditions.</summary>
-        public new int? Duration { get; set; }
+        public int? Duration { get; set; } = null;
 
         /// <summary>Whether or not the condition is ignored by Baton Pass - only for pure conditions.</summary>
-        public bool NoCopy { get; set; }
+        public bool NoCopy { get; set; } = false;
 
         /// <summary>Whether or not the condition affects fainted Pokemon.</summary>
-        public bool AffectsFainted { get; set; }
+        public bool AffectsFainted { get; set; } = false;
 
         /// <summary>Moves only: what status does it set?</summary>
-        public string? Status { get; set; }
+        public Id? Status { get; set; } = null;
 
         /// <summary>Moves only: what weather does it set?</summary>
-        public string? Weather { get; set; }
+        public Id? Weather { get; set; } = null;
 
         /// <summary>???</summary>
         public string SourceEffect { get; set; } = string.Empty;
 
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
+        string? IEffectData.EffectTypeString { get; set; } = null;
+        public bool? Infiltrates { get; set; } = null;
+
         protected BasicEffect(IAnyObject data)
         {
-            Name = GetString(data, "name").Trim();
-            
-            // Hidden Power hack
-            if (data.ContainsKey("realMove") && data["realMove"] is string realMove)
+            if (data.TryGetString("name", out string? name))
             {
-                Id = DexUtilities.ToID(realMove);
+                Name = name.Trim();
             }
             else
             {
-                Id = DexUtilities.ToID(Name);
+                throw new ArgumentException("Name is required for BasicEffect.");
             }
 
-            Fullname = GetString(data, "fullname");
-            if (string.IsNullOrEmpty(Fullname))
+            if (data.TryGetString("realMove", out string? realMove))
+            {
+                Id = new Id(realMove);
+            }
+            else
+            {
+                Id = new Id(Name);
+            }
+
+            if (data.TryGetString("fullname", out string? fullname))
+            {
+                Fullname = fullname; // No trim
+            }
+            else
+            {
                 Fullname = Name;
+            }
 
-            var effectTypeStr = GetString(data, "effectType");
-            if (Enum.TryParse<EffectType>(effectTypeStr, true, out var effectType))
+            if (data.TryGetEnum<EffectType>("effectType", out var effectType))
+            {
                 EffectType = effectType;
+            }
+
+
+            if (data.TryGetBool("exists", out var exists))
+            {
+                Exists = exists;
+            }
             else
-                EffectType = sim.EffectType.Condition;
+            {
+                Exists = !Id.IsEmpty;
+            }
 
-            Exists = GetBool(data, "exists") ?? !string.IsNullOrEmpty(Id);
-            Num = GetInt(data, "num") ?? 0;
-            Gen = GetInt(data, "gen") ?? 0;
-            ShortDesc = GetString(data, "shortDesc");
-            Desc = GetString(data, "desc");
-            
-            var nonStandardStr = GetString(data, "isNonstandard");
-            if (!string.IsNullOrEmpty(nonStandardStr) && Enum.TryParse<Nonstandard>(nonStandardStr, true, out var nonStandard))
-                IsNonstandard = nonStandard;
+            if (data.TryGetInt("num", out var num))
+            {
+                Num = num;
+            }
 
-            Duration = GetInt(data, "duration");
-            NoCopy = GetBool(data, "noCopy") ?? false;
-            AffectsFainted = GetBool(data, "affectsFainted") ?? false;
-            Status = GetString(data, "status");
-            Weather = GetString(data, "weather");
-            SourceEffect = GetString(data, "sourceEffect") ?? string.Empty;
-        }
+            if (data.TryGetInt("gen", out var gen))
+            {
+                Gen = gen;
+            }
 
-        private static string GetString(IAnyObject data, string key)
-        {
-            return data.ContainsKey(key) && data[key] is string str ? str : string.Empty;
-        }
+            if (data.TryGetString("shortDesc", out string? shortDesc))
+            {
+                ShortDesc = shortDesc;
+            }
 
-        private static int? GetInt(IAnyObject data, string key)
-        {
-            if (!data.ContainsKey(key)) return null;
-            var value = data[key];
-            if (value is int i) return i;
-            if (value is string s && int.TryParse(s, out var parsed)) return parsed;
-            return null;
-        }
+            if (data.TryGetString("desc", out string? desc))
+            {
+                Desc = desc;
+            }
 
-        private static bool? GetBool(IAnyObject data, string key)
-        {
-            if (!data.ContainsKey(key)) return null;
-            var value = data[key];
-            if (value is bool b) return b;
-            if (value is string s && bool.TryParse(s, out var parsed)) return parsed;
-            return null;
+            if (data.TryGetEnum<Nonstandard>("isNonstandard", out var nonstandard))
+            {
+                IsNonstandard = nonstandard;
+            }
+
+            if (data.TryGetInt("duration", out var duration))
+            {
+                Duration = duration;
+            }
+
+            if (data.TryGetBool("noCopy", out var noCopy))
+            {
+                NoCopy = noCopy;
+            }
+
+            if (data.TryGetBool("affectsFainted", out var affectsFainted))
+            {
+                AffectsFainted = affectsFainted;
+            }
+
+            if (data.TryGetId("status", out Id? status))
+            {
+                Status = status;
+            }
+
+            if (data.TryGetId("weather", out Id? weather))
+            {
+                Weather = weather;
+            }
+
+            if (data.TryGetString("sourceEffect", out string? sourceEffect))
+            {
+                SourceEffect = sourceEffect;
+            }
         }
 
         public override string ToString()
@@ -239,32 +272,44 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class Nature : BasicEffect
+    public class Nature : BasicEffect, INatureData
     {
-        public override EffectType EffectType => sim.EffectType.Nature;
-        public StatIDExceptHP? Plus { get; }
-        public StatIDExceptHP? Minus { get; }
+        // public EffectType EffectType => EffectType.Nature;
+        public StatIDExceptHP? Plus { get; set; }
+        public StatIDExceptHP? Minus { get; set; }
 
         public Nature(IAnyObject data) : base(data)
         {
             Fullname = $"nature: {Name}";
-            EffectType = sim.EffectType.Nature;
+            EffectType = EffectType.Nature;
             Gen = 3;
 
-            if (data.ContainsKey("plus") && data["plus"] is string plusStr &&
-                Enum.TryParse<StatIDExceptHP>(plusStr, true, out var plus))
+            if (data.TryGetEnum<StatIDExceptHP>("plus", out var plus))
             {
                 Plus = plus;
             }
 
-            if (data.ContainsKey("minus") && data["minus"] is string minusStr &&
-                Enum.TryParse<StatIDExceptHP>(minusStr, true, out var minus))
+            if (data.TryGetEnum<StatIDExceptHP>("minus", out var minus))
             {
                 Minus = minus;
             }
 
-            ObjectExtensions.AssignMissingFields(new DefaultTextData(), data); // Placeholder for assignMissingFields
+            // AssignMissingFields(data);
         }
+
+        //private void AssignMissingFields(IAnyObject data)
+        //{
+
+        //}
+    }
+
+    public static class NatureConstants
+    {
+        public static readonly Nature EmptyNature = new(new DefaultTextData
+        {
+            ["name"] = "",
+            ["exists"] = false
+        });
     }
 
     public interface INatureData
@@ -286,85 +331,32 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public class NatureDataTable : Dictionary<string, NatureData> { }
+    public interface INatureDataTable : IDictionary<IdEntry, NatureData> { }
 
-    public class DexNatures
+    public class DexNatures(ModdedDex dex)
     {
-        private readonly ModdedDex _dex;
-        private readonly Dictionary<string, Nature> _natureCache = new();
-        private Nature[]? _allCache;
+        private readonly ModdedDex _dex = dex;
+        private readonly Dictionary<string, Nature> _natureCache = [];
+        private Nature[]? _allCache = null;
 
-        private static readonly Nature EmptyNature = new(new DefaultTextData { ["name"] = "", ["exists"] = false });
-
-        public DexNatures(ModdedDex dex)
+        public Nature Get(string name)
         {
-            _dex = dex;
+            throw new Exception("Get method is not implemented yet.");
         }
 
-        public Nature Get(object? name)
+        public Nature Get(Nature nature)
         {
-            if (name is Nature nature) return nature;
-            return GetByID(DexUtilities.ToID(name));
+            throw new Exception("Get method is not implemented yet.");
         }
 
-        public Nature GetByID(string id)
+        public Nature GetByID(Id id)
         {
-            if (string.IsNullOrEmpty(id)) return EmptyNature;
-
-            if (_natureCache.TryGetValue(id, out var nature))
-                return nature;
-
-            var alias = _dex.GetAlias(id);
-            if (!string.IsNullOrEmpty(alias))
-            {
-                nature = Get(alias);
-                if (nature.Exists)
-                {
-                    _natureCache[id] = nature;
-                }
-                return nature;
-            }
-
-            if (!string.IsNullOrEmpty(id) && _dex.Data.Natures?.ContainsKey(id) == true)
-            {
-                var natureData = _dex.Data.Natures[id];
-                var data = new DefaultTextData
-                {
-                    ["name"] = natureData.Name,
-                    ["plus"] = natureData.Plus?.ToString(),
-                    ["minus"] = natureData.Minus?.ToString()
-                };
-                nature = new Nature(data);
-                if (nature.Gen > _dex.Gen)
-                    nature.IsNonstandard = Nonstandard.Future;
-            }
-            else
-            {
-                var data = new DefaultTextData { ["name"] = id, ["exists"] = false };
-                nature = new Nature(data);
-            }
-
-            if (nature.Exists)
-                _natureCache[id] = nature; // In real implementation, this would be deep frozen
-
-            return nature;
+            throw new Exception();
         }
 
         public Nature[] All()
         {
-            if (_allCache != null) return _allCache;
-
-            var natures = new List<Nature>();
-            if (_dex.Data.Natures != null)
-            {
-                foreach (var id in _dex.Data.Natures.Keys)
-                {
-                    natures.Add(GetByID(id));
-                }
-            }
-
-            _allCache = natures.ToArray();
-            return _allCache;
+            throw new Exception();
         }
     }
 
@@ -376,21 +368,21 @@ namespace ApogeeVGC_CS.sim
         Nonstandard? IsNonstandard { get; set; }
     }
 
-    public class TypeData : ITypeData
-    {
-        public Dictionary<string, int> DamageTaken { get; set; } = new();
-        public SparseStatsTable? HPdvs { get; set; }
-        public SparseStatsTable? HPivs { get; set; }
-        public Nonstandard? IsNonstandard { get; set; }
-    }
+    //public class TypeData : ITypeData
+    //{
+    //    public Dictionary<string, int> DamageTaken { get; set; } = new();
+    //    public SparseStatsTable? HPdvs { get; set; }
+    //    public SparseStatsTable? HPivs { get; set; }
+    //    public Nonstandard? IsNonstandard { get; set; }
+    //}
 
-    public class ModdedTypeData : TypeData
+    public interface IModdedTypeData : ITypeData
     {
         public bool Inherit { get; set; }
     }
 
-    public class TypeDataTable : Dictionary<string, TypeData> { }
-    public class ModdedTypeDataTable : Dictionary<string, ModdedTypeData> { }
+    public interface ITypeDataTable : IDictionary<string, ITypeData> { }
+    public interface IModdedTypeDataTable : IDictionary<string, IModdedTypeData> { }
 
     public enum TypeInfoEffectType
     {
@@ -404,13 +396,13 @@ namespace ApogeeVGC_CS.sim
         /// ID. This will be a lowercase version of the name with all the
         /// non-alphanumeric characters removed. e.g. 'flying'
         /// </summary>
-        public string Id { get; }
+        public Id Id { get; }
 
         /// <summary>Name. e.g. 'Flying'</summary>
         public string Name { get; }
 
         /// <summary>Effect type.</summary>
-        public TypeInfoEffectType EffectType { get; }
+        public TypeInfoEffectType EffectType { get; } = TypeInfoEffectType.Type;
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
@@ -424,54 +416,91 @@ namespace ApogeeVGC_CS.sim
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; }
+        public int Gen { get; } = 0;
 
         /// <summary>
         /// Set to 'Future' for types before they're released (like Fairy
         /// in Gen 5 or Dark in Gen 1).
         /// </summary>
-        public Nonstandard? IsNonstandard { get; set; }
+        public Nonstandard? IsNonstandard { get; set; } = null;
 
         /// <summary>
         /// Type chart, attackingTypeName:result, effectid:result
         /// result is: 0 = normal, 1 = weakness, 2 = resistance, 3 = immunity
         /// </summary>
-        public Dictionary<string, int> DamageTaken { get; set; } = new();
+        public Dictionary<string, int> DamageTaken { get; set; } = [];
 
         /// <summary>The IVs to get this Type Hidden Power (in gen 3 and later)</summary>
-        public SparseStatsTable HPivs { get; set; } = new();
+        public SparseStatsTable HPivs { get; set; } = [];
 
         /// <summary>The DVs to get this Type Hidden Power (in gen 2).</summary>
-        public SparseStatsTable HPdvs { get; set; } = new();
+        public SparseStatsTable HPdvs { get; set; } = [];
 
         public TypeInfo(IAnyObject data)
         {
-            Name = data.ContainsKey("name") && data["name"] is string name ? name : string.Empty;
-            Id = data.ContainsKey("id") && data["id"] is string id ? id : string.Empty;
+            if (data.TryGetString("name", out string? name))
+            {
+                Name = name; // no trim
+            }
+            else
+            {
+                throw new ArgumentException("Name is required for BasicEffect.");
+            }
 
-            var effectTypeStr = data.ContainsKey("effectType") && data["effectType"] is string effectType ? effectType : "Type";
-            EffectType = Enum.TryParse<TypeInfoEffectType>(effectTypeStr, true, out var parsedEffectType) 
-                ? parsedEffectType 
-                : TypeInfoEffectType.Type;
+            if (data.TryGetId("id", out Id? id))
+            {
+                Id = id;
+            }
+            else
+            {
+                throw new ArgumentException("ID is required for TypeInfo.");
+            }
 
-            Exists = data.ContainsKey("exists") && data["exists"] is bool exists ? exists : !string.IsNullOrEmpty(Id);
-            Gen = data.ContainsKey("gen") && data["gen"] is int gen ? gen : 0;
+            if (data.TryGetEnum<TypeInfoEffectType>("effectType", out TypeInfoEffectType effectType))
+            {
+                EffectType = effectType;
+            }
 
-            var nonStandardStr = data.ContainsKey("isNonstandard") && data["isNonstandard"] is string nonStandard ? nonStandard : null;
-            if (!string.IsNullOrEmpty(nonStandardStr) && Enum.TryParse<Nonstandard>(nonStandardStr, true, out var parsedNonStandard))
-                IsNonstandard = parsedNonStandard;
+            if (data.TryGetBool("exists", out bool exists))
+            {
+                Exists = exists;
+            }
+            else
+            {
+                Exists = !Id.IsEmpty;
+            }
 
-            if (data.ContainsKey("damageTaken") && data["damageTaken"] is Dictionary<string, int> damageTaken)
+            if (data.TryGetInt("gen", out int gen))
+            {
+                Gen = gen;
+            }
+
+            if (data.TryGetEnum<Nonstandard>("isNonstandard", out Nonstandard nonstandard))
+            {
+                IsNonstandard = nonstandard;
+            }
+
+            if (data.TryGetDictionary<string, int>("damageTaken", out Dictionary<string, int>? damageTaken))
+            {
                 DamageTaken = damageTaken;
+            }
 
-            if (data.ContainsKey("HPivs") && data["HPivs"] is SparseStatsTable hpIvs)
-                HPivs = hpIvs;
+            if (data.TryGetClass<SparseStatsTable>("HPivs", out SparseStatsTable? hpivs))
+            {
+                HPivs = hpivs;
+            }
 
-            if (data.ContainsKey("HPdvs") && data["HPdvs"] is SparseStatsTable hpDvs)
-                HPdvs = hpDvs;
+            if (data.TryGetClass<SparseStatsTable>("HPdvs", out SparseStatsTable? hpdvs))
+            {
+                HPdvs = hpdvs;
+            }
 
-            ObjectExtensions.AssignMissingFields(new DefaultTextData(), data); // Placeholder
+            //AssignMissingFields(data);
         }
+        //private void AssignMissingFields(IAnyObject data)
+        //{
+
+        //}
 
         public override string ToString()
         {
@@ -479,108 +508,52 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class DexTypes
+    public static class TypeInfoConstants
     {
-        private readonly ModdedDex _dex;
-        private readonly Dictionary<string, TypeInfo> _typeCache = new();
-        private TypeInfo[]? _allCache;
-        private string[]? _namesCache;
-
-        private static readonly TypeInfo EmptyTypeInfo = new(new DefaultTextData 
-        { 
-            ["name"] = "", 
-            ["id"] = "", 
-            ["exists"] = false, 
-            ["effectType"] = "EffectType" 
+        public static readonly TypeInfo EmptyTypeInfo = new(new DefaultTextData
+        {
+            ["name"] = "",
+            ["id"] = "",
+            ["exists"] = false,
+            ["effectType"] = "EffectType"
         });
+    }
 
-        public DexTypes(ModdedDex dex)
+    public class DexTypes(ModdedDex dex)
+    {
+        private readonly ModdedDex _dex = dex;
+        private readonly Dictionary<Id, TypeInfo> _typeCache = [];
+        private TypeInfo[]? _allCache = null;
+        private string[]? _namesCache = null;
+
+        public TypeInfo Get(string name)
         {
-            _dex = dex;
+            throw new Exception("Get method is not implemented yet.");
         }
 
-        public TypeInfo Get(object? name)
+        public TypeInfo Get(TypeInfo type)
         {
-            if (name is TypeInfo typeInfo) return typeInfo;
-            return GetByID(DexUtilities.ToID(name));
+            throw new Exception("Get method is not implemented yet.");
         }
 
-        public TypeInfo GetByID(string id)
+        public TypeInfo GetByID(Id id)
         {
-            if (string.IsNullOrEmpty(id)) return EmptyTypeInfo;
-
-            if (_typeCache.TryGetValue(id, out var type))
-                return type;
-
-            var typeName = char.ToUpperInvariant(id[0]) + id.Substring(1);
-            
-            if (!string.IsNullOrEmpty(typeName) && _dex.Data.TypeChart?.ContainsKey(id) == true)
-            {
-                var typeChartData = _dex.Data.TypeChart[id];
-                var data = new DefaultTextData
-                {
-                    ["name"] = typeName,
-                    ["id"] = id,
-                    ["damageTaken"] = typeChartData.DamageTaken,
-                    ["HPivs"] = typeChartData.HPivs,
-                    ["HPdvs"] = typeChartData.HPdvs,
-                    ["isNonstandard"] = typeChartData.IsNonstandard?.ToString()
-                };
-                type = new TypeInfo(data);
-            }
-            else
-            {
-                var data = new DefaultTextData
-                {
-                    ["name"] = typeName,
-                    ["id"] = id,
-                    ["exists"] = false,
-                    ["effectType"] = "EffectType"
-                };
-                type = new TypeInfo(data);
-            }
-
-            if (type.Exists)
-                _typeCache[id] = type; // In real implementation, would be deep frozen
-
-            return type;
+            throw new Exception();
         }
 
         public string[] Names()
         {
-            if (_namesCache != null) return _namesCache;
-
-            _namesCache = All()
-                .Where(type => type.IsNonstandard == null)
-                .Select(type => type.Name)
-                .ToArray();
-
-            return _namesCache;
+            throw new Exception("Names method is not implemented yet.");
         }
 
         public bool IsName(string? name)
         {
-            if (string.IsNullOrEmpty(name)) return false;
-            var id = name.ToLowerInvariant();
-            var typeName = char.ToUpperInvariant(id[0]) + id.Substring(1);
-            return name == typeName && _dex.Data.TypeChart?.ContainsKey(id) == true;
+            throw new Exception("IsName method is not implemented yet.");
         }
 
         public TypeInfo[] All()
         {
-            if (_allCache != null) return _allCache;
-
-            var types = new List<TypeInfo>();
-            if (_dex.Data.TypeChart != null)
-            {
-                foreach (var id in _dex.Data.TypeChart.Keys)
-                {
-                    types.Add(GetByID(id));
-                }
-            }
-
-            _allCache = types.ToArray();
-            return _allCache;
+            throw new Exception("All method is not implemented yet.");
         }
     }
 
@@ -680,28 +653,12 @@ namespace ApogeeVGC_CS.sim
 
         public StatID? GetID(string name)
         {
-            if (name == "Spd") return StatID.Spe;
-            
-            var id = DexUtilities.ToID(name);
-            
-            if (ReverseCache.TryGetValue(id, out var statId))
-                return statId;
-                
-            if (Enum.TryParse<StatID>(id, true, out var parsedStatId) && IdsCache.Contains(parsedStatId))
-                return parsedStatId;
-                
-            return null;
+            throw new Exception();
         }
 
         public StatID[] Ids()
         {
             return IdsCache;
         }
-    }
-
-    public class DexData
-    {
-        public NatureDataTable? Natures { get; set; }
-        public TypeDataTable? TypeChart { get; set; }
     }
 }
