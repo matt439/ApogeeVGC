@@ -55,6 +55,21 @@ namespace ApogeeVGC_CS.sim
             Value = FromObject(obj);
         }
 
+        /**
+         * Returns true if the sequence of elements of searchString converted to a String is the
+         * same as the corresponding elements of this object (converted to a String) starting at
+         * endPosition – length(this). Otherwise returns false.
+         */
+        public bool EndsWith(string searchString, int? endPosition = null)
+        {
+            if (string.IsNullOrEmpty(Value) || string.IsNullOrEmpty(searchString))
+            {
+                return false;
+            }
+            int startIndex = endPosition.HasValue ? Math.Max(0, endPosition.Value - searchString.Length) : 0;
+            return Value.IndexOf(searchString, startIndex, StringComparison.OrdinalIgnoreCase) == startIndex;
+        }
+
         // If a string is passed, it will be converted to lowercase and non-alphanumeric characters will be stripped.
         private static string FromString(string id)
         {
