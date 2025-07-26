@@ -599,9 +599,8 @@ namespace ApogeeVGC_CS.sim
             Init();
         }
 
-        public void Init()
+        private void Init()
         {
-            // InitBasicEffect();
 
             Fullname = $"ability: {Name}";
             EffectType = EffectType.Ability;
@@ -624,84 +623,6 @@ namespace ApogeeVGC_CS.sim
                     Gen = 3;
             }
         }
-
-        //public Ability(IAnyObject data)
-        //{
-        //    // Initialize from data object
-        //    if (data.TryGetValue("name", out object? nameValue))
-        //    {
-        //        Name = nameValue?.ToString() ?? string.Empty;
-        //    }
-
-        //    if (data.TryGetValue("rating", out object? ratingValue) &&
-        //        ratingValue != null && int.TryParse(ratingValue.ToString(), out int rating))
-        //    {
-        //        Rating = rating;
-        //    }
-
-        //    if (data.TryGetValue("suppressWeather", out object? weatherValue))
-        //    {
-        //        SuppressWeather = Convert.ToBoolean(weatherValue);
-        //    }
-
-        //    if (data.TryGetValue("flags", out object? flagsValue) && flagsValue is AbilityFlags flags)
-        //    {
-        //        Flags = flags;
-        //    }
-        //    else
-        //    {
-        //        Flags = new AbilityFlags();
-        //    }
-
-        //    if (data.TryGetValue("num", out object? numValue) &&
-        //        int.TryParse(numValue?.ToString(), out int num))
-        //    {
-        //        Num = num;
-        //    }
-
-        //    Fullname = $"ability: {Name}";
-        //    EffectType = "Ability";
-
-        //    // Auto-assign generation based on ability number
-        //    if (Gen == 0)
-        //    {
-        //        if (Num >= 268)
-        //            Gen = 9;
-        //        else if (Num >= 234)
-        //            Gen = 8;
-        //        else if (Num >= 192)
-        //            Gen = 7;
-        //        else if (Num >= 165)
-        //            Gen = 6;
-        //        else if (Num >= 124)
-        //            Gen = 5;
-        //        else if (Num >= 77)
-        //            Gen = 4;
-        //        else if (Num >= 1)
-        //            Gen = 3;
-        //    }
-
-        //    AssignMissingFields(data);
-        //}
-
-        //private void AssignMissingFields(IAnyObject data)
-        //{
-        //    if (data.TryGetValue("desc", out object? descValue))
-        //    {
-        //        Desc = descValue.ToString();
-        //    }
-
-        //    if (data.TryGetValue("shortDesc", out object? shortDescValue))
-        //    { 
-        //        ShortDesc = shortDescValue.ToString();
-        //    }
-
-        //    if (data.TryGetValue("exists", out object? existsValue))
-        //    {
-        //        Exists = Convert.ToBoolean(existsValue);
-        //    }
-        //}
-
     }
 
     public static class AbilityConstants
