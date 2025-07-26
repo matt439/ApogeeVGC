@@ -220,11 +220,6 @@ namespace ApogeeVGC_CS.sim
     public interface IEffect { }
 
     /// <summary>
-    /// Represents an ability effect.
-    /// </summary>
-    public interface IAbility : IEffect { }
-
-    /// <summary>
     /// Represents an item effect.
     /// </summary>
     public interface IItem : IEffect { }
@@ -267,7 +262,7 @@ namespace ApogeeVGC_CS.sim
 
     public interface IEffectData
     {
-        public string? Name { get; set; }
+        public string Name { get; set; } // changed this from nullable to non-nullable so it matches IBasicEffect
         public string? Desc { get; set; }
         public int? Duration { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
@@ -301,14 +296,38 @@ namespace ApogeeVGC_CS.sim
         Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule
     }
 
+    //public interface IBasicEffect : IEffectData
+    //{
+    //    Id Id { get; set; }
+    //    EffectType EffectType { get; set; }
+    //    bool Exists { get; set; }
+    //    string Fullname { get; set; }
+    //    int Gen { get; set; }
+    //    string SourceEffect { get; set; }
+    //}
+
     public interface IBasicEffect : IEffectData
     {
-        Id Id { get; set; }
-        EffectType EffectType { get; set; }
-        bool Exists { get; set; }
-        string Fullname { get; set; }
-        int Gen { get; set; }
-        string SourceEffect { get; set; }
+        public Id Id { get; set; }
+        public new string Name { get; set; }
+        public string Fullname { get; set; }
+        public EffectType EffectType { get; set; }
+        public bool Exists { get; set; }
+        public int Num { get; set; }
+        public int Gen { get; set; }
+        public new string? ShortDesc { get; set; }
+        public new string? Desc { get; set; }
+        public new Nonstandard? IsNonstandard { get; set; }
+        public new int? Duration { get; set; }
+        public bool NoCopy { get; set; }
+        public bool AffectsFainted { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
+        public string SourceEffect { get; set; }
+        public new Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
+        public new string? EffectTypeString { get; set; }
+        public new bool? Infiltrates { get; set; }
+        public string? RealMove { get; set; }// Added this for the Init method
     }
 
     public enum GameType

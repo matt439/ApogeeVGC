@@ -79,7 +79,7 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public abstract class BasicEffect : IEffectData
+    public abstract class BasicEffect
     {
         /// <summary>
         /// ID. This will be a lowercase version of the name with all the
@@ -163,108 +163,169 @@ namespace ApogeeVGC_CS.sim
         public string SourceEffect { get; set; } = string.Empty;
 
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-        string? IEffectData.EffectTypeString { get; set; } = null;
+        public string? EffectTypeString { get; set; } = null;
         public bool? Infiltrates { get; set; } = null;
+        public string? RealMove { get; set; } = null; // Added this for the Init method
 
-        protected BasicEffect(IAnyObject data)
+        public BasicEffect() { }
+        
+        public BasicEffect(IBasicEffect other)
         {
-            if (data.TryGetString("name", out string? name))
+            // Copy all fields without any logic
+            Id = other.Id;
+            Name = other.Name;
+            Fullname = other.Fullname;
+            EffectType = other.EffectType;
+            Exists = other.Exists;
+            Num = other.Num;
+            Gen = other.Gen;
+            ShortDesc = other.ShortDesc;
+            Desc = other.Desc;
+            IsNonstandard = other.IsNonstandard;
+            Duration = other.Duration;
+            NoCopy = other.NoCopy;
+            AffectsFainted = other.AffectsFainted;
+            Status = other.Status;
+            Weather = other.Weather;
+            SourceEffect = other.SourceEffect;
+            DurationCallback = other.DurationCallback;
+            EffectTypeString = other.EffectTypeString;
+            Infiltrates = other.Infiltrates;
+            RealMove = other.RealMove;
+
+            InitBasicEffect();
+        }
+
+        public void InitBasicEffect()
+        {
+            if (Name != string.Empty)
             {
-                Name = name.Trim();
+                Name = Name.Trim();
             }
             else
             {
                 throw new ArgumentException("Name is required for BasicEffect.");
             }
 
-            if (data.TryGetString("realMove", out string? realMove))
+            if (RealMove != null)
             {
-                Id = new Id(realMove);
+                Id = new Id(RealMove);
             }
             else
             {
                 Id = new Id(Name);
             }
 
-            if (data.TryGetString("fullname", out string? fullname))
-            {
-                Fullname = fullname; // No trim
-            }
-            else
+            if (Fullname == string.Empty)
             {
                 Fullname = Name;
             }
 
-            if (data.TryGetEnum<EffectType>("effectType", out var effectType))
-            {
-                EffectType = effectType;
-            }
-
-
-            if (data.TryGetBool("exists", out var exists))
-            {
-                Exists = exists;
-            }
-            else
-            {
+            if (!Exists)
+            {                 
                 Exists = !Id.IsEmpty;
             }
-
-            if (data.TryGetInt("num", out var num))
-            {
-                Num = num;
-            }
-
-            if (data.TryGetInt("gen", out var gen))
-            {
-                Gen = gen;
-            }
-
-            if (data.TryGetString("shortDesc", out string? shortDesc))
-            {
-                ShortDesc = shortDesc;
-            }
-
-            if (data.TryGetString("desc", out string? desc))
-            {
-                Desc = desc;
-            }
-
-            if (data.TryGetEnum<Nonstandard>("isNonstandard", out var nonstandard))
-            {
-                IsNonstandard = nonstandard;
-            }
-
-            if (data.TryGetInt("duration", out var duration))
-            {
-                Duration = duration;
-            }
-
-            if (data.TryGetBool("noCopy", out var noCopy))
-            {
-                NoCopy = noCopy;
-            }
-
-            if (data.TryGetBool("affectsFainted", out var affectsFainted))
-            {
-                AffectsFainted = affectsFainted;
-            }
-
-            if (data.TryGetId("status", out Id? status))
-            {
-                Status = status;
-            }
-
-            if (data.TryGetId("weather", out Id? weather))
-            {
-                Weather = weather;
-            }
-
-            if (data.TryGetString("sourceEffect", out string? sourceEffect))
-            {
-                SourceEffect = sourceEffect;
-            }
         }
+
+        //protected BasicEffect(IAnyObject data)
+        //{
+        //    if (data.TryGetString("name", out string? name))
+        //    {
+        //        Name = name.Trim();
+        //    }
+        //    else
+        //    {
+        //        throw new ArgumentException("Name is required for BasicEffect.");
+        //    }
+
+        //    if (data.TryGetString("realMove", out string? realMove))
+        //    {
+        //        Id = new Id(realMove);
+        //    }
+        //    else
+        //    {
+        //        Id = new Id(Name);
+        //    }
+
+        //    if (data.TryGetString("fullname", out string? fullname))
+        //    {
+        //        Fullname = fullname; // No trim
+        //    }
+        //    else
+        //    {
+        //        Fullname = Name;
+        //    }
+
+        //    if (data.TryGetEnum<EffectType>("effectType", out var effectType))
+        //    {
+        //        EffectType = effectType;
+        //    }
+
+
+        //    if (data.TryGetBool("exists", out var exists))
+        //    {
+        //        Exists = exists;
+        //    }
+        //    else
+        //    {
+        //        Exists = !Id.IsEmpty;
+        //    }
+
+        //    if (data.TryGetInt("num", out var num))
+        //    {
+        //        Num = num;
+        //    }
+
+        //    if (data.TryGetInt("gen", out var gen))
+        //    {
+        //        Gen = gen;
+        //    }
+
+        //    if (data.TryGetString("shortDesc", out string? shortDesc))
+        //    {
+        //        ShortDesc = shortDesc;
+        //    }
+
+        //    if (data.TryGetString("desc", out string? desc))
+        //    {
+        //        Desc = desc;
+        //    }
+
+        //    if (data.TryGetEnum<Nonstandard>("isNonstandard", out var nonstandard))
+        //    {
+        //        IsNonstandard = nonstandard;
+        //    }
+
+        //    if (data.TryGetInt("duration", out var duration))
+        //    {
+        //        Duration = duration;
+        //    }
+
+        //    if (data.TryGetBool("noCopy", out var noCopy))
+        //    {
+        //        NoCopy = noCopy;
+        //    }
+
+        //    if (data.TryGetBool("affectsFainted", out var affectsFainted))
+        //    {
+        //        AffectsFainted = affectsFainted;
+        //    }
+
+        //    if (data.TryGetId("status", out Id? status))
+        //    {
+        //        Status = status;
+        //    }
+
+        //    if (data.TryGetId("weather", out Id? weather))
+        //    {
+        //        Weather = weather;
+        //    }
+
+        //    if (data.TryGetString("sourceEffect", out string? sourceEffect))
+        //    {
+        //        SourceEffect = sourceEffect;
+        //    }
+        //}
 
         public override string ToString()
         {
