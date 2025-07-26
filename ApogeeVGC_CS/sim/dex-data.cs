@@ -164,7 +164,7 @@ namespace ApogeeVGC_CS.sim
         public StatIDExceptHP? Minus { get; set; }
     }
 
-    public class Nature : BasicEffect, INatureData
+    public class Nature : BasicEffect, INature
     {
         public StatIDExceptHP? Plus { get; set; } = null;
         public StatIDExceptHP? Minus { get; set; } = null;
@@ -198,28 +198,28 @@ namespace ApogeeVGC_CS.sim
 
     public class NatureData : INatureData
     {
-        public StatIDExceptHP? Plus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public StatIDExceptHP? Minus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Id Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Fullname { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public EffectType EffectType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool Exists { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int Num { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int Gen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string? ShortDesc { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string? Desc { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Nonstandard? IsNonstandard { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int? Duration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool NoCopy { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool AffectsFainted { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Id? Status { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Id? Weather { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string SourceEffect { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string? EffectTypeString { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool? Infiltrates { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string? RealMove { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public StatIDExceptHP? Plus { get; set; }
+        public StatIDExceptHP? Minus { get; set; }
+        public Id Id { get; set; }
+        public string Name { get; set; }
+        public string Fullname { get; set; }
+        public EffectType EffectType { get; set; }
+        public bool Exists { get; set; }
+        public int Num { get; set; }
+        public int Gen { get; set; }
+        public string? ShortDesc { get; set; }
+        public string? Desc { get; set; }
+        public Nonstandard? IsNonstandard { get; set; }
+        public int? Duration { get; set; }
+        public bool NoCopy { get; set; }
+        public bool AffectsFainted { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
+        public string SourceEffect { get; set; }
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
+        public string? EffectTypeString { get; set; }
+        public bool? Infiltrates { get; set; }
+        public string? RealMove { get; set; }
     }
 
     public class ModdedNatureData : NatureData
@@ -266,15 +266,15 @@ namespace ApogeeVGC_CS.sim
 
     public class TypeData : ITypeData
     {
-        public Dictionary<string, int> DamageTaken { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public SparseStatsTable? HPdvs { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public SparseStatsTable? HPivs { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Nonstandard? IsNonstandard { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Id Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public TypeInfoEffectType EffectType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool Exists { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int Gen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Dictionary<string, int> DamageTaken { get; set; }
+        public SparseStatsTable? HPdvs { get; set; }
+        public SparseStatsTable? HPivs { get; set; }
+        public Nonstandard? IsNonstandard { get; set; }
+        public Id Id { get; set; }
+        public string Name { get; set; }
+        public TypeInfoEffectType EffectType { get; set; }
+        public bool Exists { get; set; }
+        public int Gen { get; set; }
     }
 
     public interface IModdedTypeData : ITypeData
