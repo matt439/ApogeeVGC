@@ -45,7 +45,7 @@ namespace ApogeeVGC_CS.sim
         Self
     }
 
-    public class MoveFlags
+    public interface IMoveFlags
     {
         public bool AllyAnim { get; set; }
         public bool BypassSub { get; set; }
@@ -172,7 +172,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; set; }
     }
 
-    public class MoveData : EffectData, IMoveEventMethods
+    public interface IMoveData : IEffectData, IMoveEventMethods
     {
         public string Name { get; set; } = string.Empty;
         public int? Num { get; set; }
@@ -257,6 +257,7 @@ namespace ApogeeVGC_CS.sim
         public string? BaseMove { get; set; }
     }
 
+    // helper class for MoveData
     public class ZMoveData
     {
         public int? BasePower { get; set; }
@@ -264,38 +265,40 @@ namespace ApogeeVGC_CS.sim
         public object? Boost { get; set; } // Replace with SparseBoostsTable if available
     }
 
+    // Helper class for MoveData
     public class MaxMoveData
     {
         public int BasePower { get; set; }
     }
 
+    // helper class for MoveData
     public class SelfBoostData
     {
-        public object? Boosts { get; set; } // Replace with SparseBoostsTable if available
+        public SparseBoostsTable? Boosts { get; set; } // Replace with SparseBoostsTable if available
     }
 
-    public class ModdedMoveData : MoveData
+    public interface IModdedMoveData : IMoveData
     {
-        public bool Inherit { get; set; }
-        public bool? IgniteBoosted { get; set; }
-        public bool? SettleBoosted { get; set; }
-        public bool? BodyOfWaterBoosted { get; set; }
-        public bool? LongWhipBoost { get; set; }
-        public int? Gen { get; set; }
+        bool Inherit { get; set; }
+        bool? IgniteBoosted { get; set; }
+        bool? SettleBoosted { get; set; }
+        bool? BodyOfWaterBoosted { get; set; }
+        bool? LongWhipBoost { get; set; }
+        int? Gen { get; set; }
     }
 
     // MoveDataTable and ModdedMoveDataTable
-    public class MoveDataTable : Dictionary<string, MoveData> { }
-    public class ModdedMoveDataTable : Dictionary<string, ModdedMoveData> { }
+    public class MoveDataTable : Dictionary<IdEntry, IMoveData> { }
+    public class ModdedMoveDataTable : Dictionary<IdEntry, IModdedMoveData> { }
 
     // Move class (readonly effectType)
-    public class Move : BasicEffect
+    public class Move : BasicEffect, IMoveData
     {
         public override EffectType EffectType => EffectType.Move;
         // Inherit all properties from BasicEffect and MoveData as needed
     }
 
-    // MoveHitData structure
+    // Element of MoveHitData
     public class MoveHitResult
     {
         public bool Crit { get; set; }
@@ -305,7 +308,8 @@ namespace ApogeeVGC_CS.sim
 
     public class MoveHitData : Dictionary<string, MoveHitResult> { }
 
-    // ActiveMove structure
+    public class MutableMove : BasicEffect, IMoveData { }
+
     public class ActiveMove : MoveData, IActiveMove
     {
         public new string Name { get; set; } = string.Empty;
@@ -345,7 +349,6 @@ namespace ApogeeVGC_CS.sim
         public bool? IsZOrMaxPowered { get; set; }
     }
 
-    // MoveCategory enum
     public enum MoveCategory
     {
         Physical,
@@ -353,7 +356,7 @@ namespace ApogeeVGC_CS.sim
         Status
     }
 
-    public class DataMove : BasicEffect
+    public class DataMove : BasicEffect, IMoveData
     {
         public override EffectType EffectType => EffectType.Move;
         public string Type { get; set; } = string.Empty;
@@ -396,140 +399,11 @@ namespace ApogeeVGC_CS.sim
         public bool ForceSTAB { get; set; }
         public string? VolatileStatus { get; set; }
 
-        public int Gen { get; set; }
-        public string Id { get; set; } = string.Empty;
+        //public int Gen { get; set; }
+        //public string Id { get; set; } = string.Empty;
 
         public DataMove(IAnyObject data) : base(data)
         {
-            Name = BasicEffect.GetString(data, "name");
-            Type = BasicEffect.GetString(data, "type");
-            Target = (MoveTarget)Enum.Parse(typeof(MoveTarget), BasicEffect.GetString(data, "target") ?? "Self", true);
-            BasePower = BasicEffect.GetInt(data, "basePower") ?? 0;
-            Accuracy = data.ContainsKey("accuracy") ? data["accuracy"] : true;
-            CritRatio = BasicEffect.GetInt(data, "critRatio") ?? 1;
-            BaseMoveType = BasicEffect.GetString(data, "baseMoveType") ?? Type;
-            Secondary = data.ContainsKey("secondary") ? (SecondaryEffect?)data["secondary"] : null;
-            Secondaries = data.ContainsKey("secondaries") ? (List<SecondaryEffect>?)data["secondaries"] : (Secondary != null ? new List<SecondaryEffect> { Secondary } : null);
-            HasSheerForce = data.ContainsKey("hasSheerForce") && Secondaries == null;
-            Priority = BasicEffect.GetInt(data, "priority") ?? 0;
-            Category = Enum.TryParse(BasicEffect.GetString(data, "category"), out MoveCategory cat) ? cat : MoveCategory.Status;
-            OverrideOffensiveStat = data.ContainsKey("overrideOffensiveStat") ? data["overrideOffensiveStat"]?.ToString() : null;
-            OverrideOffensivePokemon = data.ContainsKey("overrideOffensivePokemon") ? data["overrideOffensivePokemon"]?.ToString() : null;
-            OverrideDefensiveStat = data.ContainsKey("overrideDefensiveStat") ? data["overrideDefensiveStat"]?.ToString() : null;
-            OverrideDefensivePokemon = data.ContainsKey("overrideDefensivePokemon") ? data["overrideDefensivePokemon"]?.ToString() : null;
-            IgnoreNegativeOffensive = BasicEffect.GetBool(data, "ignoreNegativeOffensive") ?? false;
-            IgnorePositiveDefensive = BasicEffect.GetBool(data, "ignorePositiveDefensive") ?? false;
-            IgnoreOffensive = BasicEffect.GetBool(data, "ignoreOffensive") ?? false;
-            IgnoreDefensive = BasicEffect.GetBool(data, "ignoreDefensive") ?? false;
-            IgnoreImmunity = data.ContainsKey("ignoreImmunity") ? data["ignoreImmunity"] : (Category == MoveCategory.Status);
-            Pp = BasicEffect.GetInt(data, "pp") ?? 0;
-            NoPpBoosts = BasicEffect.GetBool(data, "noPPBoosts") ?? (BasicEffect.GetBool(data, "isZ") ?? false);
-            IsZ = data.ContainsKey("isZ") ? data["isZ"] : false;
-            IsMax = data.ContainsKey("isMax") ? data["isMax"] : false;
-            Flags = data.ContainsKey("flags") ? (MoveFlags)data["flags"] : new MoveFlags();
-            SelfSwitch = data.ContainsKey("selfSwitch") ? data["selfSwitch"] : null;
-            NonGhostTarget = data.ContainsKey("nonGhostTarget") ? (MoveTarget?)data["nonGhostTarget"] : null;
-            IgnoreAbility = BasicEffect.GetBool(data, "ignoreAbility") ?? false;
-            Damage = data.ContainsKey("damage") ? data["damage"] : null;
-            SpreadHit = BasicEffect.GetBool(data, "spreadHit") ?? false;
-            ForceSTAB = BasicEffect.GetBool(data, "forceSTAB") ?? false;
-            VolatileStatus = data.ContainsKey("volatileStatus") ? data["volatileStatus"]?.ToString() : null;
-
-            // Max Move base power calculation
-            if (Category != MoveCategory.Status && !data.ContainsKey("maxMove") && Id != "struggle")
-            {
-                MaxMove = new MaxMoveData { BasePower = 1 };
-                if ((IsMax is bool b && b) || (IsZ is bool z && z))
-                {
-                    // already initialized to 1
-                }
-                else if (BasePower == 0)
-                {
-                    MaxMove.BasePower = 100;
-                }
-                else if (Type == "Fighting" || Type == "Poison")
-                {
-                    if (BasePower >= 150) MaxMove.BasePower = 100;
-                    else if (BasePower >= 110) MaxMove.BasePower = 95;
-                    else if (BasePower >= 75) MaxMove.BasePower = 90;
-                    else if (BasePower >= 65) MaxMove.BasePower = 85;
-                    else if (BasePower >= 55) MaxMove.BasePower = 80;
-                    else if (BasePower >= 45) MaxMove.BasePower = 75;
-                    else MaxMove.BasePower = 70;
-                }
-                else
-                {
-                    if (BasePower >= 150) MaxMove.BasePower = 150;
-                    else if (BasePower >= 110) MaxMove.BasePower = 140;
-                    else if (BasePower >= 75) MaxMove.BasePower = 130;
-                    else if (BasePower >= 65) MaxMove.BasePower = 120;
-                    else if (BasePower >= 55) MaxMove.BasePower = 110;
-                    else if (BasePower >= 45) MaxMove.BasePower = 100;
-                    else MaxMove.BasePower = 90;
-                }
-            }
-
-            // Z-Move base power calculation
-            if (Category != MoveCategory.Status && !data.ContainsKey("zMove") && !(IsZ is bool z2 && z2) && !(IsMax is bool m2 && m2) && Id != "struggle")
-            {
-                int basePower = BasePower;
-                ZMove = new ZMoveData();
-                if (data.ContainsKey("multihit") && data["multihit"] is Array) basePower *= 3;
-                if (basePower == 0) ZMove.BasePower = 100;
-                else if (basePower >= 140) ZMove.BasePower = 200;
-                else if (basePower >= 130) ZMove.BasePower = 195;
-                else if (basePower >= 120) ZMove.BasePower = 190;
-                else if (basePower >= 110) ZMove.BasePower = 185;
-                else if (basePower >= 100) ZMove.BasePower = 180;
-                else if (basePower >= 90) ZMove.BasePower = 175;
-                else if (basePower >= 80) ZMove.BasePower = 160;
-                else if (basePower >= 70) ZMove.BasePower = 140;
-                else if (basePower >= 60) ZMove.BasePower = 120;
-                else ZMove.BasePower = 100;
-            }
-
-            // Generation assignment
-            if (Gen == 0)
-            {
-                if (BasicEffect.GetInt(data, "num") >= 827 && !(IsMax is bool m3 && m3))
-                {
-                    Gen = 9;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 743)
-                {
-                    Gen = 8;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 622)
-                {
-                    Gen = 7;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 560)
-                {
-                    Gen = 6;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 468)
-                {
-                    Gen = 5;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 355)
-                {
-                    Gen = 4;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 252)
-                {
-                    Gen = 3;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 166)
-                {
-                    Gen = 2;
-                }
-                else if (BasicEffect.GetInt(data, "num") >= 1)
-                {
-                    Gen = 1;
-                }
-            }
-
-            // TODO: assignMissingFields logic
         }
     }
 

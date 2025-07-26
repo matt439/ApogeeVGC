@@ -277,17 +277,22 @@ namespace ApogeeVGC_CS.sim
         public string? ShortDesc { get; set; }
     }
 
-    public class ModdedEffectData : IEffectData
+    //public class ModdedEffectData : IEffectData
+    //{
+    //    public bool Inherit { get; set; } = true;
+    //    public string? Name { get; set; } = string.Empty;
+    //    public string? Desc { get; set; } = string.Empty;
+    //    public int? Duration { get; set; } = null;
+    //    public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
+    //    public string? EffectTypeString { get; set; } = null;
+    //    public bool? Infiltrates { get; set; } = null;
+    //    public Nonstandard? IsNonstandard { get; set; } = null;
+    //    public string? ShortDesc { get; set; } = string.Empty;
+    //}
+
+    public interface IModdedEffectData : IEffectData
     {
-        public bool Inherit { get; set; } = true;
-        public string? Name { get; set; } = string.Empty;
-        public string? Desc { get; set; } = string.Empty;
-        public int? Duration { get; set; } = null;
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-        public string? EffectTypeString { get; set; } = null;
-        public bool? Infiltrates { get; set; } = null;
-        public Nonstandard? IsNonstandard { get; set; } = null;
-        public string? ShortDesc { get; set; } = string.Empty;
+        public bool Inherit { get; set; }
     }
 
     public enum EffectType
@@ -295,15 +300,16 @@ namespace ApogeeVGC_CS.sim
         Condition, Pokemon, Move, Item, Ability, Format,
         Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule
     }
-    //public interface IBasicEffect : IEffectData
-    //{
-    //    Id Id { get; set; }
-    //    EffectType EffectType { get; set; }
-    //    bool Exists { get; set; }
-    //    string Fullname { get; set; }
-    //    int Gen { get; set; }
-    //    string SourceEffect { get; set; }
-    //}
+
+    public interface IBasicEffect : IEffectData
+    {
+        Id Id { get; set; }
+        EffectType EffectType { get; set; }
+        bool Exists { get; set; }
+        string Fullname { get; set; }
+        int Gen { get; set; }
+        string SourceEffect { get; set; }
+    }
 
     public enum GameType
     {
