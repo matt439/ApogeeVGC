@@ -541,9 +541,9 @@ namespace ApogeeVGC_CS.sim
     /// PokemonConditionData, SideConditionData, and FieldConditionData
     /// inherit from this interface.
     /// </summary>
-    public interface IConditionData : ICondition, IBasicEffect { } // Added IBasicEffect
+    public interface IConditionData { }
 
-    public interface IPokemonConditionData : IPokemonEventMethods, IConditionData { }
+    public interface IPokemonConditionData : IPokemonEventMethods, ICondition, IConditionData { }
 
     public class PokemonConditionData : IPokemonConditionData
     {
@@ -1065,7 +1065,7 @@ namespace ApogeeVGC_CS.sim
         public string? RealMove { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    public interface ISideConditionData : ISideEventMethods, IConditionData { }
+    public interface ISideConditionData : ISideEventMethods, ICondition, IConditionData { }
 
     public class SideConditionData : ISideConditionData
     {
@@ -1587,7 +1587,7 @@ namespace ApogeeVGC_CS.sim
         public string? RealMove { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
-    public interface IFieldConditionData : IFieldEventMethods, IConditionData { }
+    public interface IFieldConditionData : IFieldEventMethods, ICondition, IConditionData { }
 
     public class FieldConditionData : IFieldConditionData
     {
@@ -2120,8 +2120,7 @@ namespace ApogeeVGC_CS.sim
     /// <summary>
     /// Represents a condition effect.
     /// </summary>
-    public interface ICondition : IBasicEffect, ISideEventMethods,
-        IFieldEventMethods, IPokemonEventMethods, IEffect
+    public interface ICondition : IBasicEffect
     {
         public int? CounterMax { get; set; }
         public int? EffectOrder { get; set; }
@@ -2131,7 +2130,8 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; set; }
     }
 
-    public class Condition : BasicEffect, ICondition
+    public class Condition : BasicEffect, ICondition, ISideEventMethods,
+        IFieldEventMethods, IPokemonEventMethods, IEffect
     {
         public int? CounterMax { get; set; }
         public int? EffectOrder { get; set; }
@@ -2631,7 +2631,31 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryPrimaryHitPriority { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public int? OnTypePriority { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public Condition(IConditionData other) : base(other)
+        public Condition(PokemonConditionData other) : base(other)
+        {
+            CopyConditionData(other);
+            CopyEventMethods(other);
+            CopyPokemonEventMethods(other);
+            Init();
+        }
+
+        public Condition(SideConditionData other) : base(other)
+        {
+            CopyConditionData(other);
+            CopyEventMethods(other);
+            CopySideEventMethods(other);
+            Init();
+        }
+
+        public Condition(FieldConditionData other) : base(other)
+        {
+            CopyConditionData(other);
+            CopyEventMethods(other);
+            CopyFieldEventMethods(other);
+            Init();
+        }
+
+        private void CopyConditionData(ICondition other)
         {
             CounterMax = other.CounterMax;
             EffectOrder = other.EffectOrder;
@@ -2639,8 +2663,528 @@ namespace ApogeeVGC_CS.sim
             OnEnd = other.OnEnd;
             OnRestart = other.OnRestart;
             OnStart = other.OnStart;
+        }
 
-            Init();
+        private void CopyEventMethods(IEventMethods eventMethods)
+        {
+            // Basic event methods
+            OnDamagingHit = eventMethods.OnDamagingHit;
+            OnEmergencyExit = eventMethods.OnEmergencyExit;
+            OnAfterEachBoost = eventMethods.OnAfterEachBoost;
+            OnAfterHit = eventMethods.OnAfterHit;
+            OnAfterMega = eventMethods.OnAfterMega;
+            OnAfterSetStatus = eventMethods.OnAfterSetStatus;
+            OnAfterSubDamage = eventMethods.OnAfterSubDamage;
+            OnAfterSwitchInSelf = eventMethods.OnAfterSwitchInSelf;
+            OnAfterTerastallization = eventMethods.OnAfterTerastallization;
+            OnAfterUseItem = eventMethods.OnAfterUseItem;
+            OnAfterTakeItem = eventMethods.OnAfterTakeItem;
+            OnAfterBoost = eventMethods.OnAfterBoost;
+            OnAfterFaint = eventMethods.OnAfterFaint;
+            OnAfterMoveSecondarySelf = eventMethods.OnAfterMoveSecondarySelf;
+            OnAfterMoveSecondary = eventMethods.OnAfterMoveSecondary;
+            OnAfterMove = eventMethods.OnAfterMove;
+            OnAfterMoveSelf = eventMethods.OnAfterMoveSelf;
+            OnAttract = eventMethods.OnAttract;
+            OnAccuracy = eventMethods.OnAccuracy;
+            OnBasePower = eventMethods.OnBasePower;
+            OnBeforeFaint = eventMethods.OnBeforeFaint;
+            OnBeforeMove = eventMethods.OnBeforeMove;
+            OnBeforeSwitchIn = eventMethods.OnBeforeSwitchIn;
+            OnBeforeSwitchOut = eventMethods.OnBeforeSwitchOut;
+            OnBeforeTurn = eventMethods.OnBeforeTurn;
+            OnChangeBoost = eventMethods.OnChangeBoost;
+            OnTryBoost = eventMethods.OnTryBoost;
+            OnChargeMove = eventMethods.OnChargeMove;
+            OnCriticalHit = eventMethods.OnCriticalHit;
+            OnDamage = eventMethods.OnDamage;
+            OnDeductPP = eventMethods.OnDeductPP;
+            OnDisableMove = eventMethods.OnDisableMove;
+            OnDragOut = eventMethods.OnDragOut;
+            OnEatItem = eventMethods.OnEatItem;
+            OnEffectiveness = eventMethods.OnEffectiveness;
+            OnEntryHazard = eventMethods.OnEntryHazard;
+            OnFaint = eventMethods.OnFaint;
+            OnFlinch = eventMethods.OnFlinch;
+            OnFractionalPriority = eventMethods.OnFractionalPriority;
+            OnHit = eventMethods.OnHit;
+            OnImmunity = eventMethods.OnImmunity;
+            OnLockMove = eventMethods.OnLockMove;
+            OnMaybeTrapPokemon = eventMethods.OnMaybeTrapPokemon;
+            OnModifyAccuracy = eventMethods.OnModifyAccuracy;
+            OnModifyAtk = eventMethods.OnModifyAtk;
+            OnModifyBoost = eventMethods.OnModifyBoost;
+            OnModifyCritRatio = eventMethods.OnModifyCritRatio;
+            OnModifyDamage = eventMethods.OnModifyDamage;
+            OnModifyDef = eventMethods.OnModifyDef;
+            OnModifyMove = eventMethods.OnModifyMove;
+            OnModifyPriority = eventMethods.OnModifyPriority;
+            OnModifySecondaries = eventMethods.OnModifySecondaries;
+            OnModifyType = eventMethods.OnModifyType;
+            OnModifyTarget = eventMethods.OnModifyTarget;
+            OnModifySpA = eventMethods.OnModifySpA;
+            OnModifySpD = eventMethods.OnModifySpD;
+            OnModifySpe = eventMethods.OnModifySpe;
+            OnModifySTAB = eventMethods.OnModifySTAB;
+            OnModifyWeight = eventMethods.OnModifyWeight;
+            OnMoveAborted = eventMethods.OnMoveAborted;
+            OnNegateImmunity = eventMethods.OnNegateImmunity;
+            OnOverrideAction = eventMethods.OnOverrideAction;
+            OnPrepareHit = eventMethods.OnPrepareHit;
+            OnPseudoWeatherChange = eventMethods.OnPseudoWeatherChange;
+            OnRedirectTarget = eventMethods.OnRedirectTarget;
+            OnResidual = eventMethods.OnResidual;
+            OnSetAbility = eventMethods.OnSetAbility;
+            OnSetStatus = eventMethods.OnSetStatus;
+            OnSetWeather = eventMethods.OnSetWeather;
+            OnSideConditionStart = eventMethods.OnSideConditionStart;
+            OnStallMove = eventMethods.OnStallMove;
+            OnSwitchIn = eventMethods.OnSwitchIn;
+            OnSwitchOut = eventMethods.OnSwitchOut;
+            OnSwap = eventMethods.OnSwap;
+            OnTakeItem = eventMethods.OnTakeItem;
+            OnWeatherChange = eventMethods.OnWeatherChange;
+            OnTerrainChange = eventMethods.OnTerrainChange;
+            OnTrapPokemon = eventMethods.OnTrapPokemon;
+            OnTryAddVolatile = eventMethods.OnTryAddVolatile;
+            OnTryEatItem = eventMethods.OnTryEatItem;
+            OnTryHeal = eventMethods.OnTryHeal;
+            OnTryHit = eventMethods.OnTryHit;
+            OnTryHitField = eventMethods.OnTryHitField;
+            OnTryHitSide = eventMethods.OnTryHitSide;
+            OnInvulnerability = eventMethods.OnInvulnerability;
+            OnTryMove = eventMethods.OnTryMove;
+            OnTryPrimaryHit = eventMethods.OnTryPrimaryHit;
+            OnType = eventMethods.OnType;
+            OnUseItem = eventMethods.OnUseItem;
+            OnUpdate = eventMethods.OnUpdate;
+            OnWeather = eventMethods.OnWeather;
+            OnWeatherModifyDamage = eventMethods.OnWeatherModifyDamage;
+            OnModifyDamagePhase1 = eventMethods.OnModifyDamagePhase1;
+            OnModifyDamagePhase2 = eventMethods.OnModifyDamagePhase2;
+
+            // Foe event handlers
+            OnFoeDamagingHit = eventMethods.OnFoeDamagingHit;
+            OnFoeAfterEachBoost = eventMethods.OnFoeAfterEachBoost;
+            OnFoeAfterHit = eventMethods.OnFoeAfterHit;
+            OnFoeAfterSetStatus = eventMethods.OnFoeAfterSetStatus;
+            OnFoeAfterSubDamage = eventMethods.OnFoeAfterSubDamage;
+            OnFoeAfterSwitchInSelf = eventMethods.OnFoeAfterSwitchInSelf;
+            OnFoeAfterUseItem = eventMethods.OnFoeAfterUseItem;
+            OnFoeAfterBoost = eventMethods.OnFoeAfterBoost;
+            OnFoeAfterFaint = eventMethods.OnFoeAfterFaint;
+            OnFoeAfterMoveSecondarySelf = eventMethods.OnFoeAfterMoveSecondarySelf;
+            OnFoeAfterMoveSecondary = eventMethods.OnFoeAfterMoveSecondary;
+            OnFoeAfterMove = eventMethods.OnFoeAfterMove;
+            OnFoeAfterMoveSelf = eventMethods.OnFoeAfterMoveSelf;
+            OnFoeAttract = eventMethods.OnFoeAttract;
+            OnFoeAccuracy = eventMethods.OnFoeAccuracy;
+            OnFoeBasePower = eventMethods.OnFoeBasePower;
+            OnFoeBeforeFaint = eventMethods.OnFoeBeforeFaint;
+            OnFoeBeforeMove = eventMethods.OnFoeBeforeMove;
+            OnFoeBeforeSwitchIn = eventMethods.OnFoeBeforeSwitchIn;
+            OnFoeBeforeSwitchOut = eventMethods.OnFoeBeforeSwitchOut;
+            OnFoeTryBoost = eventMethods.OnFoeTryBoost;
+            OnFoeChargeMove = eventMethods.OnFoeChargeMove;
+            OnFoeCriticalHit = eventMethods.OnFoeCriticalHit;
+            OnFoeDamage = eventMethods.OnFoeDamage;
+            OnFoeDeductPP = eventMethods.OnFoeDeductPP;
+            OnFoeDisableMove = eventMethods.OnFoeDisableMove;
+            OnFoeDragOut = eventMethods.OnFoeDragOut;
+            OnFoeEatItem = eventMethods.OnFoeEatItem;
+            OnFoeEffectiveness = eventMethods.OnFoeEffectiveness;
+            OnFoeFaint = eventMethods.OnFoeFaint;
+            OnFoeFlinch = eventMethods.OnFoeFlinch;
+            OnFoeHit = eventMethods.OnFoeHit;
+            OnFoeImmunity = eventMethods.OnFoeImmunity;
+            OnFoeLockMove = eventMethods.OnFoeLockMove;
+            OnFoeMaybeTrapPokemon = eventMethods.OnFoeMaybeTrapPokemon;
+            OnFoeModifyAccuracy = eventMethods.OnFoeModifyAccuracy;
+            OnFoeModifyAtk = eventMethods.OnFoeModifyAtk;
+            OnFoeModifyBoost = eventMethods.OnFoeModifyBoost;
+            OnFoeModifyCritRatio = eventMethods.OnFoeModifyCritRatio;
+            OnFoeModifyDamage = eventMethods.OnFoeModifyDamage;
+            OnFoeModifyDef = eventMethods.OnFoeModifyDef;
+            OnFoeModifyMove = eventMethods.OnFoeModifyMove;
+            OnFoeModifyPriority = eventMethods.OnFoeModifyPriority;
+            OnFoeModifySecondaries = eventMethods.OnFoeModifySecondaries;
+            OnFoeModifySpA = eventMethods.OnFoeModifySpA;
+            OnFoeModifySpD = eventMethods.OnFoeModifySpD;
+            OnFoeModifySpe = eventMethods.OnFoeModifySpe;
+            OnFoeModifySTAB = eventMethods.OnFoeModifySTAB;
+            OnFoeModifyType = eventMethods.OnFoeModifyType;
+            OnFoeModifyTarget = eventMethods.OnFoeModifyTarget;
+            OnFoeModifyWeight = eventMethods.OnFoeModifyWeight;
+            OnFoeMoveAborted = eventMethods.OnFoeMoveAborted;
+            OnFoeNegateImmunity = eventMethods.OnFoeNegateImmunity;
+            OnFoeOverrideAction = eventMethods.OnFoeOverrideAction;
+            OnFoePrepareHit = eventMethods.OnFoePrepareHit;
+            OnFoeRedirectTarget = eventMethods.OnFoeRedirectTarget;
+            OnFoeResidual = eventMethods.OnFoeResidual;
+            OnFoeSetAbility = eventMethods.OnFoeSetAbility;
+            OnFoeSetStatus = eventMethods.OnFoeSetStatus;
+            OnFoeSetWeather = eventMethods.OnFoeSetWeather;
+            OnFoeStallMove = eventMethods.OnFoeStallMove;
+            OnFoeSwitchOut = eventMethods.OnFoeSwitchOut;
+            OnFoeTakeItem = eventMethods.OnFoeTakeItem;
+            OnFoeTerrain = eventMethods.OnFoeTerrain;
+            OnFoeTrapPokemon = eventMethods.OnFoeTrapPokemon;
+            OnFoeTryAddVolatile = eventMethods.OnFoeTryAddVolatile;
+            OnFoeTryEatItem = eventMethods.OnFoeTryEatItem;
+            OnFoeTryHeal = eventMethods.OnFoeTryHeal;
+            OnFoeTryHit = eventMethods.OnFoeTryHit;
+            OnFoeTryHitField = eventMethods.OnFoeTryHitField;
+            OnFoeTryHitSide = eventMethods.OnFoeTryHitSide;
+            OnFoeInvulnerability = eventMethods.OnFoeInvulnerability;
+            OnFoeTryMove = eventMethods.OnFoeTryMove;
+            OnFoeTryPrimaryHit = eventMethods.OnFoeTryPrimaryHit;
+            OnFoeType = eventMethods.OnFoeType;
+            OnFoeWeatherModifyDamage = eventMethods.OnFoeWeatherModifyDamage;
+            OnFoeModifyDamagePhase1 = eventMethods.OnFoeModifyDamagePhase1;
+            OnFoeModifyDamagePhase2 = eventMethods.OnFoeModifyDamagePhase2;
+
+            // Source event handlers  
+            OnSourceDamagingHit = eventMethods.OnSourceDamagingHit;
+            OnSourceAfterEachBoost = eventMethods.OnSourceAfterEachBoost;
+            OnSourceAfterHit = eventMethods.OnSourceAfterHit;
+            OnSourceAfterSetStatus = eventMethods.OnSourceAfterSetStatus;
+            OnSourceAfterSubDamage = eventMethods.OnSourceAfterSubDamage;
+            OnSourceAfterSwitchInSelf = eventMethods.OnSourceAfterSwitchInSelf;
+            OnSourceAfterUseItem = eventMethods.OnSourceAfterUseItem;
+            OnSourceAfterBoost = eventMethods.OnSourceAfterBoost;
+            OnSourceAfterFaint = eventMethods.OnSourceAfterFaint;
+            OnSourceAfterMoveSecondarySelf = eventMethods.OnSourceAfterMoveSecondarySelf;
+            OnSourceAfterMoveSecondary = eventMethods.OnSourceAfterMoveSecondary;
+            OnSourceAfterMove = eventMethods.OnSourceAfterMove;
+            OnSourceAfterMoveSelf = eventMethods.OnSourceAfterMoveSelf;
+            OnSourceAttract = eventMethods.OnSourceAttract;
+            OnSourceAccuracy = eventMethods.OnSourceAccuracy;
+            OnSourceBasePower = eventMethods.OnSourceBasePower;
+            OnSourceBeforeFaint = eventMethods.OnSourceBeforeFaint;
+            OnSourceBeforeMove = eventMethods.OnSourceBeforeMove;
+            OnSourceBeforeSwitchIn = eventMethods.OnSourceBeforeSwitchIn;
+            OnSourceBeforeSwitchOut = eventMethods.OnSourceBeforeSwitchOut;
+            OnSourceTryBoost = eventMethods.OnSourceTryBoost;
+            OnSourceChargeMove = eventMethods.OnSourceChargeMove;
+            OnSourceCriticalHit = eventMethods.OnSourceCriticalHit;
+            OnSourceDamage = eventMethods.OnSourceDamage;
+            OnSourceDeductPP = eventMethods.OnSourceDeductPP;
+            OnSourceDisableMove = eventMethods.OnSourceDisableMove;
+            OnSourceDragOut = eventMethods.OnSourceDragOut;
+            OnSourceEatItem = eventMethods.OnSourceEatItem;
+            OnSourceEffectiveness = eventMethods.OnSourceEffectiveness;
+            OnSourceFaint = eventMethods.OnSourceFaint;
+            OnSourceFlinch = eventMethods.OnSourceFlinch;
+            OnSourceHit = eventMethods.OnSourceHit;
+            OnSourceImmunity = eventMethods.OnSourceImmunity;
+            OnSourceLockMove = eventMethods.OnSourceLockMove;
+            OnSourceMaybeTrapPokemon = eventMethods.OnSourceMaybeTrapPokemon;
+            OnSourceModifyAccuracy = eventMethods.OnSourceModifyAccuracy;
+            OnSourceModifyAtk = eventMethods.OnSourceModifyAtk;
+            OnSourceModifyBoost = eventMethods.OnSourceModifyBoost;
+            OnSourceModifyCritRatio = eventMethods.OnSourceModifyCritRatio;
+            OnSourceModifyDamage = eventMethods.OnSourceModifyDamage;
+            OnSourceModifyDef = eventMethods.OnSourceModifyDef;
+            OnSourceModifyMove = eventMethods.OnSourceModifyMove;
+            OnSourceModifyPriority = eventMethods.OnSourceModifyPriority;
+            OnSourceModifySecondaries = eventMethods.OnSourceModifySecondaries;
+            OnSourceModifySpA = eventMethods.OnSourceModifySpA;
+            OnSourceModifySpD = eventMethods.OnSourceModifySpD;
+            OnSourceModifySpe = eventMethods.OnSourceModifySpe;
+            OnSourceModifySTAB = eventMethods.OnSourceModifySTAB;
+            OnSourceModifyType = eventMethods.OnSourceModifyType;
+            OnSourceModifyTarget = eventMethods.OnSourceModifyTarget;
+            OnSourceModifyWeight = eventMethods.OnSourceModifyWeight;
+            OnSourceMoveAborted = eventMethods.OnSourceMoveAborted;
+            OnSourceNegateImmunity = eventMethods.OnSourceNegateImmunity;
+            OnSourceOverrideAction = eventMethods.OnSourceOverrideAction;
+            OnSourcePrepareHit = eventMethods.OnSourcePrepareHit;
+            OnSourceRedirectTarget = eventMethods.OnSourceRedirectTarget;
+            OnSourceResidual = eventMethods.OnSourceResidual;
+            OnSourceSetAbility = eventMethods.OnSourceSetAbility;
+            OnSourceSetStatus = eventMethods.OnSourceSetStatus;
+            OnSourceSetWeather = eventMethods.OnSourceSetWeather;
+            OnSourceStallMove = eventMethods.OnSourceStallMove;
+            OnSourceSwitchOut = eventMethods.OnSourceSwitchOut;
+            OnSourceTakeItem = eventMethods.OnSourceTakeItem;
+            OnSourceTerrain = eventMethods.OnSourceTerrain;
+            OnSourceTrapPokemon = eventMethods.OnSourceTrapPokemon;
+            OnSourceTryAddVolatile = eventMethods.OnSourceTryAddVolatile;
+            OnSourceTryEatItem = eventMethods.OnSourceTryEatItem;
+            OnSourceTryHeal = eventMethods.OnSourceTryHeal;
+            OnSourceTryHit = eventMethods.OnSourceTryHit;
+            OnSourceTryHitField = eventMethods.OnSourceTryHitField;
+            OnSourceTryHitSide = eventMethods.OnSourceTryHitSide;
+            OnSourceInvulnerability = eventMethods.OnSourceInvulnerability;
+            OnSourceTryMove = eventMethods.OnSourceTryMove;
+            OnSourceTryPrimaryHit = eventMethods.OnSourceTryPrimaryHit;
+            OnSourceType = eventMethods.OnSourceType;
+            OnSourceWeatherModifyDamage = eventMethods.OnSourceWeatherModifyDamage;
+            OnSourceModifyDamagePhase1 = eventMethods.OnSourceModifyDamagePhase1;
+            OnSourceModifyDamagePhase2 = eventMethods.OnSourceModifyDamagePhase2;
+
+            // Any event handlers
+            OnAnyDamagingHit = eventMethods.OnAnyDamagingHit;
+            OnAnyAfterEachBoost = eventMethods.OnAnyAfterEachBoost;
+            OnAnyAfterHit = eventMethods.OnAnyAfterHit;
+            OnAnyAfterSetStatus = eventMethods.OnAnyAfterSetStatus;
+            OnAnyAfterSubDamage = eventMethods.OnAnyAfterSubDamage;
+            OnAnyAfterSwitchInSelf = eventMethods.OnAnyAfterSwitchInSelf;
+            OnAnyAfterUseItem = eventMethods.OnAnyAfterUseItem;
+            OnAnyAfterBoost = eventMethods.OnAnyAfterBoost;
+            OnAnyAfterFaint = eventMethods.OnAnyAfterFaint;
+            OnAnyAfterMega = eventMethods.OnAnyAfterMega;
+            OnAnyAfterMoveSecondarySelf = eventMethods.OnAnyAfterMoveSecondarySelf;
+            OnAnyAfterMoveSecondary = eventMethods.OnAnyAfterMoveSecondary;
+            OnAnyAfterMove = eventMethods.OnAnyAfterMove;
+            OnAnyAfterMoveSelf = eventMethods.OnAnyAfterMoveSelf;
+            OnAnyAfterTerastallization = eventMethods.OnAnyAfterTerastallization;
+            OnAnyAttract = eventMethods.OnAnyAttract;
+            OnAnyAccuracy = eventMethods.OnAnyAccuracy;
+            OnAnyBasePower = eventMethods.OnAnyBasePower;
+            OnAnyBeforeFaint = eventMethods.OnAnyBeforeFaint;
+            OnAnyBeforeMove = eventMethods.OnAnyBeforeMove;
+            OnAnyBeforeSwitchIn = eventMethods.OnAnyBeforeSwitchIn;
+            OnAnyBeforeSwitchOut = eventMethods.OnAnyBeforeSwitchOut;
+            OnAnyTryBoost = eventMethods.OnAnyTryBoost;
+            OnAnyChargeMove = eventMethods.OnAnyChargeMove;
+            OnAnyCriticalHit = eventMethods.OnAnyCriticalHit;
+            OnAnyDamage = eventMethods.OnAnyDamage;
+            OnAnyDeductPP = eventMethods.OnAnyDeductPP;
+            OnAnyDisableMove = eventMethods.OnAnyDisableMove;
+            OnAnyDragOut = eventMethods.OnAnyDragOut;
+            OnAnyEatItem = eventMethods.OnAnyEatItem;
+            OnAnyEffectiveness = eventMethods.OnAnyEffectiveness;
+            OnAnyFaint = eventMethods.OnAnyFaint;
+            OnAnyFlinch = eventMethods.OnAnyFlinch;
+            OnAnyHit = eventMethods.OnAnyHit;
+            OnAnyImmunity = eventMethods.OnAnyImmunity;
+            OnAnyLockMove = eventMethods.OnAnyLockMove;
+            OnAnyMaybeTrapPokemon = eventMethods.OnAnyMaybeTrapPokemon;
+            OnAnyModifyAccuracy = eventMethods.OnAnyModifyAccuracy;
+            OnAnyModifyAtk = eventMethods.OnAnyModifyAtk;
+            OnAnyModifyBoost = eventMethods.OnAnyModifyBoost;
+            OnAnyModifyCritRatio = eventMethods.OnAnyModifyCritRatio;
+            OnAnyModifyDamage = eventMethods.OnAnyModifyDamage;
+            OnAnyModifyDef = eventMethods.OnAnyModifyDef;
+            OnAnyModifyMove = eventMethods.OnAnyModifyMove;
+            OnAnyModifyPriority = eventMethods.OnAnyModifyPriority;
+            OnAnyModifySecondaries = eventMethods.OnAnyModifySecondaries;
+            OnAnyModifySpA = eventMethods.OnAnyModifySpA;
+            OnAnyModifySpD = eventMethods.OnAnyModifySpD;
+            OnAnyModifySpe = eventMethods.OnAnyModifySpe;
+            OnAnyModifySTAB = eventMethods.OnAnyModifySTAB;
+            OnAnyModifyType = eventMethods.OnAnyModifyType;
+            OnAnyModifyTarget = eventMethods.OnAnyModifyTarget;
+            OnAnyModifyWeight = eventMethods.OnAnyModifyWeight;
+            OnAnyMoveAborted = eventMethods.OnAnyMoveAborted;
+            OnAnyNegateImmunity = eventMethods.OnAnyNegateImmunity;
+            OnAnyOverrideAction = eventMethods.OnAnyOverrideAction;
+            OnAnyPrepareHit = eventMethods.OnAnyPrepareHit;
+            OnAnyPseudoWeatherChange = eventMethods.OnAnyPseudoWeatherChange;
+            OnAnyRedirectTarget = eventMethods.OnAnyRedirectTarget;
+            OnAnyResidual = eventMethods.OnAnyResidual;
+            OnAnySetAbility = eventMethods.OnAnySetAbility;
+            OnAnySetStatus = eventMethods.OnAnySetStatus;
+            OnAnySetWeather = eventMethods.OnAnySetWeather;
+            OnAnyStallMove = eventMethods.OnAnyStallMove;
+            OnAnySwitchIn = eventMethods.OnAnySwitchIn;
+            OnAnySwitchOut = eventMethods.OnAnySwitchOut;
+            OnAnyTakeItem = eventMethods.OnAnyTakeItem;
+            OnAnyTerrain = eventMethods.OnAnyTerrain;
+            OnAnyTrapPokemon = eventMethods.OnAnyTrapPokemon;
+            OnAnyTryAddVolatile = eventMethods.OnAnyTryAddVolatile;
+            OnAnyTryEatItem = eventMethods.OnAnyTryEatItem;
+            OnAnyTryHeal = eventMethods.OnAnyTryHeal;
+            OnAnyTryHit = eventMethods.OnAnyTryHit;
+            OnAnyTryHitField = eventMethods.OnAnyTryHitField;
+            OnAnyTryHitSide = eventMethods.OnAnyTryHitSide;
+            OnAnyInvulnerability = eventMethods.OnAnyInvulnerability;
+            OnAnyTryMove = eventMethods.OnAnyTryMove;
+            OnAnyTryPrimaryHit = eventMethods.OnAnyTryPrimaryHit;
+            OnAnyType = eventMethods.OnAnyType;
+            OnAnyWeatherModifyDamage = eventMethods.OnAnyWeatherModifyDamage;
+            OnAnyModifyDamagePhase1 = eventMethods.OnAnyModifyDamagePhase1;
+            OnAnyModifyDamagePhase2 = eventMethods.OnAnyModifyDamagePhase2;
+
+            // Priority fields
+            OnAccuracyPriority = eventMethods.OnAccuracyPriority;
+            OnDamagingHitOrder = eventMethods.OnDamagingHitOrder;
+            OnAfterMoveSecondaryPriority = eventMethods.OnAfterMoveSecondaryPriority;
+            OnAfterMoveSecondarySelfPriority = eventMethods.OnAfterMoveSecondarySelfPriority;
+            OnAfterMoveSelfPriority = eventMethods.OnAfterMoveSelfPriority;
+            OnAfterSetStatusPriority = eventMethods.OnAfterSetStatusPriority;
+            OnAnyBasePowerPriority = eventMethods.OnAnyBasePowerPriority;
+            OnAnyInvulnerabilityPriority = eventMethods.OnAnyInvulnerabilityPriority;
+            OnAnyModifyAccuracyPriority = eventMethods.OnAnyModifyAccuracyPriority;
+            OnAnyFaintPriority = eventMethods.OnAnyFaintPriority;
+            OnAnyPrepareHitPriority = eventMethods.OnAnyPrepareHitPriority;
+            OnAnySwitchInPriority = eventMethods.OnAnySwitchInPriority;
+            OnAnySwitchInSubOrder = eventMethods.OnAnySwitchInSubOrder;
+            OnAllyBasePowerPriority = eventMethods.OnAllyBasePowerPriority;
+            OnAllyModifyAtkPriority = eventMethods.OnAllyModifyAtkPriority;
+            OnAllyModifySpAPriority = eventMethods.OnAllyModifySpAPriority;
+            OnAllyModifySpDPriority = eventMethods.OnAllyModifySpDPriority;
+            OnAttractPriority = eventMethods.OnAttractPriority;
+            OnBasePowerPriority = eventMethods.OnBasePowerPriority;
+            OnBeforeMovePriority = eventMethods.OnBeforeMovePriority;
+            OnBeforeSwitchOutPriority = eventMethods.OnBeforeSwitchOutPriority;
+            OnChangeBoostPriority = eventMethods.OnChangeBoostPriority;
+            OnDamagePriority = eventMethods.OnDamagePriority;
+            OnDragOutPriority = eventMethods.OnDragOutPriority;
+            OnEffectivenessPriority = eventMethods.OnEffectivenessPriority;
+            OnFoeBasePowerPriority = eventMethods.OnFoeBasePowerPriority;
+            OnFoeBeforeMovePriority = eventMethods.OnFoeBeforeMovePriority;
+            OnFoeModifyDefPriority = eventMethods.OnFoeModifyDefPriority;
+            OnFoeModifySpDPriority = eventMethods.OnFoeModifySpDPriority;
+            OnFoeRedirectTargetPriority = eventMethods.OnFoeRedirectTargetPriority;
+            OnFoeTrapPokemonPriority = eventMethods.OnFoeTrapPokemonPriority;
+            OnFractionalPriorityPriority = eventMethods.OnFractionalPriorityPriority;
+            OnHitPriority = eventMethods.OnHitPriority;
+            OnInvulnerabilityPriority = eventMethods.OnInvulnerabilityPriority;
+            OnModifyAccuracyPriority = eventMethods.OnModifyAccuracyPriority;
+            OnModifyAtkPriority = eventMethods.OnModifyAtkPriority;
+            OnModifyCritRatioPriority = eventMethods.OnModifyCritRatioPriority;
+            OnModifyDefPriority = eventMethods.OnModifyDefPriority;
+            OnModifyMovePriority = eventMethods.OnModifyMovePriority;
+            OnModifyPriorityPriority = eventMethods.OnModifyPriorityPriority;
+            OnModifySpAPriority = eventMethods.OnModifySpAPriority;
+            OnModifySpDPriority = eventMethods.OnModifySpDPriority;
+            OnModifySpePriority = eventMethods.OnModifySpePriority;
+            OnModifySTABPriority = eventMethods.OnModifySTABPriority;
+            OnModifyTypePriority = eventMethods.OnModifyTypePriority;
+            OnModifyWeightPriority = eventMethods.OnModifyWeightPriority;
+            OnRedirectTargetPriority = eventMethods.OnRedirectTargetPriority;
+            OnResidualOrder = eventMethods.OnResidualOrder;
+            OnResidualPriority = eventMethods.OnResidualPriority;
+            OnResidualSubOrder = eventMethods.OnResidualSubOrder;
+            OnSourceBasePowerPriority = eventMethods.OnSourceBasePowerPriority;
+            OnSourceInvulnerabilityPriority = eventMethods.OnSourceInvulnerabilityPriority;
+            OnSourceModifyAccuracyPriority = eventMethods.OnSourceModifyAccuracyPriority;
+            OnSourceModifyAtkPriority = eventMethods.OnSourceModifyAtkPriority;
+            OnSourceModifyDamagePriority = eventMethods.OnSourceModifyDamagePriority;
+            OnSourceModifySpAPriority = eventMethods.OnSourceModifySpAPriority;
+            OnSwitchInPriority = eventMethods.OnSwitchInPriority;
+            OnSwitchInSubOrder = eventMethods.OnSwitchInSubOrder;
+            OnTrapPokemonPriority = eventMethods.OnTrapPokemonPriority;
+            OnTryBoostPriority = eventMethods.OnTryBoostPriority;
+            OnTryEatItemPriority = eventMethods.OnTryEatItemPriority;
+            OnTryHealPriority = eventMethods.OnTryHealPriority;
+            OnTryHitPriority = eventMethods.OnTryHitPriority;
+            OnTryMovePriority = eventMethods.OnTryMovePriority;
+            OnTryPrimaryHitPriority = eventMethods.OnTryPrimaryHitPriority;
+            OnTypePriority = eventMethods.OnTypePriority;
+        }
+
+        private void CopyPokemonEventMethods(IPokemonEventMethods eventMethods)
+        {
+            // Ally event handlers (triggered by ally Pokémon actions)
+            OnAllyDamagingHit = eventMethods.OnAllyDamagingHit;
+            OnAllyAfterEachBoost = eventMethods.OnAllyAfterEachBoost;
+            OnAllyAfterHit = eventMethods.OnAllyAfterHit;
+            OnAllyAfterSetStatus = eventMethods.OnAllyAfterSetStatus;
+            OnAllyAfterSubDamage = eventMethods.OnAllyAfterSubDamage;
+            OnAllyAfterSwitchInSelf = eventMethods.OnAllyAfterSwitchInSelf;
+            OnAllyAfterUseItem = eventMethods.OnAllyAfterUseItem;
+            OnAllyAfterBoost = eventMethods.OnAllyAfterBoost;
+            OnAllyAfterFaint = eventMethods.OnAllyAfterFaint;
+            OnAllyAfterMoveSecondarySelf = eventMethods.OnAllyAfterMoveSecondarySelf;
+            OnAllyAfterMoveSecondary = eventMethods.OnAllyAfterMoveSecondary;
+            OnAllyAfterMove = eventMethods.OnAllyAfterMove;
+            OnAllyAfterMoveSelf = eventMethods.OnAllyAfterMoveSelf;
+            OnAllyAttract = eventMethods.OnAllyAttract;
+            OnAllyAccuracy = eventMethods.OnAllyAccuracy;
+            OnAllyBasePower = eventMethods.OnAllyBasePower;
+            OnAllyBeforeFaint = eventMethods.OnAllyBeforeFaint;
+            OnAllyBeforeMove = eventMethods.OnAllyBeforeMove;
+            OnAllyBeforeSwitchIn = eventMethods.OnAllyBeforeSwitchIn;
+            OnAllyBeforeSwitchOut = eventMethods.OnAllyBeforeSwitchOut;
+            OnAllyTryBoost = eventMethods.OnAllyTryBoost;
+            OnAllyChargeMove = eventMethods.OnAllyChargeMove;
+            OnAllyCriticalHit = eventMethods.OnAllyCriticalHit;
+            OnAllyDamage = eventMethods.OnAllyDamage;
+            OnAllyDeductPP = eventMethods.OnAllyDeductPP;
+            OnAllyDisableMove = eventMethods.OnAllyDisableMove;
+            OnAllyDragOut = eventMethods.OnAllyDragOut;
+            OnAllyEatItem = eventMethods.OnAllyEatItem;
+            OnAllyEffectiveness = eventMethods.OnAllyEffectiveness;
+            OnAllyFaint = eventMethods.OnAllyFaint;
+            OnAllyFlinch = eventMethods.OnAllyFlinch;
+            OnAllyHit = eventMethods.OnAllyHit;
+            OnAllyImmunity = eventMethods.OnAllyImmunity;
+            OnAllyLockMove = eventMethods.OnAllyLockMove;
+            OnAllyMaybeTrapPokemon = eventMethods.OnAllyMaybeTrapPokemon;
+            OnAllyModifyAccuracy = eventMethods.OnAllyModifyAccuracy;
+            OnAllyModifyAtk = eventMethods.OnAllyModifyAtk;
+            OnAllyModifyBoost = eventMethods.OnAllyModifyBoost;
+            OnAllyModifyCritRatio = eventMethods.OnAllyModifyCritRatio;
+            OnAllyModifyDamage = eventMethods.OnAllyModifyDamage;
+            OnAllyModifyDef = eventMethods.OnAllyModifyDef;
+            OnAllyModifyMove = eventMethods.OnAllyModifyMove;
+            OnAllyModifyPriority = eventMethods.OnAllyModifyPriority;
+            OnAllyModifySecondaries = eventMethods.OnAllyModifySecondaries;
+            OnAllyModifySpA = eventMethods.OnAllyModifySpA;
+            OnAllyModifySpD = eventMethods.OnAllyModifySpD;
+            OnAllyModifySpe = eventMethods.OnAllyModifySpe;
+            OnAllyModifySTAB = eventMethods.OnAllyModifySTAB;
+            OnAllyModifyType = eventMethods.OnAllyModifyType;
+            OnAllyModifyTarget = eventMethods.OnAllyModifyTarget;
+            OnAllyModifyWeight = eventMethods.OnAllyModifyWeight;
+            OnAllyMoveAborted = eventMethods.OnAllyMoveAborted;
+            OnAllyNegateImmunity = eventMethods.OnAllyNegateImmunity;
+            OnAllyOverrideAction = eventMethods.OnAllyOverrideAction;
+            OnAllyPrepareHit = eventMethods.OnAllyPrepareHit;
+            OnAllyRedirectTarget = eventMethods.OnAllyRedirectTarget;
+            OnAllyResidual = eventMethods.OnAllyResidual;
+            OnAllySetAbility = eventMethods.OnAllySetAbility;
+            OnAllySetStatus = eventMethods.OnAllySetStatus;
+            OnAllySetWeather = eventMethods.OnAllySetWeather;
+            OnAllyStallMove = eventMethods.OnAllyStallMove;
+            OnAllySwitchOut = eventMethods.OnAllySwitchOut;
+            OnAllyTakeItem = eventMethods.OnAllyTakeItem;
+            OnAllyTerrain = eventMethods.OnAllyTerrain;
+            OnAllyTrapPokemon = eventMethods.OnAllyTrapPokemon;
+            OnAllyTryAddVolatile = eventMethods.OnAllyTryAddVolatile;
+            OnAllyTryEatItem = eventMethods.OnAllyTryEatItem;
+            OnAllyTryHeal = eventMethods.OnAllyTryHeal;
+            OnAllyTryHit = eventMethods.OnAllyTryHit;
+            OnAllyTryHitField = eventMethods.OnAllyTryHitField;
+            OnAllyTryHitSide = eventMethods.OnAllyTryHitSide;
+            OnAllyInvulnerability = eventMethods.OnAllyInvulnerability;
+            OnAllyTryMove = eventMethods.OnAllyTryMove;
+            OnAllyTryPrimaryHit = eventMethods.OnAllyTryPrimaryHit;
+            OnAllyType = eventMethods.OnAllyType;
+            OnAllyWeatherModifyDamage = eventMethods.OnAllyWeatherModifyDamage;
+            OnAllyModifyDamagePhase1 = eventMethods.OnAllyModifyDamagePhase1;
+            OnAllyModifyDamagePhase2 = eventMethods.OnAllyModifyDamagePhase2;
+        }
+
+        private void CopySideEventMethods(ISideEventMethods eventMethods)
+        {
+            // Side condition lifecycle events
+            OnSideStart = eventMethods.OnSideStart;
+            OnSideRestart = eventMethods.OnSideRestart;
+            OnSideResidual = eventMethods.OnSideResidual;
+            OnSideEnd = eventMethods.OnSideEnd;
+
+            // Side event priorities and ordering
+            OnSideResidualOrder = eventMethods.OnSideResidualOrder;
+            OnSideResidualPriority = eventMethods.OnSideResidualPriority;
+            OnSideResidualSubOrder = eventMethods.OnSideResidualSubOrder;
+        }
+
+        private void CopyFieldEventMethods(IFieldEventMethods eventMethods)
+        {
+            // Field condition lifecycle events
+            OnFieldStart = eventMethods.OnFieldStart;
+            OnFieldRestart = eventMethods.OnFieldRestart;
+            OnFieldResidual = eventMethods.OnFieldResidual;
+            OnFieldEnd = eventMethods.OnFieldEnd;
+
+            // Field event priorities and ordering
+            OnFieldResidualOrder = eventMethods.OnFieldResidualOrder;
+            OnFieldResidualPriority = eventMethods.OnFieldResidualPriority;
+            OnFieldResidualSubOrder = eventMethods.OnFieldResidualSubOrder;
         }
 
         public void Init()

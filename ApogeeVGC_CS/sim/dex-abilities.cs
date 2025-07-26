@@ -563,31 +563,11 @@ namespace ApogeeVGC_CS.sim
     // Main Ability class extending BasicEffect
     public class Ability : BasicEffect, IAbility
     {
-        // public string EffectType { get; set; } = "Ability";
-
         // Rating from -1 Detrimental to +5 Essential
         public int Rating { get; set; } = 0;
         public bool SuppressWeather { get; set; } = false;
         public AbilityFlags Flags { get; set; } = new();
         public IConditionData? Condition { get; set; } = null;
-
-        //// IBasicEffect implementation
-        //public Id Id { get; set; } = new();
-        //EffectType IBasicEffect.EffectType { get; set; } = sim.EffectType.Ability;
-        //public bool Exists { get; set; } = true;
-        //public string Fullname { get; set; } = string.Empty;
-        //public int Gen { get; set; }
-        //public string SourceEffect { get; set; } = string.Empty;
-
-        //// Additional properties that might be inherited from BasicEffect
-        //public string Name { get; set; } = string.Empty;
-        //public string? Desc { get; set; }
-        //public string? ShortDesc { get; set; }
-        //public int Num { get; set; }
-        //public int? Duration {  get; set; }
-        //public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        //public bool? Infiltrates { get; set; }
-        //public Nonstandard? IsNonstandard { get; set; }
 
         public Ability(IAbility other) : base(other)
         {

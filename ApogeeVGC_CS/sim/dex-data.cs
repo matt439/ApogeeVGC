@@ -8,77 +8,6 @@ using System.Runtime.CompilerServices;
 
 namespace ApogeeVGC_CS.sim
 {
-    ///// <summary>
-    ///// Converts anything to an ID. An ID must have only lowercase alphanumeric
-    ///// characters.
-    ///// 
-    ///// If a string is passed, it will be converted to lowercase and
-    ///// non-alphanumeric characters will be stripped.
-    ///// 
-    ///// If an object with an ID is passed, its ID will be returned.
-    ///// Otherwise, an empty string will be returned.
-    ///// 
-    ///// Generally assigned to the global toID, because of how
-    ///// commonly it's used.
-    ///// </summary>
-    //public static class DexUtilities
-    //{
-    //    public static string ToID(object? text)
-    //    {
-    //        if (text == null) return string.Empty;
-            
-    //        string? textStr = null;
-            
-    //        if (text is string str)
-    //        {
-    //            textStr = str;
-    //        }
-    //        else if (text is int number)
-    //        {
-    //            textStr = number.ToString();
-    //        }
-    //        else
-    //        {
-    //            // Try to get ID from object properties
-    //            var type = text.GetType();
-    //            var idProp = type.GetProperty("Id") ?? type.GetProperty("ID") ?? 
-    //                        type.GetProperty("UserId") ?? type.GetProperty("RoomId");
-                
-    //            if (idProp != null && idProp.GetValue(text) is string propValue)
-    //            {
-    //                textStr = propValue;
-    //            }
-    //            else
-    //            {
-    //                textStr = text.ToString();
-    //            }
-    //        }
-
-    //        if (string.IsNullOrEmpty(textStr)) return string.Empty;
-
-    //        return Regex.Replace(textStr.ToLowerInvariant(), @"[^a-z0-9]+", "");
-    //    }
-    //}
-
-    /// <summary>
-    /// Like Object.assign but only assigns fields missing from self.
-    /// Facilitates consistent field ordering in constructors.
-    /// Modifies self in-place.
-    /// </summary>
-    public static class ObjectExtensions
-    {
-        public static void AssignMissingFields(IAnyObject self, IAnyObject data)
-        {
-            foreach (var kvp in data)
-            {
-                if (!self.ContainsKey(kvp.Key))
-                {
-                    self[kvp.Key] = kvp.Value;
-                }
-            }
-        }
-    }
-
     public abstract class BasicEffect
     {
         /// <summary>
@@ -193,10 +122,10 @@ namespace ApogeeVGC_CS.sim
             Infiltrates = other.Infiltrates;
             RealMove = other.RealMove;
 
-            InitBasicEffect();
+            Init();
         }
 
-        public void InitBasicEffect()
+        private void Init()
         {
             if (Name != string.Empty)
             {
