@@ -220,11 +220,6 @@ namespace ApogeeVGC_CS.sim
     public interface IEffect { }
 
     /// <summary>
-    /// Represents an item effect.
-    /// </summary>
-    public interface IItem : IEffect { }
-
-    /// <summary>
     /// Represents an active move effect.
     /// </summary>
     public interface IActiveMove : IEffect { }

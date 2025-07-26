@@ -10,9 +10,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    public interface IFormatData : IEventMethods, IFormat, IFormatListEntry
-    {
-    }
+    public interface IFormatData : IEventMethods, IFormat, IFormatListEntry { }
 
     // Represents the element of a "FormatList" type
     public interface IFormatListEntry { }
