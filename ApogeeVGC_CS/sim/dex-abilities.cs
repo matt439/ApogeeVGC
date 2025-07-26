@@ -575,13 +575,12 @@ namespace ApogeeVGC_CS.sim
             SuppressWeather = other.SuppressWeather;
             Flags = other.Flags;
             Condition = other.Condition;
-
-            Init();
         }
 
-        private void Init()
+        public void Init()
         {
-
+            InitBasicEffect();
+            
             Fullname = $"ability: {Name}";
             EffectType = EffectType.Ability;
 

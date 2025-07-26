@@ -2636,7 +2636,6 @@ namespace ApogeeVGC_CS.sim
             CopyConditionData(other);
             CopyEventMethods(other);
             CopyPokemonEventMethods(other);
-            Init();
         }
 
         public Condition(SideConditionData other) : base(other)
@@ -2644,7 +2643,6 @@ namespace ApogeeVGC_CS.sim
             CopyConditionData(other);
             CopyEventMethods(other);
             CopySideEventMethods(other);
-            Init();
         }
 
         public Condition(FieldConditionData other) : base(other)
@@ -2652,7 +2650,6 @@ namespace ApogeeVGC_CS.sim
             CopyConditionData(other);
             CopyEventMethods(other);
             CopyFieldEventMethods(other);
-            Init();
         }
 
         private void CopyConditionData(ICondition other)
@@ -3189,6 +3186,8 @@ namespace ApogeeVGC_CS.sim
 
         public void Init()
         {
+            InitBasicEffect();
+
             if (EffectType != EffectType.Condition ||
                 EffectType != EffectType.Weather ||
                 EffectType != EffectType.Status ||

@@ -95,10 +95,8 @@ namespace ApogeeVGC_CS.sim
         public string? EffectTypeString { get; set; } = null;
         public bool? Infiltrates { get; set; } = null;
         public string? RealMove { get; set; } = null; // Added this for the Init method
-
-        public BasicEffect() { }
         
-        public BasicEffect(IBasicEffect other)
+        protected BasicEffect(IBasicEffect other)
         {
             // Copy all fields without any logic
             Id = other.Id;
@@ -121,11 +119,9 @@ namespace ApogeeVGC_CS.sim
             EffectTypeString = other.EffectTypeString;
             Infiltrates = other.Infiltrates;
             RealMove = other.RealMove;
-
-            Init();
         }
 
-        private void Init()
+        public void InitBasicEffect()
         {
             if (Name != string.Empty)
             {
@@ -156,164 +152,74 @@ namespace ApogeeVGC_CS.sim
             }
         }
 
-        //protected BasicEffect(IAnyObject data)
-        //{
-        //    if (data.TryGetString("name", out string? name))
-        //    {
-        //        Name = name.Trim();
-        //    }
-        //    else
-        //    {
-        //        throw new ArgumentException("Name is required for BasicEffect.");
-        //    }
-
-        //    if (data.TryGetString("realMove", out string? realMove))
-        //    {
-        //        Id = new Id(realMove);
-        //    }
-        //    else
-        //    {
-        //        Id = new Id(Name);
-        //    }
-
-        //    if (data.TryGetString("fullname", out string? fullname))
-        //    {
-        //        Fullname = fullname; // No trim
-        //    }
-        //    else
-        //    {
-        //        Fullname = Name;
-        //    }
-
-        //    if (data.TryGetEnum<EffectType>("effectType", out var effectType))
-        //    {
-        //        EffectType = effectType;
-        //    }
-
-
-        //    if (data.TryGetBool("exists", out var exists))
-        //    {
-        //        Exists = exists;
-        //    }
-        //    else
-        //    {
-        //        Exists = !Id.IsEmpty;
-        //    }
-
-        //    if (data.TryGetInt("num", out var num))
-        //    {
-        //        Num = num;
-        //    }
-
-        //    if (data.TryGetInt("gen", out var gen))
-        //    {
-        //        Gen = gen;
-        //    }
-
-        //    if (data.TryGetString("shortDesc", out string? shortDesc))
-        //    {
-        //        ShortDesc = shortDesc;
-        //    }
-
-        //    if (data.TryGetString("desc", out string? desc))
-        //    {
-        //        Desc = desc;
-        //    }
-
-        //    if (data.TryGetEnum<Nonstandard>("isNonstandard", out var nonstandard))
-        //    {
-        //        IsNonstandard = nonstandard;
-        //    }
-
-        //    if (data.TryGetInt("duration", out var duration))
-        //    {
-        //        Duration = duration;
-        //    }
-
-        //    if (data.TryGetBool("noCopy", out var noCopy))
-        //    {
-        //        NoCopy = noCopy;
-        //    }
-
-        //    if (data.TryGetBool("affectsFainted", out var affectsFainted))
-        //    {
-        //        AffectsFainted = affectsFainted;
-        //    }
-
-        //    if (data.TryGetId("status", out Id? status))
-        //    {
-        //        Status = status;
-        //    }
-
-        //    if (data.TryGetId("weather", out Id? weather))
-        //    {
-        //        Weather = weather;
-        //    }
-
-        //    if (data.TryGetString("sourceEffect", out string? sourceEffect))
-        //    {
-        //        SourceEffect = sourceEffect;
-        //    }
-        //}
-
         public override string ToString()
         {
             return Name;
         }
     }
 
-    public class Nature : BasicEffect, INatureData
+    public interface INature : IBasicEffect
     {
-        // public EffectType EffectType => EffectType.Nature;
         public StatIDExceptHP? Plus { get; set; }
         public StatIDExceptHP? Minus { get; set; }
+    }
 
-        public Nature(IAnyObject data) : base(data)
+    public class Nature : BasicEffect, INatureData
+    {
+        public StatIDExceptHP? Plus { get; set; } = null;
+        public StatIDExceptHP? Minus { get; set; } = null;
+
+        public Nature(INatureData other) : base(other)
         {
+            Plus = other.Plus;
+            Minus = other.Minus;
+        }
+
+        public void Init()
+        {
+            InitBasicEffect();
+            
             Fullname = $"nature: {Name}";
             EffectType = EffectType.Nature;
             Gen = 3;
-
-            if (data.TryGetEnum<StatIDExceptHP>("plus", out var plus))
-            {
-                Plus = plus;
-            }
-
-            if (data.TryGetEnum<StatIDExceptHP>("minus", out var minus))
-            {
-                Minus = minus;
-            }
-
-            // AssignMissingFields(data);
         }
-
-        //private void AssignMissingFields(IAnyObject data)
-        //{
-
-        //}
     }
 
     public static class NatureConstants
     {
-        public static readonly Nature EmptyNature = new(new DefaultTextData
+        public static readonly Nature EmptyNature = new(new NatureData
         {
-            ["name"] = "",
-            ["exists"] = false
+            Name = string.Empty,
+            Exists = false
         });
     }
 
-    public interface INatureData
-    {
-        string Name { get; set; }
-        StatIDExceptHP? Plus { get; set; }
-        StatIDExceptHP? Minus { get; set; }
-    }
+    public interface INatureData : INature { }
 
     public class NatureData : INatureData
     {
-        public string Name { get; set; } = string.Empty;
-        public StatIDExceptHP? Plus { get; set; }
-        public StatIDExceptHP? Minus { get; set; }
+        public StatIDExceptHP? Plus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public StatIDExceptHP? Minus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Id Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Fullname { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public EffectType EffectType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool Exists { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Num { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Gen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string? ShortDesc { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string? Desc { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Nonstandard? IsNonstandard { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int? Duration { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool NoCopy { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool AffectsFainted { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Id? Status { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Id? Weather { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string SourceEffect { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string? EffectTypeString { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool? Infiltrates { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string? RealMove { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 
     public class ModdedNatureData : NatureData
@@ -321,7 +227,7 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public interface INatureDataTable : IDictionary<IdEntry, NatureData> { }
+    public class NatureDataTable : Dictionary<IdEntry, INatureData> { }
 
     public class DexNatures(ModdedDex dex)
     {
@@ -350,7 +256,7 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public interface ITypeData
+    public interface ITypeData : ITypeInfo
     {
         Dictionary<string, int> DamageTaken { get; set; }
         SparseStatsTable? HPdvs { get; set; }
@@ -358,26 +264,40 @@ namespace ApogeeVGC_CS.sim
         Nonstandard? IsNonstandard { get; set; }
     }
 
-    //public class TypeData : ITypeData
-    //{
-    //    public Dictionary<string, int> DamageTaken { get; set; } = new();
-    //    public SparseStatsTable? HPdvs { get; set; }
-    //    public SparseStatsTable? HPivs { get; set; }
-    //    public Nonstandard? IsNonstandard { get; set; }
-    //}
+    public class TypeData : ITypeData
+    {
+        public Dictionary<string, int> DamageTaken { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public SparseStatsTable? HPdvs { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public SparseStatsTable? HPivs { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Nonstandard? IsNonstandard { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Id Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public TypeInfoEffectType EffectType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool Exists { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Gen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
 
     public interface IModdedTypeData : ITypeData
     {
         public bool Inherit { get; set; }
     }
 
-    public interface ITypeDataTable : IDictionary<string, ITypeData> { }
-    public interface IModdedTypeDataTable : IDictionary<string, IModdedTypeData> { }
+    public class TypeDataTable : Dictionary<IdEntry, ITypeData> { }
+    public class IModdedTypeDataTable : Dictionary<IdEntry, IModdedTypeData> { }
 
     public enum TypeInfoEffectType
     {
         Type,
         EffectType
+    }
+
+    public interface ITypeInfo
+    {
+        public Id Id { get; set; }
+        public string Name { get; set; }
+        public TypeInfoEffectType EffectType { get; set; }
+        public bool Exists { get; set; }
+        public int Gen { get; set; }
     }
 
     public class TypeInfo : ITypeData
@@ -386,27 +306,27 @@ namespace ApogeeVGC_CS.sim
         /// ID. This will be a lowercase version of the name with all the
         /// non-alphanumeric characters removed. e.g. 'flying'
         /// </summary>
-        public Id Id { get; }
+        public Id Id { get; set; } = new Id();
 
         /// <summary>Name. e.g. 'Flying'</summary>
-        public string Name { get; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>Effect type.</summary>
-        public TypeInfoEffectType EffectType { get; } = TypeInfoEffectType.Type;
+        public TypeInfoEffectType EffectType { get; set; } = TypeInfoEffectType.Type;
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
         /// for an effect that doesn't exist, you get a dummy effect that
         /// doesn't do anything, and this field set to false.
         /// </summary>
-        public bool Exists { get; }
+        public bool Exists { get; set; } = true;
 
         /// <summary>
         /// The generation of Pokemon game this was INTRODUCED (NOT
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; } = 0;
+        public int Gen { get; set; } = 0;
 
         /// <summary>
         /// Set to 'Future' for types before they're released (like Fairy
@@ -426,71 +346,27 @@ namespace ApogeeVGC_CS.sim
         /// <summary>The DVs to get this Type Hidden Power (in gen 2).</summary>
         public SparseStatsTable HPdvs { get; set; } = [];
 
-        public TypeInfo(IAnyObject data)
+        public TypeInfo(ITypeData data)
         {
-            if (data.TryGetString("name", out string? name))
-            {
-                Name = name; // no trim
-            }
-            else
-            {
-                throw new ArgumentException("Name is required for BasicEffect.");
-            }
+            
+            Id = data.Id;
+            Name = data.Name;
+            EffectType = data.EffectType;
+            Exists = data.Exists;
+            Gen = data.Gen;
+            IsNonstandard = data.IsNonstandard;
+            DamageTaken = data.DamageTaken;
+            HPivs = data.HPivs;
+            HPdvs = data.HPdvs;
+        }
 
-            if (data.TryGetId("id", out Id? id))
-            {
-                Id = id;
-            }
-            else
-            {
-                throw new ArgumentException("ID is required for TypeInfo.");
-            }
-
-            if (data.TryGetEnum<TypeInfoEffectType>("effectType", out TypeInfoEffectType effectType))
-            {
-                EffectType = effectType;
-            }
-
-            if (data.TryGetBool("exists", out bool exists))
-            {
-                Exists = exists;
-            }
-            else
+        public void Init()
+        {
+            if (!Exists)
             {
                 Exists = !Id.IsEmpty;
             }
-
-            if (data.TryGetInt("gen", out int gen))
-            {
-                Gen = gen;
-            }
-
-            if (data.TryGetEnum<Nonstandard>("isNonstandard", out Nonstandard nonstandard))
-            {
-                IsNonstandard = nonstandard;
-            }
-
-            if (data.TryGetDictionary<string, int>("damageTaken", out Dictionary<string, int>? damageTaken))
-            {
-                DamageTaken = damageTaken;
-            }
-
-            if (data.TryGetClass<SparseStatsTable>("HPivs", out SparseStatsTable? hpivs))
-            {
-                HPivs = hpivs;
-            }
-
-            if (data.TryGetClass<SparseStatsTable>("HPdvs", out SparseStatsTable? hpdvs))
-            {
-                HPdvs = hpdvs;
-            }
-
-            //AssignMissingFields(data);
         }
-        //private void AssignMissingFields(IAnyObject data)
-        //{
-
-        //}
 
         public override string ToString()
         {
@@ -500,12 +376,12 @@ namespace ApogeeVGC_CS.sim
 
     public static class TypeInfoConstants
     {
-        public static readonly TypeInfo EmptyTypeInfo = new(new DefaultTextData
+        public static readonly TypeInfo EmptyTypeInfo = new(new TypeData
         {
-            ["name"] = "",
-            ["id"] = "",
-            ["exists"] = false,
-            ["effectType"] = "EffectType"
+            Name = "",
+            Id = new Id(),
+            Exists = false,
+            EffectType = TypeInfoEffectType.EffectType
         });
     }
 
