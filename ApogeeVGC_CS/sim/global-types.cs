@@ -234,11 +234,6 @@ namespace ApogeeVGC_CS.sim
     /// </summary>
     public interface ISpecies : IEffect { }
 
-    /// <summary>
-    /// Represents a format effect.
-    /// </summary>
-    public interface IFormat : IEffect { }
-
     public interface ICommonHandlers
     {
         Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierEffect { get; set; }

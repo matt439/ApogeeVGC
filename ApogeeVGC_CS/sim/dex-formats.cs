@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
+using static ApogeeVGC_CS.sim.Format;
 using static System.Collections.Specialized.BitVector32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    public interface IFormatData : IEventMethods, IFormatListEntry
+    public interface IFormatData : IEventMethods, IFormat, IFormatListEntry
     {
-        // TS version also extends Partial<Format>
-        // Define methods from Format that should be implemented
     }
 
     // Represents the element of a "FormatList" type
@@ -33,14 +33,10 @@ namespace ApogeeVGC_CS.sim
     }
 
     // export interface FormatDataTable { [id: IDEntry]: FormatData }
-    public interface IFormatDataTable : IDictionary<IdEntry, IFormatData>
-    {
-    }
+    public class FormatDataTable : Dictionary<IdEntry, IFormatData> { }
 
     // export interface ModdedFormatDataTable { [id: IDEntry]: ModdedFormatData }
-    public interface IModdedFormatDataTable : IDictionary<IdEntry, IModdedFormatData>
-    {
-    }
+    public class ModdedFormatDataTable : Dictionary<IdEntry, IModdedFormatData> { }
 
     public enum FormatEffectType
     {
@@ -173,19 +169,21 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class Format : BasicEffect, IFormat
+    /// <summary>
+    /// Represents a format effect.
+    /// </summary>
+    public interface IFormat : IBasicEffect, IEffect
     {
-        // Basic format properties
-        public string Mod { get; } = "gen9"; // Default value
+        public string Mod { get; set; }
 
         /// <summary>
         /// Name of the team generator algorithm, if this format uses
         /// random/fixed teams. null if players can bring teams.
         /// </summary>
-        public string? Team { get; } = null;
+        public string? Team { get; set; }
 
-        public FormatEffectType FormatEffectType { get; } = FormatEffectType.Format; // Default value
-        public bool Debug { get; } = false; // Default value
+        public FormatEffectType FormatEffectType { get; set; }
+        public bool Debug { get; set; }
 
         /// <summary>
         /// Whether or not a format will update ladder points if searched
@@ -193,162 +191,194 @@ namespace ApogeeVGC_CS.sim
         /// (Challenge and tournament games will never update ladder points.)
         /// (Defaults to true.)
         /// </summary>
-        public object Rated { get; } = true; // Can be bool or string, defaults to true
+        public object Rated { get; set; }
 
         /// <summary>Game type.</summary>
-        public GameType GameType { get; } = GameType.Singles; // Default value
+        public GameType GameType { get; set; }
 
         /// <summary>Number of players, based on game type, for convenience</summary>
-        public int PlayerCount { get; }
+        public int PlayerCount { get; set; }
 
         /// <summary>List of rule names.</summary>
-        public List<string> Ruleset { get; } = []; // Default to empty list
+        public List<string> Ruleset { get; set; }
 
         /// <summary>
         /// Base list of rule names as specified in "./config/formats.ts".
         /// Used in a custom format to correctly display the altered ruleset.
         /// </summary>
-        public List<string> BaseRuleset { get; } = [];
+        public List<string> BaseRuleset { get; set; }
 
         /// <summary>List of banned effects.</summary>
-        public List<string> Banlist { get; } = [];
+        public List<string> Banlist { get; set; }
 
         /// <summary>List of effects that aren't completely banned.</summary>
-        public List<string> Restricted { get; } = [];
+        public List<string> Restricted { get; set; }
 
         /// <summary>List of inherited banned effects to override.</summary>
-        public List<string> Unbanlist { get; } = [];
+        public List<string> Unbanlist { get; set; }
 
         /// <summary>List of ruleset and banlist changes in a custom format.</summary>
-        public List<string>? CustomRules { get; } = null;
+        public List<string>? CustomRules { get; set; }
 
         /// <summary>Table of rule names and banned effects.</summary>
-        public RuleTable? RuleTable { get; set; } = null;
+        public RuleTable? RuleTable { get; set; }
 
         /// <summary>An optional function that runs at the start of a battle.</summary>
-        public Action<Battle>? OnBegin { get; } // deault is undefined
+        public Action<Battle>? OnBegin { get; set; } // deault is undefined
 
-        public bool NoLog { get; }
+        public bool NoLog { get; set; }
 
         // Rule-specific properties (only apply to rules, not formats)
-        public object? HasValue { get; } // Can be bool, "integer", or "positive-integer"
-        public Func<ValidationContext, string, string?>? OnValidateRule { get; }
+        public object? HasValue { get; set; } // Can be bool, "integer", or "positive-integer"
+        public Func<ValidationContext, string, string?>? OnValidateRule { get; set; }
 
         /// <summary>ID of rule that can't be combined with this rule</summary>
-        public string? MutuallyExclusiveWith { get; }
+        public string? MutuallyExclusiveWith { get; set; }
 
         // Battle module properties
-        public IModdedBattleScriptsData? Battle { get; }
-        public IModdedBattlePokemon? Pokemon { get; }
-        public IModdedBattleQueue? Queue { get; }
-        public IModdedField? Field { get; }
-        public IModdedBattleActions? Actions { get; }
-        public IModdedBattleSide? Side { get; }
+        public IModdedBattleScriptsData? Battle { get; set; }
+        public IModdedBattlePokemon? Pokemon { get; set; }
+        public IModdedBattleQueue? Queue { get; set; }
+        public IModdedField? Field { get; set; }
+        public IModdedBattleActions? Actions { get; set; }
+        public IModdedBattleSide? Side { get; set; }
 
         // Display and tournament properties
-        public bool? ChallengeShow { get; }
-        public bool? SearchShow { get; }
-        public bool? BestOfDefault { get; }
-        public bool? TeraPreviewDefault { get; }
-        public List<string>? Threads { get; }
-        public bool? TournamentShow { get; }
+        public bool? ChallengeShow { get; set; }
+        public bool? SearchShow { get; set; }
+        public bool? BestOfDefault { get; set; }
+        public bool? TeraPreviewDefault { get; set; }
+        public List<string>? Threads { get; set; }
+        public bool? TournamentShow { get; set; }
 
         // Validation functions
-        public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; }
-        public Func<Format, string, Id>? GetEvoFamily { get; }
-        public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; }
-        public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; }
-        public Func<TeamValidator, PokemonSet, Format, IAnyObject?, IAnyObject?, List<string>?>? OnChangeSet { get; }
+        public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; set; }
+        public Func<Format, string, Id>? GetEvoFamily { get; set; }
+        public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; set; }
+        public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; set; }
+        public Func<TeamValidator, PokemonSet, Format, object?, object?, List<string>?>? OnChangeSet { get; set; }
 
         // Battle event handlers
-        public int? OnModifySpeciesPriority { get; }
-        public Func<Battle, Species, Pokemon?, Pokemon?, IEffect?, Species?>? OnModifySpecies { get; }
-        public Action<Battle>? OnBattleStart { get; }
-        public Action<Battle>? OnTeamPreview { get; }
-        public Func<TeamValidator, PokemonSet, Format, IAnyObject, IAnyObject, List<string>?>? OnValidateSet { get; }
-        public Func<TeamValidator, List<PokemonSet>, Format, IAnyObject, List<string>?>? OnValidateTeam { get; }
-        public Func<TeamValidator, PokemonSet, IAnyObject, List<string>?>? ValidateSet { get; }
-        public Func<TeamValidator, List<PokemonSet>, ValidationOptions?, List<string>?>? ValidateTeam { get; }
+        public int? OnModifySpeciesPriority { get; set; }
+        public Func<Battle, Species, Pokemon?, Pokemon?, IEffect?, Species?>? OnModifySpecies { get; set; }
+        public Action<Battle>? OnBattleStart { get; set; }
+        public Action<Battle>? OnTeamPreview { get; set; }
+        public Func<TeamValidator, PokemonSet, Format, object, object, List<string>?>? OnValidateSet { get; set; }
+        public Func<TeamValidator, List<PokemonSet>, Format, object, List<string>?>? OnValidateTeam { get; set; }
+        public Func<TeamValidator, PokemonSet, object, List<string>?>? ValidateSet { get; set; }
+        public Func<TeamValidator, List<PokemonSet>, ValidationOptions?, List<string>?>? ValidateTeam { get; set; }
 
         // Layout properties
-        public string? Section { get; }
-        public int? Column { get; }
+        public string? Section { get; set; }
+        public int? Column { get; set; }
+    }
 
-        public Format(IAnyObject data) : base(data)
+    public class Format : BasicEffect, IFormat
+    {
+        public string Mod { get; set; } = "gen9";
+        public string? Team { get; set; } = null;
+        public FormatEffectType FormatEffectType { get; set; } = FormatEffectType.Format;
+        public bool Debug { get; set; } = false;
+        public object Rated { get; set; } = false;
+        public GameType GameType { get; set; } = GameType.Singles;
+        public int PlayerCount { get; set; }
+        public List<string> Ruleset { get; set; } = [];
+        public List<string> BaseRuleset { get; set; } = [];
+        public List<string> Banlist { get; set; } = [];
+        public List<string> Restricted { get; set; } = [];
+        public List<string> Unbanlist { get; set; } = [];
+        public List<string>? CustomRules { get; set; } = null;
+        public RuleTable? RuleTable { get; set; } = null;
+        public Action<Battle>? OnBegin { get; set; }
+        public bool NoLog { get; set; }
+        public object? HasValue { get; set; }
+        public Func<ValidationContext, string, string?>? OnValidateRule { get; set; }
+        public string? MutuallyExclusiveWith { get; set; }
+        public IModdedBattleScriptsData? Battle { get; set; }
+        public IModdedBattlePokemon? Pokemon { get; set; }
+        public IModdedBattleQueue? Queue { get; set; }
+        public IModdedField? Field { get; set; }
+        public IModdedBattleActions? Actions { get; set; }
+        public IModdedBattleSide? Side { get; set; }
+        public bool? ChallengeShow { get; set; }
+        public bool? SearchShow { get; set; }
+        public bool? BestOfDefault { get; set; }
+        public bool? TeraPreviewDefault { get; set; }
+        public List<string>? Threads { get; set; }
+        public bool? TournamentShow { get; set; }
+        public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; set; }
+        public Func<Format, string, Id>? GetEvoFamily { get; set; }
+        public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; set; }
+        public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; set; }
+        public Func<TeamValidator, PokemonSet, Format, object?, object?, List<string>?>? OnChangeSet { get; set; }
+        public int? OnModifySpeciesPriority { get; set; }
+        public Func<Battle, Species, Pokemon?, Pokemon?, IEffect?, Species?>? OnModifySpecies { get; set; }
+        public Action<Battle>? OnBattleStart { get; set; }
+        public Action<Battle>? OnTeamPreview { get; set; }
+        public Func<TeamValidator, PokemonSet, Format, object, object, List<string>?>? OnValidateSet { get; set; }
+        public Func<TeamValidator, List<PokemonSet>, Format, object, List<string>?>? OnValidateTeam { get; set; }
+        public Func<TeamValidator, PokemonSet, object, List<string>?>? ValidateSet { get; set; }
+        public Func<TeamValidator, List<PokemonSet>, ValidationOptions?, List<string>?>? ValidateTeam { get; set; }
+        public string? Section { get; set; }
+        public int? Column { get; set; }
+
+        public Format(IFormat data) : base(data)
         {
-            if (data.TryGetString("mod", out var mod))
-            {
-                Mod = mod;
-            }
+            Mod = data.Mod;
+            Team = data.Team;
+            FormatEffectType = data.FormatEffectType;
+            Debug = data.Debug;
+            Rated = data.Rated;
+            GameType = data.GameType;
+            PlayerCount = data.PlayerCount;
+            Ruleset = data.Ruleset;
+            BaseRuleset = data.BaseRuleset;
+            Banlist = data.Banlist;
+            Restricted = data.Restricted;
+            Unbanlist = data.Unbanlist;
+            CustomRules = data.CustomRules;
+            RuleTable = data.RuleTable;
+            OnBegin = data.OnBegin;
+            NoLog = data.NoLog;
+            HasValue = data.HasValue;
+            OnValidateRule = data.OnValidateRule;
+            MutuallyExclusiveWith = data.MutuallyExclusiveWith;
+            Battle = data.Battle;
+            Pokemon = data.Pokemon;
+            Queue = data.Queue;
+            Field = data.Field;
+            Actions = data.Actions;
+            Side = data.Side;
+            ChallengeShow = data.ChallengeShow;
+            SearchShow = data.SearchShow;
+            BestOfDefault = data.BestOfDefault;
+            TeraPreviewDefault = data.TeraPreviewDefault;
+            Threads = data.Threads;
+            TournamentShow = data.TournamentShow;
+            CheckCanLearn = data.CheckCanLearn;
+            GetEvoFamily = data.GetEvoFamily;
+            GetSharedPower = data.GetSharedPower;
+            GetSharedItems = data.GetSharedItems;
+            OnChangeSet = data.OnChangeSet;
+            OnModifySpeciesPriority = data.OnModifySpeciesPriority;
+            OnModifySpecies = data.OnModifySpecies;
+            OnBattleStart = data.OnBattleStart;
+            OnTeamPreview = data.OnTeamPreview;
+            OnValidateSet = data.OnValidateSet;
+            OnValidateTeam = data.OnValidateTeam;
+            ValidateSet = data.ValidateSet;
+            ValidateTeam = data.ValidateTeam;
+            Section = data.Section;
+            Column = data.Column;
+        }
 
-            if (data.TryGetEnum<FormatEffectType>("effectType", out var effectType))
-            {
-                FormatEffectType = effectType;
-            }
+        public void Init()
+        {
+            InitBasicEffect();
 
-            if (data.TryGetBool("debug", out var debug))
+            if (!(Rated.GetType() == typeof(bool) || Rated.GetType() == typeof(string)))
             {
-                Debug = debug;
-            }
-
-            // Rated can be a boolean or a string
-            if (data.TryGetString("rated", out var ratedString))
-            {
-                Rated = ratedString;
-            }
-            else if (data.TryGetBool("rated", out var ratedBool))
-            {
-                Rated = ratedBool;
-            }
-
-            if (data.TryGetEnum<GameType>("gameType", out var gameType))
-            {
-                GameType = gameType;
-            }
-
-            if (data.TryGetList<string>("ruleset", out var ruleset))
-            {
-                Ruleset = ruleset;
-            }
-
-            if (data.TryGetList<string>("baseRuleset", out var baseRuleset))
-            {
-                BaseRuleset = baseRuleset;
-            }
-
-            if (data.TryGetList<string>("banlist", out var banlist))
-            {
-                Banlist = banlist;
-            }
-
-            if (data.TryGetList<string>("restricted", out var restricted))
-            {
-                Restricted = restricted;
-            }
-
-            if (data.TryGetList<string>("unbanlist", out var unbanlist))
-            {
-                Unbanlist = unbanlist;
-            }
-
-            if (data.TryGetList<string>("customRules", out var customRules))
-            {
-                CustomRules = customRules;
-            }
-
-            if (data.TryGetClass<RuleTable> ("ruleTable", out var ruleTable))
-            {
-                RuleTable = ruleTable;
-            }
-
-            if (data.TryGetAction<Battle>("onBegin", out var onBegin))
-            {
-                OnBegin = onBegin;
-            }
-
-            if (data.TryGetBool("noLog", out var noLog))
-            {
-                NoLog = noLog;
+                throw new ArgumentException("Rated must be a bool or string.");
             }
 
             if (GameType == GameType.Multi || GameType == GameType.FreeForAll)
@@ -360,9 +390,10 @@ namespace ApogeeVGC_CS.sim
                 PlayerCount = 2;
             }
         }
+    }
 
-        // Helper class for Format
-        public class ValidationContext
+    // Helper class for Format
+    public class ValidationContext
         {
             public Format Format { get; set; } = null!;
             public RuleTable RuleTable { get; set; } = null!;
@@ -375,7 +406,6 @@ namespace ApogeeVGC_CS.sim
             public bool? RemoveNicknames { get; set; }
             public Dictionary<string, Dictionary<string, bool>>? SkipSets { get; set; }
         }
-    }
 
     public static class FormatUtils
     {
