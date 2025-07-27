@@ -31,10 +31,10 @@ namespace ApogeeVGC_CS.sim
     }
 
     // export interface FormatDataTable { [id: IDEntry]: FormatData }
-    public class FormatDataTable : Dictionary<IdEntry, IFormatData> { }
+    public class FormatDataTable : Dictionary<IDEntry, IFormatData> { }
 
     // export interface ModdedFormatDataTable { [id: IDEntry]: ModdedFormatData }
-    public class ModdedFormatDataTable : Dictionary<IdEntry, IModdedFormatData> { }
+    public class ModdedFormatDataTable : Dictionary<IDEntry, IModdedFormatData> { }
 
     public enum FormatEffectType
     {
@@ -251,7 +251,7 @@ namespace ApogeeVGC_CS.sim
 
         // Validation functions
         public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; set; }
-        public Func<Format, string, Id>? GetEvoFamily { get; set; }
+        public Func<Format, string, ID>? GetEvoFamily { get; set; }
         public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; set; }
         public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; set; }
         public Func<TeamValidator, PokemonSet, Format, object?, object?, List<string>?>? OnChangeSet { get; set; }
@@ -305,7 +305,7 @@ namespace ApogeeVGC_CS.sim
         public List<string>? Threads { get; set; }
         public bool? TournamentShow { get; set; }
         public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; set; }
-        public Func<Format, string, Id>? GetEvoFamily { get; set; }
+        public Func<Format, string, ID>? GetEvoFamily { get; set; }
         public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; set; }
         public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; set; }
         public Func<TeamValidator, PokemonSet, Format, object?, object?, List<string>?>? OnChangeSet { get; set; }
@@ -417,7 +417,7 @@ namespace ApogeeVGC_CS.sim
     public class DexFormats(ModdedDex dex)
     {
         ModdedDex Dex { get; } = dex;
-        private readonly Dictionary<Id, Format> _rulesetCache = [];
+        private readonly Dictionary<ID, Format> _rulesetCache = [];
         private readonly Format[]? _formatListCache = null;
 
         public DexFormats Load()
@@ -455,7 +455,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("ValidateRule method is not implemented yet.");
         }
 
-        public bool ValidPokemonTag(Id tagId)
+        public bool ValidPokemonTag(ID tagId)
         {
             throw new NotImplementedException("ValidPokemonTag method is not implemented yet.");
         }

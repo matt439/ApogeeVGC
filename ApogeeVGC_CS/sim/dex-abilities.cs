@@ -514,7 +514,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -526,8 +526,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -546,8 +546,8 @@ namespace ApogeeVGC_CS.sim
     }
 
     // Type aliases for data tables
-    public class AbilityDataTable : Dictionary<IdEntry, AbilityData> { }
-    public class ModdedAbilityDataTable : Dictionary<IdEntry, ModdedAbilityData> { }
+    public class AbilityDataTable : Dictionary<IDEntry, AbilityData> { }
+    public class ModdedAbilityDataTable : Dictionary<IDEntry, ModdedAbilityData> { }
 
     /// <summary>
     /// Represents an ability effect.
@@ -608,7 +608,7 @@ namespace ApogeeVGC_CS.sim
     {
         public static readonly Ability EmptyAbility = new(new AbilityData
         {
-            Id = new Id(string.Empty),
+            Id = new ID(string.Empty),
             Name = "",
             Exists = false
         });
@@ -617,7 +617,7 @@ namespace ApogeeVGC_CS.sim
     public class DexAbilities(ModdedDex dex)
     {
         public ModdedDex Dex { get; } = dex;
-        private readonly Dictionary<Id, Ability> _abilityCache = [];
+        private readonly Dictionary<ID, Ability> _abilityCache = [];
         private List<Ability>? _allCache = null;
 
         public Ability Get(string name = "")
@@ -630,7 +630,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public Ability GetById(Id id)
+        public Ability GetById(ID id)
         {
             throw new NotImplementedException();
         }

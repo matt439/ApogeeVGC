@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace ApogeeVGC_CS.sim
 {
-    public abstract class BasicEffect
+    public abstract class BasicEffect : IBasicEffect
     {
         /// <summary>
         /// ID. This will be a lowercase version of the name with all the
@@ -16,7 +16,7 @@ namespace ApogeeVGC_CS.sim
         /// becomes "mrmime", and "Basculin-Blue-Striped" becomes
         /// "basculinbluestriped".
         /// </summary>
-        public Id Id { get; set; } = new Id();
+        public ID Id { get; set; } = new ID();
 
         /// <summary>
         /// Name. Currently does not support Unicode letters, so "Flabébé"
@@ -83,16 +83,16 @@ namespace ApogeeVGC_CS.sim
         public bool AffectsFainted { get; set; } = false;
 
         /// <summary>Moves only: what status does it set?</summary>
-        public Id? Status { get; set; } = null;
+        public ID? Status { get; set; } = null;
 
         /// <summary>Moves only: what weather does it set?</summary>
-        public Id? Weather { get; set; } = null;
+        public ID? Weather { get; set; } = null;
 
         /// <summary>???</summary>
         public string SourceEffect { get; set; } = string.Empty;
 
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-        public string? EffectTypeString { get; set; } = null;
+        //public string? EffectTypeString { get; set; } = null;
         public bool? Infiltrates { get; set; } = null;
         public string? RealMove { get; set; } = null; // Added this for the Init method
         
@@ -116,7 +116,7 @@ namespace ApogeeVGC_CS.sim
             Weather = other.Weather;
             SourceEffect = other.SourceEffect;
             DurationCallback = other.DurationCallback;
-            EffectTypeString = other.EffectTypeString;
+            //EffectTypeString = other.EffectTypeString;
             Infiltrates = other.Infiltrates;
             RealMove = other.RealMove;
         }
@@ -134,11 +134,11 @@ namespace ApogeeVGC_CS.sim
 
             if (RealMove != null)
             {
-                Id = new Id(RealMove);
+                Id = new ID(RealMove);
             }
             else
             {
-                Id = new Id(Name);
+                Id = new ID(Name);
             }
 
             if (Fullname == string.Empty)
@@ -200,7 +200,7 @@ namespace ApogeeVGC_CS.sim
     {
         public StatIDExceptHP? Plus { get; set; }
         public StatIDExceptHP? Minus { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -213,8 +213,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -227,7 +227,7 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public class NatureDataTable : Dictionary<IdEntry, INatureData> { }
+    public class NatureDataTable : Dictionary<IDEntry, INatureData> { }
 
     public class DexNatures(ModdedDex dex)
     {
@@ -245,7 +245,7 @@ namespace ApogeeVGC_CS.sim
             throw new Exception("Get method is not implemented yet.");
         }
 
-        public Nature GetByID(Id id)
+        public Nature GetByID(ID id)
         {
             throw new Exception();
         }
@@ -270,7 +270,7 @@ namespace ApogeeVGC_CS.sim
         public SparseStatsTable? HPdvs { get; set; }
         public SparseStatsTable? HPivs { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public TypeInfoEffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -282,8 +282,8 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public class TypeDataTable : Dictionary<IdEntry, ITypeData> { }
-    public class IModdedTypeDataTable : Dictionary<IdEntry, IModdedTypeData> { }
+    public class TypeDataTable : Dictionary<IDEntry, ITypeData> { }
+    public class IModdedTypeDataTable : Dictionary<IDEntry, IModdedTypeData> { }
 
     public enum TypeInfoEffectType
     {
@@ -293,7 +293,7 @@ namespace ApogeeVGC_CS.sim
 
     public interface ITypeInfo
     {
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public TypeInfoEffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -306,7 +306,7 @@ namespace ApogeeVGC_CS.sim
         /// ID. This will be a lowercase version of the name with all the
         /// non-alphanumeric characters removed. e.g. 'flying'
         /// </summary>
-        public Id Id { get; set; } = new Id();
+        public ID Id { get; set; } = new ID();
 
         /// <summary>Name. e.g. 'Flying'</summary>
         public string Name { get; set; } = string.Empty;
@@ -379,7 +379,7 @@ namespace ApogeeVGC_CS.sim
         public static readonly TypeInfo EmptyTypeInfo = new(new TypeData
         {
             Name = "",
-            Id = new Id(),
+            Id = new ID(),
             Exists = false,
             EffectType = TypeInfoEffectType.EffectType
         });
@@ -388,7 +388,7 @@ namespace ApogeeVGC_CS.sim
     public class DexTypes(ModdedDex dex)
     {
         private readonly ModdedDex _dex = dex;
-        private readonly Dictionary<Id, TypeInfo> _typeCache = [];
+        private readonly Dictionary<ID, TypeInfo> _typeCache = [];
         private TypeInfo[]? _allCache = null;
         private string[]? _namesCache = null;
 
@@ -402,7 +402,7 @@ namespace ApogeeVGC_CS.sim
             throw new Exception("Get method is not implemented yet.");
         }
 
-        public TypeInfo GetByID(Id id)
+        public TypeInfo GetByID(ID id)
         {
             throw new Exception();
         }

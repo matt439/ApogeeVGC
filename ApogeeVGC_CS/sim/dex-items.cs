@@ -517,7 +517,7 @@ namespace ApogeeVGC_CS.sim
         public Delegate? OnUse { get; set; }
         public Action<Battle, Pokemon>? OnStart { get; set; }
         public Action<Battle, Pokemon>? OnEnd { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -530,8 +530,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -545,8 +545,8 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon>? OnCustap { get; set; }
     }
 
-    public class ItemDataTable : Dictionary<IdEntry, IItemData> { }
-    public class ModdedItemDataTable : Dictionary<IdEntry, IModdedItemData> { }
+    public class ItemDataTable : Dictionary<IDEntry, IItemData> { }
+    public class ModdedItemDataTable : Dictionary<IDEntry, IModdedItemData> { }
 
 
     /// <summary>
@@ -797,7 +797,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("Get method is not implemented yet.");
         }
 
-        public Item GetByID(Id id)
+        public Item GetByID(ID id)
         {
             throw new NotImplementedException("GetByID method is not implemented yet.");
         }

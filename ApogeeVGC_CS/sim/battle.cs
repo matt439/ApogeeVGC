@@ -62,7 +62,7 @@ namespace ApogeeVGC_CS.sim
     public class BattleOptions
     {
         public Format? Format { get; set; }
-        public Id FormatId { get; set; } = new();
+        public ID FormatId { get; set; } = new();
         public Action<string, object>? Send { get; set; }
         public PRNG? Prng { get; set; }
         public PRNGSeed? Seed { get; set; }
@@ -122,7 +122,7 @@ namespace ApogeeVGC_CS.sim
     public class Battle
     {
         // Readonly properties
-        public Id Id { get; } = new();
+        public ID Id { get; } = new();
         public bool DebugMode { get; }
         public bool? ForceRandomChance { get; }
         public bool Deserialized { get; }
@@ -175,7 +175,7 @@ namespace ApogeeVGC_CS.sim
         public Pokemon? ActiveTarget { get; set; }
 
         public ActiveMove? LastMove { get; set; }
-        public Id? LastSuccessfulMoveThisTurn { get; set; }
+        public ID? LastSuccessfulMoveThisTurn { get; set; }
         public int LastMoveLine { get; set; }
         public int LastDamage { get; set; }
         public int EffectOrder { get; set; }
@@ -197,7 +197,7 @@ namespace ApogeeVGC_CS.sim
         // Methods
         public Func<double, int?, double> Trunc { get; set; }
         public Func<object, int?, int?, int> ClampIntRange { get; set; }
-        public Func<object, Id> ToID { get; set; }
+        public Func<object, ID> ToID { get; set; }
 
         public Battle(BattleOptions options)
         {

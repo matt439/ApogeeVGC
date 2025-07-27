@@ -1043,7 +1043,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -1056,8 +1056,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -1565,7 +1565,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -1578,8 +1578,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -2087,7 +2087,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public Id Id { get; set; }
+        public ID Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -2100,8 +2100,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         public string? EffectTypeString { get; set; }
@@ -2113,8 +2113,8 @@ namespace ApogeeVGC_CS.sim
     {
         public bool Inherit { get; set; }
     }
-    public class ConditionDataTable : Dictionary<IdEntry, IConditionData> { }
-    public class ModdedConditionDataTable : Dictionary<IdEntry, IModdedConditionData> { }
+    public class ConditionDataTable : Dictionary<IDEntry, IConditionData> { }
+    public class ModdedConditionDataTable : Dictionary<IDEntry, IModdedConditionData> { }
 
 
     /// <summary>
@@ -3210,7 +3210,7 @@ namespace ApogeeVGC_CS.sim
     public class DexConditions(ModdedDex dex)
     {
         ModdedDex Dex { get; } = dex;
-        private readonly Dictionary<Id, Condition> _conditionCache = [];
+        private readonly Dictionary<ID, Condition> _conditionCache = [];
 
         public Condition Get(string? name = "")
         {
@@ -3222,7 +3222,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("Get method is not implemented yet.");
         }
 
-        public Condition GetById(Id id)
+        public Condition GetById(ID id)
         {
             throw new NotImplementedException("GetById method is not implemented yet.");
         }

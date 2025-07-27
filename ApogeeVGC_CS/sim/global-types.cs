@@ -16,7 +16,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace ApogeeVGC_CS.sim
 {
     // An ID must have only lowercase alphanumeric characters
-    public class Id
+    public class ID
     {
         private string _value = string.Empty;
         public string Value
@@ -40,17 +40,17 @@ namespace ApogeeVGC_CS.sim
         public bool IsId => true;
         public bool IsEmpty => string.IsNullOrEmpty(Value);
 
-        public Id()
+        public ID()
         {
             Value = string.Empty; // Default to empty string
         }
 
-        public Id(string id)
+        public ID(string id)
         {
             Value = FromString(id);
         }
 
-        public Id(object obj)
+        public ID(object obj)
         {
             Value = FromObject(obj);
         }
@@ -104,7 +104,7 @@ namespace ApogeeVGC_CS.sim
     }
 
     // must be lowercase alphanumeric
-    public class IdEntry
+    public class IDEntry
     {
         private string _value = string.Empty;
         public string Value
@@ -205,10 +205,10 @@ namespace ApogeeVGC_CS.sim
         public SparseStatsTable? IVs { get; set; }
         public int? PerfectIVs { get; set; }
         public bool? IsHidden { get; set; }
-        public List<IdEntry>? Abilities { get; set; }
+        public List<IDEntry>? Abilities { get; set; }
         public int? MaxEggMoves { get; set; }
-        public List<IdEntry>? Moves { get; set; }
-        public IdEntry? Pokeball { get; set; }
+        public List<IDEntry>? Moves { get; set; }
+        public IDEntry? Pokeball { get; set; }
         public string? From { get; set; }
         public bool? Japan { get; set; }
         public bool? EmeraldEventEgg { get; set; }
@@ -251,7 +251,8 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; }
         public int? Duration { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
+        public EffectType EffectType { get; set; }
         public bool? Infiltrates { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
         public string? ShortDesc { get; set; }
@@ -293,25 +294,25 @@ namespace ApogeeVGC_CS.sim
 
     public interface IBasicEffect : IEffectData
     {
-        public Id Id { get; set; }
-        public new string Name { get; set; }
+        public ID Id { get; set; }
+        //public new string Name { get; set; }
         public string Fullname { get; set; }
-        public EffectType EffectType { get; set; }
+        //public EffectType EffectType { get; set; }
         public bool Exists { get; set; }
         public int Num { get; set; }
         public int Gen { get; set; }
-        public new string? ShortDesc { get; set; }
-        public new string? Desc { get; set; }
-        public new Nonstandard? IsNonstandard { get; set; }
-        public new int? Duration { get; set; }
+        //public new string? ShortDesc { get; set; }
+        //public new string? Desc { get; set; }
+        //public new Nonstandard? IsNonstandard { get; set; }
+        //public new int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
+        public ID? Status { get; set; }
+        public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
-        public new Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public new string? EffectTypeString { get; set; }
-        public new bool? Infiltrates { get; set; }
+        //public new Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
+        //public new string? EffectTypeString { get; set; }
+        //public new bool? Infiltrates { get; set; }
         public string? RealMove { get; set; }// Added this for the Init method
     }
 
@@ -416,7 +417,7 @@ namespace ApogeeVGC_CS.sim
         Func<Pokemon, bool?, bool>? CureStatus { get; set; }
         Func<Pokemon, object, object?, object?, int>? DeductPP { get; set; }
         Func<Pokemon, bool?, Pokemon?, object?, bool>? EatItem { get; set; }
-        Func<Pokemon, Id>? EffectiveWeather { get; set; }
+        Func<Pokemon, ID>? EffectiveWeather { get; set; }
         Func<Pokemon, object, object, object?, string?, bool>? FormeChange { get; set; }
         Func<Pokemon, object, bool>? HasType { get; set; }
         Func<Pokemon, object>? GetAbility { get; set; }
