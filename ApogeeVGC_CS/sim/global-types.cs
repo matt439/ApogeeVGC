@@ -160,7 +160,20 @@ namespace ApogeeVGC_CS.sim
     }
 
     public class StatsExceptHPTable : Dictionary<StatIDExceptHP, int> { }
-    public class StatsTable : Dictionary<StatID, int> { }
+    public class StatsTable : Dictionary<StatID, int>
+    {
+        public StatsTable() : base()
+        {
+            this[StatID.Hp] = 0; // Initialize HP to 0
+        }
+        public StatsTable(StatsTable other) : this()
+        {
+            foreach (var kvp in other)
+            {
+                this[kvp.Key] = kvp.Value;
+            }
+        }
+    }
     public class SparseStatsTable : Dictionary<StatID, int> { }
 
     public enum BoostID
@@ -218,16 +231,6 @@ namespace ApogeeVGC_CS.sim
     /// Base interface for all effect types.
     /// </summary>
     public interface IEffect { }
-
-    /// <summary>
-    /// Represents an active move effect.
-    /// </summary>
-    public interface IActiveMove : IEffect { }
-
-    /// <summary>
-    /// Represents a species effect.
-    /// </summary>
-    public interface ISpecies : IEffect { }
 
     public interface ICommonHandlers
     {

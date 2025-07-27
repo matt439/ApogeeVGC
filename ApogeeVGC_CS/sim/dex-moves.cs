@@ -480,7 +480,9 @@ namespace ApogeeVGC_CS.sim
 
     public class MoveHitData : Dictionary<string, MoveHitResult> { }
 
-    public interface IMutableMove : IMoveData
+    public interface IMutableMove : IMoveData { }
+
+    public interface IActiveMove : IMutableMove, IEffect
     {
         public int Hit { get; set; }
         public MoveHitData? MoveHitData { get; set; }
@@ -499,7 +501,7 @@ namespace ApogeeVGC_CS.sim
         public bool? PranksterBoosted { get; set; }
         public bool? SelfDropped { get; set; }
         //public object? SelfSwitch { get; set; } // "copyvolatile", "shedtail", or bool
-        
+
         public string? StatusRoll { get; set; }
         public bool? StellarBoosted { get; set; }
         public object? TotalDamage { get; set; } // int or false
@@ -512,7 +514,7 @@ namespace ApogeeVGC_CS.sim
         public bool? IsZOrMaxPowered { get; set; }
     }
 
-    public class ActiveMove : IMutableMove
+    public class ActiveMove : IActiveMove
     {
         public PokemonType? BaseMoveType { get; set; }
         public PokemonType Type { get; set; }

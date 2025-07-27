@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
-    // SpeciesAbility structure
-    public class SpeciesAbility
+    public class SpeciesAbility(string slot0, string? slot1, string? hidden, string? special)
     {
-        public string Slot0 { get; set; } = string.Empty;
-        public string? Slot1 { get; set; }
-        public string? Hidden { get; set; }
-        public string? Special { get; set; }
+        public string Slot0 { get; set; } = slot0;
+        public string? Slot1 { get; set; } = slot1;
+        public string? Hidden { get; set; } = hidden;
+        public string? Special { get; set; } = special;
+
+        public SpeciesAbility(SpeciesAbility other) :
+            this(other.Slot0, other.Slot1, other.Hidden, other.Special)
+        {
+        }
     }
 
-    // SpeciesTag enum
     public enum SpeciesTag
     {
         Mythical,
@@ -21,26 +22,39 @@ namespace ApogeeVGC_CS.sim
         Paradox
     }
 
-    // SpeciesData structure
-    public class SpeciesData
+    public interface ISpeciesData
     {
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
         public int Num { get; set; }
-        public List<string> Types { get; set; } = new();
-        public SpeciesAbility Abilities { get; set; } = new();
-        public StatsTable BaseStats { get; set; } = new();
-        public List<string> EggGroups { get; set; } = new();
+        public List<PokemonType> Types { get; set; }
+        public SpeciesAbility Abilities { get; set; }
+        public StatsTable BaseStats { get; set; }
+        public List<string> EggGroups { get; set; }
         public double WeightKg { get; set; }
     }
 
-    // ModdedSpeciesData structure
-    public class ModdedSpeciesData : SpeciesData
+    public class SpeciesData(ISpeciesData other) : ISpeciesData
+    {
+        public string Name { get; set; } = other.Name;
+        public int Num { get; set; } = other.Num;
+        public List<PokemonType> Types { get; set; } = [.. other.Types];
+        public SpeciesAbility Abilities { get; set; } = new(other.Abilities);
+        public StatsTable BaseStats { get; set; } = new(other.BaseStats);
+        public List<string> EggGroups { get; set; } = [.. other.EggGroups];
+        public double WeightKg { get; set; } = other.WeightKg;
+    }
+
+    public interface IModdedSpeciesData : ISpeciesData
     {
         public bool Inherit { get; set; }
     }
 
-    // SpeciesFormatsData structure
-    public class SpeciesFormatsData
+    public class ModdedSpeciesData(IModdedSpeciesData data) : SpeciesData(data), IModdedSpeciesData
+    {
+        public bool Inherit { get; set; }
+    }
+
+    public interface ISpeciesFormatsData
     {
         public string? DoublesTier { get; set; }
         public bool? GmaxUnreleased { get; set; }
@@ -49,13 +63,20 @@ namespace ApogeeVGC_CS.sim
         public string? Tier { get; set; }
     }
 
-    // ModdedSpeciesFormatsData structure
+    public class SpeciesFormatsData : ISpeciesFormatsData
+    {
+        public string? DoublesTier { get; set; }
+        public bool? GmaxUnreleased { get; set; }
+        public string? IsNonstandard { get; set; }
+        public string? NatDexTier { get; set; }
+        public string? Tier { get; set; }
+    }
+
     public class ModdedSpeciesFormatsData : SpeciesFormatsData
     {
         public bool? Inherit { get; set; }
     }
 
-    // LearnsetData structure
     public class LearnsetData
     {
         public Dictionary<string, List<MoveSource>>? Learnset { get; set; }
@@ -65,20 +86,17 @@ namespace ApogeeVGC_CS.sim
         public bool? Exists { get; set; }
     }
 
-    // ModdedLearnsetData structure
     public class ModdedLearnsetData : LearnsetData
     {
         public bool? Inherit { get; set; }
     }
 
-    // PokemonGoData structure
     public class PokemonGoData
     {
         public List<string>? Encounters { get; set; }
         public Dictionary<string, int?>? LGPERestrictiveMoves { get; set; }
     }
 
-    // Data tables
     public class SpeciesDataTable : Dictionary<string, SpeciesData> { }
     public class ModdedSpeciesDataTable : Dictionary<string, ModdedSpeciesData> { }
     public class SpeciesFormatsDataTable : Dictionary<string, SpeciesFormatsData> { }
@@ -99,11 +117,13 @@ namespace ApogeeVGC_CS.sim
         public string Details { get; set; } = details;
     }
 
-    public class Species : BasicEffect, ISpecies
+    /// <summary>
+    /// Represents a species effect.
+    /// </summary>
+    public interface ISpecies : IEffect { }
+
+    public class Species : BasicEffect, ISpeciesFormatsData, ISpecies
     {
-        public override EffectType EffectType => EffectType.Pokemon;
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
         public string BaseSpecies { get; set; } = string.Empty;
         public string Forme { get; set; } = string.Empty;
         public string BaseForme { get; set; } = string.Empty;
