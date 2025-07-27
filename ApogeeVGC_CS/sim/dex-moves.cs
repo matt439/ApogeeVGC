@@ -307,7 +307,7 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; }
         public int? Duration { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
         public string? ShortDesc { get; set; }
@@ -598,7 +598,7 @@ namespace ApogeeVGC_CS.sim
         public bool AffectsFainted { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public string? RealMove { get; set; }
         public IConditionData? Condition { get; set; }

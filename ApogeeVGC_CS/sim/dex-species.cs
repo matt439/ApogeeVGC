@@ -92,18 +92,11 @@ namespace ApogeeVGC_CS.sim
         TM, Tutor, LevelUp, Restricted, Egg, DreamWorld, Event, Virtual, Chain
     }
 
-    public class MoveSource
+    public class MoveSource(int generation, MoveSourceType sourceType, string details = "")
     {
-        public int Generation { get; set; } // 1-9
-        public MoveSourceType SourceType { get; set; }
-        public string Details { get; set; } = string.Empty; // Level, event index, etc.
-
-        public MoveSource(int generation, MoveSourceType sourceType, string details = "")
-        {
-            Generation = generation;
-            SourceType = sourceType;
-            Details = details;
-        }
+        public int Generation { get; set; } = generation;
+        public MoveSourceType SourceType { get; set; } = sourceType;
+        public string Details { get; set; } = details;
     }
 
     public class Species : BasicEffect, ISpecies
@@ -165,60 +158,6 @@ namespace ApogeeVGC_CS.sim
 
         public Species(IAnyObject data) : base(data)
         {
-            Name = BasicEffect.GetString(data, "name");
-            BaseSpecies = BasicEffect.GetString(data, "baseSpecies") ?? Name;
-            Forme = BasicEffect.GetString(data, "forme") ?? string.Empty;
-            BaseForme = BasicEffect.GetString(data, "baseForme") ?? string.Empty;
-            CosmeticFormes = data.ContainsKey("cosmeticFormes") ? (List<string>?)data["cosmeticFormes"] : null;
-            OtherFormes = data.ContainsKey("otherFormes") ? (List<string>?)data["otherFormes"] : null;
-            FormeOrder = data.ContainsKey("formeOrder") ? (List<string>?)data["formeOrder"] : null;
-            SpriteId = data.ContainsKey("spriteid") ? data["spriteid"]?.ToString() ?? string.Empty :
-                (BaseSpecies + (BaseSpecies != Name ? $"-{Forme}" : ""));
-            Abilities = data.ContainsKey("abilities") ? (SpeciesAbility)data["abilities"] : new SpeciesAbility();
-            Types = data.ContainsKey("types") ? (List<string>)data["types"] : new List<string> { "???" };
-            AddedType = data.ContainsKey("addedType") ? data["addedType"]?.ToString() : null;
-            Prevo = data.ContainsKey("prevo") ? data["prevo"]?.ToString() ?? string.Empty : string.Empty;
-            Tier = data.ContainsKey("tier") ? data["tier"]?.ToString() ?? string.Empty : string.Empty;
-            DoublesTier = data.ContainsKey("doublesTier") ? data["doublesTier"]?.ToString() ?? string.Empty : string.Empty;
-            NatDexTier = data.ContainsKey("natDexTier") ? data["natDexTier"]?.ToString() ?? string.Empty : string.Empty;
-            Evos = data.ContainsKey("evos") ? (List<string>)data["evos"] : new List<string>();
-            EvoType = data.ContainsKey("evoType") ? data["evoType"]?.ToString() : null;
-            EvoMove = data.ContainsKey("evoMove") ? data["evoMove"]?.ToString() : null;
-            EvoLevel = data.ContainsKey("evoLevel") ? (int?)data["evoLevel"] : null;
-            NFE = BasicEffect.GetBool(data, "nfe") ?? false;
-            EggGroups = data.ContainsKey("eggGroups") ? (List<string>)data["eggGroups"] : new List<string>();
-            CanHatch = BasicEffect.GetBool(data, "canHatch") ?? false;
-            Gender = data.ContainsKey("gender") ? data["gender"]?.ToString() ?? string.Empty : string.Empty;
-            GenderRatio = data.ContainsKey("genderRatio") ? (Dictionary<string, double>)data["genderRatio"] :
-                (Gender == "M" ? new() { { "M", 1 }, { "F", 0 } } :
-                 Gender == "F" ? new() { { "M", 0 }, { "F", 1 } } :
-                 Gender == "N" ? new() { { "M", 0 }, { "F", 0 } } :
-                 new() { { "M", 0.5 }, { "F", 0.5 } });
-            RequiredItem = data.ContainsKey("requiredItem") ? data["requiredItem"]?.ToString() : null;
-            RequiredItems = data.ContainsKey("requiredItems") ? (List<string>?)data["requiredItems"] :
-                (RequiredItem != null ? new List<string> { RequiredItem } : null);
-            BaseStats = data.ContainsKey("baseStats") ? (StatsTable)data["baseStats"] : new StatsTable();
-            BST = BaseStats.hp + BaseStats.atk + BaseStats.def + BaseStats.spa + BaseStats.spd + BaseStats.spe;
-            WeightKg = data.ContainsKey("weightkg") ? Convert.ToDouble(data["weightkg"]) : 0;
-            WeightHg = WeightKg * 10;
-            HeightM = data.ContainsKey("heightm") ? Convert.ToDouble(data["heightm"]) : 0;
-            Color = data.ContainsKey("color") ? data["color"]?.ToString() ?? string.Empty : string.Empty;
-            Tags = data.ContainsKey("tags") ? (List<SpeciesTag>)data["tags"] : new List<SpeciesTag>();
-            UnreleasedHidden = data.ContainsKey("unreleasedHidden") ? data["unreleasedHidden"] : false;
-            MaleOnlyHidden = BasicEffect.GetBool(data, "maleOnlyHidden") ?? false;
-            MaxHP = data.ContainsKey("maxHP") ? (int?)data["maxHP"] : null;
-            IsMega = (Forme != null && (Forme == "Mega" || Forme == "Mega-X" || Forme == "Mega-Y")) ? true : null;
-            CanGigantamax = data.ContainsKey("canGigantamax") ? data["canGigantamax"]?.ToString() : null;
-            GmaxUnreleased = BasicEffect.GetBool(data, "gmaxUnreleased");
-            CannotDynamax = BasicEffect.GetBool(data, "cannotDynamax");
-            BattleOnly = data.ContainsKey("battleOnly") ? data["battleOnly"] :
-                (IsMega == true ? BaseSpecies : null);
-            ChangesFrom = data.ContainsKey("changesFrom") ? data["changesFrom"]?.ToString() :
-                (BattleOnly != null && BattleOnly.ToString() != BaseSpecies ? BattleOnly.ToString() : BaseSpecies);
-            if (ChangesFrom is List<string> changesList && changesList.Count > 0)
-                ChangesFrom = changesList[0];
-            PokemonGoData = data.ContainsKey("pokemonGoData") ? (List<string>?)data["pokemonGoData"] : null;
-
             // Generation assignment
             if (Gen == 0 && Num >= 1)
             {

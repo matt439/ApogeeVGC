@@ -166,8 +166,8 @@ namespace ApogeeVGC_CS.sim
         public IEffect Effect { get; set; }
         public EffectState EffectState { get; set; }
 
-        public IAnyObject Event { get; set; }
-        public IAnyObject? Events { get; set; }
+        public object Event { get; set; }
+        public object? Events { get; set; }
         public int EventDepth { get; set; }
 
         public ActiveMove? ActiveMove { get; set; }
@@ -204,7 +204,7 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement constructor logic
         }
 
-        public IAnyObject ToJSON()
+        public object ToJSON()
         {
             throw new NotImplementedException();
             // TODO - implement JSON serialization
@@ -275,25 +275,25 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public static int ComparePriority(IAnyObject a, IAnyObject b)
+        public static int ComparePriority(object a, object b)
         {
             // TODO: Implement priority comparison
             throw new NotImplementedException();
         }
 
-        public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
+        public static int CompareRedirectOrder(object a, object b)
         {
             // TODO: Implement redirect order comparison
             throw new NotImplementedException();
         }
 
-        public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
+        public static int CompareLeftToRightOrder(object a, object b)
         {
             // TODO: Implement left-to-right order comparison
             throw new NotImplementedException();
         }
 
-        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) where T : IAnyObject
+        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null)
         {
             // TODO: Implement speed sorting with tie resolution
             throw new NotImplementedException();
@@ -311,7 +311,7 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement field event handling logic
         }
 
-        public IAnyObject SingleEvent(string eventId, IEffect effect, object? state = null,
+        public object SingleEvent(string eventId, IEffect effect, object? state = null,
             object? target = null, object? source = null, IEffect? sourceEffect = null,
             object? relayVar = null, Delegate? customCallback = null)
         {
@@ -319,7 +319,7 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement single event handling logic
         }
 
-        public IAnyObject RunEvent(string eventId, object? target = null, object? source = null,
+        public object RunEvent(string eventId, object? target = null, object? source = null,
             IEffect? sourceEffect = null, object? relayVar = null, bool onEffect = false,
             bool fastExit = false)
         {
@@ -327,7 +327,7 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement event running logic
         }
 
-        public IAnyObject PriorityEvent(string eventId, object target, object? source = null,
+        public object PriorityEvent(string eventId, object target, object? source = null,
             IEffect? effect = null, object? relayVar = null, bool onEffect = false)
         {
             throw new NotImplementedException();
@@ -613,7 +613,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void GetActionSpeed(IAnyObject action)
+        public void GetActionSpeed(object action)
         {
             throw new NotImplementedException();
         }

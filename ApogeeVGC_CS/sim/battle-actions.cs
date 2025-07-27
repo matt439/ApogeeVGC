@@ -148,12 +148,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("TrySpreadMoveHit method is not implemented yet.");
         }
 
-        public IAnyObject[] HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+        public object[] HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
         {
             throw new NotImplementedException("HitStepInvulnerabilityEvent method is not implemented yet.");
         }
 
-        public IAnyObject HitStepTryHitEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+        public object HitStepTryHitEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
         {
             throw new NotImplementedException("HitStepTryHitEvent method is not implemented yet.");
         }

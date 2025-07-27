@@ -1060,7 +1060,7 @@ namespace ApogeeVGC_CS.sim
         public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public string? RealMove { get; set; }
     }
@@ -1582,7 +1582,7 @@ namespace ApogeeVGC_CS.sim
         public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public string? RealMove { get; set; }
     }
@@ -2104,7 +2104,7 @@ namespace ApogeeVGC_CS.sim
         public ID? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        public string? EffectTypeString { get; set; }
+        //public string? EffectTypeString { get; set; }
         public bool? Infiltrates { get; set; }
         public string? RealMove { get; set; }
     }
