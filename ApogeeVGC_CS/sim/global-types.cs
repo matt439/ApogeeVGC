@@ -93,6 +93,12 @@ namespace ApogeeVGC_CS.sim
     public class IdEntry : Id
     {
         public override bool IsId => false;
+
+        public IdEntry() { }
+
+        public IdEntry(string id) : base(id) { }
+
+        public IdEntry(object obj) : base(obj) { }
     }
 
     // must be lowercase alphanumeric and can be empty

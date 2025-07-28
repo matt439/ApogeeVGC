@@ -73,20 +73,20 @@
         /// A shortened form of the description of this effect.
         /// Not all effects have this.
         /// </summary>
-        public string? ShortDesc { get; protected set; }
+        public string? ShortDesc { get; init; }
 
         /// <summary>The full description for this effect.</summary>
-        public string? Desc { get; protected set; }
+        public string? Desc { get; init; }
 
         /// <summary>
         /// Is this item/move/ability/pokemon nonstandard? Specified for effects
         /// that have no use in standard formats: made-up pokemon (CAP),
         /// glitches (MissingNo etc), Pokestar pokemon, etc.
         /// </summary>
-        public Nonstandard? IsNonstandard { get; protected set; }
+        public Nonstandard? IsNonstandard { get; init; }
 
         /// <summary>The duration of the condition - only for pure conditions.</summary>
-        public int? Duration { get; protected set; }
+        public int? Duration { get; init; }
 
         /// <summary>Whether or not the condition is ignored by Baton Pass - only for pure conditions.</summary>
         public required bool NoCopy { get; init; }
@@ -95,47 +95,16 @@
         public required bool AffectsFainted { get; init; }
 
         /// <summary>Moves only: what status does it set?</summary>
-        public Id? Status { get; protected set; }
+        public Id? Status { get; init; }
 
         /// <summary>Moves only: what weather does it set?</summary>
-        public Id? Weather { get; protected set; }
+        public Id? Weather { get; init; }
 
         /// <summary>???</summary>
         public required string SourceEffect { get; init; }
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; protected set; }
-        public bool? Infiltrates { get; protected set; }
-        public string? RealMove { get; protected set; }
-
-        //public void InitBasicEffect()
-        //{
-        //    if (Name != string.Empty)
-        //    {
-        //        Name = Name.Trim();
-        //    }
-        //    else
-        //    {
-        //        throw new ArgumentException("Name is required for BasicEffect.");
-        //    }
-
-        //    if (RealMove != null)
-        //    {
-        //        Id = new Id(RealMove);
-        //    }
-        //    else
-        //    {
-        //        Id = new Id(Name);
-        //    }
-
-        //    if (Fullname == string.Empty)
-        //    {
-        //        Fullname = Name;
-        //    }
-
-        //    if (!Exists)
-        //    {                 
-        //        Exists = !Id.IsEmpty;
-        //    }
-        //}
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
+        public bool? Infiltrates { get; init; }
+        public string? RealMove { get; init; }
 
         public override string ToString()
         {
@@ -235,58 +204,65 @@
         public StatIdExceptHp? Minus { get; }
     }
 
+    //public class NatureData : INatureData
+    //{
+    //    public StatIdExceptHp? Plus { get; set; }
+    //    public StatIdExceptHp? Minus { get; set; }
+    //    public Id Id { get; set; }
+    //    public string Name { get; set; }
+    //    public string Fullname { get; set; }
+    //    public EffectType EffectType { get; set; }
+    //    public bool Exists { get; set; }
+    //    public int Num { get; set; }
+    //    public int Gen { get; set; }
+    //    public string? ShortDesc { get; set; }
+    //    public string? Desc { get; set; }
+    //    public Nonstandard? IsNonstandard { get; set; }
+    //    public int? Duration { get; set; }
+    //    public bool NoCopy { get; set; }
+    //    public bool AffectsFainted { get; set; }
+    //    public Id? Status { get; set; }
+    //    public Id? Weather { get; set; }
+    //    public string SourceEffect { get; set; }
+    //    public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
+    //    //public string? EffectTypeString { get; set; }
+    //    public bool? Infiltrates { get; set; }
+    //    public string? RealMove { get; set; }
+    //}
+
     public class NatureData : INatureData
     {
-        public StatIdExceptHp? Plus { get; set; }
-        public StatIdExceptHp? Minus { get; set; }
-        public Id Id { get; set; }
-        public string Name { get; set; }
-        public string Fullname { get; set; }
-        public EffectType EffectType { get; set; }
-        public bool Exists { get; set; }
-        public int Num { get; set; }
-        public int Gen { get; set; }
-        public string? ShortDesc { get; set; }
-        public string? Desc { get; set; }
-        public Nonstandard? IsNonstandard { get; set; }
-        public int? Duration { get; set; }
-        public bool NoCopy { get; set; }
-        public bool AffectsFainted { get; set; }
-        public Id? Status { get; set; }
-        public Id? Weather { get; set; }
-        public string SourceEffect { get; set; }
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        //public string? EffectTypeString { get; set; }
-        public bool? Infiltrates { get; set; }
-        public string? RealMove { get; set; }
+        public required string Name { get; init; }
+        public StatIdExceptHp? Plus { get; init; }
+        public StatIdExceptHp? Minus { get; init; }
     }
 
     public class ModdedNatureData : NatureData
     {
-        public bool Inherit { get; set; }
+        public static bool Inherit => true;
     }
 
-    public class NatureDataTable : Dictionary<IdEntry, INatureData> { }
+    public class NatureDataTable : Dictionary<IdEntry, INatureData>;
 
     public class DexNatures(ModdedDex dex)
     {
         private readonly ModdedDex _dex = dex;
-        private readonly Dictionary<string, Nature> _natureCache = [];
+        private readonly Dictionary<Id, Nature> _natureCache = new();
         private Nature[]? _allCache = null;
 
         public Nature Get(string name)
         {
-            throw new Exception("Get method is not implemented yet.");
+            return GetById(new Id(name));
         }
 
-        public Nature Get(Nature nature)
+        public static Nature Get(Nature nature)
         {
-            throw new Exception("Get method is not implemented yet.");
+            return nature;
         }
 
         public Nature GetById(Id id)
         {
-            throw new Exception();
+            throw new Exception("GetById method is not implemented yet.");
         }
 
         public Nature[] All()
@@ -295,34 +271,35 @@
         }
     }
 
-    public interface ITypeData : ITypeInfo
+    public interface ITypeData
     {
-        Dictionary<string, int> DamageTaken { get; set; }
-        SparseStatsTable? HPdvs { get; set; }
-        SparseStatsTable? HPivs { get; set; }
-        Nonstandard? IsNonstandard { get; set; }
+        Dictionary<string, int> DamageTaken { get; }
+        SparseStatsTable? HpDvs { get; }
+        SparseStatsTable? HpIvs { get; }
+        Nonstandard? IsNonstandard { get; }
     }
 
-    public class TypeData : ITypeData
-    {
-        public Dictionary<string, int> DamageTaken { get; set; }
-        public SparseStatsTable? HPdvs { get; set; }
-        public SparseStatsTable? HPivs { get; set; }
-        public Nonstandard? IsNonstandard { get; set; }
-        public Id Id { get; set; }
-        public string Name { get; set; }
-        public TypeInfoEffectType EffectType { get; set; }
-        public bool Exists { get; set; }
-        public int Gen { get; set; }
-    }
+    //public class TypeData : ITypeData
+    //{
+    //    public Dictionary<string, int> DamageTaken { get; set; }
+    //    public SparseStatsTable? HpDvs { get; set; }
+    //    public SparseStatsTable? HpIvs { get; set; }
+    //    public Nonstandard? IsNonstandard { get; set; }
+    //    public Id Id { get; set; }
+    //    public string Name { get; set; }
+    //    public TypeInfoEffectType EffectType { get; set; }
+    //    public bool Exists { get; set; }
+    //    public int Gen { get; set; }
+    //}
 
     public interface IModdedTypeData : ITypeData
     {
-        public bool Inherit { get; set; }
+        public static bool Inherit => true;
     }
 
-    public class TypeDataTable : Dictionary<IdEntry, ITypeData> { }
-    public class IModdedTypeDataTable : Dictionary<IdEntry, IModdedTypeData> { }
+    public class TypeDataTable : Dictionary<IdEntry, ITypeData>;
+
+    public class ModdedTypeDataTable : Dictionary<IdEntry, IModdedTypeData>;
 
     public enum TypeInfoEffectType
     {
@@ -330,14 +307,14 @@
         EffectType
     }
 
-    public interface ITypeInfo
-    {
-        public Id Id { get; set; }
-        public string Name { get; set; }
-        public TypeInfoEffectType EffectType { get; set; }
-        public bool Exists { get; set; }
-        public int Gen { get; set; }
-    }
+    //public interface ITypeInfo : ITypeData
+    //{
+    //    public Id Id { get; set; }
+    //    public string Name { get; set; }
+    //    public TypeInfoEffectType EffectType { get; set; }
+    //    public bool Exists { get; set; }
+    //    public int Gen { get; set; }
+    //}
 
     public class TypeInfo : ITypeData
     {
@@ -345,67 +322,67 @@
         /// ID. This will be a lowercase version of the name with all the
         /// non-alphanumeric characters removed. e.g. 'flying'
         /// </summary>
-        public Id Id { get; set; } = new Id();
+        public required Id Id { get; init; }
 
         /// <summary>Name. e.g. 'Flying'</summary>
-        public string Name { get; set; } = string.Empty;
+        public required string Name { get; init; }
 
         /// <summary>Effect type.</summary>
-        public TypeInfoEffectType EffectType { get; set; } = TypeInfoEffectType.Type;
+        public required TypeInfoEffectType EffectType { get; init; }
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
         /// for an effect that doesn't exist, you get a dummy effect that
         /// doesn't do anything, and this field set to false.
         /// </summary>
-        public bool Exists { get; set; } = true;
+        public required bool Exists { get; init; }
 
         /// <summary>
         /// The generation of Pokemon game this was INTRODUCED (NOT
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; set; } = 0;
+        public required int Gen { get; init; }
 
         /// <summary>
         /// Set to 'Future' for types before they're released (like Fairy
         /// in Gen 5 or Dark in Gen 1).
         /// </summary>
-        public Nonstandard? IsNonstandard { get; set; } = null;
+        public Nonstandard? IsNonstandard { get; init; }
 
         /// <summary>
         /// Type chart, attackingTypeName:result, effectid:result
         /// result is: 0 = normal, 1 = weakness, 2 = resistance, 3 = immunity
         /// </summary>
-        public Dictionary<string, int> DamageTaken { get; set; } = [];
+        public required Dictionary<string, int> DamageTaken { get; init; }
 
         /// <summary>The IVs to get this Type Hidden Power (in gen 3 and later)</summary>
-        public SparseStatsTable HPivs { get; set; } = [];
+        public required SparseStatsTable HpIvs { get; init; }
 
         /// <summary>The DVs to get this Type Hidden Power (in gen 2).</summary>
-        public SparseStatsTable HPdvs { get; set; } = [];
+        public required SparseStatsTable HpDvs { get; init; }
 
-        public TypeInfo(ITypeData data)
-        {
+        //public TypeInfo(ITypeData data)
+        //{
             
-            Id = data.Id;
-            Name = data.Name;
-            EffectType = data.EffectType;
-            Exists = data.Exists;
-            Gen = data.Gen;
-            IsNonstandard = data.IsNonstandard;
-            DamageTaken = data.DamageTaken;
-            HPivs = data.HPivs;
-            HPdvs = data.HPdvs;
-        }
+        //    Id = data.Id;
+        //    Name = data.Name;
+        //    EffectType = data.EffectType;
+        //    Exists = data.Exists;
+        //    Gen = data.Gen;
+        //    IsNonstandard = data.IsNonstandard;
+        //    DamageTaken = data.DamageTaken;
+        //    HpIvs = data.HpIvs;
+        //    HpDvs = data.HpDvs;
+        //}
 
-        public void Init()
-        {
-            if (!Exists)
-            {
-                Exists = !Id.IsEmpty;
-            }
-        }
+        //public void Init()
+        //{
+        //    if (!Exists)
+        //    {
+        //        Exists = !Id.IsEmpty;
+        //    }
+        //}
 
         public override string ToString()
         {
@@ -415,13 +392,17 @@
 
     public static class TypeInfoConstants
     {
-        public static readonly TypeInfo EmptyTypeInfo = new(new TypeData
+        public static readonly TypeInfo EmptyTypeInfo = new()
         {
             Name = "",
             Id = new Id(),
             Exists = false,
-            EffectType = TypeInfoEffectType.EffectType
-        });
+            EffectType = TypeInfoEffectType.EffectType,
+            Gen = 0,
+            DamageTaken = [],
+            HpIvs = [],
+            HpDvs = []
+        };
     }
 
     public class DexTypes(ModdedDex dex)
@@ -468,24 +449,32 @@
         public Dictionary<StatId, string> MediumNames { get; }
         public Dictionary<StatId, string> Names { get; }
 
-        private static readonly StatId[] IdsCache = { StatId.Hp, StatId.Atk, StatId.Def, StatId.Spa, StatId.Spd, StatId.Spe };
+        private static readonly StatId[] IdsCache =
+        [
+            StatId.Hp,
+            StatId.Atk,
+            StatId.Def,
+            StatId.Spa,
+            StatId.Spd,
+            StatId.Spe
+        ];
         
-        private static readonly Dictionary<string, StatId> ReverseCache = new()
+        public static readonly Dictionary<IdEntry, StatId> ReverseCache = new()
         {
-            ["hitpoints"] = StatId.Hp,
-            ["attack"] = StatId.Atk,
-            ["defense"] = StatId.Def,
-            ["specialattack"] = StatId.Spa,
-            ["spatk"] = StatId.Spa,
-            ["spattack"] = StatId.Spa,
-            ["specialatk"] = StatId.Spa,
-            ["special"] = StatId.Spa,
-            ["spc"] = StatId.Spa,
-            ["specialdefense"] = StatId.Spd,
-            ["spdef"] = StatId.Spd,
-            ["spdefense"] = StatId.Spd,
-            ["specialdef"] = StatId.Spd,
-            ["speed"] = StatId.Spe,
+            [new IdEntry("hitpoints")] = StatId.Hp,
+            [new IdEntry("attack")] = StatId.Atk,
+            [new IdEntry("defense")] = StatId.Def,
+            [new IdEntry("specialattack")] = StatId.Spa,
+            [new IdEntry("spatk")] = StatId.Spa,
+            [new IdEntry("spattack")] = StatId.Spa,
+            [new IdEntry("specialatk")] = StatId.Spa,
+            [new IdEntry("special")] = StatId.Spa,
+            [new IdEntry("spc")] = StatId.Spa,
+            [new IdEntry("specialdefense")] = StatId.Spd,
+            [new IdEntry("spdef")] = StatId.Spd,
+            [new IdEntry("spdefense")] = StatId.Spd,
+            [new IdEntry("specialdef")] = StatId.Spd,
+            [new IdEntry("speed")] = StatId.Spe,
         };
 
         public DexStats(ModdedDex dex)
