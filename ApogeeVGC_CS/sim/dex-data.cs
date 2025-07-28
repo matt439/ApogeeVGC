@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
-    public abstract class BasicEffect : IBasicEffect
+    public abstract class BasicEffect(BasicEffect other) : IEffectData
     {
         /// <summary>
         /// ID. This will be a lowercase version of the name with all the
@@ -16,30 +8,30 @@ namespace ApogeeVGC_CS.sim
         /// becomes "mrmime", and "Basculin-Blue-Striped" becomes
         /// "basculinbluestriped".
         /// </summary>
-        public ID Id { get; set; } = new ID();
+        public Id Id { get; protected set; } = other.Id;
 
         /// <summary>
         /// Name. Currently does not support Unicode letters, so "Flabébé"
         /// is "Flabebe" and "Nidoran♀" is "Nidoran-F".
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; protected set; } = other.Name;
 
         /// <summary>
         /// Full name. Prefixes the name with the effect type. For instance,
         /// Leftovers would be "item: Leftovers", confusion the status
         /// condition would be "confusion", etc.
         /// </summary>
-        public string Fullname { get; set; } = string.Empty;
+        public string Fullname { get; protected set; } = other.Fullname;
 
         /// <summary>Effect type.</summary>
-        public EffectType EffectType { get; set; } = EffectType.Condition;
+        public EffectType EffectType { get; protected set; } = other.EffectType;
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
         /// for an effect that doesn't exist, you get a dummy effect that
         /// doesn't do anything, and this field set to false.
         /// </summary>
-        public bool Exists { get; set; } = false;
+        public bool Exists { get; protected set; } = other.Exists;
 
         /// <summary>
         /// Dex number? For a Pokemon, this is the National Dex number. For
@@ -48,78 +40,51 @@ namespace ApogeeVGC_CS.sim
         /// doesn't. Nonstandard effects (e.g. CAP effects) will have
         /// negative numbers.
         /// </summary>
-        public int Num { get; set; } = 0;
+        public int Num { get; protected set; } = other.Num;
 
         /// <summary>
         /// The generation of Pokemon game this was INTRODUCED (NOT
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; set; } = 0;
+        public int Gen { get; protected set; } = other.Gen;
 
         /// <summary>
         /// A shortened form of the description of this effect.
         /// Not all effects have this.
         /// </summary>
-        public string? ShortDesc { get; set; } = string.Empty;
+        public string? ShortDesc { get; protected set; } = other.ShortDesc;
 
         /// <summary>The full description for this effect.</summary>
-        public string? Desc { get; set; } = string.Empty;
+        public string? Desc { get; protected set; } = other.Desc;
 
         /// <summary>
         /// Is this item/move/ability/pokemon nonstandard? Specified for effects
         /// that have no use in standard formats: made-up pokemon (CAP),
         /// glitches (MissingNo etc), Pokestar pokemon, etc.
         /// </summary>
-        public Nonstandard? IsNonstandard { get; set; } = null;
+        public Nonstandard? IsNonstandard { get; protected set; } = other.IsNonstandard;
 
         /// <summary>The duration of the condition - only for pure conditions.</summary>
-        public int? Duration { get; set; } = null;
+        public int? Duration { get; protected set; } = other.Duration;
 
         /// <summary>Whether or not the condition is ignored by Baton Pass - only for pure conditions.</summary>
-        public bool NoCopy { get; set; } = false;
+        public bool NoCopy { get; protected set; } = other.NoCopy;
 
         /// <summary>Whether or not the condition affects fainted Pokemon.</summary>
-        public bool AffectsFainted { get; set; } = false;
+        public bool AffectsFainted { get; protected set; } = other.AffectsFainted;
 
         /// <summary>Moves only: what status does it set?</summary>
-        public ID? Status { get; set; } = null;
+        public Id? Status { get; protected set; } = other.Status;
 
         /// <summary>Moves only: what weather does it set?</summary>
-        public ID? Weather { get; set; } = null;
+        public Id? Weather { get; protected set; } = other.Weather;
 
         /// <summary>???</summary>
-        public string SourceEffect { get; set; } = string.Empty;
-
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-        //public string? EffectTypeString { get; set; } = null;
-        public bool? Infiltrates { get; set; } = null;
-        public string? RealMove { get; set; } = null; // Added this for the Init method
-        
-        protected BasicEffect(IBasicEffect other)
-        {
-            // Copy all fields without any logic
-            Id = other.Id;
-            Name = other.Name;
-            Fullname = other.Fullname;
-            EffectType = other.EffectType;
-            Exists = other.Exists;
-            Num = other.Num;
-            Gen = other.Gen;
-            ShortDesc = other.ShortDesc;
-            Desc = other.Desc;
-            IsNonstandard = other.IsNonstandard;
-            Duration = other.Duration;
-            NoCopy = other.NoCopy;
-            AffectsFainted = other.AffectsFainted;
-            Status = other.Status;
-            Weather = other.Weather;
-            SourceEffect = other.SourceEffect;
-            DurationCallback = other.DurationCallback;
-            //EffectTypeString = other.EffectTypeString;
-            Infiltrates = other.Infiltrates;
-            RealMove = other.RealMove;
-        }
+        public string SourceEffect { get; protected set; } = other.SourceEffect;
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; protected set; } = other.DurationCallback;
+        public bool? Infiltrates { get; protected set; } = other.Infiltrates;
+        public string? RealMove { get; protected set; } = other.RealMove;
 
         public void InitBasicEffect()
         {
@@ -134,11 +99,11 @@ namespace ApogeeVGC_CS.sim
 
             if (RealMove != null)
             {
-                Id = new ID(RealMove);
+                Id = new Id(RealMove);
             }
             else
             {
-                Id = new ID(Name);
+                Id = new Id(Name);
             }
 
             if (Fullname == string.Empty)
@@ -160,14 +125,14 @@ namespace ApogeeVGC_CS.sim
 
     public interface INature : IBasicEffect
     {
-        public StatIDExceptHP? Plus { get; set; }
-        public StatIDExceptHP? Minus { get; set; }
+        public StatIdExceptHp? Plus { get; set; }
+        public StatIdExceptHp? Minus { get; set; }
     }
 
     public class Nature : BasicEffect, INature
     {
-        public StatIDExceptHP? Plus { get; set; } = null;
-        public StatIDExceptHP? Minus { get; set; } = null;
+        public StatIdExceptHp? Plus { get; set; } = null;
+        public StatIdExceptHp? Minus { get; set; } = null;
 
         public Nature(INatureData other) : base(other)
         {
@@ -198,9 +163,9 @@ namespace ApogeeVGC_CS.sim
 
     public class NatureData : INatureData
     {
-        public StatIDExceptHP? Plus { get; set; }
-        public StatIDExceptHP? Minus { get; set; }
-        public ID Id { get; set; }
+        public StatIdExceptHp? Plus { get; set; }
+        public StatIdExceptHp? Minus { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -213,8 +178,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public ID? Status { get; set; }
-        public ID? Weather { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         //public string? EffectTypeString { get; set; }
@@ -227,7 +192,7 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public class NatureDataTable : Dictionary<IDEntry, INatureData> { }
+    public class NatureDataTable : Dictionary<IdEntry, INatureData> { }
 
     public class DexNatures(ModdedDex dex)
     {
@@ -245,7 +210,7 @@ namespace ApogeeVGC_CS.sim
             throw new Exception("Get method is not implemented yet.");
         }
 
-        public Nature GetByID(ID id)
+        public Nature GetById(Id id)
         {
             throw new Exception();
         }
@@ -270,7 +235,7 @@ namespace ApogeeVGC_CS.sim
         public SparseStatsTable? HPdvs { get; set; }
         public SparseStatsTable? HPivs { get; set; }
         public Nonstandard? IsNonstandard { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public TypeInfoEffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -282,8 +247,8 @@ namespace ApogeeVGC_CS.sim
         public bool Inherit { get; set; }
     }
 
-    public class TypeDataTable : Dictionary<IDEntry, ITypeData> { }
-    public class IModdedTypeDataTable : Dictionary<IDEntry, IModdedTypeData> { }
+    public class TypeDataTable : Dictionary<IdEntry, ITypeData> { }
+    public class IModdedTypeDataTable : Dictionary<IdEntry, IModdedTypeData> { }
 
     public enum TypeInfoEffectType
     {
@@ -293,7 +258,7 @@ namespace ApogeeVGC_CS.sim
 
     public interface ITypeInfo
     {
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public TypeInfoEffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -306,7 +271,7 @@ namespace ApogeeVGC_CS.sim
         /// ID. This will be a lowercase version of the name with all the
         /// non-alphanumeric characters removed. e.g. 'flying'
         /// </summary>
-        public ID Id { get; set; } = new ID();
+        public Id Id { get; set; } = new Id();
 
         /// <summary>Name. e.g. 'Flying'</summary>
         public string Name { get; set; } = string.Empty;
@@ -379,7 +344,7 @@ namespace ApogeeVGC_CS.sim
         public static readonly TypeInfo EmptyTypeInfo = new(new TypeData
         {
             Name = "",
-            Id = new ID(),
+            Id = new Id(),
             Exists = false,
             EffectType = TypeInfoEffectType.EffectType
         });
@@ -388,7 +353,7 @@ namespace ApogeeVGC_CS.sim
     public class DexTypes(ModdedDex dex)
     {
         private readonly ModdedDex _dex = dex;
-        private readonly Dictionary<ID, TypeInfo> _typeCache = [];
+        private readonly Dictionary<Id, TypeInfo> _typeCache = [];
         private TypeInfo[]? _allCache = null;
         private string[]? _namesCache = null;
 
@@ -402,7 +367,7 @@ namespace ApogeeVGC_CS.sim
             throw new Exception("Get method is not implemented yet.");
         }
 
-        public TypeInfo GetByID(ID id)
+        public TypeInfo GetById(Id id)
         {
             throw new Exception();
         }
@@ -425,104 +390,104 @@ namespace ApogeeVGC_CS.sim
 
     public class DexStats
     {
-        public Dictionary<StatID, string> ShortNames { get; }
-        public Dictionary<StatID, string> MediumNames { get; }
-        public Dictionary<StatID, string> Names { get; }
+        public Dictionary<StatId, string> ShortNames { get; }
+        public Dictionary<StatId, string> MediumNames { get; }
+        public Dictionary<StatId, string> Names { get; }
 
-        private static readonly StatID[] IdsCache = { StatID.Hp, StatID.Atk, StatID.Def, StatID.Spa, StatID.Spd, StatID.Spe };
+        private static readonly StatId[] IdsCache = { StatId.Hp, StatId.Atk, StatId.Def, StatId.Spa, StatId.Spd, StatId.Spe };
         
-        private static readonly Dictionary<string, StatID> ReverseCache = new()
+        private static readonly Dictionary<string, StatId> ReverseCache = new()
         {
-            ["hitpoints"] = StatID.Hp,
-            ["attack"] = StatID.Atk,
-            ["defense"] = StatID.Def,
-            ["specialattack"] = StatID.Spa,
-            ["spatk"] = StatID.Spa,
-            ["spattack"] = StatID.Spa,
-            ["specialatk"] = StatID.Spa,
-            ["special"] = StatID.Spa,
-            ["spc"] = StatID.Spa,
-            ["specialdefense"] = StatID.Spd,
-            ["spdef"] = StatID.Spd,
-            ["spdefense"] = StatID.Spd,
-            ["specialdef"] = StatID.Spd,
-            ["speed"] = StatID.Spe,
+            ["hitpoints"] = StatId.Hp,
+            ["attack"] = StatId.Atk,
+            ["defense"] = StatId.Def,
+            ["specialattack"] = StatId.Spa,
+            ["spatk"] = StatId.Spa,
+            ["spattack"] = StatId.Spa,
+            ["specialatk"] = StatId.Spa,
+            ["special"] = StatId.Spa,
+            ["spc"] = StatId.Spa,
+            ["specialdefense"] = StatId.Spd,
+            ["spdef"] = StatId.Spd,
+            ["spdefense"] = StatId.Spd,
+            ["specialdef"] = StatId.Spd,
+            ["speed"] = StatId.Spe,
         };
 
         public DexStats(ModdedDex dex)
         {
             if (dex.Gen != 1)
             {
-                ShortNames = new Dictionary<StatID, string>
+                ShortNames = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Atk", 
-                    [StatID.Def] = "Def",
-                    [StatID.Spa] = "SpA",
-                    [StatID.Spd] = "SpD",
-                    [StatID.Spe] = "Spe"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Atk", 
+                    [StatId.Def] = "Def",
+                    [StatId.Spa] = "SpA",
+                    [StatId.Spd] = "SpD",
+                    [StatId.Spe] = "Spe"
                 };
 
-                MediumNames = new Dictionary<StatID, string>
+                MediumNames = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Attack",
-                    [StatID.Def] = "Defense",
-                    [StatID.Spa] = "Sp. Atk",
-                    [StatID.Spd] = "Sp. Def",
-                    [StatID.Spe] = "Speed"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Attack",
+                    [StatId.Def] = "Defense",
+                    [StatId.Spa] = "Sp. Atk",
+                    [StatId.Spd] = "Sp. Def",
+                    [StatId.Spe] = "Speed"
                 };
 
-                Names = new Dictionary<StatID, string>
+                Names = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Attack",
-                    [StatID.Def] = "Defense",
-                    [StatID.Spa] = "Special Attack",
-                    [StatID.Spd] = "Special Defense",
-                    [StatID.Spe] = "Speed"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Attack",
+                    [StatId.Def] = "Defense",
+                    [StatId.Spa] = "Special Attack",
+                    [StatId.Spd] = "Special Defense",
+                    [StatId.Spe] = "Speed"
                 };
             }
             else
             {
-                ShortNames = new Dictionary<StatID, string>
+                ShortNames = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Atk",
-                    [StatID.Def] = "Def",
-                    [StatID.Spa] = "Spc",
-                    [StatID.Spd] = "[SpD]",
-                    [StatID.Spe] = "Spe"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Atk",
+                    [StatId.Def] = "Def",
+                    [StatId.Spa] = "Spc",
+                    [StatId.Spd] = "[SpD]",
+                    [StatId.Spe] = "Spe"
                 };
 
-                MediumNames = new Dictionary<StatID, string>
+                MediumNames = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Attack",
-                    [StatID.Def] = "Defense",
-                    [StatID.Spa] = "Special",
-                    [StatID.Spd] = "[Sp. Def]",
-                    [StatID.Spe] = "Speed"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Attack",
+                    [StatId.Def] = "Defense",
+                    [StatId.Spa] = "Special",
+                    [StatId.Spd] = "[Sp. Def]",
+                    [StatId.Spe] = "Speed"
                 };
 
-                Names = new Dictionary<StatID, string>
+                Names = new Dictionary<StatId, string>
                 {
-                    [StatID.Hp] = "HP",
-                    [StatID.Atk] = "Attack",
-                    [StatID.Def] = "Defense",
-                    [StatID.Spa] = "Special",
-                    [StatID.Spd] = "[Special Defense]",
-                    [StatID.Spe] = "Speed"
+                    [StatId.Hp] = "HP",
+                    [StatId.Atk] = "Attack",
+                    [StatId.Def] = "Defense",
+                    [StatId.Spa] = "Special",
+                    [StatId.Spd] = "[Special Defense]",
+                    [StatId.Spe] = "Speed"
                 };
             }
         }
 
-        public StatID? GetID(string name)
+        public StatId? GetId(string name)
         {
             throw new Exception();
         }
 
-        public StatID[] Ids()
+        public StatId[] Ids()
         {
             return IdsCache;
         }

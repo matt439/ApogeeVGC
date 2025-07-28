@@ -13,7 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    public enum ChannelID
+    public enum ChannelId
     {
         Channel0 = 0,
         Channel1 = 1,
@@ -22,7 +22,7 @@ namespace ApogeeVGC_CS.sim
         Channel4 = 4
     }
 
-    public class ChannelMessages : Dictionary<ChannelID, List<string>> { }
+    public class ChannelMessages : Dictionary<ChannelId, List<string>> { }
 
     public static class BattleUtils
     {
@@ -62,10 +62,10 @@ namespace ApogeeVGC_CS.sim
     public class BattleOptions
     {
         public Format? Format { get; set; }
-        public ID FormatId { get; set; } = new();
+        public Id FormatId { get; set; } = new();
         public Action<string, object>? Send { get; set; }
-        public PRNG? Prng { get; set; }
-        public PRNGSeed? Seed { get; set; }
+        public Prng? Prng { get; set; }
+        public PrngSeed? Seed { get; set; }
         public object? Rated { get; set; } // bool or string
         public PlayerOptions? P1 { get; set; }
         public PlayerOptions? P2 { get; set; }
@@ -122,7 +122,7 @@ namespace ApogeeVGC_CS.sim
     public class Battle
     {
         // Readonly properties
-        public ID Id { get; } = new();
+        public Id Id { get; } = new();
         public bool DebugMode { get; }
         public bool? ForceRandomChance { get; }
         public bool Deserialized { get; }
@@ -133,15 +133,15 @@ namespace ApogeeVGC_CS.sim
         public int ActivePerHalf { get; }
         public Field Field { get; }
         public Side[] Sides { get; }
-        public PRNGSeed PrngSeed { get; }
+        public PrngSeed PrngSeed { get; }
 
         // Mutable properties
         public ModdedDex Dex { get; set; }
         public int Gen { get; set; }
         public RuleTable RuleTable { get; set; }
-        public PRNG Prng { get; set; }
+        public Prng Prng { get; set; }
         public object Rated { get; set; } // bool or string
-        public bool ReportExactHP { get; set; }
+        public bool ReportExactHp { get; set; }
         public bool ReportPercentages { get; set; }
         public bool SupportCancel { get; set; }
 
@@ -175,7 +175,7 @@ namespace ApogeeVGC_CS.sim
         public Pokemon? ActiveTarget { get; set; }
 
         public ActiveMove? LastMove { get; set; }
-        public ID? LastSuccessfulMoveThisTurn { get; set; }
+        public Id? LastSuccessfulMoveThisTurn { get; set; }
         public int LastMoveLine { get; set; }
         public int LastDamage { get; set; }
         public int EffectOrder { get; set; }
@@ -187,30 +187,30 @@ namespace ApogeeVGC_CS.sim
         public HashSet<string> Hints { get; } = new();
 
         // Constants
-        public string NOT_FAIL { get; } = "";
-        public int HIT_SUBSTITUTE { get; } = 0;
-        public bool FAIL { get; } = false;
-        public object? SILENT_FAIL { get; } = null;
+        public string NotFail { get; } = "";
+        public int HitSubstitute { get; } = 0;
+        public bool Fail { get; } = false;
+        public object? SilentFail { get; } = null;
 
         public Action<string, object> Send { get; }
 
         // Methods
         public Func<double, int?, double> Trunc { get; set; }
         public Func<object, int?, int?, int> ClampIntRange { get; set; }
-        public Func<object, ID> ToID { get; set; }
+        public Func<object, Id> ToId { get; set; }
 
         public Battle(BattleOptions options)
         {
             // TODO: Implement constructor logic
         }
 
-        public object ToJSON()
+        public object ToJson()
         {
             throw new NotImplementedException();
             // TODO - implement JSON serialization
         }
 
-        public static Battle FromJSON(object serialized)
+        public static Battle FromJson(object serialized)
         {
             // TODO: Implement JSON deserialization
             throw new NotImplementedException();
@@ -245,7 +245,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void ResetRNG(PRNGSeed? seed = null)
+        public void ResetRng(PrngSeed? seed = null)
         {
             // TODO: Implement RNG reset
             throw new NotImplementedException();
@@ -413,7 +413,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool ForceWin(SideID? side = null)
+        public bool ForceWin(SideId? side = null)
         {
             throw new NotImplementedException();
         }
@@ -449,7 +449,7 @@ namespace ApogeeVGC_CS.sim
             return new List<Pokemon>();
         }
 
-        public bool SwapPosition(Pokemon pokemon, int NewPosition, string? attributes = null)
+        public bool SwapPosition(Pokemon pokemon, int newPosition, string? attributes = null)
         {
             throw new NotImplementedException();
         }
@@ -487,7 +487,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void CheckEVBalance()
+        public void CheckEvBalance()
         {
             // Implementation for checking EV balance
             throw new NotImplementedException();
@@ -628,7 +628,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool Choose(SideID side, string input)
+        public bool Choose(SideId side, string input)
         {
             throw new NotImplementedException();
         }
@@ -643,7 +643,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void UndoChoice(SideID sideId)
+        public void UndoChoice(SideId sideId)
         {
             throw new NotImplementedException();
         }
@@ -659,7 +659,7 @@ namespace ApogeeVGC_CS.sim
         }
         // addSplit(side: SideID, secret: Part[], shared?: Part[])
 
-        public void AddSplit(SideID side, IReadOnlyList<Part> secret, IReadOnlyList<Part>? shared = null)
+        public void AddSplit(SideId side, IReadOnlyList<Part> secret, IReadOnlyList<Part>? shared = null)
         {
             throw new NotImplementedException();
         }
@@ -709,7 +709,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void SetPlayer(SideID slot, PlayerOptions options)
+        public void SetPlayer(SideId slot, PlayerOptions options)
         {
             throw new NotImplementedException();
         }
@@ -719,7 +719,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public Side GetSide(SideID sideid)
+        public Side GetSide(SideId sideid)
         {
             throw new NotImplementedException();
         }

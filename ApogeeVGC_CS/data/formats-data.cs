@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ApogeeVGC_CS.data
 {
-    internal class formats_data
+    internal class FormatsData
     {
     }
 }

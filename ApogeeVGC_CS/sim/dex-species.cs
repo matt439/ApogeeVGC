@@ -94,7 +94,7 @@
     public class PokemonGoData
     {
         public List<string>? Encounters { get; set; }
-        public Dictionary<string, int?>? LGPERestrictiveMoves { get; set; }
+        public Dictionary<string, int?>? LgpeRestrictiveMoves { get; set; }
     }
 
     public class SpeciesDataTable : Dictionary<string, SpeciesData> { }
@@ -107,7 +107,7 @@
 
     public enum MoveSourceType
     {
-        TM, Tutor, LevelUp, Restricted, Egg, DreamWorld, Event, Virtual, Chain
+        Tm, Tutor, LevelUp, Restricted, Egg, DreamWorld, Event, Virtual, Chain
     }
 
     public class MoveSource(int generation, MoveSourceType sourceType, string details = "")
@@ -142,14 +142,14 @@
         public string? EvoMove { get; set; }
         public string? EvoRegion { get; set; }
         public int? EvoLevel { get; set; }
-        public bool NFE { get; set; }
+        public bool Nfe { get; set; }
         public List<string> EggGroups { get; set; } = new();
         public bool CanHatch { get; set; }
         public string Gender { get; set; } = string.Empty;
         public Dictionary<string, double> GenderRatio { get; set; } = new() { { "M", 0.5 }, { "F", 0.5 } };
         public StatsTable BaseStats { get; set; } = new();
-        public int? MaxHP { get; set; }
-        public int BST { get; set; }
+        public int? MaxHp { get; set; }
+        public int Bst { get; set; }
         public double WeightKg { get; set; }
         public double WeightHg { get; set; }
         public double HeightM { get; set; }

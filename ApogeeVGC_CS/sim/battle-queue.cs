@@ -14,7 +14,7 @@ namespace ApogeeVGC_CS.sim
         public Pokemon Pokemon { get; set; } = new();
         public int TargetLoc { get; set; }
         public Pokemon OriginalTarget { get; set; } = new();
-        public ID MoveId { get; set; } = new();
+        public Id MoveId { get; set; } = new();
         public Move Move { get; set; } = new();
         public object? Mega { get; set; } // bool or "done"
         public string? ZMove { get; set; }

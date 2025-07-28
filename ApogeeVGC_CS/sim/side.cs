@@ -106,7 +106,7 @@ namespace ApogeeVGC_CS.sim
     public class SideRequestData
     {
         public string Name { get; set; } = string.Empty;
-        public SideID Id { get; set; }
+        public SideId Id { get; set; }
         public List<PokemonSwitchRequestData> Pokemon { get; set; } = new();
         public bool? NoCancel { get; set; }
     }
@@ -145,7 +145,7 @@ namespace ApogeeVGC_CS.sim
     public class Side
     {
         public Battle Battle { get; }
-        public SideID Id { get; }
+        public SideId Id { get; }
         public int N { get; }
 
         public string Name { get; set; } = string.Empty;
@@ -178,7 +178,7 @@ namespace ApogeeVGC_CS.sim
             // Copy side scripts from battle if needed
 
             Battle = battle;
-            Id = (SideID)sideNum;
+            Id = (SideId)sideNum;
             N = sideNum;
 
             Name = name;

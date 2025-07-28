@@ -1,56 +1,42 @@
-﻿using ApogeeVGC_CS.sim;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Text.RegularExpressions;
 
 namespace ApogeeVGC_CS.sim
 {
     // An ID must have only lowercase alphanumeric characters
-    public class ID
+    public class Id
     {
-        private string _value = string.Empty;
         public string Value
         {
-            get => _value;
+            get;
             set
             {
-                if (_value != value)
+                if (field == value) return;
+
+                if (IsValid(value))
                 {
-                    if (IsValid(value))
-                    {
-                        _value = value;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Invalid ID format. Must be lowercase alphanumeric.");
-                    }
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid ID format. Must be lowercase alphanumeric.");
                 }
             }
         }
-        public bool IsId => true;
+
+        public virtual bool IsId => true;
         public bool IsEmpty => string.IsNullOrEmpty(Value);
 
-        public ID()
+        public Id()
         {
             Value = string.Empty; // Default to empty string
         }
 
-        public ID(string id)
+        public Id(string id)
         {
             Value = FromString(id);
         }
 
-        public ID(object obj)
+        public Id(object obj)
         {
             Value = FromObject(obj);
         }
@@ -58,7 +44,7 @@ namespace ApogeeVGC_CS.sim
         /**
          * Returns true if the sequence of elements of searchString converted to a String is the
          * same as the corresponding elements of this object (converted to a String) starting at
-         * endPosition – length(this). Otherwise returns false.
+         * endPosition – length(this). Otherwise, returns false.
          */
         public bool EndsWith(string searchString, int? endPosition = null)
         {
@@ -92,7 +78,7 @@ namespace ApogeeVGC_CS.sim
             }
         }
 
-        private static bool IsValid(string id)
+        public static bool IsValid(string id)
         {
             if (string.IsNullOrEmpty(id)) return false;
             foreach (char c in id)
@@ -104,67 +90,69 @@ namespace ApogeeVGC_CS.sim
     }
 
     // must be lowercase alphanumeric
-    public class IDEntry
+    public class IdEntry : Id
     {
-        private string _value = string.Empty;
-        public string Value
-        {
-            get => _value;
-            set => _value = value?.ToLowerInvariant() ?? string.Empty;
-        }
+        public override bool IsId => false;
     }
 
-    // must be lowercase alphanumeric
+    // must be lowercase alphanumeric and can be empty
     public class PokemonSlot
     {
-        private string _value = string.Empty;
+        public static bool IsSlot => true;
+
         public string Value
         {
-            get => _value;
-            set => _value = value?.ToLowerInvariant() ?? string.Empty;
-        }
-        public bool IsSlot => true;
-    }
+            get;
+            set
+            {
+                if (field == value) return;
+                if (IsValid(value))
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid slot format. Must be lowercase alphanumeric.");
+                }
+            }
+        } = string.Empty;
 
-    //// Represents a generic object with string keys and any values
-    //public interface IAnyObject : IDictionary<string, object>
-    //{
-    //    public bool TryGetInt(string key, [MaybeNullWhen(false)] out int @int);
-    //    public bool TryGetBool(string key, [MaybeNullWhen(false)] out bool @bool);
-    //    public bool TryGetString(string key, [MaybeNullWhen(false)] out string @string);
-    //    public bool TryGetId(string key, [MaybeNullWhen(false)] out Id id);
-    //    public bool TryGetEnum<TEnum>(string key, [MaybeNullWhen(false)] out TEnum enumValue) where TEnum : Enum;
-    //    public bool TryGetStruct<TStruct>(string key, [MaybeNullWhen(false)] out TStruct structValue) where TStruct : struct;
-    //    public bool TryGetClass<TClass>(string key, [MaybeNullWhen(false)] out TClass? classValue) where TClass : class;
-    //    public bool TryGetObject(string key, [MaybeNullWhen(false)] out object? obj);
-    //    public bool TryGetList<T>(string key, [MaybeNullWhen(false)] out List<T> list) where T : class;
-    //    public bool TryGetDictionary<TKey, TValue>(string key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> dict) where TKey : notnull;
-    //    public bool TryGetNullable<T>(string key, out T? value) where T : struct;
-    //    public bool TryGetFunction<T>(string key, [MaybeNullWhen(false)] out Func<T> function);
-    //    public bool TryGetAction<T>(string key, [MaybeNullWhen(false)] out Action<T> action);
-    //}
+        public PokemonSlot() { }
+
+        public PokemonSlot(string value)
+        {
+            Value = value;
+        }
+
+        private static bool IsValid(string s)
+        {
+            return s.Length == 0 || // Empty string is valid
+                   Id.IsValid(s);
+        }
+    }
 
     public enum GenderName
     {
         M, F, N, Empty
     }
 
-    public enum StatIDExceptHP
+    public enum StatIdExceptHp
     {
         Atk, Def, Spa, Spd, Spe
     }
 
-    public enum StatID
+    public enum StatId
     {
         Hp, Atk, Def, Spa, Spd, Spe
     }
 
-    public class StatsExceptHPTable : Dictionary<StatIDExceptHP, int> { }
-    public class StatsTable : Dictionary<StatID, int>
+    public class StatsExceptHpTable : Dictionary<StatIdExceptHp, int>;
+
+    public class StatsTable : Dictionary<StatId, int>
     {
-        public StatsTable() : base()
+        public StatsTable()
         {
-            this[StatID.Hp] = 0; // Initialize HP to 0
+            this[StatId.Hp] = 0; // Initialize HP to 0
         }
         public StatsTable(StatsTable other) : this()
         {
@@ -174,54 +162,55 @@ namespace ApogeeVGC_CS.sim
             }
         }
     }
-    public class SparseStatsTable : Dictionary<StatID, int> { }
 
-    public enum BoostID
+    public class SparseStatsTable : Dictionary<StatId, int>;
+
+    public enum BoostId
     {
         Atk, Def, Spa, Spd, Spe, Accuracy, Evasion
     }
 
-    public class BoostsTable : Dictionary<BoostID, int> { }
-    public class SparseBoostsTable : Dictionary<BoostID, int> { }
+    public class BoostsTable : Dictionary<BoostId, int>;
+
+    public class SparseBoostsTable : Dictionary<BoostId, int>;
 
     public enum Nonstandard
     {
-        Past, Future, Unobtainable, CAP, LGPE, Custom, Gigantamax
+        Past, Future, Unobtainable, Cap, Lgpe, Custom, Gigantamax
     }
 
     // Tier types from TierTypes namespace
     public enum SinglesTier
     {
-        AG, Uber, UberAlt, OU, OUAlt, UUBL, UU, RUBL, RU, NUBL, NU, NUAlt, PUBL, PU,
-        PUAlt, ZUBL, ZU, NFE, LC
+        Ag, Uber, UberAlt, Ou, OuAlt, Uubl, Uu, Rubl, Ru, Nubl, Nu, NuAlt, Publ, Pu,
+        PuAlt, Zubl, Zu, Nfe, Lc
     }
 
     public enum DoublesTier
     {
-        DUber, DUberAlt, DOU, DOUAlt, DBL, DUU, DUUAlt, NFE, LC
+        DUber, DUberAlt, Dou, DouAlt, Dbl, Duu, DuuAlt, Nfe, Lc
     }
 
     public enum OtherTier
     {
-        Unreleased, Illegal, CAP, CAP_NFE, CAP_LC
+        Unreleased, Illegal, Cap, CapNfe, CapLc
     }
 
     public class EventInfo
     {
         public int Generation { get; set; }
         public int? Level { get; set; }
-        // true: always shiny, 1: sometimes shiny, false/null: never shiny
-        public bool? Shiny { get; set; }
+        public bool? Shiny { get; set; } // true: always shiny, 1: sometimes shiny, false/null: never shiny
         public int? ShinySometimes { get; set; } // Use this if you need to distinguish '1'
         public GenderName? Gender { get; set; }
         public string? Nature { get; set; }
         public SparseStatsTable? IVs { get; set; }
         public int? PerfectIVs { get; set; }
         public bool? IsHidden { get; set; }
-        public List<IDEntry>? Abilities { get; set; }
+        public List<IdEntry>? Abilities { get; set; }
         public int? MaxEggMoves { get; set; }
-        public List<IDEntry>? Moves { get; set; }
-        public IDEntry? Pokeball { get; set; }
+        public List<IdEntry>? Moves { get; set; }
+        public IdEntry? Pokeball { get; set; }
         public string? From { get; set; }
         public bool? Japan { get; set; }
         public bool? EmeraldEventEgg { get; set; }
@@ -230,7 +219,7 @@ namespace ApogeeVGC_CS.sim
     /// <summary>
     /// Base interface for all effect types.
     /// </summary>
-    public interface IEffect { }
+    public interface IEffect;
 
     public interface ICommonHandlers
     {
@@ -250,29 +239,15 @@ namespace ApogeeVGC_CS.sim
 
     public interface IEffectData
     {
-        public string Name { get; set; } // changed this from nullable to non-nullable so it matches IBasicEffect
-        public string? Desc { get; set; }
-        public int? Duration { get; set; }
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        //public string? EffectTypeString { get; set; }
-        public EffectType EffectType { get; set; }
-        public bool? Infiltrates { get; set; }
-        public Nonstandard? IsNonstandard { get; set; }
-        public string? ShortDesc { get; set; }
+        public string Name { get; } // changed this from nullable to non-nullable so it matches IBasicEffect
+        public string? Desc { get; }
+        public int? Duration { get; }
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; }
+        public EffectType EffectType { get; }
+        public bool? Infiltrates { get; }
+        public Nonstandard? IsNonstandard { get; }
+        public string? ShortDesc { get; }
     }
-
-    //public class ModdedEffectData : IEffectData
-    //{
-    //    public bool Inherit { get; set; } = true;
-    //    public string? Name { get; set; } = string.Empty;
-    //    public string? Desc { get; set; } = string.Empty;
-    //    public int? Duration { get; set; } = null;
-    //    public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; } = null;
-    //    public string? EffectTypeString { get; set; } = null;
-    //    public bool? Infiltrates { get; set; } = null;
-    //    public Nonstandard? IsNonstandard { get; set; } = null;
-    //    public string? ShortDesc { get; set; } = string.Empty;
-    //}
 
     public interface IModdedEffectData : IEffectData
     {
@@ -285,38 +260,20 @@ namespace ApogeeVGC_CS.sim
         Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule
     }
 
-    //public interface IBasicEffect : IEffectData
-    //{
-    //    Id Id { get; set; }
-    //    EffectType EffectType { get; set; }
-    //    bool Exists { get; set; }
-    //    string Fullname { get; set; }
-    //    int Gen { get; set; }
-    //    string SourceEffect { get; set; }
-    //}
-
     public interface IBasicEffect : IEffectData
     {
-        public ID Id { get; set; }
-        //public new string Name { get; set; }
-        public string Fullname { get; set; }
-        //public EffectType EffectType { get; set; }
-        public bool Exists { get; set; }
-        public int Num { get; set; }
-        public int Gen { get; set; }
-        //public new string? ShortDesc { get; set; }
-        //public new string? Desc { get; set; }
-        //public new Nonstandard? IsNonstandard { get; set; }
-        //public new int? Duration { get; set; }
-        public bool NoCopy { get; set; }
-        public bool AffectsFainted { get; set; }
-        public ID? Status { get; set; }
-        public ID? Weather { get; set; }
-        public string SourceEffect { get; set; }
-        //public new Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-        //public new string? EffectTypeString { get; set; }
-        //public new bool? Infiltrates { get; set; }
-        public string? RealMove { get; set; }// Added this for the Init method
+        public Id Id { get; }
+        public bool Exists { get; }
+        public string Fullname { get; }
+        public int Gen { get; }
+        public string SourceEffect { get; }
+
+        //public bool NoCopy { get; }
+        //public bool AffectsFainted { get; }
+        //public Id? Status { get; }
+        //public Id? Weather { get; }
+        //public int Num { get; }
+        //public string? RealMove { get; }// Added this for the Init method
     }
 
     public enum GameType
@@ -324,14 +281,14 @@ namespace ApogeeVGC_CS.sim
         Singles, Doubles, Triples, Rotation, Multi, FreeForAll
     }
 
-    public enum SideID
+    public enum SideId
     {
         P1, P2, P3, P4
     }
 
-    public class SpreadMoveTargets : List<Pokemon?> { }
-    public class SpreadMoveDamage : List<object> { } // number | boolean | undefined
-    public class ZMoveOptions : List<ZMoveOption?> { }
+    public class SpreadMoveTargets : List<Pokemon?>;
+    public class SpreadMoveDamage : List<object>; // number | boolean | undefined
+    public class ZMoveOptions : List<ZMoveOption?>;
 
     // helper class for ZMoveOptions
     public class ZMoveOption
@@ -416,11 +373,11 @@ namespace ApogeeVGC_CS.sim
         object? LostItemForDelibird { get; set; }
         Func<Pokemon, SparseBoostsTable, object>? BoostBy { get; set; }
         Action<Pokemon>? ClearBoosts { get; set; }
-        Func<Pokemon, StatIDExceptHP, int, int?, int>? CalculateStat { get; set; }
+        Func<Pokemon, StatIdExceptHp, int, int?, int>? CalculateStat { get; set; }
         Func<Pokemon, bool?, bool>? CureStatus { get; set; }
-        Func<Pokemon, object, object?, object?, int>? DeductPP { get; set; }
+        Func<Pokemon, object, object?, object?, int>? DeductPp { get; set; }
         Func<Pokemon, bool?, Pokemon?, object?, bool>? EatItem { get; set; }
-        Func<Pokemon, ID>? EffectiveWeather { get; set; }
+        Func<Pokemon, Id>? EffectiveWeather { get; set; }
         Func<Pokemon, object, object, object?, string?, bool>? FormeChange { get; set; }
         Func<Pokemon, object, bool>? HasType { get; set; }
         Func<Pokemon, object>? GetAbility { get; set; }
@@ -429,13 +386,13 @@ namespace ApogeeVGC_CS.sim
         Func<Pokemon, object>? GetMoveRequestData { get; set; }
         Func<Pokemon, string?, bool?, List<object>>? GetMoves { get; set; }
         Func<Pokemon, ActiveMove, Pokemon, object>? GetMoveTargets { get; set; }
-        Func<Pokemon, StatIDExceptHP, bool?, bool?, bool?, int>? GetStat { get; set; }
+        Func<Pokemon, StatIdExceptHp, bool?, bool?, bool?, int>? GetStat { get; set; }
         Func<Pokemon, bool?, bool?, List<string>>? GetTypes { get; set; }
         Func<Pokemon, int>? GetWeight { get; set; }
         Func<Pokemon, object, bool>? HasAbility { get; set; }
         Func<Pokemon, object, bool>? HasItem { get; set; }
         Func<Pokemon, bool?, bool?>? IsGrounded { get; set; }
-        Action<Pokemon, StatIDExceptHP, int>? ModifyStat { get; set; }
+        Action<Pokemon, StatIdExceptHp, int>? ModifyStat { get; set; }
         Action<Pokemon, ActiveMove, int?>? MoveUsed { get; set; }
         Action<Pokemon>? RecalculateStats { get; set; }
         Func<Pokemon, ActiveMove, int>? RunEffectiveness { get; set; }
@@ -504,7 +461,7 @@ namespace ApogeeVGC_CS.sim
         public int? Rating { get; set; }
         public List<PokemonSet>? Team { get; set; }
         public string? TeamString { get; set; }
-        public PRNGSeed? Seed { get; set; }
+        public PrngSeed? Seed { get; set; }
     }
     public interface IBasicTextData
     {
@@ -561,11 +518,11 @@ namespace ApogeeVGC_CS.sim
         public T? Gen7 { get; set; }
         public T? Gen8 { get; set; }
     }
-    public class AbilityText : TextFile<AbilityTextData> { }
-    public class MoveText : TextFile<MoveTextData> { }
-    public class ItemText : TextFile<ItemTextData> { }
-    public class PokedexText : TextFile<PokedexTextData> { }
-    public class DefaultText { } //: DefaultTextData { }
+    public class AbilityText : TextFile<AbilityTextData>;
+    public class MoveText : TextFile<MoveTextData>;
+    public class ItemText : TextFile<ItemTextData>;
+    public class PokedexText : TextFile<PokedexTextData>;
+    public class DefaultText; //: DefaultTextData { }
 
     // Use a class instead of namespace
     public static class RandomTeamsTypes
@@ -626,7 +583,7 @@ namespace ApogeeVGC_CS.sim
             public int? DynamaxLevel { get; set; }
             public bool? Gigantamax { get; set; }
             public string? TeraType { get; set; }
-            public Role? Role { get; set; }
+            public Role? PokemonRole { get; set; }
         }
 
         public class RandomFactorySet
@@ -672,7 +629,7 @@ namespace ApogeeVGC_CS.sim
         public class RandomSetData
         {
             public Role Role { get; set; }
-            public List<string> Movepool { get; set; } = new();
+            public List<string> Movepool { get; set; } = [];
             public List<string>? Abilities { get; set; }
             public List<string>? TeraTypes { get; set; }
             public List<string>? PreferredTypes { get; set; }
@@ -681,7 +638,7 @@ namespace ApogeeVGC_CS.sim
         public class RandomSpeciesData
         {
             public int? Level { get; set; }
-            public List<RandomSetData> Sets { get; set; } = new();
+            public List<RandomSetData> Sets { get; set; } = [];
         }
 
         public enum Role
@@ -696,7 +653,7 @@ namespace ApogeeVGC_CS.sim
             FastBulkySetup,
             BulkySupport,
             FastSupport,
-            AVPivot,
+            AvPivot,
             DoublesFastAttacker,
             DoublesSetupSweeper,
             DoublesWallbreaker,
@@ -716,10 +673,10 @@ namespace ApogeeVGC_CS.sim
     }
 
     // Mutable wrapper for immutable types
-    public class Mutable<T> where T : class
+    public class Mutable<T>(T value)
+        where T : class
     {
-        public T Value { get; set; }
-        public Mutable(T value) { Value = value; }
+        public T Value { get; set; } = value;
     }
 
     // Implementations of text data interfaces for various effects
@@ -803,197 +760,4 @@ namespace ApogeeVGC_CS.sim
         public string? Desc { get; set; }
         public string? ShortDesc { get; set; }
     }
-
-    //public class DefaultTextData : IAnyObject
-    //{
-    //    private readonly Dictionary<string, object> _data = new();
-
-    //    public object this[string key]
-    //    {
-    //        get => _data[key];
-    //        set => _data[key] = value;
-    //    }
-
-    //    public ICollection<string> Keys => _data.Keys;
-    //    public ICollection<object> Values => _data.Values;
-    //    public int Count => _data.Count;
-    //    public bool IsReadOnly => false;
-
-    //    public void Add(string key, object value) => _data.Add(key, value);
-    //    public void Add(KeyValuePair<string, object> item) => _data.Add(item.Key, item.Value);
-    //    public void Clear() => _data.Clear();
-    //    public bool Contains(KeyValuePair<string, object> item) => _data.Contains(item);
-    //    public bool ContainsKey(string key) => _data.ContainsKey(key);
-    //    public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) => ((IDictionary<string, object>)_data).CopyTo(array, arrayIndex);
-    //    public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => _data.GetEnumerator();
-    //    public bool Remove(string key) => _data.Remove(key);
-    //    public bool Remove(KeyValuePair<string, object> item) => _data.Remove(item.Key);
-
-    //    public bool TryGetBool(string key, [MaybeNullWhen(false)] out bool @bool)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is bool b)
-    //        {
-    //            @bool = b;
-    //            return true;
-    //        }
-    //        @bool = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetEffectType(string key, [MaybeNullWhen(false)] out EffectType effectType)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is EffectType et)
-    //        {
-    //            effectType = et;
-    //            return true;
-    //        }
-    //        effectType = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetId(string key, [MaybeNullWhen(false)] out Id id)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is Id i)
-    //        {
-    //            id = i;
-    //            return true;
-    //        }
-    //        id = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetInt(string key, [MaybeNullWhen(false)] out int @int)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is int i)
-    //        {
-    //            @int = i;
-    //            return true;
-    //        }
-    //        @int = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetString(string key, [MaybeNullWhen(false)] out string @string)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is string s)
-    //        {
-    //            @string = s;
-    //            return true;
-    //        }
-    //        @string = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetEnum<TEnum>(string key, [MaybeNullWhen(false)] out TEnum @enum) where TEnum : Enum
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is TEnum e)
-    //        {
-    //            @enum = e;
-    //            return true;
-    //        }
-    //        @enum = default;
-    //        return false;
-    //    }
-
-    //    // for IDictionary
-    //    public bool TryGetValue(string key, out object value) => _data.TryGetValue(key, out value);
-    //    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _data.GetEnumerator();
-
-    //    public bool TryGetStruct<TStruct>(string key, [MaybeNullWhen(false)] out TStruct structValue) where TStruct : struct
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is TStruct s)
-    //        {
-    //            structValue = s;
-    //            return true;
-    //        }
-    //        structValue = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetClass<TClass>(string key, [MaybeNullWhen(false)] out TClass? classValue) where TClass : class
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is TClass c)
-    //        {
-    //            classValue = c;
-    //            return true;
-    //        }
-    //        classValue = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetObject(string key, [MaybeNullWhen(false)] out object? obj)
-    //    {
-    //        if (_data.TryGetValue(key, out var value))
-    //        {
-    //            obj = value;
-    //            return true;
-    //        }
-    //        obj = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetList<T>(string key, [MaybeNullWhen(false)] out List<T> list) where T : class
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is List<T> l)
-    //        {
-    //            list = l;
-    //            return true;
-    //        }
-    //        list = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetDictionary<TKey, TValue>(string key, [MaybeNullWhen(false)] out Dictionary<TKey, TValue> dict) where TKey : notnull
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is Dictionary<TKey, TValue> d)
-    //        {
-    //            dict = d;
-    //            return true;
-    //        }
-    //        dict = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetNullable<T>(string key, [MaybeNullWhen(false)] out T? value) where T : struct
-    //    {
-    //        if (_data.TryGetValue(key, out var obj) && obj is T v)
-    //        {
-    //            value = v;
-    //            return true;
-    //        }
-    //        value = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetFunction<T>(string key, [MaybeNullWhen(false)] out Func<T> function)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is Func<T> func)
-    //        {
-    //            function = func;
-    //            return true;
-    //        }
-    //        function = default;
-    //        return false;
-    //    }
-
-    //    public bool TryGetAction<T>(string key, [MaybeNullWhen(false)] out Action<T> action)
-    //    {
-    //        if (_data.TryGetValue(key, out var value) && value is Action<T> act)
-    //        {
-    //            action = act;
-    //            return true;
-    //        }
-    //        action = default;
-    //        return false;
-    //    }
-    //}
-
-    //public class AnyObjectEmpty : DefaultTextData, IAnyObject
-    //{
-    //}
-
-
-    //public interface IPokemonSet { }
-    //public interface IPRNGSeed { }
-    //public interface ITypeInfo { }
 }

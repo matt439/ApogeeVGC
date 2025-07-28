@@ -59,7 +59,7 @@ namespace ApogeeVGC_CS.sim
         public int Gen { get; }
         public RuleTable RuleTable { get; }
         public int MinSourceGen { get; }
-        public Func<object, string> ToID { get; }
+        public Func<object, string> ToId { get; }
 
         public TeamValidator(object format, ModdedDex dex)
         {
@@ -72,7 +72,7 @@ namespace ApogeeVGC_CS.sim
             Gen = Dex.Gen;
             RuleTable = Dex.Formats.GetRuleTable(Format);
             MinSourceGen = RuleTable.MinSourceGen;
-            ToID = Dex.ToID;
+            ToId = Dex.ToID;
         }
     }
 }

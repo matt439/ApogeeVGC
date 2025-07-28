@@ -1,12 +1,4 @@
-﻿using ApogeeVGC_CS.sim;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     /**
      * Describes the acceptable target(s) of a move.
@@ -231,7 +223,7 @@ namespace ApogeeVGC_CS.sim
         public IConditionData? Condition { get; set; }
         public int BasePower { get; set; }
         public object Accuracy { get; set; } // true or int
-        public int PP { get; set; }
+        public int Pp { get; set; }
         public MoveCategory Category { get; set; }
         public PokemonType Type { get; set; }
         public int Priority { get; set; }
@@ -240,12 +232,12 @@ namespace ApogeeVGC_CS.sim
         //public string? RealMove { get; set; } // For Hidden Power
         public object? Damage { get; set; } // number | 'level' | false | null;
         public ContestType? ContestType { get; set; }
-        public bool? NoPPBoosts { get; set; }
+        public bool? NoPpBoosts { get; set; }
         public object? IsZ { get; set; } // bool or IDEntry
         public ZMoveData? ZMove { get; set; }
         public object? IsMax { get; set; } // bool or string
         public MaxMoveData? MaxMove { get; set; }
-        public object? OHKO { get; set; } // bool or "Ice"
+        public object? Ohko { get; set; } // bool or "Ice"
         public bool? ThawsTarget { get; set; }
         public int[]? Heal { get; set; }
         public bool? ForceSwitch { get; set; }
@@ -268,10 +260,10 @@ namespace ApogeeVGC_CS.sim
         public int? CritModifier { get; set; }
         public int? CritRatio { get; set; }
         public PokemonOrigin? OverrideOffensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideOffensiveStat { get; set; }
+        public StatIdExceptHp? OverrideOffensiveStat { get; set; }
         public PokemonOrigin? OverrideDefensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideDefensiveStat { get; set; }
-        public bool? ForceSTAB { get; set; }
+        public StatIdExceptHp? OverrideDefensiveStat { get; set; }
+        public bool? ForceStab { get; set; }
         public bool? IgnoreAbility { get; set; }
         public bool? IgnoreAccuracy { get; set; }
         public bool? IgnoreDefensive { get; set; }
@@ -295,8 +287,7 @@ namespace ApogeeVGC_CS.sim
         public bool? HasCrashDamage { get; set; }
         public bool? IsConfusionSelfHit { get; set; }
         public bool? StallingMove { get; set; }
-        public ID? BaseMove { get; set; }
-        public bool NoPpBoosts { get; set; }
+        public Id? BaseMove { get; set; }
     }
 
     public class MoveData : IMoveData
@@ -350,7 +341,7 @@ namespace ApogeeVGC_CS.sim
         public string? PseudoWeather { get; set; }
         public string? Terrain { get; set; }
         public string? Weather { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
         public bool Exists { get; set; }
@@ -363,20 +354,20 @@ namespace ApogeeVGC_CS.sim
         public IConditionData? Condition { get; set; }
         public int BasePower { get; set; }
         public object Accuracy { get; set; }
-        public int PP { get; set; }
+        public int Pp { get; set; }
         public MoveCategory Category { get; set; }
         public int Priority { get; set; }
         public MoveTarget Target { get; set; }
         public MoveFlags Flags { get; set; }
         public object? Damage { get; set; }
         public ContestType? ContestType { get; set; }
-        public bool? NoPPBoosts { get; set; }
-        public bool NoPpBoosts { get; set; }
+        public bool? NoPpBoosts { get; set; }
+        //public bool NoPpBoosts { get; set; }
         public object? IsZ { get; set; }
         public ZMoveData? ZMove { get; set; }
         public object? IsMax { get; set; }
         public MaxMoveData? MaxMove { get; set; }
-        public object? OHKO { get; set; }
+        public object? Ohko { get; set; }
         public bool? ThawsTarget { get; set; }
         public int[]? Heal { get; set; }
         public bool? ForceSwitch { get; set; }
@@ -398,10 +389,10 @@ namespace ApogeeVGC_CS.sim
         public int? CritModifier { get; set; }
         public int? CritRatio { get; set; }
         public PokemonOrigin? OverrideOffensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideOffensiveStat { get; set; }
+        public StatIdExceptHp? OverrideOffensiveStat { get; set; }
         public PokemonOrigin? OverrideDefensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideDefensiveStat { get; set; }
-        public bool? ForceSTAB { get; set; }
+        public StatIdExceptHp? OverrideDefensiveStat { get; set; }
+        public bool? ForceStab { get; set; }
         public bool? IgnoreAbility { get; set; }
         public bool? IgnoreAccuracy { get; set; }
         public bool? IgnoreDefensive { get; set; }
@@ -425,10 +416,10 @@ namespace ApogeeVGC_CS.sim
         public bool? HasCrashDamage { get; set; }
         public bool? IsConfusionSelfHit { get; set; }
         public bool? StallingMove { get; set; }
-        public ID? BaseMove { get; set; }
+        public Id? BaseMove { get; set; }
         public bool? SpreadHit { get; set; }
-        ID? IBasicEffect.Status { get; set; }
-        ID? IBasicEffect.Weather { get; set; }
+        Id? IBasicEffect.Status { get; set; }
+        Id? IBasicEffect.Weather { get; set; }
     }
 
     // helper class for MoveData
@@ -462,8 +453,8 @@ namespace ApogeeVGC_CS.sim
     }
 
     // MoveDataTable and ModdedMoveDataTable
-    public class MoveDataTable : Dictionary<IDEntry, IMoveData> { }
-    public class ModdedMoveDataTable : Dictionary<IDEntry, IModdedMoveData> { }
+    public class MoveDataTable : Dictionary<IdEntry, IMoveData> { }
+    public class ModdedMoveDataTable : Dictionary<IdEntry, IModdedMoveData> { }
 
     public interface IMove : IBasicEffect { }
 
@@ -585,7 +576,7 @@ namespace ApogeeVGC_CS.sim
         public string? PseudoWeather { get; set; }
         public string? Terrain { get; set; }
         public string? Weather { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -606,20 +597,20 @@ namespace ApogeeVGC_CS.sim
         public IConditionData? Condition { get; set; }
         public int BasePower { get; set; }
         public object Accuracy { get; set; }
-        public int PP { get; set; }
+        public int Pp { get; set; }
         public MoveCategory Category { get; set; }
         public int Priority { get; set; }
         public MoveTarget Target { get; set; }
         public MoveFlags Flags { get; set; }
         public object? Damage { get; set; }
         public ContestType? ContestType { get; set; }
-        public bool? NoPPBoosts { get; set; }
-        public bool NoPpBoosts { get; set; }
+        public bool? NoPpBoosts { get; set; }
+        //public bool NoPpBoosts { get; set; }
         public object? IsZ { get; set; }
         public ZMoveData? ZMove { get; set; }
         public object? IsMax { get; set; }
         public MaxMoveData? MaxMove { get; set; }
-        public object? OHKO { get; set; }
+        public object? Ohko { get; set; }
         public bool? ThawsTarget { get; set; }
         public int[]? Heal { get; set; }
         public bool? ForceSwitch { get; set; }
@@ -639,10 +630,10 @@ namespace ApogeeVGC_CS.sim
         public int? CritModifier { get; set; }
         public int? CritRatio { get; set; }
         public PokemonOrigin? OverrideOffensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideOffensiveStat { get; set; }
+        public StatIdExceptHp? OverrideOffensiveStat { get; set; }
         public PokemonOrigin? OverrideDefensivePokemon { get; set; }
-        public StatIDExceptHP? OverrideDefensiveStat { get; set; }
-        public bool? ForceSTAB { get; set; }
+        public StatIdExceptHp? OverrideDefensiveStat { get; set; }
+        public bool? ForceStab { get; set; }
         public bool? IgnoreAbility { get; set; }
         public bool? IgnoreAccuracy { get; set; }
         public bool? IgnoreDefensive { get; set; }
@@ -666,9 +657,9 @@ namespace ApogeeVGC_CS.sim
         public bool? HasCrashDamage { get; set; }
         public bool? IsConfusionSelfHit { get; set; }
         public bool? StallingMove { get; set; }
-        public ID? BaseMove { get; set; }
-        ID? IBasicEffect.Status { get; set; }
-        ID? IBasicEffect.Weather { get; set; }
+        public Id? BaseMove { get; set; }
+        Id? IBasicEffect.Status { get; set; }
+        Id? IBasicEffect.Weather { get; set; }
     }
 
     public enum MoveCategory
@@ -713,11 +704,11 @@ namespace ApogeeVGC_CS.sim
         public IConditionData? Condition { get; set; } = data.Condition;
         public int BasePower { get; set; } = data.BasePower;
         public object Accuracy { get; set; } = data.Accuracy;
-        public int PP { get; set; } = data.PP; 
+        public int Pp { get; set; } = data.Pp; 
         public int Priority { get; set; } = data.Priority;
         public MoveTarget Target { get; set; } = data.Target;
         public ContestType? ContestType { get; set; } = data.ContestType;
-        public object? OHKO { get; set; } = data.OHKO;
+        public object? Ohko { get; set; } = data.Ohko;
         public bool? ThawsTarget { get; set; } = data.ThawsTarget;
         public int[]? Heal { get; set; } = data.Heal;
         public bool? ForceSwitch { get; set; } = data.ForceSwitch;
@@ -734,9 +725,9 @@ namespace ApogeeVGC_CS.sim
         public SecondaryEffect? Self { get; set; } = data.Self;
         public bool? AlwaysHit { get; set; } = data.AlwaysHit;
         public int? BasePowerModifier { get; set; } = data.BasePowerModifier;
-        public StatIDExceptHP? OverrideOffensiveStat { get; set; } = data.OverrideOffensiveStat;
+        public StatIdExceptHp? OverrideOffensiveStat { get; set; } = data.OverrideOffensiveStat;
         public PokemonOrigin? OverrideDefensivePokemon { get; set; } = data.OverrideDefensivePokemon;
-        public StatIDExceptHP? OverrideDefensiveStat { get; set; } = data.OverrideDefensiveStat;
+        public StatIdExceptHp? OverrideDefensiveStat { get; set; } = data.OverrideDefensiveStat;
         public bool? IgnoreAccuracy { get; set; } = data.IgnoreAccuracy;
         public bool? IgnoreEvasion { get; set; } = data.IgnoreEvasion;
         public object? IgnoreImmunity { get; set; } = data.IgnoreImmunity;
@@ -753,8 +744,8 @@ namespace ApogeeVGC_CS.sim
         public bool? HasCrashDamage { get; set; } = data.HasCrashDamage;
         public bool? IsConfusionSelfHit { get; set; } = data.IsConfusionSelfHit;
         public bool? StallingMove { get; set; } = data.StallingMove;
-        public ID? BaseMove { get; set; } = data.BaseMove;
-        public bool? NoPPBoosts { get; set; } = data.NoPpBoosts;
+        public Id? BaseMove { get; set; } = data.BaseMove;
+        //public bool? NoPpBoosts { get; set; } = data.NoPpBoosts;
 
         // Initialize all IMoveEventMethods properties
         public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; set; } = data.BasePowerCallback;
@@ -798,7 +789,7 @@ namespace ApogeeVGC_CS.sim
         public string? Terrain { get; set; } = data.Terrain;
 
         // IDataMove properties - these need to be initialized from data or set to defaults
-        public bool NoPpBoosts { get; set; } = data.NoPpBoosts;
+        public bool? NoPpBoosts { get; set; } = data.NoPpBoosts;
         public object? IsZ { get; set; } = data.IsZ; // bool or string
         public ZMoveData? ZMove { get; set; } = data.ZMove;
         public object? IsMax { get; set; } = data.IsMax; // bool or string
@@ -812,7 +803,7 @@ namespace ApogeeVGC_CS.sim
         public int? CritModifier { get; set; } = data.CritModifier;
         public int? CritRatio { get; set; } = data.CritRatio;
         public PokemonOrigin? OverrideOffensivePokemon { get; set; } = data.OverrideOffensivePokemon;
-        public bool? ForceSTAB { get; set; } = data.ForceSTAB;
+        public bool? ForceStab { get; set; } = data.ForceStab;
         public bool? IgnoreAbility { get; set; } = data.IgnoreAbility;
         public bool? IgnoreDefensive { get; set; } = data.IgnoreDefensive;
         public bool? IgnoreNegativeOffensive { get; set; } = data.IgnoreNegativeOffensive;
@@ -876,7 +867,7 @@ namespace ApogeeVGC_CS.sim
             NonGhostTarget ??= MoveTarget.Any;
             IgnoreAbility ??= false;
             SpreadHit ??= false;
-            ForceSTAB ??= false;
+            ForceStab ??= false;
 
             if (VolatileStatus is string vs)
             {

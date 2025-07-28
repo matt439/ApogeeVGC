@@ -43,7 +43,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnChargeMove { get; set; }
         Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnCriticalHit { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
-        Func<Battle, Pokemon, Pokemon, int?>? OnDeductPP { get; set; }
+        Func<Battle, Pokemon, Pokemon, int?>? OnDeductPp { get; set; }
         Action<Battle, Pokemon>? OnDisableMove { get; set; }
         Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; set; }
         Action<Battle, Item, Pokemon>? OnEatItem { get; set; }
@@ -70,7 +70,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; set; }
         Func<Battle, int, Pokemon, int?>? OnModifySpe { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySTAB { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; set; }
         Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; set; }
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; set; }
         Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; set; }
@@ -136,7 +136,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeChargeMove { get; set; }
         Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnFoeCriticalHit { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; set; }
-        Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPP { get; set; }
+        Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; set; }
         Action<Battle, Pokemon>? OnFoeDisableMove { get; set; }
         Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; set; }
         Action<Battle, Item, Pokemon>? OnFoeEatItem { get; set; }
@@ -159,7 +159,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; set; }
         Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySTAB { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; set; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; set; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; set; }
         Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; set; }
@@ -218,7 +218,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceChargeMove { get; set; }
         Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnSourceCriticalHit { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; set; }
-        Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPP { get; set; }
+        Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; set; }
         Action<Battle, Pokemon>? OnSourceDisableMove { get; set; }
         Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; set; }
         Action<Battle, Item, Pokemon>? OnSourceEatItem { get; set; }
@@ -241,7 +241,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; set; }
         Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySTAB { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; set; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; set; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; set; }
         Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; set; }
@@ -300,7 +300,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyChargeMove { get; set; }
         Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAnyCriticalHit { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; set; }
-        Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPP { get; set; }
+        Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; set; }
         Action<Battle, Pokemon>? OnAnyDisableMove { get; set; }
         Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; set; }
         Action<Battle, Item, Pokemon>? OnAnyEatItem { get; set; }
@@ -323,7 +323,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; set; }
         Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySTAB { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; set; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; set; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; set; }
         Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; set; }
@@ -401,7 +401,7 @@ namespace ApogeeVGC_CS.sim
         int? OnModifySpAPriority { get; set; }
         int? OnModifySpDPriority { get; set; }
         int? OnModifySpePriority { get; set; }
-        int? OnModifySTABPriority { get; set; }
+        int? OnModifyStabPriority { get; set; }
         int? OnModifyTypePriority { get; set; }
         int? OnModifyWeightPriority { get; set; }
         int? OnRedirectTargetPriority { get; set; }
@@ -453,7 +453,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAllyChargeMove { get; set; }
         Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAllyCriticalHit { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAllyDamage { get; set; }
-        Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPP { get; set; }
+        Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; set; }
         Action<Battle, Pokemon>? OnAllyDisableMove { get; set; }
         Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; set; }
         Action<Battle, Item, Pokemon>? OnAllyEatItem { get; set; }
@@ -476,7 +476,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; set; }
         Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; set; }
         Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySTAB { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; set; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; set; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAllyModifyTarget { get; set; }
         Func<Battle, int, Pokemon, int?>? OnAllyModifyWeight { get; set; }
@@ -591,7 +591,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAllyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAllyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAllyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAllyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; set; }
@@ -614,7 +614,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAllyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifyWeight { get; set; }
@@ -675,7 +675,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnEatItem { get; set; }
@@ -702,7 +702,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; set; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; set; }
         public Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; set; }
@@ -763,7 +763,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnFoeCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnFoeDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnFoeEatItem { get; set; }
@@ -786,7 +786,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; set; }
@@ -841,7 +841,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnSourceCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnSourceDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnSourceEatItem { get; set; }
@@ -864,7 +864,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; set; }
@@ -921,7 +921,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAnyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAnyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAnyEatItem { get; set; }
@@ -944,7 +944,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; set; }
@@ -1020,7 +1020,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnModifySpAPriority { get; set; }
         public int? OnModifySpDPriority { get; set; }
         public int? OnModifySpePriority { get; set; }
-        public int? OnModifySTABPriority { get; set; }
+        public int? OnModifyStabPriority { get; set; }
         public int? OnModifyTypePriority { get; set; }
         public int? OnModifyWeightPriority { get; set; }
         public int? OnRedirectTargetPriority { get; set; }
@@ -1043,7 +1043,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -1056,8 +1056,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public ID? Status { get; set; }
-        public ID? Weather { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         //public string? EffectTypeString { get; set; }
@@ -1113,7 +1113,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAllyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAllyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAllyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAllyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; set; }
@@ -1136,7 +1136,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAllyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifyWeight { get; set; }
@@ -1197,7 +1197,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnEatItem { get; set; }
@@ -1224,7 +1224,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; set; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; set; }
         public Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; set; }
@@ -1285,7 +1285,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnFoeCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnFoeDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnFoeEatItem { get; set; }
@@ -1308,7 +1308,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; set; }
@@ -1363,7 +1363,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnSourceCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnSourceDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnSourceEatItem { get; set; }
@@ -1386,7 +1386,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; set; }
@@ -1443,7 +1443,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAnyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAnyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAnyEatItem { get; set; }
@@ -1466,7 +1466,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; set; }
@@ -1542,7 +1542,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnModifySpAPriority { get; set; }
         public int? OnModifySpDPriority { get; set; }
         public int? OnModifySpePriority { get; set; }
-        public int? OnModifySTABPriority { get; set; }
+        public int? OnModifyStabPriority { get; set; }
         public int? OnModifyTypePriority { get; set; }
         public int? OnModifyWeightPriority { get; set; }
         public int? OnRedirectTargetPriority { get; set; }
@@ -1565,7 +1565,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -1578,8 +1578,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public ID? Status { get; set; }
-        public ID? Weather { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         //public string? EffectTypeString { get; set; }
@@ -1635,7 +1635,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAllyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAllyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAllyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAllyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; set; }
@@ -1658,7 +1658,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAllyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifyWeight { get; set; }
@@ -1719,7 +1719,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnEatItem { get; set; }
@@ -1746,7 +1746,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; set; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; set; }
         public Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; set; }
@@ -1807,7 +1807,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnFoeCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnFoeDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnFoeEatItem { get; set; }
@@ -1830,7 +1830,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; set; }
@@ -1885,7 +1885,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnSourceCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnSourceDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnSourceEatItem { get; set; }
@@ -1908,7 +1908,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; set; }
@@ -1965,7 +1965,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAnyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAnyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAnyEatItem { get; set; }
@@ -1988,7 +1988,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; set; }
@@ -2064,7 +2064,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnModifySpAPriority { get; set; }
         public int? OnModifySpDPriority { get; set; }
         public int? OnModifySpePriority { get; set; }
-        public int? OnModifySTABPriority { get; set; }
+        public int? OnModifyStabPriority { get; set; }
         public int? OnModifyTypePriority { get; set; }
         public int? OnModifyWeightPriority { get; set; }
         public int? OnRedirectTargetPriority { get; set; }
@@ -2087,7 +2087,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnTryMovePriority { get; set; }
         public int? OnTryPrimaryHitPriority { get; set; }
         public int? OnTypePriority { get; set; }
-        public ID Id { get; set; }
+        public Id Id { get; set; }
         public string Name { get; set; }
         public string Fullname { get; set; }
         public EffectType EffectType { get; set; }
@@ -2100,8 +2100,8 @@ namespace ApogeeVGC_CS.sim
         public int? Duration { get; set; }
         public bool NoCopy { get; set; }
         public bool AffectsFainted { get; set; }
-        public ID? Status { get; set; }
-        public ID? Weather { get; set; }
+        public Id? Status { get; set; }
+        public Id? Weather { get; set; }
         public string SourceEffect { get; set; }
         public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
         //public string? EffectTypeString { get; set; }
@@ -2113,8 +2113,8 @@ namespace ApogeeVGC_CS.sim
     {
         public bool Inherit { get; set; }
     }
-    public class ConditionDataTable : Dictionary<IDEntry, IConditionData> { }
-    public class ModdedConditionDataTable : Dictionary<IDEntry, IModdedConditionData> { }
+    public class ConditionDataTable : Dictionary<IdEntry, IConditionData> { }
+    public class ModdedConditionDataTable : Dictionary<IdEntry, IModdedConditionData> { }
 
 
     /// <summary>
@@ -2178,7 +2178,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAllyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAllyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAllyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAllyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; set; }
@@ -2201,7 +2201,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAllyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifyWeight { get; set; }
@@ -2262,7 +2262,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnEatItem { get; set; }
@@ -2289,7 +2289,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; set; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; set; }
         public Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; set; }
@@ -2350,7 +2350,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnFoeCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnFoeDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnFoeEatItem { get; set; }
@@ -2373,7 +2373,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; set; }
@@ -2428,7 +2428,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnSourceCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnSourceDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnSourceEatItem { get; set; }
@@ -2451,7 +2451,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; set; }
@@ -2508,7 +2508,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyChargeMove { get; set; }
         public Func<Battle, Pokemon, object?, ActiveMove, bool?>? OnAnyCriticalHit { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; set; }
-        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPP { get; set; }
+        public Func<Battle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; set; }
         public Action<Battle, Pokemon>? OnAnyDisableMove { get; set; }
         public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; set; }
         public Action<Battle, Item, Pokemon>? OnAnyEatItem { get; set; }
@@ -2531,7 +2531,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; set; }
         public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; set; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySTAB { get; set; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; set; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; set; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; set; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; set; }
@@ -2607,7 +2607,7 @@ namespace ApogeeVGC_CS.sim
         public int? OnModifySpAPriority { get; set; }
         public int? OnModifySpDPriority { get; set; }
         public int? OnModifySpePriority { get; set; }
-        public int? OnModifySTABPriority { get; set; }
+        public int? OnModifyStabPriority { get; set; }
         public int? OnModifyTypePriority { get; set; }
         public int? OnModifyWeightPriority { get; set; }
         public int? OnRedirectTargetPriority { get; set; }
@@ -2695,7 +2695,7 @@ namespace ApogeeVGC_CS.sim
             OnChargeMove = eventMethods.OnChargeMove;
             OnCriticalHit = eventMethods.OnCriticalHit;
             OnDamage = eventMethods.OnDamage;
-            OnDeductPP = eventMethods.OnDeductPP;
+            OnDeductPp = eventMethods.OnDeductPp;
             OnDisableMove = eventMethods.OnDisableMove;
             OnDragOut = eventMethods.OnDragOut;
             OnEatItem = eventMethods.OnEatItem;
@@ -2722,7 +2722,7 @@ namespace ApogeeVGC_CS.sim
             OnModifySpA = eventMethods.OnModifySpA;
             OnModifySpD = eventMethods.OnModifySpD;
             OnModifySpe = eventMethods.OnModifySpe;
-            OnModifySTAB = eventMethods.OnModifySTAB;
+            OnModifyStab = eventMethods.OnModifyStab;
             OnModifyWeight = eventMethods.OnModifyWeight;
             OnMoveAborted = eventMethods.OnMoveAborted;
             OnNegateImmunity = eventMethods.OnNegateImmunity;
@@ -2785,7 +2785,7 @@ namespace ApogeeVGC_CS.sim
             OnFoeChargeMove = eventMethods.OnFoeChargeMove;
             OnFoeCriticalHit = eventMethods.OnFoeCriticalHit;
             OnFoeDamage = eventMethods.OnFoeDamage;
-            OnFoeDeductPP = eventMethods.OnFoeDeductPP;
+            OnFoeDeductPp = eventMethods.OnFoeDeductPp;
             OnFoeDisableMove = eventMethods.OnFoeDisableMove;
             OnFoeDragOut = eventMethods.OnFoeDragOut;
             OnFoeEatItem = eventMethods.OnFoeEatItem;
@@ -2808,7 +2808,7 @@ namespace ApogeeVGC_CS.sim
             OnFoeModifySpA = eventMethods.OnFoeModifySpA;
             OnFoeModifySpD = eventMethods.OnFoeModifySpD;
             OnFoeModifySpe = eventMethods.OnFoeModifySpe;
-            OnFoeModifySTAB = eventMethods.OnFoeModifySTAB;
+            OnFoeModifyStab = eventMethods.OnFoeModifyStab;
             OnFoeModifyType = eventMethods.OnFoeModifyType;
             OnFoeModifyTarget = eventMethods.OnFoeModifyTarget;
             OnFoeModifyWeight = eventMethods.OnFoeModifyWeight;
@@ -2865,7 +2865,7 @@ namespace ApogeeVGC_CS.sim
             OnSourceChargeMove = eventMethods.OnSourceChargeMove;
             OnSourceCriticalHit = eventMethods.OnSourceCriticalHit;
             OnSourceDamage = eventMethods.OnSourceDamage;
-            OnSourceDeductPP = eventMethods.OnSourceDeductPP;
+            OnSourceDeductPp = eventMethods.OnSourceDeductPp;
             OnSourceDisableMove = eventMethods.OnSourceDisableMove;
             OnSourceDragOut = eventMethods.OnSourceDragOut;
             OnSourceEatItem = eventMethods.OnSourceEatItem;
@@ -2888,7 +2888,7 @@ namespace ApogeeVGC_CS.sim
             OnSourceModifySpA = eventMethods.OnSourceModifySpA;
             OnSourceModifySpD = eventMethods.OnSourceModifySpD;
             OnSourceModifySpe = eventMethods.OnSourceModifySpe;
-            OnSourceModifySTAB = eventMethods.OnSourceModifySTAB;
+            OnSourceModifyStab = eventMethods.OnSourceModifyStab;
             OnSourceModifyType = eventMethods.OnSourceModifyType;
             OnSourceModifyTarget = eventMethods.OnSourceModifyTarget;
             OnSourceModifyWeight = eventMethods.OnSourceModifyWeight;
@@ -2947,7 +2947,7 @@ namespace ApogeeVGC_CS.sim
             OnAnyChargeMove = eventMethods.OnAnyChargeMove;
             OnAnyCriticalHit = eventMethods.OnAnyCriticalHit;
             OnAnyDamage = eventMethods.OnAnyDamage;
-            OnAnyDeductPP = eventMethods.OnAnyDeductPP;
+            OnAnyDeductPp = eventMethods.OnAnyDeductPp;
             OnAnyDisableMove = eventMethods.OnAnyDisableMove;
             OnAnyDragOut = eventMethods.OnAnyDragOut;
             OnAnyEatItem = eventMethods.OnAnyEatItem;
@@ -2970,7 +2970,7 @@ namespace ApogeeVGC_CS.sim
             OnAnyModifySpA = eventMethods.OnAnyModifySpA;
             OnAnyModifySpD = eventMethods.OnAnyModifySpD;
             OnAnyModifySpe = eventMethods.OnAnyModifySpe;
-            OnAnyModifySTAB = eventMethods.OnAnyModifySTAB;
+            OnAnyModifyStab = eventMethods.OnAnyModifyStab;
             OnAnyModifyType = eventMethods.OnAnyModifyType;
             OnAnyModifyTarget = eventMethods.OnAnyModifyTarget;
             OnAnyModifyWeight = eventMethods.OnAnyModifyWeight;
@@ -3048,7 +3048,7 @@ namespace ApogeeVGC_CS.sim
             OnModifySpAPriority = eventMethods.OnModifySpAPriority;
             OnModifySpDPriority = eventMethods.OnModifySpDPriority;
             OnModifySpePriority = eventMethods.OnModifySpePriority;
-            OnModifySTABPriority = eventMethods.OnModifySTABPriority;
+            OnModifyStabPriority = eventMethods.OnModifyStabPriority;
             OnModifyTypePriority = eventMethods.OnModifyTypePriority;
             OnModifyWeightPriority = eventMethods.OnModifyWeightPriority;
             OnRedirectTargetPriority = eventMethods.OnRedirectTargetPriority;
@@ -3100,7 +3100,7 @@ namespace ApogeeVGC_CS.sim
             OnAllyChargeMove = eventMethods.OnAllyChargeMove;
             OnAllyCriticalHit = eventMethods.OnAllyCriticalHit;
             OnAllyDamage = eventMethods.OnAllyDamage;
-            OnAllyDeductPP = eventMethods.OnAllyDeductPP;
+            OnAllyDeductPp = eventMethods.OnAllyDeductPp;
             OnAllyDisableMove = eventMethods.OnAllyDisableMove;
             OnAllyDragOut = eventMethods.OnAllyDragOut;
             OnAllyEatItem = eventMethods.OnAllyEatItem;
@@ -3123,7 +3123,7 @@ namespace ApogeeVGC_CS.sim
             OnAllyModifySpA = eventMethods.OnAllyModifySpA;
             OnAllyModifySpD = eventMethods.OnAllyModifySpD;
             OnAllyModifySpe = eventMethods.OnAllyModifySpe;
-            OnAllyModifySTAB = eventMethods.OnAllyModifySTAB;
+            OnAllyModifyStab = eventMethods.OnAllyModifyStab;
             OnAllyModifyType = eventMethods.OnAllyModifyType;
             OnAllyModifyTarget = eventMethods.OnAllyModifyTarget;
             OnAllyModifyWeight = eventMethods.OnAllyModifyWeight;
@@ -3210,7 +3210,7 @@ namespace ApogeeVGC_CS.sim
     public class DexConditions(ModdedDex dex)
     {
         ModdedDex Dex { get; } = dex;
-        private readonly Dictionary<ID, Condition> _conditionCache = [];
+        private readonly Dictionary<Id, Condition> _conditionCache = [];
 
         public Condition Get(string? name = "")
         {
@@ -3222,7 +3222,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("Get method is not implemented yet.");
         }
 
-        public Condition GetById(ID id)
+        public Condition GetById(Id id)
         {
             throw new NotImplementedException("GetById method is not implemented yet.");
         }

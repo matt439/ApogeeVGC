@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ApogeeVGC_CS.data
 {
-    internal class pokedex
+    internal class Pokedex
     {
     }
 }

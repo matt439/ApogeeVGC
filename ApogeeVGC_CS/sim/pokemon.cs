@@ -10,8 +10,8 @@ namespace ApogeeVGC_CS.sim
     {
         public string Id { get; set; } = string.Empty;
         public string Move { get; set; } = string.Empty;
-        public int PP { get; set; }
-        public int MaxPP { get; set; }
+        public int Pp { get; set; }
+        public int MaxPp { get; set; }
         public string? Target { get; set; }
         public object Disabled { get; set; } = false; // bool or string
         public string? DisabledSource { get; set; }
@@ -104,9 +104,9 @@ namespace ApogeeVGC_CS.sim
         public Pokemon? Illusion { get; set; }
         public bool Transformed { get; set; }
 
-        public int MaxHP { get; set; }
-        public int BaseMaxHP { get; set; }
-        public int HP { get; set; }
+        public int MaxHp { get; set; }
+        public int BaseMaxHp { get; set; }
+        public int Hp { get; set; }
         public bool Fainted { get; set; }
         public bool FaintQueued { get; set; }
         public bool? SubFainted { get; set; }
@@ -240,8 +240,8 @@ namespace ApogeeVGC_CS.sim
                 {
                     Move = move.Name,
                     Id = move.Id,
-                    PP = basepp,
-                    MaxPP = basepp,
+                    Pp = basepp,
+                    MaxPp = basepp,
                     Target = move.Target.ToString(),
                     Disabled = false,
                     DisabledSource = string.Empty,
@@ -317,7 +317,7 @@ namespace ApogeeVGC_CS.sim
 
             // Final initialization
             ClearVolatile();
-            HP = MaxHP;
+            Hp = MaxHp;
         }
 
         private string GetUpdatedDetails()
