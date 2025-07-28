@@ -28,6 +28,11 @@
         }
     }
 
+    public class Test2
+    {
+        public int? X { get; init; }
+    }
+
 
     class Program
     {
@@ -36,7 +41,8 @@
             // A a = new A { X = 10 };
             // B b = new B { Y = 20 };
 
-            TestClass test = new TestClass(5, 10);
+            //TestClass test = new TestClass(5, 10);
+            Test2 test2;
         }
     }
 

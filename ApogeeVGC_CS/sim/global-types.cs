@@ -223,18 +223,18 @@ namespace ApogeeVGC_CS.sim
 
     public interface ICommonHandlers
     {
-        Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierEffect { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierMove { get; set; }
-        Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultMove { get; set; }
-        Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultMove { get; set; }
-        Action<Battle, Pokemon, Pokemon, IEffect> VoidEffect { get; set; }
-        Action<Battle, Pokemon, Pokemon, IActiveMove> VoidMove { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierSourceEffect { get; set; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierSourceMove { get; set; }
-        Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultSourceMove { get; set; }
-        Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultSourceMove { get; set; }
-        Action<Battle, Pokemon, Pokemon, IEffect> VoidSourceEffect { get; set; }
-        Action<Battle, Pokemon, Pokemon, IActiveMove> VoidSourceMove { get; set; }
+        Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierEffect { get; }
+        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierMove { get; }
+        Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultMove { get; }
+        Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultMove { get; }
+        Action<Battle, Pokemon, Pokemon, IEffect> VoidEffect { get; }
+        Action<Battle, Pokemon, Pokemon, IActiveMove> VoidMove { get; }
+        Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierSourceEffect { get; }
+        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierSourceMove { get; }
+        Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultSourceMove { get; }
+        Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultSourceMove { get; }
+        Action<Battle, Pokemon, Pokemon, IEffect> VoidSourceEffect { get; }
+        Action<Battle, Pokemon, Pokemon, IActiveMove> VoidSourceMove { get; }
     }
 
     public interface IEffectData
@@ -251,7 +251,7 @@ namespace ApogeeVGC_CS.sim
 
     public interface IModdedEffectData : IEffectData
     {
-        public bool Inherit { get; set; }
+        public bool Inherit { get; }
     }
 
     public enum EffectType

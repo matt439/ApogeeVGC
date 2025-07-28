@@ -1,6 +1,6 @@
 ﻿namespace ApogeeVGC_CS.sim
 {
-    public abstract class BasicEffect(BasicEffect other) : IEffectData
+    public abstract class BasicEffect : IEffectData
     {
         /// <summary>
         /// ID. This will be a lowercase version of the name with all the
@@ -8,30 +8,50 @@
         /// becomes "mrmime", and "Basculin-Blue-Striped" becomes
         /// "basculinbluestriped".
         /// </summary>
-        public Id Id { get; protected set; } = other.Id;
+        public Id Id => RealMove != null ? new Id(RealMove) : new Id(Name);
 
         /// <summary>
         /// Name. Currently does not support Unicode letters, so "Flabébé"
         /// is "Flabebe" and "Nidoran♀" is "Nidoran-F".
         /// </summary>
-        public string Name { get; protected set; } = other.Name;
+        public required string Name
+        {
+            get;
+            init
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(value), "Name cannot be null.");
+                }
+                if (value.Length == 0)
+                {
+                    throw new ArgumentException("Name cannot be empty.", nameof(value));
+                }
+
+                field = value.Trim();
+            }
+        }
 
         /// <summary>
         /// Full name. Prefixes the name with the effect type. For instance,
         /// Leftovers would be "item: Leftovers", confusion the status
         /// condition would be "confusion", etc.
         /// </summary>
-        public string Fullname { get; protected set; } = other.Fullname;
+        public virtual required string Fullname
+        {
+            get => string.IsNullOrEmpty(field) ? Name : field;
+            init;
+        }
 
         /// <summary>Effect type.</summary>
-        public EffectType EffectType { get; protected set; } = other.EffectType;
+        public virtual required EffectType EffectType { get; init; }
 
         /// <summary>
         /// Does it exist? For historical reasons, when you use an accessor
         /// for an effect that doesn't exist, you get a dummy effect that
         /// doesn't do anything, and this field set to false.
         /// </summary>
-        public bool Exists { get; protected set; } = other.Exists;
+        public required bool Exists { get; init; }
 
         /// <summary>
         /// Dex number? For a Pokemon, this is the National Dex number. For
@@ -40,82 +60,82 @@
         /// doesn't. Nonstandard effects (e.g. CAP effects) will have
         /// negative numbers.
         /// </summary>
-        public int Num { get; protected set; } = other.Num;
+        public required int Num { get; init; }
 
         /// <summary>
         /// The generation of Pokemon game this was INTRODUCED (NOT
         /// necessarily the current gen being simulated.) Not all effects
         /// track generation; this will be 0 if not known.
         /// </summary>
-        public int Gen { get; protected set; } = other.Gen;
+        public virtual required int Gen { get; init; }
 
         /// <summary>
         /// A shortened form of the description of this effect.
         /// Not all effects have this.
         /// </summary>
-        public string? ShortDesc { get; protected set; } = other.ShortDesc;
+        public string? ShortDesc { get; protected set; }
 
         /// <summary>The full description for this effect.</summary>
-        public string? Desc { get; protected set; } = other.Desc;
+        public string? Desc { get; protected set; }
 
         /// <summary>
         /// Is this item/move/ability/pokemon nonstandard? Specified for effects
         /// that have no use in standard formats: made-up pokemon (CAP),
         /// glitches (MissingNo etc), Pokestar pokemon, etc.
         /// </summary>
-        public Nonstandard? IsNonstandard { get; protected set; } = other.IsNonstandard;
+        public Nonstandard? IsNonstandard { get; protected set; }
 
         /// <summary>The duration of the condition - only for pure conditions.</summary>
-        public int? Duration { get; protected set; } = other.Duration;
+        public int? Duration { get; protected set; }
 
         /// <summary>Whether or not the condition is ignored by Baton Pass - only for pure conditions.</summary>
-        public bool NoCopy { get; protected set; } = other.NoCopy;
+        public required bool NoCopy { get; init; }
 
         /// <summary>Whether or not the condition affects fainted Pokemon.</summary>
-        public bool AffectsFainted { get; protected set; } = other.AffectsFainted;
+        public required bool AffectsFainted { get; init; }
 
         /// <summary>Moves only: what status does it set?</summary>
-        public Id? Status { get; protected set; } = other.Status;
+        public Id? Status { get; protected set; }
 
         /// <summary>Moves only: what weather does it set?</summary>
-        public Id? Weather { get; protected set; } = other.Weather;
+        public Id? Weather { get; protected set; }
 
         /// <summary>???</summary>
-        public string SourceEffect { get; protected set; } = other.SourceEffect;
-        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; protected set; } = other.DurationCallback;
-        public bool? Infiltrates { get; protected set; } = other.Infiltrates;
-        public string? RealMove { get; protected set; } = other.RealMove;
+        public required string SourceEffect { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; protected set; }
+        public bool? Infiltrates { get; protected set; }
+        public string? RealMove { get; protected set; }
 
-        public void InitBasicEffect()
-        {
-            if (Name != string.Empty)
-            {
-                Name = Name.Trim();
-            }
-            else
-            {
-                throw new ArgumentException("Name is required for BasicEffect.");
-            }
+        //public void InitBasicEffect()
+        //{
+        //    if (Name != string.Empty)
+        //    {
+        //        Name = Name.Trim();
+        //    }
+        //    else
+        //    {
+        //        throw new ArgumentException("Name is required for BasicEffect.");
+        //    }
 
-            if (RealMove != null)
-            {
-                Id = new Id(RealMove);
-            }
-            else
-            {
-                Id = new Id(Name);
-            }
+        //    if (RealMove != null)
+        //    {
+        //        Id = new Id(RealMove);
+        //    }
+        //    else
+        //    {
+        //        Id = new Id(Name);
+        //    }
 
-            if (Fullname == string.Empty)
-            {
-                Fullname = Name;
-            }
+        //    if (Fullname == string.Empty)
+        //    {
+        //        Fullname = Name;
+        //    }
 
-            if (!Exists)
-            {                 
-                Exists = !Id.IsEmpty;
-            }
-        }
+        //    if (!Exists)
+        //    {                 
+        //        Exists = !Id.IsEmpty;
+        //    }
+        //}
 
         public override string ToString()
         {
@@ -123,43 +143,97 @@
         }
     }
 
-    public interface INature : IBasicEffect
-    {
-        public StatIdExceptHp? Plus { get; set; }
-        public StatIdExceptHp? Minus { get; set; }
-    }
+    //public interface INature : IBasicEffect
+    //{
+    //    public StatIdExceptHp? Plus { get; set; }
+    //    public StatIdExceptHp? Minus { get; set; }
+    //}
 
-    public class Nature : BasicEffect, INature
-    {
-        public StatIdExceptHp? Plus { get; set; } = null;
-        public StatIdExceptHp? Minus { get; set; } = null;
+    //public class Nature : BasicEffect, INature
+    //{
+    //    public StatIdExceptHp? Plus { get; set; } = null;
+    //    public StatIdExceptHp? Minus { get; set; } = null;
 
-        public Nature(INatureData other) : base(other)
+    //    public Nature(INatureData other) : base(other)
+    //    {
+    //        Plus = other.Plus;
+    //        Minus = other.Minus;
+    //    }
+
+    //    public void Init()
+    //    {
+    //        InitBasicEffect();
+
+    //        Fullname = $"nature: {Name}";
+    //        EffectType = EffectType.Nature;
+    //        Gen = 3;
+    //    }
+    //}
+
+    //public class Nature(Nature other) : BasicEffect(other), IBasicEffect, INatureData
+    //{
+    //    public StatIdExceptHp? Plus { get; } = other.Plus;
+    //    public StatIdExceptHp? Minus { get; } = other.Minus;
+
+    //    public void Init()
+    //    {
+    //        InitBasicEffect();
+
+    //        Fullname = $"nature: {Name}";
+    //        EffectType = EffectType.Nature;
+    //        Gen = 3;
+    //    }
+    //}
+
+    public class Nature : BasicEffect, IBasicEffect, INatureData
+    {
+        public StatIdExceptHp? Plus { get; init; }
+        public StatIdExceptHp? Minus { get; init; }
+
+        public override required string Fullname
         {
-            Plus = other.Plus;
-            Minus = other.Minus;
+            get => $"nature: {Name}";
+            init { } // Placeholder: does nothing, but required by the base class
         }
-
-        public void Init()
+        public override required EffectType EffectType
         {
-            InitBasicEffect();
-            
-            Fullname = $"nature: {Name}";
-            EffectType = EffectType.Nature;
-            Gen = 3;
+            get => EffectType.Nature;
+            init { } // Placeholder: does nothing, but required by the base class
+        }
+        public override required int Gen
+        {
+            get => 3;
+            init { } // Placeholder: does nothing, but required by the base class
         }
     }
 
     public static class NatureConstants
     {
-        public static readonly Nature EmptyNature = new(new NatureData
+        public static readonly Nature EmptyNature = new()
         {
-            Name = string.Empty,
-            Exists = false
-        });
+            Name = "",
+            Exists = false,
+            EffectType = EffectType.Nature,
+            Plus = null,
+            Minus = null,
+            Fullname = string.Empty,
+            Gen = 0,
+            Num = 0,
+            NoCopy = false,
+            AffectsFainted = false,
+            SourceEffect = string.Empty
+        };
     }
 
-    public interface INatureData : INature { }
+    // public interface INatureData : INature { }
+
+
+    public interface INatureData
+    {
+        public string Name { get; }
+        public StatIdExceptHp? Plus { get; }
+        public StatIdExceptHp? Minus { get; }
+    }
 
     public class NatureData : INatureData
     {
