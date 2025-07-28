@@ -112,48 +112,6 @@
         }
     }
 
-    //public interface INature : IBasicEffect
-    //{
-    //    public StatIdExceptHp? Plus { get; set; }
-    //    public StatIdExceptHp? Minus { get; set; }
-    //}
-
-    //public class Nature : BasicEffect, INature
-    //{
-    //    public StatIdExceptHp? Plus { get; set; } = null;
-    //    public StatIdExceptHp? Minus { get; set; } = null;
-
-    //    public Nature(INatureData other) : base(other)
-    //    {
-    //        Plus = other.Plus;
-    //        Minus = other.Minus;
-    //    }
-
-    //    public void Init()
-    //    {
-    //        InitBasicEffect();
-
-    //        Fullname = $"nature: {Name}";
-    //        EffectType = EffectType.Nature;
-    //        Gen = 3;
-    //    }
-    //}
-
-    //public class Nature(Nature other) : BasicEffect(other), IBasicEffect, INatureData
-    //{
-    //    public StatIdExceptHp? Plus { get; } = other.Plus;
-    //    public StatIdExceptHp? Minus { get; } = other.Minus;
-
-    //    public void Init()
-    //    {
-    //        InitBasicEffect();
-
-    //        Fullname = $"nature: {Name}";
-    //        EffectType = EffectType.Nature;
-    //        Gen = 3;
-    //    }
-    //}
-
     public class Nature : BasicEffect, IBasicEffect, INatureData
     {
         public StatIdExceptHp? Plus { get; init; }
@@ -194,41 +152,12 @@
         };
     }
 
-    // public interface INatureData : INature { }
-
-
     public interface INatureData
     {
         public string Name { get; }
         public StatIdExceptHp? Plus { get; }
         public StatIdExceptHp? Minus { get; }
     }
-
-    //public class NatureData : INatureData
-    //{
-    //    public StatIdExceptHp? Plus { get; set; }
-    //    public StatIdExceptHp? Minus { get; set; }
-    //    public Id Id { get; set; }
-    //    public string Name { get; set; }
-    //    public string Fullname { get; set; }
-    //    public EffectType EffectType { get; set; }
-    //    public bool Exists { get; set; }
-    //    public int Num { get; set; }
-    //    public int Gen { get; set; }
-    //    public string? ShortDesc { get; set; }
-    //    public string? Desc { get; set; }
-    //    public Nonstandard? IsNonstandard { get; set; }
-    //    public int? Duration { get; set; }
-    //    public bool NoCopy { get; set; }
-    //    public bool AffectsFainted { get; set; }
-    //    public Id? Status { get; set; }
-    //    public Id? Weather { get; set; }
-    //    public string SourceEffect { get; set; }
-    //    public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; set; }
-    //    //public string? EffectTypeString { get; set; }
-    //    public bool? Infiltrates { get; set; }
-    //    public string? RealMove { get; set; }
-    //}
 
     public class NatureData : INatureData
     {
@@ -246,9 +175,9 @@
 
     public class DexNatures(ModdedDex dex)
     {
-        private readonly ModdedDex _dex = dex;
-        private readonly Dictionary<Id, Nature> _natureCache = new();
-        private Nature[]? _allCache = null;
+        private ModdedDex Dex { get; }= dex;
+        private Dictionary<Id, Nature> NatureCache { get;} = new();
+        private Nature[]? AllCache { get; } = null;
 
         public Nature Get(string name)
         {
@@ -279,19 +208,6 @@
         Nonstandard? IsNonstandard { get; }
     }
 
-    //public class TypeData : ITypeData
-    //{
-    //    public Dictionary<string, int> DamageTaken { get; set; }
-    //    public SparseStatsTable? HpDvs { get; set; }
-    //    public SparseStatsTable? HpIvs { get; set; }
-    //    public Nonstandard? IsNonstandard { get; set; }
-    //    public Id Id { get; set; }
-    //    public string Name { get; set; }
-    //    public TypeInfoEffectType EffectType { get; set; }
-    //    public bool Exists { get; set; }
-    //    public int Gen { get; set; }
-    //}
-
     public interface IModdedTypeData : ITypeData
     {
         public static bool Inherit => true;
@@ -306,15 +222,6 @@
         Type,
         EffectType
     }
-
-    //public interface ITypeInfo : ITypeData
-    //{
-    //    public Id Id { get; set; }
-    //    public string Name { get; set; }
-    //    public TypeInfoEffectType EffectType { get; set; }
-    //    public bool Exists { get; set; }
-    //    public int Gen { get; set; }
-    //}
 
     public class TypeInfo : ITypeData
     {
@@ -362,28 +269,6 @@
         /// <summary>The DVs to get this Type Hidden Power (in gen 2).</summary>
         public required SparseStatsTable HpDvs { get; init; }
 
-        //public TypeInfo(ITypeData data)
-        //{
-            
-        //    Id = data.Id;
-        //    Name = data.Name;
-        //    EffectType = data.EffectType;
-        //    Exists = data.Exists;
-        //    Gen = data.Gen;
-        //    IsNonstandard = data.IsNonstandard;
-        //    DamageTaken = data.DamageTaken;
-        //    HpIvs = data.HpIvs;
-        //    HpDvs = data.HpDvs;
-        //}
-
-        //public void Init()
-        //{
-        //    if (!Exists)
-        //    {
-        //        Exists = !Id.IsEmpty;
-        //    }
-        //}
-
         public override string ToString()
         {
             return Name;
@@ -407,10 +292,10 @@
 
     public class DexTypes(ModdedDex dex)
     {
-        private readonly ModdedDex _dex = dex;
-        private readonly Dictionary<Id, TypeInfo> _typeCache = [];
-        private TypeInfo[]? _allCache = null;
-        private string[]? _namesCache = null;
+        private ModdedDex Dex { get; } = dex;
+        private Dictionary<Id, TypeInfo> TypeCache { get; } = [];
+        private TypeInfo[]? AllCache{ get; } = null;
+        private string[]? NamesCache { get; } = null;
 
         public TypeInfo Get(string name)
         {
