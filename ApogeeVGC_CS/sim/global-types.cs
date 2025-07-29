@@ -223,7 +223,7 @@ namespace ApogeeVGC_CS.sim
     }
 
     /// <summary>
-    /// Base interface for all effect types.
+    /// Base interface for all effect types (Ability | Item | ActiveMove | Species | Condition | Format)
     /// </summary>
     public interface IEffect;
 
