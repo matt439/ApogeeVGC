@@ -718,7 +718,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public EffectState InitEffectState(EffectState obj, int? effectOrder)
+        public EffectState InitEffectState(EffectState obj, int? effectOrder = null)
         {
             throw new NotImplementedException();
         }

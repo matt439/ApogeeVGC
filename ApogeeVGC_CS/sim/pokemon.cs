@@ -31,10 +31,10 @@ namespace ApogeeVGC_CS.sim
 
     public class EffectState
     {
-        public string Id { get; set; } = string.Empty;
-        public int EffectOrder { get; set; }
-        public int? Duration { get; set; }
-        public Dictionary<string, object>? ExtraData { get; set; }
+        public required Id Id { get; init; }
+        public required int EffectOrder { get; init; }
+        public int? Duration { get; init; }
+        public Dictionary<string, object>? ExtraData { get; init; }
     }
 
     public static class PokemonConstants

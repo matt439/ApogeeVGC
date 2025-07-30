@@ -25,6 +25,7 @@ namespace ApogeeVGC_CS.sim
 
         public virtual bool IsId => true;
         public bool IsEmpty => string.IsNullOrEmpty(Value);
+        public static Id Empty => new();
 
         public Id()
         {
