@@ -154,19 +154,30 @@ namespace ApogeeVGC_CS.sim
 
     public class StatsExceptHpTable : Dictionary<StatIdExceptHp, int>;
 
-    public class StatsTable : Dictionary<StatId, int>
+    //public class StatsTable : Dictionary<StatId, int>
+    //{
+    //    public StatsTable()
+    //    {
+    //        this[StatId.Hp] = 0; // Initialize HP to 0
+    //    }
+    //    public StatsTable(StatsTable other) : this()
+    //    {
+    //        foreach (var kvp in other)
+    //        {
+    //            this[kvp.Key] = kvp.Value;
+    //        }
+    //    }
+    //}
+
+    public class StatsTable
     {
-        public StatsTable()
-        {
-            this[StatId.Hp] = 0; // Initialize HP to 0
-        }
-        public StatsTable(StatsTable other) : this()
-        {
-            foreach (var kvp in other)
-            {
-                this[kvp.Key] = kvp.Value;
-            }
-        }
+        public int Hp { get; init; } = 0;
+        public int Atk { get; init; } = 0;
+        public int Def { get; init; } = 0;
+        public int Spa { get; init; } = 0;
+        public int Spd { get; init; } = 0;
+        public int Spe { get; init; } = 0;
+        public int BaseStatTotal => Hp + Atk + Def + Spa + Spd + Spe;
     }
 
     public class SparseStatsTable : Dictionary<StatId, int>;
@@ -185,21 +196,55 @@ namespace ApogeeVGC_CS.sim
         Past, Future, Unobtainable, Cap, Lgpe, Custom, Gigantamax
     }
 
-    // Tier types from TierTypes namespace
-    public enum SinglesTier
-    {
-        Ag, Uber, UberAlt, Ou, OuAlt, Uubl, Uu, Rubl, Ru, Nubl, Nu, NuAlt, Publ, Pu,
-        PuAlt, Zubl, Zu, Nfe, Lc
-    }
+    //public enum SinglesTier
+    //{
+    //    Ag, Uber, UberAlt, Ou, OuAlt, Uubl, Uu, Rubl, Ru, Nubl, Nu, NuAlt, Publ, Pu,
+    //    PuAlt, Zubl, Zu, Nfe, Lc
+    //}
 
-    public enum DoublesTier
-    {
-        DUber, DUberAlt, Dou, DouAlt, Dbl, Duu, DuuAlt, Nfe, Lc
-    }
+    //public enum DoublesTier
+    //{
+    //    DUber, DUberAlt, Dou, DouAlt, Dbl, Duu, DuuAlt, Nfe, Lc
+    //}
 
-    public enum OtherTier
+    //public enum OtherTier
+    //{
+    //    Unreleased, Illegal, Cap, CapNfe, CapLc
+    //}
+
+    public enum Tier
     {
+        // Singles
+        Ag, Uber, UberAlt, Ou, OuAlt, Uubl, Uu, Rubl, Ru, Nubl, Nu, NuAlt, Publ, Pu, PuAlt, Zubl, Zu, Nfe, Lc,
+        // Doubles
+        DUber, DUberAlt, Dou, DouAlt, Dbl, Duu, DuuAlt,
+        // Other
         Unreleased, Illegal, Cap, CapNfe, CapLc
+    }
+
+    // Helper class for tier checks
+    public static class TierTools
+    {
+        public static bool IsSinglesTier(Tier? tier)
+        {
+            return tier is >= Tier.Ag and <= Tier.Lc;
+        }
+        public static bool IsDoublesTier(Tier? tier)
+        {
+            return tier is >= Tier.DUber and <= Tier.DuuAlt;
+        }
+        public static bool IsOtherTier(Tier? tier)
+        {
+            return tier is >= Tier.Unreleased and <= Tier.CapLc;
+        }
+        public static bool IsDoublesOrOtherTier(Tier? tier)
+        {
+            return IsDoublesTier(tier) || IsOtherTier(tier);
+        }
+        public static bool IsSinglesOrOtherTier(Tier? tier)
+        {
+            return IsSinglesTier(tier) || IsOtherTier(tier);
+        }
     }
 
     public class EventInfo
@@ -230,17 +275,17 @@ namespace ApogeeVGC_CS.sim
     public interface ICommonHandlers
     {
         public Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierEffect { get; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierMove { get; }
-        public Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultMove { get; }
-        public Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultMove { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int> ModifierMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?> ResultMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, object> ExtResultMove { get; }
         public Action<Battle, Pokemon, Pokemon, IEffect> VoidEffect { get; }
-        public Action<Battle, Pokemon, Pokemon, IActiveMove> VoidMove { get; }
+        public Action<Battle, Pokemon, Pokemon, ActiveMove> VoidMove { get; }
         public Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierSourceEffect { get; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int> ModifierSourceMove { get; }
-        public Func<Battle, Pokemon, Pokemon, IActiveMove, bool?> ResultSourceMove { get; }
-        public Func<Battle, Pokemon, Pokemon, IActiveMove, object> ExtResultSourceMove { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int> ModifierSourceMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?> ResultSourceMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, object> ExtResultSourceMove { get; }
         public Action<Battle, Pokemon, Pokemon, IEffect> VoidSourceEffect { get; }
-        public Action<Battle, Pokemon, Pokemon, IActiveMove> VoidSourceMove { get; }
+        public Action<Battle, Pokemon, Pokemon, ActiveMove> VoidSourceMove { get; }
     }
 
     public interface IEffectData
@@ -263,7 +308,8 @@ namespace ApogeeVGC_CS.sim
     public enum EffectType
     {
         Condition, Pokemon, Move, Item, Ability, Format,
-        Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule
+        Nature, Ruleset, Weather, Status, Terrain, Rule, ValidatorRule,
+        Learnset // Added for Learnset class
     }
 
     public interface IBasicEffect : IEffectData

@@ -179,6 +179,7 @@
         Dark,
         Steel,
         Fairy,
+        Unknown,
     }
 
     public enum ContestType
