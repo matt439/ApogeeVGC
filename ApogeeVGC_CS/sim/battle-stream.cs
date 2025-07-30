@@ -1,23 +1,31 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Net.Mail;
 
 namespace ApogeeVGC_CS.sim
 {
     // Helper struct to hold player streams
     public struct PlayerStreams
     {
-        public Stream Omniscient { get; set; } // Placeholder for omniscient stream
-        public Stream Spectator { get; set; } // Placeholder for spectator stream
-        public Stream Player1 { get; set; }
-        public Stream Player2 { get; set; }
-        public Stream Player3 { get; set; } // Optional, for 3-player battles
-        public Stream Player4 { get; set; } // Optional, for 4-player battles
+        public Stream Omniscient { get; init; } // Placeholder for omniscient stream
+        public Stream Spectator { get; init; } // Placeholder for spectator stream
+        public Stream Player1 { get; init; }
+        public Stream Player2 { get; init; }
+        public Stream Player3 { get; init; } // Optional, for 3-player battles
+        public Stream Player4 { get; init; } // Optional, for 4-player battles
     }
-    
+
     // Helper class to manage battle-queue functions
-    static public class BattleStreamUtils
+    public static class BattleStreamUtils
     {
+        /**
+         * Like string.split(delimiter), but only recognizes the first `limit`
+         * delimiters (default 1).
+         *
+         * `"1 2 3 4".split(" ", 2) => ["1", "2"]`
+         *
+         * `Utils.splitFirst("1 2 3 4", " ", 1) => ["1", "2 3 4"]`
+         *
+         * Returns an array of length exactly limit + 1.
+         */
         public static string[] SplitFirst(string str, string delimiter, int limit = 1)
         {
             throw new NotImplementedException("SplitFirst method is not implemented yet.");
@@ -29,22 +37,35 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-
     public class BattleStreamOptions
     {
-        public bool? Debug { get; set; }
-        public bool? NoCatch { get; set; }
-        public bool? KeepAlive { get; set; }
-        public object? Replay { get; set; } // bool or "spectator"
+        public bool? Debug { get; init; }
+        public bool? NoCatch { get; init; }
+        public bool? KeepAlive { get; init; }
+        public object? Replay
+        {
+            get;
+            init // bool or "spectator"
+            {
+                if (value is bool or "spectator")
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Replay must be a boolean or 'spectator'.");
+                }
+            }
+        } 
     }
 
-    public class BattleStream(BattleStreamOptions? options = null) // : ObjectReadWriteStream<string> // Implement as needed
+    public class BattleStream(BattleStreamOptions? options = null)
     {
-        public bool Debug { get; set; } = options?.Debug ?? false;
-        public bool NoCatch { get; set; } = options?.NoCatch ?? false;
-        public object Replay { get; set; } = options?.Replay ?? false;
-        public bool KeepAlive { get; set; } = options?.KeepAlive ?? false;
-        public Battle? Battle { get; set; } = null;
+        public bool Debug { get; init; } = options?.Debug ?? false;
+        public bool NoCatch { get; init; } = options?.NoCatch ?? false;
+        public object Replay { get; init; } = options?.Replay ?? false;
+        public bool KeepAlive { get; init; } = options?.KeepAlive ?? false;
+        public Battle? Battle { get; init; } = null;
 
         private void Write(string chunk)
         {
