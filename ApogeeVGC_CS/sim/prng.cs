@@ -1,16 +1,9 @@
-﻿using System;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     // Seed types
-    public class PrngSeed
+    public class PrngSeed(string value)
     {
-        public string Value { get; set; } = string.Empty;
-
-        public PrngSeed(string value)
-        {
-            Value = value;
-        }
+        public string Value { get; set; } = value;
 
         public static implicit operator string(PrngSeed seed) => seed.Value;
         public static implicit operator PrngSeed(string value) => new(value);
@@ -18,33 +11,23 @@ namespace ApogeeVGC_CS.sim
         public override string ToString() => Value;
     }
 
-    public class SodiumRngSeed
+    public class SodiumRngSeed(string value)
     {
         public string Type { get; } = "sodium";
-        public string Value { get; set; } = string.Empty;
-
-        public SodiumRngSeed(string value)
-        {
-            Value = value;
-        }
+        public string Value { get; set; } = value;
     }
 
     // 64-bit big-endian [high -> low] int
-    public class Gen5RngSeed
+    public class Gen5RngSeed(uint val1, uint val2, uint val3, uint val4)
     {
-        public uint[] Values { get; set; } = new uint[4];
-
-        public Gen5RngSeed(uint val1, uint val2, uint val3, uint val4)
-        {
-            Values = new[] { val1, val2, val3, val4 };
-        }
+        public uint[] Values { get; set; } = [val1, val2, val3, val4];
     }
 
     // Low-level source of 32-bit random numbers
     public interface IRng
     {
-        PrngSeed GetSeed();
-        uint Next(); // random 32-bit number
+        public PrngSeed GetSeed();
+        public uint Next(); // random 32-bit number
     }
 
     // High-level PRNG API, for getting random numbers
@@ -61,7 +44,7 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public Prng(PrngSeed? seed = null, PrngSeed? initialSeed = null)
         {
-            if (seed == null) seed = GenerateSeed();
+            seed ??= GenerateSeed();
 
             // Handle array compatibility for old input logs
             if (seed.Value.StartsWith('[') && seed.Value.EndsWith(']'))
@@ -82,21 +65,21 @@ namespace ApogeeVGC_CS.sim
         private static PrngSeed GenerateSeed()
         {
             // Generate a sodium seed by default
-            var random = new Random();
-            var randomString = Convert.ToBase64String(Guid.NewGuid().ToByteArray())[..8];
+            //var random = new Random();
+            string randomString = Convert.ToBase64String(Guid.NewGuid().ToByteArray())[..8];
             return $"sodium,{randomString}";
         }
 
         private void SetSeed(PrngSeed seed)
         {
-            var parts = seed.Value.Split(',', 2);
+            string[] parts = seed.Value.Split(',', 2);
             if (parts.Length < 2)
             {
                 throw new ArgumentException($"Invalid seed format: {seed}");
             }
 
-            var seedType = parts[0];
-            var seedValue = parts[1];
+            string seedType = parts[0];
+            string seedValue = parts[1];
 
             switch (seedType)
             {
@@ -122,29 +105,15 @@ namespace ApogeeVGC_CS.sim
     }
 
     // Placeholder implementations - these would need actual RNG logic
-    public class SodiumRng : IRng
+    public class SodiumRng(string seed) : IRng
     {
-        private readonly string _seed;
-
-        public SodiumRng(string seed)
-        {
-            _seed = seed;
-        }
-
-        public PrngSeed GetSeed() => $"sodium,{_seed}";
+        public PrngSeed GetSeed() => $"sodium,{seed}";
         public uint Next() => 0; // TODO: Implement sodium RNG
     }
 
-    public class Gen5Rng : IRng
+    public class Gen5Rng(string seed) : IRng
     {
-        private readonly string _seed;
-
-        public Gen5Rng(string seed)
-        {
-            _seed = seed;
-        }
-
-        public PrngSeed GetSeed() => $"gen5,{_seed}";
+        public PrngSeed GetSeed() => $"gen5,{seed}";
         public uint Next() => 0; // TODO: Implement Gen 5 RNG
     }
 }
