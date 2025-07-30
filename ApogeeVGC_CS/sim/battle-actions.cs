@@ -1,81 +1,154 @@
-﻿using System;
-using System.Collections.Generic;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Reflection;
 
 namespace ApogeeVGC_CS.sim
 {
     public static class ChoosableTargets
     {
-        public static readonly HashSet<string> Targets = new()
+        public static readonly HashSet<string> Targets =
+            ["normal", "any", "adjacentAlly", "adjacentAllyOrSelf", "adjacentFoe"];
+    }
+
+    public static class BattleActionsConstants
+    {
+        public static readonly Dictionary<ZMoveTypes, string> MaxMoves = new()
         {
-            "normal", "any", "adjacentAlly", "adjacentAllyOrSelf", "adjacentFoe"
+            [ZMoveTypes.Flying] = "Max Airstream",
+            [ZMoveTypes.Dark] = "Max Darkness",
+            [ZMoveTypes.Fire] = "Max Flare",
+            [ZMoveTypes.Bug] = "Max Flutterby",
+            [ZMoveTypes.Water] = "Max Geyser",
+            [ZMoveTypes.Status] = "Max Guard",
+            [ZMoveTypes.Ice] = "Max Hailstorm",
+            [ZMoveTypes.Fighting] = "Max Knuckle",
+            [ZMoveTypes.Electric] = "Max Lightning",
+            [ZMoveTypes.Psychic] = "Max Mindstorm",
+            [ZMoveTypes.Poison] = "Max Ooze",
+            [ZMoveTypes.Grass] = "Max Overgrowth",
+            [ZMoveTypes.Ghost] = "Max Phantasm",
+            [ZMoveTypes.Ground] = "Max Quake",
+            [ZMoveTypes.Rock] = "Max Rockfall",
+            [ZMoveTypes.Fairy] = "Max Starfall",
+            [ZMoveTypes.Steel] = "Max Steelspike",
+            [ZMoveTypes.Normal] = "Max Strike",
+            [ZMoveTypes.Dragon] = "Max Wyrmwind"
         };
+
+        public static readonly Dictionary<PokemonType, string> ZMoves = new()
+        {
+            [PokemonType.Poison] = "Acid Downpour",
+            [PokemonType.Fighting] = "All-Out Pummeling",
+            [PokemonType.Dark] = "Black Hole Eclipse",
+            [PokemonType.Grass] = "Bloom Doom",
+            [PokemonType.Normal] = "Breakneck Blitz",
+            [PokemonType.Rock] = "Continental Crush",
+            [PokemonType.Steel] = "Corkscrew Crash",
+            [PokemonType.Dragon] = "Devastating Drake",
+            [PokemonType.Electric] = "Gigavolt Havoc",
+            [PokemonType.Water] = "Hydro Vortex",
+            [PokemonType.Fire] = "Inferno Overdrive",
+            [PokemonType.Ghost] = "Never-Ending Nightmare",
+            [PokemonType.Bug] = "Savage Spin-Out",
+            [PokemonType.Psychic] = "Shattered Psyche",
+            [PokemonType.Ice] = "Subzero Slammer",
+            [PokemonType.Flying] = "Supersonic Skystrike",
+            [PokemonType.Ground] = "Tectonic Rage",
+            [PokemonType.Fairy] = "Twinkle Tackle"
+        };
+    }
+
+    public enum ZMoveTypes
+    {
+        Flying,
+        Dark,
+        Fire,
+        Bug,
+        Water,
+        Status,
+        Ice,
+        Fighting,
+        Electric,
+        Psychic,
+        Poison,
+        Grass,
+        Ghost,
+        Ground,
+        Rock,
+        Fairy,
+        Steel,
+        Normal,
+        Dragon,
+    }
+
+    public enum SwitchInResult
+    {
+        Success,
+        Fail,
+        PursuitFaint,
+    }
+
+    // Extension method for object property copying
+    public static class ObjectExtensions
+    {
+        public static void AssignFrom<T>(this T target, T? source) where T : class
+        {
+            if (source == null) return;
+
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanWrite && p.CanRead);
+
+            foreach (var prop in properties)
+            {
+                var value = prop.GetValue(source);
+                if (value != null)
+                {
+                    prop.SetValue(target, value);
+                }
+            }
+        }
+    }
+
+    // Helper struct for RunMove method
+    public struct RunMoveResult
+    {
+        public EffectState? SourceEffect { get; set; }
+        public string? ZMove { get; set; }
+        public bool? ExternalMove { get; set; }
+        public string? MaxMove { get; set; }
+        public Pokemon? OriginalTarget { get; set; }
+    }
+
+    // Helper struct for UseMove method
+    public struct UseMoveOptions
+    {
+        public Pokemon? Target { get; set; }
+        public IEffect? SourceEffect { get; set; }
+        public string? ZMove { get; set; }
+        public string? MaxMove { get; set; }
     }
 
     public class BattleActions
     {
-        public Battle Battle { get; }
-        public ModdedDex Dex { get; }
+        public Battle Battle { get; init; }
+        public ModdedDex Dex { get; init; }
 
-        public static readonly Dictionary<string, string> MaxMoves = new()
-        {
-            ["Flying"] = "Max Airstream",
-            ["Dark"] = "Max Darkness",
-            ["Fire"] = "Max Flare",
-            ["Bug"] = "Max Flutterby",
-            ["Water"] = "Max Geyser",
-            ["Status"] = "Max Guard",
-            ["Ice"] = "Max Hailstorm",
-            ["Fighting"] = "Max Knuckle",
-            ["Electric"] = "Max Lightning",
-            ["Psychic"] = "Max Mindstorm",
-            ["Poison"] = "Max Ooze",
-            ["Grass"] = "Max Overgrowth",
-            ["Ghost"] = "Max Phantasm",
-            ["Ground"] = "Max Quake",
-            ["Rock"] = "Max Rockfall",
-            ["Fairy"] = "Max Starfall",
-            ["Steel"] = "Max Steelspike",
-            ["Normal"] = "Max Strike",
-            ["Dragon"] = "Max Wyrmwind"
-        };
-
-        public static readonly Dictionary<string, string> ZMoves = new()
-        {
-            ["Poison"] = "Acid Downpour",
-            ["Fighting"] = "All-Out Pummeling",
-            ["Dark"] = "Black Hole Eclipse",
-            ["Grass"] = "Bloom Doom",
-            ["Normal"] = "Breakneck Blitz",
-            ["Rock"] = "Continental Crush",
-            ["Steel"] = "Corkscrew Crash",
-            ["Dragon"] = "Devastating Drake",
-            ["Electric"] = "Gigavolt Havoc",
-            ["Water"] = "Hydro Vortex",
-            ["Fire"] = "Inferno Overdrive",
-            ["Ghost"] = "Never-Ending Nightmare",
-            ["Bug"] = "Savage Spin-Out",
-            ["Psychic"] = "Shattered Psyche",
-            ["Ice"] = "Subzero Slammer",
-            ["Flying"] = "Supersonic Skystrike",
-            ["Ground"] = "Tectonic Rage",
-            ["Fairy"] = "Twinkle Tackle"
-        };
+        
 
         public BattleActions(Battle battle)
         {
-            // TODO
+            Battle = battle;
+            Dex = battle.Dex;
+
+            //if (Dex.Data.Scripts.Actions != null)
+            //{
+            //    ObjectExtensions.AssignFrom(Dex.Data.Scripts.Actions);
+            //}
+            //if (Battle.Format.Actions != null)
+            //{
+            //    ObjectExtensions.AssignFrom(Battle.Format.Actions);
+            //}
         }
 
-        public enum SwitchInResult
-        {
-            Success,
-            Fail,
-            PursuitFaint,
-        }
-
-        public SwitchInResult SwitchIn(Pokemon pokemon, int pos, IEffect? sourceEffect = null, bool isDrag = false)
+        public SwitchInResult SwitchIn(Pokemon pokemon, int pos, IEffect? sourceEffect = null, bool? isDrag = null)
         {
             throw new NotImplementedException("SwitchIn method is not implemented yet.");
         }
@@ -90,16 +163,6 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("RunSwitch method is not implemented yet.");
         }
 
-        // Helper struct for RunMove method
-        public struct RunMoveResult
-        {
-            public EffectState? SourceEffect { get; set; }
-            public string? ZMove { get; set; }
-            public bool? ExternalMove { get; set; }
-            public string? MaxMove { get; set; }
-            public Pokemon? OriginalTarget { get; set; }
-        }
-
         public RunMoveResult RunMove(Move move, Pokemon pokemon, int targetLoc,
             IEffect? sourceEffect = null, string? zMove = null, bool externalMove = false,
             string? maxMove = null, Pokemon? originalTarget = null)
@@ -112,15 +175,6 @@ namespace ApogeeVGC_CS.sim
             string? maxMove = null, Pokemon? originalTarget = null)
         {
             throw new NotImplementedException();
-        }
-
-        // Helper struct for UseMove method
-        public struct UseMoveOptions
-        {
-            public Pokemon? Target { get; set; }
-            public IEffect? SourceEffect { get; set; }
-            public string? ZMove { get; set; }
-            public string? MaxMove { get; set; }
         }
 
         public bool UseMove(Move move, Pokemon pokemon, UseMoveOptions? options = null)
