@@ -45,19 +45,19 @@
         Action<Battle, string, Pokemon>? OnImmunity { get; }
         Func<Battle, Pokemon, string?>? OnLockMove { get; }
         Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyAccuracy { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAtk { get; }
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnModifyBoost { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyCritRatio { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamage { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyDef { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDef { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; }
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; }
         Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; }
@@ -136,17 +136,17 @@
         Action<Battle, string, Pokemon>? OnFoeImmunity { get; }
         Func<Battle, Pokemon, string?>? OnFoeLockMove { get; }
         Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyAccuracy { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAtk { get; }
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnFoeModifyBoost { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyCritRatio { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamage { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyDef { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDef { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnFoeModifyMove { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyPriority { get; }
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; }
@@ -218,17 +218,17 @@
         Action<Battle, string, Pokemon>? OnSourceImmunity { get; }
         Func<Battle, Pokemon, string?>? OnSourceLockMove { get; }
         Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyAccuracy { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAtk { get; }
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnSourceModifyBoost { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyCritRatio { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamage { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyDef { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDef { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnSourceModifyMove { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyPriority { get; }
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; }
@@ -300,17 +300,17 @@
         Action<Battle, string, Pokemon>? OnAnyImmunity { get; }
         Func<Battle, Pokemon, string?>? OnAnyLockMove { get; }
         Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyAccuracy { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAtk { get; }
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAnyModifyBoost { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyCritRatio { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamage { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyDef { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDef { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAnyModifyMove { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyPriority { get; }
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; }
@@ -453,17 +453,17 @@
         Action<Battle, string, Pokemon>? OnAllyImmunity { get; }
         Func<Battle, Pokemon, string?>? OnAllyLockMove { get; }
         Action<Battle, Pokemon>? OnAllyMaybeTrapPokemon { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifyAccuracy { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyAtk { get; }
         Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAllyModifyBoost { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyCritRatio { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamage { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifyDef { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDef { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAllyModifyMove { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyPriority { get; }
         Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; }
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; }
@@ -594,19 +594,19 @@
         public Action<Battle, string, Pokemon>? OnImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnLockMove { get; init; }
         public Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; init; }
@@ -680,17 +680,17 @@
         public Action<Battle, string, Pokemon>? OnFoeImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnFoeLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnFoeModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnFoeModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; init; }
@@ -758,17 +758,17 @@
         public Action<Battle, string, Pokemon>? OnSourceImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnSourceLockMove { get; init; }
         public Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnSourceModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnSourceModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; init; }
@@ -838,17 +838,17 @@
         public Action<Battle, string, Pokemon>? OnAnyImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnAnyLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAnyModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAnyModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; init; }
@@ -998,17 +998,17 @@
         public Action<Battle, string, Pokemon>? OnAllyImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnAllyLockMove { get; init; }
         public Action<Battle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAllyModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAllyModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAllyModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnAllyModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAllyModifyType { get; init; }

@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     public class Dex
     {
-        public Dictionary<string, ModdedDex> Dexes = new();
+        public Dictionary<string, ModdedDex> Dexes { get; init; } = new();
 
-        Dex()
+        public Dex()
         {
-            // Initialize base dex
-            var baseDex = new ModdedDex("base");
-            Dexes[baseDex.Name] = baseDex;
+            // Initialize the base modded dex
+            var baseDex = new ModdedDex();
+            Dexes[baseDex.CurrentMod] = baseDex;
+            Dexes[DexConstants.BaseMod.ToString()] = baseDex;
         }
     }
 
@@ -52,48 +49,83 @@ namespace ApogeeVGC_CS.sim
         };
     }
 
-    public class DexTable<T> : Dictionary<string, T> { }
+    public class DexTable<T> : Dictionary<Id, T>;
 
-    public class AliasesTable : Dictionary<string, string> { }
+    public class AliasesTable : Dictionary<Id, string>;
 
     public class DexTableData
     {
-        public DexTable<AbilityData> Abilities { get; set; } = new();
-        public DexTable<FormatData> Rulesets { get; set; } = new();
-        public DexTable<ItemData> Items { get; set; } = new();
-        public DexTable<LearnsetData> Learnsets { get; set; } = new();
-        public DexTable<MoveData> Moves { get; set; } = new();
-        public DexTable<NatureData> Natures { get; set; } = new();
-        public DexTable<SpeciesData> Pokedex { get; set; } = new();
-        public DexTable<SpeciesFormatsData> FormatsData { get; set; } = new();
-        public DexTable<PokemonGoData> PokemonGoData { get; set; } = new();
-        public DexTable<object> Scripts { get; set; } = new();
-        public DexTable<IConditionData> Conditions { get; set; } = new();
-        public DexTable<TypeData> TypeChart { get; set; } = new();
+        public DexTable<AbilityData> Abilities { get; init; } = new();
+        public DexTable<FormatData> Rulesets { get; init; } = new();
+        public DexTable<ItemData> Items { get; init; } = new();
+        public DexTable<LearnsetData> Learnsets { get; init; } = new();
+        public DexTable<MoveData> Moves { get; init; } = new();
+        public DexTable<NatureData> Natures { get; init; } = new();
+        public DexTable<SpeciesData> Pokedex { get; init; } = new();
+        public DexTable<SpeciesFormatsData> FormatsData { get; init; } = new();
+        public DexTable<PokemonGoData> PokemonGoData { get; init; } = new();
+        public DexTable<object> Scripts { get; init; } = new();
+        public DexTable<IConditionData> Conditions { get; init; } = new();
+        public DexTable<TypeData> TypeChart { get; init; } = new();
     }
 
-    // TextTableData structure
     public class TextTableData
     {
-        public DexTable<AbilityText> Abilities { get; set; } = new();
-        public DexTable<ItemText> Items { get; set; } = new();
-        public DexTable<MoveText> Moves { get; set; } = new();
-        public DexTable<PokedexText> Pokedex { get; set; } = new();
-        public DexTable<DefaultText> Default { get; set; } = new();
+        public DexTable<AbilityText> Abilities { get; init; } = new();
+        public DexTable<ItemText> Items { get; init; } = new();
+        public DexTable<MoveText> Moves { get; init; } = new();
+        public DexTable<PokedexText> Pokedex { get; init; } = new();
+        public DexTable<DefaultText> Default { get; init; } = new();
     }
+
+    // Helper class for to hold Dex constants
+    public static class DexConstants
+    {
+        public static Id BaseMod => new("gen9");
+        public const string DataDir = "data";
+        public const string ModsDir = "mods";
+    }
+
+    // Helper struct for GetDescs()
+    public struct Descriptions
+    {
+        public string Desc { get; init; }
+        public string ShortDesc { get; init; }
+    }
+
+    // Helper struct for GetHiddenPower()
+    public struct HiddenPower
+    {
+        public PokemonType Type { get; init; }
+        public int Power { get; init; }
+    }
+
+    // Helper enum for DataSearch()
+    public enum DataSearchType
+    {
+        Pokedex,
+        Moves,
+        Abilities,
+        Items,
+        Natures,
+        TypeChart,
+    }
+
+    // MoveText | ItemText | AbilityText | PokedexText | DefaultText
+    public interface ITextFile;
 
     public class ModdedDex
     {
-        public string Name { get; } = "[ModdedDex]";
-        public bool IsBase { get; }
-        public string CurrentMod { get; }
-        public string DataDir { get; }
-        public int Gen { get; set; } = 0;
-        public string ParentMod { get; set; } = string.Empty;
-        public bool ModsLoaded { get; set; } = false;
+        public static string Name => "[ModdedDex]";
+        public bool IsBase => CurrentMod == "base";
+        public string CurrentMod { get; init; }
+        public string DataDir => IsBase ? DexConstants.DataDir : $"{DexConstants.ModsDir}/{CurrentMod}";
+        public int Gen => 0;
+        public string ParentMod { get; init; } = string.Empty;
+        public bool ModsLoaded { get; init; } = false;
 
-        public DexTableData? DataCache { get; set; }
-        public TextTableData? TextCache { get; set; }
+        public DexTableData? DataCache { get; init; } = null;
+        public TextTableData? TextCache { get; init; } = null;
 
         // Managers for each data type
         public DexFormats Formats { get; }
@@ -106,17 +138,12 @@ namespace ApogeeVGC_CS.sim
         public DexTypes Types { get; }
         public DexStats Stats { get; }
 
-        public Dictionary<string, string>? Aliases { get; set; }
-        public Dictionary<string, List<string>>? FuzzyAliases { get; set; }
+        public Dictionary<Id, Id>? Aliases { get; init; } = null;
+        public Dictionary<Id, List<Id>>? FuzzyAliases { get; init; } = null;
 
         public ModdedDex(string mod = "base")
         {
-            IsBase = (mod == "base");
             CurrentMod = mod;
-            DataDir = IsBase ? "DATA_DIR" : $"MODS_DIR/{CurrentMod}";
-
-            DataCache = null;
-            TextCache = null;
 
             Formats = new DexFormats(this);
             Abilities = new DexAbilities(this);
@@ -136,23 +163,142 @@ namespace ApogeeVGC_CS.sim
             get
             {
                 IncludeMods();
-                return new Dictionary<string, ModdedDex>(); // Replace with actual dexes
+                throw new NotImplementedException();
             }
         }
 
-        private DexTableData LoadData()
+        public ModdedDex Mod(string? mod)
         {
-            // TODO: Implement data loading logic
-            return new DexTableData();
+            throw new NotImplementedException("Mod method not implemented yet.");
         }
 
-        private void IncludeMods()
+        public ModdedDex ForGen(int gen)
         {
-            // TODO: Implement mod inclusion logic
+            throw new NotImplementedException("ForGen method not implemented yet.");
         }
 
-        // TODO: Implement other methods as needed
+        public ModdedDex ForFormat(string name)
+        {
+            throw new NotImplementedException("ForFormat method not implemented yet.");
+        }
+
+        public ModdedDex ForFormat(FormatData format)
+        {
+            throw new NotImplementedException("ForFormat method not implemented yet.");
+        }
+
+        public object ModData(DataType dataType, string id)
+        {
+            throw new NotImplementedException("ModData method not implemented yet.");
+        }
+
+        public string EffectToString { get; } = Name;
+
+        /**
+         * Sanitizes a username or Pokemon nickname
+         *
+         * Returns the passed name, sanitized for safe use as a name in the PS
+         * protocol.
+         *
+         * Such a string must uphold these guarantees:
+         * - must not contain any ASCII whitespace character other than a space
+         * - must not start or end with a space character
+         * - must not contain any of: | , [ ]
+         * - must not be the empty string
+         * - must not contain Unicode RTL control characters
+         *
+         * If no such string can be found, returns the empty string. Calling
+         * functions are expected to check for that condition and deal with it
+         * accordingly.
+         *
+         * getName also enforces that there are not multiple consecutive space
+         * characters in the name, although this is not strictly necessary for
+         * safety.
+         */
+        public string GetName(object name)
+        {
+            throw new NotImplementedException("GetName method not implemented yet.");
+        }
+
+        public bool GetImmunity(PokemonType source, List<PokemonType> target)
+        {
+            throw new NotImplementedException("GetImmunit method not implemented yet.");
+        }
+
+        public int GetEffectiveness(PokemonType source, List<PokemonType> target)
+        {
+            throw new NotImplementedException("GetImmunit method not implemented yet.");
+        }
+
+        public Descriptions GetDescs(TextTableData table, Id id, object dataEntry)
+        {
+            throw new NotImplementedException("GetDescs method not implemented yet.");
+        }
+
+        public ActiveMove GetActiveMove(Move move)
+        {
+            throw new NotImplementedException("GetActiveMove method not implemented yet.");
+        }
+
+        public ActiveMove GetActiveMove(string name)
+        {
+            throw new NotImplementedException("GetActiveMove method not implemented yet.");
+        }
+
+        public HiddenPower GetHiddenPower(StatsTable ivs)
+        {
+            throw new NotImplementedException("GetHiddenPower method not implemented yet.");
+        }
+
+        // int Trunc()
+
+        public List<object>? DataSearch(string target, List<DataSearchType>? searchIn = null, bool? isInexact = null)
+        {
+            throw new NotImplementedException("DataSearch method not implemented yet.");
+        }
+
+        public object? LoadDataFile(string basePath, DataType dataType)
+        {
+            throw new NotImplementedException("LoadDataFile method not implemented yet.");
+        }
+
+        public DexTable<ITextFile> LoadTextFile(string name, string exportName)
+        {
+            throw new NotImplementedException("LoadTextFile method not implemented yet.");
+        }
+        public ModdedDex IncludeMods()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ModdedDex IncludeModData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ModdedDex IncludeData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public TextTableData LoadTextData()
+        {
+            throw new NotImplementedException("LoadTextData method not implemented yet.");
+        }
+
+        public Id? GetAlias(Id id)
+        {
+            throw new NotImplementedException("GetAlias method not implemented yet.");
+        }
+
+        public ModdedDex LoadAliases()
+        {
+            throw new NotImplementedException("LoadAliases method not implemented yet.");
+        }
+
+        public DexTableData LoadData()
+        {
+            throw new NotImplementedException("LoadAliases method not implemented yet.");
+        }
     }
-
-    
 }

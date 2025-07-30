@@ -202,10 +202,18 @@
 
     public interface ITypeData
     {
-        Dictionary<string, int> DamageTaken { get; }
-        SparseStatsTable? HpDvs { get; }
-        SparseStatsTable? HpIvs { get; }
-        Nonstandard? IsNonstandard { get; }
+        public Dictionary<string, int> DamageTaken { get; }
+        public SparseStatsTable? HpDvs { get; }
+        public SparseStatsTable? HpIvs { get; }
+        public Nonstandard? IsNonstandard { get; }
+    }
+
+    public class TypeData : ITypeData
+    {
+        public required Dictionary<string, int> DamageTaken { get; init; }
+        public SparseStatsTable? HpDvs { get; init; }
+        public SparseStatsTable? HpIvs { get; init; }
+        public Nonstandard? IsNonstandard { get; init; }
     }
 
     public interface IModdedTypeData : ITypeData

@@ -47,19 +47,19 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnLockMove { get; init; }
         public Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; init; }
@@ -133,17 +133,17 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnFoeImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnFoeLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnFoeModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnFoeModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnFoeModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; init; }
@@ -211,17 +211,17 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnSourceImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnSourceLockMove { get; init; }
         public Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnSourceModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnSourceModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnSourceModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; init; }
@@ -291,17 +291,17 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnAnyImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnAnyLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAnyModifyBoost { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyCritRatio { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAnyModifyMove { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IActiveMove, int>? OnAnyModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; init; }

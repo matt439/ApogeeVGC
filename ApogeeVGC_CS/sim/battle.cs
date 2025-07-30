@@ -1,15 +1,4 @@
-﻿using ApogeeVGC_CS.sim;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Numerics;
-using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Text.RegularExpressions;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -146,7 +135,7 @@ namespace ApogeeVGC_CS.sim
         public bool SupportCancel { get; set; }
 
         public BattleActions Actions { get; set; }
-        public BattleQueue Queue { get; set; }
+        //public BattleQueue Queue { get; set; }
         public List<FaintQueueEntry> FaintQueue { get; } = new();
 
         public List<string> Log { get; } = new();

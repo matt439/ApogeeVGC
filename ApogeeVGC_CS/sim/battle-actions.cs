@@ -195,7 +195,7 @@ namespace ApogeeVGC_CS.sim
         }
         public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets,
             Pokemon pokemon, ActiveMove moveOrMoveName,
-            HitEffect? hitEffect = null, bool? isSecondary = null, bool? isSelf = false)
+            IHitEffect? hitEffect = null, bool? isSecondary = null, bool? isSelf = false)
         {
             throw new NotImplementedException("SpreadMoveHit method is not implemented yet.");
         }
@@ -241,7 +241,7 @@ namespace ApogeeVGC_CS.sim
         }
 
         public int? MoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove moveOrMoveName,
-            HitEffect? moveData = null, bool? isSecondary = null, bool? isSelf = null)
+            IHitEffect? moveData = null, bool? isSecondary = null, bool? isSelf = null)
         {
             throw new NotImplementedException("MoveHit method is not implemented yet.");
         }

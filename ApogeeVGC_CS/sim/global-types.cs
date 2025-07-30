@@ -87,6 +87,11 @@ namespace ApogeeVGC_CS.sim
             }
             return true;
         }
+
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 
     // must be lowercase alphanumeric
@@ -570,11 +575,15 @@ namespace ApogeeVGC_CS.sim
         public T? Gen7 { get; set; }
         public T? Gen8 { get; set; }
     }
-    public class AbilityText : TextFile<AbilityTextData>;
-    public class MoveText : TextFile<MoveTextData>;
-    public class ItemText : TextFile<ItemTextData>;
-    public class PokedexText : TextFile<PokedexTextData>;
-    public class DefaultText; //: DefaultTextData { }
+
+    public class AbilityText : TextFile<AbilityTextData>, ITextFile;
+
+    public class MoveText : TextFile<MoveTextData>, ITextFile;
+
+    public class ItemText : TextFile<ItemTextData>, ITextFile;
+
+    public class PokedexText : TextFile<PokedexTextData>, ITextFile;
+    public class DefaultText : ITextFile; //: DefaultTextData { }
 
     // Use a class instead of namespace
     public static class RandomTeamsTypes

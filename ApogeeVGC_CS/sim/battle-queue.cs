@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     public class MoveAction : IAction
     {
@@ -126,7 +122,7 @@ namespace ApogeeVGC_CS.sim
         }
 
         public IAction? WillAct()
-        {             
+        {
             throw new NotImplementedException("WillAct method is not implemented yet.");
         }
 
