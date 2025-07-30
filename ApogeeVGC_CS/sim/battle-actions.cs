@@ -94,11 +94,11 @@ namespace ApogeeVGC_CS.sim
             if (source == null) return;
 
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.CanWrite && p.CanRead);
+                .Where(p => p is { CanWrite: true, CanRead: true });
 
             foreach (var prop in properties)
             {
-                var value = prop.GetValue(source);
+                object? value = prop.GetValue(source);
                 if (value != null)
                 {
                     prop.SetValue(target, value);
@@ -110,28 +110,26 @@ namespace ApogeeVGC_CS.sim
     // Helper struct for RunMove method
     public struct RunMoveResult
     {
-        public EffectState? SourceEffect { get; set; }
-        public string? ZMove { get; set; }
-        public bool? ExternalMove { get; set; }
-        public string? MaxMove { get; set; }
-        public Pokemon? OriginalTarget { get; set; }
+        public EffectState? SourceEffect { get; init; }
+        public string? ZMove { get; init; }
+        public bool? ExternalMove { get; init; }
+        public string? MaxMove { get; init; }
+        public Pokemon? OriginalTarget { get; init; }
     }
 
     // Helper struct for UseMove method
     public struct UseMoveOptions
     {
-        public Pokemon? Target { get; set; }
-        public IEffect? SourceEffect { get; set; }
-        public string? ZMove { get; set; }
-        public string? MaxMove { get; set; }
+        public Pokemon? Target { get; init; }
+        public IEffect? SourceEffect { get; init; }
+        public string? ZMove { get; init; }
+        public string? MaxMove { get; init; }
     }
 
     public class BattleActions
     {
         public Battle Battle { get; init; }
         public ModdedDex Dex { get; init; }
-
-        
 
         public BattleActions(Battle battle)
         {

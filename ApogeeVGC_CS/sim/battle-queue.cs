@@ -1,80 +1,146 @@
 ﻿namespace ApogeeVGC_CS.sim
 {
+    public enum MoveActionChoice
+    {
+        Move,
+        BeforeTurnMove,
+        PriorityChargeMove,
+    }
+
+    public enum MoveActionOrder
+    {
+        S0,
+        S5,
+        S200,
+        S201,
+        S199,
+        S106,
+    }
+
     public class MoveAction : IAction
     {
-        public string Choice { get; set; } = string.Empty; // "move", "beforeTurnMove", "priorityChargeMove"
-        public int Order { get; set; }
-        public int Priority { get; set; }
-        public double FractionalPriority { get; set; }
-        public int Speed { get; set; }
-        public Pokemon Pokemon { get; set; } = new();
-        public int TargetLoc { get; set; }
-        public Pokemon OriginalTarget { get; set; } = new();
-        public Id MoveId { get; set; } = new();
-        public Move Move { get; set; } = new();
-        public object? Mega { get; set; } // bool or "done"
-        public string? ZMove { get; set; }
-        public string? MaxMove { get; set; }
-        public IEffect? SourceEffect { get; set; }
+        public required MoveActionChoice Choice { get; init; }
+        public required MoveActionOrder Order { get; init; }
+        public required int Priority { get; init; }
+        public required double FractionalPriority { get; init; }
+        public required int Speed { get; init; }
+        public required Pokemon Pokemon { get; init; }
+        public required int TargetLoc { get; init; }
+        public required Pokemon OriginalTarget { get; init; }
+        public required Id MoveId { get; init; }
+        public required Move Move { get; init; }
+        public required object Mega
+        {
+            get;
+            init // bool or "done"
+            {
+                field = value switch
+                {
+                    bool b => b,
+                    "done" => value,
+                    _ => throw new ArgumentException("Mega must be a bool or 'done'.")
+                };
+            }
+        }
+        public string? ZMove { get; init; }
+        public string? MaxMove { get; init; }
+        public IEffect? SourceEffect { get; init; }
+    }
+
+    public enum SwitchActionChoice
+    {
+        Switch,
+        InstaSwitch,
+        RevivalBlessing,
+    }
+
+    public enum SwitchActionOrder
+    {
+        S3,
+        S6,
+        S103,
     }
 
     public class SwitchAction : IAction
     {
-        public string Choice { get; set; } = string.Empty; // "switch", "instaswitch", "revivalblessing"
-        public int Order { get; set; }
-        public int Priority { get; set; }
-        public int Speed { get; set; }
-        public Pokemon Pokemon { get; set; } = new();
-        public Pokemon Target { get; set; } = new();
-        public IEffect? SourceEffect { get; set; }
+        public required SwitchActionChoice Choice { get; init; }
+        public required SwitchActionOrder Order { get; init; }
+        public required int Priority { get; init; }
+        public required int Speed { get; init; }
+        public required Pokemon Pokemon { get; init; }
+        public required Pokemon Target { get; init; }
+        public IEffect? SourceEffect { get; init; }
     }
 
     public class TeamAction : IAction
     {
-        public string Choice { get; set; } = "team";
-        public int Priority { get; set; }
-        public int Speed { get; set; } = 1;
-        public Pokemon Pokemon { get; set; } = new();
-        public int Index { get; set; }
+        public static string Choice => "team";
+        public required int Priority { get; init; }
+        public static int Speed => 1;
+        public required Pokemon Pokemon { get; init; }
+        public required int Index { get; init; }
     }
 
-    // Field action (not done by a Pokémon)
+    public enum FieldActionChoice
+    {
+        Start,
+        Residual,
+        Pass,
+        BeforeTurn,
+    }
+
     public class FieldAction : IAction
     {
-        public string Choice { get; set; } = string.Empty; // "start", "residual", "pass", "beforeTurn"
-        public int Priority { get; set; }
-        public int Speed { get; set; } = 1;
-        public object? Pokemon { get; set; } = null;
+        public required FieldActionChoice Choice { get; init; }
+        public required int Priority { get; init; }
+        public static int Speed => 1;
+        public static Pokemon? Pokemon => null;
     }
 
-    // Generic Pokémon action
+    public enum PokemonActionChoice
+    {
+        MegaEvo,
+        MegaEvoX,
+        MegaEvoY,
+        Shift,
+        RunSwitch,
+        Event,
+        RunDynamax,
+        Terastallize,
+    }
+
     public class PokemonAction : IAction
     {
-        public string Choice { get; set; } = string.Empty; // "megaEvo", "megaEvoX", etc.
-        public int Priority { get; set; }
-        public int Speed { get; set; }
-        public Pokemon Pokemon { get; set; } = new();
-        public Pokemon? Dragger { get; set; } // For "runSwitch"
-        public string? Event { get; set; } // For "event"
+        public required PokemonActionChoice Choice { get; init; }
+        public required int Priority { get; init; }
+        public required int Speed { get; init; }
+        public required Pokemon Pokemon { get; init; }
+        public Pokemon? Dragger { get; init; } // For "runSwitch"
+        public string? Event { get; init; } // For "event"
     }
 
     // export type Action = MoveAction | SwitchAction | TeamAction | FieldAction | PokemonAction;
-    public interface IAction
-    {
+    public interface IAction;
 
-    }
-
-    // ActionChoice: flexible action structure
     public class ActionChoice
     {
-        public string Choice { get; set; } = string.Empty;
-        public Dictionary<string, object>? ExtraProperties { get; set; }
+        public required string Choice { get; init; }
+        public Dictionary<string, object>? ExtraProperties { get; init; }
     }
 
     public class BattleQueue
     {
         public Battle Battle { get; }
-        public List<IAction> List { get; } = new();
+        public List<IAction> List { get; } = [];
+
+        public BattleQueue(Battle battle)
+        {
+            Battle = battle;
+
+            // This would use ObjectExtensions.Assign()
+            //const queueScripts = battle.format.queue || battle.dex.data.Scripts.queue;
+            //if (queueScripts) Object.assign(this, queueScripts);
+        }
 
         public IAction? Shift()
         {
@@ -101,6 +167,12 @@
             throw new NotImplementedException("Entries method is not implemented yet.");
         }
 
+        /**
+         * Takes an ActionChoice, and fills it out into a full Action object.
+         *
+         * Returns an array of Actions because some ActionChoices (like mega moves)
+         * resolve to two Actions (mega evolution + use move)
+         */
         public IAction[] ResolveAction(ActionChoice action, bool midTurn = false)
         {
             throw new NotImplementedException("ResolveAction method is not implemented yet.");
