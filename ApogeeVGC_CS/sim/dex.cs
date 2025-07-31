@@ -182,7 +182,7 @@
             throw new NotImplementedException("ForFormat method not implemented yet.");
         }
 
-        public ModdedDex ForFormat(FormatData format)
+        public ModdedDex ForFormat(Format format)
         {
             throw new NotImplementedException("ForFormat method not implemented yet.");
         }

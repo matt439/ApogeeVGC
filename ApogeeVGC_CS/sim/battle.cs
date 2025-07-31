@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
+using ApogeeVGC_CS.lib;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -11,7 +13,7 @@ namespace ApogeeVGC_CS.sim
         Channel4 = 4
     }
 
-    public class ChannelMessages : Dictionary<ChannelId, List<string>> { }
+    public class ChannelMessages : Dictionary<ChannelId, List<string>>;
 
     public static class BattleUtils
     {
@@ -20,20 +22,20 @@ namespace ApogeeVGC_CS.sim
             var splitRegex = new Regex(@"\|split\|p([1234])\n(.*)\n(.*)|.+", RegexOptions.Multiline);
             var channelIdSet = new HashSet<int>(channelIds);
             var channelMessages = new Dictionary<int, List<string>>();
-            foreach (var id in channelIdSet)
+            foreach (int id in channelIdSet)
             {
-                channelMessages[id] = new List<string>();
+                channelMessages[id] = [];
             }
-            channelMessages[-1] = new List<string>();
+            channelMessages[-1] = [];
 
             foreach (Match match in splitRegex.Matches(message))
             {
-                var playerMatch = match.Groups[1].Value;
-                var secretMessage = match.Groups[2].Value;
-                var sharedMessage = match.Groups[3].Value;
+                string playerMatch = match.Groups[1].Value;
+                string secretMessage = match.Groups[2].Value;
+                string sharedMessage = match.Groups[3].Value;
                 int player = string.IsNullOrEmpty(playerMatch) ? 0 : int.Parse(playerMatch);
 
-                foreach (var channelId in channelIdSet)
+                foreach (int channelId in channelIdSet)
                 {
                     string line = match.Value;
                     if (player != 0)
@@ -50,48 +52,121 @@ namespace ApogeeVGC_CS.sim
 
     public class BattleOptions
     {
-        public Format? Format { get; set; }
-        public Id FormatId { get; set; } = new();
-        public Action<string, object>? Send { get; set; }
-        public Prng? Prng { get; set; }
-        public PrngSeed? Seed { get; set; }
-        public object? Rated { get; set; } // bool or string
-        public PlayerOptions? P1 { get; set; }
-        public PlayerOptions? P2 { get; set; }
-        public PlayerOptions? P3 { get; set; }
-        public PlayerOptions? P4 { get; set; }
-        public bool? Debug { get; set; }
-        public bool? ForceRandomChance { get; set; }
-        public bool? Deserialized { get; set; }
-        public bool? StrictChoices { get; set; }
+        public Format? Format { get; init; }
+        public required Id FormatId { get; init; }
+        public Action<string, object>? Send { get; init; }
+        public Prng? Prng { get; init; }
+        public PrngSeed? PrngSeed { get; init; }
+        public object? Rated
+        {
+            get;
+            init // bool or string
+            {
+                if (value is bool or string)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Rated must be a boolean or string.");
+                }
+            }
+        }
+        public PlayerOptions? P1 { get; init; }
+        public PlayerOptions? P2 { get; init; }
+        public PlayerOptions? P3 { get; init; }
+        public PlayerOptions? P4 { get; init; }
+        public bool? Debug { get; init; }
+        public bool? ForceRandomChance { get; init; }
+        public bool? Deserialized { get; init; }
+        public bool? StrictChoices { get; init; }
     }
 
     public class EventListenerWithoutPriority
     {
-        public required IEffect Effect { get; set; }
-        public Pokemon? Target { get; set; }
-        public int? Index { get; set; }
-        public Delegate? Callback { get; set; }
-        public EffectState? State { get; set; }
-        public Delegate? End { get; set; }
-        public object[]? EndCallArgs { get; set; }
-        public object EffectHolder { get; set; } = new(); // can be Pokemon, Side, Field, or Battle
+        public required IEffect Effect { get; init; }
+        public Pokemon? Target { get; init; }
+        public int? Index { get; init; }
+        public Delegate? Callback { get; init; }
+        public EffectState? State { get; init; }
+        public Delegate? End { get; init; }
+        public object[]? EndCallArgs { get; init; }
+        public required object EffectHolder
+        {
+            get;
+            init // can be Pokemon, Side, Field, or Battle
+            {
+                if (value is Pokemon or Side or Field or Battle)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("EffectHolder must be a Pokemon, Side, Field, or Battle.");
+                }
+            }
+        } 
     }
 
     public class EventListener : EventListenerWithoutPriority
     {
-        public int? Order { get; set; }
-        public int Priority { get; set; }
-        public int SubOrder { get; set; }
-        public int? EffectOrder { get; set; }
-        public int? Speed { get; set; }
+        public int? Order { get; init; }
+        public int Priority { get; init; }
+        public int SubOrder { get; init; }
+        public int? EffectOrder { get; init; }
+        public int? Speed { get; init; }
     }
 
-    // Part type (union)
-    // string | number | boolean | Pokemon | Side | Effect | Move | null | undefined;
+
+    public enum PartType
+    {
+        String,
+        Number,
+        Boolean,
+        Pokemon,
+        Side,
+        Effect,
+        Move,
+        Null,
+        Undefined
+    }
+
     public class Part
     {
-        public object? Value { get; set; }
+        public object? Value
+        {
+            get;
+            init // string | number | boolean | Pokemon | Side | Effect | Move | null | undefined
+            {
+                if (value is string or int or bool or Pokemon or Side or IEffect or Move or null)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Value must be a string, number," +
+                                                "boolean, Pokemon, Side, Effect, Move, null, or undefined.");
+                }
+            }
+        }
+        public PartType Type
+        {
+            get
+            {
+                return Value switch
+                {
+                    string => PartType.String,
+                    int => PartType.Number,
+                    bool => PartType.Boolean,
+                    Pokemon => PartType.Pokemon,
+                    Side => PartType.Side,
+                    IEffect => PartType.Effect,
+                    Move => PartType.Move,
+                    null => PartType.Null,
+                    _ => PartType.Undefined
+                };
+            }
+        }
     }
 
     public enum RequestState
@@ -99,98 +174,300 @@ namespace ApogeeVGC_CS.sim
         TeamPreview,
         Move,
         Switch,
-        None
+        None,
     }
+
     public class FaintQueueEntry
     {
-        public required Pokemon Target { get; set; }
-        public Pokemon? Source { get; set; }
-        public IEffect? Effect { get; set; }
+        public required Pokemon Target { get; init; }
+        public Pokemon? Source { get; init; }
+        public IEffect? Effect { get; init; }
     }
 
     public class Battle
     {
-        // Readonly properties
-        public Id Id { get; } = new();
-        public bool DebugMode { get; }
-        public bool? ForceRandomChance { get; }
-        public bool Deserialized { get; }
-        public bool StrictChoices { get; }
-        public Format Format { get; }
-        public EffectState FormatData { get; }
-        public GameType GameType { get; }
-        public int ActivePerHalf { get; }
-        public Field Field { get; }
-        public Side[] Sides { get; }
-        public PrngSeed PrngSeed { get; }
+        public required Id Id { get; init; }
+        public required bool DebugMode { get; init; }
+        public bool? ForceRandomChance { get; init; }
+        public required bool Deserialized { get; init; }
+        public required bool StrictChoices { get; init; }
+        public required Format Format { get; init; }
+        public required EffectState FormatData { get; init; }
+        public required GameType GameType { get; init; }
+        public required int ActivePerHalf
+        {
+            get;
+            init // 1, 2, or 3
+            {
+                if (value is 1 or 2 or 3)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "ActivePerHalf must be 1, 2, or 3.");
+                }
+            }
+        }
+        public required Field Field { get; init; }
+        public required Side[] Sides
+        {
+            get;
+            init // Array of sides, size 2 or 4
+            {
+                if (value.Length is 2 or 4)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Sides must be an array of size 2 or 4.");
+                }
+            }
+        }
+        public required PrngSeed PrngSeed { get; init; }
+        public required ModdedDex Dex { get; init; }
+        public required ModdedDex BaseDex { get; init; } // Added to emulate how the JavaScript version works
+        public required int Gen { get; init; }
+        public required RuleTable RuleTable { get; init; }
+        public required Prng Prng { get; init; }
+        public required object Rated
+        {
+            get;
+            init // bool or string
+            {
+                if (value is bool or string)
+                {
+                    field = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Rated must be a boolean or string.");
+                }
+            }
+        } 
+        public required bool ReportExactHp { get; init; }
+        public required bool ReportPercentages { get; init; }
+        public required bool SupportCancel { get; init; }
 
-        // Mutable properties
-        public ModdedDex Dex { get; set; }
-        public int Gen { get; set; }
-        public RuleTable RuleTable { get; set; }
-        public Prng Prng { get; set; }
-        public object Rated { get; set; } // bool or string
-        public bool ReportExactHp { get; set; }
-        public bool ReportPercentages { get; set; }
-        public bool SupportCancel { get; set; }
+        public required BattleActions Actions { get; init; }
+        public BattleQueue Queue { get; init; }
+        public required List<FaintQueueEntry> FaintQueue { get; init; }
 
-        public BattleActions Actions { get; set; }
-        //public BattleQueue Queue { get; set; }
-        public List<FaintQueueEntry> FaintQueue { get; } = new();
+        public required List<string> Log { get; init; }
+        public required List<string> InputLog { get; init; }
+        public required List<string> MessageLog { get; init; }
+        public required int SentLogPos { get; init; }
+        public required bool SentEnd { get; init; }
+        public static bool SentRequests => true;
 
-        public List<string> Log { get; } = new();
-        public List<string> InputLog { get; } = new();
-        public List<string> MessageLog { get; } = new();
-        public int SentLogPos { get; set; }
-        public bool SentEnd { get; set; }
-        public bool SentRequests { get; set; } = true;
+        public required RequestState RequestState { get; init; }
+        public required int Turn { get; init; }
+        public required bool MidTurn { get; init; }
+        public required bool Started { get; init; }
+        public required bool Ended { get; init; }
+        public string? Winner { get; init; }
 
-        public RequestState RequestState { get; set; }
-        public int Turn { get; set; }
-        public bool MidTurn { get; set; }
-        public bool Started { get; set; }
-        public bool Ended { get; set; }
-        public string? Winner { get; set; }
+        public required IEffect Effect { get; init; }
+        public required EffectState EffectState { get; init; }
 
-        public IEffect Effect { get; set; }
-        public EffectState EffectState { get; set; }
+        public required object Event { get; init; }
+        public object? Events { get; init; }
+        public required int EventDepth { get; init; }
 
-        public object Event { get; set; }
-        public object? Events { get; set; }
-        public int EventDepth { get; set; }
+        public ActiveMove? ActiveMove { get; init; }
+        public Pokemon? ActivePokemon { get; init; }
+        public Pokemon? ActiveTarget { get; init; }
 
-        public ActiveMove? ActiveMove { get; set; }
-        public Pokemon? ActivePokemon { get; set; }
-        public Pokemon? ActiveTarget { get; set; }
+        public ActiveMove? LastMove { get; init; }
+        public Id? LastSuccessfulMoveThisTurn { get; init; }
+        public required int LastMoveLine { get; init; }
+        public required int LastDamage { get; init; }
+        public required int EffectOrder { get; init; }
+        public required bool QuickClawRoll { get; init; }
+        public required List<int> SpeedOrder { get; init; }
 
-        public ActiveMove? LastMove { get; set; }
-        public Id? LastSuccessfulMoveThisTurn { get; set; }
-        public int LastMoveLine { get; set; }
-        public int LastDamage { get; set; }
-        public int EffectOrder { get; set; }
-        public bool QuickClawRoll { get; set; }
-        public List<int> SpeedOrder { get; } = new();
+        public object? TeamGenerator { get; init; }
 
-        public object? TeamGenerator { get; set; }
-
-        public HashSet<string> Hints { get; } = new();
+        public required HashSet<string> Hints { get; init; }
 
         // Constants
-        public string NotFail { get; } = "";
-        public int HitSubstitute { get; } = 0;
-        public bool Fail { get; } = false;
-        public object? SilentFail { get; } = null;
+        public static string NotFail => "";
+        public static int HitSubstitute => 0;
+        public static bool Fail => false;
+        public static object? SilentFail => null;
 
-        public Action<string, object> Send { get; }
+        public Action<string, object> Send { get; init; }
 
         // Methods
-        public Func<double, int?, double> Trunc { get; set; }
-        public Func<object, int?, int?, int> ClampIntRange { get; set; }
-        public Func<object, Id> ToId { get; set; }
+        //public Func<int, int?, int> Trunc { get; init; }
+        // public Func<object, int?, int?, int> ClampIntRange { get; init; }
+        // public Func<object, Id> ToId { get; init; }
 
-        public Battle(BattleOptions options)
+        public Battle(BattleOptions options, ModdedDex baseDex)
         {
-            // TODO: Implement constructor logic
+            BaseDex = baseDex;
+            Log = [];
+            //Add(["t:"]);
+
+            Format = options.Format ?? BaseDex.Formats.Get(options.FormatId.ToString(), true);
+
+            Dex = BaseDex.ForFormat(Format);
+            Gen = Dex.Gen;
+            RuleTable = Dex.Formats.GetRuleTable(Format);
+
+            Id = new Id();
+
+            DebugMode = Format.Debug || (options.Debug ?? false);
+            // Require debug mode and explicitly passed true/false
+            ForceRandomChance = (DebugMode && options.ForceRandomChance.HasValue)
+                ? options.ForceRandomChance
+                : null;
+
+            Deserialized = options.Deserialized ?? false;
+            StrictChoices = options.StrictChoices ?? false;
+            var effectState = new EffectState() { Id = Format.Id, EffectOrder = 0 };
+            FormatData = InitEffectState(effectState);
+            GameType = Format.GameType;
+            Field = new Field(this);
+            Sides = new Side[options is { P1: not null, P2: not null } ? 2 : 4];
+
+            if (GameType == GameType.Triples)
+            {
+                ActivePerHalf = 3;
+            }
+            else if (GameType == GameType.Doubles || Format.PlayerCount > 2)
+            {
+                ActivePerHalf = 2;
+            }
+            else
+            {
+                ActivePerHalf = 1;
+            }
+
+            Prng = options.Prng ?? new Prng(options.PrngSeed);
+            PrngSeed = Prng.StartingSeed;
+            Rated = options.Rated ?? false;
+            ReportExactHp = Format.Debug;
+            ReportPercentages = false;
+            SupportCancel = false;
+
+            Queue = new BattleQueue(this);
+            Actions = new BattleActions(this);
+            FaintQueue = [];
+
+            InputLog = [];
+            MessageLog = [];
+            SentLogPos = 0;
+            SentEnd = false;
+
+            RequestState = RequestState.None;
+            Turn = 0;
+            MidTurn = false;
+            Started = false;
+            Ended = false;
+
+            Effect = ConditionConstants.EmptyCondition; // Could be a different default effect
+            EffectState = InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 });
+
+            Event = new object(); // Placeholder for event object
+            Events = null;
+            EventDepth = 0;
+
+            ActiveMove = null;
+            ActivePokemon = null;
+            ActiveTarget = null;
+
+            LastMove = null;
+            LastMoveLine = -1;
+            LastSuccessfulMoveThisTurn = null;
+            LastDamage = 0;
+            EffectOrder = 0;
+            QuickClawRoll = false;
+            SpeedOrder = [];
+
+            for (var i = 0; i < ActivePerHalf * 2; i++)
+            {
+                SpeedOrder.Add(i);
+            }
+
+            TeamGenerator = null;
+
+            Hints = [];
+
+            // Create input options for logging
+            var inputOptions = new Dictionary<string, object>
+            {
+                ["formatid"] = options.FormatId,
+                ["seed"] = PrngSeed
+            };
+
+            if (Rated is true or string)
+            {
+                inputOptions["rated"] = Rated;
+            }
+
+            // Version logging (if version system is implemented)
+            // TODO: Implement version system
+            /*
+            if (__version?.Head != null)
+            {
+                InputLog.Add($"> version {__version.Head}");
+            }
+            if (__version?.Origin != null)
+            {
+                InputLog.Add($"> version - origin {__version.Origin}");
+            }
+            */
+
+            InputLog.Add($"> start {JsonSerializer.Serialize(inputOptions)}");
+
+            Add("gametype", GameType);
+
+            // Process rules - timing is early enough to hook into ModifySpecies event
+            foreach (string rule in RuleTable.Keys)
+            {
+                if ("+-*!".Contains(rule[0])) continue;
+
+                var subFormat = Dex.Formats.Get(rule);
+                if (!subFormat.Exists) continue;
+                // Check if format has event handlers (excluding specific ones handled elsewhere)
+                var excludedHandlers = new HashSet<string>
+                {
+                    "onBegin", "onTeamPreview", "onBattleStart", "onValidateRule",
+                    "onValidateTeam", "onChangeSet", "onValidateSet"
+                };
+
+                bool hasEventHandler = subFormat.GetType()
+                    .GetProperties()
+                    .Any(prop => prop.Name.StartsWith("On") &&
+                                 !excludedHandlers.Contains(prop.Name));
+
+                if (hasEventHandler)
+                {
+                    Field.AddPseudoWeather(rule);
+                }
+            }
+
+            // Set up players
+            var sideIds = new[] { SideId.P1, SideId.P2, SideId.P3, SideId.P4 };
+            foreach (var sideId in sideIds)
+            {
+                var playerOptions = sideId switch
+                {
+                    SideId.P1 => options.P1,
+                    SideId.P2 => options.P2,
+                    SideId.P3 => options.P3,
+                    SideId.P4 => options.P4,
+                    _ => null
+                };
+
+                if (playerOptions != null)
+                {
+                    SetPlayer(sideId, playerOptions);
+                }
+            }
+
         }
 
         public object ToJson()
@@ -434,8 +711,7 @@ namespace ApogeeVGC_CS.sim
 
         private List<Pokemon> PossibleSwitches(Side side)
         {
-            // Implementation for getting possible switches
-            return new List<Pokemon>();
+            throw new NotImplementedException();
         }
 
         public bool SwapPosition(Pokemon pokemon, int newPosition, string? attributes = null)
