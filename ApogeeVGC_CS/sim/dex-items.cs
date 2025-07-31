@@ -31,7 +31,7 @@
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; init; }
         public Action<Battle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnBeforeMove { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnBeforeMove { get; init; }
         public Action<Battle, Pokemon>? OnBeforeSwitchIn { get; init; }
         public Action<Battle, Pokemon>? OnBeforeSwitchOut { get; init; }
         public Action<Battle, Pokemon>? OnBeforeTurn { get; init; }
