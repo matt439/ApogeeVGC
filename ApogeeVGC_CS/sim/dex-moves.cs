@@ -1284,6 +1284,11 @@
             throw new NotImplementedException();
         }
 
+        public Move Get(Id name)
+        {
+            throw new NotImplementedException();
+        }
+
         public Move Get(Move? move)
         {
             throw new NotImplementedException();

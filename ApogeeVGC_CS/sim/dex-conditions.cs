@@ -59,7 +59,7 @@ namespace ApogeeVGC_CS.sim
         Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; }
         Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; }
-        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpD { get; }
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifySpD { get; }
         Func<Battle, int, Pokemon, int?>? OnModifySpe { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; }
         Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; }
@@ -608,7 +608,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
         public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; init; }
