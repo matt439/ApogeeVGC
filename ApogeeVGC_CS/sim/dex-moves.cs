@@ -179,6 +179,9 @@
         Dark,
         Steel,
         Fairy,
+        /// <summary>
+        /// Represents the "???" type
+        /// </summary>
         Unknown,
     }
 

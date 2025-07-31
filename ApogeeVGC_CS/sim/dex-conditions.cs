@@ -25,7 +25,7 @@ namespace ApogeeVGC_CS.sim
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnAccuracy { get; }
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; }
         Action<Battle, Pokemon, IEffect>? OnBeforeFaint { get; }
-        Action<Battle, Pokemon, Pokemon, ActiveMove>? OnBeforeMove { get; }
+        Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnBeforeMove { get; }
         Action<Battle, Pokemon>? OnBeforeSwitchIn { get; }
         Action<Battle, Pokemon>? OnBeforeSwitchOut { get; }
         Action<Battle, Pokemon>? OnBeforeTurn { get; }
@@ -574,7 +574,7 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnAccuracy { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; init; }
         public Action<Battle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnBeforeMove { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnBeforeMove { get; init; }
         public Action<Battle, Pokemon>? OnBeforeSwitchIn { get; init; }
         public Action<Battle, Pokemon>? OnBeforeSwitchOut { get; init; }
         public Action<Battle, Pokemon>? OnBeforeTurn { get; init; }

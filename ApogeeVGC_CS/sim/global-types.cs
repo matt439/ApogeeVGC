@@ -411,6 +411,7 @@ namespace ApogeeVGC_CS.sim
         public EffectType EffectType { get; }
         public Dictionary<string, object> ExtraData { get; set; }
         public string Name { get; }
+        public Id Id { get; }
     }
 
     public interface ICommonHandlers

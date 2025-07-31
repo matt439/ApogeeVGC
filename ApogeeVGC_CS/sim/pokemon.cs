@@ -60,9 +60,9 @@ namespace ApogeeVGC_CS.sim
     {
         public required Id Id { get; init; }
         public required int EffectOrder { get; init; }
-        public int? Duration { get; init; }
+        public int? Duration { get; set; }
         public Pokemon? Target { get; init; }
-        public Dictionary<string, object>? ExtraData { get; set; }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public static class PokemonConstants
@@ -939,12 +939,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public string? HasMove(string moveId)
+        public Id? HasMove(Id moveId)
         {
             throw new NotImplementedException();
         }
 
-        public void DisableMove(string moveId, bool isHidden, IEffect? sourceEffect = null)
+        public void DisableMove(Id moveId, bool isHidden, IEffect? sourceEffect = null)
         {
             throw new NotImplementedException();
         }

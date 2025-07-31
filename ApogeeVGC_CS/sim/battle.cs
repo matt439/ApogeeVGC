@@ -495,7 +495,7 @@ namespace ApogeeVGC_CS.sim
             return $"Battle: {Format}";
         }
 
-        public double Random(int? m = null, int? n = null)
+        public int Random(int? m = null, int? n = null)
         {
             // TODO: Implement random number generation
             throw new NotImplementedException();

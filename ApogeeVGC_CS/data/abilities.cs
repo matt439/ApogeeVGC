@@ -65,7 +65,7 @@ namespace ApogeeVGC_CS.data
                     battle.Add("-ability", pokemon, "As One");
                     battle.Add("-ability", pokemon, "Unnerve");
 
-                    pokemon.AbilityState.ExtraData ??= new Dictionary<string, object>();
+                    pokemon.AbilityState.ExtraData ??= [];
                     pokemon.AbilityState.ExtraData["unnerved"] = true;
                 },
 
