@@ -365,7 +365,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("GetConfusionDamage method is not implemented yet.");
         }
 
-        public string? CanMegaEvolve(Pokemon pokemon)
+        public string? CanMegaEvo(Pokemon pokemon)
         {
             throw new NotImplementedException("CanMegaEvolve method is not implemented yet.");
         }

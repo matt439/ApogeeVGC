@@ -177,14 +177,121 @@ namespace ApogeeVGC_CS.sim
 
     public class StatsTable
     {
-        public int Hp { get; init; } = 0;
-        public int Atk { get; init; } = 0;
-        public int Def { get; init; } = 0;
-        public int Spa { get; init; } = 0;
-        public int Spd { get; init; } = 0;
-        public int Spe { get; init; } = 0;
+        public int Hp
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
+        public int Atk
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
+        public int Def
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
+        public int Spa
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
+        public int Spd
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
+        public int Spe
+        {
+            get;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentException("value must be positive.");
+                }
+                field = value;
+            }
+        }
 
         public int BaseStatTotal => Hp + Atk + Def + Spa + Spd + Spe;
+
+        public int GetStat(StatId stat)
+        {
+            return stat switch
+            {
+                StatId.Hp => Hp,
+                StatId.Atk => Atk,
+                StatId.Def => Def,
+                StatId.Spa => Spa,
+                StatId.Spd => Spd,
+                StatId.Spe => Spe,
+                _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+            };
+        }
+
+        public void SetStat(StatId stat, int value)
+        {
+            switch (stat)
+            {
+                case StatId.Hp:
+                    Hp = value;
+                    break;
+                case StatId.Atk:
+                    Atk = value;
+                    break;
+                case StatId.Def:
+                    Def = value;
+                    break;
+                case StatId.Spa:
+                    Spa = value;
+                    break;
+                case StatId.Spd:
+                    Spd = value;
+                    break;
+                case StatId.Spe:
+                    Spe = value;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+            }
+        }
 
         public static bool IsValidIv(int stat)
         {

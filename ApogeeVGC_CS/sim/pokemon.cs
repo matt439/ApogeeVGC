@@ -1,4 +1,4 @@
-﻿using System.Resources;
+﻿using ApogeeVGC_CS.lib;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -8,7 +8,7 @@ namespace ApogeeVGC_CS.sim
         public required string Move { get; init; }
         public required int Pp { get; init; }
         public required int MaxPp { get; init; }
-        public string? Target { get; init; }
+        public MoveTarget? Target { get; init; }
 
         public required object Disabled
         {
@@ -61,6 +61,7 @@ namespace ApogeeVGC_CS.sim
         public required Id Id { get; init; }
         public required int EffectOrder { get; init; }
         public int? Duration { get; init; }
+        public Pokemon? Target { get; init; }
         public Dictionary<string, object>? ExtraData { get; init; }
     }
 
@@ -104,13 +105,13 @@ namespace ApogeeVGC_CS.sim
         public required int DynamaxLevel { get; init; }
         public required bool Gigantamax { get; init; }
 
-        public required string BaseHpType { get; init; }
+        public required PokemonType BaseHpType { get; init; }
         public required int BaseHpPower { get; init; }
 
         public required List<MoveSlot> BaseMoveSlots { get; init; }
         public required List<MoveSlot> MoveSlots { get; init; }
 
-        public required string HpType { get; init; }
+        public required PokemonType HpType { get; init; }
         public required int HpPower { get; init; }
 
         public required int Position { get; init; }
@@ -171,7 +172,7 @@ namespace ApogeeVGC_CS.sim
 
         public required bool FormeRegression { get; init; }
 
-        public required List<string> Types { get; init; }
+        public required List<PokemonType> Types { get; init; }
         public required string AddedType { get; init; }
         public required bool KnownType { get; init; }
         public required string ApparentType { get; init; }
@@ -267,8 +268,8 @@ namespace ApogeeVGC_CS.sim
             }
         }
 
-        public required string TeraType { get; init; }
-        public required List<string> BaseTypes { get; init; }
+        public required PokemonType TeraType { get; init; }
+        public required List<PokemonType> BaseTypes { get; init; }
         public string? Terastallized { get; init; }
 
         public string? Staleness
@@ -329,55 +330,262 @@ namespace ApogeeVGC_CS.sim
 
         public Dictionary<string, object> M { get; init; } = [];
 
-        public Pokemon(string set, Side side)
+        public Pokemon(string set, Side side) : this(new PokemonSet
+        {
+            Species = set,
+            Moves = [],
+            Name = set,
+            Item = string.Empty,
+            Ability = string.Empty,
+            Nature = string.Empty,
+            Gender = GenderName.Empty,
+            Evs = new StatsTable(),
+            Ivs = new StatsTable(),
+            Level = 0
+        },
+            side) { }
+
+        public Pokemon(PokemonSet set, Side side)
         {
             Side = side;
             Battle = side.Battle;
 
-            BaseSpecies = Battle.Dex.Species.Get(set);
+            BaseSpecies = Battle.Dex.Species.Get(set.Species);
             if (!BaseSpecies.Exists)
                 throw new ArgumentException($"Unidentified species: {BaseSpecies.Name}");
 
-            Set = new PokemonSet
-            {
-                Species = BaseSpecies.Name,
-                Moves =
-                    [],
-                Name = set,
-                Item = string.Empty,
-                Ability = string.Empty,
-                Nature = string.Empty,
-                Gender = string.Empty,
-                Evs = new StatsTable(),
-                Ivs = new StatsTable(),
-                Level = 0
-            };
-
             Species = BaseSpecies;
 
+            // Name setup
+            if (string.IsNullOrEmpty(set.Name) || set.Name == set.Species)
+            {
+                set.Name = BaseSpecies.BaseSpecies;
+            }
+            SpeciesState = Battle.InitEffectState(new EffectState
+            {
+                Id = Species.Id,
+                EffectOrder = 0
+            });
+
+            Name = set.Name.Length > 20 ? set.Name[..20] : set.Name;
+
+            // Level setup
+            Level = Utilities.ClampIntRange(set.AdjustLevel ?? set.Level, 1, 9999);
+
+            Gender = set.Gender;
+
+            // Happiness, Pokeball, Dynamax
+            Happiness = set.Happiness is { } h ? Utilities.ClampIntRange(h, 0, 255) : 255;
+            Pokeball = new Id(set.Pokeball ?? "pokeball");
+            DynamaxLevel = set.DynamaxLevel is { } dl ? Utilities.ClampIntRange(dl, 0, 10) : 10;
+            Gigantamax = set.Gigantamax ?? false;
+
+            // Move slots initialization
+            BaseMoveSlots = [];
+            MoveSlots = [];
+
+            if (set.Moves.Count == 0)
+            {
+                throw new InvalidOperationException($"Set {Name} has no moves");
+            }
+
+            foreach (string moveId in set.Moves)
+            {
+                var move = Battle.Dex.Moves.Get(moveId);
+                if (move.Id.IsEmpty) continue;
+
+                if (move.Id.ToString() == "hiddenpower" && move.Type != PokemonType.Normal)
+                {
+                    if (set.HpType == PokemonType.Unknown)
+                        set.HpType = move.Type;
+                    move = Battle.Dex.Moves.Get("hiddenpower");
+                }
+
+                int basePp = (move.NoPpBoosts ?? false) ? move.Pp : move.Pp * 8 / 5;
+                if (Battle.Gen < 3) basePp = Math.Min(61, basePp);
+
+                BaseMoveSlots.Add(new MoveSlot
+                {
+                    Move = move.Name,
+                    Id = move.Id,
+                    Pp = basePp,
+                    MaxPp = basePp,
+                    Target = move.Target,
+                    Disabled = false,
+                    DisabledSource = string.Empty,
+                    Used = false
+                });
+            }
+
+            Position = 0;
+            Details = GetUpdatedDetails();
+
+            // Status initialization
+            Status = new Id("");
+            StatusState = Battle.InitEffectState(new EffectState
+            {
+                Id = new Id(),
+                EffectOrder = 0
+            });
+            
+            
+            Volatiles = [];
+            ShowCure = null;
+
+            // EV/IV setup
+            Set!.Evs = new StatsTable { Hp = 0, Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
+            Set.Ivs = new StatsTable { Hp = 31, Atk = 31, Def = 31, Spa = 31, Spd = 31, Spe = 31 };
+
+            foreach (var stat in Enum.GetValues<StatId>())
+            {
+                if (Set.Evs.GetStat(stat) == 0) Set.Evs.SetStat(stat, 0);
+                if (Set.Ivs.GetStat(stat) == 0) Set.Ivs.SetStat(stat, 31);
+            }
+
+            foreach (var stat in Enum.GetValues<StatId>())
+            {
+                Set.Evs.SetStat(stat, Utilities.ClampIntRange(Set.Evs.GetStat(stat), 0, 255));
+                Set.Ivs.SetStat(stat, Utilities.ClampIntRange(Set.Ivs.GetStat(stat), 0, 31));
+            }
+
+            // Gen 1-2 DV handling
+            if (Battle.Gen <= 2)
+            {
+                foreach (var stat in Enum.GetValues<StatId>())
+                {
+                    Set.Ivs.SetStat(stat, Set.Ivs.GetStat(stat) & 30); // Ensure even values
+                }
+            }
+
+            // Hidden Power calculation
+            var hpData = Battle.Dex.GetHiddenPower(Set.Ivs);
+            HpType = set.HpType ?? hpData.Type;
+            HpPower = hpData.Power;
+
+            BaseHpType = HpType;
+            BaseHpPower = HpPower;
+
+            // Stats initialization
+            BaseStoredStats = new StatsTable(); // Will be initialized in SetSpecies
+            StoredStats = new StatsTable { Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
+            Boosts = new BoostsTable
+            {
+                [BoostId.Atk] = 0,
+                [BoostId.Def] = 0,
+                [BoostId.Spa] = 0,
+                [BoostId.Spd] = 0,
+                [BoostId.Spe] = 0,
+                [BoostId.Accuracy] = 0,
+                [BoostId.Evasion] = 0
+            };
+
+            // Ability setup
+            BaseAbility = new Id(set.Ability);
+            Ability = BaseAbility;
+            AbilityState = Battle.InitEffectState(new EffectState
+            {
+                Id = Ability,
+                Target = this,
+                EffectOrder = 0
+            });
+
+            // Item setup
+            Item = new Id(set.Item);
+            ItemState = Battle.InitEffectState(new EffectState
+            {
+                Id = Item,
+                Target = this,
+                EffectOrder = 0
+            });
+            LastItem = new Id("");
+            UsedItemThisTurn = false;
+            AteBerry = false;
+
+            // Trap states
+            Trapped = false;
+            MaybeTrapped = false;
+            MaybeDisabled = false;
+            MaybeLocked = false;
+
+            // Transform states
+            Illusion = null;
+            Transformed = false;
+
+            // HP and fainting
+            Fainted = false;
+            FaintQueued = false;
+            SubFainted = null;
+
+            // Forme
+            FormeRegression = false;
+
+            // Types
+            Types = BaseSpecies.Types;
+            BaseTypes = Types;
+            AddedType = string.Empty;
+            KnownType = true;
+            ApparentType = string.Join("/", BaseSpecies.Types);
+            TeraType = set.TeraType ?? Types[0];
+
+            // Switch flags
+            SwitchFlag = false;
+            ForceSwitchFlag = false;
+            SkipBeforeSwitchOutEventFlag = false;
+            DraggedIn = null;
+            NewlySwitched = false;
+            BeingCalledBack = false;
+
+            // Move tracking
+            LastMove = null;
+            if (Battle.Gen == 2) LastMoveEncore = null;
+            LastMoveUsed = null;
+            MoveThisTurn = string.Empty;
+            StatsRaisedThisTurn = false;
+            StatsLoweredThisTurn = false;
+            HurtThisTurn = null;
+            LastDamage = 0;
+            AttackedBy = [];
+            TimesAttacked = 0;
+
+            // Activity states
+            IsActive = false;
+            ActiveTurns = 0;
+            ActiveMoveActions = 0;
+            PreviouslySwitchedIn = 0;
+            TruantTurn = false;
+            BondTriggered = false;
+            SwordBoost = false;
+            ShieldBoost = false;
+            SyrupTriggered = false;
+            StellarBoostedTypes = [];
+            IsStarted = false;
+            DuringMove = false;
+
+            // Physical properties
+            WeightHg = 1;
+            Speed = 0;
+
+            // Special abilities
+            CanMegaEvo = Battle.Actions.CanMegaEvo(this);
+            CanMegaEvoX = Battle.Actions.CanMegaEvoX?.Invoke(Battle.Actions, this);
+            CanMegaEvoY = Battle.Actions.CanMegaEvoY?.Invoke(Battle.Actions, this);
+            CanUltraBurst = Battle.Actions.CanUltraBurst(this);
+            CanGigantamax = BaseSpecies.CanGigantamax;
+            CanTerastallize = Battle.Actions.CanTerastallize(this);
+
+            // Gen-specific stats
+            if (Battle.Gen == 1)
+            {
+                ModifiedStats = new StatsTable { Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
+            }
+
+            // HP initialization
+            MaxHp = 0;
+            BaseMaxHp = 0;
+            Hp = 0;
+            ClearVolatile();
+            Hp = MaxHp;
         }
-
-        //public Pokemon(PokemonSet set, Side side)
-        //{
-        //    Side = side;
-        //    Battle = side.Battle;
-
-        //    // Handle Pokemon scripts from format/dex if needed
-
-        //    if (set is string setName)
-        //        set = new { name = setName };
-
-        //    var setData = (dynamic)set;
-        //    BaseSpecies = Battle.Dex.Species.Get(setData.species ?? setData.name);
-        //    if (!BaseSpecies.Exists)
-        //        throw new ArgumentException($"Unidentified species: {BaseSpecies.Name}");
-
-        //    Set = (PokemonSet)set;
-        //    Species = BaseSpecies;
-
-        //    if (setData.name == setData.species || string.IsNullOrEmpty(setData.name))
-        //        setData.name = BaseSpecies.BaseSpecies;
-        //}
 
         public object ToJson()
         {

@@ -6,7 +6,7 @@
          * Nickname. Should be identical to its base species if not specified
          * by the player, e.g. "Minior".
          */
-        public required string Name { get; init; }
+        public required string Name { get; set; }
 
         /**
          * Species name (including forme if applicable), e.g. "Minior-Red".
@@ -40,7 +40,7 @@
         */
         public required string Nature { get; init; }
 
-        public required string Gender { get; init; }
+        public required GenderName Gender { get; init; }
 
         /**
          * Effort Values, used in stat calculation.
@@ -51,7 +51,7 @@
         public required StatsTable Evs
         {
             get;
-            init
+            set
             {
                 if (!value.IsValidEvs())
                 {
@@ -76,7 +76,7 @@
         public required StatsTable Ivs
         {
             get;
-            init
+            set
             {
                 if (!value.IsValidIvs())
                 {
@@ -142,7 +142,7 @@
          * Hidden Power type. Optional in older gens, but used in Gen 7+
          * because `ivs` contain post-Battle-Cap values.
          */
-        public string? HpType { get; init; }
+        public PokemonType? HpType { get; set; }
 
         /**
          * Dynamax Level. Affects the amount of HP gained when Dynamaxed.
@@ -163,7 +163,9 @@
 
         public bool? Gigantamax { get; init; }
 
-        public string? TeraType { get; init; }
+        public PokemonType? TeraType { get; init; }
+
+        public int? AdjustLevel { get; init; } // added for Pokemon class constructor
     }
 
     public class Teams
