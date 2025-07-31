@@ -341,7 +341,10 @@ namespace ApogeeVGC_CS.sim
 
     public enum SideId
     {
-        P1, P2, P3, P4
+        P1 = 0,
+        P2 = 1,
+        P3 = 2,
+        P4 = 3,
     }
 
     public class SpreadMoveTargets : List<Pokemon?>;

@@ -1,177 +1,206 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
-    // Enums for choice types
     public enum ChoiceType
     {
         Move, Switch, InstaSwitch, RevivalBlessing, Team, Shift, Pass
     }
 
-    // ChosenAction class
     public class ChosenAction
     {
-        public ChoiceType Choice { get; set; }
-        public Pokemon? Pokemon { get; set; }
-        public int? TargetLoc { get; set; }
-        public string MoveId { get; set; } = string.Empty;
-        public ActiveMove? Move { get; set; }
-        public Pokemon? Target { get; set; }
-        public int? Index { get; set; }
-        public Side? Side { get; set; }
-        public bool? Mega { get; set; }
-        public bool? MegaX { get; set; }
-        public bool? MegaY { get; set; }
-        public string? ZMove { get; set; }
-        public string? MaxMove { get; set; }
-        public string? Terastallize { get; set; }
-        public int? Priority { get; set; }
+        public required ChoiceType Choice { get; init; }
+        public Pokemon? Pokemon { get; init; }
+        public int? TargetLoc { get; init; }
+        public required string MoveId { get; init; }
+        public ActiveMove? Move { get; init; }
+        public Pokemon? Target { get; init; }
+        public int? Index { get; init; }
+        public Side? Side { get; init; }
+        public bool? Mega { get; init; }
+        public bool? MegaX { get; init; }
+        public bool? MegaY { get; init; }
+        public string? ZMove { get; init; }
+        public string? MaxMove { get; init; }
+        public string? Terastallize { get; init; }
+        public int? Priority { get; init; }
     }
 
-    // Choice class
     public class Choice
     {
-        public bool CantUndo { get; set; }
-        public string Error { get; set; } = string.Empty;
-        public List<ChosenAction> Actions { get; set; } = new();
-        public int ForcedSwitchesLeft { get; set; }
-        public int ForcedPassesLeft { get; set; }
-        public HashSet<int> SwitchIns { get; set; } = new();
-        public bool ZMove { get; set; }
-        public bool Mega { get; set; }
-        public bool Ultra { get; set; }
-        public bool Dynamax { get; set; }
-        public bool Terastallize { get; set; }
+        public required bool CantUndo { get; init; }
+        public required string Error { get; init; }
+        public required List<ChosenAction> Actions { get; init; }
+        public required int ForcedSwitchesLeft { get; init; }
+        public required int ForcedPassesLeft { get; init; }
+        public required HashSet<int> SwitchIns { get; init; }
+        public required bool ZMove { get; init; }
+        public required bool Mega { get; init; }
+        public required bool Ultra { get; init; }
+        public required bool Dynamax { get; init; }
+        public required bool Terastallize { get; init; }
     }
 
-    // Request data classes
     public class PokemonSwitchRequestData
     {
-        public string Ident { get; set; } = string.Empty;
-        public string Details { get; set; } = string.Empty;
-        public string Condition { get; set; } = string.Empty;
-        public bool Active { get; set; }
-        public StatsTable Stats { get; set; } = new();
-        public List<string> Moves { get; set; } = new();
-        public string BaseAbility { get; set; } = string.Empty;
-        public string Item { get; set; } = string.Empty;
-        public string Pokeball { get; set; } = string.Empty;
-        public string? Ability { get; set; }
-        public bool? Commanding { get; set; }
-        public bool? Reviving { get; set; }
-        public string? TeraType { get; set; }
-        public string? Terastallized { get; set; }
+        public required string Ident { get; init; }
+        public required string Details { get; init; }
+        public required string Condition { get; init; }
+        public required bool Active { get; init; }
+        public required StatsTable Stats { get; init; }
+        public required List<Id> Moves { get; init; }
+        public required Id BaseAbility { get; init; }
+        public required Id Item { get; init; }
+        public required Id Pokeball { get; init; }
+        public Id? Ability { get; init; }
+        public bool? Commanding { get; init; }
+        public bool? Reviving { get; init; }
+        public string? TeraType { get; init; }
+        public string? Terastallized { get; init; }
     }
 
     public class PokemonMoveData
     {
-        public string Move { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
-        public string? Target { get; set; }
-        public object? Disabled { get; set; } // string or bool
-        public string? DisabledSource { get; set; }
+        public required string Move { get; init; }
+        public required Id Id { get; init; }
+        public string? Target { get; init; }
+
+        public object? Disabled
+        {
+            get;
+            init // string or bool
+            {
+                field = value switch
+                {
+                    bool b => b,
+                    string s => s,
+                    _ => throw new ArgumentException("Disabled must be a boolean or a string.")
+                };
+            }
+        } 
+        public string? DisabledSource { get; init; }
     }
 
     public class PokemonMoveRequestData
     {
-        public List<PokemonMoveData> Moves { get; set; } = new();
-        public bool? MaybeDisabled { get; set; }
-        public bool? MaybeLocked { get; set; }
-        public bool? Trapped { get; set; }
-        public bool? MaybeTrapped { get; set; }
-        public bool? CanMegaEvo { get; set; }
-        public bool? CanMegaEvoX { get; set; }
-        public bool? CanMegaEvoY { get; set; }
-        public bool? CanUltraBurst { get; set; }
-        public object? CanZMove { get; set; }
-        public bool? CanDynamax { get; set; }
-        public DynamaxOptions? MaxMoves { get; set; }
-        public string? CanTerastallize { get; set; }
+        public required List<PokemonMoveData> Moves { get; init; }
+        public bool? MaybeDisabled { get; init; }
+        public bool? MaybeLocked { get; init; }
+        public bool? Trapped { get; init; }
+        public bool? MaybeTrapped { get; init; }
+        public bool? CanMegaEvo { get; init; }
+        public bool? CanMegaEvoX { get; init; }
+        public bool? CanMegaEvoY { get; init; }
+        public bool? CanUltraBurst { get; init; }
+        public object? CanZMove { get; init; }
+        public bool? CanDynamax { get; init; }
+        public DynamaxOptions? MaxMoves { get; init; }
+        public string? CanTerastallize { get; init; }
     }
 
     public class DynamaxMoveData
     {
-        public string Move { get; set; } = string.Empty;
-        public MoveTarget Target { get; set; }
-        public bool? Disabled { get; set; }
+        public required string Move { get; init; }
+        public required MoveTarget Target { get; init; }
+        public bool? Disabled { get; init; }
     }
 
     public class DynamaxOptions
     {
-        public List<DynamaxMoveData> MaxMoves { get; set; } = new();
-        public string? Gigantamax { get; set; }
+        public required List<DynamaxMoveData> MaxMoves { get; init; }
+        public string? Gigantamax { get; init; }
     }
 
     public class SideRequestData
     {
-        public string Name { get; set; } = string.Empty;
-        public SideId Id { get; set; }
-        public List<PokemonSwitchRequestData> Pokemon { get; set; } = new();
-        public bool? NoCancel { get; set; }
+        public required string Name { get; init; }
+        public required SideId Id { get; init; }
+        public required List<PokemonSwitchRequestData> Pokemon { get; init; }
+        public bool? NoCancel { get; init; }
     }
 
-    // Request types
     public abstract class ChoiceRequest
     {
-        public bool? Wait { get; set; }
-        public SideRequestData Side { get; set; } = new();
-        public bool? NoCancel { get; set; }
+        public virtual bool? Wait { get; init; }
+        public required SideRequestData Side { get; init; }
+        public bool? NoCancel { get; init; }
+        public virtual bool? TeamPreview { get; init; }
     }
 
     public class SwitchRequest : ChoiceRequest
     {
-        public List<bool> ForceSwitch { get; set; } = new();
+        public required List<bool> ForceSwitch { get; init; }
     }
 
     public class TeamPreviewRequest : ChoiceRequest
     {
-        public bool TeamPreview { get; set; } = true;
-        public int? MaxChosenTeamSize { get; set; }
+        public override bool? TeamPreview
+        {
+            get => true;
+            init { }
+        }
+        public int? MaxChosenTeamSize { get; init; }
+        public List<bool>? ForceSwitch { get; init; }
     }
 
     public class MoveRequest : ChoiceRequest
     {
-        public List<PokemonMoveRequestData> Active { get; set; } = new();
-        public SideRequestData? Ally { get; set; }
+        public required List<PokemonMoveRequestData> Active { get; init; }
+        public SideRequestData? Ally { get; init; }
+        public List<bool>? ForceSwitch { get; init; }
     }
 
     public class WaitRequest : ChoiceRequest
     {
-        public new bool Wait { get; set; } = true;
+        public override bool? Wait
+        {
+            get => true;
+            init { }
+        }
+        public List<bool>? ForceSwitch { get; init; }
     }
 
-    // Side class
+    // event: 'mega' | 'megax' | 'megay' | 'zmove' | 'ultra' | 'dynamax' | 'terastallize' | ''
+    public enum EventType
+    {
+        Mega,
+        MegaX,
+        MegaY,
+        ZMove,
+        Ultra,
+        Dynamax,
+        Terastallize,
+        None,
+    }
+
     public class Side
     {
         public Battle Battle { get; }
         public SideId Id { get; }
         public int N { get; }
 
-        public string Name { get; set; } = string.Empty;
-        public string Avatar { get; set; } = string.Empty;
-        public Side Foe { get; set; } = null!; // set in battle.start()
-        public Side? AllySide { get; set; } = null; // set in battle.start()
-        public List<PokemonSet> Team { get; set; } = new();
-        public List<Pokemon> Pokemon { get; set; } = new();
-        public List<Pokemon?> Active { get; set; } = new();
+        public required string Name { get; init; }
+        public required string Avatar { get; init; }
+        public Side Foe { get; init; } = null!; // set in battle.start()
+        public Side? AllySide { get; init; } = null; // set in battle.start()
+        public required List<PokemonSet> Team { get; init; }
+        public required List<Pokemon> Pokemon { get; init; }
+        public required List<Pokemon> Active { get; init; }
 
-        public int PokemonLeft { get; set; }
-        public bool ZMoveUsed { get; set; }
-        public bool DynamaxUsed { get; set; }
+        public int PokemonLeft => Pokemon.Count;
+        public required bool ZMoveUsed { get; init; }
+        public required bool DynamaxUsed { get; init; }
 
-        public Pokemon? FaintedLastTurn { get; set; }
-        public Pokemon? FaintedThisTurn { get; set; }
-        public int TotalFainted { get; set; }
-        public string LastSelectedMove { get; set; } = string.Empty; // Gen 1 only
+        public Pokemon? FaintedLastTurn { get; init; }
+        public Pokemon? FaintedThisTurn { get; init; }
+        public required int TotalFainted { get; init; }
+        public Id LastSelectedMove { get; init; } = new(); // Gen 1 tracking
 
-        public Dictionary<string, EffectState> SideConditions { get; set; } = new();
-        public List<Dictionary<string, EffectState>> SlotConditions { get; set; } = new();
+        public required Dictionary<string, EffectState> SideConditions { get; init; }
+        public required List<Dictionary<string, EffectState>> SlotConditions { get; init; }
 
-        public ChoiceRequest? ActiveRequest { get; set; }
-        public Choice Choice { get; set; } = new();
+        public ChoiceRequest? ActiveRequest { get; init; }
+        public required Choice Choice { get; init; }
 
-        public Move? LastMove { get; set; } // Gen 1 tracking
+        public Move? LastMove { get; init; } // Gen 1 tracking
 
         public Side(string name, Battle battle, int sideNum, List<PokemonSet> team)
         {
@@ -185,7 +214,7 @@ namespace ApogeeVGC_CS.sim
             Avatar = string.Empty;
 
             Team = team;
-            Pokemon = new List<Pokemon>();
+            Pokemon = [];
 
             foreach (var set in Team)
             {
@@ -193,32 +222,25 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Initialize active slots based on game type
-            switch (Battle.GameType)
+            Active = Battle.GameType switch
             {
-                case "doubles":
-                    Active = new List<Pokemon?> { null, null };
-                    break;
-                case "triples":
-                case "rotation":
-                    Active = new List<Pokemon?> { null, null, null };
-                    break;
-                default:
-                    Active = new List<Pokemon?> { null };
-                    break;
-            }
+                GameType.Doubles => [null!, null!],
+                GameType.Triples or GameType.Rotation => [null!, null!, null!],
+                _ => [null!]
+            };
 
-            PokemonLeft = Pokemon.Count;
+            //PokemonLeft = Pokemon.Count;
             FaintedLastTurn = null;
             FaintedThisTurn = null;
             TotalFainted = 0;
             ZMoveUsed = false;
             DynamaxUsed = Battle.Gen != 8;
 
-            SideConditions = new Dictionary<string, EffectState>();
-            SlotConditions = new List<Dictionary<string, EffectState>>();
+            SideConditions = [];
+            SlotConditions = [];
 
             // Initialize slot conditions for each active slot
-            for (int i = 0; i < Active.Count; i++)
+            for (var i = 0; i < Active.Count; i++)
             {
                 SlotConditions.Add(new Dictionary<string, EffectState>());
             }
@@ -228,10 +250,10 @@ namespace ApogeeVGC_CS.sim
             {
                 CantUndo = false,
                 Error = string.Empty,
-                Actions = new List<ChosenAction>(),
+                Actions = [],
                 ForcedSwitchesLeft = 0,
                 ForcedPassesLeft = 0,
-                SwitchIns = new HashSet<int>(),
+                SwitchIns = [],
                 ZMove = false,
                 Mega = false,
                 Ultra = false,
@@ -242,11 +264,281 @@ namespace ApogeeVGC_CS.sim
             LastMove = null;
         }
 
-        private void AddPokemon(PokemonSet set)
+        public object ToJson()
         {
-            // TODO: Implement AddPokemon logic
-            var pokemon = new Pokemon(set, this);
-            Pokemon.Add(pokemon);
+            throw new NotImplementedException("ToJson method is not implemented yet.");
+        }
+
+        public RequestState GetRequestState()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pokemon? AddPokemon(PokemonSet set)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CanDynamaxNow()
+        {
+            throw new NotImplementedException("CanDynamaxNow method is not implemented yet.");
+        }
+
+        public string GetChoice()
+        {
+            throw new NotImplementedException("GetChoice method is not implemented yet.");
+        }
+
+        public override string ToString()
+        {
+            return $"{Id.ToString()}: {Name}";
+        }
+
+        public SideRequestData GetRequestData(bool? forAlly = null)
+        {
+            throw new NotImplementedException("GetRequestData method is not implemented yet.");
+        }
+
+        public Pokemon? RandomFoe()
+        {
+            throw new NotImplementedException("RandomFoe method is not implemented yet.");
+        }
+
+        public List<Side> FoeSideWithConditions()
+        {
+            throw new NotImplementedException("FoeSideWithConditions method is not implemented yet.");
+        }
+
+        public int FoePokemonLeft()
+        {
+            throw new NotImplementedException("FoePokemonLeft method is not implemented yet.");
+        }
+
+        public bool Allies(bool? all = null)
+        {
+            throw new NotImplementedException("Allies method is not implemented yet.");
+        }
+
+        public bool Foes(bool? all = null)
+        {
+            throw new NotImplementedException("Allies method is not implemented yet.");
+        }
+
+        public List<Pokemon> ActiveTeam()
+        {
+            throw new NotImplementedException("ActiveTeam method is not implemented yet.");
+        }
+
+        public bool HasAlly(Pokemon pokemon)
+        {
+            throw new NotImplementedException("HasAlly method is not implemented yet.");
+        }
+
+        public bool AddSideCondition(string status, Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSideCondition method is not implemented yet.");
+        }
+
+        public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSideCondition method is not implemented yet.");
+        }
+
+        public bool AddSideCondition(string status, bool debug, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSideCondition method is not implemented yet.");
+        }
+
+        public bool AddSideCondition(Condition status, bool debug, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSideCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSideCondition(string status)
+        {
+            throw new NotImplementedException("GetSideCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSideCondition(IEffect status)
+        {
+            throw new NotImplementedException("GetSideCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSideCondition(string status)
+        {
+            throw new NotImplementedException("RemoveSideCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSideCondition(IEffect status)
+        {
+            throw new NotImplementedException("RemoveSideCondition method is not implemented yet.");
+        }
+
+        public bool AddSlotCondition(Pokemon target, string status,
+            Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSlotCondition method is not implemented yet.");
+        }
+
+        public bool AddSlotCondition(Pokemon target, Condition status,
+            Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSlotCondition method is not implemented yet.");
+        }
+
+        public bool AddSlotCondition(int target, string status,
+            Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSlotCondition method is not implemented yet.");
+        }
+
+        public bool AddSlotCondition(int target, Condition status,
+            Pokemon? source = null, IEffect? sourceEffect = null)
+        {
+            throw new NotImplementedException("AddSlotCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSlotCondition(Pokemon target, string status)
+        {
+            throw new NotImplementedException("GetSlotCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSlotCondition(Pokemon target, IEffect status)
+        {
+            throw new NotImplementedException("GetSlotCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSlotCondition(int target, string status)
+        {
+            throw new NotImplementedException("GetSlotCondition method is not implemented yet.");
+        }
+
+        public IEffect? GetSlotCondition(int target, IEffect status)
+        {
+            throw new NotImplementedException("GetSlotCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSlotCondition(Pokemon target, string status)
+        {
+            throw new NotImplementedException("RemoveSlotCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSlotCondition(Pokemon target, IEffect status)
+        {
+            throw new NotImplementedException("RemoveSlotCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSlotCondition(int target, string status)
+        {
+            throw new NotImplementedException("RemoveSlotCondition method is not implemented yet.");
+        }
+
+        public bool RemoveSlotCondition(int target, IEffect status)
+        {
+            throw new NotImplementedException("RemoveSlotCondition method is not implemented yet.");
+        }
+
+        public void Send(List<object> parts)
+        {
+            throw new NotImplementedException("Send method is not implemented yet.");
+        }
+
+        public void EmitRequest(ChoiceRequest update)
+        {
+            throw new NotImplementedException("EmitRequest method is not implemented yet.");
+        }
+
+        public void EmitRequest()
+        {
+            EmitRequest(ActiveRequest!);
+        }
+
+        public void EmitChoiceError(string message, Pokemon? pokemon = null,
+            Func<PokemonMoveRequestData, bool?>? update = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsChoiceDone()
+        {
+            throw new NotImplementedException("IsChoiceDone method is not implemented yet.");
+        }
+
+        public bool ChooseMove(string moveText, int targetLoc = 0, EventType eventType = EventType.None)
+        {
+            throw new NotImplementedException("ChooseMove method is not implemented yet.");
+        }
+
+        public bool ChooseSwitch(int moveText, int targetLoc = 0, EventType eventType = EventType.None)
+        {
+            throw new NotImplementedException("ChooseSwitch method is not implemented yet.");
+        }
+
+        public bool ChooseInstaSwitch(int targetLoc = 0, EventType eventType = EventType.None)
+        {
+            throw new NotImplementedException("ChooseInstaSwitch method is not implemented yet.");
+        }
+
+        public bool UpdateRequestForPokemon(Pokemon pokemon, Func<PokemonMoveRequestData, bool?> update)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Side? ChooseSwith(string? slotText = null)
+        {
+            throw new NotImplementedException("ChooseSwith method is not implemented yet.");
+        }
+
+        /**
+         * The number of pokemon you must choose in Team Preview.
+         *
+         * Note that PS doesn't support choosing fewer than this number of pokemon.
+         * In the games, it is sometimes possible to bring fewer than this, but
+         * since that's nearly always a mistake, we haven't gotten around to
+         * supporting it.
+         */
+        public int PickedTeamSize()
+        {
+            throw new NotImplementedException("PickedTeamSize method is not implemented yet.");
+        }
+
+        public bool ChooseTeam(string data = "")
+        {
+            throw new NotImplementedException("ChooseTeam method is not implemented yet.");
+        }
+        public bool ChooseShift()
+        {
+            throw new NotImplementedException("ChooseShift method is not implemented yet.");
+        }
+
+        public void ClearChoice()
+        {
+            throw new NotImplementedException("ClearChoice method is not implemented yet.");
+        }
+
+        public bool Choose(string input)
+        {
+            throw new NotImplementedException("Choose method is not implemented yet.");
+        }
+
+        public int GetChoiceIndex(bool? isPass = null)
+        {
+            throw new NotImplementedException("GetChoiceIndex method is not implemented yet.");
+        }
+
+        public Side ChoosePass()
+        {
+            throw new NotImplementedException("ChoosePass method is not implemented yet.");
+        }
+
+        public bool AutoChoose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Destroy()
+        {
+            throw new NotImplementedException("Destroy method is not implemented yet.");
         }
     }
 }
