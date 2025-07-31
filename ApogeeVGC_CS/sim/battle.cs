@@ -579,9 +579,14 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement field event handling logic
         }
 
-        public object SingleEvent(string eventId, IEffect effect, object? state = null,
-            object? target = null, object? source = null, IEffect? sourceEffect = null,
-            object? relayVar = null, Delegate? customCallback = null)
+        public object SingleEvent(string eventId,
+            IEffect effect,
+            object? state = null,
+            object? target = null,
+            object? source = null,
+            IEffect? sourceEffect = null,
+            object? relayVar = null,
+            Delegate? customCallback = null)
         {
             throw new NotImplementedException();
             // TODO: Implement single event handling logic
@@ -790,6 +795,21 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        public int Chain(int previousMod, int nextMod)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Chain(int previousMod, int[] nextMod)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Chain(int[] previousMod, int nextMod)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Chain(int[] previousMod, int[] nextMod)
         {
             throw new NotImplementedException();
@@ -800,7 +820,17 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        public void ChainModify(int[] numerator, int denominator = 1)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Modify(int value, int[] numerator, int denominator = 1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Modify(int value, int numerator, int denominator = 1)
         {
             throw new NotImplementedException();
         }

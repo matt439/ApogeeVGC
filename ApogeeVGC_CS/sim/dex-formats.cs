@@ -674,6 +674,7 @@ namespace ApogeeVGC_CS.sim
         // Layout properties
         public string? Section { get; init; }
         public int? Column { get; init; }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     // Helper class for Format

@@ -465,6 +465,7 @@
             }
             init;
         }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public static class SpeciesConstants

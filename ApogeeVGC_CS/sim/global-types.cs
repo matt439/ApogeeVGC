@@ -406,7 +406,12 @@ namespace ApogeeVGC_CS.sim
     /// <summary>
     /// Base interface for all effect types (Ability | Item | ActiveMove | Species | Condition | Format)
     /// </summary>
-    public interface IEffect;
+    public interface IEffect
+    {
+        public EffectType EffectType { get; }
+        public Dictionary<string, object> ExtraData { get; set; }
+        public string Name { get; }
+    }
 
     public interface ICommonHandlers
     {

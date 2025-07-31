@@ -788,7 +788,7 @@
         public bool? IsExternal { get; init; }
         public bool? LastHit { get; init; }
         public int? Magnitude { get; init; }
-        public bool? PranksterBoosted { get; init; }
+        public bool? PranksterBoosted { get; set; }
         public bool? SelfDropped { get; init; }
         //public object? SelfSwitch { get; init; } // "copyvolatile", "shedtail", or bool
 
@@ -816,6 +816,7 @@
         public Pokemon? RuinedSpA { get; init; }
         public Pokemon? RuinedSpD { get; init; }
         public bool? IsZOrMaxPowered { get; init; }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public enum MoveCategory

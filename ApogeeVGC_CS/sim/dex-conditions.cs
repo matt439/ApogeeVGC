@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.data;
+
+namespace ApogeeVGC_CS.sim
 {
     public interface IEventMethods
     {
@@ -549,7 +551,7 @@
 
 
     public class Condition : BasicEffect, IBasicEffect, ISideEventMethods,
-        IFieldEventMethods, IPokemonEventMethods, IEffect
+        IFieldEventMethods, IPokemonEventMethods, IEffect, IConditionData
     {
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
         public Action<Battle, Pokemon>? OnEmergencyExit { get; init; }
@@ -1059,6 +1061,13 @@
                 field = value;
             }
         }
+        public int? CounterMax { get; init; }
+        public int? EffectOrder { get; init; }
+        public Action<Battle, Pokemon>? OnCopy { get; init; }
+        public Action<Battle, Pokemon>? OnEnd { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnRestart { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public static class  ConditionConstants

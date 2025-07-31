@@ -486,6 +486,7 @@
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyWeatherModifyDamage { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamagePhase1 { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamagePhase2 { get; init; }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public class ModdedItemData : ItemData

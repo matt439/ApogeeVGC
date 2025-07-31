@@ -514,12 +514,12 @@
     public class Ability : BasicEffect, IBasicEffect, IEffect
     {
         // Rating from -1 Detrimental to +5 Essential
-        public required int Rating
+        public required double Rating
         {
             get;
             init
             {
-                if (value is < -1 or > 5)
+                if (value is < -1.0 or > 5.0)
                     throw new ArgumentOutOfRangeException(nameof(value), "Rating must be between -1 and 5.");
                 field = value;
             }
@@ -557,6 +557,7 @@
             }
             init;
         }
+        public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
     public static class AbilityConstants

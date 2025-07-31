@@ -62,7 +62,7 @@ namespace ApogeeVGC_CS.sim
         public required int EffectOrder { get; init; }
         public int? Duration { get; init; }
         public Pokemon? Target { get; init; }
-        public Dictionary<string, object>? ExtraData { get; init; }
+        public Dictionary<string, object>? ExtraData { get; set; }
     }
 
     public static class PokemonConstants
@@ -1079,6 +1079,11 @@ namespace ApogeeVGC_CS.sim
         }
 
         public Nature GetNature()
+        {
+            throw new NotImplementedException();
+        }
+
+        public object AddVolatile(string status)
         {
             throw new NotImplementedException();
         }
