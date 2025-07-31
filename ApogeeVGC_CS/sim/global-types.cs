@@ -183,7 +183,30 @@ namespace ApogeeVGC_CS.sim
         public int Spa { get; init; } = 0;
         public int Spd { get; init; } = 0;
         public int Spe { get; init; } = 0;
+
         public int BaseStatTotal => Hp + Atk + Def + Spa + Spd + Spe;
+
+        public static bool IsValidIv(int stat)
+        {
+            return stat is >= 0 and <= 31;
+        }
+
+        public static bool IsValidEv(int stat)
+        {
+            return stat is >= 0 and <= 255;
+        }
+
+        public bool IsValidIvs()
+        {
+            return IsValidIv(Hp) && IsValidIv(Atk) && IsValidIv(Def) &&
+                   IsValidIv(Spa) && IsValidIv(Spd) && IsValidIv(Spe);
+        }
+
+        public bool IsValidEvs()
+        {
+            return IsValidEv(Hp) && IsValidEv(Atk) && IsValidEv(Def) &&
+                   IsValidEv(Spa) && IsValidEv(Spd) && IsValidEv(Spe);
+        }
     }
 
     public class SparseStatsTable : Dictionary<StatId, int>;
