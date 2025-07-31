@@ -1,70 +1,102 @@
-﻿using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
-    // Describes a possible way to get a Pokémon (e.g., "2Eparent", "5D", "7V")
-    public class PokemonSource
+    public enum SourceType
     {
-        public string Value { get; set; } = string.Empty;
-        public PokemonSource(string value) { Value = value; }
-        public override string ToString() => Value;
+        E, // Egg
+        S, // Event
+        D, // Dream World
+        V, // Virtual Console or Let's Go transfer
     }
 
-    public class PokemonSources
+    public class PokemonSource
     {
-        // Specific possible sources
-        public List<PokemonSource> Sources { get; set; } = new();
-        // If nonzero, allows all sources from this gen and earlier
-        public int SourcesBefore { get; set; }
-        // Requires sources from this gen or later
-        public int SourcesAfter { get; set; }
-        public bool? IsHidden { get; set; }
-
-        // Optional lists for egg/event/tradeback moves, etc.
-        public List<string>? LimitedEggMoves { get; set; }
-        public List<string>? PossiblyLimitedEggMoves { get; set; }
-        public List<string>? TradebackLimitedEggMoves { get; set; }
-        public List<string>? LevelUpEggMoves { get; set; }
-        public List<string>? PomegEggMoves { get; set; }
-        public string? PomegEventEgg { get; set; }
-        public int? EventOnlyMinSourceGen { get; set; }
-        public List<string>? LearnsetDomain { get; set; }
-        public int MoveEvoCarryCount { get; set; }
-        public string? BabyOnly { get; set; }
-        public string? SketchMove { get; set; }
-        public int DreamWorldMoveCount { get; set; }
-        public string? Hm { get; set; }
-        public bool? IsFromPokemonGo { get; set; }
-        public string? PokemonGoSource { get; set; }
-        public List<string>? RestrictiveMoves { get; set; }
-        public string? RestrictedMove { get; set; }
-
-        public PokemonSources(int sourcesBefore = 0, int sourcesAfter = 0)
+        public required int Generation 
         {
-            Sources = new List<PokemonSource>();
-            SourcesBefore = sourcesBefore;
-            SourcesAfter = sourcesAfter;
-            IsHidden = null;
-            LimitedEggMoves = null;
-            MoveEvoCarryCount = 0;
-            DreamWorldMoveCount = 0;
+            get;
+            init // 1-9
+            {
+                if (value is < 1 or > 9)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "Generation must be between 1 and 9.");
+                }
+                field = value;
+            }
+        }
+        public required SourceType Type { get; init; }
+        public string? Source { get; init; }
+    }
+
+    public class PokemonSources(int sourcesBefore = 0, int sourcesAfter = 0)
+    {
+        public required List<PokemonSource> Sources { get; init; } = [];
+        public required int SourcesBefore { get; init; } = sourcesBefore;
+        public required int SourcesAfter { get; init; } = sourcesAfter;
+        public bool? IsHidden { get; init; } = null;
+        public List<Id>? LimitedEggMoves { get; init; } = null;
+        public List<Id>? PossiblyLimitedEggMoves { get; init; }
+        public List<Id>? TradebackLimitedEggMoves { get; init; }
+        public List<Id>? LevelUpEggMoves { get; init; }
+        public List<Id>? PomegEggMoves { get; init; }
+        public string? PomegEventEgg { get; init; }
+        public int? EventOnlyMinSourceGen { get; init; }
+        public List<string>? LearnsetDomain { get; init; }
+        public int MoveEvoCarryCount { get; init; } = 0;
+        public string? BabyOnly { get; init; }
+        public string? SketchMove { get; init; }
+        public required int DreamWorldMoveCount { get; init; } = 0;
+        public string? Hm { get; init; }
+        public bool? IsFromPokemonGo { get; init; }
+        public string? PokemonGoSource { get; init; }
+        public List<string>? RestrictiveMoves { get; init; }
+        public Id? RestrictedMove { get; init; }
+
+        public int Size()
+        {
+            throw new NotImplementedException("size method is not implemented yet.");
+        }
+
+        public void Add(PokemonSource source, Id? limitedEggMove = null)
+        {
+            throw new NotImplementedException("Add method is not implemented yet.");
+        }
+
+        public void AddGen(int sourceGen)
+        {
+            throw new NotImplementedException("AddGen method is not implemented yet.");
+        }
+
+        public int MinSourceGen()
+        {
+            throw new NotImplementedException("MinSourceGen method is not implemented yet.");
+        }
+
+        public int MaxSourceGen()
+        {
+            throw new NotImplementedException("MinSourceGen method is not implemented yet.");
+        }
+
+        public void IntersectWith(PokemonSource other)
+        {
+            throw new NotImplementedException();
         }
     }
 
     public class TeamValidator
     {
-        public Format Format { get; }
-        public ModdedDex Dex { get; }
-        public int Gen { get; }
-        public RuleTable RuleTable { get; }
-        public int MinSourceGen { get; }
-        public Func<object, string> ToId { get; }
+        public required Format Format { get; init; }
+        public required ModdedDex Dex { get; init; }
+        public required int Gen { get; init; }
+        public required RuleTable RuleTable { get; init; }
+        public required int MinSourceGen { get; init; }
+        //public Func<object, string> ToId { get; }
 
-        public TeamValidator(object format, ModdedDex dex)
+        public TeamValidator(string format, ModdedDex dex)
+            : this(dex.Formats.Get(format), dex) { }
+
+        public TeamValidator(Format format, ModdedDex dex)
         {
-            Format = dex.Formats.Get(format);
-            if (Format.EffectType != "Format")
+            Format = format;
+            if (Format.EffectType != EffectType.Format)
             {
                 throw new ArgumentException($"format should be a 'Format', but was a '{Format.EffectType}'");
             }
@@ -72,7 +104,6 @@ namespace ApogeeVGC_CS.sim
             Gen = Dex.Gen;
             RuleTable = Dex.Formats.GetRuleTable(Format);
             MinSourceGen = RuleTable.MinSourceGen;
-            ToId = Dex.ToID;
         }
     }
 }

@@ -720,6 +720,11 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        public Format Get(Format format, bool isTrusted = false)
+        {
+            throw new NotImplementedException();
+        }
+
         public Format[] All()
         {
             throw new NotImplementedException("All method is not implemented yet.");

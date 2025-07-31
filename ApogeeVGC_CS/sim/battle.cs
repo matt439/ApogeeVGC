@@ -395,6 +395,8 @@ namespace ApogeeVGC_CS.sim
 
             Hints = [];
 
+            Send = options.Send ?? ((channel, message) => { });
+
             // Create input options for logging
             var inputOptions = new Dictionary<string, object>
             {
