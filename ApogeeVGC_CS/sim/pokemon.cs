@@ -61,7 +61,6 @@ namespace ApogeeVGC_CS.sim
         public required Id Id { get; init; }
         public required int EffectOrder { get; init; }
         public int? Duration { get; set; }
-        public Pokemon? Target { get; init; }
         public Dictionary<string, object> ExtraData { get; set; } = [];
     }
 
@@ -330,20 +329,20 @@ namespace ApogeeVGC_CS.sim
 
         public Dictionary<string, object> M { get; init; } = [];
 
-        public Pokemon(string set, Side side) : this(new PokemonSet
-        {
-            Species = set,
-            Moves = [],
-            Name = set,
-            Item = string.Empty,
-            Ability = string.Empty,
-            Nature = string.Empty,
-            Gender = GenderName.Empty,
-            Evs = new StatsTable(),
-            Ivs = new StatsTable(),
-            Level = 0
-        },
-            side) { }
+        //public Pokemon(string set, Side side) : this(new PokemonSet
+        //{
+        //    Species = set,
+        //    Moves = [],
+        //    Name = set,
+        //    Item = string.Empty,
+        //    Ability = string.Empty,
+        //    Nature = string.Empty,
+        //    Gender = GenderName.Empty,
+        //    Evs = new StatsTable(),
+        //    Ivs = new StatsTable(),
+        //    Level = 0
+        //},
+        //    side) { }
 
         public Pokemon(PokemonSet set, Side side)
         {
@@ -485,7 +484,10 @@ namespace ApogeeVGC_CS.sim
             AbilityState = Battle.InitEffectState(new EffectState
             {
                 Id = Ability,
-                Target = this,
+                ExtraData = new Dictionary<string, object>()
+                {
+                    ["target"] = this
+                },
                 EffectOrder = 0
             });
 
@@ -494,7 +496,10 @@ namespace ApogeeVGC_CS.sim
             ItemState = Battle.InitEffectState(new EffectState
             {
                 Id = Item,
-                Target = this,
+                ExtraData = new Dictionary<string, object>()
+                {
+                    ["target"] = this
+                },
                 EffectOrder = 0
             });
             LastItem = new Id("");

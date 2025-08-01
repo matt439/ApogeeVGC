@@ -1,4 +1,5 @@
-﻿using ApogeeVGC_CS.sim;
+﻿using ApogeeVGC_CS.data;
+using ApogeeVGC_CS.sim;
 using System.Drawing;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -527,16 +528,22 @@ namespace ApogeeVGC_CS.data
                     OnFoeRedirectTargetPriority = 1,
                     OnFoeRedirectTarget = (battle, target, source, source2, move) =>
                     {
-                        var ragePowderUser = battle.EffectState.Target;
-                        if (ragePowderUser.IsSkyDropped())
+                        var ragePowderUser = battle.EffectState.ExtraData["target"];
+                        if (ragePowderUser is not Pokemon pokemonUser)
+                        {
+                            battle.Debug("Rage Powder user is not a Pokemon");
+                            return null;
+                        }
+                        if (pokemonUser.IsSkyDropped())
                             return null;
 
-                        if (source.RunStatusImmunity("powder") && battle.ValidTarget(ragePowderUser, source, move.Target))
+                        if (source.RunStatusImmunity("powder") &&
+                            battle.ValidTarget(pokemonUser, source, move.Target))
                         {
                             if (move.SmartTarget ?? false)
                                 move.SmartTarget = false;
                             battle.Debug("Rage Powder redirected target of move");
-                            return ragePowderUser;
+                            return pokemonUser;
                         }
                         return null;
                     },
@@ -649,6 +656,352 @@ namespace ApogeeVGC_CS.data
                 },
                 Target = MoveTarget.Normal,
                 Type = PokemonType.Fairy,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("thunderwave")] = new MoveData
+            {
+                Num = 86,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Thunder Wave",
+                Pp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true
+                },
+                Status = new Id("par"),
+                IgnoreImmunity = false,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = PokemonType.Electric,
+                ZMove = new ZMoveData { Boost = new() { [BoostId.Spd] = 1 } },
+                ContestType = ContestType.Cool,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("reflect")] = new MoveData
+            {
+                Num = 115,
+                Accuracy = true,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Reflect",
+                Pp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true
+                },
+                SideCondition = "reflect",
+                Condition = new Condition
+                {
+                    Name = "Reflect",
+                    Duration = 5,
+                    DurationCallback = (battle, target, source, effect) =>
+                    {
+                        if (source != null && source.HasItem("lightclay"))
+                        {
+                            return 8;
+                        }
+                        return 5;
+                    },
+                    OnAnyModifyDamage = (battle, damage, source, target, move) =>
+                    {
+                        var sideTarget = battle.EffectState.ExtraData["target"];
+                        if (sideTarget is not Side side)
+                        {
+                            battle.Debug("Reflect target is not a Side");
+                            return damage;
+                        }
+
+                        if (target != source && side.HasAlly(target) &&
+                            move.Category == MoveCategory.Physical)
+                        {
+                            if (!(target.GetMoveHitData(move)?.Crit ?? false) && !(move.Infiltrates ?? false))
+                            {
+                                battle.Debug("Reflect weaken");
+                                if (battle.ActivePerHalf > 1)
+                                {
+                                    battle.ChainModify([2732, 4096]);
+                                    return damage * 2732 / 4096;
+                                }
+                                battle.ChainModify(1, 2);
+                                return damage / 2;
+                            }
+                        }
+                        return damage;
+                    },
+                    OnSideStart = (battle, side, source, effect) =>
+                    {
+                        battle.Add("-sidestart", side, "Reflect");
+                    },
+                    OnSideResidualOrder = 26,
+                    OnSideResidualSubOrder = 1,
+                    OnSideEnd = (battle, side) =>
+                    {
+                        battle.Add("-sideend", side, "Reflect");
+                    },
+                    EffectType = EffectType.Condition,
+                    Exists = true,
+                    SourceEffect = "reflect",
+                    Fullname = string.Empty,
+                    Num = 0,
+                    Gen = 0,
+                    NoCopy = false,
+                    AffectsFainted = false,
+                },
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = PokemonType.Psychic,
+                ZMove = new ZMoveData { Boost = new() { [BoostId.Def] = 1 } },
+                ContestType = ContestType.Clever,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("lightscreen")] = new MoveData
+            {
+                Num = 113,
+                Accuracy = true,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Light Screen",
+                Pp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true
+                },
+                SideCondition = "lightscreen",
+                Condition = new Condition
+                {
+                    Name = "Light Screen",
+                    Duration = 5,
+                    DurationCallback = (battle, target, source, effect) =>
+                    {
+                        if (source != null && source.HasItem("lightclay"))
+                        {
+                            return 8;
+                        }
+                        return 5;
+                    },
+                    OnAnyModifyDamage = (battle, damage, source, target, move) =>
+                    {
+                        var sideTarget = battle.EffectState.ExtraData["target"];
+                        if (sideTarget is not Side side)
+                        {
+                            battle.Debug("Light Screen target is not a Side");
+                            return damage;
+                        }
+
+                        if (target != source && side.HasAlly(target) &&
+                            move.Category == MoveCategory.Special)
+                        {
+                            if (!(target.GetMoveHitData(move)?.Crit ?? false) && !(move.Infiltrates ?? false))
+                            {
+                                battle.Debug("Light Screen weaken");
+                                if (battle.ActivePerHalf > 1)
+                                {
+                                    battle.ChainModify([2732, 4096]);
+                                    return damage * 2732 / 4096;
+                                }
+                                battle.ChainModify(1, 2);
+                                return damage / 2;
+                            }
+                        }
+                        return damage;
+                    },
+                    OnSideStart = (battle, side, source, effect) =>
+                    {
+                        battle.Add("-sidestart", side, "move: Light Screen");
+                    },
+                    OnSideResidualOrder = 26,
+                    OnSideResidualSubOrder = 2,
+                    OnSideEnd = (battle, side) =>
+                    {
+                        battle.Add("-sideend", side, "move: Light Screen");
+                    },
+                    EffectType = EffectType.Condition,
+                    Exists = true,
+                    SourceEffect = "lightscreen",
+                    Fullname = string.Empty,
+                    Num = 0,
+                    Gen = 0,
+                    NoCopy = false,
+                    AffectsFainted = false,
+                },
+                Secondary = null,
+                Target = MoveTarget.AllySide,
+                Type = PokemonType.Psychic,
+                ZMove = new ZMoveData { Boost = new() { [BoostId.Spd] = 1 } },
+                ContestType = ContestType.Beauty,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("fakeout")] = new MoveData
+            {
+                Num = 252,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Fake Out",
+                Pp = 10,
+                Priority = 3,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true
+                },
+                OnTry = (battle, source, target, move) =>
+                {
+                    if (source.ActiveMoveActions > 1)
+                    {
+                        battle.Hint("Fake Out only works on your first turn out.");
+                        return false;
+                    }
+                    return true;
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    VolatileStatus = new Id("flinch")
+                },
+                Target = MoveTarget.Normal,
+                Type = PokemonType.Normal,
+                ContestType = ContestType.Cute,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("heavyslam")] = new MoveData
+            {
+                Num = 484,
+                Accuracy = 100,
+                BasePower = 0, // Calculated dynamically
+                Category = MoveCategory.Physical,
+                Name = "Heavy Slam",
+                Pp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    NonSky = true,
+                    Metronome = true
+                },
+                OnBasePower = (battle, basePower, pokemon, target, move) =>
+                {
+                    double targetWeight = target.GetWeight();
+                    double pokemonWeight = pokemon.GetWeight();
+                    int bp;
+                    if (pokemonWeight >= targetWeight * 5)
+                        bp = 120;
+                    else if (pokemonWeight >= targetWeight * 4)
+                        bp = 100;
+                    else if (pokemonWeight >= targetWeight * 3)
+                        bp = 80;
+                    else if (pokemonWeight >= targetWeight * 2)
+                        bp = 60;
+                    else
+                        bp = 40;
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                },
+                OnTryHit = (battle, target, pokemon, move) =>
+                {
+                    if (target.Volatiles.ContainsKey("dynamax"))
+                    {
+                        battle.Add("-fail", pokemon, "Dynamax");
+                        battle.AttrLastMove("[still]");
+                        return null;
+                    }
+                    return true;
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = PokemonType.Steel,
+                ZMove = new ZMoveData { BasePower = 160 },
+                MaxMove = new MaxMoveData { BasePower = 130 },
+                ContestType = ContestType.Tough,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("lowkick")] = new MoveData
+            {
+                Num = 67,
+                Accuracy = 100,
+                BasePower = 0, // Calculated dynamically
+                Category = MoveCategory.Physical,
+                Name = "Low Kick",
+                Pp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true
+                },
+                OnBasePower = (battle, basePower, pokemon, target, move) =>
+                {
+                    double targetWeight = target.GetWeight();
+                    int bp;
+                    if (targetWeight >= 2000)
+                        bp = 120;
+                    else if (targetWeight >= 1000)
+                        bp = 100;
+                    else if (targetWeight >= 500)
+                        bp = 80;
+                    else if (targetWeight >= 250)
+                        bp = 60;
+                    else if (targetWeight >= 100)
+                        bp = 40;
+                    else
+                        bp = 20;
+                    battle.Debug($"BP: {bp}");
+                    return bp;
+                },
+                OnTryHit = (battle, target, pokemon, move) =>
+                {
+                    if (target.Volatiles.ContainsKey("dynamax"))
+                    {
+                        battle.Add("-fail", pokemon, "Dynamax");
+                        battle.AttrLastMove("[still]");
+                        return null;
+                    }
+                    return true;
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = PokemonType.Fighting,
+                ZMove = new ZMoveData { BasePower = 160 },
+                ContestType = ContestType.Tough,
+                EffectType = EffectType.Move,
+            },
+            [new IdEntry("wildcharge")] = new MoveData
+            {
+                Num = 528,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Wild Charge",
+                Pp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true
+                },
+                Recoil = (1, 4), // User takes 1/4 of damage dealt as recoil
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = PokemonType.Electric,
+                ContestType = ContestType.Tough,
                 EffectType = EffectType.Move,
             },
         };

@@ -865,12 +865,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool ValidTargetLoc(int targetLoc, Pokemon source, string targetType)
+        public bool ValidTargetLoc(int targetLoc, Pokemon source, MoveTarget targetType)
         {
             throw new NotImplementedException();
         }
 
-        public bool ValidTarget(Pokemon target, Pokemon source, string targetType)
+        public bool ValidTarget(Pokemon target, Pokemon source, MoveTarget targetType)
         {
             throw new NotImplementedException();
         }
