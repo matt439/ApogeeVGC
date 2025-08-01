@@ -924,6 +924,16 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        public bool HasType(PokemonType type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool HasType(List<PokemonType> types)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Faint(Pokemon? pokemon = null, IEffect? effect = null)
         {
             throw new NotImplementedException();

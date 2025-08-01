@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -93,6 +94,27 @@ namespace ApogeeVGC_CS.sim
         {
             return Value;
         }
+
+        public static bool operator ==(Id id, string str)
+        {
+            if (id is null && str == null) return true;
+            if (id is null || str == null) return false;
+            return id.Value == FromString(str);
+        }
+
+        public static bool operator !=(Id id, string str) => !(id == str);
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Id otherId)
+                return Value == otherId.Value;
+            if (obj is string str)
+                return Value == FromString(str);
+            return false;
+        }
+
+        public override int GetHashCode() => Value.GetHashCode();
+
     }
 
     // must be lowercase alphanumeric
@@ -414,6 +436,7 @@ namespace ApogeeVGC_CS.sim
         public Dictionary<string, object> ExtraData { get; set; }
         public string Name { get; }
         public Id Id { get; }
+        public int? Duration { get; }
     }
 
     public interface ICommonHandlers

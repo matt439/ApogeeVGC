@@ -190,9 +190,8 @@
         Cool,
         Beauty,
         Cute,
-        Smart,
+        Clever,
         Tough,
-        Sheen
     }
 
     public enum PokemonOrigin
@@ -512,7 +511,7 @@
     {
         public required bool Crit { get; init; }
         public required int TypeMod { get; init; }
-        public required bool ZBrokeProtect { get; init; }
+        public required bool ZBrokeProtect { get; set; }
     }
 
     public class MoveHitData : Dictionary<string, MoveHitResult>;
@@ -718,7 +717,7 @@
         public MoveTarget? NonGhostTarget { get; init; }
         public double? SpreadModifier { get; init; }
         public bool? SleepUsable { get; init; }
-        public bool? SmartTarget { get; init; }
+        public bool? SmartTarget { get; set; }
         public bool? TracksTarget { get; init; }
         public bool? WillCrit { get; init; }
         public bool? CallsMove { get; init; }
