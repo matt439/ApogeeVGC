@@ -1,7 +1,4 @@
-﻿using ApogeeVGC_CS.data;
-using ApogeeVGC_CS.sim;
-using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
+﻿using ApogeeVGC_CS.sim;
 
 namespace ApogeeVGC_CS.data
 {
@@ -917,7 +914,7 @@ namespace ApogeeVGC_CS.data
                     {
                         battle.Add("-fail", pokemon, "Dynamax");
                         battle.AttrLastMove("[still]");
-                        return null;
+                        return false;
                     }
                     return true;
                 },
@@ -970,7 +967,7 @@ namespace ApogeeVGC_CS.data
                     {
                         battle.Add("-fail", pokemon, "Dynamax");
                         battle.AttrLastMove("[still]");
-                        return null;
+                        return false;
                     }
                     return true;
                 },
