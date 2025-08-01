@@ -123,38 +123,112 @@
 
     public class PokemonGoDataTable : Dictionary<IdEntry, PokemonGoData>;
 
-    /**
-     * Describes a possible way to get a move onto a pokemon.
-     *
-     * First character is a generation number, 1-9.
-     * Second character is a source ID, one of:
-     *
-     * - M = TM/HM
-     * - T = tutor
-     * - L = start or level-up, 3rd char+ is the level
-     * - R = restricted (special moves like Rotom moves)
-     * - E = egg
-     * - D = Dream World, only 5D is valid
-     * - S = event, 3rd char+ is the index in .eventData
-     * - V = Virtual Console or Let's Go transfer, only 7V/8V is valid
-     * - C = NOT A REAL SOURCE, see note, only 3C/4C is valid
-     *
-     * C marks certain moves learned by a pokemon's prevo. It's used to
-     * work around the chainbreeding checker's shortcuts for performance;
-     * it lets the pokemon be a valid father for teaching the move, but
-     * is otherwise ignored by the learnset checker (which will actually
-     * check prevos for compatibility).
-     */
+    /// <summary>
+    /// Describes a possible way to get a move onto a Pokémon.
+    /// <para>
+    /// Format: The first character is a generation number (1-9). The second character is a source ID:
+    /// <list type="bullet">
+    /// <item><description>M = TM / HM</description></item>
+    /// <item><description>T = tutor</description></item>
+    /// <item><description>L = start or level-up, 3rd char+ is the level</description></item>
+    /// <item><description>R = restricted (special moves like Rotom moves)</description></item>
+    /// <item><description>E = egg</description></item>
+    /// <item><description>D = Dream World, only 5D is valid</description></item>
+    /// <item><description>S = event, 3rd char+ is the index in .eventData</description></item>
+    /// <item><description>V = Virtual Console or Let's Go transfer, only 7V/8V is valid</description></item>
+    /// <item><description>C = NOT A REAL SOURCE, see note, only 3C/4C is valid</description></item>
+    /// </list>
+    /// C marks certain moves learned by a Pokémon's pre-evolution. It's used to work around the chainbreeding checker's shortcuts for performance;
+    /// it lets the Pokémon be a valid father for teaching the move, but is otherwise ignored by the learnset checker (which will actually check prevos for compatibility).
+    /// </para>
+    /// </summary>
+
     public enum MoveSourceType
     {
         Tm, Tutor, LevelUp, Restricted, Egg, DreamWorld, Event, Virtual, Chain
     }
 
-    public class MoveSource(int generation, MoveSourceType sourceType, string details = "")
+    public class MoveSource
     {
-        public int Generation { get; set; } = generation;
-        public MoveSourceType SourceType { get; set; } = sourceType;
-        public string Details { get; set; } = details;
+        public int Generation
+        {
+            get;
+            init
+            {
+                if (value is < 1 or > 9)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value), "Generation must be between 1 and 9.");
+                }
+                field = value;
+            }
+        }
+        public MoveSourceType SourceType { get; init; }
+        public string Details { get; init; } = string.Empty;
+
+        public MoveSource(int generation, MoveSourceType sourceType, string details = "")
+        {
+            Generation = generation;
+            SourceType = sourceType;
+            Details = details;
+        }
+
+        public MoveSource(int generation, string sourceType, string details = "")
+        {
+            Generation = generation;
+            SourceType = StringToMoveSourceType(sourceType);
+            Details = details;
+        }
+
+        public MoveSource(string code)
+        {
+            string firstChar = code[..1];
+            if (!int.TryParse(firstChar, out int generation))
+            {
+                throw new ArgumentOutOfRangeException(nameof(code), "Invalid generation in move source code.");
+            }
+            Generation = generation;
+            string sourceTypeStr = code.Substring(1, 1);
+            SourceType = StringToMoveSourceType(sourceTypeStr);
+            Details = code.Length > 2 ? code.Substring(2) : string.Empty;
+        }
+
+        public override string ToString()
+        {
+            return $"{Generation}{MoveSourceTypeToString(SourceType)}{Details}";
+        }
+
+        private static string MoveSourceTypeToString(MoveSourceType sourceType)
+        {
+            return sourceType switch
+            {
+                MoveSourceType.Tm => "M",
+                MoveSourceType.Tutor => "T",
+                MoveSourceType.LevelUp => "L",
+                MoveSourceType.Restricted => "R",
+                MoveSourceType.Egg => "E",
+                MoveSourceType.DreamWorld => "D",
+                MoveSourceType.Event => "S",
+                MoveSourceType.Virtual => "V",
+                MoveSourceType.Chain => "C",
+                _ => throw new ArgumentOutOfRangeException(nameof(sourceType), sourceType, null)
+            };
+        }
+        private static MoveSourceType StringToMoveSourceType(string sourceType)
+        {
+            return sourceType switch
+            {
+                "M" => MoveSourceType.Tm,
+                "T" => MoveSourceType.Tutor,
+                "L" => MoveSourceType.LevelUp,
+                "R" => MoveSourceType.Restricted,
+                "E" => MoveSourceType.Egg,
+                "D" => MoveSourceType.DreamWorld,
+                "S" => MoveSourceType.Event,
+                "V" => MoveSourceType.Virtual,
+                "C" => MoveSourceType.Chain,
+                _ => throw new ArgumentOutOfRangeException(nameof(sourceType), sourceType, null)
+            };
+        }
     }
 
     public enum EvoType

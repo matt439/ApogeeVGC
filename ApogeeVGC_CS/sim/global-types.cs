@@ -316,7 +316,9 @@ namespace ApogeeVGC_CS.sim
         }
     }
 
-    public class SparseStatsTable : Dictionary<StatId, int>;
+    public class SparseStatsTable : Dictionary<StatId, int>
+    {
+    }
 
     public enum BoostId
     {
@@ -391,8 +393,8 @@ namespace ApogeeVGC_CS.sim
         public int? ShinySometimes { get; set; } // Use this if you need to distinguish '1'
         public GenderName? Gender { get; set; }
         public string? Nature { get; set; }
-        public SparseStatsTable? IVs { get; set; }
-        public int? PerfectIVs { get; set; }
+        public SparseStatsTable? Ivs { get; set; }
+        public int? PerfectIvs { get; set; }
         public bool? IsHidden { get; set; }
         public List<IdEntry>? Abilities { get; set; }
         public int? MaxEggMoves { get; set; }
