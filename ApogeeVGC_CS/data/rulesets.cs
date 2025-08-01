@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ApogeeVGC_CS.sim;
 
 namespace ApogeeVGC_CS.data
 {
-    internal class Rulesets
+    public static class Rulesets
     {
+        public static FormatDataTable FormatData { get; } = new()
+        {
+        };
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ApogeeVGC_CS.sim;
 
 namespace ApogeeVGC_CS.data
 {
-    internal class scripts
+    public static class Scripts
     {
+        public static BattleScriptsData ScriptsData { get; } = new()
+        {
+            Gen = 9,
+        };
     }
 }
