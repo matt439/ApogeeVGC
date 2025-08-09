@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ApogeeVGC_CS.sim
 {
     /// <summary>
     /// EffectState | Record<string, never> | null
@@ -135,7 +137,7 @@
             EffectUnionFactory.ToSingleEventSource(format);
 
         public static implicit operator SingleEventSource(bool value) =>
-            value ? new FalseSingleEventSource() : new NullSingleEventSource();
+            value ? new NullSingleEventSource() : new FalseSingleEventSource();
     }
     public record StringSingleEventSource(string Value) : SingleEventSource;
     public record PokemonSingleEventSource(Pokemon Pokemon) : SingleEventSource;
@@ -169,7 +171,7 @@
         public static implicit operator RunEventSource(string value) => new StringRunEventSource(value);
         public static implicit operator RunEventSource(Pokemon pokemon) => new PokemonRunEventSource(pokemon);
         public static implicit operator RunEventSource(bool value) =>
-            value ? new FalseRunEventSource() : new NullRunEventSource();
+            value ? new NullRunEventSource() : new FalseRunEventSource();
     }
     public record StringRunEventSource(string Value) : RunEventSource;
     public record PokemonRunEventSource(Pokemon Pokemon) : RunEventSource;
@@ -234,7 +236,7 @@
     public abstract record SpreadDamageTarget
     {
         public static implicit operator SpreadDamageTarget(bool value) =>
-            value ? new FalseSpreadDamageTarget() : new NullSpreadDamageTarget();
+            value ? new NullSpreadDamageTarget() : new FalseSpreadDamageTarget();
         public static implicit operator SpreadDamageTarget(Pokemon pokemon) =>
             new PokemonSpreadDamageTarget(pokemon);
     }
@@ -383,18 +385,6 @@
     public record AnyObjectAddMoveArg(IAnyObject AnyObject) : AddMoveArg;
 
     /// <summary>
-    /// int | false
-    /// </summary>
-    public abstract record IntFalseUnion
-    {
-        public static implicit operator IntFalseUnion(int value) => new IntIntFalseUnion(value);
-        public static implicit operator IntFalseUnion(bool value) =>
-            value ? new FalseIntFalseUnion() : throw new ArgumentException("Must be false");
-    }
-    public record IntIntFalseUnion(int Value) : IntFalseUnion;
-    public record FalseIntFalseUnion : IntFalseUnion;
-
-    /// <summary>
     /// 'drain' | Effect | null
     /// </summary>
     public abstract record HealEffect
@@ -423,19 +413,127 @@
     public record EffectHealEffect(IEffect Effect) : HealEffect;
     public record NullHealEffect : HealEffect;
 
+    /// <summary>
+    /// int | false
+    /// </summary>
+    public abstract record IntFalseUnion
+    {
+        public static implicit operator IntFalseUnion(int value) => new IntIntFalseUnion(value);
+        public static implicit operator IntFalseUnion(bool value) =>
+            value ? throw new ArgumentException("must be 'false'")  : new FalseIntFalseUnion();
+    }
+    public record IntIntFalseUnion(int Value) : IntFalseUnion;
+    public record FalseIntFalseUnion : IntFalseUnion;
+
+    /// <summary>
+    /// bool | string
+    /// </summary>
+    public abstract record BoolStringUnion
+    {
+        public static implicit operator BoolStringUnion(bool value) => new BoolBoolStringUnion(value);
+        public static implicit operator BoolStringUnion(string value) => new StringBoolStringUnion(value);
+    }
+    public record BoolBoolStringUnion(bool Value) : BoolStringUnion;
+    public record StringBoolStringUnion(string Value) : BoolStringUnion;
+
+    /// <summary>
+    /// int | bool
+    /// </summary>
+    public abstract record IntBoolUnion
+    {
+        public static implicit operator IntBoolUnion(int value) => new IntIntBoolUnion(value);
+        public static implicit operator IntBoolUnion(bool value) => new BoolIntBoolUnion(value);
+    }
+    public record IntIntBoolUnion(int Value) : IntBoolUnion;
+    public record BoolIntBoolUnion(bool Value) : IntBoolUnion;
 
 
+    /// <summary>
+    /// Pokemon | Side | Field | Battle
+    /// </summary>
+    public abstract record EventEffectHolder
+    {
+        public static implicit operator EventEffectHolder(Pokemon pokemon) =>
+            new PokemonEventEffectHolder(pokemon);
+        public static implicit operator EventEffectHolder(Side side) =>
+            new SideEventEffectHolder(side);
+        public static implicit operator EventEffectHolder(Field field) =>
+            new FieldEventEffectHolder(field);
+        public static implicit operator EventEffectHolder(Battle battle) =>
+            new BattleEventEffectHolder(battle);
+    }
+    public record PokemonEventEffectHolder(Pokemon Pokemon) : EventEffectHolder;
+    public record SideEventEffectHolder(Side Side) : EventEffectHolder;
+    public record FieldEventEffectHolder(Field Field) : EventEffectHolder;
+    public record BattleEventEffectHolder(Battle Battle) : EventEffectHolder;
+
+    /// <summary>
+    /// boolean | 'done'
+    /// </summary>
+    public abstract record MoveActionMega
+    {
+        public static implicit operator MoveActionMega(bool value) => new BoolMoveActionMega(value);
+        public static implicit operator MoveActionMega(string value) =>
+            value == "done" ? new DoneMoveActionMega() :
+            throw new ArgumentException("Must be 'done'");
+    }
+    public record BoolMoveActionMega(bool Value) : MoveActionMega;
+    public record DoneMoveActionMega : MoveActionMega;
 
 
+    /// <summary>
+    /// boolean | 'spectator'
+    /// </summary>
+    public abstract record BattleStreamReplay
+    {
+        public static implicit operator BattleStreamReplay(bool value) => new BoolBattleStreamReplay(value);
+        public static implicit operator BattleStreamReplay(string value) =>
+            value == "spectator" ? new SpectatorBattleStreamReplay() :
+            throw new ArgumentException("Must be 'spectator'");
+    }
+    public record BoolBattleStreamReplay(bool Value) : BattleStreamReplay;
+    public record SpectatorBattleStreamReplay : BattleStreamReplay;
+
+    /// <summary>
+    /// Pokemon & Side
+    /// </summary>
+    public class OnAllyResidualTarget
+    {
+        public required Pokemon Pokemon { get; init; }
+        public required Side Side { get; init; }
+    }
 
 
+    /// <summary>
+    /// bool | ''
+    /// </summary>
+    public abstract record BoolEmptyStringUnion
+    {
+        public static implicit operator BoolEmptyStringUnion(bool value) =>
+            new BoolEmptyStringBoolUnion(value);
+        public static implicit operator BoolEmptyStringUnion(string value) =>
+            value == string.Empty ? new EmptyStringBoolUnion(value) :
+            throw new ArgumentException("Must be an empty string");
+    }
+    public record BoolEmptyStringBoolUnion(bool Value) : BoolEmptyStringUnion;
+    public record EmptyStringBoolUnion(string Value) : BoolEmptyStringUnion;
 
 
-
-
-
-
-
+    /// <summary>
+    /// CommonHandlers['ModifierSourceMove'] | -0.1
+    /// </summary>
+    public abstract record OnFractionalPriority
+    {
+        public static implicit operator OnFractionalPriority(
+            Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> function) =>
+            new OnFractionalPriorityFunc(function);
+        public static implicit operator OnFractionalPriority(double value) =>
+            value == -0.1 ? new OnFrationalPriorityNeg(value) :
+            throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
+    }
+    public record OnFractionalPriorityFunc(
+        Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> Function) : OnFractionalPriority;
+    public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 
 
 

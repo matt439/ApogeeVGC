@@ -1,5 +1,13 @@
-﻿using System.Text.Json;
+﻿using ApogeeVGC_CS.data;
+using ApogeeVGC_CS.sim;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -56,21 +64,7 @@ namespace ApogeeVGC_CS.sim
         public Action<string, object>? Send { get; init; }
         public Prng? Prng { get; init; }
         public PrngSeed? PrngSeed { get; init; }
-        public object? Rated
-        {
-            get;
-            init // bool or string
-            {
-                if (value is bool or string)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Rated must be a boolean or string.");
-                }
-            }
-        }
+        public BoolStringUnion? Rated { get; init; }
         public PlayerOptions? P1 { get; init; }
         public PlayerOptions? P2 { get; init; }
         public PlayerOptions? P3 { get; init; }
@@ -90,21 +84,7 @@ namespace ApogeeVGC_CS.sim
         public EffectState? State { get; init; }
         public Delegate? End { get; init; }
         public object[]? EndCallArgs { get; init; }
-        public required object EffectHolder
-        {
-            get;
-            init // can be Pokemon, Side, Field, or Battle
-            {
-                if (value is Pokemon or Side or Field or Battle)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("EffectHolder must be a Pokemon, Side, Field, or Battle.");
-                }
-            }
-        } 
+        public required EventEffectHolder EffectHolder { get; init; }
     }
 
     public class EventListener : EventListenerWithoutPriority
@@ -187,21 +167,7 @@ namespace ApogeeVGC_CS.sim
         public required int Gen { get; init; }
         public required RuleTable RuleTable { get; init; }
         public required Prng Prng { get; set; }
-        public required object Rated
-        {
-            get;
-            init // bool or string
-            {
-                if (value is bool or string)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Rated must be a boolean or string.");
-                }
-            }
-        } 
+        public required BoolStringUnion Rated { get; init; }
         public required bool ReportExactHp { get; init; }
         public required bool ReportPercentages { get; init; }
         public required bool SupportCancel { get; init; }
@@ -547,28 +513,109 @@ namespace ApogeeVGC_CS.sim
 
         public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
         {
-            // TODO: Implement redirect order comparison
-            throw new NotImplementedException();
+            // Priority comparison (higher values first)
+            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            if (priorityResult != 0) return priorityResult;
+
+            // Speed comparison (higher values first)
+            var speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
+            if (speedResult != 0) return speedResult;
+
+            // AbilityState EffectOrder comparison (inverted, only if both have ability states)
+            if (a.AbilityState != null && b.AbilityState != null)
+            {
+                return a.AbilityState.EffectOrder.CompareTo(b.AbilityState.EffectOrder);
+            }
+
+            return 0;
         }
 
         public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
         {
-            // TODO: Implement left-to-right order comparison
-            throw new NotImplementedException();
+            // Order comparison (lower values first, null = last)
+            var orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            if (orderResult != 0) return orderResult;
+
+            // Priority comparison (higher values first)
+            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            if (priorityResult != 0) return priorityResult;
+
+            // Index comparison (lower values first)
+            return (a.Index ?? 0).CompareTo(b.Index ?? 0);
         }
 
-        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null)
+        /// <summary>Sort a list, resolving speed ties the way the games do.</summary>
+        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) where T : IAnyObject
         {
-            // TODO: Implement speed sorting with tie resolution
-            throw new NotImplementedException();
+            comparator ??= (a, b) => ComparePriority(a, b);
+
+            if (list.Count < 2) return;
+
+            int sorted = 0;
+
+            // This is a Selection Sort - not the fastest sort in general, but
+            // actually faster than QuickSort for small arrays like the ones
+            // SpeedSort is used for.
+            // More importantly, it makes it easiest to resolve speed ties properly.
+            while (sorted + 1 < list.Count)
+            {
+                var nextIndexes = new List<int> { sorted };
+
+                // Grab list of next indexes
+                for (int i = sorted + 1; i < list.Count; i++)
+                {
+                    int delta = comparator(list[nextIndexes[0]], list[i]);
+                    if (delta < 0) continue;
+                    if (delta > 0) nextIndexes = [i];
+                    if (delta == 0) nextIndexes.Add(i);
+                }
+
+                // Put list of next indexes where they belong
+                for (int i = 0; i < nextIndexes.Count; i++)
+                {
+                    int index = nextIndexes[i];
+                    if (index != sorted + i)
+                    {
+                        // nextIndexes is guaranteed to be in order, so it will never have
+                        // been disturbed by an earlier swap
+                        (list[sorted + i], list[index]) = (list[index], list[sorted + i]);
+                    }
+                }
+
+                // Shuffle tied elements for fair randomization
+                if (nextIndexes.Count > 1)
+                {
+                    Prng.Shuffle(list, sorted, sorted + nextIndexes.Count);
+                }
+
+                sorted += nextIndexes.Count;
+            }
         }
 
+        /// <summary>
+        /// Runs an event with no source on each Pokémon on the field, in Speed order.
+        /// </summary>
         public void EachEvent(string eventId, IEffect? effect = null, object? relayVar = null)
         {
-            throw new NotImplementedException();
-            // TODO: Implement event handling logic
+            var actives = GetAllActive();
+            if (effect == null && Effect != null)
+                effect = Effect;
+
+            // Sort by speed descending (fastest first)
+            SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
+
+            foreach (var pokemon in actives)
+            {
+                RunEvent(eventId, pokemon, null, effect, relayVar);
+            }
+
+            if (eventId == "Weather" && Gen >= 7)
+            {
+                // TODO: further research when updates happen
+                EachEvent("Update");
+            }
         }
-        // fieldEvent(eventid: string, targets?: Pokemon[])
+
         public void FieldEvent(string eventId, IReadOnlyList<Pokemon>? targets = null)
         {
             throw new NotImplementedException();
@@ -614,10 +661,61 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public Delegate? GetCallback(BattleGetCallbackTarget target,
-            IEffect effect, string callbackName)
+        public Delegate? GetCallback(GetCallbackTarget target, IEffect effect, string callbackName)
         {
-            throw new NotImplementedException();
+            Delegate? callback = callbackName switch
+            {
+                "onAnySwitchIn" => effect.OnAnySwitchIn,
+                "onSwitchIn" => effect.OnSwitchIn,
+                "onStart" => effect.OnStart,
+                _ => GetCallbackFromEffect(effect, callbackName) // fallback to reflection
+            };
+
+            // The special Gen 5+ logic is now much cleaner:
+            if (callback == null &&
+                target is PokemonGetCallbackTarget &&
+                Gen >= 5 &&
+                callbackName == "onSwitchIn" &&
+                effect.OnAnySwitchIn == null &&  // Direct property access!
+                (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)) &&
+                effect.OnStart != null)
+            {
+                callback = effect.OnStart;
+            }
+
+            return callback;
+        }
+
+        // Helper method to get a callback from an effect using reflection
+        private static Delegate? GetCallbackFromEffect(IEffect effect, string callbackName)
+        {
+            // Use reflection to get the callback by name for other callbacks not in IEffect
+            var type = effect.GetType();
+            var property = type.GetProperty(callbackName, BindingFlags.Public | BindingFlags.Instance);
+
+            if (property?.PropertyType == typeof(Delegate) ||
+                property?.PropertyType.IsSubclassOf(typeof(Delegate)) == true ||
+                property?.PropertyType.IsSubclassOf(typeof(MulticastDelegate)) == true)
+            {
+                return property.GetValue(effect) as Delegate;
+            }
+
+            return null;
+        }
+
+        // Helper methods to check if an effect is an ability or item
+        private static bool IsAbilityOrItem(IEffect effect)
+        {
+            return effect.EffectType == EffectType.Ability || effect.EffectType == EffectType.Item;
+        }
+
+        private static bool IsInnateAbilityOrItem(IEffect effect)
+        {
+            // Innate abilities/items - Status effects with ability/item prefix
+            if (effect.EffectType != EffectType.Status) return false;
+
+            var idParts = effect.Id.ToString().Split(':');
+            return idParts.Length > 0 && (idParts[0] == "ability" || idParts[0] == "item");
         }
 
         public List<EventListener> FindEventHandlers(FindEventHandlersTarget target,
@@ -631,6 +729,75 @@ namespace ApogeeVGC_CS.sim
         {
             throw new NotImplementedException();
         }
+
+        //public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon,
+        //    string callbackName, string? getKey = null)
+        //{
+        //    var handlers = new List<EventListener>();
+
+        //    // Check status condition (burn, paralysis, sleep, etc.)
+        //    var status = pokemon.GetStatus();
+        //    var callback = GetCallback(pokemon, status, callbackName);
+        //    if (callback != null || (!string.IsNullOrEmpty(getKey) && HasProperty(pokemon.StatusState, getKey)))
+        //    {
+        //        handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+        //        {
+        //            Effect = status,
+        //            Callback = callback,
+        //            State = pokemon.StatusState,
+        //            End = CreateClearStatusDelegate(pokemon),
+        //            EffectHolder = pokemon
+        //        }, callbackName));
+        //    }
+
+        //    // Check volatile conditions (temporary effects)
+        //    foreach (var kvp in pokemon.Volatiles)
+        //    {
+        //        string id = kvp.Key;
+        //        EffectState volatileState = kvp.Value;
+        //        var volatile = Dex.Conditions.GetById(new Id(id));
+
+        //        callback = GetCallback(pokemon, volatile, callbackName);
+        //        if (callback != null || (!string.IsNullOrEmpty(getKey) && HasProperty(volatileState, getKey)))
+        //        {
+        //            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+        //            {
+        //                Effect = volatile,
+        //                Callback = callback,
+        //                State = volatileState,
+        //                End = CreateRemoveVolatileDelegate(pokemon),
+        //                EffectHolder = pokemon
+        //            }, callbackName));
+        //    }
+
+        //    return handlers;
+        //}
+
+        //// Helper methods for creating cleanup delegates
+        //private static Delegate CreateClearStatusDelegate(Pokemon pokemon)
+        //{
+        //    return new Action(() => pokemon.ClearStatus());
+        //}
+
+        //private static Delegate CreateRemoveVolatileDelegate(Pokemon pokemon)
+        //{
+        //    return new Action<string>(volatileId => pokemon.RemoveVolatile(volatileId));
+        //}
+
+        //private static Delegate CreateClearAbilityDelegate(Pokemon pokemon)
+        //{
+        //    return new Action(() => pokemon.ClearAbility());
+        //}
+
+        //private static Delegate CreateClearItemDelegate(Pokemon pokemon)
+        //{
+        //    return new Action(() => pokemon.ClearItem());
+        //}
+
+        //private static Delegate CreateRemoveSlotConditionDelegate(Side side, Pokemon pokemon, Id conditionId)
+        //{
+        //    return new Action(() => side.RemoveSlotCondition(pokemon, conditionId.ToString()));
+        //}
 
         public List<EventListener> FindBattleEventHandlers(string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
@@ -647,7 +814,65 @@ namespace ApogeeVGC_CS.sim
         public List<EventListener> FindSideEventHandlers(Side side, string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            throw new NotImplementedException();
+            var handlers = new List<EventListener>();
+
+            foreach (var kvp in side.SideConditions)
+            {
+                string id = kvp.Key;
+                EffectState sideConditionData = kvp.Value;
+
+                // Get the condition from the dex
+                var sideCondition = Dex.Conditions.GetById(new Id(id));
+
+                // Get the callback for this condition
+                var callback = GetCallback(side, sideCondition, callbackName);
+
+                // Check if we should include this handler
+                bool hasCallback = callback != null;
+                bool hasSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                   HasProperty(sideConditionData, getKey);
+
+                if (hasCallback || hasSpecialKey)
+                {
+                    // Create the event listener without priority info first
+                    var listenerWithoutPriority = new EventListenerWithoutPriority
+                    {
+                        Effect = sideCondition,
+                        Callback = callback,
+                        State = sideConditionData,
+                        End = customHolder != null ? null : CreateRemoveSideConditionDelegate(side),
+                        EffectHolder = customHolder ?? (object)side
+                    };
+
+                    // Resolve priority and create full event listener
+                    var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
+                    handlers.Add(eventListener);
+                }
+            }
+
+            return handlers;
+        }
+
+        // Helper method to check if an EffectState has a specific property
+        private static bool HasProperty(EffectState effectState, string propertyName)
+        {
+            // Check named properties first
+            var property = typeof(EffectState).GetProperty(propertyName,
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+            if (property != null)
+            {
+                return property.GetValue(effectState) != null;
+            }
+
+            // Fallback to ExtraData
+            return effectState.ExtraData?.ContainsKey(propertyName) ?? false;
+        }
+
+        // Helper method to create a delegate for removing side conditions
+        private static Delegate? CreateRemoveSideConditionDelegate(Side side)
+        {
+            return new Action<string>(conditionId => side.RemoveSideCondition(conditionId));
         }
 
         public void OnEvent(string eventId, Format target, params object[] rest)

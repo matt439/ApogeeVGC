@@ -42,28 +42,16 @@ namespace ApogeeVGC_CS.sim
         public bool? Debug { get; init; }
         public bool? NoCatch { get; init; }
         public bool? KeepAlive { get; init; }
-        public object? Replay
-        {
-            get;
-            init // bool or "spectator"
-            {
-                if (value is bool or "spectator")
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Replay must be a boolean or 'spectator'.");
-                }
-            }
-        } 
+        public BattleStreamReplay? Replay { get; init; }
+
     }
 
     public class BattleStream(BattleStreamOptions? options = null)
     {
         public bool Debug { get; init; } = options?.Debug ?? false;
         public bool NoCatch { get; init; } = options?.NoCatch ?? false;
-        public object Replay { get; init; } = options?.Replay ?? false;
+        public BattleStreamReplay Replay { get; init; } =
+            options?.Replay ?? new BoolBattleStreamReplay(false);
         public bool KeepAlive { get; init; } = options?.KeepAlive ?? false;
         public Battle? Battle { get; init; } = null;
 

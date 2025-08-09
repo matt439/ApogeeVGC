@@ -437,20 +437,23 @@ namespace ApogeeVGC_CS.sim
         public string Name { get; }
         public Id Id { get; }
         public int? Duration { get; }
+        Action<Battle, Pokemon>? OnAnySwitchIn { get; }
+        Action<Battle, Pokemon>? OnSwitchIn { get; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; }
     }
 
     public interface ICommonHandlers
     {
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierEffect { get; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int> ModifierMove { get; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, int?> ModifierEffect { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> ModifierMove { get; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?> ResultMove { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object> ExtResultMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?> ExtResultMove { get; }
         public Action<Battle, Pokemon, Pokemon, IEffect> VoidEffect { get; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove> VoidMove { get; }
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, int> ModifierSourceEffect { get; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int> ModifierSourceMove { get; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, int?> ModifierSourceEffect { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> ModifierSourceMove { get; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?> ResultSourceMove { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object> ExtResultSourceMove { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?> ExtResultSourceMove { get; }
         public Action<Battle, Pokemon, Pokemon, IEffect> VoidSourceEffect { get; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove> VoidSourceMove { get; }
     }
@@ -997,6 +1000,8 @@ namespace ApogeeVGC_CS.sim
         int? Speed { get; }
         int? SubOrder { get; }
         int? EffectOrder { get; }
+        int? Index { get; }
+        EffectState? AbilityState { get; }
     }
 
     //public class AnyObject : Dictionary<string, object>

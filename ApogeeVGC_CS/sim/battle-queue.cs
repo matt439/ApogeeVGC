@@ -7,20 +7,32 @@
         PriorityChargeMove,
     }
 
-    public enum MoveActionOrder
-    {
-        S0,
-        S5,
-        S200,
-        S201,
-        S199,
-        S106,
-    }
+    //public enum MoveActionOrder
+    //{
+    //    S3,
+    //    S5,
+    //    S200,
+    //    S201,
+    //    S199,
+    //    S106,
+    //}
 
     public class MoveAction : IAction
     {
         public required MoveActionChoice Choice { get; init; }
-        public required MoveActionOrder Order { get; init; }
+        public required int Order
+        { 
+            get; 
+            init
+            {
+                if (!(value == 3 || value == 5 || value == 200 || value == 201 ||
+                    value == 199 || value == 106))
+                {
+                    throw new ArgumentException("Order must be one of the predefined values: 3, 5, 200, 201, 199, or 106.");
+                }
+                field = value;
+            }
+        }
         public required int Priority { get; init; }
         public required double FractionalPriority { get; init; }
         public required int Speed { get; init; }
@@ -29,19 +41,7 @@
         public required Pokemon OriginalTarget { get; init; }
         public required Id MoveId { get; init; }
         public required Move Move { get; init; }
-        public required object Mega
-        {
-            get;
-            init // bool or "done"
-            {
-                field = value switch
-                {
-                    bool b => b,
-                    "done" => value,
-                    _ => throw new ArgumentException("Mega must be a bool or 'done'.")
-                };
-            }
-        }
+        public required MoveActionMega Mega { get; init; }
         public string? ZMove { get; init; }
         public string? MaxMove { get; init; }
         public IEffect? SourceEffect { get; init; }
@@ -119,7 +119,9 @@
         public string? Event { get; init; } // For "event"
     }
 
-    // export type Action = MoveAction | SwitchAction | TeamAction | FieldAction | PokemonAction;
+    /// <summary>
+    /// MoveAction | SwitchAction | TeamAction | FieldAction | PokemonAction
+    /// </summary>
     public interface IAction;
 
     public class ActionChoice

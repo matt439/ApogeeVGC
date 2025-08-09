@@ -189,7 +189,7 @@ namespace ApogeeVGC_CS.sim
     public class Prng
     {
         public PrngSeed StartingSeed { get; }
-        private IRng rng;
+        private IRng rng = new SodiumRng(SodiumRng.GenerateSeed());
 
         /// <summary>Creates a new source of randomness for the given seed.</summary>
         public Prng(PrngSeed? seed = null, PrngSeed? initialSeed = null)
@@ -377,7 +377,7 @@ namespace ApogeeVGC_CS.sim
         // https://github.com/jedisct1/libsodium/blob/ce07d6c82c0e6c75031cf627913bf4f9d3f1e754/src/libsodium/randombytes/randombytes.c#L178
         private static readonly byte[] Nonce = "LibsodiumDRG"u8.ToArray();
 
-        private byte[] seed;
+        private byte[] seed = new byte[32];
 
         /// <summary>Creates a new source of randomness for the given seed.</summary>
         public SodiumRng(SodiumRngSeed seed)

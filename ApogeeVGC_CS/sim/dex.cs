@@ -2,7 +2,7 @@
 {
     public class Dex
     {
-        public Dictionary<string, ModdedDex> Dexes { get; init; } = new();
+        public Dictionary<string, ModdedDex> Dexes { get; init; } = [];
 
         public Dex()
         {
@@ -55,27 +55,27 @@
 
     public class DexTableData
     {
-        public DexTable<AbilityData> Abilities { get; init; } = new();
-        public DexTable<FormatData> Rulesets { get; init; } = new();
-        public DexTable<ItemData> Items { get; init; } = new();
-        public DexTable<LearnsetData> Learnsets { get; init; } = new();
-        public DexTable<MoveData> Moves { get; init; } = new();
-        public DexTable<NatureData> Natures { get; init; } = new();
-        public DexTable<SpeciesData> Pokedex { get; init; } = new();
-        public DexTable<SpeciesFormatsData> FormatsData { get; init; } = new();
-        public DexTable<PokemonGoData> PokemonGoData { get; init; } = new();
-        public DexTable<object> Scripts { get; init; } = new();
-        public DexTable<IConditionData> Conditions { get; init; } = new();
-        public DexTable<TypeData> TypeChart { get; init; } = new();
+        public DexTable<AbilityData> Abilities { get; init; } = [];
+        public DexTable<FormatData> Rulesets { get; init; } = [];
+        public DexTable<ItemData> Items { get; init; } = [];
+        public DexTable<LearnsetData> Learnsets { get; init; } = [];
+        public DexTable<MoveData> Moves { get; init; } = [];
+        public DexTable<NatureData> Natures { get; init; } = [];
+        public DexTable<SpeciesData> Pokedex { get; init; } = [];
+        public DexTable<SpeciesFormatsData> FormatsData { get; init; } = []; 
+        public DexTable<PokemonGoData> PokemonGoData { get; init; } = [];
+        public DexTable<IAnyObject> Scripts { get; init; } = [];
+        public DexTable<IConditionData> Conditions { get; init; } = [];
+        public DexTable<TypeData> TypeChart { get; init; } = [];
     }
 
     public class TextTableData
     {
-        public DexTable<AbilityText> Abilities { get; init; } = new();
-        public DexTable<ItemText> Items { get; init; } = new();
-        public DexTable<MoveText> Moves { get; init; } = new();
-        public DexTable<PokedexText> Pokedex { get; init; } = new();
-        public DexTable<DefaultText> Default { get; init; } = new();
+        public DexTable<AbilityText> Abilities { get; init; } = [];
+        public DexTable<ItemText> Items { get; init; } = [];
+        public DexTable<MoveText> Moves { get; init; } = [];
+        public DexTable<PokedexText> Pokedex { get; init; } = [];
+        public DexTable<DefaultText> Default { get; init; } = [];
     }
 
     // Helper class for to hold Dex constants
@@ -120,7 +120,7 @@
         public bool IsBase => CurrentMod == "base";
         public string CurrentMod { get; init; }
         public string DataDir => IsBase ? DexConstants.DataDir : $"{DexConstants.ModsDir}/{CurrentMod}";
-        public int Gen => 0;
+        public int Gen { get; init; } = 0;
         public string ParentMod { get; init; } = string.Empty;
         public bool ModsLoaded { get; init; } = false;
 
@@ -252,7 +252,8 @@
 
         // int Trunc()
 
-        public List<object>? DataSearch(string target, List<DataSearchType>? searchIn = null, bool? isInexact = null)
+        public List<object>? DataSearch(string target, List<DataSearchType>? searchIn = null,
+            bool? isInexact = null)
         {
             throw new NotImplementedException("DataSearch method not implemented yet.");
         }

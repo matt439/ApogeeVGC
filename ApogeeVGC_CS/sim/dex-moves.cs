@@ -120,43 +120,39 @@
 
     public interface IMoveEventMethods
     {
-        // Return int, false (null), or null
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion?>? BasePowerCallback { get; }
         // Return true to stop the move from being used
         public Func<Battle, Pokemon, Pokemon?, ActiveMove, bool?>? BeforeMoveCallback { get; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? BeforeTurnCallback { get; }
-        // Return int or false (null)
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? DamageCallback { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion>? DamageCallback { get; }
         public Action<Battle, Pokemon>? PriorityChargeCallback { get; }
         public Action<Battle, Pokemon>? OnDisableMove { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; }
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; } // CommonHandlers['VoidSourceMove']
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAfterSubDamage { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondarySelf { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; }
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondarySelf { get; } // CommonHandlers['VoidSourceMove']
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; } // CommonHandlers['VoidMove']
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; } // CommonHandlers['VoidSourceMove']
         public int? OnDamagePriority { get; }
-        // Return int, bool, or null
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnBasePower { get; } // CommonHandlers['ModifierSourceMove']
         // Return int or void (null)
         public Func<Battle, int, Pokemon?, string, ActiveMove, int?>? OnEffectiveness { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; }
-        // Return bool, null, empty string, or void
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnHitSide { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; } // CommonHandlers['ResultMove']
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; } // CommonHandlers['ResultMove']
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnHitSide { get; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyPriority { get; } // CommonHandlers['ModifierSourceMove']
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; } // CommonHandlers['VoidMove']
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnTryHitSide { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; }
-        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; } // CommonHandlers['ResultMove']
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; } // CommonHandlers['ResultSourceMove']
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryHit { get; } // CommonHandlers['ExtResultSourceMove']
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; } // CommonHandlers['ResultMove']
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnTryHitSide { get; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; } // // CommonHandlers['ResultMove']
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; } // CommonHandlers['ResultSourceMove'];
+        public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; } // CommonHandlers['VoidSourceMove'];
     }
 
     public enum PokemonType

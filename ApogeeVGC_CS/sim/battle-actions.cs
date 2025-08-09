@@ -110,7 +110,7 @@ namespace ApogeeVGC_CS.sim
     // Helper struct for RunMove method
     public struct RunMoveResult
     {
-        public EffectState? SourceEffect { get; init; }
+        public IEffect? SourceEffect { get; init; }
         public string? ZMove { get; init; }
         public bool? ExternalMove { get; init; }
         public string? MaxMove { get; init; }
