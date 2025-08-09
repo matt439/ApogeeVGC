@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
-using ApogeeVGC_CS.lib;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -448,7 +447,6 @@ namespace ApogeeVGC_CS.sim
 
         public override string ToString()
         {
-            // TODO: Implement string representation
             return $"Battle: {Format}";
         }
 
