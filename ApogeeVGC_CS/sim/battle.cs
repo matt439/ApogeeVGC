@@ -117,58 +117,6 @@ namespace ApogeeVGC_CS.sim
         public int? Speed { get; init; }
     }
 
-
-    public enum PartType
-    {
-        String,
-        Number,
-        Boolean,
-        Pokemon,
-        Side,
-        Effect,
-        Move,
-        Null,
-        Undefined
-    }
-
-    public class Part
-    {
-        public object? Value
-        {
-            get;
-            init // string | number | boolean | Pokemon | Side | Effect | Move | null | undefined
-            {
-                if (value is string or int or bool or Pokemon or Side or IEffect or Move or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Value must be a string, number," +
-                                                "boolean, Pokemon, Side, Effect, Move, null, or undefined.");
-                }
-            }
-        }
-        public PartType Type
-        {
-            get
-            {
-                return Value switch
-                {
-                    string => PartType.String,
-                    int => PartType.Number,
-                    bool => PartType.Boolean,
-                    Pokemon => PartType.Pokemon,
-                    Side => PartType.Side,
-                    IEffect => PartType.Effect,
-                    Move => PartType.Move,
-                    null => PartType.Null,
-                    _ => PartType.Undefined
-                };
-            }
-        }
-    }
-
     public enum RequestState
     {
         TeamPreview,
@@ -183,6 +131,15 @@ namespace ApogeeVGC_CS.sim
         public Pokemon? Source { get; init; }
         public IEffect? Effect { get; init; }
     }
+
+    public class SideSecretShared
+    {
+        public SideId Side { get; set; }
+        public string Secret { get; set; } = string.Empty;
+        public string Shared { get; set; } = string.Empty;
+    }
+
+    public delegate SideSecretShared SideSecretSharedFactory();
 
     public class Battle
     {
@@ -525,7 +482,8 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null)
+        public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null,
+            Pokemon? target = null)
         {
             // TODO: Implement active move setting
             throw new NotImplementedException();
@@ -579,11 +537,12 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement field event handling logic
         }
 
-        public object SingleEvent(string eventId,
+        public object SingleEvent(
+            string eventId,
             IEffect effect,
-            object? state = null,
-            object? target = null,
-            object? source = null,
+            SingleEventState state,
+            SingleEventTarget target,
+            SingleEventSource? source = null,
             IEffect? sourceEffect = null,
             object? relayVar = null,
             Delegate? customCallback = null)
@@ -592,66 +551,84 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement single event handling logic
         }
 
-        public object RunEvent(string eventId, object? target = null, object? source = null,
-            IEffect? sourceEffect = null, object? relayVar = null, bool onEffect = false,
+        public object RunEvent(
+            string eventId,
+            RunEventTarget? target = null,
+            RunEventSource? source = null,
+            IEffect? sourceEffect = null,
+            object? relayVar = null,
+            bool onEffect = false,
             bool fastExit = false)
         {
             throw new NotImplementedException();
-            // TODO: Implement event running logic
         }
 
-        public object PriorityEvent(string eventId, object target, object? source = null,
-            IEffect? effect = null, object? relayVar = null, bool onEffect = false)
+        public object PriorityEvent(string eventId, PriorityEventTarget target,
+            Pokemon? source = null, IEffect? effect = null, object? relayVar = null,
+            bool onEffect = false)
         {
             throw new NotImplementedException();
         }
 
-        public EventListener ResolvePriority(EventListenerWithoutPriority listener, string callbackName)
+        public EventListener ResolvePriority(EventListenerWithoutPriority listener,
+            string callbackName)
         {
             throw new NotImplementedException();
         }
 
-        public Delegate? GetCallback(object target, IEffect effect, string callbackName)
+        public Delegate? GetCallback(BattleGetCallbackTarget target,
+            IEffect effect, string callbackName)
         {
             throw new NotImplementedException();
         }
 
-        public List<EventListener> FindEventHandlers(object target, string eventName, object? source = null)
+        public List<EventListener> FindEventHandlers(FindEventHandlersTarget target,
+            string eventName, Pokemon? source = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, string callbackName, string? getKey = null)
+        public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon,
+            string callbackName, string? getKey = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<EventListener> FindBattleEventHandlers(string callbackName, string? getKey = null, Pokemon? customHolder = null)
+        public List<EventListener> FindBattleEventHandlers(string callbackName,
+            string? getKey = null, Pokemon? customHolder = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<EventListener> FindFieldEventHandlers(Field field, string callbackName, string? getKey = null, Pokemon? customHolder = null)
+        public List<EventListener> FindFieldEventHandlers(Field field, string callbackName,
+            string? getKey = null, Pokemon? customHolder = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<EventListener> FindSideEventHandlers(Side side, string callbackName, string? getKey = null, Pokemon? customHolder = null)
+        public List<EventListener> FindSideEventHandlers(Side side, string callbackName,
+            string? getKey = null, Pokemon? customHolder = null)
         {
             throw new NotImplementedException();
         }
 
-        public void OnEvent(string eventId, IEffect target, params object[] rest)
+        public void OnEvent(string eventId, Format target, params object[] rest)
         {
             throw new NotImplementedException();
         }
 
-        public bool CheckMoveMakesContact(ActiveMove move, Pokemon attacker, Pokemon defender, bool announcePads = false)
+        public bool CheckMoveMakesContact(ActiveMove move, Pokemon attacker, Pokemon defender,
+            bool announcePads = false)
         {
             throw new NotImplementedException();
         }
 
         public Pokemon? GetPokemon(string fullname)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Pokemon? GetPokemon(Pokemon pokemon)
         {
             throw new NotImplementedException();
         }
@@ -666,7 +643,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void MakeRequest(RequestState? type)
+        public void MakeRequest(RequestState? type = null)
         {
             throw new NotImplementedException();
         }
@@ -696,12 +673,27 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool Win(object? side = null)
+        public bool Win(SideId side)
         {
             throw new NotImplementedException();
         }
 
-        public bool Lose(object? side = null)
+        public bool Win(Side side)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Win(string? side = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Lose(SideId side)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Lose(Side side)
         {
             throw new NotImplementedException();
         }
@@ -753,7 +745,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void Restart(Action<string, object>? send = null)
+        public void Restart(Action<string, List<string>>? send = null)
         {
             // Implementation for restarting the battle
             throw new NotImplementedException();
@@ -771,14 +763,15 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public int?[] SpreadDamage(SpreadMoveDamage damage, IReadOnlyList<Pokemon?>? targetArray = null,
-            Pokemon? source = null, IEffect? effect = null, bool instafaint = false)
+        public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage,
+            List<SpreadDamageTarget>? targetArray = null, Pokemon? source = null,
+            SpreadDamageEffect? effect = null, bool instafaint = false)
         {
             throw new NotImplementedException();
         }
 
-        public int? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
-            IEffect? effect = null, bool instafaint = false)
+        public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
+            DamageEffect? effect = null, bool instafaint = false)
         {
             throw new NotImplementedException();
         }
@@ -789,8 +782,8 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public int? Heal(int damage, Pokemon? target = null, Pokemon? source = null,
-            IEffect? effect = null)
+        public IntFalseUnion Heal(int damage, Pokemon? target = null, Pokemon? source = null,
+            HealEffect? effect = null)
         {
             throw new NotImplementedException();
         }
@@ -800,7 +793,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public int Chain(int previousMod, int[] nextMod)
+        public int Chain(int previousMod, int[]  nextMod)
         {
             throw new NotImplementedException();
         }
@@ -825,12 +818,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public int Modify(int value, int[] numerator, int denominator = 1)
+        public int Modify(int value, int numerator, int denominator = 1)
         {
             throw new NotImplementedException();
         }
 
-        public int Modify(int value, int numerator, int denominator = 1)
+        public int Modify(int value, int[] numerator, int denominator = 1)
         {
             throw new NotImplementedException();
         }
@@ -961,17 +954,17 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void Add(params object[] parts)
+        public void Add(params AddPart[] parts)
         {
             throw new NotImplementedException();
         }
 
-        public void AddMove(params object[] args)
+        public void AddMove(params AddMoveArg[] args)
         {
             throw new NotImplementedException();
         }
 
-        public void AttrLastMove(params object[] args)
+        public void AttrLastMove(params AddMoveArg[] args)
         {
             throw new NotImplementedException();
         }

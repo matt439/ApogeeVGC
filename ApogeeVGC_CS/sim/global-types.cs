@@ -428,7 +428,7 @@ namespace ApogeeVGC_CS.sim
     }
 
     /// <summary>
-    /// Base interface for all effect types (Ability | Item | ActiveMove | Species | Condition | Format)
+    /// Ability | ItemData | ActiveMove | Species | Condition | Format
     /// </summary>
     public interface IEffect
     {
@@ -985,5 +985,12 @@ namespace ApogeeVGC_CS.sim
     {
         public string? Desc { get; set; }
         public string? ShortDesc { get; set; }
+    }
+
+    public class AnyObject : Dictionary<string, object>
+    {
+        public AnyObject() : base(StringComparer.OrdinalIgnoreCase) { }
+        public AnyObject(IDictionary<string, object> dictionary) :
+            base(dictionary, StringComparer.OrdinalIgnoreCase) { }
     }
 }

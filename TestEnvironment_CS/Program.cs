@@ -33,6 +33,10 @@
         public int? X { get; init; }
     }
 
+    public abstract record AddPart;
+    public record StringAddPart(string Value) : AddPart;
+    public record IntAddPart(int Value) : AddPart;
+    public record BoolAddPart(bool Value) : AddPart;
 
     class Program
     {
@@ -42,7 +46,25 @@
             // B b = new B { Y = 20 };
 
             //TestClass test = new TestClass(5, 10);
-            Test2 test2;
+            //Test2 test2;
+        }
+
+        public void Add(params AddPart[] parts)
+        {
+            foreach (var part in parts)
+            {
+                switch (part)
+                {
+                    case StringAddPart(var str):
+                        // Handle string
+                        break;
+                    case IntAddPart(var num):
+                        // Handle int
+                        break;
+                    case BoolAddPart(var b):
+                        break;
+                }
+            }
         }
     }
 

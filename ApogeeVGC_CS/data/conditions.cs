@@ -359,7 +359,7 @@ namespace ApogeeVGC_CS.data
                         Target = MoveTarget.Self,
                         Flags = new MoveFlags(),
                     };
-                    battle.Damage(damage, pokemon, pokemon, confusedMove);
+                    battle.Damage(damage, pokemon, pokemon, new EffectDamageEffect(confusedMove));
                     return false; // Prevent move
                 },
                 EffectType = EffectType.Status,

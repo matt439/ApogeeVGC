@@ -75,16 +75,27 @@ namespace ApogeeVGC_CS.data
                             battle2.Debug("Nothing to leech into");
                             return;
                         }
-                        int? damage = battle2.Damage(target2.BaseMaxHp / 8, target2, foundTarget);
+                        IntFalseUnion? damage = battle2.Damage(target2.BaseMaxHp / 8, target2, foundTarget);
                         if (damage == null)
                         {
                             battle2.Debug("Leech Seed damage is null");
                             return;
                         }
-                        if (damage > 0)
+                        switch (damage)
                         {
-                            battle2.Heal((int)damage, foundTarget, target2);
+                            case IntIntFalseUnion(int intDamage):
+                                if (intDamage > 0)
+                                {
+                                    battle2.Heal(intDamage, foundTarget, target2);
+                                }
+                                break;
+                            case FalseIntFalseUnion falseDamage:
+                                damage = 0;
+                                break;
+                            default:
+                                throw new Exception("Unexpected damage type in Leech Seed residual");
                         }
+                        
                     }
                 },
                 OnTryImmunity = (unusedBattle, target3, unusedSource, unusedActiveMove) =>
