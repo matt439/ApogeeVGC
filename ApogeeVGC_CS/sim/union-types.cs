@@ -102,6 +102,15 @@
         };
     }
 
+    public static class AnyObjectUnionFactory
+    {
+        public static AddMoveArg ToAddMoveArg(IAnyObject anyObject) => anyObject switch
+        {
+            Pokemon pokemon => new AnyObjectAddMoveArg(pokemon),
+            _ => throw new InvalidOperationException($"Cannot convert {anyObject.GetType()} to AddMoveArg")
+        };
+    }
+
     /// <summary>
     /// string | Pokemon | Effect | false | null
     /// </summary>
@@ -358,23 +367,20 @@
     public record GameTypeAddPart(GameType GameType) : AddPart;
 
     /// <summary>
-    /// string | number | Function | AnyObject |
-    /// Pokemon (used for AnyObject)
+    /// string | number | Function | AnyObject
     /// </summary>
     public abstract record AddMoveArg
     {
         public static implicit operator AddMoveArg(string value) => new StringAddMoveArg(value);
         public static implicit operator AddMoveArg(int value) => new IntAddMoveArg(value);
         public static implicit operator AddMoveArg(Delegate @delegate) => new FuncAddMoveArg(@delegate);
-        public static implicit operator AddMoveArg(AnyObject anyObject) =>
-            new AnyObjectAddMoveArg(anyObject);
-        public static implicit operator AddMoveArg(Pokemon pokemon) => new PokemonAddMoveArg(pokemon);
+        public static implicit operator AddMoveArg(Pokemon pokemon) =>
+            AnyObjectUnionFactory.ToAddMoveArg(pokemon);
     }
     public record StringAddMoveArg(string Value) : AddMoveArg;
     public record IntAddMoveArg(int Value) : AddMoveArg;
     public record FuncAddMoveArg(Delegate Delegate) : AddMoveArg;
-    public record AnyObjectAddMoveArg(AnyObject AnyObject) : AddMoveArg;
-    public record PokemonAddMoveArg(Pokemon Pokemon) : AddMoveArg;
+    public record AnyObjectAddMoveArg(IAnyObject AnyObject) : AddMoveArg;
 
     /// <summary>
     /// int | false

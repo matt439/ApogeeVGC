@@ -186,7 +186,7 @@ namespace ApogeeVGC_CS.sim
         public required ModdedDex BaseDex { get; init; } // Added to emulate how the JavaScript version works
         public required int Gen { get; init; }
         public required RuleTable RuleTable { get; init; }
-        public required Prng Prng { get; init; }
+        public required Prng Prng { get; set; }
         public required object Rated
         {
             get;
@@ -231,11 +231,11 @@ namespace ApogeeVGC_CS.sim
         public object? Events { get; init; }
         public required int EventDepth { get; init; }
 
-        public ActiveMove? ActiveMove { get; init; }
-        public Pokemon? ActivePokemon { get; init; }
-        public Pokemon? ActiveTarget { get; init; }
+        public ActiveMove? ActiveMove { get; set; }
+        public Pokemon? ActivePokemon { get; set; }
+        public Pokemon? ActiveTarget { get; set; }
 
-        public ActiveMove? LastMove { get; init; }
+        public ActiveMove? LastMove { get; set; }
         public Id? LastSuccessfulMoveThisTurn { get; init; }
         public required int LastMoveLine { get; init; }
         public required int LastDamage { get; init; }
@@ -452,66 +452,106 @@ namespace ApogeeVGC_CS.sim
 
         public int Random(int? m = null, int? n = null)
         {
-            // TODO: Implement random number generation
-            throw new NotImplementedException();
+            return (int)Prng.Random(m, n);
         }
 
         public bool RandomChance(int numerator, int denominator)
         {
-            // TODO: Implement random chance calculation
-            throw new NotImplementedException();
+            if (ForceRandomChance.HasValue)
+                return ForceRandomChance.Value;
+            return Prng.RandomChance(numerator, denominator);
         }
 
         public T Sample<T>(IReadOnlyList<T> items)
         {
-            // TODO: Implement random sampling
-            throw new NotImplementedException();
+            return Prng.Sample(items);
         }
 
         public void ResetRng(PrngSeed? seed = null)
         {
-            // TODO: Implement RNG reset
-            throw new NotImplementedException();
+            Prng = new Prng(seed ?? PrngSeed);
+            Add("message", "The battle's RNG was reset.");
         }
 
         public bool SuppressingAbility(Pokemon? target = null)
         {
-            // TODO: Implement ability suppression check
-            throw new NotImplementedException();
+            return ActivePokemon != null
+                && ActivePokemon.IsActive
+                && (ActivePokemon != target || Gen < 8)
+                && ActiveMove != null
+                && (ActiveMove.IgnoreAbility ?? false)
+                && (target == null || !target.HasItem("Ability Shield"));
         }
 
-        public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null,
-            Pokemon? target = null)
+        public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null)
         {
-            // TODO: Implement active move setting
-            throw new NotImplementedException();
+            ActiveMove = move;
+            ActivePokemon = pokemon;
+            ActiveTarget = target ?? pokemon;
         }
 
         public void ClearActiveMove(bool failed = false)
         {
-            // TODO: Implement active move clearing
-            throw new NotImplementedException();
+            if (ActiveMove != null)
+            {
+                if (!failed)
+                {
+                    LastMove = ActiveMove;
+                }
+                ActiveMove = null;
+                ActivePokemon = null;
+                ActiveTarget = null;
+            }
         }
 
         public void UpdateSpeed()
         {
-            // TODO: Implement speed update for all active Pokemon
-            throw new NotImplementedException();
+            foreach (Pokemon pokemon in GetAllActive())
+            {
+                pokemon.UpdateSpeed();
+            }
         }
 
-        public static int ComparePriority(object a, object b)
+
+        /**
+	     * The default sort order for actions, but also event listeners.
+	     *
+	     * 1. Order, low to high (default last)
+	     * 2. Priority, high to low (default 0)
+	     * 3. Speed, high to low (default 0)
+	     * 4. SubOrder, low to high (default 0)
+	     * 5. EffectOrder, low to high (default 0)
+	     *
+	     */
+        public static int ComparePriority(IAnyObject a, IAnyObject b)
         {
-            // TODO: Implement priority comparison
-            throw new NotImplementedException();
+            // Order comparison (lower values first, null = last)
+            var orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            if (orderResult != 0) return orderResult;
+
+            // Priority comparison (higher values first)
+            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            if (priorityResult != 0) return priorityResult;
+
+            // Speed comparison (higher values first)
+            var speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
+            if (speedResult != 0) return speedResult;
+
+            // SubOrder comparison (lower values first)
+            var subOrderResult = (a.SubOrder ?? 0).CompareTo(b.SubOrder ?? 0);
+            if (subOrderResult != 0) return subOrderResult;
+
+            // EffectOrder comparison (lower values first)
+            return (a.EffectOrder ?? 0).CompareTo(b.EffectOrder ?? 0);
         }
 
-        public static int CompareRedirectOrder(object a, object b)
+        public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
         {
             // TODO: Implement redirect order comparison
             throw new NotImplementedException();
         }
 
-        public static int CompareLeftToRightOrder(object a, object b)
+        public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
         {
             // TODO: Implement left-to-right order comparison
             throw new NotImplementedException();

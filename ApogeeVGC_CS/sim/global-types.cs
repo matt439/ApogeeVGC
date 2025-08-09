@@ -987,10 +987,22 @@ namespace ApogeeVGC_CS.sim
         public string? ShortDesc { get; set; }
     }
 
-    public class AnyObject : Dictionary<string, object>
+    /// <summary>
+    /// Pokemon |
+    /// </summary>
+    public interface IAnyObject
     {
-        public AnyObject() : base(StringComparer.OrdinalIgnoreCase) { }
-        public AnyObject(IDictionary<string, object> dictionary) :
-            base(dictionary, StringComparer.OrdinalIgnoreCase) { }
+        int? Order { get; }
+        int? Priority { get; }
+        int? Speed { get; }
+        int? SubOrder { get; }
+        int? EffectOrder { get; }
     }
+
+    //public class AnyObject : Dictionary<string, object>
+    //{
+    //    public AnyObject() : base(StringComparer.OrdinalIgnoreCase) { }
+    //    public AnyObject(IDictionary<string, object> dictionary) :
+    //        base(dictionary, StringComparer.OrdinalIgnoreCase) { }
+    //}
 }

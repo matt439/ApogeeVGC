@@ -89,7 +89,7 @@ namespace ApogeeVGC_CS.sim
         public List<Pokemon> PressureTargets { get; init; }
     }
 
-    public class Pokemon
+    public class Pokemon : IAnyObject
     {
         public Side Side { get; }
         public Battle Battle { get; }
@@ -328,6 +328,16 @@ namespace ApogeeVGC_CS.sim
         public Action? RecalculateStats { get; init; }
 
         public Dictionary<string, object> M { get; init; } = [];
+
+        public int? Order { get; set; }
+
+        public int? Priority { get; set; }
+
+        int? IAnyObject.Speed => Speed;
+
+        public int? SubOrder { get; set; }
+
+        public int? EffectOrder { get; set; }
 
         //public Pokemon(string set, Side side) : this(new PokemonSet
         //{
