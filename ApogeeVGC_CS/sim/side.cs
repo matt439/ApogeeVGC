@@ -63,19 +63,7 @@
         public required Id Id { get; init; }
         public string? Target { get; init; }
 
-        public object? Disabled
-        {
-            get;
-            init // string or bool
-            {
-                field = value switch
-                {
-                    bool b => b,
-                    string s => s,
-                    _ => throw new ArgumentException("Disabled must be a boolean or a string.")
-                };
-            }
-        } 
+        public BoolStringUnion? Disabled { get; init; }
         public string? DisabledSource { get; init; }
     }
 
@@ -90,7 +78,7 @@
         public bool? CanMegaEvoX { get; init; }
         public bool? CanMegaEvoY { get; init; }
         public bool? CanUltraBurst { get; init; }
-        public object? CanZMove { get; init; }
+        public IAnyObject? CanZMove { get; init; }
         public bool? CanDynamax { get; init; }
         public DynamaxOptions? MaxMoves { get; init; }
         public string? CanTerastallize { get; init; }
