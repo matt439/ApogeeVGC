@@ -1171,9 +1171,30 @@ namespace ApogeeVGC_CS.sim
     public record SideWinSideUnion(Side Side) : WinSideUnion;
 
 
+    /// <summary>
+    /// bool | 'hidden'
+    /// </summary>
+    public abstract record PokemonTrapped
+    {
+        public static implicit operator PokemonTrapped(bool value) => new BoolPokemonTrapped(value);
+        public static implicit operator PokemonTrapped(string value) =>
+            value == "hidden" ? new HiddenPokemonTrapped(value) :
+                throw new ArgumentException("Must be 'hidden' for HiddenPokemonTrapped");
+    }
+    public record BoolPokemonTrapped(bool Value) : PokemonTrapped;
+    public record HiddenPokemonTrapped(string Value) : PokemonTrapped;
 
 
-
+    /// <summary>
+    /// Id | boolean
+    /// </summary>
+    public abstract record IdBoolUnion
+    {
+        public static implicit operator IdBoolUnion(Id id) => new IdBoolUnionId(id);
+        public static implicit operator IdBoolUnion(bool value) => new IdBoolUnionBool(value);
+    }
+    public record IdBoolUnionId(Id Id) : IdBoolUnion;
+    public record IdBoolUnionBool(bool Value) : IdBoolUnion;
 
 
 

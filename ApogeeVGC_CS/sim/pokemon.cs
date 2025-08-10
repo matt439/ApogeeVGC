@@ -9,23 +9,7 @@ namespace ApogeeVGC_CS.sim
         public required int Pp { get; init; }
         public required int MaxPp { get; init; }
         public MoveTarget? Target { get; init; }
-
-        public required object Disabled
-        {
-            get;
-            init // bool or string
-            {
-                if (value is bool or string)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Disabled must be a bool or string");
-                }
-            }
-        }
-
+        public required BoolStringUnion Disabled { get; init; }
         public string? DisabledSource { get; init; }
         public required bool Used { get; init; }
         public bool? Virtual { get; init; }
@@ -38,22 +22,7 @@ namespace ApogeeVGC_CS.sim
         public required bool ThisTurn { get; init; }
         public Id? Move { get; init; }
         public required PokemonSlot Slot { get; init; }
-
-        public object? DamageValue
-        {
-            get;
-            init // int, bool, or null
-            {
-                if (value is int or bool or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("DamageValue must be an int, bool, or null");
-                }
-            }
-        }
+        public IntBoolUnion? DamageValue { get; init; }
     }
 
     public class EffectState
@@ -138,60 +107,25 @@ namespace ApogeeVGC_CS.sim
         public required Id LastItem { get; init; }
         public required bool UsedItemThisTurn { get; init; }
         public required bool AteBerry { get; init; }
-
-        public required object Trapped
-        {
-            get;
-            init // bool or "hidden"
-            {
-                if (value is bool or "hidden")
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Trapped must be a bool or 'hidden'");
-                }
-            }
-        }
-
+        public required PokemonTrapped Trapped { get; init; }
         public required bool MaybeTrapped { get; init; }
         public required bool MaybeDisabled { get; init; }
         public bool? MaybeLocked { get; init; }
 
         public Pokemon? Illusion { get; init; }
         public required bool Transformed { get; init; }
-
         public required int MaxHp { get; init; }
         public required int BaseMaxHp { get; init; }
         public required int Hp { get; init; }
         public required bool Fainted { get; init; }
         public required bool FaintQueued { get; init; }
         public bool? SubFainted { get; init; }
-
         public required bool FormeRegression { get; init; }
-
         public required List<PokemonType> Types { get; init; }
         public required string AddedType { get; init; }
         public required bool KnownType { get; init; }
         public required string ApparentType { get; init; }
-
-        public required object SwitchFlag
-        {
-            get;
-            init // Id or bool
-            {
-                if (value is Id or bool)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("SwitchFlag must be an Id or bool");
-                }
-            }
-        }
-
+        public required IdBoolUnion SwitchFlag { get; init; }
         public required bool ForceSwitchFlag { get; init; }
         public required bool SkipBeforeSwitchOutEventFlag { get; init; }
         public int? DraggedIn { get; init; }
@@ -202,23 +136,7 @@ namespace ApogeeVGC_CS.sim
         public ActiveMove? LastMoveEncore { get; init; } // Gen 2 only
         public ActiveMove? LastMoveUsed { get; init; }
         public int? LastMoveTargetLoc { get; init; }
-
-        public required object MoveThisTurn
-        {
-            get;
-            init // string or bool
-            {
-                if (value is string or bool)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("MoveThisTurn must be a string or bool");
-                }
-            }
-        }
-
+        public required BoolStringUnion MoveThisTurn { get; init; }
         public required bool StatsRaisedThisTurn { get; init; }
         public required bool StatsLoweredThisTurn { get; init; }
         public bool? MoveLastTurnResult { get; init; }
@@ -250,23 +168,7 @@ namespace ApogeeVGC_CS.sim
         public string? CanMegaEvoY { get; init; }
         public string? CanUltraBurst { get; init; }
         public string? CanGigantamax { get; }
-
-        public object? CanTerastallize
-        {
-            get;
-            init // string, false, or null
-            {
-                if (value is string or false or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("CanTerastallize must be a string, false, or null");
-                }
-            }
-        }
-
+        public StringFalseUnion? CanTerastallize { get; init; }
         public required PokemonType TeraType { get; init; }
         public required List<PokemonType> BaseTypes { get; init; }
         public string? Terastallized { get; init; }
