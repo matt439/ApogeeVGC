@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     /// <summary>
     /// EffectState | Record<string, never> | null

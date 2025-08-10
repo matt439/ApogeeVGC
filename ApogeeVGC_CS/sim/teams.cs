@@ -185,7 +185,7 @@
             throw new NotImplementedException();
         }
 
-        public string? UnpackName(string? name, object? dexTable = null)
+        public string? UnpackName(string? name, Func<string, IAnyObject>? dexTable = null)
         {
             throw new NotImplementedException();
         }
