@@ -42,26 +42,26 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon>? OnEntryHazard { get; init; }
         public Action<Battle, Pokemon, Pokemon, IEffect>? OnFaint { get; init; }
         public Func<Battle, Pokemon, bool?>? OnFlinch { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, double?>? OnFractionalPriority { get; init; }
+        public OnFractionalPriority? OnFractionalPriority { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; init; }
         public Action<Battle, string, Pokemon>? OnImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnLockMove { get; init; }
         public Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyAtk { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnModifyBoost { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyCritRatio { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyCritRatio { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifySpA { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifySpA { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifySpe { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyStab { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyStab { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnModifyWeight { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveAborted { get; init; }
         public Func<Battle, Pokemon, string, bool?>? OnNegateImmunity { get; init; }
@@ -88,16 +88,16 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitSide { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnInvulnerability { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnInvulnerability { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object?>? OnTryPrimaryHit { get; init; }
         public Func<Battle, List<string>, Pokemon, List<string>?>? OnType { get; init; }
         public Action<Battle, Item, Pokemon>? OnUseItem { get; init; }
         public Action<Battle, Pokemon>? OnUpdate { get; init; }
         public Action<Battle, Pokemon, object?, Condition>? OnWeather { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnWeatherModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamagePhase1 { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyDamagePhase2 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnWeatherModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyDamagePhase1 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyDamagePhase2 { get; init; }
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; init; }
         public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeAfterHit { get; init; }
@@ -113,7 +113,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeAfterMoveSelf { get; init; }
         public Action<Battle, Pokemon, Pokemon>? OnFoeAttract { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnFoeAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeBasePower { get; init; }
         public Action<Battle, Pokemon, IEffect>? OnFoeBeforeFaint { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeBeforeMove { get; init; }
         public Action<Battle, Pokemon>? OnFoeBeforeSwitchIn { get; init; }
@@ -133,21 +133,21 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnFoeImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnFoeLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyAtk { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnFoeModifyBoost { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyCritRatio { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyCritRatio { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnFoeModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifySpA { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifySpe { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyStab { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnFoeModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnFoeModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnFoeModifyWeight { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnFoeMoveAborted { get; init; }
         public Func<Battle, Pokemon, string, bool?>? OnFoeNegateImmunity { get; init; }
@@ -169,13 +169,13 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnFoeTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnFoeTryHitField { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnFoeTryHitSide { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnFoeInvulnerability { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnFoeInvulnerability { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnFoeTryMove { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object?>? OnFoeTryPrimaryHit { get; init; }
         public Func<Battle, List<string>, Pokemon, List<string>?>? OnFoeType { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeWeatherModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamagePhase1 { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnFoeModifyDamagePhase2 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeWeatherModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyDamagePhase1 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnFoeModifyDamagePhase2 { get; init; }
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; init; }
         public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceAfterHit { get; init; }
@@ -191,7 +191,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceAfterMoveSelf { get; init; }
         public Action<Battle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnSourceAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceBasePower { get; init; }
         public Action<Battle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceBeforeMove { get; init; }
         public Action<Battle, Pokemon>? OnSourceBeforeSwitchIn { get; init; }
@@ -211,21 +211,21 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnSourceImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnSourceLockMove { get; init; }
         public Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyAtk { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnSourceModifyBoost { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyCritRatio { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyCritRatio { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnSourceModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifySpA { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifySpe { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyStab { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnSourceModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnSourceModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnSourceModifyWeight { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnSourceMoveAborted { get; init; }
         public Func<Battle, Pokemon, string, bool?>? OnSourceNegateImmunity { get; init; }
@@ -247,13 +247,13 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnSourceTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnSourceTryHitField { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnSourceTryHitSide { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnSourceInvulnerability { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnSourceInvulnerability { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnSourceTryMove { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object?>? OnSourceTryPrimaryHit { get; init; }
         public Func<Battle, List<string>, Pokemon, List<string>?>? OnSourceType { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceWeatherModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamagePhase1 { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnSourceModifyDamagePhase2 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceWeatherModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyDamagePhase1 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnSourceModifyDamagePhase2 { get; init; }
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; init; }
         public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyAfterHit { get; init; }
@@ -271,7 +271,7 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, Pokemon>? OnAnyAfterTerastallization { get; init; }
         public Action<Battle, Pokemon, Pokemon>? OnAnyAttract { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, object?>? OnAnyAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyBasePower { get; init; }
         public Action<Battle, Pokemon, IEffect>? OnAnyBeforeFaint { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyBeforeMove { get; init; }
         public Action<Battle, Pokemon>? OnAnyBeforeSwitchIn { get; init; }
@@ -291,21 +291,21 @@ namespace ApogeeVGC_CS.sim
         public Action<Battle, string, Pokemon>? OnAnyImmunity { get; init; }
         public Func<Battle, Pokemon, string?>? OnAnyLockMove { get; init; }
         public Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAccuracy { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyAtk { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyAccuracy { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyAtk { get; init; }
         public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAnyModifyBoost { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyCritRatio { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDef { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyCritRatio { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyDef { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnAnyModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyPriority { get; init; }
         public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpA { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifySpD { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifySpA { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifySpD { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifySpe { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyStab { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyStab { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnAnyModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnAnyModifyTarget { get; init; }
         public Func<Battle, int, Pokemon, int?>? OnAnyModifyWeight { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; init; }
         public Func<Battle, Pokemon, string, bool?>? OnAnyNegateImmunity { get; init; }
@@ -329,13 +329,13 @@ namespace ApogeeVGC_CS.sim
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnAnyTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnAnyTryHitField { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnAnyTryHitSide { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnAnyInvulnerability { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAnyInvulnerability { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnAnyTryMove { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, object?>? OnAnyTryPrimaryHit { get; init; }
         public Func<Battle, List<string>, Pokemon, List<string>?>? OnAnyType { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyWeatherModifyDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamagePhase1 { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAnyModifyDamagePhase2 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyWeatherModifyDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyDamagePhase1 { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnAnyModifyDamagePhase2 { get; init; }
         public int? OnAccuracyPriority { get; init; }
         public int? OnDamagingHitOrder { get; init; }
         public int? OnAfterMoveSecondaryPriority { get; init; }
@@ -675,6 +675,9 @@ namespace ApogeeVGC_CS.sim
         public string? Section { get; init; }
         public int? Column { get; init; }
         public Dictionary<string, object> ExtraData { get; set; } = [];
+        public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+        public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
     }
 
     // Helper class for Format

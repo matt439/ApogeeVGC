@@ -416,10 +416,10 @@
         public bool? Infiltrates { get; init; }
         public Nonstandard? IsNonstandard { get; init; }
         public string? ShortDesc { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion?>? BasePowerCallback { get; init; }
         public Func<Battle, Pokemon, Pokemon?, ActiveMove, bool?>? BeforeMoveCallback { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? BeforeTurnCallback { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? DamageCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion>? DamageCallback { get; init; }
         public Action<Battle, Pokemon>? PriorityChargeCallback { get; init; }
         public Action<Battle, Pokemon>? OnDisableMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; init; }
@@ -428,8 +428,8 @@
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; init; }
         public int? OnDamagePriority { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnBasePower { get; init; }
         public Func<Battle, int, Pokemon?, string, ActiveMove, int?>? OnEffectiveness { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; init; }
         public SparseBoostsTable? Boosts { get; init; }
@@ -441,17 +441,17 @@
         public string? Terrain { get; init; }
         public Id? Weather { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnHitSide { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyPriority { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnTryHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnTryHitSide { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; init; }
@@ -729,10 +729,10 @@
         // public bool? Infiltrates { get; init; }
         // public Nonstandard? IsNonstandard { get; init; }
         // public string? ShortDesc { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion?>? BasePowerCallback { get; init; }
         public Func<Battle, Pokemon, Pokemon?, ActiveMove, bool?>? BeforeMoveCallback { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? BeforeTurnCallback { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? DamageCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion>? DamageCallback { get; init; }
         public Action<Battle, Pokemon>? PriorityChargeCallback { get; init; }
         public Action<Battle, Pokemon>? OnDisableMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; init; }
@@ -741,8 +741,8 @@
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; init; }
         public int? OnDamagePriority { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnBasePower { get; init; }
         public Func<Battle, int, Pokemon?, string, ActiveMove, int?>? OnEffectiveness { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; init; }
         public SparseBoostsTable? Boosts { get; init; }
@@ -754,17 +754,17 @@
         public string? Terrain { get; init; }
         //public string? Weather { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnHitSide { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyPriority { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnTryHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnTryHitSide { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; init; }
@@ -815,6 +815,9 @@
         public Pokemon? RuinedSpD { get; init; }
         public bool? IsZOrMaxPowered { get; init; }
         public Dictionary<string, object> ExtraData { get; set; } = [];
+        public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+        public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
     }
 
     public enum MoveCategory
@@ -1193,10 +1196,10 @@
         public bool? IsConfusionSelfHit { get; init; }
         public bool? StallingMove { get; init; }
         public Id? BaseMove { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? BasePowerCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion?>? BasePowerCallback { get; init; }
         public Func<Battle, Pokemon, Pokemon?, ActiveMove, bool?>? BeforeMoveCallback { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? BeforeTurnCallback { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, int?>? DamageCallback { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion>? DamageCallback { get; init; }
         public Action<Battle, Pokemon>? PriorityChargeCallback { get; init; }
         public Action<Battle, Pokemon>? OnDisableMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterHit { get; init; }
@@ -1205,8 +1208,8 @@
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMoveSecondary { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAfterMove { get; init; }
         public int? OnDamagePriority { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnBasePower { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnBasePower { get; init; }
         public Func<Battle, int, Pokemon?, string, ActiveMove, int?>? OnEffectiveness { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; init; }
         public SparseBoostsTable? Boosts { get; init; }
@@ -1217,17 +1220,17 @@
         public string? PseudoWeather { get; init; }
         public string? Terrain { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnHitSide { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon?>? OnModifyMove { get; init; }
-        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnModifyPriority { get; init; }
+        public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?>? OnModifyPriority { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnMoveFail { get; init; }
         public Action<Battle, ActiveMove, Pokemon, Pokemon>? OnModifyType { get; init; }
-        public Action<Battle, object, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
+        public Action<Battle, Pokemon, Pokemon, Pokemon, ActiveMove>? OnModifyTarget { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnPrepareHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTry { get; init; }
-        public Func<Battle, Pokemon, Pokemon, ActiveMove, object>? OnTryHit { get; init; }
+        public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryHit { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryHitField { get; init; }
-        public Func<Battle, Side, Pokemon, ActiveMove, object?>? OnTryHitSide { get; init; }
+        public Func<Battle, Side, Pokemon, ActiveMove, BoolEmptyStringUnion?>? OnTryHitSide { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryImmunity { get; init; }
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnTryMove { get; init; }
         public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnUseMoveMessage { get; init; }

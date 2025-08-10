@@ -39,13 +39,14 @@ namespace ApogeeVGC_CS.data
                 Name = "Choice Specs",
                 SpriteNum = 70,
                 Fling = new FlingData { BasePower = 10 },
-                OnStart = (battle, pokemon) =>
+                OnStart = (battle, pokemon, sourcePokemon, effect) =>
                 {
                     if (pokemon.Volatiles.ContainsKey("choicelock"))
                     {
                         battle.Debug("removing choicelock");
                     }
                     pokemon.RemoveVolatile("choicelock");
+                    return true;
                 },
                 OnModifyMove = (battle, move, pokemon, target) =>
                 {

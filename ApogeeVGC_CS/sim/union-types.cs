@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace ApogeeVGC_CS.sim
+﻿namespace ApogeeVGC_CS.sim
 {
     /// <summary>
     /// EffectState | Record<string, never> | null
@@ -518,7 +516,6 @@ namespace ApogeeVGC_CS.sim
     public record BoolEmptyStringBoolUnion(bool Value) : BoolEmptyStringUnion;
     public record EmptyStringBoolUnion(string Value) : BoolEmptyStringUnion;
 
-
     /// <summary>
     /// CommonHandlers['ModifierSourceMove'] | -0.1
     /// </summary>
@@ -527,16 +524,27 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator OnFractionalPriority(
             Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> function) =>
             new OnFractionalPriorityFunc(function);
+
+        private const double Tolerance = 0.0001;
+
         public static implicit operator OnFractionalPriority(double value) =>
-            value == -0.1 ? new OnFrationalPriorityNeg(value) :
+            Math.Abs(value - (-0.1)) < Tolerance ? new OnFrationalPriorityNeg(value) :
             throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
     }
     public record OnFractionalPriorityFunc(
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> Function) : OnFractionalPriority;
     public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 
-
-
+    /// <summary>
+    /// string | List<string>
+    /// </summary>
+    public abstract record StrListStrUnion
+    {
+        public static implicit operator StrListStrUnion(string value) => new StrStrListStrUnion(value);
+        public static implicit operator StrListStrUnion(List<string> value) => new StrListStrListUnion(value);
+    }
+    public record StrStrListStrUnion(string Value) : StrListStrUnion;
+    public record StrListStrListUnion(List<string> Value) : StrListStrUnion;
 
 
     ///// <summary>

@@ -339,6 +339,8 @@ namespace ApogeeVGC_CS.sim
 
         public int? EffectOrder { get; set; }
 
+        public int? Index { get; init; }
+
         //public Pokemon(string set, Side side) : this(new PokemonSet
         //{
         //    Species = set,

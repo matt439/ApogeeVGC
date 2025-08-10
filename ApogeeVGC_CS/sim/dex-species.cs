@@ -540,6 +540,9 @@
             init;
         }
         public Dictionary<string, object> ExtraData { get; set; } = [];
+        public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+        public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
     }
 
     public static class SpeciesConstants

@@ -1,13 +1,6 @@
-﻿using ApogeeVGC_CS.data;
-using ApogeeVGC_CS.sim;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -61,7 +54,7 @@ namespace ApogeeVGC_CS.sim
     {
         public Format? Format { get; init; }
         public required Id FormatId { get; init; }
-        public Action<string, object>? Send { get; init; }
+        public Action<string, StrListStrUnion>? Send { get; init; }
         public Prng? Prng { get; init; }
         public PrngSeed? PrngSeed { get; init; }
         public BoolStringUnion? Rated { get; init; }
@@ -219,7 +212,7 @@ namespace ApogeeVGC_CS.sim
         public static bool Fail => false;
         public static object? SilentFail => null;
 
-        public Action<string, object> Send { get; init; }
+        public Action<string, StrListStrUnion> Send { get; init; }
 
         // Methods
         //public Func<int, int?, int> Trunc { get; init; }
@@ -323,13 +316,9 @@ namespace ApogeeVGC_CS.sim
             var inputOptions = new Dictionary<string, object>
             {
                 ["formatid"] = options.FormatId,
-                ["seed"] = PrngSeed
+                ["seed"] = PrngSeed,
+                ["rated"] = Rated
             };
-
-            if (Rated is true or string)
-            {
-                inputOptions["rated"] = Rated;
-            }
 
             // Version logging (if version system is implemented)
             // TODO: Implement version system
@@ -648,8 +637,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public object PriorityEvent(string eventId, PriorityEventTarget target,
-            Pokemon? source = null, IEffect? effect = null, object? relayVar = null,
+        public object PriorityEvent(
+            string eventId,
+            PriorityEventTarget target,
+            Pokemon? source = null,
+            IEffect? effect = null,
+            object? relayVar = null,
             bool onEffect = false)
         {
             throw new NotImplementedException();
@@ -841,7 +834,8 @@ namespace ApogeeVGC_CS.sim
                         Callback = callback,
                         State = sideConditionData,
                         End = customHolder != null ? null : CreateRemoveSideConditionDelegate(side),
-                        EffectHolder = customHolder ?? (object)side
+                        
+                        EffectHolder = (EventEffectHolder)customHolder ?? side
                     };
 
                     // Resolve priority and create full event listener
@@ -875,7 +869,7 @@ namespace ApogeeVGC_CS.sim
             return new Action<string>(conditionId => side.RemoveSideCondition(conditionId));
         }
 
-        public void OnEvent(string eventId, Format target, params object[] rest)
+        public void OnEvent(string eventId, Format target, params IAnyObject[] rest)
         {
             throw new NotImplementedException();
         }
@@ -1166,7 +1160,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void GetActionSpeed(object action)
+        public void GetActionSpeed(IAnyObject action)
         {
             throw new NotImplementedException();
         }
