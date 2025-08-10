@@ -546,6 +546,22 @@
     public record StrStrListStrUnion(string Value) : StrListStrUnion;
     public record StrListStrListUnion(List<string> Value) : StrListStrUnion;
 
+    /// <summary>
+    /// string | number | ActiveMove
+    /// </summary>
+    public abstract record GetDamageMove
+    {
+        public static implicit operator GetDamageMove(string value) => new StrGetDamageMove(value);
+        public static implicit operator GetDamageMove(int value) => new IntGetDamageMove(value);
+        public static implicit operator GetDamageMove(ActiveMove activeMove) =>
+            new ActiveMoveGetDamageMove(activeMove);
+    }
+    public record StrGetDamageMove(string Value) : GetDamageMove;
+
+    public record IntGetDamageMove(int Value) : GetDamageMove;
+    public record ActiveMoveGetDamageMove(ActiveMove ActiveMove) : GetDamageMove;
+
+
 
     ///// <summary>
     ///// StringObject | Pokemon | Side | Field | Battle

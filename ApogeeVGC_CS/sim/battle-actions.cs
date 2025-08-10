@@ -237,11 +237,11 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("HitStepTypeImmunity method is not implemented yet.");
         }
 
-        public object TryMoveHit(List<Pokemon> targetOrTargets, Pokemon pokemon, ActiveMove move)
+        public IntFalseUnion? TryMoveHit(List<Pokemon> targetOrTargets, Pokemon pokemon, ActiveMove move)
         {
             throw new NotImplementedException("TryMoveHit method is not implemented yet.");
         }
-        public object HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+        public List<IntBoolUnion?> HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
         {
             throw new NotImplementedException("HitStepTypeImmunity method is not implemented yet.");
         }
@@ -349,7 +349,7 @@ namespace ApogeeVGC_CS.sim
 	     * Normal PS return value rules apply:
 	     * undefined = success, null = silent failure, false = loud failure
 	     */
-        public int? GetDamage(Pokemon source, Pokemon target, object move,
+        public int? GetDamage(Pokemon source, Pokemon target, GetDamageMove move,
             bool suppressMessages = false)
         {
             throw new NotImplementedException("GetDamage method is not implemented yet.");
