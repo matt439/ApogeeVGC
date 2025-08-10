@@ -204,21 +204,7 @@
         public bool? SpreadHit { get; init; }
         public IConditionData? Condition { get; init; }
         public int BasePower { get; init; }
-        public required object Accuracy
-        {
-            get;
-            init
-            {
-                if (value is bool or double or int)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Accuracy must be a boolean, integer or double.");
-                }
-            }
-        }
+        public required MoveDataAccuracy Accuracy { get; init; }
         public required int Pp { get; init; }
         public required MoveCategory Category { get; init; }
         public required PokemonType Type { get; init; }
@@ -226,130 +212,21 @@
         public required MoveTarget Target { get; init; }
         public required MoveFlags Flags { get; init; }
         public string? RealMove { get; init; } // For Hidden Power
-        public object? Damage
-        {
-            get;
-            init
-            {
-                if (field is int or double or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Damage must be a number, string, or an array of numbers.");
-                }
-            }
-        }
+        public MoveDataDamage? Damage { get; init; }
         public ContestType? ContestType { get; init; }
         public bool? NoPpBoosts { get; init; }
-        public object? IsZ
-        {
-            get;
-            init
-            {
-                if (value is bool or IdEntry or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsZ must be bool or IdEntry");
-                }
-            }
-        }
+        public MoveDataIsZ? IsZ { get; init; }
         public ZMoveData? ZMove { get; init; }
-        public object? IsMax
-        {
-            get;
-            init
-            {
-                if (value is bool or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsMaz must be bool, string or null");
-                }
-            }
-        }
+        public BoolStringUnion? IsMax { get; init; }
         public MaxMoveData? MaxMove { get; init; }
 
-        public object? Ohko // bool or "Ice"
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                    {
-                        if (s == "Ice")
-                        {
-                            field = s;
-                        }
-
-                        break;
-                    }
-                    default:
-                        throw new ArgumentException("Ohko must be bool or 'Ice'");
-                }
-            }
-        }
+        public MoveDataOhko? Ohko { get; init; }
         public bool? ThawsTarget { get; init; }
         public int[]? Heal { get; init; }
         public bool? ForceSwitch { get; init; }
-        public object? SelfSwitch // "copyvolatile", "shedtail", or bool
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                    {
-                        if (s is "copyvolatile" or "shedtail")
-                        {
-                            field = s;
-                        }
-                        break;
-                    }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'copyvolatile', or 'shedtail'");
-                }
-            }
-        } 
+        public MoveDataSelfSwitch? SelfSwitch { get; init; }
         public SelfBoostData? SelfBoost { get; init; }
-        public object? SelfDestruct // "always", "ifHit", or bool
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                    {
-                        if (s is "always" or "ifHit")
-                        {
-                            field = s;
-                        }
-                        break;
-                    }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'always', or 'ifHit'");
-                }
-            }
-        }
+        public MoveDataSelfdestruct? SelfDestruct { get; init; }
         public bool? BreaksProtect { get; init; }
         public (int, int)? Recoil { get; init; }
         public (int, int)? Drain { get; init; }
@@ -374,21 +251,7 @@
         public bool? IgnoreAccuracy { get; init; }
         public bool? IgnoreDefensive { get; init; }
         public bool? IgnoreEvasion { get; init; }
-        public object? IgnoreImmunity // boolean | { [typeName: string]: boolean };
-        {
-            get;
-            init
-            {
-                if (value is bool or (PokemonType, bool) or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IgnoreImmunity must be bool or (PokemonType, bool) tuple");
-                }
-            }
-        } 
+        public MoveDataIgnoreImmunity? IgnoreImmunity { get; init; }
         public bool? IgnoreNegativeOffensive { get; init; }
         public bool? IgnoreOffensive { get; init; }
         public bool? IgnorePositiveDefensive { get; init; }
@@ -518,21 +381,7 @@
         public bool? SpreadHit { get; init; }
         public IConditionData? Condition { get; init; }
         public int BasePower { get; init; }
-        public required object Accuracy
-        {
-            get;
-            init
-            {
-                if (value is bool or double or int)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Accuracy must be a boolean, integer or double.");
-                }
-            }
-        }
+        public required MoveDataAccuracy Accuracy { get; init; }
         public required int Pp { get; init; }
         public required MoveCategory Category { get; init; }
         public required PokemonType Type { get; init; }
@@ -540,129 +389,20 @@
         public required MoveTarget Target { get; init; }
         public required MoveFlags Flags { get; init; }
         //public string? RealMove { get; init; } // For Hidden Power
-        public object? Damage
-        {
-            get;
-            init
-            {
-                if (field is int or double or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Damage must be a number, string, or an array of numbers.");
-                }
-            }
-        }
+        public MoveDataDamage? Damage { get; init; }
         public ContestType? ContestType { get; init; }
         public bool? NoPpBoosts { get; init; }
-        public object? IsZ
-        {
-            get;
-            init
-            {
-                if (value is bool or IdEntry or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsZ must be bool or IdEntry");
-                }
-            }
-        }
+        public MoveDataIsZ? IsZ { get; init; }
         public ZMoveData? ZMove { get; init; }
-        public object? IsMax
-        {
-            get;
-            init
-            {
-                if (value is bool or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsMaz must be bool, string or null");
-                }
-            }
-        }
+        public BoolStringUnion? IsMax { get; init; }
         public MaxMoveData? MaxMove { get; init; }
-        public object? Ohko // bool or "Ice"
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s == "Ice")
-                            {
-                                field = s;
-                            }
-
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool or 'Ice'");
-                }
-            }
-        }
+        public MoveDataOhko? Ohko { get; init; }
         public bool? ThawsTarget { get; init; }
         public int[]? Heal { get; init; }
         public bool? ForceSwitch { get; init; }
-        public object? SelfSwitch // "copyvolatile", "shedtail", or bool
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s is "copyvolatile" or "shedtail")
-                            {
-                                field = s;
-                            }
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'copyvolatile', or 'shedtail'");
-                }
-            }
-        }
+        public MoveDataSelfSwitch? SelfSwitch { get; init; }
         public SelfBoostData? SelfBoost { get; init; }
-        public object? SelfDestruct // "always", "ifHit", or bool
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s is "always" or "ifHit")
-                            {
-                                field = s;
-                            }
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'always', or 'ifHit'");
-                }
-            }
-        }
+        public MoveDataSelfdestruct? SelfDestruct { get; init; }
         public bool? BreaksProtect { get; init; }
         public (int, int)? Recoil { get; init; }
         public (int, int)? Drain { get; init; }
@@ -687,21 +427,7 @@
         public bool? IgnoreAccuracy { get; init; }
         public bool? IgnoreDefensive { get; init; }
         public bool? IgnoreEvasion { get; init; }
-        public object? IgnoreImmunity // boolean | { [typeName: string]: boolean };
-        {
-            get;
-            init
-            {
-                if (value is bool or (PokemonType, bool) or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IgnoreImmunity must be bool or (PokemonType, bool) tuple");
-                }
-            }
-        }
+        public MoveDataIgnoreImmunity? IgnoreImmunity { get; init; }
         public bool? IgnoreNegativeOffensive { get; init; }
         public bool? IgnoreOffensive { get; init; }
         public bool? IgnorePositiveDefensive { get; init; }
@@ -792,21 +518,7 @@
 
         public string? StatusRoll { get; init; }
         public bool? StellarBoosted { get; init; }
-        public object? TotalDamage // int or false
-        {
-            get;
-            init
-            {
-                if (value is int or double or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("TotalDamage must be a number or null.");
-                }
-            }
-        } 
+        public IntFalseUnion? TotalDamage { get; init; }
         public IEffect? TypeChangerBoosted { get; init; }
         public bool? WillChangeForme { get; init; }
         public Pokemon? RuinedAtk { get; init; }
@@ -837,73 +549,32 @@
         }
         public IConditionData? Condition { get; init; }
         public int BasePower { get; init; }
-        public required object Accuracy
-        {
-            get;
-            init
-            {
-                if (value is bool or double or int)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Accuracy must be a boolean, integer or double.");
-                }
-            }
-        }
+        public required IntTrueUnion Accuracy { get; init; }
         public required int Pp { get; init; }
         public required MoveCategory Category { get; init; }
         public required PokemonType Type { get; init; }
         public required int Priority { get; init; }
         public required MoveTarget Target { get; init; }
         public required MoveFlags Flags { get; init; }
-        public object? Damage
-        {
-            get;
-            init
-            {
-                if (field is int or double or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Damage must be a number, string, or an array of numbers.");
-                }
-            }
-        }
+        public MoveDataDamage? Damage { get; init; }
         public ContestType? ContestType { get; init; }
-
         public bool? NoPpBoosts
         {
-            get => (field ?? IsZ) == (object)true;
+            get => (field ?? IsZ) == true;
             init;
         }
-        public object? IsZ
-        {
-            get => field ?? false;
-            init
-            {
-                if (value is bool or IdEntry or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsZ must be bool or IdEntry");
-                }
-            }
-        }
-
+        public MoveDataIsZ? IsZ { get; init; }
         public ZMoveData? ZMove
         {
             get
             {
                 // Only initialize if not Status, not already a Z/Max move, and not "struggle"
-                if (Category == MoveCategory.Status || field != null || IsZ is true || IsMax is true ||
-                    Id.Value == "struggle") return field;
-
+                if (Category == MoveCategory.Status || field != null || IsZ is BoolMoveDataIsZ ||
+                    IsMax is BoolBoolStringUnion || Id.Value == "struggle")
+                {
+                    return field;
+                }
+                
                 int basePower = BasePower;
 
                 // If multi-hit, triple the base power
@@ -929,22 +600,7 @@
             }
             init;
         }
-        public object? IsMax
-        {
-            get => field ?? false;
-            init
-            {
-                if (value is bool or string or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IsMaz must be bool, string or null");
-                }
-            }
-        }
-
+        public BoolStringUnion? IsMax { get; init; }
         public MaxMoveData? MaxMove
         {
             get
@@ -957,7 +613,7 @@
                     BasePower = 1, // Default value, will be adjusted later
                 };
 
-                if ((IsMax is true) || (IsZ is true))
+                if (IsMax is BoolBoolStringUnion || IsZ is BoolMoveDataIsZ)
                 {
                     return field;
                 }
@@ -993,80 +649,13 @@
             init;
         }
 
-        public object? Ohko // bool or "Ice"
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s == "Ice")
-                            {
-                                field = s;
-                            }
-
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool or 'Ice'");
-                }
-            }
-        }
+        public MoveDataOhko? Ohko { get; init; }
         public bool? ThawsTarget { get; init; }
         public int[]? Heal { get; init; }
         public bool? ForceSwitch { get; init; }
-        public object? SelfSwitch // "copyvolatile", "shedtail", or bool
-        {
-            get => field as string ?? field;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s is "copyvolatile" or "shedtail")
-                            {
-                                field = s;
-                            }
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'copyvolatile', or 'shedtail'");
-                }
-            }
-        }
+        public MoveDataSelfSwitch? SelfSwitch { get; init; }
         public SelfBoostData? SelfBoost { get; init; }
-        public object? SelfDestruct // "always", "ifHit", or bool
-        {
-            get;
-            init
-            {
-                switch (value)
-                {
-                    case bool or null:
-                        field = value;
-                        break;
-                    case string s:
-                        {
-                            if (s is "always" or "ifHit")
-                            {
-                                field = s;
-                            }
-                            break;
-                        }
-                    default:
-                        throw new ArgumentException("Ohko must be bool, 'always', or 'ifHit'");
-                }
-            }
-        }
+        public MoveDataSelfdestruct? SelfDestruct { get; init; }
         public bool? BreaksProtect { get; init; }
         public (int, int)? Recoil { get; init; }
         public (int, int)? Drain { get; init; }
@@ -1142,21 +731,7 @@
             init;
         }
         public bool? IgnoreEvasion { get; init; }
-        public object? IgnoreImmunity // boolean | { [typeName: string]: boolean };
-        {
-            get => field ?? (Category == MoveCategory.Status);
-            init
-            {
-                if (value is bool or (PokemonType, bool) or null)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("IgnoreImmunity must be bool or (PokemonType, bool) tuple");
-                }
-            }
-        }
+        public MoveDataIgnoreImmunity? IgnoreImmunity { get; init; }
 
         public bool? IgnoreNegativeOffensive
         {
@@ -1255,7 +830,7 @@
                 return field switch
                 {
                     // Special handling for Gen 8 G-Max moves (num 1000 but part of Gen 8)
-                    >= 827 when (bool?)IsMax != true => 9,
+                    >= 827 when IsMax != true => 9,
                     >= 743 => 8,
                     >= 622 => 7,
                     >= 560 => 6,

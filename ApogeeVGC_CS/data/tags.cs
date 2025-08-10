@@ -77,12 +77,12 @@ namespace ApogeeVGC_CS.data
             [new IdEntry("zmove")] = new TagData
             {
                 Name = "Z-Move",
-                MoveFilter = move => move.IsZ != null && (bool?)move.IsZ == true,
+                MoveFilter = move => move.IsZ != null && move.IsZ == true,
             },
             [new IdEntry("maxmove")] = new TagData
             {
                 Name = "Max Move",
-                MoveFilter = move => move.IsMax != null && (bool?)move.IsMax == true,
+                MoveFilter = move => move.IsMax != null && move.IsMax == true,
             },
             [new IdEntry("contact")] = new TagData
             {
@@ -148,7 +148,7 @@ namespace ApogeeVGC_CS.data
             {
                 Name = "Nonsnatchable",
                 Desc = "Can't be copied by Snatch.",
-                MoveFilter = move => (move.Target == MoveTarget.AllyTeam || move.Target == MoveTarget.Self || move.Target == MoveTarget.AdjacentAllyOrSelf) && move.Flags.Snatch != true,
+                MoveFilter = move => move.Target is MoveTarget.AllyTeam or MoveTarget.Self or MoveTarget.AdjacentAllyOrSelf && move.Flags.Snatch != true,
             },
             [new IdEntry("bypasssubstitute")] = new TagData
             {
@@ -159,7 +159,7 @@ namespace ApogeeVGC_CS.data
             [new IdEntry("gmaxmove")] = new TagData
             {
                 Name = "G-Max Move",
-                MoveFilter = move => move.IsMax is string,
+                MoveFilter = move => move.IsMax is StringBoolStringUnion,
             },
 
             // Tiers
@@ -442,7 +442,17 @@ namespace ApogeeVGC_CS.data
             [new IdEntry("accuracy")] = new TagData
             {
                 Name = "Accuracy",
-                MoveNumCol = move => move.Accuracy is true ? 101 : (move.Accuracy as int? ?? 0),
+                //MoveNumCol = move => move.Accuracy is TrueMoveDataAccuracy ? 101 : (move.Accuracy as int? ?? 0),
+                MoveNumCol = move =>
+                {
+                    return move.Accuracy switch
+                    {
+                        TrueMoveDataAccuracy => 101,
+                        IntMoveDataAccuracy(var i) => i,
+                        DoubleMoveDataAccuracy(var d) => (int)(d * 100),
+                        _ => 0
+                    };
+                }
             },
             [new IdEntry("maxpp")] = new TagData
             {

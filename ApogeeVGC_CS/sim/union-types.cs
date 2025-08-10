@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ApogeeVGC_CS.sim
 {
     /// <summary>
     /// EffectState | Record<string, never> | null
@@ -627,6 +629,136 @@
     }
     public record SparseBoostsTableItemBoosts(SparseBoostsTable Table) : ItemBoosts;
     public record FlaseItemBoosts(bool Value) : ItemBoosts;
+
+
+    /// <summary>
+    /// int | double | true
+    /// </summary>
+    public abstract record MoveDataAccuracy
+    {
+        public static implicit operator MoveDataAccuracy(int value) => new IntMoveDataAccuracy(value);
+        public static implicit operator MoveDataAccuracy(double value) => new DoubleMoveDataAccuracy(value);
+        public static implicit operator MoveDataAccuracy(bool value) =>
+            value ? new TrueMoveDataAccuracy(value) :
+            throw new ArgumentException("Must be 'true' for TrueMoveDataAccuracy");
+    }
+    public record IntMoveDataAccuracy(int Value) : MoveDataAccuracy;
+    public record DoubleMoveDataAccuracy(double Value) : MoveDataAccuracy;
+    public record TrueMoveDataAccuracy(bool Value) : MoveDataAccuracy;
+
+    /// <summary>
+    /// int | 'level' | false
+    /// </summary>
+    public abstract record MoveDataDamage
+    {
+        public static implicit operator MoveDataDamage(int value) => new MoveDataDamageInt(value);
+        public static implicit operator MoveDataDamage(string value) =>
+            value == "level" ? new MoveDataDamageLevel(value) :
+                throw new ArgumentException("Must be 'level'");
+        public static implicit operator MoveDataDamage(bool value) =>
+            value ? throw new ArgumentException("Must be 'false' for MoveDataDamageFalse") :
+            new MoveDataDamageFalse(value);
+    }
+    public record MoveDataDamageInt(int Value) : MoveDataDamage;
+    public record MoveDataDamageLevel(string Value) : MoveDataDamage;
+    public record MoveDataDamageFalse(bool Value) : MoveDataDamage;
+
+    /// <summary>
+    /// boolean | IDEntry
+    /// </summary>
+    public abstract record MoveDataIsZ
+    {
+        public static implicit operator MoveDataIsZ(bool value) => new BoolMoveDataIsZ(value);
+        public static implicit operator MoveDataIsZ(IdEntry value) => new IdEntryMoveDataIsZ(value);
+    }
+    public record BoolMoveDataIsZ(bool Value) : MoveDataIsZ;
+    public record IdEntryMoveDataIsZ(IdEntry Value) : MoveDataIsZ;
+
+    /// <summary>
+    ///  boolean | 'Ice'
+    /// </summary>
+    public abstract record MoveDataOhko
+    {
+        public static implicit operator MoveDataOhko(bool value) => new BoolMoveDataOhko(value);
+        public static implicit operator MoveDataOhko(string value) => 
+            value == "Ice" ? new IceMoveDataOhko(value) :
+            throw new ArgumentException("Must be 'Ice' for IceMoveDataOhko");
+    }
+    public record BoolMoveDataOhko(bool Value) : MoveDataOhko;
+    public record IceMoveDataOhko(string Value) : MoveDataOhko;
+
+
+    /// <summary>
+    /// 'copyvolatile' | 'shedtail' | boolean
+    /// </summary>
+    public abstract record MoveDataSelfSwitch
+    {
+        public static implicit operator MoveDataSelfSwitch(string value) =>
+            value switch
+            {
+                "copyvolatile" => new CopyVolatileMoveDataSelfSwitch(),
+                "shedtail" => new ShedTailMoveDataSelfSwitch(),
+                _ => new BoolMoveDataSelfSwitch(bool.Parse(value))
+            };
+
+        public static implicit operator MoveDataSelfSwitch(bool value) => new BoolMoveDataSelfSwitch(value);
+    }
+    public record CopyVolatileMoveDataSelfSwitch : MoveDataSelfSwitch;
+    public record ShedTailMoveDataSelfSwitch : MoveDataSelfSwitch;
+    public record BoolMoveDataSelfSwitch(bool Value) : MoveDataSelfSwitch;
+
+    /// <summary>
+    /// 'always' | 'ifHit' | boolean
+    /// </summary>
+    public abstract record MoveDataSelfdestruct
+    {
+        public static implicit operator MoveDataSelfdestruct(string value) =>
+            value switch
+            {
+                "always" => new AlwaysMoveDataSelfdestruct(),
+                "ifHit" => new IfHitMoveDataSelfdestruct(),
+                _ => new BoolMoveDataSelfdestruct(bool.Parse(value))
+            };
+        public static implicit operator MoveDataSelfdestruct(bool value) => new BoolMoveDataSelfdestruct(value);
+    }
+    public record AlwaysMoveDataSelfdestruct : MoveDataSelfdestruct;
+    public record IfHitMoveDataSelfdestruct : MoveDataSelfdestruct;
+    public record BoolMoveDataSelfdestruct(bool Value) : MoveDataSelfdestruct;
+
+
+    /// <summary>
+    /// boolean | { [PokemonType: string]: boolean }
+    /// </summary>
+    public abstract record MoveDataIgnoreImmunity
+    {
+        public static implicit operator MoveDataIgnoreImmunity(bool value) =>
+            new BoolMoveDataIgnoreImmunity(value);
+        public static implicit operator MoveDataIgnoreImmunity(Dictionary<PokemonType, bool> typeImmunities) =>
+            new TypeMoveDataIgnoreImmunity(typeImmunities);
+    }
+    public record BoolMoveDataIgnoreImmunity(bool Value) : MoveDataIgnoreImmunity;
+    public record TypeMoveDataIgnoreImmunity(Dictionary<PokemonType, bool> TypeImmunities) :
+        MoveDataIgnoreImmunity;
+
+
+    /// <summary>
+    /// int | true
+    /// </summary>
+    public abstract record IntTrueUnion
+    {
+        public static implicit operator IntTrueUnion(int value) => new IntIntTrueUnion(value);
+        public static implicit operator IntTrueUnion(bool value) =>
+            value ? new TrueIntTrueUnion(value) :
+            throw new ArgumentException("Must be 'true' for TrueIntTrueUnion");
+    }
+    public record IntIntTrueUnion(int Value) : IntTrueUnion;
+    public record TrueIntTrueUnion(bool Value) : IntTrueUnion;
+
+
+
+
+
+
 
 
 
