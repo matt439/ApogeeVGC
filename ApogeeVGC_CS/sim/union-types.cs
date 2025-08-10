@@ -10,8 +10,11 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator SingleEventState(EffectState effectState) =>
             new EffectStateSingleEventState(effectState);
     }
+
     public record EffectStateSingleEventState(EffectState EffectState) : SingleEventState;
+
     public record EmptySingleEventState : SingleEventState;
+
     public record NullSingleEventState : SingleEventState;
 
     /// <summary>
@@ -21,18 +24,27 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator SingleEventTarget(string value) =>
             new StringSingleEventTarget(value);
+
         public static implicit operator SingleEventTarget(Pokemon pokemon) =>
             new PokemonSingleEventTarget(pokemon);
+
         public static implicit operator SingleEventTarget(Side side) => new SideSingleEventTarget(side);
         public static implicit operator SingleEventTarget(Field field) => new FieldSingleEventTarget(field);
+
         public static implicit operator SingleEventTarget(Battle battle) =>
             new BattleSingleEventTarget(battle);
     }
+
     public record StringSingleEventTarget(string Value) : SingleEventTarget;
+
     public record PokemonSingleEventTarget(Pokemon Pokemon) : SingleEventTarget;
+
     public record SideSingleEventTarget(Side Side) : SingleEventTarget;
+
     public record FieldSingleEventTarget(Field Field) : SingleEventTarget;
+
     public record BattleSingleEventTarget(Battle Battle) : SingleEventTarget;
+
     public record NullSingleEventTarget : SingleEventTarget;
 
     public static class EffectUnionFactory
@@ -102,6 +114,17 @@ namespace ApogeeVGC_CS.sim
             Format format => new EffectHealEffect(format),
             _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to HealEffect")
         };
+
+        public static EffectEffectStringUnion ToEffectStringUnion(IEffect effect) => effect switch
+        {
+            Ability ability => new EffectEffectStringUnion(ability),
+            ItemData itemData => new EffectEffectStringUnion(itemData),
+            ActiveMove activeMove => new EffectEffectStringUnion(activeMove),
+            Species species => new EffectEffectStringUnion(species),
+            Condition condition => new EffectEffectStringUnion(condition),
+            Format format => new EffectEffectStringUnion(format),
+            _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to EffectEffectStringUnion")
+        };
     }
 
     public static class AnyObjectUnionFactory
@@ -120,29 +143,40 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator SingleEventSource(string value) =>
             new StringSingleEventSource(value);
+
         public static implicit operator SingleEventSource(Pokemon pokemon) =>
             new PokemonSingleEventSource(pokemon);
 
         public static implicit operator SingleEventSource(Ability ability) =>
             EffectUnionFactory.ToSingleEventSource(ability);
+
         public static implicit operator SingleEventSource(ItemData itemData) =>
             EffectUnionFactory.ToSingleEventSource(itemData);
+
         public static implicit operator SingleEventSource(ActiveMove activeMove) =>
             EffectUnionFactory.ToSingleEventSource(activeMove);
+
         public static implicit operator SingleEventSource(Species species) =>
             EffectUnionFactory.ToSingleEventSource(species);
+
         public static implicit operator SingleEventSource(Condition condition) =>
             EffectUnionFactory.ToSingleEventSource(condition);
+
         public static implicit operator SingleEventSource(Format format) =>
             EffectUnionFactory.ToSingleEventSource(format);
 
         public static implicit operator SingleEventSource(bool value) =>
             value ? new NullSingleEventSource() : new FalseSingleEventSource();
     }
+
     public record StringSingleEventSource(string Value) : SingleEventSource;
+
     public record PokemonSingleEventSource(Pokemon Pokemon) : SingleEventSource;
+
     public record EffectSingleEventSource(IEffect Effect) : SingleEventSource;
+
     public record FalseSingleEventSource : SingleEventSource;
+
     public record NullSingleEventSource : SingleEventSource;
 
     /// <summary>
@@ -152,15 +186,22 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator RunEventTarget(Pokemon pokemon) =>
             new PokemonRunEventTarget(pokemon);
+
         public static implicit operator RunEventTarget(List<Pokemon> pokemonList) =>
             new PokemonListRunEventTarget(pokemonList);
+
         public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
         public static implicit operator RunEventTarget(Battle battle) => new BattleRunEventTarget(battle);
     }
+
     public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;
+
     public record PokemonListRunEventTarget(List<Pokemon> PokemonList) : RunEventTarget;
+
     public record SideRunEventTarget(Side Side) : RunEventTarget;
+
     public record BattleRunEventTarget(Battle Battle) : RunEventTarget;
+
     public record NullRunEventTarget : RunEventTarget;
 
     /// <summary>
@@ -170,12 +211,17 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator RunEventSource(string value) => new StringRunEventSource(value);
         public static implicit operator RunEventSource(Pokemon pokemon) => new PokemonRunEventSource(pokemon);
+
         public static implicit operator RunEventSource(bool value) =>
             value ? new NullRunEventSource() : new FalseRunEventSource();
     }
+
     public record StringRunEventSource(string Value) : RunEventSource;
+
     public record PokemonRunEventSource(Pokemon Pokemon) : RunEventSource;
+
     public record FalseRunEventSource : RunEventSource;
+
     public record NullRunEventSource : RunEventSource;
 
     /// <summary>
@@ -185,13 +231,18 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator PriorityEventTarget(Pokemon pokemon) =>
             new PokemonPriorityEventTarget(pokemon);
+
         public static implicit operator PriorityEventTarget(Side side) =>
             new SidePriorityEventTarget(side);
+
         public static implicit operator PriorityEventTarget(Battle battle) =>
             new BattlePriorityEventTarget(battle);
     }
+
     public record PokemonPriorityEventTarget(Pokemon Pokemon) : PriorityEventTarget;
+
     public record SidePriorityEventTarget(Side Side) : PriorityEventTarget;
+
     public record BattlePriorityEventTarget(Battle Battle) : PriorityEventTarget;
 
     /// <summary>
@@ -201,14 +252,20 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator GetCallbackTarget(Pokemon pokemon) =>
             new PokemonGetCallbackTarget(pokemon);
+
         public static implicit operator GetCallbackTarget(Side side) => new SideGetCallbackTarget(side);
         public static implicit operator GetCallbackTarget(Field field) => new FieldGetCallbackTarget(field);
+
         public static implicit operator GetCallbackTarget(Battle battle) =>
             new BattleGetCallbackTarget(battle);
     }
+
     public record PokemonGetCallbackTarget(Pokemon Pokemon) : GetCallbackTarget;
+
     public record SideGetCallbackTarget(Side Side) : GetCallbackTarget;
+
     public record FieldGetCallbackTarget(Field Field) : GetCallbackTarget;
+
     public record BattleGetCallbackTarget(Battle Battle) : GetCallbackTarget;
 
     /// <summary>
@@ -218,16 +275,23 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator FindEventHandlersTarget(Pokemon pokemon) =>
             new PokemonFindEventHandlersTarget(pokemon);
+
         public static implicit operator FindEventHandlersTarget(List<Pokemon> pokemonList) =>
             new PokemonListFindEventHandlersTarget(pokemonList);
+
         public static implicit operator FindEventHandlersTarget(Side side) =>
             new SideFindEventHandlersTarget(side);
+
         public static implicit operator FindEventHandlersTarget(Battle battle) =>
             new BattleFindEventHandlersTarget(battle);
     }
+
     public record PokemonFindEventHandlersTarget(Pokemon Pokemon) : FindEventHandlersTarget;
+
     public record PokemonListFindEventHandlersTarget(List<Pokemon> PokemonList) : FindEventHandlersTarget;
+
     public record SideFindEventHandlersTarget(Side Side) : FindEventHandlersTarget;
+
     public record BattleFindEventHandlersTarget(Battle Battle) : FindEventHandlersTarget;
 
     /// <summary>
@@ -237,11 +301,15 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator SpreadDamageTarget(bool value) =>
             value ? new NullSpreadDamageTarget() : new FalseSpreadDamageTarget();
+
         public static implicit operator SpreadDamageTarget(Pokemon pokemon) =>
             new PokemonSpreadDamageTarget(pokemon);
     }
+
     public record FalseSpreadDamageTarget : SpreadDamageTarget;
+
     public record PokemonSpreadDamageTarget(Pokemon Pokemon) : SpreadDamageTarget;
+
     public record NullSpreadDamageTarget : SpreadDamageTarget;
 
     /// <summary>
@@ -259,20 +327,29 @@ namespace ApogeeVGC_CS.sim
 
         public static implicit operator SpreadDamageEffect(Ability ability) =>
             EffectUnionFactory.ToSpreadDamageEffect(ability);
+
         public static implicit operator SpreadDamageEffect(ItemData itemData) =>
             EffectUnionFactory.ToSpreadDamageEffect(itemData);
+
         public static implicit operator SpreadDamageEffect(ActiveMove activeMove) =>
             EffectUnionFactory.ToSpreadDamageEffect(activeMove);
+
         public static implicit operator SpreadDamageEffect(Species species) =>
             EffectUnionFactory.ToSpreadDamageEffect(species);
+
         public static implicit operator SpreadDamageEffect(Condition condition) =>
             EffectUnionFactory.ToSpreadDamageEffect(condition);
+
         public static implicit operator SpreadDamageEffect(Format format) =>
             EffectUnionFactory.ToSpreadDamageEffect(format);
     }
+
     public record DrainSpreadDamageEffect : SpreadDamageEffect;
+
     public record RecoilSpreadDamageEffect : SpreadDamageEffect;
+
     public record EffectSpreadDamageEffect(IEffect Effect) : SpreadDamageEffect;
+
     public record NullSpreadDamageEffect : SpreadDamageEffect;
 
     /// <summary>
@@ -290,20 +367,29 @@ namespace ApogeeVGC_CS.sim
 
         public static implicit operator DamageEffect(Ability ability) =>
             EffectUnionFactory.ToDamageEffect(ability);
+
         public static implicit operator DamageEffect(ItemData itemData) =>
             EffectUnionFactory.ToDamageEffect(itemData);
+
         public static implicit operator DamageEffect(ActiveMove activeMove) =>
             EffectUnionFactory.ToDamageEffect(activeMove);
+
         public static implicit operator DamageEffect(Species species) =>
             EffectUnionFactory.ToDamageEffect(species);
+
         public static implicit operator DamageEffect(Condition condition) =>
             EffectUnionFactory.ToDamageEffect(condition);
+
         public static implicit operator DamageEffect(Format format) =>
             EffectUnionFactory.ToDamageEffect(format);
     }
+
     public record DrainDamageEffect : DamageEffect;
+
     public record RecoilDamageEffect : DamageEffect;
+
     public record EffectDamageEffect(IEffect Effect) : DamageEffect;
+
     public record NullDamageEffect : DamageEffect;
 
     /// <summary>
@@ -319,26 +405,39 @@ namespace ApogeeVGC_CS.sim
 
         public static implicit operator Part(Ability ability) =>
             EffectUnionFactory.ToPart(ability);
+
         public static implicit operator Part(ItemData itemData) =>
             EffectUnionFactory.ToPart(itemData);
+
         public static implicit operator Part(ActiveMove activeMove) =>
             EffectUnionFactory.ToPart(activeMove);
+
         public static implicit operator Part(Species species) =>
             EffectUnionFactory.ToPart(species);
+
         public static implicit operator Part(Condition condition) =>
             EffectUnionFactory.ToPart(condition);
+
         public static implicit operator Part(Format format) =>
             EffectUnionFactory.ToPart(format);
 
         public static implicit operator Part(Move move) => new MovePart(move);
     }
+
     public record StringPart(string Value) : Part;
+
     public record IntPart(int Value) : Part;
+
     public record BoolPart(bool Value) : Part;
+
     public record PokemonPart(Pokemon Pokemon) : Part;
+
     public record SidePart(Side Side) : Part;
+
     public record EffectPart(IEffect Effect) : Part;
+
     public record MovePart(Move Move) : Part;
+
     public record NullPart : Part;
 
     /// <summary>
@@ -364,8 +463,11 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator AddPart(GameType value) => new GameTypeAddPart(value);
         public static implicit operator AddPart(Func<SideSecretShared> func) => new FuncAddPart(func);
     }
+
     public record PartAddPart(Part Part) : AddPart;
+
     public record FuncAddPart(Func<SideSecretShared> Func) : AddPart;
+
     public record GameTypeAddPart(GameType GameType) : AddPart;
 
     /// <summary>
@@ -376,12 +478,17 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator AddMoveArg(string value) => new StringAddMoveArg(value);
         public static implicit operator AddMoveArg(int value) => new IntAddMoveArg(value);
         public static implicit operator AddMoveArg(Delegate @delegate) => new FuncAddMoveArg(@delegate);
+
         public static implicit operator AddMoveArg(Pokemon pokemon) =>
             AnyObjectUnionFactory.ToAddMoveArg(pokemon);
     }
+
     public record StringAddMoveArg(string Value) : AddMoveArg;
+
     public record IntAddMoveArg(int Value) : AddMoveArg;
+
     public record FuncAddMoveArg(Delegate Delegate) : AddMoveArg;
+
     public record AnyObjectAddMoveArg(IAnyObject AnyObject) : AddMoveArg;
 
     /// <summary>
@@ -398,19 +505,27 @@ namespace ApogeeVGC_CS.sim
 
         public static implicit operator HealEffect(Ability ability) =>
             EffectUnionFactory.ToHealEffect(ability);
+
         public static implicit operator HealEffect(ItemData itemData) =>
             EffectUnionFactory.ToHealEffect(itemData);
+
         public static implicit operator HealEffect(ActiveMove activeMove) =>
             EffectUnionFactory.ToHealEffect(activeMove);
+
         public static implicit operator HealEffect(Species species) =>
             EffectUnionFactory.ToHealEffect(species);
+
         public static implicit operator HealEffect(Condition condition) =>
             EffectUnionFactory.ToHealEffect(condition);
+
         public static implicit operator HealEffect(Format format) =>
             EffectUnionFactory.ToHealEffect(format);
     }
+
     public record DrainHealEffect : HealEffect;
+
     public record EffectHealEffect(IEffect Effect) : HealEffect;
+
     public record NullHealEffect : HealEffect;
 
     /// <summary>
@@ -419,10 +534,13 @@ namespace ApogeeVGC_CS.sim
     public abstract record IntFalseUnion
     {
         public static implicit operator IntFalseUnion(int value) => new IntIntFalseUnion(value);
+
         public static implicit operator IntFalseUnion(bool value) =>
-            value ? throw new ArgumentException("must be 'false'")  : new FalseIntFalseUnion();
+            value ? throw new ArgumentException("must be 'false'") : new FalseIntFalseUnion();
     }
+
     public record IntIntFalseUnion(int Value) : IntFalseUnion;
+
     public record FalseIntFalseUnion : IntFalseUnion;
 
     /// <summary>
@@ -433,7 +551,9 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator BoolStringUnion(bool value) => new BoolBoolStringUnion(value);
         public static implicit operator BoolStringUnion(string value) => new StringBoolStringUnion(value);
     }
+
     public record BoolBoolStringUnion(bool Value) : BoolStringUnion;
+
     public record StringBoolStringUnion(string Value) : BoolStringUnion;
 
     /// <summary>
@@ -444,7 +564,9 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator IntBoolUnion(int value) => new IntIntBoolUnion(value);
         public static implicit operator IntBoolUnion(bool value) => new BoolIntBoolUnion(value);
     }
+
     public record IntIntBoolUnion(int Value) : IntBoolUnion;
+
     public record BoolIntBoolUnion(bool Value) : IntBoolUnion;
 
 
@@ -455,16 +577,23 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator EventEffectHolder(Pokemon pokemon) =>
             new PokemonEventEffectHolder(pokemon);
+
         public static implicit operator EventEffectHolder(Side side) =>
             new SideEventEffectHolder(side);
+
         public static implicit operator EventEffectHolder(Field field) =>
             new FieldEventEffectHolder(field);
+
         public static implicit operator EventEffectHolder(Battle battle) =>
             new BattleEventEffectHolder(battle);
     }
+
     public record PokemonEventEffectHolder(Pokemon Pokemon) : EventEffectHolder;
+
     public record SideEventEffectHolder(Side Side) : EventEffectHolder;
+
     public record FieldEventEffectHolder(Field Field) : EventEffectHolder;
+
     public record BattleEventEffectHolder(Battle Battle) : EventEffectHolder;
 
     /// <summary>
@@ -473,11 +602,13 @@ namespace ApogeeVGC_CS.sim
     public abstract record MoveActionMega
     {
         public static implicit operator MoveActionMega(bool value) => new BoolMoveActionMega(value);
+
         public static implicit operator MoveActionMega(string value) =>
-            value == "done" ? new DoneMoveActionMega() :
-            throw new ArgumentException("Must be 'done'");
+            value == "done" ? new DoneMoveActionMega() : throw new ArgumentException("Must be 'done'");
     }
+
     public record BoolMoveActionMega(bool Value) : MoveActionMega;
+
     public record DoneMoveActionMega : MoveActionMega;
 
 
@@ -487,11 +618,15 @@ namespace ApogeeVGC_CS.sim
     public abstract record BattleStreamReplay
     {
         public static implicit operator BattleStreamReplay(bool value) => new BoolBattleStreamReplay(value);
+
         public static implicit operator BattleStreamReplay(string value) =>
-            value == "spectator" ? new SpectatorBattleStreamReplay() :
-            throw new ArgumentException("Must be 'spectator'");
+            value == "spectator"
+                ? new SpectatorBattleStreamReplay()
+                : throw new ArgumentException("Must be 'spectator'");
     }
+
     public record BoolBattleStreamReplay(bool Value) : BattleStreamReplay;
+
     public record SpectatorBattleStreamReplay : BattleStreamReplay;
 
     /// <summary>
@@ -511,11 +646,15 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator BoolEmptyStringUnion(bool value) =>
             new BoolEmptyStringBoolUnion(value);
+
         public static implicit operator BoolEmptyStringUnion(string value) =>
-            value == string.Empty ? new EmptyStringBoolUnion(value) :
-            throw new ArgumentException("Must be an empty string");
+            value == string.Empty
+                ? new EmptyStringBoolUnion(value)
+                : throw new ArgumentException("Must be an empty string");
     }
+
     public record BoolEmptyStringBoolUnion(bool Value) : BoolEmptyStringUnion;
+
     public record EmptyStringBoolUnion(string Value) : BoolEmptyStringUnion;
 
     /// <summary>
@@ -530,11 +669,14 @@ namespace ApogeeVGC_CS.sim
         private const double Tolerance = 0.0001;
 
         public static implicit operator OnFractionalPriority(double value) =>
-            Math.Abs(value - (-0.1)) < Tolerance ? new OnFrationalPriorityNeg(value) :
-            throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
+            Math.Abs(value - (-0.1)) < Tolerance
+                ? new OnFrationalPriorityNeg(value)
+                : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
     }
+
     public record OnFractionalPriorityFunc(
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, int?> Function) : OnFractionalPriority;
+
     public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 
     /// <summary>
@@ -545,7 +687,9 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator StrListStrUnion(string value) => new StrStrListStrUnion(value);
         public static implicit operator StrListStrUnion(List<string> value) => new StrListStrListUnion(value);
     }
+
     public record StrStrListStrUnion(string Value) : StrListStrUnion;
+
     public record StrListStrListUnion(List<string> Value) : StrListStrUnion;
 
     /// <summary>
@@ -555,11 +699,15 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator GetDamageMove(string value) => new StrGetDamageMove(value);
         public static implicit operator GetDamageMove(int value) => new IntGetDamageMove(value);
+
         public static implicit operator GetDamageMove(ActiveMove activeMove) =>
             new ActiveMoveGetDamageMove(activeMove);
     }
+
     public record StrGetDamageMove(string Value) : GetDamageMove;
+
     public record IntGetDamageMove(int Value) : GetDamageMove;
+
     public record ActiveMoveGetDamageMove(ActiveMove ActiveMove) : GetDamageMove;
 
     /// <summary>
@@ -568,10 +716,13 @@ namespace ApogeeVGC_CS.sim
     public abstract record DexFormatsHasValue
     {
         public static implicit operator DexFormatsHasValue(bool value) => new BoolDexFormatsHasValue(value);
+
         public static implicit operator DexFormatsHasValue(HasValueOption value) =>
             new HasValueOptionUnion(value);
     }
+
     public record BoolDexFormatsHasValue(bool Value) : DexFormatsHasValue;
+
     public record HasValueOptionUnion(HasValueOption Value) : DexFormatsHasValue;
 
     /// <summary>
@@ -581,11 +732,15 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator StrIntListStrUnion(string value) => new StrStrIntListStrUnion(value);
         public static implicit operator StrIntListStrUnion(int value) => new IntStrIntListStrUnion(value);
+
         public static implicit operator StrIntListStrUnion(List<string> value) =>
             new ListStrStrIntListStrUnion(value);
     }
+
     public record StrStrIntListStrUnion(string Value) : StrIntListStrUnion;
+
     public record IntStrIntListStrUnion(int Value) : StrIntListStrUnion;
+
     public record ListStrStrIntListStrUnion(List<string> Value) : StrIntListStrUnion;
 
 
@@ -595,10 +750,13 @@ namespace ApogeeVGC_CS.sim
     public abstract record ValidateRuleReturn
     {
         public static implicit operator ValidateRuleReturn(string value) => new StringValidateRuleReturn(value);
+
         public static implicit operator ValidateRuleReturn(List<StrIntListStrUnion> value) =>
             new ListValidateRuleReturn(value);
     }
+
     public record StringValidateRuleReturn(string Value) : ValidateRuleReturn;
+
     public record ListValidateRuleReturn(List<StrIntListStrUnion> Value) : ValidateRuleReturn;
 
 
@@ -608,11 +766,15 @@ namespace ApogeeVGC_CS.sim
     public abstract record StringTrueUnion
     {
         public static implicit operator StringTrueUnion(string value) => new StringTrue(value);
+
         public static implicit operator StringTrueUnion(bool value) =>
-            value ? new TrueStringTrueUnion(value) :
-            throw new ArgumentException("Must be 'true' for TrueStringTrueUnion");
+            value
+                ? new TrueStringTrueUnion(value)
+                : throw new ArgumentException("Must be 'true' for TrueStringTrueUnion");
     }
+
     public record StringTrue(string Value) : StringTrueUnion;
+
     public record TrueStringTrueUnion(bool Value) : StringTrueUnion;
 
 
@@ -623,11 +785,13 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator ItemBoosts(SparseBoostsTable table) =>
             new SparseBoostsTableItemBoosts(table);
+
         public static implicit operator ItemBoosts(bool value) =>
-            value ? throw new ArgumentException("Must be 'false' for FlaseItemBoosts") :
-            new FlaseItemBoosts(value);
+            value ? throw new ArgumentException("Must be 'false' for FlaseItemBoosts") : new FlaseItemBoosts(value);
     }
+
     public record SparseBoostsTableItemBoosts(SparseBoostsTable Table) : ItemBoosts;
+
     public record FlaseItemBoosts(bool Value) : ItemBoosts;
 
 
@@ -638,12 +802,17 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator MoveDataAccuracy(int value) => new IntMoveDataAccuracy(value);
         public static implicit operator MoveDataAccuracy(double value) => new DoubleMoveDataAccuracy(value);
+
         public static implicit operator MoveDataAccuracy(bool value) =>
-            value ? new TrueMoveDataAccuracy(value) :
-            throw new ArgumentException("Must be 'true' for TrueMoveDataAccuracy");
+            value
+                ? new TrueMoveDataAccuracy(value)
+                : throw new ArgumentException("Must be 'true' for TrueMoveDataAccuracy");
     }
+
     public record IntMoveDataAccuracy(int Value) : MoveDataAccuracy;
+
     public record DoubleMoveDataAccuracy(double Value) : MoveDataAccuracy;
+
     public record TrueMoveDataAccuracy(bool Value) : MoveDataAccuracy;
 
     /// <summary>
@@ -652,12 +821,14 @@ namespace ApogeeVGC_CS.sim
     public abstract record MoveDataDamage
     {
         public static implicit operator MoveDataDamage(int value) => new MoveDataDamageInt(value);
+
         public static implicit operator MoveDataDamage(string value) =>
-            value == "level" ? new MoveDataDamageLevel(value) :
-                throw new ArgumentException("Must be 'level'");
+            value == "level" ? new MoveDataDamageLevel(value) : throw new ArgumentException("Must be 'level'");
+
         public static implicit operator MoveDataDamage(bool value) =>
-            value ? throw new ArgumentException("Must be 'false' for MoveDataDamageFalse") :
-            new MoveDataDamageFalse(value);
+            value
+                ? throw new ArgumentException("Must be 'false' for MoveDataDamageFalse")
+                : new MoveDataDamageFalse(value);
     }
     public record MoveDataDamageInt(int Value) : MoveDataDamage;
     public record MoveDataDamageLevel(string Value) : MoveDataDamage;
@@ -680,9 +851,11 @@ namespace ApogeeVGC_CS.sim
     public abstract record MoveDataOhko
     {
         public static implicit operator MoveDataOhko(bool value) => new BoolMoveDataOhko(value);
-        public static implicit operator MoveDataOhko(string value) => 
-            value == "Ice" ? new IceMoveDataOhko(value) :
-            throw new ArgumentException("Must be 'Ice' for IceMoveDataOhko");
+
+        public static implicit operator MoveDataOhko(string value) =>
+            value == "Ice"
+                ? new IceMoveDataOhko(value)
+                : throw new ArgumentException("Must be 'Ice' for IceMoveDataOhko");
     }
     public record BoolMoveDataOhko(bool Value) : MoveDataOhko;
     public record IceMoveDataOhko(string Value) : MoveDataOhko;
@@ -719,6 +892,7 @@ namespace ApogeeVGC_CS.sim
                 "ifHit" => new IfHitMoveDataSelfdestruct(),
                 _ => new BoolMoveDataSelfdestruct(bool.Parse(value))
             };
+
         public static implicit operator MoveDataSelfdestruct(bool value) => new BoolMoveDataSelfdestruct(value);
     }
     public record AlwaysMoveDataSelfdestruct : MoveDataSelfdestruct;
@@ -733,6 +907,7 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator MoveDataIgnoreImmunity(bool value) =>
             new BoolMoveDataIgnoreImmunity(value);
+
         public static implicit operator MoveDataIgnoreImmunity(Dictionary<PokemonType, bool> typeImmunities) =>
             new TypeMoveDataIgnoreImmunity(typeImmunities);
     }
@@ -747,237 +922,269 @@ namespace ApogeeVGC_CS.sim
     public abstract record IntTrueUnion
     {
         public static implicit operator IntTrueUnion(int value) => new IntIntTrueUnion(value);
+
         public static implicit operator IntTrueUnion(bool value) =>
-            value ? new TrueIntTrueUnion(value) :
-            throw new ArgumentException("Must be 'true' for TrueIntTrueUnion");
+            value ? new TrueIntTrueUnion(value) : throw new ArgumentException("Must be 'true' for TrueIntTrueUnion");
     }
+
     public record IntIntTrueUnion(int Value) : IntTrueUnion;
     public record TrueIntTrueUnion(bool Value) : IntTrueUnion;
 
 
+    /// <summary>
+    /// boolean | 'Past'
+    /// </summary>
+    public abstract record DexSpeciesUnreleasedHidden
+    {
+        public static implicit operator DexSpeciesUnreleasedHidden(bool value) =>
+            new BoolDexSpeciesUnreleasedHidden(value);
+
+        public static implicit operator DexSpeciesUnreleasedHidden(string value) =>
+            value == "Past"
+                ? new PastDexSpeciesUnreleasedHidden(value)
+                : throw new ArgumentException("Must be 'Past' for PastDexSpeciesUnreleasedHidden");
+    }
+    public record BoolDexSpeciesUnreleasedHidden(bool Value) : DexSpeciesUnreleasedHidden;
+    public record PastDexSpeciesUnreleasedHidden(string Value) : DexSpeciesUnreleasedHidden;
 
 
+    /// <summary>
+    /// Move | string
+    /// </summary>
+    public abstract record MoveStringUnion
+    {
+        public static implicit operator MoveStringUnion(Move move) => new MoveMoveStringUnion(move);
+        public static implicit operator MoveStringUnion(string value) => new StringMoveStringUnion(value);
+    }
+
+    public record MoveMoveStringUnion(Move Move) : MoveStringUnion;
+    public record StringMoveStringUnion(string Value) : MoveStringUnion;
 
 
+    /// <summary>
+    /// boolean | "pursuitfaint"
+    /// </summary>
+    public abstract record SwitchInReturnBase
+    {
+        public static implicit operator SwitchInReturnBase(bool value) => new BoolSwitchInReturn(value);
+
+        public static implicit operator SwitchInReturnBase(string value) =>
+            value == "pursuitfaint"
+                ? new PursuitFaintSwitchInReturn(value)
+                : throw new ArgumentException("Must be 'pursuitfaint' for PursuitFaintSwitchInReturn");
+    }
+
+    public record BoolSwitchInReturn(bool Value) : SwitchInReturnBase;
+    public record PursuitFaintSwitchInReturn(string Value) : SwitchInReturnBase;
 
 
+    /// <summary>
+    /// int | false | ''
+    /// </summary>
+    public abstract record TryMoveHitReturn
+    {
+        public static implicit operator TryMoveHitReturn(int value) => new IntTryMoveHitReturn(value);
+
+        public static implicit operator TryMoveHitReturn(bool value) =>
+            value
+                ? throw new ArgumentException("Must be 'false' for FalseTryMoveHitReturn")
+                : new FalseTryMoveHitReturn(value);
+
+        public static implicit operator TryMoveHitReturn(string value) =>
+            string.IsNullOrEmpty(value)
+                ? new StringTryMoveHitReturn(value)
+                : throw new ArgumentException("Must be an empty string for StringTryMoveHitReturn");
+    }
+    public record IntTryMoveHitReturn(int Value) : TryMoveHitReturn;
+    public record FalseTryMoveHitReturn(bool Value) : TryMoveHitReturn;
+    public record StringTryMoveHitReturn(string Value) : TryMoveHitReturn;
+
+    /// <summary>
+    /// Condition | string
+    /// </summary>
+    public abstract record ConditionStrUnion
+    {
+        public static implicit operator ConditionStrUnion(Condition condition) =>
+            new ConditionConStrUnion(condition);
+
+        public static implicit operator ConditionStrUnion(string value) => new StringConStrUnion(value);
+    }
+    public record ConditionConStrUnion(Condition Condition) : ConditionStrUnion;
+    public record StringConStrUnion(string Value) : ConditionStrUnion;
 
 
-
-
-
-
-
-
-
-
+    /// <summary>
+    /// Pokemon | 'debug'
+    /// </summary>
+    public abstract record AddSideConditionSource
+    {
+        public static implicit operator AddSideConditionSource(Pokemon pokemon) =>
+            new PokemonAddSideConditionSource(pokemon);
+        public static implicit operator AddSideConditionSource(string value) =>
+            value == "debug" ? new DebugAddSideConditionSource(value) :
+                throw new ArgumentException("Must be 'debug'");
+    }
+    public record PokemonAddSideConditionSource(Pokemon Pokemon) : AddSideConditionSource;
+    public record DebugAddSideConditionSource(string Value) : AddSideConditionSource;
 
 
     ///// <summary>
-    ///// StringObject | Pokemon | Side | Field | Battle
+    ///// Move | string
     ///// </summary>
-    //public interface ISingleEventTarget;
-
-    ///// <summary>
-    ///// StringObject | Pokemon |
-    ///// IEffect {Ability | Item | ActiveMove | Species | Condition | Format} | FalseObject
-    ///// </summary>
-    //public interface ISingleEventSource;
-
-    ///// <summary>
-    ///// Pokemon | PokemonList | Side | Battle
-    ///// </summary>
-    //public interface IRunEventTarget;
-
-    ///// <summary>
-    ///// StringObject | Pokemon | FalseObject
-    ///// </summary>
-    //public interface IRunEventSource;
-
-    ///// <summary>
-    ///// Pokemon | Side | Battle
-    ///// </summary>
-    //public interface IPriorityEventTarget;
-
-    ///// <summary>
-    ///// Pokemon | Side | Field | Battle
-    ///// </summary>
-    //public interface IGetCallbackTarget;
-
-    ///// <summary>
-    ///// Pokemon | PokemonList | Side | Battle
-    ///// </summary>
-    //public interface  IFindEventHandlersTarget;
-
-    ///// <summary>
-    ///// false | Pokemon
-    ///// </summary>
-    //public interface ISpreadDamageTarget;
-
-    ///// <summary>
-    ///// 'drain' | 'recoil' | Effect
-    ///// </summary>
-    //public interface ISpreadDamageEffect;
-
-    ///// <summary>
-    ///// 'drain' | 'recoil' | Effect
-    ///// </summary>
-    //public interface IDamageEffect;
-
-    ///// <summary>
-    ///// number | false
-    ///// </summary>
-    //public interface IIntFalseUnion;
-
-    ///// <summary>
-    ///// 'drain' | Effect
-    ///// </summary>
-    //public interface IHealEffect;
-
-    ///// <summary>
-    ///// int | List<int>
-    ///// </summary>
-    //public interface IIntListIntUnion;
-
-    /////// <summary>
-    /////// string | number | boolean | Pokemon | Side | Effect | Move | null | undefined
-    /////// </summary>
-    ////public interface IPart : IAddPart;
-
-    /////// <summary>
-    /////// Part {string | number | boolean | Pokemon | Side | Effect | Move | null | undefined} | 
-    /////// Func<SideSecretShared> | GameType
-    /////// </summary>
-    ////public interface IAddPart;
-
-    ///// <summary>
-    ///// string | number | Function | AnyObject
-    ///// </summary>
-    //public interface IAddMoveArg;
-
-    ///// <summary>
-    ///// Pokemon |
-    ///// </summary>
-    //public interface IAnyObject : IAddMoveArg;
-
-    //public class GameTypeObject(GameType gameType) : IAddPart
+    //public abstract record MoveStrUnion
     //{
-    //    public GameType GameType { get; set; } = gameType;
+    //    public static implicit operator MoveStrUnion(Move move) => new MoveMoveStrUnion(move);
+    //    public static implicit operator MoveStrUnion(string value) => new StringMoveStrUnion(value);
     //}
-
-    //public class AddPartFunc(Func<SideSecretShared> func) : IAddPart
-    //{
-    //    public required Func<SideSecretShared> Func { get; set; } = func;
-    //}
-
-    //public class DelegateObject(Delegate @delegate) : IAddMoveArg
-    //{
-    //    public required Delegate Delegate { get; set; } = @delegate;
-    //}
+    //public record MoveMoveStrUnion(Move Move) : MoveStrUnion;
+    //public record StringMoveStrUnion(string Value) : MoveStrUnion;
 
 
-    ////public class ActionObject : IAction;
-
-    ////public class FunctionObject : IFunction;
-
-    ////public class AnyObject : IAddMoveArg;
-
-    //public class PokemonList : List<Pokemon>, IRunEventTarget, IFindEventHandlersTarget;
-
-    //public class StringObject(string s) : IRunEventSource, ISingleEventTarget, ISpreadDamageEffect,
-    //    IDamageEffect, IHealEffect, IPart, IAddMoveArg
-    //{
-    //    public string String { get; set; } = s;
-    //}
-
-    //public class BoolObject(bool b) : IPart
-    //{
-    //    public bool Bool { get; set; } = b;
-    //}
-
-    //public class FalseObject : IRunEventSource, ISingleEventSource, ISpreadDamageTarget,
-    //    IIntFalseUnion
-    //{
-    //    public static bool False => false;
-    //}
-
-    //public class IntObject(int i) : IIntFalseUnion, IIntListIntUnion, IPart, IAddMoveArg
-    //{
-    //    public int Int { get; set; } = i;
-    //}
-
-    //public class IntList : List<int>, IIntListIntUnion;
+    /// <summary>
+    /// Species | string
+    /// </summary>
+    public abstract record SpeciesStrUnion
+    {
+        public static implicit operator SpeciesStrUnion(Species species) => new SpeciesSpeciesStrUnion(species);
+        public static implicit operator SpeciesStrUnion(string value) => new StringSpeciesStrUnion(value);
+    }
+    public record SpeciesSpeciesStrUnion(Species Species) : SpeciesStrUnion;
+    public record StringSpeciesStrUnion(string Value) : SpeciesStrUnion;
 
 
+    /// <summary>
+    /// ActiveMove | string
+    /// </summary>
+    public abstract record ActiveMoveStringUnion
+    {
+        public static implicit operator ActiveMoveStringUnion(ActiveMove activeMove) =>
+            new ActiveMoveActiveMoveStringUnion(activeMove);
+        public static implicit operator ActiveMoveStringUnion(string value) =>
+            new StringActiveMoveStringUnion(value);
+    }
+    public record ActiveMoveActiveMoveStringUnion(ActiveMove ActiveMove) : ActiveMoveStringUnion;
+    public record StringActiveMoveStringUnion(string Value) : ActiveMoveStringUnion;
+
+
+    /// <summary>
+    /// Ability | string
+    /// </summary>
+    public abstract record AbilityStringUnion
+    {
+        public static implicit operator AbilityStringUnion(Ability ability) =>
+            new AbilityAbilityStringUnion(ability);
+        public static implicit operator AbilityStringUnion(string value) => new StringAbilityStringUnion(value);
+    }
+    public record AbilityAbilityStringUnion(Ability Ability) : AbilityStringUnion;
+    public record StringAbilityStringUnion(string Value) : AbilityStringUnion;
+
+
+    /// <summary>
+    /// string | false
+    /// </summary>
+    public abstract record StringFalseUnion
+    {
+        public static implicit operator StringFalseUnion(string value) => new StringStringFalseUnion(value);
+        public static implicit operator StringFalseUnion(bool value) =>
+            value ? throw new ArgumentException("Must be 'false'") : new FalseStringFalseUnion();
+    }
+    public record StringStringFalseUnion(string Value) : StringFalseUnion;
+    public record FalseStringFalseUnion : StringFalseUnion;
+
+
+    /// <summary>
+    /// Item | string
+    /// </summary>
+    public abstract record ItemStringUnion
+    {
+        public static implicit operator ItemStringUnion(Item item) => new ItemItemStringUnion(item);
+        public static implicit operator ItemStringUnion(string value) => new StringItemStringUnion(value);
+    }
+    public record ItemItemStringUnion(Item Item) : ItemStringUnion;
+    public record StringItemStringUnion(string Value) : ItemStringUnion;
+
+
+    /// <summary>
+    /// Item | boolean
+    /// </summary>
+    public abstract record ItemBoolUnion
+    {
+        public static implicit operator ItemBoolUnion(Item item) => new ItemItemBoolUnion(item);
+        public static implicit operator ItemBoolUnion(bool value) =>
+            value ? throw new ArgumentException("Must be 'false'") : new FalseItemBoolUnion();
+    }
+    public record ItemItemBoolUnion(Item Item) : ItemBoolUnion;
+    public record FalseItemBoolUnion : ItemBoolUnion;
+
+
+    /// <summary>
+    /// IEffect | string
+    /// </summary>
+    public abstract record EffectStringUnion
+    {
+        public static implicit operator EffectStringUnion(Ability ability) =>
+            EffectUnionFactory.ToEffectStringUnion(ability);
+        public static implicit operator EffectStringUnion(ItemData itemData) =>
+            EffectUnionFactory.ToEffectStringUnion(itemData);
+        public static implicit operator EffectStringUnion(ActiveMove activeMove) =>
+            EffectUnionFactory.ToEffectStringUnion(activeMove);
+        public static implicit operator EffectStringUnion(Species species) =>
+            EffectUnionFactory.ToEffectStringUnion(species);
+        public static implicit operator EffectStringUnion(Condition condition) =>
+            EffectUnionFactory.ToEffectStringUnion(condition);
+        public static implicit operator EffectStringUnion(Format format) =>
+            EffectUnionFactory.ToEffectStringUnion(format);
+
+        public static implicit operator EffectStringUnion(string value) => new StringEffectStringUnion(value);
+    }
+    public record EffectEffectStringUnion(IEffect Effect) : EffectStringUnion;
+    public record StringEffectStringUnion(string Value) : EffectStringUnion;
+
+
+    /// <summary>
+    /// Bool | 0
+    /// </summary>
+    public abstract record BoolZeroUnion
+    {
+        public static implicit operator BoolZeroUnion(bool value) => new BoolBoolZeroUnion(value);
+        public static implicit operator BoolZeroUnion(int value) =>
+            value == 0 ? new ZeroBoolZeroUnion(value) :
+                throw new ArgumentException("Must be 0 for ZeroBoolZeroUnion");
+    }
+    public record BoolBoolZeroUnion(bool Value) : BoolZeroUnion;
+    public record ZeroBoolZeroUnion(int Value) : BoolZeroUnion;
+
+
+    /// <summary>
+    /// SideId | '' | Side
+    /// </summary>
+    public abstract record WinSideUnion
+    {
+        public static implicit operator WinSideUnion(SideId sideId) => new SideIdWinSideUnion(sideId);
+        public static implicit operator WinSideUnion(string value) =>
+            string.IsNullOrEmpty(value) ? new EmptyStringWinSideUnion(value) :
+                throw new ArgumentException("Must be an empty string for EmptyStringWinSideUnion");
+        public static implicit operator WinSideUnion(Side side) => new SideWinSideUnion(side);
+    }
+    public record SideIdWinSideUnion(SideId SideId) : WinSideUnion;
+    public record EmptyStringWinSideUnion(string Value) : WinSideUnion;
+    public record SideWinSideUnion(Side Side) : WinSideUnion;
 
 
 
 
-    ///// <summary>
-    ///// Pokemon | PokemonList | Side | Battle
-    ///// </summary>
-    //public interface IRunEventTarget : IPokemonSideBattlePokemonListUnion;
 
-    ///// <summary>
-    ///// StringObject | Pokemon | FalseObject
-    ///// </summary>
-    //public interface IRunEventSource : IStringObjectPokemonFalseObjectUnion;
 
-    ///// <summary>
-    ///// StringObject | Pokemon | Side | Field | Battle
-    ///// </summary>
-    //public interface ISingleEventTarget : IPokemonSideFieldBattleUnionStringObject;
 
-    ///// <summary>
-    ///// StringObject | Pokemon |
-    ///// IEffect {Ability | Item | ActiveMove | Species | Condition | Format} | FalseObject
-    ///// </summary>
-    //public interface ISingleEventSource : IStringObjectPokemonFalseObjectEffectUnion;
 
-    ///// <summary>
-    ///// Pokemon | Side | Battle
-    ///// </summary>
-    //public interface IPokemonSideBattleUnion;
 
-    ///// <summary>
-    ///// Pokemon | Side | Field | Battle
-    ///// </summary>
-    //public interface IPokemonSideFieldBattleUnion : IPokemonSideBattleUnion;
 
-    ///// <summary>
-    ///// Pokemon | Side | Battle | PokemonList
-    ///// </summary>
-    //public interface IPokemonSideBattlePokemonListUnion : IPokemonSideFieldBattleUnion;
 
-    ///// <summary>
-    ///// Pokemon | Side | Field | Battle | StringObject
-    ///// </summary>
-    //public interface IPokemonSideFieldBattleUnionStringObject : IPokemonSideFieldBattleUnion;
 
-    ///// <summary>
-    ///// StringObject | Pokemon | FalseObject
-    ///// </summary>
-    //public interface IStringObjectPokemonFalseObjectUnion;
 
-    ///// <summary>
-    ///// StringObject | Pokemon | FalseObject | Effect
-    ///// </summary>
-    //public interface IStringObjectPokemonFalseObjectEffectUnion :
-    //    IStringObjectPokemonFalseObjectUnion;
 
-    //public class PokemonList : IPokemonSideBattlePokemonListUnion
-    //{
-    //    public required List<Pokemon> Value {  get; set; }
-    //}
 
-    //public class StringObject : IStringObjectPokemonFalseObjectUnion,
-    //    IPokemonSideFieldBattleUnionStringObject
-    //{
-    //    public required string Value { get; set; }
-    //}
 
-    //public class FalseObject : IStringObjectPokemonFalseObjectUnion
-    //{
-    //    public static bool Value => false;
-    //}
+
+
 }

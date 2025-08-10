@@ -391,19 +391,7 @@
         public required double HeightM { get; init; }
         public required string Color { get; init; }
         public required List<SpeciesTag> Tags { get; init; }
-        public required object UnreleasedHidden
-        {
-            get;
-            init // bool or "Past"
-            {
-                field = value switch
-                {
-                    bool => value,
-                    "Past" => true,
-                    _ => false
-                };
-            }
-        } 
+        public required DexSpeciesUnreleasedHidden UnreleasedHidden { get; init; }
         public required bool MaleOnlyHidden { get; init; }
         public string? Mother { get; init; }
 
@@ -434,22 +422,7 @@
         }
         public string? RequiredTeraType { get; init; }
 
-        public List<string>? BattleOnly
-        {
-            get // string or string[]
-            {
-                if (field is { Count: > 0 })
-                {
-                    return field;
-                }
-                if (IsMega is true || Forme is "Primal")
-                {
-                    return [BaseSpecies];
-                }
-                return null;
-            }
-            init;
-        } 
+        public StrListStrUnion? BattleOnly { get; init; }
         public string? RequiredItem { get; init; }
         public string? RequiredMove { get; init; }
         public string? RequiredAbility { get; init; }
@@ -479,9 +452,20 @@
                 {
                     return field;
                 }
-                if (BattleOnly is { Count: > 0 } && BattleOnly[0] != BaseSpecies)
+                switch (BattleOnly)
                 {
-                    return BattleOnly[0];
+                    case StrStrListStrUnion(var str):
+                        if (str != BaseSpecies)
+                        {
+                            return str;
+                        }
+                        break;
+                    case StrListStrListUnion(var strList):
+                        if (strList.Count > 0 && strList[0] != BaseSpecies)
+                        {
+                            return strList[0];
+                        }
+                        break;
                 }
                 return BaseSpecies;
             }

@@ -106,11 +106,12 @@ namespace ApogeeVGC_CS.sim
 
         public override bool Equals(object? obj)
         {
-            if (obj is Id otherId)
-                return Value == otherId.Value;
-            if (obj is string str)
-                return Value == FromString(str);
-            return false;
+            return obj switch
+            {
+                Id otherId => Value == otherId.Value,
+                string str => Value == FromString(str),
+                _ => false
+            };
         }
 
         public override int GetHashCode() => Value.GetHashCode();
@@ -512,7 +513,7 @@ namespace ApogeeVGC_CS.sim
     }
 
     public class SpreadMoveTargets : List<Pokemon?>;
-    public class SpreadMoveDamage : List<object>; // number | boolean | undefined
+    public class SpreadMoveDamage : List<IntBoolUnion?>;
     public class ZMoveOptions : List<ZMoveOption?>;
 
     // helper class for ZMoveOptions
@@ -525,6 +526,15 @@ namespace ApogeeVGC_CS.sim
     public class BattleScriptsData
     {
         public int Gen { get; set; }
+    }
+
+    public class RunMoveOptions
+    {
+        public IEffect? SourceEffect { get; init; }
+        public string? ZMove { get; init; }
+        public bool? ExternalMove { get; init; }
+        public string? MaxMove { get; init; }
+        public Pokemon? OriginalTarget { get; init; }
     }
 
     public interface IModdedBattleActions
@@ -549,85 +559,132 @@ namespace ApogeeVGC_CS.sim
         public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, SpreadMoveDamage>? HitStepMoveHitLoop { get; set; }
         public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, List<bool>>? HitStepTryImmunity { get; set; }
         public Action<BattleActions, List<Pokemon>, Pokemon, ActiveMove>? HitStepStealBoosts { get; set; }
-        public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, List<object>>? HitStepTryHitEvent { get; set; }
+        public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, List<bool?>>? HitStepTryHitEvent { get; set; }
         public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, List<bool>>? HitStepInvulnerabilityEvent { get; set; }
         public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, List<bool>>? HitStepTypeImmunity { get; set; }
-        public Func<BattleActions, Pokemon?, Pokemon, ActiveMove, ActiveMove?, bool?, bool?, object>? MoveHit { get; set; }
-        public Action<BattleActions, object>? RunAction { get; set; }
+        public Func<BattleActions, Pokemon?, Pokemon, ActiveMove, ActiveMove?, bool?, bool?, IntFalseUnion?>? MoveHit { get; set; }
+        public Action<BattleActions, IAction>? RunAction { get; set; }
         public Func<BattleActions, Pokemon, bool>? RunMegaEvo { get; set; }
         public Func<BattleActions, Pokemon, bool>? RunMegaEvoX { get; set; }
         public Func<BattleActions, Pokemon, bool>? RunMegaEvoY { get; set; }
-        public Action<BattleActions, object, Pokemon, int, object>? RunMove { get; set; }
+        public Action<BattleActions, MoveStringUnion, Pokemon, int, RunMoveOptions?>? RunMove { get; set; }
         public Func<BattleActions, SpreadMoveDamage, SpreadMoveTargets, Pokemon, ActiveMove, ActiveMove, bool?, bool?, SpreadMoveDamage>? RunMoveEffects { get; set; }
         public Func<BattleActions, Pokemon, bool>? RunSwitch { get; set; }
         public Action<BattleActions, ActiveMove, Pokemon>? RunZPower { get; set; }
         public Action<BattleActions, SpreadMoveTargets, Pokemon, ActiveMove, ActiveMove, bool?>? Secondaries { get; set; }
         public Action<BattleActions, SpreadMoveTargets, Pokemon, ActiveMove, ActiveMove, bool?, bool?>? SelfDrops { get; set; }
         public Func<BattleActions, SpreadMoveTargets, Pokemon, ActiveMove, ActiveMove?, bool?, bool?, Tuple<SpreadMoveDamage, SpreadMoveTargets>>? SpreadMoveHit { get; set; }
-        public Func<BattleActions, Pokemon, int, object, bool?, object>? SwitchIn { get; set; }
+        public Func<BattleActions, Pokemon, int, IEffect?, bool?, SwitchInReturnBase>? SwitchIn { get; set; }
         public Func<BattleActions, string, bool>? TargetTypeChoices { get; set; }
         public Action<BattleActions, Pokemon>? Terastallize { get; set; }
-        public Func<BattleActions, Pokemon, Pokemon, ActiveMove, object>? TryMoveHit { get; set; }
+        public Func<BattleActions, Pokemon, Pokemon, ActiveMove, TryMoveHitReturn?>? TryMoveHit { get; set; }
         public Func<BattleActions, SpreadMoveDamage, SpreadMoveTargets, Pokemon, ActiveMove, ActiveMove, bool?, SpreadMoveDamage>? TryPrimaryHitEvent { get; set; }
         public Func<BattleActions, List<Pokemon>, Pokemon, ActiveMove, bool?, bool>? TrySpreadMoveHit { get; set; }
-        public Func<BattleActions, Move, Pokemon, object?, bool>? UseMove { get; set; }
-        public Func<BattleActions, Move, Pokemon, object?, bool>? UseMoveInner { get; set; }
-        public Func<BattleActions, Pokemon, Pokemon, object, bool, object>? GetDamage { get; set; }
+        public Func<BattleActions, Move, Pokemon, IEffect?, bool>? UseMove { get; set; }
+        public Func<BattleActions, Move, Pokemon, IEffect?, bool>? UseMoveInner { get; set; }
+        public Func<BattleActions, Pokemon, Pokemon, GetDamageMove, bool, IntFalseUnion?>? GetDamage { get; set; }
         public Action<BattleActions, int, Pokemon, Pokemon, ActiveMove, bool?>? ModifyDamage { get; set; }
 
         // OMs (Other Metagames)
-        public Func<BattleActions, Species, object, Species>? MutateOriginalSpecies { get; set; }
-        public Func<BattleActions, Species, Pokemon?, object>? GetFormeChangeDeltas { get; set; }
+        public Func<BattleActions, Species, IAnyObject, Species>? MutateOriginalSpecies { get; set; }
+        public Func<BattleActions, Species, Pokemon?, IAnyObject>? GetFormeChangeDeltas { get; set; }
         public Func<BattleActions, string, string, Pokemon?, Species>? GetMixedSpecies { get; set; }
+    }
+
+    public class GetRequestDataReturn
+    {
+        public required string Name { get; init; }
+        public required Id Id { get; init; }
+        public required List<IAnyObject> Pokemon { get; init; }
     }
 
     public interface IModdedBattleSide
     {
         public bool? Inherit { get; set; }
-        public Func<Side, object, object, object, object, bool>? AddSideCondition { get; set; }
+        public Func<Side, ConditionStrUnion, AddSideConditionSource?, IEffect?, bool>?  AddSideCondition { get; set; }
         public Func<Side, bool?, List<Pokemon>>? Allies { get; set; }
         public Func<Side, bool>? CanDynamaxNow { get; set; }
         public Func<Side, string?, object>? ChooseSwitch { get; set; }
         public Func<Side, string>? GetChoice { get; set; }
-        public Func<Side, bool?, object>? GetRequestData { get; set; }
+        public Func<Side, bool?, GetRequestDataReturn>? GetRequestData { get; set; }
+    }
+
+    // Helper class for move choices
+    public class MoveChoice
+    {
+        public string Move { get; init; } = string.Empty;
+        public Id Id { get; init; } = new();
+        public string? Target { get; init; }
+        public bool? Disabled { get; init; }
+    }
+
+    // Helper class for GetMoveRequestData
+    public class GetMoveRequestDataReturn
+    {
+        public List<MoveChoice> Moves { get; init; } = [];
+        public bool? MaybeDisabled { get; init; }
+        public bool? Trapped { get; init; }
+        public bool? MaybeTrapped { get; init; }
+        public bool? CanMegaEvo { get; init; }
+        public bool? CanUltraBurst { get; init; }
+        public ZMoveOptions? CanZMove { get; init; }
+    }
+
+    // helper class for GetMoves
+    public class GetMovesReturn
+    {
+        public string Move { get; init; } = string.Empty;
+        public string Id { get; init; } = string.Empty;
+        public BoolStringUnion? Disabled { get; init; }
+        public string? DisabledSource { get; init; }
+        public string? Target { get; init; }
+        public int? Pp { get; init; }
+        public int? MaxPp { get; init; }
+    }
+
+    // helper class for GetMoveTargets
+    public class GetMoveTargetsReturn
+    {
+        public List<Pokemon> Targets { get; init; } = [];
+        public List<Pokemon> PressureTargets { get; init; } = [];
     }
 
     public interface IModdedBattlePokemon
     {
         public bool? Inherit { get; set; }
-        public object? LostItemForDelibird { get; set; }
-        public Func<Pokemon, SparseBoostsTable, object>? BoostBy { get; set; }
+        public Item? LostItemForDelibird { get; set; }
+        public Func<Pokemon, SparseBoostsTable, IntBoolUnion>? BoostBy { get; set; }
         public Action<Pokemon>? ClearBoosts { get; set; }
         public Func<Pokemon, StatIdExceptHp, int, int?, int>? CalculateStat { get; set; }
         public Func<Pokemon, bool?, bool>? CureStatus { get; set; }
-        public Func<Pokemon, object, object?, object?, int>? DeductPp { get; set; }
-        public Func<Pokemon, bool?, Pokemon?, object?, bool>? EatItem { get; set; }
+        public Func<Pokemon, MoveStringUnion, int?, SpreadDamageTarget, int>? DeductPp { get; set; }
+        public Func<Pokemon, bool?, Pokemon?, IEffect?, bool>? EatItem { get; set; }
         public Func<Pokemon, Id>? EffectiveWeather { get; set; }
-        public Func<Pokemon, object, object, object?, string?, bool>? FormeChange { get; set; }
-        public Func<Pokemon, object, bool>? HasType { get; set; }
-        public Func<Pokemon, object>? GetAbility { get; set; }
+        public Func<Pokemon, SpeciesStrUnion, IEffect, bool?, string?, bool>? FormeChange { get; set; }
+        public Func<Pokemon, StrListStrUnion, bool>? HasType { get; set; }
+        public Func<Pokemon, Ability>? GetAbility { get; set; }
         public Func<Pokemon, int>? GetActionSpeed { get; set; }
-        public Func<Pokemon, object>? GetItem { get; set; }
-        public Func<Pokemon, object>? GetMoveRequestData { get; set; }
-        public Func<Pokemon, string?, bool?, List<object>>? GetMoves { get; set; }
-        public Func<Pokemon, ActiveMove, Pokemon, object>? GetMoveTargets { get; set; }
+        public Func<Pokemon, Item>? GetItem { get; set; }
+        public Func<Pokemon, GetMoveRequestDataReturn>? GetMoveRequestData { get; set; }
+        public Func<Pokemon, string?, bool?, List<GetMovesReturn>>? GetMoves { get; set; }
+        public Func<Pokemon, ActiveMove, Pokemon, GetMoveTargetsReturn>? GetMoveTargets { get; set; }
         public Func<Pokemon, StatIdExceptHp, bool?, bool?, bool?, int>? GetStat { get; set; }
         public Func<Pokemon, bool?, bool?, List<string>>? GetTypes { get; set; }
         public Func<Pokemon, int>? GetWeight { get; set; }
-        public Func<Pokemon, object, bool>? HasAbility { get; set; }
-        public Func<Pokemon, object, bool>? HasItem { get; set; }
+        public Func<Pokemon, StrListStrUnion, bool>? HasAbility { get; set; }
+        public Func<Pokemon, StrListStrUnion, bool>? HasItem { get; set; }
         public Func<Pokemon, bool?, bool?>? IsGrounded { get; set; }
         public Action<Pokemon, StatIdExceptHp, int>? ModifyStat { get; set; }
         public Action<Pokemon, ActiveMove, int?>? MoveUsed { get; set; }
         public Action<Pokemon>? RecalculateStats { get; set; }
         public Func<Pokemon, ActiveMove, int>? RunEffectiveness { get; set; }
-        public Func<Pokemon, object, object?, bool>? RunImmunity { get; set; }
-        public Func<Pokemon, object, Pokemon?, bool, object>? SetAbility { get; set; }
-        public Func<Pokemon, object, Pokemon?, object?, bool>? SetItem { get; set; }
-        public Func<Pokemon, object, Pokemon?, object?, bool, bool>? SetStatus { get; set; }
-        public Func<Pokemon, Pokemon?, object>? TakeItem { get; set; }
-        public Func<Pokemon, Pokemon, object?, bool>? TransformInto { get; set; }
-        public Func<Pokemon, Pokemon?, object?, bool>? UseItem { get; set; }
+        public Func<Pokemon, ActiveMoveStringUnion, BoolStringUnion?, bool>? RunImmunity { get; set; }
+        public Func<Pokemon, AbilityStringUnion, Pokemon?, bool, StringFalseUnion>? SetAbility { get; set; }
+        public Func<Pokemon, ItemStringUnion, Pokemon?, IEffect?, bool>? SetItem { get; set; }
+        public Func<Pokemon, ConditionStrUnion, Pokemon?, IEffect?, bool, bool>? SetStatus { get; set; }
+        public Func<Pokemon, Pokemon?, ItemBoolUnion>? TakeItem { get; set; }
+        public Func<Pokemon, Pokemon, IEffect?, bool>? TransformInto { get; set; }
+        public Func<Pokemon, Pokemon?, IEffect?, bool>? UseItem { get; set; }
         public Func<Pokemon, bool>? IgnoringAbility { get; set; }
         public Func<Pokemon, bool>? IgnoringItem { get; set; }
         // OMs (Other Metagames)
@@ -645,9 +702,9 @@ namespace ApogeeVGC_CS.sim
     {
         public bool? Inherit { get; set; }
         public Func<Field, bool>? SuppressingWeather { get; set; }
-        public Func<Field, object, object, object?, bool>? AddPseudoWeather { get; set; }
-        public Func<Field, object, object, object?, bool?>? SetWeather { get; set; }
-        public Func<Field, object, object, object?, bool>? SetTerrain { get; set; }
+        public Func<Field, ConditionStrUnion, AddSideConditionSource?, IEffect?, bool>? AddPseudoWeather { get; set; }
+        public Func<Field, ConditionStrUnion, AddSideConditionSource?, IEffect?, bool?>? SetWeather { get; set; }
+        public Func<Field, EffectStringUnion, AddSideConditionSource, IEffect?, bool>? SetTerrain { get; set; }
     }
 
     public interface IModdedBattleScriptsData
@@ -658,23 +715,23 @@ namespace ApogeeVGC_CS.sim
         public IModdedBattleQueue? Queue { get; set; }
         public IModdedField? Field { get; set; }
         public IModdedBattleSide? Side { get; set; }
-        public Func<Battle, SparseBoostsTable, Pokemon, Pokemon?, object?, bool?, bool?, object>? Boost { get; set; }
+        public Func<Battle, SparseBoostsTable, Pokemon, Pokemon?, IEffect?, bool?, bool?, BoolZeroUnion?>? Boost { get; set; }
         public Action<Battle, string>? Debug { get; set; }
-        public Action<Battle, object>? GetActionSpeed { get; set; }
+        public Action<Battle, IAnyObject>? GetActionSpeed { get; set; }
         public Action<ModdedDex>? Init { get; set; }
         public Func<Battle, bool[], string[], bool?>? MaybeTriggerEndlessBattleClause { get; set; }
         public Func<Battle, StatsTable, PokemonSet, StatsTable>? NatureModify { get; set; }
         public Action<Battle>? EndTurn { get; set; }
-        public Action<Battle, object>? RunAction { get; set; }
+        public Action<Battle, IAction>? RunAction { get; set; }
         public Func<Battle, StatsTable, PokemonSet, StatsTable>? SpreadModify { get; set; }
         public Action<Battle>? Start { get; set; }
         public Func<Battle, bool>? SuppressingWeather { get; set; }
         public Func<double, double>? Trunc { get; set; }
-        public Func<Battle, object?, bool>? Win { get; set; }
+        public Func<Battle, WinSideUnion?, bool>? Win { get; set; }
         public Func<Battle, bool?, bool?, bool?, bool?>? FaintMessages { get; set; }
         public Func<Battle, bool>? Tiebreak { get; set; }
         public Func<Battle, ActiveMove, Pokemon, Pokemon, bool?, bool>? CheckMoveMakesContact { get; set; }
-        public Func<Battle, object?, bool?>? CheckWin { get; set; }
+        public Func<Battle, FaintQueueEntry?, bool?>? CheckWin { get; set; }
         public Action<Battle, string, List<Pokemon>?>? FieldEvent { get; set; }
         public Func<Battle, bool?, bool?, List<Pokemon>>? GetAllActive { get; set; }
     }
