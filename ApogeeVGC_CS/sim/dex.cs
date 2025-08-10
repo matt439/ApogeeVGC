@@ -230,7 +230,7 @@
             throw new NotImplementedException("GetImmunit method not implemented yet.");
         }
 
-        public Descriptions GetDescs(TextTableData table, Id id, object dataEntry)
+        public Descriptions GetDescs(TextTableData table, Id id, IAnyObject dataEntry)
         {
             throw new NotImplementedException("GetDescs method not implemented yet.");
         }
@@ -252,13 +252,13 @@
 
         // int Trunc()
 
-        public List<object>? DataSearch(string target, List<DataSearchType>? searchIn = null,
+        public List<IAnyObject>? DataSearch(string target, List<DataSearchType>? searchIn = null,
             bool? isInexact = null)
         {
             throw new NotImplementedException("DataSearch method not implemented yet.");
         }
 
-        public object? LoadDataFile(string basePath, DataType dataType)
+        public IAnyObject? LoadDataFile(string basePath, DataType dataType)
         {
             throw new NotImplementedException("LoadDataFile method not implemented yet.");
         }

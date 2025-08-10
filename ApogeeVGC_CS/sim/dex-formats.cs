@@ -453,6 +453,12 @@ namespace ApogeeVGC_CS.sim
         public bool Accelerate { get; }
     }
 
+    public enum HasValueOption
+    {
+        Integer,
+        PositiveInteger,
+    }
+
     /**
      * A RuleTable keeps track of the rules that a format has. The key can be:
      * - '[ruleid]' the ID of a rule in effect
@@ -568,21 +574,7 @@ namespace ApogeeVGC_CS.sim
         /// (Challenge and tournament games will never update ladder points.)
         /// (Defaults to true.)
         /// </summary>
-        public required object Rated
-        {
-            get;
-            init
-            {
-                if (value is bool or string)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Rated must be a bool or string.");
-                }
-            }
-        }
+        public required BoolStringUnion Rated { get; init; }
 
         /// <summary>Game type.</summary>
         public required GameType GameType { get; init; }
@@ -620,19 +612,7 @@ namespace ApogeeVGC_CS.sim
         public required bool NoLog { get; init; }
 
         // Rule-specific properties (only apply to rules, not formats)
-        public object? HasValue // Can be bool, "integer", or "positive-integer"
-        {
-            get;
-            init
-            {
-                field = value switch
-                {
-                    bool or string or int => value,
-                    null => null,
-                    _ => throw new ArgumentException("HasValue must be a bool, string, int, or null.")
-                };
-            }
-        } 
+        public DexFormatsHasValue? HasValue { get; init; }
         public Func<ValidationContext, string, string?>? OnValidateRule { get; init; }
 
         /// <summary>ID of rule that can't be combined with this rule</summary>
@@ -744,7 +724,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("GetRuleTable method is not implemented yet.");
         }
 
-        public object ValidateRule(string rule, Format? format = null)
+        public ValidateRuleReturn ValidateRule(string rule, Format? format = null)
         {
             throw new NotImplementedException("ValidateRule method is not implemented yet.");
         }

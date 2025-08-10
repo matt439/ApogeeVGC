@@ -25,8 +25,7 @@
             get; 
             init
             {
-                if (!(value == 3 || value == 5 || value == 200 || value == 201 ||
-                    value == 199 || value == 106))
+                if (value is not (3 or 5 or 200 or 201 or 199 or 106))
                 {
                     throw new ArgumentException("Order must be one of the predefined values: 3, 5, 200, 201, 199, or 106.");
                 }

@@ -547,7 +547,7 @@
     public record StrListStrListUnion(List<string> Value) : StrListStrUnion;
 
     /// <summary>
-    /// string | number | ActiveMove
+    /// string | int | ActiveMove
     /// </summary>
     public abstract record GetDamageMove
     {
@@ -557,9 +557,62 @@
             new ActiveMoveGetDamageMove(activeMove);
     }
     public record StrGetDamageMove(string Value) : GetDamageMove;
-
     public record IntGetDamageMove(int Value) : GetDamageMove;
     public record ActiveMoveGetDamageMove(ActiveMove ActiveMove) : GetDamageMove;
+
+    /// <summary>
+    /// bool | HasValueOption.Integer | HasValueOption.PositiveInteger
+    /// </summary>
+    public abstract record DexFormatsHasValue
+    {
+        public static implicit operator DexFormatsHasValue(bool value) => new BoolDexFormatsHasValue(value);
+        public static implicit operator DexFormatsHasValue(HasValueOption value) =>
+            new HasValueOptionUnion(value);
+    }
+    public record BoolDexFormatsHasValue(bool Value) : DexFormatsHasValue;
+    public record HasValueOptionUnion(HasValueOption Value) : DexFormatsHasValue;
+
+    /// <summary>
+    /// string | int | List<string>
+    /// </summary>
+    public abstract record StrIntListStrUnion
+    {
+        public static implicit operator StrIntListStrUnion(string value) => new StrStrIntListStrUnion(value);
+        public static implicit operator StrIntListStrUnion(int value) => new IntStrIntListStrUnion(value);
+        public static implicit operator StrIntListStrUnion(List<string> value) =>
+            new ListStrStrIntListStrUnion(value);
+    }
+    public record StrStrIntListStrUnion(string Value) : StrIntListStrUnion;
+    public record IntStrIntListStrUnion(int Value) : StrIntListStrUnion;
+    public record ListStrStrIntListStrUnion(List<string> Value) : StrIntListStrUnion;
+
+
+    /// <summary>
+    /// string | (string | number | string[])[]
+    /// </summary>
+    public abstract record ValidateRuleReturn
+    {
+        public static implicit operator ValidateRuleReturn(string value) => new StringValidateRuleReturn(value);
+        public static implicit operator ValidateRuleReturn(List<StrIntListStrUnion> value) =>
+            new ListValidateRuleReturn(value);
+    }
+    public record StringValidateRuleReturn(string Value) : ValidateRuleReturn;
+    public record ListValidateRuleReturn(List<StrIntListStrUnion> Value) : ValidateRuleReturn;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
