@@ -600,8 +600,33 @@
     public record ListValidateRuleReturn(List<StrIntListStrUnion> Value) : ValidateRuleReturn;
 
 
+    /// <summary>
+    /// string | true
+    /// </summary>
+    public abstract record StringTrueUnion
+    {
+        public static implicit operator StringTrueUnion(string value) => new StringTrue(value);
+        public static implicit operator StringTrueUnion(bool value) =>
+            value ? new TrueStringTrueUnion(value) :
+            throw new ArgumentException("Must be 'true' for TrueStringTrueUnion");
+    }
+    public record StringTrue(string Value) : StringTrueUnion;
+    public record TrueStringTrueUnion(bool Value) : StringTrueUnion;
 
 
+    /// <summary>
+    /// SparseBoostsTable | false
+    /// </summary>
+    public abstract record ItemBoosts
+    {
+        public static implicit operator ItemBoosts(SparseBoostsTable table) =>
+            new SparseBoostsTableItemBoosts(table);
+        public static implicit operator ItemBoosts(bool value) =>
+            value ? throw new ArgumentException("Must be 'false' for FlaseItemBoosts") :
+            new FlaseItemBoosts(value);
+    }
+    public record SparseBoostsTableItemBoosts(SparseBoostsTable Table) : ItemBoosts;
+    public record FlaseItemBoosts(bool Value) : ItemBoosts;
 
 
 

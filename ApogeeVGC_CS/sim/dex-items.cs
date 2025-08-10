@@ -540,22 +540,7 @@
         public string? OnMemory { get; init; }
         public string? MegaStone { get; init; }
         public string? MegaEvolves { get; init; }
-
-        public object? ZMove // true or string
-        {
-            get;
-            init
-            {
-                if (value is bool or string)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("ZMove must be a boolean or string.");
-                }
-            }
-        }
+        public StringTrueUnion? ZMove { get; init; }
 
         public string? ZMoveType { get; init; }
         public string? ZMoveFrom { get; init; }
@@ -572,21 +557,7 @@
         public (int BasePower, string Type)? NaturalGift { get; init; }
         public int? SpriteNum { get; init; }
 
-        public object? Boosts
-        {
-            get;
-            init
-            {
-                if (value is SparseBoostsTable or bool)
-                {
-                    field = value;
-                }
-                else
-                {
-                    throw new ArgumentException("Boosts must be a SparseBoostsTable or boolean.");
-                }
-            }
-        }
+        public ItemBoosts? Boosts { get; init; }
 
         // Event handlers
         public Delegate? OnEat { get; init; }
