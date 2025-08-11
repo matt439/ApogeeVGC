@@ -415,25 +415,22 @@ namespace ApogeeVGC_CS.data
                         pokemon.RemoveVolatile("choicelock");
                         return true;
                     }
-                    Id? lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out var moveObj) 
+                    var lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) 
                         ? moveObj as Id
                         : Id.Empty;
-                    if (!pokemon.IgnoringItem() && !pokemon.Volatiles.ContainsKey("dynamax") &&
-                        move.Id != lockedMove && move.Id != new Id("struggle"))
-                    {
-                        battle.AddMove("move", pokemon, move.Name);
-                        battle.AttrLastMove("[still]");
-                        battle.Debug("Disabled by Choice item lock");
-                        battle.Add("-fail", pokemon);
-                        return false;
-                    }
-                    return true;
+                    if (pokemon.IgnoringItem() || pokemon.Volatiles.ContainsKey("dynamax") ||
+                        move.Id == lockedMove || move.Id == new Id("struggle")) return true;
+                    battle.AddMove("move", pokemon, move.Name);
+                    battle.AttrLastMove("[still]");
+                    battle.Debug("Disabled by Choice item lock");
+                    battle.Add("-fail", pokemon);
+                    return false;
                 },
                 OnDisableMove = (battle, pokemon) =>
                 {
                     var item = pokemon.GetItem();
-                    Id? lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out var moveObj) ? moveObj as Id : null;
-                    if (item == null || (!item.IsChoice ?? false) || pokemon.HasMove(lockedMove ?? Id.Empty) == null)
+                    var lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) ? moveObj as Id : null;
+                    if ((!item.IsChoice ?? false) || pokemon.HasMove(lockedMove ?? Id.Empty) is null)
                     {
                         pokemon.RemoveVolatile("choicelock");
                         return;

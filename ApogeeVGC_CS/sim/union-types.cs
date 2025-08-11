@@ -190,6 +190,15 @@
 
         public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
         public static implicit operator RunEventTarget(Battle battle) => new BattleRunEventTarget(battle);
+
+        public static implicit operator RunEventTarget(SingleEventTarget target) => target switch
+        {
+            PokemonSingleEventTarget pokemonTarget => new PokemonRunEventTarget(pokemonTarget.Pokemon),
+            SideSingleEventTarget sideTarget => new SideRunEventTarget(sideTarget.Side),
+            FieldSingleEventTarget fieldTarget => new NullRunEventTarget(), // No direct conversion for Field
+            BattleSingleEventTarget battleTarget => new BattleRunEventTarget(battleTarget.Battle),
+            _ => throw new InvalidOperationException($"Cannot convert {target.GetType()} to RunEventTarget")
+        };
     }
 
     public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;
@@ -212,6 +221,15 @@
 
         public static implicit operator RunEventSource(bool value) =>
             value ? new NullRunEventSource() : new FalseRunEventSource();
+
+        public static implicit operator RunEventSource(SingleEventSource source) => source switch
+        {
+            StringSingleEventSource stringSource => new StringRunEventSource(stringSource.Value),
+            PokemonSingleEventSource pokemonSource => new PokemonRunEventSource(pokemonSource.Pokemon),
+            FalseSingleEventSource => new FalseRunEventSource(),
+            NullSingleEventSource => new NullRunEventSource(),
+            _ => throw new InvalidOperationException($"Cannot convert {source.GetType()} to RunEventSource")
+        };
     }
 
     public record StringRunEventSource(string Value) : RunEventSource;
@@ -256,6 +274,17 @@
 
         public static implicit operator GetCallbackTarget(Battle battle) =>
             new BattleGetCallbackTarget(battle);
+
+
+        public static implicit operator GetCallbackTarget(SingleEventTarget target) =>
+            target switch
+            {
+                PokemonSingleEventTarget pokemonTarget => new PokemonGetCallbackTarget(pokemonTarget.Pokemon),
+                SideSingleEventTarget sideTarget => new SideGetCallbackTarget(sideTarget.Side),
+                FieldSingleEventTarget fieldTarget => new FieldGetCallbackTarget(fieldTarget.Field),
+                BattleSingleEventTarget battleTarget => new BattleGetCallbackTarget(battleTarget.Battle),
+                _ => throw new InvalidOperationException($"Cannot convert {target.GetType()} to GetCallbackTarget")
+            };
     }
 
     public record PokemonGetCallbackTarget(Pokemon Pokemon) : GetCallbackTarget;

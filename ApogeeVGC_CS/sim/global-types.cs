@@ -43,6 +43,18 @@ namespace ApogeeVGC_CS.sim
             Value = FromObject(obj);
         }
 
+        public static bool operator ==(Id? left, Id? right)
+        {
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null || right is null) return false;
+            return left.Value == right.Value;
+        }
+
+        public static bool operator !=(Id? left, Id? right)
+        {
+            return !(left == right);
+        }
+
         /**
          * Returns true if the sequence of elements of searchString converted to a String is the
          * same as the corresponding elements of this object (converted to a String) starting at
@@ -1052,13 +1064,13 @@ namespace ApogeeVGC_CS.sim
     /// </summary>
     public interface IAnyObject
     {
-        int? Order { get; }
-        int? Priority { get; }
+        IntFalseUnion Order { get; }
+        int Priority { get; }
         int? Speed { get; }
-        int? SubOrder { get; }
+        int SubOrder { get; }
         int? EffectOrder { get; }
         int? Index { get; }
-        EffectState? AbilityState { get; }
+        EffectState AbilityState { get; }
     }
 
     //public class AnyObject : Dictionary<string, object>

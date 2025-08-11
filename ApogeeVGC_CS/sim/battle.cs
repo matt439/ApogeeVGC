@@ -2,6 +2,7 @@
 using ApogeeVGC_CS.sim;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Reflection;
 using System.Text.Json;
@@ -86,12 +87,13 @@ namespace ApogeeVGC_CS.sim
         public required EventEffectHolder EffectHolder { get; init; }
     }
 
-    public class EventListener : EventListenerWithoutPriority
+    public class EventListener : EventListenerWithoutPriority, IAnyObject
     {
-        public int? Order { get; init; }
+        public IntFalseUnion Order { get; init; }
         public int Priority { get; init; }
         public int SubOrder { get; init; }
         public int? EffectOrder { get; init; }
+        public EffectState? AbilityState { get; }
         public int? Speed { get; init; }
     }
 
@@ -189,12 +191,12 @@ namespace ApogeeVGC_CS.sim
         public required bool Ended { get; init; }
         public string? Winner { get; init; }
 
-        public required IEffect Effect { get; init; }
-        public required EffectState EffectState { get; init; }
+        public required IEffect Effect { get; set; }
+        public required EffectState EffectState { get; set; }
 
-        public required object Event { get; init; }
+        public required object Event { get; set; }
         public object? Events { get; init; }
-        public required int EventDepth { get; init; }
+        public required int EventDepth { get; set; }
 
         public ActiveMove? ActiveMove { get; set; }
         public Pokemon? ActivePokemon { get; set; }
@@ -473,24 +475,36 @@ namespace ApogeeVGC_CS.sim
         }
 
 
-        /**
-	     * The default sort order for actions, but also event listeners.
-	     *
-	     * 1. Order, low to high (default last)
-	     * 2. Priority, high to low (default 0)
-	     * 3. Speed, high to low (default 0)
-	     * 4. SubOrder, low to high (default 0)
-	     * 5. EffectOrder, low to high (default 0)
-	     *
-	     */
+        /// <summary>
+        /// The default sort order for actions, but also event listeners.
+        /// 
+        /// 1. Order, low to high (default last)
+        /// 2. Priority, high to low (default 0)
+        /// 3. Speed, high to low (default 0)
+        /// 4. SubOrder, low to high (default 0)
+        /// 5. EffectOrder, low to high (default 0)
+        /// </summary>
         public static int ComparePriority(IAnyObject a, IAnyObject b)
         {
-            // Order comparison (lower values first, null = last)
-            int orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            // Order comparison (lower values first, null/false = last)
+            // Using int.MaxValue as default for null/false
+            int aOrder = a.Order switch
+            {
+                IntIntFalseUnion intOrder => intOrder.Value,
+                _ => int.MaxValue
+            };
+
+            int bOrder = b.Order switch
+            {
+                IntIntFalseUnion intOrder => intOrder.Value,
+                _ => int.MaxValue
+            };
+
+            int orderResult = aOrder.CompareTo(bOrder);
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            int priorityResult = (b.Priority).CompareTo(a.Priority);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
@@ -498,41 +512,64 @@ namespace ApogeeVGC_CS.sim
             if (speedResult != 0) return speedResult;
 
             // SubOrder comparison (lower values first)
-            int subOrderResult = (a.SubOrder ?? 0).CompareTo(b.SubOrder ?? 0);
+            int subOrderResult = (a.SubOrder).CompareTo(b.SubOrder);
             return subOrderResult != 0 ? subOrderResult :
                 // EffectOrder comparison (lower values first)
                 (a.EffectOrder ?? 0).CompareTo(b.EffectOrder ?? 0);
         }
 
+        /// <summary>
+        /// Comparison function for redirect order sorting.
+        /// Used for sorting event handlers when fastExit is true.
+        /// 
+        /// 1. Priority, high to low (default 0)
+        /// 2. Speed, high to low (default 0) 
+        /// 3. AbilityState EffectOrder, low to high (only if both have ability states)
+        /// </summary>
         public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
         {
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            int priorityResult = (b.Priority).CompareTo(a.Priority);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
             int speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
-            if (speedResult != 0) return speedResult;
-
-            // AbilityState EffectOrder comparison (inverted, only if both have ability states)
-            if (a.AbilityState != null && b.AbilityState != null)
-            {
-                return a.AbilityState.EffectOrder.CompareTo(b.AbilityState.EffectOrder);
-            }
-
-            return 0;
+            return speedResult != 0 ? speedResult :
+                // AbilityState EffectOrder comparison (lower values first, only if both have ability states)
+                a.AbilityState.EffectOrder.CompareTo(b.AbilityState.EffectOrder);
         }
 
+        /// <summary>
+        /// Comparison function for left-to-right order sorting.
+        /// Used for specific events like "Invulnerability", "TryHit", "DamagingHit", "EntryHazard".
+        /// 
+        /// 1. Order, low to high (default last)
+        /// 2. Priority, high to low (default 0)
+        /// 3. Index, low to high (default 0) - for array position ordering
+        /// </summary>
         public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
         {
-            // Order comparison (lower values first, null = last)
-            int orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            // Order comparison (lower values first, null/false = last)
+            // Using 4294967296 as default for null/false (same as TypeScript)
+            int aOrder = a.Order switch
+            {
+                IntIntFalseUnion intOrder => intOrder.Value,
+                _ => int.MaxValue
+            };
+
+            int bOrder = b.Order switch
+            {
+                IntIntFalseUnion intOrder => intOrder.Value,
+                _ => int.MaxValue
+            };
+
+            int orderResult = aOrder.CompareTo(bOrder);
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            int priorityResult = (b.Priority).CompareTo(a.Priority);
             return priorityResult != 0 ? priorityResult :
-                // Index comparison (lower values first)
+                // Index comparison (lower values first) - for left-to-right array ordering
                 (a.Index ?? 0).CompareTo(b.Index ?? 0);
         }
 
@@ -621,20 +658,201 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement field event handling logic
         }
 
+        //public object SingleEvent(
+        //    string eventId,
+        //    IEffect effect,
+        //    SingleEventState state,
+        //    SingleEventTarget target,
+        //    SingleEventSource? source = null,
+        //    IEffect? sourceEffect = null,
+        //    object? relayVar = null,
+        //    Delegate? customCallback = null)
+        //{
+        //    throw new NotImplementedException();
+        //    // TODO: Implement single event handling logic
+        //}
+
         public object SingleEvent(
-            string eventId,
-            IEffect effect,
-            SingleEventState state,
-            SingleEventTarget target,
-            SingleEventSource? source = null,
-            IEffect? sourceEffect = null,
-            object? relayVar = null,
-            Delegate? customCallback = null)
+           string eventId,
+           IEffect effect,
+           SingleEventState state,
+           SingleEventTarget target,
+           SingleEventSource? source = null,
+           IEffect? sourceEffect = null,
+           object? relayVar = null,
+           Delegate? customCallback = null)
         {
-            throw new NotImplementedException();
-            // TODO: Implement single event handling logic
+            // Check for infinite recursion or other stack issues
+            if (EventDepth >= 8)
+            {
+                Add("message", "STACK LIMIT EXCEEDED");
+                Add("message", "PLEASE REPORT IN BUG THREAD");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {(Event is BattleEvent battleEvent ? battleEvent.Id :
+                    "unknown")}");
+                throw new StackOverflowException("Event stack depth exceeded");
+            }
+
+            if (Log.Count - SentLogPos > 1000)
+            {
+                Add("message", "LINE LIMIT EXCEEDED");
+                Add("message", "PLEASE REPORT IN BUG THREAD");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {(Event is BattleEvent battleEvent ? battleEvent.Id :
+                    "unknown")}");
+                throw new InvalidOperationException("Infinite loop detected");
+            }
+
+            // Optional debugging
+            // Debug($"Event: {eventId} (depth {EventDepth})");
+
+            // Handle relay variable defaults
+            var hasRelayVar = true;
+            if (relayVar == null)
+            {
+                relayVar = true;
+                hasRelayVar = false;
+            }
+
+            // Early exit conditions for suppressed effects
+
+            // Status effect where the Pokémon's status has changed
+            if (effect.EffectType == EffectType.Status &&
+                target is PokemonSingleEventTarget pokemonTarget &&
+                pokemonTarget.Pokemon.Status != effect.Id)
+            {
+                return relayVar; // Status has changed, don't trigger the effect
+            }
+
+            // Ability suppressed by Mold Breaker on switch-in
+            if (eventId == "SwitchIn" &&
+                effect.EffectType == EffectType.Ability &&
+                effect is Ability { Flags.Breakable: true } &&
+                target is PokemonSingleEventTarget moldBreakerTarget &&
+                SuppressingAbility(moldBreakerTarget.Pokemon))
+            {
+                Debug($"{eventId} handler suppressed by Mold Breaker");
+                return relayVar;
+            }
+
+            // Item ignored by the Pokémon
+            if (eventId != "Start" &&
+                eventId != "TakeItem" &&
+                effect.EffectType == EffectType.Item &&
+                target is PokemonSingleEventTarget itemTarget &&
+                itemTarget.Pokemon.IgnoringItem())
+            {
+                Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
+                return relayVar;
+            }
+
+            // Ability ignored by the Pokémon
+            if (eventId != "End" &&
+                effect.EffectType == EffectType.Ability &&
+                target is PokemonSingleEventTarget abilityTarget &&
+                abilityTarget.Pokemon.IgnoringAbility())
+            {
+                Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
+                return relayVar;
+            }
+
+            // Weather suppressed by Abilities like Air Lock
+            if (effect.EffectType == EffectType.Weather &&
+                eventId != "FieldStart" &&
+                eventId != "FieldResidual" &&
+                eventId != "FieldEnd" &&
+                Field.SuppressingWeather())
+            {
+                Debug($"{eventId} handler suppressed by Air Lock");
+                return relayVar;
+            }
+
+            // Get the callback function
+            Delegate? callback = customCallback ?? GetCallback(target, effect, $"on{eventId}");
+            if (callback == null) return relayVar;
+
+            // Save the current battle state
+            var parentEffect = Effect;
+            var parentEffectState = EffectState;
+            object parentEvent = Event;
+
+            try
+            {
+                // Update battle state for this event
+                Effect = effect;
+                EffectState = state switch
+                {
+                    EffectStateSingleEventState effectState => effectState.EffectState,
+                    EmptySingleEventState => InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 }),
+                    _ => InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 })
+                };
+
+                Event = new BattleEvent
+                {
+                    Id = eventId,
+                    Target = target,
+                    Source = source,
+                    Effect = sourceEffect
+                };
+
+                EventDepth++;
+
+                // Build the argument list for the callback
+                var args = new List<object>();
+                if (hasRelayVar)
+                    args.Add(relayVar);
+
+                args.Add(target);
+                args.Add(source ?? new NullSingleEventSource());
+                args.Add(sourceEffect ?? ConditionConstants.EmptyCondition);
+
+                // Invoke the callback
+                object? returnVal;
+                try
+                {
+                    returnVal = callback.DynamicInvoke(args.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    Debug($"Error in event handler: {ex.Message}");
+                    returnVal = null;
+                }
+
+                // Return either the callback's return value or the original relayVar
+                return returnVal ?? relayVar;
+            }
+            finally
+            {
+                // Restore the previous battle state
+                EventDepth--;
+                Effect = parentEffect;
+                EffectState = parentEffectState;
+                Event = parentEvent;
+            }
         }
 
+        //// Helper class to represent the event context
+        //private class BattleEvent
+        //{
+        //    public required string Id { get; set; }
+        //    public required SingleEventTarget Target { get; set; }
+        //    public required SingleEventSource Source { get; set; }
+        //    public required IEffect Effect { get; set; }
+        //}
+
+
+
+        /// <summary>
+        /// Runs an event with handlers across the battle.
+        /// </summary>
+        /// <param name="eventId">The event identifier (e.g. "Damage", "ModifyDamage", "Weather")</param>
+        /// <param name="target">The primary target of the event (Pokemon, Pokemon[], Side or Battle)</param>
+        /// <param name="source">The source causing the event (Pokemon or string identifier)</param>
+        /// <param name="sourceEffect">The effect causing the event</param>
+        /// <param name="relayVar">The initial value passed to handlers, often modified by them</param>
+        /// <param name="onEffect">Whether to only run the handler on the sourceEffect</param>
+        /// <param name="fastExit">Whether to use fast exit comparison for handlers</param>
+        /// <returns>The final relayVar value after all handlers have processed it</returns>
         public object RunEvent(
             string eventId,
             RunEventTarget? target = null,
@@ -644,7 +862,379 @@ namespace ApogeeVGC_CS.sim
             bool onEffect = false,
             bool fastExit = false)
         {
-            throw new NotImplementedException();
+            // Stack depth check to prevent infinite recursion
+            if (EventDepth >= 8)
+            {
+                Add("message", "STACK LIMIT EXCEEDED");
+                Add("message", "PLEASE REPORT IN BUG THREAD");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {(Event is BattleEvent battleEvent ? battleEvent.Id : "unknown")}");
+                throw new StackOverflowException("Stack overflow in event system");
+            }
+
+            // Default target is this battle
+            target ??= new BattleRunEventTarget(this);
+
+            // Determine effect source for handler lookup
+            Pokemon? effectSource = null;
+            if (source is PokemonRunEventSource pokemonSource)
+            {
+                effectSource = pokemonSource.Pokemon;
+            }
+
+            // Find all handlers for this event
+            var handlers = FindEventHandlers(target switch
+            {
+                PokemonRunEventTarget pokemonTarget => new PokemonFindEventHandlersTarget(pokemonTarget.Pokemon),
+                PokemonListRunEventTarget pokemonListTarget => new PokemonListFindEventHandlersTarget(pokemonListTarget.PokemonList),
+                SideRunEventTarget sideTarget => new SideFindEventHandlersTarget(sideTarget.Side),
+                BattleRunEventTarget => new BattleFindEventHandlersTarget(this),
+                _ => throw new ArgumentException($"Unsupported target type: {target.GetType().Name}")
+            }, eventId, effectSource);
+
+            // Add source effect handler if specified
+            if (onEffect)
+            {
+                if (sourceEffect == null)
+                {
+                    throw new ArgumentException("onEffect specified without a sourceEffect");
+                }
+
+                var callback = GetCallback(target switch
+                {
+                    PokemonRunEventTarget pokemonTarget => new PokemonGetCallbackTarget(pokemonTarget.Pokemon),
+                    SideRunEventTarget sideTarget => new SideGetCallbackTarget(sideTarget.Side),
+                    BattleRunEventTarget => new BattleGetCallbackTarget(this),
+                    _ => throw new ArgumentException($"Array targets not supported with onEffect")
+                }, sourceEffect, $"on{eventId}");
+
+                if (callback != null)
+                {
+                    if (target is PokemonListRunEventTarget)
+                    {
+                        throw new ArgumentException("Array targets not supported with onEffect");
+                    }
+
+                    var effectHolder = target switch
+                    {
+                        PokemonRunEventTarget pokemonTarget => (EventEffectHolder)pokemonTarget.Pokemon,
+                        SideRunEventTarget sideTarget => sideTarget.Side,
+                        BattleRunEventTarget => this,
+                        _ => throw new ArgumentException($"Unsupported target type: {target.GetType().Name}")
+                    };
+
+                    var listenerWithoutPriority = new EventListenerWithoutPriority
+                    {
+                        Effect = sourceEffect,
+                        Callback = callback,
+                        State = InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 }),
+                        End = null,
+                        EffectHolder = effectHolder
+                    };
+
+                    var resolvedListener = ResolvePriority(listenerWithoutPriority, $"on{eventId}");
+                    handlers.Insert(0, resolvedListener); // Add to beginning with unshift
+                }
+            }
+
+            // Sort handlers based on event type
+            if (new[] { "Invulnerability", "TryHit", "DamagingHit", "EntryHazard" }.Contains(eventId))
+            {
+                handlers.Sort(CompareLeftToRightOrder);
+            }
+            else if (fastExit)
+            {
+                handlers.Sort(CompareRedirectOrder);
+            }
+            else
+            {
+                SpeedSort(handlers);
+            }
+
+            // Set up relay variables
+            var hasRelayVar = true;
+            var args = new List<object>(); // Arguments to pass to callbacks
+
+            if (relayVar == null)
+            {
+                relayVar = true;
+                hasRelayVar = false;
+            }
+            else
+            {
+                args.Add(relayVar);
+            }
+
+            // Add standard arguments
+            args.Add(target);
+            args.Add(source ?? new NullRunEventSource());
+            args.Add(sourceEffect ?? ConditionConstants.EmptyCondition);
+
+            // Save parent event and set up this event
+            object parentEvent = Event;
+            var newEvent = new BattleEvent
+            {
+                Id = eventId,
+                Target = target,
+                Source = source,
+                Effect = sourceEffect,
+                Modifier = 1
+            };
+            Event = newEvent;
+            EventDepth++;
+
+            try
+            {
+                // Handle array targets specially
+                List<object>? targetRelayVars = null;
+                if (target is PokemonListRunEventTarget pokemonListTarget)
+                {
+                    targetRelayVars = [];
+                    if (relayVar is IEnumerable<object> relayVarArray)
+                    {
+                        // Copy array values
+                        targetRelayVars.AddRange(relayVarArray);
+                    }
+                    else
+                    {
+                        // Initialize with true for each target
+                        for (int i = 0; i < pokemonListTarget.PokemonList.Count; i++)
+                        {
+                            targetRelayVars.Add(true);
+                        }
+                    }
+                }
+
+                // Process each handler
+                foreach (var handler in handlers)
+                {
+                    // Handle array targets - if this handler has an index
+                    if (handler.Index.HasValue)
+                    {
+                        var index = handler.Index.Value;
+
+                        // Skip if this target's relay var is falsy (unless it's 0 for DamagingHit)
+                        if (targetRelayVars != null &&
+                            index < targetRelayVars.Count &&
+                            !IsTruthy(targetRelayVars[index]) &&
+                            !(Equals(targetRelayVars[index], 0) && eventId == "DamagingHit"))
+                        {
+                            continue;
+                        }
+
+                        // Update target in args and event
+                        if (handler.Target is { } targetPokemon)
+                        {
+                            args[hasRelayVar ? 1 : 0] = targetPokemon;
+                            newEvent.Target = new PokemonRunEventTarget(targetPokemon);
+                        }
+
+                        // Update relay var for this target
+                        if (hasRelayVar && targetRelayVars != null && index < targetRelayVars.Count)
+                        {
+                            args[0] = targetRelayVars[index];
+                        }
+                    }
+
+                    var effect = handler.Effect;
+                    var effectHolder = handler.EffectHolder;
+
+                    // Check if this handler should be suppressed
+
+                    switch (effect.EffectType)
+                    {
+                        // Status has changed
+                        case EffectType.Status when
+                            effectHolder is PokemonEventEffectHolder pokemonEffectHolder &&
+                            pokemonEffectHolder.Pokemon.Status != effect.Id:
+                            continue;
+                        // Ability suppressed by Mold Breaker
+                        case EffectType.Ability when
+                            effect is Ability { Flags.Breakable: true } &&
+                            SuppressingAbility(effectHolder switch
+                            {
+                                PokemonEventEffectHolder pokemonHolder => pokemonHolder.Pokemon,
+                                _ => null
+                            }):
+                            // Always suppress if breakable flag is set
+                            Debug($"{eventId} handler suppressed by Mold Breaker");
+                            continue;
+                        // Custom abilities without num property - handle specific events
+                        case EffectType.Ability when effect is Ability { Num: 0 }:
+                        {
+                            // These events are suppressed for custom abilities when Mold Breaker is active
+                            var attackingEvents = new HashSet<string>
+                            {
+                                "BeforeMove", "BasePower", "Immunity", "RedirectTarget",
+                                "Heal", "SetStatus", "CriticalHit", "ModifyAtk", "ModifyDef",
+                                "ModifySpA", "ModifySpD", "ModifySpe", "ModifyAccuracy", "ModifyBoost",
+                                "ModifyDamage", "ModifySecondaries", "ModifyWeight", "TryAddVolatile",
+                                "TryHit", "TryHitSide", "TryMove", "Boost", "DragOut", "Effectiveness"
+                            };
+
+                            if (attackingEvents.Contains(eventId) &&
+                                SuppressingAbility(effectHolder switch
+                                {
+                                    PokemonEventEffectHolder pokemonHolder => pokemonHolder.Pokemon,
+                                    _ => null
+                                }) || eventId == "Damage" &&
+                                sourceEffect?.EffectType == EffectType.Move &&
+                                SuppressingAbility(effectHolder switch
+                                {
+                                    PokemonEventEffectHolder pokemonHolder => pokemonHolder.Pokemon,
+                                    _ => null
+                                }))
+                            {
+                                Debug($"{eventId} handler suppressed by Mold Breaker");
+                                continue;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    // Item ignored by Embargo, Klutz or Magic Room
+                    if (eventId != "Start" && eventId != "SwitchIn" && eventId != "TakeItem" &&
+                        effect.EffectType == EffectType.Item &&
+                        effectHolder is PokemonEventEffectHolder itemHolderPokemon &&
+                        itemHolderPokemon.Pokemon.IgnoringItem())
+                    {
+                        if (eventId != "Update")
+                        {
+                            Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
+                        }
+                        continue;
+                    }
+
+                    // Ability ignored by Gastro Acid or Neutralizing Gas
+
+                    if (eventId != "End" &&
+                        effect.EffectType == EffectType.Ability &&
+                        effectHolder is PokemonEventEffectHolder abilityHolderPokemon &&
+                        abilityHolderPokemon.Pokemon.IgnoringAbility())
+                    {
+                        if (eventId != "Update")
+                        {
+                            Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
+                        }
+                        continue;
+                    }
+
+                    // Weather suppressed by Air Lock
+                    if ((effect.EffectType == EffectType.Weather || eventId == "Weather") &&
+                        eventId != "Residual" && eventId != "End" &&
+                        Field.SuppressingWeather())
+                    {
+                        Debug($"{eventId} handler suppressed by Air Lock");
+                        continue;
+                    }
+
+                    // Invoke the callback and get the result
+                    object? returnVal;
+                    if (handler.Callback is { } callback)
+                    {
+                        // Save battle state
+                        var parentEffect = Effect;
+                        var parentEffectState = EffectState;
+
+                        // Set up state for this handler
+                        Effect = handler.Effect;
+                        EffectState = handler.State ?? InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 });
+                        EffectState.ExtraData["target"] = handler.EffectHolder;
+
+                        try
+                        {
+                            // Call the handler
+                            returnVal = callback.DynamicInvoke(args.ToArray());
+                        }
+                        finally
+                        {
+                            // Restore battle state
+                            Effect = parentEffect;
+                            EffectState = parentEffectState;
+                        }
+                    }
+                    else
+                    {
+                        // Non-function callbacks are treated as direct return values
+                        returnVal = handler.Callback;
+                    }
+
+                    // Process the return value
+                    if (returnVal == null) continue;
+                    relayVar = returnVal;
+
+                    // Early exit if result is falsy or fastExit is true
+                    if (!IsTruthy(relayVar) || fastExit)
+                    {
+                        if (handler.Index.HasValue && targetRelayVars != null &&
+                            handler.Index.Value < targetRelayVars.Count)
+                        {
+                            // Update this target's relay var
+                            targetRelayVars[handler.Index.Value] = relayVar;
+
+                            // Check if all targets are falsy to exit the whole event
+                            if (targetRelayVars.All(v => !IsTruthy(v)))
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            // For non-array targets, just exit
+                            break;
+                        }
+                    }
+
+                    // Update the args for the next handler
+                    if (hasRelayVar)
+                    {
+                        args[0] = relayVar;
+                    }
+                }
+
+                // Apply modifiers to numeric results
+                if (relayVar is not int intRelayVar)
+                    return target is PokemonListRunEventTarget ? targetRelayVars! : relayVar;
+                int modifier = newEvent.Modifier;
+                if (modifier != 1)
+                {
+                    relayVar = Modify(intRelayVar, modifier);
+                }
+
+                // Return the appropriate result
+                return target is PokemonListRunEventTarget ? targetRelayVars! : relayVar;
+            }
+            finally
+            {
+                // Always clean up event state
+                EventDepth--;
+                Event = parentEvent;
+            }
+        }
+
+        // Helper method to check if a value should be considered "truthy"
+        private static bool IsTruthy(object? value)
+        {
+            return value switch
+            {
+                null => false,
+                bool boolValue => boolValue,
+                int intValue => intValue != 0,
+                double doubleValue => doubleValue != 0,
+                string stringValue => !string.IsNullOrEmpty(stringValue),
+                _ => true // Objects are truthy
+            };
+        }
+
+        // Event context class to store current event data
+        public class BattleEvent
+        {
+            public required string Id { get; set; }
+            public required RunEventTarget Target { get; set; }
+            public required RunEventSource Source { get; set; }
+            public required IEffect? Effect { get; set; }
+            public int Modifier { get; set; } = 1;
         }
 
         public object PriorityEvent(

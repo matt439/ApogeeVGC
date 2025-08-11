@@ -232,13 +232,13 @@ namespace ApogeeVGC_CS.sim
 
         public Dictionary<string, object> M { get; init; } = [];
 
-        public int? Order { get; set; }
+        public IntFalseUnion Order { get; set; }
 
-        public int? Priority { get; set; }
+        public int Priority { get; set; }
 
         int? IAnyObject.Speed => Speed;
 
-        public int? SubOrder { get; set; }
+        public int SubOrder { get; set; }
 
         public int? EffectOrder { get; set; }
 
