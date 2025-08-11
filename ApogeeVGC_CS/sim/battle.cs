@@ -1,6 +1,12 @@
-﻿using System.Reflection;
+﻿using ApogeeVGC_CS.data;
+using ApogeeVGC_CS.sim;
+using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -198,7 +204,7 @@ namespace ApogeeVGC_CS.sim
         public Id? LastSuccessfulMoveThisTurn { get; init; }
         public required int LastMoveLine { get; init; }
         public required int LastDamage { get; init; }
-        public required int EffectOrder { get; init; }
+        public required int EffectOrder { get; set; }
         public required bool QuickClawRoll { get; init; }
         public required List<int> SpeedOrder { get; init; }
 
@@ -310,7 +316,7 @@ namespace ApogeeVGC_CS.sim
 
             Hints = [];
 
-            Send = options.Send ?? ((channel, message) => { });
+            Send = options.Send ?? ((_, _) => { });
 
             // Create input options for logging
             var inputOptions = new Dictionary<string, object>
@@ -430,12 +436,11 @@ namespace ApogeeVGC_CS.sim
 
         public bool SuppressingAbility(Pokemon? target = null)
         {
-            return ActivePokemon != null
-                && ActivePokemon.IsActive
-                && (ActivePokemon != target || Gen < 8)
-                && ActiveMove != null
-                && (ActiveMove.IgnoreAbility ?? false)
-                && (target == null || !target.HasItem("Ability Shield"));
+            return ActivePokemon is { IsActive: true }
+                   && (ActivePokemon != target || Gen < 8)
+                   && ActiveMove != null
+                   && (ActiveMove.IgnoreAbility ?? false)
+                   && (target == null || !target.HasItem("Ability Shield"));
         }
 
         public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null)
@@ -481,33 +486,32 @@ namespace ApogeeVGC_CS.sim
         public static int ComparePriority(IAnyObject a, IAnyObject b)
         {
             // Order comparison (lower values first, null = last)
-            var orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            int orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
-            var speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
+            int speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
             if (speedResult != 0) return speedResult;
 
             // SubOrder comparison (lower values first)
-            var subOrderResult = (a.SubOrder ?? 0).CompareTo(b.SubOrder ?? 0);
-            if (subOrderResult != 0) return subOrderResult;
-
-            // EffectOrder comparison (lower values first)
-            return (a.EffectOrder ?? 0).CompareTo(b.EffectOrder ?? 0);
+            int subOrderResult = (a.SubOrder ?? 0).CompareTo(b.SubOrder ?? 0);
+            return subOrderResult != 0 ? subOrderResult :
+                // EffectOrder comparison (lower values first)
+                (a.EffectOrder ?? 0).CompareTo(b.EffectOrder ?? 0);
         }
 
         public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
         {
             // Priority comparison (higher values first)
-            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
-            var speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
+            int speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
             if (speedResult != 0) return speedResult;
 
             // AbilityState EffectOrder comparison (inverted, only if both have ability states)
@@ -522,15 +526,14 @@ namespace ApogeeVGC_CS.sim
         public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
         {
             // Order comparison (lower values first, null = last)
-            var orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
+            int orderResult = (a.Order ?? int.MaxValue).CompareTo(b.Order ?? int.MaxValue);
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            var priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
-            if (priorityResult != 0) return priorityResult;
-
-            // Index comparison (lower values first)
-            return (a.Index ?? 0).CompareTo(b.Index ?? 0);
+            int priorityResult = (b.Priority ?? 0).CompareTo(a.Priority ?? 0);
+            return priorityResult != 0 ? priorityResult :
+                // Index comparison (lower values first)
+                (a.Index ?? 0).CompareTo(b.Index ?? 0);
         }
 
         /// <summary>Sort a list, resolving speed ties the way the games do.</summary>
@@ -540,7 +543,7 @@ namespace ApogeeVGC_CS.sim
 
             if (list.Count < 2) return;
 
-            int sorted = 0;
+            var sorted = 0;
 
             // This is a Selection Sort - not the fastest sort in general, but
             // actually faster than QuickSort for small arrays like the ones
@@ -554,13 +557,21 @@ namespace ApogeeVGC_CS.sim
                 for (int i = sorted + 1; i < list.Count; i++)
                 {
                     int delta = comparator(list[nextIndexes[0]], list[i]);
-                    if (delta < 0) continue;
-                    if (delta > 0) nextIndexes = [i];
-                    if (delta == 0) nextIndexes.Add(i);
+                    switch (delta)
+                    {
+                        case < 0:
+                            continue;
+                        case > 0:
+                            nextIndexes = [i];
+                            break;
+                        case 0:
+                            nextIndexes.Add(i);
+                            break;
+                    }
                 }
 
                 // Put list of next indexes where they belong
-                for (int i = 0; i < nextIndexes.Count; i++)
+                for (var i = 0; i < nextIndexes.Count; i++)
                 {
                     int index = nextIndexes[i];
                     if (index != sorted + i)
@@ -587,8 +598,7 @@ namespace ApogeeVGC_CS.sim
         public void EachEvent(string eventId, IEffect? effect = null, object? relayVar = null)
         {
             var actives = GetAllActive();
-            if (effect == null && Effect != null)
-                effect = Effect;
+            effect ??= Effect;
 
             // Sort by speed descending (fastest first)
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
@@ -648,15 +658,157 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public EventListener ResolvePriority(EventListenerWithoutPriority listener,
-            string callbackName)
+        public EventListener ResolvePriority(EventListenerWithoutPriority listener, string callbackName)
         {
-            throw new NotImplementedException();
+            // Get explicit priority values from the effect if they exist
+            int? order = GetEffectProperty<int>(listener.Effect, $"{callbackName}Order");
+            int priority = GetEffectProperty<int>(listener.Effect, $"{callbackName}Priority") ?? 0;
+            int subOrder = GetEffectProperty<int>(listener.Effect, $"{callbackName}SubOrder") ?? 0;
+
+            // If subOrder is not explicitly defined, calculate a default based on effect type
+            if (subOrder == 0)
+            {
+                subOrder = GetDefaultSubOrder(listener);
+            }
+
+            int? effectOrder = null;
+            // For certain events, effectOrder is used as a tiebreaker
+            if (callbackName.EndsWith("SwitchIn") || callbackName.EndsWith("RedirectTarget"))
+            {
+                effectOrder = listener.State?.EffectOrder;
+            }
+
+            int? speed = null;
+            if (listener.EffectHolder is not PokemonEventEffectHolder pokemonEvent)
+                return new EventListener
+                {
+                    Effect = listener.Effect,
+                    Callback = listener.Callback,
+                    State = listener.State,
+                    End = listener.End,
+                    EndCallArgs = listener.EndCallArgs,
+                    EffectHolder = listener.EffectHolder,
+                    Target = listener.Target,
+                    Index = listener.Index,
+                    Order = order,
+                    Priority = priority,
+                    SubOrder = subOrder,
+                    EffectOrder = effectOrder,
+                    Speed = speed
+                };
+            var pokemon = pokemonEvent.Pokemon;
+            speed = pokemon.Speed;
+            // Special speed calculation for Magic Bounce
+            if (listener.Effect is { EffectType: EffectType.Ability, Name: "Magic Bounce" } &&
+                callbackName == "onAllyTryHitSide")
+            {
+                speed = pokemon.GetStat(StatIdExceptHp.Spe, true, true);
+            }
+            // Adjust speed for onSwitchIn events to handle speed ties deterministically
+            if (!callbackName.EndsWith("SwitchIn"))
+                return new EventListener
+                {
+                    Effect = listener.Effect,
+                    Callback = listener.Callback,
+                    State = listener.State,
+                    End = listener.End,
+                    EndCallArgs = listener.EndCallArgs,
+                    EffectHolder = listener.EffectHolder,
+                    Target = listener.Target,
+                    Index = listener.Index,
+                    Order = order,
+                    Priority = priority,
+                    SubOrder = subOrder,
+                    EffectOrder = effectOrder,
+                    Speed = speed
+                };
+            int fieldPositionValue = pokemon.Side.N * Sides.Length + pokemon.Position;
+            int speedIndex = SpeedOrder.IndexOf(fieldPositionValue);
+            if (speedIndex >= 0)
+            {
+                // Subtract a small fraction to maintain order without changing integer speed
+                speed -= speedIndex / (ActivePerHalf * 2);
+            }
+
+            // Construct the final EventListener with all priority values
+            return new EventListener
+            {
+                Effect = listener.Effect,
+                Callback = listener.Callback,
+                State = listener.State,
+                End = listener.End,
+                EndCallArgs = listener.EndCallArgs,
+                EffectHolder = listener.EffectHolder,
+                Target = listener.Target,
+                Index = listener.Index,
+                Order = order,
+                Priority = priority,
+                SubOrder = subOrder,
+                EffectOrder = effectOrder,
+                Speed = speed
+            };
         }
 
+        private static int GetDefaultSubOrder(EventListenerWithoutPriority listener)
+        {
+            // Default sub-order values based on extensive community research
+            var effectTypeOrder = new Dictionary<EffectType, int>
+            {
+                [EffectType.Condition] = 2,
+                [EffectType.Weather] = 5,
+                [EffectType.Format] = 5,
+                [EffectType.Rule] = 5,
+                [EffectType.Ruleset] = 5,
+                [EffectType.Ability] = 7,
+                [EffectType.Item] = 8,
+            };
+
+            if (!effectTypeOrder.TryGetValue(listener.Effect.EffectType, out int defaultSubOrder)) return 0;
+            switch (listener.Effect.EffectType)
+            {
+                // Refine sub-order for specific conditions and abilities
+                case EffectType.Condition when listener.EffectHolder is SideEventEffectHolder:
+                {
+                    // Check if it's a slot-specific condition (e.g., Spikes) or a side-wide one (e.g., Tailwind)
+                    bool isSlotCondition = listener.State?.ExtraData.ContainsKey("isSlotCondition") ?? false;
+                    return isSlotCondition ? 3 : 4;
+                }
+                case EffectType.Condition when listener.EffectHolder is FieldEventEffectHolder:
+                    return 5; // Field conditions like terrains
+                case EffectType.Ability when listener.Effect.Name is "Poison Touch" or "Perish Body":
+                    return 6;
+                case EffectType.Ability when listener.Effect.Name == "Stall":
+                    return 9;
+                case EffectType.Pokemon:
+                case EffectType.Move:
+                case EffectType.Item:
+                case EffectType.Format:
+                case EffectType.Nature:
+                case EffectType.Ruleset:
+                case EffectType.Weather:
+                case EffectType.Status:
+                case EffectType.Terrain:
+                case EffectType.Rule:
+                case EffectType.ValidatorRule:
+                case EffectType.Learnset:
+                default:
+                    return defaultSubOrder;
+            }
+        }
+
+        // Helper to get a property value from an effect using reflection
+        private T? GetEffectProperty<T>(IEffect effect, string propertyName) where T : struct
+        {
+            var propInfo = effect.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (propInfo != null && propInfo.PropertyType == typeof(T))
+            {
+                return (T?)propInfo.GetValue(effect);
+            }
+            return null;
+        }
         public Delegate? GetCallback(GetCallbackTarget target, IEffect effect, string callbackName)
         {
-            Delegate? callback = callbackName switch
+            var callback = callbackName switch
             {
                 "onAnySwitchIn" => effect.OnAnySwitchIn,
                 "onSwitchIn" => effect.OnSwitchIn,
@@ -699,7 +851,7 @@ namespace ApogeeVGC_CS.sim
         // Helper methods to check if an effect is an ability or item
         private static bool IsAbilityOrItem(IEffect effect)
         {
-            return effect.EffectType == EffectType.Ability || effect.EffectType == EffectType.Item;
+            return effect.EffectType is EffectType.Ability or EffectType.Item;
         }
 
         private static bool IsInnateAbilityOrItem(IEffect effect)
@@ -707,101 +859,490 @@ namespace ApogeeVGC_CS.sim
             // Innate abilities/items - Status effects with ability/item prefix
             if (effect.EffectType != EffectType.Status) return false;
 
-            var idParts = effect.Id.ToString().Split(':');
+            string[] idParts = effect.Id.ToString().Split(':');
             return idParts.Length > 0 && (idParts[0] == "ability" || idParts[0] == "item");
         }
 
         public List<EventListener> FindEventHandlers(FindEventHandlersTarget target,
             string eventName, Pokemon? source = null)
         {
-            throw new NotImplementedException();
+            var handlers = new List<EventListener>();
+            var excludedEvents = new HashSet<string> { "BeforeTurn", "Update", "Weather", "WeatherChange", "TerrainChange" };
+            bool prefixedHandlers = !excludedEvents.Contains(eventName);
+
+            switch (target)
+            {
+                // Case 1: Target is an array of Pokemon
+                case PokemonListFindEventHandlersTarget pokemonArrayTarget:
+                {
+                    for (var i = 0; i < pokemonArrayTarget.PokemonList.Count; i++)
+                    {
+                        var pokemon = pokemonArrayTarget.PokemonList[i];
+                        var curHandlers =
+                            FindEventHandlers(new PokemonFindEventHandlersTarget(pokemon), eventName, source);
+                        foreach (var handler in curHandlers)
+                        {
+                            // Re-assign target and index for handlers from the array
+                            var updatedListener = new EventListener
+                            {
+                                Effect = handler.Effect,
+                                Callback = handler.Callback,
+                                State = handler.State,
+                                End = handler.End,
+                                EndCallArgs = handler.EndCallArgs,
+                                EffectHolder = handler.EffectHolder,
+                                Target = pokemon,
+                                Index = i,
+                                Order = handler.Order,
+                                Priority = handler.Priority,
+                                SubOrder = handler.SubOrder,
+                                EffectOrder = handler.EffectOrder,
+                                Speed = handler.Speed
+                            };
+                            handlers.Add(updatedListener);
+                        }
+                    }
+                    return handlers;
+                }
+                // Case 2: Target is a single Pokemon
+                case PokemonFindEventHandlersTarget pokemonTarget when
+                    (pokemonTarget.Pokemon.IsActive || source?.IsActive == true):
+                {
+                    handlers.AddRange(FindPokemonEventHandlers(pokemonTarget.Pokemon,
+                        $"on{eventName}"));
+                    if (prefixedHandlers)
+                    {
+                        foreach (var allyActive in pokemonTarget.Pokemon.AlliesAndSelf())
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(allyActive,
+                                $"onAlly{eventName}"));
+                            handlers.AddRange(FindPokemonEventHandlers(allyActive,
+                                $"onAny{eventName}"));
+                        }
+                        foreach (var foeActive in pokemonTarget.Pokemon.Foes())
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(foeActive,
+                                $"onFoe{eventName}"));
+                            handlers.AddRange(FindPokemonEventHandlers(foeActive,
+                                $"onAny{eventName}"));
+                        }
+                    }
+                    // After handling Pokemon-specific events, bubble up to the side level
+                    target = new SideFindEventHandlersTarget(pokemonTarget.Pokemon.Side);
+                    break;
+                }
+            }
+
+            // Handle source-specific events
+            if (source != null && prefixedHandlers)
+            {
+                handlers.AddRange(FindPokemonEventHandlers(source, $"onSource{eventName}"));
+            }
+
+            // Case 3: Target is a Side (or has bubbled up from a Pokemon)
+            if (target is SideFindEventHandlersTarget sideTarget)
+            {
+                foreach (var side in Sides)
+                {
+                    // Handle events on all active Pokemon on the side
+                    foreach (var activePokemon in side.Active)
+                    {
+                        if (side == sideTarget.Side || side == sideTarget.Side.AllySide)
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(activePokemon, $"on{eventName}"));
+                        }
+                        else if (prefixedHandlers)
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(activePokemon, $"onFoe{eventName}"));
+                        }
+                        if (prefixedHandlers)
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(activePokemon, $"onAny{eventName}"));
+                        }
+                    }
+
+                    // Handle events on the side itself
+                    if (side is { N: >= 2, AllySide: not null }) continue;
+                    if (side == sideTarget.Side || side == sideTarget.Side.AllySide)
+                    {
+                        handlers.AddRange(FindSideEventHandlers(side, $"on{eventName}"));
+                    }
+                    else if (prefixedHandlers)
+                    {
+                        handlers.AddRange(FindSideEventHandlers(side, $"onFoe{eventName}"));
+                    }
+                    if (prefixedHandlers)
+                    {
+                        handlers.AddRange(FindSideEventHandlers(side, $"onAny{eventName}"));
+                    }
+                }
+            }
+
+            // Finally, add field-level and battle-level handlers
+            handlers.AddRange(FindFieldEventHandlers(Field, $"on{eventName}"));
+            handlers.AddRange(FindBattleEventHandlers($"on{eventName}"));
+
+            return handlers;
         }
 
         public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon,
             string callbackName, string? getKey = null)
         {
-            throw new NotImplementedException();
+            var handlers = new List<EventListener>();
+
+            // Handle status effects
+            var status = pokemon.GetStatus();
+            var callback = GetCallback(pokemon, status, callbackName);
+
+            bool hasStatusCallback = callback != null;
+            bool hasStatusSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                       HasProperty(pokemon.StatusState, getKey);
+
+            if (hasStatusCallback || hasStatusSpecialKey)
+            {
+                var statusListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = status,
+                    Callback = callback,
+                    State = pokemon.StatusState,
+                    End = CreateClearStatusDelegate(pokemon),
+                    EffectHolder = pokemon
+                };
+
+                var statusEventListener = ResolvePriority(statusListenerWithoutPriority, callbackName);
+                handlers.Add(statusEventListener);
+            }
+
+            // Handle volatile status effects
+            foreach ((string id, var volatileState) in pokemon.Volatiles)
+            {
+                // Get the volatile condition from the dex
+                var vol = Dex.Conditions.GetById(new Id(id));
+                var volatileCallback = GetCallback(pokemon, vol, callbackName);
+
+                bool hasVolatileCallback = volatileCallback != null;
+                bool hasVolatileSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                             HasProperty(volatileState, getKey);
+
+                if (!hasVolatileCallback && !hasVolatileSpecialKey) continue;
+                var volatileListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = vol,
+                    Callback = volatileCallback,
+                    State = volatileState,
+                    End = CreateRemoveVolatileDelegate(pokemon),
+                    EffectHolder = pokemon
+                };
+
+                var volatileEventListener = ResolvePriority(volatileListenerWithoutPriority, callbackName);
+                handlers.Add(volatileEventListener);
+            }
+
+            // Handle ability
+            var ability = pokemon.GetAbility();
+            var abilityCallback = GetCallback(pokemon, ability, callbackName);
+
+            bool hasAbilityCallback = abilityCallback != null;
+            bool hasAbilitySpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                       HasProperty(pokemon.AbilityState, getKey);
+
+            if (hasAbilityCallback || hasAbilitySpecialKey)
+            {
+                var abilityListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = ability,
+                    Callback = abilityCallback,
+                    State = pokemon.AbilityState,
+                    End = CreateClearAbilityDelegate(pokemon),
+                    EffectHolder = pokemon
+                };
+
+                var abilityEventListener = ResolvePriority(abilityListenerWithoutPriority, callbackName);
+                handlers.Add(abilityEventListener);
+            }
+
+            // Handle item
+            var item = pokemon.GetItem();
+            var itemCallback = GetCallback(pokemon, item, callbackName);
+
+            bool hasItemCallback = itemCallback != null;
+            bool hasItemSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                    HasProperty(pokemon.ItemState, getKey);
+
+            if (hasItemCallback || hasItemSpecialKey)
+            {
+                var itemListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = item,
+                    Callback = itemCallback,
+                    State = pokemon.ItemState,
+                    End = CreateClearItemDelegate(pokemon),
+                    EffectHolder = pokemon
+                };
+
+                var itemEventListener = ResolvePriority(itemListenerWithoutPriority, callbackName);
+                handlers.Add(itemEventListener);
+            }
+
+            // Handle species (base species)
+            var species = pokemon.BaseSpecies;
+            var speciesCallback = GetCallback(pokemon, species, callbackName);
+
+            if (speciesCallback != null)
+            {
+                var speciesListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = species,
+                    Callback = speciesCallback,
+                    State = pokemon.SpeciesState,
+                    End = CreateEmptyDelegate(), // Empty function like in JS
+                    EffectHolder = pokemon
+                };
+
+                var speciesEventListener = ResolvePriority(speciesListenerWithoutPriority, callbackName);
+                handlers.Add(speciesEventListener);
+            }
+
+            // Handle slot conditions
+            var side = pokemon.Side;
+            if (pokemon.Position >= side.SlotConditions.Count) return handlers;
+            var slotConditionsForPosition = side.SlotConditions[pokemon.Position];
+            foreach (var slotKvp in slotConditionsForPosition)
+            {
+                string conditionId = slotKvp.Key;
+                EffectState slotConditionState = slotKvp.Value;
+
+                // Get the slot condition from the dex
+                var slotCondition = Dex.Conditions.GetById(new Id(conditionId));
+                var slotCallback = GetCallback(pokemon, slotCondition, callbackName);
+
+                bool hasSlotCallback = slotCallback != null;
+                bool hasSlotSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                         HasProperty(slotConditionState, getKey);
+
+                if (!hasSlotCallback && !hasSlotSpecialKey) continue;
+                var slotListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = slotCondition,
+                    Callback = slotCallback,
+                    State = slotConditionState,
+                    End = CreateRemoveSlotConditionDelegate(side),
+                    EndCallArgs = [side, pokemon, slotCondition.Id],
+                    EffectHolder = pokemon
+                };
+
+                var slotEventListener = ResolvePriority(slotListenerWithoutPriority, callbackName);
+                handlers.Add(slotEventListener);
+            }
+
+            return handlers;
         }
 
-        //public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon,
-        //    string callbackName, string? getKey = null)
+        // Helper methods to create delegates for Pokemon-specific cleanup functions
+        private static Delegate CreateClearStatusDelegate(Pokemon pokemon)
+        {
+            return new Func<bool>(() => pokemon.ClearStatus());
+        }
+
+        private static Delegate CreateRemoveVolatileDelegate(Pokemon pokemon)
+        {
+            return new Func<string, bool>(statusId => pokemon.RemoveVolatile(statusId));
+        }
+
+        private static Delegate CreateClearAbilityDelegate(Pokemon pokemon)
+        {
+            return new Func<Id?>(() => pokemon.ClearAbility());
+        }
+
+        private static Delegate CreateClearItemDelegate(Pokemon pokemon)
+        {
+            return new Func<bool>(() => pokemon.ClearItem());
+        }
+
+        private static Delegate CreateEmptyDelegate()
+        {
+            return new Action(() => { }); // Empty function
+        }
+
+        private static Delegate CreateRemoveSlotConditionDelegate(Side side)
+        {
+            return new Func<Side, Pokemon, Id, bool>((s, p, id) => side.RemoveSlotCondition(p, id.ToString()));
+        }
+
+        //public List<EventListener> FindBattleEventHandlers(string callbackName,
+        //    string? getKey = null, Pokemon? customHolder = null)
         //{
-        //    var handlers = new List<EventListener>();
-
-        //    // Check status condition (burn, paralysis, sleep, etc.)
-        //    var status = pokemon.GetStatus();
-        //    var callback = GetCallback(pokemon, status, callbackName);
-        //    if (callback != null || (!string.IsNullOrEmpty(getKey) && HasProperty(pokemon.StatusState, getKey)))
-        //    {
-        //        handlers.Add(ResolvePriority(new EventListenerWithoutPriority
-        //        {
-        //            Effect = status,
-        //            Callback = callback,
-        //            State = pokemon.StatusState,
-        //            End = CreateClearStatusDelegate(pokemon),
-        //            EffectHolder = pokemon
-        //        }, callbackName));
-        //    }
-
-        //    // Check volatile conditions (temporary effects)
-        //    foreach (var kvp in pokemon.Volatiles)
-        //    {
-        //        string id = kvp.Key;
-        //        EffectState volatileState = kvp.Value;
-        //        var volatile = Dex.Conditions.GetById(new Id(id));
-
-        //        callback = GetCallback(pokemon, volatile, callbackName);
-        //        if (callback != null || (!string.IsNullOrEmpty(getKey) && HasProperty(volatileState, getKey)))
-        //        {
-        //            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
-        //            {
-        //                Effect = volatile,
-        //                Callback = callback,
-        //                State = volatileState,
-        //                End = CreateRemoveVolatileDelegate(pokemon),
-        //                EffectHolder = pokemon
-        //            }, callbackName));
-        //    }
-
-        //    return handlers;
-        //}
-
-        //// Helper methods for creating cleanup delegates
-        //private static Delegate CreateClearStatusDelegate(Pokemon pokemon)
-        //{
-        //    return new Action(() => pokemon.ClearStatus());
-        //}
-
-        //private static Delegate CreateRemoveVolatileDelegate(Pokemon pokemon)
-        //{
-        //    return new Action<string>(volatileId => pokemon.RemoveVolatile(volatileId));
-        //}
-
-        //private static Delegate CreateClearAbilityDelegate(Pokemon pokemon)
-        //{
-        //    return new Action(() => pokemon.ClearAbility());
-        //}
-
-        //private static Delegate CreateClearItemDelegate(Pokemon pokemon)
-        //{
-        //    return new Action(() => pokemon.ClearItem());
-        //}
-
-        //private static Delegate CreateRemoveSlotConditionDelegate(Side side, Pokemon pokemon, Id conditionId)
-        //{
-        //    return new Action(() => side.RemoveSlotCondition(pokemon, conditionId.ToString()));
+        //    throw new NotImplementedException();
         //}
 
         public List<EventListener> FindBattleEventHandlers(string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            throw new NotImplementedException();
+            var handlers = new List<EventListener>();
+
+            // Handle format-level callbacks
+            var callback = GetCallback(this, Format, callbackName);
+
+            bool hasFormatCallback = callback != null;
+            bool hasFormatSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                      HasProperty(FormatData, getKey);
+
+            if (hasFormatCallback || hasFormatSpecialKey)
+            {
+                var formatListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = Format,
+                    Callback = callback,
+                    State = FormatData,
+                    End = null, // Format handlers typically don't have cleanup
+                    EffectHolder = (EventEffectHolder)customHolder ?? this
+                };
+
+                var formatEventListener = ResolvePriority(formatListenerWithoutPriority, callbackName);
+                handlers.Add(formatEventListener);
+            }
+
+            // Handle dynamic event handlers (if Events is implemented)
+            if (Events is not Dictionary<string, List<EventHandlerData>> eventDict) return handlers;
+            if (!eventDict.TryGetValue(callbackName, out var eventHandlers)) return handlers;
+            foreach (var handler in eventHandlers)
+            {
+                // Determine state based on target effect type
+                EffectState? state = handler.Target.EffectType == EffectType.Format
+                    ? FormatData
+                    : null;
+
+                // Create event listener directly with priority info
+                var dynamicEventListener = new EventListener
+                {
+                    Effect = handler.Target,
+                    Callback = handler.Callback,
+                    State = state,
+                    End = null,
+                    EffectHolder = (EventEffectHolder)customHolder ?? this,
+                    Priority = handler.Priority,
+                    Order = handler.Order,
+                    SubOrder = handler.SubOrder,
+                    EffectOrder = handler.EffectOrder,
+                    Speed = handler.Speed
+                };
+
+                handlers.Add(dynamicEventListener);
+            }
+
+            return handlers;
+        }
+
+        // Helper class for dynamic event handler data
+        public class EventHandlerData
+        {
+            public required IEffect Target { get; init; }
+            public required Delegate Callback { get; init; }
+            public int Priority { get; init; }
+            public int? Order { get; init; }
+            public int SubOrder { get; init; }
+            public int? EffectOrder { get; init; }
+            public int? Speed { get; init; }
         }
 
         public List<EventListener> FindFieldEventHandlers(Field field, string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            throw new NotImplementedException();
+            var handlers = new List<EventListener>();
+
+            // Handle pseudo weather conditions
+            foreach ((string id, var pseudoWeatherState) in field.PseudoWeather)
+            {
+                // Get the pseudo weather condition from the dex
+                var pseudoWeather = Dex.Conditions.GetById(new Id(id));
+
+                // Get the callback for this condition
+                var callback = GetCallback(field, pseudoWeather, callbackName);
+
+                // Check if we should include this handler
+                bool hasCallback = callback != null;
+                bool hasSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                   HasProperty(pseudoWeatherState, getKey);
+
+                if (!hasCallback && !hasSpecialKey) continue;
+                // Create the event listener without priority info first
+                var listenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = pseudoWeather,
+                    Callback = callback,
+                    State = pseudoWeatherState,
+                    End = customHolder != null ? null : CreateRemovePseudoWeatherDelegate(field),
+                    EffectHolder = (EventEffectHolder?)customHolder ?? field
+                };
+
+                // Resolve priority and create full event listener
+                var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
+                handlers.Add(eventListener);
+            }
+
+            // Handle weather
+            var weather = field.GetWeather();
+            var weatherCallback = GetCallback(field, weather, callbackName);
+
+            bool hasWeatherCallback = weatherCallback != null;
+            bool hasWeatherSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                       HasProperty(field.WeatherState, getKey);
+
+            if (hasWeatherCallback || hasWeatherSpecialKey)
+            {
+                var weatherListenerWithoutPriority = new EventListenerWithoutPriority
+                {
+                    Effect = weather,
+                    Callback = weatherCallback,
+                    State = field.WeatherState,
+                    End = customHolder != null ? null : CreateClearWeatherDelegate(field),
+                    EffectHolder = (EventEffectHolder)customHolder ?? field
+                };
+
+                var weatherEventListener = ResolvePriority(weatherListenerWithoutPriority, callbackName);
+                handlers.Add(weatherEventListener);
+            }
+
+            // Handle terrain
+            var terrain = field.GetTerrain();
+            var terrainCallback = GetCallback(field, terrain, callbackName);
+
+            bool hasTerrainCallback = terrainCallback != null;
+            bool hasTerrainSpecialKey = !string.IsNullOrEmpty(getKey) &&
+                                       HasProperty(field.TerrainState, getKey);
+
+            if (!hasTerrainCallback && !hasTerrainSpecialKey) return handlers;
+            var terrainListenerWithoutPriority = new EventListenerWithoutPriority
+            {
+                Effect = terrain,
+                Callback = terrainCallback,
+                State = field.TerrainState,
+                End = customHolder != null ? null : CreateClearTerrainDelegate(field),
+                EffectHolder = (EventEffectHolder)customHolder ?? field
+            };
+
+            var terrainEventListener = ResolvePriority(terrainListenerWithoutPriority, callbackName);
+            handlers.Add(terrainEventListener);
+
+            return handlers;
+        }
+
+        // Helper method to create a delegate for removing pseudo weather
+        private static Delegate? CreateRemovePseudoWeatherDelegate(Field field)
+        {
+            return new Action<string>(conditionId => field.RemovePseudoWeather(conditionId));
+        }
+
+        // Helper method to create a delegate for clearing weather
+        private static Delegate? CreateClearWeatherDelegate(Field field)
+        {
+            return new Action(() => field.ClearWeather());
+        }
+
+        // Helper method to create a delegate for clearing terrain
+        private static Delegate? CreateClearTerrainDelegate(Field field)
+        {
+            return new Action(() => field.ClearTerrain());
         }
 
         public List<EventListener> FindSideEventHandlers(Side side, string callbackName,
@@ -825,23 +1366,21 @@ namespace ApogeeVGC_CS.sim
                 bool hasSpecialKey = !string.IsNullOrEmpty(getKey) &&
                                    HasProperty(sideConditionData, getKey);
 
-                if (hasCallback || hasSpecialKey)
+                if (!hasCallback && !hasSpecialKey) continue;
+                // Create the event listener without priority info first
+                var listenerWithoutPriority = new EventListenerWithoutPriority
                 {
-                    // Create the event listener without priority info first
-                    var listenerWithoutPriority = new EventListenerWithoutPriority
-                    {
-                        Effect = sideCondition,
-                        Callback = callback,
-                        State = sideConditionData,
-                        End = customHolder != null ? null : CreateRemoveSideConditionDelegate(side),
+                    Effect = sideCondition,
+                    Callback = callback,
+                    State = sideConditionData,
+                    End = customHolder != null ? null : CreateRemoveSideConditionDelegate(side),
                         
-                        EffectHolder = (EventEffectHolder)customHolder ?? side
-                    };
+                    EffectHolder = (EventEffectHolder)customHolder ?? side
+                };
 
-                    // Resolve priority and create full event listener
-                    var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
-                    handlers.Add(eventListener);
-                }
+                // Resolve priority and create full event listener
+                var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
+                handlers.Add(eventListener);
             }
 
             return handlers;
@@ -1022,7 +1561,7 @@ namespace ApogeeVGC_CS.sim
 
         public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage,
             List<SpreadDamageTarget>? targetArray = null, Pokemon? source = null,
-            SpreadDamageEffect? effect = null, bool instafaint = false)
+            DamageEffect? effect = null, bool instafaint = false)
         {
             throw new NotImplementedException();
         }
@@ -1152,7 +1691,119 @@ namespace ApogeeVGC_CS.sim
 
         public bool? FaintMessages(bool lastFirst = false, bool forceCheck = false, bool checkWin = true)
         {
-            throw new NotImplementedException();
+            if (Ended) return null;
+
+            int length = FaintQueue.Count;
+            if (length == 0)
+            {
+                if (forceCheck && CheckWin() == true) return true;
+                return false;
+            }
+
+            if (lastFirst)
+            {
+                // Move last element to front (equivalent to unshift + pop)
+                var lastElement = FaintQueue[^1];
+                FaintQueue.RemoveAt(FaintQueue.Count - 1);
+                FaintQueue.Insert(0, lastElement);
+            }
+
+            FaintQueueEntry? faintData = null;
+
+            while (FaintQueue.Count > 0)
+            {
+                int faintQueueLeft = FaintQueue.Count;
+                faintData = FaintQueue[0];
+                FaintQueue.RemoveAt(0); // equivalent to shift()
+
+                var pokemon = faintData.Target;
+
+                if (pokemon.Fainted ||
+                    RunEvent("BeforeFaint", pokemon, faintData.Source, faintData.Effect) is false or null) continue;
+                Add("faint", pokemon);
+
+                if (pokemon.Side.PokemonLeft > 0) pokemon.Side.PokemonLeft--;
+                if (pokemon.Side.TotalFainted < 100) pokemon.Side.TotalFainted++;
+
+                RunEvent("Faint", pokemon, faintData.Source, faintData.Effect);
+                SingleEvent("End", pokemon.GetAbility(), pokemon.AbilityState, pokemon);
+                SingleEvent("End", pokemon.GetItem(), pokemon.ItemState, pokemon);
+
+                if (pokemon is { FormeRegression: true, Transformed: false })
+                {
+                    // before clearing volatiles
+                    pokemon.BaseSpecies = Dex.Species.Get(pokemon.Set.Species ?? pokemon.Set.Name);
+                    pokemon.BaseAbility = new Id(pokemon.Set.Ability ?? string.Empty);
+                }
+
+                pokemon.ClearVolatile(false);
+                pokemon.Fainted = true;
+                pokemon.Illusion = null;
+                pokemon.IsActive = false;
+                pokemon.IsStarted = false;
+                pokemon.Terastallized = null; // equivalent to delete
+
+                if (pokemon.FormeRegression)
+                {
+                    // after clearing volatiles
+                    pokemon.Details = pokemon.GetUpdatedDetails();
+                    Add("detailschange", pokemon, pokemon.Details, "[silent]");
+                    pokemon.FormeRegression = false;
+                }
+
+                pokemon.Side.FaintedThisTurn = pokemon;
+                if (FaintQueue.Count >= faintQueueLeft) checkWin = true;
+            }
+
+            switch (Gen)
+            {
+                case <= 1:
+                {
+                    // in gen 1, fainting skips the rest of the turn
+                    // residuals don't exist in gen 1
+                    Queue.Clear();
+
+                    // Fainting clears accumulated Bide damage
+                    foreach (var pokemon in GetAllActive())
+                    {
+                        if (!pokemon.Volatiles.TryGetValue("bide", out var bideState) ||
+                            bideState.ExtraData?.ContainsKey("damage") != true) continue;
+                        bideState.ExtraData["damage"] = 0;
+                        Hint("Desync Clause Mod activated!");
+                        Hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
+                    }
+
+                    break;
+                }
+                case <= 3 when GameType == GameType.Singles:
+                {
+                    // in gen 3 or earlier, fainting in singles skips to residuals
+                    foreach (var pokemon in GetAllActive())
+                    {
+                        if (Gen <= 2)
+                        {
+                            // in gen 2, fainting skips moves only
+                            Queue.CancelMove(pokemon);
+                        }
+                        else
+                        {
+                            // in gen 3, fainting skips all moves and switches
+                            Queue.CancelAction(pokemon);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            if (checkWin && CheckWin(faintData) == true) return true;
+
+            if (faintData != null && length > 0)
+            {
+                RunEvent("AfterFaint", faintData.Target, faintData.Source, faintData.Effect, length);
+            }
+
+            return false;
         }
 
         public bool? CheckWin(FaintQueueEntry? faintData = null)
@@ -1233,7 +1884,10 @@ namespace ApogeeVGC_CS.sim
 
         public void Debug(string activity)
         {
-            throw new NotImplementedException();
+            if (DebugMode)
+            {
+                Add("debug", activity);
+            }
         }
 
         public string GetDebugLog()
@@ -1276,9 +1930,44 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public EffectState InitEffectState(EffectState obj, int? effectOrder = null)
+        public EffectState InitEffectState(EffectState template, int? effectOrder = null)
         {
-            throw new NotImplementedException();
+            int finalEffectOrder;
+
+            if (effectOrder.HasValue)
+            {
+                // If an effect order is explicitly provided, use it.
+                finalEffectOrder = effectOrder.Value;
+            }
+            else if (!template.Id.IsEmpty && template.ExtraData.TryGetValue("target", out object? targetObj))
+            {
+                // The effect order is incremented only if the target is not an inactive Pokémon.
+                bool isInactivePokemon = targetObj is Pokemon { IsActive: false };
+                if (!isInactivePokemon)
+                {
+                    // Use the battle's master counter for active effects.
+                    finalEffectOrder = EffectOrder++;
+                }
+                else
+                {
+                    // Effects on inactive Pokémon get a default order of 0.
+                    finalEffectOrder = 0;
+                }
+            }
+            else
+            {
+                // Effects with no target get a default order of 0.
+                finalEffectOrder = 0;
+            }
+
+            // Since EffectOrder is an init-only property, we must create a new instance.
+            return new EffectState
+            {
+                Id = template.Id,
+                Duration = template.Duration,
+                ExtraData = template.ExtraData,
+                EffectOrder = finalEffectOrder
+            };
         }
 
         public void ClearEffectState(EffectState state)

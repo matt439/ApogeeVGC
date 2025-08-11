@@ -50,7 +50,7 @@
         public static AddPart ToAddPart(IEffect effect) => effect switch
         {
             Ability ability => new PartAddPart(new EffectPart(ability)),
-            ItemData itemData => new PartAddPart(new EffectPart(itemData)),
+            Item item => new PartAddPart(new EffectPart(item)),
             ActiveMove activeMove => new PartAddPart(new EffectPart(activeMove)),
             Species species => new PartAddPart(new EffectPart(species)),
             Condition condition => new PartAddPart(new EffectPart(condition)),
@@ -61,7 +61,7 @@
         public static SingleEventSource ToSingleEventSource(IEffect effect) => effect switch
         {
             Ability ability => new EffectSingleEventSource(ability),
-            ItemData itemData => new EffectSingleEventSource(itemData),
+            Item item => new EffectSingleEventSource(item),
             ActiveMove activeMove => new EffectSingleEventSource(activeMove),
             Species species => new EffectSingleEventSource(species),
             Condition condition => new EffectSingleEventSource(condition),
@@ -69,21 +69,21 @@
             _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource")
         };
 
-        public static SpreadDamageEffect ToSpreadDamageEffect(IEffect effect) => effect switch
-        {
-            Ability ability => new EffectSpreadDamageEffect(ability),
-            ItemData itemData => new EffectSpreadDamageEffect(itemData),
-            ActiveMove activeMove => new EffectSpreadDamageEffect(activeMove),
-            Species species => new EffectSpreadDamageEffect(species),
-            Condition condition => new EffectSpreadDamageEffect(condition),
-            Format format => new EffectSpreadDamageEffect(format),
-            _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SpreadDamageEffect")
-        };
+        //public static SpreadDamageEffect ToSpreadDamageEffect(IEffect effect) => effect switch
+        //{
+        //    Ability ability => new EffectSpreadDamageEffect(ability),
+        //    ItemData itemData => new EffectSpreadDamageEffect(itemData),
+        //    ActiveMove activeMove => new EffectSpreadDamageEffect(activeMove),
+        //    Species species => new EffectSpreadDamageEffect(species),
+        //    Condition condition => new EffectSpreadDamageEffect(condition),
+        //    Format format => new EffectSpreadDamageEffect(format),
+        //    _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SpreadDamageEffect")
+        //};
 
         public static DamageEffect ToDamageEffect(IEffect effect) => effect switch
         {
             Ability ability => new EffectDamageEffect(ability),
-            ItemData itemData => new EffectDamageEffect(itemData),
+            Item item => new EffectDamageEffect(item),
             ActiveMove activeMove => new EffectDamageEffect(activeMove),
             Species species => new EffectDamageEffect(species),
             Condition condition => new EffectDamageEffect(condition),
@@ -94,7 +94,7 @@
         public static Part ToPart(IEffect effect) => effect switch
         {
             Ability ability => new EffectPart(ability),
-            ItemData itemData => new EffectPart(itemData),
+            Item item => new EffectPart(item),
             ActiveMove activeMove => new EffectPart(activeMove),
             Species species => new EffectPart(species),
             Condition condition => new EffectPart(condition),
@@ -105,7 +105,7 @@
         public static HealEffect ToHealEffect(IEffect effect) => effect switch
         {
             Ability ability => new EffectHealEffect(ability),
-            ItemData itemData => new EffectHealEffect(itemData),
+            Item item => new EffectHealEffect(item),
             ActiveMove activeMove => new EffectHealEffect(activeMove),
             Species species => new EffectHealEffect(species),
             Condition condition => new EffectHealEffect(condition),
@@ -116,7 +116,7 @@
         public static EffectEffectStringUnion ToEffectStringUnion(IEffect effect) => effect switch
         {
             Ability ability => new EffectEffectStringUnion(ability),
-            ItemData itemData => new EffectEffectStringUnion(itemData),
+            Item item => new EffectEffectStringUnion(item),
             ActiveMove activeMove => new EffectEffectStringUnion(activeMove),
             Species species => new EffectEffectStringUnion(species),
             Condition condition => new EffectEffectStringUnion(condition),
@@ -148,8 +148,8 @@
         public static implicit operator SingleEventSource(Ability ability) =>
             EffectUnionFactory.ToSingleEventSource(ability);
 
-        public static implicit operator SingleEventSource(ItemData itemData) =>
-            EffectUnionFactory.ToSingleEventSource(itemData);
+        public static implicit operator SingleEventSource(Item item) =>
+            EffectUnionFactory.ToSingleEventSource(item);
 
         public static implicit operator SingleEventSource(ActiveMove activeMove) =>
             EffectUnionFactory.ToSingleEventSource(activeMove);
@@ -310,45 +310,41 @@
 
     public record NullSpreadDamageTarget : SpreadDamageTarget;
 
-    /// <summary>
-    /// 'drain' | 'recoil' | Effect | null
-    /// </summary>
-    public abstract record SpreadDamageEffect
-    {
-        public static implicit operator SpreadDamageEffect(string value) =>
-            value switch
-            {
-                "drain" => new DrainSpreadDamageEffect(),
-                "recoil" => new RecoilSpreadDamageEffect(),
-                _ => new NullSpreadDamageEffect()
-            };
+    ///// <summary>
+    ///// 'drain' | 'recoil' | Effect | null
+    ///// </summary>
+    //public abstract record SpreadDamageEffect
+    //{
+    //    public static implicit operator SpreadDamageEffect(string value) =>
+    //        value switch
+    //        {
+    //            "drain" => new DrainSpreadDamageEffect(),
+    //            "recoil" => new RecoilSpreadDamageEffect(),
+    //            _ => new NullSpreadDamageEffect()
+    //        };
 
-        public static implicit operator SpreadDamageEffect(Ability ability) =>
-            EffectUnionFactory.ToSpreadDamageEffect(ability);
+    //    public static implicit operator SpreadDamageEffect(Ability ability) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(ability);
 
-        public static implicit operator SpreadDamageEffect(ItemData itemData) =>
-            EffectUnionFactory.ToSpreadDamageEffect(itemData);
+    //    public static implicit operator SpreadDamageEffect(ItemData itemData) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(itemData);
 
-        public static implicit operator SpreadDamageEffect(ActiveMove activeMove) =>
-            EffectUnionFactory.ToSpreadDamageEffect(activeMove);
+    //    public static implicit operator SpreadDamageEffect(ActiveMove activeMove) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(activeMove);
 
-        public static implicit operator SpreadDamageEffect(Species species) =>
-            EffectUnionFactory.ToSpreadDamageEffect(species);
+    //    public static implicit operator SpreadDamageEffect(Species species) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(species);
 
-        public static implicit operator SpreadDamageEffect(Condition condition) =>
-            EffectUnionFactory.ToSpreadDamageEffect(condition);
+    //    public static implicit operator SpreadDamageEffect(Condition condition) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(condition);
 
-        public static implicit operator SpreadDamageEffect(Format format) =>
-            EffectUnionFactory.ToSpreadDamageEffect(format);
-    }
-
-    public record DrainSpreadDamageEffect : SpreadDamageEffect;
-
-    public record RecoilSpreadDamageEffect : SpreadDamageEffect;
-
-    public record EffectSpreadDamageEffect(IEffect Effect) : SpreadDamageEffect;
-
-    public record NullSpreadDamageEffect : SpreadDamageEffect;
+    //    public static implicit operator SpreadDamageEffect(Format format) =>
+    //        EffectUnionFactory.ToSpreadDamageEffect(format);
+    //}
+    //public record DrainSpreadDamageEffect : SpreadDamageEffect;
+    //public record RecoilSpreadDamageEffect : SpreadDamageEffect;
+    //public record EffectSpreadDamageEffect(IEffect Effect) : SpreadDamageEffect;
+    //public record NullSpreadDamageEffect : SpreadDamageEffect;
 
     /// <summary>
     /// 'drain' | 'recoil' | Effect | null
@@ -366,8 +362,8 @@
         public static implicit operator DamageEffect(Ability ability) =>
             EffectUnionFactory.ToDamageEffect(ability);
 
-        public static implicit operator DamageEffect(ItemData itemData) =>
-            EffectUnionFactory.ToDamageEffect(itemData);
+        public static implicit operator DamageEffect(Item item) =>
+            EffectUnionFactory.ToDamageEffect(item);
 
         public static implicit operator DamageEffect(ActiveMove activeMove) =>
             EffectUnionFactory.ToDamageEffect(activeMove);
@@ -404,8 +400,8 @@
         public static implicit operator Part(Ability ability) =>
             EffectUnionFactory.ToPart(ability);
 
-        public static implicit operator Part(ItemData itemData) =>
-            EffectUnionFactory.ToPart(itemData);
+        public static implicit operator Part(Item item) =>
+            EffectUnionFactory.ToPart(item);
 
         public static implicit operator Part(ActiveMove activeMove) =>
             EffectUnionFactory.ToPart(activeMove);
@@ -451,7 +447,7 @@
         public static implicit operator AddPart(Side value) => new PartAddPart(new SidePart(value));
 
         public static implicit operator AddPart(Ability ability) => EffectUnionFactory.ToAddPart(ability);
-        public static implicit operator AddPart(ItemData itemData) => EffectUnionFactory.ToAddPart(itemData);
+        public static implicit operator AddPart(Item item) => EffectUnionFactory.ToAddPart(item);
         public static implicit operator AddPart(ActiveMove activeMove) => EffectUnionFactory.ToAddPart(activeMove);
         public static implicit operator AddPart(Species species) => EffectUnionFactory.ToAddPart(species);
         public static implicit operator AddPart(Condition condition) => EffectUnionFactory.ToAddPart(condition);
@@ -504,8 +500,8 @@
         public static implicit operator HealEffect(Ability ability) =>
             EffectUnionFactory.ToHealEffect(ability);
 
-        public static implicit operator HealEffect(ItemData itemData) =>
-            EffectUnionFactory.ToHealEffect(itemData);
+        public static implicit operator HealEffect(Item item) =>
+            EffectUnionFactory.ToHealEffect(item);
 
         public static implicit operator HealEffect(ActiveMove activeMove) =>
             EffectUnionFactory.ToHealEffect(activeMove);
@@ -1122,8 +1118,8 @@
     {
         public static implicit operator EffectStringUnion(Ability ability) =>
             EffectUnionFactory.ToEffectStringUnion(ability);
-        public static implicit operator EffectStringUnion(ItemData itemData) =>
-            EffectUnionFactory.ToEffectStringUnion(itemData);
+        public static implicit operator EffectStringUnion(Item item) =>
+            EffectUnionFactory.ToEffectStringUnion(item);
         public static implicit operator EffectStringUnion(ActiveMove activeMove) =>
             EffectUnionFactory.ToEffectStringUnion(activeMove);
         public static implicit operator EffectStringUnion(Species species) =>

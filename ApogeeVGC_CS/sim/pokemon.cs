@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC_CS.lib;
+using System.Runtime.CompilerServices;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -83,9 +84,9 @@ namespace ApogeeVGC_CS.sim
         public required int HpPower { get; init; }
 
         public required int Position { get; init; }
-        public required string Details { get; init; }
+        public required string Details { get; set; }
 
-        public required Species BaseSpecies { get; init; }
+        public required Species BaseSpecies { get; set; }
         public required Species Species { get; init; }
         public required EffectState SpeciesState { get; init; }
 
@@ -98,7 +99,7 @@ namespace ApogeeVGC_CS.sim
         public required StatsTable StoredStats { get; init; }
         public required BoostsTable Boosts { get; init; }
 
-        public required Id BaseAbility { get; init; }
+        public required Id BaseAbility { get; set; }
         public required Id Ability { get; init; }
         public required EffectState AbilityState { get; init; }
 
@@ -112,15 +113,15 @@ namespace ApogeeVGC_CS.sim
         public required bool MaybeDisabled { get; init; }
         public bool? MaybeLocked { get; init; }
 
-        public Pokemon? Illusion { get; init; }
+        public Pokemon? Illusion { get; set; }
         public required bool Transformed { get; init; }
         public required int MaxHp { get; init; }
         public required int BaseMaxHp { get; init; }
         public required int Hp { get; init; }
-        public required bool Fainted { get; init; }
+        public required bool Fainted { get; set; }
         public required bool FaintQueued { get; init; }
         public bool? SubFainted { get; init; }
-        public required bool FormeRegression { get; init; }
+        public required bool FormeRegression { get; set; }
         public required List<PokemonType> Types { get; init; }
         public required string AddedType { get; init; }
         public required bool KnownType { get; init; }
@@ -146,7 +147,7 @@ namespace ApogeeVGC_CS.sim
         public required List<Attacker> AttackedBy { get; init; }
         public required int TimesAttacked { get; init; }
 
-        public required bool IsActive { get; init; }
+        public required bool IsActive { get; set; }
         public required int ActiveTurns { get; init; }
         public required int ActiveMoveActions { get; init; }
         public required int PreviouslySwitchedIn { get; init; }
@@ -157,7 +158,7 @@ namespace ApogeeVGC_CS.sim
         public required bool SyrupTriggered { get; init; } // Gen 9 only
         public required List<string> StellarBoostedTypes { get; init; } // Gen 9 only
 
-        public required bool IsStarted { get; init; }
+        public required bool IsStarted { get; set; }
         public required bool DuringMove { get; init; }
 
         public required double WeightHg { get; init; }
@@ -171,7 +172,7 @@ namespace ApogeeVGC_CS.sim
         public StringFalseUnion? CanTerastallize { get; init; }
         public required PokemonType TeraType { get; init; }
         public required List<PokemonType> BaseTypes { get; init; }
-        public string? Terastallized { get; init; }
+        public string? Terastallized { get; set; }
 
         public string? Staleness
         {
@@ -643,12 +644,68 @@ namespace ApogeeVGC_CS.sim
 
         public bool IgnoringAbility()
         {
-            throw new NotImplementedException();
+            // In Gen 5+, inactive Pokemon's abilities are ignored.
+            if (Battle.Gen >= 5 && !IsActive) return true;
+
+            var ability = GetAbility();
+
+            // Certain abilities don't work while transformed.
+            if (ability.Flags.NoTransform ?? false && Transformed) return true;
+            // Abilities that can't be suppressed are never ignored.
+            if (ability.Flags.CantSuppress ?? false) return false;
+            // Gastro Acid suppresses abilities.
+            if (Volatiles.ContainsKey("gastroacid")) return true;
+
+            // Neutralizing Gas check
+            // Ability Shield prevents suppression by Neutralizing Gas.
+            // The Neutralizing Gas user itself is not affected by its own ability.
+            if (HasItem("Ability Shield") || this.Ability == "neutralizinggas") return false;
+
+            foreach (var pokemon in Battle.GetAllActive())
+            {
+                // A different active Pokemon has Neutralizing Gas.
+                // We check its ability directly to avoid infinite recursion from `pokemon.HasAbility()`.
+                if (pokemon.Ability == "neutralizinggas" &&
+                    // Its ability must not be suppressed by Gastro Acid.
+                    !pokemon.Volatiles.ContainsKey("gastroacid") &&
+                    // It must not be transformed.
+                    !pokemon.Transformed &&
+                    // Its ability must not be in the process of ending.
+                    !(pokemon.AbilityState.ExtraData.TryGetValue("ending",
+                        out object? ending) && (bool)ending) &&
+                        // The target Pokemon must not be under the effect of Commander.
+                        !Volatiles.ContainsKey("commanding"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public bool IgnoringItem(bool isFling = false)
         {
-            throw new NotImplementedException();
+            var item = GetItem();
+
+            // Primal Orbs are never ignored
+            if (item.IsPrimalOrb) return false;
+
+            // Gen 3-4: knocked off items are ignored
+            if (ItemState.ExtraData?.ContainsKey("knockedOff") == true &&
+                (bool)(ItemState.ExtraData["knockedOff"])) return true;
+
+            // Gen 5+: inactive Pokemon ignore their items
+            if (Battle.Gen >= 5 && !IsActive) return true;
+
+            // Embargo condition or Magic Room field condition
+            if (Volatiles.ContainsKey("embargo") ||
+                Battle.Field.PseudoWeather.ContainsKey("magicroom")) return true;
+
+            // Check Fling first to avoid infinite recursion
+            if (isFling) return Battle.Gen >= 5 && HasAbility("klutz");
+
+            // Klutz ability makes Pokemon ignore items (unless item ignores Klutz)
+            return !(item.IgnoreKlutz) && HasAbility("klutz");
         }
 
         public int DeductPp(string move, Pokemon target, int? amount = null)

@@ -429,7 +429,7 @@ namespace ApogeeVGC_CS.sim
     }
 
     /// <summary>
-    /// Ability | ItemData | ActiveMove | Species | Condition | Format
+    /// Ability | Item | ActiveMove | Species | Condition | Format
     /// </summary>
     public interface IEffect
     {

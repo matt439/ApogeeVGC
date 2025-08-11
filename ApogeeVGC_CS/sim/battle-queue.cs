@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using System;
+
+namespace ApogeeVGC_CS.sim
 {
     public enum MoveActionChoice
     {
@@ -160,7 +162,8 @@
 
         public int Unshift(IAction action)
         {
-            throw new NotImplementedException("Push method is not implemented yet.");
+            List.Insert(0, action);
+            return List.Count;
         }
 
         public IEnumerator<IAction> Entries()

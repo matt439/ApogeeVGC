@@ -1,4 +1,7 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.data;
+using System.Drawing;
+
+namespace ApogeeVGC_CS.sim
 {
     public class Field
     {
@@ -58,7 +61,41 @@
 
         public bool SuppressingWeather()
         {
-            throw new NotImplementedException("SuppressingWeather method is not implemented yet.");
+            // Iterate through each side of the battle.
+            foreach (var side in Battle.Sides)
+            {
+                // Iterate through each active Pokémon on the side.
+                foreach (var pokemon in side.Active)
+                {
+                    // Ensure the Pokémon exists and is not fainted.
+                    if (pokemon.Fainted)
+                    {
+                        continue;
+                    }
+
+                    // Check if the Pokémon's ability is currently active (not being ignored).
+                    if (pokemon.IgnoringAbility())
+                    {
+                        continue;
+                    }
+
+                    var ability = pokemon.GetAbility();
+
+                    // Check if the ability has the suppressWeather flag.
+                    // Also check that the ability's effect is not in the process of ending.
+                    bool isEnding = pokemon.AbilityState.ExtraData.TryGetValue("ending", out object? ending) &&
+                                    (bool)ending;
+
+                    if (ability.SuppressWeather && !isEnding)
+                    {
+                        // If we find any Pokémon suppressing weather, we can return true immediately.
+                        return true;
+                    }
+                }
+            }
+
+            // If no Pokémon is suppressing weather, return false.
+            return false;
         }
 
         public bool IsWeather(string weather)
@@ -161,7 +198,7 @@
             throw new NotImplementedException("IsTerrain method is not implemented yet.");
         }
 
-        public bool GetTerrain()
+        public Condition GetTerrain()
         {
             throw new NotImplementedException("GetTerrain method is not implemented yet.");
         }

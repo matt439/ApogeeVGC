@@ -8,7 +8,7 @@
         public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? Effect { get; init; }
     }
 
-    public class ItemData : Item, IPokemonEventMethods, IEffect
+    public class ItemData : Item, IPokemonEventMethods
     {
         public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
         public Action<Battle, Pokemon>? OnEmergencyExit { get; init; }
@@ -81,7 +81,7 @@
         public Func<Battle, Pokemon, Pokemon, Condition, bool?>? OnSetWeather { get; init; }
         public Action<Battle, Side, Pokemon, Condition>? OnSideConditionStart { get; init; }
         public Func<Battle, Pokemon, bool?>? OnStallMove { get; init; }
-        public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+        // public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
         public Action<Battle, Pokemon>? OnSwitchOut { get; init; }
         public Action<Battle, Pokemon, Pokemon>? OnSwap { get; init; }
         public Func<Battle, Item, Pokemon, Pokemon, ActiveMove?, bool?>? OnTakeItem { get; init; }
@@ -324,7 +324,7 @@
         public Func<Battle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnySetStatus { get; init; }
         public Func<Battle, Pokemon, Pokemon, Condition, bool?>? OnAnySetWeather { get; init; }
         public Func<Battle, Pokemon, bool?>? OnAnyStallMove { get; init; }
-        public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+        // public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
         public Action<Battle, Pokemon>? OnAnySwitchOut { get; init; }
         public Func<Battle, Item, Pokemon, Pokemon, ActiveMove?, bool?>? OnAnyTakeItem { get; init; }
         public Action<Battle, Pokemon>? OnAnyTerrain { get; init; }
@@ -486,8 +486,6 @@
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyWeatherModifyDamage { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamagePhase1 { get; init; }
         public Func<Battle, int, Pokemon, Pokemon, ActiveMove, int>? OnAllyModifyDamagePhase2 { get; init; }
-        public Dictionary<string, object> ExtraData { get; set; } = [];
-        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
     }
 
     public class ModdedItemData : ItemData
@@ -500,8 +498,13 @@
 
     public class ModdedItemDataTable : Dictionary<IdEntry, ModdedItemData>;
 
-    public class Item : BasicEffect, IBasicEffect
+    public class Item : BasicEffect, IBasicEffect, IEffect
     {
+        public Dictionary<string, object> ExtraData { get; set; } = [];
+        public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
+        public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+        public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+
         public FlingData? Fling
         {
             get
@@ -562,7 +565,9 @@
         // Event handlers
         public Delegate? OnEat { get; init; }
         public Delegate? OnUse { get; init; }
-        public Action<Battle, Pokemon>? OnStart { get; init; }
+
+        // This property is commented out because it conflicts with the interface IEffect
+        //public Action<Battle, Pokemon>? OnStart { get; init; }
         public Action<Battle, Pokemon>? OnEnd { get; init; }
 
         public override required string Fullname

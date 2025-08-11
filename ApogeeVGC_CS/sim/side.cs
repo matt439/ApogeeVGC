@@ -173,13 +173,13 @@
         public required List<Pokemon> Pokemon { get; init; }
         public required List<Pokemon> Active { get; init; }
 
-        public int PokemonLeft => Pokemon.Count;
+        public required int PokemonLeft { get; set; }
         public required bool ZMoveUsed { get; init; }
         public required bool DynamaxUsed { get; init; }
 
         public Pokemon? FaintedLastTurn { get; init; }
-        public Pokemon? FaintedThisTurn { get; init; }
-        public required int TotalFainted { get; init; }
+        public Pokemon? FaintedThisTurn { get; set; }
+        public required int TotalFainted { get; set; }
         public Id LastSelectedMove { get; init; } = new(); // Gen 1 tracking
 
         public required Dictionary<string, EffectState> SideConditions { get; init; }
@@ -217,7 +217,7 @@
                 _ => [null!]
             };
 
-            //PokemonLeft = Pokemon.Count;
+            PokemonLeft = Pokemon.Count;
             FaintedLastTurn = null;
             FaintedThisTurn = null;
             TotalFainted = 0;
