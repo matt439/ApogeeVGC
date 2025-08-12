@@ -1,13 +1,6 @@
-﻿using ApogeeVGC_CS.data;
-using ApogeeVGC_CS.sim;
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -89,11 +82,11 @@ namespace ApogeeVGC_CS.sim
 
     public class EventListener : EventListenerWithoutPriority, IAnyObject
     {
-        public IntFalseUnion Order { get; init; }
+        public required IntFalseUnion Order { get; init; }
         public int Priority { get; init; }
         public int SubOrder { get; init; }
         public int? EffectOrder { get; init; }
-        public EffectState? AbilityState { get; }
+        public required EffectState AbilityState { get; init; }
         public int? Speed { get; init; }
     }
 
@@ -346,28 +339,18 @@ namespace ApogeeVGC_CS.sim
             Add("gametype", GameType);
 
             // Process rules - timing is early enough to hook into ModifySpecies event
-            foreach (string rule in RuleTable.Keys)
+            foreach (string rule in from rule in RuleTable.Keys where
+                         !"+-*!".Contains(rule[0]) let subFormat = Dex.Formats.Get(rule)
+                            where subFormat.Exists let excludedHandlers = new HashSet<string>
+                     {
+                         "onBegin", "onTeamPreview", "onBattleStart", "onValidateRule",
+                         "onValidateTeam", "onChangeSet", "onValidateSet"
+                     } let hasEventHandler = subFormat.GetType()
+                         .GetProperties()
+                         .Any(prop => prop.Name.StartsWith("On") &&
+                                      !excludedHandlers.Contains(prop.Name)) where hasEventHandler select rule)
             {
-                if ("+-*!".Contains(rule[0])) continue;
-
-                var subFormat = Dex.Formats.Get(rule);
-                if (!subFormat.Exists) continue;
-                // Check if format has event handlers (excluding specific ones handled elsewhere)
-                var excludedHandlers = new HashSet<string>
-                {
-                    "onBegin", "onTeamPreview", "onBattleStart", "onValidateRule",
-                    "onValidateTeam", "onChangeSet", "onValidateSet"
-                };
-
-                bool hasEventHandler = subFormat.GetType()
-                    .GetProperties()
-                    .Any(prop => prop.Name.StartsWith("On") &&
-                                 !excludedHandlers.Contains(prop.Name));
-
-                if (hasEventHandler)
-                {
-                    Field.AddPseudoWeather(rule);
-                }
+                Field.AddPseudoWeather(rule);
             }
 
             // Set up players
@@ -454,21 +437,19 @@ namespace ApogeeVGC_CS.sim
 
         public void ClearActiveMove(bool failed = false)
         {
-            if (ActiveMove != null)
+            if (ActiveMove == null) return;
+            if (!failed)
             {
-                if (!failed)
-                {
-                    LastMove = ActiveMove;
-                }
-                ActiveMove = null;
-                ActivePokemon = null;
-                ActiveTarget = null;
+                LastMove = ActiveMove;
             }
+            ActiveMove = null;
+            ActivePokemon = null;
+            ActiveTarget = null;
         }
 
         public void UpdateSpeed()
         {
-            foreach (Pokemon pokemon in GetAllActive())
+            foreach (var pokemon in GetAllActive())
             {
                 pokemon.UpdateSpeed();
             }
@@ -658,20 +639,6 @@ namespace ApogeeVGC_CS.sim
             // TODO: Implement field event handling logic
         }
 
-        //public object SingleEvent(
-        //    string eventId,
-        //    IEffect effect,
-        //    SingleEventState state,
-        //    SingleEventTarget target,
-        //    SingleEventSource? source = null,
-        //    IEffect? sourceEffect = null,
-        //    object? relayVar = null,
-        //    Delegate? customCallback = null)
-        //{
-        //    throw new NotImplementedException();
-        //    // TODO: Implement single event handling logic
-        //}
-
         public object SingleEvent(
            string eventId,
            IEffect effect,
@@ -768,7 +735,7 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Get the callback function
-            Delegate? callback = customCallback ?? GetCallback(target, effect, $"on{eventId}");
+            var callback = customCallback ?? GetCallback(target, effect, $"on{eventId}");
             if (callback == null) return relayVar;
 
             // Save the current battle state
@@ -783,7 +750,6 @@ namespace ApogeeVGC_CS.sim
                 EffectState = state switch
                 {
                     EffectStateSingleEventState effectState => effectState.EffectState,
-                    EmptySingleEventState => InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 }),
                     _ => InitEffectState(new EffectState { Id = Id.Empty, EffectOrder = 0 })
                 };
 
@@ -791,7 +757,7 @@ namespace ApogeeVGC_CS.sim
                 {
                     Id = eventId,
                     Target = target,
-                    Source = source,
+                    Source = source ?? throw new ArgumentNullException(nameof(source)),
                     Effect = sourceEffect
                 };
 
@@ -803,7 +769,7 @@ namespace ApogeeVGC_CS.sim
                     args.Add(relayVar);
 
                 args.Add(target);
-                args.Add(source ?? new NullSingleEventSource());
+                args.Add(source);
                 args.Add(sourceEffect ?? ConditionConstants.EmptyCondition);
 
                 // Invoke the callback
@@ -905,7 +871,7 @@ namespace ApogeeVGC_CS.sim
                     PokemonRunEventTarget pokemonTarget => new PokemonGetCallbackTarget(pokemonTarget.Pokemon),
                     SideRunEventTarget sideTarget => new SideGetCallbackTarget(sideTarget.Side),
                     BattleRunEventTarget => new BattleGetCallbackTarget(this),
-                    _ => throw new ArgumentException($"Array targets not supported with onEffect")
+                    _ => throw new ArgumentException("Array targets not supported with onEffect")
                 }, sourceEffect, $"on{eventId}");
 
                 if (callback != null)
@@ -976,7 +942,7 @@ namespace ApogeeVGC_CS.sim
             {
                 Id = eventId,
                 Target = target,
-                Source = source,
+                Source = source ?? throw new ArgumentNullException(nameof(source)),
                 Effect = sourceEffect,
                 Modifier = 1
             };
@@ -998,7 +964,7 @@ namespace ApogeeVGC_CS.sim
                     else
                     {
                         // Initialize with true for each target
-                        for (int i = 0; i < pokemonListTarget.PokemonList.Count; i++)
+                        for (var i = 0; i < pokemonListTarget.PokemonList.Count; i++)
                         {
                             targetRelayVars.Add(true);
                         }
@@ -1011,7 +977,7 @@ namespace ApogeeVGC_CS.sim
                     // Handle array targets - if this handler has an index
                     if (handler.Index.HasValue)
                     {
-                        var index = handler.Index.Value;
+                        int index = handler.Index.Value;
 
                         // Skip if this target's relay var is falsy (unless it's 0 for DamagingHit)
                         if (targetRelayVars != null &&
@@ -1280,11 +1246,16 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = listener.EffectHolder,
                     Target = listener.Target,
                     Index = listener.Index,
-                    Order = order,
+                    Order = order ?? throw new InvalidOperationException(),
                     Priority = priority,
                     SubOrder = subOrder,
                     EffectOrder = effectOrder,
-                    Speed = speed
+                    Speed = speed,
+                    AbilityState = new EffectState()
+                    {
+                        Id = Id.Empty,
+                        EffectOrder = 0,
+                    }
                 };
             var pokemon = pokemonEvent.Pokemon;
             speed = pokemon.Speed;
@@ -1306,11 +1277,16 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = listener.EffectHolder,
                     Target = listener.Target,
                     Index = listener.Index,
-                    Order = order,
+                    Order = order ?? throw new InvalidOperationException(),
                     Priority = priority,
                     SubOrder = subOrder,
                     EffectOrder = effectOrder,
-                    Speed = speed
+                    Speed = speed,
+                    AbilityState = new EffectState()
+                    {
+                        Id = Id.Empty,
+                        EffectOrder = 0,
+                    },
                 };
             int fieldPositionValue = pokemon.Side.N * Sides.Length + pokemon.Position;
             int speedIndex = SpeedOrder.IndexOf(fieldPositionValue);
@@ -1331,11 +1307,16 @@ namespace ApogeeVGC_CS.sim
                 EffectHolder = listener.EffectHolder,
                 Target = listener.Target,
                 Index = listener.Index,
-                Order = order,
+                Order = order ?? throw new InvalidOperationException(),
                 Priority = priority,
                 SubOrder = subOrder,
                 EffectOrder = effectOrder,
-                Speed = speed
+                Speed = speed,
+                AbilityState = new EffectState()
+                {
+                    Id = Id.Empty,
+                    EffectOrder = 0,
+                },
             };
         }
 
@@ -1487,7 +1468,12 @@ namespace ApogeeVGC_CS.sim
                                 Priority = handler.Priority,
                                 SubOrder = handler.SubOrder,
                                 EffectOrder = handler.EffectOrder,
-                                Speed = handler.Speed
+                                Speed = handler.Speed,
+                                AbilityState = new EffectState()
+                                {
+                                    Id = Id.Empty,
+                                    EffectOrder = 0,
+                                },
                             };
                             handlers.Add(updatedListener);
                         }
@@ -1731,22 +1717,22 @@ namespace ApogeeVGC_CS.sim
         // Helper methods to create delegates for Pokemon-specific cleanup functions
         private static Delegate CreateClearStatusDelegate(Pokemon pokemon)
         {
-            return new Func<bool>(() => pokemon.ClearStatus());
+            return new Func<bool>(pokemon.ClearStatus);
         }
 
         private static Delegate CreateRemoveVolatileDelegate(Pokemon pokemon)
         {
-            return new Func<string, bool>(statusId => pokemon.RemoveVolatile(statusId));
+            return new Func<string, bool>(pokemon.RemoveVolatile);
         }
 
         private static Delegate CreateClearAbilityDelegate(Pokemon pokemon)
         {
-            return new Func<Id?>(() => pokemon.ClearAbility());
+            return new Func<Id?>(pokemon.ClearAbility);
         }
 
         private static Delegate CreateClearItemDelegate(Pokemon pokemon)
         {
-            return new Func<bool>(() => pokemon.ClearItem());
+            return new Func<bool>(pokemon.ClearItem);
         }
 
         private static Delegate CreateEmptyDelegate()
@@ -1756,7 +1742,7 @@ namespace ApogeeVGC_CS.sim
 
         private static Delegate CreateRemoveSlotConditionDelegate(Side side)
         {
-            return new Func<Side, Pokemon, Id, bool>((s, p, id) => side.RemoveSlotCondition(p, id.ToString()));
+            return new Func<Side, Pokemon, Id, bool>((_, p, id) => side.RemoveSlotCondition(p, id.ToString()));
         }
 
         //public List<EventListener> FindBattleEventHandlers(string callbackName,
@@ -1785,7 +1771,7 @@ namespace ApogeeVGC_CS.sim
                     Callback = callback,
                     State = FormatData,
                     End = null, // Format handlers typically don't have cleanup
-                    EffectHolder = (EventEffectHolder)customHolder ?? this
+                    EffectHolder = customHolder ?? throw new ArgumentNullException(nameof(customHolder))
                 };
 
                 var formatEventListener = ResolvePriority(formatListenerWithoutPriority, callbackName);
@@ -1795,15 +1781,11 @@ namespace ApogeeVGC_CS.sim
             // Handle dynamic event handlers (if Events is implemented)
             if (Events is not Dictionary<string, List<EventHandlerData>> eventDict) return handlers;
             if (!eventDict.TryGetValue(callbackName, out var eventHandlers)) return handlers;
-            foreach (var handler in eventHandlers)
-            {
-                // Determine state based on target effect type
-                EffectState? state = handler.Target.EffectType == EffectType.Format
+            handlers.AddRange(from handler in eventHandlers
+                let state = handler.Target.EffectType == EffectType.Format
                     ? FormatData
-                    : null;
-
-                // Create event listener directly with priority info
-                var dynamicEventListener = new EventListener
+                    : null
+                select new EventListener
                 {
                     Effect = handler.Target,
                     Callback = handler.Callback,
@@ -1814,11 +1796,9 @@ namespace ApogeeVGC_CS.sim
                     Order = handler.Order,
                     SubOrder = handler.SubOrder,
                     EffectOrder = handler.EffectOrder,
-                    Speed = handler.Speed
-                };
-
-                handlers.Add(dynamicEventListener);
-            }
+                    Speed = handler.Speed,
+                    AbilityState = new EffectState() { Id = Id.Empty, EffectOrder = 0, },
+                });
 
             return handlers;
         }
@@ -1862,7 +1842,7 @@ namespace ApogeeVGC_CS.sim
                     Callback = callback,
                     State = pseudoWeatherState,
                     End = customHolder != null ? null : CreateRemovePseudoWeatherDelegate(field),
-                    EffectHolder = (EventEffectHolder?)customHolder ?? field
+                    EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? field
                 };
 
                 // Resolve priority and create full event listener
@@ -1886,7 +1866,7 @@ namespace ApogeeVGC_CS.sim
                     Callback = weatherCallback,
                     State = field.WeatherState,
                     End = customHolder != null ? null : CreateClearWeatherDelegate(field),
-                    EffectHolder = (EventEffectHolder)customHolder ?? field
+                    EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? field
                 };
 
                 var weatherEventListener = ResolvePriority(weatherListenerWithoutPriority, callbackName);
@@ -1908,7 +1888,7 @@ namespace ApogeeVGC_CS.sim
                 Callback = terrainCallback,
                 State = field.TerrainState,
                 End = customHolder != null ? null : CreateClearTerrainDelegate(field),
-                EffectHolder = (EventEffectHolder)customHolder ?? field
+                EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? field
             };
 
             var terrainEventListener = ResolvePriority(terrainListenerWithoutPriority, callbackName);
@@ -1940,11 +1920,8 @@ namespace ApogeeVGC_CS.sim
         {
             var handlers = new List<EventListener>();
 
-            foreach (var kvp in side.SideConditions)
+            foreach ((string id, var sideConditionData) in side.SideConditions)
             {
-                string id = kvp.Key;
-                EffectState sideConditionData = kvp.Value;
-
                 // Get the condition from the dex
                 var sideCondition = Dex.Conditions.GetById(new Id(id));
 
@@ -1965,7 +1942,7 @@ namespace ApogeeVGC_CS.sim
                     State = sideConditionData,
                     End = customHolder != null ? null : CreateRemoveSideConditionDelegate(side),
                         
-                    EffectHolder = (EventEffectHolder)customHolder ?? side
+                    EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? side
                 };
 
                 // Resolve priority and create full event listener
@@ -1989,7 +1966,7 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Fallback to ExtraData
-            return effectState.ExtraData?.ContainsKey(propertyName) ?? false;
+            return effectState.ExtraData.ContainsKey(propertyName);
         }
 
         // Helper method to create a delegate for removing side conditions
@@ -2308,14 +2285,14 @@ namespace ApogeeVGC_CS.sim
 
                 var pokemon = faintData.Target;
 
-                if (pokemon.Fainted ||
-                    RunEvent("BeforeFaint", pokemon, faintData.Source, faintData.Effect) is false or null) continue;
+                if (faintData.Source != null && (pokemon.Fainted ||
+                                                 RunEvent("BeforeFaint", pokemon, faintData.Source, faintData.Effect) is false or null)) continue;
                 Add("faint", pokemon);
 
                 if (pokemon.Side.PokemonLeft > 0) pokemon.Side.PokemonLeft--;
                 if (pokemon.Side.TotalFainted < 100) pokemon.Side.TotalFainted++;
 
-                RunEvent("Faint", pokemon, faintData.Source, faintData.Effect);
+                RunEvent("Faint", pokemon, faintData.Source ?? throw new InvalidOperationException(), faintData.Effect);
                 SingleEvent("End", pokemon.GetAbility(), pokemon.AbilityState, pokemon);
                 SingleEvent("End", pokemon.GetItem(), pokemon.ItemState, pokemon);
 

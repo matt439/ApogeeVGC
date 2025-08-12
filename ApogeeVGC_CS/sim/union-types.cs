@@ -1,4 +1,7 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.lib;
+using Buffer = ApogeeVGC_CS.lib.Buffer;
+
+namespace ApogeeVGC_CS.sim
 {
     /// <summary>
     /// EffectState | Record<string, never> | null
@@ -1219,7 +1222,42 @@
     public record IdBoolUnionId(Id Id) : IdBoolUnion;
     public record IdBoolUnionBool(bool Value) : IdBoolUnion;
 
+    /// <summary>
+    /// string | Task<string?>
+    /// </summary>
+    public abstract record StringTaskUnion
+    {
+        public static implicit operator StringTaskUnion(string value) => new StringStringTaskUnion(value);
 
+        public static implicit operator StringTaskUnion(Task<string?> promise) =>
+            new TaskStringTaskUnion(promise);
+    }
+    public record StringStringTaskUnion(string Value) : StringTaskUnion;
+    public record TaskStringTaskUnion(Task<string?> Promise) : StringTaskUnion;
+
+
+    /// <summary>
+    /// string | int
+    /// </summary>
+    public abstract record StringIntUnion
+    {
+        public static implicit operator StringIntUnion(string value) => new StringIntUnionString(value);
+        public static implicit operator StringIntUnion(int value) => new StringIntUnionInt(value);
+    }
+    public record StringIntUnionString(string Value) : StringIntUnion;
+    public record StringIntUnionInt(int Value) : StringIntUnion;
+
+
+    /// <summary>
+    /// Buffer | Task<Buffer>
+    /// </summary>
+    public abstract record BufferTaskBuffer
+    {
+        public static implicit operator BufferTaskBuffer(Buffer value) => new BufferBuffer(value);
+        public static implicit operator BufferTaskBuffer(Task<Buffer> promise) => new TaskBuffer(promise);
+    }
+    public record BufferBuffer(Buffer Value) : BufferTaskBuffer;
+    public record TaskBuffer(Task<Buffer> Promise) : BufferTaskBuffer;
 
 
 
