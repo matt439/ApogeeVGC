@@ -73,7 +73,7 @@
          * In Gen 7+, Bottle Caps means these can either match the
          * Hidden Power type or 31.
          */
-        public required StatsTable Ivs
+        public StatsTable Ivs
         {
             get;
             set
@@ -84,7 +84,7 @@
                 }
                 field = value;
             }
-        }
+        } = StatsTable.PerfectIvs;
 
         /**
          * This is usually between 1 and 100, inclusive,
@@ -166,86 +166,101 @@
         public PokemonType? TeraType { get; init; }
 
         public int? AdjustLevel { get; init; } // added for Pokemon class constructor
+
+        //public PokemonSet(SpeciesData data, string item, string ability, List<string> moves, string nature,
+        //    GenderName gender, StatsTable evs, StatsTable ivs, int level)
+        //{
+        //    Name = data.Name;
+        //    Species = data.Id.ToString();
+        //    Item = item;
+        //    Ability = ability;
+        //    Moves = moves;
+        //    Nature = nature;
+        //    Gender = gender;
+        //    Evs = evs;
+        //    Ivs = ivs;
+        //    Level = level;
+        //}
     }
 
-    public class Teams
+    public static class Teams
     {
-        public string Pack(List<PokemonSet>? team = null)
+        public static string Pack(List<PokemonSet>? team = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<PokemonSet>? Unpack(string buf)
+        public static List<PokemonSet>? Unpack(string buf)
         {
             throw new NotImplementedException();
         }
 
-        public string PackName(string? name = null)
+        public static string PackName(string? name = null)
         {
             throw new NotImplementedException();
         }
 
-        public string? UnpackName(string? name, Func<string, IAnyObject>? dexTable = null)
+        public static string? UnpackName(string? name, Func<string, AnyObject>? dexTable = null)
         {
             throw new NotImplementedException();
         }
 
-        public string Export(List<PokemonSet> team, object? options = null)
+        public static string Export(List<PokemonSet> team, object? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public string ExportSet(PokemonSet set, object? options = null)
+        public static string ExportSet(PokemonSet set, object? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public void ParseExportedTeamLine(string line, bool isFirstLine, PokemonSet set, bool? aggressive = null)
+        public static void ParseExportedTeamLine(string line, bool isFirstLine, PokemonSet set, bool? aggressive = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<PokemonSet>? Import(string buffer, bool? aggressive = null)
+        public static List<PokemonSet>? Import(string buffer, bool? aggressive = null)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(string format, Prng seed)
+        public static object GetGenerator(string format, Prng seed)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(Format format, Prng seed)
+        public static object GetGenerator(Format format, Prng seed)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(string format, PrngSeed seed)
+        public static object GetGenerator(string format, PrngSeed seed)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(Format format, PrngSeed seed)
+        public static object GetGenerator(Format format, PrngSeed seed)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(string format)
+        public static object GetGenerator(string format)
         {
             throw new NotImplementedException();
         }
 
-        public object GetGenerator(Format format)
+        public static object GetGenerator(Format format)
         {
             throw new NotImplementedException();
         }
 
-        public List<PokemonSet> Generate(string format, PlayerOptions? options = null)
+        public static List<PokemonSet> Generate(string format, PlayerOptions? options = null)
         {
             throw new NotImplementedException();
         }
 
-        public List<PokemonSet> Generate(Format format, PlayerOptions? options = null)
+        public static List<PokemonSet> Generate(Format format, PlayerOptions? options = null)
         {
             throw new NotImplementedException();
         }

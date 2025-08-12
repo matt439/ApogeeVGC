@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 
 namespace ApogeeVGC_CS.sim
@@ -221,9 +222,10 @@ namespace ApogeeVGC_CS.sim
                 {
                     throw new ArgumentException("value must be positive.");
                 }
+
                 field = value;
             }
-        }
+        } 
         public int Atk
         {
             get;
@@ -235,7 +237,7 @@ namespace ApogeeVGC_CS.sim
                 }
                 field = value;
             }
-        }
+        } = 0;
         public int Def
         {
             get;
@@ -247,7 +249,7 @@ namespace ApogeeVGC_CS.sim
                 }
                 field = value;
             }
-        }
+        } = 0;
         public int Spa
         {
             get;
@@ -259,7 +261,7 @@ namespace ApogeeVGC_CS.sim
                 }
                 field = value;
             }
-        }
+        } = 0;
         public int Spd
         {
             get;
@@ -271,7 +273,7 @@ namespace ApogeeVGC_CS.sim
                 }
                 field = value;
             }
-        }
+        } = 0;
         public int Spe
         {
             get;
@@ -283,7 +285,7 @@ namespace ApogeeVGC_CS.sim
                 }
                 field = value;
             }
-        }
+        } = 0;
 
         public int BaseStatTotal => Hp + Atk + Def + Spa + Spd + Spe;
 
@@ -349,6 +351,16 @@ namespace ApogeeVGC_CS.sim
             return IsValidEv(Hp) && IsValidEv(Atk) && IsValidEv(Def) &&
                    IsValidEv(Spa) && IsValidEv(Spd) && IsValidEv(Spe);
         }
+
+        public static StatsTable PerfectIvs => new()
+        {
+            Hp = 31,
+            Atk = 31,
+            Def = 31,
+            Spa = 31,
+            Spd = 31,
+            Spe = 31,
+        };
     }
 
     public class SparseStatsTable : Dictionary<StatId, int>
@@ -598,8 +610,8 @@ namespace ApogeeVGC_CS.sim
         public Action<BattleActions, int, Pokemon, Pokemon, ActiveMove, bool?>? ModifyDamage { get; set; }
 
         // OMs (Other Metagames)
-        public Func<BattleActions, Species, IAnyObject, Species>? MutateOriginalSpecies { get; set; }
-        public Func<BattleActions, Species, Pokemon?, IAnyObject>? GetFormeChangeDeltas { get; set; }
+        public Func<BattleActions, Species, AnyObject, Species>? MutateOriginalSpecies { get; set; }
+        public Func<BattleActions, Species, Pokemon?, AnyObject>? GetFormeChangeDeltas { get; set; }
         public Func<BattleActions, string, string, Pokemon?, Species>? GetMixedSpecies { get; set; }
     }
 
@@ -607,7 +619,7 @@ namespace ApogeeVGC_CS.sim
     {
         public required string Name { get; init; }
         public required Id Id { get; init; }
-        public required List<IAnyObject> Pokemon { get; init; }
+        public required List<AnyObject> Pokemon { get; init; }
     }
 
     public interface IModdedBattleSide
@@ -729,7 +741,7 @@ namespace ApogeeVGC_CS.sim
         public IModdedBattleSide? Side { get; set; }
         public Func<Battle, SparseBoostsTable, Pokemon, Pokemon?, IEffect?, bool?, bool?, BoolZeroUnion?>? Boost { get; set; }
         public Action<Battle, string>? Debug { get; set; }
-        public Action<Battle, IAnyObject>? GetActionSpeed { get; set; }
+        public Action<Battle, AnyObject>? GetActionSpeed { get; set; }
         public Action<ModdedDex>? Init { get; set; }
         public Func<Battle, bool[], string[], bool?>? MaybeTriggerEndlessBattleClause { get; set; }
         public Func<Battle, StatsTable, PokemonSet, StatsTable>? NatureModify { get; set; }
@@ -1059,24 +1071,88 @@ namespace ApogeeVGC_CS.sim
         public string? ShortDesc { get; set; }
     }
 
-    /// <summary>
-    /// Pokemon |
-    /// </summary>
-    public interface IAnyObject
-    {
-        IntFalseUnion Order { get; }
-        int Priority { get; }
-        int? Speed { get; }
-        int SubOrder { get; }
-        int? EffectOrder { get; }
-        int? Index { get; }
-        EffectState AbilityState { get; }
-    }
-
-    //public class AnyObject : Dictionary<string, object>
+    ///// <summary>
+    ///// Pokemon | PokemonSwitchRequestData
+    ///// </summary>
+    //public interface IAnyObject
     //{
-    //    public AnyObject() : base(StringComparer.OrdinalIgnoreCase) { }
-    //    public AnyObject(IDictionary<string, object> dictionary) :
-    //        base(dictionary, StringComparer.OrdinalIgnoreCase) { }
+    //    //IntFalseUnion Order { get; }
+    //    //int Priority { get; }
+    //    //int? Speed { get; }
+    //    //int SubOrder { get; }
+    //    //int? EffectOrder { get; }
+    //    //int? Index { get; }
+    //    //EffectState AbilityState { get; }
+    //    //int Count { get; }
+    //    //public Dictionary<string, object> ExtraData { get; set; }
     //}
+
+    public class AnyObject(object value) : Dictionary<string, object>(ToAnyObject(value))
+    {
+        public IntFalseUnion? Order => (IntFalseUnion?)this["order"];
+        public int? Priority => (int?)this["priority"];
+        public int? Speed => (int?)this["speed"];
+        public int? SubOrder => (int?)this["subOrder"];
+        public int? EffectOrder => (int?)this["effectOrder"];
+        public EffectState? AbilityState => (EffectState?)this["abilityState"];
+        public int? Index => (int?)this["index"];
+
+
+        public static Dictionary<string, object> ToAnyObject<T>(T? obj)
+            where T : class
+        {
+            var anyObject = new Dictionary<string, object>();
+            if (obj == null) return anyObject;
+
+            var type = obj.GetType();
+            var properties = type.GetProperties(System.Reflection.BindingFlags.Public |
+                                                System.Reflection.BindingFlags.Instance);
+
+            foreach (var prop in properties)
+            {
+                object? value = prop.GetValue(obj);
+
+                if (value == null)
+                {
+                    anyObject[prop.Name] = DBNull.Value;
+                }
+                else if (IsSimpleType(prop.PropertyType))
+                {
+                    anyObject[prop.Name] = value;
+                }
+                else if (value is System.Collections.IEnumerable enumerable and not string)
+                {
+                    // Handle collections (arrays, lists, etc.)
+                    var list = new List<object?>();
+                    foreach (object? item in enumerable)
+                    {
+                        if (item == null)
+                            list.Add(DBNull.Value);
+                        else if (IsSimpleType(item.GetType()))
+                            list.Add(item);
+                        else
+                            list.Add(ToAnyObject(item));
+                    }
+                    anyObject[prop.Name] = list;
+                }
+                else
+                {
+                    // Handle nested objects
+                    anyObject[prop.Name] = ToAnyObject(value);
+                }
+            }
+
+            return anyObject;
+        }
+
+        private static bool IsSimpleType(Type type)
+        {
+            return type.IsPrimitive
+                   || type.IsEnum
+                   || type == typeof(string)
+                   || type == typeof(decimal)
+                   || type == typeof(DateTime)
+                   || type == typeof(Guid);
+        }
+    }
 }

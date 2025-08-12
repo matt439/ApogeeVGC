@@ -108,12 +108,12 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("ReceiveLine method is not implemented yet.");
         }
 
-        public void ReceiveRequest(string choice)
+        public virtual void ReceiveRequest(IChoiceRequest request)
         {
             throw new NotImplementedException("ReceiveRequest method is not implemented yet.");
         }
 
-        public void ReceiveError(string error)
+        public virtual void ReceiveError(Exception error)
         {
             throw new NotImplementedException("ReceiveError method is not implemented yet.");
         }

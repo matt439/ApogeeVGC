@@ -64,7 +64,7 @@
         public DexTable<SpeciesData> Pokedex { get; init; } = [];
         public DexTable<SpeciesFormatsData> FormatsData { get; init; } = []; 
         public DexTable<PokemonGoData> PokemonGoData { get; init; } = [];
-        public DexTable<IAnyObject> Scripts { get; init; } = [];
+        public DexTable<AnyObject> Scripts { get; init; } = [];
         public DexTable<IConditionData> Conditions { get; init; } = [];
         public DexTable<TypeData> TypeChart { get; init; } = [];
     }
@@ -230,7 +230,7 @@
             throw new NotImplementedException("GetImmunit method not implemented yet.");
         }
 
-        public Descriptions GetDescs(TextTableData table, Id id, IAnyObject dataEntry)
+        public Descriptions GetDescs(TextTableData table, Id id, AnyObject dataEntry)
         {
             throw new NotImplementedException("GetDescs method not implemented yet.");
         }
@@ -252,13 +252,13 @@
 
         // int Trunc()
 
-        public List<IAnyObject>? DataSearch(string target, List<DataSearchType>? searchIn = null,
+        public List<AnyObject>? DataSearch(string target, List<DataSearchType>? searchIn = null,
             bool? isInexact = null)
         {
             throw new NotImplementedException("DataSearch method not implemented yet.");
         }
 
-        public IAnyObject? LoadDataFile(string basePath, DataType dataType)
+        public AnyObject? LoadDataFile(string basePath, DataType dataType)
         {
             throw new NotImplementedException("LoadDataFile method not implemented yet.");
         }

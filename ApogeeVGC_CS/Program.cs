@@ -1,12 +1,11 @@
-﻿
-
-namespace ApogeeVGC_CS
+﻿namespace ApogeeVGC_CS
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            var test = new Test1V1();
+            //test.RunTest();
         }
     }
 }

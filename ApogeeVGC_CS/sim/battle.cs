@@ -80,7 +80,7 @@ namespace ApogeeVGC_CS.sim
         public required EventEffectHolder EffectHolder { get; init; }
     }
 
-    public class EventListener : EventListenerWithoutPriority, IAnyObject
+    public class EventListener : EventListenerWithoutPriority
     {
         public required IntFalseUnion Order { get; init; }
         public int Priority { get; init; }
@@ -465,8 +465,11 @@ namespace ApogeeVGC_CS.sim
         /// 4. SubOrder, low to high (default 0)
         /// 5. EffectOrder, low to high (default 0)
         /// </summary>
-        public static int ComparePriority(IAnyObject a, IAnyObject b)
+        public static int ComparePriority(object objA, object objB)
         {
+            var a = objA as AnyObject ?? new AnyObject(objA);
+            var b = objB as AnyObject ?? new AnyObject(objB);
+
             // Order comparison (lower values first, null/false = last)
             // Using int.MaxValue as default for null/false
             int aOrder = a.Order switch
@@ -485,7 +488,7 @@ namespace ApogeeVGC_CS.sim
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority).CompareTo(a.Priority);
+            int priorityResult = Nullable.Compare(b.Priority, a.Priority);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
@@ -493,7 +496,7 @@ namespace ApogeeVGC_CS.sim
             if (speedResult != 0) return speedResult;
 
             // SubOrder comparison (lower values first)
-            int subOrderResult = (a.SubOrder).CompareTo(b.SubOrder);
+            int subOrderResult = Nullable.Compare(b.SubOrder, a.SubOrder);
             return subOrderResult != 0 ? subOrderResult :
                 // EffectOrder comparison (lower values first)
                 (a.EffectOrder ?? 0).CompareTo(b.EffectOrder ?? 0);
@@ -507,17 +510,25 @@ namespace ApogeeVGC_CS.sim
         /// 2. Speed, high to low (default 0) 
         /// 3. AbilityState EffectOrder, low to high (only if both have ability states)
         /// </summary>
-        public static int CompareRedirectOrder(IAnyObject a, IAnyObject b)
+        public static int CompareRedirectOrder(object objA, object objB)
         {
+            var a = objA as AnyObject ?? new AnyObject(objA);
+            var b = objB as AnyObject ?? new AnyObject(objB);
+
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority).CompareTo(a.Priority);
+            int priorityResult = Nullable.Compare(b.Priority, a.Priority);
             if (priorityResult != 0) return priorityResult;
 
             // Speed comparison (higher values first)
             int speedResult = (b.Speed ?? 0).CompareTo(a.Speed ?? 0);
-            return speedResult != 0 ? speedResult :
-                // AbilityState EffectOrder comparison (lower values first, only if both have ability states)
-                a.AbilityState.EffectOrder.CompareTo(b.AbilityState.EffectOrder);
+            if (a.AbilityState == null) return 0;
+            if (b.AbilityState != null)
+                return speedResult != 0
+                    ? speedResult
+                    :
+                    // AbilityState EffectOrder comparison (lower values first, only if both have ability states)
+                    a.AbilityState.EffectOrder.CompareTo(b.AbilityState.EffectOrder);
+            return 0;
         }
 
         /// <summary>
@@ -528,8 +539,11 @@ namespace ApogeeVGC_CS.sim
         /// 2. Priority, high to low (default 0)
         /// 3. Index, low to high (default 0) - for array position ordering
         /// </summary>
-        public static int CompareLeftToRightOrder(IAnyObject a, IAnyObject b)
+        public static int CompareLeftToRightOrder(object objA, object objB)
         {
+            var a = objA as AnyObject ?? new AnyObject(objA);
+            var b = objB as AnyObject ?? new AnyObject(objB);
+
             // Order comparison (lower values first, null/false = last)
             // Using 4294967296 as default for null/false (same as TypeScript)
             int aOrder = a.Order switch
@@ -548,16 +562,18 @@ namespace ApogeeVGC_CS.sim
             if (orderResult != 0) return orderResult;
 
             // Priority comparison (higher values first)
-            int priorityResult = (b.Priority).CompareTo(a.Priority);
-            return priorityResult != 0 ? priorityResult :
+            int priorityResult = Nullable.Compare(b.Priority, a.Priority);
+            return priorityResult != 0
+                ? priorityResult
+                :
                 // Index comparison (lower values first) - for left-to-right array ordering
                 (a.Index ?? 0).CompareTo(b.Index ?? 0);
         }
 
         /// <summary>Sort a list, resolving speed ties the way the games do.</summary>
-        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) where T : IAnyObject
+        public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null)
         {
-            comparator ??= (a, b) => ComparePriority(a, b);
+            comparator ??= (x, y) => ComparePriority(x!, y!);
 
             if (list.Count < 2) return;
 
@@ -1975,7 +1991,7 @@ namespace ApogeeVGC_CS.sim
             return new Action<string>(conditionId => side.RemoveSideCondition(conditionId));
         }
 
-        public void OnEvent(string eventId, Format target, params IAnyObject[] rest)
+        public void OnEvent(string eventId, Format target, params AnyObject[] rest)
         {
             throw new NotImplementedException();
         }
@@ -2016,7 +2032,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public List<ChoiceRequest> GetRequests(RequestState type)
+        public List<IChoiceRequest> GetRequests(RequestState type)
         {
             throw new NotImplementedException();
         }
@@ -2378,7 +2394,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public void GetActionSpeed(IAnyObject action)
+        public void GetActionSpeed(AnyObject action)
         {
             throw new NotImplementedException();
         }

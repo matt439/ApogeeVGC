@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.sim.tools;
+
+namespace ApogeeVGC_CS.sim
 {
     public enum ChoiceType
     {
@@ -57,12 +59,19 @@
         public string? Terastallized { get; init; }
     }
 
-    public class PokemonMoveData
+    public interface IPokemonDynamaxMoveData
+    {
+        public string Move { get; }
+        public string Target { get; }
+        public BoolStringUnion? Disabled { get; }
+    }
+
+    // helper class for PokemonMoveRequestData
+    public class PokemonMoveData : IPokemonDynamaxMoveData
     {
         public required string Move { get; init; }
         public required Id Id { get; init; }
         public string? Target { get; init; }
-
         public BoolStringUnion? Disabled { get; init; }
         public string? DisabledSource { get; init; }
     }
@@ -78,17 +87,30 @@
         public bool? CanMegaEvoX { get; init; }
         public bool? CanMegaEvoY { get; init; }
         public bool? CanUltraBurst { get; init; }
-        public IAnyObject? CanZMove { get; init; }
+        public AnyObject? CanZMove { get; init; }
         public bool? CanDynamax { get; init; }
         public DynamaxOptions? MaxMoves { get; init; }
         public string? CanTerastallize { get; init; }
     }
 
-    public class DynamaxMoveData
+    public class DynamaxMoveData : IPokemonDynamaxMoveData
     {
         public required string Move { get; init; }
-        public required MoveTarget Target { get; init; }
-        public bool? Disabled { get; init; }
+        public required MoveTarget MoveTarget { get; init; }
+        public bool? DisabledMove { get; init; }
+        public string Target => Stringify.GetMoveTargetString(MoveTarget);
+        public BoolStringUnion? Disabled
+        {
+            get
+            {
+                return DisabledMove switch
+                {
+                    true => new BoolBoolStringUnion(true),
+                    false => new BoolBoolStringUnion(false),
+                    _ => null
+                };
+            }
+        }
     }
 
     public class DynamaxOptions
@@ -105,45 +127,54 @@
         public bool? NoCancel { get; init; }
     }
 
-    public abstract class ChoiceRequest
+    public interface IChoiceRequest
     {
-        public virtual bool? Wait { get; init; }
+        public bool? Wait { get; }
+        public SideRequestData Side { get; }
+        public bool? NoCancel { get; }
+        public bool? TeamPreview { get; }
+        public List<bool>? ForceSwitch { get; }
+    }
+
+    public class SwitchRequest : IChoiceRequest
+    {
+        public bool? Wait => null;
+        public bool? TeamPreview => null;
+        public required List<bool> ForceSwitch { get; init; }
         public required SideRequestData Side { get; init; }
         public bool? NoCancel { get; init; }
-        public virtual bool? TeamPreview { get; init; }
+        public bool? Update { get; init; }
     }
 
-    public class SwitchRequest : ChoiceRequest
+    public class TeamPreviewRequest : IChoiceRequest
     {
-        public required List<bool> ForceSwitch { get; init; }
-    }
-
-    public class TeamPreviewRequest : ChoiceRequest
-    {
-        public override bool? TeamPreview
-        {
-            get => true;
-            init { }
-        }
+        public bool? Wait => null;
+        public bool? TeamPreview => true;
+        public List<bool>? ForceSwitch => null;
         public int? MaxChosenTeamSize { get; init; }
-        public List<bool>? ForceSwitch { get; init; }
+        public required SideRequestData Side { get; init; }
+        public bool? NoCancel { get; init; }
     }
 
-    public class MoveRequest : ChoiceRequest
+    public class MoveRequest : IChoiceRequest
     {
+        public bool? Wait => null;
+        public bool? TeamPreview => null;
+        public List<bool>? ForceSwitch => null;
         public required List<PokemonMoveRequestData> Active { get; init; }
+        public required SideRequestData Side { get; init; }
         public SideRequestData? Ally { get; init; }
-        public List<bool>? ForceSwitch { get; init; }
+        public bool? NoCancel { get; init; }
+        public bool? Update { get; init; }
     }
 
-    public class WaitRequest : ChoiceRequest
+    public class WaitRequest : IChoiceRequest
     {
-        public override bool? Wait
-        {
-            get => true;
-            init { }
-        }
-        public List<bool>? ForceSwitch { get; init; }
+        public bool? Wait => true;
+        public bool? TeamPreview => null;
+        public List<bool>? ForceSwitch => null;
+        public required SideRequestData Side { get; init; }
+        public bool? NoCancel { get; init; }
     }
 
     // event: 'mega' | 'megax' | 'megay' | 'zmove' | 'ultra' | 'dynamax' | 'terastallize' | ''
@@ -185,7 +216,7 @@
         public required Dictionary<string, EffectState> SideConditions { get; init; }
         public required List<Dictionary<string, EffectState>> SlotConditions { get; init; }
 
-        public ChoiceRequest? ActiveRequest { get; init; }
+        public IChoiceRequest? ActiveRequest { get; init; }
         public required Choice Choice { get; init; }
 
         public Move? LastMove { get; init; } // Gen 1 tracking
@@ -431,7 +462,7 @@
             throw new NotImplementedException("Send method is not implemented yet.");
         }
 
-        public void EmitRequest(ChoiceRequest update)
+        public void EmitRequest(IChoiceRequest update)
         {
             throw new NotImplementedException("EmitRequest method is not implemented yet.");
         }

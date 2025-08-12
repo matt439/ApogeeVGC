@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC_CS.lib;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -59,7 +60,7 @@ namespace ApogeeVGC_CS.sim
         public List<Pokemon> PressureTargets { get; init; }
     }
 
-    public class Pokemon : IAnyObject
+    public class Pokemon
     {
         public Side Side { get; }
         public Battle Battle { get; }
@@ -232,34 +233,23 @@ namespace ApogeeVGC_CS.sim
 
         public Dictionary<string, object> M { get; init; } = [];
 
-        public IntFalseUnion Order { get; set; }
 
-        public int Priority { get; set; }
+    //public Pokemon(string set, Side side) : this(new PokemonSet
+    //{
+    //    Species = set,
+    //    Moves = [],
+    //    Name = set,
+    //    Item = string.Empty,
+    //    Ability = string.Empty,
+    //    Nature = string.Empty,
+    //    Gender = GenderName.Empty,
+    //    Evs = new StatsTable(),
+    //    Ivs = new StatsTable(),
+    //    Level = 0
+    //},
+    //    side) { }
 
-        int? IAnyObject.Speed => Speed;
-
-        public int SubOrder { get; set; }
-
-        public int? EffectOrder { get; set; }
-
-        public int? Index { get; init; }
-
-        //public Pokemon(string set, Side side) : this(new PokemonSet
-        //{
-        //    Species = set,
-        //    Moves = [],
-        //    Name = set,
-        //    Item = string.Empty,
-        //    Ability = string.Empty,
-        //    Nature = string.Empty,
-        //    Gender = GenderName.Empty,
-        //    Evs = new StatsTable(),
-        //    Ivs = new StatsTable(),
-        //    Level = 0
-        //},
-        //    side) { }
-
-        public Pokemon(PokemonSet set, Side side)
+    public Pokemon(PokemonSet set, Side side)
         {
             Side = side;
             Battle = side.Battle;

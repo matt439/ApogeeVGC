@@ -128,14 +128,14 @@ namespace ApogeeVGC_CS.sim
         };
     }
 
-    public static class AnyObjectUnionFactory
-    {
-        public static AddMoveArg ToAddMoveArg(IAnyObject anyObject) => anyObject switch
-        {
-            Pokemon pokemon => new AnyObjectAddMoveArg(pokemon),
-            _ => throw new InvalidOperationException($"Cannot convert {anyObject.GetType()} to AddMoveArg")
-        };
-    }
+    //public static class AnyObjectUnionFactory
+    //{
+    //    public static AddMoveArg ToAddMoveArg(IAnyObject anyObject) => anyObject switch
+    //    {
+    //        Pokemon pokemon => new AnyObjectAddMoveArg(pokemon),
+    //        _ => throw new InvalidOperationException($"Cannot convert {anyObject.GetType()} to AddMoveArg")
+    //    };
+    //}
 
     /// <summary>
     /// string | Pokemon | Effect | false | null
@@ -504,9 +504,8 @@ namespace ApogeeVGC_CS.sim
         public static implicit operator AddMoveArg(string value) => new StringAddMoveArg(value);
         public static implicit operator AddMoveArg(int value) => new IntAddMoveArg(value);
         public static implicit operator AddMoveArg(Delegate @delegate) => new FuncAddMoveArg(@delegate);
-
-        public static implicit operator AddMoveArg(Pokemon pokemon) =>
-            AnyObjectUnionFactory.ToAddMoveArg(pokemon);
+        public static implicit operator AddMoveArg(AnyObject anyObject) => 
+            new AnyObjectAddMoveArg(anyObject);
     }
 
     public record StringAddMoveArg(string Value) : AddMoveArg;
@@ -515,7 +514,7 @@ namespace ApogeeVGC_CS.sim
 
     public record FuncAddMoveArg(Delegate Delegate) : AddMoveArg;
 
-    public record AnyObjectAddMoveArg(IAnyObject AnyObject) : AddMoveArg;
+    public record AnyObjectAddMoveArg(AnyObject AnyObject) : AddMoveArg;
 
     /// <summary>
     /// 'drain' | Effect | null
@@ -576,6 +575,43 @@ namespace ApogeeVGC_CS.sim
     {
         public static implicit operator BoolStringUnion(bool value) => new BoolBoolStringUnion(value);
         public static implicit operator BoolStringUnion(string value) => new StringBoolStringUnion(value);
+
+        /// <summary>
+        /// Negation operator for BoolStringUnion
+        /// </summary>
+        /// <param name="value">The BoolStringUnion to negate</param>
+        /// <returns>Negated BoolStringUnion</returns>
+        public static bool operator !(BoolStringUnion value)
+        {
+            return value switch
+            {
+                BoolBoolStringUnion boolValue => !boolValue.Value,
+                StringBoolStringUnion stringValue => NegateStringValue(stringValue.Value) is BoolBoolStringUnion negatedBool
+                    ? negatedBool.Value
+                    : throw new InvalidOperationException("Unexpected result from NegateStringValue"),
+                _ => throw new InvalidOperationException("Unknown BoolStringUnion type")
+            };
+        }
+
+        /// <summary>
+        /// Helper method to handle string negation logic
+        /// </summary>
+        private static BoolStringUnion NegateStringValue(string value)
+        {
+            return value.ToLowerInvariant() switch
+            {
+                "true" => new StringBoolStringUnion("false"),
+                "false" => new StringBoolStringUnion("true"),
+                "yes" => new StringBoolStringUnion("no"),
+                "no" => new StringBoolStringUnion("yes"),
+                "on" => new StringBoolStringUnion("off"),
+                "off" => new StringBoolStringUnion("on"),
+                "1" => new StringBoolStringUnion("0"),
+                "0" => new StringBoolStringUnion("1"),
+                "" => new StringBoolStringUnion("true"), // Empty string treated as false, so negate to true
+                _ => new BoolBoolStringUnion(false) // Default: treat unknown strings as true, negate to false
+            };
+        }
     }
 
     public record BoolBoolStringUnion(bool Value) : BoolStringUnion;
@@ -1259,7 +1295,17 @@ namespace ApogeeVGC_CS.sim
     public record BufferBuffer(Buffer Value) : BufferTaskBuffer;
     public record TaskBuffer(Task<Buffer> Promise) : BufferTaskBuffer;
 
-
+    /// <summary>
+    /// Prng | PrngSeed
+    /// </summary>
+    public abstract record PrngPrngSeedUnion
+    {
+        public static implicit operator PrngPrngSeedUnion(Prng prng) => new PrngPrngSeedUnionPrng(prng);
+        public static implicit operator PrngPrngSeedUnion(PrngSeed prngSeed) =>
+            new PrngPrngSeedUnionPrngSeed(prngSeed);
+    }
+    public record PrngPrngSeedUnionPrng(Prng Prng) : PrngPrngSeedUnion;
+    public record PrngPrngSeedUnionPrngSeed(PrngSeed PrngSeed) : PrngPrngSeedUnion;
 
 
 

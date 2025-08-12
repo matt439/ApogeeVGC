@@ -420,7 +420,7 @@ namespace ApogeeVGC_CS.data
                         : Id.Empty;
                     if (pokemon.IgnoringItem() || pokemon.Volatiles.ContainsKey("dynamax") ||
                         move.Id == lockedMove || move.Id == new Id("struggle")) return true;
-                    battle.AddMove("move", pokemon, move.Name);
+                    battle.AddMove("move", new AnyObject(pokemon), move.Name);
                     battle.AttrLastMove("[still]");
                     battle.Debug("Disabled by Choice item lock");
                     battle.Add("-fail", pokemon);
