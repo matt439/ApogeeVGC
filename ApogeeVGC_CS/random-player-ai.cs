@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC_CS.sim;
+using ApogeeVGC_CS.lib;
 
 namespace ApogeeVGC_CS
 {
@@ -69,7 +70,7 @@ namespace ApogeeVGC_CS
     }
 
 
-    public class RandomPlayerAi(Stream playerStream, RandomPlayerAiOptions options, bool debug = false)
+    public class RandomPlayerAi(object playerStream, RandomPlayerAiOptions options, bool debug = false)
         : BattlePlayer(playerStream, debug)
     {
         protected int Move { get; init; } = options.Move ?? 1;
@@ -86,152 +87,145 @@ namespace ApogeeVGC_CS
 
         public override void ReceiveRequest(IChoiceRequest request)
         {
-            if (request is WaitRequest)
+            switch (request)
             {
-                // wait request - do nothing
-                return;
-            }
-            else if (request is SwitchRequest switchRequest)
-            {
-                // handle switch request
-                var pokemon = switchRequest.Side.Pokemon;
-                var chosen = new List<int>();
-                var choices = new List<string>();
-
-                for (int i = 0; i < switchRequest.ForceSwitch.Count; i++)
+                case WaitRequest:
+                    // wait request - do nothing
+                    return;
+                case SwitchRequest switchRequest:
                 {
-                    if (!switchRequest.ForceSwitch[i])
+                    // handle switch request
+                    var pokemon = switchRequest.Side.Pokemon;
+                    var chosen = new List<int>();
+                    var choices = new List<string>();
+
+                    for (int i = 0; i < switchRequest.ForceSwitch.Count; i++)
                     {
-                        choices.Add("pass");
-                        continue;
-                    }
-
-                    // Find valid switch options - Pokemon that are:
-                    // - not null
-                    // - not active (position > forceSwitch.Count)
-                    // - not already chosen for another position
-                    // - not fainted (or fainted only when using Revival Blessing)
-                    var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
-                        pokemon[j - 1] != null &&
-                        j > switchRequest.ForceSwitch.Count &&
-                        !chosen.Contains(j) &&
-                        !pokemon[j - 1].Condition.EndsWith(" fnt") == !pokemon[i].Reviving
-                    ).ToList();
-
-                    if (canSwitch.Count == 0)
-                    {
-                        choices.Add("pass");
-                        continue;
-                    }
-
-                    var target = ChooseSwitch(
-                        canSwitch.Select(slot => new SwitchOption
+                        if (!switchRequest.ForceSwitch[i])
                         {
-                            Slot = slot,
-                            Pokemon = pokemon[slot - 1]
-                        }).ToList()
-                    );
+                            choices.Add("pass");
+                            continue;
+                        }
 
-                    chosen.Add(target);
-                    choices.Add($"switch {target}");
+                        // Find valid switch options - Pokemon that are:
+                        // - not null
+                        // - not active (position > forceSwitch.Count)
+                        // - not already chosen for another position
+                        // - not fainted (or fainted only when using Revival Blessing)
+                        var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
+                            j > switchRequest.ForceSwitch.Count &&
+                            !chosen.Contains(j) &&
+                            !pokemon[j - 1].Condition.EndsWith(" fnt") == !pokemon[i].Reviving
+                        ).ToList();
+
+                        if (canSwitch.Count == 0)
+                        {
+                            choices.Add("pass");
+                            continue;
+                        }
+
+                        int target = ChooseSwitch(
+                            canSwitch.Select(slot => new SwitchOption
+                            {
+                                Slot = slot,
+                                Pokemon = pokemon[slot - 1]
+                            }).ToList()
+                        );
+
+                        chosen.Add(target);
+                        choices.Add($"switch {target}");
+                    }
+
+                    Choose(string.Join(", ", choices));
+                    break;
                 }
-
-                Choose(string.Join(", ", choices));
-            }
-            else if (request is TeamPreviewRequest teamPreviewRequest)
-            {
-                Choose(ChooseTeamPreview(teamPreviewRequest.Side.Pokemon));
-            }
-            else if (request is MoveRequest moveRequest)
-            {
-                // move request
-                bool canMegaEvo = true, canUltraBurst = true, canZMove = true,
-                     canDynamax = true, canTerastallize = true;
-                var pokemon = moveRequest.Side.Pokemon;
-                var chosen = new List<int>();
-                var choices = new List<string>();
-
-                for (int i = 0; i < moveRequest.Active.Count; i++)
+                case TeamPreviewRequest teamPreviewRequest:
+                    Choose(ChooseTeamPreview(teamPreviewRequest.Side.Pokemon));
+                    break;
+                case MoveRequest moveRequest:
                 {
-                    var active = moveRequest.Active[i];
+                    // move request
+                    bool canMegaEvo = true, canUltraBurst = true, canZMove = true,
+                        canDynamax = true, canTerastallize = true;
+                    var pokemon = moveRequest.Side.Pokemon;
+                    var chosen = new List<int>();
+                    var choices = new List<string>();
 
-                    // Skip fainted or commanding Pokemon
-                    if (pokemon[i].Condition.EndsWith(" fnt") || (pokemon[i].Commanding ?? false))
+                    for (var i = 0; i < moveRequest.Active.Count; i++)
                     {
-                        choices.Add("pass");
-                        continue;
-                    }
+                        var active = moveRequest.Active[i];
 
-                    // Update available special move options
-                    canMegaEvo = canMegaEvo && (active.CanMegaEvo ?? false);
-                    canUltraBurst = canUltraBurst && (active.CanUltraBurst ?? false);
-                    canZMove = canZMove && active.CanZMove != null;
-                    canDynamax = canDynamax && active.CanDynamax != null;
-                    canTerastallize = canTerastallize && active.CanTerastallize != null;
-
-                    // Determine if we should use special form-changing moves
-                    bool change = (canMegaEvo || canUltraBurst || canDynamax) && Prng.Random() < Mega;
-
-                    // Decide if we should use max moves
-                    bool useMaxMoves = (!(active.CanDynamax ?? false) && active.MaxMoves != null) ||
-                                       (change && canDynamax);
-
-                    var canMove = new List<MoveOption>();
-                    if (useMaxMoves && active.MaxMoves?.MaxMoves is List<DynamaxMoveData> maxMoves)
-                    {
-                        for (int j = 1; j <= maxMoves.Count; j++)
+                        // Skip fainted or commanding Pokemon
+                        if (pokemon[i].Condition.EndsWith(" fnt") || (pokemon[i].Commanding ?? false))
                         {
-                            if (!maxMoves[j - 1].Disabled)
+                            choices.Add("pass");
+                            continue;
+                        }
+
+                        // Update available special move options
+                        canMegaEvo = canMegaEvo && (active.CanMegaEvo ?? false);
+                        canUltraBurst = canUltraBurst && (active.CanUltraBurst ?? false);
+                        canZMove = canZMove && active.CanZMove != null;
+                        canDynamax = canDynamax && active.CanDynamax != null;
+                        canTerastallize = canTerastallize && active.CanTerastallize != null;
+
+                        // Determine if we should use special form-changing moves
+                        bool change = (canMegaEvo || canUltraBurst || canDynamax) && Prng.Random() < Mega;
+
+                        // Decide if we should use max moves
+                        bool useMaxMoves = (!(active.CanDynamax ?? false) && active.MaxMoves != null) ||
+                                           (change && canDynamax);
+
+                        var canMove = new List<MoveOption>();
+                        if (useMaxMoves && active.MaxMoves?.MaxMoves is { } maxMoves)
+                        {
+                            for (var j = 1; j <= maxMoves.Count; j++)
                             {
-                                canMove.Add(new MoveOption
+                                if (!(maxMoves[j - 1].Disabled ?? false))
                                 {
-                                    Slot = j,
-                                    Move = maxMoves[j - 1].Move,
-                                    Target = maxMoves[j - 1].Target,
-                                    ZMove = false
-                                });
+                                    canMove.Add(new MoveOption
+                                    {
+                                        Slot = j,
+                                        Move = maxMoves[j - 1].Move,
+                                        Target = maxMoves[j - 1].Target,
+                                        ZMove = false
+                                    });
+                                }
                             }
                         }
-                    }
-                    else if (active.Moves is List<PokemonMoveData> movesList)
-                    {
-                        for (int j = 1; j <= movesList.Count; j++)
+                        else if (active.Moves is { } movesList)
                         {
-                            if (!movesList[j - 1].Disabled)
+                            for (var j = 1; j <= movesList.Count; j++)
                             {
-                                canMove.Add(new MoveOption
+                                if (!(movesList[j - 1].Disabled ?? false))
                                 {
-                                    Slot = j,
-                                    Move = movesList[j - 1].Move,
-                                    Target = movesList[j - 1].Target,
-                                    ZMove = false
-                                });
+                                    canMove.Add(new MoveOption
+                                    {
+                                        Slot = j,
+                                        Move = movesList[j - 1].Move,
+                                        Target = (movesList[j - 1].Target ?? string.Empty),
+                                        ZMove = false
+                                    });
+                                }
                             }
                         }
-                    }
 
-                    // Add Z-move options if available
-                    if (canZMove && active.CanZMove is not null)
-                    {
-                        Dictionary<string, object>? zMoveDict = null;
-                        if (active.CanZMove is Dictionary<string, object> dict)
+                        // Add Z-move options if available
+                        if (canZMove && active.CanZMove is not null)
                         {
-                            zMoveDict = dict;
-                        }
-                        else if (active.CanZMove is AnyObject anyObj)
-                        {
-                            zMoveDict = anyObj as Dictionary<string, object>;
-                            if (zMoveDict == null && anyObj is not null)
+                            Dictionary<string, object>? zMoveDict = null;
+                            if (active.CanZMove is Dictionary<string, object> dict)
                             {
-                                zMoveDict = new Dictionary<string, object>(anyObj);
+                                zMoveDict = dict;
                             }
-                        }
-                        if (zMoveDict != null)
-                        {
-                            var zMoves = ZMoveCollection.FromExtraData(zMoveDict);
-                            for (int j = 1; j <= zMoves.Count; j++)
+                            else if (active.CanZMove is { } anyObj)
                             {
-                                if (zMoves[j - 1] != null)
+                                zMoveDict = anyObj;
+                            }
+                            if (zMoveDict != null)
+                            {
+                                var zMoves = ZMoveCollection.FromExtraData(zMoveDict);
+                                for (var j = 1; j <= zMoves.Count; j++)
                                 {
                                     canMove.Add(new MoveOption
                                     {
@@ -243,128 +237,125 @@ namespace ApogeeVGC_CS
                                 }
                             }
                         }
-                    }
 
-                    // Handle ally targeting logic in multi-battles
-                    bool hasAlly = pokemon.Count > 1 && !pokemon[i ^ 1].Condition.EndsWith(" fnt");
-                    var filtered = canMove.Where(m => m.Target != "adjacentAlly" || hasAlly).ToList();
-                    canMove = filtered.Count > 0 ? filtered : canMove;
+                        // Handle ally targeting logic in multi-battles
+                        bool hasAlly = pokemon.Count > 1 && !pokemon[i ^ 1].Condition.EndsWith(" fnt");
+                        var filtered = canMove.Where(m => m.Target != "adjacentAlly" || hasAlly).ToList();
+                        canMove = filtered.Count > 0 ? filtered : canMove;
 
-                    // Build move choices with proper targeting
-                    var moves = new List<ChooseMoveOption>();
-                    foreach (var m in canMove)
-                    {
-                        string moveChoice = $"move {m.Slot}";
-
-                        if (moveRequest.Active.Count > 1)
+                        // Build move choices with proper targeting
+                        var moves = new List<ChooseMoveOption>();
+                        foreach (var m in canMove)
                         {
-                            // Add targeting for multi-battles
-                            if (new[] { "normal", "any", "adjacentFoe" }.Contains(m.Target))
+                            var moveChoice = $"move {m.Slot}";
+
+                            if (moveRequest.Active.Count > 1)
                             {
-                                moveChoice += $" {1 + Prng.Random(2)}";
-                            }
-                            if (m.Target == "adjacentAlly")
-                            {
-                                moveChoice += $" -{(i ^ 1) + 1}";
-                            }
-                            if (m.Target == "adjacentAllyOrSelf")
-                            {
-                                if (hasAlly)
+                                // Add targeting for multi-battles
+                                if (new[] { "normal", "any", "adjacentFoe" }.Contains(m.Target))
                                 {
-                                    moveChoice += $" -{1 + Prng.Random(2)}";
+                                    moveChoice += $" {1 + Prng.Random(2)}";
+                                }
+                                switch (m.Target)
+                                {
+                                    case "adjacentAlly":
+                                        moveChoice += $" -{(i ^ 1) + 1}";
+                                        break;
+                                    case "adjacentAllyOrSelf" when hasAlly:
+                                        moveChoice += $" -{1 + Prng.Random(2)}";
+                                        break;
+                                    case "adjacentAllyOrSelf":
+                                        moveChoice += $" -{i + 1}";
+                                        break;
+                                }
+                            }
+
+                            if (m.ZMove) moveChoice += " zmove";
+
+                            moves.Add(new ChooseMoveOption
+                            {
+                                Choice = moveChoice,
+                                Move = m
+                            });
+                        }
+
+                        // Find valid switch targets
+                        var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
+                            !pokemon[j - 1].Active &&
+                            !chosen.Contains(j) &&
+                            !pokemon[j - 1].Condition.EndsWith(" fnt")
+                        ).ToList();
+
+                        // Decide whether to switch or use move
+                        var switches = (active.Trapped ?? false) ? [] : canSwitch;
+
+                        if (switches.Count > 0 && (moves.Count == 0 || Prng.Random() > Move))
+                        {
+                            // Choose to switch
+                            var switchOptions = canSwitch.Select(slot => new SwitchOption
+                            {
+                                Slot = slot,
+                                Pokemon = pokemon[slot - 1]
+                            }).ToList();
+
+                            var target = ChooseSwitch(switchOptions);
+                            chosen.Add(target);
+                            choices.Add($"switch {target}");
+                        }
+                        else if (moves.Count > 0)
+                        {
+                            // Choose to use a move
+                            var move = ChooseMove(moves);
+
+                            // Handle special move mechanics
+                            if (move.EndsWith(" zmove"))
+                            {
+                                canZMove = false;
+                                choices.Add(move);
+                            }
+                            else if (change)
+                            {
+                                if (canTerastallize)
+                                {
+                                    canTerastallize = false;
+                                    choices.Add($"{move} terastallize");
+                                }
+                                else if (canDynamax)
+                                {
+                                    canDynamax = false;
+                                    choices.Add($"{move} dynamax");
+                                }
+                                else if (canMegaEvo)
+                                {
+                                    canMegaEvo = false;
+                                    choices.Add($"{move} mega");
                                 }
                                 else
                                 {
-                                    moveChoice += $" -{i + 1}";
+                                    canUltraBurst = false;
+                                    choices.Add($"{move} ultra");
                                 }
-                            }
-                        }
-
-                        if (m.ZMove) moveChoice += " zmove";
-
-                        moves.Add(new ChooseMoveOption
-                        {
-                            Choice = moveChoice,
-                            Move = m
-                        });
-                    }
-
-                    // Find valid switch targets
-                    var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
-                        pokemon[j - 1] != null &&
-                        !pokemon[j - 1].Active &&
-                        !chosen.Contains(j) &&
-                        !pokemon[j - 1].Condition.EndsWith(" fnt")
-                    ).ToList();
-
-                    // Decide whether to switch or use move
-                    var switches = (active.Trapped ?? false) ? [] : canSwitch;
-
-                    if (switches.Count > 0 && (moves.Count == 0 || Prng.Random() > Move))
-                    {
-                        // Choose to switch
-                        var switchOptions = canSwitch.Select(slot => new SwitchOption
-                        {
-                            Slot = slot,
-                            Pokemon = pokemon[slot - 1]
-                        }).ToList();
-
-                        var target = ChooseSwitch(switchOptions);
-                        chosen.Add(target);
-                        choices.Add($"switch {target}");
-                    }
-                    else if (moves.Count > 0)
-                    {
-                        // Choose to use a move
-                        var move = ChooseMove(moves);
-
-                        // Handle special move mechanics
-                        if (move.EndsWith(" zmove"))
-                        {
-                            canZMove = false;
-                            choices.Add(move);
-                        }
-                        else if (change)
-                        {
-                            if (canTerastallize)
-                            {
-                                canTerastallize = false;
-                                choices.Add($"{move} terastallize");
-                            }
-                            else if (canDynamax)
-                            {
-                                canDynamax = false;
-                                choices.Add($"{move} dynamax");
-                            }
-                            else if (canMegaEvo)
-                            {
-                                canMegaEvo = false;
-                                choices.Add($"{move} mega");
                             }
                             else
                             {
-                                canUltraBurst = false;
-                                choices.Add($"{move} ultra");
+                                choices.Add(move);
                             }
                         }
                         else
                         {
-                            choices.Add(move);
+                            // No valid moves or switches
+                            throw new Exception(
+                                $"{GetType().Name} unable to make choice {i}. " +
+                                $"request = '{request.GetType()}', chosen = '{string.Join(",", chosen)}', " +
+                                $"(mega = {canMegaEvo}, ultra = {canUltraBurst}, zmove = {canZMove}, " +
+                                $"dynamax = '{canDynamax}', terastallize = {canTerastallize})"
+                            );
                         }
                     }
-                    else
-                    {
-                        // No valid moves or switches
-                        throw new Exception(
-                            $"{GetType().Name} unable to make choice {i}. " +
-                            $"request = '{request.GetType()}', chosen = '{string.Join(",", chosen)}', " +
-                            $"(mega = {canMegaEvo}, ultra = {canUltraBurst}, zmove = {canZMove}, " +
-                            $"dynamax = '{canDynamax}', terastallize = {canTerastallize})"
-                        );
-                    }
-                }
 
-                Choose(string.Join(", ", choices));
+                    Choose(string.Join(", ", choices));
+                    break;
+                }
             }
         }
 
@@ -372,11 +363,22 @@ namespace ApogeeVGC_CS
         protected new virtual void Choose(string choice)
         {
             // Send the choice to the battle stream
-            // Implementation depends on how BattlePlayer communicates with the battle
-            // This might involve writing to the Stream property
-            byte[] choiceBytes = System.Text.Encoding.UTF8.GetBytes(choice + "\n");
-            Stream.Write(choiceBytes, 0, choiceBytes.Length);
-            Stream.Flush();
+            // Use the same logic as the base BattlePlayer Choose method
+            var choiceBytes = System.Text.Encoding.UTF8.GetBytes(choice + "\n");
+            
+            switch (Stream)
+            {
+                case ObjectReadWriteStream<string> readWriteStream:
+                    // For synchronous operation, we need to block on the async method
+                    Task.Run(async () => await readWriteStream.WriteAsync(choice)).Wait();
+                    break;
+                case System.IO.Stream netStream:
+                    netStream.Write(choiceBytes, 0, choiceBytes.Length);
+                    netStream.Flush();
+                    break;
+                default:
+                    throw new NotSupportedException($"Unsupported stream type for writing: {Stream.GetType()}");
+            }
         }
 
         protected virtual string ChooseTeamPreview(List<AnyObject> team)

@@ -1,4 +1,7 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ApogeeVGC_CS.sim
 {
     public class PokemonSet
     {
@@ -187,7 +190,164 @@
     {
         public static string Pack(List<PokemonSet>? team = null)
         {
-            throw new NotImplementedException();
+            if (team == null || team.Count == 0) return string.Empty;
+
+            // Helper function to get IV value (empty string if 31 or default)
+            string GetIv(StatsTable ivs, StatId stat)
+            {
+                int value = ivs.GetStat(stat);
+                return value == 31 ? string.Empty : value.ToString();
+            }
+
+            var buf = new StringBuilder();
+
+            foreach (var set in team)
+            {
+                if (buf.Length > 0) buf.Append(']');
+
+                // name
+                buf.Append(set.Name ?? set.Species);
+
+                // species
+                var id = PackName(set.Species ?? set.Name);
+                var nameId = PackName(set.Name ?? set.Species);
+                buf.Append($"|{(nameId == id ? string.Empty : id)}");
+
+                // item
+                buf.Append($"|{PackName(set.Item)}");
+
+                // ability
+                buf.Append($"|{PackName(set.Ability)}");
+
+                // moves
+                buf.Append("|");
+                buf.Append(string.Join(",", set.Moves.Select(PackName)));
+
+                // nature
+                buf.Append($"|{set.Nature ?? string.Empty}");
+
+                // evs
+                string evs = "|";
+                if (set.Evs != null)
+                {
+                    var evValues = new[]
+                    {
+                set.Evs.Hp == 0 ? string.Empty : set.Evs.Hp.ToString(),
+                set.Evs.Atk == 0 ? string.Empty : set.Evs.Atk.ToString(),
+                set.Evs.Def == 0 ? string.Empty : set.Evs.Def.ToString(),
+                set.Evs.Spa == 0 ? string.Empty : set.Evs.Spa.ToString(),
+                set.Evs.Spd == 0 ? string.Empty : set.Evs.Spd.ToString(),
+                set.Evs.Spe == 0 ? string.Empty : set.Evs.Spe.ToString()
+            };
+                    evs = $"|{string.Join(",", evValues)}";
+                }
+
+                if (evs == "|,,,,,")
+                {
+                    buf.Append("|");
+                }
+                else
+                {
+                    buf.Append(evs);
+                }
+
+                // gender
+                if (set.Gender != GenderName.Empty && set.Gender != default(GenderName))
+                {
+                    buf.Append($"|{set.Gender}");
+                }
+                else
+                {
+                    buf.Append("|");
+                }
+
+                // ivs
+                string ivs = "|";
+                if (set.Ivs != null)
+                {
+                    var ivValues = new[]
+                    {
+                GetIv(set.Ivs, StatId.Hp),
+                GetIv(set.Ivs, StatId.Atk),
+                GetIv(set.Ivs, StatId.Def),
+                GetIv(set.Ivs, StatId.Spa),
+                GetIv(set.Ivs, StatId.Spd),
+                GetIv(set.Ivs, StatId.Spe)
+            };
+                    ivs = $"|{string.Join(",", ivValues)}";
+                }
+
+                if (ivs == "|,,,,,")
+                {
+                    buf.Append("|");
+                }
+                else
+                {
+                    buf.Append(ivs);
+                }
+
+                // shiny
+                if (set.Shiny == true)
+                {
+                    buf.Append("|S");
+                }
+                else
+                {
+                    buf.Append("|");
+                }
+
+                // level
+                if (set.Level != 100)
+                {
+                    buf.Append($"|{set.Level}");
+                }
+                else
+                {
+                    buf.Append("|");
+                }
+
+                // happiness
+                if (set.Happiness.HasValue && set.Happiness.Value != 255)
+                {
+                    buf.Append($"|{set.Happiness.Value}");
+                }
+                else
+                {
+                    buf.Append("|");
+                }
+
+                // Extended data (comma-separated after happiness)
+                bool hasExtendedData = !string.IsNullOrEmpty(set.Pokeball) ||
+                                      set.HpType.HasValue ||
+                                      set.Gigantamax == true ||
+                                      (set.DynamaxLevel.HasValue && set.DynamaxLevel.Value != 10) ||
+                                      set.TeraType.HasValue;
+
+                if (hasExtendedData)
+                {
+                    // HP Type
+                    buf.Append($",{set.HpType?.ToString() ?? string.Empty}");
+
+                    // Pokeball
+                    buf.Append($",{PackName(set.Pokeball ?? string.Empty)}");
+
+                    // Gigantamax
+                    buf.Append($",{(set.Gigantamax == true ? "G" : string.Empty)}");
+
+                    // Dynamax Level
+                    string dynamaxLevel = string.Empty;
+                    if (set.DynamaxLevel.HasValue && set.DynamaxLevel.Value != 10)
+                    {
+                        dynamaxLevel = set.DynamaxLevel.Value.ToString();
+                    }
+                    buf.Append($",{dynamaxLevel}");
+
+                    // Tera Type
+                    buf.Append($",{set.TeraType?.ToString() ?? string.Empty}");
+                }
+            }
+
+            return buf.ToString();
         }
 
         public static List<PokemonSet>? Unpack(string buf)
@@ -197,7 +357,13 @@
 
         public static string PackName(string? name = null)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(name)) return string.Empty;
+
+            // Convert to lowercase and remove non-alphanumeric characters
+            // This should match the ID conversion logic used elsewhere in the codebase
+            return new string(name.ToLowerInvariant()
+                .Where(c => char.IsLetterOrDigit(c))
+                .ToArray());
         }
 
         public static string? UnpackName(string? name, Func<string, AnyObject>? dexTable = null)

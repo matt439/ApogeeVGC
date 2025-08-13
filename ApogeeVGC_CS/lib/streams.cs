@@ -576,7 +576,7 @@ namespace ApogeeVGC_CS.lib
             IsWritable = true;
             Encoding = BufferEncoding.Utf8;
             NetWritableStream = null;
-            _drainWaiters = new List<TaskCompletionSource>();
+            _drainWaiters = [];
 
             // Process options
             WriteStreamOptions options;
@@ -982,7 +982,8 @@ namespace ApogeeVGC_CS.lib
 
         private bool ShouldApplyBackpressure()
         {
-            // In a real implementation, check if the underlying stream's buffer is full
+            // In a real implementation, you'd check if the underlying stream's buffer is full
+            // For now, this is a placeholder
             return false;
         }
 
@@ -1092,7 +1093,8 @@ namespace ApogeeVGC_CS.lib
         public bool IsWritable { get; } = false;
         public Stream? NodeReadableStream { get; private set; }
 
-        public ObjectReadStream(List<T> buffer, Queue<Exception> errorBuffer, Task nextPush, object? optionsOrStreamLike = null)
+        public ObjectReadStream(List<T> buffer, Queue<Exception> errorBuffer, Task nextPush,
+            object? optionsOrStreamLike = null)
         {
             _buffer = [];
             _errorBuffer = new Queue<Exception>();
@@ -1815,5 +1817,320 @@ namespace ApogeeVGC_CS.lib
             /// </summary>
             public Func<ObjectWriteStream<T>, Task>? WriteEnd { get; set; }
         }
+    }
+
+
+    /// <summary>
+    /// Configuration options for ObjectReadWriteStream initialization.
+    /// Provides customizable handlers for read and write operations.
+    /// </summary>
+    /// <typeparam name="T">The type of objects in the stream</typeparam>
+    public class ObjectReadWriteStreamOptions<T>
+    {
+        /// <summary>
+        /// Optional custom read function.
+        /// </summary>
+        public Func<ObjectReadStream<T>, Task>? Read { get; set; }
+
+        /// <summary>
+        /// Optional custom pause function.
+        /// </summary>
+        public Func<ObjectReadStream<T>, Task>? Pause { get; set; }
+
+        /// <summary>
+        /// Optional custom destroy function.
+        /// </summary>
+        public Func<ObjectReadStream<T>, Task>? Destroy { get; set; }
+
+        /// <summary>
+        /// Optional custom write function that handles individual elements.
+        /// </summary>
+        public Func<ObjectReadStream<T>.ObjectWriteStream<T>, T, Task>? Write { get; set; }
+
+        /// <summary>
+        /// Optional custom write end function that handles stream finalization.
+        /// </summary>
+        public Func<Task>? WriteEnd { get; set; }
+
+        /// <summary>
+        /// Optional .NET Stream to wrap for writing operations.
+        /// </summary>
+        public Stream? NodeWritableStream { get; set; }
+
+        /// <summary>
+        /// Initial buffer of objects for reading.
+        /// </summary>
+        public T[]? Buffer { get; set; }
+    }
+
+
+
+    /// <summary>
+    /// A duplex stream that supports both reading and writing of typed objects.
+    /// Combines the functionality of ObjectReadStream and ObjectWriteStream.
+    /// </summary>
+    /// <typeparam name="T">The type of objects in the stream</typeparam>
+    public class ObjectReadWriteStream<T> : ObjectReadStream<T>, IAsyncDisposable
+    {
+        private readonly Func<ObjectWriteStream<T>, T, Task>? _customWrite;
+        private readonly Func<Task>? _customWriteEnd;
+        private readonly List<TaskCompletionSource> _drainWaiters;
+        private bool _disposed;
+
+        // Override to ensure both are true for duplex streams
+        public new bool IsReadable { get; } = true;
+        public new bool IsWritable { get; private set; } = true;
+        public Stream? NodeWritableStream { get; private set; }
+
+        /// <summary>
+        /// Creates a new ObjectReadWriteStream (duplex stream).
+        /// </summary>
+        /// <param name="options">Configuration options for the duplex stream</param>
+        public ObjectReadWriteStream(ObjectReadWriteStreamOptions<T>? options = null)
+            : base(CreateReadStreamOptions(options), new Queue<Exception>(), Task.CompletedTask)
+        {
+            _drainWaiters = new List<TaskCompletionSource>();
+            options ??= new ObjectReadWriteStreamOptions<T>();
+
+            // Set up writable stream integration
+            if (options.NodeWritableStream != null)
+            {
+                NodeWritableStream = options.NodeWritableStream;
+                SetupWritableStreamHandling(options);
+            }
+
+            // Apply custom handlers
+            _customWrite = options.Write;
+            _customWriteEnd = options.WriteEnd;
+
+            // Initialize buffer if provided
+            if (options.Buffer != null)
+            {
+                foreach (var item in options.Buffer)
+                {
+                    Push(item);
+                }
+                PushEnd();
+            }
+        }
+
+        #region Write Operations
+
+        /// <summary>
+        /// Writes an element to the stream. If element is null/default, ends the stream.
+        /// </summary>
+        /// <param name="element">The element to write, or null to end the stream</param>
+        /// <returns>Task representing the async write operation</returns>
+        public async Task WriteAsync(T? element)
+        {
+            if (!IsWritable)
+                throw new InvalidOperationException("Stream is not writable");
+
+            if (element == null || element.Equals(default(T)))
+            {
+                await WriteEndAsync();
+                return;
+            }
+
+            await WriteInternalAsync(element);
+        }
+
+        /// <summary>
+        /// Virtual method for custom write implementation.
+        /// Should be overridden by subclasses to provide actual write logic.
+        /// </summary>
+        /// <param name="element">The element to write</param>
+        /// <returns>Task representing the async write operation</returns>
+        protected virtual async Task WriteInternalAsync(T element)
+        {
+            if (_customWrite != null)
+            {
+                // Create a temporary ObjectWriteStream wrapper for the callback
+                var writeStream = new ObjectWriteStream<T>();
+                await _customWrite(writeStream, element);
+            }
+            else if (NodeWritableStream != null)
+            {
+                // Default behavior: write to underlying stream
+                byte[] bytes = SerializeElement(element);
+                await NodeWritableStream.WriteAsync(bytes);
+                await NodeWritableStream.FlushAsync();
+
+                // Handle backpressure if needed
+                if (ShouldApplyBackpressure())
+                {
+                    await WaitForDrainAsync();
+                }
+            }
+            else
+            {
+                throw new NotImplementedException(
+                    "ObjectReadWriteStream needs to be subclassed and the WriteInternalAsync method needs to be implemented.");
+            }
+        }
+
+        /// <summary>
+        /// Virtual method for custom writeEnd implementation.
+        /// In a ReadWriteStream, this only affects the write side.
+        /// </summary>
+        /// <returns>Task representing the async end operation</returns>
+        protected virtual async Task WriteEndInternalAsync()
+        {
+            if (_customWriteEnd != null)
+            {
+                await _customWriteEnd();
+            }
+            else if (NodeWritableStream != null && !IsStandardStream(NodeWritableStream))
+            {
+                await NodeWritableStream.FlushAsync();
+                NodeWritableStream.Close();
+            }
+        }
+
+        /// <summary>
+        /// Ends the write side of the stream, optionally writing a final element.
+        /// </summary>
+        /// <param name="element">Optional final element to write before ending</param>
+        /// <returns>Task representing the async end operation</returns>
+        public async Task WriteEndAsync(T? element = default)
+        {
+            if (element != null && !element.Equals(default(T)))
+            {
+                await WriteAsync(element);
+            }
+
+            await WriteEndInternalAsync();
+            IsWritable = false;
+        }
+
+        #endregion
+
+        #region Read Operations Override
+
+        /// <summary>
+        /// In a ReadWriteStream, ReadInternalAsync does not need to be implemented,
+        /// because it's valid for the read stream buffer to be filled only by WriteInternalAsync.
+        /// </summary>
+        /// <param name="size">Number of elements to read (ignored in duplex streams)</param>
+        /// <returns>Completed task</returns>
+        protected override Task ReadInternalAsync(int size = 0)
+        {
+            // In duplex streams, reading can be fulfilled by writes, so no implementation needed
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private static List<T> CreateReadStreamOptions(ObjectReadWriteStreamOptions<T>? options)
+        {
+            List<T> buffer = new List<T>();
+            
+            if (options?.Buffer != null)
+            {
+                buffer.AddRange(options.Buffer);
+            }
+            
+            return buffer;
+        }
+
+        private void SetupWritableStreamHandling(ObjectReadWriteStreamOptions<T> options)
+        {
+            if (NodeWritableStream == null) return;
+
+            // Set up default write behavior if not provided
+            options.Write ??= async (writeStream, data) =>
+            {
+                byte[] bytes = SerializeElement(data);
+                await NodeWritableStream.WriteAsync(bytes);
+                await NodeWritableStream.FlushAsync();
+
+                if (ShouldApplyBackpressure())
+                {
+                    await WaitForDrainAsync();
+                }
+            };
+
+            // Set up writeEnd behavior for non-standard streams
+            if (!IsStandardStream(NodeWritableStream))
+            {
+                options.WriteEnd ??= async () =>
+                {
+                    await NodeWritableStream.FlushAsync();
+                    NodeWritableStream.Close();
+                };
+            }
+        }
+
+        private byte[] SerializeElement(T element)
+        {
+            if (element is string str)
+                return System.Text.Encoding.UTF8.GetBytes(str + Environment.NewLine);
+
+            if (element is byte[] bytes)
+                return bytes;
+
+            // Use System.Text.Json for complex objects
+            string json = System.Text.Json.JsonSerializer.Serialize(element);
+            return System.Text.Encoding.UTF8.GetBytes(json + Environment.NewLine);
+        }
+
+        private bool ShouldApplyBackpressure()
+        {
+            // In a real implementation, check if the underlying stream's buffer is full
+            return false;
+        }
+
+        private async Task WaitForDrainAsync()
+        {
+            var tcs = new TaskCompletionSource();
+            _drainWaiters.Add(tcs);
+
+            // Simulate drain handling
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(10); // Simulate brief wait
+                ResolveDrainWaiters();
+            });
+
+            await tcs.Task;
+        }
+
+        private void ResolveDrainWaiters()
+        {
+            foreach (var waiter in _drainWaiters)
+            {
+                waiter.SetResult();
+            }
+            _drainWaiters.Clear();
+        }
+
+        private static bool IsStandardStream(Stream stream)
+        {
+            return stream == Console.OpenStandardOutput() ||
+                   stream == Console.OpenStandardError() ||
+                   stream == Console.OpenStandardInput();
+        }
+
+        #endregion
+
+        #region Disposal
+
+        public async ValueTask DisposeAsync()
+        {
+            if (!_disposed)
+            {
+                if (IsWritable)
+                    await WriteEndAsync();
+
+                await DestroyAsync();
+                NodeWritableStream?.Dispose();
+                _disposed = true;
+                IsWritable = false;
+            }
+        }
+
+        #endregion
     }
 }
