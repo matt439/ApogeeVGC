@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using ApogeeVGC_CS.data;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -701,7 +702,15 @@ namespace ApogeeVGC_CS.sim
 
         public Format Get(string? name = null, bool isTrusted = false)
         {
-            throw new NotImplementedException();
+            
+            if (string.IsNullOrEmpty(name))
+            {
+                return Rulesets.FormatData[Rulesets.DefaultFormat] ??
+                       throw new KeyNotFoundException($"Format '{name}' not found.");
+            }
+
+            return Rulesets.FormatData[new IdEntry(name)] ??
+                   throw new KeyNotFoundException($"Format '{name}' not found.");
         }
 
         public Format Get(Format format, bool isTrusted = false)
@@ -721,7 +730,22 @@ namespace ApogeeVGC_CS.sim
 
         public RuleTable GetRuleTable(Format format, int depth = 1, Dictionary<string, int>? repeals = null)
         {
-            throw new NotImplementedException("GetRuleTable method is not implemented yet.");
+            //TODO: Properly implement this method to return a RuleTable based on the format and depth.
+
+            return new RuleTable
+            {
+                ComplexBans = null,
+                ComplexTeamBans = null,
+                TagRules = null,
+                ValueRules = null,
+                MinTeamSize = 4,
+                MaxTeamSize = 6,
+                MaxMoveCount = 0,
+                MinSourceGen = 0,
+                MinLevel = 50,
+                MaxLevel = 50,
+                DefaultLevel = 50
+            };
         }
 
         public ValidateRuleReturn ValidateRule(string rule, Format? format = null)

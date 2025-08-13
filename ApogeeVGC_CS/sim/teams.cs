@@ -199,9 +199,9 @@ namespace ApogeeVGC_CS.sim
                 return value == 31 ? string.Empty : value.ToString();
             }
 
-            var buf = new StringBuilder();
+            StringBuilder buf = new StringBuilder();
 
-            foreach (var set in team)
+            foreach (PokemonSet set in team)
             {
                 if (buf.Length > 0) buf.Append(']');
 
@@ -209,8 +209,8 @@ namespace ApogeeVGC_CS.sim
                 buf.Append(set.Name ?? set.Species);
 
                 // species
-                var id = PackName(set.Species ?? set.Name);
-                var nameId = PackName(set.Name ?? set.Species);
+                string id = PackName(set.Species ?? set.Name);
+                string nameId = PackName(set.Name ?? set.Species);
                 buf.Append($"|{(nameId == id ? string.Empty : id)}");
 
                 // item
@@ -230,7 +230,7 @@ namespace ApogeeVGC_CS.sim
                 string evs = "|";
                 if (set.Evs != null)
                 {
-                    var evValues = new[]
+                    string[] evValues = new[]
                     {
                 set.Evs.Hp == 0 ? string.Empty : set.Evs.Hp.ToString(),
                 set.Evs.Atk == 0 ? string.Empty : set.Evs.Atk.ToString(),
@@ -265,7 +265,7 @@ namespace ApogeeVGC_CS.sim
                 string ivs = "|";
                 if (set.Ivs != null)
                 {
-                    var ivValues = new[]
+                    string[] ivValues = new[]
                     {
                 GetIv(set.Ivs, StatId.Hp),
                 GetIv(set.Ivs, StatId.Atk),

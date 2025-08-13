@@ -50,7 +50,7 @@ namespace ApogeeVGC_CS.lib
         /// </summary>
         public Buffer(Buffer buffer)
         {
-            var bytes = new byte[buffer.Length];
+            byte[] bytes = new byte[buffer.Length];
             buffer.CopyTo(bytes);
             _memory = new Memory<byte>(bytes);
         }
@@ -138,10 +138,10 @@ namespace ApogeeVGC_CS.lib
             }
 
             int length = totalLength ?? list.Sum(b => b.Length);
-            var result = new byte[length];
-            var offset = 0;
+            byte[] result = new byte[length];
+            int offset = 0;
 
-            foreach (var buffer in list)
+            foreach (Buffer buffer in list)
             {
                 buffer.CopyTo(result, offset);
                 offset += buffer.Length;
@@ -163,7 +163,7 @@ namespace ApogeeVGC_CS.lib
         /// </summary>
         public static Buffer Alloc(int size, object? fill = null, BufferEncoding encoding = BufferEncoding.Utf8)
         {
-            var buffer = new Buffer(size);
+            Buffer buffer = new Buffer(size);
 
             if (fill != null)
             {
@@ -320,7 +320,7 @@ namespace ApogeeVGC_CS.lib
         public Buffer Fill(object value, int offset = 0, int? end = null, BufferEncoding encoding = BufferEncoding.Utf8)
         {
             int actualEnd = end ?? Length;
-            var targetSpan = _memory.Slice(offset, actualEnd - offset).Span;
+            Span<byte> targetSpan = _memory.Slice(offset, actualEnd - offset).Span;
 
             switch (value)
             {
@@ -330,7 +330,7 @@ namespace ApogeeVGC_CS.lib
                 case string strValue:
                 {
                     byte[] bytes = GetBytesFromString(strValue, encoding);
-                    for (var i = 0; i < targetSpan.Length; i++)
+                    for (int i = 0; i < targetSpan.Length; i++)
                     {
                         targetSpan[i] = bytes[i % bytes.Length];
                     }
@@ -339,7 +339,7 @@ namespace ApogeeVGC_CS.lib
                 }
                 case Buffer bufValue:
                 {
-                    for (var i = 0; i < targetSpan.Length; i++)
+                    for (int i = 0; i < targetSpan.Length; i++)
                     {
                         targetSpan[i] = bufValue[i % bufValue.Length];
                     }
@@ -364,7 +364,7 @@ namespace ApogeeVGC_CS.lib
         // IEnumerable implementation
         public IEnumerator<byte> GetEnumerator()
         {
-            for (var i = 0; i < Length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 yield return this[i];
             }

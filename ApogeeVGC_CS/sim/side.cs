@@ -1,4 +1,5 @@
-﻿using ApogeeVGC_CS.sim.tools;
+﻿using System.Text.Json;
+using ApogeeVGC_CS.sim.tools;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -143,7 +144,7 @@ namespace ApogeeVGC_CS.sim
         public required List<bool> ForceSwitch { get; init; }
         public required SideRequestData Side { get; init; }
         public bool? NoCancel { get; init; }
-        public bool? Update { get; init; }
+        public bool? Update { get; set; }
     }
 
     public class TeamPreviewRequest : IChoiceRequest
@@ -165,7 +166,7 @@ namespace ApogeeVGC_CS.sim
         public required SideRequestData Side { get; init; }
         public SideRequestData? Ally { get; init; }
         public bool? NoCancel { get; init; }
-        public bool? Update { get; init; }
+        public bool? Update { get; set; }
     }
 
     public class WaitRequest : IChoiceRequest
@@ -216,7 +217,7 @@ namespace ApogeeVGC_CS.sim
         public required Dictionary<string, EffectState> SideConditions { get; init; }
         public required List<Dictionary<string, EffectState>> SlotConditions { get; init; }
 
-        public IChoiceRequest? ActiveRequest { get; init; }
+        public IChoiceRequest? ActiveRequest { get; set; }
         public required Choice Choice { get; init; }
 
         public Move? LastMove { get; init; } // Gen 1 tracking
@@ -235,7 +236,7 @@ namespace ApogeeVGC_CS.sim
             Team = team;
             Pokemon = [];
 
-            foreach (var set in Team)
+            foreach (PokemonSet set in Team)
             {
                 AddPokemon(set);
             }
@@ -259,7 +260,7 @@ namespace ApogeeVGC_CS.sim
             SlotConditions = [];
 
             // Initialize slot conditions for each active slot
-            for (var i = 0; i < Active.Count; i++)
+            for (int i = 0; i < Active.Count; i++)
             {
                 SlotConditions.Add(new Dictionary<string, EffectState>());
             }
@@ -462,14 +463,34 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException("Send method is not implemented yet.");
         }
 
-        public void EmitRequest(IChoiceRequest update)
+        public void EmitRequest(IChoiceRequest? update = null, bool updatedRequest = false)
         {
-            throw new NotImplementedException("EmitRequest method is not implemented yet.");
-        }
+            // Use provided update or fall back to activeRequest
+            update ??= ActiveRequest;
 
-        public void EmitRequest()
-        {
-            EmitRequest(ActiveRequest!);
+            if (update == null)
+                throw new InvalidOperationException("No request to emit");
+
+            // Set update flag if this is an updated request and the request type supports it
+            if (updatedRequest)
+            {
+                switch (update)
+                {
+                    case MoveRequest moveRequest:
+                        moveRequest.Update = true;
+                        break;
+                    case SwitchRequest switchRequest:
+                        switchRequest.Update = true;
+                        break;
+                }
+            }
+
+            // Send the battle update with JSON serialized request
+            string jsonRequest = JsonSerializer.Serialize(update);
+            Battle.Send("sideupdate", $"{Id}\n|request|{jsonRequest}");
+
+            // Update the active request
+            ActiveRequest = update;
         }
 
         public void EmitChoiceError(string message, Pokemon? pokemon = null,

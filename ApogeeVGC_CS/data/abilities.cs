@@ -87,7 +87,7 @@ namespace ApogeeVGC_CS.data
                 OnSourceAfterFaint = (battle, length, target, source, effect) =>
                 {
                     if (effect?.EffectType != EffectType.Move) return;
-                    var boosts = new SparseBoostsTable
+                    SparseBoostsTable boosts = new SparseBoostsTable
                     {
                         [BoostId.Atk] = length
                     };
@@ -244,7 +244,7 @@ namespace ApogeeVGC_CS.data
                     }
                     else
                     {
-                        var quarkDriveVolatile = target.GetVolatile("quarkdrive");
+                        IEffect? quarkDriveVolatile = target.GetVolatile("quarkdrive");
                         if (quarkDriveVolatile?.ExtraData.ContainsKey("fromBooster") != true ||
                             !(bool)quarkDriveVolatile.ExtraData["fromBooster"])
                         {
@@ -270,7 +270,7 @@ namespace ApogeeVGC_CS.data
                     NoCopy = true,
                     OnStart = (battle, pokemon, source, effect) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
                         if (effectState == null) return null;
 
                         if (effect?.Name == "Booster Energy")
@@ -284,7 +284,7 @@ namespace ApogeeVGC_CS.data
                             battle.Add("-activate", pokemon, "ability: Quark Drive");
                         }
 
-                        var bestStat = pokemon.GetBestStat(false, true);
+                        StatIdExceptHp bestStat = pokemon.GetBestStat(false, true);
                         effectState.ExtraData ??= new Dictionary<string, object>();
                         effectState.ExtraData["bestStat"] = bestStat.ToString().ToLower();
                         battle.Add("-start", pokemon, $"quarkdrive{bestStat.ToString().ToLower()}");
@@ -293,8 +293,8 @@ namespace ApogeeVGC_CS.data
                     OnModifyAtkPriority = 5,
                     OnModifyAtk = (battle, atk, pokemon, defender, move) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
-                        var bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
+                        string? bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
 
                         if (bestStat != "atk" || pokemon.IgnoringAbility())
                             return atk;
@@ -306,8 +306,8 @@ namespace ApogeeVGC_CS.data
                     OnModifyDefPriority = 6,
                     OnModifyDef = (battle, def, pokemon, attacker, move) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
-                        var bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
+                        string? bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
 
                         if (bestStat != "def" || pokemon.IgnoringAbility())
                             return def;
@@ -319,8 +319,8 @@ namespace ApogeeVGC_CS.data
                     OnModifySpAPriority = 5,
                     OnModifySpA = (battle, spa, pokemon, defender, move) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
-                        var bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
+                        string? bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
 
                         if (bestStat != "spa" || pokemon.IgnoringAbility())
                             return spa;
@@ -332,8 +332,8 @@ namespace ApogeeVGC_CS.data
                     OnModifySpDPriority = 6,
                     OnModifySpD = (battle, spd, pokemon, attacker, move) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
-                        var bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
+                        string? bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
 
                         if (bestStat != "spd" || pokemon.IgnoringAbility())
                             return spd;
@@ -344,8 +344,8 @@ namespace ApogeeVGC_CS.data
                     },
                     OnModifySpe = (battle, spe, pokemon) =>
                     {
-                        var effectState = pokemon.GetVolatile("quarkdrive");
-                        var bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
+                        IEffect? effectState = pokemon.GetVolatile("quarkdrive");
+                        string? bestStat = effectState?.ExtraData?.GetValueOrDefault("bestStat") as string;
 
                         if (bestStat != "spe" || pokemon.IgnoringAbility())
                             return spe;

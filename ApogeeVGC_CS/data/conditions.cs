@@ -121,7 +121,7 @@ namespace ApogeeVGC_CS.data
                 {
                     // Decrement sleep counter (Early Bird halves sleep duration)
                     int decrement = pokemon.HasAbility("earlybird") ? 2 : 1;
-                    if (pokemon.StatusState.ExtraData.TryGetValue("time", out var timeObj) &&
+                    if (pokemon.StatusState.ExtraData.TryGetValue("time", out object? timeObj) &&
                                                                                 timeObj is int time)
                     {
                         time -= decrement;
@@ -273,7 +273,7 @@ namespace ApogeeVGC_CS.data
                 {
                     // Increment stage up to 15
                     int stage = 0;
-                    if (battle.EffectState.ExtraData.TryGetValue("stage", out var stageObj) && stageObj is int s)
+                    if (battle.EffectState.ExtraData.TryGetValue("stage", out object? stageObj) && stageObj is int s)
                         stage = s;
                     if (stage < 15) stage++;
                     battle.EffectState.ExtraData["stage"] = stage;
@@ -319,8 +319,8 @@ namespace ApogeeVGC_CS.data
                 OnBeforeMove = (battle, pokemon, target, move) =>
                 {
                     // Decrement confusion counter
-                    if (pokemon.Volatiles.TryGetValue("confusion", out var confusion) &&
-                        confusion.ExtraData.TryGetValue("time", out var timeObj) &&
+                    if (pokemon.Volatiles.TryGetValue("confusion", out EffectState? confusion) &&
+                        confusion.ExtraData.TryGetValue("time", out object? timeObj) &&
                         timeObj is int time)
                     {
                         time--;
@@ -340,7 +340,7 @@ namespace ApogeeVGC_CS.data
                     int damage = battle.Actions.GetConfusionDamage(pokemon, 40);
                     if (damage == 0)
                         throw new Exception("Confusion damage not dealt");
-                    var confusedMove = new ActiveMove
+                    ActiveMove? confusedMove = new ActiveMove
                     {
                         EffectType = EffectType.Move,
                         Type = PokemonType.Unknown,
@@ -398,7 +398,7 @@ namespace ApogeeVGC_CS.data
                 NoCopy = true,
                 OnStart = (battle, pokemon, source, sourceEffect) =>
                 {
-                    var activeMove = battle.ActiveMove ?? throw new Exception("Battle.ActiveMove is null");
+                    ActiveMove? activeMove = battle.ActiveMove ?? throw new Exception("Battle.ActiveMove is null");
                     if (activeMove.Id.IsEmpty || activeMove.HasBounced == true ||
                                                         activeMove.SourceEffect == "snatch")
                     {
@@ -409,13 +409,13 @@ namespace ApogeeVGC_CS.data
                 },
                 OnBeforeMove = (battle, pokemon, target, move) =>
                 {
-                    var item = pokemon.GetItem();
+                    Item? item = pokemon.GetItem();
                     if (item == null || (!item.IsChoice ?? false))
                     {
                         pokemon.RemoveVolatile("choicelock");
                         return true;
                     }
-                    var lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) 
+                    Id? lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) 
                         ? moveObj as Id
                         : Id.Empty;
                     if (pokemon.IgnoringItem() || pokemon.Volatiles.ContainsKey("dynamax") ||
@@ -428,8 +428,8 @@ namespace ApogeeVGC_CS.data
                 },
                 OnDisableMove = (battle, pokemon) =>
                 {
-                    var item = pokemon.GetItem();
-                    var lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) ? moveObj as Id : null;
+                    Item? item = pokemon.GetItem();
+                    Id? lockedMove = battle.EffectState.ExtraData.TryGetValue("move", out object? moveObj) ? moveObj as Id : null;
                     if ((!item.IsChoice ?? false) || pokemon.HasMove(lockedMove ?? Id.Empty) is null)
                     {
                         pokemon.RemoveVolatile("choicelock");
@@ -439,11 +439,11 @@ namespace ApogeeVGC_CS.data
                     {
                         return;
                     }
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot? moveSlot in pokemon.MoveSlots)
                     {
                         if (moveSlot.Id != lockedMove)
                         {
-                            string? sourceEffect = battle.EffectState.ExtraData.TryGetValue("sourceEffect", out var srcEff)
+                            string? sourceEffect = battle.EffectState.ExtraData.TryGetValue("sourceEffect", out object? srcEff)
                             ? srcEff as string
                             : throw new Exception("sourceEffect not found in ExtraData");
 
@@ -485,7 +485,7 @@ namespace ApogeeVGC_CS.data
                 OnStallMove = (battle, pokemon) =>
                 {
                     int counter = 1;
-                    if (battle.EffectState.ExtraData.TryGetValue("counter", out var counterObj) && counterObj is int c)
+                    if (battle.EffectState.ExtraData.TryGetValue("counter", out object? counterObj) && counterObj is int c)
                         counter = c;
                     battle.Debug($"Success chance: {Math.Round(100.0 / counter)}%");
                     bool success = battle.RandomChance(1, counter);
@@ -498,7 +498,7 @@ namespace ApogeeVGC_CS.data
                 OnRestart = (battle, pokemon, source, sourceEffect) =>
                 {
                     int counterMax = 729;
-                    if (battle.EffectState.ExtraData.TryGetValue("counter", out var counterObj) && counterObj is int counter)
+                    if (battle.EffectState.ExtraData.TryGetValue("counter", out object? counterObj) && counterObj is int counter)
                     {
                         if (counter < counterMax)
                         {

@@ -49,13 +49,13 @@ namespace ApogeeVGC_CS
         // Factory method to create from ExtraData
         public static ZMoveCollection FromExtraData(Dictionary<string, object> extraData)
         {
-            var collection = new ZMoveCollection();
+            ZMoveCollection collection = new ZMoveCollection();
 
             // Parse the ExtraData structure and populate the collection
             // This depends on how the data is actually stored
             if (!extraData.TryGetValue("moves", out object? movesObj) ||
                 movesObj is not List<Dictionary<string, object>> movesList) return collection;
-            foreach (var moveDict in movesList)
+            foreach (Dictionary<string, object> moveDict in movesList)
             {
                 collection.Add(new ZMoveCollectionData
                 {
@@ -95,9 +95,9 @@ namespace ApogeeVGC_CS
                 case SwitchRequest switchRequest:
                 {
                     // handle switch request
-                    var pokemon = switchRequest.Side.Pokemon;
-                    var chosen = new List<int>();
-                    var choices = new List<string>();
+                    List<PokemonSwitchRequestData> pokemon = switchRequest.Side.Pokemon;
+                    List<int> chosen = new List<int>();
+                    List<string> choices = new List<string>();
 
                     for (int i = 0; i < switchRequest.ForceSwitch.Count; i++)
                     {
@@ -112,7 +112,7 @@ namespace ApogeeVGC_CS
                         // - not active (position > forceSwitch.Count)
                         // - not already chosen for another position
                         // - not fainted (or fainted only when using Revival Blessing)
-                        var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
+                        List<int> canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
                             j > switchRequest.ForceSwitch.Count &&
                             !chosen.Contains(j) &&
                             !pokemon[j - 1].Condition.EndsWith(" fnt") == !pokemon[i].Reviving
@@ -147,13 +147,13 @@ namespace ApogeeVGC_CS
                     // move request
                     bool canMegaEvo = true, canUltraBurst = true, canZMove = true,
                         canDynamax = true, canTerastallize = true;
-                    var pokemon = moveRequest.Side.Pokemon;
-                    var chosen = new List<int>();
-                    var choices = new List<string>();
+                    List<PokemonSwitchRequestData> pokemon = moveRequest.Side.Pokemon;
+                    List<int> chosen = new List<int>();
+                    List<string> choices = new List<string>();
 
-                    for (var i = 0; i < moveRequest.Active.Count; i++)
+                    for (int i = 0; i < moveRequest.Active.Count; i++)
                     {
-                        var active = moveRequest.Active[i];
+                        PokemonMoveRequestData active = moveRequest.Active[i];
 
                         // Skip fainted or commanding Pokemon
                         if (pokemon[i].Condition.EndsWith(" fnt") || (pokemon[i].Commanding ?? false))
@@ -176,10 +176,10 @@ namespace ApogeeVGC_CS
                         bool useMaxMoves = (!(active.CanDynamax ?? false) && active.MaxMoves != null) ||
                                            (change && canDynamax);
 
-                        var canMove = new List<MoveOption>();
+                        List<MoveOption> canMove = new List<MoveOption>();
                         if (useMaxMoves && active.MaxMoves?.MaxMoves is { } maxMoves)
                         {
-                            for (var j = 1; j <= maxMoves.Count; j++)
+                            for (int j = 1; j <= maxMoves.Count; j++)
                             {
                                 if (!(maxMoves[j - 1].Disabled ?? false))
                                 {
@@ -195,7 +195,7 @@ namespace ApogeeVGC_CS
                         }
                         else if (active.Moves is { } movesList)
                         {
-                            for (var j = 1; j <= movesList.Count; j++)
+                            for (int j = 1; j <= movesList.Count; j++)
                             {
                                 if (!(movesList[j - 1].Disabled ?? false))
                                 {
@@ -224,8 +224,8 @@ namespace ApogeeVGC_CS
                             }
                             if (zMoveDict != null)
                             {
-                                var zMoves = ZMoveCollection.FromExtraData(zMoveDict);
-                                for (var j = 1; j <= zMoves.Count; j++)
+                                ZMoveCollection zMoves = ZMoveCollection.FromExtraData(zMoveDict);
+                                for (int j = 1; j <= zMoves.Count; j++)
                                 {
                                     canMove.Add(new MoveOption
                                     {
@@ -240,14 +240,14 @@ namespace ApogeeVGC_CS
 
                         // Handle ally targeting logic in multi-battles
                         bool hasAlly = pokemon.Count > 1 && !pokemon[i ^ 1].Condition.EndsWith(" fnt");
-                        var filtered = canMove.Where(m => m.Target != "adjacentAlly" || hasAlly).ToList();
+                        List<MoveOption> filtered = canMove.Where(m => m.Target != "adjacentAlly" || hasAlly).ToList();
                         canMove = filtered.Count > 0 ? filtered : canMove;
 
                         // Build move choices with proper targeting
-                        var moves = new List<ChooseMoveOption>();
-                        foreach (var m in canMove)
+                        List<ChooseMoveOption> moves = new List<ChooseMoveOption>();
+                        foreach (MoveOption m in canMove)
                         {
-                            var moveChoice = $"move {m.Slot}";
+                            string moveChoice = $"move {m.Slot}";
 
                             if (moveRequest.Active.Count > 1)
                             {
@@ -280,32 +280,32 @@ namespace ApogeeVGC_CS
                         }
 
                         // Find valid switch targets
-                        var canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
+                        List<int> canSwitch = RandomPlayerAiUtils.Range(1, 6).Where(j =>
                             !pokemon[j - 1].Active &&
                             !chosen.Contains(j) &&
                             !pokemon[j - 1].Condition.EndsWith(" fnt")
                         ).ToList();
 
                         // Decide whether to switch or use move
-                        var switches = (active.Trapped ?? false) ? [] : canSwitch;
+                        List<int> switches = (active.Trapped ?? false) ? [] : canSwitch;
 
                         if (switches.Count > 0 && (moves.Count == 0 || Prng.Random() > Move))
                         {
                             // Choose to switch
-                            var switchOptions = canSwitch.Select(slot => new SwitchOption
+                            List<SwitchOption> switchOptions = canSwitch.Select(slot => new SwitchOption
                             {
                                 Slot = slot,
                                 Pokemon = pokemon[slot - 1]
                             }).ToList();
 
-                            var target = ChooseSwitch(switchOptions);
+                            int target = ChooseSwitch(switchOptions);
                             chosen.Add(target);
                             choices.Add($"switch {target}");
                         }
                         else if (moves.Count > 0)
                         {
                             // Choose to use a move
-                            var move = ChooseMove(moves);
+                            string move = ChooseMove(moves);
 
                             // Handle special move mechanics
                             if (move.EndsWith(" zmove"))
@@ -364,7 +364,7 @@ namespace ApogeeVGC_CS
         {
             // Send the choice to the battle stream
             // Use the same logic as the base BattlePlayer Choose method
-            var choiceBytes = System.Text.Encoding.UTF8.GetBytes(choice + "\n");
+            byte[] choiceBytes = System.Text.Encoding.UTF8.GetBytes(choice + "\n");
             
             switch (Stream)
             {
@@ -415,7 +415,7 @@ namespace ApogeeVGC_CS
             {
                 throw new ArgumentException("Step must be greater than 0.");
             }
-            var range = new List<int>();
+            List<int> range = new List<int>();
             for (int i = start; i < end; i += step)
             {
                 range.Add(i);

@@ -71,8 +71,8 @@ namespace ApogeeVGC_CS.sim
             if (nonce.Length != 12)
                 throw new ArgumentException("Nonce must be 12 bytes");
 
-            var result = new byte[data.Length];
-            var state = new uint[16];
+            byte[] result = new byte[data.Length];
+            uint[] state = new uint[16];
 
             // Initialize state
             state[0] = ConstantByte0;
@@ -99,7 +99,7 @@ namespace ApogeeVGC_CS.sim
             int blockCount = (data.Length + 63) / 64;
             for (int block = 0; block < blockCount; block++)
             {
-                var keyStream = GenerateKeyStreamBlock(state);
+                byte[] keyStream = GenerateKeyStreamBlock(state);
 
                 int blockSize = Math.Min(64, data.Length - block * 64);
                 for (int i = 0; i < blockSize; i++)
@@ -116,7 +116,7 @@ namespace ApogeeVGC_CS.sim
 
         private static byte[] GenerateKeyStreamBlock(uint[] state)
         {
-            var workingState = new uint[16];
+            uint[] workingState = new uint[16];
             Array.Copy(state, workingState, 16);
 
             // 20 rounds (10 double rounds)
@@ -142,10 +142,10 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Convert to bytes
-            var result = new byte[64];
+            byte[] result = new byte[64];
             for (int i = 0; i < 16; i++)
             {
-                var bytes = BitConverter.GetBytes(workingState[i]);
+                byte[] bytes = BitConverter.GetBytes(workingState[i]);
                 Buffer.BlockCopy(bytes, 0, result, i * 4, 4);
             }
 
@@ -199,7 +199,7 @@ namespace ApogeeVGC_CS.sim
             // Handle array compatibility for old input logs
             if (seed.Value.Contains(',') && !seed.Value.StartsWith("sodium,") && !seed.Value.StartsWith("gen5,"))
             {
-                var parts = seed.Value.Split(',');
+                string[] parts = seed.Value.Split(',');
                 if (parts.Length == 4 && parts.All(p => int.TryParse(p, out _)))
                 {
                     seed = new PrngSeed(string.Join(",", parts));
@@ -214,13 +214,13 @@ namespace ApogeeVGC_CS.sim
         {
             if (seed.Value.StartsWith("sodium,"))
             {
-                var parts = seed.Value.Split(',');
+                string[] parts = seed.Value.Split(',');
                 rng = new SodiumRng(new SodiumRngSeed(parts[0], parts[1]));
             }
             else if (seed.Value.StartsWith("gen5,"))
             {
-                var hexSeed = seed.Value[5..];
-                var gen5Seed = new Gen5RngSeed(
+                string hexSeed = seed.Value[5..];
+                Gen5RngSeed gen5Seed = new Gen5RngSeed(
                     Convert.ToInt32(hexSeed[0..4], 16),
                     Convert.ToInt32(hexSeed[4..8], 16),
                     Convert.ToInt32(hexSeed[8..12], 16),
@@ -230,7 +230,7 @@ namespace ApogeeVGC_CS.sim
             }
             else if (Regex.IsMatch(seed.Value, @"^[0-9]"))
             {
-                var parts = seed.Value.Split(',').Select(int.Parse).ToArray();
+                int[] parts = seed.Value.Split(',').Select(int.Parse).ToArray();
                 rng = new Gen5Rng(Gen5RngSeed.FromArray(parts));
             }
             else
@@ -258,7 +258,7 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public double Random(int? from = null, int? to = null)
         {
-            var result = rng.Next();
+            uint result = rng.Next();
 
             if (from.HasValue) from = (int)Math.Floor((double)from.Value);
             if (to.HasValue) to = (int)Math.Floor((double)to.Value);
@@ -310,8 +310,8 @@ namespace ApogeeVGC_CS.sim
                 throw new ArgumentException("Cannot sample an empty array");
             }
 
-            var index = (int)Random(items.Count);
-            var item = items[index];
+            int index = (int)Random(items.Count);
+            T item = items[index];
 
             return item;
         }
@@ -328,7 +328,7 @@ namespace ApogeeVGC_CS.sim
 
             while (start < end - 1)
             {
-                var nextIndex = (int)Random(start, end.Value);
+                int nextIndex = (int)Random(start, end.Value);
                 if (start != nextIndex)
                 {
                     (items[start], items[nextIndex]) = (items[nextIndex], items[start]);
@@ -349,7 +349,7 @@ namespace ApogeeVGC_CS.sim
 
         public static PrngSeed ConvertSeed(Gen5RngSeed seed)
         {
-            var values = seed.ToArray();
+            int[] values = seed.ToArray();
             return new PrngSeed(string.Join(",", values));
         }
 
@@ -390,8 +390,8 @@ namespace ApogeeVGC_CS.sim
             // randombytes_buf_deterministic requires 32 bytes, but
             // generateSeed generates 16 bytes, so the last 16 bytes will be 0
             // when starting out. This shouldn't cause any problems.
-            var seedBuf = new byte[32];
-            var hexString = seedData.HexString.PadRight(64, '0');
+            byte[] seedBuf = new byte[32];
+            string hexString = seedData.HexString.PadRight(64, '0');
 
             for (int i = 0; i < hexString.Length; i += 2)
             {
@@ -403,17 +403,17 @@ namespace ApogeeVGC_CS.sim
 
         public PrngSeed GetSeed()
         {
-            var hexString = Convert.ToHexString(seed).ToLowerInvariant();
+            string hexString = Convert.ToHexString(seed).ToLowerInvariant();
             return new PrngSeed($"sodium,{hexString}");
         }
 
         public uint Next()
         {
-            var zeroBuf = new byte[36];
+            byte[] zeroBuf = new byte[36];
 
             // Use ChaCha20 encryption - tested to do the exact same thing as
             // sodium.randombytes_buf_deterministic(buf, this.seed);
-            var buf = ChaCha20.Encrypt(seed, Nonce, zeroBuf);
+            byte[] buf = ChaCha20.Encrypt(seed, Nonce, zeroBuf);
 
             // Use the first 32 bytes for the next seed, and the next 4 bytes for the output
             seed = buf[0..32];
@@ -424,11 +424,11 @@ namespace ApogeeVGC_CS.sim
 
         public static SodiumRngSeed GenerateSeed()
         {
-            var seed = new byte[16];
-            using var rng = RandomNumberGenerator.Create();
+            byte[] seed = new byte[16];
+            using RandomNumberGenerator rng = RandomNumberGenerator.Create();
             rng.GetBytes(seed);
 
-            var hexString = Convert.ToHexString(seed).ToLowerInvariant();
+            string hexString = Convert.ToHexString(seed).ToLowerInvariant();
             return new SodiumRngSeed("sodium", hexString);
         }
     }
@@ -448,7 +448,7 @@ namespace ApogeeVGC_CS.sim
 
         public PrngSeed GetSeed()
         {
-            var values = seed.ToArray();
+            int[] values = seed.ToArray();
             return new PrngSeed(string.Join(",", values));
         }
 
@@ -464,10 +464,10 @@ namespace ApogeeVGC_CS.sim
         private static Gen5RngSeed MultiplyAdd(Gen5RngSeed a, Gen5RngSeed b, Gen5RngSeed c)
         {
             // If you've done long multiplication, this is the same thing.
-            var aArray = a.ToArray();
-            var bArray = b.ToArray();
-            var cArray = c.ToArray();
-            var outArray = new int[4];
+            int[] aArray = a.ToArray();
+            int[] bArray = b.ToArray();
+            int[] cArray = c.ToArray();
+            int[] outArray = new int[4];
             long carry = 0;
 
             for (int outIndex = 3; outIndex >= 0; outIndex--)
@@ -497,8 +497,8 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         private static Gen5RngSeed NextFrame(Gen5RngSeed seed, int framesToAdvance = 1)
         {
-            var a = new Gen5RngSeed(0x5D58, 0x8B65, 0x6C07, 0x8965);
-            var c = new Gen5RngSeed(0, 0, 0x26, 0x9EC3);
+            Gen5RngSeed a = new Gen5RngSeed(0x5D58, 0x8B65, 0x6C07, 0x8965);
+            Gen5RngSeed c = new Gen5RngSeed(0, 0, 0x26, 0x9EC3);
 
             for (int i = 0; i < framesToAdvance; i++)
             {
@@ -511,7 +511,7 @@ namespace ApogeeVGC_CS.sim
 
         public static Gen5RngSeed GenerateSeed()
         {
-            var random = new Random();
+            Random random = new Random();
             return new Gen5RngSeed(
                 random.Next(0, 65536), // 2^16
                 random.Next(0, 65536),

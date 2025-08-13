@@ -6,8 +6,7 @@
 
         public Dex()
         {
-            // Initialize the base modded dex
-            var baseDex = new ModdedDex();
+            ModdedDex baseDex = new ModdedDex();
             Dexes[baseDex.CurrentMod] = baseDex;
             Dexes[DexConstants.BaseMod.ToString()] = baseDex;
         }

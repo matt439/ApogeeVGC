@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 
@@ -80,8 +81,8 @@ namespace ApogeeVGC_CS.sim
         // If an object with an ID is passed, its ID will be returned. Otherwise, an empty string will be returned.
         private static string FromObject(object obj)
         {
-            var type = obj.GetType();
-            var idProp = type.GetProperty("id") ?? type.GetProperty("userId") ?? type.GetProperty("roomId");
+            Type type = obj.GetType();
+            PropertyInfo? idProp = type.GetProperty("id") ?? type.GetProperty("userId") ?? type.GetProperty("roomId");
 
             if (idProp != null && idProp.GetValue(obj) is string propValue)
             {
@@ -95,7 +96,7 @@ namespace ApogeeVGC_CS.sim
 
         public static bool IsValid(string id)
         {
-            if (string.IsNullOrEmpty(id)) return false;
+            //if (string.IsNullOrEmpty(id)) return false;
             foreach (char c in id)
             {
                 if (!char.IsLower(c) && !char.IsDigit(c)) return false;
@@ -1101,14 +1102,14 @@ namespace ApogeeVGC_CS.sim
         public static Dictionary<string, object> ToAnyObject<T>(T? obj)
             where T : class
         {
-            var anyObject = new Dictionary<string, object>();
+            Dictionary<string, object> anyObject = new Dictionary<string, object>();
             if (obj == null) return anyObject;
 
-            var type = obj.GetType();
-            var properties = type.GetProperties(System.Reflection.BindingFlags.Public |
-                                                System.Reflection.BindingFlags.Instance);
+            Type type = obj.GetType();
+            PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public |
+                                                           System.Reflection.BindingFlags.Instance);
 
-            foreach (var prop in properties)
+            foreach (PropertyInfo prop in properties)
             {
                 object? value = prop.GetValue(obj);
 
@@ -1123,7 +1124,7 @@ namespace ApogeeVGC_CS.sim
                 else if (value is System.Collections.IEnumerable enumerable and not string)
                 {
                     // Handle collections (arrays, lists, etc.)
-                    var list = new List<object?>();
+                    List<object?> list = new List<object?>();
                     foreach (object? item in enumerable)
                     {
                         if (item == null)

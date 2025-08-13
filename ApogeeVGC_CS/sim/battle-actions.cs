@@ -93,10 +93,10 @@ namespace ApogeeVGC_CS.sim
         {
             if (source == null) return;
 
-            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            IEnumerable<PropertyInfo> properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => p is { CanWrite: true, CanRead: true });
 
-            foreach (var prop in properties)
+            foreach (PropertyInfo prop in properties)
             {
                 object? value = prop.GetValue(source);
                 if (value != null)

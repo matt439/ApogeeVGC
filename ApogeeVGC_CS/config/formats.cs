@@ -1,14 +1,12 @@
 ﻿using ApogeeVGC_CS.sim;
 
-namespace ApogeeVGC_CS.data
+namespace ApogeeVGC_CS.config
 {
-    public static class Rulesets
+    public static class Formats
     {
-        public static IdEntry DefaultFormat => new("ApogeeVGC 1v1");
-
-        public static FormatDataTable FormatData { get; } = new()
-        {
-            [new IdEntry("ApogeeVGC 1v1")] = new FormatData
+        public static FormatList FormatsList { get; } =
+        [
+            new FormatData
             {
                 Name = "ApogeeVGC 1v1",
                 Mod = "gen9",
@@ -30,8 +28,8 @@ namespace ApogeeVGC_CS.data
                 Banlist = null,
                 Restricted = null,
                 Unbanlist = null,
-                NoLog = false
+                NoLog = false,
             }
-        };
+        ];
     }
 }

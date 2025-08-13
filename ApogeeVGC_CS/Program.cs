@@ -2,10 +2,10 @@
 {
     public class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            var test = new Test1V1();
-            test.RunTest();
+            Test1V1 test = new Test1V1();
+            await test.RunTest();
         }
     }
 }

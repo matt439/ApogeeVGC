@@ -62,10 +62,10 @@ namespace ApogeeVGC_CS.sim
         public bool SuppressingWeather()
         {
             // Iterate through each side of the battle.
-            foreach (var side in Battle.Sides)
+            foreach (Side side in Battle.Sides)
             {
                 // Iterate through each active Pokémon on the side.
-                foreach (var pokemon in side.Active)
+                foreach (Pokemon pokemon in side.Active)
                 {
                     // Ensure the Pokémon exists and is not fainted.
                     if (pokemon.Fainted)
@@ -79,7 +79,7 @@ namespace ApogeeVGC_CS.sim
                         continue;
                     }
 
-                    var ability = pokemon.GetAbility();
+                    Ability ability = pokemon.GetAbility();
 
                     // Check if the ability has the suppressWeather flag.
                     // Also check that the ability's effect is not in the process of ending.

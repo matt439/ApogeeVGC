@@ -158,9 +158,9 @@ namespace ApogeeVGC_CS.data
                 },
                 OnDisableMove = (battle, pokemon) =>
                 {
-                    foreach (var moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot? moveSlot in pokemon.MoveSlots)
                     {
-                        var move = battle.Dex.Moves.Get(moveSlot.Id);
+                        Move? move = battle.Dex.Moves.Get(moveSlot.Id);
                         if (move.Category == MoveCategory.Status && move.Id != new Id("mefirst"))
                         {
                             pokemon.DisableMove(moveSlot.Id, false);

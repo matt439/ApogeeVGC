@@ -295,7 +295,7 @@ namespace ApogeeVGC_CS.sim
 
             foreach (string moveId in set.Moves)
             {
-                var move = Battle.Dex.Moves.Get(moveId);
+                Move move = Battle.Dex.Moves.Get(moveId);
                 if (move.Id.IsEmpty) continue;
 
                 if (move.Id.ToString() == "hiddenpower" && move.Type != PokemonType.Normal)
@@ -340,13 +340,13 @@ namespace ApogeeVGC_CS.sim
             Set!.Evs = new StatsTable { Hp = 0, Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
             Set.Ivs = new StatsTable { Hp = 31, Atk = 31, Def = 31, Spa = 31, Spd = 31, Spe = 31 };
 
-            foreach (var stat in Enum.GetValues<StatId>())
+            foreach (StatId stat in Enum.GetValues<StatId>())
             {
                 if (Set.Evs.GetStat(stat) == 0) Set.Evs.SetStat(stat, 0);
                 if (Set.Ivs.GetStat(stat) == 0) Set.Ivs.SetStat(stat, 31);
             }
 
-            foreach (var stat in Enum.GetValues<StatId>())
+            foreach (StatId stat in Enum.GetValues<StatId>())
             {
                 Set.Evs.SetStat(stat, Utilities.ClampIntRange(Set.Evs.GetStat(stat), 0, 255));
                 Set.Ivs.SetStat(stat, Utilities.ClampIntRange(Set.Ivs.GetStat(stat), 0, 31));
@@ -355,14 +355,14 @@ namespace ApogeeVGC_CS.sim
             // Gen 1-2 DV handling
             if (Battle.Gen <= 2)
             {
-                foreach (var stat in Enum.GetValues<StatId>())
+                foreach (StatId stat in Enum.GetValues<StatId>())
                 {
                     Set.Ivs.SetStat(stat, Set.Ivs.GetStat(stat) & 30); // Ensure even values
                 }
             }
 
             // Hidden Power calculation
-            var hpData = Battle.Dex.GetHiddenPower(Set.Ivs);
+            HiddenPower hpData = Battle.Dex.GetHiddenPower(Set.Ivs);
             HpType = set.HpType ?? hpData.Type;
             HpPower = hpData.Power;
 
@@ -637,7 +637,7 @@ namespace ApogeeVGC_CS.sim
             // In Gen 5+, inactive Pokemon's abilities are ignored.
             if (Battle.Gen >= 5 && !IsActive) return true;
 
-            var ability = GetAbility();
+            Ability ability = GetAbility();
 
             // Certain abilities don't work while transformed.
             if (ability.Flags.NoTransform ?? false && Transformed) return true;
@@ -651,7 +651,7 @@ namespace ApogeeVGC_CS.sim
             // The Neutralizing Gas user itself is not affected by its own ability.
             if (HasItem("Ability Shield") || this.Ability == "neutralizinggas") return false;
 
-            foreach (var pokemon in Battle.GetAllActive())
+            foreach (Pokemon pokemon in Battle.GetAllActive())
             {
                 // A different active Pokemon has Neutralizing Gas.
                 // We check its ability directly to avoid infinite recursion from `pokemon.HasAbility()`.
@@ -675,7 +675,7 @@ namespace ApogeeVGC_CS.sim
 
         public bool IgnoringItem(bool isFling = false)
         {
-            var item = GetItem();
+            Item item = GetItem();
 
             // Primal Orbs are never ignored
             if (item.IsPrimalOrb) return false;

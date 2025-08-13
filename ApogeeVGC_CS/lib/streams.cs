@@ -1,4 +1,5 @@
-﻿using ApogeeVGC_CS.sim;
+﻿using System.Reflection;
+using ApogeeVGC_CS.sim;
 using System.Runtime.InteropServices.JavaScript;
 using static ApogeeVGC_CS.lib.ReadStream;
 
@@ -133,7 +134,7 @@ namespace ApogeeVGC_CS.lib
             {
                 try
                 {
-                    var buffer = new byte[4096];
+                    byte[] buffer = new byte[4096];
                     while (true)
                     {
                         int bytesRead = await nodeStream.ReadAsync(buffer);
@@ -145,7 +146,7 @@ namespace ApogeeVGC_CS.lib
                         }
 
                         // Equivalent to 'data' event
-                        var data = new byte[bytesRead];
+                        byte[] data = new byte[bytesRead];
                         Array.Copy(buffer, data, bytesRead);
                         Push(Buffer.From(data), Encoding);
                     }
@@ -238,10 +239,10 @@ namespace ApogeeVGC_CS.lib
         /// </summary>
         private static Dictionary<string, object> ConvertToOptionsDictionary(object obj)
         {
-            var options = new Dictionary<string, object>();
+            Dictionary<string, object> options = new Dictionary<string, object>();
 
-            var properties = obj.GetType().GetProperties();
-            foreach (var prop in properties)
+            PropertyInfo[] properties = obj.GetType().GetProperties();
+            foreach (PropertyInfo prop in properties)
             {
                 object? value = prop.GetValue(obj);
                 if (value != null)
@@ -622,7 +623,7 @@ namespace ApogeeVGC_CS.lib
                         await NetWritableStream.FlushAsync();
 
                         // Use TaskCompletionSource to handle async completion
-                        var tcs = new TaskCompletionSource();
+                        TaskCompletionSource tcs = new TaskCompletionSource();
 
                         try
                         {
@@ -757,7 +758,7 @@ namespace ApogeeVGC_CS.lib
 
         private async Task WaitForDrainAsync()
         {
-            var tcs = new TaskCompletionSource();
+            TaskCompletionSource tcs = new TaskCompletionSource();
             _drainWaiters.Add(tcs);
 
             // In a real implementation, you'd set up an event handler for when the stream can accept more data
@@ -773,7 +774,7 @@ namespace ApogeeVGC_CS.lib
 
         private void ResolveDrainWaiters()
         {
-            foreach (var waiter in _drainWaiters)
+            foreach (TaskCompletionSource waiter in _drainWaiters)
             {
                 waiter.SetResult();
             }
@@ -825,7 +826,7 @@ namespace ApogeeVGC_CS.lib
                 NodeWritableStream = nodeStream;
 
                 // Set up write behavior with backpressure handling
-                var writeFunc = new WriteDelegate(async (_, data) =>
+                WriteDelegate writeFunc = new WriteDelegate(async (_, data) =>
                 {
                     byte[] bytes = ConvertToBytes(data, Encoding);
 
@@ -846,7 +847,7 @@ namespace ApogeeVGC_CS.lib
                     {
                         await NodeWritableStream.FlushAsync();
 
-                        var tcs = new TaskCompletionSource();
+                        TaskCompletionSource tcs = new TaskCompletionSource();
                         try
                         {
                             NodeWritableStream.Close();
@@ -989,7 +990,7 @@ namespace ApogeeVGC_CS.lib
 
         private async Task WaitForDrainAsync()
         {
-            var tcs = new TaskCompletionSource();
+            TaskCompletionSource tcs = new TaskCompletionSource();
             _drainWaiters.Add(tcs);
 
             // Simulate drain handling
@@ -1004,7 +1005,7 @@ namespace ApogeeVGC_CS.lib
 
         private void ResolveDrainWaiters()
         {
-            foreach (var waiter in _drainWaiters)
+            foreach (TaskCompletionSource waiter in _drainWaiters)
             {
                 waiter.SetResult();
             }
@@ -1106,7 +1107,7 @@ namespace ApogeeVGC_CS.lib
             _nextPush = _nextPushResolver.Task;
 
             // Process different input types
-            var options = ProcessOptions(optionsOrStreamLike);
+            ObjectReadStreamOptions<T> options = ProcessOptions(optionsOrStreamLike);
 
             switch (options)
             {
@@ -1194,7 +1195,7 @@ namespace ApogeeVGC_CS.lib
         {
             if (_errorBuffer.Count > 0)
             {
-                var error = _errorBuffer.Dequeue();
+                Exception error = _errorBuffer.Dequeue();
                 throw error;
             }
         }
@@ -1338,7 +1339,7 @@ namespace ApogeeVGC_CS.lib
         {
             if (_buffer.Count > 0)
             {
-                var item = _buffer[0];
+                T item = _buffer[0];
                 _buffer.RemoveAt(0);
                 return item;
             }
@@ -1347,7 +1348,7 @@ namespace ApogeeVGC_CS.lib
 
             if (_buffer.Count == 0) return default;
 
-            var result = _buffer[0];
+            T result = _buffer[0];
             _buffer.RemoveAt(0);
             return result;
         }
@@ -1375,7 +1376,7 @@ namespace ApogeeVGC_CS.lib
             await LoadIntoBufferAsync(count ?? 1, true);
 
             int takeCount = count ?? _buffer.Count;
-            var result = _buffer.Take(takeCount).ToArray();
+            T[] result = _buffer.Take(takeCount).ToArray();
             _buffer.RemoveRange(0, result.Length);
 
             return result;
@@ -1389,7 +1390,7 @@ namespace ApogeeVGC_CS.lib
         {
             await LoadIntoBufferAsync(int.MaxValue, true);
 
-            var result = _buffer.ToArray();
+            T[] result = _buffer.ToArray();
             _buffer.Clear();
 
             return result;
@@ -1431,7 +1432,7 @@ namespace ApogeeVGC_CS.lib
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var item = await ReadAsync();
+                T? item = await ReadAsync();
                 if (item == null && _atEof) yield break;
                 if (item != null) yield return item;
             }
@@ -1444,7 +1445,7 @@ namespace ApogeeVGC_CS.lib
         {
             if (_buffer.Count > 0)
             {
-                var item = _buffer[0];
+                T item = _buffer[0];
                 _buffer.RemoveAt(0);
                 return new IteratorResult<T>(item, false);
             }
@@ -1454,7 +1455,7 @@ namespace ApogeeVGC_CS.lib
             if (_buffer.Count == 0)
                 return new IteratorResult<T>(default, true);
 
-            var result = _buffer[0];
+            T result = _buffer[0];
             _buffer.RemoveAt(0);
             return new IteratorResult<T>(result, false);
         }
@@ -1472,7 +1473,7 @@ namespace ApogeeVGC_CS.lib
         {
             options ??= new PipeToOptions();
 
-            await foreach (var item in this)
+            await foreach (T item in this)
             {
                 await outStream.WriteAsync(item);
             }
@@ -1510,7 +1511,7 @@ namespace ApogeeVGC_CS.lib
                     // For demonstration, assuming T is string
                     if (typeof(T) == typeof(string))
                     {
-                        using var reader = new StreamReader(stream);
+                        using StreamReader reader = new StreamReader(stream);
                         while (await reader.ReadLineAsync() is { } line)
                         {
                             if (line is T item)
@@ -1709,7 +1710,7 @@ namespace ApogeeVGC_CS.lib
                     {
                         await NodeWritableStream.FlushAsync();
 
-                        var tcs = new TaskCompletionSource();
+                        TaskCompletionSource tcs = new TaskCompletionSource();
                         try
                         {
                             NodeWritableStream.Close();
@@ -1746,7 +1747,7 @@ namespace ApogeeVGC_CS.lib
 
             private async Task WaitForDrainAsync()
             {
-                var tcs = new TaskCompletionSource();
+                TaskCompletionSource tcs = new TaskCompletionSource();
                 _drainWaiters.Add(tcs);
 
                 // Simulate drain handling
@@ -1761,7 +1762,7 @@ namespace ApogeeVGC_CS.lib
 
             private void ResolveDrainWaiters()
             {
-                foreach (var waiter in _drainWaiters)
+                foreach (TaskCompletionSource waiter in _drainWaiters)
                 {
                     waiter.SetResult();
                 }
@@ -1906,7 +1907,7 @@ namespace ApogeeVGC_CS.lib
             // Initialize buffer if provided
             if (options.Buffer != null)
             {
-                foreach (var item in options.Buffer)
+                foreach (T item in options.Buffer)
                 {
                     Push(item);
                 }
@@ -1946,7 +1947,7 @@ namespace ApogeeVGC_CS.lib
             if (_customWrite != null)
             {
                 // Create a temporary ObjectWriteStream wrapper for the callback
-                var writeStream = new ObjectWriteStream<T>();
+                ObjectWriteStream<T> writeStream = new ObjectWriteStream<T>();
                 await _customWrite(writeStream, element);
             }
             else if (NodeWritableStream != null)
@@ -2084,7 +2085,7 @@ namespace ApogeeVGC_CS.lib
 
         private async Task WaitForDrainAsync()
         {
-            var tcs = new TaskCompletionSource();
+            TaskCompletionSource tcs = new TaskCompletionSource();
             _drainWaiters.Add(tcs);
 
             // Simulate drain handling
@@ -2099,7 +2100,7 @@ namespace ApogeeVGC_CS.lib
 
         private void ResolveDrainWaiters()
         {
-            foreach (var waiter in _drainWaiters)
+            foreach (TaskCompletionSource waiter in _drainWaiters)
             {
                 waiter.SetResult();
             }

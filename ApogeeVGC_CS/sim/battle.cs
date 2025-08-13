@@ -1,6 +1,11 @@
-﻿using System.Reflection;
+﻿using ApogeeVGC_CS.data;
+using System;
+using System.Drawing;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -116,15 +121,15 @@ namespace ApogeeVGC_CS.sim
 
     public class Battle
     {
-        public required Id Id { get; init; }
-        public required bool DebugMode { get; init; }
+        public Id Id { get; init; }
+        public bool DebugMode { get; init; }
         public bool? ForceRandomChance { get; init; }
-        public required bool Deserialized { get; init; }
-        public required bool StrictChoices { get; init; }
-        public required Format Format { get; init; }
-        public required EffectState FormatData { get; init; }
-        public required GameType GameType { get; init; }
-        public required int ActivePerHalf
+        public bool Deserialized { get; init; }
+        public bool StrictChoices { get; init; }
+        public Format Format { get; init; }
+        public EffectState FormatData { get; init; }
+        public GameType GameType { get; init; }
+        public int ActivePerHalf
         {
             get;
             init // 1, 2, or 3
@@ -139,8 +144,8 @@ namespace ApogeeVGC_CS.sim
                 }
             }
         }
-        public required Field Field { get; init; }
-        public required Side[] Sides
+        public Field Field { get; init; }
+        public Side[] Sides
         {
             get;
             init // Array of sides, size 2 or 4
@@ -155,41 +160,41 @@ namespace ApogeeVGC_CS.sim
                 }
             }
         }
-        public required PrngSeed PrngSeed { get; init; }
-        public required ModdedDex Dex { get; init; }
-        public required ModdedDex BaseDex { get; init; } // Added to emulate how the JavaScript version works
-        public required int Gen { get; init; }
-        public required RuleTable RuleTable { get; init; }
-        public required Prng Prng { get; set; }
-        public required BoolStringUnion Rated { get; init; }
-        public required bool ReportExactHp { get; init; }
-        public required bool ReportPercentages { get; init; }
-        public required bool SupportCancel { get; init; }
+        public PrngSeed PrngSeed { get; init; }
+        public ModdedDex Dex { get; init; }
+        public ModdedDex BaseDex { get; init; } // Added to emulate how the JavaScript version works
+        public int Gen { get; init; }
+        public RuleTable RuleTable { get; init; }
+        public Prng Prng { get; set; }
+        public BoolStringUnion Rated { get; init; }
+        public bool ReportExactHp { get; init; }
+        public bool ReportPercentages { get; init; }
+        public bool SupportCancel { get; init; }
 
-        public required BattleActions Actions { get; init; }
+        public BattleActions Actions { get; init; }
         public BattleQueue Queue { get; init; }
-        public required List<FaintQueueEntry> FaintQueue { get; init; }
+        public List<FaintQueueEntry> FaintQueue { get; init; }
 
-        public required List<string> Log { get; init; }
-        public required List<string> InputLog { get; init; }
-        public required List<string> MessageLog { get; init; }
-        public required int SentLogPos { get; init; }
-        public required bool SentEnd { get; init; }
+        public List<string> Log { get; init; }
+        public List<string> InputLog { get; init; }
+        public List<string> MessageLog { get; init; }
+        public int SentLogPos { get; set; }
+        public bool SentEnd { get; set; }
         public static bool SentRequests => true;
 
-        public required RequestState RequestState { get; init; }
-        public required int Turn { get; init; }
-        public required bool MidTurn { get; init; }
-        public required bool Started { get; init; }
-        public required bool Ended { get; init; }
+        public RequestState RequestState { get; init; }
+        public int Turn { get; init; }
+        public bool MidTurn { get; init; }
+        public bool Started { get; init; }
+        public bool Ended { get; init; }
         public string? Winner { get; init; }
 
-        public required IEffect Effect { get; set; }
-        public required EffectState EffectState { get; set; }
+        public IEffect Effect { get; set; }
+        public EffectState EffectState { get; set; }
 
-        public required object Event { get; set; }
+        public object Event { get; set; }
         public object? Events { get; init; }
-        public required int EventDepth { get; set; }
+        public int EventDepth { get; set; }
 
         public ActiveMove? ActiveMove { get; set; }
         public Pokemon? ActivePokemon { get; set; }
@@ -197,15 +202,15 @@ namespace ApogeeVGC_CS.sim
 
         public ActiveMove? LastMove { get; set; }
         public Id? LastSuccessfulMoveThisTurn { get; init; }
-        public required int LastMoveLine { get; init; }
-        public required int LastDamage { get; init; }
-        public required int EffectOrder { get; set; }
-        public required bool QuickClawRoll { get; init; }
-        public required List<int> SpeedOrder { get; init; }
+        public int LastMoveLine { get; init; }
+        public int LastDamage { get; init; }
+        public int EffectOrder { get; set; }
+        public bool QuickClawRoll { get; init; }
+        public List<int> SpeedOrder { get; init; }
 
         public object? TeamGenerator { get; init; }
 
-        public required HashSet<string> Hints { get; init; }
+        public HashSet<string> Hints { get; init; }
 
         // Constants
         public static string NotFail => "";
@@ -228,7 +233,9 @@ namespace ApogeeVGC_CS.sim
 
             Format = options.Format ?? BaseDex.Formats.Get(options.FormatId.ToString(), true);
 
-            Dex = BaseDex.ForFormat(Format);
+            // TODO: Add support for non-base formats
+            //Dex = BaseDex.ForFormat(Format);
+            Dex = BaseDex;
             Gen = Dex.Gen;
             RuleTable = Dex.Formats.GetRuleTable(Format);
 
@@ -302,7 +309,7 @@ namespace ApogeeVGC_CS.sim
             QuickClawRoll = false;
             SpeedOrder = [];
 
-            for (var i = 0; i < ActivePerHalf * 2; i++)
+            for (int i = 0; i < ActivePerHalf * 2; i++)
             {
                 SpeedOrder.Add(i);
             }
@@ -314,7 +321,7 @@ namespace ApogeeVGC_CS.sim
             Send = options.Send ?? ((_, _) => { });
 
             // Create input options for logging
-            var inputOptions = new Dictionary<string, object>
+            Dictionary<string, object> inputOptions = new Dictionary<string, object>
             {
                 ["formatid"] = options.FormatId,
                 ["seed"] = PrngSeed,
@@ -354,10 +361,10 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Set up players
-            var sideIds = new[] { SideId.P1, SideId.P2, SideId.P3, SideId.P4 };
-            foreach (var sideId in sideIds)
+            SideId[] sideIds = new[] { SideId.P1, SideId.P2, SideId.P3, SideId.P4 };
+            foreach (SideId sideId in sideIds)
             {
-                var playerOptions = sideId switch
+                PlayerOptions? playerOptions = sideId switch
                 {
                     SideId.P1 => options.P1,
                     SideId.P2 => options.P2,
@@ -449,7 +456,7 @@ namespace ApogeeVGC_CS.sim
 
         public void UpdateSpeed()
         {
-            foreach (var pokemon in GetAllActive())
+            foreach (Pokemon pokemon in GetAllActive())
             {
                 pokemon.UpdateSpeed();
             }
@@ -467,8 +474,8 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public static int ComparePriority(object objA, object objB)
         {
-            var a = objA as AnyObject ?? new AnyObject(objA);
-            var b = objB as AnyObject ?? new AnyObject(objB);
+            AnyObject a = objA as AnyObject ?? new AnyObject(objA);
+            AnyObject b = objB as AnyObject ?? new AnyObject(objB);
 
             // Order comparison (lower values first, null/false = last)
             // Using int.MaxValue as default for null/false
@@ -512,8 +519,8 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public static int CompareRedirectOrder(object objA, object objB)
         {
-            var a = objA as AnyObject ?? new AnyObject(objA);
-            var b = objB as AnyObject ?? new AnyObject(objB);
+            AnyObject a = objA as AnyObject ?? new AnyObject(objA);
+            AnyObject b = objB as AnyObject ?? new AnyObject(objB);
 
             // Priority comparison (higher values first)
             int priorityResult = Nullable.Compare(b.Priority, a.Priority);
@@ -541,8 +548,8 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public static int CompareLeftToRightOrder(object objA, object objB)
         {
-            var a = objA as AnyObject ?? new AnyObject(objA);
-            var b = objB as AnyObject ?? new AnyObject(objB);
+            AnyObject a = objA as AnyObject ?? new AnyObject(objA);
+            AnyObject b = objB as AnyObject ?? new AnyObject(objB);
 
             // Order comparison (lower values first, null/false = last)
             // Using 4294967296 as default for null/false (same as TypeScript)
@@ -577,7 +584,7 @@ namespace ApogeeVGC_CS.sim
 
             if (list.Count < 2) return;
 
-            var sorted = 0;
+            int sorted = 0;
 
             // This is a Selection Sort - not the fastest sort in general, but
             // actually faster than QuickSort for small arrays like the ones
@@ -585,7 +592,7 @@ namespace ApogeeVGC_CS.sim
             // More importantly, it makes it easiest to resolve speed ties properly.
             while (sorted + 1 < list.Count)
             {
-                var nextIndexes = new List<int> { sorted };
+                List<int> nextIndexes = new List<int> { sorted };
 
                 // Grab list of next indexes
                 for (int i = sorted + 1; i < list.Count; i++)
@@ -605,7 +612,7 @@ namespace ApogeeVGC_CS.sim
                 }
 
                 // Put list of next indexes where they belong
-                for (var i = 0; i < nextIndexes.Count; i++)
+                for (int i = 0; i < nextIndexes.Count; i++)
                 {
                     int index = nextIndexes[i];
                     if (index != sorted + i)
@@ -631,13 +638,13 @@ namespace ApogeeVGC_CS.sim
         /// </summary>
         public void EachEvent(string eventId, IEffect? effect = null, object? relayVar = null)
         {
-            var actives = GetAllActive();
+            List<Pokemon> actives = GetAllActive();
             effect ??= Effect;
 
             // Sort by speed descending (fastest first)
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
-            foreach (var pokemon in actives)
+            foreach (Pokemon pokemon in actives)
             {
                 RunEvent(eventId, pokemon, null, effect, relayVar);
             }
@@ -690,7 +697,7 @@ namespace ApogeeVGC_CS.sim
             // Debug($"Event: {eventId} (depth {EventDepth})");
 
             // Handle relay variable defaults
-            var hasRelayVar = true;
+            bool hasRelayVar = true;
             if (relayVar == null)
             {
                 relayVar = true;
@@ -751,12 +758,12 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Get the callback function
-            var callback = customCallback ?? GetCallback(target, effect, $"on{eventId}");
+            Delegate? callback = customCallback ?? GetCallback(target, effect, $"on{eventId}");
             if (callback == null) return relayVar;
 
             // Save the current battle state
-            var parentEffect = Effect;
-            var parentEffectState = EffectState;
+            IEffect parentEffect = Effect;
+            EffectState parentEffectState = EffectState;
             object parentEvent = Event;
 
             try
@@ -780,7 +787,7 @@ namespace ApogeeVGC_CS.sim
                 EventDepth++;
 
                 // Build the argument list for the callback
-                var args = new List<object>();
+                List<object> args = new List<object>();
                 if (hasRelayVar)
                     args.Add(relayVar);
 
@@ -865,7 +872,7 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Find all handlers for this event
-            var handlers = FindEventHandlers(target switch
+            List<EventListener> handlers = FindEventHandlers(target switch
             {
                 PokemonRunEventTarget pokemonTarget => new PokemonFindEventHandlersTarget(pokemonTarget.Pokemon),
                 PokemonListRunEventTarget pokemonListTarget => new PokemonListFindEventHandlersTarget(pokemonListTarget.PokemonList),
@@ -882,7 +889,7 @@ namespace ApogeeVGC_CS.sim
                     throw new ArgumentException("onEffect specified without a sourceEffect");
                 }
 
-                var callback = GetCallback(target switch
+                Delegate? callback = GetCallback(target switch
                 {
                     PokemonRunEventTarget pokemonTarget => new PokemonGetCallbackTarget(pokemonTarget.Pokemon),
                     SideRunEventTarget sideTarget => new SideGetCallbackTarget(sideTarget.Side),
@@ -897,7 +904,7 @@ namespace ApogeeVGC_CS.sim
                         throw new ArgumentException("Array targets not supported with onEffect");
                     }
 
-                    var effectHolder = target switch
+                    EventEffectHolder effectHolder = target switch
                     {
                         PokemonRunEventTarget pokemonTarget => (EventEffectHolder)pokemonTarget.Pokemon,
                         SideRunEventTarget sideTarget => sideTarget.Side,
@@ -905,7 +912,7 @@ namespace ApogeeVGC_CS.sim
                         _ => throw new ArgumentException($"Unsupported target type: {target.GetType().Name}")
                     };
 
-                    var listenerWithoutPriority = new EventListenerWithoutPriority
+                    EventListenerWithoutPriority listenerWithoutPriority = new EventListenerWithoutPriority
                     {
                         Effect = sourceEffect,
                         Callback = callback,
@@ -914,7 +921,7 @@ namespace ApogeeVGC_CS.sim
                         EffectHolder = effectHolder
                     };
 
-                    var resolvedListener = ResolvePriority(listenerWithoutPriority, $"on{eventId}");
+                    EventListener resolvedListener = ResolvePriority(listenerWithoutPriority, $"on{eventId}");
                     handlers.Insert(0, resolvedListener); // Add to beginning with unshift
                 }
             }
@@ -934,8 +941,8 @@ namespace ApogeeVGC_CS.sim
             }
 
             // Set up relay variables
-            var hasRelayVar = true;
-            var args = new List<object>(); // Arguments to pass to callbacks
+            bool hasRelayVar = true;
+            List<object> args = new List<object>(); // Arguments to pass to callbacks
 
             if (relayVar == null)
             {
@@ -954,7 +961,7 @@ namespace ApogeeVGC_CS.sim
 
             // Save parent event and set up this event
             object parentEvent = Event;
-            var newEvent = new BattleEvent
+            BattleEvent newEvent = new BattleEvent
             {
                 Id = eventId,
                 Target = target,
@@ -980,7 +987,7 @@ namespace ApogeeVGC_CS.sim
                     else
                     {
                         // Initialize with true for each target
-                        for (var i = 0; i < pokemonListTarget.PokemonList.Count; i++)
+                        for (int i = 0; i < pokemonListTarget.PokemonList.Count; i++)
                         {
                             targetRelayVars.Add(true);
                         }
@@ -988,7 +995,7 @@ namespace ApogeeVGC_CS.sim
                 }
 
                 // Process each handler
-                foreach (var handler in handlers)
+                foreach (EventListener handler in handlers)
                 {
                     // Handle array targets - if this handler has an index
                     if (handler.Index.HasValue)
@@ -1018,8 +1025,8 @@ namespace ApogeeVGC_CS.sim
                         }
                     }
 
-                    var effect = handler.Effect;
-                    var effectHolder = handler.EffectHolder;
+                    IEffect effect = handler.Effect;
+                    EventEffectHolder effectHolder = handler.EffectHolder;
 
                     // Check if this handler should be suppressed
 
@@ -1045,7 +1052,7 @@ namespace ApogeeVGC_CS.sim
                         case EffectType.Ability when effect is Ability { Num: 0 }:
                         {
                             // These events are suppressed for custom abilities when Mold Breaker is active
-                            var attackingEvents = new HashSet<string>
+                            HashSet<string> attackingEvents = new HashSet<string>
                             {
                                 "BeforeMove", "BasePower", "Immunity", "RedirectTarget",
                                 "Heal", "SetStatus", "CriticalHit", "ModifyAtk", "ModifyDef",
@@ -1116,8 +1123,8 @@ namespace ApogeeVGC_CS.sim
                     if (handler.Callback is { } callback)
                     {
                         // Save battle state
-                        var parentEffect = Effect;
-                        var parentEffectState = EffectState;
+                        IEffect parentEffect = Effect;
+                        EffectState parentEffectState = EffectState;
 
                         // Set up state for this handler
                         Effect = handler.Effect;
@@ -1273,7 +1280,7 @@ namespace ApogeeVGC_CS.sim
                         EffectOrder = 0,
                     }
                 };
-            var pokemon = pokemonEvent.Pokemon;
+            Pokemon pokemon = pokemonEvent.Pokemon;
             speed = pokemon.Speed;
             // Special speed calculation for Magic Bounce
             if (listener.Effect is { EffectType: EffectType.Ability, Name: "Magic Bounce" } &&
@@ -1339,7 +1346,7 @@ namespace ApogeeVGC_CS.sim
         private static int GetDefaultSubOrder(EventListenerWithoutPriority listener)
         {
             // Default sub-order values based on extensive community research
-            var effectTypeOrder = new Dictionary<EffectType, int>
+            Dictionary<EffectType, int> effectTypeOrder = new Dictionary<EffectType, int>
             {
                 [EffectType.Condition] = 2,
                 [EffectType.Weather] = 5,
@@ -1386,7 +1393,7 @@ namespace ApogeeVGC_CS.sim
         // Helper to get a property value from an effect using reflection
         private T? GetEffectProperty<T>(IEffect effect, string propertyName) where T : struct
         {
-            var propInfo = effect.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            PropertyInfo? propInfo = effect.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             if (propInfo != null && propInfo.PropertyType == typeof(T))
             {
                 return (T?)propInfo.GetValue(effect);
@@ -1395,7 +1402,7 @@ namespace ApogeeVGC_CS.sim
         }
         public Delegate? GetCallback(GetCallbackTarget target, IEffect effect, string callbackName)
         {
-            var callback = callbackName switch
+            Delegate? callback = callbackName switch
             {
                 "onAnySwitchIn" => effect.OnAnySwitchIn,
                 "onSwitchIn" => effect.OnSwitchIn,
@@ -1422,8 +1429,8 @@ namespace ApogeeVGC_CS.sim
         private static Delegate? GetCallbackFromEffect(IEffect effect, string callbackName)
         {
             // Use reflection to get the callback by name for other callbacks not in IEffect
-            var type = effect.GetType();
-            var property = type.GetProperty(callbackName, BindingFlags.Public | BindingFlags.Instance);
+            Type type = effect.GetType();
+            PropertyInfo? property = type.GetProperty(callbackName, BindingFlags.Public | BindingFlags.Instance);
 
             if (property?.PropertyType == typeof(Delegate) ||
                 property?.PropertyType.IsSubclassOf(typeof(Delegate)) == true ||
@@ -1462,12 +1469,12 @@ namespace ApogeeVGC_CS.sim
                 // Case 1: Target is an array of Pokemon
                 case PokemonListFindEventHandlersTarget pokemonArrayTarget:
                 {
-                    for (var i = 0; i < pokemonArrayTarget.PokemonList.Count; i++)
+                    for (int i = 0; i < pokemonArrayTarget.PokemonList.Count; i++)
                     {
-                        var pokemon = pokemonArrayTarget.PokemonList[i];
+                        Pokemon pokemon = pokemonArrayTarget.PokemonList[i];
                         var curHandlers =
                             FindEventHandlers(new PokemonFindEventHandlersTarget(pokemon), eventName, source);
-                        foreach (var handler in curHandlers)
+                        foreach (EventListener handler in curHandlers)
                         {
                             // Re-assign target and index for handlers from the array
                             var updatedListener = new EventListener
@@ -1504,14 +1511,14 @@ namespace ApogeeVGC_CS.sim
                         $"on{eventName}"));
                     if (prefixedHandlers)
                     {
-                        foreach (var allyActive in pokemonTarget.Pokemon.AlliesAndSelf())
+                        foreach (Pokemon allyActive in pokemonTarget.Pokemon.AlliesAndSelf())
                         {
                             handlers.AddRange(FindPokemonEventHandlers(allyActive,
                                 $"onAlly{eventName}"));
                             handlers.AddRange(FindPokemonEventHandlers(allyActive,
                                 $"onAny{eventName}"));
                         }
-                        foreach (var foeActive in pokemonTarget.Pokemon.Foes())
+                        foreach (Pokemon foeActive in pokemonTarget.Pokemon.Foes())
                         {
                             handlers.AddRange(FindPokemonEventHandlers(foeActive,
                                 $"onFoe{eventName}"));
@@ -1534,10 +1541,10 @@ namespace ApogeeVGC_CS.sim
             // Case 3: Target is a Side (or has bubbled up from a Pokemon)
             if (target is SideFindEventHandlersTarget sideTarget)
             {
-                foreach (var side in Sides)
+                foreach (Side side in Sides)
                 {
                     // Handle events on all active Pokemon on the side
-                    foreach (var activePokemon in side.Active)
+                    foreach (Pokemon activePokemon in side.Active)
                     {
                         if (side == sideTarget.Side || side == sideTarget.Side.AllySide)
                         {
@@ -1549,7 +1556,8 @@ namespace ApogeeVGC_CS.sim
                         }
                         if (prefixedHandlers)
                         {
-                            handlers.AddRange(FindPokemonEventHandlers(activePokemon, $"onAny{eventName}"));
+                            handlers.AddRange(FindPokemonEventHandlers(activePokemon,
+                                $"onAny{eventName}"));
                         }
                     }
 
@@ -1576,15 +1584,14 @@ namespace ApogeeVGC_CS.sim
 
             return handlers;
         }
-
         public List<EventListener> FindPokemonEventHandlers(Pokemon pokemon,
             string callbackName, string? getKey = null)
         {
             var handlers = new List<EventListener>();
 
             // Handle status effects
-            var status = pokemon.GetStatus();
-            var callback = GetCallback(pokemon, status, callbackName);
+            Condition status = pokemon.GetStatus();
+            Delegate? callback = GetCallback(pokemon, status, callbackName);
 
             bool hasStatusCallback = callback != null;
             bool hasStatusSpecialKey = !string.IsNullOrEmpty(getKey) &&
@@ -1601,23 +1608,23 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var statusEventListener = ResolvePriority(statusListenerWithoutPriority, callbackName);
+                EventListener statusEventListener = ResolvePriority(statusListenerWithoutPriority, callbackName);
                 handlers.Add(statusEventListener);
             }
 
             // Handle volatile status effects
-            foreach ((string id, var volatileState) in pokemon.Volatiles)
+            foreach ((string id, EffectState volatileState) in pokemon.Volatiles)
             {
                 // Get the volatile condition from the dex
-                var vol = Dex.Conditions.GetById(new Id(id));
-                var volatileCallback = GetCallback(pokemon, vol, callbackName);
+                Condition vol = Dex.Conditions.GetById(new Id(id));
+                Delegate? volatileCallback = GetCallback(pokemon, vol, callbackName);
 
                 bool hasVolatileCallback = volatileCallback != null;
                 bool hasVolatileSpecialKey = !string.IsNullOrEmpty(getKey) &&
                                              HasProperty(volatileState, getKey);
 
                 if (!hasVolatileCallback && !hasVolatileSpecialKey) continue;
-                var volatileListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority volatileListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = vol,
                     Callback = volatileCallback,
@@ -1626,13 +1633,13 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var volatileEventListener = ResolvePriority(volatileListenerWithoutPriority, callbackName);
+                EventListener volatileEventListener = ResolvePriority(volatileListenerWithoutPriority, callbackName);
                 handlers.Add(volatileEventListener);
             }
 
             // Handle ability
-            var ability = pokemon.GetAbility();
-            var abilityCallback = GetCallback(pokemon, ability, callbackName);
+            Ability ability = pokemon.GetAbility();
+            Delegate? abilityCallback = GetCallback(pokemon, ability, callbackName);
 
             bool hasAbilityCallback = abilityCallback != null;
             bool hasAbilitySpecialKey = !string.IsNullOrEmpty(getKey) &&
@@ -1640,7 +1647,7 @@ namespace ApogeeVGC_CS.sim
 
             if (hasAbilityCallback || hasAbilitySpecialKey)
             {
-                var abilityListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority abilityListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = ability,
                     Callback = abilityCallback,
@@ -1649,13 +1656,13 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var abilityEventListener = ResolvePriority(abilityListenerWithoutPriority, callbackName);
+                EventListener abilityEventListener = ResolvePriority(abilityListenerWithoutPriority, callbackName);
                 handlers.Add(abilityEventListener);
             }
 
             // Handle item
-            var item = pokemon.GetItem();
-            var itemCallback = GetCallback(pokemon, item, callbackName);
+            Item item = pokemon.GetItem();
+            Delegate? itemCallback = GetCallback(pokemon, item, callbackName);
 
             bool hasItemCallback = itemCallback != null;
             bool hasItemSpecialKey = !string.IsNullOrEmpty(getKey) &&
@@ -1663,7 +1670,7 @@ namespace ApogeeVGC_CS.sim
 
             if (hasItemCallback || hasItemSpecialKey)
             {
-                var itemListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority itemListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = item,
                     Callback = itemCallback,
@@ -1672,17 +1679,17 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var itemEventListener = ResolvePriority(itemListenerWithoutPriority, callbackName);
+                EventListener itemEventListener = ResolvePriority(itemListenerWithoutPriority, callbackName);
                 handlers.Add(itemEventListener);
             }
 
             // Handle species (base species)
-            var species = pokemon.BaseSpecies;
-            var speciesCallback = GetCallback(pokemon, species, callbackName);
+            Species species = pokemon.BaseSpecies;
+            Delegate? speciesCallback = GetCallback(pokemon, species, callbackName);
 
             if (speciesCallback != null)
             {
-                var speciesListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority speciesListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = species,
                     Callback = speciesCallback,
@@ -1691,29 +1698,29 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var speciesEventListener = ResolvePriority(speciesListenerWithoutPriority, callbackName);
+                EventListener speciesEventListener = ResolvePriority(speciesListenerWithoutPriority, callbackName);
                 handlers.Add(speciesEventListener);
             }
 
             // Handle slot conditions
-            var side = pokemon.Side;
+            Side side = pokemon.Side;
             if (pokemon.Position >= side.SlotConditions.Count) return handlers;
-            var slotConditionsForPosition = side.SlotConditions[pokemon.Position];
-            foreach (var slotKvp in slotConditionsForPosition)
+            Dictionary<string, EffectState> slotConditionsForPosition = side.SlotConditions[pokemon.Position];
+            foreach (KeyValuePair<string, EffectState> slotKvp in slotConditionsForPosition)
             {
                 string conditionId = slotKvp.Key;
                 EffectState slotConditionState = slotKvp.Value;
 
                 // Get the slot condition from the dex
-                var slotCondition = Dex.Conditions.GetById(new Id(conditionId));
-                var slotCallback = GetCallback(pokemon, slotCondition, callbackName);
+                Condition slotCondition = Dex.Conditions.GetById(new Id(conditionId));
+                Delegate? slotCallback = GetCallback(pokemon, slotCondition, callbackName);
 
                 bool hasSlotCallback = slotCallback != null;
                 bool hasSlotSpecialKey = !string.IsNullOrEmpty(getKey) &&
                                          HasProperty(slotConditionState, getKey);
 
                 if (!hasSlotCallback && !hasSlotSpecialKey) continue;
-                var slotListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority slotListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = slotCondition,
                     Callback = slotCallback,
@@ -1723,7 +1730,7 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = pokemon
                 };
 
-                var slotEventListener = ResolvePriority(slotListenerWithoutPriority, callbackName);
+                EventListener slotEventListener = ResolvePriority(slotListenerWithoutPriority, callbackName);
                 handlers.Add(slotEventListener);
             }
 
@@ -1770,10 +1777,10 @@ namespace ApogeeVGC_CS.sim
         public List<EventListener> FindBattleEventHandlers(string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            var handlers = new List<EventListener>();
+            List<EventListener> handlers = new List<EventListener>();
 
             // Handle format-level callbacks
-            var callback = GetCallback(this, Format, callbackName);
+            Delegate? callback = GetCallback(this, Format, callbackName);
 
             bool hasFormatCallback = callback != null;
             bool hasFormatSpecialKey = !string.IsNullOrEmpty(getKey) &&
@@ -1781,7 +1788,7 @@ namespace ApogeeVGC_CS.sim
 
             if (hasFormatCallback || hasFormatSpecialKey)
             {
-                var formatListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority formatListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = Format,
                     Callback = callback,
@@ -1790,13 +1797,13 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = customHolder ?? throw new ArgumentNullException(nameof(customHolder))
                 };
 
-                var formatEventListener = ResolvePriority(formatListenerWithoutPriority, callbackName);
+                EventListener formatEventListener = ResolvePriority(formatListenerWithoutPriority, callbackName);
                 handlers.Add(formatEventListener);
             }
 
             // Handle dynamic event handlers (if Events is implemented)
             if (Events is not Dictionary<string, List<EventHandlerData>> eventDict) return handlers;
-            if (!eventDict.TryGetValue(callbackName, out var eventHandlers)) return handlers;
+            if (!eventDict.TryGetValue(callbackName, out List<EventHandlerData>? eventHandlers)) return handlers;
             handlers.AddRange(from handler in eventHandlers
                 let state = handler.Target.EffectType == EffectType.Format
                     ? FormatData
@@ -1834,16 +1841,16 @@ namespace ApogeeVGC_CS.sim
         public List<EventListener> FindFieldEventHandlers(Field field, string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            var handlers = new List<EventListener>();
+            List<EventListener> handlers = new List<EventListener>();
 
             // Handle pseudo weather conditions
-            foreach ((string id, var pseudoWeatherState) in field.PseudoWeather)
+            foreach ((string id, EffectState pseudoWeatherState) in field.PseudoWeather)
             {
                 // Get the pseudo weather condition from the dex
-                var pseudoWeather = Dex.Conditions.GetById(new Id(id));
+                Condition pseudoWeather = Dex.Conditions.GetById(new Id(id));
 
                 // Get the callback for this condition
-                var callback = GetCallback(field, pseudoWeather, callbackName);
+                Delegate? callback = GetCallback(field, pseudoWeather, callbackName);
 
                 // Check if we should include this handler
                 bool hasCallback = callback != null;
@@ -1852,7 +1859,7 @@ namespace ApogeeVGC_CS.sim
 
                 if (!hasCallback && !hasSpecialKey) continue;
                 // Create the event listener without priority info first
-                var listenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority listenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = pseudoWeather,
                     Callback = callback,
@@ -1862,13 +1869,13 @@ namespace ApogeeVGC_CS.sim
                 };
 
                 // Resolve priority and create full event listener
-                var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
+                EventListener eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
                 handlers.Add(eventListener);
             }
 
             // Handle weather
-            var weather = field.GetWeather();
-            var weatherCallback = GetCallback(field, weather, callbackName);
+            Condition weather = field.GetWeather();
+            Delegate? weatherCallback = GetCallback(field, weather, callbackName);
 
             bool hasWeatherCallback = weatherCallback != null;
             bool hasWeatherSpecialKey = !string.IsNullOrEmpty(getKey) &&
@@ -1876,7 +1883,7 @@ namespace ApogeeVGC_CS.sim
 
             if (hasWeatherCallback || hasWeatherSpecialKey)
             {
-                var weatherListenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority weatherListenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = weather,
                     Callback = weatherCallback,
@@ -1885,20 +1892,20 @@ namespace ApogeeVGC_CS.sim
                     EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? field
                 };
 
-                var weatherEventListener = ResolvePriority(weatherListenerWithoutPriority, callbackName);
+                EventListener weatherEventListener = ResolvePriority(weatherListenerWithoutPriority, callbackName);
                 handlers.Add(weatherEventListener);
             }
 
             // Handle terrain
-            var terrain = field.GetTerrain();
-            var terrainCallback = GetCallback(field, terrain, callbackName);
+            Condition terrain = field.GetTerrain();
+            Delegate? terrainCallback = GetCallback(field, terrain, callbackName);
 
             bool hasTerrainCallback = terrainCallback != null;
             bool hasTerrainSpecialKey = !string.IsNullOrEmpty(getKey) &&
                                        HasProperty(field.TerrainState, getKey);
 
             if (!hasTerrainCallback && !hasTerrainSpecialKey) return handlers;
-            var terrainListenerWithoutPriority = new EventListenerWithoutPriority
+            EventListenerWithoutPriority terrainListenerWithoutPriority = new EventListenerWithoutPriority
             {
                 Effect = terrain,
                 Callback = terrainCallback,
@@ -1907,7 +1914,7 @@ namespace ApogeeVGC_CS.sim
                 EffectHolder = (EventEffectHolder?)(customHolder ?? throw new ArgumentNullException(nameof(customHolder))) ?? field
             };
 
-            var terrainEventListener = ResolvePriority(terrainListenerWithoutPriority, callbackName);
+            EventListener terrainEventListener = ResolvePriority(terrainListenerWithoutPriority, callbackName);
             handlers.Add(terrainEventListener);
 
             return handlers;
@@ -1934,15 +1941,15 @@ namespace ApogeeVGC_CS.sim
         public List<EventListener> FindSideEventHandlers(Side side, string callbackName,
             string? getKey = null, Pokemon? customHolder = null)
         {
-            var handlers = new List<EventListener>();
+            List<EventListener> handlers = new List<EventListener>();
 
-            foreach ((string id, var sideConditionData) in side.SideConditions)
+            foreach ((string id, EffectState sideConditionData) in side.SideConditions)
             {
                 // Get the condition from the dex
-                var sideCondition = Dex.Conditions.GetById(new Id(id));
+                Condition sideCondition = Dex.Conditions.GetById(new Id(id));
 
                 // Get the callback for this condition
-                var callback = GetCallback(side, sideCondition, callbackName);
+                Delegate? callback = GetCallback(side, sideCondition, callbackName);
 
                 // Check if we should include this handler
                 bool hasCallback = callback != null;
@@ -1951,7 +1958,7 @@ namespace ApogeeVGC_CS.sim
 
                 if (!hasCallback && !hasSpecialKey) continue;
                 // Create the event listener without priority info first
-                var listenerWithoutPriority = new EventListenerWithoutPriority
+                EventListenerWithoutPriority listenerWithoutPriority = new EventListenerWithoutPriority
                 {
                     Effect = sideCondition,
                     Callback = callback,
@@ -1962,7 +1969,7 @@ namespace ApogeeVGC_CS.sim
                 };
 
                 // Resolve priority and create full event listener
-                var eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
+                EventListener eventListener = ResolvePriority(listenerWithoutPriority, callbackName);
                 handlers.Add(eventListener);
             }
 
@@ -1973,7 +1980,7 @@ namespace ApogeeVGC_CS.sim
         private static bool HasProperty(EffectState effectState, string propertyName)
         {
             // Check named properties first
-            var property = typeof(EffectState).GetProperty(propertyName,
+            PropertyInfo? property = typeof(EffectState).GetProperty(propertyName,
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
 
             if (property != null)
@@ -2114,7 +2121,7 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool MaybeTriggerEndlessBattleClause(bool[] trappedBySide, string[] stalenessBySide)
+        public bool? MaybeTriggerEndlessBattleClause(bool[] trappedBySide, string[] stalenessBySide)
         {
             throw new NotImplementedException();
         }
@@ -2230,7 +2237,7 @@ namespace ApogeeVGC_CS.sim
         public MoveCategory GetCategory(Move move)
         {
             throw new NotImplementedException();
-        }
+               }
 
         public int Randomizer(int baseDamage)
         {
@@ -2286,7 +2293,7 @@ namespace ApogeeVGC_CS.sim
             if (lastFirst)
             {
                 // Move last element to front (equivalent to unshift + pop)
-                var lastElement = FaintQueue[^1];
+                FaintQueueEntry lastElement = FaintQueue[^1];
                 FaintQueue.RemoveAt(FaintQueue.Count - 1);
                 FaintQueue.Insert(0, lastElement);
             }
@@ -2299,7 +2306,7 @@ namespace ApogeeVGC_CS.sim
                 faintData = FaintQueue[0];
                 FaintQueue.RemoveAt(0); // equivalent to shift()
 
-                var pokemon = faintData.Target;
+                Pokemon pokemon = faintData.Target;
 
                 if (faintData.Source != null && (pokemon.Fainted ||
                                                  RunEvent("BeforeFaint", pokemon, faintData.Source, faintData.Effect) is false or null)) continue;
@@ -2347,9 +2354,9 @@ namespace ApogeeVGC_CS.sim
                     Queue.Clear();
 
                     // Fainting clears accumulated Bide damage
-                    foreach (var pokemon in GetAllActive())
+                    foreach (Pokemon pokemon in GetAllActive())
                     {
-                        if (!pokemon.Volatiles.TryGetValue("bide", out var bideState) ||
+                        if (!pokemon.Volatiles.TryGetValue("bide", out EffectState? bideState) ||
                             bideState.ExtraData?.ContainsKey("damage") != true) continue;
                         bideState.ExtraData["damage"] = 0;
                         Hint("Desync Clause Mod activated!");
@@ -2361,7 +2368,7 @@ namespace ApogeeVGC_CS.sim
                 case <= 3 when GameType == GameType.Singles:
                 {
                     // in gen 3 or earlier, fainting in singles skips to residuals
-                    foreach (var pokemon in GetAllActive())
+                    foreach (Pokemon pokemon in GetAllActive())
                     {
                         if (Gen <= 2)
                         {
@@ -2440,29 +2447,26 @@ namespace ApogeeVGC_CS.sim
         }
         // addSplit(side: SideID, secret: Part[], shared?: Part[])
 
-        public void AddSplit(SideId side, IReadOnlyList<Part> secret, IReadOnlyList<Part>? shared = null)
+        public void AddSplit(SideId side, IReadOnlyList<string> secret, IReadOnlyList<string>? shared = null)
         {
-            throw new NotImplementedException();
-        }
+            // Use shared if provided, otherwise use secret for both
+            shared ??= secret;
 
-        public void Add(params AddPart[] parts)
-        {
-            throw new NotImplementedException();
-        }
+            // Format the split message: |split|p{side}\n{secret}\n{shared}
+            string sideStr = side switch
+            {
+                SideId.P1 => "1",
+                SideId.P2 => "2", 
+                SideId.P3 => "3",
+                SideId.P4 => "4",
+                _ => throw new ArgumentException($"Invalid side: {side}")
+            };
 
-        public void AddMove(params AddMoveArg[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AttrLastMove(params AddMoveArg[] args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RetargetLastMove(Pokemon newTarget)
-        {
-            throw new NotImplementedException();
+            string secretMsg = string.Join("|", secret);
+            string sharedMsg = string.Join("|", shared);
+            
+            string splitMessage = $"|split|p{sideStr}\n{secretMsg}\n{sharedMsg}";
+            Log.Add(splitMessage);
         }
 
         public void Debug(string activity)
@@ -2473,44 +2477,85 @@ namespace ApogeeVGC_CS.sim
             }
         }
 
-        public string GetDebugLog()
+        public void Add(params AddPart[] parts)
         {
-            throw new NotImplementedException();
+            // Check if any parts are functions
+            bool hasFunctionParts = parts.Any(part => part is FuncAddPart);
+
+            if (!hasFunctionParts)
+            {
+                // Simple case: all parts are strings, join them and add to log
+                string[] stringParts = parts.Select(part => ConvertPartToString(part)).ToArray();
+                Log.Add($"|{string.Join("|", stringParts)}");
+                return;
+            }
+
+            // Complex case: handle split messaging
+            SideId? side = null;
+            List<string> secret = [];
+            List<string> shared = [];
+
+            foreach (AddPart part in parts)
+            {
+                switch (part)
+                {
+                    case FuncAddPart functionPart:
+                    {
+                        SideSecretShared split = functionPart.Func();
+                        if (side.HasValue && side.Value != split.Side)
+                        {
+                            throw new InvalidOperationException("Multiple sides passed to add");
+                        }
+                        side = split.Side;
+                        secret.Add(split.Secret);
+                        shared.Add(split.Shared);
+                        break;
+                    }
+                    default:
+                        string stringValue = ConvertPartToString(part);
+                        secret.Add(stringValue);
+                        shared.Add(stringValue);
+                        break;
+                }
+            }
+
+            if (side.HasValue)
+            {
+                AddSplit(side.Value, secret, shared);
+            }
         }
 
-        public void DebugError(string activity)
+        // Convenience overload to maintain compatibility with existing string calls
+        public void Add(params string[] parts)
         {
-            throw new NotImplementedException();
+            Log.Add($"|{string.Join("|", parts)}");
         }
 
-        public List<PokemonSet> GetTeam(PlayerOptions options)
+        private static string ConvertPartToString(AddPart part)
         {
-            throw new NotImplementedException();
+            return part switch
+            {
+                PartAddPart partPart => ConvertPartCoreToString(partPart.Part),
+                GameTypeAddPart gameTypePart => gameTypePart.GameType.ToString(),
+                FuncAddPart => string.Empty, // Functions should be handled separately
+                _ => string.Empty
+            };
         }
 
-        public void ShowOpenTeamSheets()
+        private static string ConvertPartCoreToString(Part part)
         {
-            throw new NotImplementedException();
-        }
-
-        public void SetPlayer(SideId slot, PlayerOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SendUpdates()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Side GetSide(SideId sideid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetOverFlowedTurnCount()
-        {
-            throw new NotImplementedException();
+            return part switch
+            {
+                StringPart stringPart => stringPart.Value,
+                IntPart intPart => intPart.Value.ToString(),
+                BoolPart boolPart => boolPart.Value.ToString().ToLower(),
+                PokemonPart pokemonPart => pokemonPart.Pokemon.ToString(),
+                SidePart sidePart => sidePart.Side.ToString(),
+                EffectPart effectPart => effectPart.Effect.Name,
+                MovePart movePart => movePart.Move.Name,
+                NullPart => "null",
+                _ => string.Empty
+            };
         }
 
         public EffectState InitEffectState(EffectState template, int? effectOrder = null)
@@ -2553,12 +2598,88 @@ namespace ApogeeVGC_CS.sim
             };
         }
 
-        public void ClearEffectState(EffectState state)
+        public void SetPlayer(SideId slot, PlayerOptions options)
         {
             throw new NotImplementedException();
         }
 
-        public void Destroy()
+        public void AddMove(params AddMoveArg[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AttrLastMove(params AddMoveArg[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendUpdates()
+        {
+            // Send incremental log updates if there are new entries
+            if (SentLogPos >= Log.Count) return;
+
+            // Send only new log entries since last update
+            List<string> newLogEntries = Log.Skip(SentLogPos).ToList();
+            Send("update", newLogEntries);
+
+            // Emit requests from all sides if not already sent
+            if (!SentRequests)
+            {
+                foreach (Side side in Sides)
+                {
+                    side.EmitRequest();
+                }
+                // Note: SentRequests is static and always returns true in this implementation
+                // In a full implementation, this would be an instance property that gets set to true here
+            }
+
+            // Update the position marker
+            SentLogPos = Log.Count;
+
+            // Send end-of-battle log if battle has ended and not already sent
+            if (!SentEnd && Ended)
+            {
+                // Create comprehensive battle log object
+                var battleLog = new
+                {
+                    winner = Winner,
+                    seed = PrngSeed,
+                    turns = Turn,
+                    p1 = Sides[0].Name,
+                    p2 = Sides[1].Name,
+                    p3 = Sides.Length > 2 ? Sides[2]?.Name : null,
+                    p4 = Sides.Length > 3 ? Sides[3]?.Name : null,
+                    p1team = Sides[0].Team,
+                    p2team = Sides[1].Team,
+                    p3team = Sides.Length > 2 ? Sides[2]?.Team : null,
+                    p4team = Sides.Length > 3 ? Sides[3]?.Team : null,
+                    score = new List<int> { Sides[0].PokemonLeft, Sides[1].PokemonLeft },
+                    inputLog = InputLog
+                };
+
+                // Add additional scores for 3+ player games
+                if (Sides.Length > 2 && Sides[2] != null)
+                {
+                    battleLog.score.Add(Sides[2].PokemonLeft);
+                }
+                if (Sides.Length > 3 && Sides[3] != null)
+                {
+                    battleLog.score.Add(Sides[3].PokemonLeft);
+                }
+
+                // Serialize and send the final battle log
+                string jsonLog = JsonSerializer.Serialize(battleLog, new JsonSerializerOptions
+                {
+                    WriteIndented = false,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                });
+
+                Send("end", jsonLog);
+                SentEnd = true;
+            }
+        }
+
+        public void ShowOpenTeamSheets()
         {
             throw new NotImplementedException();
         }

@@ -57,7 +57,7 @@ namespace ApogeeVGC_CS.data
                     OnResidualOrder = 8,
                     OnResidual = static (battle2, target2, unusedSource2, unusedEffect2) =>
                     {
-                        var sourceSlot = target2.Volatiles["leechseed"].ExtraData["sourceSlot"];
+                        object? sourceSlot = target2.Volatiles["leechseed"].ExtraData["sourceSlot"];
                         if (sourceSlot == null)
                         {
                             battle2.Debug("Leech Seed source slot is null");
@@ -230,7 +230,7 @@ namespace ApogeeVGC_CS.data
                         {
                             battle.Add("-activate", target, "move: Protect");
                         }
-                        var lockedMove = source.GetVolatile("lockedmove");
+                        IEffect? lockedMove = source.GetVolatile("lockedmove");
                         if (lockedMove != null && lockedMove.Duration == 2)
                         {
                             source.RemoveVolatile("lockedmove");
@@ -536,7 +536,7 @@ namespace ApogeeVGC_CS.data
                     OnFoeRedirectTargetPriority = 1,
                     OnFoeRedirectTarget = (battle, target, source, source2, move) =>
                     {
-                        var ragePowderUser = battle.EffectState.ExtraData["target"];
+                        object? ragePowderUser = battle.EffectState.ExtraData["target"];
                         if (ragePowderUser is not Pokemon pokemonUser)
                         {
                             battle.Debug("Rage Powder user is not a Pokemon");
@@ -720,7 +720,7 @@ namespace ApogeeVGC_CS.data
                     },
                     OnAnyModifyDamage = (battle, damage, source, target, move) =>
                     {
-                        var sideTarget = battle.EffectState.ExtraData["target"];
+                        object? sideTarget = battle.EffectState.ExtraData["target"];
                         if (sideTarget is not Side side)
                         {
                             battle.Debug("Reflect target is not a Side");
@@ -799,7 +799,7 @@ namespace ApogeeVGC_CS.data
                     },
                     OnAnyModifyDamage = (battle, damage, source, target, move) =>
                     {
-                        var sideTarget = battle.EffectState.ExtraData["target"];
+                        object? sideTarget = battle.EffectState.ExtraData["target"];
                         if (sideTarget is not Side side)
                         {
                             battle.Debug("Light Screen target is not a Side");

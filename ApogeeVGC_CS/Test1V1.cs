@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿using ApogeeVGC_CS.lib;
 using ApogeeVGC_CS.sim;
-using ApogeeVGC_CS.lib;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ApogeeVGC_CS
 {
@@ -12,6 +13,8 @@ namespace ApogeeVGC_CS
 
     public class Test1V1
     {
+        public Dex Dex { get; } = new();
+        
         // Cache JsonSerializerOptions to fix CA1869
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -130,10 +133,10 @@ namespace ApogeeVGC_CS
                 Level = 50,
             }
         ];
-        
-        public void RunTest()
+
+        public async Task RunTest()
         {
-            var streams = BattleStreamUtils.GetPlayerStreams(new BattleStream());
+            PlayerStreams streams = BattleStreamUtils.GetPlayerStreams(new BattleStream(Dex));
 
             var p1Spec = new PlayerSpecification()
             {
@@ -149,96 +152,94 @@ namespace ApogeeVGC_CS
 
             var battleSpec = new BattleSpecification
             {
-                FormatId = "gen9vgc2024regh",
+                FormatId = "apogeevgc1v1",
                 Seed = [1, 2, 3, 4], // Use a simple array instead of Prng.GenerateSeed().ToArray()
                 Rated = false,
                 Debug = true
             };
 
-            var p1 = new RandomPlayerAi(streams.Player1, new RandomPlayerAiOptions());
-            var p2 = new RandomPlayerAi(streams.Player2, new RandomPlayerAiOptions());
-
-            InitializeBattle(streams, battleSpec, p1Spec, p2Spec);
-
-            p1.Start();
-            p2.Start();
-
-            var streamReadingTask = Task.Run(async () =>
+            var p1 = new RandomPlayerAi(streams.Player1, new RandomPlayerAiOptions
             {
+                Move = 1,
+                Mega = 0,
+                Seed = new Prng(Prng.GenerateSeed())
+            });
+
+            var p2 = new RandomPlayerAi(streams.Player2, new RandomPlayerAiOptions
+            {
+                Move = 1,
+                Mega = 0,
+                Seed = new Prng(Prng.GenerateSeed())
+            });
+
+            // Wait for battle initialization to complete
+            await InitializeBattleAsync(streams, battleSpec, p1Spec, p2Spec);
+
+            Console.WriteLine("Battle initialized, starting players...");
+
+            // Start both players asynchronously
+            Task p1Task = p1.Start();
+            Task p2Task = p2.Start();
+
+            // Create a task that signals completion when battle ends
+            var battleCompletionSource = new TaskCompletionSource<bool>();
+
+            Task.Run(async () => {
                 try
                 {
-                    Console.WriteLine("Starting to read from omniscient stream...");
-                    
-                    // Use a timeout to prevent infinite waiting
-                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-                    
-                    await foreach (string chunk in streams.Omniscient.ReadAllChunksAsync().WithCancellation(cts.Token))
+                    await foreach (string chunk in streams.Omniscient.ReadAllChunksAsync())
                     {
-                        Console.WriteLine($"Received chunk: {chunk}");
+                        Console.WriteLine($"Received: {chunk}");
+
+                        // Signal battle completion when you see an end condition
+                        if (!chunk.Contains("|win|") && !chunk.Contains("|tie|")) continue;
+                        Console.WriteLine("Battle completed!");
+                        battleCompletionSource.SetResult(true);
+                        break;
                     }
-                    
-                    Console.WriteLine("Finished reading from omniscient stream.");
-                }
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine("Stream reading timed out after 30 seconds.");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error reading omniscient stream: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    Console.WriteLine($"Error: {ex.Message}");
+                    battleCompletionSource.SetException(ex);
                 }
             });
 
-            // Wait a bit to let everything initialize
-            Console.WriteLine("Waiting for battle to process...");
-            Thread.Sleep(5000);
-            
-            Console.WriteLine("Test completed. Check output above for battle information.");
+            // Wait for battle to complete with a generous timeout
+            if (!battleCompletionSource.Task.Wait(TimeSpan.FromMinutes(2)))
+            {
+                Console.WriteLine("Battle timed out after 2 minutes");
+            }
 
-            Console.ReadLine();
+            // Wait for both players to finish
+            await Task.WhenAll(p1Task, p2Task);
+
+            Console.WriteLine("Test completed. Press Enter to exit.");
+            //Console.ReadLine();
         }
 
-        private static void InitializeBattle(PlayerStreams streams, BattleSpecification battleSpec,
-            PlayerSpecification p1Spec, PlayerSpecification p2Spec)
+        // Make initialization awaitable
+        private static async Task InitializeBattleAsync(PlayerStreams streams,
+            BattleSpecification battleSpec, PlayerSpecification p1Spec, PlayerSpecification p2Spec)
         {
             try
             {
-                // Use cached JsonSerializerOptions to fix CA1869
-                string battleJson = System.Text.Json.JsonSerializer.Serialize(battleSpec, JsonOptions);
-                string p1Json = System.Text.Json.JsonSerializer.Serialize(p1Spec, JsonOptions);
-                string p2Json = System.Text.Json.JsonSerializer.Serialize(p2Spec, JsonOptions);
+                string battleJson = JsonSerializer.Serialize(battleSpec, JsonOptions);
+                string p1Json = JsonSerializer.Serialize(p1Spec, JsonOptions);
+                string p2Json = JsonSerializer.Serialize(p2Spec, JsonOptions);
 
-                // Create the initialization command sequence
-                var commands = new[]
-                {
-                    $"> start {battleJson}",
-                    $"> player p1 {p1Json}",
-                    $"> player p2 {p2Json}"
-                };
+                string[] commands =
+                [
+                    $">start {battleJson}",
+                    $">player p1 {p1Json}",
+                    $">player p2 {p2Json}"
+                ];
 
                 string fullCommand = string.Join("\n", commands) + "\n";
+                Console.WriteLine("Sending initialization commands...");
 
-                // Print the fullCommand to console for debugging
-                Console.WriteLine("Sending initialization commands:");
-                Console.WriteLine(fullCommand);
-                Console.WriteLine("=== End of initialization commands ===");
-
-                // Use the WriteAsync method for the ObjectReadWriteStream
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await streams.Omniscient.WriteAsync(fullCommand);
-                        Console.WriteLine("Commands sent to omniscient stream successfully");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error writing to omniscient stream: {ex.Message}");
-                    }
-                });
-
-                Console.WriteLine("Battle initialized successfully");
+                await streams.Omniscient.WriteAsync(fullCommand);
+                Console.WriteLine("Commands sent successfully");
             }
             catch (Exception ex)
             {
@@ -247,13 +248,19 @@ namespace ApogeeVGC_CS
             }
         }
     }
-
-
     public class BattleSpecification
     {
+        [JsonPropertyName("formatid")]
         public string FormatId { get; set; } = "gen9vgc2024regh";
-        public int[] Seed { get; set; } = { 1, 2, 3, 4 };
-        public bool Rated { get; set; } = false;
-        public bool Debug { get; set; } = false;
+
+        [JsonPropertyName("seed")]
+        public int[] Seed { get; set; } = [1, 2, 3, 4];
+
+        [JsonPropertyName("rated")]
+        public bool Rated { get; set; }
+
+        [JsonPropertyName("debug")]
+        public bool Debug { get; set; }
     }
+
 }
