@@ -42,15 +42,10 @@ internal class Driver
         }
     }
 
-    internal void RunRandomTest()
+    private void RunRandomTest()
     {
-        if (Simulator == null)
-        {
-            Simulator = new Simulator();
-        }
-        else
-        {
-            Simulator.Reset();
-        }
+        //Simulator = new Simulator();
+        //Player1 = new PlayerRandom();
+        //Player2 = new PlayerRandom();
     }
 }
