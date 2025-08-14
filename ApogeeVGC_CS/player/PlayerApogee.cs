@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApogeeVGC_CS.sim
+namespace ApogeeVGC_CS.player
 {
+    internal class PlayerApogee
+    {
+    }
 }
