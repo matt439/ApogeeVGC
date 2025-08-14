@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.data;
+
+namespace ApogeeVGC_CS.sim
 {
     public class FlingData
     {
@@ -603,46 +605,312 @@
         }
     }
 
-    public static class ItemConstants
+    public static class ItemUtils
     {
-        public static readonly Item EmptyItem = new()
+        //public static readonly Item EmptyItem = new()
+        //{
+        //    IsBerry = false,
+        //    IgnoreKlutz = false,
+        //    IsGem = false,
+        //    IsPokeball = false,
+        //    IsPrimalOrb = false,
+        //    Fullname = string.Empty,
+        //    EffectType = EffectType.Condition,
+        //    Gen = 0,
+        //    Name = string.Empty,
+        //    Exists = false,
+        //    Num = 0,
+        //    NoCopy = false,
+        //    AffectsFainted = false,
+        //    SourceEffect = string.Empty
+        //};
+
+        public static Item EmptyItem(string? name = null)
         {
-            IsBerry = false,
-            IgnoreKlutz = false,
-            IsGem = false,
-            IsPokeball = false,
-            IsPrimalOrb = false,
-            Fullname = string.Empty,
-            EffectType = EffectType.Condition,
-            Gen = 0,
-            Name = string.Empty,
-            Exists = false,
-            Num = 0,
-            NoCopy = false,
-            AffectsFainted = false,
-            SourceEffect = string.Empty
-        };
+            return new Item
+            {
+                IsBerry = false,
+                IgnoreKlutz = false,
+                IsGem = false,
+                IsPokeball = false,
+                IsPrimalOrb = false,
+                Fullname = string.Empty,
+                EffectType = EffectType.Item,
+                Gen = 0,
+                Name = name ?? string.Empty,
+                Exists = name is not null,
+                Num = 0,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty,
+            };
+        }
     }
 
     public class DexItems(ModdedDex dex)
     {
         private ModdedDex Dex { get; } = dex;
         private Dictionary<string, Item> ItemCache { get; } = [];
-        private List<Item>? AllCache { get; } = null;
+        private List<Item>? AllCache { get; set; }
 
-        public Item Get(string name)
+        public void LoadTestItems()
         {
-            throw new NotImplementedException("Get method is not implemented yet.");
+            AllCache = [];
+
+            foreach (var itemData in Items.ItemData)
+            {
+                ItemCache[itemData.Key.ToString()] = itemData.Value;
+                AllCache.Add(itemData.Value);
+            }
         }
 
-        public Item Get(Item item)
+        public Item Get(string? name)
         {
-            throw new NotImplementedException("Get method is not implemented yet.");
+            try
+            {
+                // Handle null or empty string
+                if (string.IsNullOrEmpty(name))
+                {
+                    return GetById(Id.Empty);
+                }
+
+                // Trim whitespace and convert to ID
+                string trimmedName = name.Trim();
+                var id = new Id(trimmedName);
+
+                return GetById(id);
+            }
+            catch (Exception ex)
+            {
+                // Log error and return empty item
+                Console.WriteLine($"Error getting item by name '{name}': {ex.Message}");
+                return ItemUtils.EmptyItem();
+            }
+        }
+
+        public Item Get(Item? item)
+        {
+            // If an Item object is passed, return it directly
+            return item ?? GetById(Id.Empty);
         }
 
         public Item GetById(Id id)
         {
-            throw new NotImplementedException("GetByID method is not implemented yet.");
+            // Return empty item for empty ID
+            if (id.IsEmpty)
+            {
+                return ItemUtils.EmptyItem();
+            }
+
+            // Check cache first
+            if (ItemCache.TryGetValue(id.Value, out Item? cachedItem))
+            {
+                return cachedItem;
+            }
+
+            Item? item = null;
+
+            // Try alias resolution
+            Id? aliasId = Dex.GetAlias(id);
+            if (aliasId is not null)
+            {
+                item = Get(aliasId.Value);
+                if (item.Exists)
+                {
+                    ItemCache[id.Value] = item;
+                }
+                return item;
+            }
+
+            // Try berry fallback - if item not found, try adding "berry" suffix
+            if (!Dex.Data.Items.ContainsKey(id))
+            {
+                var berryId = new Id($"{id.Value}berry");
+                if (Dex.Data.Items.ContainsKey(berryId))
+                {
+                    item = GetById(berryId);
+                    ItemCache[id.Value] = item;
+                    return item;
+                }
+            }
+
+            // Try to construct from data
+            if (Dex.Data.Items.TryGetValue(id, out ItemData? itemData))
+            {
+                try
+                {
+                    // Get text descriptions
+                    var descriptions = GetItemDescriptions(id, itemData);
+
+                    // Create Item from ItemData and text data
+                    item = CreateItemFromData(id.Value, itemData, descriptions);
+
+                    // Apply generation restrictions
+                    if (item.Gen > Dex.Gen)
+                    {
+                        // Mark as nonstandard for future generations
+                        item.IsNonstandard = Nonstandard.Future;
+                    }
+
+                    // Try to reuse parent mod item if identical
+                    item = TryReuseParentModItem(item, id, itemData);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error creating item '{id}': {ex.Message}");
+                    item = ItemUtils.EmptyItem(id.Value);
+                }
+            }
+            else
+            {
+                // Create non-existent item
+                item = ItemUtils.EmptyItem(id.Value);
+            }
+
+            // Cache successful results
+            if (item.Exists)
+            {
+                ItemCache[id.Value] = item;
+            }
+
+            return item;
+        }
+
+        // Helper method to get item descriptions
+        private Descriptions GetItemDescriptions(Id id, ItemData itemData)
+        {
+            try
+            {
+                // Use the existing GetDescs method from ModdedDex
+                return Dex.GetDescs(CastToITextFileTable(Dex.LoadTextData().Items), id, new AnyObject(itemData));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading descriptions for item '{id}': {ex.Message}");
+                return new Descriptions
+                {
+                    Desc = string.Empty,
+                    ShortDesc = string.Empty
+                };
+            }
+        }
+
+        private static DexTable<ITextFile> CastToITextFileTable(DexTable<ItemText> source)
+        {
+            var result = new DexTable<ITextFile>();
+            foreach (var (key, value) in source)
+            {
+                result[key] = value;
+            }
+            return result;
+        }
+
+        // Helper method to create Item from data
+        private static Item CreateItemFromData(string name, ItemData itemData, Descriptions descriptions)
+        {
+            return new Item
+            {
+                // Basic properties
+                Name = name,
+                Num = itemData.Num,
+                Gen = itemData.Gen,
+                Exists = true,
+
+                // Description properties
+                Desc = descriptions.Desc,
+                ShortDesc = descriptions.ShortDesc,
+
+                // Item-specific properties from ItemData
+                IsBerry = itemData.IsBerry,
+                IgnoreKlutz = itemData.IgnoreKlutz,
+                IsGem = itemData.IsGem,
+                IsPokeball = itemData.IsPokeball,
+                IsPrimalOrb = itemData.IsPrimalOrb,
+
+                // Additional properties
+                OnDrive = itemData.OnDrive,
+                OnMemory = itemData.OnMemory,
+                MegaStone = itemData.MegaStone,
+                MegaEvolves = itemData.MegaEvolves,
+                ZMove = itemData.ZMove,
+                ZMoveType = itemData.ZMoveType,
+                ZMoveFrom = itemData.ZMoveFrom,
+                OnPlate = itemData.OnPlate,
+                ForcedForme = itemData.ForcedForme,
+                IsChoice = itemData.IsChoice,
+                NaturalGift = itemData.NaturalGift,
+                SpriteNum = itemData.SpriteNum,
+                Boosts = itemData.Boosts,
+
+                // Copy other relevant properties
+                IsNonstandard = itemData.IsNonstandard,
+                NoCopy = itemData.NoCopy,
+                AffectsFainted = itemData.AffectsFainted,
+                SourceEffect = itemData.SourceEffect,
+
+                // Required properties for BasicEffect
+                Fullname = $"item: {name}",
+                EffectType = EffectType.Item
+            };
+        }
+
+        //// Helper method to create non-existent item
+        //private static Item CreateNonExistentItem(string name)
+        //{
+        //    return new Item
+        //    {
+        //        Name = name,
+        //        Exists = false,
+        //        IsBerry = false,
+        //        IgnoreKlutz = false,
+        //        IsGem = false,
+        //        IsPokeball = false,
+        //        IsPrimalOrb = false,
+        //        Fullname = $"item: {name}",
+        //        EffectType = EffectType.Item,
+        //        Gen = 0,
+        //        Num = 0,
+        //        NoCopy = false,
+        //        AffectsFainted = false,
+        //        SourceEffect = string.Empty
+        //    };
+        //}
+
+        // Helper method to try reusing parent mod item
+        private Item TryReuseParentModItem(Item item, Id id, ItemData itemData)
+        {
+            if (string.IsNullOrEmpty(Dex.ParentMod))
+            {
+                return item;
+            }
+
+            try
+            {
+                // Get parent mod
+                var parentMod = Dex.Mod(Dex.ParentMod);
+
+                // Check if item data is identical to parent
+                if (parentMod.Data.Items.TryGetValue(id, out ItemData? parentItemData) &&
+                    ReferenceEquals(itemData, parentItemData))
+                {
+                    // Get parent item
+                    var parentItem = parentMod.Items.GetById(id);
+
+                    // Check if key properties are identical
+                    if (item.IsNonstandard == parentItem.IsNonstandard &&
+                        item.Desc == parentItem.Desc &&
+                        item.ShortDesc == parentItem.ShortDesc)
+                    {
+                        return parentItem;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking parent mod for item '{id}': {ex.Message}");
+            }
+
+            return item;
         }
 
         public List<Item> All()

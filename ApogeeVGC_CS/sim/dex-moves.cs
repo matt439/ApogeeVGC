@@ -850,31 +850,407 @@
     {
         private ModdedDex Dex { get; } = dex;
         private Dictionary<string, Move> MoveCache { get; init; } = new();
-        private IReadOnlyList<Move>? AllCache { get; init; } = null;
+        private IReadOnlyList<Move>? AllCache { get; set; } = null;
+
+        public void LoadTestMoves()
+        {
+
+        }
 
         public Move Get(string? name)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(name))
+                return MoveUtils.EmptyMove();
+
+            var id = new Id(name.Trim());
+            return GetById(id);
         }
 
         public Move Get(Id name)
         {
-            throw new NotImplementedException();
+            return GetById(name);
         }
 
         public Move Get(Move? move)
         {
-            throw new NotImplementedException();
+            return move ?? MoveUtils.EmptyMove(); // If already a Move object, return as-is
         }
 
         public Move GetById(Id id)
         {
-            throw new NotImplementedException();
+            if (id.Value == "")
+                return MoveUtils.EmptyMove();
+
+            // Check cache first
+            if (MoveCache.TryGetValue(id.Value, out Move? cachedMove))
+                return cachedMove;
+
+            Move? move = null;
+
+            // Try alias resolution
+            Id? aliasId = Dex.GetAlias(id);
+            if (aliasId is not null)
+            {
+                move = Get(aliasId.Value);
+                if (move.Exists)
+                {
+                    MoveCache[id.Value] = move;
+                }
+                return move;
+            }
+
+            // Handle Hidden Power moves
+            var processedId = id;
+            if (id.Value.StartsWith("hiddenpower"))
+            {
+                // Extract type from Hidden Power move name using regex
+                var match = System.Text.RegularExpressions.Regex.Match(id.Value, @"([a-z]*)([0-9]*)");
+                if (match.Success && !string.IsNullOrEmpty(match.Groups[1].Value))
+                {
+                    processedId = new Id(match.Groups[1].Value);
+                }
+            }
+
+            // Try to load from data
+            if (!processedId.IsEmpty && Dex.Data.Moves.ContainsKey(processedId))
+            {
+                var moveData = Dex.Data.Moves[processedId];
+                var moveTextData = Dex.GetDescs(CastToITextFileTable(Dex.LoadTextData().Moves), processedId, new AnyObject(moveData));
+
+                // Create new Move from data
+                //move = CreateMoveFromData(processedId.Value, moveData, moveTextData);
+                move = MoveUtils.MoveFromMoveData(moveData);
+
+                // Apply generation rules
+                if (move.Gen > Dex.Gen)
+                {
+                    move.IsNonstandard = Nonstandard.Future;
+                }
+
+                // Try to reuse parent mod move if identical
+                move = TryReuseParentModMove(move, processedId, moveData);
+            }
+            else
+            {
+                // Create non-existent move
+                move = CreateNonExistentMove(processedId.Value);
+            }
+
+            // Cache successful results
+            if (move.Exists)
+            {
+                MoveCache[id.Value] = move;
+            }
+
+            return move;
         }
 
         public IReadOnlyList<Move> All()
         {
-            throw new NotImplementedException();
+            if (AllCache != null)
+                return AllCache;
+
+            var moves = new List<Move>();
+            foreach (var id in Dex.Data.Moves.Keys)
+            {
+                moves.Add(GetById(new Id(id.Value)));
+            }
+
+            AllCache = moves.AsReadOnly();
+            return AllCache;
+        }
+
+        // Helper method to cast text tables (same as in DexAbilities)
+        private static DexTable<ITextFile> CastToITextFileTable(DexTable<MoveText> source)
+        {
+            var result = new DexTable<ITextFile>();
+            foreach (var (key, value) in source)
+            {
+                result[key] = value;
+            }
+            return result;
+        }
+
+        // Helper method to try reusing parent mod move
+        private Move TryReuseParentModMove(Move move, Id id, MoveData moveData)
+        {
+            if (string.IsNullOrEmpty(Dex.ParentMod))
+                return move;
+
+            try
+            {
+                var parentDex = Dex.Mod(Dex.ParentMod);
+                if (parentDex?.Data.Moves.TryGetValue(id, out MoveData? parentMoveData) == true)
+                {
+                    // Check if move data is identical (simplified comparison)
+                    if (AreMoveDataIdentical(moveData, parentMoveData))
+                    {
+                        var parentMove = parentDex.Moves.GetById(id);
+
+                        // Check if descriptions and nonstandard status match
+                        if (move.IsNonstandard == parentMove.IsNonstandard &&
+                            move.Desc == parentMove.Desc &&
+                            move.ShortDesc == parentMove.ShortDesc)
+                        {
+                            return parentMove;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking parent mod for move '{id}': {ex.Message}");
+            }
+
+            return move;
+        }
+
+        // Helper method to compare move data (simplified)
+        private static bool AreMoveDataIdentical(MoveData moveData1, MoveData moveData2)
+        {
+            // Implement a comparison based on key properties
+            // This is a simplified version - you may need to add more comparisons
+            return moveData1.BasePower == moveData2.BasePower &&
+                   moveData1.Accuracy.Equals(moveData2.Accuracy) &&
+                   moveData1.Pp == moveData2.Pp &&
+                   moveData1.Category == moveData2.Category &&
+                   moveData1.Type == moveData2.Type &&
+                   moveData1.Priority == moveData2.Priority &&
+                   moveData1.Target == moveData2.Target;
+        }
+
+        // Helper method to create non-existent move
+        private static Move CreateNonExistentMove(string name)
+        {
+            return new Move
+            {
+                Name = name,
+                Exists = false,
+                BasePower = 0,
+                Accuracy = new TrueMoveDataAccuracy(true),
+                Pp = 0,
+                Category = MoveCategory.Status,
+                Type = PokemonType.Normal,
+                Priority = 0,
+                Target = MoveTarget.Self,
+                Flags = new MoveFlags(),
+                Fullname = $"move: {name}",
+                EffectType = EffectType.Move,
+                Gen = 0,
+                Num = 0,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty,
+                ShortDesc = string.Empty,
+                Desc = string.Empty
+            };
+        }
+    }
+
+    public static class MoveUtils
+    {
+        //public static readonly Move EmptyMove = new()
+        //{
+        //    Name = string.Empty,
+        //    Exists = false,
+        //    BasePower = 0,
+        //    Accuracy = new MoveDataAccuracy { Value = true },
+        //    Pp = 0,
+        //    Category = MoveCategory.Status,
+        //    Type = PokemonType.Normal,
+        //    Priority = 0,
+        //    Target = MoveTarget.Self,
+        //    Flags = new MoveFlags(),
+        //    Fullname = string.Empty,
+        //    EffectType = EffectType.Move,
+        //    Gen = 0,
+        //    Num = 0,
+        //    NoCopy = false,
+        //    AffectsFainted = false,
+        //    SourceEffect = string.Empty,
+        //    ShortDesc = string.Empty,
+        //    Desc = string.Empty
+        //};
+
+        public static Move EmptyMove(string? name = null)
+        {
+            return new Move()
+            {
+                Name = name ?? string.Empty,
+                Exists = name is not null,
+                BasePower = 0,
+                Accuracy = new TrueMoveDataAccuracy(true),
+                Pp = 0,
+                Category = MoveCategory.Status,
+                Type = PokemonType.Normal,
+                Priority = 0,
+                Target = MoveTarget.Self,
+                Flags = new MoveFlags(),
+                Fullname = string.Empty,
+                EffectType = EffectType.Move,
+                Gen = 0,
+                Num = 0,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty,
+                ShortDesc = string.Empty,
+                Desc = string.Empty
+            };
+        }
+
+        public static Move MoveFromMoveData(MoveData data)
+        {
+            return new Move()
+            {
+                Gen = 9,
+                Fullname = string.Empty,
+                EffectType = EffectType.Move,
+                Name = data.Name,
+                Num = data.Num ?? 0,
+                Exists = true,
+                NoCopy = false, // Moves are generally copyable
+                AffectsFainted = false, // Most moves don't affect fainted Pokemon
+                SourceEffect = string.Empty,
+
+                // Text descriptions
+                Desc = data.Desc ?? string.Empty,
+                ShortDesc = data.ShortDesc ?? string.Empty,
+
+                // Core move properties from MoveData
+                BasePower = data.BasePower,
+                Accuracy = data.Accuracy,
+                Pp = data.Pp,
+                Category = data.Category,
+                Type = data.Type,
+                Priority = data.Priority,
+                Target = data.Target,
+                Flags = data.Flags,
+
+                // Optional move mechanics
+                Damage = data.Damage,
+                ContestType = data.ContestType,
+                NoPpBoosts = data.NoPpBoosts,
+                IsZ = data.IsZ,
+                ZMove = data.ZMove,
+                IsMax = data.IsMax,
+                MaxMove = data.MaxMove,
+
+                // Special move effects
+                Ohko = data.Ohko,
+                ThawsTarget = data.ThawsTarget,
+                Heal = data.Heal,
+                ForceSwitch = data.ForceSwitch,
+                SelfSwitch = data.SelfSwitch,
+                SelfBoost = data.SelfBoost,
+                SelfDestruct = data.SelfDestruct,
+                BreaksProtect = data.BreaksProtect,
+                Recoil = data.Recoil,
+                Drain = data.Drain,
+                MindBlownRecoil = data.MindBlownRecoil,
+                StealsBoosts = data.StealsBoosts,
+                StruggleRecoil = data.StruggleRecoil,
+
+                // Secondary effects
+                Secondary = data.Secondary,
+                Secondaries = data.Secondaries,
+                Self = data.Self,
+                HasSheerForce = data.HasSheerForce,
+
+                // Hit mechanics
+                AlwaysHit = data.AlwaysHit,
+                BaseMoveType = data.BaseMoveType,
+                BasePowerModifier = data.BasePowerModifier,
+                CritModifier = data.CritModifier,
+                CritRatio = data.CritRatio,
+
+                // Override mechanics
+                OverrideOffensivePokemon = data.OverrideOffensivePokemon,
+                OverrideOffensiveStat = data.OverrideOffensiveStat,
+                OverrideDefensivePokemon = data.OverrideDefensivePokemon,
+                OverrideDefensiveStat = data.OverrideDefensiveStat,
+
+                // Ignore mechanics
+                ForceStab = data.ForceStab,
+                IgnoreAbility = data.IgnoreAbility,
+                IgnoreAccuracy = data.IgnoreAccuracy,
+                IgnoreDefensive = data.IgnoreDefensive,
+                IgnoreEvasion = data.IgnoreEvasion,
+                IgnoreImmunity = data.IgnoreImmunity,
+                IgnoreNegativeOffensive = data.IgnoreNegativeOffensive,
+                IgnoreOffensive = data.IgnoreOffensive,
+                IgnorePositiveDefensive = data.IgnorePositiveDefensive,
+                IgnorePositiveEvasion = data.IgnorePositiveEvasion,
+
+                // Multi-hit and accuracy
+                MultiAccuracy = data.MultiAccuracy,
+                MultiHit = data.MultiHit,
+                MultiHitType = data.MultiHitType,
+                NoDamageVariance = data.NoDamageVariance,
+                NonGhostTarget = data.NonGhostTarget,
+                SpreadModifier = data.SpreadModifier,
+
+                // Usability conditions
+                SleepUsable = data.SleepUsable,
+                SmartTarget = data.SmartTarget,
+                TracksTarget = data.TracksTarget,
+                WillCrit = data.WillCrit,
+                CallsMove = data.CallsMove,
+                HasCrashDamage = data.HasCrashDamage,
+                IsConfusionSelfHit = data.IsConfusionSelfHit,
+                StallingMove = data.StallingMove,
+                BaseMove = data.BaseMove,
+
+                // Event callbacks - these define the move's behavior
+                BasePowerCallback = data.BasePowerCallback,
+                BeforeMoveCallback = data.BeforeMoveCallback,
+                BeforeTurnCallback = data.BeforeTurnCallback,
+                DamageCallback = data.DamageCallback,
+                PriorityChargeCallback = data.PriorityChargeCallback,
+                OnDisableMove = data.OnDisableMove,
+                OnAfterHit = data.OnAfterHit,
+                OnAfterSubDamage = data.OnAfterSubDamage,
+                OnAfterMoveSecondarySelf = data.OnAfterMoveSecondarySelf,
+                OnAfterMoveSecondary = data.OnAfterMoveSecondary,
+                OnAfterMove = data.OnAfterMove,
+                OnDamagePriority = data.OnDamagePriority,
+                OnDamage = data.OnDamage,
+                OnBasePower = data.OnBasePower,
+                OnEffectiveness = data.OnEffectiveness,
+                OnHit = data.OnHit,
+                OnHitField = data.OnHitField,
+                OnHitSide = data.OnHitSide,
+                OnModifyMove = data.OnModifyMove,
+                OnModifyPriority = data.OnModifyPriority,
+                OnMoveFail = data.OnMoveFail,
+                OnModifyType = data.OnModifyType,
+                OnModifyTarget = data.OnModifyTarget,
+                OnPrepareHit = data.OnPrepareHit,
+                OnTry = data.OnTry,
+                OnTryHit = data.OnTryHit,
+                OnTryHitField = data.OnTryHitField,
+                OnTryHitSide = data.OnTryHitSide,
+                OnTryImmunity = data.OnTryImmunity,
+                OnTryMove = data.OnTryMove,
+                OnUseMoveMessage = data.OnUseMoveMessage,
+
+                // Hit effects
+                Boosts = data.Boosts,
+                Status = data.Status,
+                VolatileStatus = data.VolatileStatus,
+                SideCondition = data.SideCondition,
+                SlotCondition = data.SlotCondition,
+                PseudoWeather = data.PseudoWeather,
+                Terrain = data.Terrain,
+                Weather = data.Weather,
+
+                // Initialize computed properties that might need special handling
+                SpreadHit = data.SpreadHit ?? false,
+                IsNonstandard = data.IsNonstandard,
+                Duration = data.Duration,
+                DurationCallback = data.DurationCallback,
+                Infiltrates = data.Infiltrates,
+                Condition = data.Condition,
+            };
         }
     }
 }

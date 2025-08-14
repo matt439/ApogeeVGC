@@ -1,5 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using ApogeeVGC_CS.config;
 using ApogeeVGC_CS.data;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using String = System.String;
 
 namespace ApogeeVGC_CS.sim
 {
@@ -559,14 +564,14 @@ namespace ApogeeVGC_CS.sim
 
     public class Format : BasicEffect, IBasicEffect, IEffect
     {
-        public required string Mod { get; init; }
+        public required string Mod { get; set; }
 
         /// <summary>
         /// Name of the team generator algorithm, if this format uses
         /// random/fixed teams. null if players can bring teams.
         /// </summary>
         public string? Team { get; init; }
-        public required FormatEffectType FormatEffectType { get; init; }
+        public required FormatEffectType FormatEffectType { get; set; }
         public required bool Debug { get; init; }
 
         /// <summary>
@@ -590,7 +595,7 @@ namespace ApogeeVGC_CS.sim
         /// Base list of rule names as specified in "./config/formats.ts".
         /// Used in a custom format to correctly display the altered ruleset.
         /// </summary>
-        public required List<string> BaseRuleset { get; init; }
+        public required List<string> BaseRuleset { get; set; }
 
         /// <summary>List of banned effects.</summary>
         public required List<string> Banlist { get; init; }
@@ -628,12 +633,12 @@ namespace ApogeeVGC_CS.sim
         public IModdedBattleSide? Side { get; init; }
 
         // Display and tournament properties
-        public bool? ChallengeShow { get; init; }
-        public bool? SearchShow { get; init; }
-        public bool? BestOfDefault { get; init; }
-        public bool? TeraPreviewDefault { get; init; }
+        public bool? ChallengeShow { get; set; }
+        public bool? SearchShow { get; set; }
+        public bool? BestOfDefault { get; set; }
+        public bool? TeraPreviewDefault { get; set; }
         public List<string>? Threads { get; init; }
-        public bool? TournamentShow { get; init; }
+        public bool? TournamentShow { get; set; }
 
         // Validation functions
         public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; init; }
@@ -653,8 +658,8 @@ namespace ApogeeVGC_CS.sim
         public Func<TeamValidator, List<PokemonSet>, ValidationOptions?, List<string>?>? ValidateTeam { get; init; }
 
         // Layout properties
-        public string? Section { get; init; }
-        public int? Column { get; init; }
+        public string? Section { get; set; }
+        public int? Column { get; set; }
         public Dictionary<string, object> ExtraData { get; set; } = [];
         public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
         public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
@@ -682,17 +687,386 @@ namespace ApogeeVGC_CS.sim
         {
             throw new NotImplementedException("MergeFormatLists method is not implemented yet.");
         }
+
+        //public static Format EmptyFormat(string? name = null)
+        //{
+        //    return new Format
+        //    {
+        //        Mod = null,
+        //        FormatEffectType = FormatEffectType.Format,
+        //        Debug = false,
+        //        Rated = null,
+        //        GameType = GameType.Singles,
+        //        Ruleset = null,
+        //        BaseRuleset = null,
+        //        Banlist = null,
+        //        Restricted = null,
+        //        Unbanlist = null,
+        //        NoLog = false,
+        //        Name = null,
+        //        Fullname = null,
+        //        EffectType = EffectType.Condition,
+        //        Exists = false,
+        //        Num = 0,
+        //        Gen = 0,
+        //        NoCopy = false,
+        //        AffectsFainted = false,
+        //        SourceEffect = null
+        //    };
+        //}
     }
 
     public class DexFormats(ModdedDex dex)
     {
         private ModdedDex Dex { get; } = dex;
         private Dictionary<Id, Format> RulesetCache { get; }= [];
-        private Format[]? FormatListCache { get; } = null;
+        private Format[]? FormatListCache { get; set; }
+
+        public void LoadTestFormats()
+        {
+            var testFormat = new Format
+            {
+                Mod = DexConstants.BaseMod.ToString(),
+                FormatEffectType = FormatEffectType.Format,
+                Debug = false,
+                Rated = new BoolBoolStringUnion(false),
+                GameType = GameType.Singles,
+                Ruleset = [],
+                BaseRuleset = [],
+                Banlist = [],
+                Restricted = [],
+                Unbanlist = [],
+                NoLog = false,
+                Name = "ApogeeVGC 1v1",
+                Fullname = "ApogeeVGC 1v1",
+                EffectType = EffectType.Format,
+                Exists = true,
+                Num = 0,
+                Gen = 9,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty,
+            };
+            RulesetCache[new Id("apogeevgc-1v1")] = testFormat;
+            FormatListCache = [testFormat];
+        }
 
         public DexFormats Load()
         {
-            throw new NotImplementedException("load method is not implemented yet.");
+            // Ensure this only runs on the base mod
+            if (!Dex.IsBase)
+            {
+                throw new InvalidOperationException("This should only be run on the base mod");
+            }
+
+            // Include mods first
+            Dex.IncludeMods();
+
+            // Return if already cached
+            if (FormatListCache != null)
+            {
+                return this;
+            }
+
+            var formatsList = new List<Format>();
+
+            try
+            {
+                // Load custom formats (optional)
+                FormatList? customFormats = null;
+                try
+                {
+                    customFormats = LoadCustomFormats();
+                }
+                catch (FileNotFoundException)
+                {
+                    // Custom formats are optional - continue without them
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    // Custom formats are optional - continue without them
+                }
+
+                // Load base formats (required)
+                var baseFormats = LoadBaseFormats();
+
+                // Merge formats if custom formats exist
+                var allFormats = customFormats != null
+                    ? FormatUtils.MergeFormatLists(baseFormats, customFormats)
+                    : baseFormats;
+
+                // Process all formats
+                ProcessFormats(allFormats, formatsList);
+
+                // Cache the result
+                FormatListCache = formatsList.ToArray();
+
+                return this;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error loading formats: {ex.Message}", ex);
+            }
+        }
+
+        // Helper method to load custom formats
+        private FormatList? LoadCustomFormats()
+        {
+            string customFormatsPath = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
+                "..", "config", "custom-formats.json");
+
+            if (!File.Exists(customFormatsPath))
+            {
+                return null;
+            }
+
+            string jsonContent = File.ReadAllText(customFormatsPath);
+            var jsonDocument = JsonDocument.Parse(jsonContent);
+
+            if (!jsonDocument.RootElement.TryGetProperty("Formats", out JsonElement formatsElement))
+            {
+                throw new InvalidDataException("Custom formats file must have a 'Formats' property");
+            }
+
+            if (formatsElement.ValueKind != JsonValueKind.Array)
+            {
+                throw new InvalidDataException("Exported property 'Formats' from custom-formats must be an array");
+            }
+
+            return DeserializeFormatList(formatsElement);
+        }
+
+        // Helper method to load base formats
+        private FormatList LoadBaseFormats()
+        {
+            //string baseFormatsPath = Path.Combine(
+            //    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
+            //    "..", "config", "formats.json");
+
+            //if (!File.Exists(baseFormatsPath))
+            //{
+            //    throw new FileNotFoundException($"Base formats file not found: {baseFormatsPath}");
+            //}
+
+            //string jsonContent = File.ReadAllText(baseFormatsPath);
+            //var jsonDocument = JsonDocument.Parse(jsonContent);
+
+            //if (!jsonDocument.RootElement.TryGetProperty("Formats", out JsonElement formatsElement))
+            //{
+            //    throw new InvalidDataException("Base formats file must have a 'Formats' property");
+            //}
+
+            //if (formatsElement.ValueKind != JsonValueKind.Array)
+            //{
+            //    throw new InvalidDataException("Exported property 'Formats' from formats must be an array");
+            //}
+
+            //return DeserializeFormatList(formatsElement);
+
+            return Formats.FormatsList;
+        }
+
+        // Helper method to deserialize format list from JSON
+        private static FormatList DeserializeFormatList(JsonElement formatsElement)
+        {
+            var formatList = new FormatList();
+
+            foreach (JsonElement formatElement in formatsElement.EnumerateArray())
+            {
+                if (formatElement.TryGetProperty("section", out JsonElement sectionElement) &&
+                    !formatElement.TryGetProperty("name", out _))
+                {
+                    // This is a section entry
+                    var sectionEntry = new SectionEntry
+                    {
+                        Section = sectionElement.GetString() ?? "",
+                        Column = formatElement.TryGetProperty("column", out JsonElement columnElement)
+                            ? columnElement.GetInt32() : null
+                    };
+                    formatList.Add(sectionEntry);
+                }
+                else
+                {
+                    // This is a format entry
+                    var formatData = JsonSerializer.Deserialize<FormatData>(formatElement.GetRawText());
+                    if (formatData != null)
+                    {
+                        formatList.Add(formatData);
+                    }
+                }
+            }
+
+            return formatList;
+        }
+
+        // Helper method to process all formats
+        private void ProcessFormats(FormatList allFormats, List<Format> formatsList)
+        {
+            string currentSection = "";
+            int currentColumn = 1;
+
+            for (int i = 0; i < allFormats.Count; i++)
+            {
+                var entry = allFormats[i];
+
+                switch (entry)
+                {
+                    case SectionEntry sectionEntry:
+                        currentSection = sectionEntry.Section;
+                        if (sectionEntry.Column.HasValue)
+                        {
+                            currentColumn = sectionEntry.Column.Value;
+                        }
+                        continue;
+
+                    case FormatData formatData:
+                        ProcessSingleFormat(formatData, i, currentSection, currentColumn, formatsList);
+                        break;
+
+                    default:
+                        throw new InvalidDataException($"Unknown format list entry type at index {i}");
+                }
+            }
+        }
+
+        // Helper method to process a single format
+        private void ProcessSingleFormat(FormatData formatData, int index, string currentSection,
+            int currentColumn, List<Format> formatsList)
+        {
+            // Validate format name
+            var id = new Id(formatData.Name);
+            if (id.IsEmpty)
+            {
+                throw new ArgumentException(
+                    $"Format #{index + 1} must have a name with alphanumeric characters, not '{formatData.Name}'");
+            }
+
+            // Check for duplicate IDs
+            if (RulesetCache.ContainsKey(id))
+            {
+                throw new InvalidOperationException($"Format #{index + 1} has a duplicate ID: '{id}'");
+            }
+
+            // Set defaults for section and column if not specified
+            if (string.IsNullOrEmpty(formatData.Section))
+            {
+                formatData.Section = currentSection;
+            }
+
+            if (!formatData.Column.HasValue)
+            {
+                formatData.Column = currentColumn;
+            }
+
+            // Set effect type
+            formatData.FormatEffectType = FormatEffectType.Format;
+
+            // Copy base ruleset
+            formatData.BaseRuleset = formatData.Ruleset?.ToList() ?? new List<string>();
+
+            // Set display defaults
+            formatData.ChallengeShow ??= true;
+            formatData.SearchShow ??= true;
+            formatData.TournamentShow ??= true;
+            formatData.BestOfDefault ??= false;
+            formatData.TeraPreviewDefault ??= false;
+
+            // Set mod default
+            if (string.IsNullOrEmpty(formatData.Mod))
+            {
+                formatData.Mod = "gen9";
+            }
+
+            // Validate mod exists
+            if (!Dex.Dexes().ContainsKey(formatData.Mod))
+            {
+                throw new InvalidOperationException(
+                    $"Format \"{formatData.Name}\" requires nonexistent mod: '{formatData.Mod}'");
+            }
+
+            // Create Format from FormatData
+            var format = CreateFormatFromData(formatData);
+
+            // Cache and add to list
+            RulesetCache[id] = format;
+            formatsList.Add(format);
+        }
+
+        // Helper method to create Format from FormatData
+        private static Format CreateFormatFromData(FormatData formatData)
+        {
+            return new Format
+            {
+                // Basic Effect properties
+                Name = formatData.Name,
+                Fullname = $"format: {formatData.Name}",
+                EffectType = EffectType.Format,
+                Exists = true,
+                Num = formatData.Num,
+                Gen = formatData.Gen,
+                Desc = formatData.Desc,
+                ShortDesc = formatData.ShortDesc,
+                IsNonstandard = formatData.IsNonstandard,
+                NoCopy = formatData.NoCopy,
+                AffectsFainted = formatData.AffectsFainted,
+                SourceEffect = formatData.SourceEffect,
+
+                // Format-specific properties
+                Mod = formatData.Mod,
+                Team = formatData.Team,
+                FormatEffectType = formatData.FormatEffectType,
+                Debug = formatData.Debug,
+                Rated = formatData.Rated,
+                GameType = formatData.GameType,
+                Ruleset = formatData.Ruleset,
+                BaseRuleset = formatData.BaseRuleset,
+                Banlist = formatData.Banlist,
+                Restricted = formatData.Restricted,
+                Unbanlist = formatData.Unbanlist,
+                CustomRules = formatData.CustomRules,
+                NoLog = formatData.NoLog,
+
+                // Display properties
+                Section = formatData.Section,
+                Column = formatData.Column,
+                ChallengeShow = formatData.ChallengeShow,
+                SearchShow = formatData.SearchShow,
+                TournamentShow = formatData.TournamentShow,
+                BestOfDefault = formatData.BestOfDefault,
+                TeraPreviewDefault = formatData.TeraPreviewDefault,
+
+                // Copy other relevant properties
+                OnBegin = formatData.OnBegin,
+                HasValue = formatData.HasValue,
+                OnValidateRule = formatData.OnValidateRule,
+                MutuallyExclusiveWith = formatData.MutuallyExclusiveWith,
+
+                // Battle module properties
+                Battle = formatData.Battle,
+                Pokemon = formatData.Pokemon,
+                Queue = formatData.Queue,
+                Field = formatData.Field,
+                Actions = formatData.Actions,
+                Side = formatData.Side,
+
+                // Validation functions
+                CheckCanLearn = formatData.CheckCanLearn,
+                GetEvoFamily = formatData.GetEvoFamily,
+                GetSharedPower = formatData.GetSharedPower,
+                GetSharedItems = formatData.GetSharedItems,
+                OnChangeSet = formatData.OnChangeSet,
+
+                // Event handlers
+                OnModifySpeciesPriority = formatData.OnModifySpeciesPriority,
+                OnModifySpecies = formatData.OnModifySpecies,
+                OnBattleStart = formatData.OnBattleStart,
+                OnTeamPreview = formatData.OnTeamPreview,
+                OnValidateSet = formatData.OnValidateSet,
+                OnValidateTeam = formatData.OnValidateTeam,
+                ValidateSet = formatData.ValidateSet,
+                ValidateTeam = formatData.ValidateTeam
+            };
         }
 
         public string Validate(string name)

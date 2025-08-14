@@ -35,7 +35,7 @@ namespace ApogeeVGC_CS.data
     */
     public static class Abilities
     {
-        public static AbilityData DefaultAbilityData = new()
+        public static readonly AbilityData DefaultAbilityData = new()
         {
             Name = string.Empty,
             Fullname = string.Empty,
@@ -97,7 +97,7 @@ namespace ApogeeVGC_CS.data
                 },
                 Name = "As One (Glastrier)",
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition, //EffectType.Ability,
                 Exists = true,
                 Num = 266,
                 Gen = 0,
@@ -145,7 +145,7 @@ namespace ApogeeVGC_CS.data
                 Rating = 4.5,
                 Num = 289,
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition, //EffectType.Ability,
                 Exists = true,
                 Gen = 0,
                 NoCopy = false,
@@ -171,7 +171,7 @@ namespace ApogeeVGC_CS.data
                 Rating = 3.5,
                 Num = 62,
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition,
                 Exists = true,
                 Gen = 0,
                 NoCopy = false,
@@ -199,7 +199,7 @@ namespace ApogeeVGC_CS.data
                 Rating = 2,
                 Num = 49,
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition,
                 Exists = true,
                 Gen = 0,
                 NoCopy = false,
@@ -221,7 +221,7 @@ namespace ApogeeVGC_CS.data
                 Rating = 4,
                 Num = 158,
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition,
                 Exists = true,
                 Gen = 0,
                 NoCopy = false,
@@ -261,7 +261,7 @@ namespace ApogeeVGC_CS.data
                 {
                     Name = "Quark Drive",
                     Fullname = "ability: Quark Drive",
-                    EffectType = EffectType.Ability,
+                    EffectType = EffectType.Condition,
                     Exists = true,
                     Num = 282,
                     Gen = 0,
@@ -363,7 +363,7 @@ namespace ApogeeVGC_CS.data
                 Rating = 3,
                 Num = 282,
                 Fullname = string.Empty,
-                EffectType = EffectType.Ability,
+                EffectType = EffectType.Condition,
                 Exists = true,
                 Gen = 0,
                 NoCopy = false,

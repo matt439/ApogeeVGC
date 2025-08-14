@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.data;
+
+namespace ApogeeVGC_CS.sim
 {
     public abstract class BasicEffect : IEffectData
     {
@@ -23,10 +25,10 @@
                 {
                     throw new ArgumentNullException(nameof(value), "Name cannot be null.");
                 }
-                if (value.Length == 0)
-                {
-                    throw new ArgumentException("Name cannot be empty.", nameof(value));
-                }
+                //if (value.Length == 0)
+                //{
+                //    throw new ArgumentException("Name cannot be empty.", nameof(value));
+                //}
 
                 field = value.Trim();
             }
@@ -83,7 +85,7 @@
         /// that have no use in standard formats: made-up pokemon (CAP),
         /// glitches (MissingNo etc), Pokestar pokemon, etc.
         /// </summary>
-        public Nonstandard? IsNonstandard { get; init; }
+        public Nonstandard? IsNonstandard { get; set; }
 
         /// <summary>The duration of the condition - only for pure conditions.</summary>
         public int? Duration { get; init; }
@@ -177,26 +179,132 @@
     {
         private ModdedDex Dex { get; }= dex;
         private Dictionary<Id, Nature> NatureCache { get;} = new();
-        private Nature[]? AllCache { get; } = null;
+        private Nature[]? AllCache { get; set; } = null;
+
+        public void LoadTestNatures()
+        {
+            foreach (var data in Natures.NatureData)
+            {
+                NatureCache[data.Key] = CreateNatureFromData(data.Value.Name, data.Value);
+            }
+        }
 
         public Nature Get(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return NatureConstants.EmptyNature;
+
             return GetById(new Id(name));
         }
 
         public static Nature Get(Nature nature)
         {
-            return nature;
+            return nature; // If already a Nature object, return as-is
         }
 
         public Nature GetById(Id id)
         {
-            throw new Exception("GetById method is not implemented yet.");
+            if (id.Value == "")
+                return NatureConstants.EmptyNature;
+
+            // Check cache first
+            if (NatureCache.TryGetValue(id, out Nature? cachedNature))
+                return cachedNature;
+
+            Nature? nature = null;
+
+            // Try alias resolution
+            Id? aliasId = Dex.GetAlias(id);
+            if (aliasId is not null)
+            {
+                nature = Get(aliasId.Value);
+                if (nature.Exists)
+                {
+                    NatureCache[id] = nature;
+                }
+                return nature;
+            }
+
+            // Try to load from data
+            if (!id.IsEmpty && Dex.Data.Natures.ContainsKey(id))
+            {
+                var natureData = Dex.Data.Natures[id];
+
+                // Create new Nature from data
+                nature = CreateNatureFromData(id.Value, natureData);
+
+                // Apply generation rules
+                if (nature.Gen > Dex.Gen)
+                {
+                    nature.IsNonstandard = Nonstandard.Future;
+                }
+            }
+            else
+            {
+                // Create non-existent nature
+                nature = CreateNonExistentNature(id.Value);
+            }
+
+            // Cache successful results
+            if (nature.Exists)
+            {
+                NatureCache[id] = nature;
+            }
+
+            return nature;
         }
 
         public Nature[] All()
         {
-            throw new Exception();
+            if (AllCache != null)
+                return AllCache;
+
+            var natures = new List<Nature>();
+            foreach (var id in Dex.Data.Natures.Keys)
+            {
+                natures.Add(GetById(new Id(id.Value)));
+            }
+
+            AllCache = natures.ToArray();
+            return AllCache;
+        }
+
+        // Helper method to create Nature from data
+        private static Nature CreateNatureFromData(string name, INatureData natureData)
+        {
+            return new Nature
+            {
+                Name = name,
+                Plus = natureData.Plus,
+                Minus = natureData.Minus,
+                Fullname = $"nature: {name}",
+                EffectType = EffectType.Nature,
+                Gen = 3, // Natures were introduced in Gen 3
+                Exists = true,
+                Num = 0, // Natures don't typically have numbers
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty
+            };
+        }
+
+        // Helper method to create non-existent nature
+        private static Nature CreateNonExistentNature(string name)
+        {
+            return new Nature
+            {
+                Name = name,
+                Plus = null,
+                Minus = null,
+                Fullname = $"nature: {name}",
+                EffectType = EffectType.Nature,
+                Gen = 0,
+                Exists = false,
+                Num = 0,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty
+            };
         }
     }
 
@@ -304,6 +412,30 @@
         private Dictionary<Id, TypeInfo> TypeCache { get; } = [];
         private TypeInfo[]? AllCache{ get; } = null;
         private string[]? NamesCache { get; } = null;
+
+        public void LoadTestTypes()
+        {
+            foreach (var data in TypeChart.TypeData)
+            {
+                TypeCache[data.Key] = CreateTypeInfoFromData(data.Key.ToString(), data.Value);
+            }
+        }
+
+        private static TypeInfo CreateTypeInfoFromData(string name, ITypeData typeData)
+        {
+            return new TypeInfo
+            {
+                Name = name,
+                Id = new Id(name),
+                EffectType = TypeInfoEffectType.Type,
+                Exists = true,
+                Gen = 0, // Default to 0, can be set later
+                IsNonstandard = typeData.IsNonstandard,
+                DamageTaken = typeData.DamageTaken,
+                HpIvs = typeData.HpIvs ?? new SparseStatsTable(),
+                HpDvs = typeData.HpDvs ?? new SparseStatsTable()
+            };
+        }
 
         public TypeInfo Get(string name)
         {

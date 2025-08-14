@@ -1,10 +1,12 @@
 ﻿using ApogeeVGC_CS.lib;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC_CS.sim
 {
-    public class MoveSlot
+    public record MoveSlot
     {
         public required Id Id { get; init; }
         public required string Move { get; init; }
@@ -30,7 +32,7 @@ namespace ApogeeVGC_CS.sim
     public class EffectState
     {
         public required Id Id { get; init; }
-        public required int EffectOrder { get; init; }
+        public int EffectOrder { get; init; }
         public int? Duration { get; set; }
         public Dictionary<string, object> ExtraData { get; set; } = [];
     }
@@ -65,114 +67,114 @@ namespace ApogeeVGC_CS.sim
         public Side Side { get; }
         public Battle Battle { get; }
 
-        public required PokemonSet Set { get; init; }
-        public required string Name { get; init; }
+        public PokemonSet Set { get; init; }
+        public string Name { get; init; }
         public string Fullname => $"{Side.Id}: {Name}";
-        public required int Level { get; init; }
-        public required GenderName Gender { get; init; }
-        public required int Happiness { get; init; }
-        public required Id Pokeball { get; init; }
-        public required int DynamaxLevel { get; init; }
-        public required bool Gigantamax { get; init; }
+        public int Level { get; init; }
+        public GenderName Gender { get; init; }
+        public int Happiness { get; init; }
+        public Id Pokeball { get; init; }
+        public int DynamaxLevel { get; init; }
+        public bool Gigantamax { get; init; }
 
-        public required PokemonType BaseHpType { get; init; }
-        public required int BaseHpPower { get; init; }
+        public PokemonType BaseHpType { get; init; }
+        public int BaseHpPower { get; init; }
 
-        public required List<MoveSlot> BaseMoveSlots { get; init; }
-        public required List<MoveSlot> MoveSlots { get; init; }
+        public List<MoveSlot> BaseMoveSlots { get; init; }
+        public List<MoveSlot> MoveSlots { get; set; }
 
-        public required PokemonType HpType { get; init; }
-        public required int HpPower { get; init; }
+        public PokemonType HpType { get; set; }
+        public int HpPower { get; set; }
 
-        public required int Position { get; init; }
-        public required string Details { get; set; }
+        public int Position { get; set; }
+        public string Details { get; set; }
 
-        public required Species BaseSpecies { get; set; }
-        public required Species Species { get; init; }
-        public required EffectState SpeciesState { get; init; }
+        public Species BaseSpecies { get; set; }
+        public Species Species { get; set; }
+        public EffectState SpeciesState { get; init; }
 
-        public required Id Status { get; init; }
-        public required EffectState StatusState { get; init; }
-        public required Dictionary<string, EffectState> Volatiles { get; init; }
+        public Id Status { get; init; }
+        public EffectState StatusState { get; init; }
+        public Dictionary<string, EffectState> Volatiles { get; init; }
         public bool? ShowCure { get; init; }
 
-        public required StatsTable BaseStoredStats { get; init; }
-        public required StatsTable StoredStats { get; init; }
-        public required BoostsTable Boosts { get; init; }
+        public StatsTable BaseStoredStats { get; set; }
+        public StatsTable StoredStats { get; init; }
+        public BoostsTable Boosts { get; set; }
 
-        public required Id BaseAbility { get; set; }
-        public required Id Ability { get; init; }
-        public required EffectState AbilityState { get; init; }
+        public Id BaseAbility { get; set; }
+        public Id Ability { get; set; }
+        public EffectState AbilityState { get; init; }
 
-        public required Id Item { get; init; }
-        public required EffectState ItemState { get; init; }
-        public required Id LastItem { get; init; }
-        public required bool UsedItemThisTurn { get; init; }
-        public required bool AteBerry { get; init; }
-        public required PokemonTrapped Trapped { get; init; }
-        public required bool MaybeTrapped { get; init; }
-        public required bool MaybeDisabled { get; init; }
+        public Id Item { get; init; }
+        public EffectState ItemState { get; init; }
+        public Id LastItem { get; init; }
+        public bool UsedItemThisTurn { get; init; }
+        public bool AteBerry { get; init; }
+        public PokemonTrapped Trapped { get; init; }
+        public bool MaybeTrapped { get; init; }
+        public bool MaybeDisabled { get; init; }
         public bool? MaybeLocked { get; init; }
 
         public Pokemon? Illusion { get; set; }
-        public required bool Transformed { get; init; }
-        public required int MaxHp { get; init; }
-        public required int BaseMaxHp { get; init; }
-        public required int Hp { get; init; }
-        public required bool Fainted { get; set; }
-        public required bool FaintQueued { get; init; }
+        public bool Transformed { get; set; }
+        public int MaxHp { get; set; }
+        public int BaseMaxHp { get; set; }
+        public int Hp { get; set; }
+        public bool Fainted { get; set; }
+        public bool FaintQueued { get; init; }
         public bool? SubFainted { get; init; }
-        public required bool FormeRegression { get; set; }
-        public required List<PokemonType> Types { get; init; }
-        public required string AddedType { get; init; }
-        public required bool KnownType { get; init; }
-        public required string ApparentType { get; init; }
-        public required IdBoolUnion SwitchFlag { get; init; }
-        public required bool ForceSwitchFlag { get; init; }
-        public required bool SkipBeforeSwitchOutEventFlag { get; init; }
+        public bool FormeRegression { get; set; }
+        public List<PokemonType> Types { get; init; }
+        public string AddedType { get; set; }
+        public bool KnownType { get; set; }
+        public string ApparentType { get; set; }
+        public IdBoolUnion SwitchFlag { get; set; }
+        public bool ForceSwitchFlag { get; set; }
+        public bool SkipBeforeSwitchOutEventFlag { get; init; }
         public int? DraggedIn { get; init; }
-        public required bool NewlySwitched { get; init; }
-        public required bool BeingCalledBack { get; init; }
+        public bool NewlySwitched { get; set; }
+        public bool BeingCalledBack { get; set; }
 
-        public ActiveMove? LastMove { get; init; }
-        public ActiveMove? LastMoveEncore { get; init; } // Gen 2 only
-        public ActiveMove? LastMoveUsed { get; init; }
+        public ActiveMove? LastMove { get; set; }
+        public ActiveMove? LastMoveEncore { get; set; } // Gen 2 only
+        public ActiveMove? LastMoveUsed { get; set; }
         public int? LastMoveTargetLoc { get; init; }
-        public required BoolStringUnion MoveThisTurn { get; init; }
-        public required bool StatsRaisedThisTurn { get; init; }
-        public required bool StatsLoweredThisTurn { get; init; }
-        public bool? MoveLastTurnResult { get; init; }
-        public bool? MoveThisTurnResult { get; init; }
-        public int? HurtThisTurn { get; init; }
-        public required int LastDamage { get; init; }
-        public required List<Attacker> AttackedBy { get; init; }
-        public required int TimesAttacked { get; init; }
+        public BoolStringUnion MoveThisTurn { get; set; }
+        public bool StatsRaisedThisTurn { get; init; }
+        public bool StatsLoweredThisTurn { get; init; }
+        public bool? MoveLastTurnResult { get; set; }
+        public bool? MoveThisTurnResult { get; set; }
+        public int? HurtThisTurn { get; set; }
+        public int LastDamage { get; set; }
+        public List<Attacker> AttackedBy { get; init; }
+        public int TimesAttacked { get; init; }
 
-        public required bool IsActive { get; set; }
-        public required int ActiveTurns { get; init; }
-        public required int ActiveMoveActions { get; init; }
-        public required int PreviouslySwitchedIn { get; init; }
-        public required bool TruantTurn { get; init; }
-        public required bool BondTriggered { get; init; }
-        public required bool SwordBoost { get; init; } // Gen 9 only
-        public required bool ShieldBoost { get; init; } // Gen 9 only
-        public required bool SyrupTriggered { get; init; } // Gen 9 only
-        public required List<string> StellarBoostedTypes { get; init; } // Gen 9 only
+        public bool IsActive { get; set; }
+        public int ActiveTurns { get; init; }
+        public int ActiveMoveActions { get; init; }
+        public int PreviouslySwitchedIn { get; init; }
+        public bool TruantTurn { get; init; }
+        public bool BondTriggered { get; init; }
+        public bool SwordBoost { get; init; } // Gen 9 only
+        public bool ShieldBoost { get; init; } // Gen 9 only
+        public bool SyrupTriggered { get; init; } // Gen 9 only
+        public List<string> StellarBoostedTypes { get; init; } // Gen 9 only
 
-        public required bool IsStarted { get; set; }
-        public required bool DuringMove { get; init; }
+        public bool IsStarted { get; set; }
+        public bool DuringMove { get; init; }
 
-        public required double WeightHg { get; init; }
-        public required int Speed { get; init; }
+        public double WeightHg { get; set; }
+        public int Speed { get; set; }
 
         public string? CanMegaEvo { get; init; }
         public string? CanMegaEvoX { get; init; }
         public string? CanMegaEvoY { get; init; }
         public string? CanUltraBurst { get; init; }
         public string? CanGigantamax { get; }
-        public StringFalseUnion? CanTerastallize { get; init; }
-        public required PokemonType TeraType { get; init; }
-        public required List<PokemonType> BaseTypes { get; init; }
+        public StringFalseUnion? CanTerastallize { get; set; }
+        public PokemonType TeraType { get; init; }
+        public List<PokemonType> BaseTypes { get; init; }
         public string? Terastallized { get; set; }
 
         public string? Staleness
@@ -210,7 +212,7 @@ namespace ApogeeVGC_CS.sim
         public string? VolatileStaleness
         {
             get;
-            init // "external"
+            set // "external"
             {
                 if (value is "external" or null)
                 {
@@ -226,7 +228,7 @@ namespace ApogeeVGC_CS.sim
         // Gen 1 only
         public StatsTable? ModifiedStats { get; init; }
 
-        public Action<StatIdExceptHp, int>? ModifyStat { get; init; }
+        public Action<StatIdExceptHp, double>? ModifyStat { get; init; }
 
         // Stadium only
         public Action? RecalculateStats { get; init; }
@@ -257,6 +259,8 @@ namespace ApogeeVGC_CS.sim
             BaseSpecies = Battle.Dex.Species.Get(set.Species);
             if (!BaseSpecies.Exists)
                 throw new ArgumentException($"Unidentified species: {BaseSpecies.Name}");
+
+            Set = set;
 
             Species = BaseSpecies;
 
@@ -524,7 +528,39 @@ namespace ApogeeVGC_CS.sim
 
         public string GetUpdatedDetails(int? level = null)
         {
-            throw new NotImplementedException();
+            string name = Species.Name;
+
+            // Handle special forms that should use base species name
+            if (name is "Greninja-Bond" or "Rockruff-Dusk")
+            {
+                name = Species.BaseSpecies;
+            }
+
+            // Use provided level or fall back to Pokemon's level
+            int displayLevel = level ?? Level;
+
+            // Build the details string
+            var details = new List<string> { name };
+
+            // Add level if not 100 (standard level)
+            if (displayLevel != 100)
+            {
+                details.Add($"L{displayLevel}");
+            }
+
+            // Add gender if not empty
+            if (Gender != GenderName.Empty)
+            {
+                details.Add(Gender.ToString());
+            }
+
+            // Add shiny status if applicable
+            if (Set.Shiny == true)
+            {
+                details.Add("shiny");
+            }
+
+            return string.Join(", ", details);
         }
 
         public FullDetails GetFullDetails()
@@ -858,9 +894,165 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Changes this Pokemon's species to the given species.
+        /// This function only handles changes to stats and type.
+        /// Use FormeChange to handle changes to ability and sending client messages.
+        /// </summary>
         public Species? SetSpecies(Species rawSpecies, IEffect? source = null, bool isTransform = false)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Use battle effect as default source
+                source ??= Battle.Effect;
+
+                // Run ModifySpecies event to allow modifications
+                var modifiedSpecies = Battle.RunEvent("ModifySpecies", this, null, source, rawSpecies);
+
+                // Handle different return types from the event
+                var species = modifiedSpecies switch
+                {
+                    Species s => s,
+                    null => null,
+                    _ => rawSpecies // Fallback to original if unexpected type
+                };
+
+                if (species == null) return null;
+
+                // Update species
+                Species = species;
+
+                // Update type information safely
+                UpdateTypeInformation(species, rawSpecies);
+
+                // Update weight
+                WeightHg = species.WeightHg;
+
+                // Calculate and apply new stats
+                var stats = CalculateNewStats(species);
+
+                // Initialize HP if needed
+                InitializeHpIfNeeded(stats);
+
+                // Update stored stats
+                UpdateStoredStatsForSpeciesChange(stats, isTransform);
+
+                // Apply generation-specific modifications
+                ApplyGenerationSpecificModifications();
+
+                // Update speed
+                Speed = StoredStats.Spe;
+
+                return species;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in SetSpecies for {Name}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private void UpdateTypeInformation(Species species, Species rawSpecies)
+        {
+            try
+            {
+                SetType(species.Types, enforce: true);
+                ApparentType = string.Join("/", rawSpecies.Types.Select(t => t.ToString()));
+                AddedType = species.AddedType?.ToString() ?? "";
+                KnownType = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating type information: {ex.Message}");
+                // Continue with defaults
+                ApparentType = string.Join("/", species.Types.Select(t => t.ToString()));
+                AddedType = "";
+                KnownType = true;
+            }
+        }
+
+        private StatsTable CalculateNewStats(Species species)
+        {
+            var stats = Battle.SpreadModify(species.BaseStats, Set);
+
+            // Handle special maxHP override
+            if (species.MaxHp.HasValue)
+            {
+                var newStats = new StatsTable();
+                // Copy all stats from the original
+                if (species.MaxHp.HasValue)
+                {
+                    stats = new StatsTable(stats)
+                    {
+                        Hp = species.MaxHp.Value // Direct property assignment
+                    };
+                }
+                // Override the HP value
+                newStats.SetStat(StatId.Hp, species.MaxHp.Value);
+                stats = newStats;
+            }
+
+            return stats;
+        }
+
+        private void InitializeHpIfNeeded(StatsTable stats)
+        {
+            if (MaxHp != 0) return;
+            BaseMaxHp = stats.Hp;
+            MaxHp = stats.Hp;
+            Hp = stats.Hp;
+        }
+
+        private void UpdateStoredStatsForSpeciesChange(StatsTable stats, bool isTransform)
+        {
+            // Update base stored stats (not for transforms)
+            if (!isTransform)
+            {
+                BaseStoredStats = stats;
+            }
+
+            // Update all stored stats except HP
+            foreach (var statId in Enum.GetValues<StatIdExceptHp>())
+            {
+                int statValue = stats.GetStat(StatIdTools.ConvertToStatId(statId));
+                StoredStats.SetStat(StatIdTools.ConvertToStatId(statId), statValue);
+
+                // Gen 1: Reset modified stats
+                ModifiedStats?.SetStat(StatIdTools.ConvertToStatId(statId), statValue);
+            }
+        }
+
+        private void ApplyGenerationSpecificModifications()
+        {
+            if (Battle.Gen <= 1)
+            {
+                ApplyGen1StatusModifications();
+            }
+        }
+
+        private void ApplyGen1StatusModifications()
+        {
+            if (ModifyStat == null) return;
+
+            try
+            {
+                // Re-apply burn and paralysis drops in Gen 1
+                string statusValue = Status.Value.ToLowerInvariant();
+
+                switch (statusValue)
+                {
+                    case "par":
+                        ModifyStat(StatIdExceptHp.Spe, 0.25);
+                        break;
+                    case "brn":
+                        ModifyStat(StatIdExceptHp.Atk, 0.5);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error applying Gen 1 status modifications: {ex.Message}");
+            }
         }
 
         public bool FormeChange(Species speciesId, IEffect? source = null, bool? isPermanent = null,
@@ -877,7 +1069,178 @@ namespace ApogeeVGC_CS.sim
 
         public void ClearVolatile(bool includeSwitchFlags = true)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Reset all boosts to 0
+                Boosts ??= new BoostsTable();
+                foreach (var boostType in Enum.GetValues<BoostId>())
+                {
+                    Boosts[boostType] = 0;
+                }
+
+                // Handle move slots restoration
+                RestoreMoveSlots();
+
+                // Reset transformation state
+                ResetTransformationState();
+
+                // Handle linked volatiles cleanup
+                CleanupLinkedVolatiles();
+
+                // Handle volatile effects
+                HandleVolatileEffects();
+
+                // Clear switch flags if requested
+                if (includeSwitchFlags)
+                {
+                    SwitchFlag = false;
+                    ForceSwitchFlag = false;
+                }
+
+                // Reset move and damage tracking
+                ResetMoveTracking();
+                ResetDamageTracking();
+
+                // Clear staleness and state flags
+                ClearStateFlags();
+
+                // Reset to base species
+                SetSpecies(BaseSpecies);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ClearVolatile for {Name}: {ex.Message}");
+                // Continue with partial cleanup rather than throwing
+            }
+        }
+
+        private void RestoreMoveSlots()
+        {
+            if (Battle.Gen == 1 && HasBaseMoveId(new Id("mimic")) && !Transformed)
+            {
+                int mimicSlotIndex = GetBaseMoveSlotIndex(new Id("mimic"));
+                if (mimicSlotIndex >= 0 && mimicSlotIndex < MoveSlots.Count)
+                {
+                    int preservedMimicPp = MoveSlots[mimicSlotIndex].Pp;
+                    MoveSlots = CloneMoveSlots(BaseMoveSlots);
+
+                    if (mimicSlotIndex < MoveSlots.Count)
+                    {
+                        MoveSlots[mimicSlotIndex] = MoveSlots[mimicSlotIndex] with { Pp = preservedMimicPp };
+                    }
+                }
+                else
+                {
+                    MoveSlots = CloneMoveSlots(BaseMoveSlots);
+                }
+            }
+            else
+            {
+                MoveSlots = CloneMoveSlots(BaseMoveSlots);
+            }
+        }
+
+        private void ResetTransformationState()
+        {
+            Transformed = false;
+            Ability = BaseAbility;
+            HpType = BaseHpType;
+            HpPower = BaseHpPower;
+
+            if (CanTerastallize is FalseStringFalseUnion)
+            {
+                CanTerastallize = TeraType.ToString();
+            }
+        }
+
+        private void CleanupLinkedVolatiles()
+        {
+            var volatilesToProcess = Volatiles.ToList(); // Create a copy to avoid modification during iteration
+
+            foreach (var (statusId, volatileData) in volatilesToProcess)
+            {
+                if (volatileData?.ExtraData != null &&
+                    volatileData.ExtraData.TryGetValue("linkedStatus", out object? linkedStatusObj) &&
+                    volatileData.ExtraData.TryGetValue("linkedPokemon", out object? linkedPokemonObj) &&
+                    linkedStatusObj is string linkedStatus &&
+                    linkedPokemonObj is List<Pokemon> linkedPokemon)
+                {
+                    RemoveLinkedVolatiles(linkedStatus, linkedPokemon);
+                }
+            }
+        }
+
+        private void HandleVolatileEffects()
+        {
+            if (Species.Name == "Eternatus-Eternamax" && Volatiles.TryGetValue("dynamax", out EffectState? dynamaxVolatile))
+            {
+                Volatiles.Clear();
+                Volatiles["dynamax"] = dynamaxVolatile;
+            }
+            else
+            {
+                Volatiles.Clear();
+            }
+        }
+
+        private void ResetMoveTracking()
+        {
+            LastMove = null;
+            if (Battle.Gen == 2) LastMoveEncore = null;
+            LastMoveUsed = null;
+            MoveThisTurn = "";
+            MoveLastTurnResult = null;
+            MoveThisTurnResult = null;
+        }
+
+        private void ResetDamageTracking()
+        {
+            LastDamage = 0;
+            AttackedBy?.Clear();
+            HurtThisTurn = null;
+            NewlySwitched = true;
+            BeingCalledBack = false;
+        }
+
+        private void ClearStateFlags()
+        {
+            VolatileStaleness = null;
+
+            AbilityState?.ExtraData?.Remove("started");
+            ItemState?.ExtraData?.Remove("started");
+        }
+
+        private static List<MoveSlot> CloneMoveSlots(List<MoveSlot> original)
+        {
+            return original.Select(slot => new MoveSlot
+            {
+                Id = slot.Id,
+                Move = slot.Move,
+                Pp = slot.Pp,
+                MaxPp = slot.MaxPp,
+                Target = slot.Target,
+                Disabled = slot.Disabled,
+                DisabledSource = slot.DisabledSource,
+                Used = slot.Used,
+                Virtual = slot.Virtual
+            }).ToList();
+        }
+
+        private bool HasBaseMoveId(Id moveId)
+        {
+            return BaseMoveSlots.Any(slot => slot.Id == moveId);
+        }
+
+        private int GetBaseMoveSlotIndex(Id moveId)
+        {
+            for (int i = 0; i < BaseMoveSlots.Count; i++)
+            {
+                if (BaseMoveSlots[i].Id == moveId)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         public bool HasType(string type)
@@ -1110,12 +1473,33 @@ namespace ApogeeVGC_CS.sim
 
         public void RemoveLinkedVolatiles(string linkedStatus, List<Pokemon> linkedPokemon)
         {
-            throw new NotImplementedException();
+            foreach (Pokemon linkedPoke in linkedPokemon)
+            {
+                linkedPoke.RemovePokemonFromVolatileLinks(linkedStatus, this);
+            }
         }
 
         public void RemoveLinkedVolatiles(IEffect linkedStatus, List<Pokemon> linkedPokemon)
         {
-            throw new NotImplementedException();
+            RemoveLinkedVolatiles(linkedStatus.ToString(), linkedPokemon);
+        }
+
+        // Helper method
+        private void RemovePokemonFromVolatileLinks(string statusId, Pokemon pokemonToRemove)
+        {
+            if (!Volatiles.TryGetValue(statusId, out EffectState? volatileData))
+                return;
+
+            if (volatileData.ExtraData.TryGetValue("linkedPokemon", out object? linkedObj) &&
+                linkedObj is List<Pokemon> linkedList)
+            {
+                linkedList.Remove(pokemonToRemove);
+
+                if (linkedList.Count == 0)
+                {
+                    RemoveVolatile(statusId);
+                }
+            }
         }
 
         public FullDetails GetHealth()
@@ -1123,14 +1507,52 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
-        public bool SetType(string newType, bool enforce = false)
+        /// <summary>
+        /// Sets a type using PokemonType enum (except on Arceus, who resists type changes)
+        /// </summary>
+        public bool SetType(PokemonType newType, bool enforce = false)
         {
-            throw new NotImplementedException();
+            return SetType(new List<PokemonType> { newType }, enforce);
         }
 
-        public bool SetType(List<string> newTypes, bool enforce = false)
+        public bool SetType(List<PokemonType> newTypes, bool enforce = false)
         {
-            throw new NotImplementedException();
+            if (newTypes == null || newTypes.Count == 0)
+                throw new ArgumentException("Must pass type to SetType");
+
+            if (!enforce)
+            {
+                // First type of Arceus, Silvally cannot be normally changed
+                if (IsTypeChangeResistantPokemon())
+                    return false;
+
+                // Terastallized Pokemon cannot have their base type changed except via forme change
+                if (IsTerastallized())
+                    return false;
+            }
+
+            // Update the Pokemon's types
+            Types.Clear();
+            Types.AddRange(newTypes);
+
+            AddedType = "";
+            KnownType = true;
+            ApparentType = string.Join("/", newTypes.Select(t => t.ToString()));
+
+            return true;
+        }
+
+        // Helper method to check if Pokemon resists type changes
+        private bool IsTypeChangeResistantPokemon()
+        {
+            return (Battle.Gen >= 5 && Species.Num is 493 or 773) ||
+                   (Battle.Gen == 4 && HasAbility("multitype"));
+        }
+
+        // Helper method to check if Pokemon is Terastallized
+        private bool IsTerastallized()
+        {
+            return !string.IsNullOrEmpty(Terastallized);
         }
 
         public bool AddType(string newType)

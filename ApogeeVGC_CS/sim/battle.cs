@@ -1,6 +1,8 @@
 ﻿using ApogeeVGC_CS.data;
+using ApogeeVGC_CS.sim;
 using System;
 using System.Drawing;
+using System.Numerics;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -145,7 +147,7 @@ namespace ApogeeVGC_CS.sim
             }
         }
         public Field Field { get; init; }
-        public Side[] Sides
+        public Side?[] Sides
         {
             get;
             init // Array of sides, size 2 or 4
@@ -208,7 +210,7 @@ namespace ApogeeVGC_CS.sim
         public bool QuickClawRoll { get; init; }
         public List<int> SpeedOrder { get; init; }
 
-        public object? TeamGenerator { get; init; }
+        public TeamGenerator? TeamGenerator { get; set; }
 
         public HashSet<string> Hints { get; init; }
 
@@ -321,7 +323,7 @@ namespace ApogeeVGC_CS.sim
             Send = options.Send ?? ((_, _) => { });
 
             // Create input options for logging
-            Dictionary<string, object> inputOptions = new Dictionary<string, object>
+            var inputOptions = new Dictionary<string, object>
             {
                 ["formatid"] = options.FormatId,
                 ["seed"] = PrngSeed,
@@ -787,7 +789,7 @@ namespace ApogeeVGC_CS.sim
                 EventDepth++;
 
                 // Build the argument list for the callback
-                List<object> args = new List<object>();
+                var args = new List<object>();
                 if (hasRelayVar)
                     args.Add(relayVar);
 
@@ -965,7 +967,7 @@ namespace ApogeeVGC_CS.sim
             {
                 Id = eventId,
                 Target = target,
-                Source = source ?? throw new ArgumentNullException(nameof(source)),
+                Source = source, //?? throw new ArgumentNullException(nameof(source)),
                 Effect = sourceEffect,
                 Modifier = 1
             };
@@ -1186,7 +1188,7 @@ namespace ApogeeVGC_CS.sim
                 if (relayVar is not int intRelayVar)
                     return target is PokemonListRunEventTarget ? targetRelayVars! : relayVar;
                 int modifier = newEvent.Modifier;
-                if (modifier != 1)
+                if (modifier != 1.0)
                 {
                     relayVar = Modify(intRelayVar, modifier);
                 }
@@ -2194,39 +2196,156 @@ namespace ApogeeVGC_CS.sim
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Chains a modifier to the current event modifier using fixed-point arithmetic.
+        /// This accumulates modifiers that will be applied later with FinalModify.
+        /// </summary>
         public void ChainModify(int numerator, int denominator = 1)
         {
-            throw new NotImplementedException();
+            if (Event is not BattleEvent battleEvent)
+                throw new InvalidOperationException("No active event to modify");
+
+            int previousMod = Trunc(battleEvent.Modifier * 4096);
+            int nextMod = Trunc(numerator * 4096 / denominator);
+            battleEvent.Modifier = (int)(((previousMod * nextMod + 2048) >> 12) / 4096.0);
         }
 
-        public void ChainModify(int[] numerator, int denominator = 1)
+        /// <summary>
+        /// Chains a modifier using array notation [numerator, denominator].
+        /// </summary>
+        public void ChainModify(int[] fraction)
         {
-            throw new NotImplementedException();
+            if (fraction.Length != 2)
+                throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]");
+
+            ChainModify(fraction[0], fraction[1]);
         }
 
+        /// <summary>
+        /// Applies a modifier to a value using Pokemon's precise fixed-point arithmetic.
+        /// Can be called as modify(value, numerator, denominator) or modify(value, [numerator, denominator]).
+        /// </summary>
         public int Modify(int value, int numerator, int denominator = 1)
         {
-            throw new NotImplementedException();
+            int modifier = Trunc(numerator * 4096 / denominator);
+            return Trunc((Trunc(value * modifier) + 2048 - 1) / 4096);
         }
 
-        public int Modify(int value, int[] numerator, int denominator = 1)
+        /// <summary>
+        /// Applies a modifier using array notation [numerator, denominator].
+        /// </summary>
+        public int Modify(int value, int[] fraction)
         {
-            throw new NotImplementedException();
+            if (fraction.Length != 2)
+                throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]");
+
+            return Modify(value, fraction[0], fraction[1]);
         }
 
+        /// <summary>
+        /// Given a table of base stats and a pokemon set, return the actual stats.
+        /// </summary>
         public StatsTable SpreadModify(StatsTable baseStats, PokemonSet set)
         {
-            throw new NotImplementedException();
+            var modStats = new StatsTable();
+
+            foreach (StatId statName in Enum.GetValues<StatId>())
+            {
+                int calculatedStat = StatModify(baseStats, set, statName);
+                modStats.SetStat(statName, calculatedStat);
+            }
+
+            return modStats;
         }
 
-        public StatsTable NatureModify(StatsTable baseStats, PokemonSet set)
+        /// <summary>
+        /// Calculate a single stat value using Pokemon's official stat calculation formula.
+        /// Includes proper truncation and nature effects with overflow protection.
+        /// </summary>
+        public int StatModify(StatsTable baseStats, PokemonSet set, StatId statName)
         {
-            throw new NotImplementedException();
+            int stat = baseStats.GetStat(statName);
+
+            if (statName == StatId.Hp)
+            {
+                // HP formula: ((2 * base + IV + EV/4 + 100) * level / 100) + 10
+                return Trunc(Trunc(2 * stat + set.Ivs.GetStat(statName) +
+                                  Trunc(set.Evs.GetStat(statName) / 4) + 100) * set.Level / 100 + 10);
+            }
+
+            // Other stats: ((2 * base + IV + EV/4) * level / 100) + 5
+            stat = Trunc(Trunc(2 * stat + set.Ivs.GetStat(statName) +
+                              Trunc(set.Evs.GetStat(statName) / 4)) * set.Level / 100 + 5);
+
+            // Apply nature modifications
+            if (!string.IsNullOrEmpty(set.Nature))
+            {
+                Nature nature = Dex.Natures.Get(set.Nature);
+
+                // Natures are calculated with 16-bit truncation.
+                // This only affects Eternatus-Eternamax in Pure Hackmons.
+                if (nature.Plus == StatIdTools.ConvertToStatIdExceptId(statName))
+                {
+                    // TODO: Apply overflow protection if the rule is active
+                    //// Apply overflow protection if the rule is active
+                    //if (RuleTable.Has("overflowstatmod"))
+                    //{
+                    //    stat = Math.Min(stat, 595);
+                    //}
+                    stat = Trunc(Trunc(stat * 110, 16) / 100);
+                }
+                else if (nature.Minus == StatIdTools.ConvertToStatIdExceptId(statName))
+                {
+                    // TODO: Apply overflow protection if the rule is active
+                    //// Apply overflow protection if the rule is active
+                    //if (RuleTable.Has("overflowstatmod"))
+                    //{
+                    //    stat = Math.Min(stat, 728);
+                    //}
+                    stat = Trunc(Trunc(stat * 90, 16) / 100);
+                }
+            }
+
+            return stat;
         }
 
+        /// <summary>
+        /// Applies the accumulated event modifier to a value and resets the modifier.
+        /// This is the final step in damage/stat calculation chains.
+        /// </summary>
         public int FinalModify(int relayVar)
         {
-            throw new NotImplementedException();
+            if (Event is not BattleEvent battleEvent)
+                throw new InvalidOperationException("No active event to finalize");
+
+            relayVar = Modify(relayVar, (int)(battleEvent.Modifier * 4096), 4096);
+            battleEvent.Modifier = 1; // Reset modifier
+            return relayVar;
+        }
+
+        /// <summary>
+        /// Pokemon's truncation function that matches the game's behavior.
+        /// Supports both regular truncation and 16-bit truncation for nature calculations.
+        /// </summary>
+        private static int Trunc(double value, int? bits = null)
+        {
+            if (bits.HasValue)
+            {
+                // 16-bit truncation for nature calculations
+                int truncated = (int)Math.Truncate(value);
+                int mask = (1 << bits.Value) - 1;
+                return truncated & mask;
+            }
+
+            return (int)Math.Truncate(value);
+        }
+
+        /// <summary>
+        /// Convenience overload for integer division with truncation.
+        /// </summary>
+        private static int Trunc(int value)
+        {
+            return value;
         }
 
         public MoveCategory GetCategory(string move)
@@ -2485,7 +2604,7 @@ namespace ApogeeVGC_CS.sim
             if (!hasFunctionParts)
             {
                 // Simple case: all parts are strings, join them and add to log
-                string[] stringParts = parts.Select(part => ConvertPartToString(part)).ToArray();
+                string[] stringParts = parts.Select(ConvertPartToString).ToArray();
                 Log.Add($"|{string.Join("|", stringParts)}");
                 return;
             }
@@ -2600,7 +2719,167 @@ namespace ApogeeVGC_CS.sim
 
         public void SetPlayer(SideId slot, PlayerOptions options)
         {
-            throw new NotImplementedException();
+            Side? side;
+            bool didSomething = true;
+
+            // Convert SideId enum to array index (P1=0, P2=1, P3=2, P4=3)
+            int slotNum = slot switch
+            {
+                SideId.P1 => 0,
+                SideId.P2 => 1,
+                SideId.P3 => 2,
+                SideId.P4 => 3,
+                _ => throw new ArgumentException($"Invalid side ID: {slot}")
+            };
+
+            if (Sides[slotNum] == null)
+            {
+                // Create new player
+                var team = GetTeam(options);
+                string playerName = options.Name ?? $"Player {slotNum + 1}";
+                side = new Side(playerName, this, slotNum, team)
+                {
+                    Name = string.Empty,
+                    Avatar = string.Empty,
+                    Team = [],
+                    Pokemon = [],
+                    Active = [],
+                    PokemonLeft = 0,
+                    ZMoveUsed = false,
+                    DynamaxUsed = false,
+                    TotalFainted = 0,
+                    SideConditions = [],
+                    SlotConditions = [],
+                    Choice = new Choice
+                    {
+                        CantUndo = false,
+                        Error = string.Empty,
+                        Actions = [],
+                        ForcedSwitchesLeft = 0,
+                        ForcedPassesLeft = 0,
+                        SwitchIns = [],
+                        ZMove = false,
+                        Mega = false,
+                        Ultra = false,
+                        Dynamax = false,
+                        Terastallize = false
+                    },
+                };
+
+                if (!string.IsNullOrEmpty(options.Avatar))
+                {
+                    side.Avatar = options.Avatar;
+                }
+
+                Sides[slotNum] = side;
+            }
+            else
+            {
+                // Edit existing player
+                side = Sides[slotNum];
+                didSomething = false;
+
+                // Update name if different
+                if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
+                {
+                    side.Name = options.Name;
+                    didSomething = true;
+                }
+
+                // Update avatar if different
+                if (!string.IsNullOrEmpty(options.Avatar) && side.Avatar != options.Avatar)
+                {
+                    side.Avatar = options.Avatar;
+                    didSomething = true;
+                }
+
+                // Prevent team changes for existing players
+                if (options.Team != null)
+                {
+                    throw new InvalidOperationException($"Player {slot} already has a team!");
+                }
+            }
+
+            // Handle team data conversion if needed
+            if (options.Team != null && options.Team is not PlayerOptionsTeamString)
+            {
+                // Convert team object to packed string format
+                options.Team = Teams.Pack(((PlayerOptionsTeamPokemonSet)options.Team).PokemonSets);
+            }
+
+            // Exit early if no changes were made
+            if (!didSomething) return;
+
+            // Log the player setup
+            string optionsJson = JsonSerializer.Serialize(options);
+            InputLog.Add($"> player {slot} {optionsJson}");
+
+            // Add player info to battle log
+            string rating = options.Rating?.ToString() ?? string.Empty;
+
+            var sideSecretShared = () => new SideSecretShared
+            {
+                Side = side.Id,
+                Secret = optionsJson,
+                Shared = rating
+            };
+
+            Add("player", sideSecretShared, side.Name, side.Avatar, rating);
+
+            // Start battle if all sides are ready and battle hasn't started
+            if (Sides.All(playerSide => playerSide != null) && !Started)
+            {
+                Start();
+            }
+        }
+
+        public List<PokemonSet> GetTeam(PlayerOptions options)
+        {
+            // Start with the team from options
+            PlayerOptionsTeam? team = options.Team;
+
+            // Handle the union type properly
+            switch (team)
+            {
+                case PlayerOptionsTeamPokemonSet { PokemonSets.Count: > 0 } pokemonSetTeam:
+                    return pokemonSetTeam.PokemonSets;
+
+                case PlayerOptionsTeamString teamString when !string.IsNullOrEmpty(teamString.TeamString):
+                    // Unpack string team
+                    var unpackedTeam = Teams.Unpack(teamString.TeamString);
+                    if (unpackedTeam is { Count: > 0 })
+                    {
+                        return unpackedTeam;
+                    }
+                    break;
+            }
+
+            // If team string is provided separately, try that
+            if (!string.IsNullOrEmpty(options.TeamString))
+            {
+                var unpackedTeam = Teams.Unpack(options.TeamString);
+                if (unpackedTeam is { Count: > 0 })
+                {
+                    return unpackedTeam;
+                }
+            }
+
+            // Generate a seed if not provided
+            options.Seed ??= Prng.GenerateSeed();
+
+            // Initialize or update team generator
+            if (TeamGenerator == null)
+            {
+                TeamGenerator = Teams.GetGenerator(Format, options.Seed);
+            }
+            else
+            {
+                TeamGenerator.Seed = options.Seed;
+            }
+
+            // Generate and return the team
+            var generatedTeam = TeamGenerator.GetTeam(options);
+            return generatedTeam;
         }
 
         public void AddMove(params AddMoveArg[] args)

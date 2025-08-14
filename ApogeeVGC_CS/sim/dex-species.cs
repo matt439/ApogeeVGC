@@ -1,4 +1,10 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.config;
+using ApogeeVGC_CS.data;
+using ApogeeVGC_CS.sim;
+using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ApogeeVGC_CS.sim
 {
     public class SpeciesAbility
     {
@@ -308,7 +314,7 @@
         public Tier? DoublesTier
         {
             get;
-            init // TierTypes.Doubles | TierTypes.Other
+            set // TierTypes.Doubles | TierTypes.Other
             {
                 if (value == null || TierTools.IsDoublesOrOtherTier(value))
                 {
@@ -325,7 +331,7 @@
         public Tier? NatDexTier
         {
             get;
-            init // TierTypes.Singles | TierTypes.Other
+            set // TierTypes.Singles | TierTypes.Other
             {
                 if (value == null || TierTools.IsSinglesOrOtherTier(value))
                 {
@@ -336,7 +342,7 @@
         public Tier? Tier
         {
             get;
-            init // TierTypes.Singles | TierTypes.Other
+            set // TierTypes.Singles | TierTypes.Other
             {
                 if (value == null || TierTools.IsSinglesOrOtherTier(value))
                 {
@@ -362,7 +368,7 @@
                 $"{new Id(BaseSpecies)}{(BaseSpecies != Name ? $"-{new Id(Forme)}" : "")}";
             init;
         }
-        public required SpeciesAbility Abilities { get; init; }
+        public required SpeciesAbility Abilities { get; set; }
 
         public required List<PokemonType> Types
         {
@@ -378,9 +384,9 @@
         public string? EvoMove { get; init; }
         public EvoRegion? EvoRegion { get; init; }
         public int? EvoLevel { get; init; }
-        public required bool Nfe { get; init; }
+        public required bool Nfe { get; set; }
         public required List<string> EggGroups { get; init; }
-        public required bool CanHatch { get; init; }
+        public required bool CanHatch { get; set; }
         public required GenderName Gender { get; init; }
         public required GenderRatio GenderRatio { get; init; }
         public required StatsTable BaseStats { get; init; }
@@ -529,46 +535,93 @@
         public Func<Battle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
     }
 
-    public static class SpeciesConstants
+    public static class SpeciesUtils
     {
-        public static readonly Species EmptySpecies = new()
+        //public static Species EmptySpecies => new()
+        //{
+        //    Fullname = string.Empty,
+        //    EffectType = EffectType.Condition,
+        //    Gen = 0,
+        //    Name = string.Empty,
+        //    Exists = false,
+        //    Num = 0,
+        //    NoCopy = false,
+        //    AffectsFainted = false,
+        //    SourceEffect = string.Empty,
+        //    BaseSpecies = string.Empty,
+        //    Forme = string.Empty,
+        //    BaseForme = string.Empty,
+        //    SpriteId = string.Empty,
+        //    Abilities = new SpeciesAbility { Slot0 = string.Empty },
+        //    Types = [],
+        //    AddedType = null,
+        //    Prevo = string.Empty,
+        //    Evos = [],
+        //    Nfe = false,
+        //    EggGroups = [],
+        //    CanHatch = false,
+        //    Gender = GenderName.M,
+        //    GenderRatio = new GenderRatio { M = 0.0, F = 0.0 },
+        //    BaseStats = new StatsTable(),
+        //    WeightKg = 0,
+        //    HeightM = 0,
+        //    Color = string.Empty,
+        //    Tags = [],
+        //    UnreleasedHidden = false,
+        //    MaleOnlyHidden = false,
+        //    Tier = Tier.Illegal,
+        //    DoublesTier = Tier.Illegal,
+        //    NatDexTier = Tier.Illegal,
+        //    IsNonstandard = Nonstandard.Custom,
+        //};
+
+        public static Species EmptySpecies(string? name = null)
         {
-            Fullname = string.Empty,
-            EffectType = EffectType.Condition,
-            Gen = 0,
-            Name = string.Empty,
-            Exists = false,
-            Num = 0,
-            NoCopy = false,
-            AffectsFainted = false,
-            SourceEffect = string.Empty,
-            BaseSpecies = string.Empty,
-            Forme = string.Empty,
-            BaseForme = string.Empty,
-            SpriteId = string.Empty,
-            Abilities = new SpeciesAbility {Slot0 = string.Empty},
-            Types = [],
-            AddedType = null,
-            Prevo = string.Empty,
-            Evos = [],
-            Nfe = false,
-            EggGroups = [],
-            CanHatch = false,
-            Gender = GenderName.M,
-            GenderRatio = new GenderRatio {M = 0.0, F = 0.0},
-            BaseStats = new StatsTable(),
-            WeightKg = 0,
-            HeightM = 0,
-            Color = string.Empty,
-            Tags = [],
-            UnreleasedHidden = false,
-            MaleOnlyHidden = false,
-            Tier = Tier.Illegal,
-            DoublesTier = Tier.Illegal,
-            NatDexTier = Tier.Illegal,
-            IsNonstandard = Nonstandard.Custom,
-        };
-    }
+            Species emptySpecies = new()
+            {
+                Fullname = string.Empty,
+                EffectType = EffectType.Condition,
+                Gen = 0,
+                Name = name ?? string.Empty,
+                Exists = false,
+                Num = 0,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty,
+                BaseSpecies = string.Empty,
+                Forme = string.Empty,
+                BaseForme = string.Empty,
+                SpriteId = string.Empty,
+                Abilities = new SpeciesAbility { Slot0 = string.Empty },
+                Types = [],
+                AddedType = null,
+                Prevo = string.Empty,
+                Evos = [],
+                Nfe = false,
+                EggGroups = [],
+                CanHatch = false,
+                Gender = GenderName.M,
+                GenderRatio = new GenderRatio { M = 0.0, F = 0.0 },
+                BaseStats = new StatsTable(),
+                WeightKg = 0,
+                HeightM = 0,
+                Color = string.Empty,
+                Tags = [],
+                UnreleasedHidden = false,
+                MaleOnlyHidden = false,
+                Tier = Tier.Illegal,
+                DoublesTier = Tier.Illegal,
+                NatDexTier = Tier.Illegal,
+                IsNonstandard = Nonstandard.Custom,
+            };
+            return emptySpecies;
+        }
+
+        public static Species EmptySpecies(Id id)
+        {
+            return EmptySpecies(id.ToString());
+        }
+}
 
     public class Learnset(Species species)
     {
@@ -582,7 +635,7 @@
         /// <summary>
         /// True if the only way to get this Pokémon is from events.
         /// </summary>
-        public required bool EventOnly {get; init; }
+        public bool EventOnly {get; init; }
 
         /// <summary>
         /// List of event data for each event.
@@ -590,7 +643,7 @@
         public List<EventInfo>? EventData { get; init; }
         public List<EventInfo>? Encounters { get; init; }
         public static bool Exists => true;
-        public required Species Species { get; init; } = species;
+        public Species Species { get; init; } = species;
     }
 
     public class DexSpecies(ModdedDex dex)
@@ -600,19 +653,582 @@
         private Dictionary<Id, Learnset> LearnsetCache { get; } = [];
         private Species[]? AllCache { get; } = null;
 
+        public void LoadTestSpecies()
+        {
+            foreach (var data in Pokedex.SpeciesData)
+            {
+                SpeciesCache[data.Key] = data.Value;
+                LearnsetCache[data.Key] = new Learnset(data.Value);
+            }
+        }
+
         public Species Get(string? name)
         {
-            throw new NotImplementedException();
+            var id = Id.Empty;
+
+            if (string.IsNullOrEmpty(name)) return GetById(id);
+            name = name.Trim();
+            id = new Id(name);
+
+            // Handle special Nidoran gender cases
+            if (id.Value != "nidoran") return GetById(id);
+            if (name.EndsWith($"♀"))
+            {
+                id = new Id("nidoranf");
+            }
+            else if (name.EndsWith($"♂"))
+            {
+                id = new Id("nidoranm");
+            }
+
+            return GetById(id);
         }
 
         public Species Get(Species? species)
         {
-            throw new NotImplementedException();
+            // If a Species object is passed, return it directly
+            return species ??
+                   // If null is passed, get empty species
+                   GetById(Id.Empty);
         }
 
         public Species GetById(Id id)
         {
-            throw new NotImplementedException();
+            // Return empty species for empty ID
+            if (id.IsEmpty) return SpeciesUtils.EmptySpecies();
+
+            // Check cache first
+            if (SpeciesCache.TryGetValue(id, out Species? cachedSpecies))
+            {
+                return cachedSpecies;
+            }
+
+            Species? species = null;
+
+            // Try alias resolution
+            species = TryGetSpeciesFromAlias(id);
+            if (species != null)
+            {
+                SpeciesCache[id] = species; // Cache result
+                return species;
+            }
+
+            // Try forme name parsing if not in Pokedex
+            species = TryGetSpeciesFromFormeNames(id);
+            if (species != null)
+            {
+                SpeciesCache[id] = species;
+                return species;
+            }
+
+            // Try to construct from Pokedex data
+            species = TryConstructSpeciesFromPokedex(id);
+            if (species != null)
+            {
+                // Cache successful constructions
+                if (species.Exists)
+                {
+                    SpeciesCache[id] = species;
+                }
+                return species;
+            }
+
+            // Create non-existent species as fallback
+            species = SpeciesUtils.EmptySpecies(id);
+            return species;
+        }
+
+        private Species? TryGetSpeciesFromAlias(Id id)
+        {
+            Id? alias = Dex.GetAlias(id);
+            if (alias is null) return null;
+
+            // Check for special event ID
+            if (Dex.Data.FormatsData.TryGetValue(id, out SpeciesFormatsData? formatsData))
+            {
+                SpeciesData pokedexData = Dex.Data.Pokedex[alias];
+
+                // Create special event species
+                Species eventSpecies = CreateSpeciesFromData(pokedexData, formatsData, id.ToString());
+
+                // Special handling for event abilities
+                if (pokedexData.Abilities.Special != null)
+                {
+                    eventSpecies.Abilities = new SpeciesAbility
+                    {
+                        Slot0 = pokedexData.Abilities.Special
+                    };
+                }
+
+                return eventSpecies;
+            }
+            else
+            {
+                // Regular alias - get the base species
+                Species baseSpecies = Get(alias.ToString());
+
+                // Check for cosmetic forme
+                if (baseSpecies.CosmeticFormes == null) return baseSpecies;
+                foreach (string forme in baseSpecies.CosmeticFormes)
+                {
+                    if (new Id(forme) == id)
+                    {
+                        return CreateCosmeticFormSpecies(baseSpecies, forme);
+                    }
+                }
+
+                return baseSpecies;
+            }
+        }
+
+        private Species? TryGetSpeciesFromFormeNames(Id id)
+        {
+            if (Dex.Data.Pokedex.ContainsKey(id)) return null;
+
+            // Forme name mappings
+            var formeNames = new Dictionary<string, string[]>
+            {
+                ["alola"] = ["a", "alola", "alolan"],
+                ["galar"] = ["g", "galar", "galarian"],
+                ["hisui"] = ["h", "hisui", "hisuian"],
+                ["paldea"] = ["p", "paldea", "paldean"],
+                ["mega"] = ["m", "mega"],
+                ["primal"] = ["p", "primal"]
+            };
+
+            foreach (var (forme, aliases) in formeNames)
+            {
+                foreach (string alias in aliases)
+                {
+                    string pokeName = "";
+
+                    if (id.Value.StartsWith(alias))
+                    {
+                        pokeName = id.Value.Substring(alias.Length);
+                    }
+                    else if (id.Value.EndsWith(alias))
+                    {
+                        pokeName = id.Value.Substring(0, id.Value.Length - alias.Length);
+                    }
+
+                    if (string.IsNullOrEmpty(pokeName)) continue;
+
+                    // Try to resolve pokeName alias
+                    Id? resolvedAlias = Dex.GetAlias(new Id(pokeName));
+                    pokeName = resolvedAlias?.ToString() ?? pokeName;
+
+                    string fullFormeName = pokeName + forme;
+                    if (Dex.Data.Pokedex.ContainsKey(new Id(fullFormeName)))
+                    {
+                        var formeSpecies = Get(fullFormeName);
+                        if (formeSpecies.Exists)
+                        {
+                            return formeSpecies;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private Species? TryConstructSpeciesFromPokedex(Id id)
+        {
+            if (!Dex.Data.Pokedex.TryGetValue(id, out SpeciesData? pokedexData))
+            {
+                return null;
+            }
+
+            // Get base species tags if applicable
+            List<SpeciesTag>? baseSpeciesTags = null;
+            if (!string.IsNullOrEmpty(pokedexData.BaseSpecies))
+            {
+                var baseSpeciesId = new Id(pokedexData.BaseSpecies);
+                if (Dex.Data.Pokedex.TryGetValue(baseSpeciesId, out SpeciesData? baseData))
+                {
+                    baseSpeciesTags = baseData.Tags;
+                }
+            }
+
+            // Get formats data
+            Dex.Data.FormatsData.TryGetValue(id, out SpeciesFormatsData? formatsData);
+
+            // Create species with combined data
+            var species = CreateSpeciesFromData(pokedexData, formatsData, id.ToString(), baseSpeciesTags);
+
+            // Inherit status conditions from base species (Arceus, Silvally)
+            InheritBaseSpeciesStatuses(species);
+
+            // Apply tier inheritance logic
+            ApplyTierInheritance(species);
+
+            // Apply generation-specific restrictions
+            ApplyGenerationRestrictions(species);
+
+            // Apply mod-specific restrictions
+            ApplyModSpecificRestrictions(species);
+
+            // Calculate NFE (Not Fully Evolved) status
+            CalculateNfeStatus(species);
+
+            // Calculate breeding eligibility
+            CalculateBreedingEligibility(species);
+
+            // Apply generation-specific stat adjustments
+            ApplyGenerationAdjustments(species);
+
+            // Apply ability restrictions for older generations
+            ApplyAbilityRestrictions(species);
+
+            // Try to reuse parent mod species if identical
+            species = TryReuseParentModSpecies(species, id);
+
+            return species;
+        }
+
+        private Species CreateSpeciesFromData(SpeciesData pokedexData, SpeciesFormatsData? formatsData,
+            string name, List<SpeciesTag>? tags = null)
+        {
+            return new Species
+            {
+                // Copy all required properties from pokedexData
+                Name = name,
+                Num = pokedexData.Num,
+                BaseSpecies = pokedexData.BaseSpecies,
+                Forme = pokedexData.Forme,
+                BaseForme = pokedexData.BaseForme,
+                SpriteId = pokedexData.SpriteId,
+                Abilities = pokedexData.Abilities,
+                Types = pokedexData.Types,
+                AddedType = pokedexData.AddedType,
+                Prevo = pokedexData.Prevo,
+                Evos = pokedexData.Evos,
+                Nfe = pokedexData.Nfe,
+                EggGroups = pokedexData.EggGroups,
+                CanHatch = pokedexData.CanHatch,
+                Gender = pokedexData.Gender,
+                GenderRatio = pokedexData.GenderRatio,
+                BaseStats = pokedexData.BaseStats,
+                WeightKg = pokedexData.WeightKg,
+                HeightM = pokedexData.HeightM,
+                Color = pokedexData.Color,
+                Tags = tags ?? pokedexData.Tags,
+                UnreleasedHidden = pokedexData.UnreleasedHidden,
+                MaleOnlyHidden = pokedexData.MaleOnlyHidden,
+
+                // Apply formats data if available
+                Tier = formatsData?.Tier ?? pokedexData.Tier,
+                DoublesTier = formatsData?.DoublesTier ?? pokedexData.DoublesTier,
+                NatDexTier = formatsData?.NatDexTier ?? pokedexData.NatDexTier,
+                IsNonstandard = formatsData?.IsNonstandard ?? pokedexData.IsNonstandard,
+                GmaxUnreleased = formatsData?.GmaxUnreleased ?? pokedexData.GmaxUnreleased,
+
+                // BasicEffect required properties
+                Fullname = $"pokemon: {name}",
+                EffectType = EffectType.Pokemon,
+                Gen = CalculateGeneration(pokedexData),
+                Exists = true,
+                SourceEffect = string.Empty,
+                NoCopy = false,
+                AffectsFainted = false
+            };
+        }
+
+        private Species CreateCosmeticFormSpecies(Species baseSpecies, string forme)
+        {
+            string formeId = forme.Substring(baseSpecies.Name.Length + 1);
+
+            return new Species
+            {
+                // Copy most properties from base species
+                Name = forme,
+                Forme = formeId,
+                BaseForme = "",
+                BaseSpecies = baseSpecies.Name,
+                OtherFormes = null,
+                CosmeticFormes = null,
+
+                // Copy all other required properties...
+                Num = baseSpecies.Num,
+                SpriteId = baseSpecies.SpriteId,
+                Abilities = baseSpecies.Abilities,
+                Types = baseSpecies.Types,
+                AddedType = baseSpecies.AddedType,
+                Prevo = baseSpecies.Prevo,
+                Evos = baseSpecies.Evos,
+                Nfe = baseSpecies.Nfe,
+                EggGroups = baseSpecies.EggGroups,
+                CanHatch = baseSpecies.CanHatch,
+                Gender = baseSpecies.Gender,
+                GenderRatio = baseSpecies.GenderRatio,
+                BaseStats = baseSpecies.BaseStats,
+                WeightKg = baseSpecies.WeightKg,
+                HeightM = baseSpecies.HeightM,
+                Color = baseSpecies.Color,
+                Tags = baseSpecies.Tags,
+                UnreleasedHidden = baseSpecies.UnreleasedHidden,
+                MaleOnlyHidden = baseSpecies.MaleOnlyHidden,
+                Tier = baseSpecies.Tier,
+                DoublesTier = baseSpecies.DoublesTier,
+                NatDexTier = baseSpecies.NatDexTier,
+                IsNonstandard = baseSpecies.IsNonstandard,
+                GmaxUnreleased = baseSpecies.GmaxUnreleased,
+
+                // BasicEffect properties
+                Fullname = $"pokemon: {forme}",
+                EffectType = EffectType.Pokemon,
+                Gen = baseSpecies.Gen,
+                Exists = true,
+                SourceEffect = string.Empty,
+                NoCopy = false,
+                AffectsFainted = false
+            };
+        }
+
+        // Helper methods for complex logic
+        private void InheritBaseSpeciesStatuses(Species species)
+        {
+            if (string.IsNullOrEmpty(species.BaseSpecies)) return;
+
+            var baseSpeciesId = new Id(species.BaseSpecies);
+            if (Dex.Data.Conditions.TryGetValue(baseSpeciesId, out var baseConditions))
+            {
+                // Apply base species conditions that don't already exist
+                // This would require reflection or a more sophisticated mapping system
+                // Implementation depends on your condition system
+            }
+        }
+
+        private void ApplyTierInheritance(Species species)
+        {
+            // Skip if all tiers are already set or if this is a base species
+            if (species is { Tier: not null, DoublesTier: not null, NatDexTier: not null }) return;
+            if (species.BaseSpecies == species.Name) return;
+
+            var baseSpeciesId = new Id(species.BaseSpecies);
+
+            // Apply tier inheritance based on species type
+            if (species.BaseSpecies == "Mimikyu")
+            {
+                ApplyMimikyuTiers(species, baseSpeciesId);
+            }
+            else if (species.Name.EndsWith("totem"))
+            {
+                ApplyTotemTiers(species);
+            }
+            else if (species.BattleOnly != null)
+            {
+                ApplyBattleOnlyTiers(species);
+            }
+            else
+            {
+                ApplyBaseSpeciesTiers(species, baseSpeciesId);
+            }
+
+            // Apply defaults for any still-null tiers
+            species.Tier ??= Tier.Illegal;
+            species.DoublesTier ??= species.Tier;
+            species.NatDexTier ??= species.Tier;
+        }
+
+        private void ApplyGenerationRestrictions(Species species)
+        {
+            if (species.Gen <= Dex.Gen) return;
+            species.Tier = Tier.Illegal;
+            species.DoublesTier = Tier.Illegal;
+            species.NatDexTier = Tier.Illegal;
+            species.IsNonstandard = Nonstandard.Future;
+        }
+
+        private void ApplyModSpecificRestrictions(Species species)
+        {
+            if (Dex.CurrentMod == "gen7letsgo" && species.IsNonstandard == null)
+            {
+                ApplyLetsGoRestrictions(species);
+            }
+
+            if (Dex.CurrentMod == "gen8bdsp")
+            {
+                ApplyBdspRestrictions(species);
+            }
+        }
+
+        private void CalculateNfeStatus(Species species)
+        {
+            species.Nfe = species.Evos.Any(evo =>
+            {
+                Species evoSpecies = Get(evo);
+                return evoSpecies.IsNonstandard == null ||
+                       evoSpecies.IsNonstandard == species.IsNonstandard ||
+                       evoSpecies.IsNonstandard == Nonstandard.Unobtainable;
+            });
+        }
+
+        private static void CalculateBreedingEligibility(Species species)
+        {
+            species.CanHatch = species.CanHatch ||
+                (!species.EggGroups.Contains("Ditto") &&
+                 !species.EggGroups.Contains("Undiscovered") &&
+                 string.IsNullOrEmpty(species.Prevo) &&
+                 species.Name != "Manaphy");
+        }
+
+        private void ApplyGenerationAdjustments(Species species)
+        {
+            // Gen 1: Remove Special Defense from BST calculation
+            if (Dex.Gen == 1)
+            {
+                // Note: In the original code, this modifies species.bst -= species.baseStats.spd
+                // Since BST is calculated as a property, we'd need to modify the base stats
+                // or handle this in the BST calculation itself
+            }
+        }
+
+        private void ApplyAbilityRestrictions(Species species)
+        {
+            if (Dex.Gen < 5)
+            {
+                // Remove hidden abilities in older generations
+                species.Abilities = new SpeciesAbility
+                {
+                    Slot0 = species.Abilities.Slot0,
+                    Slot1 = species.Abilities.Slot1,
+                    Hidden = null,
+                    Special = species.Abilities.Special
+                };
+            }
+
+            if (Dex.Gen != 3) return;
+            // Remove abilities that don't exist in Gen 3
+            Ability slot1Ability = Dex.Abilities.Get(species.Abilities.Slot1 ?? "");
+            if (slot1Ability.Gen == 4)
+            {
+                species.Abilities = new SpeciesAbility
+                {
+                    Slot0 = species.Abilities.Slot0,
+                    Slot1 = null,
+                    Hidden = species.Abilities.Hidden,
+                    Special = species.Abilities.Special
+                };
+            }
+        }
+
+        private static Species TryReuseParentModSpecies(Species species, Id id)
+        {
+            return species;
+        }
+
+        private static int CalculateGeneration(SpeciesData data)
+        {
+            // Generation calculation logic from the original Species class
+            if (data.Num < 1) return 0;
+
+            if (data.Num >= 906 || data.Forme.Contains("Paldea")) return 9;
+            if (data.Num >= 810 || data.Forme is "Gmax" or "Galar" or "Galar-Zen" or "Hisui") return 8;
+            if (data.Num >= 722 || data.Forme.StartsWith("Alola") || data.Forme == "Starter") return 7;
+            if (data.Forme == "Primal") return 6;
+            if (data.Num >= 650) return 6; // Mega evolution era
+
+            return data.Num switch
+            {
+                >= 494 => 5,
+                >= 387 => 4,
+                >= 252 => 3,
+                >= 152 => 2,
+                _ => 1
+            };
+        }
+
+        private void ApplyMimikyuTiers(Species species, Id baseSpeciesId)
+        {
+            if (!Dex.Data.FormatsData.TryGetValue(baseSpeciesId, out SpeciesFormatsData? baseFormatsData))
+                return;
+
+            species.Tier ??= baseFormatsData.Tier ?? Tier.Illegal;
+            species.DoublesTier ??= baseFormatsData.DoublesTier ?? species.Tier;
+            species.NatDexTier ??= baseFormatsData.NatDexTier ?? species.Tier;
+        }
+
+        private void ApplyTotemTiers(Species species)
+        {
+            // Remove 'totem' suffix to get base species ID
+            string baseId = species.Name.Substring(0, species.Name.Length - 5); // Remove "totem"
+            var baseSpeciesId = new Id(baseId);
+
+            if (!Dex.Data.FormatsData.TryGetValue(baseSpeciesId, out SpeciesFormatsData? baseFormatsData))
+                return;
+
+            species.Tier ??= baseFormatsData.Tier ?? Tier.Illegal;
+            species.DoublesTier ??= baseFormatsData.DoublesTier ?? species.Tier;
+            species.NatDexTier ??= baseFormatsData.NatDexTier ?? species.Tier;
+        }
+
+        private void ApplyBattleOnlyTiers(Species species)
+        {
+            if (species.BattleOnly == null) return;
+
+            Id battleOnlyId = species.BattleOnly switch
+            {
+                StrStrListStrUnion(var str) => new Id(str),
+                StrListStrListUnion(var strList) when strList.Count > 0 => new Id(strList[0]),
+                _ => Id.Empty
+            };
+
+            if (battleOnlyId.IsEmpty) return;
+
+            if (!Dex.Data.FormatsData.TryGetValue(battleOnlyId, out SpeciesFormatsData? battleOnlyFormatsData))
+                return;
+
+            species.Tier ??= battleOnlyFormatsData.Tier ?? Tier.Illegal;
+            species.DoublesTier ??= battleOnlyFormatsData.DoublesTier ?? species.Tier;
+            species.NatDexTier ??= battleOnlyFormatsData.NatDexTier ?? species.Tier;
+        }
+
+        private void ApplyBaseSpeciesTiers(Species species, Id baseSpeciesId)
+        {
+            if (!Dex.Data.FormatsData.TryGetValue(baseSpeciesId, out SpeciesFormatsData? baseFormatsData))
+            {
+                throw new InvalidOperationException($"{species.BaseSpecies} has no formats-data entry");
+            }
+
+            species.Tier ??= baseFormatsData.Tier ?? Tier.Illegal;
+            species.DoublesTier ??= baseFormatsData.DoublesTier ?? species.Tier;
+            species.NatDexTier ??= baseFormatsData.NatDexTier ?? species.Tier;
+        }
+
+        private static void ApplyLetsGoRestrictions(Species species)
+        {
+            // Check if Pokemon is valid in Let's Go
+            bool isLetsGo = (species.Num <= 151 ||
+                            new[] { "Meltan", "Melmetal" }.Contains(species.Name)) &&
+                           (string.IsNullOrEmpty(species.Forme) ||
+                            (new[] { "Alola", "Mega", "Mega-X", "Mega-Y", "Starter" }.Contains(species.Forme) &&
+                             species.Name != "Pikachu-Alola"));
+
+            if (!isLetsGo)
+            {
+                species.IsNonstandard = Nonstandard.Past;
+            }
+        }
+
+        private static void ApplyBdspRestrictions(Species species)
+        {
+            // Apply BDSP (Brilliant Diamond/Shining Pearl) restrictions
+            if (species.IsNonstandard != null &&
+                !new[] { Nonstandard.Gigantamax, Nonstandard.Cap }.Contains(species.IsNonstandard.Value))
+                return;
+
+            bool isIllegal = species.Gen > 4 ||
+                            (species.Num < 1 && species.IsNonstandard != Nonstandard.Cap) ||
+                            species.Name == "Pichu-Spiky-eared";
+
+            if (isIllegal)
+            {
+                species.IsNonstandard = Nonstandard.Future;
+                species.Tier = Tier.Illegal;
+                species.DoublesTier = Tier.Illegal;
+                species.NatDexTier = Tier.Illegal;
+            }
         }
 
         /**

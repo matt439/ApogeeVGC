@@ -1308,7 +1308,18 @@ namespace ApogeeVGC_CS.sim
     public record PrngPrngSeedUnionPrngSeed(PrngSeed PrngSeed) : PrngPrngSeedUnion;
 
 
-
+    /// <summary>
+    /// List<PokemonSet> | string
+    /// </summary>
+    public abstract record PlayerOptionsTeam
+    {
+        public static implicit operator PlayerOptionsTeam(List<PokemonSet> pokemonSets) =>
+            new PlayerOptionsTeamPokemonSet(pokemonSets);
+        public static implicit operator PlayerOptionsTeam(string teamString) =>
+            new PlayerOptionsTeamString(teamString);
+    }
+    public record PlayerOptionsTeamPokemonSet(List<PokemonSet> PokemonSets) : PlayerOptionsTeam;
+    public record PlayerOptionsTeamString(string TeamString) : PlayerOptionsTeam;
 
 
 

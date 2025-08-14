@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC_CS.sim
+﻿using ApogeeVGC_CS.data;
+
+namespace ApogeeVGC_CS.sim
 {
     public interface IAbilityEventMethods
     {
@@ -600,26 +602,148 @@
     {
         private ModdedDex Dex { get; } = dex;
         private Dictionary<Id, Ability> AbilityCache { get; }= [];
-        private List<Ability>? AllCache { get; }= null;
+        private List<Ability>? AllCache { get; set; }
+
+        public void LoadTestAbilities()
+        {
+            foreach (Id id in Abilities.AbilitiesData.Select(abilityData =>
+                         new Id(abilityData.Key)).Where(id => !AbilityCache.ContainsKey(id)))
+            {
+                AbilityCache[id] = GetById(id);
+            }
+        }
 
         public Ability Get(string name = "")
         {
-            throw new NotImplementedException("Get method is not implemented yet.");
+            if (string.IsNullOrEmpty(name))
+                return AbilityConstants.EmptyAbility;
+
+            var id = new Id(name.Trim());
+            return GetById(id);
         }
 
         public Ability Get(Ability ability)
         {
-            throw new NotImplementedException();
+            return ability; // If already an Ability object, return as-is
         }
 
         public Ability GetById(Id id)
         {
-            throw new NotImplementedException();
+            if (id.Value == "")
+                return AbilityConstants.EmptyAbility;
+
+            // Check cache first
+            if (AbilityCache.TryGetValue(id, out Ability? cachedAbility))
+                return cachedAbility;
+
+            Ability? ability = null;
+
+            // Try alias resolution
+            Id? aliasId = Dex.GetAlias(id);
+            if (aliasId is not null)
+            {
+                ability = Get(aliasId.Value);
+            }
+            else if (!id.IsEmpty && Dex.Data.Abilities.ContainsKey(id))
+            {
+                // Load ability data
+                var abilityData = Dex.Data.Abilities[id];
+                var abilityTextData = Dex.GetDescs(CastToITextFileTable(Dex.LoadTextData().Abilities),
+                    id, new AnyObject(abilityData));
+
+                // Create new Ability from data
+                ability = CreateAbilityFromData(id.Value, abilityData, abilityTextData);
+
+                // Apply generation rules
+                if (ability.Gen > Dex.Gen)
+                {
+                    ability.IsNonstandard = Nonstandard.Future;
+                }
+
+                if (Dex.CurrentMod == "gen7letsgo" && id.Value != "noability")
+                {
+                    ability.IsNonstandard = Nonstandard.Past;
+                }
+
+                if ((Dex.CurrentMod == "gen7letsgo" || Dex.Gen <= 2) && id.Value == "noability")
+                {
+                    ability.IsNonstandard = null;
+                }
+            }
+            else
+            {
+                // Create non-existent ability
+                ability = new Ability
+                {
+                    Name = id.Value,
+                    Exists = false,
+                    Rating = 0,
+                    SuppressWeather = false,
+                    Flags = new AbilityFlags(),
+                    Fullname = $"ability: {id.Value}",
+                    EffectType = EffectType.Ability,
+                    Gen = 0,
+                    Num = 0,
+                    NoCopy = false,
+                    AffectsFainted = false,
+                    SourceEffect = string.Empty
+                };
+            }
+
+            // Cache successful results
+            if (ability.Exists)
+            {
+                AbilityCache[id] = ability;
+            }
+
+            return ability;
+        }
+
+        private static DexTable<ITextFile> CastToITextFileTable(DexTable<AbilityText> source)
+        {
+            var result = new DexTable<ITextFile>();
+            foreach (var (key, value) in source)
+            {
+                result[key] = value;
+            }
+            return result;
         }
 
         public List<Ability> All()
         {
-            throw new NotImplementedException("All method is not implemented yet.");
+            if (AllCache != null)
+                return AllCache;
+
+            var abilities = new List<Ability>();
+            foreach (var id in Dex.Data.Abilities.Keys)
+            {
+                abilities.Add(GetById(new Id(id.Value)));
+            }
+
+            AllCache = abilities;
+            return AllCache;
+        }
+
+        private Ability CreateAbilityFromData(string name, AbilityData abilityData, Descriptions textData)
+        {
+            return new Ability
+            {
+                Name = name,
+                Rating = abilityData.Rating,
+                SuppressWeather = abilityData.SuppressWeather,
+                Flags = abilityData.Flags,
+                Fullname = $"ability: {name}",
+                EffectType = EffectType.Ability,
+                Gen = abilityData.Gen,
+                Num = abilityData.Num,
+                Exists = true,
+                NoCopy = abilityData.NoCopy,
+                AffectsFainted = abilityData.AffectsFainted,
+                SourceEffect = abilityData.SourceEffect,
+                // Add text descriptions
+                ShortDesc = textData.ShortDesc ?? string.Empty,
+                Desc = textData.Desc ?? string.Empty
+            };
         }
     }
 }

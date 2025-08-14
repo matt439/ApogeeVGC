@@ -367,12 +367,14 @@ namespace ApogeeVGC_CS.sim
 
         public string? CanMegaEvo(Pokemon pokemon)
         {
-            throw new NotImplementedException("CanMegaEvolve method is not implemented yet.");
+            return null;
+            // TODO: Properly implement this
         }
 
         public string? CanUltraBurst(Pokemon pokemon)
         {
-            throw new NotImplementedException("CanUltraBurst method is not implemented yet.");
+            return null;
+            // TODO: Properly implement this
         }
 
         public bool RunMegaEvo(Pokemon pokemon)
@@ -387,7 +389,8 @@ namespace ApogeeVGC_CS.sim
 
         public string? CanTerastallize(Pokemon pokemon)
         {
-            throw new NotImplementedException("CanTerastallize method is not implemented yet.");
+            return null;
+            // TODO: properly implement this
         }
 
         public void Terastallize(Pokemon pokemon)

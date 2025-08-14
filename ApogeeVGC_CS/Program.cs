@@ -4,8 +4,7 @@
     {
         private static async Task Main(string[] args)
         {
-            Test1V1 test = new Test1V1();
-            await test.RunTest();
+            await Test1V1.RunTest();
         }
     }
 }

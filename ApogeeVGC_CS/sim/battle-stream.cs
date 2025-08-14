@@ -210,7 +210,7 @@ namespace ApogeeVGC_CS.sim
         public BattleStreamReplay? Replay { get; init; }
     }
 
-    public class BattleStream(Dex dex, BattleStreamOptions? options = null) : ObjectReadWriteStream<string>
+    public class BattleStream(BattleStreamOptions? options = null) : ObjectReadWriteStream<string>
     {
         public bool Debug { get; init; } = options?.Debug ?? false;
         public bool NoCatch { get; init; } = options?.NoCatch ?? false;
@@ -218,7 +218,6 @@ namespace ApogeeVGC_CS.sim
             options?.Replay ?? new BoolBattleStreamReplay(false);
         public bool KeepAlive { get; init; } = options?.KeepAlive ?? false;
         public Battle? Battle { get; set; }
-        protected Dex Dex { get; } = dex;
 
         /// <summary>
         /// Main write method that processes chunks with error handling and battle updates.
@@ -349,7 +348,7 @@ namespace ApogeeVGC_CS.sim
                                 SendCallback, debugFlag);
                             
                             // Create the battle: this.battle = new Battle(options)
-                            Battle = new Battle(battleOptions, Dex.Dexes[DexConstants.BaseMod.ToString()]);
+                            Battle = new Battle(battleOptions, Dex.GetRequiredDex(DexConstants.BaseMod.ToString()));
 
                             Push("info: Battle created successfully");
                             Push($"start: {System.Text.Json.JsonSerializer.Serialize(options)}");
@@ -935,7 +934,7 @@ Examples: battle.turn, p1?.name, player('p1'), pokemon('p1', 'pikachu')";
 
             if (!line.StartsWith('|')) return;
 
-            string[] parts = BattleStreamUtils.SplitFirst(line[1..], "|");
+            string[] parts = SplitFirst(line[1..], "|");
             string cmd = parts[0];
             string rest = parts.Length > 1 ? parts[1] : string.Empty;
 
@@ -997,7 +996,7 @@ Examples: battle.turn, p1?.name, player('p1'), pokemon('p1', 'pikachu')";
                 case ObjectReadWriteStream<string> readWriteStream:
                     await readWriteStream.WriteAsync(choice);
                     break;
-                case System.IO.Stream netStream:
+                case Stream netStream:
                     await netStream.WriteAsync(choiceBytes, 0, choiceBytes.Length);
                     await netStream.FlushAsync();
                     break;
@@ -1045,9 +1044,9 @@ Examples: battle.turn, p1?.name, player('p1'), pokemon('p1', 'pikachu')";
         public BattleStream BattleStream { get; }
         public string CurrentMessage { get; set; }
 
-        public BattleTextStream(Dex dex, BattleStreamOptions? options = null)
+        public BattleTextStream(BattleStreamOptions? options = null)
         {
-            BattleStream = new BattleStream(dex, options);
+            BattleStream = new BattleStream(options);
             CurrentMessage = string.Empty;
             Listen();
         }

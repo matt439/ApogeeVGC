@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 namespace ApogeeVGC_CS.sim
@@ -195,6 +196,37 @@ namespace ApogeeVGC_CS.sim
         Hp, Atk, Def, Spa, Spd, Spe
     }
 
+    public static class StatIdTools
+    {
+        public static StatId ConvertToStatId(StatIdExceptHp stat)
+        {
+            return stat switch
+            {
+                StatIdExceptHp.Atk => StatId.Atk,
+                StatIdExceptHp.Def => StatId.Def,
+                StatIdExceptHp.Spa => StatId.Spa,
+                StatIdExceptHp.Spd => StatId.Spd,
+                StatIdExceptHp.Spe => StatId.Spe,
+                _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID except HP.")
+            };
+        }
+
+        public static StatIdExceptHp ConvertToStatIdExceptId(StatId stat)
+        {
+            return stat switch
+            {
+                StatId.Atk => StatIdExceptHp.Atk,
+                StatId.Def => StatIdExceptHp.Def,
+                StatId.Spa => StatIdExceptHp.Spa,
+                StatId.Spd => StatIdExceptHp.Spd,
+                StatId.Spe => StatIdExceptHp.Spe,
+                StatId.Hp => throw new ArgumentOutOfRangeException(nameof(stat),
+                    "Cannot convert HP to StatIdExceptHp."),
+                _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+            };
+        }
+    }
+
     public class StatsExceptHpTable : Dictionary<StatIdExceptHp, int>;
 
     //public class StatsTable : Dictionary<StatId, int>
@@ -362,6 +394,18 @@ namespace ApogeeVGC_CS.sim
             Spd = 31,
             Spe = 31,
         };
+
+        public StatsTable() { }
+
+        public StatsTable(StatsTable other)
+        {
+            Hp = other.Hp;
+            Atk = other.Atk;
+            Def = other.Def;
+            Spa = other.Spa;
+            Spd = other.Spd;
+            Spe = other.Spe;
+        }
     }
 
     public class SparseStatsTable : Dictionary<StatId, int>
@@ -766,7 +810,7 @@ namespace ApogeeVGC_CS.sim
         public string? Name { get; set; }
         public string? Avatar { get; set; }
         public int? Rating { get; set; }
-        public List<PokemonSet>? Team { get; set; }
+        public PlayerOptionsTeam? Team { get; set; }
         public string? TeamString { get; set; }
         public PrngSeed? Seed { get; set; }
     }
@@ -813,6 +857,21 @@ namespace ApogeeVGC_CS.sim
         public string? Upkeep { get; set; }
     }
 
+    // Interface for generation-specific text data
+    public interface IGenerationTextData
+    {
+        string? Desc { get; }
+        string? ShortDesc { get; }
+    }
+
+    // Example implementation for generation-specific text
+    public class GenerationTextData : IGenerationTextData
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
+    }
+
+
     public class TextFile<T> where T : class
     {
         public string Name { get; set; } = string.Empty;
@@ -826,14 +885,75 @@ namespace ApogeeVGC_CS.sim
         public T? Gen8 { get; set; }
     }
 
-    public class AbilityText : TextFile<AbilityTextData>, ITextFile;
+    public class AbilityText : TextFile<AbilityTextData>, ITextFile
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
 
-    public class MoveText : TextFile<MoveTextData>, ITextFile;
+        // Generation-specific properties
+        public GenerationTextData? Gen3 { get; init; }
+        public GenerationTextData? Gen4 { get; init; }
+        public GenerationTextData? Gen5 { get; init; }
+        public GenerationTextData? Gen6 { get; init; }
+        public GenerationTextData? Gen7 { get; init; }
+        public GenerationTextData? Gen8 { get; init; }
+        public GenerationTextData? Gen9 { get; init; }
+    }
 
-    public class ItemText : TextFile<ItemTextData>, ITextFile;
+    public class MoveText : TextFile<MoveTextData>, ITextFile
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
+        // Generation-specific properties
+        public GenerationTextData? Gen3 { get; init; }
+        public GenerationTextData? Gen4 { get; init; }
+        public GenerationTextData? Gen5 { get; init; }
+        public GenerationTextData? Gen6 { get; init; }
+        public GenerationTextData? Gen7 { get; init; }
+        public GenerationTextData? Gen8 { get; init; }
+        public GenerationTextData? Gen9 { get; init; }
+    }
 
-    public class PokedexText : TextFile<PokedexTextData>, ITextFile;
-    public class DefaultText : ITextFile; //: DefaultTextData { }
+    public class ItemText : TextFile<ItemTextData>, ITextFile
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
+        // Generation-specific properties
+        public GenerationTextData? Gen3 { get; init; }
+        public GenerationTextData? Gen4 { get; init; }
+        public GenerationTextData? Gen5 { get; init; }
+        public GenerationTextData? Gen6 { get; init; }
+        public GenerationTextData? Gen7 { get; init; }
+        public GenerationTextData? Gen8 { get; init; }
+        public GenerationTextData? Gen9 { get; init; }
+    }
+
+    public class PokedexText : TextFile<PokedexTextData>, ITextFile
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
+        // Generation-specific properties
+        public GenerationTextData? Gen3 { get; init; }
+        public GenerationTextData? Gen4 { get; init; }
+        public GenerationTextData? Gen5 { get; init; }
+        public GenerationTextData? Gen6 { get; init; }
+        public GenerationTextData? Gen7 { get; init; }
+        public GenerationTextData? Gen8 { get; init; }
+        public GenerationTextData? Gen9 { get; init; }
+    }
+
+    public class DefaultText : ITextFile
+    {
+        public string? Desc { get; init; }
+        public string? ShortDesc { get; init; }
+        public GenerationTextData? Gen3 { get; init; }
+        public GenerationTextData? Gen4 { get; init; }
+        public GenerationTextData? Gen5 { get; init; }
+        public GenerationTextData? Gen6 { get; init; }
+        public GenerationTextData? Gen7 { get; init; }
+        public GenerationTextData? Gen8 { get; init; }
+        public GenerationTextData? Gen9 { get; init; }
+    }
 
     // Use a class instead of namespace
     public static class RandomTeamsTypes
@@ -1088,8 +1208,20 @@ namespace ApogeeVGC_CS.sim
     //    //public Dictionary<string, object> ExtraData { get; set; }
     //}
 
-    public class AnyObject(object value) : Dictionary<string, object>(ToAnyObject(value))
+    public class AnyObject : Dictionary<string, object>
     {
+        public AnyObject()
+        {
+        }
+
+        public AnyObject(object value) : base(ToAnyObject(value))
+        {
+        }
+
+        public AnyObject(Dictionary<string, object> dict) : base(dict)
+        {
+        }
+
         public IntFalseUnion? Order => (IntFalseUnion?)this["order"];
         public int? Priority => (int?)this["priority"];
         public int? Speed => (int?)this["speed"];
@@ -1098,16 +1230,14 @@ namespace ApogeeVGC_CS.sim
         public EffectState? AbilityState => (EffectState?)this["abilityState"];
         public int? Index => (int?)this["index"];
 
-
-        public static Dictionary<string, object> ToAnyObject<T>(T? obj)
-            where T : class
+        public static Dictionary<string, object> ToAnyObject<T>(T? obj) where T : class
         {
-            Dictionary<string, object> anyObject = new Dictionary<string, object>();
+            var anyObject = new Dictionary<string, object>();
             if (obj == null) return anyObject;
 
             Type type = obj.GetType();
-            PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Public |
-                                                           System.Reflection.BindingFlags.Instance);
+            var properties = type.GetProperties(System.Reflection.BindingFlags.Public |
+                                                System.Reflection.BindingFlags.Instance);
 
             foreach (PropertyInfo prop in properties)
             {
@@ -1124,7 +1254,7 @@ namespace ApogeeVGC_CS.sim
                 else if (value is System.Collections.IEnumerable enumerable and not string)
                 {
                     // Handle collections (arrays, lists, etc.)
-                    List<object?> list = new List<object?>();
+                    var list = new List<object?>();
                     foreach (object? item in enumerable)
                     {
                         if (item == null)

@@ -2,6 +2,7 @@
 using ApogeeVGC_CS.sim;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace ApogeeVGC_CS
 {
@@ -13,8 +14,6 @@ namespace ApogeeVGC_CS
 
     public class Test1V1
     {
-        public Dex Dex { get; } = new();
-        
         // Cache JsonSerializerOptions to fix CA1869
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -134,9 +133,9 @@ namespace ApogeeVGC_CS
             }
         ];
 
-        public async Task RunTest()
+        public static async Task RunTest()
         {
-            PlayerStreams streams = BattleStreamUtils.GetPlayerStreams(new BattleStream(Dex));
+            PlayerStreams streams = BattleStreamUtils.GetPlayerStreams(new BattleStream());
 
             var p1Spec = new PlayerSpecification()
             {
@@ -191,16 +190,22 @@ namespace ApogeeVGC_CS
                     {
                         Console.WriteLine($"Received: {chunk}");
 
-                        // Signal battle completion when you see an end condition
                         if (!chunk.Contains("|win|") && !chunk.Contains("|tie|")) continue;
                         Console.WriteLine("Battle completed!");
                         battleCompletionSource.SetResult(true);
                         break;
                     }
                 }
+                catch (NotImplementedException ex)
+                {
+                    Console.WriteLine($"NotImplementedException caught: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    // Don't rethrow - let execution continue
+                }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.WriteLine($"Other exception caught: {ex.GetType().Name}: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
                     battleCompletionSource.SetException(ex);
                 }
             });
@@ -213,6 +218,7 @@ namespace ApogeeVGC_CS
 
             // Wait for both players to finish
             await Task.WhenAll(p1Task, p2Task);
+            //await Task.WhenAll(p1Task);
 
             Console.WriteLine("Test completed. Press Enter to exit.");
             //Console.ReadLine();

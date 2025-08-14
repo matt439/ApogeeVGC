@@ -197,8 +197,8 @@ namespace ApogeeVGC_CS.sim
         public SideId Id { get; }
         public int N { get; }
 
-        public required string Name { get; init; }
-        public required string Avatar { get; init; }
+        public required string Name { get; set; }
+        public required string Avatar { get; set; }
         public Side Foe { get; init; } = null!; // set in battle.start()
         public Side? AllySide { get; init; } = null; // set in battle.start()
         public required List<PokemonSet> Team { get; init; }
@@ -296,7 +296,14 @@ namespace ApogeeVGC_CS.sim
 
         public Pokemon? AddPokemon(PokemonSet set)
         {
-            throw new NotImplementedException();
+            // Prevent adding more than 24 Pokemon to a side
+            if (Pokemon.Count >= 24) return null;
+
+            var newPokemon = new Pokemon(set, this);
+            Pokemon.Add(newPokemon);
+            PokemonLeft++;
+
+            return newPokemon;
         }
 
         public bool CanDynamaxNow()

@@ -110,7 +110,7 @@ namespace ApogeeVGC_CS.sim
 
         public Condition GetWeather()
         {
-            throw new NotImplementedException("GetWeather method is not implemented yet.");
+            return Battle.Dex.Conditions.GetById(Weather);
         }
 
         public bool SetTerrain(string status, Pokemon? source = null, IEffect? sourceEffect = null)
@@ -200,7 +200,7 @@ namespace ApogeeVGC_CS.sim
 
         public Condition GetTerrain()
         {
-            throw new NotImplementedException("GetTerrain method is not implemented yet.");
+            return Battle.Dex.Conditions.GetById(Terrain);
         }
 
         public bool AddPseudoWeather(string status, Pokemon source, IEffect? sourceEffect = null)

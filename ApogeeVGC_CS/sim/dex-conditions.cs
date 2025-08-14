@@ -1092,19 +1092,334 @@ namespace ApogeeVGC_CS.sim
         private ModdedDex Dex { get; } = dex;
         private readonly Dictionary<Id, Condition> _conditionCache = [];
 
+        public void LoadTestConditions()
+        {
+            foreach (var condition in Conditions.ConditionData)
+            {
+                _conditionCache[condition.Key] = (Condition)condition.Value;
+            }
+        }
+
         public Condition Get(string? name)
         {
-            throw new NotImplementedException("Get method is not implemented yet.");
+            if (string.IsNullOrEmpty(name))
+                return ConditionConstants.EmptyCondition;
+
+            // Check for special prefixes that should be passed as-is to GetById
+            if (name.StartsWith("item:") || name.StartsWith("ability:"))
+            {
+                return GetById(new Id(name));
+            }
+
+            return GetById(new Id(name));
         }
 
         public Condition Get(IEffect? effect)
         {
-            throw new NotImplementedException("Get method is not implemented yet.");
+            if (effect == null)
+                return ConditionConstants.EmptyCondition;
+
+            // If it's already a Condition, return it as-is
+            if (effect is Condition condition)
+                return condition;
+
+            // Otherwise, try to get by the effect's ID
+            return GetById(effect.Id);
         }
 
         public Condition GetById(Id id)
         {
-            throw new NotImplementedException("GetById method is not implemented yet.");
+            if (id.Value == "")
+                return ConditionConstants.EmptyCondition;
+
+            // Check cache first
+            if (_conditionCache.TryGetValue(id, out Condition? cachedCondition))
+                return cachedCondition;
+
+            Condition? condition = null;
+
+            // Handle item conditions
+            if (id.Value.StartsWith("item:"))
+            {
+                string itemId = id.Value.Substring(5); // Remove "item:" prefix
+                var item = Dex.Items.GetById(new Id(itemId));
+
+                condition = CreateConditionFromItem(item, id);
+            }
+            // Handle ability conditions
+            else if (id.Value.StartsWith("ability:"))
+            {
+                string abilityId = id.Value.Substring(8); // Remove "ability:" prefix
+                var ability = Dex.Abilities.GetById(new Id(abilityId));
+
+                condition = CreateConditionFromAbility(ability, id);
+            }
+            // Check rulesets (formats)
+            else if (Dex.Data.Rulesets.ContainsKey(id))
+            {
+                var format = Dex.Formats.Get(id.Value);
+                condition = CreateConditionFromFormat(format);
+
+                // Formats can't be frozen if they don't have a ruleTable
+                _conditionCache[id] = condition;
+                return condition;
+            }
+            // Check direct conditions data
+            else if (Dex.Data.Conditions.ContainsKey(id))
+            {
+                var conditionData = Dex.Data.Conditions[id];
+                condition = CreateConditionFromData(id.Value, conditionData);
+            }
+            // Check for conditions in moves, abilities, or items
+            else
+            {
+                condition = FindConditionInGameData(id);
+            }
+
+            // Handle special hardcoded conditions
+            if (condition == null)
+            {
+                condition = CreateSpecialCondition(id);
+            }
+
+            // Final fallback: create non-existent condition
+            if (condition == null)
+            {
+                condition = CreateNonExistentCondition(id.Value);
+            }
+
+            // Cache the result
+            _conditionCache[id] = condition;
+            return condition;
+        }
+
+        // Helper method to create condition from item
+        private static Condition CreateConditionFromItem(Item item, Id conditionId)
+        {
+            return new Condition
+            {
+                Name = item.Name,
+                EffectType = EffectType.Condition,
+                Exists = item.Exists,
+                Num = item.Num,
+                Gen = item.Gen,
+                Fullname = $"item: {item.Name}",
+                ShortDesc = item.ShortDesc,
+                Desc = item.Desc,
+                IsNonstandard = item.IsNonstandard,
+                NoCopy = item.NoCopy,
+                AffectsFainted = item.AffectsFainted,
+                SourceEffect = item.SourceEffect
+            };
+        }
+
+        // Helper method to create condition from ability
+        private static Condition CreateConditionFromAbility(Ability ability, Id conditionId)
+        {
+            return new Condition
+            {
+                Name = ability.Name,
+                EffectType = EffectType.Condition,
+                Exists = ability.Exists,
+                Num = ability.Num,
+                Gen = ability.Gen,
+                Fullname = $"ability: {ability.Name}",
+                ShortDesc = ability.ShortDesc,
+                Desc = ability.Desc,
+                IsNonstandard = ability.IsNonstandard,
+                NoCopy = ability.NoCopy,
+                AffectsFainted = ability.AffectsFainted,
+                SourceEffect = ability.SourceEffect
+            };
+        }
+
+        // Helper method to create condition from format
+        private static Condition CreateConditionFromFormat(Format format)
+        {
+            return new Condition
+            {
+                Name = format.Name,
+                EffectType = EffectType.Condition,
+                Exists = format.Exists,
+                Num = format.Num,
+                Gen = format.Gen,
+                Fullname = format.Fullname,
+                ShortDesc = format.ShortDesc,
+                Desc = format.Desc,
+                IsNonstandard = format.IsNonstandard,
+                NoCopy = format.NoCopy,
+                AffectsFainted = format.AffectsFainted,
+                SourceEffect = format.SourceEffect
+            };
+        }
+
+        // Helper method to create condition from condition data
+        private static Condition CreateConditionFromData(string name, IConditionData conditionData)
+        {
+            // Convert the condition data to a Condition object
+            // This would depend on the actual structure of IConditionData
+            return new Condition
+            {
+                Name = name,
+                EffectType = EffectType.Condition,
+                Exists = true,
+                Num = 0,
+                Gen = 0,
+                Fullname = $"condition: {name}",
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty
+                // Add other properties from conditionData as needed
+            };
+        }
+
+        // Helper method to find conditions in moves, abilities, or items
+        private Condition? FindConditionInGameData(Id id)
+        {
+            // Check moves
+            if (Dex.Data.Moves.TryGetValue(id, out var moveData) && HasCondition(moveData))
+            {
+                var conditionInfo = GetConditionFromData(moveData);
+                return CreateConditionFromInfo(conditionInfo, id.Value);
+            }
+
+            // Check abilities
+            if (Dex.Data.Abilities.TryGetValue(id, out var abilityData) && HasCondition(abilityData))
+            {
+                var conditionInfo = GetConditionFromData(abilityData);
+                return CreateConditionFromInfo(conditionInfo, id.Value);
+            }
+
+            // Check items
+            if (Dex.Data.Items.TryGetValue(id, out var itemData) && HasCondition(itemData))
+            {
+                var conditionInfo = GetConditionFromData(itemData);
+                return CreateConditionFromInfo(conditionInfo, id.Value);
+            }
+
+            return null;
+        }
+
+        // Helper method to check if data has condition property
+        private static bool HasCondition(object data)
+        {
+            // Use reflection or pattern matching to check for condition property
+            try
+            {
+                var type = data.GetType();
+                var conditionProperty = type.GetProperty("Condition");
+                return conditionProperty?.GetValue(data) != null;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Helper method to get condition from data
+        private static object? GetConditionFromData(object data)
+        {
+            try
+            {
+                var type = data.GetType();
+                var conditionProperty = type.GetProperty("Condition");
+                return conditionProperty?.GetValue(data);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Helper method to create condition from condition info
+        private static Condition CreateConditionFromInfo(object? conditionInfo, string defaultName)
+        {
+            if (conditionInfo == null)
+            {
+                return CreateNonExistentCondition(defaultName);
+            }
+
+            // Extract properties from conditionInfo
+            // This would depend on the actual structure of the condition data
+            return new Condition
+            {
+                Name = GetPropertyValue<string>(conditionInfo, "Name") ?? defaultName,
+                EffectType = EffectType.Condition,
+                Exists = true,
+                Num = 0,
+                Gen = 0,
+                Fullname = $"condition: {defaultName}",
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty
+                // Add other properties from conditionInfo as needed
+            };
+        }
+
+        // Helper method to create special hardcoded conditions
+        private static Condition? CreateSpecialCondition(Id id)
+        {
+            return id.Value switch
+            {
+                "recoil" => new Condition
+                {
+                    Name = "Recoil",
+                    EffectType = EffectType.Condition, // Note: Original uses 'Recoil' but we map to Condition
+                    Exists = true,
+                    Num = 0,
+                    Gen = 0,
+                    Fullname = "condition: Recoil",
+                    NoCopy = false,
+                    AffectsFainted = false,
+                    SourceEffect = string.Empty
+                },
+                "drain" => new Condition
+                {
+                    Name = "Drain",
+                    EffectType = EffectType.Condition, // Note: Original uses 'Drain' but we map to Condition
+                    Exists = true,
+                    Num = 0,
+                    Gen = 0,
+                    Fullname = "condition: Drain",
+                    NoCopy = false,
+                    AffectsFainted = false,
+                    SourceEffect = string.Empty
+                },
+                _ => null
+            };
+        }
+
+        // Helper method to create non-existent condition
+        private static Condition CreateNonExistentCondition(string name)
+        {
+            return new Condition
+            {
+                Name = name,
+                EffectType = EffectType.Condition,
+                Exists = false,
+                Num = 0,
+                Gen = 0,
+                Fullname = string.Empty,
+                NoCopy = false,
+                AffectsFainted = false,
+                SourceEffect = string.Empty
+            };
+        }
+
+        // Helper method to get property value using reflection
+        private static T? GetPropertyValue<T>(object obj, string propertyName)
+        {
+            try
+            {
+                var type = obj.GetType();
+                var property = type.GetProperty(propertyName);
+                var value = property?.GetValue(obj);
+                return value is T result ? result : default;
+            }
+            catch
+            {
+                return default;
+            }
         }
     }
 }
