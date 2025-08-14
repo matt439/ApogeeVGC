@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApogeeVGC.Data
+namespace ApogeeVGC.Data;
+
+internal class Rulesets
 {
-    internal class Rulesets
-    {
-    }
 }

@@ -1,2 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿namespace ApogeeVGC;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        var driver = new Driver();
+    }
+}

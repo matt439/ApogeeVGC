@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApogeeVGC.Player
+namespace ApogeeVGC.Player;
+
+internal class PlayerConsole
 {
-    internal class PlayerConsole
-    {
-    }
 }

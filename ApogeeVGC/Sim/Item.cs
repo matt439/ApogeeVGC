@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApogeeVGC.Sim
+namespace ApogeeVGC.Sim;
+
+internal class Item
 {
-    internal class Item
-    {
-    }
 }
