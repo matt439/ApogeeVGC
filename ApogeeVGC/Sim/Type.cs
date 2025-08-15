@@ -69,6 +69,15 @@ public enum StatType
     Spe,
 }
 
+public enum StatTypeExceptHp
+{
+    Atk,
+    Def,
+    SpA,
+    SpD,
+    Spe,
+}
+
 public enum MoveEffectiveness
 {
     Normal = 0,
@@ -77,7 +86,7 @@ public enum MoveEffectiveness
     Immune = 3,
 }
 
-public class TypeData
+public record TypeData
 {
     public required Dictionary<MoveType, MoveEffectiveness> DamageTaken { get; init; }
     public Dictionary<StatType, int>? HpDvs { get; init; }
