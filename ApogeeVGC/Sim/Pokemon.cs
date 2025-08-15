@@ -49,15 +49,18 @@ public static class PokemonBuilder
             movesList.Add(move);
         }
 
-        Pokemon pokemon = new()
+        Specie spec = library.Species[specie] ??
+                        throw new ArgumentException($"Specie {specie} not found in library.");
+        Nature nat = library.Natures[nature] ??
+                        throw new ArgumentException($"Nature {nature} not found in library.");
+
+        Pokemon pokemon = new(spec, evs, ivs ?? StatsTable.PerfectIvs, nat)
         {
-            Specie = library.Species[specie] ?? throw new ArgumentException($"Specie {specie} not found in library."),
             Moves = movesList,
             Item = library.Items[item] ?? throw new ArgumentException($"Item {item} not found in library."),
-            Ability = library.Abilities[ability] ?? throw new ArgumentException($"Ability {ability} not found in library."),
+            Ability = library.Abilities[ability] ??
+                      throw new ArgumentException($"Ability {ability} not found in library."),
             Evs = evs,
-            Nature = library.Natures[nature] ?? throw new ArgumentException($"Nature {nature} not found in library."),
-            Ivs = ivs ?? StatsTable.PerfectIvs,
             Name = nickname ?? library.Species[specie].Name,
             Shiny = shiny,
             Level = level,
@@ -67,9 +70,9 @@ public static class PokemonBuilder
             : throw new ArgumentException("Invalid Pokemon configuration.");
     }
 
-    public static PokemonTeam BuildTestTeam(Library library)
+    public static PokemonSet BuildTestSet(Library library)
     {
-        return new PokemonTeam()
+        return new PokemonSet()
         {
             Pokemons =
             [
@@ -82,37 +85,84 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
                     NatureType.Adamant
                 ),
+                Build(
+                    library,
+                    SpecieId.Miraidon,
+                    [MoveId.DragonBasic, MoveId.ElectricBasic, MoveId.FlyingBasic, MoveId.PsychicBasic],
+                    ItemId.ChoiceSpecs,
+                    AbilityId.HadronEngine,
+                    new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
+                    NatureType.Modest
+                ),
+                Build(
+                    library,
+                    SpecieId.Ursaluna,
+                    [MoveId.NormalBasic, MoveId.FightingBasic, MoveId.GroundBasic, MoveId.RockBasic],
+                    ItemId.FlameOrb,
+                    AbilityId.Guts,
+                    new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
+                    NatureType.Adamant
+                ),
+                Build(
+                    library,
+                    SpecieId.Volcarona,
+                    [MoveId.FireBasic, MoveId.BugBasic, MoveId.FlyingBasic, MoveId.PsychicBasic],
+                    ItemId.RockyHelmet,
+                    AbilityId.FlameBody,
+                    new StatsTable { Hp = 252, Def = 196, SpD = 60 },
+                    NatureType.Bold
+                ),
+                Build(
+                    library,
+                    SpecieId.Grimmsnarl,
+                    [MoveId.DarkBasic, MoveId.FairyBasic, MoveId.PsychicBasic, MoveId.FightingBasic],
+                    ItemId.LightClay,
+                    AbilityId.Prankster,
+                    new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },
+                    NatureType.Careful
+                ),
+                Build(
+                    library,
+                    SpecieId.IronHands,
+                    [MoveId.FightingBasic, MoveId.ElectricBasic, MoveId.GroundBasic, MoveId.PsychicBasic],
+                    ItemId.AssaultVest,
+                    AbilityId.QuarkDrive,
+                    new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
+                    NatureType.Adamant
+                )
             ]
         };
     }
 }
 
-public class PokemonTeam
+public class PokemonSet
 {
     public List<Pokemon> Pokemons { get; init; } = [];
 }
 
 public class Pokemon
 {
-    public required Specie Specie { get; init; }
+    public Specie Specie { get; init; }
     public required IEnumerable<Move> Moves { get; init; }
     public required Item Item { get; init; }
     public required Ability Ability { get; init; }
-    public required StatsTable Evs { get; init; }
-    public required Nature Nature { get; init; }
-    public required StatsTable Ivs { get; init; }
+    public StatsTable Evs { get; init; }
+    public Nature Nature { get; init; }
+    public StatsTable Ivs { get; init; }
     public required string Name { get; init; }
     public int Level { get; init; }
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
-
     public StatsTable UnmodifiedStats { get; }
     public StatsTable CurrentStats { get; }
-
     public bool IsFainted => CurrentStats.Hp <= 0;
 
-    public Pokemon()
+    public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature)
     {
+        Specie = specie;
+        Evs = evs;
+        Ivs = ivs;
+        Nature = nature;
         UnmodifiedStats = CalculateUnmodifiedStats();
         CurrentStats = UnmodifiedStats;
     }

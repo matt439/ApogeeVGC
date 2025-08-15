@@ -27,5 +27,6 @@ public record Library
     public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => _speciesFormats.SpeciesFormatsData;
     // tags
     public IReadOnlyDictionary<PokemonType, TypeData> TypeData => _typeChart.TypeData;
-    
+    public TypeChart TypeChart => _typeChart;
+
 }

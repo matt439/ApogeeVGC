@@ -12,6 +12,29 @@ public record TypeChart
         TypeData = new ReadOnlyDictionary<PokemonType, TypeData>(_typeData);
     }
 
+    public double GetEffectiveness(PokemonType pokemon, MoveType moveType)
+    {
+        MoveEffectiveness moveEffectiveness = _typeData[pokemon].DamageTaken[moveType];
+        return EffectivenessMultiplier(moveEffectiveness);
+    }
+
+    public double GetEffectiveness(List<PokemonType> pokemon, MoveType moveType)
+    {
+        return pokemon.Aggregate(1.0, (current, type) =>
+            current * EffectivenessMultiplier(_typeData[type].DamageTaken[moveType]));
+    }
+
+    private static double EffectivenessMultiplier(MoveEffectiveness effectiveness)
+    {
+        return effectiveness switch
+        {
+            MoveEffectiveness.SuperEffective => 2.0,
+            MoveEffectiveness.NotVeryEffective => 0.5,
+            MoveEffectiveness.Immune => 0.0,
+            _ => 1.0, // Normal effectiveness
+        };
+    }
+
     private readonly Dictionary<PokemonType, TypeData> _typeData = new()
     {
         [PokemonType.Bug] = new TypeData

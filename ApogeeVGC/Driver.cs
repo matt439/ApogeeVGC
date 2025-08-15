@@ -15,8 +15,8 @@ public enum DriverMode
 
 public class Driver
 {
-    private Library Lib { get; } = new();
-    private ISimulator? Simulator { get; set; }
+    private Library Library { get; } = new();
+    private Simulator? Simulator { get; set; }
     private IPlayer? Player1 { get; set; }
     private IPlayer? Player2 { get; set; }
 
@@ -46,41 +46,46 @@ public class Driver
 
     private void RunRandomTest()
     {
-        Simulator = new Simulator();
-        Player1 = new PlayerRandom(PlayerId.Player1);
-        Player2 = new PlayerRandom(PlayerId.Player2);
+        Simulator = new Simulator
+        {
+            Battle = BattleGenerator.GenerateTestBattle(Library)
+        };
 
-        //Simulator.Start();
+        Player1 = new PlayerRandom(PlayerId.Player1, Simulator.Battle);
+        Player2 = new PlayerRandom(PlayerId.Player2, Simulator.Battle);
 
-        //while (Simulator.State != SimState.Player1Win && Simulator.State != SimState.Player2Win)
-        //{
-        //    PlayerChoices currentChoices = Simulator.PlayerChoices;
-        //    if (currentChoices == null)
-        //    {
-        //        throw new InvalidOperationException("Current player choices cannot be null.");
-        //    }
-        //    switch (currentChoices.PlayerId)
-        //    {
-        //        case PlayerId.Player1:
-        //        {
-        //            Choice command = Player1.GetNextChoice(currentChoices);
-        //            Simulator.InputCommand(command);
+        SimulatorOutput output = Simulator.Start();
 
-        //            break;
-        //        }
-        //        case PlayerId.Player2:
-        //        {
-        //            Choice command = Player2.GetNextChoice(currentChoices);
-        //            Simulator.InputCommand(command);
+        while (output.State != SimState.Player1Win && output.State != SimState.Player2Win)
+        {
+            // Get choices from players
+            Choice player1Choice = Player1.GetNextChoice(output.Player1Choices);
+            Choice player2Choice = Player2.GetNextChoice(output.Player2Choices);
+            // Create input for the simulator
+            SimulatorInput input = new()
+            {
+                Player1Choice = player1Choice,
+                Player2Choice = player2Choice
+            };
+            // Perform the command in the simulator
+            output = Simulator.PerformCommand(input);
+            // Output the current state of the battle
+            Console.WriteLine($"Player 1 chose: {player1Choice}, Player 2 chose: {player2Choice}");
+        }
 
-        //            break;
-        //        }
-        //        default:
-        //            throw new ArgumentOutOfRangeException();
-        //    }
-        //}
-
-        //Console.WriteLine("Battle finished.");
-        //Console.WriteLine($"Player {Simulator.State} wins");
+        Console.WriteLine("Battle finished.");
+        switch (output.State)
+        {
+            case SimState.Player1Win:
+                Console.WriteLine("Player 1 wins!");
+                break;
+            case SimState.Player2Win:
+                Console.WriteLine("Player 2 wins!");
+                break;
+            case SimState.Running:
+            default:
+                Console.WriteLine("Battle ended unexpectedly.");
+                break;
+        }
     }
 }

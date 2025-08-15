@@ -53,7 +53,7 @@ public interface IPlayer
 
     PlayerId PlayerId { get; }
 
-    Choice GetNextChoice(PlayerChoices availableChoices);
+    Choice GetNextChoice(IReadOnlyList<Choice> availableChoices);
 
-    void InputBattle(Battle battle);
+    //void InputBattle(Battle battle);
 }

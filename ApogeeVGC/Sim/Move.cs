@@ -121,9 +121,9 @@ public record SecondaryEffect
  * all - The move targets the field or all Pokémon at once.
  * allAdjacent - The move is a spread move that also hits the user's ally.
  * allAdjacentFoes - The move is a spread move.
- * allies - The move affects all active Pokémon on the user's team.
+ * allies - The move affects all active Pokémon on the user's set.
  * allySide - The move adds a side condition on the user's side.
- * allyTeam - The move affects all unfainted Pokémon on the user's team.
+ * allyTeam - The move affects all unfainted Pokémon on the user's set.
  * any - The move can hit any other active Pokémon, not just those adjacent.
  * foeSide - The move adds a side condition on the foe's side.
  * normal - The move can hit one adjacent Pokémon of your choice.
