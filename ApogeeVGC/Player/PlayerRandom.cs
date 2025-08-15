@@ -1,7 +1,19 @@
-﻿namespace ApogeeVGC.Player;
+﻿using ApogeeVGC.Sim;
 
-//public class PlayerRandom : IPlayer
-//{
+namespace ApogeeVGC.Player;
+
+public class PlayerRandom(PlayerId playerId) : IPlayer
+{
+    public PlayerId PlayerId { get; } = playerId;
 
 
-//}
+    public Choice GetNextChoice(PlayerChoices availableChoices)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void InputBattle(Battle battle)
+    {
+        throw new NotImplementedException();
+    }
+}

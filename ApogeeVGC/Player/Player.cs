@@ -1,14 +1,38 @@
-﻿namespace ApogeeVGC.Player;
+﻿using ApogeeVGC.Sim;
 
-public class Choice
+namespace ApogeeVGC.Player;
+
+public enum PlayerId
+{
+    Player1 = 1,
+    Player2 = 2,
+}
+
+public enum Choice
+{
+    Move1 = 1,
+    Move2 = 2,
+    Move3 = 3,
+    Move4 = 4,
+    Switch1 = 5,
+    Switch2 = 6,
+    Switch3 = 7,
+    Switch4 = 8,
+    Switch5 = 9,
+    Quit = 10,
+    None = 11,
+    Invalid = 12,
+}
+
+public class ChoiceDetails
 {
 
 }
 
 public class PlayerChoices
 {
-    public int PlayerId { get; set; }
-    public List<Choice> Choices { get; set; } = [];
+    public PlayerId PlayerId { get; init; }
+    public Dictionary<Choice, ChoiceDetails> Choices { get; init; } = [];
 }
 
 
@@ -17,7 +41,9 @@ public interface IPlayer
     //int GetInputCommand();  
     //void InputCurrentPlayerChoices(PlayerChoices choices);
 
-    int GetNextCommand(PlayerChoices choices);
+    PlayerId PlayerId { get; }
 
-    //void GetBattle(Battle battle);
+    Choice GetNextChoice(PlayerChoices availableChoices);
+
+    void InputBattle(Battle battle);
 }

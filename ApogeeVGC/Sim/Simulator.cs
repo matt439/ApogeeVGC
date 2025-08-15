@@ -2,15 +2,36 @@
 
 namespace ApogeeVGC.Sim;
 
-public interface ISimulator
+public enum SimState
 {
-    PlayerChoices GetCurrentPlayerChoices();
-    void InputCommand(int commandId);
-
-    Battle GetBattle();
+    Initialised,
+    Running,
+    Player1Win,
+    Player2Win,
 }
 
-//public class Simulator : ISimulator
-//{
+public interface ISimulator
+{
+    Battle Battle { get; }
+    PlayerChoices PlayerChoices { get; }
+    SimState State { get; }
 
-//}
+    void InputCommand(Choice choice);
+    void Start();
+}
+
+public class Simulator : ISimulator
+{
+    public Battle Battle { get; }
+    public PlayerChoices PlayerChoices { get; }
+    public SimState State { get; }
+    public void InputCommand(Choice choice)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Start()
+    {
+        throw new NotImplementedException();
+    }
+}
