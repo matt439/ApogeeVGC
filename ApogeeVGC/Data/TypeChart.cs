@@ -1,10 +1,18 @@
-﻿using ApogeeVGC.Sim;
+﻿using System.Collections.ObjectModel;
+using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
 
-public static class TypeChart
+public record TypeChart
 {
-    public static Dictionary<PokemonType, TypeData> TypeData { get; } = new()
+    public IReadOnlyDictionary<PokemonType, TypeData> TypeData { get; }
+
+    public TypeChart()
+    {
+        TypeData = new ReadOnlyDictionary<PokemonType, TypeData>(_typeData);
+    }
+
+    private readonly Dictionary<PokemonType, TypeData> _typeData = new()
     {
         [PokemonType.Bug] = new TypeData
         {
@@ -30,16 +38,16 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.Def] = 30,
-                [StatType.SpD] = 30,
+                [StatId.Atk] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 13,
-                [StatType.Def] = 13,
+                [StatId.Atk] = 13,
+                [StatId.Def] = 13,
             },
         },
         [PokemonType.Fire] = new TypeData
@@ -66,16 +74,16 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.SuperEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.SpA] = 30,
-                [StatType.Spe] = 30,
+                [StatId.Atk] = 30,
+                [StatId.SpA] = 30,
+                [StatId.Spe] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 14,
-                [StatType.Def] = 12,
+                [StatId.Atk] = 14,
+                [StatId.Def] = 12,
             },
         },
         [PokemonType.Water] = new TypeData
@@ -102,16 +110,16 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.Def] = 30,
-                [StatType.SpA] = 30,
+                [StatId.Atk] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpA] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 14,
-                [StatType.Def] = 13,
+                [StatId.Atk] = 14,
+                [StatId.Def] = 13,
             },
         },
         [PokemonType.Electric] = new TypeData
@@ -138,13 +146,13 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.SpA] = 30,
+                [StatId.SpA] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 14,
+                [StatId.Atk] = 14,
             },
         },
         [PokemonType.Grass] = new TypeData
@@ -171,15 +179,15 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.SpA] = 30,
+                [StatId.Atk] = 30,
+                [StatId.SpA] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 14,
-                [StatType.Def] = 14,
+                [StatId.Atk] = 14,
+                [StatId.Def] = 14,
             },
         },
         [PokemonType.Ice] = new TypeData
@@ -206,14 +214,14 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.Def] = 30,
+                [StatId.Atk] = 30,
+                [StatId.Def] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 13,
+                [StatId.Def] = 13,
             },
         },
         [PokemonType.Fighting] = new TypeData
@@ -240,17 +248,17 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 30,
-                [StatType.SpA] = 30,
-                [StatType.SpD] = 30,
-                [StatType.Spe] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpA] = 30,
+                [StatId.SpD] = 30,
+                [StatId.Spe] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 12,
-                [StatType.Def] = 12,
+                [StatId.Atk] = 12,
+                [StatId.Def] = 12,
             },
         },
         [PokemonType.Poison] = new TypeData
@@ -277,16 +285,16 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 30,
-                [StatType.SpA] = 30,
-                [StatType.SpD] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpA] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 12,
-                [StatType.Def] = 14,
+                [StatId.Atk] = 12,
+                [StatId.Def] = 14,
             },
         },
         [PokemonType.Ground] = new TypeData
@@ -313,14 +321,14 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.SuperEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.SpA] = 30,
-                [StatType.SpD] = 30,
+                [StatId.SpA] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 12,
+                [StatId.Atk] = 12,
             },
         },
         [PokemonType.Flying] = new TypeData
@@ -347,18 +355,18 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Hp] = 30,
-                [StatType.Atk] = 30,
-                [StatType.Def] = 30,
-                [StatType.SpA] = 30,
-                [StatType.SpD] = 30,
+                [StatId.Hp] = 30,
+                [StatId.Atk] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpA] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 12,
-                [StatType.Def] = 13,
+                [StatId.Atk] = 12,
+                [StatId.Def] = 13,
             },
         },
         [PokemonType.Psychic] = new TypeData
@@ -385,14 +393,14 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
-                [StatType.Spe] = 30,
+                [StatId.Atk] = 30,
+                [StatId.Spe] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 12,
+                [StatId.Def] = 12,
             },
         },
         [PokemonType.Rock] = new TypeData
@@ -419,16 +427,16 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.SuperEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 30,
-                [StatType.SpD] = 30,
-                [StatType.Spe] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpD] = 30,
+                [StatId.Spe] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 13,
-                [StatType.Def] = 12,
+                [StatId.Atk] = 13,
+                [StatId.Def] = 12,
             },
         },
         [PokemonType.Ghost] = new TypeData
@@ -455,15 +463,15 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 30,
-                [StatType.SpD] = 30,
+                [StatId.Def] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 13,
-                [StatType.Def] = 14,
+                [StatId.Atk] = 13,
+                [StatId.Def] = 14,
             },
         },
         [PokemonType.Dragon] = new TypeData
@@ -490,13 +498,13 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 30,
+                [StatId.Atk] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Def] = 14,
+                [StatId.Def] = 14,
             },
         },
         [PokemonType.Dark] = new TypeData
@@ -523,7 +531,7 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = [],
+            HpIvs = new Dictionary<StatId, int>(),
         },
         [PokemonType.Steel] = new TypeData
         {
@@ -549,13 +557,13 @@ public static class TypeChart
                 [MoveType.Stellar] = MoveEffectiveness.Normal,
                 [MoveType.Water] = MoveEffectiveness.Normal,
             },
-            HpIvs = new Dictionary<StatType, int>
+            HpIvs = new Dictionary<StatId, int>
             {
-                [StatType.SpD] = 30,
+                [StatId.SpD] = 30,
             },
-            HpDvs = new Dictionary<StatType, int>
+            HpDvs = new Dictionary<StatId, int>
             {
-                [StatType.Atk] = 13,
+                [StatId.Atk] = 13,
             },
         },
         [PokemonType.Fairy] = new TypeData

@@ -4,24 +4,34 @@ namespace ApogeeVGC.Player;
 
 public enum PlayerId
 {
-    Player1 = 1,
-    Player2 = 2,
+    Player1,
+    Player2,
 }
 
 public enum Choice
 {
-    Move1 = 1,
-    Move2 = 2,
-    Move3 = 3,
-    Move4 = 4,
-    Switch1 = 5,
-    Switch2 = 6,
-    Switch3 = 7,
-    Switch4 = 8,
-    Switch5 = 9,
-    Quit = 10,
-    None = 11,
-    Invalid = 12,
+    Move1,
+    Move2,
+    Move3,
+    Move4,
+
+    Switch1,
+    Switch2,
+    Switch3,
+    Switch4,
+    Switch5,
+    Switch6,
+
+    Select1,
+    Select2,
+    Select3,
+    Select4,
+    Select5,
+    Select6,
+
+    Quit,
+    None,
+    Invalid,
 }
 
 public class ChoiceDetails

@@ -51,15 +51,27 @@ public enum MoveType
 
 public enum Nonstandard
 {
-    Past, Future, Unobtainable, Cap, Lgpe, Custom, Gigantamax
+    Past,
+    Future,
+    Unobtainable,
+    Cap,
+    Lgpe,
+    Custom,
+    Gigantamax
 }
 
 public enum BoostId
 {
-    Atk, Def, SpA, SpD, Spe, Accuracy, Evasion
+    Atk,
+    Def,
+    SpA,
+    SpD,
+    Spe,
+    Accuracy,
+    Evasion
 }
 
-public enum StatType
+public enum StatId
 {
     Hp,
     Atk,
@@ -69,7 +81,7 @@ public enum StatType
     Spe,
 }
 
-public enum StatTypeExceptHp
+public enum StatIdExceptHp
 {
     Atk,
     Def,
@@ -77,6 +89,38 @@ public enum StatTypeExceptHp
     SpD,
     Spe,
 }
+
+public static class StatIdTools
+{
+    public static StatId ConvertToStatId(StatIdExceptHp stat)
+    {
+        return stat switch
+        {
+            StatIdExceptHp.Atk => StatId.Atk,
+            StatIdExceptHp.Def => StatId.Def,
+            StatIdExceptHp.SpA => StatId.SpA,
+            StatIdExceptHp.SpD => StatId.SpD,
+            StatIdExceptHp.Spe => StatId.Spe,
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID except HP.")
+        };
+    }
+
+    public static StatIdExceptHp ConvertToStatIdExceptId(StatId stat)
+    {
+        return stat switch
+        {
+            StatId.Atk => StatIdExceptHp.Atk,
+            StatId.Def => StatIdExceptHp.Def,
+            StatId.SpA => StatIdExceptHp.SpA,
+            StatId.SpD => StatIdExceptHp.SpD,
+            StatId.Spe => StatIdExceptHp.Spe,
+            StatId.Hp => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert HP to StatIdExceptHp."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+        };
+    }
+}
+
 
 public enum MoveEffectiveness
 {
@@ -88,8 +132,8 @@ public enum MoveEffectiveness
 
 public record TypeData
 {
-    public required Dictionary<MoveType, MoveEffectiveness> DamageTaken { get; init; }
-    public Dictionary<StatType, int>? HpDvs { get; init; }
-    public Dictionary<StatType, int>? HpIvs { get; init; }
+    public required IReadOnlyDictionary<MoveType, MoveEffectiveness> DamageTaken { get; init; }
+    public IReadOnlyDictionary<StatId, int>? HpDvs { get; init; }
+    public IReadOnlyDictionary<StatId, int>? HpIvs { get; init; }
     public Nonstandard? IsNonstandard { get; init; }
 }

@@ -1,5 +1,5 @@
 ﻿namespace ApogeeVGC.Data;
 
-public class Tags
+public record Tags
 {
 }

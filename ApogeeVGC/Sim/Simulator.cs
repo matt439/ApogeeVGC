@@ -12,7 +12,7 @@ public enum SimState
 
 public interface ISimulator
 {
-    Battle Battle { get; }
+    Battle? Battle { get; }
     PlayerChoices PlayerChoices { get; }
     SimState State { get; }
 
@@ -22,8 +22,8 @@ public interface ISimulator
 
 public class Simulator : ISimulator
 {
-    public Battle Battle { get; }
-    public PlayerChoices PlayerChoices { get; }
+    public Battle? Battle { get; private set; }
+    public PlayerChoices? PlayerChoices { get; }
     public SimState State { get; }
     public void InputCommand(Choice choice)
     {
