@@ -48,7 +48,7 @@ public class Driver
     {
         Simulator = new Simulator
         {
-            Battle = BattleGenerator.GenerateTestBattle(Library)
+            Battle = BattleGenerator.GenerateTestBattle(Library, "Rand1"," Rand2")
         };
 
         Player1 = new PlayerRandom(PlayerId.Player1, Simulator.Battle);
@@ -69,11 +69,6 @@ public class Driver
             };
             // Perform the command in the simulator
             output = Simulator.PerformCommand(input);
-            // Output the current state of the battle
-
-
-            Console.Write($"Player 1 chose: {player1Choice.GetChoiceName()}, ");
-            Console.WriteLine($"Player 2 chose: {player2Choice.GetChoiceName()}\n");
         }
 
         Console.WriteLine("Battle finished.");
@@ -96,7 +91,7 @@ public class Driver
     {
         Simulator = new Simulator
         {
-            Battle = BattleGenerator.GenerateTestBattle(Library)
+            Battle = BattleGenerator.GenerateTestBattle(Library, "Matt", "Random")
         };
 
         Player1 = new PlayerConsole(PlayerId.Player1, Simulator.Battle);
@@ -117,10 +112,6 @@ public class Driver
             };
             // Perform the command in the simulator
             output = Simulator.PerformCommand(input);
-            // Output the current state of the battle
-
-            Console.Write($"Player 1 chose: {player1Choice.GetChoiceName()}, ");
-            Console.WriteLine($"Player 2 chose: {player2Choice.GetChoiceName()}\n");
         }
 
         Console.WriteLine("Battle finished.");

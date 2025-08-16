@@ -133,7 +133,11 @@ public class Battle
     {
         if (choice.IsSwitchChoice())
         {
+            Pokemon prevActive = atkSide.Team.ActivePokemon;
             atkSide.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
+
+            UiGenerator.PrintSwitchAction(atkSide.Team.Trainer.Name, prevActive,
+                atkSide.Team.ActivePokemon);
         }
         else if (choice.IsMoveChoice())
         {
@@ -141,7 +145,10 @@ public class Battle
             Pokemon attacker = atkSide.Team.ActivePokemon;
             Move move = attacker.Moves[moveIndex];
             Pokemon defender = defSide.Team.ActivePokemon;
+            int damage = Damage(attacker, defender, move);
+            defender.Damage(damage);
 
+            UiGenerator.PrintMoveAction(attacker, move, damage, defender);
         }
     }
 
@@ -206,11 +213,27 @@ public static class UiGenerator
         }
         StringBuilder sb = new();
         sb.AppendLine("Available choices:");
-        foreach (Choice t in availableChoices)
+        for (int i = 0; i < availableChoices.Length; i++)
         {
-            sb.AppendLine(GenerateChoiceString(battle, perspective, t));
+            sb.AppendLine($"{i + 1}: {GenerateChoiceString(battle, perspective, availableChoices[i])}");
         }
+
         sb.Append("Please enter the number of your choice:");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
+        sb.AppendLine($"It dealt {damage} damage.");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintSwitchAction(string trainerName, Pokemon switchedOut, Pokemon switchedIn)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{trainerName} withdrew {switchedOut.Name}. {trainerName} sent out {switchedIn.Name}!");
         Console.WriteLine(sb.ToString());
     }
 
@@ -241,7 +264,7 @@ public static class UiGenerator
             throw new InvalidOperationException("Move choice cannot be made to a null Move.");
         }
         StringBuilder sb = new();
-        sb.Append($"{choice.GetChoiceName()}: ");
+        sb.Append("Move: ");
         sb.Append(move.Name);
         return sb.ToString();
     }
@@ -260,7 +283,7 @@ public static class UiGenerator
             throw new InvalidOperationException("Switch choice cannot be made to a null Pokemon.");
         }
         StringBuilder sb = new();
-        sb.Append($"{choice.GetChoiceName()}: ");
+        sb.Append($"Switch: ");
         sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
         return sb.ToString();
     }
@@ -283,7 +306,7 @@ public static class UiGenerator
         sb.Append(PrimarySpacer);
         sb.Append(HpBarSpacer);
         sb.Append(CreateHpBar(activePokemon));
-        sb.AppendLine($" {activePokemon.CurrentHp.ToString()} / {activePokemon.UnmodifiedStats.Hp.ToString()}");
+        sb.AppendLine($" {activePokemon.CurrentHp.ToString()} / {activePokemon.UnmodifiedHp.ToString()}");
         sb.Append(PrimarySpacer);
         sb.AppendLine($"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}\n\n");
         Console.WriteLine(sb.ToString());
@@ -309,9 +332,9 @@ public static class UiGenerator
 
     private static string CreateHpBar(Pokemon pokemon)
     {
-        int maxHp = pokemon.UnmodifiedStats.Hp;
-        int currentHp = pokemon.CurrentHp;
-        int filledLength = (int)((double)currentHp / maxHp * HpBarLength);
+        //int maxHp = pokemon.UnmodifiedStats.Hp;
+        //int currentHp = pokemon.CurrentHp;
+        int filledLength = (int)(pokemon.CurrentHpRatio * HpBarLength);
         string filledPart = new('█', filledLength);
         string emptyPart = new('░', HpBarLength - filledLength);
         return $"[{filledPart}{emptyPart}]";
@@ -321,20 +344,20 @@ public static class UiGenerator
     {
         int turnNumber = turn + 1;
         string turnString = turnNumber.ToString(CultureInfo.InvariantCulture);
-        Console.WriteLine($"##########  Turn {turnString}  ##########\n");
+        Console.WriteLine($"####################  Turn {turnString}  ####################\n");
     }
 }
 
 public static class BattleGenerator
 {
-    public static Battle GenerateTestBattle(Library library)
+    public static Battle GenerateTestBattle(Library library, string trainerName1, string trainerName2)
     {
         return new Battle
         {
             Library = library,
             Field = new Field(),
-            Side1 = SideGenerator.GenerateTestSide(library),
-            Side2 = SideGenerator.GenerateTestSide(library)
+            Side1 = SideGenerator.GenerateTestSide(library, trainerName1),
+            Side2 = SideGenerator.GenerateTestSide(library, trainerName2)
         };
     }
 }

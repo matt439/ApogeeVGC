@@ -9,11 +9,11 @@ public class Side
 
 public static class SideGenerator
 {
-    public static Side GenerateTestSide(Library library)
+    public static Side GenerateTestSide(Library library, string trainerName)
     {
         return new Side
         {
-            Team = TeamGenerator.GenerateTestTeam(library)
+            Team = TeamGenerator.GenerateTestTeam(library, trainerName)
         };
     }
 }

@@ -7,11 +7,11 @@ public class Trainer
 
 public static class TrainerGenerator
 {
-    public static Trainer GenerateTestTrainer()
+    public static Trainer GenerateTestTrainer(string name)
     {
         return new Trainer
         {
-            Name = "Test Trainer"
+            Name = name
         };
     }
 }

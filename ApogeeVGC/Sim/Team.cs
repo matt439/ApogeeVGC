@@ -57,11 +57,11 @@ public class Team
 
 public static class TeamGenerator
 {
-    public static Team GenerateTestTeam(Library library)
+    public static Team GenerateTestTeam(Library library, string trainerName)
     {
         return new Team
         {
-            Trainer = TrainerGenerator.GenerateTestTrainer(),
+            Trainer = TrainerGenerator.GenerateTestTrainer(trainerName),
             PokemonSet = PokemonBuilder.BuildTestSet(library),
             ActivePokemonIndex = 0
         };

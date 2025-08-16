@@ -200,8 +200,14 @@ public class Pokemon
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }
-    public StatsTable UnmodifiedStats { get; }
-    public StatsTable CurrentStats { get; }
+    private StatsTable UnmodifiedStats { get; }
+    private StatsTable CurrentStats { get; }
+    public int UnmodifiedHp => UnmodifiedStats.Hp;
+    public int UnmodifiedAtk => UnmodifiedStats.Atk;
+    public int UnmodifiedDef => UnmodifiedStats.Def;
+    public int UnmodifiedSpA => UnmodifiedStats.SpA;
+    public int UnmodifiedSpD => UnmodifiedStats.SpD;
+    public int UnmodifiedSpe => UnmodifiedStats.Spe;
     public int CurrentHp => CurrentStats.Hp;
     public int CurrentAtk => CurrentStats.Atk;
     public int CurrentDef => CurrentStats.Def;
@@ -221,7 +227,7 @@ public class Pokemon
         Nature = nature;
         Level = level;
         UnmodifiedStats = CalculateUnmodifiedStats();
-        CurrentStats = UnmodifiedStats;
+        CurrentStats = CalculateUnmodifiedStats();
     }
 
     public void Heal(int amount)

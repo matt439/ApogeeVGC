@@ -36,6 +36,7 @@ public class PlayerConsole(PlayerId playerId, Battle battle) : IPlayer
             if (int.TryParse(input, out int choiceIndex) && choiceIndex > 0 &&
                 choiceIndex <= availableChoices.Length)
             {
+                Console.Clear();
                 return availableChoices[choiceIndex - 1];
             }
             Console.WriteLine("Invalid choice. Please try again:");
