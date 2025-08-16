@@ -153,7 +153,7 @@ public class PokemonSet
         }
     }
     public int PokemonCount => Pokemons.Length;
-    public Pokemon[] AlivePokemon => Pokemons.Where(pokemon => !pokemon.Fainted).ToArray();
+    public Pokemon[] AlivePokemon => Pokemons.Where(pokemon => !pokemon.IsFainted).ToArray();
     public int AlivePokemonCount => AlivePokemon.Length;
     public int FaintedCount => PokemonCount - AlivePokemonCount;
     public bool AllFainted => AlivePokemonCount == 0;
@@ -216,7 +216,7 @@ public class Pokemon
     public int CurrentSpe => CurrentStats.Spe;
     public double CurrentHpRatio => (double)CurrentHp / UnmodifiedStats.Hp;
     public int CurrentHpPercentage => (int)(CurrentHpRatio * 100);
-    public bool Fainted => CurrentStats.Hp <= 0;
+    public bool IsFainted => CurrentStats.Hp <= 0;
 
     // Need to have these parameters to calculate the stats correctly
     public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)

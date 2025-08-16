@@ -30,6 +30,14 @@ public enum Choice
     Select5,
     Select6,
 
+    TargetSlot1,
+    TargetSlot2,
+    TargetSlot3,
+    TargetSlot4,
+
+    TargetSide1,
+    TargetSide2,
+
     Quit,
     None,
     Invalid,

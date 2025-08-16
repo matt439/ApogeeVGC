@@ -4,7 +4,9 @@ namespace ApogeeVGC.Sim;
 
 public enum SimState
 {
-    Running,
+    RequestingPlayer1Input,
+    RequestingPlayer2Input,
+    RequestingBothPlayersInput,
     Player1Win,
     Player2Win,
 }
@@ -38,21 +40,43 @@ public class Simulator
             };
         }
 
-        Battle.ApplyChoices(input.Player1Choice, input.Player2Choice);
-
-        return new SimulatorOutput()
+        BattleState battleState = Battle.State;
+        switch (battleState)
         {
-            State = SimState.Running,
-            Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
-            Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
-        };
+            case BattleState.WaitingForPlayer1:
+                Battle.ApplyChoice(PlayerId.Player1, input.Player1Choice);
+                return new SimulatorOutput()
+                {
+                    State = SimState.RequestingPlayer1Input,
+                    Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
+                    Player2Choices = []
+                };
+            case BattleState.WaitingForPlayer2:
+                Battle.ApplyChoice(PlayerId.Player2, input.Player2Choice);
+                return new SimulatorOutput()
+                {
+                    State = SimState.RequestingPlayer2Input,
+                    Player1Choices = [],
+                    Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
+                };
+            case BattleState.WaitingForBothPlayers:
+                Battle.ApplyChoices(input.Player1Choice, input.Player2Choice);
+                return new SimulatorOutput()
+                {
+                    State = SimState.RequestingBothPlayersInput,
+                    Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
+                    Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
+                };
+            default:
+                throw new InvalidOperationException($"Unexpected battle state: {battleState}");
+        }
     }
 
     public SimulatorOutput Start()
     {
         return new SimulatorOutput()
         {
-            State = SimState.Running,
+            State = SimState.RequestingBothPlayersInput,
             Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
             Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
         };

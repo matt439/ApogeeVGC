@@ -38,7 +38,7 @@ public class Team
         }
     }
     public int[] SwitchOptionIndexes => Enumerable.Range(0, PokemonSet.PokemonCount)
-            .Where(i => i != ActivePokemonIndex && !PokemonSet.Pokemons[i].Fainted)
+            .Where(i => i != ActivePokemonIndex && !PokemonSet.Pokemons[i].IsFainted)
             .ToArray();
     public bool IsDefeated => PokemonSet.AllFainted;
     public override string ToString()
@@ -46,7 +46,7 @@ public class Team
         string line1 = $"Team: {Trainer.Name}, Active:\n";
         string line2 = $"{ActivePokemon}\n";
         string line3 = $"Pokemon Count: {PokemonSet.PokemonCount}, " + 
-                       "Fainted: {PokemonSet.FaintedCount}/{PokemonSet.PokemonCount}";
+                       "IsFainted: {PokemonSet.FaintedCount}/{PokemonSet.PokemonCount}";
         return line1 + line2 + line3 ;
     }
     public void Print()

@@ -6,13 +6,22 @@ using ApogeeVGC.Player;
 
 namespace ApogeeVGC.Sim;
 
+public enum BattleState
+{
+    WaitingForPlayer1,
+    WaitingForPlayer2,
+    WaitingForBothPlayers,
+}
+
 public class Battle
 {
     public required Library Library { get; init; }
     public required Field Field { get; init; }
     public required Side Side1 { get; init; }
     public required Side Side2 { get; init; }
-    public int Turn { get; private set; } = 0;
+    public int Turn { get; private set; }
+    public BattleState State { get; private set; } = BattleState.WaitingForBothPlayers;
+
 
     private int Damage(Pokemon attacker, Pokemon defender, Move move, bool crit = false)
     {
@@ -34,6 +43,11 @@ public class Battle
         return Math.Max(1, typeModified);
     }
 
+    public void ApplyChoice(PlayerId playerId, Choice choice)
+    {
+
+    }
+
     public void ApplyChoices(Choice player1Choice, Choice player2Choice)
     {
         PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
@@ -41,6 +55,16 @@ public class Battle
         {
             ApplyChoice(player1Choice, Side1, Side2);
             if (IsWinner() != PlayerId.None) return;
+            if (Side1.Team.ActivePokemon.IsFainted)
+            {
+                UiGenerator.PrintSwitchAction(Side1.Team.Trainer.Name, Side1.Team.ActivePokemon,
+                    Side1.Team.ActivePokemon);
+            }
+            else
+            {
+                UiGenerator.PrintSwitchAction(Side2.Team.Trainer.Name, Side2.Team.ActivePokemon,
+                    Side2.Team.ActivePokemon);
+            }
             ApplyChoice(player2Choice, Side2, Side1);
         }
         else
@@ -147,7 +171,6 @@ public class Battle
             Pokemon defender = defSide.Team.ActivePokemon;
             int damage = Damage(attacker, defender, move);
             defender.Damage(damage);
-
             UiGenerator.PrintMoveAction(attacker, move, damage, defender);
         }
     }
