@@ -27,34 +27,43 @@ public class Simulator
 
     public SimulatorOutput PerformCommand(SimulatorInput input)
     {
-        throw new NotImplementedException();
+        PlayerId winner = Battle.IsWinner();
+        if (winner != PlayerId.None)
+        {
+            return new SimulatorOutput
+            {
+                State = winner == PlayerId.Player1 ? SimState.Player1Win : SimState.Player2Win,
+                Player1Choices = [],
+                Player2Choices = []
+            };
+        }
+
+        Battle.ApplyChoices(input.Player1Choice, input.Player2Choice);
+
+        return new SimulatorOutput()
+        {
+            State = SimState.Running,
+            Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
+            Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
+        };
     }
 
     public SimulatorOutput Start()
     {
-        throw new NotImplementedException();
+        return new SimulatorOutput()
+        {
+            State = SimState.Running,
+            Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
+            Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
+        };
     }
-
-    private List<Choice> GetAvailableChoices(PlayerId playerId)
-    {
-        // This method should return the available choices for the given player.
-        // For now, we return an empty list as a placeholder.
-        return new List<Choice>();
-    }
-
-    private PlayerId IsWinner()
-    {
-        throw new NotImplementedException("This method should determine if there is a winner.");
-    }
-
-
 }
 
 public record SimulatorOutput
 {
     public SimState State { get; init; }
-    public required IReadOnlyList<Choice> Player1Choices { get; init; }
-    public required IReadOnlyList<Choice> Player2Choices { get; init; }
+    public required Choice[] Player1Choices { get; init; }
+    public required Choice[] Player2Choices { get; init; }
 }
 
 public record SimulatorInput

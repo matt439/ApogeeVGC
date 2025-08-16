@@ -26,6 +26,37 @@ public enum PokemonType
     Unknown,
 }
 
+public static class PokemonTypeTools
+{
+    public static MoveType ConvertToMoveType(this PokemonType type)
+    {
+        return type switch
+        {
+            PokemonType.Normal => MoveType.Normal,
+            PokemonType.Fire => MoveType.Fire,
+            PokemonType.Water => MoveType.Water,
+            PokemonType.Electric => MoveType.Electric,
+            PokemonType.Grass => MoveType.Grass,
+            PokemonType.Ice => MoveType.Ice,
+            PokemonType.Fighting => MoveType.Fighting,
+            PokemonType.Poison => MoveType.Poison,
+            PokemonType.Ground => MoveType.Ground,
+            PokemonType.Flying => MoveType.Flying,
+            PokemonType.Psychic => MoveType.Psychic,
+            PokemonType.Bug => MoveType.Bug,
+            PokemonType.Rock => MoveType.Rock,
+            PokemonType.Ghost => MoveType.Ghost,
+            PokemonType.Dragon => MoveType.Dragon,
+            PokemonType.Dark => MoveType.Dark,
+            PokemonType.Steel => MoveType.Steel,
+            PokemonType.Fairy => MoveType.Fairy,
+            PokemonType.Unknown => throw new ArgumentOutOfRangeException(nameof(type),
+                "Unknown type cannot be converted to MoveType."),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), "Invalid Pokemon type.")
+        };
+    }
+}
+
 public enum MoveType
 {
     Normal,
@@ -47,6 +78,37 @@ public enum MoveType
     Steel,
     Fairy,
     Stellar,
+}
+
+public static class MoveTypeTools
+{
+    public static PokemonType ConvertToPokemonType(this MoveType type)
+    {
+        return type switch
+        {
+            MoveType.Normal => PokemonType.Normal,
+            MoveType.Fire => PokemonType.Fire,
+            MoveType.Water => PokemonType.Water,
+            MoveType.Electric => PokemonType.Electric,
+            MoveType.Grass => PokemonType.Grass,
+            MoveType.Ice => PokemonType.Ice,
+            MoveType.Fighting => PokemonType.Fighting,
+            MoveType.Poison => PokemonType.Poison,
+            MoveType.Ground => PokemonType.Ground,
+            MoveType.Flying => PokemonType.Flying,
+            MoveType.Psychic => PokemonType.Psychic,
+            MoveType.Bug => PokemonType.Bug,
+            MoveType.Rock => PokemonType.Rock,
+            MoveType.Ghost => PokemonType.Ghost,
+            MoveType.Dragon => PokemonType.Dragon,
+            MoveType.Dark => PokemonType.Dark,
+            MoveType.Steel => PokemonType.Steel,
+            MoveType.Fairy => PokemonType.Fairy,
+            MoveType.Stellar => throw new ArgumentOutOfRangeException(nameof(type),
+                "Stellar type cannot be converted to Pokemon type."),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), "Invalid move type.")
+        };
+    }
 }
 
 public enum Nonstandard
@@ -92,7 +154,7 @@ public enum StatIdExceptHp
 
 public static class StatIdTools
 {
-    public static StatId ConvertToStatId(StatIdExceptHp stat)
+    public static StatId ConvertToStatId(this StatIdExceptHp stat)
     {
         return stat switch
         {
@@ -105,7 +167,7 @@ public static class StatIdTools
         };
     }
 
-    public static StatIdExceptHp ConvertToStatIdExceptId(StatId stat)
+    public static StatIdExceptHp ConvertToStatIdExceptId(this StatId stat)
     {
         return stat switch
         {
@@ -124,10 +186,10 @@ public static class StatIdTools
 
 public enum MoveEffectiveness
 {
-    Normal = 0,
-    SuperEffective = 1,
-    NotVeryEffective = 2,
-    Immune = 3,
+    Normal,
+    SuperEffective,
+    NotVeryEffective,
+    Immune,
 }
 
 public record TypeData

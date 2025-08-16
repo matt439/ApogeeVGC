@@ -396,7 +396,7 @@ public record Learnsets
                     {
                         Generation = 5,
                         Level = 77,
-                        Gender = GenderName.M,
+                        Gender = GenderId.M,
                         Nature = "Calm",
                         Ivs = new Dictionary<StatId, int> { [StatId.Hp] = 30, [StatId.Atk] = 30, [StatId.Def] = 30, [StatId.SpA] = 30, [StatId.SpD] = 30, [StatId.Spe] = 30 },
                         Moves = [new string("bugbuzz"), new string("overheat"), new string("hyperbeam"), new string("quiverdance")],

@@ -96,12 +96,27 @@ public class MoveSource
     }
 }
 
-public enum GenderName
+public enum GenderId
 {
     M,
     F,
     N,
     Empty
+}
+
+public static class GenderIdExtensions
+{
+    public static string GenderIdString(this GenderId id)
+    {
+        return id switch
+        {
+            GenderId.M => "M",
+            GenderId.F => "F",
+            GenderId.N => string.Empty,
+            GenderId.Empty => string.Empty,
+            _ => throw new ArgumentOutOfRangeException(nameof(id), id, null)
+        };
+    }
 }
 
 public class EventInfo
@@ -110,7 +125,7 @@ public class EventInfo
     public int? Level { get; set; }
     public bool? Shiny { get; set; } // true: always shiny, 1: sometimes shiny, false/null: never shiny
     public int? ShinySometimes { get; set; } // Use this if you need to distinguish '1'
-    public GenderName? Gender { get; set; }
+    public GenderId? Gender { get; set; }
     public string? Nature { get; set; }
     public Dictionary<StatId, int>? Ivs { get; set; }
     public int? PerfectIvs { get; set; }
@@ -326,7 +341,7 @@ public record Specie
     public string? BaseSpecies { get; init; }
     public string? Forme { get; init; }
     public List<PokemonType> Types { get; init; } = [];
-    public GenderName Gender { get; init; }
+    public GenderId Gender { get; init; }
     public StatsTable BaseStats { get; init; } = new();
     public SpeciesAbility Abilities { get; init; } = new();
     public double Height { get; init; } // in meters

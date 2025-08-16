@@ -21,7 +21,7 @@ public record Species
             BaseSpecies = "Calyrex",
             Forme = "Ice",
             Types = [PokemonType.Psychic, PokemonType.Ice],
-            Gender = GenderName.N,
+            Gender = GenderId.N,
             BaseStats = new StatsTable()
             {
                 Hp = 100,
@@ -41,7 +41,7 @@ public record Species
             Num = 1008,
             Name = "Miraidon",
             Types = [PokemonType.Electric, PokemonType.Dragon],
-            Gender = GenderName.N,
+            Gender = GenderId.N,
             BaseStats = new StatsTable
             {
                 Hp = 100,
@@ -61,7 +61,7 @@ public record Species
             Num = 901,
             Name = "Ursaluna",
             Types = [PokemonType.Ground, PokemonType.Normal],
-            Gender = GenderName.M, // Default, or use GenderName.N if genderless
+            Gender = GenderId.M, // Default, or use GenderId.N if genderless
             BaseStats = new StatsTable
             {
                 Hp = 130,
@@ -86,7 +86,7 @@ public record Species
             Num = 637,
             Name = "Volcarona",
             Types = [PokemonType.Bug, PokemonType.Fire],
-            Gender = GenderName.M, // or GenderName.N if genderless, adjust as needed
+            Gender = GenderId.M, // or GenderId.N if genderless, adjust as needed
             BaseStats = new StatsTable
             {
                 Hp = 85,
@@ -110,7 +110,7 @@ public record Species
             Num = 861,
             Name = "Grimmsnarl",
             Types = [PokemonType.Dark, PokemonType.Fairy],
-            Gender = GenderName.M,
+            Gender = GenderId.M,
             BaseStats = new StatsTable
             {
                 Hp = 95,
@@ -135,7 +135,7 @@ public record Species
             Num = 992,
             Name = "Iron Hands",
             Types = [PokemonType.Fighting, PokemonType.Electric],
-            Gender = GenderName.N,
+            Gender = GenderId.N,
             BaseStats = new StatsTable
             {
                 Hp = 154,
