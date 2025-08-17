@@ -17,9 +17,4 @@ public class PlayerRandom(PlayerId playerId, Battle battle) : IPlayer
         int randomIndex = new Random().Next(availableChoices.Length);
         return availableChoices[randomIndex];
     }
-
-    //public void InputBattle(Battle battle)
-    //{
-    //    throw new NotImplementedException();
-    //}
 }

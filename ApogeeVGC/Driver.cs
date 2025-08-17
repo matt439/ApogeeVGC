@@ -17,8 +17,6 @@ public class Driver
 {
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
-    private IPlayer? Player1 { get; set; }
-    private IPlayer? Player2 { get; set; }
 
     public void Start(DriverMode mode)
     {
@@ -56,7 +54,7 @@ public class Driver
 
         //SimulatorOutput output = Simulator.Start();
 
-        //while (output.State != SimState.Player1Win && output.State != SimState.Player2Win)
+        //while (output.RequestState != SimState.Player1Win && output.RequestState != SimState.Player2Win)
         //{
         //    // Get choices from players
         //    Choice player1Choice = Player1.GetNextChoice(output.Player1Choices);
@@ -72,7 +70,7 @@ public class Driver
         //}
 
         //Console.WriteLine("Battle finished.");
-        //switch (output.State)
+        //switch (output.RequestState)
         //{
         //    case SimState.Player1Win:
         //        Console.WriteLine("Player 1 wins!");
@@ -89,68 +87,15 @@ public class Driver
 
     private void RunConsoleVsRandomTest()
     {
+        Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", "Random");
+
         Simulator = new Simulator
         {
-            Battle = BattleGenerator.GenerateTestBattle(Library, "Matt", "Random")
+            Battle = battle,
+            Player1 = new PlayerConsole(PlayerId.Player1, battle),
+            Player2 = new PlayerRandom(PlayerId.Player2, battle),
         };
 
-        Player1 = new PlayerConsole(PlayerId.Player1, Simulator.Battle);
-        Player2 = new PlayerRandom(PlayerId.Player2, Simulator.Battle);
-
-        SimulatorOutput output = Simulator.Start();
-        
-
-        while (output.State != SimState.Player1Win && output.State != SimState.Player2Win)
-        {
-            var player1Choice = Choice.Invalid;
-            var player2Choice = Choice.Invalid;
-
-            switch (output.State)
-            {
-                case SimState.RequestingPlayer1Input:
-                    player1Choice = Player1.GetNextChoice(output.Player1Choices);
-                    break;
-                case SimState.RequestingPlayer2Input:
-                    player2Choice = Player2.GetNextChoice(output.Player2Choices);
-                    break;
-                case SimState.RequestingBothPlayersInput:
-                    player1Choice = Player1.GetNextChoice(output.Player1Choices);
-                    player2Choice = Player2.GetNextChoice(output.Player2Choices);
-                    break;
-                case SimState.Player1Win:
-                case SimState.Player2Win:
-                    throw new InvalidOperationException("Battle has already ended.");
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            // Get choices from players
-            
-            // Create input for the simulator
-            SimulatorInput input = new()
-            {
-                Player1Choice = player1Choice,
-                Player2Choice = player2Choice
-            };
-            // Perform the command in the simulator
-            output = Simulator.PerformCommand(input);
-        }
-
-        Console.WriteLine("Battle finished.");
-        switch (output.State)
-        {
-            case SimState.Player1Win:
-                Console.WriteLine("Player 1 wins!");
-                break;
-            case SimState.Player2Win:
-                Console.WriteLine("Player 2 wins!");
-                break;
-            case SimState.RequestingPlayer1Input:
-            case SimState.RequestingPlayer2Input:
-            case SimState.RequestingBothPlayersInput:
-            default:
-                Console.WriteLine("Battle ended unexpectedly.");
-                break;
-        }
+        Simulator.Run();
     }
 }
