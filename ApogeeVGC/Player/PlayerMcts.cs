@@ -11,7 +11,7 @@ public class PlayerMcts : IPlayer
     private readonly PokemonMonteCarloTreeSearch _mcts;
 
     public PlayerMcts(PlayerId playerId, Battle battle, int maxIterations, double explorationParameter,
-        int? seed = null)
+        int? seed = null, int? maxDegreeOfParallelism = null)
     {
         PlayerId = playerId;
         Battle = battle;
@@ -20,13 +20,14 @@ public class PlayerMcts : IPlayer
             throw new ArgumentOutOfRangeException(nameof(maxIterations),
                 "Max iterations must be greater than 0.");
         }
-        if (explorationParameter <= 0)
+        if (explorationParameter < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(explorationParameter),
-                "Exploration parameter must be greater than 0.");
+                "Exploration parameter must be 0 or greater.");
         }
         _seed = seed ?? Environment.TickCount;
-        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, _seed);
+        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, _seed,
+            maxDegreeOfParallelism);
     }
 
     public Choice GetNextChoice(Choice[] availableChoices)
