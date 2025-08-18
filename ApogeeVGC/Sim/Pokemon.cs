@@ -157,6 +157,18 @@ public class PokemonSet
     public int AlivePokemonCount => AlivePokemon.Length;
     public int FaintedCount => PokemonCount - AlivePokemonCount;
     public bool AllFainted => AlivePokemonCount == 0;
+
+    /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// </summary>
+    /// <returns>A new PokemonSet instance with copied Pokemon</returns>
+    public PokemonSet Copy()
+    {
+        return new PokemonSet
+        {
+            Pokemons = Pokemons.Select(pokemon => pokemon.Copy()).ToArray()
+        };
+    }
 }
 
 public class Pokemon
@@ -228,6 +240,39 @@ public class Pokemon
         Level = level;
         UnmodifiedStats = CalculateUnmodifiedStats();
         CurrentStats = CalculateUnmodifiedStats();
+    }
+
+    /// <summary>
+    /// Creates a deep copy of this Pokemon for MCTS simulation purposes.
+    /// This method creates an independent copy with the same state while sharing immutable references.
+    /// </summary>
+    /// <returns>A new Pokemon instance with copied state</returns>
+    public Pokemon Copy()
+    {
+        // Create a new Pokemon with the same base data
+        Pokemon copy = new(Specie, Evs, Ivs, Nature, Level)
+        {
+            Moves = Moves,        // Immutable, safe to share
+            Item = Item,          // Immutable, safe to share
+            Ability = Ability,    // Immutable, safe to share
+            Name = Name,
+            Shiny = Shiny,
+            TerraType = TerraType,
+            Gender = Gender
+        };
+
+        // Copy the current HP state (most important for battle simulation)
+        // Calculate the HP difference and apply it to the copy
+        int hpDifference = UnmodifiedHp - CurrentHp;
+        if (hpDifference > 0)
+        {
+            copy.Damage(hpDifference);
+        }
+
+        // TODO: When status effects, stat boosts, etc. are implemented,
+        // they will need to be copied here as well
+
+        return copy;
     }
 
     public void Heal(int amount)

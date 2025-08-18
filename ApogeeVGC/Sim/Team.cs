@@ -41,6 +41,21 @@ public class Team
             .Where(i => i != ActivePokemonIndex && !PokemonSet.Pokemons[i].IsFainted)
             .ToArray();
     public bool IsDefeated => PokemonSet.AllFainted;
+
+    /// <summary>
+    /// Creates a deep copy of this Team for MCTS simulation purposes.
+    /// </summary>
+    /// <returns>A new Team instance with copied state</returns>
+    public Team Copy()
+    {
+        return new Team
+        {
+            Trainer = Trainer, // Trainer is immutable, safe to share
+            PokemonSet = PokemonSet.Copy(),
+            ActivePokemonIndex = ActivePokemonIndex
+        };
+    }
+
     public override string ToString()
     {
         string line1 = $"Team: {Trainer.Name}, Active:\n";

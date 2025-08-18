@@ -1,5 +1,66 @@
-﻿namespace ApogeeVGC.Player;
+﻿using ApogeeVGC.Sim;
+using ApogeeVGC.Mcts;
 
-public class PlayerMcts
+namespace ApogeeVGC.Player;
+
+public class PlayerMcts : IPlayer
 {
+    public PlayerId PlayerId { get; }
+    public Battle Battle { get; }
+    private readonly int _seed;
+    private readonly PokemonMonteCarloTreeSearch _mcts;
+
+    public PlayerMcts(PlayerId playerId, Battle battle, int maxIterations, double explorationParameter,
+        int? seed = null)
+    {
+        PlayerId = playerId;
+        Battle = battle;
+        if (maxIterations <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxIterations),
+                "Max iterations must be greater than 0.");
+        }
+        if (explorationParameter <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(explorationParameter),
+                "Exploration parameter must be greater than 0.");
+        }
+        _seed = seed ?? Environment.TickCount;
+        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, _seed);
+    }
+
+    public Choice GetNextChoice(Choice[] availableChoices)
+    {
+        switch (availableChoices.Length)
+        {
+            case 0:
+                return Choice.Invalid;
+            case 1:
+                // Only one choice available, no need for MCTS
+                return availableChoices[0];
+            default:
+                try
+                {
+                    // Use MCTS to find the best choice
+                    var result = _mcts.FindBestChoice(Battle, availableChoices);
+            
+                    if (result.OptimalChoice != Choice.Invalid)
+                    {
+                        return result.OptimalChoice;
+                    }
+            
+                    // Fallback to first available choice if MCTS fails
+                    return availableChoices[0];
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception if you have logging
+                    Console.WriteLine($"MCTS failed with exception: {ex.Message}");
+            
+                    // Fallback to random choice
+                    var random = new Random(_seed);
+                    return availableChoices[random.Next(availableChoices.Length)];
+                }
+        }
+    }
 }
