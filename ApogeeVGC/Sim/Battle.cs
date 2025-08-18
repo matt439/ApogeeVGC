@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Data;
+﻿using System.Diagnostics;
+using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 
 namespace ApogeeVGC.Sim;
@@ -34,8 +35,8 @@ public enum PlayerState
     TeamPreviewLocked,
     MoveSwitchSelect,
     MoveSwitchLocked,
-    SwitchSelect,
-    SwitchLocked,
+    FaintedSelect,
+    FaintedLocked,
     //TagetSelect,
     //TargetLocked,
     // TODO: Implement these above states
@@ -49,37 +50,18 @@ public class Battle
     public required Side Side1 { get; init; }
     public required Side Side2 { get; init; }
     public int Turn { get; private set; }
-    //public BattleRequestState RequestState
-    //{
-    //    get
-    //    {
-    //        lock (ChoiceLock)
-    //        {
-    //            return field;
-    //        }
-    //    }
-    //    private set
-    //    {
-    //        lock (ChoiceLock)
-    //        {
-    //            field = value;
-    //        }
-    //    }
-    //} = BattleRequestState.RequestingBothPlayersInput;
-    //private BattleState State { get; set; } = BattleState.Playing;
     private PlayerState Player1State { get; set; } = PlayerState.MoveSwitchSelect;
     private PlayerState Player2State { get; set; } = PlayerState.MoveSwitchSelect;
     private Choice? Player1PendingChoice { get; set; }
     private Choice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
+    public bool PrintDebug { get; set; }
 
     public void SubmitChoice(PlayerId playerId, Choice choice)
     {
         lock (ChoiceLock)
         {
             CheckForChoiceError(playerId, choice);
-
-            PlayerState playerState = GetPlayerState(playerId);
 
             SetPendingChoice(playerId, choice);
 
@@ -90,7 +72,7 @@ public class Battle
                     Player2PendingChoice ?? throw new ArgumentException("Player2PendingChoice cannot be null"));
                 ClearPendingChoices();
             }
-            else if (IsReadyForSwitchProcessing())
+            else if (IsReadyForFaintedSelectProcessing())
             {
                 // Process switch choices
                 if (Player1PendingChoice != null)
@@ -110,138 +92,6 @@ public class Battle
             // Reset player states for the next turn
             Player1State = PlayerState.MoveSwitchSelect;
             Player2State = PlayerState.MoveSwitchSelect;
-        }
-    }
-
-    private void SetPendingChoice(PlayerId playerId, Choice? choice)
-    {
-        switch (playerId)
-        {
-            case PlayerId.Player1:
-                Player1PendingChoice = choice;
-                break;
-            case PlayerId.Player2:
-                Player2PendingChoice = choice;
-                break;
-            case PlayerId.None:
-                throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId));
-            default:
-                throw new ArgumentException("Invalid player ID", nameof(playerId));
-        }
-    }
-
-    private void PerformMoveSwitches(Choice player1Choice, Choice player2Choice)
-    {
-        PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
-
-        // Create execution order based on priority
-        var executionOrder = nextPlayer == PlayerId.Player1
-            ? new[] { (PlayerId.Player1, player1Choice), (PlayerId.Player2, player2Choice) }
-            : new[] { (PlayerId.Player2, player2Choice), (PlayerId.Player1, player1Choice) };
-
-        // Execute choices in priority order
-        foreach ((PlayerId playerId, Choice choice) in executionOrder)
-        {
-            if (ExecutePlayerChoice(playerId, choice)) continue;
-
-            // Battle ended, stop processing
-            return;
-        }
-        ClearPendingChoices();
-    }
-
-    /// <summary>
-    /// Execute a single player's choice and handle any resulting fainted states
-    /// Returns false if the battle has ended, true otherwise
-    /// </summary>
-    private bool ExecutePlayerChoice(PlayerId playerId, Choice choice)
-    {
-        if (choice.IsMoveChoice())
-        {
-            PerformMove(playerId, choice);
-            SetPendingChoice(playerId, null);
-            SetPlayerState(playerId, PlayerState.Idle);
-
-            // Check for battle end after move
-            if (IsWinner() != PlayerId.None)
-            {
-                return false; // Battle has ended
-            }
-
-            // Update player states for any fainted Pokemon
-            UpdateFaintedStates();
-        }
-        else if (choice.IsSwitchChoice())
-        {
-            PerformSwitch(playerId, choice);
-            SetPendingChoice(playerId, null);
-            SetPlayerState(playerId, PlayerState.Idle);
-        }
-        else
-        {
-            throw new InvalidOperationException($"Invalid choice for {playerId}: {choice}");
-        }
-
-        return true; // Continue battle
-    }
-
-    /// <summary>
-    /// Check both sides for fainted Pokemon and update player states accordingly
-    /// </summary>
-    private void UpdateFaintedStates()
-    {
-        if (Side1.Team.ActivePokemon.IsFainted)
-        {
-            Player1State = PlayerState.SwitchSelect;
-        }
-        if (Side2.Team.ActivePokemon.IsFainted)
-        {
-            Player2State = PlayerState.SwitchSelect;
-        }
-    }
-
-    private void ClearPendingChoices()
-    {
-        Player1PendingChoice = null;
-        Player2PendingChoice = null;
-    }
-
-    private bool IsReadyForMoveSwitchProcessing()
-    {
-        return Player1State == PlayerState.MoveSwitchLocked && Player2State == PlayerState.MoveSwitchLocked;
-    }
-
-    private bool IsReadyForSwitchProcessing()
-    {
-        // 1 or 2 players can be locked in switch state, but not both
-        return Player1State == PlayerState.SwitchLocked && Player2State == PlayerState.SwitchLocked ||
-               Player1State == PlayerState.SwitchLocked && Player2State == PlayerState.Idle ||
-               Player1State == PlayerState.Idle && Player2State == PlayerState.SwitchLocked;
-    }
-
-    private bool IsEndOfTurn()
-    {
-        if (IsWinner() != PlayerId.None)
-        {
-            return true; // Battle has ended, no more turns
-        }
-        lock (ChoiceLock)
-        {
-            return !Player1State.CanSubmitChoice() && !Player2State.CanSubmitChoice();
-        }
-    }
-
-    private bool CanPlayerSubmitChoice(PlayerId playerId)
-    {
-        if (IsWinner() != PlayerId.None) return false;
-        lock (ChoiceLock)
-        {
-            return playerId switch
-            {
-                PlayerId.Player1 => Player1State.CanSubmitChoice(),
-                PlayerId.Player2 => Player2State.CanSubmitChoice(),
-                _ => false
-            };
         }
     }
 
@@ -275,106 +125,6 @@ public class Battle
         }
     }
 
-    private void PerformMove(PlayerId playerId, Choice choice)
-    {
-        Side atkSide = GetSide(playerId);
-        Side defSide = GetSide(playerId.OpposingPlayerId());
-
-        int moveIndex = choice.GetMoveIndexFromChoice();
-        Pokemon attacker = atkSide.Team.ActivePokemon;
-        Move move = attacker.Moves[moveIndex];
-        Pokemon defender = defSide.Team.ActivePokemon;
-        int damage = Damage(attacker, defender, move);
-        defender.Damage(damage);
-        UiGenerator.PrintMoveAction(attacker, move, damage, defender);
-    }
-
-    private void PerformSwitch(PlayerId playerId, Choice choice)
-    {
-        if (IsWinner() != PlayerId.None)
-        {
-            throw new InvalidOperationException("Cannot switch Pokémon when the battle has already ended.");
-        }
-        if (!choice.IsSwitchChoice())
-        {
-            throw new ArgumentException("Choice must be a switch choice to switch Pokémon.", nameof(choice));
-        }
-
-        Side side = GetSide(playerId);
-        Pokemon prevActive = side.Team.ActivePokemon;
-        side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
-        UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
-            side.Team.ActivePokemon);
-    }
-
-
-    //public void ApplyChoice(PlayerId playerId, Choice choice)
-    //{
-    //    bool player1Input = playerId == PlayerId.Player1 && RequestState == BattleRequestState.RequestingPlayer1Input;
-    //    bool player2Input = playerId == PlayerId.Player2 && RequestState == BattleRequestState.RequestingPlayer2Input;
-    //    if (!player1Input && !player2Input)
-    //    {
-    //        throw new InvalidOperationException("Cannot apply choice when not in the correct state for the player.");
-    //    }
-    //    if (RequestState == BattleRequestState.RequestingBothPlayersInput)
-    //    {
-    //        throw new InvalidOperationException("Cannot apply choice when both players are expected to input.");
-    //    }
-    //    if (IsWinner() != PlayerId.None)
-    //    {
-    //        throw new InvalidOperationException("Cannot apply choice when the battle has already ended.");
-    //    }
-
-    //    if (player1Input)
-    //    {
-    //        ApplyChoice(choice, Side1, Side2);
-    //    }
-    //    else if (player2Input)
-    //    {
-    //        ApplyChoice(choice, Side2, Side1);
-    //    }
-
-    //    CheckForAndHandleWin();
-    //}
-
-    //public void ApplyChoices(Choice player1Choice, Choice player2Choice)
-    //{
-    //    PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
-    //    if (nextPlayer == PlayerId.Player1)
-    //    {
-    //        ApplyChoice(player1Choice, Side1, Side2);
-    //        if (CheckForAndHandleWin())
-    //        {
-    //            // If Player 1 wins, we don't need to apply Player 2's choice.
-    //            return;
-    //        }
-    //        if (CheckForAndHandleFainted())
-    //            //if (Side1.Team.ActivePokemon.IsFainted)
-    //            //{
-    //            //    UiGenerator.PrintSwitchAction(Side1.Team.Trainer.Name, Side1.Team.ActivePokemon,
-    //            //        Side1.Team.ActivePokemon);
-    //            //}
-    //            //else
-    //            //{
-    //            //    UiGenerator.PrintSwitchAction(Side2.Team.Trainer.Name, Side2.Team.ActivePokemon,
-    //            //        Side2.Team.ActivePokemon);
-    //            //}
-    //            ApplyChoice(player2Choice, Side2, Side1);
-    //    }
-    //    else
-    //    {
-    //        ApplyChoice(player2Choice, Side2, Side1);
-    //        if (CheckForAndHandleWin())
-    //        {
-    //            // If Player 2 wins, we don't need to apply Player 1's choice.
-    //            return;
-    //        }
-    //        ApplyChoice(player1Choice, Side1, Side2);
-    //    }
-    //    CheckForAndHandleWin();
-    //    Turn++;
-    //}
-
     public Choice[] GetAvailableChoices(PlayerId playerId)
     {
         lock (ChoiceLock)
@@ -396,40 +146,255 @@ public class Battle
 
     public Side GetSide(PlayerId playerId)
     {
-        return playerId switch
+        lock (ChoiceLock)
         {
-            PlayerId.Player1 => Side1,
-            PlayerId.Player2 => Side2,
-            PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId)),
-            _ => throw new ArgumentException("Invalid player ID", nameof(playerId))
-        };
+            return playerId switch
+            {
+                PlayerId.Player1 => Side1,
+                PlayerId.Player2 => Side2,
+                PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId)),
+                _ => throw new ArgumentException("Invalid player ID", nameof(playerId))
+            };
+        }
     }
 
-    //private bool CheckForAndHandleFainted()
-    //{
-    //    bool player1Fainted = Side1.Team.ActivePokemon.IsFainted;
-    //    bool player2Fainted = Side2.Team.ActivePokemon.IsFainted;
+    private void SetPendingChoice(PlayerId playerId, Choice? choice)
+    {
+        switch (playerId)
+        {
+            case PlayerId.Player1:
+                Player1PendingChoice = choice;
+                break;
+            case PlayerId.Player2:
+                Player2PendingChoice = choice;
+                break;
+            case PlayerId.None:
+                throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId));
+            default:
+                throw new ArgumentException("Invalid player ID", nameof(playerId));
+        }
 
-    //    if (!player1Fainted && !player2Fainted)
-    //    {
-    //        return false; // No fainted Pokémon, nothing to handle
-    //    }
+        UpdatePlayerState(playerId, choice);
+    }
 
+    private void UpdatePlayerState(PlayerId playerId, Choice? choice)
+    {
+        if (choice is null) return; // No choice to update state with
 
+        PlayerState playerState = GetPlayerState(playerId);
 
+        switch (playerState)
+        {
+            case PlayerState.MoveSwitchSelect:
+                if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice())
+                {
+                    SetPlayerState(playerId, PlayerState.MoveSwitchLocked);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Invalid choice for MoveSwitchSelect: {choice}");
+                }
+                break;
+            case PlayerState.FaintedSelect:
+                if (choice.Value.IsSwitchChoice())
+                {
+                    SetPlayerState(playerId, PlayerState.FaintedLocked);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Invalid choice for SwitchSelect: {choice}");
+                }
+                break;
+            case PlayerState.TeamPreviewSelect:
+                throw new NotImplementedException();
+            case PlayerState.TeamPreviewLocked:
+            case PlayerState.MoveSwitchLocked:
+            case PlayerState.FaintedLocked:
+                throw new InvalidOperationException($"Player {playerId} is already locked in state: {playerState}");
+            case PlayerState.Idle:
+                throw new InvalidOperationException("Player cannot submit choice in Idle state.");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null);
+        }
+    }
 
-    //    return true;
-    //}
+    private void PerformMoveSwitches(Choice player1Choice, Choice player2Choice)
+    {
+        PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
 
-    //private bool CheckForAndHandleWin()
-    //{
-    //    PlayerId winner = IsWinner();
-    //    if (winner == PlayerId.None) return false;
+        // Create execution order based on priority
+        var executionOrder = nextPlayer == PlayerId.Player1
+            ? new[] { (PlayerId.Player1, player1Choice), (PlayerId.Player2, player2Choice) }
+            : new[] { (PlayerId.Player2, player2Choice), (PlayerId.Player1, player1Choice) };
 
-    //    RequestState = winner == PlayerId.Player1 ? BattleRequestState.Player1Win : BattleRequestState.Player2Win;
-    //    Console.WriteLine($"{winner} wins the battle!");
-    //    return true;
-    //}
+        // Execute choices in priority order
+        foreach ((PlayerId playerId, Choice choice) in executionOrder)
+        {
+            ExecutePlayerChoice(playerId, choice);
+        }
+        ClearPendingChoices();
+    }
+
+    private void ExecutePlayerChoice(PlayerId playerId, Choice choice)
+    {
+        PlayerState playerState = GetPlayerState(playerId);
+
+        // This occurs when a player's pokemon faints and they need to select a new one
+        // Their previous choice isn't valid anymore as it was based on the now-fainted pokemon
+        if (playerState == PlayerState.FaintedSelect)
+        {
+            return;
+        }
+
+        if (choice.IsMoveChoice())
+        {
+            PerformMove(playerId, choice);
+            SetPendingChoice(playerId, null);
+            SetPlayerState(playerId, PlayerState.Idle);
+
+            // Check for battle end after move
+            if (IsWinner() != PlayerId.None)
+            {
+                return;
+            }
+
+            // Update player states for any fainted Pokemon
+            UpdateFaintedStates();
+        }
+        else if (choice.IsSwitchChoice())
+        {
+            PerformSwitch(playerId, choice);
+            SetPendingChoice(playerId, null);
+            SetPlayerState(playerId, PlayerState.Idle);
+        }
+        else
+        {
+            throw new InvalidOperationException($"Invalid choice for {playerId}: {choice}");
+        }
+    }
+
+    private void UpdateFaintedStates()
+    {
+        if (Side1.Team.ActivePokemon.IsFainted)
+        {
+            Player1State = PlayerState.FaintedSelect;
+            if (PrintDebug)
+            {
+                UiGenerator.PrintFaintedAction(Side1.Team.ActivePokemon);
+            }
+        }
+        if (Side2.Team.ActivePokemon.IsFainted)
+        {
+            Player2State = PlayerState.FaintedSelect;
+            if (PrintDebug)
+            {
+                UiGenerator.PrintFaintedAction(Side2.Team.ActivePokemon);
+            }
+        }
+    }
+
+    private void ClearPendingChoices()
+    {
+        Player1PendingChoice = null;
+        Player2PendingChoice = null;
+    }
+
+    private bool IsReadyForMoveSwitchProcessing()
+    {
+        return Player1State == PlayerState.MoveSwitchLocked && Player2State == PlayerState.MoveSwitchLocked;
+    }
+
+    private bool IsReadyForFaintedSelectProcessing()
+    {
+        // 1 or 2 players can be locked in switch state, but not both
+        return Player1State == PlayerState.FaintedLocked && Player2State == PlayerState.FaintedLocked ||
+               Player1State == PlayerState.FaintedLocked && Player2State == PlayerState.Idle ||
+               Player1State == PlayerState.Idle && Player2State == PlayerState.FaintedLocked;
+    }
+
+    private bool IsEndOfTurn()
+    {
+        if (IsWinner() != PlayerId.None)
+        {
+            return true; // Battle has ended, no more turns
+        }
+        lock (ChoiceLock)
+        {
+            return !Player1State.CanSubmitChoice() && !Player2State.CanSubmitChoice();
+        }
+    }
+
+    private bool CanPlayerSubmitChoice(PlayerId playerId)
+    {
+        if (IsWinner() != PlayerId.None) return false;
+        lock (ChoiceLock)
+        {
+            return playerId switch
+            {
+                PlayerId.Player1 => Player1State.CanSubmitChoice(),
+                PlayerId.Player2 => Player2State.CanSubmitChoice(),
+                _ => false
+            };
+        }
+    }
+
+   
+
+    private void PerformMove(PlayerId playerId, Choice choice)
+    {
+        Side atkSide = GetSide(playerId);
+        Side defSide = GetSide(playerId.OpposingPlayerId());
+
+        int moveIndex = choice.GetMoveIndexFromChoice();
+        Pokemon attacker = atkSide.Team.ActivePokemon;
+        Move move = attacker.Moves[moveIndex];
+        Pokemon defender = defSide.Team.ActivePokemon;
+        int damage = Damage(attacker, defender, move);
+        defender.Damage(damage);
+        if (PrintDebug)
+        {
+            UiGenerator.PrintMoveAction(attacker, move, damage, defender);
+        }
+    }
+
+    private void PerformSwitch(PlayerId playerId, Choice choice)
+    {
+        if (IsWinner() != PlayerId.None)
+        {
+            throw new InvalidOperationException("Cannot switch Pokémon when the battle has already ended.");
+        }
+        if (!choice.IsSwitchChoice())
+        {
+            throw new ArgumentException("Choice must be a switch choice to switch Pokémon.", nameof(choice));
+        }
+
+        Side side = GetSide(playerId);
+        Pokemon prevActive = side.Team.ActivePokemon;
+        side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
+
+        if (!PrintDebug) return;
+
+        PlayerState playerState = GetPlayerState(playerId);
+        switch (playerState)
+        {
+            case PlayerState.MoveSwitchLocked:
+                UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
+                    side.Team.ActivePokemon);
+                break;
+            case PlayerState.FaintedLocked:
+                UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name,
+                    side.Team.ActivePokemon);
+                break;
+            case PlayerState.TeamPreviewSelect:
+            case PlayerState.TeamPreviewLocked:
+            case PlayerState.MoveSwitchSelect:
+            case PlayerState.FaintedSelect:
+            case PlayerState.Idle:
+                throw new InvalidOperationException($"Player {playerId} cannot switch Pokémon in current state: {playerState}");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null);
+        }
+    }
 
     private PlayerId IsWinner()
     {
@@ -509,18 +474,6 @@ public class Battle
         return 0; // Default priority for other choices
     }
 
-    //private void ApplyChoice(Choice choice, Side atkSide, Side defSide)
-    //{
-    //    if (choice.IsSwitchChoice())
-    //    {
-            
-    //    }
-    //    else if (choice.IsMoveChoice())
-    //    {
-            
-    //    }
-    //}
-
     private Choice[] GetAvailableChoices(Side side)
     {
         // TODO: Implement logic to determine available choices based on the current state of the battle.
@@ -535,11 +488,11 @@ public class Battle
                 throw new NotImplementedException();
             case PlayerState.MoveSwitchSelect:
                 return GetMoveSwitchChoices(side);
-            case PlayerState.SwitchSelect:
+            case PlayerState.FaintedSelect:
                 return GetSwitchChoices(side);
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchLocked:
-            case PlayerState.SwitchLocked:
+            case PlayerState.FaintedLocked:
             case PlayerState.Idle:
             default: return [];
         }
@@ -597,13 +550,13 @@ public class Battle
 
         PlayerState playerState = playerId == PlayerId.Player1 ? Player1State : Player2State;
         if (playerState is PlayerState.TeamPreviewLocked or
-            PlayerState.SwitchLocked or
+            PlayerState.FaintedLocked or
             PlayerState.MoveSwitchLocked)
         {
             throw new InvalidOperationException($"Player {playerId} cannot submit choice in current state: {playerState}");
         }
         bool isSwitchChoice = choice.IsSwitchChoice();
-        if (isSwitchChoice && playerState is not (PlayerState.SwitchSelect or PlayerState.MoveSwitchSelect))
+        if (isSwitchChoice && playerState is not (PlayerState.FaintedSelect or PlayerState.MoveSwitchSelect))
         {
             throw new InvalidOperationException($"Player {playerId} cannot submit switch choice in current state: {playerState}");
         }
@@ -657,8 +610,8 @@ public static class BattleTools
             PlayerState.TeamPreviewLocked => false,
             PlayerState.MoveSwitchSelect => true,
             PlayerState.MoveSwitchLocked => false,
-            PlayerState.SwitchSelect => true,
-            PlayerState.SwitchLocked => false,
+            PlayerState.FaintedSelect => true,
+            PlayerState.FaintedLocked => false,
             PlayerState.Idle => false,
             _ => throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null)
         };
@@ -678,14 +631,16 @@ public static class BattleTools
 
 public static class BattleGenerator
 {
-    public static Battle GenerateTestBattle(Library library, string trainerName1, string trainerName2)
+    public static Battle GenerateTestBattle(Library library, string trainerName1,
+        string trainerName2, bool printDebug = false)
     {
         return new Battle
         {
             Library = library,
             Field = new Field(),
             Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1),
-            Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2)
+            Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2),
+            PrintDebug = printDebug,
         };
     }
 }

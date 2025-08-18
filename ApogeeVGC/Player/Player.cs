@@ -141,16 +141,16 @@ public static class ChoiceTools
     }
 }
 
-public class ChoiceDetails
-{
+//public class ChoiceDetails
+//{
 
-}
+//}
 
-public class PlayerChoices
-{
-    public PlayerId PlayerId { get; init; }
-    public Dictionary<Choice, ChoiceDetails> Choices { get; init; } = [];
-}
+//public class PlayerChoices
+//{
+//    public PlayerId PlayerId { get; init; }
+//    public Dictionary<Choice, ChoiceDetails> Choices { get; init; } = [];
+//}
 
 
 public interface IPlayer

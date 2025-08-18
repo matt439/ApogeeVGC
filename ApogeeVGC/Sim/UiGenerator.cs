@@ -61,6 +61,27 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintFaintedSelectAction(string trainerName, Pokemon pokemon)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{trainerName} selected {pokemon.Name} to switch in.");
+        Console.WriteLine(sb.ToString());
+    }
+    public static void PrintFaintedAction(Pokemon pokemon)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{pokemon.Name} fainted!");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintBattleEnd(string winnerName)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("The battle has ended.");
+        sb.AppendLine($"The winner is {winnerName}!");
+        Console.WriteLine(sb.ToString());
+    }
+
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
         if (choice.IsMoveChoice())

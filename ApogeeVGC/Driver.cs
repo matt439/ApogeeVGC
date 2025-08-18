@@ -1,12 +1,15 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim;
+using System.Collections.Concurrent;
+using System.Text;
 
 namespace ApogeeVGC;
 
 public enum DriverMode
 {
     RandomVsRandom,
+    RandomVsRandomEvaluation,
     ConsoleVsRandom,
     ConsoleVsConsole,
     ConsoleVsMcts,
@@ -18,6 +21,11 @@ public class Driver
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
+    private const int RandomEvaluationNumTest = 100000;
+    private const int NumThreads = 16;
+    private const int PlayerRandom1Seed = 439;
+    private const int PlayerRandom2Seed = 1818;
+
     public void Start(DriverMode mode)
     {
         switch (mode)
@@ -25,18 +33,18 @@ public class Driver
             case DriverMode.RandomVsRandom:
                 RunRandomTest();
                 break;
+            case DriverMode.RandomVsRandomEvaluation:
+                RunRandomVsRandomEvaluationTest();
+                break;
             case DriverMode.ConsoleVsRandom:
                 RunConsoleVsRandomTest();
                 break;
             case DriverMode.ConsoleVsConsole:
                 throw new NotImplementedException("Console vs Console mode is not implemented yet.");
-                break;
             case DriverMode.ConsoleVsMcts:
                 throw new NotImplementedException("Console vs MCTS mode is not implemented yet.");
-                break;
             case DriverMode.MctsVsRandom:
                 throw new NotImplementedException("MCTS vs Random mode is not implemented yet.");
-                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
         }
@@ -44,58 +52,105 @@ public class Driver
 
     private void RunRandomTest()
     {
-        //Simulator = new Simulator
-        //{
-        //    Battle = BattleGenerator.GenerateTestBattle(Library, "Rand1"," Rand2")
-        //};
+        Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
+            "Random2", true);
+        Simulator = new Simulator
+        {
+            Battle = battle,
+            Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+                PlayerRandom1Seed),
+            Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+                PlayerRandom2Seed),
+        };
+        SimulatorResult result = Simulator.Run();
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "Player 1",
+            SimulatorResult.Player2Win => "Player 2",
+            _ => "Unknown"
+        };
+        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
 
-        //Player1 = new PlayerRandom(PlayerId.Player1, Simulator.Battle);
-        //Player2 = new PlayerRandom(PlayerId.Player2, Simulator.Battle);
+    private void RunRandomVsRandomEvaluationTest()
+    {
+        var simResults = new ConcurrentBag<SimulatorResult>();
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        //SimulatorOutput output = Simulator.Start();
+        // Thread-safe counter for seed generation
+        int seedCounter = 0;
 
-        //while (output.RequestState != SimState.Player1Win && output.RequestState != SimState.Player2Win)
-        //{
-        //    // Get choices from players
-        //    Choice player1Choice = Player1.GetNextChoice(output.Player1Choices);
-        //    Choice player2Choice = Player2.GetNextChoice(output.Player2Choices);
-        //    // Create input for the simulator
-        //    SimulatorInput input = new()
-        //    {
-        //        Player1Choice = player1Choice,
-        //        Player2Choice = player2Choice
-        //    };
-        //    // Perform the command in the simulator
-        //    output = Simulator.PerformCommand(input);
-        //}
+        Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads }, 
+            i =>
+        {
+            // Generate unique seeds for each simulation using thread-safe increment
+            int currentSeed = Interlocked.Increment(ref seedCounter);
+            int player1Seed = PlayerRandom1Seed + currentSeed;
+            int player2Seed = PlayerRandom2Seed + currentSeed;
 
-        //Console.WriteLine("Battle finished.");
-        //switch (output.RequestState)
-        //{
-        //    case SimState.Player1Win:
-        //        Console.WriteLine("Player 1 wins!");
-        //        break;
-        //    case SimState.Player2Win:
-        //        Console.WriteLine("Player 2 wins!");
-        //        break;
-        //    case SimState.Running:
-        //    default:
-        //        Console.WriteLine("Battle ended unexpectedly.");
-        //        break;
-        //}
+            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
+                "Random2");
+            var simulator = new Simulator
+            {
+                Battle = battle,
+                Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+                    player1Seed),
+                Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+                    player2Seed),
+            };
+            simResults.Add(simulator.Run());
+        });
+
+        stopwatch.Stop();
+
+        // Convert to list for counting
+        var resultsList = simResults.ToList();
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+
+        // Calculate timing metrics
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+
+        // Rest of the method with timing information added...
+        StringBuilder sb = new();
+        sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
+        sb.AppendLine($"Player 1 Wins: {player1Wins}");
+        sb.AppendLine($"Player 2 Wins: {player2Wins}");
+        sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
+        sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / RandomEvaluationNumTest:P2}");
+        sb.AppendLine();
+        sb.AppendLine("Performance Metrics:");
+        sb.AppendLine($"Number of threads: {NumThreads}");
+        sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
+        sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
+        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        Console.WriteLine(sb.ToString());
+
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
     }
 
     private void RunConsoleVsRandomTest()
     {
-        Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", "Random");
+        Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
+            "Random", true);
 
         Simulator = new Simulator
         {
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
-            Player2 = new PlayerRandom(PlayerId.Player2, battle),
+            Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.MoveChoices,
+                PlayerRandom2Seed),
         };
 
         Simulator.Run();
+
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
     }
 }

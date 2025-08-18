@@ -2,15 +2,6 @@
 
 namespace ApogeeVGC.Sim;
 
-//public enum SimState
-//{
-//    RequestingPlayer1Input,
-//    RequestingPlayer2Input,
-//    RequestingBothPlayersInput,
-//    Player1Win,
-//    Player2Win,
-//}
-
 //public interface ISimulator
 //{
 //    Battle? Battle { get; }
@@ -21,18 +12,22 @@ namespace ApogeeVGC.Sim;
 //    void Start();
 //}
 
+public enum SimulatorResult
+{
+    Player1Win,
+    Player2Win,
+}
+
 public class Simulator
 {
     public required Battle Battle { get; init; }
     public required IPlayer Player1 { get; init; }
     public required IPlayer Player2 { get; init; }
-    //public PlayerChoices? PlayerChoices { get; }
-    //public SimState RequestState { get; }
+    public bool PrintDebug { get; set; }
 
-    public void Run()
+    public SimulatorResult Run()
     {
         BattleRequestState battleState = Battle.GetRequestState();
-
 
         while (battleState != BattleRequestState.Player1Win &&
                battleState != BattleRequestState.Player2Win)
@@ -66,78 +61,33 @@ public class Simulator
             battleState = Battle.GetRequestState();
         }
 
-        Console.WriteLine("Battle finished.");
+        string winner;
+        SimulatorResult result;
         switch (battleState)
         {
             case BattleRequestState.Player1Win:
-                Console.WriteLine("Player 1 wins!");
+                winner = Battle.Side1.Team.Trainer.Name;
+                result = SimulatorResult.Player1Win;
                 break;
             case BattleRequestState.Player2Win:
-                Console.WriteLine("Player 2 wins!");
+                winner = Battle.Side2.Team.Trainer.Name;
+                result = SimulatorResult.Player2Win;
                 break;
             case BattleRequestState.RequestingPlayer1Input:
             case BattleRequestState.RequestingPlayer2Input:
             case BattleRequestState.RequestingBothPlayersInput:
+                throw new InvalidOperationException("Battle has not ended yet.");
             default:
-                Console.WriteLine("Battle ended unexpectedly.");
-                break;
+                throw new ArgumentOutOfRangeException(nameof(battleState), battleState,
+                    "Unexpected battle state.");
         }
+
+        if (PrintDebug)
+        {
+            UiGenerator.PrintBattleEnd(winner);
+        }
+        return result;
     }
-
-    //private SimulatorOutput PerformCommand(SimulatorInput input)
-    //{
-    //    PlayerId winner = Battle.IsWinner();
-    //    if (winner != PlayerId.None)
-    //    {
-    //        return new SimulatorOutput
-    //        {
-    //            RequestState = winner == PlayerId.Player1 ? SimState.Player1Win : SimState.Player2Win,
-    //            Player1Choices = [],
-    //            Player2Choices = []
-    //        };
-    //    }
-
-    //    BattleRequestState battleState = Battle.RequestState;
-    //    switch (battleState)
-    //    {
-    //        case BattleRequestState.WaitingForPlayer1:
-    //            Battle.ApplyChoice(PlayerId.Player1, input.Player1Choice);
-    //            return new SimulatorOutput()
-    //            {
-    //                RequestState = SimState.RequestingPlayer1Input,
-    //                Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
-    //                Player2Choices = []
-    //            };
-    //        case BattleRequestState.WaitingForPlayer2:
-    //            Battle.ApplyChoice(PlayerId.Player2, input.Player2Choice);
-    //            return new SimulatorOutput()
-    //            {
-    //                RequestState = SimState.RequestingPlayer2Input,
-    //                Player1Choices = [],
-    //                Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
-    //            };
-    //        case BattleRequestState.WaitingForBothPlayers:
-    //            Battle.ApplyChoices(input.Player1Choice, input.Player2Choice);
-    //            return new SimulatorOutput()
-    //            {
-    //                RequestState = SimState.RequestingBothPlayersInput,
-    //                Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
-    //                Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
-    //            };
-    //        default:
-    //            throw new InvalidOperationException($"Unexpected battle state: {battleState}");
-    //    }
-    //}
-
-    //private SimulatorOutput Start()
-    //{
-    //    return new SimulatorOutput()
-    //    {
-    //        RequestState = SimState.RequestingBothPlayersInput,
-    //        Player1Choices = Battle.GetAvailableChoices(PlayerId.Player1),
-    //        Player2Choices = Battle.GetAvailableChoices(PlayerId.Player2)
-    //    };
-    //}
 }
 
 //public record SimulatorOutput
