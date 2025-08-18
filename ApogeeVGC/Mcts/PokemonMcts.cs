@@ -8,9 +8,11 @@ public class PokemonMonteCarloTreeSearch(
     int maxIterations,
     double explorationParameter,
     PlayerId mctsPlayerId,
-    int? seed = null)
+    int? seed = null,
+    int? maxDegreeOfParallelism = null)
 {
     private readonly Random _random = seed.HasValue ? new Random(seed.Value) : new Random();
+    private readonly int _maxDegreeOfParallelism = maxDegreeOfParallelism ?? Environment.ProcessorCount;
 
     public struct MoveResult
     {
@@ -50,17 +52,27 @@ public class PokemonMonteCarloTreeSearch(
             );
         }
 
-        for (int i = 0; i < maxIterations; i++)
+        // **PARALLEL MCTS IMPLEMENTATION**
+        // Use Parallel.For to run MCTS iterations concurrently
+        var parallelOptions = new ParallelOptions
         {
+            MaxDegreeOfParallelism = _maxDegreeOfParallelism
+        };
+
+        Parallel.For(0, maxIterations, parallelOptions, i =>
+        {
+            // Each thread gets its own random number generator to avoid contention
+            var threadRandom = new Random(_random.Next() + i);
+            
             // Selection
             Node node = Selection(rootNode);
             if (node == null)
             {
-                throw new Exception("No node selected");
+                return; // Skip this iteration
             }
 
             // Expansion
-            Node? expandedNode = Expansion(node);
+            Node? expandedNode = Expansion(node, threadRandom);
             if (expandedNode == null)
             {
                 // Check if the node is terminal before trying to get battle result
@@ -69,18 +81,17 @@ public class PokemonMonteCarloTreeSearch(
                     SimulatorResult battleResult = GetBattleResult(node.Battle);
                     BackPropagate(node, battleResult);
                 }
-                // If not terminal and expandedNode is null, it means the node hasn't been visited enough
-                // or has no children to expand - skip this iteration
-                continue;
+                // If not terminal and expandedNode is null, skip this iteration
+                return;
             }
 
             // Simulation
             Battle simulationBattle = CopyBattle(expandedNode.Battle);
-            SimulatorResult simulationResult = Simulation(simulationBattle);
+            SimulatorResult simulationResult = Simulation(simulationBattle, threadRandom);
 
             // Backpropagation
             BackPropagate(expandedNode, simulationResult);
-        }
+        });
 
         var result = new MoveResult();
 
@@ -103,6 +114,7 @@ public class PokemonMonteCarloTreeSearch(
         Node current = root;
         while (!current.IsLeaf && !current.IsTerminal)
         {
+            // Thread-safe read of children - no lock needed for reading
             Node? child = current.SelectHighestValueChild();
             if (child == null)
             {
@@ -114,7 +126,7 @@ public class PokemonMonteCarloTreeSearch(
         return current;
     }
 
-    private Node? Expansion(Node node)
+    private Node? Expansion(Node node, Random threadRandom)
     {
         if (node.IsTerminal)
         {
@@ -128,27 +140,27 @@ public class PokemonMonteCarloTreeSearch(
             return node; // Return the node itself for simulation
         }
 
-        // Node has been visited, now we can expand it
+        // Thread-safe expansion - GenerateChildren handles synchronization internally
         GenerateChildren(node);
 
-        // If no children were generated (e.g., not our turn), return null
+        // Thread-safe read of children count
         if (node.ChildNodes.Count == 0)
         {
             return null;
         }
 
-        // Select a random unvisited child node
-        int randomChildIndex = _random.Next(node.ChildNodes.Count);
+        // Select a random unvisited child node using thread-local random
+        int randomChildIndex = threadRandom.Next(node.ChildNodes.Count);
         return node.ChildNodes[randomChildIndex];
     }
 
-    private SimulatorResult Simulation(Battle battle)
+    private SimulatorResult Simulation(Battle battle, Random threadRandom)
     {
-        // Random playout using random players
+        // Random playout using random players with thread-local random seeds
         var randomPlayer1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
-            _random.Next());
+            threadRandom.Next());
         var randomPlayer2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
-            _random.Next());
+            threadRandom.Next());
         
         var simulator = new Simulator
         {
@@ -196,13 +208,23 @@ public class PokemonMonteCarloTreeSearch(
             availableChoices = parent.Battle.GetAvailableChoices(playerToMove);
         }
 
-        foreach (Choice choice in availableChoices)
+        // **THREAD SAFETY: Synchronize access to UntriedChoices and ChildNodes**
+        lock (parent.LockObject)
         {
-            if (!parent.UntriedChoices.Contains(choice)) continue;
+            // Check if children have already been generated by another thread
+            if (parent.ChildNodes.Count > 0)
+            {
+                return; // Another thread already generated children
+            }
 
-            var childNode = new Node(parent.Battle, parent, choice, explorationParameter, mctsPlayerId);
-            parent.ChildNodes.Add(childNode);
-            parent.UntriedChoices.Remove(choice);
+            foreach (Choice choice in availableChoices)
+            {
+                if (!parent.UntriedChoices.Contains(choice)) continue;
+
+                var childNode = new Node(parent.Battle, parent, choice, explorationParameter, mctsPlayerId);
+                parent.ChildNodes.Add(childNode);
+                parent.UntriedChoices.Remove(choice);
+            }
         }
     }
 
@@ -233,13 +255,50 @@ public class PokemonMonteCarloTreeSearch(
         public Battle Battle { get; }
         public List<Choice> UntriedChoices { get; }
         public List<Node> ChildNodes { get; }
-        private int Wins { get; set; }
-        private int Losses { get; set; }
-        public int Visits => Wins + Losses;
-        public bool IsLeaf => ChildNodes.Count < 1;
+        
+        // **THREAD SAFETY: Use locks to protect mutable state**
+        public readonly object LockObject = new object(); // Make it public for external locking
+        private int _wins;
+        private int _losses;
+        
+        // Thread-safe properties
+        public int Wins 
+        { 
+            get { lock (LockObject) { return _wins; } }
+            private set { lock (LockObject) { _wins = value; } }
+        }
+        
+        public int Losses 
+        { 
+            get { lock (LockObject) { return _losses; } }
+            private set { lock (LockObject) { _losses = value; } }
+        }
+        
+        public int Visits 
+        { 
+            get { lock (LockObject) { return _wins + _losses; } }
+        }
+        
+        public bool IsLeaf 
+        { 
+            get { lock (LockObject) { return ChildNodes.Count < 1; } }
+        }
+        
         private bool IsRoot => Parent == null;
         public bool IsTerminal => IsGameTerminal(Battle.GetRequestState());
-        private float WinRate => Visits > 0 ? Wins / (float)Visits : 0f;
+        
+        private float WinRate 
+        { 
+            get 
+            { 
+                lock (LockObject) 
+                { 
+                    int visits = _wins + _losses;
+                    return visits > 0 ? _wins / (float)visits : 0f; 
+                } 
+            }
+        }
+        
         private double Value => CalculateValue();
 
         private readonly double _explorationParameter;
@@ -284,8 +343,8 @@ public class PokemonMonteCarloTreeSearch(
             }
 
             ChildNodes = [];
-            Wins = 0;
-            Losses = 0;
+            _wins = 0;
+            _losses = 0;
         }
 
         private double CalculateValue()
@@ -294,19 +353,24 @@ public class PokemonMonteCarloTreeSearch(
             {
                 return -1.0;
             }
-            if (Visits < 1)
-            {
-                return double.MaxValue;
-            }
             
-            // At this point we know we're not the root node, so Parent should not be null
-            if (Parent == null)
+            lock (LockObject)
             {
-                throw new InvalidOperationException("Non-root node should have a parent");
+                int visits = _wins + _losses;
+                if (visits < 1)
+                {
+                    return double.MaxValue;
+                }
+                
+                // At this point we know we're not the root node, so Parent should not be null
+                if (Parent == null)
+                {
+                    throw new InvalidOperationException("Non-root node should have a parent");
+                }
+                
+                return _wins / (double)visits +
+                       _explorationParameter * Math.Sqrt(Math.Log(Parent.Visits) / visits);
             }
-            
-            return Wins / (double)Visits +
-                   _explorationParameter * Math.Sqrt(Math.Log(Parent.Visits) / Visits);
         }
 
         private Choice[] GetAvailableChoicesForNode()
@@ -347,12 +411,18 @@ public class PokemonMonteCarloTreeSearch(
 
         public Node? SelectHighestValueChild()
         {
-            if (ChildNodes.Count == 0) return null;
+            // Thread-safe reading of children - use a snapshot to avoid collection modification issues
+            Node[] children;
+            lock (LockObject)
+            {
+                if (ChildNodes.Count == 0) return null;
+                children = ChildNodes.ToArray();
+            }
             
             Node? bestChild = null;
             double maxUcb = double.MinValue;
             
-            foreach (Node child in ChildNodes)
+            foreach (Node child in children)
             {
                 double ucb = child.Value;
                 if (ucb > maxUcb)
@@ -366,14 +436,20 @@ public class PokemonMonteCarloTreeSearch(
 
         public int SelectMostVisitedChild()
         {
-            if (ChildNodes.Count == 0) return -1;
+            // Thread-safe reading of children
+            Node[] children;
+            lock (LockObject)
+            {
+                if (ChildNodes.Count == 0) return -1;
+                children = ChildNodes.ToArray();
+            }
             
             int mostVisitedIndex = -1;
             int maxVisits = 0;
             
-            for (int i = 0; i < ChildNodes.Count; i++)
+            for (int i = 0; i < children.Length; i++)
             {
-                Node child = ChildNodes[i];
+                Node child = children[i];
                 
                 // Only consider nodes that represent MCTS player moves for final selection
                 // This ensures we're selecting among our own choices, not opponent responses
@@ -383,7 +459,11 @@ public class PokemonMonteCarloTreeSearch(
                 if (child.Visits > maxVisits)
                 {
                     maxVisits = child.Visits;
-                    mostVisitedIndex = i;
+                    // Find the original index in the actual ChildNodes list
+                    lock (LockObject)
+                    {
+                        mostVisitedIndex = ChildNodes.IndexOf(child);
+                    }
                 }
             }
             return mostVisitedIndex;
@@ -394,16 +474,17 @@ public class PokemonMonteCarloTreeSearch(
             bool mctsWon = (result == SimulatorResult.Player1Win && mctsPlayerId == PlayerId.Player1) ||
                           (result == SimulatorResult.Player2Win && mctsPlayerId == PlayerId.Player2);
 
-            // For nodes representing MCTS player moves: wins/losses are direct
-            // For nodes representing opponent moves: we want to track what's good for MCTS player
-            // The outcome is always from MCTS player's perspective regardless of whose move this node represents
-            if (mctsWon)
+            // Thread-safe update of win/loss counts
+            lock (LockObject)
             {
-                Wins++;
-            }
-            else
-            {
-                Losses++;
+                if (mctsWon)
+                {
+                    _wins++;
+                }
+                else
+                {
+                    _losses++;
+                }
             }
         }
 
@@ -425,21 +506,41 @@ public class PokemonMonteCarloTreeSearch(
         {
             PlayerId playerToMove = GetPlayerToMove();
             string playerInfo = playerToMove != PlayerId.None ? $" (Player: {playerToMove})" : "";
-            return $"Choice: {Choice}{playerInfo}, Wins: {Wins}, Visits: {Visits}, WinRate: {WinRate:P2}, ChildNodes: {ChildNodes.Count}, Value: {Value:F3}";
+            
+            // Thread-safe reading of statistics
+            lock (LockObject)
+            {
+                int visits = _wins + _losses;
+                float winRate = visits > 0 ? _wins / (float)visits : 0f;
+                return $"Choice: {Choice}{playerInfo}, Wins: {_wins}, Visits: {visits}, WinRate: {winRate:P2}, ChildNodes: {ChildNodes.Count}, Value: {Value:F3}";
+            }
         }
 
         public string ToStringWithChildren()
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"Root: {ToString()} (Children: {ChildNodes.Count}, UntriedChoices: {UntriedChoices.Count})");
-            sb.AppendLine("Root's children:");
-            for (int i = 0; i < ChildNodes.Count; i++)
+            
+            // Thread-safe snapshot of current state
+            Node[] children;
+            int untriedCount;
+            string[] untriedChoices;
+            
+            lock (LockObject)
             {
-                sb.AppendLine($"{i}: {ChildNodes[i]}");
+                children = ChildNodes.ToArray();
+                untriedCount = UntriedChoices.Count;
+                untriedChoices = UntriedChoices.Select(c => c.ToString()).ToArray();
             }
-            if (UntriedChoices.Count > 0)
+            
+            sb.AppendLine($"Root: {ToString()} (Children: {children.Length}, UntriedChoices: {untriedCount})");
+            sb.AppendLine("Root's children:");
+            for (int i = 0; i < children.Length; i++)
             {
-                sb.AppendLine($"Untried choices: {string.Join(", ", UntriedChoices)}");
+                sb.AppendLine($"{i}: {children[i]}");
+            }
+            if (untriedCount > 0)
+            {
+                sb.AppendLine($"Untried choices: {string.Join(", ", untriedChoices)}");
             }
             return sb.ToString();
         }
