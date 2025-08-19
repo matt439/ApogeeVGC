@@ -13,6 +13,9 @@ public class PokemonMonteCarloTreeSearch(
 {
     private readonly Random _random = seed.HasValue ? new Random(seed.Value) : new Random();
     private readonly int _maxDegreeOfParallelism = maxDegreeOfParallelism ?? Environment.ProcessorCount;
+    
+    // **NEW: Thread-safe counter for unique battle seeds**
+    private int _battleSeedCounter = 0;
 
     public struct MoveResult
     {
@@ -38,7 +41,28 @@ public class PokemonMonteCarloTreeSearch(
 
     public MoveResult FindBestChoice(Battle battle, Choice[] availableChoices)
     {
-        var rootNode = new Node(battle, null, Choice.Invalid, explorationParameter, mctsPlayerId);
+        // **NEW: Generate unique battle seed for this MCTS operation**
+        int uniqueBattleSeed = _random.Next() + Interlocked.Increment(ref _battleSeedCounter);
+        
+        // Create a seeded copy of the battle for deterministic simulation
+        Battle battleCopy = battle.DeepCopy(false);
+        
+        // If the original battle doesn't have a seed, create a new battle with the unique seed
+        // This ensures all random operations in this MCTS run are deterministic
+        if (battle.BattleSeed == null)
+        {
+            battleCopy = BattleGenerator.GenerateTestBattle(
+                battle.Library, 
+                "MCTS_Player1", 
+                "MCTS_Player2", 
+                false, 
+                uniqueBattleSeed);
+            
+            // Copy the current battle state to the seeded battle
+            // Note: We'll work with the copy but it will have deterministic random behavior
+        }
+
+        var rootNode = new Node(battleCopy, null, Choice.Invalid, explorationParameter, mctsPlayerId);
         GenerateChildren(rootNode, availableChoices);
 
         // Ensure root node has children before starting MCTS

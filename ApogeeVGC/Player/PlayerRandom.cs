@@ -12,8 +12,8 @@ public class PlayerRandom(PlayerId playerId, Battle battle, PlayerRandomStrategy
     int? seed = null) : IPlayer
 {
     public PlayerId PlayerId { get; } = playerId;
-    public Battle Battle { get; } = battle;
-    public PlayerRandomStrategy Strategy {get; set; } = strategy;
+    private Battle Battle { get; } = battle;
+    private PlayerRandomStrategy Strategy {get; } = strategy;
 
     private readonly Random _random = seed is null ? new Random() : new Random(seed.Value);
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using ApogeeVGC.Data;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 
 namespace ApogeeVGC.Sim;
@@ -50,12 +49,14 @@ public class Battle
     public required Side Side1 { get; init; }
     public required Side Side2 { get; init; }
     public int Turn { get; private set; }
+    public bool PrintDebug { get; set; }
+    public int? BattleSeed { get; init; }
     private PlayerState Player1State { get; set; } = PlayerState.MoveSwitchSelect;
     private PlayerState Player2State { get; set; } = PlayerState.MoveSwitchSelect;
     private Choice? Player1PendingChoice { get; set; }
     private Choice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
-    public bool PrintDebug { get; set; }
+    
 
     /// <summary>
     /// Creates a deep copy of the battle state for MCTS simulation purposes.
@@ -80,7 +81,8 @@ public class Battle
             Player2State = Player2State,
             Player1PendingChoice = Player1PendingChoice,
             Player2PendingChoice = Player2PendingChoice,
-            PrintDebug = printDebug ?? PrintDebug
+            PrintDebug = printDebug ?? PrintDebug,
+            BattleSeed = BattleSeed,
             // Note: ChoiceLock gets a new instance automatically
         };
     }
@@ -304,12 +306,6 @@ public class Battle
             SetPendingChoice(playerId, null);
             SetPlayerState(playerId, PlayerState.Idle);
 
-            // Check for battle end after move
-            if (IsWinner() != PlayerId.None)
-            {
-                return;
-            }
-
             // Update player states for any fainted Pokemon
             UpdateFaintedStates();
         }
@@ -450,11 +446,11 @@ public class Battle
     {
         if (Side1.Team.IsDefeated)
         {
-            return PlayerId.Player1;
+            return PlayerId.Player2;
         }
         if (Side2.Team.IsDefeated)
         {
-            return PlayerId.Player2;
+            return PlayerId.Player1;
         }
         return PlayerId.None;
     }
@@ -682,7 +678,7 @@ public static class BattleTools
 public static class BattleGenerator
 {
     public static Battle GenerateTestBattle(Library library, string trainerName1,
-        string trainerName2, bool printDebug = false)
+        string trainerName2, bool printDebug = false, int? seed = null)
     {
         return new Battle
         {
@@ -691,6 +687,7 @@ public static class BattleGenerator
             Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1),
             Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2),
             PrintDebug = printDebug,
+            BattleSeed = seed,
         };
     }
 }

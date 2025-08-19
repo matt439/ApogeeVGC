@@ -48,6 +48,7 @@ public class Simulator
                 case BattleRequestState.RequestingBothPlayersInput:
                     player1Choice = Player1.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player1));
                     player2Choice = Player2.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player2));
+
                     Battle.SubmitChoice(PlayerId.Player1, player1Choice);
                     Battle.SubmitChoice(PlayerId.Player2, player2Choice);
                     break;

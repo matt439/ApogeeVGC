@@ -22,7 +22,7 @@ public class Driver
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
-    private const int RandomEvaluationNumTest = 1000000;
+    private const int RandomEvaluationNumTest = 100000;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 125;
@@ -168,26 +168,43 @@ public class Driver
         // Thread-safe counter for seed generation
         int seedCounter = 0;
 
-        Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads }, 
-            _ =>
+        //Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads }, 
+        //    _ =>
+        //{
+        //    // Generate unique seeds for each simulation using thread-safe increment
+        //    int currentSeed = Interlocked.Increment(ref seedCounter);
+        //    int player1Seed = PlayerRandom1Seed + currentSeed;
+        //    int player2Seed = PlayerRandom2Seed + currentSeed;
+
+        //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
+        //        "Random2");
+        //    var simulator = new Simulator
+        //    {
+        //        Battle = battle,
+        //        Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+        //            player1Seed),
+        //        Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+        //            player2Seed),
+        //    };
+        //    simResults.Add(simulator.Run());
+        //});
+
+        for (int i = 0; i < RandomEvaluationNumTest; i++)
         {
-            // Generate unique seeds for each simulation using thread-safe increment
-            int currentSeed = Interlocked.Increment(ref seedCounter);
+            int currentSeed = i + 1; // Sequential increment
             int player1Seed = PlayerRandom1Seed + currentSeed;
             int player2Seed = PlayerRandom2Seed + currentSeed;
 
-            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-                "Random2");
+            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1", "Random2");
             var simulator = new Simulator
             {
                 Battle = battle,
-                Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
-                    player1Seed),
-                Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
-                    player2Seed),
+                Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices, player1Seed),
+                Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices, player2Seed),
             };
             simResults.Add(simulator.Run());
-        });
+        }
+
 
         stopwatch.Stop();
 
