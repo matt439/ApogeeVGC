@@ -57,6 +57,10 @@ public class Battle
     private Choice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
     
+    // Lazy-initialized seeded random number generator for deterministic battle simulation
+    private Random? _battleRandom;
+    private Random BattleRandom => _battleRandom ??= BattleSeed.HasValue ? new Random(BattleSeed.Value) : new Random();
+    
 
     /// <summary>
     /// Creates a deep copy of the battle state for MCTS simulation purposes.
@@ -84,6 +88,7 @@ public class Battle
             PrintDebug = printDebug ?? PrintDebug,
             BattleSeed = BattleSeed,
             // Note: ChoiceLock gets a new instance automatically
+            // Note: _battleRandom will be initialized with the same seed when first accessed
         };
     }
 
@@ -463,7 +468,7 @@ public class Battle
         int defenseStat = defender.GetDefenseStat(move);
         int basePower = move.BasePower;
         double critModifier = crit ? 1.5 : 1.0;
-        double random = 0.85 + new Random().NextDouble() * 0.15; // Random factor between 0.85 and 1.0
+        double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
         bool stab = attacker.IsStab(move);
         double stabModifier = stab ? 1.5 : 1.0;
         double typeEffectiveness = Library.TypeChart.GetEffectiveness(defender.Specie.Types, move.Type);
@@ -501,7 +506,7 @@ public class Battle
             return PlayerId.Player2;
         }
         // Speed ties are resolved randomly
-        return new Random().Next(2) == 0 ? PlayerId.Player1 : PlayerId.Player2;
+        return BattleRandom.Next(2) == 0 ? PlayerId.Player1 : PlayerId.Player2;
     }
 
     private static int Priority(Choice choice, Side side)
