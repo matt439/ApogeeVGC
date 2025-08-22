@@ -400,11 +400,12 @@ public class Battle
         Pokemon attacker = atkSide.Team.ActivePokemon;
         Move move = attacker.Moves[moveIndex];
         Pokemon defender = defSide.Team.ActivePokemon;
-        int damage = Damage(attacker, defender, move);
+        bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
+        int damage = Damage(attacker, defender, move, isCrit);
         defender.Damage(damage);
         if (PrintDebug)
         {
-            UiGenerator.PrintMoveAction(attacker, move, damage, defender);
+            UiGenerator.PrintMoveAction(attacker, move, damage, defender, isCrit);
         }
     }
 

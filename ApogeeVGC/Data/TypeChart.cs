@@ -3,6 +3,16 @@ using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
 
+//public enum MoveEffectiveness
+//{
+//    Normal,
+//    SuperEffective2x,
+//    SuperEffective4x, // For moves that are super effective against two types
+//    NotVeryEffective0_5x,
+//    NotVeryEffective0_25x, // For moves that are not very effective against two types
+//    Immune
+//}
+
 public record TypeChart
 {
     public IReadOnlyDictionary<PokemonType, TypeData> TypeData { get; }

@@ -46,10 +46,15 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
-    public static void PrintMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender)
+    public static void PrintMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender,
+        bool isCrit = false)
     {
         StringBuilder sb = new();
         sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
+        if (isCrit)
+        {
+            sb.AppendLine("Critical hit!");
+        }
         sb.AppendLine($"It dealt {damage} damage.");
         Console.WriteLine(sb.ToString());
     }
