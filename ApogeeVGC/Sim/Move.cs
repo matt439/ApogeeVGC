@@ -221,7 +221,7 @@ public record Move
             field = value;
         }
     } = 0;
-    public int MaxPp => (1 + (int)(0.2 * PpUp)) * BasePp;
+    public int MaxPp => BasePp + (int)(0.2 * BasePp * PpUp);
     public int UsedPp
     {
         get;
