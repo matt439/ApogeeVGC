@@ -399,6 +399,13 @@ public class Battle
         int moveIndex = choice.GetMoveIndexFromChoice();
         Pokemon attacker = atkSide.Team.ActivePokemon;
         Move move = attacker.Moves[moveIndex];
+        if (move.Pp <= 0)
+        {
+            throw new InvalidOperationException($"Move {move.Name} has no PP left" +
+                                                $"for player {playerId}");
+        }
+        move.UsedPp++;  // Decrease PP for the move used
+
         Pokemon defender = defSide.Team.ActivePokemon;
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
@@ -554,12 +561,19 @@ public class Battle
 
     private static Choice[] GetMoveSwitchChoices(Side side)
     {
-        // TODO: Implement logic to determine available moves based on the current state of the battle.
+        // TODO: Implement logic to determine available moves
+        // based on the current state of the battle.
         
         Choice[] choices = [];
         for (int i = 0; i < side.Team.ActivePokemon.Moves.Length; i++)
         {
-            choices = choices.Append(i.GetChoiceFromMoveIndex()).ToArray();
+            // Check if the move is available (has PP left)
+            if (side.Team.ActivePokemon.Moves[i].Pp > 0)
+            {
+                choices = choices.Append(i.GetChoiceFromMoveIndex()).ToArray();
+            }
+            // TODO: Check for choice lock, encore, disable, imprison, taunt,
+            // torment, assault vest, etc.
         }
 
         var switchChoices = GetSwitchChoices(side);

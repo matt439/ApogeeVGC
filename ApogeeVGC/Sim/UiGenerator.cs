@@ -141,6 +141,11 @@ public static class UiGenerator
         StringBuilder sb = new();
         sb.Append("Move: ");
         sb.Append(move.Name);
+        sb.Append(" (");
+        sb.Append(move.Pp);
+        sb.Append('/');
+        sb.Append(move.MaxPp);
+        sb.Append(')');
         return sb.ToString();
     }
 

@@ -20,7 +20,29 @@ public static class PokemonValidator
             throw new ArgumentException("Invalid IVs in Pokemon.");
         }
 
-        return pokemon != null;
+        return true;
+    }
+}
+
+public struct MoveSetup
+{
+    public MoveId Id { get; init; }
+    public int PpUp
+    {
+        get;
+        init
+        {
+            if (value is < 0 or > 3)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "PP Up must be between 0 and 3.");
+            }
+            field = value;
+        }
+    } = 0;
+    public MoveSetup(MoveId id, int ppUp = 0)
+    {
+        Id = id;
+        PpUp = ppUp;
     }
 }
 
@@ -29,7 +51,7 @@ public static class PokemonBuilder
     public static Pokemon Build(
         Library library,
         SpecieId specie,
-        MoveId[] moves,
+        MoveSetup[] moves,
         ItemId item,
         AbilityId ability,
         StatsTable evs,
@@ -40,13 +62,16 @@ public static class PokemonBuilder
         int level = 50)
     {
         List<Move> movesList = [];
-        foreach (MoveId moveId in moves)
+
+        foreach (MoveSetup moveSetup in moves)
         {
-            if (!library.Moves.TryGetValue(moveId, out Move? move))
+            if (!library.Moves.TryGetValue(moveSetup.Id, out Move? move))
             {
-                throw new ArgumentException($"Move {moveId} not found in library.");
+                throw new ArgumentException($"Move {moveSetup.Id} not found in library.");
             }
-            movesList.Add(move);
+            Move moveCopy = move.Copy(); // Use Copy() to ensure we get a deep copy of the move
+            moveCopy.PpUp = moveSetup.PpUp; // Set PP Up
+            movesList.Add(moveCopy);
         }
 
         Specie spec = library.Species[specie] ??
@@ -78,7 +103,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.CalyrexIce,
-                    [MoveId.IceBasic, MoveId.PsychicBasic, MoveId.GrassBasic, MoveId.DarkBasic],
+                    [new MoveSetup(MoveId.IceBasic),
+                        new MoveSetup(MoveId.PsychicBasic),
+                            new MoveSetup(MoveId.GrassBasic),
+                                new MoveSetup(MoveId.DarkBasic)],
                     ItemId.Leftovers,
                     AbilityId.AsOneGlastrier,
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
@@ -87,7 +115,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Miraidon,
-                    [MoveId.DragonBasic, MoveId.ElectricBasic, MoveId.FlyingBasic, MoveId.PsychicBasic],
+                    [new MoveSetup(MoveId.DragonBasic),
+                        new MoveSetup(MoveId.ElectricBasic),
+                            new MoveSetup(MoveId.FlyingBasic),
+                                new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.ChoiceSpecs,
                     AbilityId.HadronEngine,
                     new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
@@ -96,7 +127,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Ursaluna,
-                    [MoveId.NormalBasic, MoveId.FightingBasic, MoveId.GroundBasic, MoveId.RockBasic],
+                    [new MoveSetup(MoveId.NormalBasic),
+                        new MoveSetup(MoveId.FightingBasic),
+                            new MoveSetup(MoveId.GroundBasic),
+                                new MoveSetup(MoveId.RockBasic)],
                     ItemId.FlameOrb,
                     AbilityId.Guts,
                     new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
@@ -105,7 +139,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Volcarona,
-                    [MoveId.FireBasic, MoveId.BugBasic, MoveId.FlyingBasic, MoveId.PsychicBasic],
+                    [new MoveSetup(MoveId.FireBasic),
+                        new MoveSetup(MoveId.BugBasic),
+                            new MoveSetup(MoveId.FlyingBasic),
+                                new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.RockyHelmet,
                     AbilityId.FlameBody,
                     new StatsTable { Hp = 252, Def = 196, SpD = 60 },
@@ -114,7 +151,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Grimmsnarl,
-                    [MoveId.DarkBasic, MoveId.FairyBasic, MoveId.PsychicBasic, MoveId.FightingBasic],
+                    [new MoveSetup(MoveId.DarkBasic),
+                        new MoveSetup(MoveId.FairyBasic),
+                            new MoveSetup(MoveId.PsychicBasic),
+                                new MoveSetup(MoveId.FightingBasic)],
                     ItemId.LightClay,
                     AbilityId.Prankster,
                     new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },
@@ -123,7 +163,10 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.IronHands,
-                    [MoveId.FightingBasic, MoveId.ElectricBasic, MoveId.GroundBasic, MoveId.PsychicBasic],
+                    [new MoveSetup(MoveId.FightingBasic),
+                        new MoveSetup(MoveId.ElectricBasic),
+                            new MoveSetup(MoveId.GroundBasic),
+                                new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.AssaultVest,
                     AbilityId.QuarkDrive,
                     new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
