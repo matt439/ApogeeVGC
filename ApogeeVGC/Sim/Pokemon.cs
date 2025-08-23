@@ -234,7 +234,7 @@ public class Pokemon
             field = value;
         }
     }
-    public required Item Item { get; init; }
+    public Item? Item { get; init; }
     public required Ability Ability { get; init; }
     public StatsTable Evs { get; init; }
     public Nature Nature { get; init; }

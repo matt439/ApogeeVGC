@@ -9,7 +9,15 @@ public class PlayerConsole(PlayerId playerId, Battle battle) : IPlayer
 
     public Choice GetNextChoice(Choice[] availableChoices)
     {
-        UiGenerator.PrintBattleUi(Battle, PlayerId);
+        if (Battle.IsTeamPreview) // check if in Team Preview phase
+        {
+            UiGenerator.PrintTeamPreviewUi(Battle.GetSide(PlayerId.OpposingPlayerId()));
+        }
+        else // In Battle phase
+        {
+            UiGenerator.PrintBattleUi(Battle, PlayerId);
+        }
+
         UiGenerator.PrintChoices(Battle, PlayerId);
         Choice choice = GetChoiceFromConsole(availableChoices);
         return choice;

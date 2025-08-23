@@ -105,6 +105,7 @@ public static class ChoiceTools
         }
         return (Choice)(index + (int)Choice.Switch1);
     }
+
     public static int GetSwitchIndexFromChoice(this Choice choice)
     {
         if (choice is < Choice.Switch1 or > Choice.Switch6)

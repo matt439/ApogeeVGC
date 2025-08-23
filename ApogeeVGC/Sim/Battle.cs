@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Data;
+﻿using System.ComponentModel;
+using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 
 namespace ApogeeVGC.Sim;
@@ -51,8 +52,12 @@ public class Battle
     public int Turn { get; private set; }
     public bool PrintDebug { get; set; }
     public int? BattleSeed { get; init; }
-    private PlayerState Player1State { get; set; } = PlayerState.MoveSwitchSelect;
-    private PlayerState Player2State { get; set; } = PlayerState.MoveSwitchSelect;
+    public bool IsTeamPreview => Player1State == PlayerState.TeamPreviewSelect ||
+                                 Player2State == PlayerState.TeamPreviewSelect ||
+                                 Player1State == PlayerState.TeamPreviewLocked ||
+                                 Player2State == PlayerState.TeamPreviewLocked;
+    private PlayerState Player1State { get; set; } = PlayerState.TeamPreviewSelect;
+    private PlayerState Player2State { get; set; } = PlayerState.TeamPreviewSelect;
     private Choice? Player1PendingChoice { get; set; }
     private Choice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
@@ -120,15 +125,29 @@ public class Battle
     {
         lock (ChoiceLock)
         {
+            bool incrementTurn = true;
+
             CheckForChoiceError(playerId, choice);
 
             SetPendingChoice(playerId, choice);
 
-            if (IsReadyForMoveSwitchProcessing())
+            if (IsReadyForTeamPreviewProcessing())
+            {
+                PerformTeamPreviewSelect(Player1PendingChoice ??
+                    throw new ArgumentException("Player1PendingChoice cannot be null"),
+                    Player2PendingChoice ??
+                        throw new ArgumentException("Player2PendingChoice cannot be null"));
+                ClearPendingChoices();
+
+                // Don't increment turn after team preview processing
+                incrementTurn = false;
+            }
+            else if (IsReadyForMoveSwitchProcessing())
             {
                 PerformMoveSwitches(Player1PendingChoice ??
-                                    throw new ArgumentException("Player1PendingChoice cannot be null"),
-                    Player2PendingChoice ?? throw new ArgumentException("Player2PendingChoice cannot be null"));
+                    throw new ArgumentException("Player1PendingChoice cannot be null"),
+                        Player2PendingChoice ??
+                            throw new ArgumentException("Player2PendingChoice cannot be null"));
                 ClearPendingChoices();
             }
             else if (IsReadyForFaintedSelectProcessing())
@@ -147,7 +166,11 @@ public class Battle
 
             if (!IsEndOfTurn()) return;
 
-            Turn++;
+            if (incrementTurn)
+            { 
+                Turn++;
+            }
+
             // Reset player states for the next turn
             Player1State = PlayerState.MoveSwitchSelect;
             Player2State = PlayerState.MoveSwitchSelect;
@@ -252,7 +275,8 @@ public class Battle
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Invalid choice for MoveSwitchSelect: {choice}");
+                    throw new InvalidOperationException(
+                        $"Invalid choice for MoveSwitchSelect: {choice}");
                 }
                 break;
             case PlayerState.FaintedSelect:
@@ -262,15 +286,26 @@ public class Battle
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Invalid choice for SwitchSelect: {choice}");
+                    throw new InvalidOperationException(
+                        $"Invalid choice for SwitchSelect: {choice}");
                 }
                 break;
             case PlayerState.TeamPreviewSelect:
-                throw new NotImplementedException();
+                if (choice.Value.IsSelectChoice())
+                {
+                    SetPlayerState(playerId, PlayerState.TeamPreviewLocked);
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"Invalid choice for TeamPreviewSelect: {choice}");
+                }
+                break;
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchLocked:
             case PlayerState.FaintedLocked:
-                throw new InvalidOperationException($"Player {playerId} is already locked in state: {playerState}");
+                throw new InvalidOperationException(
+                    $"Player {playerId} is already locked in state: {playerState}");
             case PlayerState.Idle:
                 throw new InvalidOperationException("Player cannot submit choice in Idle state.");
             default:
@@ -292,7 +327,6 @@ public class Battle
         {
             ExecutePlayerChoice(playerId, choice);
         }
-        ClearPendingChoices();
     }
 
     private void ExecutePlayerChoice(PlayerId playerId, Choice choice)
@@ -362,9 +396,16 @@ public class Battle
         Player2PendingChoice = null;
     }
 
+    private bool IsReadyForTeamPreviewProcessing()
+    {
+        return Player1State == PlayerState.TeamPreviewLocked &&
+               Player2State == PlayerState.TeamPreviewLocked;
+    }
+
     private bool IsReadyForMoveSwitchProcessing()
     {
-        return Player1State == PlayerState.MoveSwitchLocked && Player2State == PlayerState.MoveSwitchLocked;
+        return Player1State == PlayerState.MoveSwitchLocked &&
+               Player2State == PlayerState.MoveSwitchLocked;
     }
 
     private bool IsReadyForFaintedSelectProcessing()
@@ -472,6 +513,23 @@ public class Battle
             default:
                 throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null);
         }
+    }
+
+    private void PerformTeamPreviewSelect(Choice player1Choice, Choice player2Choice)
+    {
+        if (IsWinner() != PlayerId.None)
+        {
+            throw new InvalidOperationException("Cannot perform team preview select when the battle has already ended.");
+        }
+        if (!player1Choice.IsSelectChoice() || !player2Choice.IsSelectChoice())
+        {
+            throw new ArgumentException("Both choices must be select choices for team preview select.");
+        }
+        Side side1 = GetSide(PlayerId.Player1);
+        Side side2 = GetSide(PlayerId.Player2);
+        // Set the selected Pokémon for each player
+        side1.Team.ActivePokemonIndex = player1Choice.GetSelectIndexFromChoice();
+        side2.Team.ActivePokemonIndex = player2Choice.GetSelectIndexFromChoice();
     }
 
     private void PerformStruggle(PlayerId playerId)
@@ -583,7 +641,8 @@ public class Battle
 
     private Choice[] GetAvailableChoices(Side side)
     {
-        // TODO: Implement logic to determine available choices based on the current state of the battle.
+        // TODO: Implement logic to determine available choices based on the
+        // current state of the battle.
 
         PlayerId playerId = side.PlayerId;
 
@@ -592,7 +651,7 @@ public class Battle
         switch (playerState)
         {
             case PlayerState.TeamPreviewSelect:
-                throw new NotImplementedException();
+                return GetTeamPreviewChoices(side);
             case PlayerState.MoveSwitchSelect:
                 return GetMoveSwitchChoices(side);
             case PlayerState.FaintedSelect:
@@ -603,6 +662,17 @@ public class Battle
             case PlayerState.Idle:
             default: return [];
         }
+    }
+
+    private static Choice[] GetTeamPreviewChoices(Side side)
+    {
+        List<Choice> choices = [];
+        int count = side.Team.PokemonSet.PokemonCount;
+        for (int i = 0; i < count; i++)
+        {
+            choices.Add(i.GetChoiceFromSelectIndex());
+        }
+        return choices.ToArray();
     }
 
     private static Choice[] GetMoveSwitchChoices(Side side)
@@ -652,7 +722,8 @@ public class Battle
     {
         if (!CanPlayerSubmitChoice(playerId))
         {
-            throw new InvalidOperationException($"Player {playerId} cannot submit choice in current state");
+            throw new InvalidOperationException($"Player {playerId} cannot submit choice in" +
+                                                $"current state");
         }
         if (choice == Choice.None)
         {
@@ -672,17 +743,27 @@ public class Battle
             PlayerState.FaintedLocked or
             PlayerState.MoveSwitchLocked)
         {
-            throw new InvalidOperationException($"Player {playerId} cannot submit choice in current state: {playerState}");
+            throw new InvalidOperationException($"Player {playerId} cannot submit choice in" +
+                                                $"current state: {playerState}");
+        }
+        bool isSelectChoice = choice.IsSelectChoice();
+        if (isSelectChoice && playerState != PlayerState.TeamPreviewSelect)
+        {
+            throw new InvalidOperationException($"Player {playerId} cannot submit select choice" +
+                                                $"in current state: {playerState}");
         }
         bool isSwitchChoice = choice.IsSwitchChoice();
-        if (isSwitchChoice && playerState is not (PlayerState.FaintedSelect or PlayerState.MoveSwitchSelect))
+        if (isSwitchChoice && playerState is not
+                (PlayerState.FaintedSelect or PlayerState.MoveSwitchSelect))
         {
-            throw new InvalidOperationException($"Player {playerId} cannot submit switch choice in current state: {playerState}");
+            throw new InvalidOperationException($"Player {playerId} cannot submit switch choice" +
+                                                $"in current state: {playerState}");
         }
         bool isMoveChoice = choice.IsMoveChoice();
         if (isMoveChoice && playerState != PlayerState.MoveSwitchSelect)
         {
-            throw new InvalidOperationException($"Player {playerId} cannot submit move choice in current state: {playerState}");
+            throw new InvalidOperationException($"Player {playerId} cannot submit move choice" +
+                                                $"in current state: {playerState}");
         }
     }
 
