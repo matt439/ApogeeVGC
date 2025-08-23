@@ -401,11 +401,13 @@ public class Battle
         Move move = attacker.Moves[moveIndex];
         Pokemon defender = defSide.Team.ActivePokemon;
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
-        int damage = Damage(attacker, defender, move, isCrit);
+        MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
+            defender.Specie.Types, move.Type);
+        int damage = Damage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
         defender.Damage(damage);
         if (PrintDebug)
         {
-            UiGenerator.PrintMoveAction(attacker, move, damage, defender, isCrit);
+            UiGenerator.PrintMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
         }
     }
 
@@ -462,7 +464,8 @@ public class Battle
     }
 
 
-    private int Damage(Pokemon attacker, Pokemon defender, Move move, bool crit = false)
+    private int Damage(Pokemon attacker, Pokemon defender, Move move,
+        double moveEffectiveness, bool crit = false)
     {
         int level = attacker.Level;
         int attackStat = attacker.GetAttackStat(move);
@@ -472,13 +475,12 @@ public class Battle
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
         bool stab = attacker.IsStab(move);
         double stabModifier = stab ? 1.5 : 1.0;
-        double typeEffectiveness = Library.TypeChart.GetEffectiveness(defender.Specie.Types, move.Type);
 
         int baseDamage = (int)((2 * level / 5.0 + 2) * basePower * attackStat / defenseStat / 50.0 + 2);
         int critMofified = RoundedDownAtHalf(critModifier * baseDamage);
         int randomModified = RoundedDownAtHalf(random * critMofified);
         int stabModified = RoundedDownAtHalf(stabModifier * randomModified);
-        int typeModified = RoundedDownAtHalf(typeEffectiveness * stabModified);
+        int typeModified = RoundedDownAtHalf(moveEffectiveness * stabModified);
         return Math.Max(1, typeModified);
     }
 

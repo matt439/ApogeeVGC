@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Player;
 using System.Globalization;
 using System.Text;
+using ApogeeVGC.Data;
 
 namespace ApogeeVGC.Sim;
 
@@ -47,13 +48,37 @@ public static class UiGenerator
     }
 
     public static void PrintMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender,
-        bool isCrit = false)
+        MoveEffectiveness effectiveness, bool isCrit = false)
     {
         StringBuilder sb = new();
         sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
         if (isCrit)
         {
             sb.AppendLine("Critical hit!");
+        }
+        switch (effectiveness)
+        {
+            case MoveEffectiveness.Normal:
+                sb.AppendLine("It was a normal hit.");
+                break;
+            case MoveEffectiveness.SuperEffective2X:
+                sb.AppendLine("It's super effective!");
+                break;
+            case MoveEffectiveness.SuperEffective4X:
+                sb.AppendLine("It was extremely super effective!");
+                break;
+            case MoveEffectiveness.NotVeryEffective05X:
+                sb.AppendLine("It's not very effective.");
+                break;
+            case MoveEffectiveness.NotVeryEffective025X:
+                sb.AppendLine("It was extremely not very effective.");
+                break;
+            case MoveEffectiveness.Immune:
+                sb.AppendLine("It had no effect.");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(effectiveness),
+                    effectiveness, "Invalid move effectiveness.");
         }
         sb.AppendLine($"It dealt {damage} damage.");
         Console.WriteLine(sb.ToString());

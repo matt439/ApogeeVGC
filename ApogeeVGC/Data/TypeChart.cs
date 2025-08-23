@@ -3,15 +3,33 @@ using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
 
-//public enum MoveEffectiveness
-//{
-//    Normal,
-//    SuperEffective2x,
-//    SuperEffective4x, // For moves that are super effective against two types
-//    NotVeryEffective0_5x,
-//    NotVeryEffective0_25x, // For moves that are not very effective against two types
-//    Immune
-//}
+public enum MoveEffectiveness
+{
+    Normal,
+    SuperEffective2X,
+    SuperEffective4X,
+    NotVeryEffective05X,
+    NotVeryEffective025X,
+    Immune,
+}
+
+public static class MoveEffectivenessTools
+{
+    public static double GetMultiplier(this MoveEffectiveness moveEffectiveness)
+    {
+        return moveEffectiveness switch
+        {
+            MoveEffectiveness.Normal => 1.0,
+            MoveEffectiveness.SuperEffective2X => 2.0,
+            MoveEffectiveness.SuperEffective4X => 4.0,
+            MoveEffectiveness.NotVeryEffective05X => 0.5,
+            MoveEffectiveness.NotVeryEffective025X => 0.25,
+            MoveEffectiveness.Immune => 0.0,
+            _ => throw new ArgumentOutOfRangeException(nameof(moveEffectiveness),
+                "Invalid move effectiveness value.")
+        };
+    }
+}
 
 public record TypeChart
 {
@@ -22,54 +40,96 @@ public record TypeChart
         TypeData = new ReadOnlyDictionary<PokemonType, TypeData>(_typeData);
     }
 
-    public double GetEffectiveness(PokemonType pokemon, MoveType moveType)
+    public MoveEffectiveness GetMoveEffectiveness(PokemonType pokemon, MoveType moveType)
     {
-        MoveEffectiveness moveEffectiveness = _typeData[pokemon].DamageTaken[moveType];
-        return EffectivenessMultiplier(moveEffectiveness);
+        TypeEffectiveness typeEffectiveness =  _typeData[pokemon].DamageTaken[moveType];
+        return typeEffectiveness.ConvertToMoveEffectiveness();
     }
 
-    public double GetEffectiveness(List<PokemonType> pokemon, MoveType moveType)
+    public MoveEffectiveness GetMoveEffectiveness(List<PokemonType> pokemon, MoveType moveType)
     {
-        return pokemon.Aggregate(1.0, (current, type) =>
-            current * EffectivenessMultiplier(_typeData[type].DamageTaken[moveType]));
-    }
-
-    private static double EffectivenessMultiplier(MoveEffectiveness effectiveness)
-    {
-        return effectiveness switch
+        return pokemon.Count switch
         {
-            MoveEffectiveness.SuperEffective => 2.0,
-            MoveEffectiveness.NotVeryEffective => 0.5,
-            MoveEffectiveness.Immune => 0.0,
-            _ => 1.0, // Normal effectiveness
+            0 => throw new ArgumentException("Pokemon type list cannot be empty.", nameof(pokemon)),
+            1 => GetMoveEffectiveness(pokemon[0], moveType),
+            > 2 => throw new ArgumentException("Pokemon type list can only contain up to two types.",
+                nameof(pokemon)),
+            _ => CombineTypeEffectivenesses(_typeData[pokemon[0]].DamageTaken[moveType],
+                _typeData[pokemon[1]].DamageTaken[moveType])
         };
+    }
+
+    private static MoveEffectiveness CombineTypeEffectivenesses(TypeEffectiveness effectiveness1,
+        TypeEffectiveness effectiveness2)
+    {
+        if (effectiveness1 == TypeEffectiveness.Immune ||
+            effectiveness2 == TypeEffectiveness.Immune)
+            return MoveEffectiveness.Immune;
+
+        if (effectiveness1 == TypeEffectiveness.Normal)
+            return effectiveness2.ConvertToMoveEffectiveness();
+
+        if (effectiveness2 == TypeEffectiveness.Normal)
+            return effectiveness1.ConvertToMoveEffectiveness();
+
+        switch (effectiveness1)
+        {
+            case TypeEffectiveness.SuperEffective:
+                switch (effectiveness2)
+                {
+                    case TypeEffectiveness.SuperEffective:
+                        return MoveEffectiveness.SuperEffective4X;
+                    case TypeEffectiveness.NotVeryEffective:
+                        return MoveEffectiveness.Normal;
+                    case TypeEffectiveness.Normal:
+                    case TypeEffectiveness.Immune:
+                    default:
+                        throw new InvalidOperationException("Invalid type effectiveness combination.");
+                }
+            case TypeEffectiveness.NotVeryEffective:
+                switch (effectiveness2)
+                {
+                    case TypeEffectiveness.SuperEffective:
+                        return MoveEffectiveness.Normal;
+                    case TypeEffectiveness.NotVeryEffective:
+                        return MoveEffectiveness.NotVeryEffective025X;
+                    case TypeEffectiveness.Normal:
+                    case TypeEffectiveness.Immune:
+                    default:
+                        throw new InvalidOperationException("Invalid type effectiveness combination.");
+                }
+            case TypeEffectiveness.Normal:
+            case TypeEffectiveness.Immune:
+            default:
+                throw new InvalidOperationException("Invalid type effectiveness combination.");
+        }
     }
 
     private readonly Dictionary<PokemonType, TypeData> _typeData = new()
     {
         [PokemonType.Bug] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fire] = MoveEffectiveness.SuperEffective,
-                [MoveType.Flying] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.SuperEffective,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fire] = TypeEffectiveness.SuperEffective,
+                [MoveType.Flying] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.SuperEffective,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -85,27 +145,27 @@ public record TypeChart
         },
         [PokemonType.Fire] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ice] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.SuperEffective,
-                [MoveType.Steel] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.SuperEffective,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ice] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.SuperEffective,
+                [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.SuperEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -121,27 +181,27 @@ public record TypeChart
         },
         [PokemonType.Water] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -157,27 +217,27 @@ public record TypeChart
         },
         [PokemonType.Electric] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -190,27 +250,27 @@ public record TypeChart
         },
         [PokemonType.Grass] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.SuperEffective,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.SuperEffective,
-                [MoveType.Flying] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ice] = MoveEffectiveness.SuperEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.SuperEffective,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
+                [MoveType.Bug] = TypeEffectiveness.SuperEffective,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.SuperEffective,
+                [MoveType.Flying] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ice] = TypeEffectiveness.SuperEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.SuperEffective,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -225,27 +285,27 @@ public record TypeChart
         },
         [PokemonType.Ice] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fire] = MoveEffectiveness.SuperEffective,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.SuperEffective,
-                [MoveType.Steel] = MoveEffectiveness.SuperEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fire] = TypeEffectiveness.SuperEffective,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.SuperEffective,
+                [MoveType.Steel] = TypeEffectiveness.SuperEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -259,27 +319,27 @@ public record TypeChart
         },
         [PokemonType.Fighting] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.SuperEffective,
-                [MoveType.Rock] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.SuperEffective,
+                [MoveType.Rock] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -296,27 +356,27 @@ public record TypeChart
         },
         [PokemonType.Poison] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fighting] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Psychic] = MoveEffectiveness.SuperEffective,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fighting] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Psychic] = TypeEffectiveness.SuperEffective,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -332,27 +392,27 @@ public record TypeChart
         },
         [PokemonType.Ground] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Immune,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.SuperEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.SuperEffective,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Immune,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.SuperEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.SuperEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -366,27 +426,27 @@ public record TypeChart
         },
         [PokemonType.Flying] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.Immune,
-                [MoveType.Ice] = MoveEffectiveness.SuperEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.SuperEffective,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.Immune,
+                [MoveType.Ice] = TypeEffectiveness.SuperEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.SuperEffective,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -404,27 +464,27 @@ public record TypeChart
         },
         [PokemonType.Psychic] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.SuperEffective,
-                [MoveType.Dark] = MoveEffectiveness.SuperEffective,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.SuperEffective,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.SuperEffective,
+                [MoveType.Dark] = TypeEffectiveness.SuperEffective,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.SuperEffective,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -438,27 +498,27 @@ public record TypeChart
         },
         [PokemonType.Rock] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fire] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Flying] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ground] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Poison] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.SuperEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.SuperEffective,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fire] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Flying] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ground] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Poison] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.SuperEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.SuperEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -474,27 +534,27 @@ public record TypeChart
         },
         [PokemonType.Ghost] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.SuperEffective,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Immune,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.SuperEffective,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Immune,
-                [MoveType.Poison] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.SuperEffective,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Immune,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.SuperEffective,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Immune,
+                [MoveType.Poison] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -509,27 +569,27 @@ public record TypeChart
         },
         [PokemonType.Dragon] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.SuperEffective,
-                [MoveType.Electric] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fairy] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.SuperEffective,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.NotVeryEffective,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.SuperEffective,
+                [MoveType.Electric] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fairy] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.SuperEffective,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.NotVeryEffective,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -542,53 +602,53 @@ public record TypeChart
         },
         [PokemonType.Dark] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.SuperEffective,
-                [MoveType.Dark] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fighting] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Immune,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.SuperEffective,
+                [MoveType.Dark] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fighting] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Immune,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>(),
         },
         [PokemonType.Steel] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fighting] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fire] = MoveEffectiveness.SuperEffective,
-                [MoveType.Flying] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Ground] = MoveEffectiveness.SuperEffective,
-                [MoveType.Ice] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Normal] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Poison] = MoveEffectiveness.Immune,
-                [MoveType.Psychic] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Rock] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Steel] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fighting] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fire] = TypeEffectiveness.SuperEffective,
+                [MoveType.Flying] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Ground] = TypeEffectiveness.SuperEffective,
+                [MoveType.Ice] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Normal] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Poison] = TypeEffectiveness.Immune,
+                [MoveType.Psychic] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Rock] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Steel] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             HpIvs = new Dictionary<StatId, int>
             {
@@ -601,77 +661,77 @@ public record TypeChart
         },
         [PokemonType.Fairy] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dark] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Dragon] = MoveEffectiveness.Immune,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.NotVeryEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.SuperEffective,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.SuperEffective,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dark] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Dragon] = TypeEffectiveness.Immune,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.NotVeryEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.SuperEffective,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.SuperEffective,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
         },
         [PokemonType.Normal] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.SuperEffective,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Immune,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.SuperEffective,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Immune,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
         },
         [PokemonType.Unknown] = new TypeData
         {
-            DamageTaken = new Dictionary<MoveType, MoveEffectiveness>
+            DamageTaken = new Dictionary<MoveType, TypeEffectiveness>
             {
-                [MoveType.Bug] = MoveEffectiveness.Normal,
-                [MoveType.Dark] = MoveEffectiveness.Normal,
-                [MoveType.Dragon] = MoveEffectiveness.Normal,
-                [MoveType.Electric] = MoveEffectiveness.Normal,
-                [MoveType.Fairy] = MoveEffectiveness.Normal,
-                [MoveType.Fighting] = MoveEffectiveness.Normal,
-                [MoveType.Fire] = MoveEffectiveness.Normal,
-                [MoveType.Flying] = MoveEffectiveness.Normal,
-                [MoveType.Ghost] = MoveEffectiveness.Normal,
-                [MoveType.Grass] = MoveEffectiveness.Normal,
-                [MoveType.Ground] = MoveEffectiveness.Normal,
-                [MoveType.Ice] = MoveEffectiveness.Normal,
-                [MoveType.Normal] = MoveEffectiveness.Normal,
-                [MoveType.Poison] = MoveEffectiveness.Normal,
-                [MoveType.Psychic] = MoveEffectiveness.Normal,
-                [MoveType.Rock] = MoveEffectiveness.Normal,
-                [MoveType.Steel] = MoveEffectiveness.Normal,
-                [MoveType.Stellar] = MoveEffectiveness.Normal,
-                [MoveType.Water] = MoveEffectiveness.Normal,
+                [MoveType.Bug] = TypeEffectiveness.Normal,
+                [MoveType.Dark] = TypeEffectiveness.Normal,
+                [MoveType.Dragon] = TypeEffectiveness.Normal,
+                [MoveType.Electric] = TypeEffectiveness.Normal,
+                [MoveType.Fairy] = TypeEffectiveness.Normal,
+                [MoveType.Fighting] = TypeEffectiveness.Normal,
+                [MoveType.Fire] = TypeEffectiveness.Normal,
+                [MoveType.Flying] = TypeEffectiveness.Normal,
+                [MoveType.Ghost] = TypeEffectiveness.Normal,
+                [MoveType.Grass] = TypeEffectiveness.Normal,
+                [MoveType.Ground] = TypeEffectiveness.Normal,
+                [MoveType.Ice] = TypeEffectiveness.Normal,
+                [MoveType.Normal] = TypeEffectiveness.Normal,
+                [MoveType.Poison] = TypeEffectiveness.Normal,
+                [MoveType.Psychic] = TypeEffectiveness.Normal,
+                [MoveType.Rock] = TypeEffectiveness.Normal,
+                [MoveType.Steel] = TypeEffectiveness.Normal,
+                [MoveType.Stellar] = TypeEffectiveness.Normal,
+                [MoveType.Water] = TypeEffectiveness.Normal,
             },
             IsNonstandard = Nonstandard.Past,
         },

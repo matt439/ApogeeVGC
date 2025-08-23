@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim;
+﻿using ApogeeVGC.Data;
+
+namespace ApogeeVGC.Sim;
 
 public enum PokemonType
 {
@@ -183,8 +185,7 @@ public static class StatIdTools
     }
 }
 
-
-public enum MoveEffectiveness
+public enum TypeEffectiveness
 {
     Normal,
     SuperEffective,
@@ -192,9 +193,24 @@ public enum MoveEffectiveness
     Immune,
 }
 
+public static class TypeEffectivenessTools
+{
+    public static MoveEffectiveness ConvertToMoveEffectiveness(this TypeEffectiveness effectiveness)
+    {
+        return effectiveness switch
+        {
+            TypeEffectiveness.Normal => MoveEffectiveness.Normal,
+            TypeEffectiveness.SuperEffective => MoveEffectiveness.SuperEffective2X,
+            TypeEffectiveness.NotVeryEffective => MoveEffectiveness.NotVeryEffective05X,
+            TypeEffectiveness.Immune => MoveEffectiveness.Immune,
+            _ => throw new ArgumentException("Invalid type effectiveness value.", nameof(effectiveness))
+        };
+    }
+}
+
 public record TypeData
 {
-    public required IReadOnlyDictionary<MoveType, MoveEffectiveness> DamageTaken { get; init; }
+    public required IReadOnlyDictionary<MoveType, TypeEffectiveness> DamageTaken { get; init; }
     public IReadOnlyDictionary<StatId, int>? HpDvs { get; init; }
     public IReadOnlyDictionary<StatId, int>? HpIvs { get; init; }
     public Nonstandard? IsNonstandard { get; init; }
