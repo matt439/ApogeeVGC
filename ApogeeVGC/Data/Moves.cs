@@ -47,6 +47,26 @@ public record Moves
             Type = MoveType.Grass,
         },
 
+        // Struggle
+        [MoveId.Struggle] = new Move
+        {
+            Num = 10000,
+            Accuracy = 100,
+            BasePower = 50,
+            Category = MoveCategory.Physical,
+            Name = "Struggle",
+            BasePp = 1,
+            Priority = 0,
+            Flags = new MoveFlags()
+            {
+                Protect = true,
+                Mirror = true,
+                Metronome = true,
+            },
+            Target = MoveTarget.Normal,
+            Type = MoveType.Normal,
+        },
+
         // Custom moves
         [MoveId.NormalBasic] = new Move
         {

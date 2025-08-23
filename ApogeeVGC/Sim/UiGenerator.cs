@@ -84,6 +84,16 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintStruggleAction(Pokemon attacker, int damage,
+        int recoil, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used Struggle on {defender.Name}.");
+        sb.AppendLine("It dealt " + damage + " damage.");
+        sb.AppendLine(attacker.Name + " took " + recoil + " recoil damage.");
+        Console.WriteLine(sb.ToString());
+    }
+
     public static void PrintSwitchAction(string trainerName, Pokemon switchedOut, Pokemon switchedIn)
     {
         StringBuilder sb = new();
@@ -121,6 +131,10 @@ public static class UiGenerator
         if (choice.IsSwitchChoice())
         {
             return GenerateSwitchChoiceString(battle, perspective, choice);
+        }
+        if (choice == Choice.Struggle)
+        {
+            return GenerateStruggleChoiceString();
         }
         throw new ArgumentException("Invalid choice type.", nameof(choice));
     }
@@ -166,6 +180,11 @@ public static class UiGenerator
         sb.Append($"Switch: ");
         sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
         return sb.ToString();
+    }
+
+    private static string GenerateStruggleChoiceString()
+    {
+        return "Struggle";
     }
 
     private const string LevelSpacer = "     ";

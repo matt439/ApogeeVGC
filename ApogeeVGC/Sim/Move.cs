@@ -26,6 +26,8 @@ public enum MoveId
     LowKick,
     WildCharge,
 
+    Struggle,
+
     // Custom moves
     NormalBasic,
     FireBasic,

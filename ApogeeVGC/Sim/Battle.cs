@@ -245,7 +245,8 @@ public class Battle
         switch (playerState)
         {
             case PlayerState.MoveSwitchSelect:
-                if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice())
+                if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice() ||
+                    choice == Choice.Struggle)
                 {
                     SetPlayerState(playerId, PlayerState.MoveSwitchLocked);
                 }
@@ -319,6 +320,15 @@ public class Battle
             PerformSwitch(playerId, choice);
             SetPendingChoice(playerId, null);
             SetPlayerState(playerId, PlayerState.Idle);
+        }
+        else if (choice == Choice.Struggle)
+        {
+            PerformStruggle(playerId);
+            SetPendingChoice(playerId, null);
+            SetPlayerState(playerId, PlayerState.Idle);
+
+            // Update player states for any fainted Pokemon
+            UpdateFaintedStates();
         }
         else
         {
@@ -439,21 +449,57 @@ public class Battle
         switch (playerState)
         {
             case PlayerState.MoveSwitchLocked:
-                UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
-                    side.Team.ActivePokemon);
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
+                        side.Team.ActivePokemon);
+                }
                 break;
             case PlayerState.FaintedLocked:
-                UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name,
-                    side.Team.ActivePokemon);
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name,
+                        side.Team.ActivePokemon);
+                }
                 break;
             case PlayerState.TeamPreviewSelect:
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchSelect:
             case PlayerState.FaintedSelect:
             case PlayerState.Idle:
-                throw new InvalidOperationException($"Player {playerId} cannot switch Pokémon in current state: {playerState}");
+                throw new InvalidOperationException($"Player {playerId} cannot switch Pokémon" +
+                                                    $"in current state: {playerState}");
             default:
                 throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null);
+        }
+    }
+
+    private void PerformStruggle(PlayerId playerId)
+    {
+        Side atkSide = GetSide(playerId);
+        Side defSide = GetSide(playerId.OpposingPlayerId());
+
+        Pokemon attacker = atkSide.Team.ActivePokemon;
+
+        if (!Library.Moves.TryGetValue(MoveId.Struggle, out Move? move))
+        {
+            throw new InvalidOperationException($"Struggle move not found in" +
+                                                $"library for player {playerId}");
+        }
+
+        Pokemon defender = defSide.Team.ActivePokemon;
+        int damage = Damage(attacker, defender, move, 1.0);
+        defender.Damage(damage);
+
+        // Struggle always deals recoil damage to the attacker
+        // The recoil is 1/4 of the damage dealt, rounded down at half
+        // but at least 1 damage
+        int recoil = Math.Max(RoundedDownAtHalf(damage / 4.0), 1);
+        attacker.Damage(recoil);
+
+        if (PrintDebug)
+        {
+            UiGenerator.PrintStruggleAction(attacker, damage, recoil, defender);
         }
     }
 
@@ -576,6 +622,12 @@ public class Battle
             // torment, assault vest, etc.
         }
 
+        if (choices.Length == 0)
+        {
+            // If no moves are available, Stuggle is the only option
+            choices = choices.Append(Choice.Struggle).ToArray();
+        }
+
         var switchChoices = GetSwitchChoices(side);
         if (switchChoices.Length > 0)
         {
@@ -583,7 +635,6 @@ public class Battle
         }
 
         return choices;
-
     }
 
     private static Choice[] GetSwitchChoices(Side side)

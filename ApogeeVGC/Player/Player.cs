@@ -38,6 +38,8 @@ public enum Choice
     TargetSide1,
     TargetSide2,
 
+    Struggle,
+
     Quit,
     None,
     Invalid,
@@ -92,7 +94,7 @@ public static class ChoiceTools
 
     public static bool IsMoveChoice(this Choice choice)
     {
-        return choice is >= Choice.Move1 and <= Choice.Move4;
+        return choice is Choice.Move1 or Choice.Move2 or Choice.Move3 or Choice.Move4;
     }
 
     public static Choice GetChoiceFromSwitchIndex(this int index)
