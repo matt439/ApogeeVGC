@@ -1,4 +1,5 @@
 using System.Text;
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim;
 using ApogeeVGC.Player;
 
@@ -8,6 +9,7 @@ public class PokemonMonteCarloTreeSearch(
     int maxIterations,
     double explorationParameter,
     PlayerId mctsPlayerId,
+    Library library,
     int? seed = null,
     int? maxDegreeOfParallelism = null)
 {
@@ -181,9 +183,11 @@ public class PokemonMonteCarloTreeSearch(
     private SimulatorResult Simulation(Battle battle, Random threadRandom)
     {
         // Random playout using random players with thread-local random seeds
-        var randomPlayer1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+        var randomPlayer1 = new PlayerRandom(PlayerId.Player1, battle, library,
+            PlayerRandomStrategy.AllChoices,
             threadRandom.Next());
-        var randomPlayer2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+        var randomPlayer2 = new PlayerRandom(PlayerId.Player2, battle, library,
+            PlayerRandomStrategy.AllChoices,
             threadRandom.Next());
         
         var simulator = new Simulator

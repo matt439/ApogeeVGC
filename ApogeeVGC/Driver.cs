@@ -24,8 +24,8 @@ public class Driver
 
     private const int RandomEvaluationNumTest = 100000;
 
-    private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 125;
+    private const int MctsEvaluationNumTest = 1000;
+    private const int MctsMaxIterations = 5;
     private const double MctsExplorationParameter = 1.4142; // Square root of 2
 
     private const int NumThreads = 16;
@@ -70,8 +70,8 @@ public class Driver
         {
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
-            Player2 = new PlayerMcts(PlayerId.Player2, battle, MctsMaxIterations, MctsExplorationParameter,
-                PlayerRandom2Seed, NumThreads)
+            Player2 = new PlayerMcts(PlayerId.Player2, battle, MctsMaxIterations,
+                MctsExplorationParameter, Library, PlayerRandom2Seed, NumThreads)
         };
         Simulator.Run();
         Console.WriteLine("Press any key to exit...");
@@ -84,9 +84,10 @@ public class Driver
         Simulator = new Simulator
         {
             Battle = battle,
-            Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations, MctsExplorationParameter,
-                PlayerRandom1Seed, NumThreads),
-            Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+            Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
+                MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads),
+            Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                PlayerRandomStrategy.AllChoices,
                 PlayerRandom2Seed),
         };
         SimulatorResult result = Simulator.Run();
@@ -116,9 +117,10 @@ public class Driver
             var simulator = new Simulator
             {
                 Battle = battle,
-                Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations, MctsExplorationParameter,
-                    player1Seed, NumThreads),
-                Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+                Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
+                    MctsExplorationParameter, Library, player1Seed, NumThreads),
+                Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                    PlayerRandomStrategy.AllChoices,
                     player2Seed),
             };
             simResults.Add(simulator.Run());
@@ -180,9 +182,11 @@ public class Driver
             var simulator = new Simulator
             {
                 Battle = battle,
-                Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+                Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
+                    PlayerRandomStrategy.AllChoices,
                     player1Seed),
-                Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+                Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                    PlayerRandomStrategy.AllChoices,
                     player2Seed),
             };
             simResults.Add(simulator.Run());
@@ -227,9 +231,11 @@ public class Driver
         Simulator = new Simulator
         {
             Battle = battle,
-            Player1 = new PlayerRandom(PlayerId.Player1, battle, PlayerRandomStrategy.AllChoices,
+            Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
+                PlayerRandomStrategy.AllChoices,
                 PlayerRandom1Seed),
-            Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.AllChoices,
+            Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                PlayerRandomStrategy.AllChoices,
                 PlayerRandom2Seed),
         };
         SimulatorResult result = Simulator.Run();
@@ -253,7 +259,8 @@ public class Driver
         {
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
-            Player2 = new PlayerRandom(PlayerId.Player2, battle, PlayerRandomStrategy.MoveChoices,
+            Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                PlayerRandomStrategy.MoveChoices,
                 PlayerRandom2Seed),
         };
 

@@ -296,7 +296,7 @@ public class Pokemon
         // Create a new Pokemon with the same base data
         Pokemon copy = new(Specie, Evs, Ivs, Nature, Level)
         {
-            Moves = Moves,        // Immutable, safe to share
+            Moves = Moves.Select(m => m.Copy()).ToArray(), // Deep copy of moves
             Item = Item,          // Immutable, safe to share
             Ability = Ability,    // Immutable, safe to share
             Name = Name,
@@ -312,6 +312,15 @@ public class Pokemon
         {
             copy.Damage(hpDifference);
         }
+
+        // Copy stat modifiers
+        copy.StatModifiers.Atk = StatModifiers.Atk;
+        copy.StatModifiers.Def = StatModifiers.Def;
+        copy.StatModifiers.SpA = StatModifiers.SpA;
+        copy.StatModifiers.SpD = StatModifiers.SpD;
+        copy.StatModifiers.Spe = StatModifiers.Spe;
+        copy.StatModifiers.Accuracy = StatModifiers.Accuracy;
+        copy.StatModifiers.Evasion = StatModifiers.Evasion;
 
         // TODO: When status effects, stat boosts, etc. are implemented,
         // they will need to be copied here as well

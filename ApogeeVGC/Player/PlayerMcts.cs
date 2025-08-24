@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim;
 using ApogeeVGC.Mcts;
 
 namespace ApogeeVGC.Player;
@@ -11,7 +12,7 @@ public class PlayerMcts : IPlayer
     private readonly PokemonMonteCarloTreeSearch _mcts;
 
     public PlayerMcts(PlayerId playerId, Battle battle, int maxIterations, double explorationParameter,
-        int? seed = null, int? maxDegreeOfParallelism = null)
+        Library library, int? seed = null, int? maxDegreeOfParallelism = null)
     {
         PlayerId = playerId;
         Battle = battle;
@@ -26,8 +27,8 @@ public class PlayerMcts : IPlayer
                 "Exploration parameter must be 0 or greater.");
         }
         _seed = seed ?? Environment.TickCount;
-        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, _seed,
-            maxDegreeOfParallelism);
+        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, library,
+            _seed, maxDegreeOfParallelism);
     }
 
     public Choice GetNextChoice(Choice[] availableChoices)
@@ -43,15 +44,12 @@ public class PlayerMcts : IPlayer
                 try
                 {
                     // Use MCTS to find the best choice
-                    var result = _mcts.FindBestChoice(Battle, availableChoices);
+                    PokemonMonteCarloTreeSearch.MoveResult result =
+                        _mcts.FindBestChoice(Battle, availableChoices);
             
-                    if (result.OptimalChoice != Choice.Invalid)
-                    {
-                        return result.OptimalChoice;
-                    }
-            
-                    // Fallback to first available choice if MCTS fails
-                    return availableChoices[0];
+                    return result.OptimalChoice != Choice.Invalid ? result.OptimalChoice :
+                        // Fallback to first available choice if MCTS fails
+                        availableChoices[0];
                 }
                 catch (Exception ex)
                 {
