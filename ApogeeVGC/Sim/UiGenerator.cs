@@ -148,6 +148,14 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintMoveMissAction(Pokemon attacker, Move move, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
+        sb.AppendLine("But it missed!");
+        Console.WriteLine(sb.ToString());
+    }
+
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
         if (choice.IsSelectChoice())

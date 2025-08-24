@@ -172,9 +172,9 @@ public record Move
         get;
         init
         {
-            if (value is < 0 or > 100)
+            if (value is < 1 or > 100)
             {
-                throw new ArgumentOutOfRangeException(nameof(Accuracy), "Accuracy must be between 0 and 100.");
+                throw new ArgumentOutOfRangeException(nameof(Accuracy), "Accuracy must be between 1 and 100.");
             }
             field = value;
         }

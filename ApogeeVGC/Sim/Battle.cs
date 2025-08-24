@@ -458,6 +458,16 @@ public class Battle
         move.UsedPp++;  // Decrease PP for the move used
 
         Pokemon defender = defSide.Team.ActivePokemon;
+
+        if (IsMoveMiss(attacker, move, defender))
+        {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintMoveMissAction(attacker, move, defender);
+            }
+            return;
+        }
+
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
             defender.Specie.Types, move.Type);
@@ -467,6 +477,27 @@ public class Battle
         {
             UiGenerator.PrintMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
         }
+    }
+
+    private bool IsMoveMiss(Pokemon attacker, Move move, Pokemon defender)
+    {
+        // get move accuracy
+        int moveAccuracy = move.Accuracy;
+
+        // get attacker accuracy stage
+        double attackerAccuracyStage = attacker.StatModifiers.AccuracyMultiplier;
+
+        // get defender evasion stage
+        double defenderEvasionStage = defender.StatModifiers.EvasionMultiplier;
+
+        // Calculate modified accuracy
+        double modifiedAccuracy = moveAccuracy * attackerAccuracyStage * defenderEvasionStage;
+
+        // generate random between 1 and 100
+        int roll = BattleRandom.Next(1, 101);
+
+        // move hits if roll is less than or equal to modified accuracy
+        return !(roll <= modifiedAccuracy);
     }
 
     private void PerformSwitch(PlayerId playerId, Choice choice)
