@@ -169,6 +169,7 @@ public record SpeciesAbility
 
 public record Specie : IEffect
 {
+    public required SpecieId Id { get; init; }
     public EffectType EffectType => EffectType.Specie;
     public int Num { get; init; }
     public string Name { get; init; } = string.Empty;

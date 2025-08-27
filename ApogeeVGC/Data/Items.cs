@@ -16,6 +16,7 @@ public record Items
     {
         [ItemId.Leftovers] = new Item
         {
+            Id = ItemId.Leftovers,
             Name = "Leftovers",
             Num = 234,
             Fling = new FlingData { BasePower = 10 },
@@ -26,6 +27,7 @@ public record Items
         },
         [ItemId.ChoiceSpecs] = new Item
         {
+            Id = ItemId.ChoiceSpecs,
             Name = "Choice Specs",
             SpriteNum = 70,
             Fling = new FlingData { BasePower = 10 },
@@ -34,6 +36,7 @@ public record Items
         },
         [ItemId.FlameOrb] = new Item
         {
+            Id = ItemId.FlameOrb,
             Name = "Flame Orb",
             SpriteNum = 145,
             Fling = new FlingData
@@ -46,6 +49,7 @@ public record Items
         },
         [ItemId.RockyHelmet] = new Item
         {
+            Id = ItemId.RockyHelmet,
             Name = "Rocky Helmet",
             SpriteNum = 417,
             Fling = new FlingData { BasePower = 60 },
@@ -54,6 +58,7 @@ public record Items
         },
         [ItemId.LightClay] = new Item
         {
+            Id = ItemId.LightClay,
             Name = "Light Clay",
             SpriteNum = 252,
             Fling = new FlingData { BasePower = 30 },
@@ -62,6 +67,7 @@ public record Items
         },
         [ItemId.AssaultVest] = new Item
         {
+            Id = ItemId.AssaultVest,
             Name = "Assault Vest",
             SpriteNum = 581,
             Fling = new FlingData { BasePower = 80 },

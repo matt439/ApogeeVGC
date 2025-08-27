@@ -16,6 +16,7 @@ public record Species
     {
         [SpecieId.CalyrexIce] = new Specie
         {
+            Id = SpecieId.CalyrexIce,
             Num = 898,
             Name = "Calyrex-Ice",
             BaseSpecies = "Calyrex",
@@ -38,6 +39,7 @@ public record Species
         },
         [SpecieId.Miraidon] = new Specie
         {
+            Id = SpecieId.Miraidon,
             Num = 1008,
             Name = "Miraidon",
             Types = [PokemonType.Electric, PokemonType.Dragon],
@@ -58,6 +60,7 @@ public record Species
         },
         [SpecieId.Ursaluna] = new Specie
         {
+            Id = SpecieId.Ursaluna,
             Num = 901,
             Name = "Ursaluna",
             Types = [PokemonType.Ground, PokemonType.Normal],
@@ -83,6 +86,7 @@ public record Species
         },
         [SpecieId.Volcarona] = new Specie
         {
+            Id = SpecieId.Volcarona,
             Num = 637,
             Name = "Volcarona",
             Types = [PokemonType.Bug, PokemonType.Fire],
@@ -107,6 +111,7 @@ public record Species
         },
         [SpecieId.Grimmsnarl] = new Specie
         {
+            Id = SpecieId.Grimmsnarl,
             Num = 861,
             Name = "Grimmsnarl",
             Types = [PokemonType.Dark, PokemonType.Fairy],
@@ -132,6 +137,7 @@ public record Species
         },
         [SpecieId.IronHands] = new Specie
         {
+            Id = SpecieId.IronHands,
             Num = 992,
             Name = "Iron Hands",
             Types = [PokemonType.Fighting, PokemonType.Electric],

@@ -31,6 +31,7 @@ public enum NatureType
 
 public record Nature
 {
+    public required NatureType Type { get; init; }
     public StatIdExceptHp? Plus { get; init; }
     public StatIdExceptHp? Minus { get; init; }
 

@@ -155,6 +155,7 @@ public enum MoveTarget
 public record Move : IEffect
 {
     public EffectType EffectType => EffectType.Move;
+    public required MoveId Id { get; init; }
     public required int Num
     {
         get;

@@ -18,6 +18,7 @@ public record FlingData
 
 public record Item : IEffect
 {
+    public required ItemId Id { get; init; }
     public EffectType EffectType => EffectType.Item;
     public string Name { get; init; } = string.Empty;
     public int SpriteNum { get; init; }

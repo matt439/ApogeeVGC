@@ -42,6 +42,7 @@ public static class TierTools
 
 public record SpeciesFormat
 {
+    public required SpecieId Id { get; init; }
     public Tier? DoublesTier
     {
         get;

@@ -21,6 +21,7 @@ public record Moves
         {
             [MoveId.GlacialLance] = new()
             {
+                Id = MoveId.GlacialLance,
                 Num = 824,
                 Accuracy = 100,
                 BasePower = 120,
@@ -34,6 +35,7 @@ public record Moves
             },
             [MoveId.LeechSeed] = new()
             {
+                Id = MoveId.LeechSeed,
                 Num = 73,
                 Accuracy = 90,
                 BasePower = 0,
@@ -55,6 +57,7 @@ public record Moves
             },
             [MoveId.TrickRoom] = new()
             {
+                Id = MoveId.TrickRoom,
                 Num = 433,
                 Accuracy = 100,
                 AlwaysHit = true,
@@ -74,6 +77,7 @@ public record Moves
             },
             [MoveId.Protect] = new()
             {
+                Id = MoveId.Protect,
                 Num = 182,
                 Accuracy = 100,
                 AlwaysHit = true,
@@ -106,6 +110,7 @@ public record Moves
             // Struggle
             [MoveId.Struggle] = new()
             {
+                Id = MoveId.Struggle,
                 Num = 10000,
                 Accuracy = 100,
                 BasePower = 50,
@@ -126,6 +131,7 @@ public record Moves
             // Custom moves
             [MoveId.NormalBasic] = new Move
             {
+                Id = MoveId.NormalBasic,
                 Num = 10001,
                 Accuracy = 90,
                 BasePower = 70,
@@ -138,6 +144,7 @@ public record Moves
             },
             [MoveId.IceBasic] = new Move
             {
+                Id = MoveId.IceBasic,
                 Num = 10002,
                 Accuracy = 90,
                 BasePower = 70,
@@ -150,6 +157,7 @@ public record Moves
             },
             [MoveId.DragonBasic] = new Move
             {
+                Id = MoveId.DragonBasic,
                 Num = 10003,
                 Accuracy = 90,
                 BasePower = 70,
@@ -162,6 +170,7 @@ public record Moves
             },
             [MoveId.FireBasic] = new Move
             {
+                Id = MoveId.FireBasic,
                 Num = 10004,
                 Accuracy = 90,
                 BasePower = 70,
@@ -174,6 +183,7 @@ public record Moves
             },
             [MoveId.BugBasic] = new Move
             {
+                Id = MoveId.BugBasic,
                 Num = 10005,
                 Accuracy = 90,
                 BasePower = 70,
@@ -186,6 +196,7 @@ public record Moves
             },
             [MoveId.FairyBasic] = new Move
             {
+                Id = MoveId.FairyBasic,
                 Num = 10006,
                 Accuracy = 90,
                 BasePower = 70,
@@ -198,6 +209,7 @@ public record Moves
             },
             [MoveId.GroundBasic] = new Move
             {
+                Id = MoveId.GroundBasic,
                 Num = 10007,
                 Accuracy = 90,
                 BasePower = 70,
@@ -210,6 +222,7 @@ public record Moves
             },
             [MoveId.FightingBasic] = new Move
             {
+                Id = MoveId.FightingBasic,
                 Num = 10008,
                 Accuracy = 90,
                 BasePower = 70,
@@ -222,6 +235,7 @@ public record Moves
             },
             [MoveId.SteelBasic] = new Move
             {
+                Id = MoveId.SteelBasic,
                 Num = 10009,
                 Accuracy = 90,
                 BasePower = 70,
@@ -234,6 +248,7 @@ public record Moves
             },
             [MoveId.DarkBasic] = new Move
             {
+                Id = MoveId.DarkBasic,
                 Num = 10010,
                 Accuracy = 90,
                 BasePower = 70,
@@ -246,6 +261,7 @@ public record Moves
             },
             [MoveId.ElectricBasic] = new Move
             {
+                Id = MoveId.ElectricBasic,
                 Num = 10011,
                 Accuracy = 90,
                 BasePower = 70,
@@ -258,6 +274,7 @@ public record Moves
             },
             [MoveId.GrassBasic] = new Move
             {
+                Id = MoveId.GrassBasic,
                 Num = 10012,
                 Accuracy = 90,
                 BasePower = 70,
@@ -270,6 +287,7 @@ public record Moves
             },
             [MoveId.PsychicBasic] = new Move
             {
+                Id = MoveId.PsychicBasic,
                 Num = 10013,
                 Accuracy = 90,
                 BasePower = 70,
@@ -282,6 +300,7 @@ public record Moves
             },
             [MoveId.PoisonBasic] = new Move
             {
+                Id = MoveId.PoisonBasic,
                 Num = 10014,
                 Accuracy = 90,
                 BasePower = 70,
@@ -294,6 +313,7 @@ public record Moves
             },
             [MoveId.FlyingBasic] = new Move
             {
+                Id = MoveId.FlyingBasic,
                 Num = 10015,
                 Accuracy = 90,
                 BasePower = 70,
@@ -306,6 +326,7 @@ public record Moves
             },
             [MoveId.RockBasic] = new Move
             {
+                Id = MoveId.RockBasic,
                 Num = 10016,
                 Accuracy = 90,
                 BasePower = 70,
@@ -318,6 +339,7 @@ public record Moves
             },
             [MoveId.WaterBasic] = new Move
             {
+                Id = MoveId.WaterBasic,
                 Num = 10017,
                 Accuracy = 90,
                 BasePower = 70,
@@ -330,6 +352,7 @@ public record Moves
             },
             [MoveId.GhostBasic] = new Move
             {
+                Id = MoveId.GhostBasic,
                 Num = 10018,
                 Accuracy = 90,
                 BasePower = 70,
