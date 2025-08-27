@@ -8,35 +8,36 @@ public enum AbilityId
     FlameBody,
     Prankster,
     QuarkDrive,
+
+    Persistent,
 }
 
 public record Ability : IEffect
 {
     public EffectType EffectType => EffectType.Ability;
+    public required AbilityId Id { get; init; }
 
-    private double _rating;
     /// <summary>
     /// Rating from -1 Detrimental to +5 Essential
     /// </summary>
     public double Rating
     {
-        get => _rating;
+        get;
         init
         {
             if (value is < -1.0 or > 5.0)
                 throw new ArgumentOutOfRangeException(nameof(value), "Rating must be between -1 and 5.");
-            _rating = value;
+            field = value;
         }
     }
 
     public string Fullname => $"ability: {Name}";
 
-    private int _gen;
     public int Gen
     {
         get
         {
-            if (_gen is >= 1 and <= 9) return _gen;
+            if (field is >= 1 and <= 9) return field;
             return Num switch
             {
                 >= 268 => 9,
@@ -46,10 +47,10 @@ public record Ability : IEffect
                 >= 124 => 5,
                 >= 77 => 4,
                 >= 1 => 3,
-                _ => _gen
+                _ => field
             };
         }
-        init => _gen = value;
+        init;
     }
 
     public string Name { get; init; } = string.Empty;

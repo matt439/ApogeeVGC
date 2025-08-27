@@ -188,6 +188,21 @@ public static class UiGenerator
         Console.WriteLine($"{target.Name} is hurt by Leech Seed! {source.Name} restored {damage} HP.");
     }
 
+    public static void PrintTrickRoomStart()
+    {
+        Console.WriteLine("The battlefield is twisted by Trick Room!");
+    }
+
+    public static void PrintTrickRoomRestart()
+    {
+        Console.WriteLine("The twisted dimensions returned to normal");
+    }
+
+    public static void PrintTrickRoomEnd()
+    {
+        Console.WriteLine("The effects of Trick Room wore off.");
+    }
+
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
         if (choice.IsSelectChoice())

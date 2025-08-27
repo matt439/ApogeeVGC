@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics.Metrics;
 using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
@@ -16,6 +17,7 @@ public record Conditions
     {
         [ConditionId.Burn] = new Condition
         {
+            Id = ConditionId.Burn,
             Name = "Burn",
             ConditionEffectType = ConditionEffectType.Status,
             OnStart = (target, source, sourceEffect) =>
@@ -58,16 +60,49 @@ public record Conditions
                 UiGenerator.PrintBurnDamage(target);
             }
         },
-        [ConditionId.Paralysis] = new Condition { Name = "Paralysis" },
-        [ConditionId.Sleep] = new Condition { Name = "Sleep" },
-        [ConditionId.Freeze] = new Condition { Name = "Freeze" },
-        [ConditionId.Poison] = new Condition { Name = "Poison" },
-        [ConditionId.Toxic] = new Condition { Name = "Toxic Poison" },
-        [ConditionId.Confusion] = new Condition { Name = "Confusion" },
-        [ConditionId.Flinch] = new Condition { Name = "Flinch" },
-        [ConditionId.ChoiceLock] = new Condition { Name = "Choice Lock" },
+        [ConditionId.Paralysis] = new Condition
+        {
+            Id = ConditionId.Paralysis,
+            Name = "Paralysis"
+        },
+        [ConditionId.Sleep] = new Condition
+        {
+            Id = ConditionId.Sleep,
+            Name = "Sleep"
+        },
+        [ConditionId.Freeze] = new Condition
+        {
+            Id = ConditionId.Freeze,
+            Name = "Freeze"
+        },
+        [ConditionId.Poison] = new Condition
+        {
+            Id = ConditionId.Poison,
+            Name = "Poison"
+        },
+        [ConditionId.Toxic] = new Condition
+        {
+            Id = ConditionId.Toxic,
+            Name = "Toxic"
+        },
+        [ConditionId.Confusion] = new Condition
+        {
+            Id = ConditionId.Confusion,
+            Name = "Confusion"
+        },
+        [ConditionId.Flinch] = new Condition
+        {
+            Id = ConditionId.Flinch,
+            Name = "Flinch"
+        },
+        [ConditionId.ChoiceLock] = new Condition
+        {
+            Id = ConditionId.ChoiceLock,
+            Name = "Choice Lock"
+        },
         [ConditionId.LeechSeed] = new Condition
         {
+            Id = ConditionId.LeechSeed,
             Name = "Leech Seed",
             ConditionEffectType = ConditionEffectType.Status,
             OnStart = (target, source, sourceEffect) =>
@@ -98,8 +133,99 @@ public record Conditions
                 }
             }
         },
+        [ConditionId.TrickRoom] = new Condition
+        {
+            Id = ConditionId.TrickRoom,
+            Duration = 5,
+            Name = "Trick Room",
+            ConditionEffectType = ConditionEffectType.Terrain,
+            DurationCallback = (sourcePokemon, _) =>
+                sourcePokemon.Ability.Id == AbilityId.Persistent ? 7 : 5,
+            OnFieldStart = (_, _, _) =>
+            {
+                UiGenerator.PrintTrickRoomStart();
+            },
+            OnFieldRestart = (_, _, _) =>
+            {
+                UiGenerator.PrintTrickRoomRestart();
+            },
+            OnFieldResidualOrder = 27,
+            OnFieldResidualSubOrder = 1,
+            OnFieldEnd = (_) =>
+            {
+                UiGenerator.PrintTrickRoomEnd();
+            },
+        },
+        [ConditionId.Stall] = new Condition
+        {
+            Id = ConditionId.Stall,
+            Name = "Stall",
+            Duration = 2,
+            CounterMax = 729,
+            OnStart = (target, _, _) =>
+            {
+                Condition? condition = target.GetCondition(ConditionId.Stall);
 
+                if (condition is null)
+                {
+                    throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
+                                                     $"pokemon {target.Name}.");
+                }
 
+                condition.Counter = 3;
+                return true;
+            },
+            OnStallMove = (random, pokemon) =>
+            {
+                Condition? condition = pokemon.GetCondition(ConditionId.Stall);
+
+                if (condition is null)
+                {
+                    throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
+                                                     $"pokemon {pokemon.Name}.");
+                }
+
+                int counter = condition.Counter ?? 1;
+                double successChance = 1.0 / counter;
+                bool success = random.NextDouble() < successChance;
+
+                if (success) return success;
+
+                if (!pokemon.RemoveCondition(ConditionId.Stall))
+                {
+                    throw new InvalidOperationException("Failed to remove Stall condition.");
+                }
+                return success;
+            },
+            OnRestart = (target, _, _) =>
+            {
+                Condition? condition = target.GetCondition(ConditionId.Stall);
+
+                if (condition is null)
+                {
+                    throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
+                                                     $"pokemon {target.Name}.");
+                }
+
+                int counter = condition.Counter ?? 1;
+                int counterMax = condition.CounterMax ?? 729;
+
+                if (counter < counterMax)
+                {
+                    condition.Counter = counter * 3;
+                }
+
+                condition.Duration = 2;
+
+                return true;
+            }
+        },
+        [ConditionId.Protect] = new Condition
+        {
+            Id = ConditionId.Protect,
+            Name = "Protect",
+            Duration = 1,
+            ConditionEffectType = ConditionEffectType.Condition,
+        },
     };
-
 }

@@ -253,7 +253,7 @@ public class Pokemon
         }
     }
 
-    public List<Condition> Conditions { get; } = [];
+    private List<Condition> Conditions { get; } = [];
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }
@@ -376,6 +376,34 @@ public class Pokemon
     public bool HasType(MoveType type)
     {
         return Specie.Types.Contains(type.ConvertToPokemonType());
+    }
+
+    public bool HasCondition(ConditionId conditionId)
+    {
+        return Conditions.Any(c => c.Id == conditionId);
+    }
+
+    public Condition? GetCondition(ConditionId conditionId)
+    {
+        return Conditions.FirstOrDefault(c => c.Id == conditionId);
+    }
+
+    public void AddCondition(Condition condition)
+    {
+        if (!HasCondition(condition.Id))
+        {
+            Conditions.Add(condition);
+        }
+        else
+        {
+            throw new InvalidOperationException($"Pokemon already has condition {condition.Id}.");
+        }
+    }
+
+    public bool RemoveCondition(ConditionId conditionId)
+    {
+        Condition? condition = GetCondition(conditionId);
+        return condition != null && Conditions.Remove(condition);
     }
 
     private int CalculateModifiedStat(StatId stat)

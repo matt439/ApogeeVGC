@@ -8,7 +8,7 @@ public record Library
     private readonly Conditions _conditions = new();
     private readonly Items _items = new();
     private readonly Learnsets _learnsets = new();
-    private readonly Moves _moves = new();
+    private readonly Moves _moves;
     private readonly Natures _natures = new();
     private readonly Rulesets _rulesets = new();
     private readonly Species _species = new();
@@ -27,4 +27,9 @@ public record Library
     // tags
     public IReadOnlyDictionary<PokemonType, TypeData> TypeData => TypeChart.TypeData;
     public TypeChart TypeChart { get; } = new();
+
+    public Library()
+    {
+        _moves = new Moves(this);
+    }
 }

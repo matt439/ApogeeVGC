@@ -260,8 +260,11 @@ public record Move : IEffect
     public MoveType Type { get; init; }
     public SecondaryEffect? Secondary { get; init; }
     public Condition? Condition { get; init; }
+    public bool AlwaysHit { get; init; }
+    public bool StallingMove { get; init; }
 
     public Func<Pokemon, bool>? OnTryImmunity { get; init; }
+    public Func<Pokemon, Pokemon?, Move?, bool>? OnHit { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
