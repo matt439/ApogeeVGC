@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using ApogeeVGC.Data;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 
 namespace ApogeeVGC.Sim;

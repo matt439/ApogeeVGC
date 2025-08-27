@@ -256,7 +256,7 @@ public class Pokemon
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }
     private StatsTable UnmodifiedStats { get; }
-    private StatsTable CurrentStats { get; set; }
+    //private StatsTable CurrentStats => new(CalculateModifiedStats());
     public StatModifiers StatModifiers { get; private set; } = new();
     public int UnmodifiedHp => UnmodifiedStats.Hp;
     public int UnmodifiedAtk => UnmodifiedStats.Atk;
@@ -264,15 +264,15 @@ public class Pokemon
     public int UnmodifiedSpA => UnmodifiedStats.SpA;
     public int UnmodifiedSpD => UnmodifiedStats.SpD;
     public int UnmodifiedSpe => UnmodifiedStats.Spe;
-    public int CurrentHp => CurrentStats.Hp;
-    public int CurrentAtk => CurrentStats.Atk;
-    public int CurrentDef => CurrentStats.Def;
-    public int CurrentSpA => CurrentStats.SpA;
-    public int CurrentSpD => CurrentStats.SpD;
-    public int CurrentSpe => CurrentStats.Spe;
-    public double CurrentHpRatio => (double)CurrentHp / UnmodifiedStats.Hp;
+    public int CurrentHp { get; private set; } = 0;
+    public int CurrentAtk => CalculateModifiedStat(StatId.Atk);
+    public int CurrentDef => CalculateModifiedStat(StatId.Def);
+    public int CurrentSpA => CalculateModifiedStat(StatId.SpA);
+    public int CurrentSpD => CalculateModifiedStat(StatId.SpD);
+    public int CurrentSpe => CalculateModifiedStat(StatId.Spe);
+    public double CurrentHpRatio => (double)CurrentHp / UnmodifiedHp;
     public int CurrentHpPercentage => (int)(CurrentHpRatio * 100);
-    public bool IsFainted => CurrentStats.Hp <= 0;
+    public bool IsFainted => CurrentHp <= 0;
 
     // Need to have these parameters to calculate the stats correctly
     public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)
@@ -283,7 +283,7 @@ public class Pokemon
         Nature = nature;
         Level = level;
         UnmodifiedStats = CalculateUnmodifiedStats();
-        CurrentStats = CalculateUnmodifiedStats();
+        CurrentHp = UnmodifiedStats.Hp; // Start with full HP
     }
 
     /// <summary>
@@ -324,12 +324,12 @@ public class Pokemon
 
     public void Heal(int amount)
     {
-        CurrentStats = CurrentStats with { Hp = Math.Min(CurrentStats.Hp + amount, UnmodifiedStats.Hp) };
+        CurrentHp = Math.Min(CurrentHp + amount, UnmodifiedStats.Hp);
     }
 
     public void Damage(int amount)
     {
-        CurrentStats = CurrentStats with { Hp = Math.Max(CurrentStats.Hp - amount, 0) };
+        CurrentHp = Math.Max(CurrentHp - amount, 0);
     }
 
     public int GetAttackStat(Move move)
@@ -360,21 +360,44 @@ public class Pokemon
 
     private int CalculateModifiedStat(StatId stat)
     {
-        // TODO: add logic for stat boosts, items, etc.
-        return CalculateUnmodifiedStat(stat);
-    }
-
-    private StatsTable CalculateModifiedStats()
-    {
-        return new StatsTable
+        if (stat == StatId.Hp)
         {
-            Hp = CalculateModifiedStat(StatId.Hp),
-            Atk = CalculateModifiedStat(StatId.Atk),
-            Def = CalculateModifiedStat(StatId.Def),
-            SpA = CalculateModifiedStat(StatId.SpA),
-            SpD = CalculateModifiedStat(StatId.SpD),
-            Spe = CalculateModifiedStat(StatId.Spe)
+            return UnmodifiedStats.Hp; // HP is not modified by stat stages
+        }
+
+        // apply stat modifiers
+        double modifier = stat switch
+        {
+            StatId.Atk => StatModifiers.AtkMultiplier,
+            StatId.Def => StatModifiers.DefMultiplier,
+            StatId.SpA => StatModifiers.SpAMultiplier,
+            StatId.SpD => StatModifiers.SpDMultiplier,
+            StatId.Spe => StatModifiers.SpeMultiplier,
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
         };
+
+        // TODO: Implement ability and status condition effects on stats
+
+        //// if speed, check for paralysis
+        //if (stat == StatId.Spe && Specie.IsParalyzed)
+        //{
+        //    modifier *= 0.5;
+        //}
+
+        //// if attack, check for burn and if ability is not Guts
+        //if (stat == StatId.Atk && Specie.IsBurned && Ability.Id != AbilityId.Guts)
+        //{
+        //    modifier *= 0.5;
+        //}
+
+        //// check for any status and guts ability
+        //if (stat == StatId.Atk && Specie.IsStatused && Ability.Id == AbilityId.Guts)
+        //{
+        //    modifier *= 1.5;
+        //}
+
+
+        return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * modifier);
     }
 
     private int CalculateUnmodifiedStat(StatId stat)
@@ -409,7 +432,7 @@ public class Pokemon
     public override string ToString()
     {
         string line1 = $"{Name} ({Specie.Name}) - Lv. {Level}";
-        string line2 = $"{CurrentStats.Hp}/{UnmodifiedStats.Hp} HP";
+        string line2 = $"{CurrentHp}/{UnmodifiedStats.Hp} HP";
         string line3 = $"Ability: {Ability.Name} - Item: {Item.Name}";
         string movesLine = string.Join(", ", Moves.Select(m => m.Name));
         return $"{line1}\n{line2}\n{line3}\nMoves: {movesLine}\n";
