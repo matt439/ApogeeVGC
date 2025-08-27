@@ -14,7 +14,17 @@ public record Conditions
 
     private readonly Dictionary<ConditionId, Condition> _conditions = new()
     {
-        [ConditionId.Burn] = new Condition { Name = "Burn" },
+        [ConditionId.Burn] = new Condition
+        {
+            Name = "Burn",
+            EffectType = EffectType.Status,
+            OnStart = (pokemon, source) =>
+            {
+
+                return true;
+            },
+
+        },
         [ConditionId.Paralysis] = new Condition { Name = "Paralysis" },
         [ConditionId.Sleep] = new Condition { Name = "Sleep" },
         [ConditionId.Freeze] = new Condition { Name = "Freeze" },
@@ -23,7 +33,6 @@ public record Conditions
         [ConditionId.Confusion] = new Condition { Name = "Confusion" },
         [ConditionId.Flinch] = new Condition { Name = "Flinch" },
         [ConditionId.ChoiceLock] = new Condition { Name = "Choice Lock" },
-        [ConditionId.Stall] = new Condition { Name = "Stall" },
     };
 
 }

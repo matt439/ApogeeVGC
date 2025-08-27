@@ -43,6 +43,7 @@ public record Moves
                 Mirror = true,
                 Metronome = true,
             },
+            OnTryImmunity = (target) => target.HasType(MoveType.Grass),
             Target = MoveTarget.Normal,
             Type = MoveType.Grass,
         },

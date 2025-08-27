@@ -334,28 +334,46 @@ public class Pokemon
 
     public int GetAttackStat(Move move)
     {
-        return move.Category switch
+        switch (move.Category)
         {
-            MoveCategory.Physical => CurrentAtk,
-            MoveCategory.Special => CurrentSpA,
-            _ => throw new ArgumentException("Invalid move category.")
-        };
+            case MoveCategory.Physical:
+                return CurrentAtk;
+            case MoveCategory.Special:
+                return CurrentSpA;
+            case MoveCategory.Status:
+            default:
+                throw new ArgumentException("Invalid move category.");
+        }
     }
 
     public int GetDefenseStat(Move move)
     {
-        return move.Category switch
+        switch (move.Category)
         {
-            MoveCategory.Physical => CurrentDef,
-            MoveCategory.Special => CurrentSpD,
-            _ => throw new ArgumentException("Invalid move category.")
-        };
+            case MoveCategory.Physical:
+                return CurrentDef;
+            case MoveCategory.Special:
+                return CurrentSpD;
+            case MoveCategory.Status:
+            default:
+                throw new ArgumentException("Invalid move category.");
+        }
     }
 
     public bool IsStab(Move move)
     {
         PokemonType moveType = move.Type.ConvertToPokemonType();
         return moveType == Specie.Types[0] || moveType == Specie.Types[1];
+    }
+
+    public bool HasType(PokemonType type)
+    {
+        return Specie.Types.Contains(type);
+    }
+
+    public bool HasType(MoveType type)
+    {
+        return Specie.Types.Contains(type.ConvertToPokemonType());
     }
 
     private int CalculateModifiedStat(StatId stat)
@@ -366,15 +384,28 @@ public class Pokemon
         }
 
         // apply stat modifiers
-        double modifier = stat switch
+        double modifier;
+        switch (stat)
         {
-            StatId.Atk => StatModifiers.AtkMultiplier,
-            StatId.Def => StatModifiers.DefMultiplier,
-            StatId.SpA => StatModifiers.SpAMultiplier,
-            StatId.SpD => StatModifiers.SpDMultiplier,
-            StatId.Spe => StatModifiers.SpeMultiplier,
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
-        };
+            case StatId.Atk:
+                modifier = StatModifiers.AtkMultiplier;
+                break;
+            case StatId.Def:
+                modifier = StatModifiers.DefMultiplier;
+                break;
+            case StatId.SpA:
+                modifier = StatModifiers.SpAMultiplier;
+                break;
+            case StatId.SpD:
+                modifier = StatModifiers.SpDMultiplier;
+                break;
+            case StatId.Spe:
+                modifier = StatModifiers.SpeMultiplier;
+                break;
+            case StatId.Hp:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+        }
 
         // TODO: Implement ability and status condition effects on stats
 

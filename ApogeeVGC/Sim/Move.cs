@@ -259,6 +259,8 @@ public record Move
     public MoveType Type { get; init; }
     public SecondaryEffect? Secondary { get; init; }
 
+    public Func<Pokemon, bool>? OnTryImmunity { get; init; }
+
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
     /// This method creates an independent copy with the same state while sharing immutable references.

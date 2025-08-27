@@ -24,8 +24,8 @@ public class Driver
 
     private const int RandomEvaluationNumTest = 10000;
 
-    private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 10000;
+    private const int MctsEvaluationNumTest = 10;
+    private const int MctsMaxIterations = 100000;
     private const double MctsExplorationParameter = 0.0; //1.4142; // Square root of 2
 
     private const int NumThreads = 16;
