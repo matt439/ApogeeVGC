@@ -1,7 +1,9 @@
-﻿using ApogeeVGC.Player;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Player;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using ApogeeVGC.Data;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ApogeeVGC.Sim;
 
@@ -154,6 +156,36 @@ public static class UiGenerator
         sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
         sb.AppendLine("But it missed!");
         Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintBurnDamage(Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} is hurt by its burn!");
+    }
+
+    public static void PrintBurnStart(Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} was burned!");
+    }
+
+    public static void PrintBurnStartFromFlameOrb(Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} was burned by its Flame Orb!");
+    }
+
+    public static void PrintBurnStartFromAbility(Pokemon target, Ability ability)
+    {
+        Console.WriteLine($"{target.Name} was burned by {ability.Name}!");
+    }
+
+    public static void PrintLeechSeedStart(Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} was seeded!");
+    }
+
+    public static void PrintLeechSeedDamage(Pokemon target, Pokemon source, int damage)
+    {
+        Console.WriteLine($"{target.Name} is hurt by Leech Seed! {source.Name} restored {damage} HP.");
     }
 
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)

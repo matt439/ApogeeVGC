@@ -16,8 +16,9 @@ public record FlingData
     public ConditionId? Status { get; init; }
 }
 
-public record Item
+public record Item : IEffect
 {
+    public EffectType EffectType => EffectType.Item;
     public string Name { get; init; } = string.Empty;
     public int SpriteNum { get; init; }
     public FlingData Fling { get; init; } = new();

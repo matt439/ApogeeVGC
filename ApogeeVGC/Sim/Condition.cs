@@ -17,7 +17,7 @@ public enum ConditionId
     //Stall,
 }
 
-public enum EffectType
+public enum ConditionEffectType
 {
     Condition,
     Weather,
@@ -25,13 +25,15 @@ public enum EffectType
     Terrain,
 }
 
-public record Condition
+public record Condition : IEffect
 {
+    public EffectType EffectType => EffectType.Condition;
     public string Name { get; init; } = string.Empty;
-    public EffectType EffectType { get; init; } = EffectType.Condition;
+    public ConditionEffectType ConditionEffectType { get; init; }
 
-    public Func<Pokemon, Pokemon, bool>? OnStart;
+    public Func<Pokemon, Pokemon, IEffect, bool>? OnStart;
     //public int EffectOrder { get; init; }
 
     public int? OnResidualOrder { get; init; }
+    public Action<Pokemon, Pokemon?, IEffect?>? OnResidual;
 }

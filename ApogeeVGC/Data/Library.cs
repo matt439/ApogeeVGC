@@ -14,7 +14,6 @@ public record Library
     private readonly Species _species = new();
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
-    private readonly TypeChart _typeChart = new();
 
     public IReadOnlyDictionary<AbilityId, Ability> Abilities => _abilities.AbilitiesData;
     public IReadOnlyDictionary<ConditionId, Condition> Conditions => _conditions.ConditionsData;
@@ -26,7 +25,6 @@ public record Library
     public IReadOnlyDictionary<SpecieId, Specie> Species => _species.SpeciesData;
     public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => _speciesFormats.SpeciesFormatsData;
     // tags
-    public IReadOnlyDictionary<PokemonType, TypeData> TypeData => _typeChart.TypeData;
-    public TypeChart TypeChart => _typeChart;
-
+    public IReadOnlyDictionary<PokemonType, TypeData> TypeData => TypeChart.TypeData;
+    public TypeChart TypeChart { get; } = new();
 }

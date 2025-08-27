@@ -252,6 +252,8 @@ public class Pokemon
             field = value;
         }
     }
+
+    public List<Condition> Conditions { get; } = [];
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }

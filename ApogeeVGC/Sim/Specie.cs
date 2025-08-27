@@ -167,8 +167,9 @@ public record SpeciesAbility
 }
 
 
-public record Specie
+public record Specie : IEffect
 {
+    public EffectType EffectType => EffectType.Specie;
     public int Num { get; init; }
     public string Name { get; init; } = string.Empty;
     public string? BaseSpecies { get; init; }

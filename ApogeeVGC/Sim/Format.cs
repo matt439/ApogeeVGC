@@ -1,7 +1,8 @@
 ﻿namespace ApogeeVGC.Sim;
 
-public record Format
+public record Format : IEffect
 {
+    public EffectType EffectType => EffectType.Format;
 }
 
 public enum Tier

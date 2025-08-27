@@ -10,8 +10,10 @@ public enum AbilityId
     QuarkDrive,
 }
 
-public record Ability
+public record Ability : IEffect
 {
+    public EffectType EffectType => EffectType.Ability;
+
     private double _rating;
     /// <summary>
     /// Rating from -1 Detrimental to +5 Essential

@@ -43,6 +43,38 @@ public record Moves
                 Mirror = true,
                 Metronome = true,
             },
+            Condition = new Condition
+            {
+                Name = "Leech Seed",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (target, source, sourceEffect) =>
+                {
+                    UiGenerator.PrintLeechSeedStart(target);
+                    return true;
+                },
+                OnResidualOrder = 8,
+                OnResidual = (target, source, effect) =>
+                {
+                    int damage = target.UnmodifiedHp / 8;
+                    if (damage < 1) damage = 1;
+
+                    if (target.CurrentHp <= 0)
+                    {
+                        throw new InvalidOperationException("Target has fainted.");
+                    }
+                    target.Damage(damage);
+
+                    if (source is not null)
+                    {
+                        source.Heal(damage);
+                        UiGenerator.PrintLeechSeedDamage(target, source, damage);
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException($"Source pokemon is null.");
+                    }
+                }
+            },
             OnTryImmunity = (target) => target.HasType(MoveType.Grass),
             Target = MoveTarget.Normal,
             Type = MoveType.Grass,

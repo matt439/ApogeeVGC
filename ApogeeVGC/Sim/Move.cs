@@ -152,8 +152,9 @@ public enum MoveTarget
     None, // Added for DataMove.SelfSwitch
 }
 
-public record Move
+public record Move : IEffect
 {
+    public EffectType EffectType => EffectType.Move;
     public required int Num
     {
         get;
@@ -258,6 +259,7 @@ public record Move
     public MoveTarget Target { get; init; }
     public MoveType Type { get; init; }
     public SecondaryEffect? Secondary { get; init; }
+    public Condition? Condition { get; init; }
 
     public Func<Pokemon, bool>? OnTryImmunity { get; init; }
 
