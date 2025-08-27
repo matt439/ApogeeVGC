@@ -22,11 +22,11 @@ public class Driver
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
-    private const int RandomEvaluationNumTest = 100000;
+    private const int RandomEvaluationNumTest = 10000;
 
-    private const int MctsEvaluationNumTest = 1000;
-    private const int MctsMaxIterations = 5;
-    private const double MctsExplorationParameter = 1.4142; // Square root of 2
+    private const int MctsEvaluationNumTest = 100;
+    private const int MctsMaxIterations = 10000;
+    private const double MctsExplorationParameter = 0.0; //1.4142; // Square root of 2
 
     private const int NumThreads = 16;
 
@@ -107,7 +107,8 @@ public class Driver
         var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        for (int i = 0; i < MctsEvaluationNumTest; i++)
+        Parallel.For(0, MctsEvaluationNumTest,
+            new ParallelOptions { MaxDegreeOfParallelism = 1 }, i =>
         {
             int player1Seed = PlayerRandom1Seed + i;
             int player2Seed = PlayerRandom2Seed + i;
@@ -120,11 +121,11 @@ public class Driver
                 Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
                     MctsExplorationParameter, Library, player1Seed, NumThreads),
                 Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    PlayerRandomStrategy.AllChoices,
+                    PlayerRandomStrategy.SuperEffectiveOrStabMoves,
                     player2Seed),
             };
             simResults.Add(simulator.Run());
-        }
+        });
 
         stopwatch.Stop();
 

@@ -256,8 +256,8 @@ public class Pokemon
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }
     private StatsTable UnmodifiedStats { get; }
-    private StatsTable CurrentStats { get; }
-    public StatModifiers StatModifiers { get; } = new();
+    private StatsTable CurrentStats { get; set; }
+    public StatModifiers StatModifiers { get; private set; } = new();
     public int UnmodifiedHp => UnmodifiedStats.Hp;
     public int UnmodifiedAtk => UnmodifiedStats.Atk;
     public int UnmodifiedDef => UnmodifiedStats.Def;
@@ -313,14 +313,8 @@ public class Pokemon
             copy.Damage(hpDifference);
         }
 
-        // Copy stat modifiers
-        copy.StatModifiers.Atk = StatModifiers.Atk;
-        copy.StatModifiers.Def = StatModifiers.Def;
-        copy.StatModifiers.SpA = StatModifiers.SpA;
-        copy.StatModifiers.SpD = StatModifiers.SpD;
-        copy.StatModifiers.Spe = StatModifiers.Spe;
-        copy.StatModifiers.Accuracy = StatModifiers.Accuracy;
-        copy.StatModifiers.Evasion = StatModifiers.Evasion;
+        // Copy stat modifiers using record copy semantics
+        copy.StatModifiers = StatModifiers with { };
 
         // TODO: When status effects, stat boosts, etc. are implemented,
         // they will need to be copied here as well
@@ -330,12 +324,12 @@ public class Pokemon
 
     public void Heal(int amount)
     {
-        CurrentStats.Hp = Math.Min(CurrentStats.Hp + amount, UnmodifiedStats.Hp);
+        CurrentStats = CurrentStats with { Hp = Math.Min(CurrentStats.Hp + amount, UnmodifiedStats.Hp) };
     }
 
     public void Damage(int amount)
     {
-        CurrentStats.Hp = Math.Max(CurrentStats.Hp - amount, 0);
+        CurrentStats = CurrentStats with { Hp = Math.Max(CurrentStats.Hp - amount, 0) };
     }
 
     public int GetAttackStat(Move move)
@@ -422,12 +416,12 @@ public class Pokemon
     }
 }
 
-public class StatModifiers
+public record StatModifiers
 {
     public int Atk
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -441,7 +435,7 @@ public class StatModifiers
     public int Def
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -455,7 +449,7 @@ public class StatModifiers
     public int SpA
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -469,7 +463,7 @@ public class StatModifiers
     public int SpD
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -483,7 +477,7 @@ public class StatModifiers
     public int Spe
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -497,7 +491,7 @@ public class StatModifiers
     public int Accuracy
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -511,7 +505,7 @@ public class StatModifiers
     public int Evasion
     {
         get;
-        set
+        init
         {
             if (!IsValidStage(value))
             {
@@ -608,5 +602,145 @@ public class StatModifiers
             6 => 3.0 / 9.0,
             _ => throw new ArgumentOutOfRangeException(nameof(stage), "Stat stage must be between -6 and +6.")
         };
+    }
+}
+
+public record StatsTable
+{
+    public int Hp
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+
+            field = value;
+        }
+    }
+    public int Atk
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            field = value;
+        }
+    } = 0;
+    public int Def
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            field = value;
+        }
+    } = 0;
+    public int SpA
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            field = value;
+        }
+    } = 0;
+    public int SpD
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            field = value;
+        }
+    } = 0;
+    public int Spe
+    {
+        get;
+        init
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            field = value;
+        }
+    } = 0;
+
+    public int BaseStatTotal => Hp + Atk + Def + SpA + SpD + Spe;
+
+    public int GetStat(StatId stat)
+    {
+        return stat switch
+        {
+            StatId.Hp => Hp,
+            StatId.Atk => Atk,
+            StatId.Def => Def,
+            StatId.SpA => SpA,
+            StatId.SpD => SpD,
+            StatId.Spe => Spe,
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+        };
+    }
+
+    public static bool IsValidIv(int stat)
+    {
+        return stat is >= 0 and <= 31;
+    }
+
+    public static bool IsValidEv(int stat)
+    {
+        return stat is >= 0 and <= 255;
+    }
+
+    public bool IsValidIvs()
+    {
+        return IsValidIv(Hp) && IsValidIv(Atk) && IsValidIv(Def) &&
+               IsValidIv(SpA) && IsValidIv(SpD) && IsValidIv(Spe);
+    }
+
+    public bool IsValidEvs()
+    {
+        return IsValidEv(Hp) && IsValidEv(Atk) && IsValidEv(Def) &&
+               IsValidEv(SpA) && IsValidEv(SpD) && IsValidEv(Spe) &&
+               BaseStatTotal <= 510;
+    }
+
+    public static StatsTable PerfectIvs => new()
+    {
+        Hp = 31,
+        Atk = 31,
+        Def = 31,
+        SpA = 31,
+        SpD = 31,
+        Spe = 31,
+    };
+
+    public StatsTable(StatsTable other)
+    {
+        Hp = other.Hp;
+        Atk = other.Atk;
+        Def = other.Def;
+        SpA = other.SpA;
+        SpD = other.SpD;
+        Spe = other.Spe;
+    }
+
+    public StatsTable()
+    {
     }
 }
