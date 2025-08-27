@@ -75,7 +75,7 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
-    public static void PrintMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender,
+    public static void PrintDamagingMoveAction(Pokemon attacker, Move move, int damage, Pokemon defender,
         MoveEffectiveness effectiveness, bool isCrit = false)
     {
         StringBuilder sb = new();
@@ -110,6 +110,13 @@ public static class UiGenerator
         }
         sb.AppendLine($"It dealt {damage} damage.");
         Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintStatusMoveAction(Pokemon attackr, Move move)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attackr.Name} used {move.Name}.");
+        Console.Write(sb.ToString());
     }
 
     public static void PrintStruggleAction(Pokemon attacker, int damage,
@@ -183,9 +190,10 @@ public static class UiGenerator
         Console.WriteLine($"{target.Name} was seeded!");
     }
 
-    public static void PrintLeechSeedDamage(Pokemon target, Pokemon source, int damage)
+    public static void PrintLeechSeedDamage(Pokemon target, int damage, Pokemon source, int heal)
     {
-        Console.WriteLine($"{target.Name} is hurt by Leech Seed! {source.Name} restored {damage} HP.");
+        Console.WriteLine($"{target.Name} is hurt by Leech Seed and lost {damage} HP!");
+        Console.WriteLine($"{source.Name} restored {heal} HP!");
     }
 
     public static void PrintTrickRoomStart()
@@ -201,6 +209,19 @@ public static class UiGenerator
     public static void PrintTrickRoomEnd()
     {
         Console.WriteLine("The effects of Trick Room wore off.");
+    }
+
+    public static void PrintMoveNoEffectAction(Pokemon attacker, Move move, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
+        sb.AppendLine("But it had no effect!");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintBlankLine()
+    {
+        Console.WriteLine();
     }
 
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
@@ -350,6 +371,6 @@ public static class UiGenerator
     {
         int turnNumber = turn + 1;
         string turnString = turnNumber.ToString(CultureInfo.InvariantCulture);
-        Console.WriteLine($"{TurnSpacer}  Turn {turnString}  {TurnSpacer}\n");
+        Console.WriteLine($"\n{TurnSpacer}  Turn {turnString}  {TurnSpacer}\n");
     }
 }

@@ -2,6 +2,8 @@
 
 public class Field
 {
+    public bool PringDebug { get; init; }
+    
     /// <summary>
     /// Creates a copy of this Field for MCTS simulation purposes.
     /// Currently Field is empty, so just create a new instance.

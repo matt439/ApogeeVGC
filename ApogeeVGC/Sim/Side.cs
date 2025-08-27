@@ -7,6 +7,7 @@ public class Side
 {
     public required Team Team { get; init; }
     public required PlayerId PlayerId { get; init; }
+    public bool PrintDebug { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Side for MCTS simulation purposes.
@@ -24,12 +25,14 @@ public class Side
 
 public static class SideGenerator
 {
-    public static Side GenerateTestSide(Library library, string trainerName, PlayerId playerId)
+    public static Side GenerateTestSide(Library library, string trainerName, PlayerId playerId,
+        bool printDebug = false)
     {
         return new Side
         {
             PlayerId = playerId,
-            Team = TeamGenerator.GenerateTestTeam(library, trainerName)
+            Team = TeamGenerator.GenerateTestTeam(library, trainerName, printDebug),
+            PrintDebug = printDebug,
         };
     }
 }

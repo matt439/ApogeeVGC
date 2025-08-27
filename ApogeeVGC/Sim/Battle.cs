@@ -165,6 +165,8 @@ public class Battle
 
             if (!IsEndOfTurn()) return;
 
+            HandleEndOfTurn();
+
             if (incrementTurn)
             { 
                 Turn++;
@@ -236,6 +238,55 @@ public class Battle
                 PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId)),
                 _ => throw new ArgumentException("Invalid player ID", nameof(playerId))
             };
+        }
+    }
+
+    private void HandleEndOfTurn()
+    {
+        UiGenerator.PrintBlankLine();
+        HandleResiduals();
+    }
+
+    private void HandleResiduals()
+    {
+        var side1Residuals = Side1.Team.ActivePokemon.GetAllResidualConditions();
+        List<(Pokemon, Condition, PlayerId)> side1ResidualsList = [];
+        foreach (Condition condition in side1Residuals)
+        {
+            if (condition.OnResidual != null)
+            {
+                side1ResidualsList.Add((Side1.Team.ActivePokemon, condition, PlayerId.Player1));
+            }
+        }
+
+        var side2Residuals = Side2.Team.ActivePokemon.GetAllResidualConditions();
+        List<(Pokemon, Condition, PlayerId)> side2ResidualsList = [];
+        foreach (Condition condition in side2Residuals)
+        {
+            if (condition.OnResidual != null)
+            {
+                side2ResidualsList.Add((Side2.Team.ActivePokemon, condition, PlayerId.Player2));
+            }
+        }
+
+        // Combine and sort by OnResidualOrder
+        var allResiduals = side1ResidualsList.Concat(side2ResidualsList)
+            .OrderBy(t => t.Item2.OnResidualOrder ?? int.MaxValue)
+            .ToList();
+
+        foreach ((Pokemon pokemon, Condition condition, PlayerId playerId) in allResiduals)
+        {
+            Side sourceSide = GetSide(playerId.OpposingPlayerId());
+            
+            condition.OnResidual?.Invoke(pokemon, sourceSide, condition, PrintDebug);
+
+            if (!condition.Duration.HasValue) continue;
+
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                pokemon.RemoveCondition(condition.Id);
+            }
         }
     }
 
@@ -467,6 +518,31 @@ public class Battle
             return;
         }
 
+        if (move.OnTryImmunity != null && move.OnTryImmunity(defender))
+        {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+            }
+            return;
+        }
+
+        switch (move.Category)
+        {
+            case MoveCategory.Physical:
+            case MoveCategory.Special:
+                PerformDamagingMove(attacker, move, defender);
+                break;
+            case MoveCategory.Status:
+                PerformStatusMove(attacker, move, defender);
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}");
+        }
+    }
+
+    private void PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender)
+    {
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
             defender.Specie.Types, move.Type);
@@ -474,12 +550,57 @@ public class Battle
         defender.Damage(damage);
         if (PrintDebug)
         {
-            UiGenerator.PrintMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
+            UiGenerator.PrintDamagingMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
+        }
+    }
+
+    private void PerformStatusMove(Pokemon attacker, Move move, Pokemon defender)
+    {
+        if (move.Condition is null) return;
+
+        if (PrintDebug)
+        {
+            UiGenerator.PrintStatusMoveAction(attacker, move);
+        }
+
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+                defender.AddCondition(move.Condition);
+                break;
+            case MoveTarget.All:
+                defender.AddCondition(move.Condition);
+                attacker.AddCondition(move.Condition);
+                break;
+            case MoveTarget.Self:
+                attacker.AddCondition(move.Condition);
+                break;
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.FoeSide:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+                throw new NotImplementedException();
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private bool IsMoveMiss(Pokemon attacker, Move move, Pokemon defender)
     {
+        if (move.AlwaysHit)
+        {
+            return false; // Move always hits
+        }
+
         // get move accuracy
         int moveAccuracy = move.Accuracy;
 
@@ -512,7 +633,10 @@ public class Battle
 
         Side side = GetSide(playerId);
         Pokemon prevActive = side.Team.ActivePokemon;
+        prevActive.OnSwitchOut();
         side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
+        Pokemon newActive = side.Team.ActivePokemon;
+        newActive.OnSwitchIn();
 
         if (!PrintDebug) return;
 
@@ -868,8 +992,8 @@ public static class BattleGenerator
         {
             Library = library,
             Field = new Field(),
-            Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1),
-            Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2),
+            Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1, printDebug),
+            Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2, printDebug),
             PrintDebug = printDebug,
             BattleSeed = seed,
         };

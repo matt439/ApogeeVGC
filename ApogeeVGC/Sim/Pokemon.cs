@@ -56,6 +56,7 @@ public static class PokemonBuilder
         AbilityId ability,
         StatsTable evs,
         NatureType nature,
+        bool pringDebug = false,
         StatsTable? ivs = null,
         string? nickname = null,
         bool shiny = false,
@@ -88,13 +89,14 @@ public static class PokemonBuilder
             Evs = evs,
             Name = nickname ?? library.Species[specie].Name,
             Shiny = shiny,
+            PrintDebug = pringDebug
         };
 
         return PokemonValidator.IsValid(library, pokemon) ? pokemon
             : throw new ArgumentException("Invalid Pokemon configuration.");
     }
 
-    public static PokemonSet BuildTestSet(Library library)
+    public static PokemonSet BuildTestSet(Library library, bool printDebug = false)
     {
         return new PokemonSet()
         {
@@ -103,14 +105,15 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.CalyrexIce,
-                    [new MoveSetup(MoveId.IceBasic),
-                        new MoveSetup(MoveId.PsychicBasic, 1),
+                    [new MoveSetup(MoveId.GlacialLance, 3),
+                        new MoveSetup(MoveId.LeechSeed, 1),
                             new MoveSetup(MoveId.GrassBasic, 2),
                                 new MoveSetup(MoveId.DarkBasic, 3)],
                     ItemId.Leftovers,
                     AbilityId.AsOneGlastrier,
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
-                    NatureType.Adamant
+                    NatureType.Adamant,
+                    printDebug
                 ),
                 Build(
                     library,
@@ -122,7 +125,8 @@ public static class PokemonBuilder
                     ItemId.ChoiceSpecs,
                     AbilityId.HadronEngine,
                     new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
-                    NatureType.Modest
+                    NatureType.Modest,
+                    printDebug
                 ),
                 Build(
                     library,
@@ -134,7 +138,8 @@ public static class PokemonBuilder
                     ItemId.FlameOrb,
                     AbilityId.Guts,
                     new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
-                    NatureType.Adamant
+                    NatureType.Adamant,
+                    printDebug
                 ),
                 Build(
                     library,
@@ -146,7 +151,8 @@ public static class PokemonBuilder
                     ItemId.RockyHelmet,
                     AbilityId.FlameBody,
                     new StatsTable { Hp = 252, Def = 196, SpD = 60 },
-                    NatureType.Bold
+                    NatureType.Bold,
+                    printDebug
                 ),
                 Build(
                     library,
@@ -158,7 +164,8 @@ public static class PokemonBuilder
                     ItemId.LightClay,
                     AbilityId.Prankster,
                     new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },
-                    NatureType.Careful
+                    NatureType.Careful,
+                    printDebug
                 ),
                 Build(
                     library,
@@ -170,7 +177,8 @@ public static class PokemonBuilder
                     ItemId.AssaultVest,
                     AbilityId.QuarkDrive,
                     new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
-                    NatureType.Adamant
+                    NatureType.Adamant,
+                    printDebug
                 )
             ]
         };
@@ -217,7 +225,6 @@ public class PokemonSet
 public class Pokemon
 {
     public Specie Specie { get; init; }
-
     public required Move[] Moves
     {
         get;
@@ -275,6 +282,7 @@ public class Pokemon
     public double CurrentHpRatio => (double)CurrentHp / UnmodifiedHp;
     public int CurrentHpPercentage => (int)(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
+    public bool PrintDebug { get; init; }
 
     // Need to have these parameters to calculate the stats correctly
     public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)
@@ -324,14 +332,28 @@ public class Pokemon
         return copy;
     }
 
-    public void Heal(int amount)
+    /// <summary>
+    /// Returns the actual amount healed (could be less than amount if at max HP).
+    /// </summary>
+    /// <param name="amount">The amount of HP to heal</param>
+    /// <returns>The actual amount healed</returns>
+    public int Heal(int amount)
     {
+        int previousHp = CurrentHp;
         CurrentHp = Math.Min(CurrentHp + amount, UnmodifiedStats.Hp);
+        return CurrentHp - previousHp; // Return actual amount healed
     }
 
-    public void Damage(int amount)
+    /// <summary>
+    /// Returns the actual amount of damage taken (could be less than amount if at 0 HP).
+    /// </summary>
+    /// <param name="amount">The amount of damage to deal</param>
+    /// <returns>The acutual damage dealt</returns>
+    public int Damage(int amount)
     {
+        int previousHp = CurrentHp;
         CurrentHp = Math.Max(CurrentHp - amount, 0);
+        return previousHp - CurrentHp; // Return actual damage taken
     }
 
     public int GetAttackStat(Move move)
@@ -393,6 +415,7 @@ public class Pokemon
         if (!HasCondition(condition.Id))
         {
             Conditions.Add(condition);
+            condition.OnStart?.Invoke(this, null, null, PrintDebug);
         }
         else
         {
@@ -404,6 +427,22 @@ public class Pokemon
     {
         Condition? condition = GetCondition(conditionId);
         return condition != null && Conditions.Remove(condition);
+    }
+
+    public List<Condition> GetAllResidualConditions()
+    {
+        return Conditions.Where(c => c.OnResidual != null).ToList();
+    }
+
+    public void OnSwitchOut()
+    {
+        // Clear volatile conditions
+        Conditions.RemoveAll(c => c.ConditionVolatility == ConditionVolatility.Volatile);
+    }
+
+    public void OnSwitchIn()
+    {
+        //TODO: Trigger any switch-in effects from conditions, abilities, items, etc.
     }
 
     private int CalculateModifiedStat(StatId stat)

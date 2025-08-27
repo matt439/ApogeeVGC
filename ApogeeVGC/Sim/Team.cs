@@ -7,8 +7,8 @@ public class Team
 {
     public required Trainer Trainer { get; init; }
     public required PokemonSet PokemonSet { get; init; }
-
-    public required int ActivePokemonIndex
+    public bool PrintDebug { get; init; }
+    public int ActivePokemonIndex
     {
         get;
         set
@@ -18,13 +18,15 @@ public class Team
                 throw new ArgumentOutOfRangeException(nameof(value),
                     "ActivePokemon must be within the range of the Pokemon set.");
             }
+
             if (PokemonSet.Pokemons[value] == null)
             {
                 throw new InvalidOperationException("Active Pokemon cannot be null.");
             }
+
             field = value;
         }
-    }
+    } = 0;
     public Pokemon ActivePokemon
     {
         get
@@ -72,13 +74,13 @@ public class Team
 
 public static class TeamGenerator
 {
-    public static Team GenerateTestTeam(Library library, string trainerName)
+    public static Team GenerateTestTeam(Library library, string trainerName, bool printDebug = false)
     {
         return new Team
         {
-            Trainer = TrainerGenerator.GenerateTestTrainer(trainerName),
-            PokemonSet = PokemonBuilder.BuildTestSet(library),
-            ActivePokemonIndex = 0
+            Trainer = TrainerGenerator.GenerateTestTrainer(trainerName, printDebug),
+            PokemonSet = PokemonBuilder.BuildTestSet(library, printDebug),
+            PrintDebug = printDebug,
         };
     }
 }

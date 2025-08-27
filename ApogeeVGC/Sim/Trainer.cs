@@ -3,15 +3,17 @@
 public class Trainer
 {
     public required string Name { get; init; }
+    public bool PrintDebug { get; init; }
 }
 
 public static class TrainerGenerator
 {
-    public static Trainer GenerateTestTrainer(string name)
+    public static Trainer GenerateTestTrainer(string name, bool printDebug = false)
     {
         return new Trainer
         {
-            Name = name
+            Name = name,
+            PrintDebug = printDebug,
         };
     }
 }

@@ -29,7 +29,11 @@ public record Moves
                 Name = "Glacial Lance",
                 BasePp = 5,
                 Priority = 0,
-                Flags = new MoveFlags() { Protect = true, Mirror = true },
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Ice,
             },
@@ -43,7 +47,7 @@ public record Moves
                 Name = "Leech Seed",
                 BasePp = 10,
                 Priority = 0,
-                Flags = new MoveFlags()
+                Flags = new MoveFlags
                 {
                     Protect = true,
                     Reflectable = true,
@@ -66,7 +70,7 @@ public record Moves
                 Name = "Trick Room",
                 BasePp = 5,
                 Priority = -7,
-                Flags = new MoveFlags()
+                Flags = new MoveFlags
                 {
                     Mirror = true,
                     Metronome = true,
@@ -86,7 +90,7 @@ public record Moves
                 Name = "Protect",
                 BasePp = 10,
                 Priority = 4,
-                Flags = new MoveFlags()
+                Flags = new MoveFlags
                 {
                     NoAssist = true,
                     FailCopycat = true,
@@ -118,7 +122,7 @@ public record Moves
                 Name = "Struggle",
                 BasePp = 1,
                 Priority = 0,
-                Flags = new MoveFlags()
+                Flags = new MoveFlags
                 {
                     Protect = true,
                     Mirror = true,

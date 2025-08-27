@@ -20,13 +20,14 @@ public record Conditions
             Id = ConditionId.Burn,
             Name = "Burn",
             ConditionEffectType = ConditionEffectType.Status,
-            OnStart = (target, source, sourceEffect) =>
+            ConditionVolatility = ConditionVolatility.NonVolatile,
+            OnStart = (target, source, sourceEffect, debug) =>
             {
                 switch (sourceEffect.EffectType)
                 {
                     case EffectType.Item:
                     {
-                        if (sourceEffect is Item { Name: "Flame Orb" })
+                        if (sourceEffect is Item { Name: "Flame Orb" } && debug)
                         {
                             UiGenerator.PrintBurnStartFromFlameOrb(target);
                         }
@@ -34,7 +35,7 @@ public record Conditions
                     }
                     case EffectType.Ability:
                     {
-                        if (sourceEffect is Ability ability)
+                        if (sourceEffect is Ability ability && debug)
                         {
                             UiGenerator.PrintBurnStartFromAbility(target, ability);
                         }
@@ -46,72 +47,90 @@ public record Conditions
                     case EffectType.Format:
                         return false;
                     default:
-                        UiGenerator.PrintBurnStart(target);
+                        if (debug)
+                        {
+                            UiGenerator.PrintBurnStart(target);
+                        }
                         break;
                 }
                 return true;
             },
             OnResidualOrder = 10,
-            OnResidual = (target, source, effect) =>
+            OnResidual = (target, source, effect, debug) =>
             {
                 int damage = target.UnmodifiedHp / 16;
                 if (damage < 1) damage = 1;
                 target.Damage(damage);
-                UiGenerator.PrintBurnDamage(target);
+                if (debug)
+                {
+                    UiGenerator.PrintBurnDamage(target);
+                }
             }
         },
         [ConditionId.Paralysis] = new Condition
         {
             Id = ConditionId.Paralysis,
-            Name = "Paralysis"
+            Name = "Paralysis",
+            ConditionVolatility = ConditionVolatility.NonVolatile,
         },
         [ConditionId.Sleep] = new Condition
         {
             Id = ConditionId.Sleep,
-            Name = "Sleep"
+            Name = "Sleep",
+            ConditionVolatility = ConditionVolatility.NonVolatile,
         },
         [ConditionId.Freeze] = new Condition
         {
             Id = ConditionId.Freeze,
-            Name = "Freeze"
+            Name = "Freeze",
+            ConditionVolatility = ConditionVolatility.NonVolatile,
         },
         [ConditionId.Poison] = new Condition
         {
             Id = ConditionId.Poison,
-            Name = "Poison"
+            Name = "Poison",
+            ConditionVolatility = ConditionVolatility.NonVolatile,
         },
         [ConditionId.Toxic] = new Condition
         {
             Id = ConditionId.Toxic,
-            Name = "Toxic"
+            Name = "Toxic",
+            ConditionVolatility = ConditionVolatility.NonVolatile,
         },
         [ConditionId.Confusion] = new Condition
         {
             Id = ConditionId.Confusion,
-            Name = "Confusion"
+            Name = "Confusion",
+            ConditionVolatility = ConditionVolatility.Volatile,
         },
         [ConditionId.Flinch] = new Condition
         {
             Id = ConditionId.Flinch,
-            Name = "Flinch"
+            Name = "Flinch",
+            ConditionVolatility = ConditionVolatility.Volatile,
         },
         [ConditionId.ChoiceLock] = new Condition
         {
             Id = ConditionId.ChoiceLock,
-            Name = "Choice Lock"
+            Name = "Choice Lock",
+            ConditionVolatility = ConditionVolatility.Volatile,
         },
         [ConditionId.LeechSeed] = new Condition
         {
             Id = ConditionId.LeechSeed,
             Name = "Leech Seed",
             ConditionEffectType = ConditionEffectType.Status,
-            OnStart = (target, source, sourceEffect) =>
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnStart = (target, source, sourceEffect, debug) =>
             {
-                UiGenerator.PrintLeechSeedStart(target);
+                if (debug)
+                {
+                    UiGenerator.PrintLeechSeedStart(target);
+                }
                 return true;
             },
             OnResidualOrder = 8,
-            OnResidual = (target, source, effect) =>
+            OnResidual = (target, source, effect, debug) =>
             {
                 int damage = target.UnmodifiedHp / 8;
                 if (damage < 1) damage = 1;
@@ -120,12 +139,16 @@ public record Conditions
                 {
                     throw new InvalidOperationException("Target has fainted.");
                 }
-                target.Damage(damage);
+                int actualDamage = target.Damage(damage);
 
                 if (source is not null)
                 {
-                    source.Heal(damage);
-                    UiGenerator.PrintLeechSeedDamage(target, source, damage);
+                     int actualHeal = source.Team.ActivePokemon.Heal(damage);
+                    if (debug)
+                    {
+                        UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Team.ActivePokemon,
+                            actualHeal);
+                    }
                 }
                 else
                 {
@@ -139,6 +162,7 @@ public record Conditions
             Duration = 5,
             Name = "Trick Room",
             ConditionEffectType = ConditionEffectType.Terrain,
+            ConditionVolatility = ConditionVolatility.NonVolatile,
             DurationCallback = (sourcePokemon, _) =>
                 sourcePokemon.Ability.Id == AbilityId.Persistent ? 7 : 5,
             OnFieldStart = (_, _, _) =>
@@ -162,7 +186,9 @@ public record Conditions
             Name = "Stall",
             Duration = 2,
             CounterMax = 729,
-            OnStart = (target, _, _) =>
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnStart = (target, _, _, debug) =>
             {
                 Condition? condition = target.GetCondition(ConditionId.Stall);
 
@@ -226,6 +252,18 @@ public record Conditions
             Name = "Protect",
             Duration = 1,
             ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            // OnStart
+            OnTryHitPriority = 3,
+            OnTryHit = (target, source, move) =>
+            {
+                if (!(move.Flags.Protect ?? false))
+                {
+                    return true;
+                }
+                // TODO: Check for smart target (dragon darts), outrage lock
+                return false;
+            },
         },
     };
 }
