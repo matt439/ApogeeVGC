@@ -70,6 +70,10 @@ public class PseudoWeathers
                         UiGenerator.PrintFieldElementCounter(element);
                     }
                 },
+                OnPokemonSwitchIn = (pokemon, _) =>
+                {
+                    pokemon.AddCondition(_library.Conditions[ConditionId.TrickRoom]);
+                },
             },
         };
     }

@@ -860,7 +860,7 @@ public class Battle
         }
 
         // Check if the fastest Pokemon is unique
-        if (speedOrder[0].CurrentSpe > speedOrder[1].CurrentSpe)
+        if (speedOrder[0].CurrentSpe != speedOrder[1].CurrentSpe)
         {
             return speedOrder[0] == player1Pokemon ? PlayerId.Player1 : PlayerId.Player2;
         }

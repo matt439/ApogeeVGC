@@ -17,11 +17,13 @@ public static class UiGenerator
                 PrintTurnStart(battle.Turn);
                 PrintSecondarySide(battle, PlayerId.Player2);
                 PrintPrimarySide(battle, PlayerId.Player1);
+                PrintField(battle);
                 break;
             case PlayerId.Player2:
                 PrintTurnStart(battle.Turn);
                 PrintSecondarySide(battle, PlayerId.Player1);
                 PrintPrimarySide(battle, PlayerId.Player2);
+                PrintField(battle);
                 break;
             case PlayerId.None:
                 break;
@@ -241,18 +243,22 @@ public static class UiGenerator
         {
             return GenerateSelectChoiceString(battle, perspective, choice);
         }
+
         if (choice.IsMoveChoice())
         {
             return GenerateMoveChoiceString(battle, perspective, choice);
         }
+
         if (choice.IsSwitchChoice())
         {
             return GenerateSwitchChoiceString(battle, perspective, choice);
         }
+
         if (choice == Choice.Struggle)
         {
             return GenerateStruggleChoiceString();
         }
+
         throw new ArgumentException("Invalid choice type.", nameof(choice));
     }
 
@@ -265,11 +271,13 @@ public static class UiGenerator
         {
             throw new ArgumentOutOfRangeException(nameof(choice), "Invalid select choice.");
         }
+
         Pokemon pokemon = side.Team.PokemonSet.Pokemons[selectIndex];
         if (pokemon == null)
         {
             throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
         }
+
         StringBuilder sb = new();
         sb.Append($"Select: ");
         sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
@@ -284,11 +292,13 @@ public static class UiGenerator
         {
             throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
         }
+
         Move move = side.Team.ActivePokemon.Moves[moveIndex];
         if (move == null)
         {
             throw new InvalidOperationException("Move choice cannot be made to a null Move.");
         }
+
         StringBuilder sb = new();
         sb.Append("Move: ");
         sb.Append(move.Name);
@@ -308,11 +318,13 @@ public static class UiGenerator
         {
             throw new ArgumentOutOfRangeException(nameof(choice), "Invalid switch choice.");
         }
+
         Pokemon pokemon = side.Team.PokemonSet.Pokemons[switchIndex];
         if (pokemon == null)
         {
             throw new InvalidOperationException("Switch choice cannot be made to a null Pokemon.");
         }
+
         StringBuilder sb = new();
         sb.Append($"Switch: ");
         sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
@@ -333,26 +345,29 @@ public static class UiGenerator
     {
         Side side = battle.GetSide(perspective);
         Pokemon activePokemon = side.Team.ActivePokemon;
+
+        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
+        string conditionsInfo = FormatConditionsInfo(activePokemon);
+        string stats = SingleLineStats(activePokemon);
+        string statMods = SingleLineStatModifiers(activePokemon);
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
         StringBuilder sb = new();
         sb.Append(PrimarySpacer);
-        sb.Append($"{activePokemon.Name} ({activePokemon.Specie.Name}) ");
-        sb.Append($"{activePokemon.Gender.GenderIdString()}");
-        sb.Append(LevelSpacer);
-        sb.AppendLine($"Lv{activePokemon.Level}");
+        sb.AppendLine(pokemonInfo);
         sb.Append(PrimarySpacer);
         sb.Append(HpBarSpacer);
-        sb.Append(CreateHpBar(activePokemon));
-        sb.AppendLine($" {activePokemon.CurrentHp.ToString()} / {activePokemon.UnmodifiedHp.ToString()}");
+        sb.AppendLine(hpDisplay);
         sb.Append(PrimarySpacer);
-        sb.Append("Conditions: ");
-        foreach (Condition condition in activePokemon.Conditions)
-        {
-            sb.Append(condition.Name);
-            sb.Append(' ');
-        }
-        sb.AppendLine();
+        sb.AppendLine(conditionsInfo);
         sb.Append(PrimarySpacer);
-        sb.AppendLine($"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}\n\n");
+        sb.AppendLine(stats);
+        sb.Append(PrimarySpacer);
+        sb.AppendLine(statMods);
+        sb.Append(PrimarySpacer);
+        sb.AppendLine(remainingInfo);
+
         Console.WriteLine(sb.ToString());
     }
 
@@ -360,25 +375,90 @@ public static class UiGenerator
     {
         Side side = battle.GetSide(perspective);
         Pokemon activePokemon = side.Team.ActivePokemon;
+
+        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
+        string conditionsInfo = FormatConditionsInfo(activePokemon);
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
         StringBuilder sb = new();
-        sb.Append($"{activePokemon.Name} ({activePokemon.Specie.Name}) ");
-        sb.Append($"{activePokemon.Gender.GenderIdString()}");
-        sb.Append(LevelSpacer);
-        sb.AppendLine($"Lv{activePokemon.Level}");
+        sb.AppendLine(pokemonInfo);
         sb.Append(HpBarSpacer);
-        sb.Append(CreateHpBar(activePokemon));
-        sb.Append(' ');
-        sb.Append(activePokemon.CurrentHpPercentage.ToString());
-        sb.AppendLine("%");
+        sb.AppendLine(hpDisplay);
+        sb.AppendLine(conditionsInfo);
+        sb.AppendLine($"{remainingInfo}\n\n");
+
+        Console.WriteLine(sb.ToString());
+    }
+
+    private static string SingleLineStats(Pokemon pokemon)
+    {
+        StringBuilder sb = new();
+        sb.Append("Atk:");
+        sb.Append(pokemon.CurrentAtk);
+        sb.Append(", Def:");
+        sb.Append(pokemon.CurrentDef);
+        sb.Append(", SpA:");
+        sb.Append(pokemon.CurrentSpA);
+        sb.Append(", SpD:");
+        sb.Append(pokemon.CurrentSpD);
+        sb.Append(", Spe:");
+        sb.Append(pokemon.CurrentSpe);
+        return sb.ToString();
+    }
+
+    private static string SingleLineStatModifiers(Pokemon pokemon)
+    {
+        StringBuilder sb = new();
+        sb.Append("Atk:");
+        sb.Append(pokemon.StatModifiers.Atk);
+        sb.Append(", Def:");
+        sb.Append(pokemon.StatModifiers.Def);
+        sb.Append(", SpA:");
+        sb.Append(pokemon.StatModifiers.SpA);
+        sb.Append(", SpD:");
+        sb.Append(pokemon.StatModifiers.SpD);
+        sb.Append(", Spe:");
+        sb.Append(pokemon.StatModifiers.Spe);
+        sb.Append(", Acc:");
+        sb.Append(pokemon.StatModifiers.Accuracy);
+        sb.Append(", Eva:");
+        sb.Append(pokemon.StatModifiers.Evasion);
+        return sb.ToString();
+    }
+
+    private static string FormatPokemonBasicInfo(Pokemon activePokemon)
+    {
+        return $"{activePokemon.Name} ({activePokemon.Specie.Name}) " +
+               $"{activePokemon.Gender.GenderIdString()}{LevelSpacer}Lv{activePokemon.Level}";
+    }
+
+    private static string FormatHpDisplay(Pokemon activePokemon, bool showExactHp)
+    {
+        string hpBar = CreateHpBar(activePokemon);
+
+        return showExactHp ?
+            $"{hpBar} {activePokemon.CurrentHp} / {activePokemon.UnmodifiedHp}" :
+            $"{hpBar} {activePokemon.CurrentHpPercentage}%";
+    }
+
+    private static string FormatConditionsInfo(Pokemon activePokemon)
+    {
+        StringBuilder sb = new();
         sb.Append("Conditions: ");
+        
         foreach (Condition condition in activePokemon.Conditions)
         {
             sb.Append(condition.Name);
             sb.Append(' ');
         }
-        sb.AppendLine();
-        sb.AppendLine($"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}\n\n");
-        Console.WriteLine(sb.ToString());
+        
+        return sb.ToString();
+    }
+
+    private static string FormatRemainingPokemonInfo(Side side)
+    {
+        return $"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}";
     }
 
     private static string CreateHpBar(Pokemon pokemon)
@@ -391,12 +471,55 @@ public static class UiGenerator
         return $"[{filledPart}{emptyPart}]";
     }
 
-    
-
     private static void PrintTurnStart(int turn)
     {
         int turnNumber = turn + 1;
         string turnString = turnNumber.ToString(CultureInfo.InvariantCulture);
         Console.WriteLine($"\n{TurnSpacer}  Turn {turnString}  {TurnSpacer}\n");
+    }
+
+    private static void PrintField(Battle battle)
+    {
+        Field field = battle.Field;
+
+        StringBuilder sb = new();
+        sb.AppendLine("*** Field State ***");
+        sb.Append("Weather: ");
+        if (field.HasAnyWeather)
+        {
+            sb.Append($"{field.Weather!.Name} ({field.Weather.RemainingTurns} turns remaining)");
+        }
+        else
+        {
+            sb.Append("None");
+        }
+        sb.AppendLine();
+
+        sb.Append("Terrain: ");
+        if (field.HasAnyTerrain)
+        {
+            sb.Append($"{field.Terrain!.Name} ({field.Terrain.RemainingTurns} turns remaining)");
+        }
+        else
+        {
+            sb.Append("None");
+        }
+        sb.AppendLine();
+
+
+        if (field.PseudoWeatherList.Count == 0)
+        {
+            sb.AppendLine("Pseudo-Weathers: None");
+        }
+        else
+        {
+            sb.AppendLine("Pseudo-Weathers:");
+            foreach (PseudoWeather pseudoWeather in field.PseudoWeatherList)
+            {
+                sb.AppendLine($"{pseudoWeather.Name} ({pseudoWeather.RemainingTurns} turns remaining)");
+            }
+        }
+        sb.AppendLine();
+        Console.WriteLine(sb.ToString());
     }
 }

@@ -144,7 +144,7 @@ public class Field
     public Terrain? Terrain { get; private set; }
     public bool HasAnyWeather => Weather != null;
     public bool HasAnyTerrain => Terrain != null;
-    private List<PseudoWeather> PseudoWeatherList { get; init; } = [];
+    public List<PseudoWeather> PseudoWeatherList { get; init; } = [];
 
     public bool HasWeather(WeatherId weatherId)
     {

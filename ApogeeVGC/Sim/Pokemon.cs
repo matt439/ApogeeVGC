@@ -280,7 +280,7 @@ public class Pokemon
     public int CurrentSpD => CalculateModifiedStat(StatId.SpD);
     public int CurrentSpe => CalculateModifiedStat(StatId.Spe);
     public double CurrentHpRatio => (double)CurrentHp / UnmodifiedHp;
-    public int CurrentHpPercentage => (int)(CurrentHpRatio * 100);
+    public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
     public bool PrintDebug { get; init; }
 
