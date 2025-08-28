@@ -282,6 +282,40 @@ public record Move : IEffect
     /// <returns>A new Move instance with copied state</returns>
     public Move Copy()
     {
-        return new Move(this);
+        return this with 
+        { 
+            // Records have built-in copy semantics with 'with' expression
+            // This creates a shallow copy which is appropriate since most properties
+            // are either value types, immutable references, or function delegates
+            // The mutable properties (PpUp, UsedPp) are copied correctly
+        };
+    }
+
+    // Add copy constructor for explicit copying when needed
+    public Move(Move original)
+    {
+        Id = original.Id;
+        Num = original.Num;
+        Name = original.Name;
+        Accuracy = original.Accuracy;
+        BasePower = original.BasePower;
+        Category = original.Category;
+        BasePp = original.BasePp;
+        PpUp = original.PpUp;
+        UsedPp = original.UsedPp;
+        Priority = original.Priority;
+        Flags = original.Flags;
+        Target = original.Target;
+        Type = original.Type;
+        Secondary = original.Secondary;
+        Condition = original.Condition;
+        AlwaysHit = original.AlwaysHit;
+        StallingMove = original.StallingMove;
+        OnTryImmunity = original.OnTryImmunity;
+        OnPrepareHit = original.OnPrepareHit;
+        OnHit = original.OnHit;
+        Weather = original.Weather;
+        Terrain = original.Terrain;
+        PseudoWeather = original.PseudoWeather;
     }
 }

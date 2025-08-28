@@ -82,6 +82,14 @@ public class Weather : FieldElement
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
             ElapsedTurns = ElapsedTurns,
+            PrintDebug = PrintDebug, // Added missing PrintDebug
+            // Note: Action delegates (OnEnd, OnStart, etc.) are shared immutable references
+            // since they don't contain mutable state - they're function pointers
+            OnEnd = OnEnd,
+            OnStart = OnStart,
+            OnReapply = OnReapply,
+            OnIncrementTurnCounter = OnIncrementTurnCounter,
+            OnPokemonSwitchIn = OnPokemonSwitchIn,
         };
     }
 }
@@ -108,6 +116,13 @@ public class Terrain : FieldElement
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
             ElapsedTurns = ElapsedTurns,
+            PrintDebug = PrintDebug, // Added missing PrintDebug
+            // Note: Action delegates are shared immutable references
+            OnEnd = OnEnd,
+            OnStart = OnStart,
+            OnReapply = OnReapply,
+            OnIncrementTurnCounter = OnIncrementTurnCounter,
+            OnPokemonSwitchIn = OnPokemonSwitchIn,
         };
     }
 }
@@ -134,6 +149,13 @@ public class PseudoWeather : FieldElement
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
             ElapsedTurns = ElapsedTurns,
+            PrintDebug = PrintDebug, // Added missing PrintDebug
+            // Note: Action delegates are shared immutable references
+            OnEnd = OnEnd,
+            OnStart = OnStart,
+            OnReapply = OnReapply,
+            OnIncrementTurnCounter = OnIncrementTurnCounter,
+            OnPokemonSwitchIn = OnPokemonSwitchIn,
         };
     }
 }

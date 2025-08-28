@@ -260,7 +260,7 @@ public class Pokemon
         }
     }
 
-    public List<Condition> Conditions { get; } = [];
+    public List<Condition> Conditions { get; init; } = [];
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }
@@ -307,12 +307,13 @@ public class Pokemon
         Pokemon copy = new(Specie, Evs, Ivs, Nature, Level)
         {
             Moves = Moves.Select(m => m.Copy()).ToArray(), // Deep copy of moves
+            Conditions = Conditions.Select(c => c.Copy()).ToList(), // Deep copy of conditions
             Item = Item,          // Immutable, safe to share
             Ability = Ability,    // Immutable, safe to share
             Name = Name,
             Shiny = Shiny,
             TerraType = TerraType,
-            Gender = Gender
+            Gender = Gender,
         };
 
         // Copy the current HP state (most important for battle simulation)

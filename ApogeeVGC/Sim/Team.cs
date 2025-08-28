@@ -54,7 +54,8 @@ public class Team
         {
             Trainer = Trainer, // Trainer is immutable, safe to share
             PokemonSet = PokemonSet.Copy(),
-            ActivePokemonIndex = ActivePokemonIndex
+            ActivePokemonIndex = ActivePokemonIndex,
+            PrintDebug = PrintDebug, // Added missing PrintDebug
         };
     }
 

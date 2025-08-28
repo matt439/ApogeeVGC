@@ -19,6 +19,7 @@ public class Side
         {
             PlayerId = PlayerId, // Value type, safe to copy
             Team = Team.Copy(),
+            PrintDebug = PrintDebug, // Added missing PrintDebug
         };
     }
 }
