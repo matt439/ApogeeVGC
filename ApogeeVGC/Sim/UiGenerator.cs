@@ -119,6 +119,14 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintMoveImmuneAction(Pokemon attacker, Move move, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
+        sb.AppendLine($"{defender.Name} is immune!");
+        Console.WriteLine(sb.ToString());
+    }
+
     public static void PrintStatusMoveAction(Pokemon attackr, Move move)
     {
         StringBuilder sb = new();
@@ -147,6 +155,13 @@ public static class UiGenerator
     {
         StringBuilder sb = new();
         sb.AppendLine($"{trainerName} selected {pokemon.Name} to switch in.");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintForceSwitchAction(string trainerName, Pokemon switchedOut, Pokemon switchedIn)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{trainerName} was forced to switch! {trainerName} withdrew {switchedOut.Name} and sent out {switchedIn.Name}!");
         Console.WriteLine(sb.ToString());
     }
 

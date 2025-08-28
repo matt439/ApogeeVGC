@@ -292,31 +292,31 @@ public record Move : IEffect
         };
     }
 
-    // Add copy constructor for explicit copying when needed
-    public Move(Move original)
-    {
-        Id = original.Id;
-        Num = original.Num;
-        Name = original.Name;
-        Accuracy = original.Accuracy;
-        BasePower = original.BasePower;
-        Category = original.Category;
-        BasePp = original.BasePp;
-        PpUp = original.PpUp;
-        UsedPp = original.UsedPp;
-        Priority = original.Priority;
-        Flags = original.Flags;
-        Target = original.Target;
-        Type = original.Type;
-        Secondary = original.Secondary;
-        Condition = original.Condition;
-        AlwaysHit = original.AlwaysHit;
-        StallingMove = original.StallingMove;
-        OnTryImmunity = original.OnTryImmunity;
-        OnPrepareHit = original.OnPrepareHit;
-        OnHit = original.OnHit;
-        Weather = original.Weather;
-        Terrain = original.Terrain;
-        PseudoWeather = original.PseudoWeather;
-    }
+    //// Add copy constructor for explicit copying when needed
+    //public Move(Move original)
+    //{
+    //    Id = original.Id;
+    //    Num = original.Num;
+    //    Name = original.Name;
+    //    Accuracy = original.Accuracy;
+    //    BasePower = original.BasePower;
+    //    Category = original.Category;
+    //    BasePp = original.BasePp;
+    //    PpUp = original.PpUp;
+    //    UsedPp = original.UsedPp;
+    //    Priority = original.Priority;
+    //    Flags = original.Flags;
+    //    Target = original.Target;
+    //    Type = original.Type;
+    //    Secondary = original.Secondary;
+    //    Condition = original.Condition;
+    //    AlwaysHit = original.AlwaysHit;
+    //    StallingMove = original.StallingMove;
+    //    OnTryImmunity = original.OnTryImmunity;
+    //    OnPrepareHit = original.OnPrepareHit;
+    //    OnHit = original.OnHit;
+    //    Weather = original.Weather;
+    //    Terrain = original.Terrain;
+    //    PseudoWeather = original.PseudoWeather;
+    //}
 }
