@@ -53,7 +53,7 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.LeechSeed],
+                Condition = _library.Conditions[ConditionId.LeechSeed].Copy(),
                 OnTryImmunity = (target) => target.HasType(MoveType.Grass),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -75,7 +75,7 @@ public record Moves
                     Metronome = true,
                 },
                 //Condition = _library.Conditions[ConditionId.TrickRoom],
-                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom],
+                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom].Copy(),
                 Target = MoveTarget.Field,
                 Type = MoveType.Psychic,
             },
@@ -104,10 +104,10 @@ public record Moves
                     {
                         throw new ArgumentNullException(nameof(source), "Source cannot be null in Protect move.");
                     }
-                    source.AddCondition(_library.Conditions[ConditionId.Stall], context);
+                    source.AddCondition(_library.Conditions[ConditionId.Stall].Copy(), context);
                     return true;
                 },
-                Condition = _library.Conditions[ConditionId.Protect],
+                Condition = _library.Conditions[ConditionId.Protect].Copy(),
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },

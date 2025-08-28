@@ -282,6 +282,6 @@ public record Move : IEffect
     /// <returns>A new Move instance with copied state</returns>
     public Move Copy()
     {
-        return this with { };
+        return new Move(this);
     }
 }

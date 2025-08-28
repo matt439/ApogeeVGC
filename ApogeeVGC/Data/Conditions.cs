@@ -209,14 +209,15 @@ public record Conditions
                 double successChance = 1.0 / counter;
                 bool success = context.Random.NextDouble() < successChance;
 
+                //success = false; // For testing purposes only, force stall to always fail.
+
                 if (success) return success;
 
                 if (!pokemon.RemoveCondition(ConditionId.Stall))
                 {
                     throw new InvalidOperationException("Failed to remove Stall condition.");
                 }
-                //return success;
-                return true;
+                return success;
             },
             OnRestart = (target, _, _, _) =>
             {

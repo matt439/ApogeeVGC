@@ -282,7 +282,7 @@ public class Battle
         //}
 
         var side1Conditions = Side1.Team.ActivePokemon.Conditions.ToList();
-        foreach (Condition condition in side1Conditions)
+        foreach (Condition condition in side1Conditions.ToList())
         {
             condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
             if (!condition.Duration.HasValue) continue;
@@ -294,7 +294,7 @@ public class Battle
         }
 
         var side2Conditions = Side2.Team.ActivePokemon.Conditions.ToList();
-        foreach (Condition condition in side2Conditions)
+        foreach (Condition condition in side2Conditions.ToList())
         {
             condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
             if (!condition.Duration.HasValue) continue;
@@ -602,7 +602,7 @@ public class Battle
         }
 
         // check every condition on defender for OnTryHit effects
-        foreach (Condition condition in defender.Conditions)
+        foreach (Condition condition in defender.Conditions.ToList())
         {
             if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
             if (PrintDebug)

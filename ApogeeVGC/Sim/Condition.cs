@@ -68,4 +68,10 @@ public record Condition : IEffect
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTryHit { get; init; }
     public Action<Pokemon, BattleContext>? OnTurnEnd { get; init; }
     //public Action<Field>? OnPseudoWeatherStart { get; init; }
+
+
+    public Condition Copy()
+    {
+        return new Condition(this);
+    }
 }
