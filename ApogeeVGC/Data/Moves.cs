@@ -154,6 +154,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.IceBasic] = new Move
             {
@@ -167,6 +171,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.DragonBasic] = new Move
             {
@@ -180,6 +188,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.FireBasic] = new Move
             {
@@ -193,6 +205,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.BugBasic] = new Move
             {
@@ -206,6 +222,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.FairyBasic] = new Move
             {
@@ -219,6 +239,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.GroundBasic] = new Move
             {
@@ -232,6 +256,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.FightingBasic] = new Move
             {
@@ -245,6 +273,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.SteelBasic] = new Move
             {
@@ -258,6 +290,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.DarkBasic] = new Move
             {
@@ -271,6 +307,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.ElectricBasic] = new Move
             {
@@ -284,6 +324,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.GrassBasic] = new Move
             {
@@ -297,6 +341,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.PsychicBasic] = new Move
             {
@@ -310,6 +358,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.PoisonBasic] = new Move
             {
@@ -323,6 +375,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Poison,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.FlyingBasic] = new Move
             {
@@ -336,6 +392,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Flying,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.RockBasic] = new Move
             {
@@ -349,6 +409,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Rock,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.WaterBasic] = new Move
             {
@@ -362,6 +426,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
             [MoveId.GhostBasic] = new Move
             {
@@ -375,6 +443,10 @@ public record Moves
                 Priority = 0,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ghost,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
             },
         };
     }

@@ -56,7 +56,10 @@ public record Condition : IEffect
     //public Action<Field?>? OnFieldEnd { get; init; }
     public int? CounterMax { get; init; }
     public int? Counter { get; set; }
-    public Func<Random, Pokemon, BattleContext, bool>? OnStallMove { get; init; }
+    public Func<Pokemon, BattleContext, bool>? OnStallMove { get; init; }
+    /// <summary>
+    /// target, source, sourceEffect, context
+    /// </summary>
     public Func<Pokemon, Pokemon?, IEffect?, BattleContext, bool>? OnRestart { get; init; }
     public int? OnTryHitPriority { get; init; }
     /// <summary>

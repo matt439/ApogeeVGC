@@ -238,7 +238,7 @@ public class Battle
                 PlayerId.Player1 => GetAvailableChoices(Side1),
                 PlayerId.Player2 => GetAvailableChoices(Side2),
                 PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'"),
-                _ => throw new ArgumentException("Invalid player ID", nameof(playerId))
+                _ => throw new ArgumentException("Invalid player ID", nameof(playerId)),
             };
         }
     }
@@ -267,18 +267,42 @@ public class Battle
 
     private void HandleConditionTurnEnds()
     {
-        // get all conditions with OnTurnEnd from both active Pokemon
-        var side1Conditions = Side1.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
-        var side2Conditions = Side2.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
+        //// get all conditions with OnTurnEnd from both active Pokemon
+        //var side1Conditions = Side1.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
+        //var side2Conditions = Side2.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
 
+        //foreach (Condition condition in side1Conditions)
+        //{
+        //    condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
+        //}
+
+        //foreach (Condition condition in side2Conditions)
+        //{
+        //    condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
+        //}
+
+        var side1Conditions = Side1.Team.ActivePokemon.Conditions.ToList();
         foreach (Condition condition in side1Conditions)
         {
             condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
+            if (!condition.Duration.HasValue) continue;
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                Side1.Team.ActivePokemon.RemoveCondition(condition.Id);
+            }
         }
 
+        var side2Conditions = Side2.Team.ActivePokemon.Conditions.ToList();
         foreach (Condition condition in side2Conditions)
         {
             condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
+            if (!condition.Duration.HasValue) continue;
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                Side2.Team.ActivePokemon.RemoveCondition(condition.Id);
+            }
         }
     }
 
@@ -541,6 +565,20 @@ public class Battle
                                                 $"for player {playerId}");
         }
         move.UsedPp++;  // Decrease PP for the move used
+
+        if (move.StallingMove)
+        {
+            // check for conditions with OnStallMove on attacker
+            foreach (Condition condition in attacker.Conditions.ToList())
+            {
+                if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintMoveFailAction(attacker, move);
+                }
+                return;
+            }
+        }
 
         Pokemon defender = defSide.Team.ActivePokemon;
 

@@ -173,6 +173,14 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintMoveFailAction(Pokemon attacker, Move move)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used {move.Name}.");
+        sb.AppendLine("But it failed!");
+        Console.WriteLine(sb.ToString());
+    }
+
     public static void PrintBurnDamage(Pokemon target)
     {
         Console.WriteLine($"{target.Name} is hurt by its burn!");
@@ -450,6 +458,14 @@ public static class UiGenerator
         foreach (Condition condition in activePokemon.Conditions)
         {
             sb.Append(condition.Name);
+            if (condition.Duration.HasValue)
+            {
+                sb.Append($"({condition.Duration} turns)");
+            }
+            if (condition.Counter.HasValue)
+            {
+                sb.Append($"[Count: {condition.Counter}]");
+            }
             sb.Append(' ');
         }
         

@@ -187,7 +187,6 @@ public record Conditions
             OnStart = (target, _, _, _) =>
             {
                 Condition? condition = target.GetCondition(ConditionId.Stall);
-
                 if (condition is null)
                 {
                     throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
@@ -197,10 +196,9 @@ public record Conditions
                 condition.Counter = 3;
                 return true;
             },
-            OnStallMove = (random, pokemon, _) =>
+            OnStallMove = (pokemon, context) =>
             {
                 Condition? condition = pokemon.GetCondition(ConditionId.Stall);
-
                 if (condition is null)
                 {
                     throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
@@ -209,7 +207,7 @@ public record Conditions
 
                 int counter = condition.Counter ?? 1;
                 double successChance = 1.0 / counter;
-                bool success = random.NextDouble() < successChance;
+                bool success = context.Random.NextDouble() < successChance;
 
                 if (success) return success;
 
@@ -217,12 +215,12 @@ public record Conditions
                 {
                     throw new InvalidOperationException("Failed to remove Stall condition.");
                 }
-                return success;
+                //return success;
+                return true;
             },
             OnRestart = (target, _, _, _) =>
             {
                 Condition? condition = target.GetCondition(ConditionId.Stall);
-
                 if (condition is null)
                 {
                     throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
@@ -253,13 +251,13 @@ public record Conditions
             OnTryHitPriority = 3,
             // TODO: Check for smart target (dragon darts), outrage lock
             OnTryHit = (_, _, move, _) => !(move.Flags.Protect ?? false),
-            OnTurnEnd = (target, _) =>
-            {
-                if (!target.RemoveCondition(ConditionId.Protect))
-                {
-                    throw new InvalidOperationException("Failed to remove Protect condition.");
-                }
-            },
+            //OnTurnEnd = (target, _) =>
+            //{
+            //    if (!target.RemoveCondition(ConditionId.Protect))
+            //    {
+            //        throw new InvalidOperationException("Failed to remove Protect condition.");
+            //    }
+            //},
         },
     };
 }

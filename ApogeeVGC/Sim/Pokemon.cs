@@ -410,16 +410,18 @@ public class Pokemon
         return Conditions.FirstOrDefault(c => c.Id == conditionId);
     }
 
-    public void AddCondition(Condition condition, BattleContext context)
+    public void AddCondition(Condition condition, BattleContext context, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        if (!HasCondition(condition.Id))
+        Condition? existingCondition = GetCondition(condition.Id);
+
+        if (existingCondition is null)
         {
             Conditions.Add(condition);
             condition.OnStart?.Invoke(this, null, null, context);
         }
         else
         {
-            throw new InvalidOperationException($"Pokemon already has condition {condition.Id}.");
+            existingCondition.OnRestart?.Invoke(this, source, sourceEffect, context);
         }
     }
 
@@ -434,10 +436,10 @@ public class Pokemon
         return Conditions.Where(c => c.OnResidual != null).ToArray();
     }
 
-    public Condition[] GetAllConditionsWithTurnEnd()
-    {
-        return Conditions.Where(c => c.OnTurnEnd != null).ToArray();
-    }
+    //public Condition[] GetAllConditionsWithTurnEnd()
+    //{
+    //    return Conditions.Where(c => c.OnTurnEnd != null).ToArray();
+    //}
 
     public void OnSwitchOut()
     {
