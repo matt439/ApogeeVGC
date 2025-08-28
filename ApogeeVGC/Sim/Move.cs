@@ -274,6 +274,7 @@ public record Move : IEffect
     public Weather? Weather { get; init; }
     public Terrain? Terrain { get; init; }
     public PseudoWeather? PseudoWeather { get; init; }
+    public bool SelfSwitch { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

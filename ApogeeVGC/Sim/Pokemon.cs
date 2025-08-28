@@ -118,7 +118,7 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Miraidon,
-                    [new MoveSetup(MoveId.DragonBasic),
+                    [new MoveSetup(MoveId.VoltSwitch),
                         new MoveSetup(MoveId.ElectricBasic),
                             new MoveSetup(MoveId.FlyingBasic),
                                 new MoveSetup(MoveId.PsychicBasic)],

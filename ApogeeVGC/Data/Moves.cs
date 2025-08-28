@@ -111,6 +111,26 @@ public record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
+            [MoveId.VoltSwitch] = new()
+            {
+                Id = MoveId.VoltSwitch,
+                Num = 521,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Special,
+                Name = "Volt Switch",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                SelfSwitch = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
 
 
 

@@ -42,6 +42,12 @@ public enum PlayerState
     Idle,
 }
 
+public enum MoveAction
+{
+    None,
+    SwitchAttackerOut,
+}
+
 
 public record BattleContext
 {
@@ -451,7 +457,7 @@ public class Battle
 
         if (choice.IsMoveChoice())
         {
-            PerformMove(playerId, choice);
+            MoveAction moveAction = PerformMove(playerId, choice);
             SetPendingChoice(playerId, null);
             SetPlayerState(playerId, PlayerState.Idle);
 
@@ -551,7 +557,7 @@ public class Battle
         }
     }
 
-    private void PerformMove(PlayerId playerId, Choice choice)
+    private MoveAction PerformMove(PlayerId playerId, Choice choice)
     {
         Side atkSide = GetSide(playerId);
         Side defSide = GetSide(playerId.OpposingPlayerId());
@@ -576,21 +582,24 @@ public class Battle
                 {
                     UiGenerator.PrintMoveFailAction(attacker, move);
                 }
-                return;
+
+                return MoveAction.None;
             }
         }
 
         Pokemon defender = defSide.Team.ActivePokemon;
 
+        // Miss check
         if (IsMoveMiss(attacker, move, defender))
         {
             if (PrintDebug)
             {
                 UiGenerator.PrintMoveMissAction(attacker, move, defender);
             }
-            return;
+            return MoveAction.None;
         }
 
+        // Immunity check
         if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
             move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
         {
@@ -598,7 +607,7 @@ public class Battle
             {
                 UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
             }
-            return;
+            return MoveAction.None;
         }
 
         // check every condition on defender for OnTryHit effects
@@ -609,24 +618,18 @@ public class Battle
             {
                 UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
             }
-            return;
+            return MoveAction.None;
         }
 
-        switch (move.Category)
+        return move.Category switch
         {
-            case MoveCategory.Physical:
-            case MoveCategory.Special:
-                PerformDamagingMove(attacker, move, defender);
-                break;
-            case MoveCategory.Status:
-                PerformStatusMove(attacker, move, defender);
-                break;
-            default:
-                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}");
-        }
+            MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, move, defender),
+            MoveCategory.Status => PerformStatusMove(attacker, move, defender),
+            _ => throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}")
+        };
     }
 
-    private void PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender)
+    private MoveAction PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender)
     {
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
@@ -639,19 +642,21 @@ public class Battle
         {
             UiGenerator.PrintDamagingMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
         }
+
+        return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
     }
 
-    private void PerformStatusMove(Pokemon attacker, Move move, Pokemon defender)
+    private MoveAction PerformStatusMove(Pokemon attacker, Move move, Pokemon defender)
     {
         if (move.Target == MoveTarget.Field)
         {
             HandleFieldTargetStatusMove(move);
-            return;
+            return MoveAction.None;
         }
 
         if (move.Condition is null)
         {
-            return;
+            return MoveAction.None;
         }
 
         if (PrintDebug)
@@ -693,7 +698,7 @@ public class Battle
                 throw new ArgumentOutOfRangeException();
         }
 
-        
+        return MoveAction.None;
     }
 
     private void HandleFieldTargetStatusMove(Move move)
