@@ -18,7 +18,7 @@ public class Side
         return new Side
         {
             PlayerId = PlayerId, // Value type, safe to copy
-            Team = Team.Copy()
+            Team = Team.Copy(),
         };
     }
 }

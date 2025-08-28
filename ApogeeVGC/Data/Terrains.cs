@@ -1,46 +1,52 @@
 ﻿using ApogeeVGC.Sim;
 using System.Collections.ObjectModel;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ApogeeVGC.Data;
 
 public record Terrains
 {
     public IReadOnlyDictionary<TerrainId, Terrain> TerrainData { get; }
+    private readonly Library _library;
 
-    public Terrains()
+    public Terrains(Library library)
     {
-        TerrainData = new ReadOnlyDictionary<TerrainId, Terrain>(_terrains);
+        _library = library;
+        TerrainData = new ReadOnlyDictionary<TerrainId, Terrain>(CreateTerrains());
     }
 
-    private readonly Dictionary<TerrainId, Terrain> _terrains = new()
+    private Dictionary<TerrainId, Terrain> CreateTerrains()
     {
-        [TerrainId.Electric] = new Terrain
+        return new Dictionary<TerrainId, Terrain>
         {
-            TerrainId = TerrainId.Electric,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [TerrainId.Grassy] = new Terrain
-        {
-            TerrainId = TerrainId.Grassy,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [TerrainId.Misty] = new Terrain
-        {
-            TerrainId = TerrainId.Misty,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [TerrainId.Psychic] = new Terrain
-        {
-            TerrainId = TerrainId.Psychic,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-    };
+            [TerrainId.Electric] = new Terrain
+            {
+                Id = TerrainId.Electric,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [TerrainId.Grassy] = new Terrain
+            {
+                Id = TerrainId.Grassy,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [TerrainId.Misty] = new Terrain
+            {
+                Id = TerrainId.Misty,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [TerrainId.Psychic] = new Terrain
+            {
+                Id = TerrainId.Psychic,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+        };
+    }
 }

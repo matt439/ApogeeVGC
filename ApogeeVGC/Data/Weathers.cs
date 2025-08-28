@@ -6,41 +6,46 @@ namespace ApogeeVGC.Data;
 public record Weathers
 {
     public IReadOnlyDictionary<WeatherId, Weather> WeatherData { get; }
+    private readonly Library _library;
 
-    public Weathers()
+    public Weathers(Library library)
     {
-        WeatherData = new ReadOnlyDictionary<WeatherId, Weather>(_weathers);
+        _library = library;
+        WeatherData = new ReadOnlyDictionary<WeatherId, Weather>(CreateWeathers());
     }
 
-    private readonly Dictionary<WeatherId, Weather> _weathers = new()
+    private Dictionary<WeatherId, Weather> CreateWeathers()
     {
-        [WeatherId.HarshSunlight] = new Weather
+        return new Dictionary<WeatherId, Weather>
         {
-            WeatherId = WeatherId.HarshSunlight,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [WeatherId.Rain] = new Weather
-        {
-            WeatherId = WeatherId.Rain,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [WeatherId.Sandstorm] = new Weather
-        {
-            WeatherId = WeatherId.Sandstorm,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-        [WeatherId.Snow] = new Weather
-        {
-            WeatherId = WeatherId.Snow,
-            BaseDuration = 5,
-            DurationExtension = 3,
-            // TODO: Implement effects
-        },
-    };
+            [WeatherId.HarshSunlight] = new Weather
+            {
+                Id = WeatherId.HarshSunlight,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [WeatherId.Rain] = new Weather
+            {
+                Id = WeatherId.Rain,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [WeatherId.Sandstorm] = new Weather
+            {
+                Id = WeatherId.Sandstorm,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+            [WeatherId.Snow] = new Weather
+            {
+                Id = WeatherId.Snow,
+                BaseDuration = 5,
+                DurationExtension = 3,
+                // TODO: Implement effects
+            },
+        };
+    }
 }

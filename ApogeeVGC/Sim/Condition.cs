@@ -14,7 +14,7 @@ public enum ConditionId
     Flinch,
     ChoiceLock,
     LeechSeed,
-    //TrickRoom,
+    TrickRoom,
     Stall,
     Protect,
 }

@@ -162,30 +162,32 @@ public record Conditions
                 }
             },
         },
-        //// This condition is the effect placed on each Pokemon by Trick Room.
-        //// Trick Room itself is a PseudoWeather condition on the field which applies
-        //// this condition to each Pokemon.
-        //[ConditionId.TrickRoom] = new Condition
-        //{
-        //    Id = ConditionId.TrickRoom,
-        //    Name = "Trick Room",
-        //    ConditionEffectType = ConditionEffectType.PseudoWeather,
-        //    ConditionVolatility = ConditionVolatility.Volatile,
-        //    //OnFieldStart = (_, _, _) =>
-        //    //{
-        //    //    UiGenerator.PrintTrickRoomStart();
-        //    //},
-        //    //OnFieldRestart = (_, _, _) =>
-        //    //{
-        //    //    UiGenerator.PrintTrickRoomRestart();
-        //    //},
-        //    //OnFieldResidualOrder = 27,
-        //    //OnFieldResidualSubOrder = 1,
-        //    //OnFieldEnd = (_) =>
-        //    //{
-        //    //    UiGenerator.PrintTrickRoomEnd();
-        //    //},
-        //},
+        // This condition is the effect placed on each Pokemon by Trick Room.
+        // Trick Room itself is a PseudoWeather condition on the field which applies
+        // this condition to each Pokemon.
+        // This condition doesn't have apply any effect to the Pokemon itself but could
+        // be useful for UI etc.
+        [ConditionId.TrickRoom] = new Condition
+        {
+            Id = ConditionId.TrickRoom,
+            Name = "Trick Room",
+            ConditionEffectType = ConditionEffectType.PseudoWeather,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            //OnFieldStart = (_, _, _) =>
+            //{
+            //    UiGenerator.PrintTrickRoomStart();
+            //},
+            //OnFieldRestart = (_, _, _) =>
+            //{
+            //    UiGenerator.PrintTrickRoomRestart();
+            //},
+            //OnFieldResidualOrder = 27,
+            //OnFieldResidualSubOrder = 1,
+            //OnFieldEnd = (_) =>
+            //{
+            //    UiGenerator.PrintTrickRoomEnd();
+            //},
+        },
         [ConditionId.Stall] = new Condition
         {
             Id = ConditionId.Stall,

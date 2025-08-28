@@ -6,20 +6,63 @@ namespace ApogeeVGC.Data;
 public class PseudoWeathers
 {
     public IReadOnlyDictionary<PseudoWeatherId, PseudoWeather> PseudoWeatherData { get; }
+    private readonly Library _library;
 
-    public PseudoWeathers()
+    public PseudoWeathers(Library library)
     {
-        PseudoWeatherData = new ReadOnlyDictionary<PseudoWeatherId, PseudoWeather>(_pseudoWeathers);
+        _library = library;
+        PseudoWeatherData = new ReadOnlyDictionary<PseudoWeatherId, PseudoWeather>(CreatePseudoWeathers());
     }
 
-    private readonly Dictionary<PseudoWeatherId, PseudoWeather> _pseudoWeathers = new()
+    private Dictionary<PseudoWeatherId, PseudoWeather> CreatePseudoWeathers()
     {
-        [PseudoWeatherId.TrickRoom] = new PseudoWeather
+        return new Dictionary<PseudoWeatherId, PseudoWeather>
         {
-            PseudoWeatherId = PseudoWeatherId.TrickRoom,
-            BaseDuration = 5,
-            DurationExtension = 0,
-            // TODO: Implement effects
-        },
-    };
+            [PseudoWeatherId.TrickRoom] = new()
+            {
+                Id = PseudoWeatherId.TrickRoom,
+                BaseDuration = 5,
+                DurationExtension = 0,
+                OnStart = (pokemon, context) =>
+                {
+                    // For each pokemon on the field, add the trick room condition
+                    foreach (Pokemon p in pokemon)
+                    {
+                        p.AddCondition(_library.Conditions[ConditionId.TrickRoom]);
+                    }
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintTrickRoomStart();
+                    }
+                },
+                OnEnd = (pokemon, context) =>
+                {
+                    // For each pokemon on the field, remove the trick room condition
+                    foreach (Pokemon p in pokemon)
+                    {
+                        if (!p.RemoveCondition(ConditionId.TrickRoom))
+                        {
+                            throw new InvalidOperationException($"Failed to remove Trick Room condition from {p.Specie.Name}");
+                        }
+                    }
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintTrickRoomEnd();
+                    }
+                },
+                OnReapply = (field, pokemon, context) =>
+                {
+                    // In case of trick room, applying trick room while it is already active
+                    // removes it from the field and from all pokemons
+                    field.RemovePseudoWeather( PseudoWeatherId.TrickRoom, pokemon, context);
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintTrickRoomRestart();
+                    }
+                },
+            },
+        };
+    }
 }

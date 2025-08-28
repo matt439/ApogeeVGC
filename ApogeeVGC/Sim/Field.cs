@@ -35,9 +35,10 @@ public class FieldElement
     public bool IsExpired => RemainingTurns <= 0;
     public bool PrintDebug { get; init; }
     protected int ElapsedTurns { get; set; }
-    public Action<Field, bool>? OnEnd { get; init; }
-    public Action<Field, bool>? OnStart { get; init; }
-    public Action<Pokemon, bool>? OnPokemonSwitchIn { get; init; }
+    public Action<Pokemon[], BattleContext>? OnEnd { get; init; }
+    public Action<Pokemon[], BattleContext>? OnStart { get; init; }
+    public Action<Field, Pokemon[], BattleContext>? OnReapply { get; init; }
+    public Action<Pokemon, BattleContext>? OnPokemonSwitchIn { get; init; }
 
     public void IncrementTurnCounter()
     {
@@ -67,13 +68,13 @@ public enum WeatherId
 
 public class Weather : FieldElement
 {
-    public required WeatherId WeatherId { get; init; }
+    public required WeatherId Id { get; init; }
     
     public Weather Copy()
     {
         return new Weather
         {
-            WeatherId = WeatherId,
+            Id = Id,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -92,13 +93,13 @@ public enum TerrainId
 
 public class Terrain : FieldElement
 {
-    public required TerrainId TerrainId { get; init; }
+    public required TerrainId Id { get; init; }
 
     public Terrain Copy()
     {
         return new Terrain
         {
-            TerrainId = TerrainId,
+            Id = Id,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -118,12 +119,12 @@ public enum PseudoWeatherId
 
 public class PseudoWeather : FieldElement
 {
-    public required PseudoWeatherId PseudoWeatherId { get; init; }
+    public required PseudoWeatherId Id { get; init; }
     public PseudoWeather Copy()
     {
         return new PseudoWeather
         {
-            PseudoWeatherId = PseudoWeatherId,
+            Id = Id,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -136,79 +137,120 @@ public class Field
 {
     public Weather? Weather { get; private set; }
     public Terrain? Terrain { get; private set; }
+    public bool HasAnyWeather => Weather != null;
+    public bool HasAnyTerrain => Terrain != null;
     private List<PseudoWeather> PseudoWeatherList { get; init; } = [];
-    public bool PringDebug { get; init; }
-    public bool HasWeather => Weather != null;
-    public bool HasTerrain => Terrain != null;
 
-    public void AddWeather(Weather weather)
+    public bool HasWeather(WeatherId weatherId)
     {
-        Weather?.OnEnd?.Invoke(this, PringDebug);
-        Weather = weather;
-        weather.OnStart?.Invoke(this, PringDebug);
+        return Weather?.Id == weatherId;
     }
 
-    public void RemoveWeather()
+    public void AddWeather(Weather weather, Pokemon[] pokemon, BattleContext battleContext)
+    {
+        Weather?.OnEnd?.Invoke(pokemon, battleContext);
+        Weather = weather;
+        weather.OnStart?.Invoke(pokemon, battleContext);
+    }
+
+    public void RemoveWeather(Pokemon[] pokemon, BattleContext battleContext)
     {
         if (Weather == null) return;
-        Weather.OnEnd?.Invoke(this, PringDebug);
+        Weather.OnEnd?.Invoke(pokemon, battleContext);
         Weather = null;
     }
 
-    public void AddTerrain(Terrain terrain)
+    public void ReapplyWeather(Pokemon[] pokemon, BattleContext battleContext)
     {
-        Terrain?.OnEnd?.Invoke(this, PringDebug);
-        Terrain = terrain;
-        terrain.OnStart?.Invoke(this, PringDebug);
+        if (Weather is null)
+        {
+            throw new InvalidOperationException("Cannot reapply weather when no weather is active on the field.");
+        }
+        Weather.OnReapply?.Invoke(this, pokemon, battleContext);
     }
-    public void RemoveTerrain()
+
+    public bool HasTerrain(TerrainId terrainId)
+    {
+        return Terrain?.Id == terrainId;
+    }
+
+    public void AddTerrain(Terrain terrain, Pokemon[] pokemon, BattleContext battleContext)
+    {
+        Terrain?.OnEnd?.Invoke(pokemon, battleContext);
+        Terrain = terrain;
+        terrain.OnStart?.Invoke(pokemon, battleContext);
+    }
+    public void RemoveTerrain(Pokemon[] pokemon, BattleContext battleContext)
     {
         if (Terrain == null) return;
-        Terrain.OnEnd?.Invoke(this, PringDebug);
+        Terrain.OnEnd?.Invoke(pokemon, battleContext);
         Terrain = null;
+    }
+
+    public void ReapplyTerrain(Pokemon[] pokemon, BattleContext battleContext)
+    {
+        if (Terrain is null)
+        {
+            throw new InvalidOperationException("Cannot reapply terrain when no terrain is active on the field.");
+        }
+        Terrain.OnReapply?.Invoke(this, pokemon, battleContext);
     }
 
     public bool HasPseudoWeather(PseudoWeatherId pseudoWeatherId)
     {
-        return PseudoWeatherList.Any(pw => pw.PseudoWeatherId == pseudoWeatherId);
+        return PseudoWeatherList.Any(pw => pw.Id == pseudoWeatherId);
     }
 
     public PseudoWeather? GetPseudoWeather(PseudoWeatherId pseudoWeatherId)
     {
-        return PseudoWeatherList.FirstOrDefault(pw => pw.PseudoWeatherId == pseudoWeatherId);
+        return PseudoWeatherList.FirstOrDefault(pw => pw.Id == pseudoWeatherId);
     }
 
-    public void AddPseudoWeather(PseudoWeather pseudoWeather)
+    public void AddPseudoWeather(PseudoWeather pseudoWeather, Pokemon[] pokemon, BattleContext battleContext)
     {
-        if (PseudoWeatherList.Any(pw => pw.PseudoWeatherId == pseudoWeather.PseudoWeatherId))
+        if (PseudoWeatherList.Any(pw => pw.Id == pseudoWeather.Id))
         {
-            throw new InvalidOperationException($"PseudoWeather {pseudoWeather.PseudoWeatherId} is already" +
+            throw new InvalidOperationException($"PseudoWeather {pseudoWeather.Id} is already" +
                                                 $"active on the field.");
         }
         PseudoWeatherList.Add(pseudoWeather);
-        pseudoWeather.OnStart?.Invoke(this, PringDebug);
+        pseudoWeather.OnStart?.Invoke(pokemon, battleContext);
     }
 
-    public bool RemovePseudoWeather(PseudoWeatherId pseudoWeatherId)
+    public bool RemovePseudoWeather(PseudoWeatherId pseudoWeatherId, Pokemon[] pokemon,
+        BattleContext battleContext)
     {
         PseudoWeather? pseudoWeather = PseudoWeatherList.FirstOrDefault(pw =>
-            pw.PseudoWeatherId == pseudoWeatherId);
+            pw.Id == pseudoWeatherId);
         if (pseudoWeather == null) return false;
         PseudoWeatherList.Remove(pseudoWeather);
-        pseudoWeather.OnEnd?.Invoke(this, PringDebug);
+        pseudoWeather.OnEnd?.Invoke(pokemon, battleContext);
         return true;
     }
 
-    public void OnPokemonSwitchIn(Pokemon pokemon)
+    public void ReapplyPseudoWeather(PseudoWeatherId pseudoWeatherId, Pokemon[] pokemon,
+        BattleContext battleContext)
+    {
+        PseudoWeather? pseudoWeather = PseudoWeatherList.FirstOrDefault(pw =>
+            pw.Id == pseudoWeatherId);
+        if (pseudoWeather is null)
+        {
+            throw new InvalidOperationException($"Cannot reapply pseudo-weather {pseudoWeatherId}" +
+                                                $"when it is not active on the field.");
+        }
+        pseudoWeather.OnReapply?.Invoke(this, pokemon, battleContext);
+    }
+
+    public void OnPokemonSwitchIn(Pokemon pokemon, BattleContext battleContext)
     {
         // Get all the OnPokemonSwitchIn actions from Weather, Terrain, and PseudoWeathers
         // Determine the order of execution from their priority (if any)
         // Execute them in order
-        Weather?.OnPokemonSwitchIn?.Invoke(pokemon, PringDebug);
-        Terrain?.OnPokemonSwitchIn?.Invoke(pokemon, PringDebug);
+        Weather?.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
+        Terrain?.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
         foreach (PseudoWeather pw in PseudoWeatherList)
         {
-            pw.OnPokemonSwitchIn?.Invoke(pokemon, PringDebug);
+            pw.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
         }
     }
 
@@ -219,18 +261,14 @@ public class Field
             Weather = Weather?.Copy(),
             Terrain = Terrain?.Copy(),
             PseudoWeatherList = PseudoWeatherList.Select(pw => pw.Copy()).ToList(),
-            PringDebug = PringDebug
         };
     }
 }
 
 public static class FieldGenerator
 {
-    public static Field GenerateTestField(bool printDebug = false)
+    public static Field GenerateTestField()
     {
-        return new Field
-        {
-            PringDebug = printDebug,
-        };
+        return new Field();
     }
 }

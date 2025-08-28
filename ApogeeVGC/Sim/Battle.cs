@@ -42,6 +42,14 @@ public enum PlayerState
     Idle,
 }
 
+
+public record BattleContext
+{
+    public required Library Library { get; init; }
+    public required Random Random { get; init; }
+    public bool PrintDebug { get; init; }
+}
+
 public class Battle
 {
     public required Library Library { get; init; }
@@ -55,6 +63,13 @@ public class Battle
                                  Player2State == PlayerState.TeamPreviewSelect ||
                                  Player1State == PlayerState.TeamPreviewLocked ||
                                  Player2State == PlayerState.TeamPreviewLocked;
+    private BattleContext Context => new()
+    {
+        Library = Library,
+        Random = BattleRandom,
+        PrintDebug = PrintDebug,
+    };
+    private Pokemon[] AllActivePokemon => [Side1.Team.ActivePokemon, Side2.Team.ActivePokemon];
     private PlayerState Player1State { get; set; } = PlayerState.TeamPreviewSelect;
     private PlayerState Player2State { get; set; } = PlayerState.TeamPreviewSelect;
     private Choice? Player1PendingChoice { get; set; }
@@ -63,7 +78,8 @@ public class Battle
     
     // Lazy-initialized seeded random number generator for deterministic battle simulation
     private Random? _battleRandom;
-    private Random BattleRandom => _battleRandom ??= BattleSeed.HasValue ? new Random(BattleSeed.Value) : new Random();
+    private Random BattleRandom => _battleRandom ??= BattleSeed.HasValue ?
+        new Random(BattleSeed.Value) : new Random();
     
 
     /// <summary>
@@ -572,19 +588,8 @@ public class Battle
                 attacker.AddCondition(move.Condition);
                 break;
             case MoveTarget.Field:
-                if (move.PseudoWeather is not null)
-                {
-                    Field.AddPseudoWeather(move.PseudoWeather);
-                }
-                else if (move.Weather is not null)
-                {
-                    Field.AddWeather(move.Weather);
-                }
-                else if (move.Terrain is not null)
-                {
-                    Field.AddTerrain(move.Terrain);
-                }
-                throw new InvalidOperationException($"Status move {move.Name} has no field effect defined.");
+                HandleFieldTargetStatusMove(move);
+                break;
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
@@ -602,6 +607,59 @@ public class Battle
                 throw new NotImplementedException();
             default:
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void HandleFieldTargetStatusMove(Move move)
+    {
+        if (move.PseudoWeather is null && move.Weather is null && move.Terrain is null)
+        {
+            throw new InvalidOperationException($"Status move {move.Name} has no field effect defined.");
+        }
+
+        if (move.PseudoWeather is not null)
+        {
+            // If the pseudo-weather is already present, reapply it (which may remove it)
+            if (Field.HasPseudoWeather(move.PseudoWeather.Id))
+            {
+                Field.ReapplyPseudoWeather(move.PseudoWeather.Id, AllActivePokemon, Context);
+            }
+            else // Otherwise, add the new pseudo-weather
+            {
+                Field.AddPseudoWeather(move.PseudoWeather, AllActivePokemon, Context);
+            }
+        }
+        if (move.Weather is not null)
+        {
+            if (Field.HasWeather(move.Weather.Id)) // Reapply weather if it's the same one
+            {
+                Field.ReapplyWeather(AllActivePokemon, Context);
+            }
+            else if (Field.HasAnyWeather) // Replace existing weather
+            {
+                Field.RemoveWeather(AllActivePokemon, Context);
+                Field.AddWeather(move.Weather, AllActivePokemon, Context);
+            }
+            else // No existing weather, just add the new one
+            {
+                Field.AddWeather(move.Weather, AllActivePokemon, Context);
+            }
+        }
+        if (move.Terrain is not null)
+        {
+            if (Field.HasTerrain(move.Terrain.Id)) // Reapply terrain if it's the same one
+            {
+                Field.ReapplyTerrain(AllActivePokemon, Context);
+            }
+            else if (Field.HasAnyWeather) // Replace existing terrain
+            {
+                Field.ReapplyTerrain(AllActivePokemon, Context);
+                Field.AddTerrain(move.Terrain, AllActivePokemon, Context);
+            }
+            else // No existing terrain, just add the new one
+            {
+                Field.AddTerrain(move.Terrain, AllActivePokemon, Context);
+            }
         }
     }
 
@@ -647,7 +705,7 @@ public class Battle
         prevActive.OnSwitchOut();
         side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
         Pokemon newActive = side.Team.ActivePokemon;
-        Field.OnPokemonSwitchIn(newActive);
+        Field.OnPokemonSwitchIn(newActive, Context);
         newActive.OnSwitchIn();
 
         if (!PrintDebug) return;

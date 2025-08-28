@@ -10,13 +10,13 @@ public record Library
     private readonly Learnsets _learnsets = new();
     private readonly Moves _moves;
     private readonly Natures _natures = new();
-    private readonly PseudoWeathers _pseudoWeathers = new();
+    private readonly PseudoWeathers _pseudoWeathers;
     private readonly Rulesets _rulesets = new();
     private readonly Species _species = new();
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
-    private readonly Terrains _terrains = new();
-    private readonly Weathers _weathers = new();
+    private readonly Terrains _terrains;
+    private readonly Weathers _weathers;
 
     public IReadOnlyDictionary<AbilityId, Ability> Abilities => _abilities.AbilitiesData;
     public IReadOnlyDictionary<ConditionId, Condition> Conditions => _conditions.ConditionsData;
@@ -36,6 +36,11 @@ public record Library
 
     public Library()
     {
+        _pseudoWeathers = new PseudoWeathers(this);
+        _terrains = new Terrains(this);
+        _weathers = new Weathers(this);
+
+        // Moves must be initialized last because it depends on other data
         _moves = new Moves(this);
     }
 }
