@@ -260,6 +260,7 @@ public class Battle
     private void HandleEndOfTurn()
     {
         UiGenerator.PrintBlankLine();
+        Field.OnTurnEnd(AllActivePokemon, Context);
         HandleResiduals();
     }
 
@@ -572,7 +573,16 @@ public class Battle
 
     private void PerformStatusMove(Pokemon attacker, Move move, Pokemon defender)
     {
-        if (move.Condition is null) return;
+        if (move.Target == MoveTarget.Field)
+        {
+            HandleFieldTargetStatusMove(move);
+            return;
+        }
+
+        if (move.Condition is null)
+        {
+            return;
+        }
 
         if (PrintDebug)
         {
@@ -587,9 +597,9 @@ public class Battle
             case MoveTarget.Self:
                 attacker.AddCondition(move.Condition);
                 break;
-            case MoveTarget.Field:
-                HandleFieldTargetStatusMove(move);
-                break;
+            //case MoveTarget.Field:
+            //    HandleFieldTargetStatusMove(move);
+            //    break;
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
@@ -605,6 +615,8 @@ public class Battle
             case MoveTarget.Scripted:
             case MoveTarget.None:
                 throw new NotImplementedException();
+            case MoveTarget.Field:
+                throw new InvalidOperationException("Field target should be handled separately");
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -835,15 +847,25 @@ public class Battle
         // If priorities are equal, use the speed of the active Pokémon to determine who moves first
         Pokemon player1Pokemon = Side1.Team.ActivePokemon;
         Pokemon player2Pokemon = Side2.Team.ActivePokemon;
-        if (player1Pokemon.CurrentSpe > player2Pokemon.CurrentSpe)
+
+        // Create a list of active Pokemon and sort by speed
+
+        var speedOrder = new List<Pokemon> { player1Pokemon, player2Pokemon }
+            .OrderByDescending(p => p.CurrentSpe)
+            .ToList();
+
+        if (Field.HasPseudoWeather(PseudoWeatherId.TrickRoom))
         {
-            return PlayerId.Player1;
+            speedOrder.Reverse(); // Reverse order if Trick Room is active
         }
-        if (player2Pokemon.CurrentSpe > player1Pokemon.CurrentSpe)
+
+        // Check if the fastest Pokemon is unique
+        if (speedOrder[0].CurrentSpe > speedOrder[1].CurrentSpe)
         {
-            return PlayerId.Player2;
+            return speedOrder[0] == player1Pokemon ? PlayerId.Player1 : PlayerId.Player2;
         }
-        // Speed ties are resolved randomly
+
+        // If speeds are tied, decide randomly
         return BattleRandom.Next(2) == 0 ? PlayerId.Player1 : PlayerId.Player2;
     }
 

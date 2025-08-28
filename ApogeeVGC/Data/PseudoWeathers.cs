@@ -21,6 +21,7 @@ public class PseudoWeathers
             [PseudoWeatherId.TrickRoom] = new()
             {
                 Id = PseudoWeatherId.TrickRoom,
+                Name = "Trick Room",
                 BaseDuration = 5,
                 DurationExtension = 0,
                 OnStart = (pokemon, context) =>
@@ -60,6 +61,13 @@ public class PseudoWeathers
                     if (context.PrintDebug)
                     {
                         UiGenerator.PrintTrickRoomRestart();
+                    }
+                },
+                OnIncrementTurnCounter = (_, element, context) =>
+                {
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintFieldElementCounter(element);
                     }
                 },
             },

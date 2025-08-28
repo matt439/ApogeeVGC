@@ -38,6 +38,7 @@ public static class UiGenerator
             Console.WriteLine("No available choices.");
             return;
         }
+
         StringBuilder sb = new();
         sb.AppendLine("Available choices:");
         for (int i = 0; i < availableChoices.Length; i++)
@@ -69,8 +70,10 @@ public static class UiGenerator
             {
                 sb.Append($" @ {pokemon.Item.Name}");
             }
+
             sb.AppendLine();
         }
+
         sb.AppendLine($"{Spacer2}");
         Console.WriteLine(sb.ToString());
     }
@@ -84,6 +87,7 @@ public static class UiGenerator
         {
             sb.AppendLine("Critical hit!");
         }
+
         switch (effectiveness)
         {
             case MoveEffectiveness.Normal:
@@ -108,6 +112,7 @@ public static class UiGenerator
                 throw new ArgumentOutOfRangeException(nameof(effectiveness),
                     effectiveness, "Invalid move effectiveness.");
         }
+
         sb.AppendLine($"It dealt {damage} damage.");
         Console.WriteLine(sb.ToString());
     }
@@ -142,6 +147,7 @@ public static class UiGenerator
         sb.AppendLine($"{trainerName} selected {pokemon.Name} to switch in.");
         Console.WriteLine(sb.ToString());
     }
+
     public static void PrintFaintedAction(Pokemon pokemon)
     {
         StringBuilder sb = new();
@@ -222,6 +228,11 @@ public static class UiGenerator
     public static void PrintBlankLine()
     {
         Console.WriteLine();
+    }
+
+    public static void PrintFieldElementCounter(FieldElement element)
+    {
+        Console.WriteLine($"{element.Name} has {element.RemainingTurns} turns remaining.");
     }
 
     private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
@@ -333,6 +344,14 @@ public static class UiGenerator
         sb.Append(CreateHpBar(activePokemon));
         sb.AppendLine($" {activePokemon.CurrentHp.ToString()} / {activePokemon.UnmodifiedHp.ToString()}");
         sb.Append(PrimarySpacer);
+        sb.Append("Conditions: ");
+        foreach (Condition condition in activePokemon.Conditions)
+        {
+            sb.Append(condition.Name);
+            sb.Append(' ');
+        }
+        sb.AppendLine();
+        sb.Append(PrimarySpacer);
         sb.AppendLine($"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}\n\n");
         Console.WriteLine(sb.ToString());
     }
@@ -351,6 +370,13 @@ public static class UiGenerator
         sb.Append(' ');
         sb.Append(activePokemon.CurrentHpPercentage.ToString());
         sb.AppendLine("%");
+        sb.Append("Conditions: ");
+        foreach (Condition condition in activePokemon.Conditions)
+        {
+            sb.Append(condition.Name);
+            sb.Append(' ');
+        }
+        sb.AppendLine();
         sb.AppendLine($"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}\n\n");
         Console.WriteLine(sb.ToString());
     }

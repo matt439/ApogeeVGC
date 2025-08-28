@@ -107,7 +107,7 @@ public static class PokemonBuilder
                     SpecieId.CalyrexIce,
                     [new MoveSetup(MoveId.GlacialLance, 3),
                         new MoveSetup(MoveId.LeechSeed, 1),
-                            new MoveSetup(MoveId.GrassBasic, 2),
+                            new MoveSetup(MoveId.TrickRoom, 2),
                                 new MoveSetup(MoveId.DarkBasic, 3)],
                     ItemId.Leftovers,
                     AbilityId.AsOneGlastrier,
@@ -260,7 +260,7 @@ public class Pokemon
         }
     }
 
-    private List<Condition> Conditions { get; } = [];
+    public List<Condition> Conditions { get; } = [];
     public bool Shiny { get; init; }
     public MoveType TerraType { get; init; }
     public GenderId Gender { get; init; }

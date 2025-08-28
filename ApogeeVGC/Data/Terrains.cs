@@ -19,30 +19,34 @@ public record Terrains
     {
         return new Dictionary<TerrainId, Terrain>
         {
-            [TerrainId.Electric] = new Terrain
+            [TerrainId.Electric] = new()
             {
                 Id = TerrainId.Electric,
+                Name = "Electric Terrain",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [TerrainId.Grassy] = new Terrain
+            [TerrainId.Grassy] = new()
             {
                 Id = TerrainId.Grassy,
+                Name = "Grassy Terrain",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [TerrainId.Misty] = new Terrain
+            [TerrainId.Misty] = new()
             {
                 Id = TerrainId.Misty,
+                Name = "Misty Terrain",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [TerrainId.Psychic] = new Terrain
+            [TerrainId.Psychic] = new()
             {
                 Id = TerrainId.Psychic,
+                Name = "Psychic Terrain",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects

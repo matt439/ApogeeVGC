@@ -18,30 +18,34 @@ public record Weathers
     {
         return new Dictionary<WeatherId, Weather>
         {
-            [WeatherId.HarshSunlight] = new Weather
+            [WeatherId.HarshSunlight] = new()
             {
                 Id = WeatherId.HarshSunlight,
+                Name = "Harsh Sunlight",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [WeatherId.Rain] = new Weather
+            [WeatherId.Rain] = new()
             {
                 Id = WeatherId.Rain,
+                Name = "Rain",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [WeatherId.Sandstorm] = new Weather
+            [WeatherId.Sandstorm] = new()
             {
                 Id = WeatherId.Sandstorm,
+                Name = "Sandstorm",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects
             },
-            [WeatherId.Snow] = new Weather
+            [WeatherId.Snow] = new()
             {
                 Id = WeatherId.Snow,
+                Name = "Snow",
                 BaseDuration = 5,
                 DurationExtension = 3,
                 // TODO: Implement effects

@@ -5,6 +5,7 @@
 /// </summary>
 public class FieldElement
 {
+    public required string Name { get; init; }
     public required int BaseDuration
     {
         get;
@@ -38,6 +39,7 @@ public class FieldElement
     public Action<Pokemon[], BattleContext>? OnEnd { get; init; }
     public Action<Pokemon[], BattleContext>? OnStart { get; init; }
     public Action<Field, Pokemon[], BattleContext>? OnReapply { get; init; }
+    public Action<Pokemon[], FieldElement, BattleContext>? OnIncrementTurnCounter { get; init; }
     public Action<Pokemon, BattleContext>? OnPokemonSwitchIn { get; init; }
 
     public void IncrementTurnCounter()
@@ -75,6 +77,7 @@ public class Weather : FieldElement
         return new Weather
         {
             Id = Id,
+            Name = Name,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -100,6 +103,7 @@ public class Terrain : FieldElement
         return new Terrain
         {
             Id = Id,
+            Name = Name,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -125,6 +129,7 @@ public class PseudoWeather : FieldElement
         return new PseudoWeather
         {
             Id = Id,
+            Name = Name,
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
@@ -251,6 +256,33 @@ public class Field
         foreach (PseudoWeather pw in PseudoWeatherList)
         {
             pw.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
+        }
+    }
+
+    public void OnTurnEnd(Pokemon[] pokemon, BattleContext battleContext)
+    {
+        Weather?.IncrementTurnCounter();
+        Weather?.OnIncrementTurnCounter?.Invoke(pokemon, Weather, battleContext);
+        if (Weather?.IsExpired == true)
+        {
+            RemoveWeather(pokemon, battleContext);
+        }
+
+        Terrain?.IncrementTurnCounter();
+        Terrain?.OnIncrementTurnCounter?.Invoke(pokemon, Terrain, battleContext);
+        if (Terrain?.IsExpired == true)
+        {
+            RemoveTerrain(pokemon, battleContext);
+        }
+
+        foreach (PseudoWeather pw in PseudoWeatherList.ToList())
+        {
+            pw.IncrementTurnCounter();
+            pw.OnIncrementTurnCounter?.Invoke(pokemon, pw, battleContext);
+            if (pw.IsExpired)
+            {
+                RemovePseudoWeather(pw.Id, pokemon, battleContext);
+            }
         }
     }
 
