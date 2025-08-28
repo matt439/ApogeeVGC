@@ -8,8 +8,6 @@ public enum AbilityId
     FlameBody,
     Prankster,
     QuarkDrive,
-
-    Persistent,
 }
 
 public record Ability : IEffect

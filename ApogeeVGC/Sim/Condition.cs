@@ -14,7 +14,7 @@ public enum ConditionId
     Flinch,
     ChoiceLock,
     LeechSeed,
-    TrickRoom,
+    //TrickRoom,
     Stall,
     Protect,
 }
@@ -25,6 +25,7 @@ public enum ConditionEffectType
     Weather,
     Status,
     Terrain,
+    PseudoWeather,
 }
 
 public enum ConditionVolatility
@@ -59,4 +60,5 @@ public record Condition : IEffect
     public Func<Pokemon, Pokemon?, IEffect?, bool>? OnRestart { get; init; }
     public int? OnTryHitPriority { get; init; }
     public Func<Pokemon, Pokemon, Move, bool>? OnTryHit { get; init; }
+    public Action<Field>? OnPseudoWeatherStart { get; init; }
 }

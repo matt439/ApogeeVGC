@@ -568,16 +568,27 @@ public class Battle
             case MoveTarget.Normal:
                 defender.AddCondition(move.Condition);
                 break;
-            case MoveTarget.All:
-                defender.AddCondition(move.Condition);
-                attacker.AddCondition(move.Condition);
-                break;
             case MoveTarget.Self:
                 attacker.AddCondition(move.Condition);
                 break;
+            case MoveTarget.Field:
+                if (move.PseudoWeather is not null)
+                {
+                    Field.AddPseudoWeather(move.PseudoWeather);
+                }
+                else if (move.Weather is not null)
+                {
+                    Field.AddWeather(move.Weather);
+                }
+                else if (move.Terrain is not null)
+                {
+                    Field.AddTerrain(move.Terrain);
+                }
+                throw new InvalidOperationException($"Status move {move.Name} has no field effect defined.");
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
             case MoveTarget.AllAdjacent:
             case MoveTarget.AllAdjacentFoes:
             case MoveTarget.Allies:
@@ -636,6 +647,7 @@ public class Battle
         prevActive.OnSwitchOut();
         side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
         Pokemon newActive = side.Team.ActivePokemon;
+        Field.OnPokemonSwitchIn(newActive);
         newActive.OnSwitchIn();
 
         if (!PrintDebug) return;

@@ -75,8 +75,9 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.TrickRoom],
-                Target = MoveTarget.All,
+                //Condition = _library.Conditions[ConditionId.TrickRoom],
+                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom],
+                Target = MoveTarget.Field,
                 Type = MoveType.Psychic,
             },
             [MoveId.Protect] = new()

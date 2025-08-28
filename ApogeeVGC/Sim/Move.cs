@@ -150,6 +150,7 @@ public enum MoveTarget
     Scripted,
     Self,
     None, // Added for DataMove.SelfSwitch
+    Field, // Added for Trick Room
 }
 
 public record Move : IEffect
@@ -266,6 +267,10 @@ public record Move : IEffect
 
     public Func<Pokemon, bool>? OnTryImmunity { get; init; }
     public Func<Pokemon, Pokemon?, Move?, bool>? OnHit { get; init; }
+
+    public Weather? Weather { get; init; }
+    public Terrain? Terrain { get; init; }
+    public PseudoWeather? PseudoWeather { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

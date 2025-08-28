@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics.Metrics;
 using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
@@ -21,8 +20,14 @@ public record Conditions
             Name = "Burn",
             ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.NonVolatile,
-            OnStart = (target, source, sourceEffect, debug) =>
+            OnStart = (target, _, sourceEffect, debug) =>
             {
+                if (sourceEffect is null)
+                {
+                    throw new ArgumentNullException($"Source effect is null when trying to apply" +
+                                                    $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
+                }
+                
                 switch (sourceEffect.EffectType)
                 {
                     case EffectType.Item:
@@ -56,7 +61,7 @@ public record Conditions
                 return true;
             },
             OnResidualOrder = 10,
-            OnResidual = (target, source, effect, debug) =>
+            OnResidual = (target, _, _, debug) =>
             {
                 int damage = target.UnmodifiedHp / 16;
                 if (damage < 1) damage = 1;
@@ -65,7 +70,7 @@ public record Conditions
                 {
                     UiGenerator.PrintBurnDamage(target);
                 }
-            }
+            },
         },
         [ConditionId.Paralysis] = new Condition
         {
@@ -121,7 +126,7 @@ public record Conditions
             Name = "Leech Seed",
             ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.Volatile,
-            OnStart = (target, source, sourceEffect, debug) =>
+            OnStart = (target, _, _, debug) =>
             {
                 if (debug)
                 {
@@ -130,7 +135,7 @@ public record Conditions
                 return true;
             },
             OnResidualOrder = 8,
-            OnResidual = (target, source, effect, debug) =>
+            OnResidual = (target, source, _, debug) =>
             {
                 int damage = target.UnmodifiedHp / 8;
                 if (damage < 1) damage = 1;
@@ -152,34 +157,35 @@ public record Conditions
                 }
                 else
                 {
-                    throw new ArgumentNullException($"Source pokemon is null.");
+                    throw new ArgumentNullException($"Source is null when trying to apply" +
+                                                    $"{ConditionId.LeechSeed} damage to" + $"pokemon {target.Name}.");
                 }
-            }
-        },
-        [ConditionId.TrickRoom] = new Condition
-        {
-            Id = ConditionId.TrickRoom,
-            Duration = 5,
-            Name = "Trick Room",
-            ConditionEffectType = ConditionEffectType.Terrain,
-            ConditionVolatility = ConditionVolatility.NonVolatile,
-            DurationCallback = (sourcePokemon, _) =>
-                sourcePokemon.Ability.Id == AbilityId.Persistent ? 7 : 5,
-            OnFieldStart = (_, _, _) =>
-            {
-                UiGenerator.PrintTrickRoomStart();
-            },
-            OnFieldRestart = (_, _, _) =>
-            {
-                UiGenerator.PrintTrickRoomRestart();
-            },
-            OnFieldResidualOrder = 27,
-            OnFieldResidualSubOrder = 1,
-            OnFieldEnd = (_) =>
-            {
-                UiGenerator.PrintTrickRoomEnd();
             },
         },
+        //// This condition is the effect placed on each Pokemon by Trick Room.
+        //// Trick Room itself is a PseudoWeather condition on the field which applies
+        //// this condition to each Pokemon.
+        //[ConditionId.TrickRoom] = new Condition
+        //{
+        //    Id = ConditionId.TrickRoom,
+        //    Name = "Trick Room",
+        //    ConditionEffectType = ConditionEffectType.PseudoWeather,
+        //    ConditionVolatility = ConditionVolatility.Volatile,
+        //    //OnFieldStart = (_, _, _) =>
+        //    //{
+        //    //    UiGenerator.PrintTrickRoomStart();
+        //    //},
+        //    //OnFieldRestart = (_, _, _) =>
+        //    //{
+        //    //    UiGenerator.PrintTrickRoomRestart();
+        //    //},
+        //    //OnFieldResidualOrder = 27,
+        //    //OnFieldResidualSubOrder = 1,
+        //    //OnFieldEnd = (_) =>
+        //    //{
+        //    //    UiGenerator.PrintTrickRoomEnd();
+        //    //},
+        //},
         [ConditionId.Stall] = new Condition
         {
             Id = ConditionId.Stall,
@@ -188,7 +194,7 @@ public record Conditions
             CounterMax = 729,
             ConditionEffectType = ConditionEffectType.Condition,
             ConditionVolatility = ConditionVolatility.Volatile,
-            OnStart = (target, _, _, debug) =>
+            OnStart = (target, _, _, _) =>
             {
                 Condition? condition = target.GetCondition(ConditionId.Stall);
 
@@ -255,7 +261,7 @@ public record Conditions
             ConditionVolatility = ConditionVolatility.Volatile,
             // OnStart
             OnTryHitPriority = 3,
-            OnTryHit = (target, source, move) =>
+            OnTryHit = (_, _, move) =>
             {
                 if (!(move.Flags.Protect ?? false))
                 {
