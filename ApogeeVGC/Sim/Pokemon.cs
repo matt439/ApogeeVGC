@@ -108,7 +108,7 @@ public static class PokemonBuilder
                     [new MoveSetup(MoveId.GlacialLance, 3),
                         new MoveSetup(MoveId.LeechSeed, 1),
                             new MoveSetup(MoveId.TrickRoom, 2),
-                                new MoveSetup(MoveId.DarkBasic, 3)],
+                                new MoveSetup(MoveId.Protect, 3)],
                     ItemId.Leftovers,
                     AbilityId.AsOneGlastrier,
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
@@ -410,12 +410,12 @@ public class Pokemon
         return Conditions.FirstOrDefault(c => c.Id == conditionId);
     }
 
-    public void AddCondition(Condition condition)
+    public void AddCondition(Condition condition, BattleContext context)
     {
         if (!HasCondition(condition.Id))
         {
             Conditions.Add(condition);
-            condition.OnStart?.Invoke(this, null, null, PrintDebug);
+            condition.OnStart?.Invoke(this, null, null, context);
         }
         else
         {
@@ -429,9 +429,14 @@ public class Pokemon
         return condition != null && Conditions.Remove(condition);
     }
 
-    public List<Condition> GetAllResidualConditions()
+    public Condition[] GetAllResidualConditions()
     {
-        return Conditions.Where(c => c.OnResidual != null).ToList();
+        return Conditions.Where(c => c.OnResidual != null).ToArray();
+    }
+
+    public Condition[] GetAllConditionsWithTurnEnd()
+    {
+        return Conditions.Where(c => c.OnTurnEnd != null).ToArray();
     }
 
     public void OnSwitchOut()

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
 using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
@@ -97,10 +96,15 @@ public record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
-                // OnPrepareHit
-                OnHit = (target, source, move) =>
+                // TODO: check if protect can be used
+                OnPrepareHit = (_, _, _, _) => true,
+                OnHit = (_, source, _, context) =>
                 {
-                    target.AddCondition(_library.Conditions[ConditionId.Stall]);
+                    if (source is null)
+                    {
+                        throw new ArgumentNullException(nameof(source), "Source cannot be null in Protect move.");
+                    }
+                    source.AddCondition(_library.Conditions[ConditionId.Stall], context);
                     return true;
                 },
                 Condition = _library.Conditions[ConditionId.Protect],
@@ -132,6 +136,10 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+
+
+
+
 
             // Custom moves
             [MoveId.NormalBasic] = new Move

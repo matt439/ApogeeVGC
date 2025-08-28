@@ -262,6 +262,24 @@ public class Battle
         UiGenerator.PrintBlankLine();
         Field.OnTurnEnd(AllActivePokemon, Context);
         HandleResiduals();
+        HandleConditionTurnEnds();
+    }
+
+    private void HandleConditionTurnEnds()
+    {
+        // get all conditions with OnTurnEnd from both active Pokemon
+        var side1Conditions = Side1.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
+        var side2Conditions = Side2.Team.ActivePokemon.GetAllConditionsWithTurnEnd();
+
+        foreach (Condition condition in side1Conditions)
+        {
+            condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
+        }
+
+        foreach (Condition condition in side2Conditions)
+        {
+            condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
+        }
     }
 
     private void HandleResiduals()
@@ -295,7 +313,7 @@ public class Battle
         {
             Side sourceSide = GetSide(playerId.OpposingPlayerId());
             
-            condition.OnResidual?.Invoke(pokemon, sourceSide, condition, PrintDebug);
+            condition.OnResidual?.Invoke(pokemon, sourceSide, condition, Context);
 
             if (!condition.Duration.HasValue) continue;
 
@@ -535,8 +553,20 @@ public class Battle
             return;
         }
 
-        if (move.OnTryImmunity != null && move.OnTryImmunity(defender))
+        if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
+            move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
         {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+            }
+            return;
+        }
+
+        // check every condition on defender for OnTryHit effects
+        foreach (Condition condition in defender.Conditions)
+        {
+            if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
             if (PrintDebug)
             {
                 UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
@@ -564,7 +594,9 @@ public class Battle
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
             defender.Specie.Types, move.Type);
         int damage = Damage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
+        move.OnHit?.Invoke(defender, attacker, move, Context);
         defender.Damage(damage);
+        
         if (PrintDebug)
         {
             UiGenerator.PrintDamagingMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
@@ -589,13 +621,15 @@ public class Battle
             UiGenerator.PrintStatusMoveAction(attacker, move);
         }
 
+        move.OnHit?.Invoke(defender, attacker, move, Context);
+
         switch (move.Target)
         {
             case MoveTarget.Normal:
-                defender.AddCondition(move.Condition);
+                defender.AddCondition(move.Condition, Context);
                 break;
             case MoveTarget.Self:
-                attacker.AddCondition(move.Condition);
+                attacker.AddCondition(move.Condition, Context);
                 break;
             //case MoveTarget.Field:
             //    HandleFieldTargetStatusMove(move);
@@ -620,6 +654,8 @@ public class Battle
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        
     }
 
     private void HandleFieldTargetStatusMove(Move move)

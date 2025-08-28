@@ -29,7 +29,7 @@ public class PseudoWeathers
                     // For each pokemon on the field, add the trick room condition
                     foreach (Pokemon p in pokemon)
                     {
-                        p.AddCondition(_library.Conditions[ConditionId.TrickRoom]);
+                        p.AddCondition(_library.Conditions[ConditionId.TrickRoom], context);
                     }
 
                     if (context.PrintDebug)
@@ -70,9 +70,9 @@ public class PseudoWeathers
                         UiGenerator.PrintFieldElementCounter(element);
                     }
                 },
-                OnPokemonSwitchIn = (pokemon, _) =>
+                OnPokemonSwitchIn = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.TrickRoom]);
+                    pokemon.AddCondition(_library.Conditions[ConditionId.TrickRoom], context);
                 },
             },
         };

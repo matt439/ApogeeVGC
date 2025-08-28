@@ -20,14 +20,16 @@ public record Conditions
             Name = "Burn",
             ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.NonVolatile,
-            OnStart = (target, _, sourceEffect, debug) =>
+            OnStart = (target, _, sourceEffect, context) =>
             {
                 if (sourceEffect is null)
                 {
                     throw new ArgumentNullException($"Source effect is null when trying to apply" +
                                                     $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
                 }
-                
+
+                bool debug = context.PrintDebug;
+
                 switch (sourceEffect.EffectType)
                 {
                     case EffectType.Item:
@@ -61,12 +63,12 @@ public record Conditions
                 return true;
             },
             OnResidualOrder = 10,
-            OnResidual = (target, _, _, debug) =>
+            OnResidual = (target, _, _, context) =>
             {
                 int damage = target.UnmodifiedHp / 16;
                 if (damage < 1) damage = 1;
                 target.Damage(damage);
-                if (debug)
+                if (context.PrintDebug)
                 {
                     UiGenerator.PrintBurnDamage(target);
                 }
@@ -126,16 +128,16 @@ public record Conditions
             Name = "Leech Seed",
             ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.Volatile,
-            OnStart = (target, _, _, debug) =>
+            OnStart = (target, _, _, context) =>
             {
-                if (debug)
+                if (context.PrintDebug)
                 {
                     UiGenerator.PrintLeechSeedStart(target);
                 }
                 return true;
             },
             OnResidualOrder = 8,
-            OnResidual = (target, source, _, debug) =>
+            OnResidual = (target, source, _, context) =>
             {
                 int damage = target.UnmodifiedHp / 8;
                 if (damage < 1) damage = 1;
@@ -149,7 +151,7 @@ public record Conditions
                 if (source is not null)
                 {
                      int actualHeal = source.Team.ActivePokemon.Heal(damage);
-                    if (debug)
+                    if (context.PrintDebug)
                     {
                         UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Team.ActivePokemon,
                             actualHeal);
@@ -173,20 +175,6 @@ public record Conditions
             Name = "Trick Room",
             ConditionEffectType = ConditionEffectType.PseudoWeather,
             ConditionVolatility = ConditionVolatility.Volatile,
-            //OnFieldStart = (_, _, _) =>
-            //{
-            //    UiGenerator.PrintTrickRoomStart();
-            //},
-            //OnFieldRestart = (_, _, _) =>
-            //{
-            //    UiGenerator.PrintTrickRoomRestart();
-            //},
-            //OnFieldResidualOrder = 27,
-            //OnFieldResidualSubOrder = 1,
-            //OnFieldEnd = (_) =>
-            //{
-            //    UiGenerator.PrintTrickRoomEnd();
-            //},
         },
         [ConditionId.Stall] = new Condition
         {
@@ -209,7 +197,7 @@ public record Conditions
                 condition.Counter = 3;
                 return true;
             },
-            OnStallMove = (random, pokemon) =>
+            OnStallMove = (random, pokemon, _) =>
             {
                 Condition? condition = pokemon.GetCondition(ConditionId.Stall);
 
@@ -231,7 +219,7 @@ public record Conditions
                 }
                 return success;
             },
-            OnRestart = (target, _, _) =>
+            OnRestart = (target, _, _, _) =>
             {
                 Condition? condition = target.GetCondition(ConditionId.Stall);
 
@@ -252,7 +240,7 @@ public record Conditions
                 condition.Duration = 2;
 
                 return true;
-            }
+            },
         },
         [ConditionId.Protect] = new Condition
         {
@@ -263,14 +251,14 @@ public record Conditions
             ConditionVolatility = ConditionVolatility.Volatile,
             // OnStart
             OnTryHitPriority = 3,
-            OnTryHit = (_, _, move) =>
+            // TODO: Check for smart target (dragon darts), outrage lock
+            OnTryHit = (_, _, move, _) => !(move.Flags.Protect ?? false),
+            OnTurnEnd = (target, _) =>
             {
-                if (!(move.Flags.Protect ?? false))
+                if (!target.RemoveCondition(ConditionId.Protect))
                 {
-                    return true;
+                    throw new InvalidOperationException("Failed to remove Protect condition.");
                 }
-                // TODO: Check for smart target (dragon darts), outrage lock
-                return false;
             },
         },
     };
