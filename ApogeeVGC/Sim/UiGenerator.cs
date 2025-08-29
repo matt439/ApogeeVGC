@@ -195,6 +195,53 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintStatModifierChange(Pokemon pokemon, StatId stat, int change)
+    {
+        string pokemonName = pokemon.Name;
+        string statName = stat.ConvertToString();
+        StringBuilder sb = new();
+        switch (change)
+        {
+            case 1:
+                sb.AppendLine($"{pokemonName}'s {statName} rose!");
+                break;
+            case 2:
+                sb.AppendLine($"{pokemonName}'s {statName} rose sharply!");
+                break;
+            case >=3 and <= 12:
+                sb.AppendLine($"{pokemonName}'s {statName} rose drastically!");
+                break;
+            case -1:
+                sb.AppendLine($"{pokemonName}'s {statName} fell!");
+                break;
+            case -2:
+                sb.AppendLine($"{pokemonName}'s {statName} harshly fell!");
+                break;
+            case <= -3 and >= -12:
+                sb.AppendLine($"{pokemonName}'s {statName} severely fell!");
+                break;
+            case 0:
+                throw new InvalidOperationException("Stat change cannot be zero.");
+            default:
+                throw new InvalidOperationException("Stat change must be between -12 and 12, excluding 0.");
+        }
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintStatModifierTooHigh(Pokemon pokemon, StatId stat)
+    {
+        string pokemonName = pokemon.Name;
+        string statName = stat.ConvertToString();
+        Console.WriteLine($"{pokemonName}'s {statName} won't go any higher!");
+    }
+
+    public static void PrintStatModifierTooLow(Pokemon pokemon, StatId stat)
+    {
+        string pokemonName = pokemon.Name;
+        string statName = stat.ConvertToString();
+        Console.WriteLine($"{pokemonName}'s {statName} won't go any lower!");
+    }
+
     public static void PrintMoveMissAction(Pokemon attacker, Move move, Pokemon defender)
     {
         StringBuilder sb = new();

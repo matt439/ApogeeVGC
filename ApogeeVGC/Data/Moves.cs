@@ -187,6 +187,36 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
+            [MoveId.DracoMeteor] = new()
+            {
+                Id = MoveId.DracoMeteor,
+                Num = 434,
+                Accuracy = 90,
+                BasePower = 130,
+                Category = MoveCategory.Special,
+                Name = "Draco Meteor",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnHit = (_, source, _, context) =>
+                {
+                    // lower the user's Special Attack by 2 stages
+                    if (source is null)
+                    {
+                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
+                                                                        "Draco Meteor move.");
+                    }
+                    source.AlterStatModifier(StatId.SpA, -2, context);
+                    return true;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dragon,
+            },
 
 
 

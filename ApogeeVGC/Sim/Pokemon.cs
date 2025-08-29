@@ -121,7 +121,7 @@ public static class PokemonBuilder
                     [new MoveSetup(MoveId.VoltSwitch),
                         new MoveSetup(MoveId.DazzlingGleam),
                             new MoveSetup(MoveId.ElectroDrift),
-                                new MoveSetup(MoveId.PsychicBasic)],
+                                new MoveSetup(MoveId.DracoMeteor)],
                     ItemId.ChoiceSpecs,
                     AbilityId.HadronEngine,
                     new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
@@ -283,6 +283,11 @@ public class Pokemon
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
     public bool PrintDebug { get; init; }
+    // TODO: may neeed to account for burn here
+    private int CritAtk => StatModifiers.Atk < 0 ? UnmodifiedAtk : CurrentAtk;
+    private int CritDef => StatModifiers.Def > 0 ? UnmodifiedDef : CurrentDef;
+    private int CritSpA => StatModifiers.SpA < 0 ? UnmodifiedSpA : CurrentSpA;
+    private int CritSpD => StatModifiers.SpD > 0 ? UnmodifiedSpD : CurrentSpD;
 
     // Need to have these parameters to calculate the stats correctly
     public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)
@@ -357,28 +362,28 @@ public class Pokemon
         return previousHp - CurrentHp; // Return actual damage taken
     }
 
-    public int GetAttackStat(Move move)
+    public int GetAttackStat(Move move, bool crit)
     {
         switch (move.Category)
         {
             case MoveCategory.Physical:
-                return CurrentAtk;
+                return crit ? CritAtk : CurrentAtk;
             case MoveCategory.Special:
-                return CurrentSpA;
+                return crit ? CritSpA : CurrentSpA;
             case MoveCategory.Status:
             default:
                 throw new ArgumentException("Invalid move category.");
         }
     }
 
-    public int GetDefenseStat(Move move)
+    public int GetDefenseStat(Move move, bool crit)
     {
         switch (move.Category)
         {
             case MoveCategory.Physical:
-                return CurrentDef;
+                return crit ? CritDef : CurrentDef;
             case MoveCategory.Special:
-                return CurrentSpD;
+                return crit ? CritSpD : CurrentSpD;
             case MoveCategory.Status:
             default:
                 throw new ArgumentException("Invalid move category.");
@@ -454,6 +459,83 @@ public class Pokemon
     public void OnSwitchIn()
     {
         //TODO: Trigger any switch-in effects from conditions, abilities, items, etc.
+    }
+
+    public void AlterStatModifier(StatId stat, int change, BattleContext context)
+    {
+        switch (change)
+        {
+            case 0:
+                throw new InvalidOperationException("Stat change cannot be zero.");
+            case > 12 or < -12:
+                throw new ArgumentOutOfRangeException(nameof(change), "Stat change must be between -12 and +12.");
+        }
+
+        int currentStage = stat switch
+        {
+            StatId.Atk => StatModifiers.Atk,
+            StatId.Def => StatModifiers.Def,
+            StatId.SpA => StatModifiers.SpA,
+            StatId.SpD => StatModifiers.SpD,
+            StatId.Spe => StatModifiers.Spe,
+            StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+        };
+
+        switch (currentStage)
+        {
+            case 6 when change > 0:
+            {
+                // Already at max stage, cannot increase further
+                if (context.PrintDebug)
+                {
+                    UiGenerator.PrintStatModifierTooHigh(this, stat);
+                }
+                return;
+            }
+            case -6 when change < 0:
+            {
+                // Already at min stage, cannot decrease further
+                if (context.PrintDebug)
+                {
+                    UiGenerator.PrintStatModifierTooLow(this, stat);
+                }
+                return;
+            }
+        }
+
+
+        int newStage = Math.Clamp(currentStage + change, -6, 6);
+
+        int actualChange = newStage - currentStage;
+        if (actualChange == 0)
+        {
+            // No change in stage, so no need to update
+            return;
+        }
+        StatModifiers = stat switch
+        {
+            StatId.Atk => StatModifiers with { Atk = newStage },
+            StatId.Def => StatModifiers with { Def = newStage },
+            StatId.SpA => StatModifiers with { SpA = newStage },
+            StatId.SpD => StatModifiers with { SpD = newStage },
+            StatId.Spe => StatModifiers with { Spe = newStage },
+            StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+        };
+
+        // TODO: Trigger any on-stat-change effects from conditions, abilities, items, etc.
+
+        if (context.PrintDebug)
+        {
+            UiGenerator.PrintStatModifierChange(this, stat, actualChange);
+        }
+    }
+
+    public void SetStatModifier(StatId stat, int value, BattleContext context)
+    {
+        // TODO: Implement setting stat stage directly if needed
+        // Would be used for belly drum, etc.
     }
 
     private int CalculateModifiedStat(StatId stat)

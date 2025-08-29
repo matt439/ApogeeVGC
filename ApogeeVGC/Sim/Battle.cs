@@ -846,13 +846,14 @@ public class Battle
         }
 
         int damage = Damage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
-        move.OnHit?.Invoke(defender, attacker, move, Context);
         defender.Damage(damage);
         
         if (PrintDebug)
         {
             UiGenerator.PrintDamagingMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
         }
+
+        move.OnHit?.Invoke(defender, attacker, move, Context);
 
         return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
     }
@@ -1032,19 +1033,12 @@ public class Battle
                     UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
                 }
                 break;
-            //case PlayerState.Idle:
-            //    // This handles immediate forced switches (like Volt Switch) that bypass normal choice flow
-            //    if (PrintDebug)
-            //    {
-            //        UiGenerator.PrintForceSwitchAction(side.Team.Trainer.Name, prevActive,
-            //            side.Team.ActivePokemon);
-            //    }
-            //    break;
             case PlayerState.Idle:
             case PlayerState.TeamPreviewSelect:
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchSelect:
             case PlayerState.FaintedSelect:
+            case PlayerState.ForceSwitchSelect:
                 throw new InvalidOperationException($"Player {playerId} cannot switch Pokémon" +
                                                     $"in current state: {playerState}");
             default:
@@ -1122,8 +1116,8 @@ public class Battle
         }
 
         int level = attacker.Level;
-        int attackStat = attacker.GetAttackStat(move);
-        int defenseStat = defender.GetDefenseStat(move);
+        int attackStat = attacker.GetAttackStat(move, crit);
+        int defenseStat = defender.GetDefenseStat(move, crit);
         int basePower = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? move.BasePower;
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0

@@ -121,7 +121,7 @@ public enum Nonstandard
     Cap,
     Lgpe,
     Custom,
-    Gigantamax
+    Gigantamax,
 }
 
 public enum BoostId
@@ -132,7 +132,7 @@ public enum BoostId
     SpD,
     Spe,
     Accuracy,
-    Evasion
+    Evasion,
 }
 
 public enum StatId
@@ -182,6 +182,31 @@ public static class StatIdTools
                 "Cannot convert HP to StatIdExceptHp."),
             _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
         };
+    }
+
+    public static string ConvertToString(this StatId stat, bool leadingCapital = false)
+    {
+        return (stat, leadingCapital) switch
+        {
+            (StatId.Hp, true) => "HP",
+            (StatId.Hp, false) => "hp",
+            (StatId.Atk, true) => "Attack",
+            (StatId.Atk, false) => "attack",
+            (StatId.Def, true) => "Defense",
+            (StatId.Def, false) => "defense",
+            (StatId.SpA, true) => "Special Attack",
+            (StatId.SpA, false) => "special attack",
+            (StatId.SpD, true) => "Special Defense",
+            (StatId.SpD, false) => "special defense",
+            (StatId.Spe, true) => "Speed",
+            (StatId.Spe, false) => "speed",
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+        };
+    }
+
+    public static string ConvertToString(this StatIdExceptHp stat, bool leadingCapital = false)
+    {
+        return ConvertToString(stat.ConvertToStatId(), leadingCapital);
     }
 }
 
