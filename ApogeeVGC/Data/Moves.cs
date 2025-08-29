@@ -131,7 +131,62 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
+            [MoveId.DazzlingGleam] = new()
+            {
+                Id = MoveId.DazzlingGleam,
+                Num = 605,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Dazzling Gleam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Fairy,
+            },
+            [MoveId.ElectroDrift] = new()
+            {
+                Id = MoveId.ElectroDrift,
+                Num = 879,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Special,
+                Name = "Electro Drift",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags()
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                OnBasePower = (_, target, move, context) =>
+                {
+                    // if the move is super effective, increase power by 33% (5461 / 4,096)
+                    if (target is null || move is null)
+                    {
+                        throw new ArgumentNullException("Target and move cannot be null in Electro" +
+                                                        "Drift move.");
+                    }
 
+                    MoveEffectiveness effectiveness = context.Library.TypeChart.GetMoveEffectiveness(
+                        target.Specie.Types, move.Type);
+
+                    if (effectiveness is MoveEffectiveness.SuperEffective2X or MoveEffectiveness.SuperEffective4X)
+                    {
+                        return (move.BasePower * 5461) / 4096;
+                    }
+                    return move.BasePower;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
 
 
 

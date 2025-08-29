@@ -119,8 +119,8 @@ public static class PokemonBuilder
                     library,
                     SpecieId.Miraidon,
                     [new MoveSetup(MoveId.VoltSwitch),
-                        new MoveSetup(MoveId.ElectricBasic),
-                            new MoveSetup(MoveId.FlyingBasic),
+                        new MoveSetup(MoveId.DazzlingGleam),
+                            new MoveSetup(MoveId.ElectroDrift),
                                 new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.ChoiceSpecs,
                     AbilityId.HadronEngine,
@@ -446,6 +446,9 @@ public class Pokemon
     {
         // Clear volatile conditions
         Conditions.RemoveAll(c => c.ConditionVolatility == ConditionVolatility.Volatile);
+
+        // Reset stat modifiers
+        StatModifiers = new StatModifiers();
     }
 
     public void OnSwitchIn()

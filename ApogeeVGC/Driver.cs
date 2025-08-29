@@ -278,8 +278,7 @@ public class Driver
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
             Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                PlayerRandomStrategy.MoveChoices,
-                PlayerRandom2Seed),
+                PlayerRandomStrategy.ReducedSwitching, PlayerRandom2Seed),
         };
 
         Simulator.Run();

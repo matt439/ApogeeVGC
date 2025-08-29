@@ -155,9 +155,6 @@ public class Battle
                                                     $"Current states: P1={Player1State}, P2={Player2State}");
             }
 
-            //Console.WriteLine($"Turn {Turn}: Player {playerId} submitting {choice}");
-            //Console.WriteLine($"States: P1={Player1State}, P2={Player2State}");
-
             CheckForChoiceError(playerId, choice);
 
             SetPendingChoice(playerId, choice);
@@ -226,7 +223,6 @@ public class Battle
                     if (Player2State == PlayerState.MoveSwitchLocked && Player2PendingChoice != null)
                     {
                         ExecutePlayerChoice(PlayerId.Player2, Player2PendingChoice.Value);
-                        //PerformMove(PlayerId.Player2, Player2PendingChoice.Value);
                         CLearPendingChoice(PlayerId.Player2);
                         SetPlayerState(PlayerId.Player2, PlayerState.Idle);
                         // Update player states for any fainted Pokemon
@@ -242,7 +238,6 @@ public class Battle
                     if (Player1State == PlayerState.MoveSwitchLocked && Player1PendingChoice != null)
                     {
                         ExecutePlayerChoice(PlayerId.Player1, Player1PendingChoice.Value);
-                        //PerformMove(PlayerId.Player1, Player1PendingChoice.Value);
                         CLearPendingChoice(PlayerId.Player1);
                         SetPlayerState(PlayerId.Player1, PlayerState.Idle);
                         // Update player states for any fainted Pokemon
@@ -811,6 +806,32 @@ public class Battle
 
     private MoveAction PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender)
     {
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+            case MoveTarget.AllAdjacentFoes:
+                break;
+            case MoveTarget.Self:
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.Allies:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.FoeSide:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+                throw new NotImplementedException();
+            case MoveTarget.Field:
+                throw new InvalidOperationException("Field target should be handled separately");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
             defender.Specie.Types, move.Type);
@@ -864,9 +885,6 @@ public class Battle
             case MoveTarget.Self:
                 attacker.AddCondition(move.Condition, Context);
                 break;
-            //case MoveTarget.Field:
-            //    HandleFieldTargetStatusMove(move);
-            //    break;
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
@@ -1106,7 +1124,7 @@ public class Battle
         int level = attacker.Level;
         int attackStat = attacker.GetAttackStat(move);
         int defenseStat = defender.GetDefenseStat(move);
-        int basePower = move.BasePower;
+        int basePower = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? move.BasePower;
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
         bool stab = applyStab && attacker.IsStab(move);

@@ -266,11 +266,18 @@ public record Move : IEffect
     public bool StallingMove { get; init; }
 
     public Func<Pokemon, bool>? OnTryImmunity { get; init; }
-    // target, source, move, context
+    /// <summary>
+    /// target, source, move, context
+    /// </summary>
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnPrepareHit { get; init; }
-    // target, source, move, context
+    /// <summary>
+    /// target, source, move, context
+    /// </summary>
     public Func<Pokemon, Pokemon?, Move?, BattleContext, bool>? OnHit { get; init; }
-
+    /// <summary>
+    /// source, target, move, context
+    /// </summary>
+    public Func<Pokemon, Pokemon, Move, BattleContext, int>? OnBasePower { get; init; }
     public Weather? Weather { get; init; }
     public Terrain? Terrain { get; init; }
     public PseudoWeather? PseudoWeather { get; init; }
