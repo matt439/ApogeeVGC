@@ -70,12 +70,23 @@ public record Condition : IEffect
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTryHit { get; init; }
     public Action<Pokemon, BattleContext>? OnTurnEnd { get; init; }
     //public Action<Field>? OnPseudoWeatherStart { get; init; }
-    public Func<double>? OnModifyAtk { get; init; }
-    public Func<double>? OnModifyDef { get; init; }
-    public Func<double>? OnModifySpA { get; init; }
-    public Func<double>? OnModifySpD { get; init; }
-    public Func<double>? OnModifySpe { get; init; }
+    public Func<Pokemon, double>? OnModifyAtk { get; init; }
+    public Func<Pokemon, double>? OnModifyDef { get; init; }
+    public Func<Pokemon, double>? OnModifySpA { get; init; }
+    public Func<Pokemon, double>? OnModifySpD { get; init; }
+    public Func<Pokemon, double>? OnModifySpe { get; init; }
 
+    public int? OnModifyAtkPriority { get; init; }
+    public int? OnModifyDefPriority { get; init; }
+    public int? OnModifySpAPriority { get; init; }
+    public int? OnModifySpDPriority { get; init; }
+    public int? OnModifySpePriority { get; init; }
+
+    /// <summary>
+    /// source, target, move, context
+    /// </summary>
+    public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnBeforeMove { get; init; }
+    public int? OnBeforeMovePriority { get; init; }
 
     public Condition Copy()
     {

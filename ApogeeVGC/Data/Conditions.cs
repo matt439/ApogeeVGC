@@ -33,32 +33,33 @@ public record Conditions
                 switch (sourceEffect.EffectType)
                 {
                     case EffectType.Item:
-                    {
                         if (sourceEffect is Item { Name: "Flame Orb" } && debug)
                         {
                             UiGenerator.PrintBurnStartFromFlameOrb(target);
                         }
                         break;
-                    }
                     case EffectType.Ability:
-                    {
                         if (sourceEffect is Ability ability && debug)
                         {
                             UiGenerator.PrintBurnStartFromAbility(target, ability);
                         }
                         break;
-                    }
                     case EffectType.Move:
-                    case EffectType.Specie:
-                    case EffectType.Condition:
-                    case EffectType.Format:
-                        return false;
-                    default:
                         if (debug)
                         {
                             UiGenerator.PrintBurnStart(target);
                         }
                         break;
+                    case EffectType.Specie:
+                    case EffectType.Condition:
+                    case EffectType.Format:
+                        throw new InvalidOperationException($"Effect type {sourceEffect.EffectType} cannot" +
+                                                            $"apply {ConditionId.Burn} to" +
+                                                            $"pokemon {target.Name}.");
+                    default:
+                        throw new InvalidOperationException($"Unknown effect type {sourceEffect.EffectType}" +
+                                                            $"when trying to apply {ConditionId.Burn} to" +
+                                                            $"pokemon {target.Name}.");
                 }
                 return true;
             },
@@ -69,7 +70,7 @@ public record Conditions
                 if (damage < 1) damage = 1;
                 target.Damage(damage);
                 if (context.PrintDebug)
-                {
+                { 
                     UiGenerator.PrintBurnDamage(target);
                 }
             },
@@ -78,7 +79,63 @@ public record Conditions
         {
             Id = ConditionId.Paralysis,
             Name = "Paralysis",
+            ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.NonVolatile,
+            OnStart = (target, _, sourceEffect, context) =>
+            {
+                if (sourceEffect is null)
+                {
+                    throw new ArgumentNullException($"Source effect is null when trying to apply" +
+                                                    $"{ConditionId.Paralysis} to" + $"pokemon {target.Name}.");
+                }
+
+                bool debug = context.PrintDebug;
+
+                switch (sourceEffect.EffectType)
+                {
+                    case EffectType.Ability:
+                        if (sourceEffect is Ability ability && debug)
+                        {
+                            UiGenerator.PrintParalysisStartFromAbility(target, ability);
+                        }
+                        break;
+                    case EffectType.Move:
+                        if (debug)
+                        {
+                            UiGenerator.PrintParalysisStart(target);
+                        }
+                        break;
+                    case EffectType.Specie:
+                    case EffectType.Condition:
+                    case EffectType.Format:
+                    case EffectType.Item:
+                        throw new InvalidOperationException($"Effect type {sourceEffect.EffectType} cannot" +
+                                                            $"apply {ConditionId.Paralysis} to" +
+                                                            $"pokemon {target.Name}.");
+                    default:
+                        throw new InvalidOperationException($"Unknown effect type {sourceEffect.EffectType}" +
+                                                            $"when trying to apply {ConditionId.Paralysis} to" +
+                                                            $"pokemon {target.Name}.");
+                }
+
+                return true;
+            },
+            OnModifySpePriority = -101,
+            // Quick Feet negates the speed drop from paralysis
+            // It also increases speed by 50% when the pokemon is burned, paralyzed or poisoned
+            // but that is handled in the Ability effects.
+            OnModifySpe = (pokemon) => pokemon.Ability.Id == AbilityId.QuickFeet ? 1.0 : 0.5,
+            OnBeforeMovePriority = 1,
+            OnBeforeMove = (source, _, _, context) =>
+            {
+                bool paralyzed = context.Random.NextDouble() < 0.25;
+                if (paralyzed && context.PrintDebug)
+                {
+                    UiGenerator.PrintParalysisPrevention(source);
+                }
+                return !paralyzed;
+            },
+
         },
         [ConditionId.Sleep] = new Condition
         {
@@ -270,7 +327,7 @@ public record Conditions
             Name = "Tailwind",
             ConditionEffectType = ConditionEffectType.SideCondition,
             ConditionVolatility = ConditionVolatility.Volatile,
-            OnModifySpe = () => 2.0,
+            OnModifySpe = (_) => 2.0,
         },
     };
 }

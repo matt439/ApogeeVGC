@@ -278,6 +278,21 @@ public static class UiGenerator
         Console.WriteLine($"{target.Name} was burned by {ability.Name}!");
     }
 
+    public static void PrintParalysisStart(Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} was paralysed!");
+    }
+
+    public static void PrintParalysisStartFromAbility(Pokemon target, Ability ability)
+    {
+        Console.WriteLine($"{target.Name} was paralysed by {ability.Name}!");
+    }
+
+    public static void PrintParalysisPrevention(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name} is fully paralyzed and can't move!");
+    }
+
     public static void PrintLeechSeedStart(Pokemon target)
     {
         Console.WriteLine($"{target.Name} was seeded!");

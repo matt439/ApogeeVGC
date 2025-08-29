@@ -738,6 +738,22 @@ public class Battle
         }
         move.UsedPp++;  // Decrease PP for the move used
 
+        Pokemon defender = defSide.Team.ActivePokemon;
+
+        // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
+        if (attacker.Conditions
+            .Where(c => c.OnBeforeMove != null)
+            .OrderBy(c => c.OnBeforeMovePriority ?? 0)
+            .ToList().Any(condition => condition.OnBeforeMove == null ||
+                                       !condition.OnBeforeMove(attacker, defender, move, Context)))
+        {
+            //if (PrintDebug)
+            //{
+            //    UiGenerator.PrintMoveFailAction(attacker, move);
+            //}
+            return MoveAction.None;
+        }
+
         if (move.StallingMove)
         {
             // check for conditions with OnStallMove on attacker
@@ -752,8 +768,6 @@ public class Battle
                 return MoveAction.None;
             }
         }
-
-        Pokemon defender = defSide.Team.ActivePokemon;
 
         // Miss check
         if (IsMoveMiss(attacker, move, defender))
@@ -892,10 +906,10 @@ public class Battle
         switch (move.Target)
         {
             case MoveTarget.Normal:
-                defender.AddCondition(move.Condition, Context);
+                defender.AddCondition(move.Condition, Context, attacker, move);
                 break;
             case MoveTarget.Self:
-                attacker.AddCondition(move.Condition, Context);
+                attacker.AddCondition(move.Condition, Context, attacker, move);
                 break;
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:

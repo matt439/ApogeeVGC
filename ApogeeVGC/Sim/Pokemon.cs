@@ -158,7 +158,7 @@ public static class PokemonBuilder
                     library,
                     SpecieId.Grimmsnarl,
                     [new MoveSetup(MoveId.SpiritBreak),
-                        new MoveSetup(MoveId.FairyBasic),
+                        new MoveSetup(MoveId.ThunderWave),
                             new MoveSetup(MoveId.PsychicBasic),
                                 new MoveSetup(MoveId.FightingBasic)],
                     ItemId.LightClay,
@@ -591,32 +591,25 @@ public class Pokemon
 
         // apply condition effects here
         double conditionModifier = 1.0;
-        switch (stat)
+        conditionModifier = stat switch
         {
-            case StatId.Atk:
-                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
-                    current * (condition.OnModifyAtk?.Invoke() ?? 1.0));
-                break;
-            case StatId.Def:
-                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
-                    current * (condition.OnModifyDef?.Invoke() ?? 1.0));
-                break;
-            case StatId.SpA:
-                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
-                    current * (condition.OnModifySpA?.Invoke() ?? 1.0));
-                break;
-            case StatId.SpD:
-                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
-                    current * (condition.OnModifySpD?.Invoke() ?? 1.0));
-                break;
-            case StatId.Spe:
-                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
-                    current * (condition.OnModifySpe?.Invoke() ?? 1.0));
-                break;
-            case StatId.Hp:
-            default:
-                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
-        }
+            StatId.Atk => Conditions.OrderBy(c => c.OnModifyAtkPriority ?? 0) // Sort by priority (default 0)
+                .Aggregate(conditionModifier,
+                    (current, condition) => current * (condition.OnModifyAtk?.Invoke(this) ?? 1.0)),
+            StatId.Def => Conditions.OrderBy(c => c.OnModifyDefPriority ?? 0)
+                .Aggregate(conditionModifier,
+                    (current, condition) => current * (condition.OnModifyDef?.Invoke(this) ?? 1.0)),
+            StatId.SpA => Conditions.OrderBy(c => c.OnModifySpAPriority ?? 0)
+                .Aggregate(conditionModifier,
+                    (current, condition) => current * (condition.OnModifySpA?.Invoke(this) ?? 1.0)),
+            StatId.SpD => Conditions.OrderBy(c => c.OnModifySpDPriority ?? 0)
+                .Aggregate(conditionModifier,
+                    (current, condition) => current * (condition.OnModifySpD?.Invoke(this) ?? 1.0)),
+            StatId.Spe => Conditions.OrderBy(c => c.OnModifySpePriority ?? 0)
+                .Aggregate(conditionModifier,
+                    (current, condition) => current * (condition.OnModifySpe?.Invoke(this) ?? 1.0)),
+            _ => conditionModifier,
+        };
 
         return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * statModifier * conditionModifier);
     }

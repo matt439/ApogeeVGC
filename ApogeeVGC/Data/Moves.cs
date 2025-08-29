@@ -429,6 +429,28 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
             },
+            [MoveId.ThunderWave] = new()
+            {
+                Id = MoveId.ThunderWave,
+                Num = 87,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Thunder Wave",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Condition = _library.Conditions[ConditionId.Paralysis].Copy(),
+                OnTryImmunity = (target) => target.HasType(MoveType.Electric),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
 
 
 

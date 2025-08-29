@@ -8,6 +8,8 @@ public enum AbilityId
     FlameBody,
     Prankster,
     QuarkDrive,
+
+    QuickFeet,
 }
 
 public record Ability : IEffect
