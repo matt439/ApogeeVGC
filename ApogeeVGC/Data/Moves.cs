@@ -253,6 +253,131 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.Crunch] = new()
+            {
+                Id = MoveId.Crunch,
+                Num = 242,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Crunch",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bite = true,
+                },
+                OnHit = (target, _, _, context) =>
+                {
+                    // 20% chance to lower the target's Defense by 1 stage
+                    //ArgumentNullException.ThrowIfNull(target, nameof(target));
+
+                    if (context.Random.Next(100) < 20)
+                    {
+                        target.AlterStatModifier(StatId.Def, -1, context);
+                    }
+                    return true;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.HeadlongRush] = new()
+            {
+                Id = MoveId.HeadlongRush,
+                Num = 838,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Headlong Rush",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Punch = true,
+                    Metronome = true,
+                },
+                OnHit = (_, source, _, context) =>
+                {
+                    // lowers the user's Defence and Special Defense by 1 stage
+                    if (source is null)
+                    {
+                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
+                                                                        "Headlong Rush move.");
+                    }
+                    source.AlterStatModifier(StatId.Def, -1, context);
+                    source.AlterStatModifier(StatId.SpD, -1, context);
+                    return true;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
+            },
+            [MoveId.StruggleBug] = new()
+            {
+                Id = MoveId.StruggleBug,
+                Num = 522,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Special,
+                Name = "Struggle Bug",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnHit = (target, _, _, context) =>
+                {
+                    // lowers the target's Special Attack by 1 stage
+                    if (target is null)
+                    {
+                        throw new ArgumentNullException(nameof(target), "Target cannot be null in" +
+                                                                        "Struggle Bug move.");
+                    }
+                    target.AlterStatModifier(StatId.SpA, -1, context);
+                    return true;
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Bug,
+            },
+            [MoveId.Overheat] = new()
+            {
+                Id = MoveId.Overheat,
+                Num = 315,
+                Accuracy = 90,
+                BasePower = 130,
+                Category = MoveCategory.Special,
+                Name = "Overheat",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnHit = (_, source, _, context) =>
+                {
+                    // lowers the user's Special Attack by 2 stages
+                    if (source is null)
+                    {
+                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
+                                                                        "Overheat move.");
+                    }
+                    source.AlterStatModifier(StatId.SpA, -2, context);
+                    return true;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
 
 
 
