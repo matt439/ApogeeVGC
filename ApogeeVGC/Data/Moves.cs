@@ -116,7 +116,7 @@ public record Moves
                 Id = MoveId.VoltSwitch,
                 Num = 521,
                 Accuracy = 100,
-                BasePower = 700,
+                BasePower = 70,
                 Category = MoveCategory.Special,
                 Name = "Volt Switch",
                 BasePp = 20,
@@ -129,7 +129,7 @@ public record Moves
                 },
                 SelfSwitch = true,
                 Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
+                Type = MoveType.Electric,
             },
 
 

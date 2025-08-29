@@ -42,6 +42,7 @@ public class Team
     public int[] SwitchOptionIndexes => Enumerable.Range(0, PokemonSet.PokemonCount)
             .Where(i => i != ActivePokemonIndex && !PokemonSet.Pokemons[i].IsFainted)
             .ToArray();
+    public int SwitchOptionsCount => SwitchOptionIndexes.Length;
     public bool IsDefeated => PokemonSet.AllFainted;
 
     /// <summary>

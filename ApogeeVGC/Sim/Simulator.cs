@@ -38,19 +38,30 @@ public class Simulator
             switch (battleState)
             {
                 case BattleRequestState.RequestingPlayer1Input:
-                    player1Choice = Player1.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player1));
+                {
+                    var availableChoices = Battle.GetAvailableChoices(PlayerId.Player1);
+                    player1Choice = Player1.GetNextChoice(availableChoices);
                     Battle.SubmitChoice(PlayerId.Player1, player1Choice);
+                }
                     break;
                 case BattleRequestState.RequestingPlayer2Input:
-                    player2Choice = Player2.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player2));
+                {
+                    var availableChoices = Battle.GetAvailableChoices(PlayerId.Player2);
+                    player2Choice = Player2.GetNextChoice(availableChoices);
                     Battle.SubmitChoice(PlayerId.Player2, player2Choice);
+                }
                     break;
                 case BattleRequestState.RequestingBothPlayersInput:
-                    player1Choice = Player1.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player1));
-                    player2Choice = Player2.GetNextChoice(Battle.GetAvailableChoices(PlayerId.Player2));
+                {
+                    var availableChoices1 = Battle.GetAvailableChoices(PlayerId.Player1);
+                    var availableChoices2 = Battle.GetAvailableChoices(PlayerId.Player2);
+
+                    player1Choice = Player1.GetNextChoice(availableChoices1);
+                    player2Choice = Player2.GetNextChoice(availableChoices2);
 
                     Battle.SubmitChoice(PlayerId.Player1, player1Choice);
                     Battle.SubmitChoice(PlayerId.Player2, player2Choice);
+                }
                     break;
                 case BattleRequestState.Player1Win:
                 case BattleRequestState.Player2Win:

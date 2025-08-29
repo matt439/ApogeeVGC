@@ -22,7 +22,7 @@ public class Driver
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
-    private const int RandomEvaluationNumTest = 10000;
+    private const int RandomEvaluationNumTest = 100000;
 
     private const int MctsEvaluationNumTest = 10;
     private const int MctsMaxIterations = 100000;
@@ -171,8 +171,9 @@ public class Driver
         // Thread-safe counter for seed generation
         int seedCounter = 0;
 
-        Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
-            _ =>
+        //Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
+        //    _ =>
+        for (int i = 0; i < RandomEvaluationNumTest; i++)
         {
             int currentSeed = Interlocked.Increment(ref seedCounter);
             int player1Seed = PlayerRandom1Seed + currentSeed;
@@ -191,7 +192,7 @@ public class Driver
                     player2Seed),
             };
             simResults.Add(simulator.Run());
-        });
+        }
 
         stopwatch.Stop();
 

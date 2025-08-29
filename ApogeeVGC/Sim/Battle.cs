@@ -184,6 +184,11 @@ public class Battle
                             // Clear that player's choice and set them to force switch select
                         CLearPendingChoice(executedPlayers[0]);
                         SetPlayerState(executedPlayers[0], PlayerState.ForceSwitchSelect);
+                        Side side = GetSide(executedPlayers[0]);
+                        if (PrintDebug)
+                        {
+                            UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                        }
                         break;
                 }
             }
@@ -203,7 +208,7 @@ public class Battle
             else if (IsReadyForForceSwitchProcessing())
             {
                 // Process forced switch choices
-                if (Player1PendingChoice != null)
+                if (Player1PendingChoice != null && Player1PendingChoice.Value.IsSwitchChoice())
                 {
                     PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
                     CLearPendingChoice(PlayerId.Player1);
@@ -218,7 +223,7 @@ public class Battle
                         UpdateFaintedStates();
                     }
                 }
-                else if (Player2PendingChoice != null)
+                else if (Player2PendingChoice != null && Player2PendingChoice.Value.IsSwitchChoice())
                 {
                     PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
                     CLearPendingChoice(PlayerId.Player2);
@@ -330,7 +335,10 @@ public class Battle
 
     private void HandleEndOfTurn()
     {
-        UiGenerator.PrintBlankLine();
+        if (PrintDebug)
+        {
+            UiGenerator.PrintBlankLine();
+        }
         Field.OnTurnEnd(AllActivePokemon, Context);
         HandleResiduals();
         HandleConditionTurnEnds();
@@ -555,12 +563,11 @@ public class Battle
         {
             MoveAction moveAction = PerformMove(playerId, choice);
             SetPendingChoice(playerId, null);
-            
-            if (moveAction == MoveAction.SwitchAttackerOut)
+
+            // Only set to force switch select if there are valid switch options
+            if (moveAction == MoveAction.SwitchAttackerOut &&
+                GetSide(playerId).Team.SwitchOptionsCount > 0)
             {
-                //// Perform forced switch IMMEDIATELY after this specific move
-                //// This ensures the switch happens before the opponent's move executes
-                //HandleImmediateForcedSwitchOut(playerId);
                 SetPlayerState(playerId, PlayerState.ForceSwitchSelect);
                 action = MoveAction.SwitchAttackerOut;
             }
@@ -662,17 +669,6 @@ public class Battle
 
     private bool IsReadyForForceSwitchProcessing()
     {
-        //// 1 or 2 players can be locked in force switch state, but not both
-        //return Player1State == PlayerState.ForceSwitchLocked && Player2State == PlayerState.ForceSwitchLocked ||
-
-        //       // For slow forced switch, the other player can be idle as they already executed their move
-        //       Player1State == PlayerState.ForceSwitchLocked && Player2State == PlayerState.Idle ||
-        //       Player1State == PlayerState.Idle && Player2State == PlayerState.ForceSwitchLocked ||
-
-        //       // For fast forced switch, the slower player still has a locked move choice
-        //       Player1State == PlayerState.ForceSwitchLocked && Player2State == PlayerState.MoveSwitchLocked ||
-        //       Player1State == PlayerState.MoveSwitchLocked && Player2State == PlayerState.ForceSwitchLocked;
-
         if (Player1State == PlayerState.ForceSwitchLocked && Player2State == PlayerState.ForceSwitchLocked)
         {
             throw new InvalidOperationException("Invalid battle state: both players are in ForceSwitchLocked state.");
@@ -765,7 +761,15 @@ public class Battle
         foreach (Condition condition in defender.Conditions.ToList())
         {
             if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
-            if (PrintDebug)
+
+            if (!PrintDebug) return MoveAction.None;
+
+            // Check if the defender is protected by a stall move like Protect, Detect, etc.
+            if (defender.HasCondition(ConditionId.Stall))
+            {
+                UiGenerator.PrintStallMoveProtection(attacker, move, defender);
+            }
+            else
             {
                 UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
             }
@@ -982,18 +986,18 @@ public class Battle
             case PlayerState.ForceSwitchLocked:
                 if (PrintDebug)
                 {
-                    UiGenerator.PrintForceSwitchAction(side.Team.Trainer.Name, prevActive,
-                        side.Team.ActivePokemon);
+                    UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
                 }
                 break;
+            //case PlayerState.Idle:
+            //    // This handles immediate forced switches (like Volt Switch) that bypass normal choice flow
+            //    if (PrintDebug)
+            //    {
+            //        UiGenerator.PrintForceSwitchAction(side.Team.Trainer.Name, prevActive,
+            //            side.Team.ActivePokemon);
+            //    }
+            //    break;
             case PlayerState.Idle:
-                // This handles immediate forced switches (like Volt Switch) that bypass normal choice flow
-                if (PrintDebug)
-                {
-                    UiGenerator.PrintForceSwitchAction(side.Team.Trainer.Name, prevActive,
-                        side.Team.ActivePokemon);
-                }
-                break;
             case PlayerState.TeamPreviewSelect:
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchSelect:
@@ -1304,44 +1308,6 @@ public class Battle
             case PlayerId.None:
             default:
                 throw new ArgumentException("Invalid player ID", nameof(playerId));
-        }
-    }
-
-    private void HandleImmediateForcedSwitchOut(PlayerId playerId)
-    {
-        Side side = GetSide(playerId);
-        
-        // Check if the Pokémon can actually switch out (not trapped, has available Pokémon)
-        if (side.Team.SwitchOptionIndexes.Length == 0)
-        {
-            // No Pokémon available to switch to, so no forced switch occurs
-            if (PrintDebug)
-            {
-                Console.WriteLine($"{side.Team.Trainer.Name}'s {side.Team.ActivePokemon.Name} cannot switch out - no available Pokémon!");
-            }
-            return;
-        }
-
-        // TODO: Check for trapping effects (like Arena Trap, Shadow Tag, etc.)
-        // For now, assume the switch can always happen
-
-        if (PrintDebug)
-        {
-            Console.WriteLine($"{side.Team.Trainer.Name}'s {side.Team.ActivePokemon.Name} must switch out!");
-        }
-
-        // For forced switches like Volt Switch, we need to switch immediately
-        // In a competitive game, this would typically auto-select the first available Pokémon
-        // or use some predetermined strategy
-        int firstAvailableIndex = side.Team.SwitchOptionIndexes[0];
-        Choice forcedSwitchChoice = firstAvailableIndex.GetChoiceFromSwitchIndex();
-        
-        // Perform the switch immediately without waiting for player input
-        PerformSwitch(playerId, forcedSwitchChoice);
-        
-        if (PrintDebug)
-        {
-            Console.WriteLine($"Automatic forced switch completed - switched to {side.Team.ActivePokemon.Name}");
         }
     }
 }

@@ -44,14 +44,15 @@ public class FieldElement
 
     public void IncrementTurnCounter()
     {
-        if (RemainingTurns > 0)
-        {
-            ElapsedTurns++;
-        }
-        else
-        {
-            throw new InvalidOperationException("Cannot increment turn counter beyond duration.");
-        }
+        //if (RemainingTurns > 0)
+        //{
+        //    ElapsedTurns++;
+        //}
+        //else
+        //{
+        //    throw new InvalidOperationException("Cannot increment turn counter beyond duration.");
+        //}
+        ElapsedTurns++;
     }
 
     public void ResetTurnCounter()
