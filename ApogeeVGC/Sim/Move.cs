@@ -15,7 +15,7 @@ public enum MoveId
     HeadlongRush,
     StruggleBug,
     Overheat,
-    RagePoweder,
+    //RagePoweder,
     Tailwind,
     SpiritBreak,
     ThunderWave,

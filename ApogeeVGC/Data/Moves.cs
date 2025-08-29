@@ -399,6 +399,36 @@ public record Moves
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Flying,
             },
+            [MoveId.SpiritBreak] = new()
+            {
+                Id = MoveId.SpiritBreak,
+                Num = 789,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Spirit Break",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                OnHit = (target, _, _, context) =>
+                {
+                    // lowers the target's Special Attack by 1 stage
+                    if (target is null)
+                    {
+                        throw new ArgumentNullException(nameof(target), "Target cannot be null in" +
+                                                                        "Spirit Break move.");
+                    }
+                    target.AlterStatModifier(StatId.SpA, -1, context);
+                    return true;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fairy,
+            },
 
 
 

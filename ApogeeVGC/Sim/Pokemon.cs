@@ -157,7 +157,7 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Grimmsnarl,
-                    [new MoveSetup(MoveId.DarkBasic),
+                    [new MoveSetup(MoveId.SpiritBreak),
                         new MoveSetup(MoveId.FairyBasic),
                             new MoveSetup(MoveId.PsychicBasic),
                                 new MoveSetup(MoveId.FightingBasic)],
