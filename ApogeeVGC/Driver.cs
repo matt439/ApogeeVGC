@@ -170,6 +170,7 @@ public class Driver
 
         // Thread-safe counter for seed generation
         int seedCounter = 0;//538;
+        List<int> turnOnBattleEnd = [];
 
         Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
             _ =>
@@ -192,7 +193,7 @@ public class Driver
                         player2Seed),
                 };
                 simResults.Add(simulator.Run());
-                //Console.WriteLine(i);
+                turnOnBattleEnd.Add(battle.Turn);
             });
 
         stopwatch.Stop();
@@ -206,6 +207,13 @@ public class Driver
         double totalSeconds = stopwatch.Elapsed.TotalSeconds;
         double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
         double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+
+        // Calculate turn statistics
+        double meanTurns = turnOnBattleEnd.Mean();
+        double stdDevTurns = turnOnBattleEnd.StandardDeviation();
+        double medianTurns = turnOnBattleEnd.Median();
+        int minTurns = turnOnBattleEnd.Minimum();
+        int maxTurns = turnOnBattleEnd.Maximum();
 
         // Rest of the method with timing information added...
         StringBuilder sb = new();
@@ -221,6 +229,13 @@ public class Driver
         sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
         sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
         sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        sb.AppendLine();
+        sb.AppendLine("Turn Statistics:");
+        sb.AppendLine($"Mean Turns: {meanTurns:F2}");
+        sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
+        sb.AppendLine($"Median Turns: {medianTurns:F2}");
+        sb.AppendLine($"Minimum Turns: {minTurns}");
+        sb.AppendLine($"Maximum Turns: {maxTurns}");
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press any key to exit...");
@@ -278,16 +293,75 @@ public static class Statistics
 {
     public static double Mean(this IEnumerable<int> source)
     {
-        if (source == null || !source.Any())
-            throw new ArgumentException("Source cannot be null or empty.");
-        return source.Average();
+        if (source == null)
+            throw new ArgumentException("Source cannot be null.");
+        
+        var list = source.ToList();
+        if (list.Count == 0)
+            throw new ArgumentException("Source cannot be empty.");
+        
+        return list.Average();
     }
+    
     public static double StandardDeviation(this IEnumerable<int> source)
     {
-        if (source == null || !source.Any())
-            throw new ArgumentException("Source cannot be null or empty.");
-        double mean = source.Mean();
-        double variance = source.Select(x => Math.Pow(x - mean, 2)).Average();
+        if (source == null)
+            throw new ArgumentException("Source cannot be null.");
+        
+        var list = source.ToList();
+        if (list.Count == 0)
+            throw new ArgumentException("Source cannot be empty.");
+        
+        double mean = list.Average();
+        double variance = list.Select(x => Math.Pow(x - mean, 2)).Average();
         return Math.Sqrt(variance);
+    }
+    
+    public static double Median(this IEnumerable<int> source)
+    {
+        if (source == null)
+            throw new ArgumentException("Source cannot be null.");
+        
+        var list = source.ToList();
+        if (list.Count == 0)
+            throw new ArgumentException("Source cannot be empty.");
+        
+        var sorted = list.OrderBy(x => x).ToList();
+        int count = sorted.Count;
+        
+        if (count % 2 == 0)
+        {
+            // Even number of elements - average of middle two
+            return (sorted[count / 2 - 1] + sorted[count / 2]) / 2.0;
+        }
+        else
+        {
+            // Odd number of elements - middle element
+            return sorted[count / 2];
+        }
+    }
+    
+    public static int Minimum(this IEnumerable<int> source)
+    {
+        if (source == null)
+            throw new ArgumentException("Source cannot be null.");
+        
+        var list = source.ToList();
+        if (list.Count == 0)
+            throw new ArgumentException("Source cannot be empty.");
+        
+        return list.Min();
+    }
+    
+    public static int Maximum(this IEnumerable<int> source)
+    {
+        if (source == null)
+            throw new ArgumentException("Source cannot be null.");
+        
+        var list = source.ToList();
+        if (list.Count == 0)
+            throw new ArgumentException("Source cannot be empty.");
+        
+        return list.Max();
     }
 }
