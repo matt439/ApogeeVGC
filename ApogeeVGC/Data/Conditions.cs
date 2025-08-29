@@ -139,13 +139,17 @@ public record Conditions
             OnResidualOrder = 8,
             OnResidual = (target, source, _, context) =>
             {
+                if (target.CurrentHp <= 0)
+                {
+                    //throw new InvalidOperationException("Target has fainted.");
+
+                    // If the target has fainted, do not apply Leech Seed damage.
+                    return;
+                }
+
                 int damage = target.UnmodifiedHp / 8;
                 if (damage < 1) damage = 1;
 
-                if (target.CurrentHp <= 0)
-                {
-                    throw new InvalidOperationException("Target has fainted.");
-                }
                 int actualDamage = target.Damage(damage);
 
                 if (source is not null)

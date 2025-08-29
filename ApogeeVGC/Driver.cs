@@ -169,30 +169,31 @@ public class Driver
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         // Thread-safe counter for seed generation
-        int seedCounter = 0;
+        int seedCounter = 0;//538;
 
-        //Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
-        //    _ =>
-        for (int i = 0; i < RandomEvaluationNumTest; i++)
-        {
-            int currentSeed = Interlocked.Increment(ref seedCounter);
-            int player1Seed = PlayerRandom1Seed + currentSeed;
-            int player2Seed = PlayerRandom2Seed + currentSeed;
-
-            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-                "Random2", false, currentSeed);
-            var simulator = new Simulator
+        Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
+            _ =>
+                //for (int i = 0; i < RandomEvaluationNumTest; i++)
             {
-                Battle = battle,
-                Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
-                    PlayerRandomStrategy.AllChoices,
-                    player1Seed),
-                Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    PlayerRandomStrategy.AllChoices,
-                    player2Seed),
-            };
-            simResults.Add(simulator.Run());
-        }
+                int currentSeed = Interlocked.Increment(ref seedCounter);
+                int player1Seed = PlayerRandom1Seed + currentSeed;
+                int player2Seed = PlayerRandom2Seed + currentSeed;
+
+                Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
+                    "Random2", false, currentSeed);
+                var simulator = new Simulator
+                {
+                    Battle = battle,
+                    Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
+                        PlayerRandomStrategy.AllChoices,
+                        player1Seed),
+                    Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                        PlayerRandomStrategy.AllChoices,
+                        player2Seed),
+                };
+                simResults.Add(simulator.Run());
+                //Console.WriteLine(i);
+            });
 
         stopwatch.Stop();
 
@@ -270,5 +271,23 @@ public class Driver
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
+    }
+}
+
+public static class Statistics
+{
+    public static double Mean(this IEnumerable<int> source)
+    {
+        if (source == null || !source.Any())
+            throw new ArgumentException("Source cannot be null or empty.");
+        return source.Average();
+    }
+    public static double StandardDeviation(this IEnumerable<int> source)
+    {
+        if (source == null || !source.Any())
+            throw new ArgumentException("Source cannot be null or empty.");
+        double mean = source.Mean();
+        double variance = source.Select(x => Math.Pow(x - mean, 2)).Average();
+        return Math.Sqrt(variance);
     }
 }

@@ -83,7 +83,9 @@ public class Battle
     private Choice? Player1PendingChoice { get; set; }
     private Choice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
-    
+
+    private const int TurnLimit = 1000;
+
     // Lazy-initialized seeded random number generator for deterministic battle simulation
     private Random? _battleRandom;
     private Random BattleRandom => _battleRandom ??= BattleSeed.HasValue ?
@@ -147,7 +149,14 @@ public class Battle
     {
         lock (ChoiceLock)
         {
-            //bool incrementTurn = true;
+            if (Turn > TurnLimit)
+            {
+                throw new InvalidOperationException($"Battle exceeded maximum turn limit." +
+                                                    $"Current states: P1={Player1State}, P2={Player2State}");
+            }
+
+            //Console.WriteLine($"Turn {Turn}: Player {playerId} submitting {choice}");
+            //Console.WriteLine($"States: P1={Player1State}, P2={Player2State}");
 
             CheckForChoiceError(playerId, choice);
 
@@ -213,10 +222,11 @@ public class Battle
                     PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
                     CLearPendingChoice(PlayerId.Player1);
 
-                    // If the other player's state is not idle, they still need to execute their move/switch
+                    // If the other player's state is not idle, they still need to execute their move/struggle
                     if (Player2State == PlayerState.MoveSwitchLocked && Player2PendingChoice != null)
                     {
-                        PerformMove(PlayerId.Player2, Player2PendingChoice.Value);
+                        ExecutePlayerChoice(PlayerId.Player2, Player2PendingChoice.Value);
+                        //PerformMove(PlayerId.Player2, Player2PendingChoice.Value);
                         CLearPendingChoice(PlayerId.Player2);
                         SetPlayerState(PlayerId.Player2, PlayerState.Idle);
                         // Update player states for any fainted Pokemon
@@ -228,10 +238,11 @@ public class Battle
                     PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
                     CLearPendingChoice(PlayerId.Player2);
 
-                    // If the other player's state is not idle, they still need to execute their move/switch
+                    // If the other player's state is not idle, they still need to execute their move/struggle
                     if (Player1State == PlayerState.MoveSwitchLocked && Player1PendingChoice != null)
                     {
-                        PerformMove(PlayerId.Player1, Player1PendingChoice.Value);
+                        ExecutePlayerChoice(PlayerId.Player1, Player1PendingChoice.Value);
+                        //PerformMove(PlayerId.Player1, Player1PendingChoice.Value);
                         CLearPendingChoice(PlayerId.Player1);
                         SetPlayerState(PlayerId.Player1, PlayerState.Idle);
                         // Update player states for any fainted Pokemon
@@ -240,14 +251,12 @@ public class Battle
                 }
             }
 
+            // Check if the battle has been won
+            if (IsWinner() != PlayerId.None) return;
             if (!IsEndOfTurn()) return;
 
             HandleEndOfTurn();
 
-            //if (incrementTurn)
-            //{ 
-            //    Turn++;
-            //}
             Turn++;
 
             // Reset player states for the next turn
@@ -346,7 +355,11 @@ public class Battle
 
     private void HandleConditionTurnEnds()
     {
-        var side1Conditions = Side1.Team.ActivePokemon.Conditions.ToList();
+        List<Condition> side1Conditions = [];
+        if (!Side1.Team.ActivePokemon.IsFainted) // Skip if fainted
+        {
+            side1Conditions = Side1.Team.ActivePokemon.Conditions.ToList();
+        }
         foreach (Condition condition in side1Conditions.ToList())
         {
             condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
@@ -358,7 +371,11 @@ public class Battle
             }
         }
 
-        var side2Conditions = Side2.Team.ActivePokemon.Conditions.ToList();
+        List<Condition> side2Conditions = [];
+        if (!Side2.Team.ActivePokemon.IsFainted) // Skip if fainted
+        {
+            side2Conditions = Side2.Team.ActivePokemon.Conditions.ToList();
+        }
         foreach (Condition condition in side2Conditions.ToList())
         {
             condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
@@ -373,7 +390,11 @@ public class Battle
 
     private void HandleResiduals()
     {
-        var side1Residuals = Side1.Team.ActivePokemon.GetAllResidualConditions();
+        Condition[] side1Residuals = [];
+        if (!Side1.Team.ActivePokemon.IsFainted) // Skip if fainted
+        {
+            side1Residuals = Side1.Team.ActivePokemon.GetAllResidualConditions();
+        }
         List<(Pokemon, Condition, PlayerId)> side1ResidualsList = [];
         foreach (Condition condition in side1Residuals)
         {
@@ -383,7 +404,11 @@ public class Battle
             }
         }
 
-        var side2Residuals = Side2.Team.ActivePokemon.GetAllResidualConditions();
+        Condition[] side2Residuals = [];
+        if (!Side2.Team.ActivePokemon.IsFainted) // Skip if fainted
+        {
+            side2Residuals = Side2.Team.ActivePokemon.GetAllResidualConditions();
+        }
         List<(Pokemon, Condition, PlayerId)> side2ResidualsList = [];
         foreach (Condition condition in side2Residuals)
         {
@@ -679,10 +704,10 @@ public class Battle
 
     private bool IsEndOfTurn()
     {
-        if (IsWinner() != PlayerId.None)
-        {
-            return true; // Battle has ended, no more turns
-        }
+        //if (IsWinner() != PlayerId.None)
+        //{
+        //    return true; // Battle has ended, no more turns
+        //}
         lock (ChoiceLock)
         {
             return !Player1State.CanSubmitChoice() && !Player2State.CanSubmitChoice();
@@ -1033,14 +1058,15 @@ public class Battle
 
         Pokemon attacker = atkSide.Team.ActivePokemon;
 
-        if (!Library.Moves.TryGetValue(MoveId.Struggle, out Move? move))
+        if (!Library.Moves.TryGetValue(MoveId.Struggle, out Move? struggle))
         {
             throw new InvalidOperationException($"Struggle move not found in" +
                                                 $"library for player {playerId}");
         }
+        Move struggleCopy = struggle.Copy();
 
         Pokemon defender = defSide.Team.ActivePokemon;
-        int damage = Damage(attacker, defender, move, 1.0);
+        int damage = Damage(attacker, defender, struggleCopy, 1.0, false, false);
         defender.Damage(damage);
 
         // Struggle always deals recoil damage to the attacker
@@ -1070,7 +1096,7 @@ public class Battle
 
 
     private int Damage(Pokemon attacker, Pokemon defender, Move move,
-        double moveEffectiveness, bool crit = false)
+        double moveEffectiveness, bool crit = false, bool applyStab = true)
     {
         if (moveEffectiveness == 0.0)
         {
@@ -1083,7 +1109,7 @@ public class Battle
         int basePower = move.BasePower;
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
-        bool stab = attacker.IsStab(move);
+        bool stab = applyStab && attacker.IsStab(move);
         double stabModifier = stab ? 1.5 : 1.0;
 
         int baseDamage = (int)((2 * level / 5.0 + 2) * basePower * attackStat / defenseStat / 50.0 + 2);
