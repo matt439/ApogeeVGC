@@ -281,6 +281,7 @@ public record Move : IEffect
     public Weather? Weather { get; init; }
     public Terrain? Terrain { get; init; }
     public PseudoWeather? PseudoWeather { get; init; }
+    public SideCondition? SideCondition { get; init; }
     public bool SelfSwitch { get; init; }
 
     /// <summary>

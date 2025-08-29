@@ -17,6 +17,7 @@ public enum ConditionId
     TrickRoom,
     Stall,
     Protect,
+    Tailwind,
 }
 
 public enum ConditionEffectType
@@ -26,6 +27,7 @@ public enum ConditionEffectType
     Status,
     Terrain,
     PseudoWeather,
+    SideCondition,
 }
 
 public enum ConditionVolatility
@@ -68,6 +70,11 @@ public record Condition : IEffect
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTryHit { get; init; }
     public Action<Pokemon, BattleContext>? OnTurnEnd { get; init; }
     //public Action<Field>? OnPseudoWeatherStart { get; init; }
+    public Func<double>? OnModifyAtk { get; init; }
+    public Func<double>? OnModifyDef { get; init; }
+    public Func<double>? OnModifySpA { get; init; }
+    public Func<double>? OnModifySpD { get; init; }
+    public Func<double>? OnModifySpe { get; init; }
 
 
     public Condition Copy()

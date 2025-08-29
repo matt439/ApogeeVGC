@@ -63,13 +63,13 @@ public class PseudoWeathers
                         UiGenerator.PrintTrickRoomRestart();
                     }
                 },
-                OnIncrementTurnCounter = (_, element, context) =>
-                {
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintFieldElementCounter(element);
-                    }
-                },
+                //OnIncrementTurnCounter = (_, element, context) =>
+                //{
+                //    if (context.PrintDebug)
+                //    {
+                //        UiGenerator.PrintFieldElementCounter(element);
+                //    }
+                //},
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
                     pokemon.AddCondition(_library.Conditions[ConditionId.TrickRoom].Copy(), context);

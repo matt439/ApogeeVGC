@@ -12,6 +12,7 @@ public record Library
     private readonly Natures _natures = new();
     private readonly PseudoWeathers _pseudoWeathers;
     private readonly Rulesets _rulesets = new();
+    private readonly SideConditions _sideConditions;
     private readonly Species _species = new();
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
@@ -26,6 +27,7 @@ public record Library
     public IReadOnlyDictionary<NatureType, Nature> Natures => _natures.NatureData;
     public IReadOnlyDictionary<PseudoWeatherId, PseudoWeather> PseudoWeathers => _pseudoWeathers.PseudoWeatherData;
     // rulesets
+    public IReadOnlyDictionary<SideConditionId, SideCondition> SideConditions => _sideConditions.SideConditionData;
     public IReadOnlyDictionary<SpecieId, Specie> Species => _species.SpeciesData;
     public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => _speciesFormats.SpeciesFormatsData;
     // tags
@@ -37,6 +39,7 @@ public record Library
     public Library()
     {
         _pseudoWeathers = new PseudoWeathers(this);
+        _sideConditions = new SideConditions(this);
         _terrains = new Terrains(this);
         _weathers = new Weathers(this);
 

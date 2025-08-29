@@ -304,6 +304,16 @@ public static class UiGenerator
         Console.WriteLine("The effects of Trick Room wore off.");
     }
 
+    public static void PrintTailwindStart(string trainerName)
+    {
+        Console.WriteLine($"The tailwing blew from behind {trainerName}'s team!");
+    }
+
+    public static void PrintTailwindEnd(string trainerName)
+    {
+        Console.WriteLine($"{trainerName}'s tailwind petered out.");
+    }
+
     public static void PrintMoveNoEffectAction(Pokemon attacker, Move move, Pokemon defender)
     {
         StringBuilder sb = new();
@@ -576,7 +586,7 @@ public static class UiGenerator
         Field field = battle.Field;
 
         StringBuilder sb = new();
-        sb.AppendLine("*** Field State ***");
+        sb.AppendLine("****** Field State ******");
         sb.Append("Weather: ");
         if (field.HasAnyWeather)
         {
@@ -600,7 +610,7 @@ public static class UiGenerator
         sb.AppendLine();
 
 
-        if (field.PseudoWeatherList.Count == 0)
+        if (!field.HasAnyPseudoWeather)
         {
             sb.AppendLine("Pseudo-Weathers: None");
         }
@@ -612,6 +622,33 @@ public static class UiGenerator
                 sb.AppendLine($"{pseudoWeather.Name} ({pseudoWeather.RemainingTurns} turns remaining)");
             }
         }
+
+        if (!field.HasAnySide1Conditions)
+        {
+            sb.AppendLine("Player 1 Side Conditions: None");
+        }
+        else
+        {
+            sb.AppendLine("Player 1 Side Conditions:");
+            foreach (SideCondition sideCondition in field.Side1Conditions)
+            {
+                sb.AppendLine($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining)");
+            }
+        }
+
+        if (!field.HasAnySide2Conditions)
+        {
+            sb.AppendLine("Player 2 Side Conditions: None");
+        }
+        else
+        {
+            sb.AppendLine("Player 2 Side Conditions:");
+            foreach (SideCondition sideCondition in field.Side2Conditions)
+            {
+                sb.AppendLine($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining)");
+            }
+        }
+
         sb.AppendLine();
         Console.WriteLine(sb.ToString());
     }

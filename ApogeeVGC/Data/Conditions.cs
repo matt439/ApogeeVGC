@@ -264,5 +264,13 @@ public record Conditions
             //    }
             //},
         },
+        [ConditionId.Tailwind] = new Condition
+        {
+            Id = ConditionId.Tailwind,
+            Name = "Tailwind",
+            ConditionEffectType = ConditionEffectType.SideCondition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnModifySpe = () => 2.0,
+        },
     };
 }

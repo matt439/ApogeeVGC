@@ -146,8 +146,8 @@ public static class PokemonBuilder
                     SpecieId.Volcarona,
                     [new MoveSetup(MoveId.StruggleBug),
                         new MoveSetup(MoveId.Overheat),
-                            new MoveSetup(MoveId.FlyingBasic),
-                                new MoveSetup(MoveId.PsychicBasic)],
+                            new MoveSetup(MoveId.Protect),
+                                new MoveSetup(MoveId.Tailwind)],
                     ItemId.RockyHelmet,
                     AbilityId.FlameBody,
                     new StatsTable { Hp = 252, Def = 196, SpD = 60 },
@@ -179,8 +179,8 @@ public static class PokemonBuilder
                     new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
                     NatureType.Adamant,
                     printDebug
-                )
-            ]
+                ),
+            ],
         };
     }
 }
@@ -546,23 +546,23 @@ public class Pokemon
         }
 
         // apply stat modifiers
-        double modifier;
+        double statModifier;
         switch (stat)
         {
             case StatId.Atk:
-                modifier = StatModifiers.AtkMultiplier;
+                statModifier = StatModifiers.AtkMultiplier;
                 break;
             case StatId.Def:
-                modifier = StatModifiers.DefMultiplier;
+                statModifier = StatModifiers.DefMultiplier;
                 break;
             case StatId.SpA:
-                modifier = StatModifiers.SpAMultiplier;
+                statModifier = StatModifiers.SpAMultiplier;
                 break;
             case StatId.SpD:
-                modifier = StatModifiers.SpDMultiplier;
+                statModifier = StatModifiers.SpDMultiplier;
                 break;
             case StatId.Spe:
-                modifier = StatModifiers.SpeMultiplier;
+                statModifier = StatModifiers.SpeMultiplier;
                 break;
             case StatId.Hp:
             default:
@@ -589,8 +589,36 @@ public class Pokemon
         //    modifier *= 1.5;
         //}
 
+        // apply condition effects here
+        double conditionModifier = 1.0;
+        switch (stat)
+        {
+            case StatId.Atk:
+                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
+                    current * (condition.OnModifyAtk?.Invoke() ?? 1.0));
+                break;
+            case StatId.Def:
+                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
+                    current * (condition.OnModifyDef?.Invoke() ?? 1.0));
+                break;
+            case StatId.SpA:
+                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
+                    current * (condition.OnModifySpA?.Invoke() ?? 1.0));
+                break;
+            case StatId.SpD:
+                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
+                    current * (condition.OnModifySpD?.Invoke() ?? 1.0));
+                break;
+            case StatId.Spe:
+                conditionModifier = Conditions.Aggregate(conditionModifier, (current, condition) =>
+                    current * (condition.OnModifySpe?.Invoke() ?? 1.0));
+                break;
+            case StatId.Hp:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+        }
 
-        return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * modifier);
+        return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * statModifier * conditionModifier);
     }
 
     private int CalculateUnmodifiedStat(StatId stat)

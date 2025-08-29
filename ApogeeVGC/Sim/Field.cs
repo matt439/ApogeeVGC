@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim;
+﻿using ApogeeVGC.Player;
+
+namespace ApogeeVGC.Sim;
 
 /// <summary>
 /// Base class for field elements like Weather, Terrain, and Pseudo-Weather.
@@ -161,6 +163,54 @@ public class PseudoWeather : FieldElement
     }
 }
 
+public enum SideConditionId
+{
+    Tailwind,
+}
+
+public class SideCondition : FieldElement
+{
+    public required SideConditionId Id { get; init; }
+    public required int OnSideResidualOrder { get; init; }
+    public required int OnSideResidualSubOrder { get; init; }
+    /// <summary>
+    /// side, context
+    /// </summary>
+    public Action<Side, BattleContext>? OnSideStart { get; init; }
+    /// <summary>
+    /// side, context
+    /// </summary>
+    public Action<Side, BattleContext>? OnSideEnd { get; init; }
+    /// <summary>
+    /// pokemon, context
+    /// </summary>
+    public Action<Pokemon, BattleContext>? OnSidePokemonSwitchIn { get; init; }
+
+    public SideCondition Copy()
+    {
+        return new SideCondition
+        {
+            Id = Id,
+            OnSideResidualOrder = OnSideResidualOrder,
+            OnSideResidualSubOrder = OnSideResidualSubOrder,
+            OnSideStart = OnSideStart,
+            OnSideEnd = OnSideEnd,
+            Name = Name,
+            IsExtended = IsExtended,
+            BaseDuration = BaseDuration,
+            DurationExtension = DurationExtension,
+            ElapsedTurns = ElapsedTurns,
+            PrintDebug = PrintDebug, // Added missing PrintDebug
+            // Note: Action delegates are shared immutable references
+            OnEnd = OnEnd,
+            OnStart = OnStart,
+            OnReapply = OnReapply,
+            OnIncrementTurnCounter = OnIncrementTurnCounter,
+            OnPokemonSwitchIn = OnPokemonSwitchIn,
+        };
+    }
+}
+
 public class Field
 {
     public Weather? Weather { get; private set; }
@@ -168,6 +218,11 @@ public class Field
     public bool HasAnyWeather => Weather != null;
     public bool HasAnyTerrain => Terrain != null;
     public List<PseudoWeather> PseudoWeatherList { get; init; } = [];
+    public bool HasAnyPseudoWeather => PseudoWeatherList.Count > 0;
+    public List<SideCondition> Side1Conditions { get; init; } = [];
+    public bool HasAnySide1Conditions => Side1Conditions.Count > 0;
+    public List<SideCondition> Side2Conditions { get; init; } = [];
+    public bool HasAnySide2Conditions => Side2Conditions.Count > 0;
 
     public bool HasWeather(WeatherId weatherId)
     {
@@ -177,8 +232,8 @@ public class Field
     public void AddWeather(Weather weather, Pokemon[] pokemon, BattleContext battleContext)
     {
         Weather?.OnEnd?.Invoke(pokemon, battleContext);
-        Weather = weather;
-        weather.OnStart?.Invoke(pokemon, battleContext);
+        Weather = weather.Copy();
+        Weather.OnStart?.Invoke(pokemon, battleContext);
     }
 
     public void RemoveWeather(Pokemon[] pokemon, BattleContext battleContext)
@@ -205,8 +260,8 @@ public class Field
     public void AddTerrain(Terrain terrain, Pokemon[] pokemon, BattleContext battleContext)
     {
         Terrain?.OnEnd?.Invoke(pokemon, battleContext);
-        Terrain = terrain;
-        terrain.OnStart?.Invoke(pokemon, battleContext);
+        Terrain = terrain.Copy();
+        Terrain.OnStart?.Invoke(pokemon, battleContext);
     }
     public void RemoveTerrain(Pokemon[] pokemon, BattleContext battleContext)
     {
@@ -241,8 +296,9 @@ public class Field
             throw new InvalidOperationException($"PseudoWeather {pseudoWeather.Id} is already" +
                                                 $"active on the field.");
         }
-        PseudoWeatherList.Add(pseudoWeather);
-        pseudoWeather.OnStart?.Invoke(pokemon, battleContext);
+        PseudoWeather pseudoWeatherCopy = pseudoWeather.Copy();
+        PseudoWeatherList.Add(pseudoWeatherCopy);
+        pseudoWeatherCopy.OnStart?.Invoke(pokemon, battleContext);
     }
 
     public bool RemovePseudoWeather(PseudoWeatherId pseudoWeatherId, Pokemon[] pokemon,
@@ -269,7 +325,105 @@ public class Field
         pseudoWeather.OnReapply?.Invoke(this, pokemon, battleContext);
     }
 
-    public void OnPokemonSwitchIn(Pokemon pokemon, BattleContext battleContext)
+    public bool HasSideCondition(SideConditionId sideConditionId, PlayerId playerId)
+    {
+        switch (playerId)
+        {
+            case PlayerId.Player1:
+                return Side1Conditions.Any(sc => sc.Id == sideConditionId);
+            case PlayerId.Player2:
+                return Side2Conditions.Any(sc => sc.Id == sideConditionId);
+            case PlayerId.None:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId.");
+        }
+    }
+
+    public SideCondition? GetSideCondition(SideConditionId sideConditionId, PlayerId playerId)
+    {
+        return playerId switch
+        {
+            PlayerId.Player1 => Side1Conditions.FirstOrDefault(sc => sc.Id == sideConditionId),
+            PlayerId.Player2 => Side2Conditions.FirstOrDefault(sc => sc.Id == sideConditionId),
+            PlayerId.None => throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId."),
+            _ => null,
+        };
+    }
+
+    public void AddSideCondition(SideCondition sideCondition, Side side, BattleContext battleContext)
+    {
+        List<SideCondition>? sideConditions;
+        switch (side.PlayerId)
+        {
+            case PlayerId.Player1:
+                sideConditions = Side1Conditions;
+                break;
+            case PlayerId.Player2:
+                sideConditions = Side2Conditions;
+                break;
+            case PlayerId.None:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
+        }
+        if (sideConditions.Any(sc => sc.Id == sideCondition.Id))
+        {
+            throw new InvalidOperationException($"SideCondition {sideCondition.Id} is already" +
+                                                $"active on the side.");
+        }
+        SideCondition sideConditionCopy = sideCondition.Copy();
+        sideConditions.Add(sideConditionCopy);
+        sideConditionCopy.OnSideStart?.Invoke(side, battleContext);
+        sideConditionCopy.OnStart?.Invoke(side.Team.AllActivePokemon, battleContext);
+    }
+
+    public bool RemoveSideCondition(SideConditionId sideConditionId, Side side, BattleContext battleContext)
+    {
+        List<SideCondition>? sideConditions;
+        switch (side.PlayerId)
+        {
+            case PlayerId.Player1:
+                sideConditions = Side1Conditions;
+                break;
+            case PlayerId.Player2:
+                sideConditions = Side2Conditions;
+                break;
+            case PlayerId.None:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
+        }
+        SideCondition? sideCondition = sideConditions.FirstOrDefault(sc => sc.Id == sideConditionId);
+        if (sideCondition is null) return false;
+        sideConditions.Remove(sideCondition);
+        sideCondition.OnSideEnd?.Invoke(side, battleContext);
+        sideCondition.OnEnd?.Invoke(side.Team.AllActivePokemon, battleContext);
+        return true;
+    }
+
+    public void ReapplySideCondition(SideConditionId sideConditionId, Side side, BattleContext battleContext)
+    {
+        List<SideCondition>? sideConditions;
+        switch (side.PlayerId)
+        {
+            case PlayerId.Player1:
+                sideConditions = Side1Conditions;
+                break;
+            case PlayerId.Player2:
+                sideConditions = Side2Conditions;
+                break;
+            case PlayerId.None:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
+        }
+        SideCondition? sideCondition = sideConditions.FirstOrDefault(sc => sc.Id == sideConditionId);
+        if (sideCondition is null)
+        {
+            throw new InvalidOperationException($"Cannot reapply side condition {sideConditionId}" +
+                                                $"when it is not active on the side.");
+        }
+        sideCondition.OnReapply?.Invoke(this, side.Team.AllActivePokemon, battleContext);
+    }
+
+    public void OnPokemonSwitchIn(Pokemon pokemon, PlayerId playerId, BattleContext battleContext)
     {
         // Get all the OnPokemonSwitchIn actions from Weather, Terrain, and PseudoWeathers
         // Determine the order of execution from their priority (if any)
@@ -280,10 +434,37 @@ public class Field
         {
             pw.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
         }
+
+        switch (playerId)
+        {
+            case PlayerId.Player1:
+            {
+                foreach (SideCondition sc in Side1Conditions)
+                {
+                    sc.OnSidePokemonSwitchIn?.Invoke(pokemon, battleContext);
+                    sc.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
+                }
+                break;
+            }
+            case PlayerId.Player2:
+            {
+                foreach (SideCondition sc in Side2Conditions)
+                {
+                    sc.OnSidePokemonSwitchIn?.Invoke(pokemon, battleContext);
+                    sc.OnPokemonSwitchIn?.Invoke(pokemon, battleContext);
+                }
+                break;
+            }
+            case PlayerId.None:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId.");
+        }
     }
 
-    public void OnTurnEnd(Pokemon[] pokemon, BattleContext battleContext)
+    public void OnTurnEnd(Side side1, Side side2, BattleContext battleContext)
     {
+        var pokemon = side1.Team.AllActivePokemon.Concat(side2.Team.AllActivePokemon).ToArray();
+        
         Weather?.IncrementTurnCounter();
         Weather?.OnIncrementTurnCounter?.Invoke(pokemon, Weather, battleContext);
         if (Weather?.IsExpired == true)
@@ -307,6 +488,26 @@ public class Field
                 RemovePseudoWeather(pw.Id, pokemon, battleContext);
             }
         }
+
+        foreach (SideCondition sc in Side1Conditions.ToList())
+        {
+            sc.IncrementTurnCounter();
+            sc.OnIncrementTurnCounter?.Invoke(pokemon, sc, battleContext);
+            if (sc.IsExpired)
+            {
+                RemoveSideCondition(sc.Id, side1, battleContext);
+            }
+        }
+
+        foreach (SideCondition sc in Side2Conditions.ToList())
+        {
+            sc.IncrementTurnCounter();
+            sc.OnIncrementTurnCounter?.Invoke(pokemon, sc, battleContext);
+            if (sc.IsExpired)
+            {
+                RemoveSideCondition(sc.Id, side2, battleContext);
+            }
+        }
     }
 
     public Field Copy()
@@ -316,6 +517,8 @@ public class Field
             Weather = Weather?.Copy(),
             Terrain = Terrain?.Copy(),
             PseudoWeatherList = PseudoWeatherList.Select(pw => pw.Copy()).ToList(),
+            Side1Conditions = Side1Conditions.Select(sc => sc.Copy()).ToList(),
+            Side2Conditions = Side2Conditions.Select(sc => sc.Copy()).ToList(),
         };
     }
 }

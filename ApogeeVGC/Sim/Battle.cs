@@ -343,7 +343,7 @@ public class Battle
         {
             UiGenerator.PrintBlankLine();
         }
-        Field.OnTurnEnd(AllActivePokemon, Context);
+        Field.OnTurnEnd(Side1, Side2, Context);
         HandleResiduals();
         HandleConditionTurnEnds();
     }
@@ -799,7 +799,7 @@ public class Battle
         return move.Category switch
         {
             MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, move, defender),
-            MoveCategory.Status => PerformStatusMove(attacker, move, defender),
+            MoveCategory.Status => PerformStatusMove(attacker, playerId, move, defender),
             _ => throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}")
         };
     }
@@ -858,22 +858,33 @@ public class Battle
         return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
     }
 
-    private MoveAction PerformStatusMove(Pokemon attacker, Move move, Pokemon defender)
+    private MoveAction PerformStatusMove(Pokemon attacker, PlayerId playerId, Move move, Pokemon defender)
     {
+        if (PrintDebug)
+        {
+            UiGenerator.PrintStatusMoveAction(attacker, move);
+        }
+
         if (move.Target == MoveTarget.Field)
         {
             HandleFieldTargetStatusMove(move);
             return MoveAction.None;
         }
 
-        if (move.Condition is null)
+        if (move.Target == MoveTarget.AllySide)
         {
+            HandleSideTargetStatusMove(move, playerId);
+            return MoveAction.None;
+        }
+        if (move.Target == MoveTarget.FoeSide)
+        {
+            HandleSideTargetStatusMove(move, playerId.OpposingPlayerId());
             return MoveAction.None;
         }
 
-        if (PrintDebug)
+        if (move.Condition is null)
         {
-            UiGenerator.PrintStatusMoveAction(attacker, move);
+            return MoveAction.None;
         }
 
         move.OnHit?.Invoke(defender, attacker, move, Context);
@@ -908,6 +919,25 @@ public class Battle
         }
 
         return MoveAction.None;
+    }
+
+    private void HandleSideTargetStatusMove(Move move, PlayerId playerId)
+    {
+        if (move.SideCondition is null)
+        {
+            throw new InvalidOperationException($"Status move {move.Name} has no side effect defined.");
+        }
+
+        SideCondition? condition = Field.GetSideCondition(move.SideCondition.Id, playerId);
+        if (condition is not null)
+        {
+            // If the side condition is already present, reapply it (which may remove it)
+            Field.ReapplySideCondition(condition.Id, GetSide(playerId), Context);
+        }
+        else // Otherwise, add the new side condition
+        {
+            Field.AddSideCondition(move.SideCondition, GetSide(playerId), Context);
+        }
     }
 
     private void HandleFieldTargetStatusMove(Move move)
@@ -1005,7 +1035,7 @@ public class Battle
         prevActive.OnSwitchOut();
         side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
         Pokemon newActive = side.Team.ActivePokemon;
-        Field.OnPokemonSwitchIn(newActive, Context);
+        Field.OnPokemonSwitchIn(newActive, playerId, Context);
         newActive.OnSwitchIn();
 
         if (!PrintDebug) return;
@@ -1150,7 +1180,6 @@ public class Battle
         Pokemon player2Pokemon = Side2.Team.ActivePokemon;
 
         // Create a list of active Pokemon and sort by speed
-
         var speedOrder = new List<Pokemon> { player1Pokemon, player2Pokemon }
             .OrderByDescending(p => p.CurrentSpe)
             .ToList();

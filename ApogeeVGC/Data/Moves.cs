@@ -378,6 +378,27 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
+            [MoveId.Tailwind] = new()
+            {
+                Id = MoveId.Tailwind,
+                Num = 366,
+                Accuracy = 100,
+                AlwaysHit = true,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tailwind",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                    Wind = true,
+                },
+                SideCondition = _library.SideConditions[SideConditionId.Tailwind].Copy(),
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Flying,
+            },
 
 
 
