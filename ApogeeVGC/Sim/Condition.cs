@@ -18,6 +18,8 @@ public enum ConditionId
     Stall,
     Protect,
     Tailwind,
+    Reflect,
+    LightScreen,
 }
 
 public enum ConditionEffectType
@@ -87,6 +89,11 @@ public record Condition : IEffect
     /// </summary>
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnBeforeMove { get; init; }
     public int? OnBeforeMovePriority { get; init; }
+
+    /// <summary>
+    /// moveDamage, source, target, move, isCrit, numActivePokemonSide
+    /// </summary>
+    public Func<int, Pokemon, Pokemon, Move, bool, int, double>? OnAnyModifyDamage { get; init; }
 
     public Condition Copy()
     {

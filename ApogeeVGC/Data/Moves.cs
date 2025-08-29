@@ -451,6 +451,26 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
+            [MoveId.Reflect] = new()
+            {
+                Id = MoveId.Reflect,
+                Num = 115,
+                Accuracy = 100,
+                AlwaysHit = true,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Reflect",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SideCondition = _library.SideConditions[SideConditionId.Reflect].Copy(),
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Psychic,
+            },
 
 
 

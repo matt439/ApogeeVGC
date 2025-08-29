@@ -34,6 +34,10 @@ public class FieldElement
         }
     }
     public int Duration => IsExtended ? BaseDuration + DurationExtension : BaseDuration;
+    /// <summary>
+    /// target, source, effect. If returns true, duration is extended.
+    /// </summary>
+    public Func<Pokemon?, Pokemon, IEffect, bool>? DurationCallback { get; init; }
     public int RemainingTurns => Duration - ElapsedTurns;
     public bool IsExpired => RemainingTurns <= 0;
     public bool PrintDebug { get; init; }
@@ -84,6 +88,7 @@ public class Weather : FieldElement
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
+            DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
             // Note: Action delegates (OnEnd, OnStart, etc.) are shared immutable references
@@ -118,6 +123,7 @@ public class Terrain : FieldElement
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
+            DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
             // Note: Action delegates are shared immutable references
@@ -151,6 +157,7 @@ public class PseudoWeather : FieldElement
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
+            DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
             // Note: Action delegates are shared immutable references
@@ -166,6 +173,8 @@ public class PseudoWeather : FieldElement
 public enum SideConditionId
 {
     Tailwind,
+    Reflect,
+    LightScreen,
 }
 
 public class SideCondition : FieldElement
@@ -199,6 +208,7 @@ public class SideCondition : FieldElement
             IsExtended = IsExtended,
             BaseDuration = BaseDuration,
             DurationExtension = DurationExtension,
+            DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
             // Note: Action delegates are shared immutable references
@@ -229,10 +239,12 @@ public class Field
         return Weather?.Id == weatherId;
     }
 
-    public void AddWeather(Weather weather, Pokemon[] pokemon, BattleContext battleContext)
+    public void AddWeather(Weather weather, Pokemon sourcePokemon, IEffect sourceEffect,
+        Pokemon[] pokemon, BattleContext battleContext)
     {
         Weather?.OnEnd?.Invoke(pokemon, battleContext);
         Weather = weather.Copy();
+        Weather.IsExtended = Weather.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect) ?? false;
         Weather.OnStart?.Invoke(pokemon, battleContext);
     }
 
@@ -257,10 +269,12 @@ public class Field
         return Terrain?.Id == terrainId;
     }
 
-    public void AddTerrain(Terrain terrain, Pokemon[] pokemon, BattleContext battleContext)
+    public void AddTerrain(Terrain terrain, Pokemon sourcePokemon, IEffect sourceEffect,
+        Pokemon[] pokemon, BattleContext battleContext)
     {
         Terrain?.OnEnd?.Invoke(pokemon, battleContext);
         Terrain = terrain.Copy();
+        Terrain.IsExtended = Terrain.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect) ?? false;
         Terrain.OnStart?.Invoke(pokemon, battleContext);
     }
     public void RemoveTerrain(Pokemon[] pokemon, BattleContext battleContext)
@@ -289,7 +303,8 @@ public class Field
         return PseudoWeatherList.FirstOrDefault(pw => pw.Id == pseudoWeatherId);
     }
 
-    public void AddPseudoWeather(PseudoWeather pseudoWeather, Pokemon[] pokemon, BattleContext battleContext)
+    public void AddPseudoWeather(PseudoWeather pseudoWeather, Pokemon sourcePokemon, IEffect sourceEffect,
+        Pokemon[] pokemon, BattleContext battleContext)
     {
         if (PseudoWeatherList.Any(pw => pw.Id == pseudoWeather.Id))
         {
@@ -298,6 +313,8 @@ public class Field
         }
         PseudoWeather pseudoWeatherCopy = pseudoWeather.Copy();
         PseudoWeatherList.Add(pseudoWeatherCopy);
+        pseudoWeatherCopy.IsExtended = pseudoWeatherCopy.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect)
+                                       ?? false;
         pseudoWeatherCopy.OnStart?.Invoke(pokemon, battleContext);
     }
 
@@ -350,7 +367,8 @@ public class Field
         };
     }
 
-    public void AddSideCondition(SideCondition sideCondition, Side side, BattleContext battleContext)
+    public void AddSideCondition(SideCondition sideCondition, Side side, Pokemon sourcePokemon,
+        IEffect sourceEffect, BattleContext battleContext)
     {
         List<SideCondition>? sideConditions;
         switch (side.PlayerId)
@@ -372,6 +390,8 @@ public class Field
         }
         SideCondition sideConditionCopy = sideCondition.Copy();
         sideConditions.Add(sideConditionCopy);
+        sideConditionCopy.IsExtended = sideConditionCopy.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect)
+            ?? false;
         sideConditionCopy.OnSideStart?.Invoke(side, battleContext);
         sideConditionCopy.OnStart?.Invoke(side.Team.AllActivePokemon, battleContext);
     }

@@ -159,7 +159,7 @@ public static class PokemonBuilder
                     SpecieId.Grimmsnarl,
                     [new MoveSetup(MoveId.SpiritBreak),
                         new MoveSetup(MoveId.ThunderWave),
-                            new MoveSetup(MoveId.PsychicBasic),
+                            new MoveSetup(MoveId.Reflect),
                                 new MoveSetup(MoveId.FightingBasic)],
                     ItemId.LightClay,
                     AbilityId.Prankster,
@@ -404,6 +404,11 @@ public class Pokemon
     public bool HasType(MoveType type)
     {
         return Specie.Types.Contains(type.ConvertToPokemonType());
+    }
+
+    public bool HasItem(ItemId item)
+    {
+        return Item != null && Item.Id == item;
     }
 
     public bool HasCondition(ConditionId conditionId)

@@ -41,6 +41,7 @@ public class Team
     }
     // TODO: Need to update this with doubles
     public Pokemon[] AllActivePokemon => [ActivePokemon];
+    public int AllActivePokemonCount => AllActivePokemon.Length;
     public int[] SwitchOptionIndexes => Enumerable.Range(0, PokemonSet.PokemonCount)
             .Where(i => i != ActivePokemonIndex && !PokemonSet.Pokemons[i].IsFainted)
             .ToArray();

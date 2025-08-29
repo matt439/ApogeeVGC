@@ -283,6 +283,7 @@ public record Move : IEffect
     public PseudoWeather? PseudoWeather { get; init; }
     public SideCondition? SideCondition { get; init; }
     public bool SelfSwitch { get; init; }
+    public bool Infiltrates { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

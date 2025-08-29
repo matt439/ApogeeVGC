@@ -812,13 +812,13 @@ public class Battle
 
         return move.Category switch
         {
-            MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, move, defender),
+            MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, playerId, move, defender),
             MoveCategory.Status => PerformStatusMove(attacker, playerId, move, defender),
-            _ => throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}")
+            _ => throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}"),
         };
     }
 
-    private MoveAction PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender)
+    private MoveAction PerformDamagingMove(Pokemon attacker, PlayerId attackingPlayer, Move move, Pokemon defender)
     {
         switch (move.Target)
         {
@@ -859,7 +859,19 @@ public class Battle
             return MoveAction.None;
         }
 
-        int damage = Damage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
+        int damage = CalculateDamage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
+
+        // check for OnAnyModifyDamage conditions on defender
+        if (damage > 0)
+        {
+            int numPokemonDefendingSide = GetSide(attackingPlayer.OpposingPlayerId()).Team.AllActivePokemonCount;
+
+            double multiplier = defender.Conditions.Aggregate(1.0, (current, condition) =>
+                current * (condition.OnAnyModifyDamage?.Invoke(damage, attacker, defender, move, isCrit,
+                    numPokemonDefendingSide) ?? 1.0));
+            damage = Math.Max(1, (int)(damage * multiplier)); // Always at least 1 damage
+        }
+
         defender.Damage(damage);
         
         if (PrintDebug)
@@ -881,18 +893,18 @@ public class Battle
 
         if (move.Target == MoveTarget.Field)
         {
-            HandleFieldTargetStatusMove(move);
+            HandleFieldTargetStatusMove(move, attacker);
             return MoveAction.None;
         }
 
         if (move.Target == MoveTarget.AllySide)
         {
-            HandleSideTargetStatusMove(move, playerId);
+            HandleSideTargetStatusMove(move, playerId, attacker);
             return MoveAction.None;
         }
         if (move.Target == MoveTarget.FoeSide)
         {
-            HandleSideTargetStatusMove(move, playerId.OpposingPlayerId());
+            HandleSideTargetStatusMove(move, playerId.OpposingPlayerId(), attacker);
             return MoveAction.None;
         }
 
@@ -935,7 +947,7 @@ public class Battle
         return MoveAction.None;
     }
 
-    private void HandleSideTargetStatusMove(Move move, PlayerId playerId)
+    private void HandleSideTargetStatusMove(Move move, PlayerId playerId, Pokemon attacker)
     {
         if (move.SideCondition is null)
         {
@@ -950,11 +962,11 @@ public class Battle
         }
         else // Otherwise, add the new side condition
         {
-            Field.AddSideCondition(move.SideCondition, GetSide(playerId), Context);
+            Field.AddSideCondition(move.SideCondition, GetSide(playerId), attacker, move, Context);
         }
     }
 
-    private void HandleFieldTargetStatusMove(Move move)
+    private void HandleFieldTargetStatusMove(Move move, Pokemon attacker)
     {
         if (move.PseudoWeather is null && move.Weather is null && move.Terrain is null)
         {
@@ -970,7 +982,7 @@ public class Battle
             }
             else // Otherwise, add the new pseudo-weather
             {
-                Field.AddPseudoWeather(move.PseudoWeather, AllActivePokemon, Context);
+                Field.AddPseudoWeather(move.PseudoWeather, attacker, move, AllActivePokemon, Context);
             }
         }
         if (move.Weather is not null)
@@ -982,11 +994,11 @@ public class Battle
             else if (Field.HasAnyWeather) // Replace existing weather
             {
                 Field.RemoveWeather(AllActivePokemon, Context);
-                Field.AddWeather(move.Weather, AllActivePokemon, Context);
+                Field.AddWeather(move.Weather, attacker, move, AllActivePokemon, Context);
             }
             else // No existing weather, just add the new one
             {
-                Field.AddWeather(move.Weather, AllActivePokemon, Context);
+                Field.AddWeather(move.Weather, attacker, move, AllActivePokemon, Context);
             }
         }
         if (move.Terrain is not null)
@@ -998,11 +1010,11 @@ public class Battle
             else if (Field.HasAnyWeather) // Replace existing terrain
             {
                 Field.ReapplyTerrain(AllActivePokemon, Context);
-                Field.AddTerrain(move.Terrain, AllActivePokemon, Context);
+                Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemon, Context);
             }
             else // No existing terrain, just add the new one
             {
-                Field.AddTerrain(move.Terrain, AllActivePokemon, Context);
+                Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemon, Context);
             }
         }
     }
@@ -1122,7 +1134,7 @@ public class Battle
         Move struggleCopy = struggle.Copy();
 
         Pokemon defender = defSide.Team.ActivePokemon;
-        int damage = Damage(attacker, defender, struggleCopy, 1.0, false, false);
+        int damage = CalculateDamage(attacker, defender, struggleCopy, 1.0, false, false);
         defender.Damage(damage);
 
         // Struggle always deals recoil damage to the attacker
@@ -1151,7 +1163,7 @@ public class Battle
     }
 
 
-    private int Damage(Pokemon attacker, Pokemon defender, Move move,
+    private int CalculateDamage(Pokemon attacker, Pokemon defender, Move move,
         double moveEffectiveness, bool crit = false, bool applyStab = true)
     {
         if (moveEffectiveness == 0.0)

@@ -321,12 +321,22 @@ public static class UiGenerator
 
     public static void PrintTailwindStart(string trainerName)
     {
-        Console.WriteLine($"The tailwing blew from behind {trainerName}'s team!");
+        Console.WriteLine($"A tailwind blew from behind {trainerName}'s team!");
     }
 
     public static void PrintTailwindEnd(string trainerName)
     {
         Console.WriteLine($"{trainerName}'s tailwind petered out.");
+    }
+
+    public static void PrintReflectStart(string trainerName)
+    {
+        Console.WriteLine($"{trainerName}'s team became stronger against physical attacks!");
+    }
+
+    public static void PrintReflectEnd(string trainerName)
+    {
+        Console.WriteLine($"{trainerName}'s reflect wore off.");
     }
 
     public static void PrintMoveNoEffectAction(Pokemon attacker, Move move, Pokemon defender)
@@ -638,29 +648,30 @@ public static class UiGenerator
             }
         }
 
+        sb.Append("Player 1 Side Conditions: ");
         if (!field.HasAnySide1Conditions)
         {
-            sb.AppendLine("Player 1 Side Conditions: None");
+            sb.Append("None");
         }
         else
         {
-            sb.AppendLine("Player 1 Side Conditions:");
             foreach (SideCondition sideCondition in field.Side1Conditions)
             {
-                sb.AppendLine($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining)");
+                sb.Append($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining), ");
             }
         }
+        sb.AppendLine();
 
+        sb.Append("Player 2 Side Conditions: ");
         if (!field.HasAnySide2Conditions)
         {
-            sb.AppendLine("Player 2 Side Conditions: None");
+            sb.Append("None");
         }
         else
         {
-            sb.AppendLine("Player 2 Side Conditions:");
             foreach (SideCondition sideCondition in field.Side2Conditions)
             {
-                sb.AppendLine($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining)");
+                sb.Append($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining), ");
             }
         }
 

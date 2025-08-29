@@ -329,5 +329,22 @@ public record Conditions
             ConditionVolatility = ConditionVolatility.Volatile,
             OnModifySpe = (_) => 2.0,
         },
+        [ConditionId.Reflect] = new Condition
+        {
+            Id = ConditionId.Reflect,
+            Name = "Reflect",
+            ConditionEffectType = ConditionEffectType.SideCondition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnAnyModifyDamage = (_, source, target, move, isCrit, numPokemonSide) =>
+            {
+                if (target == source || move.Category != MoveCategory.Physical) return 1.0;
+                if (isCrit || move.Infiltrates) return 1.0;
+                if (numPokemonSide > 1) // 2 pokemon on the side
+                {
+                    return 2732 / 4096.0;
+                }
+                return 0.5;
+            },
+        },
     };
 }

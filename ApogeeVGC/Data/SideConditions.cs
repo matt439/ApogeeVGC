@@ -57,7 +57,8 @@ public class SideConditions
                     {
                         if (!p.RemoveCondition(ConditionId.Tailwind))
                         {
-                            throw new InvalidOperationException($"Failed to remove tailwind condition from {p.Specie.Name}");
+                            throw new InvalidOperationException($"Failed to remove tailwind condition from" +
+                                                                $"{p.Specie.Name}");
                         }
                     }
                     if (context.PrintDebug)
@@ -75,6 +76,53 @@ public class SideConditions
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
                     pokemon.AddCondition(_library.Conditions[ConditionId.Tailwind].Copy(), context);
+                },
+            },
+            [SideConditionId.Reflect] = new()
+            {
+                Id = SideConditionId.Reflect,
+                Name = "Reflect",
+                BaseDuration = 5,
+                DurationExtension = 3, // Light Clay
+                DurationCallback = (_, source, _) => source.HasItem(ItemId.LightClay),
+                OnSideStart = (side, context) =>
+                {
+                    var pokemon = side.Team.AllActivePokemon;
+
+                    // For each pokemon on the side, add the reflect condition
+                    foreach (Pokemon p in pokemon)
+                    {
+                        p.AddCondition(_library.Conditions[ConditionId.Reflect].Copy(), context);
+                    }
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintReflectStart(side.Team.Trainer.Name);
+                    }
+                },
+                OnSideResidualOrder = 26,
+                OnSideResidualSubOrder = 1,
+                OnSideEnd = (side, context) =>
+                 {
+                     var pokemon = side.Team.AllActivePokemon;
+
+                     // For each pokemon on the side, remove the reflect condition
+                     foreach (Pokemon p in pokemon)
+                     {
+                         if (!p.RemoveCondition(ConditionId.Reflect))
+                         {
+                             throw new InvalidOperationException($"Failed to remove the reflect condition from" +
+                                                                 $"{p.Specie.Name}");
+                         }
+                     }
+                     if (context.PrintDebug)
+                     {
+                         UiGenerator.PrintReflectEnd(side.Team.Trainer.Name);
+                     }
+                 },
+                OnPokemonSwitchIn = (pokemon, context) =>
+                {
+                    pokemon.AddCondition(_library.Conditions[ConditionId.Reflect].Copy(), context);
                 },
             },
         };
