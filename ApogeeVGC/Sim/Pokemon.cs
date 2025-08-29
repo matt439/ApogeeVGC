@@ -131,7 +131,7 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.Ursaluna,
-                    [new MoveSetup(MoveId.NormalBasic),
+                    [new MoveSetup(MoveId.Facade),
                         new MoveSetup(MoveId.FightingBasic),
                             new MoveSetup(MoveId.GroundBasic),
                                 new MoveSetup(MoveId.RockBasic)],

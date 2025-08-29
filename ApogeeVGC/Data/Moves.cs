@@ -217,6 +217,42 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
             },
+            [MoveId.Facade] = new()
+            {
+                Id = MoveId.Facade,
+                Num = 263,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Facade",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                OnBasePower = (source, _, move, _) =>
+                {
+                    // If the user is poisoned, burned, or paralyzed, double the power of this move
+                    if (source is null || move is null)
+                    {
+                        throw new ArgumentNullException("Source and move cannot be null in Facade move.");
+                    }
+                    if (source.HasCondition(ConditionId.Poison) ||
+                        source.HasCondition(ConditionId.Toxic) ||
+                        source.HasCondition(ConditionId.Burn) ||
+                        source.HasCondition(ConditionId.Paralysis))
+                    {
+                        return move.BasePower * 2;
+                    }
+                    return move.BasePower;
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
 
 
 
