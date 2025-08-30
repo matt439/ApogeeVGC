@@ -284,6 +284,8 @@ public class Pokemon
     public double CurrentHpRatio => (double)CurrentHp / UnmodifiedHp;
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
+    public bool IgnoringItem => false; // TODO: Implement ignoring item logic (e.g., Embargo, Magic Room)
+    public Move? LastMoveUsed { get; set; }
     public bool PrintDebug { get; init; }
     /// <summary>
     /// This is for Fake-Out-likes specifically - it mostly counts how many move actions you've had
@@ -471,6 +473,12 @@ public class Pokemon
 
         // Reset active move actions
         ActiveMoveActions = 0;
+
+        // Reset all move disables
+        foreach (Move move in Moves)
+        {
+            move.Disabled = false;
+        }
     }
 
     public void OnSwitchIn()

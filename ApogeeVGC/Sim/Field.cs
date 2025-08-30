@@ -481,6 +481,11 @@ public class Field
         }
     }
 
+    public void OnTurnStart(Side side1, Side side2, BattleContext battleContext)
+    {
+        // TODO: Implement OnTurnStart logic if needed
+    }
+
     public void OnTurnEnd(Side side1, Side side2, BattleContext battleContext)
     {
         var pokemon = side1.Team.AllActivePokemon.Concat(side2.Team.AllActivePokemon).ToArray();

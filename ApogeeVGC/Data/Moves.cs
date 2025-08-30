@@ -246,9 +246,9 @@ public record Moves
                         source.HasCondition(ConditionId.Burn) ||
                         source.HasCondition(ConditionId.Paralysis))
                     {
-                        return move.BasePower * 2;
+                        return 2.0;
                     }
-                    return move.BasePower;
+                    return 1.0;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,

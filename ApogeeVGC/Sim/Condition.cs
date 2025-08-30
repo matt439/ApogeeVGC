@@ -21,6 +21,8 @@ public enum ConditionId
     Reflect,
     LightScreen,
     Leftovers,
+    ChoiceSpecs,
+    FlameOrb,
 }
 
 public enum ConditionEffectType
@@ -52,6 +54,7 @@ public record Condition : IEffect
 
     public int? OnResidualOrder { get; init; }
     public int? OnResidualSubOrder { get; init; }
+
     public Action<Pokemon, Side?, IEffect?, BattleContext>? OnResidual { get; init; }
     public int? Duration { get; set; }
     //public Func<Pokemon, Pokemon?, int>? DurationCallback { get; init; }
@@ -96,6 +99,11 @@ public record Condition : IEffect
     /// moveDamage, source, target, move, isCrit, numActivePokemonSide
     /// </summary>
     public Func<int, Pokemon, Pokemon, Move, bool, int, double>? OnAnyModifyDamage { get; init; }
+    /// <summary>
+    /// attacker, move, context
+    /// </summary>
+    public Action<Pokemon, Move, BattleContext>? OnDisableMove { get; init; }
+    public bool NoCopy { get; init; }
 
     public Condition Copy()
     {

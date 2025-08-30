@@ -31,6 +31,17 @@ public record Item : IEffect
     /// itemHolder, context
     /// </summary>
     public Action<Pokemon, BattleContext>? OnBeforeResiduals { get; init; }
+    public bool IsChoice { get; init; }
+
+    /// <summary>
+    /// user, context
+    /// </summary>
+    public Action<Pokemon, BattleContext>? OnStart { get; init; }
+    /// <summary>
+    /// move, user, target, context
+    /// </summary>
+    public Action<Move, Pokemon, Pokemon?, BattleContext>? OnModifyMove { get; init; }
+
     //public int? OnResidualOrder { get; init; }
     //public int? OnResidualSubOrder { get; init; }
 }

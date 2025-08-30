@@ -298,6 +298,7 @@ public record Move : IEffect
     /// The recoil damage as a fraction of the damage dealt (e.g., 0.25 for 1/4 recoil).
     /// </summary>
     public double? Recoil { get; init; }
+    public bool Disabled { get; set; }
 
 
 

@@ -258,6 +258,8 @@ public class Battle
             
             Turn++;
 
+            HandleStartOfTurn();
+
             // Reset player states for the next turn
             Player1State = PlayerState.MoveSwitchSelect;
             Player2State = PlayerState.MoveSwitchSelect;
@@ -353,6 +355,13 @@ public class Battle
         HandleConditionTurnEnds();
     }
 
+    private void HandleStartOfTurn()
+    {
+        Field.OnTurnStart(Side1, Side2, Context);
+        HandleItemTurnStarts();
+        HandleConditionTurnStarts();
+    }
+
     private void HandleBeforeResiduals()
     {
         // check all active pokemon items with OnBeforeResiduals
@@ -361,6 +370,21 @@ public class Battle
             if (pokemon.IsFainted) continue; // Skip if fainted
             pokemon.Item?.OnBeforeResiduals?.Invoke(pokemon, Context);
         }
+    }
+
+    private void HandleItemTurnStarts()
+    {
+        // check all active pokemon items with OnStart
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.Item?.OnStart?.Invoke(pokemon, Context);
+        }
+    }
+
+    private void HandleConditionTurnStarts()
+    {
+
     }
 
     private void HandleConditionTurnEnds()
@@ -745,16 +769,36 @@ public class Battle
 
         int moveIndex = choice.GetMoveIndexFromChoice();
         Pokemon attacker = atkSide.Team.ActivePokemon;
+        Pokemon defender = defSide.Team.ActivePokemon;
         Move move = attacker.Moves[moveIndex];
+
+        // This is where choice lock and choice benefits come into play
+        attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
+
         if (move.Pp <= 0)
         {
             throw new InvalidOperationException($"Move {move.Name} has no PP left" +
                                                 $"for player {playerId}");
         }
+
+        // Check OnDisableMove conditions on attacker
+        foreach (Condition condition in attacker.Conditions.ToList())
+        {
+            condition.OnDisableMove?.Invoke(attacker, move, Context);
+        }
+        if (move.Disabled)
+        {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintDisabledMoveTry(attacker, move);
+            }
+            return MoveAction.None;
+        }
+
         move.UsedPp++;  // Decrease PP for the move used
         attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
-
-        Pokemon defender = defSide.Team.ActivePokemon;
+        attacker.LastMoveUsed = move;
+        
 
         // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
         if (attacker.Conditions
@@ -1356,8 +1400,10 @@ public class Battle
         Choice[] choices = [];
         for (int i = 0; i < side.Team.ActivePokemon.Moves.Length; i++)
         {
-            // Check if the move is available (has PP left)
-            if (side.Team.ActivePokemon.Moves[i].Pp > 0)
+            Move move = side.Team.ActivePokemon.Moves[i];
+
+            // Check if the move is available (has PP left and not disabled)
+            if (move is { Pp: > 0, Disabled: false })
             {
                 choices = choices.Append(i.GetChoiceFromMoveIndex()).ToArray();
             }

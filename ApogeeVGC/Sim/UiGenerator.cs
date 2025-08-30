@@ -258,9 +258,9 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
-    public static void PrintBurnDamage(Pokemon target)
+    public static void PrintBurnDamage(Pokemon target, int damage)
     {
-        Console.WriteLine($"{target.Name} is hurt by its burn!");
+        Console.WriteLine($"{target.Name} takes {damage} damage from its burn.");
     }
 
     public static void PrintBurnStart(Pokemon target)
@@ -366,6 +366,19 @@ public static class UiGenerator
     {
         Console.WriteLine($"{target.Name} restored {actualHeal} HP using its Leftovers!");
     }
+
+    public static void PrintDisabledMoveTry(Pokemon attacker, Move move)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} tried to use {move.Name}.");
+        sb.AppendLine("But it is disabled!");
+        Console.WriteLine(sb.ToString());
+    }
+
+    //public static void PrintFlameOrbBurn(Pokemon pokemon)
+    //{
+    //    Console.WriteLine($"{pokemon.Name}'s flame orb activated!");
+    //}
 
     public static void PrintFlinch(Pokemon flinchee)
     {
@@ -611,7 +624,7 @@ public static class UiGenerator
             {
                 sb.Append($"[Count: {condition.Counter}]");
             }
-            sb.Append(' ');
+            sb.Append(", ");
         }
         
         return sb.ToString();

@@ -68,10 +68,10 @@ public record Conditions
             {
                 int damage = target.UnmodifiedHp / 16;
                 if (damage < 1) damage = 1;
-                target.Damage(damage);
+                int actualDamage = target.Damage(damage);
                 if (context.PrintDebug)
                 { 
-                    UiGenerator.PrintBurnDamage(target);
+                    UiGenerator.PrintBurnDamage(target, actualDamage);
                 }
             },
         },
@@ -187,8 +187,50 @@ public record Conditions
         [ConditionId.ChoiceLock] = new Condition
         {
             Id = ConditionId.ChoiceLock,
-            Name = "Choice Lock",
+            NoCopy = true,
+            ConditionEffectType = ConditionEffectType.Condition,
             ConditionVolatility = ConditionVolatility.Volatile,
+            // TODO: Check if hasBounced and snatch effects need to be handled
+            OnStart = (_, _, _, _) => true,
+            OnBeforeMove = (source, _, move, _) =>
+            {
+                if (!source.Item?.IsChoice ?? false)
+                {
+                    // If the source no longer has a choice item, remove the condition
+                    if (!source.RemoveCondition(ConditionId.ChoiceLock))
+                    {
+                        throw new InvalidOperationException("Failed to remove Choice Lock condition.");
+                    }
+                    return true;
+                }
+
+                if (source.IgnoringItem) return true;
+                if (source.LastMoveUsed is null) return true;
+                if (move.Id == source.LastMoveUsed.Id) return true;
+                if (move.Id == MoveId.Struggle) return true;
+
+                return false;
+            },
+            OnDisableMove = (pokeon, usedMove, _) =>
+            {
+                if (!pokeon.Item?.IsChoice ?? false)
+                {
+                    // If the source no longer has a choice item, remove the condition
+                    if (!pokeon.RemoveCondition(ConditionId.ChoiceLock))
+                    {
+                        throw new InvalidOperationException("Failed to remove Choice Lock condition.");
+                    }
+                    return;
+                }
+                if (pokeon.IgnoringItem) return;
+                foreach (Move move in pokeon.Moves)
+                {
+                    if (move.Id != usedMove.Id)
+                    {
+                        move.Disabled = true;
+                    }
+                }
+            },
         },
         [ConditionId.LeechSeed] = new Condition
         {
@@ -392,6 +434,36 @@ public record Conditions
                 {
                     UiGenerator.PrintLeftoversHeal(target, actualHeal);
                 }
+            },
+        },
+        [ConditionId.ChoiceSpecs] = new Condition
+        {
+            Id = ConditionId.ChoiceSpecs,
+            Name = "Choice Specs",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnModifySpAPriority = 1,
+            OnModifySpA = (_) => 1.5,
+        },
+        [ConditionId.FlameOrb] = new Condition
+        {
+            Id = ConditionId.FlameOrb,
+            Name = "Flame Orb",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnResidualOrder = 28,
+            OnResidualSubOrder = 3,
+            Duration = 1,
+            OnResidual = (target, _, _, context) =>
+            {
+                if (target.HasCondition(ConditionId.Burn)) return;
+                target.AddCondition(context.Library.Conditions[ConditionId.Burn].Copy(), context, target,
+                    target.Item ?? throw new InvalidOperationException("The target should always be holding" +
+                                                                       "a flame orb here"));
+                //if (context.PrintDebug)
+                //{
+                //    UiGenerator.PrintFlameOrbBurn(target);
+                //}
             },
         },
     };

@@ -43,7 +43,7 @@ public record Items
                 },
                 //OnResidualOrder = 5,
                 //OnResidualSubOrder = 4,
-                // OnResidual
+                //OnResidual
             },
             [ItemId.ChoiceSpecs] = new()
             {
@@ -53,6 +53,31 @@ public record Items
                 Fling = new FlingData { BasePower = 10 },
                 Num = 297,
                 Gen = 4,
+                IsChoice = true,
+                OnStart = (user, _) =>
+                {
+                    // remove any existing choice lock
+                    if (user.HasCondition(ConditionId.ChoiceLock))
+                    {
+                        user.RemoveCondition(ConditionId.ChoiceLock);
+                    }
+                },
+                OnModifyMove = (_, user, _, context) =>
+                {
+                    if (!user.HasItem(ItemId.ChoiceSpecs))
+                    {
+                        throw new InvalidOperationException($"{user.Specie.Name} tried to use Choice Specs" +
+                                                            $"effect but does not hold Choice Specs");
+                    }
+                    if (!user.HasCondition(ConditionId.ChoiceLock))
+                    {
+                        user.AddCondition(_library.Conditions[ConditionId.ChoiceLock].Copy(), context);
+                    }
+                    if (!user.HasCondition(ConditionId.ChoiceSpecs))
+                    {
+                        user.AddCondition(_library.Conditions[ConditionId.ChoiceSpecs].Copy(), context);
+                    }
+                },
             },
             [ItemId.FlameOrb] = new()
             {
@@ -66,6 +91,20 @@ public record Items
                 },
                 Num = 273,
                 Gen = 4,
+                OnBeforeResiduals = (itemHolder, context) =>
+                {
+                    if (!itemHolder.HasItem(ItemId.FlameOrb))
+                    {
+                        throw new InvalidOperationException($"{itemHolder.Specie.Name} tried to use Flame Orb" +
+                                                            $"effect but does not hold Flame Orb");
+                    }
+                    if (itemHolder.HasCondition(ConditionId.FlameOrb))
+                    {
+                        throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Flame Orb" +
+                                                            $"condition");
+                    }
+                    itemHolder.AddCondition(_library.Conditions[ConditionId.FlameOrb].Copy(), context);
+                },
             },
             [ItemId.RockyHelmet] = new()
             {
