@@ -284,6 +284,10 @@ public record Move : IEffect
     public SideCondition? SideCondition { get; init; }
     public bool SelfSwitch { get; init; }
     public bool Infiltrates { get; init; }
+    /// <summary>
+    /// source, target, move. Returns true to allow the move to be attempted.
+    /// </summary>
+    public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTry { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

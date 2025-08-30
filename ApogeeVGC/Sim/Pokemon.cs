@@ -1,4 +1,6 @@
 ﻿using ApogeeVGC.Data;
+using System.Collections.Generic;
+using System.Runtime.Intrinsics.X86;
 
 namespace ApogeeVGC.Sim;
 
@@ -170,7 +172,7 @@ public static class PokemonBuilder
                 Build(
                     library,
                     SpecieId.IronHands,
-                    [new MoveSetup(MoveId.FightingBasic),
+                    [new MoveSetup(MoveId.FakeOut),
                         new MoveSetup(MoveId.ElectricBasic),
                             new MoveSetup(MoveId.GroundBasic),
                                 new MoveSetup(MoveId.PsychicBasic)],
@@ -283,6 +285,13 @@ public class Pokemon
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
     public bool PrintDebug { get; init; }
+    /// <summary>
+    /// This is for Fake-Out-likes specifically - it mostly counts how many move actions you've had
+    /// since the last time you switched in.
+    /// Incremented before the move is used, so the first move use has activeMoveActions == 1.
+    /// </summary>
+    public int ActiveMoveActions { get; set; }
+
     // TODO: may neeed to account for burn here
     private int CritAtk => StatModifiers.Atk < 0 ? UnmodifiedAtk : CurrentAtk;
     private int CritDef => StatModifiers.Def > 0 ? UnmodifiedDef : CurrentDef;
@@ -459,6 +468,9 @@ public class Pokemon
 
         // Reset stat modifiers
         StatModifiers = new StatModifiers();
+
+        // Reset active move actions
+        ActiveMoveActions = 0;
     }
 
     public void OnSwitchIn()

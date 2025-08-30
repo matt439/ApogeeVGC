@@ -349,6 +349,19 @@ public static class UiGenerator
         Console.WriteLine($"{trainerName}'s light screen wore off.");
     }
 
+    public static void PrintFakeOutOnTryFail(Pokemon attacker, Pokemon defender)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine($"{attacker.Name} used Fake Out on {defender.Name}.");
+        sb.AppendLine("But if failed becuase fake out must be first move used.");
+        Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintFlinch(Pokemon flinchee)
+    {
+        Console.WriteLine($"{flinchee.Name} flinched and couldn't move!");
+    }
+
     public static void PrintMoveNoEffectAction(Pokemon attacker, Move move, Pokemon defender)
     {
         StringBuilder sb = new();

@@ -737,6 +737,7 @@ public class Battle
                                                 $"for player {playerId}");
         }
         move.UsedPp++;  // Decrease PP for the move used
+        attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
 
         Pokemon defender = defSide.Team.ActivePokemon;
 
@@ -747,10 +748,6 @@ public class Battle
             .ToList().Any(condition => condition.OnBeforeMove == null ||
                                        !condition.OnBeforeMove(attacker, defender, move, Context)))
         {
-            //if (PrintDebug)
-            //{
-            //    UiGenerator.PrintMoveFailAction(attacker, move);
-            //}
             return MoveAction.None;
         }
 
@@ -767,6 +764,12 @@ public class Battle
 
                 return MoveAction.None;
             }
+        }
+
+        // OnTry checks on the attacker's move (incl fake out, etc)
+        if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
+        {
+            return MoveAction.None;
         }
 
         // Miss check
@@ -880,6 +883,39 @@ public class Battle
         }
 
         move.OnHit?.Invoke(defender, attacker, move, Context);
+
+        // Check for move condition application
+        if (move.Condition is null) return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
+
+        // Apply condition based on move target
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+                defender.AddCondition(move.Condition, Context, attacker, move);
+                break;
+            case MoveTarget.Self:
+                attacker.AddCondition(move.Condition, Context, attacker, move);
+                break;
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.FoeSide:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+                throw new NotImplementedException();
+            case MoveTarget.Field:
+                throw new InvalidOperationException("Field target should be handled separately");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
 
         return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
     }

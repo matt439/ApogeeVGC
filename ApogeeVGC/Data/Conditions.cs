@@ -171,7 +171,18 @@ public record Conditions
         {
             Id = ConditionId.Flinch,
             Name = "Flinch",
+            ConditionEffectType = ConditionEffectType.Condition,
             ConditionVolatility = ConditionVolatility.Volatile,
+            Duration = 1,
+            OnBeforeMovePriority = 8,
+            OnBeforeMove = (source, _, _, context) =>
+            {
+                if (context.PrintDebug)
+                {
+                    UiGenerator.PrintFlinch(source);
+                }
+                return false;
+            },
         },
         [ConditionId.ChoiceLock] = new Condition
         {

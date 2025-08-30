@@ -491,6 +491,38 @@ public record Moves
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
+            [MoveId.FakeOut] = new()
+            {
+                Id = MoveId.FakeOut,
+                Num = 252,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Fake Out",
+                BasePp = 10,
+                Priority = 3,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // Fake Out only works on the first turn a Pokémon is out
+                OnTry = (source, target, _, context) =>
+                {
+                    if (source.ActiveMoveActions <= 1) return true;
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintFakeOutOnTryFail(source, target);
+                    }
+                    return false;
+                },
+                Condition = _library.Conditions[ConditionId.Flinch].Copy(),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
 
 
 
