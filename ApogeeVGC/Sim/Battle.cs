@@ -886,36 +886,48 @@ public class Battle
         move.OnHit?.Invoke(defender, attacker, move, Context);
 
         // Check for move condition application
-        if (move.Condition is null) return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
-
-        // Apply condition based on move target
-        switch (move.Target)
+        if (move.Condition is not null)
         {
-            case MoveTarget.Normal:
-                defender.AddCondition(move.Condition, Context, attacker, move);
-                break;
-            case MoveTarget.Self:
-                attacker.AddCondition(move.Condition, Context, attacker, move);
-                break;
-            case MoveTarget.AdjacentAlly:
-            case MoveTarget.AdjacentAllyOrSelf:
-            case MoveTarget.AdjacentFoe:
-            case MoveTarget.All:
-            case MoveTarget.AllAdjacent:
-            case MoveTarget.AllAdjacentFoes:
-            case MoveTarget.Allies:
-            case MoveTarget.AllySide:
-            case MoveTarget.AllyTeam:
-            case MoveTarget.Any:
-            case MoveTarget.FoeSide:
-            case MoveTarget.RandomNormal:
-            case MoveTarget.Scripted:
-            case MoveTarget.None:
-                throw new NotImplementedException();
-            case MoveTarget.Field:
-                throw new InvalidOperationException("Field target should be handled separately");
-            default:
-                throw new ArgumentOutOfRangeException();
+            // Apply condition based on move target
+            switch (move.Target)
+            {
+                case MoveTarget.Normal:
+                    defender.AddCondition(move.Condition, Context, attacker, move);
+                    break;
+                case MoveTarget.Self:
+                    attacker.AddCondition(move.Condition, Context, attacker, move);
+                    break;
+                case MoveTarget.AdjacentAlly:
+                case MoveTarget.AdjacentAllyOrSelf:
+                case MoveTarget.AdjacentFoe:
+                case MoveTarget.All:
+                case MoveTarget.AllAdjacent:
+                case MoveTarget.AllAdjacentFoes:
+                case MoveTarget.Allies:
+                case MoveTarget.AllySide:
+                case MoveTarget.AllyTeam:
+                case MoveTarget.Any:
+                case MoveTarget.FoeSide:
+                case MoveTarget.RandomNormal:
+                case MoveTarget.Scripted:
+                case MoveTarget.None:
+                    throw new NotImplementedException();
+                case MoveTarget.Field:
+                    throw new InvalidOperationException("Field target should be handled separately");
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        // check for recoil
+        if (move.Recoil is not null)
+        {
+            int recoilDamage = (int)(damage * move.Recoil.Value);
+            attacker.Damage(recoilDamage);
+            if (PrintDebug)
+            {
+                UiGenerator.PrintRecoilDamageAction(attacker, recoilDamage);
+            }
         }
 
         return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;

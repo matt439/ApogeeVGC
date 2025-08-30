@@ -295,6 +295,13 @@ public record Move : IEffect
     public Func<Pokemon, Pokemon, Move, int>? BasePowerCallback { get; init; }
 
     /// <summary>
+    /// The recoil damage as a fraction of the damage dealt (e.g., 0.25 for 1/4 recoil).
+    /// </summary>
+    public double? Recoil { get; init; }
+
+
+
+    /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
     /// This method creates an independent copy with the same state while sharing immutable references.
     /// </summary>

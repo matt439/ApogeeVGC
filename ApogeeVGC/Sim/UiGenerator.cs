@@ -357,6 +357,11 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintRecoilDamageAction(Pokemon attacker, int recoilDamage)
+    {
+        Console.WriteLine($"{attacker.Name} is hurt by recoil and lost {recoilDamage} HP!\n");
+    }
+
     public static void PrintFlinch(Pokemon flinchee)
     {
         Console.WriteLine($"{flinchee.Name} flinched and couldn't move!");

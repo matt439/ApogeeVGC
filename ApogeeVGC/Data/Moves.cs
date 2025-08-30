@@ -606,6 +606,27 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
+            [MoveId.WildCharge] = new()
+            {
+                Id = MoveId.WildCharge,
+                Num = 528,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Wild Charge",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Recoil = 1.0 / 4.0,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
 
 
 
