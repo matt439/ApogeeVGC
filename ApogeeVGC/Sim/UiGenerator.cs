@@ -380,10 +380,10 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
-    //public static void PrintFlameOrbBurn(Pokemon pokemon)
-    //{
-    //    Console.WriteLine($"{pokemon.Name}'s flame orb activated!");
-    //}
+    public static void PrintChillingNeighActivation(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name}'s Chilling Neigh ability activated!");
+    }
 
     public static void PrintFlinch(Pokemon flinchee)
     {

@@ -21,6 +21,21 @@ public record Abilities
             Num = 266,
             Rating = 3.5,
             OnSwitchInPriority = 1,
+            Flags = new AbilityFlags
+            {
+                FailRolePlay = true,
+                NoReceiver = true,
+                NoEntrain = true,
+                NoTrace = true,
+                FailSkillSwap = true,
+                CantSuppress = true,
+            },
+            OnSourceAfterFaint = (length, _, source, effect, context) =>
+            {
+                if (effect.EffectType != EffectType.Move) return;
+                UiGenerator.PrintChillingNeighActivation(source);
+                source.AlterStatModifier(StatId.Atk, length, context);
+            },
         },
         [AbilityId.HadronEngine] = new Ability
         {

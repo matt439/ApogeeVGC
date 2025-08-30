@@ -31,7 +31,7 @@ public class Driver
     private const int NumThreads = 16;
 
     private const int PlayerRandom1Seed = 439;
-    private const int PlayerRandom2Seed = 1819;
+    private const int PlayerRandom2Seed = 1818;
 
     public void Start(DriverMode mode)
     {

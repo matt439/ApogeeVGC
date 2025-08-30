@@ -211,50 +211,6 @@ public class PokemonSet
     public int FaintedCount => PokemonCount - AlivePokemonCount;
     public bool AllFainted => AlivePokemonCount == 0;
 
-    /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
-    /// /// <summary>
-    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
     /// /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
     /// </summary>
@@ -263,7 +219,7 @@ public class PokemonSet
     {
         return new PokemonSet
         {
-            Pokemons = Pokemons.Select(pokemon => pokemon.Copy()).ToArray()
+            Pokemons = Pokemons.Select(pokemon => pokemon.Copy()).ToArray(),
         };
     }
 }

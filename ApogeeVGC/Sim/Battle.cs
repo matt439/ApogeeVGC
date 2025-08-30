@@ -991,6 +991,13 @@ public class Battle
             }
         }
 
+        // check if defender fainted
+        if (defender.IsFainted)
+        {
+            // chilling neigh
+            attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
+        }
+
         return move.SelfSwitch ? MoveAction.SwitchAttackerOut : MoveAction.None;
     }
 
