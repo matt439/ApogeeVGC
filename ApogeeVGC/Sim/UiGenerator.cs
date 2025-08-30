@@ -258,6 +258,11 @@ public static class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
+    public static void PrintRockyHelmetDamage(Pokemon attacker, int damage, Pokemon defender)
+    {
+        Console.WriteLine($"{attacker.Name} took {damage} damage from {defender.Name}'s rocky helmet.");
+    }
+
     public static void PrintBurnDamage(Pokemon target, int damage)
     {
         Console.WriteLine($"{target.Name} takes {damage} damage from its burn.");

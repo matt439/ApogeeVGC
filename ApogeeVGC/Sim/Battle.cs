@@ -934,7 +934,7 @@ public class Battle
             damage = Math.Max(1, (int)(damage * multiplier)); // Always at least 1 damage
         }
 
-        defender.Damage(damage);
+        int actualDefenderDamage = defender.Damage(damage);
         
         if (PrintDebug)
         {
@@ -942,6 +942,9 @@ public class Battle
         }
 
         move.OnHit?.Invoke(defender, attacker, move, Context);
+
+        // Rocky helmet
+        defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
 
         // Check for move condition application
         if (move.Condition is not null)

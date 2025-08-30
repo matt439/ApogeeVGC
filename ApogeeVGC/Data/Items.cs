@@ -114,6 +114,18 @@ public record Items
                 Fling = new FlingData { BasePower = 60 },
                 Num = 540,
                 Gen = 5,
+                OnDamagingHitOrder = 2,
+                OnDamagingHit = (_, target, source, move, context) =>
+                {
+                    if (!(move.Flags.Contact ?? false)) return;
+
+                    int actualDamage = source.Damage(source.UnmodifiedHp / 6);
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintRockyHelmetDamage(source, actualDamage, target);
+                    }
+                },
             },
             [ItemId.LightClay] = new()
             {

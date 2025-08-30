@@ -42,6 +42,13 @@ public record Item : IEffect
     /// </summary>
     public Action<Move, Pokemon, Pokemon?, BattleContext>? OnModifyMove { get; init; }
 
+    public int OnDamagingHitOrder { get; init; }
+
+    /// <summary>
+    /// damage, target, source, move, context
+    /// </summary>
+    public Action<int, Pokemon, Pokemon, Move, BattleContext>? OnDamagingHit { get; init; }
+
     //public int? OnResidualOrder { get; init; }
     //public int? OnResidualSubOrder { get; init; }
 }
