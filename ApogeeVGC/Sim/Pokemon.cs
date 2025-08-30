@@ -160,7 +160,7 @@ public static class PokemonBuilder
                     [new MoveSetup(MoveId.SpiritBreak),
                         new MoveSetup(MoveId.ThunderWave),
                             new MoveSetup(MoveId.Reflect),
-                                new MoveSetup(MoveId.FightingBasic)],
+                                new MoveSetup(MoveId.LightScreen)],
                     ItemId.LightClay,
                     AbilityId.Prankster,
                     new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },

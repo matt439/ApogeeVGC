@@ -339,6 +339,16 @@ public static class UiGenerator
         Console.WriteLine($"{trainerName}'s reflect wore off.");
     }
 
+    public static void PrintLightScreenStart(string trainerName)
+    {
+        Console.WriteLine($"{trainerName}'s team became stronger against special attacks!");
+    }
+
+    public static void PrintLightScreenEnd(string trainerName)
+    {
+        Console.WriteLine($"{trainerName}'s light screen wore off.");
+    }
+
     public static void PrintMoveNoEffectAction(Pokemon attacker, Move move, Pokemon defender)
     {
         StringBuilder sb = new();
@@ -591,9 +601,9 @@ public static class UiGenerator
 
     private static string CreateHpBar(Pokemon pokemon)
     {
-        //int maxHp = pokemon.UnmodifiedStats.Hp;
-        //int currentHp = pokemon.CurrentHp;
-        int filledLength = (int)(pokemon.CurrentHpRatio * HpBarLength);
+        int filledLength = pokemon.CurrentHp == 0
+            ? 0
+            : Math.Max(1, (int)(pokemon.CurrentHpRatio * HpBarLength));
         string filledPart = new('█', filledLength);
         string emptyPart = new('░', HpBarLength - filledLength);
         return $"[{filledPart}{emptyPart}]";

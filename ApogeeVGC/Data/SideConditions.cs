@@ -1,14 +1,7 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim;
-using System;
-using System.Collections.Generic;
+﻿using ApogeeVGC.Sim;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ApogeeVGC.Data;
-
 
 public class SideConditions
 {
@@ -83,7 +76,7 @@ public class SideConditions
                 Id = SideConditionId.Reflect,
                 Name = "Reflect",
                 BaseDuration = 5,
-                DurationExtension = 3, // Light Clay
+                DurationExtension = 3,
                 DurationCallback = (_, source, _) => source.HasItem(ItemId.LightClay),
                 OnSideStart = (side, context) =>
                 {
@@ -123,6 +116,53 @@ public class SideConditions
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
                     pokemon.AddCondition(_library.Conditions[ConditionId.Reflect].Copy(), context);
+                },
+            },
+            [SideConditionId.LightScreen] = new()
+            {
+                Id = SideConditionId.LightScreen,
+                Name = "Light Screen",
+                BaseDuration = 5,
+                DurationExtension = 3,
+                DurationCallback = (_, source, _) => source.HasItem(ItemId.LightClay),
+                OnSideStart = (side, context) =>
+                {
+                    var pokemon = side.Team.AllActivePokemon;
+
+                    // For each pokemon on the side, add the light screen condition
+                    foreach (Pokemon p in pokemon)
+                    {
+                        p.AddCondition(_library.Conditions[ConditionId.LightScreen].Copy(), context);
+                    }
+
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintLightScreenStart(side.Team.Trainer.Name);
+                    }
+                },
+                OnSideResidualOrder = 26,
+                OnSideResidualSubOrder = 2,
+                OnSideEnd = (side, context) =>
+                {
+                    var pokemon = side.Team.AllActivePokemon;
+
+                    // For each pokemon on the side, remove the light screen condition
+                    foreach (Pokemon p in pokemon)
+                    {
+                        if (!p.RemoveCondition(ConditionId.LightScreen))
+                        {
+                            throw new InvalidOperationException("Failed to remove the light screen condition" +
+                                                                $"from {p.Specie.Name}");
+                        }
+                    }
+                    if (context.PrintDebug)
+                    {
+                        UiGenerator.PrintLightScreenEnd(side.Team.Trainer.Name);
+                    }
+                },
+                OnPokemonSwitchIn = (pokemon, context) =>
+                {
+                    pokemon.AddCondition(_library.Conditions[ConditionId.LightScreen].Copy(), context);
                 },
             },
         };

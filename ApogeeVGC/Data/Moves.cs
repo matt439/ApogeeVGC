@@ -471,6 +471,26 @@ public record Moves
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
+            [MoveId.LightScreen] = new()
+            {
+                Id = MoveId.LightScreen,
+                Num = 113,
+                Accuracy = 100,
+                AlwaysHit = true,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Light Screen",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SideCondition = _library.SideConditions[SideConditionId.LightScreen].Copy(),
+                Target = MoveTarget.AllySide,
+                Type = MoveType.Psychic,
+            },
 
 
 
