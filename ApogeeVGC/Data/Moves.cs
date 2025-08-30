@@ -656,313 +656,313 @@ public record Moves
 
 
 
-            // Custom moves
-            [MoveId.NormalBasic] = new Move
-            {
-                Id = MoveId.NormalBasic,
-                Num = 10001,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Normal Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Normal,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.IceBasic] = new Move
-            {
-                Id = MoveId.IceBasic,
-                Num = 10002,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Ice Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ice,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.DragonBasic] = new Move
-            {
-                Id = MoveId.DragonBasic,
-                Num = 10003,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Dragon Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dragon,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.FireBasic] = new Move
-            {
-                Id = MoveId.FireBasic,
-                Num = 10004,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Fire Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fire,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.BugBasic] = new Move
-            {
-                Id = MoveId.BugBasic,
-                Num = 10005,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Bug Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Bug,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.FairyBasic] = new Move
-            {
-                Id = MoveId.FairyBasic,
-                Num = 10006,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Fairy Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fairy,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.GroundBasic] = new Move
-            {
-                Id = MoveId.GroundBasic,
-                Num = 10007,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Ground Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ground,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.FightingBasic] = new Move
-            {
-                Id = MoveId.FightingBasic,
-                Num = 10008,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Fighting Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Fighting,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.SteelBasic] = new Move
-            {
-                Id = MoveId.SteelBasic,
-                Num = 10009,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Steel Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Steel,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.DarkBasic] = new Move
-            {
-                Id = MoveId.DarkBasic,
-                Num = 10010,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Dark Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Dark,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.ElectricBasic] = new Move
-            {
-                Id = MoveId.ElectricBasic,
-                Num = 10011,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Electric Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Electric,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.GrassBasic] = new Move
-            {
-                Id = MoveId.GrassBasic,
-                Num = 10012,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Grass Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Grass,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.PsychicBasic] = new Move
-            {
-                Id = MoveId.PsychicBasic,
-                Num = 10013,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Psychic Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Psychic,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.PoisonBasic] = new Move
-            {
-                Id = MoveId.PoisonBasic,
-                Num = 10014,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Poison Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Poison,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.FlyingBasic] = new Move
-            {
-                Id = MoveId.FlyingBasic,
-                Num = 10015,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Flying Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Flying,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.RockBasic] = new Move
-            {
-                Id = MoveId.RockBasic,
-                Num = 10016,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Physical,
-                Name = "Rock Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Rock,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.WaterBasic] = new Move
-            {
-                Id = MoveId.WaterBasic,
-                Num = 10017,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Water Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Water,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
-            [MoveId.GhostBasic] = new Move
-            {
-                Id = MoveId.GhostBasic,
-                Num = 10018,
-                Accuracy = 90,
-                BasePower = 70,
-                Category = MoveCategory.Special,
-                Name = "Ghost Basic",
-                BasePp = 10,
-                Priority = 0,
-                Target = MoveTarget.Normal,
-                Type = MoveType.Ghost,
-                Flags = new MoveFlags
-                {
-                    Protect = true,
-                },
-            },
+            //// Custom moves
+            //[MoveId.NormalBasic] = new Move
+            //{
+            //    Id = MoveId.NormalBasic,
+            //    Num = 10001,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Normal Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Normal,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.IceBasic] = new Move
+            //{
+            //    Id = MoveId.IceBasic,
+            //    Num = 10002,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Ice Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Ice,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.DragonBasic] = new Move
+            //{
+            //    Id = MoveId.DragonBasic,
+            //    Num = 10003,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Dragon Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Dragon,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.FireBasic] = new Move
+            //{
+            //    Id = MoveId.FireBasic,
+            //    Num = 10004,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Fire Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Fire,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.BugBasic] = new Move
+            //{
+            //    Id = MoveId.BugBasic,
+            //    Num = 10005,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Bug Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Bug,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.FairyBasic] = new Move
+            //{
+            //    Id = MoveId.FairyBasic,
+            //    Num = 10006,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Fairy Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Fairy,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.GroundBasic] = new Move
+            //{
+            //    Id = MoveId.GroundBasic,
+            //    Num = 10007,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Ground Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Ground,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.FightingBasic] = new Move
+            //{
+            //    Id = MoveId.FightingBasic,
+            //    Num = 10008,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Fighting Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Fighting,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.SteelBasic] = new Move
+            //{
+            //    Id = MoveId.SteelBasic,
+            //    Num = 10009,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Steel Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Steel,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.DarkBasic] = new Move
+            //{
+            //    Id = MoveId.DarkBasic,
+            //    Num = 10010,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Dark Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Dark,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.ElectricBasic] = new Move
+            //{
+            //    Id = MoveId.ElectricBasic,
+            //    Num = 10011,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Electric Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Electric,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.GrassBasic] = new Move
+            //{
+            //    Id = MoveId.GrassBasic,
+            //    Num = 10012,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Grass Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Grass,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.PsychicBasic] = new Move
+            //{
+            //    Id = MoveId.PsychicBasic,
+            //    Num = 10013,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Psychic Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Psychic,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.PoisonBasic] = new Move
+            //{
+            //    Id = MoveId.PoisonBasic,
+            //    Num = 10014,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Poison Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Poison,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.FlyingBasic] = new Move
+            //{
+            //    Id = MoveId.FlyingBasic,
+            //    Num = 10015,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Flying Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Flying,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.RockBasic] = new Move
+            //{
+            //    Id = MoveId.RockBasic,
+            //    Num = 10016,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Physical,
+            //    Name = "Rock Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Rock,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.WaterBasic] = new Move
+            //{
+            //    Id = MoveId.WaterBasic,
+            //    Num = 10017,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Water Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Water,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
+            //[MoveId.GhostBasic] = new Move
+            //{
+            //    Id = MoveId.GhostBasic,
+            //    Num = 10018,
+            //    Accuracy = 90,
+            //    BasePower = 70,
+            //    Category = MoveCategory.Special,
+            //    Name = "Ghost Basic",
+            //    BasePp = 10,
+            //    Priority = 0,
+            //    Target = MoveTarget.Normal,
+            //    Type = MoveType.Ghost,
+            //    Flags = new MoveFlags
+            //    {
+            //        Protect = true,
+            //    },
+            //},
         };
     }
 }
