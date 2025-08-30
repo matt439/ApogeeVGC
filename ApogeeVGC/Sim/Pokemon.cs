@@ -174,7 +174,7 @@ public static class PokemonBuilder
                     SpecieId.IronHands,
                     [new MoveSetup(MoveId.FakeOut),
                         new MoveSetup(MoveId.HeavySlam),
-                            new MoveSetup(MoveId.GroundBasic),
+                            new MoveSetup(MoveId.LowKick),
                                 new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.AssaultVest,
                     AbilityId.QuarkDrive,

@@ -571,6 +571,41 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
             },
+            [MoveId.LowKick] = new()
+            {
+                Id = MoveId.LowKick,
+                Num = 67,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = (_, target, _) =>
+                {
+                    // Power depends on the target's weight
+                    double targetWeight = target.Specie.Weight;
+                    int basePower = targetWeight switch
+                    {
+                        >= 2000 => 120,
+                        >= 1000 => 100,
+                        >= 500 => 80,
+                        >= 250 => 60,
+                        >= 100 => 40,
+                        _ => 20,
+                    };
+                    return basePower;
+                },
+                Category = MoveCategory.Physical,
+                Name = "Low Kick",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
 
 
 
