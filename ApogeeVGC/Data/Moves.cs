@@ -523,6 +523,54 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.HeavySlam] = new()
+            {
+                Id = MoveId.HeavySlam,
+                Num = 484,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = (source, target, _) =>
+                {
+                    double targetWeight = target.Specie.Weight;
+                    double sourceWeight = source.Specie.Weight;
+                    int basePower;
+                    if (sourceWeight >= targetWeight * 5)
+                    {
+                        basePower = 120;
+                    }
+                    else if (sourceWeight >= targetWeight * 4)
+                    {
+                        basePower = 100;
+                    }
+                    else if (sourceWeight >= targetWeight * 3)
+                    {
+                        basePower = 80;
+                    }
+                    else if (sourceWeight >= targetWeight * 2)
+                    {
+                        basePower = 60;
+                    }
+                    else
+                    {
+                        basePower = 40;
+                    }
+                    return basePower;
+                },
+                Category = MoveCategory.Physical,
+                Name = "Heavy Slam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    NonSky = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
 
 
 

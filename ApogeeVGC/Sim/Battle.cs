@@ -85,6 +85,7 @@ public class Battle
     private object ChoiceLock { get; } = new();
 
     private const int TurnLimit = 1000;
+    private const double Epsilon = 1e-10;
 
     // Lazy-initialized seeded random number generator for deterministic battle simulation
     private Random? _battleRandom;
@@ -1210,7 +1211,13 @@ public class Battle
         int level = attacker.Level;
         int attackStat = attacker.GetAttackStat(move, crit);
         int defenseStat = defender.GetDefenseStat(move, crit);
-        int basePower = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? move.BasePower;
+        int basePower = move.BasePowerCallback?.Invoke(attacker, defender, move) ?? move.BasePower;
+
+        double onBasePowerModifier = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? 1.0;
+        if (Math.Abs(onBasePowerModifier - 1.0) > Epsilon)
+        {
+            basePower = (int)(basePower * onBasePowerModifier);
+        }
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
         bool stab = applyStab && attacker.IsStab(move);

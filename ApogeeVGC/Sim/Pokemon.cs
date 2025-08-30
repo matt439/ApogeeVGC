@@ -173,7 +173,7 @@ public static class PokemonBuilder
                     library,
                     SpecieId.IronHands,
                     [new MoveSetup(MoveId.FakeOut),
-                        new MoveSetup(MoveId.ElectricBasic),
+                        new MoveSetup(MoveId.HeavySlam),
                             new MoveSetup(MoveId.GroundBasic),
                                 new MoveSetup(MoveId.PsychicBasic)],
                     ItemId.AssaultVest,

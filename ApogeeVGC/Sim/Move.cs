@@ -275,9 +275,9 @@ public record Move : IEffect
     /// </summary>
     public Func<Pokemon, Pokemon?, Move?, BattleContext, bool>? OnHit { get; init; }
     /// <summary>
-    /// source, target, move, context
+    /// source, target, move, context. Returns a multiplier for the base power.
     /// </summary>
-    public Func<Pokemon, Pokemon, Move, BattleContext, int>? OnBasePower { get; init; }
+    public Func<Pokemon, Pokemon, Move, BattleContext, double>? OnBasePower { get; init; }
     public Weather? Weather { get; init; }
     public Terrain? Terrain { get; init; }
     public PseudoWeather? PseudoWeather { get; init; }
@@ -288,6 +288,11 @@ public record Move : IEffect
     /// source, target, move. Returns true to allow the move to be attempted.
     /// </summary>
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTry { get; init; }
+
+    /// <summary>
+    /// source, target, move. Returns the modified base power.
+    /// </summary>
+    public Func<Pokemon, Pokemon, Move, int>? BasePowerCallback { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
