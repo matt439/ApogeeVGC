@@ -213,6 +213,50 @@ public class PokemonSet
 
     /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
+    /// /// <summary>
+    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
     /// </summary>
     /// <returns>A new PokemonSet instance with copied Pokemon</returns>
     public PokemonSet Copy()
@@ -330,6 +374,7 @@ public class Pokemon
             Shiny = Shiny,
             TerraType = TerraType,
             Gender = Gender,
+            PrintDebug = PrintDebug,
         };
 
         // Copy the current HP state (most important for battle simulation)
@@ -343,8 +388,10 @@ public class Pokemon
         // Copy stat modifiers using record copy semantics
         copy.StatModifiers = StatModifiers with { };
 
-        // TODO: When status effects, stat boosts, etc. are implemented,
-        // they will need to be copied here as well
+        // Copy mutable battle state
+        // Note: IgnoringItem is a computed property (always returns false), not a field to copy
+        copy.LastMoveUsed = LastMoveUsed; // Reference to immutable Move is safe to share
+        copy.ActiveMoveActions = ActiveMoveActions;
 
         return copy;
     }
