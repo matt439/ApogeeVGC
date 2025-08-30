@@ -6,7 +6,7 @@ public record Library
 {
     private readonly Abilities _abilities = new();
     private readonly Conditions _conditions = new();
-    private readonly Items _items = new();
+    private readonly Items _items;
     private readonly Learnsets _learnsets = new();
     private readonly Moves _moves;
     private readonly Natures _natures = new();
@@ -43,7 +43,8 @@ public record Library
         _terrains = new Terrains(this);
         _weathers = new Weathers(this);
 
-        // Moves must be initialized last because it depends on other data
+        // Moves and items must be initialized last because they depend on other data
+        _items = new Items(this);
         _moves = new Moves(this);
     }
 }

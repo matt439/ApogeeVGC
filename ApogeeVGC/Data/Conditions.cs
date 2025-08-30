@@ -374,5 +374,25 @@ public record Conditions
                 return 0.5;
             },
         },
+        [ConditionId.Leftovers] = new Condition
+        {
+            Id = ConditionId.Leftovers,
+            Name = "Leftovers",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnResidualOrder = 5,
+            OnResidualSubOrder = 4,
+            Duration = 1, // Condition is refreshed each turn by the item effect
+            OnResidual = (target, _, _, context) =>
+            {
+                int heal = target.UnmodifiedHp / 16;
+                if (heal < 1) heal = 1;
+                int actualHeal = target.Heal(heal);
+                if (context.PrintDebug)
+                {
+                    UiGenerator.PrintLeftoversHeal(target, actualHeal);
+                }
+            },
+        },
     };
 }

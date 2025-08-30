@@ -251,8 +251,11 @@ public class Battle
             if (IsWinner() != PlayerId.None) return;
             if (!IsEndOfTurn()) return;
 
-            HandleEndOfTurn();
-
+            if (Turn > -1) // Skip end of turn processing for team preview turn
+            {
+                HandleEndOfTurn();
+            }
+            
             Turn++;
 
             // Reset player states for the next turn
@@ -345,8 +348,19 @@ public class Battle
             UiGenerator.PrintBlankLine();
         }
         Field.OnTurnEnd(Side1, Side2, Context);
+        HandleBeforeResiduals();
         HandleResiduals();
         HandleConditionTurnEnds();
+    }
+
+    private void HandleBeforeResiduals()
+    {
+        // check all active pokemon items with OnBeforeResiduals
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.Item?.OnBeforeResiduals?.Invoke(pokemon, Context);
+        }
     }
 
     private void HandleConditionTurnEnds()

@@ -25,6 +25,12 @@ public record Item : IEffect
     public FlingData Fling { get; init; } = new();
     public int Num { get; init; }
     public int Gen { get; init; }
-    public int? OnResidualOrder { get; init; }
-    public int? OnResidualSubOrder { get; init; }
+    public Condition? Condition { get; init; }
+
+    /// <summary>
+    /// itemHolder, context
+    /// </summary>
+    public Action<Pokemon, BattleContext>? OnBeforeResiduals { get; init; }
+    //public int? OnResidualOrder { get; init; }
+    //public int? OnResidualSubOrder { get; init; }
 }

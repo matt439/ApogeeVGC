@@ -362,6 +362,11 @@ public static class UiGenerator
         Console.WriteLine($"{attacker.Name} is hurt by recoil and lost {recoilDamage} HP!\n");
     }
 
+    public static void PrintLeftoversHeal(Pokemon target, int actualHeal)
+    {
+        Console.WriteLine($"{target.Name} restored {actualHeal} HP using its Leftovers!");
+    }
+
     public static void PrintFlinch(Pokemon flinchee)
     {
         Console.WriteLine($"{flinchee.Name} flinched and couldn't move!");

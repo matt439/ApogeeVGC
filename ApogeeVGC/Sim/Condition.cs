@@ -20,6 +20,7 @@ public enum ConditionId
     Tailwind,
     Reflect,
     LightScreen,
+    Leftovers,
 }
 
 public enum ConditionEffectType
@@ -50,6 +51,7 @@ public record Condition : IEffect
     //public int EffectOrder { get; init; }
 
     public int? OnResidualOrder { get; init; }
+    public int? OnResidualSubOrder { get; init; }
     public Action<Pokemon, Side?, IEffect?, BattleContext>? OnResidual { get; init; }
     public int? Duration { get; set; }
     //public Func<Pokemon, Pokemon?, int>? DurationCallback { get; init; }
