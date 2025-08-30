@@ -460,10 +460,38 @@ public record Conditions
                 target.AddCondition(context.Library.Conditions[ConditionId.Burn].Copy(), context, target,
                     target.Item ?? throw new InvalidOperationException("The target should always be holding" +
                                                                        "a flame orb here"));
-                //if (context.PrintDebug)
-                //{
-                //    UiGenerator.PrintFlameOrbBurn(target);
-                //}
+            },
+        },
+        [ConditionId.AssaultVest] = new Condition
+        {
+            Id = ConditionId.AssaultVest,
+            Name = "Assault Vest",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnModifySpDPriority = 1,
+            OnModifySpD = (_) => 1.5,
+            OnDisableMove = (pokemon, _, _) =>
+            {
+                // disable all moves which are status type (except me first)
+                foreach (Move move in pokemon.Moves)
+                {
+                    if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
+                    {
+                        move.Disabled = true;
+                    }
+                }
+            },
+            OnStart = (pokemon, _, _, _) =>
+            {
+                // disable all moves which are status type (except me first)
+                foreach (Move move in pokemon.Moves)
+                {
+                    if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
+                    {
+                        move.Disabled = true;
+                    }
+                }
+                return true;
             },
         },
     };

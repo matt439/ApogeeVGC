@@ -144,6 +144,10 @@ public record Items
                 Fling = new FlingData { BasePower = 80 },
                 Num = 640,
                 Gen = 6,
+                OnStart = (pokemon, context) =>
+                {
+                    pokemon.AddCondition(_library.Conditions[ConditionId.AssaultVest].Copy(), context);
+                },
             },
         };
     }

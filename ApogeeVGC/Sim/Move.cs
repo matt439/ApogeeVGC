@@ -25,6 +25,7 @@ public enum MoveId
     HeavySlam,
     LowKick,
     WildCharge,
+    MeFirst,
 
     Struggle,
 

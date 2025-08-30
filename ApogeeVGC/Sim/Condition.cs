@@ -23,6 +23,7 @@ public enum ConditionId
     Leftovers,
     ChoiceSpecs,
     FlameOrb,
+    AssaultVest,
 }
 
 public enum ConditionEffectType
