@@ -4,7 +4,7 @@ namespace ApogeeVGC.Data;
 
 public record Library
 {
-    private readonly Abilities _abilities = new();
+    private readonly Abilities _abilities;
     private readonly Conditions _conditions = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
@@ -46,5 +46,6 @@ public record Library
         // Moves and items must be initialized last because they depend on other data
         _items = new Items(this);
         _moves = new Moves(this);
+        _abilities = new Abilities(this);
     }
 }

@@ -255,8 +255,12 @@ public class Battle
             {
                 HandleEndOfTurn();
             }
-            
-            Turn++;
+            else // Team preview turn just ended. Trigger ability/item on switch in effects
+            {
+                HandleEndOfTeamPreviewTurn();
+            }
+
+                Turn++;
 
             HandleStartOfTurn();
 
@@ -945,6 +949,11 @@ public class Battle
 
         // Rocky helmet
         defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
+        
+        foreach (Condition condition in defender.Conditions.ToList())
+        {
+            condition.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
+        }
 
         // Check for move condition application
         if (move.Condition is not null)
@@ -1162,6 +1171,15 @@ public class Battle
         return !(roll <= modifiedAccuracy);
     }
 
+    private void HandleEndOfTeamPreviewTurn()
+    {
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.OnSwitchIn(Field, AllActivePokemon, Context); // Trigger switch-in effects
+        }
+    }
+
     private void PerformSwitch(PlayerId playerId, Choice choice)
     {
         if (IsWinner() != PlayerId.None)
@@ -1179,7 +1197,7 @@ public class Battle
         side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
         Pokemon newActive = side.Team.ActivePokemon;
         Field.OnPokemonSwitchIn(newActive, playerId, Context);
-        newActive.OnSwitchIn();
+        newActive.OnSwitchIn(Field, AllActivePokemon, Context);
 
         if (!PrintDebug) return;
 
@@ -1303,12 +1321,20 @@ public class Battle
         bool stab = applyStab && attacker.IsStab(move);
         double stabModifier = stab ? 1.5 : 1.0;
 
+        double burnModifier = 1.0;
+        if (attacker.HasCondition(ConditionId.Burn) && move.Category == MoveCategory.Physical &&
+            attacker.Ability.Id != AbilityId.Guts)
+        {
+            burnModifier = 0.5;
+        }
+
         int baseDamage = (int)((2 * level / 5.0 + 2) * basePower * attackStat / defenseStat / 50.0 + 2);
         int critMofified = RoundedDownAtHalf(critModifier * baseDamage);
         int randomModified = RoundedDownAtHalf(random * critMofified);
         int stabModified = RoundedDownAtHalf(stabModifier * randomModified);
         int typeModified = RoundedDownAtHalf(moveEffectiveness * stabModified);
-        return Math.Max(1, typeModified);
+        int burnModified = RoundedDownAtHalf(burnModifier * typeModified);
+        return Math.Max(1, burnModified);
     }
 
     private PlayerId MovesNext(Choice player1Choice, Choice player2Choice)
@@ -1359,7 +1385,10 @@ public class Battle
             int moveIndex = choice.GetMoveIndexFromChoice();
             Pokemon attacker = side.Team.ActivePokemon;
             Move move = attacker.Moves[moveIndex];
-            return move.Priority;
+            int priority = move.Priority;
+            // Check for abilities that modify move priority
+            priority = attacker.Ability.OnModifyPriority?.Invoke(priority, move) ?? priority;
+            return priority;
         }
         return 0; // Default priority for other choices
     }

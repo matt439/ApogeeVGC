@@ -208,7 +208,7 @@ public static class UiGenerator
             case 2:
                 sb.AppendLine($"{pokemonName}'s {statName} rose sharply!");
                 break;
-            case >=3 and <= 12:
+            case >= 3 and <= 12:
                 sb.AppendLine($"{pokemonName}'s {statName} rose drastically!");
                 break;
             case -1:
@@ -225,6 +225,7 @@ public static class UiGenerator
             default:
                 throw new InvalidOperationException("Stat change must be between -12 and 12, excluding 0.");
         }
+
         Console.WriteLine(sb.ToString());
     }
 
@@ -396,6 +397,37 @@ public static class UiGenerator
         sb.AppendLine($"{attacker.Name} used {move.Name} on {defender.Name}.");
         sb.AppendLine("But it had no effect!");
         Console.WriteLine(sb.ToString());
+    }
+
+    public static void PrintElectricTerrainStart()
+    {
+        Console.WriteLine("The battlefield became electrified!");
+    }
+
+    public static void PrintElectricTerrainEnd()
+    {
+        Console.WriteLine("The electric terrain disappeared.");
+    }
+
+    public static void PrintFlameBodyBurn(Pokemon source, Pokemon target)
+    {
+        Console.WriteLine($"{target.Name} was burned by {source.Name}'s Flame Body!");
+    }
+
+    //public static void PrintQuarkDriveStart(Pokemon pokemon)
+    //{
+        
+    //}
+
+    public static void PrintQuarkDriveEnd(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name}'s Quark Drive wore off.");
+    }
+
+    public static void PrintQuarkDriveStart(Pokemon pokemon, StatIdExceptHp stat)
+    {
+        Console.WriteLine($"{pokemon.Name}'s Quark Drive activated!");
+        Console.WriteLine($"{pokemon.Name}'s {stat.ConvertToString()} was boosted.");
     }
 
     public static void PrintBlankLine()

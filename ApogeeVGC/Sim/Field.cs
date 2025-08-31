@@ -272,16 +272,29 @@ public class Field
     public void AddTerrain(Terrain terrain, Pokemon sourcePokemon, IEffect sourceEffect,
         Pokemon[] pokemon, BattleContext battleContext)
     {
+        if (HasTerrain(terrain.Id))
+        {
+            ReapplyTerrain(pokemon, battleContext);
+            return;
+        }
         Terrain?.OnEnd?.Invoke(pokemon, battleContext);
         Terrain = terrain.Copy();
         Terrain.IsExtended = Terrain.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect) ?? false;
         Terrain.OnStart?.Invoke(pokemon, battleContext);
+        foreach (Pokemon pok in pokemon)
+        {
+            pok.Ability.OnTerrainChange?.Invoke(pok, this, battleContext);
+        }
     }
     public void RemoveTerrain(Pokemon[] pokemon, BattleContext battleContext)
     {
         if (Terrain == null) return;
         Terrain.OnEnd?.Invoke(pokemon, battleContext);
         Terrain = null;
+        foreach (Pokemon pok in pokemon)
+        {
+            pok.Ability.OnTerrainChange?.Invoke(pok, this, battleContext);
+        }
     }
 
     public void ReapplyTerrain(Pokemon[] pokemon, BattleContext battleContext)

@@ -287,6 +287,8 @@ public class Pokemon
     public bool IgnoringItem => false; // TODO: Implement ignoring item logic (e.g., Embargo, Magic Room)
     public Move? LastMoveUsed { get; set; }
     public bool PrintDebug { get; init; }
+
+    public StatIdExceptHp? BestStat { get; set; }
     /// <summary>
     /// This is for Fake-Out-likes specifically - it mostly counts how many move actions you've had
     /// since the last time you switched in.
@@ -484,9 +486,11 @@ public class Pokemon
         }
     }
 
-    public void OnSwitchIn()
+    public void OnSwitchIn(Field field, Pokemon[] pokemons, BattleContext context)
     {
         //TODO: Trigger any switch-in effects from conditions, abilities, items, etc.
+
+        Ability.OnStart?.Invoke(this, field, pokemons, Ability, context);
     }
 
     public void AlterStatModifier(StatId stat, int change, BattleContext context)
@@ -566,6 +570,41 @@ public class Pokemon
         // Would be used for belly drum, etc.
     }
 
+    /// <summary>
+    /// Gets the Pokemon's best stat.
+    /// Used by Beast Boost, Quark Drive, and Protosynthesis.
+    /// </summary>
+    /// <param name="unboosted">If true, ignores stat boosts</param>
+    /// <param name="unmodified">If true, uses base stats without modifications</param>
+    /// <returns>The stat ID of the highest stat (excluding HP)</returns>
+    public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
+    {
+        var statName = StatIdExceptHp.Atk;
+        int bestStat = 0;
+        StatIdExceptHp[] stats = [StatIdExceptHp.Atk, StatIdExceptHp.Def, StatIdExceptHp.SpA,
+            StatIdExceptHp.SpD, StatIdExceptHp.Spe];
+
+        foreach (StatIdExceptHp stat in stats)
+        {
+            //int currentStat = GetStat(stat, unboosted, unmodified);
+            // TODO: Implement GetStat method if needed. need to account for unboosted and unmodified flags
+            int currentStat = CalculateUnmodifiedStat(stat.ConvertToStatId());
+            if (currentStat <= bestStat) continue;
+            statName = stat;
+            bestStat = currentStat;
+        }
+
+        return statName;
+    }
+
+    //private int GetStat(StatIdExceptHp stat, bool unboosted = false, bool unmodified = false)
+    //{
+    //    // Implementation would depend on your specific requirements
+    //    // This might involve checking the unboosted/unmodified flags
+    //    // and returning either current stats, base stats, or unboosted stats
+    //    throw new NotImplementedException("GetStat method needs to be implemented");
+    //}
+
     private int CalculateModifiedStat(StatId stat)
     {
         if (stat == StatId.Hp)
@@ -596,26 +635,6 @@ public class Pokemon
             default:
                 throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
         }
-
-        // TODO: Implement ability and status condition effects on stats
-
-        //// if speed, check for paralysis
-        //if (stat == StatId.Spe && Specie.IsParalyzed)
-        //{
-        //    modifier *= 0.5;
-        //}
-
-        //// if attack, check for burn and if ability is not Guts
-        //if (stat == StatId.Atk && Specie.IsBurned && Ability.Id != AbilityId.Guts)
-        //{
-        //    modifier *= 0.5;
-        //}
-
-        //// check for any status and guts ability
-        //if (stat == StatId.Atk && Specie.IsStatused && Ability.Id == AbilityId.Guts)
-        //{
-        //    modifier *= 1.5;
-        //}
 
         // apply condition effects here
         double conditionModifier = 1.0;

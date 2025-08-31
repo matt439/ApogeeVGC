@@ -24,6 +24,11 @@ public enum ConditionId
     ChoiceSpecs,
     FlameOrb,
     AssaultVest,
+    ElectricTerrain,
+    HadronEngine,
+    Guts,
+    FlameBody,
+    QuarkDrive,
 }
 
 public enum ConditionEffectType
@@ -104,6 +109,12 @@ public record Condition : IEffect
     /// attacker, move, context
     /// </summary>
     public Action<Pokemon, Move, BattleContext>? OnDisableMove { get; init; }
+
+    /// <summary>
+    /// damage, target, source, move, context
+    /// </summary>
+    public Action<int, Pokemon, Pokemon, Move, BattleContext>? OnDamagingHit { get; init; }
+
     public bool NoCopy { get; init; }
 
     public Condition Copy()

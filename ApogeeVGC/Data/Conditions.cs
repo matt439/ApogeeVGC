@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Transactions;
 using ApogeeVGC.Sim;
 
 namespace ApogeeVGC.Data;
@@ -492,6 +493,123 @@ public record Conditions
                     }
                 }
                 return true;
+            },
+        },
+        [ConditionId.ElectricTerrain] = new Condition
+        {
+            Id = ConditionId.ElectricTerrain,
+            Name = "Electric Terrain",
+            ConditionEffectType = ConditionEffectType.Terrain,
+            ConditionVolatility = ConditionVolatility.Volatile,
+        },
+        [ConditionId.HadronEngine] = new Condition
+        {
+            Id = ConditionId.HadronEngine,
+            Name = "Hadron Engine",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnModifySpAPriority = 5,
+            OnModifySpA = (pokemon) => pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5461.0 / 4096.0 : 1.0,
+        },
+        [ConditionId.Guts] = new Condition
+        {
+            Id = ConditionId.Guts,
+            Name = "Guts",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnModifyAtkPriority = 5,
+            OnModifyAtk = (pokemon) =>
+            {
+                if (pokemon.HasCondition(ConditionId.Burn) ||
+                    pokemon.HasCondition(ConditionId.Paralysis) ||
+                    pokemon.HasCondition(ConditionId.Poison) ||
+                    pokemon.HasCondition(ConditionId.Toxic))
+                {
+                    return 1.5;
+                }
+                return 1.0;
+            },
+        },
+        [ConditionId.FlameBody] = new Condition
+        {
+            Id = ConditionId.FlameBody,
+            Name = "Flame Body",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            OnDamagingHit = (_, target, source, move, context) =>
+            {
+                if (!(move.Flags.Contact ?? false)) return;
+
+                if (source.HasCondition(ConditionId.Burn) ||
+                    source.HasCondition(ConditionId.Freeze) ||
+                    source.HasCondition(ConditionId.Sleep) ||
+                    source.HasCondition(ConditionId.Paralysis) ||
+                    source.HasCondition(ConditionId.Poison) ||
+                    source.HasCondition(ConditionId.Toxic)) return;
+
+                bool burned = context.Random.NextDouble() < 0.3;
+
+                if (!burned) return;
+
+                source.AddCondition(context.Library.Conditions[ConditionId.Burn].Copy(), context, target,
+                    target.Ability ?? throw new InvalidOperationException("The target should always have" +
+                                                                          "flame body ability here"));
+                //if (context.PrintDebug)
+                //{
+                //    UiGenerator.PrintFlameBodyBurn(source, target);
+                //}
+            },
+        },
+        [ConditionId.QuarkDrive] = new Condition
+        {
+            Id = ConditionId.QuarkDrive,
+            Name = "Quark Drive",
+            ConditionEffectType = ConditionEffectType.Condition,
+            ConditionVolatility = ConditionVolatility.Volatile,
+            NoCopy = true,
+            OnStart = (pokemon, _, _, context) =>
+            {
+                pokemon.BestStat = pokemon.GetBestStat(false, true);
+                if (context.PrintDebug)
+                {
+                    UiGenerator.PrintQuarkDriveStart(pokemon, pokemon.BestStat ??
+                                                              throw new InvalidOperationException());
+                }
+                return true;
+            },
+            OnModifyAtkPriority = 5,
+            OnModifyAtk = (pokemon) =>
+            {
+                if (pokemon.BestStat is null) return 1.0;
+                if (pokemon.BestStat != StatIdExceptHp.Atk) return 1.0;
+                return pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5325.0 / 4096.0 : 1.0;
+            },
+            OnModifyDefPriority = 6,
+            OnModifyDef = (pokemon) =>
+            {
+                if (pokemon.BestStat is null) return 1.0;
+                if (pokemon.BestStat != StatIdExceptHp.Def) return 1.0;
+                return pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5325.0 / 4096.0 : 1.0;
+            },
+            OnModifySpAPriority = 5,
+            OnModifySpA = (pokemon) =>
+            {
+                if (pokemon.BestStat is null) return 1.0;
+                if (pokemon.BestStat != StatIdExceptHp.SpA) return 1.0;
+                return pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5325.0 / 4096.0 : 1.0;
+            },
+            OnModifySpDPriority = 6,
+            OnModifySpD = (pokemon) =>
+            {
+                if (pokemon.BestStat is null) return 1.0;
+                if (pokemon.BestStat != StatIdExceptHp.SpD) return 1.0;
+                return pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5325.0 / 4096.0 : 1.0;
+            },
+            OnModifySpe = (pokemon) =>
+            {
+                if (pokemon.BestStat is null) return 1.0;
+                if (pokemon.BestStat != StatIdExceptHp.Spe) return 1.0;
+                return pokemon.HasCondition(ConditionId.ElectricTerrain) ? 1.5 : 1.0;
             },
         },
     };

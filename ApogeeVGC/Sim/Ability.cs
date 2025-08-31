@@ -69,7 +69,7 @@ public record Ability : IEffect
                 >= 124 => 5,
                 >= 77 => 4,
                 >= 1 => 3,
-                _ => field
+                _ => field,
             };
         }
         init;
@@ -83,5 +83,8 @@ public record Ability : IEffect
     /// length, target, source, effect
     /// </summary>
     public Action<int, Pokemon, Pokemon, IEffect, BattleContext>? OnSourceAfterFaint { get; init; }
+    public Action<Pokemon, Field, Pokemon[], IEffect, BattleContext>? OnStart { get; init; }
+    public Func<int, Move, int>? OnModifyPriority { get; init; }
+    public Action<Pokemon, Field, BattleContext>? OnTerrainChange { get; init; }
 
 }
