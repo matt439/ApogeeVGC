@@ -25,8 +25,8 @@ public class Driver
     private const int RandomEvaluationNumTest = 100000;
 
     private const int MctsEvaluationNumTest = 10;
-    private const int MctsMaxIterations = 100000;
-    private const double MctsExplorationParameter = 0.0; //1.4142; // Square root of 2
+    private const int MctsMaxIterations = 10000;
+    private const double MctsExplorationParameter = 1.4142; // Square root of 2
 
     private const int NumThreads = 16;
 
@@ -121,7 +121,7 @@ public class Driver
                 Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
                     MctsExplorationParameter, Library, player1Seed, NumThreads),
                 Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    PlayerRandomStrategy.SuperEffectiveOrStabMoves,
+                    PlayerRandomStrategy.AllChoices,
                     player2Seed),
             };
             simResults.Add(simulator.Run());
