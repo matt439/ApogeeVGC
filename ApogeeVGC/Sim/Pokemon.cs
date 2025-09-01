@@ -58,6 +58,7 @@ public static class PokemonBuilder
         AbilityId ability,
         StatsTable evs,
         NatureType nature,
+        MoveType terraType,
         bool pringDebug = false,
         StatsTable? ivs = null,
         string? nickname = null,
@@ -91,7 +92,8 @@ public static class PokemonBuilder
             Evs = evs,
             Name = nickname ?? library.Species[specie].Name,
             Shiny = shiny,
-            PrintDebug = pringDebug
+            PrintDebug = pringDebug,
+            TeraType = terraType,
         };
 
         return PokemonValidator.IsValid(library, pokemon) ? pokemon
@@ -115,6 +117,7 @@ public static class PokemonBuilder
                     AbilityId.AsOneGlastrier,
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
                     NatureType.Adamant,
+                    MoveType.Water,
                     printDebug
                 ),
                 Build(
@@ -128,6 +131,7 @@ public static class PokemonBuilder
                     AbilityId.HadronEngine,
                     new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
                     NatureType.Modest,
+                    MoveType.Fairy,
                     printDebug
                 ),
                 Build(
@@ -141,6 +145,7 @@ public static class PokemonBuilder
                     AbilityId.Guts,
                     new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
                     NatureType.Adamant,
+                    MoveType.Ghost,
                     printDebug
                 ),
                 Build(
@@ -154,6 +159,7 @@ public static class PokemonBuilder
                     AbilityId.FlameBody,
                     new StatsTable { Hp = 252, Def = 196, SpD = 60 },
                     NatureType.Bold,
+                    MoveType.Water,
                     printDebug
                 ),
                 Build(
@@ -167,6 +173,7 @@ public static class PokemonBuilder
                     AbilityId.Prankster,
                     new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },
                     NatureType.Careful,
+                    MoveType.Ghost,
                     printDebug
                 ),
                 Build(
@@ -180,6 +187,7 @@ public static class PokemonBuilder
                     AbilityId.QuarkDrive,
                     new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
                     NatureType.Adamant,
+                    MoveType.Bug,
                     printDebug
                 ),
             ],
@@ -210,6 +218,7 @@ public class PokemonSet
     public int AlivePokemonCount => AlivePokemon.Length;
     public int FaintedCount => PokemonCount - AlivePokemonCount;
     public bool AllFainted => AlivePokemonCount == 0;
+    public bool AnyTeraUsed => Pokemons.Any(pokemon => pokemon.IsTeraUsed);
 
     /// /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
@@ -264,7 +273,54 @@ public class Pokemon
 
     public List<Condition> Conditions { get; init; } = [];
     public bool Shiny { get; init; }
-    public MoveType TerraType { get; init; }
+    public MoveType TeraType { get; init; }
+    public bool IsTeraUsed { get; private set; }
+    public PokemonType[] DefensiveTypes
+    {
+        get
+        {
+            if (IsTeraUsed)
+            {
+                return TeraType == MoveType.Stellar ? Specie.Types.ToArray() : [TeraType.ConvertToPokemonType()];
+            }
+            return Specie.Types.ToArray();
+        }
+    }
+
+    public (PokemonType, double)[] StabTypes
+    {
+        // TODO: Handle stellar tera type properly
+        get
+        {
+            const double normalStab = 1.5;
+            const double enhancedStab = 2.0;
+
+            if (!IsTeraUsed)
+            {
+                return Specie.Types.Select(type => (type, NormalStab: normalStab)).ToArray();
+            }
+
+            var stabTypes = new List<(PokemonType, double)>();
+            PokemonType teraType = TeraType.ConvertToPokemonType();
+
+            if (Specie.Types.Contains(teraType))
+            {
+                // Tera matches natural type - enhanced STAB for matching type
+                stabTypes.AddRange(
+                    Specie.Types.Select(type =>
+                        (type, type == teraType ? enhancedStab : normalStab))
+                );
+            }
+            else
+            {
+                // Tera is new type - add both tera and natural types
+                stabTypes.Add((teraType, normalStab));
+                stabTypes.AddRange(Specie.Types.Select(type => (type, NormalStab: normalStab)));
+            }
+
+            return stabTypes.ToArray();
+        }
+    }
     public GenderId Gender { get; init; }
     private StatsTable UnmodifiedStats { get; }
     //private StatsTable CurrentStats => new(CalculateModifiedStats());
@@ -330,7 +386,7 @@ public class Pokemon
             Ability = Ability,    // Immutable, safe to share
             Name = Name,
             Shiny = Shiny,
-            TerraType = TerraType,
+            TeraType = TeraType,
             Gender = Gender,
             PrintDebug = PrintDebug,
         };
@@ -406,10 +462,39 @@ public class Pokemon
         }
     }
 
+    public void Terastillize(BattleContext context)
+    {
+        IsTeraUsed = true;
+        if (context.PrintDebug)
+        {
+            UiGenerator.PrintTeraStart(this);
+        }
+    }
+
     public bool IsStab(Move move)
     {
         PokemonType moveType = move.Type.ConvertToPokemonType();
-        return moveType == Specie.Types[0] || moveType == Specie.Types[1];
+        foreach ((PokemonType type, double _) in StabTypes)
+        {
+            if (type == moveType)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public double GetStabMultiplier(Move move)
+    {
+        PokemonType moveType = move.Type.ConvertToPokemonType();
+        foreach ((PokemonType type, double multiplier) in StabTypes)
+        {
+            if (type == moveType)
+            {
+                return multiplier;
+            }
+        }
+        return 1.0;
     }
 
     public bool HasType(PokemonType type)

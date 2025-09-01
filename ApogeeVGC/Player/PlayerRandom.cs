@@ -167,7 +167,7 @@ public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
 
     private static Choice[] FilterMoveChoices(Choice[] availableChoices)
     {
-        var moveChoices = availableChoices.Where(c => c.IsMoveChoice()).ToArray();
+        var moveChoices = availableChoices.Where(c => c.IsMoveChoice() || c.IsMoveWithTeraChoice()).ToArray();
         return moveChoices;
     }
 

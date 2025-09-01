@@ -111,6 +111,33 @@ public static class MoveTypeTools
             _ => throw new ArgumentOutOfRangeException(nameof(type), "Invalid move type.")
         };
     }
+
+    public static string ConvertToString(this MoveType type)
+    {
+        return type switch
+        {
+            MoveType.Normal => "Normal",
+            MoveType.Fire => "Fire",
+            MoveType.Water => "Water",
+            MoveType.Electric => "Electric",
+            MoveType.Grass => "Grass",
+            MoveType.Ice => "Ice",
+            MoveType.Fighting => "Fighting",
+            MoveType.Poison => "Poison",
+            MoveType.Ground => "Ground",
+            MoveType.Flying => "Flying",
+            MoveType.Psychic => "Psychic",
+            MoveType.Bug => "Bug",
+            MoveType.Rock => "Rock",
+            MoveType.Ghost => "Ghost",
+            MoveType.Dragon => "Dragon",
+            MoveType.Dark => "Dark",
+            MoveType.Steel => "Steel",
+            MoveType.Fairy => "Fairy",
+            MoveType.Stellar => "Stellar",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), "Invalid move type.")
+        };
+    }
 }
 
 public enum Nonstandard

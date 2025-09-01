@@ -506,7 +506,7 @@ public class Battle
         {
             case PlayerState.MoveSwitchSelect:
                 if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice() ||
-                    choice == Choice.Struggle)
+                    choice.Value.IsMoveWithTeraChoice() || choice == Choice.Struggle)
                 {
                     SetPlayerState(playerId, PlayerState.MoveSwitchLocked);
                 }
@@ -565,6 +565,42 @@ public class Battle
     /// <returns>A list of player IDs of players who have executed their choice.</returns>
     private List<PlayerId> PerformMoveSwitches(Choice player1Choice, Choice player2Choice)
     {
+        // Check if either player is terastilizing
+        bool player1Tera = player1Choice.IsMoveWithTeraChoice();
+        bool player2Tera = player2Choice.IsMoveWithTeraChoice();
+        if (player1Tera && player2Tera)
+        {
+            // Both players are terastilizing. Determine order by speed.
+            PlayerId fasterPlayer = CalculateSpeedOrder(Side1.Team.ActivePokemon, Side2.Team.ActivePokemon);
+            if (fasterPlayer == PlayerId.Player1)
+            {
+                Side1.Team.ActivePokemon.Terastillize(Context);
+                Side2.Team.ActivePokemon.Terastillize(Context);
+            }
+            else
+            {
+                Side2.Team.ActivePokemon.Terastillize(Context);
+                Side1.Team.ActivePokemon.Terastillize(Context);
+            }
+
+            player1Choice = player1Choice.ConvertMoveWithTeraToMove();
+            Player1PendingChoice = player1Choice;
+            player2Choice = player2Choice.ConvertMoveWithTeraToMove();
+            Player2PendingChoice = player2Choice;
+        }
+        else if (player1Tera)
+        {
+            Side1.Team.ActivePokemon.Terastillize(Context);
+            player1Choice = player1Choice.ConvertMoveWithTeraToMove();
+            Player1PendingChoice = player1Choice;
+        }
+        else if (player2Tera)
+        {
+            Side2.Team.ActivePokemon.Terastillize(Context);
+            player2Choice = player2Choice.ConvertMoveWithTeraToMove();
+            Player2PendingChoice = player2Choice;
+        }
+
         PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
 
         // Create execution order based on priority
@@ -1318,8 +1354,7 @@ public class Battle
         }
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
-        bool stab = applyStab && attacker.IsStab(move);
-        double stabModifier = stab ? 1.5 : 1.0;
+        double stabModifier = applyStab ? attacker.GetStabMultiplier(move) : 1.0;
 
         double burnModifier = 1.0;
         if (attacker.HasCondition(ConditionId.Burn) && move.Category == MoveCategory.Physical &&
@@ -1354,6 +1389,11 @@ public class Battle
         Pokemon player1Pokemon = Side1.Team.ActivePokemon;
         Pokemon player2Pokemon = Side2.Team.ActivePokemon;
 
+        return CalculateSpeedOrder(player1Pokemon, player2Pokemon);
+    }
+
+    private PlayerId CalculateSpeedOrder(Pokemon player1Pokemon, Pokemon player2Pokemon)
+    {
         // Create a list of active Pokemon and sort by speed
         var speedOrder = new List<Pokemon> { player1Pokemon, player2Pokemon }
             .OrderByDescending(p => p.CurrentSpe)
@@ -1407,7 +1447,7 @@ public class Battle
             case PlayerState.TeamPreviewSelect:
                 return GetTeamPreviewChoices(side);
             case PlayerState.MoveSwitchSelect:
-                return GetMoveSwitchChoices(side);
+                return GetMoveSwitchChoices(side, side.Team.PokemonSet.AnyTeraUsed);
             case PlayerState.FaintedSelect:
             case PlayerState.ForceSwitchSelect:
                 return GetSwitchChoices(side);
@@ -1431,7 +1471,7 @@ public class Battle
         return choices.ToArray();
     }
 
-    private static Choice[] GetMoveSwitchChoices(Side side)
+    private static Choice[] GetMoveSwitchChoices(Side side, bool isTeraUsed)
     {
         // TODO: Implement logic to determine available moves
         // based on the current state of the battle.
@@ -1442,12 +1482,10 @@ public class Battle
             Move move = side.Team.ActivePokemon.Moves[i];
 
             // Check if the move is available (has PP left and not disabled)
-            if (move is { Pp: > 0, Disabled: false })
-            {
-                choices = choices.Append(i.GetChoiceFromMoveIndex()).ToArray();
-            }
-            // TODO: Check for choice lock, encore, disable, imprison, taunt,
-            // torment, assault vest, etc.
+            if (move is not { Pp: > 0, Disabled: false }) continue;
+            choices = choices.Append(i.GetChoiceFromMoveIndex()).ToArray();
+            if (isTeraUsed) continue;
+            choices = choices.Append(i.GetChoiceFromMoveWithTeraIndex()).ToArray();
         }
 
         if (choices.Length == 0)

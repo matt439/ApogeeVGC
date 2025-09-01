@@ -409,6 +409,11 @@ public static class UiGenerator
         Console.WriteLine("The electric terrain disappeared.");
     }
 
+    public static void PrintTeraStart(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name} has Terastallized into {pokemon.TeraType.ConvertToString()} type!");
+    }
+
     public static void PrintFlameBodyBurn(Pokemon source, Pokemon target)
     {
         Console.WriteLine($"{target.Name} was burned by {source.Name}'s Flame Body!");
@@ -450,6 +455,11 @@ public static class UiGenerator
         if (choice.IsMoveChoice())
         {
             return GenerateMoveChoiceString(battle, perspective, choice);
+        }
+
+        if (choice.IsMoveWithTeraChoice())
+        {
+            return GenerateMoveWithTeraChoiceString(battle, perspective, choice);
         }
 
         if (choice.IsSwitchChoice())
@@ -513,6 +523,35 @@ public static class UiGenerator
         return sb.ToString();
     }
 
+    private static string GenerateMoveWithTeraChoiceString(Battle battle, PlayerId perspective, Choice choice)
+    {
+        Side side = battle.GetSide(perspective);
+        int moveIndex = choice.GetMoveWithTeraIndexFromChoice();
+        if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
+        }
+
+        Move move = side.Team.ActivePokemon.Moves[moveIndex];
+        if (move == null)
+        {
+            throw new InvalidOperationException("Move choice cannot be made to a null Move.");
+        }
+
+        StringBuilder sb = new();
+        sb.Append("Move: ");
+        sb.Append(move.Name);
+        sb.Append(" (");
+        sb.Append(move.Pp);
+        sb.Append('/');
+        sb.Append(move.MaxPp);
+        sb.Append(')');
+        sb.Append(" + ");
+        sb.Append(side.Team.ActivePokemon.TeraType.ConvertToString());
+        sb.Append(" Tera");
+        return sb.ToString();
+    }
+
     private static string GenerateSwitchChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
         Side side = battle.GetSide(perspective);
@@ -562,6 +601,11 @@ public static class UiGenerator
         sb.Append(PrimarySpacer);
         sb.Append(HpBarSpacer);
         sb.AppendLine(hpDisplay);
+        if (activePokemon.IsTeraUsed)
+        {
+            sb.Append(PrimarySpacer);
+            sb.AppendLine(FormatTeraInfo(activePokemon));
+        }
         sb.Append(PrimarySpacer);
         sb.AppendLine(conditionsInfo);
         sb.Append(PrimarySpacer);
@@ -588,6 +632,10 @@ public static class UiGenerator
         sb.AppendLine(pokemonInfo);
         sb.Append(HpBarSpacer);
         sb.AppendLine(hpDisplay);
+        if (activePokemon.IsTeraUsed)
+        {
+            sb.AppendLine(FormatTeraInfo(activePokemon));
+        }
         sb.AppendLine(conditionsInfo);
         sb.AppendLine($"{remainingInfo}\n\n");
 
@@ -643,6 +691,11 @@ public static class UiGenerator
         return showExactHp ?
             $"{hpBar} {activePokemon.CurrentHp} / {activePokemon.UnmodifiedHp}" :
             $"{hpBar} {activePokemon.CurrentHpPercentage}%";
+    }
+
+    private static string FormatTeraInfo(Pokemon activePokemon)
+    {
+        return $"Tera Type: {activePokemon.TeraType.ConvertToString()}";
     }
 
     private static string FormatConditionsInfo(Pokemon activePokemon)
