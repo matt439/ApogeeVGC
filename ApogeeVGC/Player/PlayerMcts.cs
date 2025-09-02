@@ -36,7 +36,7 @@ public class PlayerMcts : IPlayer
         switch (availableChoices.Length)
         {
             case 0:
-                return Choice.Invalid;
+                throw new ArgumentException("No available choices provided.", nameof(availableChoices));
             case 1:
                 // Only one choice available, no need for MCTS
                 return availableChoices[0];
@@ -44,12 +44,14 @@ public class PlayerMcts : IPlayer
                 try
                 {
                     // Use MCTS to find the best choice
-                    PokemonMonteCarloTreeSearch.MoveResult result =
-                        _mcts.FindBestChoice(Battle, availableChoices);
-            
-                    return result.OptimalChoice != Choice.Invalid ? result.OptimalChoice :
-                        // Fallback to first available choice if MCTS fails
-                        availableChoices[0];
+                    PokemonMonteCarloTreeSearch.MoveResult result = _mcts.FindBestChoice(Battle, availableChoices);
+
+                    if (result.OptimalChoice == Choice.Invalid)
+                    {
+                        throw new InvalidOperationException("MCTS returned an invalid optimal choice." +
+                                                            "This should not happen.");
+                    }
+                    return result.OptimalChoice;
                 }
                 catch (Exception ex)
                 {
