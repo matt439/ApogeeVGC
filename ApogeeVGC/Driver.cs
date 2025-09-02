@@ -24,10 +24,14 @@ public class Driver
 
     private const int RandomEvaluationNumTest = 100000;
 
+    private const double Root2 = 1.4142135623730951; // sqrt of 2
     private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 1000;
-    private const double MctsExplorationParameter = 1.4142135623730951; // Actual sqrt of 2
-    
+    private const int MctsMaxIterations = 10000;
+    private const double MctsExplorationParameter = Root2;
+
+    private const ChoiceFilterStrategy MctsChoiceFilterStrategy =
+        ChoiceFilterStrategy.ReducedSwitching;
+
     private static readonly int NumThreads = Environment.ProcessorCount;
 
     private const int PlayerRandom1Seed = 439;
@@ -121,8 +125,7 @@ public class Driver
                 Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
                     MctsExplorationParameter, Library, player1Seed, NumThreads),
                 Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    ChoiceFilterStrategy.ReducedSwitching,
-                    player2Seed),
+                    MctsChoiceFilterStrategy, player2Seed),
             };
             simResults.Add(simulator.Run());
         });

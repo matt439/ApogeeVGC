@@ -19,7 +19,7 @@ public class ChoiceFilter
 {
     // In singles battles, there are at most 5 possible switch choices (6 Pokemon - 1 active).
     private const int MaxSwitchCount = 5;
-    private const int ReducedSwitchingMaxSwitchCount = 2;
+    private const int ReducedSwitchingMaxSwitchCount = 1;
     // In battles, there are at most 4 possible move choices. Each move can be used with or without Tera.
     private const int MaxMoveCount = 8;
     private const int SuperEffectiveMaxMoveCount = 4;
@@ -27,6 +27,19 @@ public class ChoiceFilter
     public static Choice FilterAndRandomlySelectChoice(Choice[] choices, ChoiceFilterStrategy strategy,
         Battle battle, PlayerId player, Random random)
     {
+        if (choices.Length == 0)
+        {
+            return Choice.Invalid; // No choices available
+        }
+
+        // check if in team preview phase
+        if (battle.IsTeamPreview)
+        {
+            // In Team Preview phase, select a random choice from all available choices
+            int randomIndexPreview = random.Next(choices.Length);
+            return choices[randomIndexPreview];
+        }
+
         var filteredChoices = Filter(choices, strategy, battle, player, random);
         if (filteredChoices.Length == 0)
         {
@@ -56,6 +69,7 @@ public class ChoiceFilter
             ChoiceFilterStrategy.SuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves =>
                 ApplySuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves(choices, battle,
                     player, random),
+
             _ => throw new InvalidOperationException("Invalid choice filter strategy"),
         };
     }
@@ -158,7 +172,22 @@ public class ChoiceFilter
 
         foreach (Choice choice in moveChoices)
         {
-            int moveIndex = choice.GetMoveIndexFromChoice();
+            if (!choice.IsMoveChoice() && !choice.IsMoveWithTeraChoice())
+            {
+                throw new InvalidOperationException("Choice must be a move choice.");
+            }
+
+            int moveIndex;
+            if (choice.IsMoveChoice())
+            {
+                moveIndex = choice.GetMoveIndexFromChoice();
+
+            }
+            else
+            {
+                moveIndex = choice.GetMoveWithTeraIndexFromChoice();
+            }
+
             if (moveIndex < 0 || moveIndex >= playerSide.Team.ActivePokemon.Moves.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
@@ -289,7 +318,21 @@ public class ChoiceFilter
         Pokemon attackingPokemon = playerSide.Team.ActivePokemon;
         var statusMoveChoices = moveChoices.Where(choice =>
         {
-            int moveIndex = choice.GetMoveIndexFromChoice();
+            if (!choice.IsMoveChoice() && !choice.IsMoveWithTeraChoice())
+            {
+                throw new InvalidOperationException("Choice must be a move choice.");
+            }
+
+            int moveIndex;
+            if (choice.IsMoveChoice())
+            {
+                moveIndex = choice.GetMoveIndexFromChoice();
+            }
+            else
+            {
+                moveIndex = choice.GetMoveWithTeraIndexFromChoice();
+            }
+
             if (moveIndex < 0 || moveIndex >= attackingPokemon.Moves.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");

@@ -24,21 +24,22 @@ public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
 
     public Choice GetNextChoice(Choice[] availableChoices)
     {
-        return Strategy switch
+        Choice selectedChoice = Strategy switch
         {
             ChoiceFilterStrategy.None => GetNextChoiceFromAll(availableChoices),
-
-            ChoiceFilterStrategy.ReducedSwitching => ChoiceFilter.FilterAndRandomlySelectChoice(
-                availableChoices, Strategy, Battle, PlayerId, _random),
-
-            ChoiceFilterStrategy.ReducedSwitchingAndSuperEffectiveOrStabDamagingMoves =>
+            ChoiceFilterStrategy.ReducedSwitching
+                or ChoiceFilterStrategy.ReducedSwitchingAndSuperEffectiveOrStabDamagingMoves
+                or ChoiceFilterStrategy.SuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves =>
                 ChoiceFilter.FilterAndRandomlySelectChoice(availableChoices, Strategy, Battle, PlayerId, _random),
-
-            ChoiceFilterStrategy.SuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves =>
-                ChoiceFilter.FilterAndRandomlySelectChoice(availableChoices, Strategy, Battle, PlayerId, _random),
-
             _ => throw new NotImplementedException($"Strategy {Strategy} not implemented."),
         };
+
+        if (selectedChoice == Choice.Invalid)
+        {
+            throw new InvalidOperationException("Filtered choice resulted in Invalid choice." +
+                                                "This should not happen.");
+        }
+        return selectedChoice;
     }
 
     private Choice GetNextChoiceFromAll(Choice[] availableChoices)
