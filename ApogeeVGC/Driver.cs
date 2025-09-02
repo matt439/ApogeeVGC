@@ -26,7 +26,7 @@ public class Driver
 
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 10000;
+    private const int MctsMaxIterations = 200;
     private const double MctsExplorationParameter = Root2;
 
     private const ChoiceFilterStrategy MctsChoiceFilterStrategy =

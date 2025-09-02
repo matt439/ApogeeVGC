@@ -42,23 +42,13 @@ public class PokemonMonteCarloTreeSearch(
 
     public MoveResult FindBestChoice(Battle battle, Choice[] availableChoices)
     {
-        int uniqueBattleSeed = _random.Next() + Interlocked.Increment(ref _battleSeedCounter);
-        
         // Create a seeded copy of the battle for deterministic simulation
         Battle battleCopy = battle.DeepCopy(false);
-        
-        // If the original battle doesn't have a seed, create a new battle with the unique seed
-        // This ensures all random operations in this MCTS run are deterministic
-        if (battle.BattleSeed == null)
+
+        // Ensure deterministic simulation
+        if (battleCopy.BattleSeed == null)
         {
-            battleCopy = BattleGenerator.GenerateTestBattle(
-                battle.Library, 
-                "MCTS_Player1", 
-                "MCTS_Player2", 
-                false, 
-                uniqueBattleSeed);
-            
-            // Copy the current battle state to the seeded battle
+            battleCopy.BattleSeed = GenerateUniqueBattleSeed();
         }
 
         var rootNode = new Node(battleCopy, null, Choice.Invalid, explorationParameter, mctsPlayerId);
@@ -148,26 +138,21 @@ public class PokemonMonteCarloTreeSearch(
     {
         if (node.IsTerminal)
         {
-            return null; // Terminal node, no expansion possible
+            return node; // Return terminal node for immediate backpropagation
         }
 
-        // If this node hasn't been visited yet, we should simulate it directly
-        // rather than expanding it (standard MCTS behavior)
         if (node.Visits < 1)
         {
-            return node; // Return the node itself for simulation
+            return node; // Return unvisited node for simulation
         }
 
-        // Thread-safe expansion - GenerateChildren handles synchronization internally
         GenerateChildren(node);
 
-        // Thread-safe read of children count
         if (node.ChildNodes.Count == 0)
         {
-            return null;
+            return node; // Return node if no children can be generated
         }
 
-        // Select a random unvisited child node using thread-local random
         int randomChildIndex = threadRandom.Next(node.ChildNodes.Count);
         return node.ChildNodes[randomChildIndex];
     }
@@ -250,6 +235,12 @@ public class PokemonMonteCarloTreeSearch(
     private static Battle CopyBattle(Battle original)
     {
         return original.DeepCopy(false);
+    }
+
+    private int GenerateUniqueBattleSeed()
+    {
+        long seed = (long)_random.Next() + Interlocked.Increment(ref _battleSeedCounter);
+        return (int)(seed % int.MaxValue);
     }
 
     private static SimulatorResult GetBattleResult(Battle battle)
@@ -446,33 +437,27 @@ public class PokemonMonteCarloTreeSearch(
 
         public int SelectMostVisitedChild()
         {
-            // Thread-safe reading of children
-            Node[] children;
             lock (LockObject)
             {
                 if (ChildNodes.Count == 0) return -1;
-                children = ChildNodes.ToArray();
-            }
-            
-            int mostVisitedIndex = -1;
-            int maxVisits = 0;
-            
-            foreach (Node child in children)
-            {
-                // Only consider nodes that represent MCTS player moves for final selection
-                // This ensures we're selecting among our own choices, not opponent responses
-                PlayerId nodePlayer = child.GetPlayerToMove();
-                if (nodePlayer != _mctsPlayerId && nodePlayer != PlayerId.None) continue;
 
-                if (child.Visits <= maxVisits) continue;
-                maxVisits = child.Visits;
-                // Find the original index in the actual ChildNodes list
-                lock (LockObject)
+                int mostVisitedIndex = -1;
+                int maxVisits = 0;
+
+                for (int i = 0; i < ChildNodes.Count; i++)
                 {
-                    mostVisitedIndex = ChildNodes.IndexOf(child);
+                    Node child = ChildNodes[i];
+                    PlayerId nodePlayer = child.GetPlayerToMove();
+                    if (nodePlayer != _mctsPlayerId && nodePlayer != PlayerId.None) continue;
+
+                    if (child.Visits > maxVisits)
+                    {
+                        maxVisits = child.Visits;
+                        mostVisitedIndex = i;
+                    }
                 }
+                return mostVisitedIndex;
             }
-            return mostVisitedIndex;
         }
 
         public void Update(SimulatorResult result, PlayerId mctsPlayerId)

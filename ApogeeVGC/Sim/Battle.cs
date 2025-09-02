@@ -66,7 +66,7 @@ public class Battle
     public required Side Side2 { get; init; }
     public int Turn { get; private set; } = -1; // Start at -1 for team preview turn
     public bool PrintDebug { get; set; }
-    public int? BattleSeed { get; init; }
+    public int? BattleSeed { get; set; }
     public bool IsTeamPreview => Player1State == PlayerState.TeamPreviewSelect ||
                                  Player2State == PlayerState.TeamPreviewSelect ||
                                  Player1State == PlayerState.TeamPreviewLocked ||
