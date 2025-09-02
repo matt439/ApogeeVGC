@@ -55,8 +55,13 @@ public record TypeChart
             > 2 => throw new ArgumentException("Pokemon type list can only contain up to two types.",
                 nameof(pokemon)),
             _ => CombineTypeEffectivenesses(_typeData[pokemon[0]].DamageTaken[moveType],
-                _typeData[pokemon[1]].DamageTaken[moveType])
+                _typeData[pokemon[1]].DamageTaken[moveType]),
         };
+    }
+
+    public MoveEffectiveness GetMoveEffectiveness(PokemonType[] pokemon, MoveType moveType)
+    {
+        return GetMoveEffectiveness(pokemon.ToList(), moveType);
     }
 
     private static MoveEffectiveness CombineTypeEffectivenesses(TypeEffectiveness effectiveness1,

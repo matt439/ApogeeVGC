@@ -407,10 +407,8 @@ public class Pokemon
         copy.LastMoveUsed = LastMoveUsed; // Reference to immutable Move is safe to share
         copy.ActiveMoveActions = ActiveMoveActions;
         
-        // Copy Tera state - CRITICAL for battle simulation accuracy
         copy.IsTeraUsed = IsTeraUsed;
         
-        // Copy best stat cache if set
         copy.BestStat = BestStat;
 
         return copy;

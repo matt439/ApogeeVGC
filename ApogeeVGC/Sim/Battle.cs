@@ -260,7 +260,7 @@ public class Battle
                 HandleEndOfTeamPreviewTurn();
             }
 
-                Turn++;
+            Turn++;
 
             HandleStartOfTurn();
 
@@ -950,7 +950,7 @@ public class Battle
 
         bool isCrit = BattleRandom.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = Library.TypeChart.GetMoveEffectiveness(
-            defender.Specie.Types, move.Type);
+            defender.DefensiveTypes, move.Type);
 
         if (effectiveness == MoveEffectiveness.Immune)
         {
