@@ -176,10 +176,10 @@ public class PokemonMonteCarloTreeSearch(
     {
         // Random playout using random players with thread-local random seeds
         var randomPlayer1 = new PlayerRandom(PlayerId.Player1, battle, library,
-            PlayerRandomStrategy.AllChoices,
+            ChoiceFilterStrategy.None,
             threadRandom.Next());
         var randomPlayer2 = new PlayerRandom(PlayerId.Player2, battle, library,
-            PlayerRandomStrategy.AllChoices,
+            ChoiceFilterStrategy.None,
             threadRandom.Next());
         
         var simulator = new Simulator

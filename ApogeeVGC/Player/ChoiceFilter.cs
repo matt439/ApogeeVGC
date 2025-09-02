@@ -24,6 +24,18 @@ public class ChoiceFilter
     private const int MaxMoveCount = 8;
     private const int SuperEffectiveMaxMoveCount = 4;
 
+    public static Choice FilterAndRandomlySelectChoice(Choice[] choices, ChoiceFilterStrategy strategy,
+        Battle battle, PlayerId player, Random random)
+    {
+        var filteredChoices = Filter(choices, strategy, battle, player, random);
+        if (filteredChoices.Length == 0)
+        {
+            return Choice.Invalid; // No choices available
+        }
+        int randomIndex = random.Next(filteredChoices.Length);
+        return filteredChoices[randomIndex];
+    }
+
     public static Choice[] Filter(Choice[] choices, ChoiceFilterStrategy strategy,
         Battle battle, PlayerId player, Random random)
     {

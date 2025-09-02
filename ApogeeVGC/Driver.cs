@@ -87,7 +87,7 @@ public class Driver
             Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
                 MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads),
             Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                PlayerRandomStrategy.AllChoices,
+                ChoiceFilterStrategy.None,
                 PlayerRandom2Seed),
         };
         SimulatorResult result = Simulator.Run();
@@ -121,7 +121,7 @@ public class Driver
                 Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
                     MctsExplorationParameter, Library, player1Seed, NumThreads),
                 Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    PlayerRandomStrategy.ReducedSwitching,
+                    ChoiceFilterStrategy.ReducedSwitching,
                     player2Seed),
             };
             simResults.Add(simulator.Run());
@@ -186,10 +186,10 @@ public class Driver
                 {
                     Battle = battle,
                     Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
-                        PlayerRandomStrategy.AllChoices,
+                        ChoiceFilterStrategy.None,
                         player1Seed),
                     Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                        PlayerRandomStrategy.AllChoices,
+                        ChoiceFilterStrategy.None,
                         player2Seed),
                 };
                 simResults.Add(simulator.Run());
@@ -250,10 +250,10 @@ public class Driver
         {
             Battle = battle,
             Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
-                PlayerRandomStrategy.AllChoices,
+                ChoiceFilterStrategy.None,
                 PlayerRandom1Seed),
             Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                PlayerRandomStrategy.AllChoices,
+                ChoiceFilterStrategy.None,
                 PlayerRandom2Seed),
         };
         SimulatorResult result = Simulator.Run();
@@ -278,7 +278,7 @@ public class Driver
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
             Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                PlayerRandomStrategy.ReducedSwitching, PlayerRandom2Seed),
+                ChoiceFilterStrategy.ReducedSwitching, PlayerRandom2Seed),
         };
 
         Simulator.Run();
