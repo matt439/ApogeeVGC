@@ -47,6 +47,7 @@ public class Team
             .ToArray();
     public int SwitchOptionsCount => SwitchOptionIndexes.Length;
     public bool IsDefeated => PokemonSet.AllFainted;
+    public int HealthTeamTotal => PokemonSet.Pokemons.Sum(p => p.CurrentHp);
 
     /// <summary>
     /// Creates a deep copy of this Team for MCTS simulation purposes.
