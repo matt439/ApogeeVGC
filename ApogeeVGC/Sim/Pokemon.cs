@@ -73,9 +73,8 @@ public static class PokemonBuilder
             {
                 throw new ArgumentException($"Move {moveSetup.Id} not found in library.");
             }
-            Move moveCopy = move.Copy(); // Use Copy() to ensure we get a deep copy of the move
-            moveCopy.PpUp = moveSetup.PpUp; // Set PP Up
-            movesList.Add(moveCopy);
+            move.PpUp = moveSetup.PpUp; // Set PP Up
+            movesList.Add(move);
         }
 
         Specie spec = library.Species[specie] ??

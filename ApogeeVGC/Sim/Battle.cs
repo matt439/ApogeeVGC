@@ -1302,10 +1302,8 @@ public class Battle
             throw new InvalidOperationException($"Struggle move not found in" +
                                                 $"library for player {playerId}");
         }
-        Move struggleCopy = struggle.Copy();
-
         Pokemon defender = defSide.Team.ActivePokemon;
-        int damage = CalculateDamage(attacker, defender, struggleCopy, 1.0, false, false);
+        int damage = CalculateDamage(attacker, defender, struggle, 1.0, false, false);
         defender.Damage(damage);
 
         // Struggle always deals recoil damage to the attacker
