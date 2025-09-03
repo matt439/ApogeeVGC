@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Data;
 

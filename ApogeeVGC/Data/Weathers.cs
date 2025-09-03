@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim;
+﻿using ApogeeVGC.Sim.FieldClasses;
 using System.Collections.ObjectModel;
 
 namespace ApogeeVGC.Data;

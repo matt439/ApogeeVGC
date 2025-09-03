@@ -1,14 +1,15 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
+using ApogeeVGC.Sim.FieldClasses;
 
 namespace ApogeeVGC.Sim.Generators;
 
 public static class BattleGenerator
 {
-    public static Battle GenerateTestBattle(Library library, string trainerName1,
+    public static Core.Battle GenerateTestBattle(Library library, string trainerName1,
         string trainerName2, bool printDebug = false, int? seed = null)
     {
-        return new Battle
+        return new Core.Battle
         {
             Library = library,
             Field = new Field(),

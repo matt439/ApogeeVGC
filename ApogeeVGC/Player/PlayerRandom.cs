@@ -1,6 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Choices;
+using Battle = ApogeeVGC.Sim.Core.Battle;
 
 namespace ApogeeVGC.Player;
 

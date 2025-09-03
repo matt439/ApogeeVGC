@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC;
+﻿using ApogeeVGC.Sim.Core;
+
+namespace ApogeeVGC;
 
 public class Program
 {

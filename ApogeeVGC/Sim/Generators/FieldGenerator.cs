@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.Generators;
+﻿using ApogeeVGC.Sim.FieldClasses;
+
+namespace ApogeeVGC.Sim.Generators;
 
 public static class FieldGenerator
 {

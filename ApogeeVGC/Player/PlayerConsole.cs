@@ -1,5 +1,8 @@
 ﻿using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Ui;
+using Battle = ApogeeVGC.Sim.Core.Battle;
 
 namespace ApogeeVGC.Player;
 

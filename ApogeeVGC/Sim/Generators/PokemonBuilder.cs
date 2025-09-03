@@ -1,4 +1,9 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Generators;
 

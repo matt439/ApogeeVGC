@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.Generators;
+﻿using ApogeeVGC.Sim.GameObjects;
+
+namespace ApogeeVGC.Sim.Generators;
 
 public static class TrainerGenerator
 {

@@ -1,7 +1,8 @@
 using System.Text;
 using ApogeeVGC.Data;
-using ApogeeVGC.Sim;
 using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Choices;
 
 namespace ApogeeVGC.Mcts;
 

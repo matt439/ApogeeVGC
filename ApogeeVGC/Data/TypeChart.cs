@@ -1,5 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Types;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Data;
 

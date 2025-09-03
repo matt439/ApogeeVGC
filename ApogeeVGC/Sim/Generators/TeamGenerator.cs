@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Generators;
 

@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Transactions;
-using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Data;

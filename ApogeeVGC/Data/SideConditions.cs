@@ -1,6 +1,10 @@
 ﻿using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.FieldClasses;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Ui;
 using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Data;
 
