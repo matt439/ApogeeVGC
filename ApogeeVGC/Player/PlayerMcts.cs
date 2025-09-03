@@ -12,7 +12,7 @@ public class PlayerMcts : IPlayer
     private readonly PokemonMonteCarloTreeSearch _mcts;
 
     public PlayerMcts(PlayerId playerId, Battle battle, int maxIterations, double explorationParameter,
-        Library library, int? seed = null, int? maxDegreeOfParallelism = null)
+        Library library, int? seed = null, int? maxDegreeOfParallelism = null, int? maxTimer = null)
     {
         PlayerId = playerId;
         Battle = battle;
@@ -28,7 +28,7 @@ public class PlayerMcts : IPlayer
         }
         _seed = seed ?? Environment.TickCount;
         _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, library,
-            _seed, maxDegreeOfParallelism);
+            _seed, maxDegreeOfParallelism, maxTimer);
     }
 
     public Choice GetNextChoice(Choice[] availableChoices)

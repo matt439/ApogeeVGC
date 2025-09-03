@@ -19,18 +19,18 @@ public enum DriverMode
 
 public class Driver
 {
+    private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
     private const int RandomEvaluationNumTest = 100000;
 
-    private const double Root2 = 1.4142135623730951; // sqrt of 2
     private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 200;
-    private const double MctsExplorationParameter = Root2;
-
-    private const ChoiceFilterStrategy MctsChoiceFilterStrategy =
+    private const int MctsMaxIterations = 1000000;
+    private const double MctsExplorationParameter = 0.0;
+    private const ChoiceFilterStrategy MctsEvaluationChoiceFilterStrategy =
         ChoiceFilterStrategy.ReducedSwitching;
+    private readonly int? _mctsMaxTimer = null; // in milliseconds
 
     private static readonly int NumThreads = Environment.ProcessorCount;
 
@@ -75,7 +75,7 @@ public class Driver
             Battle = battle,
             Player1 = new PlayerConsole(PlayerId.Player1, battle),
             Player2 = new PlayerMcts(PlayerId.Player2, battle, MctsMaxIterations,
-                MctsExplorationParameter, Library, PlayerRandom2Seed, NumThreads)
+                MctsExplorationParameter, Library, PlayerRandom2Seed, NumThreads, _mctsMaxTimer),
         };
         Simulator.Run();
         Console.WriteLine("Press any key to exit...");
@@ -111,24 +111,42 @@ public class Driver
         var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        Parallel.For(0, MctsEvaluationNumTest,
-            new ParallelOptions { MaxDegreeOfParallelism = 1 }, i =>
-        {
-            int player1Seed = PlayerRandom1Seed + i;
-            int player2Seed = PlayerRandom2Seed + i;
+        //Parallel.For(0, MctsEvaluationNumTest,
+        //    new ParallelOptions { MaxDegreeOfParallelism = 1 }, i =>
+        //{
+        //    int player1Seed = PlayerRandom1Seed + i;
+        //    int player2Seed = PlayerRandom2Seed + i;
 
-            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
-                "Random");
-            var simulator = new Simulator
-            {
-                Battle = battle,
-                Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
-                    MctsExplorationParameter, Library, player1Seed, NumThreads),
-                Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-                    MctsChoiceFilterStrategy, player2Seed),
-            };
-            simResults.Add(simulator.Run());
-        });
+        //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
+        //        "Random");
+        //    var simulator = new Simulator
+        //    {
+        //        Battle = battle,
+        //        Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
+        //            MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer),
+        //        Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+        //            MctsEvaluationChoiceFilterStrategy, player2Seed),
+        //    };
+        //    simResults.Add(simulator.Run());
+        //});
+
+        for (int i = 0; i < MctsEvaluationNumTest; i++)
+        {
+                int player1Seed = PlayerRandom1Seed + i;
+                int player2Seed = PlayerRandom2Seed + i;
+
+                Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
+                    "Random");
+                var simulator = new Simulator
+                {
+                    Battle = battle,
+                    Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
+                        MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer),
+                    Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                        MctsEvaluationChoiceFilterStrategy, player2Seed),
+                };
+                simResults.Add(simulator.Run());
+        }
 
         stopwatch.Stop();
 
@@ -153,13 +171,15 @@ public class Driver
         sb.AppendLine("MCTS Parameters:");
         sb.AppendLine($"Max Iterations: {MctsMaxIterations}");
         sb.AppendLine($"Exploration Parameter: {MctsExplorationParameter}");
+        sb.AppendLine($"Choice Filter Strategy: {MctsEvaluationChoiceFilterStrategy}");
+        sb.AppendLine($"Max turn timer: {_mctsMaxTimer} ms");
         sb.AppendLine();
         sb.AppendLine("Performance Metrics:");
         sb.AppendLine($"Number of threads: {NumThreads}");
         sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
         sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
         sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
-        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F1}");
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press any key to exit...");

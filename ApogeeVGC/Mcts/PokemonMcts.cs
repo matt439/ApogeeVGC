@@ -11,7 +11,8 @@ public class PokemonMonteCarloTreeSearch(
     PlayerId mctsPlayerId,
     Library library,
     int? seed = null,
-    int? maxDegreeOfParallelism = null)
+    int? maxDegreeOfParallelism = null,
+    int? maxTimer = null)
 {
     private readonly Random _random = seed.HasValue ? new Random(seed.Value) : new Random();
     private readonly int _maxDegreeOfParallelism = maxDegreeOfParallelism ?? Environment.ProcessorCount;
@@ -43,13 +44,23 @@ public class PokemonMonteCarloTreeSearch(
     public MoveResult FindBestChoice(Battle battle, Choice[] availableChoices)
     {
         // Create a seeded copy of the battle for deterministic simulation
-        Battle battleCopy = battle.DeepCopy(false);
+        Battle battleCopy;
+        try
+        {
+            battleCopy = battle.DeepCopy(false);
+        }
+        catch
+        {
+            // If we can't even copy the battle, fallback to first available choice
+            return new MoveResult(
+                availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
+                -1,
+                "Failed to copy battle state"
+            );
+        }
 
         // Ensure deterministic simulation
-        if (battleCopy.BattleSeed == null)
-        {
-            battleCopy.BattleSeed = GenerateUniqueBattleSeed();
-        }
+        battleCopy.BattleSeed ??= GenerateUniqueBattleSeed();
 
         var rootNode = new Node(battleCopy, null, Choice.Invalid, explorationParameter, mctsPlayerId);
         GenerateChildren(rootNode, availableChoices);
@@ -57,7 +68,6 @@ public class PokemonMonteCarloTreeSearch(
         // Ensure root node has children before starting MCTS
         if (rootNode.ChildNodes.Count == 0)
         {
-            // If no children, just return the first available choice or Invalid
             return new MoveResult(
                 availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
                 -1,
@@ -65,42 +75,57 @@ public class PokemonMonteCarloTreeSearch(
             );
         }
 
-        // **PARALLEL MCTS IMPLEMENTATION**
-        // Use Parallel.For to run MCTS iterations concurrently
+        using var cancellationTokenSource = new CancellationTokenSource();
+        if (maxTimer.HasValue)
+        {
+            cancellationTokenSource.CancelAfter(maxTimer.Value);
+        }
+
         var parallelOptions = new ParallelOptions
         {
             MaxDegreeOfParallelism = _maxDegreeOfParallelism,
+            CancellationToken = cancellationTokenSource.Token,
         };
 
-        Parallel.For(0, maxIterations, parallelOptions, i =>
+        try
         {
-            // Each thread gets its own random number generator to avoid contention
-            var threadRandom = new Random(_random.Next() + i);
-            
-            // Selection
-            Node node = Selection(rootNode);
-
-            // Expansion
-            Node? expandedNode = Expansion(node, threadRandom);
-            if (expandedNode == null)
+            Parallel.For(0, maxIterations, parallelOptions, i =>
             {
-                // Check if the node is terminal before trying to get battle result
-                if (!node.IsTerminal) return;
+                // Check for cancellation (timer expiry) at the start of each iteration
+                parallelOptions.CancellationToken.ThrowIfCancellationRequested();
 
-                SimulatorResult battleResult = GetBattleResult(node.Battle);
-                BackPropagate(node, battleResult);
-                // If not terminal and expandedNode is null, skip this iteration
-                return;
-            }
+                // Each thread gets its own random number generator to avoid contention
+                var threadRandom = new Random(_random.Next() + i);
+                
+                // Selection
+                Node node = Selection(rootNode);
 
-            // Simulation
-            Battle simulationBattle = CopyBattle(expandedNode.Battle);
-            SimulatorResult simulationResult = Simulation(simulationBattle, threadRandom);
+                // Expansion
+                Node? expandedNode = Expansion(node, threadRandom);
+                if (expandedNode == null)
+                {
+                    // Check if the node is terminal before trying to get battle result
+                    if (!node.IsTerminal) return;
 
-            // Backpropagation
-            BackPropagate(expandedNode, simulationResult);
-        });
+                    SimulatorResult battleResult = GetBattleResult(node.Battle);
+                    BackPropagate(node, battleResult);
+                    return;
+                }
 
+                // Simulation
+                Battle simulationBattle = CopyBattle(expandedNode.Battle);
+                SimulatorResult simulationResult = Simulation(simulationBattle, threadRandom);
+
+                // Backpropagation
+                BackPropagate(expandedNode, simulationResult);
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer expired - this is expected behavior, not an error
+        }
+
+        // Calculate optimal choice (always runs whether completed naturally or timed out)
         var result = new MoveResult();
 
         int optimalChoiceIndex = rootNode.SelectMostVisitedChild();
