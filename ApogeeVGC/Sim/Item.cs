@@ -51,4 +51,24 @@ public record Item : IEffect
 
     //public int? OnResidualOrder { get; init; }
     //public int? OnResidualSubOrder { get; init; }
+
+    public Item Copy()
+    {
+        return new Item
+        {
+            Id = Id,
+            Name = Name,
+            SpriteNum = SpriteNum,
+            Fling = Fling with { },
+            Num = Num,
+            Gen = Gen,
+            Condition = Condition?.Copy(),
+            OnBeforeResiduals = OnBeforeResiduals,
+            IsChoice = IsChoice,
+            OnStart = OnStart,
+            OnModifyMove = OnModifyMove,
+            OnDamagingHitOrder = OnDamagingHitOrder,
+            OnDamagingHit = OnDamagingHit,
+        };
+    }
 }

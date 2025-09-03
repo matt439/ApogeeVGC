@@ -1116,4 +1116,9 @@ public record StatsTable
     public StatsTable()
     {
     }
+
+    public StatsTable Copy()
+    {
+        return new StatsTable(this);
+    }
 }

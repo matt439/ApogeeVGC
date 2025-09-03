@@ -10,7 +10,7 @@ public enum MoveSourceType
     DreamWorld,
     Event,
     Virtual,
-    Chain
+    Chain,
 }
 
 public class MoveSource
@@ -192,4 +192,19 @@ public record Specie : IEffect
     // Other forms
     // FormeOrder
 
+    public Specie Copy()
+    {
+        return this with
+        {
+            Types = [..Types],
+            BaseStats = BaseStats.Copy(),
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = Abilities.Slot0,
+                Slot1 = Abilities.Slot1,
+                Hidden = Abilities.Hidden,
+                Special = Abilities.Special,
+            },
+        };
+    }
 }

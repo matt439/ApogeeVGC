@@ -33,7 +33,7 @@ public class SideConditions
                     // For each pokemon on the side, add the tailwind condition
                     foreach (Pokemon p in pokemon)
                     {
-                        p.AddCondition(_library.Conditions[ConditionId.Tailwind].Copy(), context);
+                        p.AddCondition(context.Library.Conditions[ConditionId.Tailwind], context);
                     }
 
                     if (context.PrintDebug)
@@ -68,7 +68,7 @@ public class SideConditions
                 //},
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.Tailwind].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.Tailwind], context);
                 },
             },
             [SideConditionId.Reflect] = new()
@@ -85,7 +85,7 @@ public class SideConditions
                     // For each pokemon on the side, add the reflect condition
                     foreach (Pokemon p in pokemon)
                     {
-                        p.AddCondition(_library.Conditions[ConditionId.Reflect].Copy(), context);
+                        p.AddCondition(context.Library.Conditions[ConditionId.Reflect], context);
                     }
 
                     if (context.PrintDebug)
@@ -115,7 +115,7 @@ public class SideConditions
                  },
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.Reflect].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.Reflect], context);
                 },
             },
             [SideConditionId.LightScreen] = new()
@@ -132,7 +132,7 @@ public class SideConditions
                     // For each pokemon on the side, add the light screen condition
                     foreach (Pokemon p in pokemon)
                     {
-                        p.AddCondition(_library.Conditions[ConditionId.LightScreen].Copy(), context);
+                        p.AddCondition(context.Library.Conditions[ConditionId.LightScreen], context);
                     }
 
                     if (context.PrintDebug)
@@ -162,7 +162,7 @@ public class SideConditions
                 },
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.LightScreen].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.LightScreen], context);
                 },
             },
         };

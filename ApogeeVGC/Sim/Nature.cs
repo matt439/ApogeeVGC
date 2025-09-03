@@ -47,4 +47,14 @@ public record Nature
         }
         return 1.0; // no change
     }
+
+    public Nature Copy()
+    {
+        return new Nature
+        {
+            Type = Type,
+            Plus = Plus,
+            Minus = Minus,
+        };
+    }
 }

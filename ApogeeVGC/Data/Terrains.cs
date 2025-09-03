@@ -32,7 +32,7 @@ public record Terrains
                      // For each pokemon on the field, add the electric terrain condition
                      foreach (Pokemon p in pokemon)
                      {
-                         p.AddCondition(_library.Conditions[ConditionId.ElectricTerrain].Copy(), context);
+                         p.AddCondition(context.Library.Conditions[ConditionId.ElectricTerrain], context);
                      }
 
                      if (context.PrintDebug)
@@ -65,7 +65,7 @@ public record Terrains
                 //},
                 OnPokemonSwitchIn = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.ElectricTerrain].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.ElectricTerrain], context);
                 },
             },
             [TerrainId.Grassy] = new()

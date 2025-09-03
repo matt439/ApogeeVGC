@@ -26,7 +26,7 @@ public record Items
                 Fling = new FlingData { BasePower = 10 },
                 SpriteNum = 242,
                 Gen = 2,
-                Condition = _library.Conditions[ConditionId.Leftovers].Copy(),
+                Condition = _library.Conditions[ConditionId.Leftovers],
                 OnBeforeResiduals = (itemHolder, context) =>
                 {
                     if (!itemHolder.HasItem(ItemId.Leftovers))
@@ -39,7 +39,7 @@ public record Items
                         throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Leftovers" +
                                                             $"condition");
                     }
-                    itemHolder.AddCondition(_library.Conditions[ConditionId.Leftovers].Copy(), context);
+                    itemHolder.AddCondition(context.Library.Conditions[ConditionId.Leftovers], context);
                 },
                 //OnResidualOrder = 5,
                 //OnResidualSubOrder = 4,
@@ -71,11 +71,11 @@ public record Items
                     }
                     if (!user.HasCondition(ConditionId.ChoiceLock))
                     {
-                        user.AddCondition(_library.Conditions[ConditionId.ChoiceLock].Copy(), context);
+                        user.AddCondition(context.Library.Conditions[ConditionId.ChoiceLock], context);
                     }
                     if (!user.HasCondition(ConditionId.ChoiceSpecs))
                     {
-                        user.AddCondition(_library.Conditions[ConditionId.ChoiceSpecs].Copy(), context);
+                        user.AddCondition(context.Library.Conditions[ConditionId.ChoiceSpecs], context);
                     }
                 },
             },
@@ -103,7 +103,7 @@ public record Items
                         throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Flame Orb" +
                                                             $"condition");
                     }
-                    itemHolder.AddCondition(_library.Conditions[ConditionId.FlameOrb].Copy(), context);
+                    itemHolder.AddCondition(context.Library.Conditions[ConditionId.FlameOrb], context);
                 },
             },
             [ItemId.RockyHelmet] = new()
@@ -146,7 +146,7 @@ public record Items
                 Gen = 6,
                 OnStart = (pokemon, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.AssaultVest].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.AssaultVest], context);
                 },
             },
         };

@@ -53,8 +53,8 @@ public record Abilities
                 Rating = 4.5,
                 OnStart = (pokemon, field, pokemons, effect, context) =>
                 {
-                    field.AddTerrain(_library.Terrains[TerrainId.Electric].Copy(), pokemon, effect, pokemons, context);
-                    pokemon.AddCondition(_library.Conditions[ConditionId.HadronEngine].Copy(), context);
+                    field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, effect, pokemons, context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
                 },
             },
             [AbilityId.Guts] = new()
@@ -65,7 +65,7 @@ public record Abilities
                 Rating = 3.5,
                 OnStart = (pokemon, _, _, _, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.Guts].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.Guts], context);
                 },
             },
             [AbilityId.FlameBody] = new()
@@ -76,7 +76,7 @@ public record Abilities
                 Rating = 2.0,
                 OnStart = (pokemon, _, _, _, context) =>
                 {
-                    pokemon.AddCondition(_library.Conditions[ConditionId.FlameBody].Copy(), context);
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.FlameBody], context);
                 },
             },
             [AbilityId.Prankster] = new()
@@ -102,7 +102,7 @@ public record Abilities
                 {
                     if (field.HasTerrain(TerrainId.Electric))
                     {
-                        pokemon.AddCondition(_library.Conditions[ConditionId.QuarkDrive].Copy(), context);
+                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
                         //if (context.PrintDebug)
                         //{
                         //    UiGenerator.PrintQuarkDriveStart(pokemon);
@@ -120,7 +120,7 @@ public record Abilities
                 {
                     if (field.HasTerrain(TerrainId.Electric))
                     {
-                        pokemon.AddCondition(_library.Conditions[ConditionId.QuarkDrive].Copy(), context);
+                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
                         //if (context.PrintDebug)
                         //{
                         //    UiGenerator.PrintQuarkDriveStart(pokemon);

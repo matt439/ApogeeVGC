@@ -53,7 +53,7 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.LeechSeed].Copy(),
+                Condition = _library.Conditions[ConditionId.LeechSeed],
                 OnTryImmunity = (target) => target.HasType(MoveType.Grass),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -75,7 +75,7 @@ public record Moves
                     Metronome = true,
                 },
                 //Condition = _library.Conditions[ConditionId.TrickRoom],
-                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom].Copy(),
+                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom],
                 Target = MoveTarget.Field,
                 Type = MoveType.Psychic,
             },
@@ -104,10 +104,10 @@ public record Moves
                     {
                         throw new ArgumentNullException(nameof(source), "Source cannot be null in Protect move.");
                     }
-                    source.AddCondition(_library.Conditions[ConditionId.Stall].Copy(), context);
+                    source.AddCondition(context.Library.Conditions[ConditionId.Stall], context);
                     return true;
                 },
-                Condition = _library.Conditions[ConditionId.Protect].Copy(),
+                Condition = _library.Conditions[ConditionId.Protect],
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -395,7 +395,7 @@ public record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.Tailwind].Copy(),
+                SideCondition = _library.SideConditions[SideConditionId.Tailwind],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Flying,
             },
@@ -446,7 +446,7 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.Paralysis].Copy(),
+                Condition = _library.Conditions[ConditionId.Paralysis],
                 OnTryImmunity = (target) => target.HasType(MoveType.Electric),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
@@ -467,7 +467,7 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.Reflect].Copy(),
+                SideCondition = _library.SideConditions[SideConditionId.Reflect],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -487,7 +487,7 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.LightScreen].Copy(),
+                SideCondition = _library.SideConditions[SideConditionId.LightScreen],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -519,7 +519,7 @@ public record Moves
                     }
                     return false;
                 },
-                Condition = _library.Conditions[ConditionId.Flinch].Copy(),
+                Condition = _library.Conditions[ConditionId.Flinch],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },

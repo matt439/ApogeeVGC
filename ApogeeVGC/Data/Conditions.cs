@@ -458,7 +458,7 @@ public record Conditions
             OnResidual = (target, _, _, context) =>
             {
                 if (target.HasCondition(ConditionId.Burn)) return;
-                target.AddCondition(context.Library.Conditions[ConditionId.Burn].Copy(), context, target,
+                target.AddCondition(context.Library.Conditions[ConditionId.Burn], context, target,
                     target.Item ?? throw new InvalidOperationException("The target should always be holding" +
                                                                        "a flame orb here"));
             },
@@ -551,7 +551,7 @@ public record Conditions
 
                 if (!burned) return;
 
-                source.AddCondition(context.Library.Conditions[ConditionId.Burn].Copy(), context, target,
+                source.AddCondition(context.Library.Conditions[ConditionId.Burn], context, target,
                     target.Ability ?? throw new InvalidOperationException("The target should always have" +
                                                                           "flame body ability here"));
                 //if (context.PrintDebug)

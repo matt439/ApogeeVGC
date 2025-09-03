@@ -23,7 +23,7 @@ public class Driver
     private Library Library { get; } = new();
     private Simulator? Simulator { get; set; }
 
-    private const int RandomEvaluationNumTest = 100000;
+    private const int RandomEvaluationNumTest = 10000;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;

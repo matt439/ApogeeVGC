@@ -87,4 +87,8 @@ public record Ability : IEffect
     public Func<int, Move, int>? OnModifyPriority { get; init; }
     public Action<Pokemon, Field, BattleContext>? OnTerrainChange { get; init; }
 
+    public Ability Copy()
+    {
+        return this with { };
+    }
 }
