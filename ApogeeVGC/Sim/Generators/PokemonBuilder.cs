@@ -1,6 +1,6 @@
 ﻿using ApogeeVGC.Data;
 
-namespace ApogeeVGC.Sim;
+namespace ApogeeVGC.Sim.Generators;
 
 public struct MoveSetup
 {

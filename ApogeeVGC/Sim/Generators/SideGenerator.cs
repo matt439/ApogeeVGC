@@ -1,7 +1,7 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 
-namespace ApogeeVGC.Sim;
+namespace ApogeeVGC.Sim.Generators;
 
 public static class SideGenerator
 {

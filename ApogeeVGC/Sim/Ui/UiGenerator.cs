@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace ApogeeVGC.Sim;
+namespace ApogeeVGC.Sim.Ui;
 
 public static class UiGenerator
 {

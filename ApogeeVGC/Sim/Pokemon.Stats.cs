@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim;
+﻿using ApogeeVGC.Sim.Ui;
+
+namespace ApogeeVGC.Sim;
 
 public partial class Pokemon
 {

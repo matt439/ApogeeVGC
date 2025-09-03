@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Transactions;
 using ApogeeVGC.Sim;
+using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Data;
 
