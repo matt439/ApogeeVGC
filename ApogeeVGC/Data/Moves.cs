@@ -180,9 +180,9 @@ public record Moves
 
                     if (effectiveness is MoveEffectiveness.SuperEffective2X or MoveEffectiveness.SuperEffective4X)
                     {
-                        return (move.BasePower * 5461) / 4096;
+                        return 5461.0 / 4096.0;
                     }
-                    return move.BasePower;
+                    return 1.0;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
