@@ -1,7 +1,4 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
-
-namespace ApogeeVGC.Sim;
+﻿namespace ApogeeVGC.Sim;
 
 public class Team
 {
@@ -75,18 +72,5 @@ public class Team
     public void Print()
     {
         Console.WriteLine(ToString());
-    }
-}
-
-public static class TeamGenerator
-{
-    public static Team GenerateTestTeam(Library library, string trainerName, bool printDebug = false)
-    {
-        return new Team
-        {
-            Trainer = TrainerGenerator.GenerateTestTrainer(trainerName, printDebug),
-            PokemonSet = PokemonBuilder.BuildTestSet(library, printDebug),
-            PrintDebug = printDebug,
-        };
     }
 }

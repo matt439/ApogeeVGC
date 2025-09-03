@@ -2,16 +2,6 @@
 
 namespace ApogeeVGC.Sim;
 
-//public interface ISimulator
-//{
-//    Battle? Battle { get; }
-//    Dictionary<PlayerId, PlayerChoices> PlayerChoices { get; }
-//    SimState RequestState { get; }
-
-//    void PerformCommand(Choice choice);
-//    void Start();
-//}
-
 public enum SimulatorResult
 {
     Player1Win,
@@ -101,16 +91,3 @@ public class Simulator
         return result;
     }
 }
-
-//public record SimulatorOutput
-//{
-//    public SimState RequestState { get; init; }
-//    public required Choice[] Player1Choices { get; init; }
-//    public required Choice[] Player2Choices { get; init; }
-//}
-
-//public record SimulatorInput
-//{
-//    public Choice Player1Choice { get; init; }
-//    public Choice Player2Choice { get; init; }
-//}
