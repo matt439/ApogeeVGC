@@ -1,6 +1,4 @@
-﻿using System.Dynamic;
-
-namespace ApogeeVGC.Sim;
+﻿namespace ApogeeVGC.Sim;
 
 public enum ConditionId
 {
@@ -127,24 +125,4 @@ public record Condition : IEffect
             // The only mutable properties (Duration, Counter) are copied correctly
         };
     }
-
-    //// Add copy constructor for explicit copying when needed
-    //public Condition(Condition original)
-    //{
-    //    Id = original.Id;
-    //    Name = original.Name;
-    //    ConditionEffectType = original.ConditionEffectType;
-    //    ConditionVolatility = original.ConditionVolatility;
-    //    OnStart = original.OnStart;
-    //    OnResidualOrder = original.OnResidualOrder;
-    //    OnResidual = original.OnResidual;
-    //    Duration = original.Duration;
-    //    CounterMax = original.CounterMax;
-    //    Counter = original.Counter;
-    //    OnStallMove = original.OnStallMove;
-    //    OnRestart = original.OnRestart;
-    //    OnTryHitPriority = original.OnTryHitPriority;
-    //    OnTryHit = original.OnTryHit;
-    //    OnTurnEnd = original.OnTurnEnd;
-    //}
 }
