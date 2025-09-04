@@ -15,6 +15,7 @@ public record Library
     private readonly Conditions _conditions = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
+    //private readonly Methods _methods;
     private readonly Moves _moves;
     private readonly Natures _natures = new();
     private readonly PseudoWeathers _pseudoWeathers;
@@ -31,6 +32,7 @@ public record Library
     private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
     private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
+    //private IReadOnlyDictionary<CommonHandlerId, Delegate> MethodsData => _methods.MethodsData;
     private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
     private IReadOnlyDictionary<NatureType, Nature> NaturesData => _natures.NatureData;
     private IReadOnlyDictionary<PseudoWeatherId, PseudoWeather> PseudoWeathersData => _pseudoWeathers.PseudoWeatherData;
@@ -52,7 +54,10 @@ public record Library
     
     public IReadOnlyDictionary<SpecieId, Learnset> Learnsets => 
         new ReadOnlyDictionaryWrapper<SpecieId, Learnset>(LearnsetsData);
-    
+
+    //public IReadOnlyDictionary<CommonHandlerId, Delegate> Methods =>
+    //        new ReadOnlyDictionary<CommonHandlerId, Delegate>((IDictionary<CommonHandlerId, Delegate>)MethodsData);
+
     public IReadOnlyDictionary<MoveId, Move> Moves => 
         new ReadOnlyDictionaryWrapper<MoveId, Move>(MovesData);
     
@@ -82,6 +87,7 @@ public record Library
 
     public Library()
     {
+        //_methods = new Methods(this);
         _pseudoWeathers = new PseudoWeathers(this);
         _sideConditions = new SideConditions(this);
         _terrains = new Terrains(this);

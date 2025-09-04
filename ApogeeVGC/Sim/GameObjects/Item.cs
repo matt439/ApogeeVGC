@@ -21,7 +21,7 @@ public record FlingData
     public ConditionId? Status { get; init; }
 }
 
-public record Item : IEffect
+public record Item : EffectMethods, IEffect
 {
     public required ItemId Id { get; init; }
     public EffectType EffectType => EffectType.Item;
