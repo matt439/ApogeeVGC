@@ -11,7 +11,7 @@ public partial class Pokemon
 {
     // Stat-related properties
     private StatsTable UnmodifiedStats { get; }
-    public StatModifiers StatModifiers { get; private set; } = new();
+    public StatModifiers StatModifiers { get; set; } = new();
 
     // Unmodified stat accessors
     public int UnmodifiedHp => UnmodifiedStats.Hp;
@@ -21,12 +21,12 @@ public partial class Pokemon
     public int UnmodifiedSpD => UnmodifiedStats.SpD;
     public int UnmodifiedSpe => UnmodifiedStats.Spe;
 
-    // Current stat accessors
-    public int CurrentAtk => CalculateModifiedStat(StatId.Atk);
-    public int CurrentDef => CalculateModifiedStat(StatId.Def);
-    public int CurrentSpA => CalculateModifiedStat(StatId.SpA);
-    public int CurrentSpD => CalculateModifiedStat(StatId.SpD);
-    public int CurrentSpe => CalculateModifiedStat(StatId.Spe);
+    //// Current stat accessors
+    //public int CurrentAtk => CalculateModifiedStat(StatId.Atk);
+    //public int CurrentDef => CalculateModifiedStat(StatId.Def);
+    //public int CurrentSpA => CalculateModifiedStat(StatId.SpA);
+    //public int CurrentSpD => CalculateModifiedStat(StatId.SpD);
+    //public int CurrentSpe => CalculateModifiedStat(StatId.Spe);
 
     // Critical hit stats
     private int CritAtk => StatModifiers.Atk < 0 ? UnmodifiedAtk : CurrentAtk;
@@ -150,82 +150,97 @@ public partial class Pokemon
         return Item != null && Item.Id == item;
     }
 
-    public void AlterStatModifier(StatId stat, int change, BattleContext context)
+    public int GetStat(Battle battle, StatIdExceptHp stat, bool unboosted = false, bool unmodified = false)
     {
-        switch (change)
+        if (unmodified)
         {
-            case 0:
-                throw new InvalidOperationException("Stat change cannot be zero.");
-            case > 12 or < -12:
-                throw new ArgumentOutOfRangeException(nameof(change), "Stat change must be between -12 and +12.");
+            return UnmodifiedStats.GetStat(stat.ConvertToStatId());
         }
-
-        int currentStage = stat switch
+        if (unboosted)
         {
-            StatId.Atk => StatModifiers.Atk,
-            StatId.Def => StatModifiers.Def,
-            StatId.SpA => StatModifiers.SpA,
-            StatId.SpD => StatModifiers.SpD,
-            StatId.Spe => StatModifiers.Spe,
-            StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
-        };
-
-        switch (currentStage)
-        {
-            case 6 when change > 0:
-                {
-                    // Already at max stage, cannot increase further
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintStatModifierTooHigh(this, stat);
-                    }
-                    return;
-                }
-            case -6 when change < 0:
-                {
-                    // Already at min stage, cannot decrease further
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintStatModifierTooLow(this, stat);
-                    }
-                    return;
-                }
+            return CalculateUnmodifiedStat(stat.ConvertToStatId());
         }
-
-
-        int newStage = Math.Clamp(currentStage + change, -6, 6);
-
-        int actualChange = newStage - currentStage;
-        if (actualChange == 0)
-        {
-            // No change in stage, so no need to update
-            return;
-        }
-        StatModifiers = stat switch
-        {
-            StatId.Atk => StatModifiers with { Atk = newStage },
-            StatId.Def => StatModifiers with { Def = newStage },
-            StatId.SpA => StatModifiers with { SpA = newStage },
-            StatId.SpD => StatModifiers with { SpD = newStage },
-            StatId.Spe => StatModifiers with { Spe = newStage },
-            StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
-        };
-
-        // TODO: Trigger any on-stat-change effects from conditions, abilities, items, etc.
-
-        if (context.PrintDebug)
-        {
-            UiGenerator.PrintStatModifierChange(this, stat, actualChange);
-        }
+        return CalculateModifiedStat(stat.ConvertToStatId());
     }
 
-    public void SetStatModifier(StatId stat, int value, BattleContext context)
-    {
-        // TODO: Implement setting stat stage directly if needed
-        // Would be used for belly drum, etc.
-    }
+
+
+    //public void AlterStatModifier(StatId stat, int change, BattleContext context)
+    //{
+    //    switch (change)
+    //    {
+    //        case 0:
+    //            throw new InvalidOperationException("Stat change cannot be zero.");
+    //        case > 12 or < -12:
+    //            throw new ArgumentOutOfRangeException(nameof(change), "Stat change must be between -12 and +12.");
+    //    }
+
+    //    int currentStage = stat switch
+    //    {
+    //        StatId.Atk => StatModifiers.Atk,
+    //        StatId.Def => StatModifiers.Def,
+    //        StatId.SpA => StatModifiers.SpA,
+    //        StatId.SpD => StatModifiers.SpD,
+    //        StatId.Spe => StatModifiers.Spe,
+    //        StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
+    //        _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+    //    };
+
+    //    switch (currentStage)
+    //    {
+    //        case 6 when change > 0:
+    //            {
+    //                // Already at max stage, cannot increase further
+    //                if (context.PrintDebug)
+    //                {
+    //                    UiGenerator.PrintStatModifierTooHigh(this, stat);
+    //                }
+    //                return;
+    //            }
+    //        case -6 when change < 0:
+    //            {
+    //                // Already at min stage, cannot decrease further
+    //                if (context.PrintDebug)
+    //                {
+    //                    UiGenerator.PrintStatModifierTooLow(this, stat);
+    //                }
+    //                return;
+    //            }
+    //    }
+
+
+    //    int newStage = Math.Clamp(currentStage + change, -6, 6);
+
+    //    int actualChange = newStage - currentStage;
+    //    if (actualChange == 0)
+    //    {
+    //        // No change in stage, so no need to update
+    //        return;
+    //    }
+    //    StatModifiers = stat switch
+    //    {
+    //        StatId.Atk => StatModifiers with { Atk = newStage },
+    //        StatId.Def => StatModifiers with { Def = newStage },
+    //        StatId.SpA => StatModifiers with { SpA = newStage },
+    //        StatId.SpD => StatModifiers with { SpD = newStage },
+    //        StatId.Spe => StatModifiers with { Spe = newStage },
+    //        StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
+    //        _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+    //    };
+
+    //    // TODO: Trigger any on-stat-change effects from conditions, abilities, items, etc.
+
+    //    if (context.PrintDebug)
+    //    {
+    //        UiGenerator.PrintStatModifierChange(this, stat, actualChange);
+    //    }
+    //}
+
+    //public void SetStatModifier(StatId stat, int value, BattleContext context)
+    //{
+    //    // TODO: Implement setting stat stage directly if needed
+    //    // Would be used for belly drum, etc.
+    //}
 
     /// <summary>
     /// Gets the Pokemon's best stat.
@@ -262,61 +277,61 @@ public partial class Pokemon
     //    throw new NotImplementedException("GetStat method needs to be implemented");
     //}
 
-    private int CalculateModifiedStat(StatId stat)
-    {
-        if (stat == StatId.Hp)
-        {
-            return UnmodifiedStats.Hp; // HP is not modified by stat stages
-        }
+    //private int CalculateModifiedStat(StatId stat)
+    //{
+    //    if (stat == StatId.Hp)
+    //    {
+    //        return UnmodifiedStats.Hp; // HP is not modified by stat stages
+    //    }
 
-        // apply stat modifiers
-        double statModifier;
-        switch (stat)
-        {
-            case StatId.Atk:
-                statModifier = StatModifiers.AtkMultiplier;
-                break;
-            case StatId.Def:
-                statModifier = StatModifiers.DefMultiplier;
-                break;
-            case StatId.SpA:
-                statModifier = StatModifiers.SpAMultiplier;
-                break;
-            case StatId.SpD:
-                statModifier = StatModifiers.SpDMultiplier;
-                break;
-            case StatId.Spe:
-                statModifier = StatModifiers.SpeMultiplier;
-                break;
-            case StatId.Hp:
-            default:
-                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
-        }
+    //    // apply stat modifiers
+    //    double statModifier;
+    //    switch (stat)
+    //    {
+    //        case StatId.Atk:
+    //            statModifier = StatModifiers.AtkMultiplier;
+    //            break;
+    //        case StatId.Def:
+    //            statModifier = StatModifiers.DefMultiplier;
+    //            break;
+    //        case StatId.SpA:
+    //            statModifier = StatModifiers.SpAMultiplier;
+    //            break;
+    //        case StatId.SpD:
+    //            statModifier = StatModifiers.SpDMultiplier;
+    //            break;
+    //        case StatId.Spe:
+    //            statModifier = StatModifiers.SpeMultiplier;
+    //            break;
+    //        case StatId.Hp:
+    //        default:
+    //            throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+    //    }
 
-        // apply condition effects here
-        double conditionModifier = 1.0;
-        conditionModifier = stat switch
-        {
-            StatId.Atk => Conditions.OrderBy(c => c.OnModifyAtkPriority ?? 0) // Sort by priority (default 0)
-                .Aggregate(conditionModifier,
-                    (current, condition) => current * (condition.OnModifyAtk?.Invoke(this) ?? 1.0)),
-            StatId.Def => Conditions.OrderBy(c => c.OnModifyDefPriority ?? 0)
-                .Aggregate(conditionModifier,
-                    (current, condition) => current * (condition.OnModifyDef?.Invoke(this) ?? 1.0)),
-            StatId.SpA => Conditions.OrderBy(c => c.OnModifySpAPriority ?? 0)
-                .Aggregate(conditionModifier,
-                    (current, condition) => current * (condition.OnModifySpA?.Invoke(this) ?? 1.0)),
-            StatId.SpD => Conditions.OrderBy(c => c.OnModifySpDPriority ?? 0)
-                .Aggregate(conditionModifier,
-                    (current, condition) => current * (condition.OnModifySpD?.Invoke(this) ?? 1.0)),
-            StatId.Spe => Conditions.OrderBy(c => c.OnModifySpePriority ?? 0)
-                .Aggregate(conditionModifier,
-                    (current, condition) => current * (condition.OnModifySpe?.Invoke(this) ?? 1.0)),
-            _ => conditionModifier,
-        };
+    //    //// apply condition effects here
+    //    //double conditionModifier = 1.0;
+    //    //conditionModifier = stat switch
+    //    //{
+    //    //    StatId.Atk => Conditions.OrderBy(c => c.OnModifyAtkPriority ?? 0) // Sort by priority (default 0)
+    //    //        .Aggregate(conditionModifier,
+    //    //            (current, condition) => current * (condition.OnModifyAtk?.Invoke(this) ?? 1.0)),
+    //    //    StatId.Def => Conditions.OrderBy(c => c.OnModifyDefPriority ?? 0)
+    //    //        .Aggregate(conditionModifier,
+    //    //            (current, condition) => current * (condition.OnModifyDef?.Invoke(this) ?? 1.0)),
+    //    //    StatId.SpA => Conditions.OrderBy(c => c.OnModifySpAPriority ?? 0)
+    //    //        .Aggregate(conditionModifier,
+    //    //            (current, condition) => current * (condition.OnModifySpA?.Invoke(this) ?? 1.0)),
+    //    //    StatId.SpD => Conditions.OrderBy(c => c.OnModifySpDPriority ?? 0)
+    //    //        .Aggregate(conditionModifier,
+    //    //            (current, condition) => current * (condition.OnModifySpD?.Invoke(this) ?? 1.0)),
+    //    //    StatId.Spe => Conditions.OrderBy(c => c.OnModifySpePriority ?? 0)
+    //    //        .Aggregate(conditionModifier,
+    //    //            (current, condition) => current * (condition.OnModifySpe?.Invoke(this) ?? 1.0)),
+    //    //    _ => conditionModifier,
+    //    //};
 
-        return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * statModifier * conditionModifier);
-    }
+    //    return (int)Math.Floor(UnmodifiedStats.GetStat(stat) * statModifier); // * conditionModifier);
+    // }
 
     private int CalculateUnmodifiedStat(StatId stat)
     {
@@ -343,7 +358,7 @@ public partial class Pokemon
             Def = CalculateUnmodifiedStat(StatId.Def),
             SpA = CalculateUnmodifiedStat(StatId.SpA),
             SpD = CalculateUnmodifiedStat(StatId.SpD),
-            Spe = CalculateUnmodifiedStat(StatId.Spe)
+            Spe = CalculateUnmodifiedStat(StatId.Spe),
         };
     }
 }

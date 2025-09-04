@@ -1,104 +1,62 @@
 ﻿namespace ApogeeVGC.Sim.Stats;
 
-public record StatModifiers
+public class StatModifiers
 {
-    public int Atk
+    private readonly Dictionary<StatModifierId, int> _modifiers;
+
+    public StatModifiers()
     {
-        get;
-        init
+        _modifiers = new Dictionary<StatModifierId, int>();
+        // Initialize all stats to 0
+        foreach (StatModifierId stat in Enum.GetValues<StatModifierId>())
+        {
+            _modifiers[stat] = 0;
+        }
+    }
+
+    public StatModifiers(Dictionary<StatModifierId, int> modifiers)
+    {
+        _modifiers = new Dictionary<StatModifierId, int>();
+        
+        // Initialize all stats to 0 first
+        foreach (StatModifierId stat in Enum.GetValues<StatModifierId>())
+        {
+            _modifiers[stat] = 0;
+        }
+        
+        // Then set provided values with validation
+        foreach (var kvp in modifiers)
+        {
+            if (!IsValidStage(kvp.Value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(modifiers), 
+                    $"Stat stage for {kvp.Key} must be between -6 and +6.");
+            }
+            _modifiers[kvp.Key] = kvp.Value;
+        }
+    }
+
+    public int Atk => _modifiers[StatModifierId.Atk];
+    public int Def => _modifiers[StatModifierId.Def];
+    public int SpA => _modifiers[StatModifierId.SpA];
+    public int SpD => _modifiers[StatModifierId.SpD];
+    public int Spe => _modifiers[StatModifierId.Spe];
+    public int Accuracy => _modifiers[StatModifierId.Accuracy];
+    public int Evasion => _modifiers[StatModifierId.Evasion];
+
+    public int this[StatModifierId stat]
+    {
+        get => _modifiers[stat];
+        private set
         {
             if (!IsValidStage(value))
             {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
+                throw new ArgumentOutOfRangeException(nameof(value), 
+                    $"Stat stage for {stat} must be between -6 and +6.");
             }
-
-            field = value;
+            _modifiers[stat] = value;
         }
-    } = 0;
-
-    public int Def
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
-
-    public int SpA
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
-
-    public int SpD
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
-
-    public int Spe
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
-
-    public int Accuracy
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
-
-    public int Evasion
-    {
-        get;
-        init
-        {
-            if (!IsValidStage(value))
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "Stat stage must be between -6 and +6.");
-            }
-
-            field = value;
-        }
-    } = 0;
+    }
 
     public double AtkMultiplier => CalculateRegularStatMultiplier(Atk);
     public double DefMultiplier => CalculateRegularStatMultiplier(Def);
@@ -107,6 +65,66 @@ public record StatModifiers
     public double SpeMultiplier => CalculateRegularStatMultiplier(Spe);
     public double AccuracyMultiplier => CalculateAccuracyStatMultiplier(Accuracy);
     public double EvasionMultiplier => CalculateEvasionStatMultiplier(Evasion);
+
+    public BoostsTable GetCappedBoost(BoostsTable boosts)
+    {
+        var cappedBoosts = new Dictionary<StatModifierId, int>();
+        foreach (var kvp in boosts.Boosts)
+        {
+            int currentStage = _modifiers[kvp.Key];
+            int newStage = Math.Clamp(currentStage + kvp.Value, -6, 6);
+            cappedBoosts[kvp.Key] = newStage - currentStage;
+        }
+        return new BoostsTable { Boosts = cappedBoosts };
+    }
+
+    /// <summary>Updates the current StatModifiers by applying the given BoostsTable</summary>
+    /// <returns>A delta of summed changes</returns>
+    public int BoostBy(BoostsTable boosts)
+    {
+        int totalChange = 0;
+        var newModifiers = new Dictionary<StatModifierId, int>(_modifiers);
+        
+        foreach (var kvp in boosts.Boosts)
+        {
+            int currentStage = newModifiers[kvp.Key];
+            int newStage = Math.Clamp(currentStage + kvp.Value, -6, 6);
+            newModifiers[kvp.Key] = newStage;
+            totalChange += newStage - currentStage;
+        }
+        return totalChange;
+    }
+
+    public int BoostBy(StatModifierId stat, int change)
+    {
+        if (change == 0) return 0;
+        
+        int currentStage = _modifiers[stat];
+        int newStage = Math.Clamp(currentStage + change, -6, 6);
+        _modifiers[stat] = newStage;
+        return newStage - currentStage;
+    }
+
+    public StatModifiers WithStat(StatModifierId stat, int value)
+    {
+        if (!IsValidStage(value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), 
+                $"Stat stage for {stat} must be between -6 and +6.");
+        }
+        
+        var newModifiers = new Dictionary<StatModifierId, int>(_modifiers)
+        {
+            [stat] = value,
+        };
+        
+        return new StatModifiers(newModifiers);
+    }
+
+    public StatModifiers Copy()
+    {
+        return new StatModifiers(new Dictionary<StatModifierId, int>(_modifiers));
+    }
 
     private static bool IsValidStage(int stage) => stage is >= -6 and <= 6;
 

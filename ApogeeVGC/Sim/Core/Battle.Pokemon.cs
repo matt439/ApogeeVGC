@@ -1,7 +1,9 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils.Extensions;
 
@@ -130,5 +132,33 @@ public partial class Battle
                 _ => throw new ArgumentException("Invalid player ID", nameof(playerId))
             };
         }
+    }
+
+    private IEffect[] GetAllEffects()
+    {
+        lock (ChoiceLock)
+        {
+            List<IEffect> effects = [];
+            return effects.ToArray();
+        }
+    }
+
+    public bool Boost(BoostsTable boosts, Pokemon target, Pokemon? source = null,
+        IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
+    {
+        // run ChangeBoost event
+        boosts = target.StatModifiers.GetCappedBoost(boosts);
+        // run TryBoost event
+
+        foreach (var kvp in boosts.Boosts)
+        {
+            target.StatModifiers.BoostBy(kvp.Key, kvp.Value);
+
+            // run AfterEachBoost event
+        }
+
+        // run AfterBoost event
+
+        return true;
     }
 }
