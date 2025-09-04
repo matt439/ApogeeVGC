@@ -18,3 +18,14 @@ public enum StatIdExceptHp
     SpD,
     Spe,
 }
+
+public enum StatModifierId
+{
+    Atk,
+    Def,
+    SpA,
+    SpD,
+    Spe,
+    Accuracy,
+    Evasion,
+}

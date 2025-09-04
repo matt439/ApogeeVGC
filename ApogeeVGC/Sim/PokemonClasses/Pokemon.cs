@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 
@@ -45,6 +46,7 @@ public partial class Pokemon
     public MoveType TeraType { get; init; }
     public GenderId Gender { get; init; }
     public bool PrintDebug { get; init; }
+    public IEffect[] Effects => GetAllEffects();
 
     // Core constructor
     public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)

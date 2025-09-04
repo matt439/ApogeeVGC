@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -22,7 +21,7 @@ public partial class Battle
                                  Player1State == PlayerState.TeamPreviewLocked ||
                                  Player2State == PlayerState.TeamPreviewLocked;
     
-    private BattleContext Context => new()
+    public BattleContext Context => new()
     {
         Library = Library,
         Random = BattleRandom,

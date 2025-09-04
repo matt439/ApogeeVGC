@@ -39,14 +39,14 @@ public record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                OnSourceAfterFaint = (length, _, source, effect, context) =>
+                OnSourceAfterFaint = (battle, length, _, source, effect) =>
                 {
                     if (effect.EffectType != EffectType.Move) return;
-                    if (context.PrintDebug)
+                    if (battle.PrintDebug)
                     {
                         UiGenerator.PrintChillingNeighActivation(source);
                     }
-                    source.AlterStatModifier(StatId.Atk, length, context);
+                    source.AlterStatModifier(StatId.Atk, length, battle.Context);
                 },
             },
             [AbilityId.HadronEngine] = new()

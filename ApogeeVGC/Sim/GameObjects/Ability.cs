@@ -1,8 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.FieldClasses;
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
+﻿using ApogeeVGC.Sim.Effects;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
@@ -21,7 +17,7 @@ public enum AbilityId
 }
 
 
-public record Ability : IEffect
+public record Ability : EffectMethods, IEffect
 {
     public EffectType EffectType => EffectType.Ability;
     public required AbilityId Id { get; init; }
@@ -66,13 +62,13 @@ public record Ability : IEffect
     public int Num { get; init; } = 0;
     public AbilityFlags Flags { get; init; } = new();
     public int OnSwitchInPriority { get; init; } = 0;
-    /// <summary>
-    /// length, target, source, effect
-    /// </summary>
-    public Action<int, Pokemon, Pokemon, IEffect, BattleContext>? OnSourceAfterFaint { get; init; }
-    public Action<Pokemon, Field, Pokemon[], IEffect, BattleContext>? OnStart { get; init; }
-    public Func<int, Move, int>? OnModifyPriority { get; init; }
-    public Action<Pokemon, Field, BattleContext>? OnTerrainChange { get; init; }
+    ///// <summary>
+    ///// length, target, source, effect
+    ///// </summary>
+    //public Action<int, Pokemon, Pokemon, IEffect, BattleContext>? OnSourceAfterFaint { get; init; }
+    //public Action<Pokemon, Field, Pokemon[], IEffect, BattleContext>? OnStart { get; init; }
+    //public Func<int, Move, int>? OnModifyPriority { get; init; }
+    //public Action<Pokemon, Field, BattleContext>? OnTerrainChange { get; init; }
 
     public Ability Copy()
     {

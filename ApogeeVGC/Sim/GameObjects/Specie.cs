@@ -13,7 +13,7 @@ public record SpeciesAbility
     public AbilityId? Special { get; init; }
 }
 
-public record Specie : IEffect
+public record Specie : EffectMethods, IEffect
 {
     public required SpecieId Id { get; init; }
     public EffectType EffectType => EffectType.Specie;
