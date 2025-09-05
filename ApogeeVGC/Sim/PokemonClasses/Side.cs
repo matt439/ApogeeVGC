@@ -8,6 +8,8 @@ public class Side
     public required PlayerId PlayerId { get; init; }
     public bool PrintDebug { get; init; }
 
+    public required SideId SideId { get; init; }
+
     /// <summary>
     /// Creates a deep copy of this Side for MCTS simulation purposes.
     /// </summary>
@@ -19,6 +21,7 @@ public class Side
             PlayerId = PlayerId, // Value type, safe to copy
             Team = Team.Copy(),
             PrintDebug = PrintDebug, // Added missing PrintDebug
+            SideId = SideId, // Value type, safe to copy
         };
     }
 }

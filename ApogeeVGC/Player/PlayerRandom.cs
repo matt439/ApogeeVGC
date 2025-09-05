@@ -1,18 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using ApogeeVGC.Data;
-using ApogeeVGC.Sim;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Choices;
 using Battle = ApogeeVGC.Sim.Core.Battle;
 
 namespace ApogeeVGC.Player;
-
-//public enum PlayerRandomStrategy
-//{
-//    AllChoices,
-//    MoveChoices,
-//    ReducedSwitching,
-//    SuperEffectiveOrStabMoves,
-//}
 
 public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
     ChoiceFilterStrategy strategy, int? seed = null) : IPlayer
@@ -26,15 +16,17 @@ public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
 
     public Choice GetNextChoice(Choice[] availableChoices)
     {
-        Choice selectedChoice = Strategy switch
-        {
-            ChoiceFilterStrategy.None => GetNextChoiceFromAll(availableChoices),
-            ChoiceFilterStrategy.ReducedSwitching
-                or ChoiceFilterStrategy.ReducedSwitchingAndSuperEffectiveOrStabDamagingMoves
-                or ChoiceFilterStrategy.SuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves =>
-                ChoiceFilter.FilterAndRandomlySelectChoice(availableChoices, Strategy, Battle, PlayerId, _random),
-            _ => throw new NotImplementedException($"Strategy {Strategy} not implemented."),
-        };
+        //Choice selectedChoice = Strategy switch
+        //{
+        //    ChoiceFilterStrategy.None => GetNextChoiceFromAll(availableChoices),
+        //    ChoiceFilterStrategy.ReducedSwitching
+        //        or ChoiceFilterStrategy.ReducedSwitchingAndSuperEffectiveOrStabDamagingMoves
+        //        or ChoiceFilterStrategy.SuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves =>
+        //        ChoiceFilter.FilterAndRandomlySelectChoice(availableChoices, Strategy, Battle, PlayerId, _random),
+        //    _ => throw new NotImplementedException($"Strategy {Strategy} not implemented."),
+        //};
+
+        Choice selectedChoice = GetNextChoiceFromAll(availableChoices);
 
         if (selectedChoice == Choice.Invalid)
         {

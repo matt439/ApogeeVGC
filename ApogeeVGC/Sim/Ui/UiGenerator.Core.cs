@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.FieldClasses;
 using System.Globalization;
 using System.Text;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Ui;
@@ -16,8 +17,10 @@ public static partial class UiGenerator
     private const string HpBarSpacer = "     ";
     private const int HpBarLength = 20;
     private const string PrimarySpacer = "                               ";
+    private const string PrimarySlot2Spacer = "       ";
+    private const string SecondarySlot1Spacer = "       ";
 
-    public static void PrintBattleUi(Core.Battle battle, PlayerId perspective)
+    public static void PrintBattleUi(Battle battle, PlayerId perspective)
     {
         switch (perspective)
         {
@@ -40,7 +43,7 @@ public static partial class UiGenerator
         }
     }
 
-    public static void PrintChoices(Core.Battle battle, PlayerId perspective)
+    public static void PrintChoices(Battle battle, PlayerId perspective)
     {
         var availableChoices = battle.GetAvailableChoices(perspective);
         if (availableChoices.Length == 0)

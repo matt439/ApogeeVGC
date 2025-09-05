@@ -83,6 +83,56 @@ public enum Choice
     // Struggle
     Struggle,
 
+    // =============================================================================
+    // TEAM PREVIEW CHOICES (DOUBLES BATTLE)
+    // =============================================================================
+    // Team Preview combinations: Select different Pokémon for both slots
+    // Pattern: TeamPreviewSlot1Select{X}_Slot2Select{Y} where X ≠ Y
+    
+    // Slot 1 = Pokémon 1, Slot 2 = Pokémon 2-6
+    TeamPreviewSlot1Select1_Slot2Select2,
+    TeamPreviewSlot1Select1_Slot2Select3,
+    TeamPreviewSlot1Select1_Slot2Select4,
+    TeamPreviewSlot1Select1_Slot2Select5,
+    TeamPreviewSlot1Select1_Slot2Select6,
+    
+    // Slot 1 = Pokémon 2, Slot 2 = Pokémon 1,3-6
+    TeamPreviewSlot1Select2_Slot2Select1,
+    TeamPreviewSlot1Select2_Slot2Select3,
+    TeamPreviewSlot1Select2_Slot2Select4,
+    TeamPreviewSlot1Select2_Slot2Select5,
+    TeamPreviewSlot1Select2_Slot2Select6,
+    
+    // Slot 1 = Pokémon 3, Slot 2 = Pokémon 1-2,4-6
+    TeamPreviewSlot1Select3_Slot2Select1,
+    TeamPreviewSlot1Select3_Slot2Select2,
+    TeamPreviewSlot1Select3_Slot2Select4,
+    TeamPreviewSlot1Select3_Slot2Select5,
+    TeamPreviewSlot1Select3_Slot2Select6,
+    
+    // Slot 1 = Pokémon 4, Slot 2 = Pokémon 1-3,5-6
+    TeamPreviewSlot1Select4_Slot2Select1,
+    TeamPreviewSlot1Select4_Slot2Select2,
+    TeamPreviewSlot1Select4_Slot2Select3,
+    TeamPreviewSlot1Select4_Slot2Select5,
+    TeamPreviewSlot1Select4_Slot2Select6,
+    
+    // Slot 1 = Pokémon 5, Slot 2 = Pokémon 1-4,6
+    TeamPreviewSlot1Select5_Slot2Select1,
+    TeamPreviewSlot1Select5_Slot2Select2,
+    TeamPreviewSlot1Select5_Slot2Select3,
+    TeamPreviewSlot1Select5_Slot2Select4,
+    TeamPreviewSlot1Select5_Slot2Select6,
+    
+    // Slot 1 = Pokémon 6, Slot 2 = Pokémon 1-5
+    TeamPreviewSlot1Select6_Slot2Select1,
+    TeamPreviewSlot1Select6_Slot2Select2,
+    TeamPreviewSlot1Select6_Slot2Select3,
+    TeamPreviewSlot1Select6_Slot2Select4,
+    TeamPreviewSlot1Select6_Slot2Select5,
+    
+    // Total Team Preview combinations: 30 (6 × 5 valid combinations)
+
     // Other
     Quit,
     None,
@@ -91,7 +141,6 @@ public enum Choice
     // =============================================================================
     // ENHANCED DOUBLES BATTLE COMBINATIONS (AUTO-GENERATED)
     // =============================================================================
-    // last generated 2025-09-05
 
     // Dual-slot combinations (both slots active)
     Slot1Move1NormalFoe1_Slot2Move1NormalFoe1,
@@ -3940,4 +3989,5 @@ public enum Choice
     Slot1Empty_Slot2Struggle,
 
     // Total enhanced combinations generated: 3839
+
 }

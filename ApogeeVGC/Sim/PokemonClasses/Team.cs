@@ -120,6 +120,26 @@ public class Team
     public bool IsDefeated => PokemonSet.AllFainted;
     public int HealthTeamTotal => PokemonSet.Pokemons.Sum(p => p.CurrentHp);
 
+    public Pokemon? GetPokemon(SlotId slot)
+    {
+        return slot switch
+        {
+            SlotId.Slot1 => Slot1Pokemon,
+            SlotId.Slot2 => Slot2Pokemon,
+            _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
+        };
+    }
+
+    public Pokemon? GetAlly(SlotId slot)
+    {
+        return slot switch
+        {
+            SlotId.Slot1 => Slot2Pokemon,
+            SlotId.Slot2 => Slot1Pokemon,
+            _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
+        };
+    }
+
     /// <summary>
     /// Creates a deep copy of this Team for MCTS simulation purposes.
     /// </summary>

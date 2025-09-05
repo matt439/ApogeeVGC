@@ -31,7 +31,7 @@ public class Driver
     private const int MctsMaxIterations = 1000000;
     private const double MctsExplorationParameter = 0.0;
     private const ChoiceFilterStrategy MctsEvaluationChoiceFilterStrategy =
-        ChoiceFilterStrategy.ReducedSwitching;
+        ChoiceFilterStrategy.None;
     private readonly int? _mctsMaxTimer = null; // in milliseconds
 
     private static readonly int NumThreads = Environment.ProcessorCount;

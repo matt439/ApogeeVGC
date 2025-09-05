@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Core;
 using System.Text;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -50,67 +51,132 @@ public static partial class UiGenerator
     }
 
     // Choice Generation Methods
-    private static string GenerateChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
-        if (choice.IsSelectChoice())
+        if (choice.IsTeamPreviewChoice())
         {
-            return GenerateSelectChoiceString(battle, perspective, choice);
+            return GenerateTeamPreviewChoiceString(battle, perspective, choice);
         }
 
-        if (choice.IsMoveChoice())
-        {
-            return GenerateMoveChoiceString(battle, perspective, choice);
-        }
+        StringBuilder sb = new();
+        var (slot1Choice, slot2Choice) = choice.DecodeDoublesChoice();
+        Choice?[] slotChoices = [slot1Choice, slot2Choice];
 
-        if (choice.IsMoveWithTeraChoice())
+        int i = 1;
+        foreach (var slotChoice in slotChoices)
         {
-            return GenerateMoveWithTeraChoiceString(battle, perspective, choice);
-        }
+            if (slotChoice is null)
+            {
+                i++;
+                continue;
+            }
 
-        if (choice.IsSwitchChoice())
-        {
-            return GenerateSwitchChoiceString(battle, perspective, choice);
-        }
+            var ch = (Choice)slotChoice;
 
-        if (choice == Choice.Struggle)
-        {
-            return GenerateStruggleChoiceString();
-        }
+            if (!ch.IsMoveChoice() && !ch.IsSwitchChoice() &&
+                ch != Choice.Struggle)
+            {
+                throw new ArgumentException("Invalid choice type in doubles choice.", nameof(choice));
+            }
 
-        throw new ArgumentException("Invalid choice type.", nameof(choice));
+            if (ch.IsMoveChoice())
+            {
+                sb.Append(GenerateMoveChoiceString(battle, perspective, choice, (SlotId)i));
+            }
+            else if (ch.IsSwitchChoice())
+            {
+                sb.Append(GenerateSwitchChoiceString(battle, perspective, choice));
+            }
+            else if (ch == Choice.Struggle)
+            {
+                sb.Append(GenerateStruggleChoiceString());
+            }
+            i++;
+        }
+        return sb.ToString();
+
+        //if (choice.IsMoveChoice())
+        //{
+        //    if (slot1Choice != null)
+        //    {
+        //        sb.Append(GenerateMoveChoiceString(battle, perspective, choice, 0));
+        //    }
+        //    if (slot2Choice == null) return sb.ToString();
+
+        //    if (slot1Choice != null)
+        //    {
+        //        sb.Append(" | ");
+        //    }
+        //    sb.Append(GenerateMoveChoiceString(battle, perspective, choice, 1));
+        //    return sb.ToString();
+        //}
+
+        //if (choice.IsSwitchChoice())
+        //{
+        //    if (slo1)
+
+        //    return GenerateSwitchChoiceString(battle, perspective, choice);
+        //}
+
+        //if (choice == Choice.Struggle)
+        //{
+        //    return GenerateStruggleChoiceString();
+        //}
+
+        //throw new ArgumentException("Invalid choice type.", nameof(choice));
     }
 
-    private static string GenerateSelectChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateTeamPreviewChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
-        Side side = battle.GetSide(perspective);
-        int selectIndex = choice.GetSelectIndexFromChoice();
-        if (selectIndex < 0 || selectIndex >= side.Team.PokemonSet.PokemonCount)
+        (int slot1Index, int slot2Index) = choice.DecodeTeamPreviewChoice();
+
+        if (slot1Index < 0 || slot1Index >= battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
+            slot2Index < 0 || slot2Index >= battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
+            slot1Index == slot2Index)
         {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid select choice.");
+            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid team preview choice.");
         }
 
-        Pokemon pokemon = side.Team.PokemonSet.Pokemons[selectIndex];
-        if (pokemon == null)
+        Side side = battle.GetSide(perspective);
+
+        Pokemon slot1Pokemon = side.Team.PokemonSet.Pokemons[slot1Index];
+        if (slot1Pokemon == null)
+        {
+            throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
+        }
+
+        Pokemon slot2Pokemon = side.Team.PokemonSet.Pokemons[slot2Index];
+        if (slot2Pokemon == null)
         {
             throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
         }
 
         StringBuilder sb = new();
         sb.Append($"Select: ");
-        sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
+        sb.Append($"{slot1Pokemon.Name} ({slot1Pokemon.Specie.Name}) - ");
+        sb.Append($"{slot2Pokemon.Name} ({slot2Pokemon.Specie.Name})");
         return sb.ToString();
     }
 
-    private static string GenerateMoveChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateMoveChoiceString(Battle battle, PlayerId perspective, Choice choice, SlotId slot)
     {
         Side side = battle.GetSide(perspective);
-        int moveIndex = choice.GetMoveIndexFromChoice();
-        if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
+
+        Pokemon? activePokemon = slot == SlotId.Slot1
+            ? side.Team.Slot1Pokemon
+            : side.Team.Slot2Pokemon;
+        if (activePokemon == null)
+        {
+            throw new InvalidOperationException("Move choice cannot be made when the active Pokemon is null.");
+        }
+
+        int moveIndex = choice.GetMoveNumber();
+        if (moveIndex < 0 || moveIndex >= activePokemon.Moves.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
         }
 
-        Move move = side.Team.ActivePokemon.Moves[moveIndex];
+        Move move = activePokemon.Moves[moveIndex];
         if (move == null)
         {
             throw new InvalidOperationException("Move choice cannot be made to a null Move.");
@@ -127,36 +193,36 @@ public static partial class UiGenerator
         return sb.ToString();
     }
 
-    private static string GenerateMoveWithTeraChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
-    {
-        Side side = battle.GetSide(perspective);
-        int moveIndex = choice.GetMoveWithTeraIndexFromChoice();
-        if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
-        }
+    //private static string GenerateMoveWithTeraChoiceString(Battle battle, PlayerId perspective, Choice choice)
+    //{
+    //    Side side = battle.GetSide(perspective);
+    //    int moveIndex = choice.GetMoveNumber();
+    //    if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
+    //    {
+    //        throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
+    //    }
 
-        Move move = side.Team.ActivePokemon.Moves[moveIndex];
-        if (move == null)
-        {
-            throw new InvalidOperationException("Move choice cannot be made to a null Move.");
-        }
+    //    Move move = side.Team.ActivePokemon.Moves[moveIndex];
+    //    if (move == null)
+    //    {
+    //        throw new InvalidOperationException("Move choice cannot be made to a null Move.");
+    //    }
 
-        StringBuilder sb = new();
-        sb.Append("Move: ");
-        sb.Append(move.Name);
-        sb.Append(" (");
-        sb.Append(move.Pp);
-        sb.Append('/');
-        sb.Append(move.MaxPp);
-        sb.Append(')');
-        sb.Append(" + ");
-        sb.Append(side.Team.ActivePokemon.TeraType.ConvertToString());
-        sb.Append(" Tera");
-        return sb.ToString();
-    }
+    //    StringBuilder sb = new();
+    //    sb.Append("Move: ");
+    //    sb.Append(move.Name);
+    //    sb.Append(" (");
+    //    sb.Append(move.Pp);
+    //    sb.Append('/');
+    //    sb.Append(move.MaxPp);
+    //    sb.Append(')');
+    //    sb.Append(" + ");
+    //    sb.Append(side.Team.ActivePokemon.TeraType.ConvertToString());
+    //    sb.Append(" Tera");
+    //    return sb.ToString();
+    //}
 
-    private static string GenerateSwitchChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateSwitchChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
         Side side = battle.GetSide(perspective);
         int switchIndex = choice.GetSwitchIndexFromChoice();
@@ -183,10 +249,25 @@ public static partial class UiGenerator
     }
 
     // Pokemon Display Methods
-    private static void PrintPrimarySide(Core.Battle battle, PlayerId perspective)
+    private static void PrintPrimarySide(Battle battle, PlayerId perspective)
     {
         Side side = battle.GetSide(perspective);
-        Pokemon activePokemon = side.Team.ActivePokemon;
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
+        StringBuilder sb = new();
+        sb.Append(FormatPrimarySlot1(battle, perspective));
+        sb.Append(FormatPrimarySlot2(battle, perspective));
+        sb.Append(PrimarySpacer);
+        sb.AppendLine(remainingInfo);
+        Console.WriteLine(sb.ToString());
+    }
+
+    private static string FormatPrimarySlot1(Battle battle, PlayerId perspective)
+    {
+        Side side = battle.GetSide(perspective);
+        Pokemon? activePokemon = side.Team.Slot1Pokemon;
+
+        if (activePokemon == null) return string.Empty;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
         string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
@@ -215,19 +296,101 @@ public static partial class UiGenerator
         sb.Append(PrimarySpacer);
         sb.AppendLine(remainingInfo);
 
+        return sb.ToString();
+    }
+
+    private static string FormatPrimarySlot2(Battle battle, PlayerId perspective)
+    {
+        Side side = battle.GetSide(perspective);
+        Pokemon? activePokemon = side.Team.Slot2Pokemon;
+
+        if (activePokemon == null) return string.Empty;
+
+        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
+        string conditionsInfo = FormatConditionsInfo(activePokemon);
+        string stats = SingleLineStats(activePokemon);
+        string statMods = SingleLineStatModifiers(activePokemon);
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
+        StringBuilder sb = new();
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.AppendLine(pokemonInfo);
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.Append(HpBarSpacer);
+        sb.AppendLine(hpDisplay);
+        if (activePokemon.IsTeraUsed)
+        {
+            sb.Append(PrimarySpacer);
+            sb.Append(PrimarySlot2Spacer);
+            sb.AppendLine(FormatTeraInfo(activePokemon));
+        }
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.AppendLine(conditionsInfo);
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.AppendLine(stats);
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.AppendLine(statMods);
+        sb.Append(PrimarySpacer);
+        sb.Append(PrimarySlot2Spacer);
+        sb.AppendLine(remainingInfo);
+
+        return sb.ToString();
+    }
+
+    private static void PrintSecondarySide(Battle battle, PlayerId perspective)
+    {
+        Side side = battle.GetSide(perspective);
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
+        StringBuilder sb = new();
+        sb.AppendLine(FormatSecondarySlot1(battle, perspective));
+        sb.AppendLine(FormatSecondarySlot2(battle, perspective));
+        sb.AppendLine($"{remainingInfo}\n\n");
         Console.WriteLine(sb.ToString());
     }
 
-    private static void PrintSecondarySide(Core.Battle battle, PlayerId perspective)
+    private static string FormatSecondarySlot1(Battle battle, PlayerId perspective)
     {
         Side side = battle.GetSide(perspective);
-        Pokemon activePokemon = side.Team.ActivePokemon;
+        Pokemon? activePokemon = side.Team.Slot1Pokemon;
+
+        if (activePokemon == null) return string.Empty;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
         string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
         string conditionsInfo = FormatConditionsInfo(activePokemon);
-        string remainingInfo = FormatRemainingPokemonInfo(side);
 
+        StringBuilder sb = new();
+        sb.Append(SecondarySlot1Spacer);
+        sb.AppendLine(pokemonInfo);
+        sb.Append(SecondarySlot1Spacer);
+        sb.Append(HpBarSpacer);
+        sb.AppendLine(hpDisplay);
+        if (activePokemon.IsTeraUsed)
+        {
+            sb.Append(SecondarySlot1Spacer);
+            sb.AppendLine(FormatTeraInfo(activePokemon));
+        }
+        sb.Append(SecondarySlot1Spacer);
+        sb.AppendLine(conditionsInfo);
+
+        return sb.ToString();
+    }
+
+    private static string FormatSecondarySlot2(Battle battle, PlayerId perspective)
+    {
+        Side side = battle.GetSide(perspective);
+        Pokemon? activePokemon = side.Team.Slot2Pokemon;
+        if (activePokemon == null) return string.Empty;
+        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
+        string conditionsInfo = FormatConditionsInfo(activePokemon);
         StringBuilder sb = new();
         sb.AppendLine(pokemonInfo);
         sb.Append(HpBarSpacer);
@@ -237,9 +400,7 @@ public static partial class UiGenerator
             sb.AppendLine(FormatTeraInfo(activePokemon));
         }
         sb.AppendLine(conditionsInfo);
-        sb.AppendLine($"{remainingInfo}\n\n");
-
-        Console.WriteLine(sb.ToString());
+        return sb.ToString();
     }
 
     // Formatting Helper Methods
@@ -336,7 +497,7 @@ public static partial class UiGenerator
         return $"[{filledPart}{emptyPart}]";
     }
 
-    private static void PrintField(Core.Battle battle)
+    private static void PrintField(Battle battle)
     {
         Field field = battle.Field;
 

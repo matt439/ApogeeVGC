@@ -151,6 +151,7 @@ public record Move : IEffect
     /// </summary>
     public double? Recoil { get; init; }
     public bool Disabled { get; set; }
+    public MoveSlotId SlotId { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

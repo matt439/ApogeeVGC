@@ -1,5 +1,13 @@
 ﻿namespace ApogeeVGC.Sim.Moves;
 
+public enum MoveSlotId
+{
+    Move1,
+    Move2,
+    Move3,
+    Move4,
+}
+
 public enum MoveId
 {
     GlacialLance,
