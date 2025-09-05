@@ -147,3 +147,14 @@ public enum MoveTarget
     /// </summary>
     Field,
 }
+
+public enum MoveSlotTarget
+{
+    NormalFoe1,
+    NormalFoe2,
+    NormalAlly,
+    AllAdjacentFoes,
+    Field,
+    AllySide,
+    Self,
+}

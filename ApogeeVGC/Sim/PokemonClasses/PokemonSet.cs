@@ -25,6 +25,8 @@ public class PokemonSet
     public bool AllFainted => AlivePokemonCount == 0;
     public bool AnyTeraUsed => Pokemons.Any(pokemon => pokemon.IsTeraUsed);
 
+    public Pokemon[] UnusedPokemons { get; init; } = [];
+
     /// /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
     /// </summary>

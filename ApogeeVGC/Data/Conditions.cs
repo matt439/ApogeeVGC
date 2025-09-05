@@ -243,45 +243,45 @@ public record Conditions
             Name = "Leech Seed",
             ConditionEffectType = ConditionEffectType.Status,
             ConditionVolatility = ConditionVolatility.Volatile,
-            OnStart = (target, _, _, context) =>
-            {
-                if (context.PrintDebug)
-                {
-                    UiGenerator.PrintLeechSeedStart(target);
-                }
-                return true;
-            },
-            OnResidualOrder = 8,
-            OnResidual = (target, source, _, context) =>
-            {
-                if (target.CurrentHp <= 0)
-                {
-                    //throw new InvalidOperationException("Target has fainted.");
+            //OnStart = (target, _, _, context) =>
+            //{
+            //    if (context.PrintDebug)
+            //    {
+            //        UiGenerator.PrintLeechSeedStart(target);
+            //    }
+            //    return true;
+            //},
+            //OnResidualOrder = 8,
+            //OnResidual = (target, source, _, context) =>
+            //{
+            //    if (target.CurrentHp <= 0)
+            //    {
+            //        //throw new InvalidOperationException("Target has fainted.");
 
-                    // If the target has fainted, do not apply Leech Seed damage.
-                    return;
-                }
+            //        // If the target has fainted, do not apply Leech Seed damage.
+            //        return;
+            //    }
 
-                int damage = target.UnmodifiedHp / 8;
-                if (damage < 1) damage = 1;
+            //    int damage = target.UnmodifiedHp / 8;
+            //    if (damage < 1) damage = 1;
 
-                int actualDamage = target.Damage(damage);
+            //    int actualDamage = target.Damage(damage);
 
-                if (source is not null)
-                {
-                     int actualHeal = source.Team.ActivePokemon.Heal(damage);
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Team.ActivePokemon,
-                            actualHeal);
-                    }
-                }
-                else
-                {
-                    throw new ArgumentNullException($"Source is null when trying to apply" +
-                                                    $"{ConditionId.LeechSeed} damage to" + $"pokemon {target.Name}.");
-                }
-            },
+            //    if (source is not null)
+            //    {
+            //        int actualHeal = source.Team.ActivePokemon.Heal(damage);
+            //        if (context.PrintDebug)
+            //        {
+            //            UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Team.ActivePokemon,
+            //                actualHeal);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        throw new ArgumentNullException($"Source is null when trying to apply" +
+            //                                        $"{ConditionId.LeechSeed} damage to" + $"pokemon {target.Name}.");
+            //    }
+            //},
         },
         // This condition is the effect placed on each Pokemon by Trick Room.
         // Trick Room itself is a PseudoWeather condition on the field which applies

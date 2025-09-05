@@ -1,97 +1,6 @@
-﻿// ReSharper disable InconsistentNaming
-namespace ApogeeVGC.Sim.Choices;
-
-// Field, allyside, self
-// normal, all adjacentfoes
-
-public enum Choice
-{
-    // Move 1
-    Move1NormalFoe1,
-    Move1NormalFoe2,
-    Move1NormalAlly,
-    Move1AllAdjacentFoes,
-    Move1Field,
-    Move1AllySide,
-    Move1Self,
-
-    Move1NormalFoe1WithTera,
-    Move1NormalFoe2WithTera,
-    Move1NormalAllyWithTera,
-    Move1AllAdjacentFoesWithTera,
-    Move1FieldWithTera,
-    Move1AllySideWithTera,
-    Move1SelfWithTera,
-
-    // Move 2
-    Move2NormalFoe1,
-    Move2NormalFoe2,
-    Move2NormalAlly,
-    Move2AllAdjacentFoes,
-    Move2Field,
-    Move2AllySide,
-    Move2Self,
-
-    Move2NormalFoe1WithTera,
-    Move2NormalFoe2WithTera,
-    Move2NormalAllyWithTera,
-    Move2AllAdjacentFoesWithTera,
-    Move2FieldWithTera,
-    Move2AllySideWithTera,
-    Move2SelfWithTera,
-
-    // Move 3
-    Move3NormalFoe1,
-    Move3NormalFoe2,
-    Move3NormalAlly,
-    Move3AllAdjacentFoes,
-    Move3Field,
-    Move3AllySide,
-    Move3Self,
-
-    Move3NormalFoe1WithTera,
-    Move3NormalFoe2WithTera,
-    Move3NormalAllyWithTera,
-    Move3AllAdjacentFoesWithTera,
-    Move3FieldWithTera,
-    Move3AllySideWithTera,
-    Move3SelfWithTera,
-
-    // Move 4
-    Move4NormalFoe1,
-    Move4NormalFoe2,
-    Move4NormalAlly,
-    Move4AllAdjacentFoes,
-    Move4Field,
-    Move4AllySide,
-    Move4Self,
-
-    Move4NormalFoe1WithTera,
-    Move4NormalFoe2WithTera,
-    Move4NormalAllyWithTera,
-    Move4AllAdjacentFoesWithTera,
-    Move4FieldWithTera,
-    Move4AllySideWithTera,
-    Move4SelfWithTera,
-
-    // Switches
-    Switch1,
-    Switch2,
-    Switch3,
-    Switch4,
-
-    // Struggle
-    Struggle,
-
-    // Other
-    Quit,
-    None,
-    Invalid,
-
     // =============================================================================
     // ENHANCED DOUBLES BATTLE COMBINATIONS (AUTO-GENERATED)
     // =============================================================================
-    // last generated 2025-09-05
 
     // Dual-slot combinations (both slots active)
     Slot1Move1NormalFoe1_Slot2Move1NormalFoe1,
@@ -3940,4 +3849,3 @@ public enum Choice
     Slot1Empty_Slot2Struggle,
 
     // Total enhanced combinations generated: 3839
-}
