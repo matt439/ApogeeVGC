@@ -13,18 +13,40 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
-    private MoveAction PerformMove(PlayerId playerId, Choice choice)
+    private MoveAction PerformMove(PlayerId playerId, SlotId slotId)
     {
+        var choice = GetPendingChoice(playerId, slotId);
+        if (choice is null)
+        {
+            throw new InvalidOperationException($"No pending choice for player {playerId}, slot {slotId}");
+        }
+        
         Side atkSide = GetSide(playerId);
+
+        int moveIndex = choice.Value.GetMoveNumber();
+        Pokemon? attacker = atkSide.Team.GetPokemon(slotId);
+        MoveSlotTarget moveSlotTarget = choice.Value.GetMoveTarget();
         Side defSide = GetSide(playerId.OpposingPlayerId());
 
-        int moveIndex = choice.GetMoveIndexFromChoice();
-        Pokemon attacker = atkSide.Team.ActivePokemon;
-        Pokemon defender = defSide.Team.ActivePokemon;
+        Pokemon? defender = moveSlotTarget switch
+        {
+            MoveSlotTarget.NormalFoe1 => defSide.Team.GetPokemon(SlotId.Slot1),
+            MoveSlotTarget.NormalFoe2 => defSide.Team.GetPokemon(SlotId.Slot2),
+            MoveSlotTarget.NormalAlly => atkSide.Team.GetPokemon(
+                slotId == SlotId.Slot1 ? SlotId.Slot2 : SlotId.Slot1),
+            _ => null,
+        };
+
+        if (attacker is null)
+        {
+            throw new InvalidOperationException($"No active Pokémon in slot {slotId}" +
+                                                $"for player {playerId}");
+        }
+
         Move move = attacker.Moves[moveIndex];
 
         // This is where choice lock and choice benefits come into play
-        attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
+        attacker.Item?.OnModifyMove?.Invoke(move, attacker, attacker, Context);
 
         if (move.Pp <= 0)
         {
@@ -55,7 +77,7 @@ public partial class Battle
             .Where(c => c.OnBeforeMove != null)
             .OrderBy(c => c.OnBeforeMovePriority ?? 0)
             .ToList().Any(condition => condition.OnBeforeMove == null ||
-                                       !condition.OnBeforeMove(attacker, defender, move, Context)))
+                                       !condition.OnBeforeMove(attacker, attacker, move, Context)))
         {
             return MoveAction.None;
         }
@@ -76,25 +98,29 @@ public partial class Battle
         }
 
         // OnTry checks on the attacker's move (incl fake out, etc)
-        if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
+        if (move.OnTry?.Invoke(attacker, attacker, move, Context) == false)
         {
             return MoveAction.None;
         }
 
         // Miss check
-        if (IsMoveMiss(attacker, move, defender))
+        if (!move.AlwaysHit)
         {
-            if (PrintDebug)
+            if (IsMoveMiss(attacker, move, defender ?? throw new InvalidOperationException()))
             {
-                UiGenerator.PrintMoveMissAction(attacker, move, defender);
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintMoveMissAction(attacker, move, defender);
+                }
+                return MoveAction.None;
             }
-            return MoveAction.None;
         }
 
         // Immunity check. Note that this does not check for normal immunity, only special cases.
         // Regular immunity check is done in PerformDamagingMove
-        if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
-            move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
+        if (move.OnTryImmunity != null && move.OnTryImmunity(defender ?? throw new InvalidOperationException()) ||
+            move.OnPrepareHit?.Invoke(defender ?? throw new InvalidOperationException(),
+                attacker, move, Context) == false)
         {
             if (PrintDebug)
             {
@@ -104,9 +130,9 @@ public partial class Battle
         }
 
         // check every condition on defender for OnTryHit effects
-        foreach (Condition condition in defender.Conditions.ToList())
+        foreach (Condition condition in defender?.Conditions.ToList() ?? [])
         {
-            if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
+            if (condition.OnTryHit == null || condition.OnTryHit(defender ?? throw new InvalidOperationException(), attacker, move, Context)) continue;
 
             if (!PrintDebug) return MoveAction.None;
 
@@ -124,8 +150,10 @@ public partial class Battle
 
         return move.Category switch
         {
-            MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, playerId, move, defender),
-            MoveCategory.Status => PerformStatusMove(attacker, playerId, move, defender),
+            MoveCategory.Physical or MoveCategory.Special => PerformDamagingMove(attacker, playerId, move,
+                defender ?? throw new InvalidOperationException()),
+            MoveCategory.Status => PerformStatusMove(attacker, playerId, move,
+                defender ?? throw new InvalidOperationException()),
             _ => throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}"),
         };
     }
@@ -393,11 +421,6 @@ public partial class Battle
 
     private bool IsMoveMiss(Pokemon attacker, Move move, Pokemon defender)
     {
-        if (move.AlwaysHit)
-        {
-            return false; // Move always hits
-        }
-
         // get move accuracy
         int moveAccuracy = move.Accuracy;
 
@@ -417,19 +440,33 @@ public partial class Battle
         return !(roll <= modifiedAccuracy);
     }
 
-    private void PerformStruggle(PlayerId playerId)
+    private void PerformStruggle(PlayerId playerId, SlotId slotId)
     {
         Side atkSide = GetSide(playerId);
         Side defSide = GetSide(playerId.OpposingPlayerId());
 
-        Pokemon attacker = atkSide.Team.ActivePokemon;
+        Pokemon? attacker = atkSide.Team.GetPokemon(slotId);
+        if (attacker is null)
+        {
+            throw new InvalidOperationException($"No active Pokémon in slot {slotId}" +
+                                                $"for player {playerId}");
+        }
 
         if (!Library.Moves.TryGetValue(MoveId.Struggle, out Move? struggle))
         {
             throw new InvalidOperationException($"Struggle move not found in" +
                                                 $"library for player {playerId}");
         }
-        Pokemon defender = defSide.Team.ActivePokemon;
+
+        Pokemon? defender = defSide.Team.Slot1Pokemon?.IsFainted ?? true
+            ? defSide.Team.Slot1Pokemon
+            : defSide.Team.Slot2Pokemon;
+        if (defender is null)
+        {
+            throw new InvalidOperationException($"No available target for Struggle" +
+                                                $"for player {playerId}");
+        }
+
         int damage = CalculateDamage(attacker, defender, struggle, 1.0, false, false);
         defender.Damage(damage);
 

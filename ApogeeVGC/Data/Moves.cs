@@ -37,7 +37,8 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                Target = MoveTarget.AllAdjacentFoes,
+                // TODO: Change back to AllAdjacentFoes when multi-targeting is implemented
+                Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
             },
             [MoveId.LeechSeed] = new()
@@ -131,7 +132,8 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                SelfSwitch = true,
+                // TODO: Implement switch after hit
+                // SelfSwitch = true,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -151,7 +153,8 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Target = MoveTarget.AllAdjacentFoes,
+                // TODO: Change back to AllAdjacentFoes when multi-targeting is implemented
+                Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
             },
             [MoveId.ElectroDrift] = new()
@@ -349,7 +352,8 @@ public record Moves
                     target.AlterStatModifier(StatId.SpA, -1, context);
                     return true;
                 },
-                Target = MoveTarget.AllAdjacentFoes,
+                // TODO: Change back to AllAdjacentFoes when multi-targeting is implemented
+                Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
             [MoveId.Overheat] = new()

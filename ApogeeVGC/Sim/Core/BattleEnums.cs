@@ -19,9 +19,6 @@ public enum PlayerState
     FaintedLocked,
     ForceSwitchSelect,
     ForceSwitchLocked,
-    //TagetSelect,
-    //TargetLocked,
-    // TODO: Implement these above states
     Idle,
 }
 

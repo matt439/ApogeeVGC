@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -9,22 +8,37 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
-    private void PerformSwitch(PlayerId playerId, Choice choice)
+    private void PerformSwitch(PlayerId playerId, SlotId slotId)
     {
         if (IsWinner() != PlayerId.None)
         {
             throw new InvalidOperationException("Cannot switch Pokémon when the battle has already ended.");
         }
-        if (!choice.IsSwitchChoice())
+
+        var choice = GetPendingChoice(playerId, slotId);
+        if (choice is null)
+        {
+            throw new InvalidOperationException($"No pending choice found for player {playerId} in slot {slotId}.");
+        }
+
+        if (!choice.Value.IsSwitchChoice())
         {
             throw new ArgumentException("Choice must be a switch choice to switch Pokémon.", nameof(choice));
         }
 
         Side side = GetSide(playerId);
-        Pokemon prevActive = side.Team.ActivePokemon;
+        Pokemon? prevActive = side.Team.GetPokemon(slotId);
+        if (prevActive is null)
+        {
+            throw new InvalidOperationException($"No active Pokémon found in slot {slotId} for player {playerId}.");
+        }
         prevActive.OnSwitchOut();
-        side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
-        Pokemon newActive = side.Team.ActivePokemon;
+        side.Team.SetPokemonIndex(choice.Value.GetSwitchIndexFromChoice(), slotId);
+        Pokemon? newActive = side.Team.GetPokemon(slotId);
+        if (newActive is null)
+        {
+            throw new InvalidOperationException($"No Pokémon found at the selected switch index for player {playerId}.");
+        }
         Field.OnPokemonSwitchIn(newActive, playerId, Context);
         newActive.OnSwitchIn(Field, AllActivePokemon, Context);
 
@@ -37,20 +51,19 @@ public partial class Battle
                 if (PrintDebug)
                 {
                     UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
-                        side.Team.ActivePokemon);
+                        newActive);
                 }
                 break;
             case PlayerState.FaintedLocked:
                 if (PrintDebug)
                 {
-                    UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name,
-                        side.Team.ActivePokemon);
+                    UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name, newActive);
                 }
                 break;
             case PlayerState.ForceSwitchLocked:
                 if (PrintDebug)
                 {
-                    UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                    UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, newActive);
                 }
                 break;
             case PlayerState.Idle:
@@ -72,35 +85,74 @@ public partial class Battle
         {
             throw new InvalidOperationException("Cannot perform team preview select when the battle has already ended.");
         }
-        if (!player1Choice.IsSelectChoice() || !player2Choice.IsSelectChoice())
-        {
-            throw new ArgumentException("Both choices must be select choices for team preview select.");
-        }
+
+        (int slot1Selection, int slot2Selection) side1Indexes = player1Choice.DecodeTeamPreviewChoice();
+        (int slot1Selection, int slot2Selection) side2Indexes = player2Choice.DecodeTeamPreviewChoice();
+
+
         Side side1 = GetSide(PlayerId.Player1);
         Side side2 = GetSide(PlayerId.Player2);
         // Set the selected Pokémon for each player
-        side1.Team.ActivePokemonIndex = player1Choice.GetSelectIndexFromChoice();
-        side2.Team.ActivePokemonIndex = player2Choice.GetSelectIndexFromChoice();
+        side1.Team.Slot1PokemonIndex = side1Indexes.slot1Selection;
+        side1.Team.Slot2PokemonIndex = side1Indexes.slot2Selection;
+        side2.Team.Slot1PokemonIndex = side2Indexes.slot1Selection;
+        side2.Team.Slot2PokemonIndex = side2Indexes.slot2Selection;
+
+        // TODO: Add unselected Pokémon to the unused list
     }
 
     private void UpdateFaintedStates()
     {
-        if (Side1.Team.ActivePokemon.IsFainted && Player1State != PlayerState.FaintedSelect &&
-            Player1State != PlayerState.ForceSwitchSelect)
+        Pokemon? side1Slot1Pokemon = Side1.Team.Slot1Pokemon;
+        if (side1Slot1Pokemon is not null)
         {
-            Player1State = PlayerState.FaintedSelect;
-            if (PrintDebug)
+            if (Side1.Team.Slot1Pokemon!.IsFainted && Player1State != PlayerState.FaintedSelect &&
+                Player1State != PlayerState.ForceSwitchSelect)
             {
-                UiGenerator.PrintFaintedAction(Side1.Team.ActivePokemon);
+                Player1State = PlayerState.FaintedSelect;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedAction(Side1.Team.Slot1Pokemon);
+                }
             }
         }
-        if (Side2.Team.ActivePokemon.IsFainted && Player2State != PlayerState.FaintedSelect &&
-            Player2State != PlayerState.ForceSwitchSelect)
+        Pokemon? side1Slot2Pokemon = Side1.Team.Slot2Pokemon;
+        if (side1Slot2Pokemon is not null)
         {
-            Player2State = PlayerState.FaintedSelect;
-            if (PrintDebug)
+            if (Side1.Team.Slot2Pokemon!.IsFainted && Player1State != PlayerState.FaintedSelect &&
+                Player1State != PlayerState.ForceSwitchSelect)
             {
-                UiGenerator.PrintFaintedAction(Side2.Team.ActivePokemon);
+                Player1State = PlayerState.FaintedSelect;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedAction(Side1.Team.Slot2Pokemon);
+                }
+            }
+        }
+        Pokemon? side2Slot1Pokemon = Side2.Team.Slot1Pokemon;
+        if (side2Slot1Pokemon is not null)
+        {
+            if (Side2.Team.Slot1Pokemon!.IsFainted && Player2State != PlayerState.FaintedSelect &&
+                Player2State != PlayerState.ForceSwitchSelect)
+            {
+                Player2State = PlayerState.FaintedSelect;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedAction(Side2.Team.Slot1Pokemon);
+                }
+            }
+        }
+        Pokemon? side2Slot2Pokemon = Side2.Team.Slot2Pokemon;
+        if (side2Slot2Pokemon is not null)
+        {
+            if (Side2.Team.Slot2Pokemon!.IsFainted && Player2State != PlayerState.FaintedSelect &&
+                Player2State != PlayerState.ForceSwitchSelect)
+            {
+                Player2State = PlayerState.FaintedSelect;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedAction(Side2.Team.Slot2Pokemon);
+                }
             }
         }
     }

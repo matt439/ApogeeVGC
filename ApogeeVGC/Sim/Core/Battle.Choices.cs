@@ -54,57 +54,57 @@ public partial class Battle
                         Side side = GetSide(executedPlayers[0]);
                         if (PrintDebug)
                         {
-                            UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                            //UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
                         }
                         break;
                 }
             }
             else if (IsReadyForFaintedSelectProcessing())
             {
-                // Process switch choices
-                if (Player1PendingChoice != null)
-                {
-                    PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
-                }
-                if (Player2PendingChoice != null)
-                {
-                    PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
-                }
-                ClearPendingChoices();
+                //// Process switch choices
+                //if (Player1PendingChoice != null)
+                //{
+                //    PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
+                //}
+                //if (Player2PendingChoice != null)
+                //{
+                //    PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
+                //}
+                //ClearPendingChoices();
             }
             else if (IsReadyForForceSwitchProcessing())
             {
-                // Process forced switch choices
-                if (Player1PendingChoice != null && Player1PendingChoice.Value.IsSwitchChoice())
-                {
-                    PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
-                    CLearPendingChoice(PlayerId.Player1);
+                //// Process forced switch choices
+                //if (Player1PendingChoice != null && Player1PendingChoice.Value.IsSwitchChoice())
+                //{
+                //    PerformSwitch(PlayerId.Player1, Player1PendingChoice.Value);
+                //    CLearPendingChoice(PlayerId.Player1);
 
-                    // If the other player's state is not idle, they still need to execute their move/struggle
-                    if (Player2State == PlayerState.MoveSwitchLocked && Player2PendingChoice != null)
-                    {
-                        ExecutePlayerChoice(PlayerId.Player2, Player2PendingChoice.Value);
-                        CLearPendingChoice(PlayerId.Player2);
-                        SetPlayerState(PlayerId.Player2, PlayerState.Idle);
-                        // Update player states for any fainted Pokemon
-                        UpdateFaintedStates();
-                    }
-                }
-                else if (Player2PendingChoice != null && Player2PendingChoice.Value.IsSwitchChoice())
-                {
-                    PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
-                    CLearPendingChoice(PlayerId.Player2);
+                //    // If the other player's state is not idle, they still need to execute their move/struggle
+                //    if (Player2State == PlayerState.MoveSwitchLocked && Player2PendingChoice != null)
+                //    {
+                //        ExecutePlayerChoice(PlayerId.Player2, Player2PendingChoice.Value);
+                //        CLearPendingChoice(PlayerId.Player2);
+                //        SetPlayerState(PlayerId.Player2, PlayerState.Idle);
+                //        // Update player states for any fainted Pokemon
+                //        UpdateFaintedStates();
+                //    }
+                //}
+                //else if (Player2PendingChoice != null && Player2PendingChoice.Value.IsSwitchChoice())
+                //{
+                //    PerformSwitch(PlayerId.Player2, Player2PendingChoice.Value);
+                //    CLearPendingChoice(PlayerId.Player2);
 
-                    // If the other player's state is not idle, they still need to execute their move/struggle
-                    if (Player1State == PlayerState.MoveSwitchLocked && Player1PendingChoice != null)
-                    {
-                        ExecutePlayerChoice(PlayerId.Player1, Player1PendingChoice.Value);
-                        CLearPendingChoice(PlayerId.Player1);
-                        SetPlayerState(PlayerId.Player1, PlayerState.Idle);
-                        // Update player states for any fainted Pokemon
-                        UpdateFaintedStates();
-                    }
-                }
+                //    // If the other player's state is not idle, they still need to execute their move/struggle
+                //    if (Player1State == PlayerState.MoveSwitchLocked && Player1PendingChoice != null)
+                //    {
+                //        ExecutePlayerChoice(PlayerId.Player1, Player1PendingChoice.Value);
+                //        CLearPendingChoice(PlayerId.Player1);
+                //        SetPlayerState(PlayerId.Player1, PlayerState.Idle);
+                //        // Update player states for any fainted Pokemon
+                //        UpdateFaintedStates();
+                //    }
+                //}
             }
 
             // Check if the battle has been won
@@ -625,5 +625,26 @@ public partial class Battle
                 _ => false,
             };
         }
+    }
+
+    private Choice? GetPendingChoice(PlayerId playerId, SlotId slotId)
+    {
+        return playerId switch
+        {
+            PlayerId.Player1 => slotId switch
+            {
+                SlotId.Slot1 => Player1Slot1PendingChoice,
+                SlotId.Slot2 => Player1Slot2PendingChoice,
+                _ => throw new ArgumentOutOfRangeException(nameof(slotId), slotId, null)
+            },
+            PlayerId.Player2 => slotId switch
+            {
+                SlotId.Slot1 => Player2Slot1PendingChoice,
+                SlotId.Slot2 => Player2Slot2PendingChoice,
+                _ => throw new ArgumentOutOfRangeException(nameof(slotId), slotId, null)
+            },
+            PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'", nameof(playerId)),
+            _ => throw new ArgumentOutOfRangeException(nameof(playerId), playerId, null)
+        };
     }
 }

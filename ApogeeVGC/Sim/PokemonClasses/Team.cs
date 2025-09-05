@@ -140,6 +140,21 @@ public class Team
         };
     }
 
+    public void SetPokemonIndex(int? index, SlotId slot)
+    {
+        switch (slot)
+        {
+            case SlotId.Slot1:
+                Slot1PokemonIndex = index;
+                break;
+            case SlotId.Slot2:
+                Slot2PokemonIndex = index;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(slot), slot, null);
+        }
+    }
+
     /// <summary>
     /// Creates a deep copy of this Team for MCTS simulation purposes.
     /// </summary>

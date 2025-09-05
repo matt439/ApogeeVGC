@@ -69,7 +69,7 @@ public partial class Battle
                 }
                 break;
             case PlayerState.TeamPreviewSelect:
-                if (choice.Value.IsSelectChoice())
+                if (choice.Value.IsTeamPreviewChoice())
                 {
                     SetPlayerState(playerId, PlayerState.TeamPreviewLocked);
                 }

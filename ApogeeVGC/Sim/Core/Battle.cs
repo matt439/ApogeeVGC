@@ -1,8 +1,8 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -28,14 +28,41 @@ public partial class Battle
         Random = BattleRandom,
         PrintDebug = PrintDebug,
     };
-    
-    private Pokemon[] AllActivePokemon => [Side1.Team.ActivePokemon, Side2.Team.ActivePokemon];
+
+    private Pokemon[] AllActivePokemon
+    {
+        get
+        {
+            List<Pokemon> activePokemons = [];
+            if (Side1.Team.Slot1Pokemon is not null)
+            {
+                activePokemons.Add(Side1.Team.Slot1Pokemon);
+            }
+            if (Side1.Team.Slot2Pokemon is not null)
+            {
+                activePokemons.Add(Side1.Team.Slot2Pokemon);
+            }
+            if (Side2.Team.Slot1Pokemon is not null)
+            {
+                activePokemons.Add(Side2.Team.Slot1Pokemon);
+            }
+            if (Side2.Team.Slot2Pokemon is not null)
+            {
+                activePokemons.Add(Side2.Team.Slot2Pokemon);
+            }
+            return activePokemons.ToArray();
+        }
+    }
     
     // Player state management
     private PlayerState Player1State { get; set; } = PlayerState.TeamPreviewSelect;
     private PlayerState Player2State { get; set; } = PlayerState.TeamPreviewSelect;
     private Choice? Player1PendingChoice { get; set; }
     private Choice? Player2PendingChoice { get; set; }
+    private Choice? Player1Slot1PendingChoice => Player1PendingChoice?.GetSlot1Choice() ?? null;
+    private Choice? Player1Slot2PendingChoice => Player1PendingChoice?.GetSlot2Choice() ?? null;
+    private Choice? Player2Slot1PendingChoice => Player2PendingChoice?.GetSlot1Choice() ?? null;
+    private Choice? Player2Slot2PendingChoice => Player2PendingChoice?.GetSlot2Choice() ?? null;
     private object ChoiceLock { get; } = new();
 
     // Constants
