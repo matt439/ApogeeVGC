@@ -5,7 +5,7 @@ public class PokemonSet
     public required Pokemon[] Pokemons
     {
         get;
-        init
+        set
         {
             if (value == null || value.Length == 0)
             {
@@ -25,7 +25,7 @@ public class PokemonSet
     public bool AllFainted => AlivePokemonCount == 0;
     public bool AnyTeraUsed => Pokemons.Any(pokemon => pokemon.IsTeraUsed);
 
-    public Pokemon[] UnusedPokemons { get; init; } = [];
+    public Pokemon[] UnusedPokemons { get; set; } = [];
 
     /// /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.

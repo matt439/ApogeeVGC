@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Ui;
 
@@ -57,7 +58,8 @@ public static partial class UiGenerator
         for (int i = 0; i < availableChoices.Length; i++)
         {
             sb.Append($"{i + 1}: ");
-            sb.AppendLine(GenerateChoiceString(battle, perspective, availableChoices[i]));
+            //sb.AppendLine(GenerateChoiceString(battle, perspective, availableChoices[i]));
+            sb.AppendLine(availableChoices[i].GetChoiceDescription());
         }
 
         sb.Append("Please enter the number of your choice:");

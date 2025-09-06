@@ -37,10 +37,30 @@ public partial class Battle
             _ => null,
         };
 
-        if (attacker is null)
+        if (defender is null) // occurs if the Pokemon is fainted or no target specified
         {
-            throw new InvalidOperationException($"No active Pokémon in slot {slotId}" +
+            switch (moveSlotTarget)
+            {
+                // if target is a foe, select the other foe
+                case MoveSlotTarget.NormalFoe1 or MoveSlotTarget.NormalFoe2:
+                    defender = defSide.Team.GetPokemon(
+                        moveSlotTarget == MoveSlotTarget.NormalFoe1 ? SlotId.Slot2 : SlotId.Slot1);
+                    break;
+                // if the target is an ally, dont perform the move
+                case MoveSlotTarget.NormalAlly:
+                    return MoveAction.None;
+            }
+        }
+
+        if (defender is null)
+        {
+            throw new InvalidOperationException($"No valid target for move in slot {slotId}" +
                                                 $"for player {playerId}");
+        }
+
+        if (attacker is null) // the attacker fainted in the same turn
+        {
+            return MoveAction.None;
         }
 
         Move move = attacker.Moves[moveIndex];

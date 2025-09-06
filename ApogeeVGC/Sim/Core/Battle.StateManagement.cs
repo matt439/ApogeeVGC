@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
@@ -35,8 +34,8 @@ public partial class Battle
         switch (playerState)
         {
             case PlayerState.MoveSwitchSelect:
-                if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice() ||
-                    choice.Value.IsMoveWithTeraChoice() || choice == Choice.Struggle)
+                if (choice.Value.ContainsSwitchAction() || choice.Value.ContainsMoveAction() ||
+                    choice == Choice.Struggle)
                 {
                     SetPlayerState(playerId, PlayerState.MoveSwitchLocked);
                 }

@@ -12,7 +12,7 @@ public class Team
         get;
         set
         {
-            if (value == Slot2PokemonIndex)
+            if (value is not null && value == Slot2PokemonIndex)
             {
                 throw new ArgumentException("Slot1 and Slot2 Pokemon indexes must be different.");
             }
@@ -30,7 +30,7 @@ public class Team
         get;
         set
         {
-            if (value == Slot1PokemonIndex)
+            if (value is not null && value == Slot1PokemonIndex)
             {
                 throw new ArgumentException("Slot1 and Slot2 Pokemon indexes must be different.");
             }

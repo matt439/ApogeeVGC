@@ -46,6 +46,7 @@ public record Abilities
                     {
                         UiGenerator.PrintChillingNeighActivation(source);
                     }
+
                     source.AlterStatModifier(StatId.Atk, length, context);
                 },
             },
@@ -147,6 +148,13 @@ public record Abilities
                     FailSkillSwap = true,
                     NoTransform = true,
                 },
+            },
+            [AbilityId.NullAbility] = new()
+            {
+                Id = AbilityId.NullAbility,
+                Name = "No Ability",
+                Num = 0,
+                Rating = 0.0,
             },
         };
     }

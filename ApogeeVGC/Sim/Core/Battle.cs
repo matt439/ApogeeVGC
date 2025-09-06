@@ -63,6 +63,8 @@ public partial class Battle
     private Choice? Player1Slot2PendingChoice => Player1PendingChoice?.GetSlot2Choice() ?? null;
     private Choice? Player2Slot1PendingChoice => Player2PendingChoice?.GetSlot1Choice() ?? null;
     private Choice? Player2Slot2PendingChoice => Player2PendingChoice?.GetSlot2Choice() ?? null;
+    private List<SlotId> Player1FaintedSwitches { get; } = [];
+    private List<SlotId> Player2FaintedSwitches { get; } = [];
     private object ChoiceLock { get; } = new();
 
     // Constants

@@ -33,31 +33,34 @@ public partial class Battle
             }
             else if (IsReadyForMoveSwitchProcessing())
             {
-                var executedPlayers = PerformMoveSwitches(Player1PendingChoice ??
+                var executedPokemon = PerformMoveSwitches(Player1PendingChoice ??
                     throw new ArgumentException("Player1PendingChoice cannot be null"),
                         Player2PendingChoice ??
                             throw new ArgumentException("Player2PendingChoice cannot be null"));
 
-                switch (executedPlayers.Count)
-                {
-                    case 0:
-                        throw new InvalidOperationException("No players executed their move/switch.");
-                    case > 2:
-                        throw new InvalidOperationException("More than two players executed their move/switch.");
-                    case 2: // Both players executed their choices. Clear both choices
-                        ClearPendingChoices();
-                        break;
-                    case 1: // Only one player executed their choice.
-                            // Clear that player's choice and set them to force switch select
-                        CLearPendingChoice(executedPlayers[0]);
-                        SetPlayerState(executedPlayers[0], PlayerState.ForceSwitchSelect);
-                        Side side = GetSide(executedPlayers[0]);
-                        if (PrintDebug)
-                        {
-                            //UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
-                        }
-                        break;
-                }
+                // clear pending choices for both players
+                ClearPendingChoices();
+
+                //switch (executedPlayers.Count)
+                //{
+                //    case 0:
+                //        throw new InvalidOperationException("No players executed their move/switch.");
+                //    case > 2:
+                //        throw new InvalidOperationException("More than two players executed their move/switch.");
+                //    case 2: // Both players executed their choices. Clear both choices
+                //        ClearPendingChoices();
+                //        break;
+                //    case 1: // Only one player executed their choice.
+                //            // Clear that player's choice and set them to force switch select
+                //        CLearPendingChoice(executedPlayers[0]);
+                //        SetPlayerState(executedPlayers[0], PlayerState.ForceSwitchSelect);
+                //        Side side = GetSide(executedPlayers[0]);
+                //        if (PrintDebug)
+                //        {
+                //            //UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                //        }
+                //        break;
+                //}
             }
             else if (IsReadyForFaintedSelectProcessing())
             {
@@ -250,10 +253,47 @@ public partial class Battle
 
         //return choices;
 
+        Pokemon? slot1Pokemon = battle.GetSide(perspective).Team.Slot1Pokemon;
+        Pokemon? slot2Pokemon = battle.GetSide(perspective).Team.Slot2Pokemon;
+
+        bool slot1Alive = slot1Pokemon is { IsFainted: false };
+        bool slot2Alive = slot2Pokemon is { IsFainted: false };
+
+
+        Pokemon? slot1FoePokemon = battle.GetSide(perspective.OpposingPlayerId()).Team.Slot1Pokemon;
+        Pokemon? slot2FoePokemon = battle.GetSide(perspective.OpposingPlayerId()).Team.Slot2Pokemon;
+
+        bool slot1FoeAlive = slot1FoePokemon is { IsFainted: false };
+        bool slot2FoeAlive = slot2FoePokemon is { IsFainted: false };
+
         var slot1Choices = GetMoveSwitchChoicesForSlot(battle, perspective, SlotId.Slot1, isTeraUsed);
         var slot2Choices = GetMoveSwitchChoicesForSlot(battle, perspective, SlotId.Slot2, isTeraUsed);
 
+        if (slot1Choices.Length == 0 && slot2Choices.Length == 0)
+        {
+            throw new InvalidOperationException($"No valid choices generated for player {perspective} in" +
+                                                $"MoveSwitchSelect state.");
+        }
+
         var doublesChoices = ChoiceGenerator.GenerateValidDoublesChoices(slot1Choices, slot2Choices);
+
+        if (doublesChoices.Length == 0)
+        {
+            // Provide detailed diagnostic information when no doubles choices are generated
+            Console.WriteLine($"ERROR: No valid doubles choices generated for player {perspective}");
+            Console.WriteLine($"Slot1 choices ({slot1Choices.Length}): {string.Join(", ", slot1Choices)}");
+            Console.WriteLine($"Slot2 choices ({slot2Choices.Length}): {string.Join(", ", slot2Choices)}");
+
+            // Run diagnostic to understand why no choices were generated
+            ChoiceGenerator.DiagnoseDoublesChoiceGeneration(slot1Choices, slot2Choices);
+
+            throw new InvalidOperationException($"No valid doubles choices generated for player {perspective} in " +
+                                                $"MoveSwitchSelect state. Slot1 has {slot1Choices.Length} choices, " +
+                                                $"Slot2 has {slot2Choices.Length} choices, but no valid combinations " +
+                                                $"could be created. This likely means the Choice enum is missing " +
+                                                $"required doubles choice combinations.");
+        }
+
         return doublesChoices;
     }
 
@@ -304,10 +344,10 @@ public partial class Battle
 
         return target switch
         {
-            MoveTarget.AllAdjacentFoes => GetAllAdjacentFoesChoices(moveIndex, isTeraUsed),
-            MoveTarget.Field => GetFieldChoices(moveIndex, isTeraUsed),
-            MoveTarget.AllySide => GetAllySideChoices(moveIndex, isTeraUsed),
-            MoveTarget.Self => GetSelfChoices(moveIndex, isTeraUsed),
+            //MoveTarget.AllAdjacentFoes => GetAllAdjacentFoesChoices(moveIndex, isTeraUsed),
+            //MoveTarget.Field => GetFieldChoices(moveIndex, isTeraUsed),
+            //MoveTarget.AllySide => GetAllySideChoices(moveIndex, isTeraUsed),
+            //MoveTarget.Self => GetSelfChoices(moveIndex, isTeraUsed),
             MoveTarget.Normal => GetChoicesForSlotsMoveNormal(battle, perspective, slot, move,
                 moveIndex, isTeraUsed),
             _ => throw new NotImplementedException($"Choice generation for move target {target}" +
@@ -546,6 +586,13 @@ public partial class Battle
                         "Move index must be between 1 and 4."),
                 });
             }
+        }
+
+        // check for duplicate choices. throw error if any found
+        if (choices.Count != choices.Distinct().Count())
+        {
+            throw new InvalidOperationException($"Duplicate choices found for move {move.Name} by {attacker.Name}." +
+                                                $"Choices: {string.Join(", ", choices)}");
         }
 
         return choices.ToArray();

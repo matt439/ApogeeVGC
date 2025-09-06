@@ -177,7 +177,7 @@ public partial class Battle
         if (choice.Value.IsMoveChoice())
         {
             MoveAction moveAction = PerformMove(playerId, slotId);
-            SetPendingChoice(playerId, null);
+            //SetPendingChoice(playerId, null);
 
             // Only set to force switch select if there are valid switch options
             if (moveAction == MoveAction.SwitchAttackerOut &&
@@ -197,13 +197,13 @@ public partial class Battle
         else if (choice.Value.IsSwitchChoice())
         {
             PerformSwitch(playerId, slotId);
-            SetPendingChoice(playerId, null);
+            //SetPendingChoice(playerId, null);
             SetPlayerState(playerId, PlayerState.Idle);
         }
         else if (choice == Choice.Struggle)
         {
             PerformStruggle(playerId, slotId);
-            SetPendingChoice(playerId, null);
+            //SetPendingChoice(playerId, null);
             SetPlayerState(playerId, PlayerState.Idle);
 
             // Update player states for any fainted Pokemon

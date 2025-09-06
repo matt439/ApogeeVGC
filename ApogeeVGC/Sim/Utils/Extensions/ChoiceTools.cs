@@ -26,72 +26,72 @@ public static class ChoiceTools
         return choice switch
         {
             // Move 1
-            Choice.Move1NormalFoe1 => "Move 1 → Foe 1",
-            Choice.Move1NormalFoe2 => "Move 1 → Foe 2", 
-            Choice.Move1NormalAlly => "Move 1 → Ally",
-            Choice.Move1AllAdjacentFoes => "Move 1 → All Adjacent Foes",
-            Choice.Move1Field => "Move 1 → Field",
-            Choice.Move1AllySide => "Move 1 → Ally Side",
-            Choice.Move1Self => "Move 1 → Self",
+            Choice.Move1NormalFoe1 => "Move 1 -> Foe 1",
+            Choice.Move1NormalFoe2 => "Move 1 -> Foe 2", 
+            Choice.Move1NormalAlly => "Move 1 -> Ally",
+            Choice.Move1AllAdjacentFoes => "Move 1 -> All Adjacent Foes",
+            Choice.Move1Field => "Move 1 -> Field",
+            Choice.Move1AllySide => "Move 1 -> Ally Side",
+            Choice.Move1Self => "Move 1 -> Self",
 
-            Choice.Move1NormalFoe1WithTera => "Move 1 → Foe 1 (with Tera)",
-            Choice.Move1NormalFoe2WithTera => "Move 1 → Foe 2 (with Tera)",
-            Choice.Move1NormalAllyWithTera => "Move 1 → Ally (with Tera)",
-            Choice.Move1AllAdjacentFoesWithTera => "Move 1 → All Adjacent Foes (with Tera)",
-            Choice.Move1FieldWithTera => "Move 1 → Field (with Tera)",
-            Choice.Move1AllySideWithTera => "Move 1 → Ally Side (with Tera)",
-            Choice.Move1SelfWithTera => "Move 1 → Self (with Tera)",
+            Choice.Move1NormalFoe1WithTera => "Move 1 -> Foe 1 (with Tera)",
+            Choice.Move1NormalFoe2WithTera => "Move 1 -> Foe 2 (with Tera)",
+            Choice.Move1NormalAllyWithTera => "Move 1 -> Ally (with Tera)",
+            Choice.Move1AllAdjacentFoesWithTera => "Move 1 -> All Adjacent Foes (with Tera)",
+            Choice.Move1FieldWithTera => "Move 1 -> Field (with Tera)",
+            Choice.Move1AllySideWithTera => "Move 1 -> Ally Side (with Tera)",
+            Choice.Move1SelfWithTera => "Move 1 -> Self (with Tera)",
 
             // Move 2
-            Choice.Move2NormalFoe1 => "Move 2 → Foe 1",
-            Choice.Move2NormalFoe2 => "Move 2 → Foe 2",
-            Choice.Move2NormalAlly => "Move 2 → Ally",
-            Choice.Move2AllAdjacentFoes => "Move 2 → All Adjacent Foes",
-            Choice.Move2Field => "Move 2 → Field",
-            Choice.Move2AllySide => "Move 2 → Ally Side",
-            Choice.Move2Self => "Move 2 → Self",
+            Choice.Move2NormalFoe1 => "Move 2 -> Foe 1",
+            Choice.Move2NormalFoe2 => "Move 2 -> Foe 2",
+            Choice.Move2NormalAlly => "Move 2 -> Ally",
+            Choice.Move2AllAdjacentFoes => "Move 2 -> All Adjacent Foes",
+            Choice.Move2Field => "Move 2 -> Field",
+            Choice.Move2AllySide => "Move 2 -> Ally Side",
+            Choice.Move2Self => "Move 2 -> Self",
 
-            Choice.Move2NormalFoe1WithTera => "Move 2 → Foe 1 (with Tera)",
-            Choice.Move2NormalFoe2WithTera => "Move 2 → Foe 2 (with Tera)",
-            Choice.Move2NormalAllyWithTera => "Move 2 → Ally (with Tera)",
-            Choice.Move2AllAdjacentFoesWithTera => "Move 2 → All Adjacent Foes (with Tera)",
-            Choice.Move2FieldWithTera => "Move 2 → Field (with Tera)",
-            Choice.Move2AllySideWithTera => "Move 2 → Ally Side (with Tera)",
-            Choice.Move2SelfWithTera => "Move 2 → Self (with Tera)",
+            Choice.Move2NormalFoe1WithTera => "Move 2 -> Foe 1 (with Tera)",
+            Choice.Move2NormalFoe2WithTera => "Move 2 -> Foe 2 (with Tera)",
+            Choice.Move2NormalAllyWithTera => "Move 2 -> Ally (with Tera)",
+            Choice.Move2AllAdjacentFoesWithTera => "Move 2 -> All Adjacent Foes (with Tera)",
+            Choice.Move2FieldWithTera => "Move 2 -> Field (with Tera)",
+            Choice.Move2AllySideWithTera => "Move 2 -> Ally Side (with Tera)",
+            Choice.Move2SelfWithTera => "Move 2 -> Self (with Tera)",
 
             // Move 3
-            Choice.Move3NormalFoe1 => "Move 3 → Foe 1",
-            Choice.Move3NormalFoe2 => "Move 3 → Foe 2",
-            Choice.Move3NormalAlly => "Move 3 → Ally",
-            Choice.Move3AllAdjacentFoes => "Move 3 → All Adjacent Foes",
-            Choice.Move3Field => "Move 3 → Field",
-            Choice.Move3AllySide => "Move 3 → Ally Side",
-            Choice.Move3Self => "Move 3 → Self",
+            Choice.Move3NormalFoe1 => "Move 3 -> Foe 1",
+            Choice.Move3NormalFoe2 => "Move 3 -> Foe 2",
+            Choice.Move3NormalAlly => "Move 3 -> Ally",
+            Choice.Move3AllAdjacentFoes => "Move 3 -> All Adjacent Foes",
+            Choice.Move3Field => "Move 3 -> Field",
+            Choice.Move3AllySide => "Move 3 -> Ally Side",
+            Choice.Move3Self => "Move 3 -> Self",
 
-            Choice.Move3NormalFoe1WithTera => "Move 3 → Foe 1 (with Tera)",
-            Choice.Move3NormalFoe2WithTera => "Move 3 → Foe 2 (with Tera)",
-            Choice.Move3NormalAllyWithTera => "Move 3 → Ally (with Tera)",
-            Choice.Move3AllAdjacentFoesWithTera => "Move 3 → All Adjacent Foes (with Tera)",
-            Choice.Move3FieldWithTera => "Move 3 → Field (with Tera)",
-            Choice.Move3AllySideWithTera => "Move 3 → Ally Side (with Tera)",
-            Choice.Move3SelfWithTera => "Move 3 → Self (with Tera)",
+            Choice.Move3NormalFoe1WithTera => "Move 3 -> Foe 1 (with Tera)",
+            Choice.Move3NormalFoe2WithTera => "Move 3 -> Foe 2 (with Tera)",
+            Choice.Move3NormalAllyWithTera => "Move 3 -> Ally (with Tera)",
+            Choice.Move3AllAdjacentFoesWithTera => "Move 3 -> All Adjacent Foes (with Tera)",
+            Choice.Move3FieldWithTera => "Move 3 -> Field (with Tera)",
+            Choice.Move3AllySideWithTera => "Move 3 -> Ally Side (with Tera)",
+            Choice.Move3SelfWithTera => "Move 3 -> Self (with Tera)",
 
             // Move 4
-            Choice.Move4NormalFoe1 => "Move 4 → Foe 1",
-            Choice.Move4NormalFoe2 => "Move 4 → Foe 2",
-            Choice.Move4NormalAlly => "Move 4 → Ally",
-            Choice.Move4AllAdjacentFoes => "Move 4 → All Adjacent Foes",
-            Choice.Move4Field => "Move 4 → Field",
-            Choice.Move4AllySide => "Move 4 → Ally Side",
-            Choice.Move4Self => "Move 4 → Self",
+            Choice.Move4NormalFoe1 => "Move 4 -> Foe 1",
+            Choice.Move4NormalFoe2 => "Move 4 -> Foe 2",
+            Choice.Move4NormalAlly => "Move 4 -> Ally",
+            Choice.Move4AllAdjacentFoes => "Move 4 -> All Adjacent Foes",
+            Choice.Move4Field => "Move 4 -> Field",
+            Choice.Move4AllySide => "Move 4 -> Ally Side",
+            Choice.Move4Self => "Move 4 -> Self",
 
-            Choice.Move4NormalFoe1WithTera => "Move 4 → Foe 1 (with Tera)",
-            Choice.Move4NormalFoe2WithTera => "Move 4 → Foe 2 (with Tera)",
-            Choice.Move4NormalAllyWithTera => "Move 4 → Ally (with Tera)",
-            Choice.Move4AllAdjacentFoesWithTera => "Move 4 → All Adjacent Foes (with Tera)",
-            Choice.Move4FieldWithTera => "Move 4 → Field (with Tera)",
-            Choice.Move4AllySideWithTera => "Move 4 → Ally Side (with Tera)",
-            Choice.Move4SelfWithTera => "Move 4 → Self (with Tera)",
+            Choice.Move4NormalFoe1WithTera => "Move 4 -> Foe 1 (with Tera)",
+            Choice.Move4NormalFoe2WithTera => "Move 4 -> Foe 2 (with Tera)",
+            Choice.Move4NormalAllyWithTera => "Move 4 -> Ally (with Tera)",
+            Choice.Move4AllAdjacentFoesWithTera => "Move 4 -> All Adjacent Foes (with Tera)",
+            Choice.Move4FieldWithTera => "Move 4 -> Field (with Tera)",
+            Choice.Move4AllySideWithTera => "Move 4 -> Ally Side (with Tera)",
+            Choice.Move4SelfWithTera => "Move 4 -> Self (with Tera)",
 
             // Other choices
             Choice.Switch1 => "Switch to Pokemon 1",
@@ -274,7 +274,8 @@ public static class ChoiceTools
     /// Decodes a team preview choice into individual slot selections.
     /// Returns the Pokémon index (1-6) for each slot.
     /// </summary>
-    public static (int slot1Selection, int slot2Selection) DecodeTeamPreviewChoice(this Choice choice)
+    public static (int slot1Selection, int slot2Selection, int slot3Selection, int slot4Selection)
+        DecodeTeamPreviewChoice(this Choice choice)
     {
         if (!IsTeamPreviewChoice(choice))
         {
@@ -283,25 +284,55 @@ public static class ChoiceTools
 
         string choiceName = choice.ToString();
         
-        // Pattern: TeamPreviewSlot1Select{X}_Slot2Select{Y}
+        // Pattern: TeamPreviewSlot1Select{A}_Slot2Select{B}_Slot3Select{C}_Slot4Select{D}
         int slot1Index = choiceName.IndexOf("Slot1Select", StringComparison.Ordinal);
         int slot2Index = choiceName.IndexOf("_Slot2Select", StringComparison.Ordinal);
+        int slot3Index = choiceName.IndexOf("_Slot3Select", StringComparison.Ordinal);
+        int slot4Index = choiceName.IndexOf("_Slot4Select", StringComparison.Ordinal);
         
-        if (slot1Index == -1 || slot2Index == -1)
+        if (slot1Index == -1 || slot2Index == -1 || slot3Index == -1 || slot4Index == -1)
         {
             throw new ArgumentException($"Invalid team preview choice format: {choice}");
         }
 
         string slot1SelectStr = choiceName.Substring(slot1Index + 11, slot2Index - slot1Index - 11);
-        string slot2SelectStr = choiceName[(slot2Index + 12)..];
+        string slot2SelectStr = choiceName.Substring(slot2Index + 12, slot3Index - slot2Index - 12);
+        string slot3SelectStr = choiceName.Substring(slot3Index + 12, slot4Index - slot3Index - 12);
+        string slot4SelectStr = choiceName[(slot4Index + 12)..];
 
         if (!int.TryParse(slot1SelectStr, out int slot1Selection) ||
-            !int.TryParse(slot2SelectStr, out int slot2Selection))
+            !int.TryParse(slot2SelectStr, out int slot2Selection) ||
+            !int.TryParse(slot3SelectStr, out int slot3Selection) ||
+            !int.TryParse(slot4SelectStr, out int slot4Selection))
         {
             throw new ArgumentException($"Could not parse team preview selections from: {choice}");
         }
 
-        return (slot1Selection, slot2Selection);
+        return (slot1Selection, slot2Selection, slot3Selection, slot4Selection);
+    }
+
+    public static (int unusedSelection1, int unusedSelection2) DecodeUnusedTeamPreviewChoice(
+        (int slot1Selection, int slot2Selection, int slot3Selection, int slot4Selection) selected)
+    {
+        // of the 1-6 selections, find the two that are not used in the team preview
+        var allSelections = new HashSet<int> { 1, 2, 3, 4, 5, 6 };
+        allSelections.Remove(selected.slot1Selection);
+        allSelections.Remove(selected.slot2Selection);
+        allSelections.Remove(selected.slot3Selection);
+        allSelections.Remove(selected.slot4Selection);
+        int[] unused = allSelections.ToArray();
+        return (unused[0], unused[1]);
+    }
+
+    /// <summary>
+    /// Decodes a team preview choice into individual slot selections (2-slot backwards compatibility).
+    /// This method is obsolete - use the 4-slot version instead.
+    /// </summary>
+    [Obsolete("2-slot team preview is deprecated. Use the 4-slot DecodeTeamPreviewChoice method instead.")]
+    public static (int slot1Selection, int slot2Selection) DecodeTeamPreviewChoiceOld(this Choice choice)
+    {
+        var (slot1, slot2, _, _) = choice.DecodeTeamPreviewChoice();
+        return (slot1, slot2);
     }
 
     /// <summary>
@@ -309,20 +340,28 @@ public static class ChoiceTools
     /// </summary>
     /// <param name="slot1Selection">Pokémon index (1-6) for slot 1</param>
     /// <param name="slot2Selection">Pokémon index (1-6) for slot 2</param>
+    /// <param name="slot3Selection">Pokémon index (1-6) for slot 3</param>
+    /// <param name="slot4Selection">Pokémon index (1-6) for slot 4</param>
     /// <returns>The corresponding team preview choice</returns>
-    public static Choice CreateTeamPreviewChoice(int slot1Selection, int slot2Selection)
+    public static Choice CreateTeamPreviewChoice(int slot1Selection, int slot2Selection, int slot3Selection, int slot4Selection)
     {
-        if (slot1Selection < 1 || slot1Selection > 6 || slot2Selection < 1 || slot2Selection > 6)
+        // Validate all selections are in valid range
+        if (slot1Selection < 1 || slot1Selection > 6 || 
+            slot2Selection < 1 || slot2Selection > 6 ||
+            slot3Selection < 1 || slot3Selection > 6 ||
+            slot4Selection < 1 || slot4Selection > 6)
         {
-            throw new ArgumentException("Selections must be between 1 and 6");
+            throw new ArgumentException("All selections must be between 1 and 6");
         }
 
-        if (slot1Selection == slot2Selection)
+        // Validate all selections are unique
+        var selections = new[] { slot1Selection, slot2Selection, slot3Selection, slot4Selection };
+        if (selections.Distinct().Count() != 4)
         {
-            throw new ArgumentException("Cannot select the same Pokémon for both slots");
+            throw new ArgumentException("All Pokémon selections must be unique");
         }
 
-        string enumName = $"TeamPreviewSlot1Select{slot1Selection}_Slot2Select{slot2Selection}";
+        string enumName = $"TeamPreviewSlot1Select{slot1Selection}_Slot2Select{slot2Selection}_Slot3Select{slot3Selection}_Slot4Select{slot4Selection}";
         
         if (Enum.TryParse(enumName, out Choice teamPreviewChoice))
         {
@@ -330,6 +369,19 @@ public static class ChoiceTools
         }
         
         throw new ArgumentException($"Team preview choice not found in enum: {enumName}");
+    }
+
+    /// <summary>
+    /// Creates a team preview choice from individual slot selections (2-slot backwards compatibility).
+    /// This method is obsolete - use the 4-slot version instead.
+    /// </summary>
+    /// <param name="slot1Selection">Pokémon index (1-6) for slot 1</param>
+    /// <param name="slot2Selection">Pokémon index (1-6) for slot 2</param>
+    /// <returns>The corresponding team preview choice</returns>
+    [Obsolete("2-slot team preview is deprecated. Use the 4-slot CreateTeamPreviewChoice method instead.")]
+    public static Choice CreateTeamPreviewChoice(int slot1Selection, int slot2Selection)
+    {
+        throw new NotSupportedException("2-slot team preview format is no longer supported. Please use the 4-slot format: CreateTeamPreviewChoice(slot1, slot2, slot3, slot4)");
     }
 
     /// <summary>
@@ -342,8 +394,8 @@ public static class ChoiceTools
             throw new ArgumentException($"Not a team preview choice: {choice}");
         }
 
-        (int slot1, int slot2) = DecodeTeamPreviewChoice(choice);
-        return $"Slot 1: Pokémon {slot1} | Slot 2: Pokémon {slot2}";
+        (int slot1, int slot2, int slot3, int slot4) = DecodeTeamPreviewChoice(choice);
+        return $"Slot 1: Pokémon {slot1} | Slot 2: Pokémon {slot2} | Slot 3: Pokémon {slot3} | Slot 4: Pokémon {slot4}";
     }
 
     /// <summary>
@@ -373,6 +425,32 @@ public static class ChoiceTools
     }
 
     /// <summary>
+    /// Gets the Pokémon selection for slot 3 from a team preview choice.
+    /// </summary>
+    public static int GetSlot3Selection(this Choice choice)
+    {
+        if (!IsTeamPreviewChoice(choice))
+        {
+            throw new ArgumentException($"Not a team preview choice: {choice}");
+        }
+
+        return DecodeTeamPreviewChoice(choice).slot3Selection;
+    }
+
+    /// <summary>
+    /// Gets the Pokémon selection for slot 4 from a team preview choice.
+    /// </summary>
+    public static int GetSlot4Selection(this Choice choice)
+    {
+        if (!IsTeamPreviewChoice(choice))
+        {
+            throw new ArgumentException($"Not a team preview choice: {choice}");
+        }
+
+        return DecodeTeamPreviewChoice(choice).slot4Selection;
+    }
+
+    /// <summary>
     /// Generates all valid team preview choices.
     /// </summary>
     /// <returns>Array of all valid team preview combinations</returns>
@@ -384,15 +462,26 @@ public static class ChoiceTools
         {
             for (int slot2 = 1; slot2 <= teamCount; slot2++)
             {
-                if (slot1 == slot2) continue; // Can't select same Pokémon for both slots
-                try
+                if (slot2 == slot1) continue; // Can't select same Pokémon
+                
+                for (int slot3 = 1; slot3 <= teamCount; slot3++)
                 {
-                    Choice choice = CreateTeamPreviewChoice(slot1, slot2);
-                    choices.Add(choice);
-                }
-                catch
-                {
-                    // Skip if the choice doesn't exist in the enum
+                    if (slot3 == slot1 || slot3 == slot2) continue; // Can't select same Pokémon
+                    
+                    for (int slot4 = 1; slot4 <= teamCount; slot4++)
+                    {
+                        if (slot4 == slot1 || slot4 == slot2 || slot4 == slot3) continue; // Can't select same Pokémon
+                        
+                        try
+                        {
+                            Choice choice = CreateTeamPreviewChoice(slot1, slot2, slot3, slot4);
+                            choices.Add(choice);
+                        }
+                        catch
+                        {
+                            // Skip if the choice doesn't exist in the enum
+                        }
+                    }
                 }
             }
         }
@@ -403,17 +492,27 @@ public static class ChoiceTools
     /// <summary>
     /// Checks if a team preview choice combination is valid.
     /// </summary>
-    public static bool IsValidTeamPreviewChoice(int slot1Selection, int slot2Selection)
+    public static bool IsValidTeamPreviewChoice(int slot1Selection, int slot2Selection, int slot3Selection, int slot4Selection)
     {
         try
         {
-            CreateTeamPreviewChoice(slot1Selection, slot2Selection);
+            CreateTeamPreviewChoice(slot1Selection, slot2Selection, slot3Selection, slot4Selection);
             return true;
         }
         catch
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// Checks if a team preview choice combination is valid (2-slot backwards compatibility).
+    /// This method is obsolete - use the 4-slot version instead.
+    /// </summary>
+    [Obsolete("2-slot team preview is deprecated. Use the 4-slot IsValidTeamPreviewChoice method instead.")]
+    public static bool IsValidTeamPreviewChoice(int slot1Selection, int slot2Selection)
+    {
+        return false; // Always return false for deprecated 2-slot format
     }
 
     // =============================================================================

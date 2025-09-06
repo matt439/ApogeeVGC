@@ -91,12 +91,49 @@ public static class ChoiceGenerator
 
     /// <summary>
     /// Generates all possible doubles battle combinations as C# enum entries.
-    /// This includes both dual-slot and single-slot scenarios.
+    /// This includes both dual-slot and single-slot scenarios, plus team preview choices.
     /// </summary>
     /// <returns>String containing all enum entries for doubles battles</returns>
     public static string GenerateDoublesChoiceEnumEntries()
     {
         var sb = new StringBuilder();
+        sb.AppendLine("    // =============================================================================");
+        sb.AppendLine("    // TEAM PREVIEW CHOICES (4-SLOT FORMAT)");
+        sb.AppendLine("    // =============================================================================");
+        sb.AppendLine("    // Team Preview combinations: Select 4 different Pokémon from roster of 6");
+        sb.AppendLine("    // Pattern: TeamPreviewSlot1Select{A}_Slot2Select{B}_Slot3Select{C}_Slot4Select{D}");
+        sb.AppendLine("    // where A, B, C, D are all different values from 1-6");
+        sb.AppendLine();
+
+        int teamPreviewCombinations = 0;
+        
+        // Generate all 4-slot team preview combinations
+        for (int slot1 = 1; slot1 <= 6; slot1++)
+        {
+            for (int slot2 = 1; slot2 <= 6; slot2++)
+            {
+                if (slot2 == slot1) continue;
+                
+                for (int slot3 = 1; slot3 <= 6; slot3++)
+                {
+                    if (slot3 == slot1 || slot3 == slot2) continue;
+                    
+                    for (int slot4 = 1; slot4 <= 6; slot4++)
+                    {
+                        if (slot4 == slot1 || slot4 == slot2 || slot4 == slot3) continue;
+                        
+                        string enumEntry = $"TeamPreviewSlot1Select{slot1}_Slot2Select{slot2}_Slot3Select{slot3}_Slot4Select{slot4}";
+                        sb.AppendLine($"    {enumEntry},");
+                        teamPreviewCombinations++;
+                    }
+                }
+            }
+        }
+        
+        sb.AppendLine();
+        sb.AppendLine($"    // Total Team Preview combinations: {teamPreviewCombinations} (6 × 5 × 4 × 3 = 360)");
+        sb.AppendLine();
+
         sb.AppendLine("    // =============================================================================");
         sb.AppendLine("    // DOUBLES BATTLE COMBINATIONS (AUTO-GENERATED)");
         sb.AppendLine("    // =============================================================================");
@@ -108,7 +145,7 @@ public static class ChoiceGenerator
             .Concat(SingleStruggleChoices)
             .ToArray();
 
-        int totalCombinations = 0;
+        int totalCombinations = teamPreviewCombinations;
 
         // Generate dual-slot combinations: Slot1 × Slot2
         sb.AppendLine("    // Dual-slot combinations (both slots active)");
@@ -149,8 +186,8 @@ public static class ChoiceGenerator
         }
 
         sb.AppendLine();
-        sb.AppendLine($"    // Total doubles combinations generated: {totalCombinations}");
-        sb.AppendLine($"    // Breakdown: Dual-slot + Single-slot1 + Single-slot2");
+        sb.AppendLine($"    // Total combinations generated: {totalCombinations}");
+        sb.AppendLine($"    // Breakdown: Team Preview ({teamPreviewCombinations}) + Dual-slot + Single-slot1 + Single-slot2");
         
         return sb.ToString();
     }
@@ -253,13 +290,16 @@ public static class ChoiceGenerator
         if (choiceName.Contains("_Slot2Empty"))
         {
             // Slot1 active, Slot2 empty
-            string slot1Name = choiceName.Substring(5, choiceName.IndexOf("_Slot2Empty", StringComparison.Ordinal) - 5);
+            // Pattern: Slot1{ChoiceName}_Slot2Empty
+            int emptyIndex = choiceName.IndexOf("_Slot2Empty", StringComparison.Ordinal);
+            string slot1Name = choiceName.Substring(5, emptyIndex - 5); // Remove "Slot1" prefix
             if (Enum.TryParse(slot1Name, out Choice slot1Choice))
                 return (slot1Choice, null);
         }
         else if (choiceName.StartsWith("Slot1Empty_Slot2"))
         {
             // Slot1 empty, Slot2 active
+            // Pattern: Slot1Empty_Slot2{ChoiceName}
             string slot2Name = choiceName.Substring(16); // Remove "Slot1Empty_Slot2" prefix
             if (Enum.TryParse(slot2Name, out Choice slot2Choice))
                 return (null, slot2Choice);
@@ -267,9 +307,15 @@ public static class ChoiceGenerator
         else
         {
             // Dual-slot case
+            // Pattern: Slot1{ChoiceName}_Slot2{ChoiceName}
             int slot2Index = choiceName.IndexOf("_Slot2", StringComparison.Ordinal);
+            if (slot2Index == -1)
+            {
+                throw new ArgumentException($"Invalid doubles choice format - missing '_Slot2': {doublesChoice}");
+            }
+            
             string slot1Name = choiceName.Substring(5, slot2Index - 5); // Remove "Slot1" prefix
-            string slot2Name = choiceName[(slot2Index + 7)..]; // Remove "_Slot2" prefix
+            string slot2Name = choiceName.Substring(slot2Index + 6); // Remove "_Slot2" prefix (6 characters)
 
             // Parse back to enum values
             if (Enum.TryParse(slot1Name, out Choice slot1Choice) && 
@@ -277,6 +323,10 @@ public static class ChoiceGenerator
             {
                 return (slot1Choice, slot2Choice);
             }
+            
+            // Debug information for troubleshooting
+            throw new ArgumentException($"Could not parse choices from: {doublesChoice}. " +
+                                      $"Extracted slot1Name: '{slot1Name}', slot2Name: '{slot2Name}'");
         }
 
         throw new ArgumentException($"Could not decode doubles choice: {doublesChoice}");
@@ -366,6 +416,7 @@ public static class ChoiceGenerator
                     catch
                     {
                         // Skip if the doubles choice doesn't exist in the enum
+                        // This can happen if not all combinations have been generated yet
                     }
                 }
             }
@@ -409,6 +460,195 @@ public static class ChoiceGenerator
     }
 
     /// <summary>
+    /// Diagnostic method to help troubleshoot when GenerateValidDoublesChoices returns empty results.
+    /// This method provides detailed information about what combinations were attempted and why they failed.
+    /// </summary>
+    public static void DiagnoseDoublesChoiceGeneration(Choice[]? slot1Choices, Choice[]? slot2Choices)
+    {
+        Console.WriteLine("=== Diagnosing Doubles Choice Generation ===");
+        
+        if (slot1Choices == null && slot2Choices == null)
+        {
+            Console.WriteLine("ERROR: Both slot choice arrays are null");
+            return;
+        }
+        
+        Console.WriteLine($"Slot1 choices count: {slot1Choices?.Length ?? 0}");
+        Console.WriteLine($"Slot2 choices count: {slot2Choices?.Length ?? 0}");
+        
+        if (slot1Choices != null)
+        {
+            Console.WriteLine("Slot1 choices: " + string.Join(", ", slot1Choices));
+        }
+        
+        if (slot2Choices != null)
+        {
+            Console.WriteLine("Slot2 choices: " + string.Join(", ", slot2Choices));
+        }
+        
+        int totalAttempts = 0;
+        int invalidCombinations = 0;
+        int enumNotFound = 0;
+        int successful = 0;
+        
+        // Test dual-slot combinations
+        if (slot1Choices != null && slot2Choices != null)
+        {
+            Console.WriteLine("\nTesting dual-slot combinations:");
+            foreach (Choice slot1Choice in slot1Choices)
+            {
+                foreach (Choice slot2Choice in slot2Choices)
+                {
+                    totalAttempts++;
+                    
+                    if (IsInvalidCombination(slot1Choice, slot2Choice))
+                    {
+                        invalidCombinations++;
+                        Console.WriteLine($"  INVALID: {slot1Choice} + {slot2Choice} - Invalid combination");
+                        continue;
+                    }
+                    
+                    try
+                    {
+                        Choice doublesChoice = CreateDoublesChoice(slot1Choice, slot2Choice);
+                        successful++;
+                        Console.WriteLine($"  SUCCESS: {slot1Choice} + {slot2Choice} -> {doublesChoice}");
+                    }
+                    catch (Exception ex)
+                    {
+                        enumNotFound++;
+                        Console.WriteLine($"  FAILED: {slot1Choice} + {slot2Choice} - {ex.Message}");
+                    }
+                }
+            }
+        }
+        
+        // Test single-slot combinations
+        if (slot1Choices != null && slot2Choices == null)
+        {
+            Console.WriteLine("\nTesting slot1-only combinations:");
+            foreach (Choice slot1Choice in slot1Choices)
+            {
+                totalAttempts++;
+                try
+                {
+                    Choice doublesChoice = CreateDoublesChoice(slot1Choice, null);
+                    successful++;
+                    Console.WriteLine($"  SUCCESS: {slot1Choice} + null -> {doublesChoice}");
+                }
+                catch (Exception ex)
+                {
+                    enumNotFound++;
+                    Console.WriteLine($"  FAILED: {slot1Choice} + null - {ex.Message}");
+                }
+            }
+        }
+        
+        if (slot1Choices == null && slot2Choices != null)
+        {
+            Console.WriteLine("\nTesting slot2-only combinations:");
+            foreach (Choice slot2Choice in slot2Choices)
+            {
+                totalAttempts++;
+                try
+                {
+                    Choice doublesChoice = CreateDoublesChoice(null, slot2Choice);
+                    successful++;
+                    Console.WriteLine($"  SUCCESS: null + {slot2Choice} -> {doublesChoice}");
+                }
+                catch (Exception ex)
+                {
+                    enumNotFound++;
+                    Console.WriteLine($"  FAILED: null + {slot2Choice} - {ex.Message}");
+                }
+            }
+        }
+        
+        Console.WriteLine("\n=== Summary ===");
+        Console.WriteLine($"Total attempts: {totalAttempts}");
+        Console.WriteLine($"Invalid combinations: {invalidCombinations}");
+        Console.WriteLine($"Enum not found: {enumNotFound}");
+        Console.WriteLine($"Successful: {successful}");
+        
+        if (successful == 0)
+        {
+            Console.WriteLine("\nWARNING: No valid doubles choices could be generated!");
+            if (enumNotFound > 0)
+            {
+                Console.WriteLine("This is likely because the Choice enum doesn't contain all the required doubles choice combinations.");
+                Console.WriteLine("You may need to run ChoiceGenerator.WriteDoublesChoicesToFile() and update your Choice.cs enum.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks if the Choice enum contains all necessary doubles choice combinations for the given single choices.
+    /// This helps identify missing enum entries that need to be added.
+    /// </summary>
+    public static bool ValidateDoublesChoiceEnumCompleteness(Choice[]? slot1Choices, Choice[]? slot2Choices)
+    {
+        if (slot1Choices == null || slot2Choices == null)
+        {
+            return false;
+        }
+        
+        Console.WriteLine("=== Validating Doubles Choice Enum Completeness ===");
+        var missingCombinations = new List<string>();
+        
+        // Check dual-slot combinations
+        foreach (Choice slot1Choice in slot1Choices)
+        {
+            foreach (Choice slot2Choice in slot2Choices)
+            {
+                if (IsInvalidCombination(slot1Choice, slot2Choice)) continue;
+                
+                string enumName = GenerateEnumEntry(slot1Choice, slot2Choice);
+                if (!Enum.TryParse<Choice>(enumName, out _))
+                {
+                    missingCombinations.Add(enumName);
+                }
+            }
+        }
+        
+        // Check single-slot combinations
+        foreach (Choice slot1Choice in slot1Choices)
+        {
+            string enumName = GenerateSingleSlotEntry(slot1Choice, isSlot1: true);
+            if (!Enum.TryParse<Choice>(enumName, out _))
+            {
+                missingCombinations.Add(enumName);
+            }
+        }
+        
+        foreach (Choice slot2Choice in slot2Choices)
+        {
+            string enumName = GenerateSingleSlotEntry(slot2Choice, isSlot1: false);
+            if (!Enum.TryParse<Choice>(enumName, out _))
+            {
+                missingCombinations.Add(enumName);
+            }
+        }
+        
+        if (missingCombinations.Count > 0)
+        {
+            Console.WriteLine($"Found {missingCombinations.Count} missing enum combinations:");
+            foreach (string missing in missingCombinations.Take(10)) // Show first 10
+            {
+                Console.WriteLine($"  {missing}");
+            }
+            if (missingCombinations.Count > 10)
+            {
+                Console.WriteLine($"  ... and {missingCombinations.Count - 10} more");
+            }
+            Console.WriteLine("\nTo fix this, run ChoiceGenerator.WriteDoublesChoicesToFile() and add the generated enums to Choice.cs");
+            return false;
+        }
+        
+        Console.WriteLine("All required doubles choice combinations are present in the enum.");
+        return true;
+    }
+
+    /// <summary>
     /// Gets statistics about the generated combinations.
     /// </summary>
     public static void PrintCombinationStats()
@@ -418,11 +658,20 @@ public static class ChoiceGenerator
         int struggleCount = SingleStruggleChoices.Length;
         int totalSingleChoices = moveCount + switchCount + struggleCount;
 
-        Console.WriteLine("=== Doubles Choice Generation Statistics ===");
-        Console.WriteLine($"Single move choices: {moveCount}");
-        Console.WriteLine($"Single switch choices: {switchCount}");
-        Console.WriteLine($"Single struggle choices: {struggleCount}");
-        Console.WriteLine($"Total single choices: {totalSingleChoices}");
+        Console.WriteLine("=== Choice Generation Statistics ===");
+        Console.WriteLine();
+        
+        // Team Preview Statistics
+        Console.WriteLine("TEAM PREVIEW (4-slot format):");
+        Console.WriteLine($"  Combinations: 6 × 5 × 4 × 3 = 360");
+        Console.WriteLine();
+
+        // Doubles Battle Statistics
+        Console.WriteLine("DOUBLES BATTLE:");
+        Console.WriteLine($"  Single move choices: {moveCount}");
+        Console.WriteLine($"  Single switch choices: {switchCount}");
+        Console.WriteLine($"  Single struggle choices: {struggleCount}");
+        Console.WriteLine($"  Total single choices: {totalSingleChoices}");
         Console.WriteLine();
         
         // Calculate dual-slot combinations
@@ -438,12 +687,139 @@ public static class ChoiceGenerator
 
         // Calculate single-slot combinations
         int singleSlotCombinations = totalSingleChoices * 2; // Slot1Empty + Slot2Empty scenarios
+        int teamPreviewCombinations = 360; // 6 × 5 × 4 × 3
+        int totalCombinations = teamPreviewCombinations + actualDualSlot + singleSlotCombinations;
 
-        int totalCombinations = actualDualSlot + singleSlotCombinations;
+        Console.WriteLine($"  Dual-slot combinations: {actualDualSlot}");
+        Console.WriteLine($"  Single-slot combinations: {singleSlotCombinations}");
+        Console.WriteLine($"  Doubles total: {actualDualSlot + singleSlotCombinations}");
+        Console.WriteLine($"  Invalid dual-slot combinations filtered: {theoreticalDualSlot - actualDualSlot}");
+        Console.WriteLine();
+        Console.WriteLine($"GRAND TOTAL: {totalCombinations} combinations");
+        Console.WriteLine($"  Team Preview: {teamPreviewCombinations}");
+        Console.WriteLine($"  Doubles Battle: {actualDualSlot + singleSlotCombinations}");
+    }
 
-        Console.WriteLine($"Dual-slot combinations: {actualDualSlot}");
-        Console.WriteLine($"Single-slot combinations: {singleSlotCombinations}");
-        Console.WriteLine($"Total combinations: {totalCombinations}");
-        Console.WriteLine($"Invalid dual-slot combinations filtered: {theoreticalDualSlot - actualDualSlot}");
+    /// <summary>
+    /// Generates all possible team preview choices for 4-slot format.
+    /// Each player selects 4 different Pokémon from their roster of 6.
+    /// </summary>
+    /// <returns>String containing all team preview enum entries</returns>
+    public static string GenerateTeamPreviewChoiceEnumEntries()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("    // =============================================================================");
+        sb.AppendLine("    // TEAM PREVIEW CHOICES (4-SLOT FORMAT)");
+        sb.AppendLine("    // =============================================================================");
+        sb.AppendLine("    // Team Preview combinations: Select 4 different Pokémon from roster of 6");
+        sb.AppendLine("    // Pattern: TeamPreviewSlot1Select{A}_Slot2Select{B}_Slot3Select{C}_Slot4Select{D}");
+        sb.AppendLine("    // where A, B, C, D are all different values from 1-6");
+        sb.AppendLine();
+
+        int teamPreviewCombinations = 0;
+        
+        // Generate all 4-slot team preview combinations
+        for (int slot1 = 1; slot1 <= 6; slot1++)
+        {
+            for (int slot2 = 1; slot2 <= 6; slot2++)
+            {
+                if (slot2 == slot1) continue;
+                
+                for (int slot3 = 1; slot3 <= 6; slot3++)
+                {
+                    if (slot3 == slot1 || slot3 == slot2) continue;
+                    
+                    for (int slot4 = 1; slot4 <= 6; slot4++)
+                    {
+                        if (slot4 == slot1 || slot4 == slot2 || slot4 == slot3) continue;
+                        
+                        string enumEntry = $"TeamPreviewSlot1Select{slot1}_Slot2Select{slot2}_Slot3Select{slot3}_Slot4Select{slot4}";
+                        sb.AppendLine($"    {enumEntry},");
+                        teamPreviewCombinations++;
+                    }
+                }
+            }
+        }
+        
+        sb.AppendLine();
+        sb.AppendLine($"    // Total Team Preview combinations: {teamPreviewCombinations} (6 × 5 × 4 × 3 = 360)");
+        sb.AppendLine();
+        
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Writes the generated team preview choices to a file for easy copying into Choice.cs.
+    /// </summary>
+    public static void WriteTeamPreviewChoicesToFile(string filePath = "TeamPreviewChoices.txt")
+    {
+        string content = GenerateTeamPreviewChoiceEnumEntries();
+        File.WriteAllText(filePath, content);
+        Console.WriteLine($"Team preview choices written to: {filePath}");
+        Console.WriteLine($"Total lines: {content.Split('\n').Length}");
+    }
+
+    /// <summary>
+    /// Gets statistics about team preview combinations.
+    /// </summary>
+    public static void PrintTeamPreviewStats()
+    {
+        Console.WriteLine("=== Team Preview Choice Generation Statistics ===");
+        Console.WriteLine("4-slot format: Select 4 Pokémon from roster of 6");
+        Console.WriteLine("Order matters, no duplicates allowed");
+        Console.WriteLine();
+        Console.WriteLine($"Total combinations: 6 × 5 × 4 × 3 = 360");
+        Console.WriteLine("Pattern: TeamPreviewSlot1Select{A}_Slot2Select{B}_Slot3Select{C}_Slot4Select{D}");
+        Console.WriteLine("Where A, B, C, D are all different values from 1-6");
+    }
+
+    /// <summary>
+    /// Test method to verify DecodeDoublesChoice works correctly.
+    /// This method can be called during development to validate the parsing logic.
+    /// </summary>
+    public static void TestDecodeDoublesChoice()
+    {
+        Console.WriteLine("=== Testing DecodeDoublesChoice Method ===");
+        
+        try
+        {
+            // Test the problematic case mentioned in the issue
+            Choice testChoice = CreateDoublesChoice(Choice.Move1NormalFoe1, Choice.Move1NormalFoe1);
+            var (slot1, slot2) = DecodeDoublesChoice(testChoice);
+            
+            Console.WriteLine($"Test 1 - Dual Move1NormalFoe1:");
+            Console.WriteLine($"  Choice: {testChoice}");
+            Console.WriteLine($"  Decoded Slot1: {slot1}");
+            Console.WriteLine($"  Decoded Slot2: {slot2}");
+            Console.WriteLine($"  Success: {slot1 == Choice.Move1NormalFoe1 && slot2 == Choice.Move1NormalFoe1}");
+            Console.WriteLine();
+            
+            // Test single slot cases
+            Choice singleSlot1 = CreateDoublesChoice(Choice.Move2NormalFoe2, null);
+            var (s1_1, s1_2) = DecodeDoublesChoice(singleSlot1);
+            
+            Console.WriteLine($"Test 2 - Single Slot1:");
+            Console.WriteLine($"  Choice: {singleSlot1}");
+            Console.WriteLine($"  Decoded Slot1: {s1_1}");
+            Console.WriteLine($"  Decoded Slot2: {s1_2}");
+            Console.WriteLine($"  Success: {s1_1 == Choice.Move2NormalFoe2 && s1_2 == null}");
+            Console.WriteLine();
+            
+            Choice singleSlot2 = CreateDoublesChoice(null, Choice.Switch3);
+            var (s2_1, s2_2) = DecodeDoublesChoice(singleSlot2);
+            
+            Console.WriteLine($"Test 3 - Single Slot2:");
+            Console.WriteLine($"  Choice: {singleSlot2}");
+            Console.WriteLine($"  Decoded Slot1: {s2_1}");
+            Console.WriteLine($"  Decoded Slot2: {s2_2}");
+            Console.WriteLine($"  Success: {s2_1 == null && s2_2 == Choice.Switch3}");
+            Console.WriteLine();
+            
+            Console.WriteLine("All tests completed successfully!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Test failed with error: {ex.Message}");
+        }
     }
 }

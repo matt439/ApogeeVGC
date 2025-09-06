@@ -76,16 +76,16 @@ public static partial class UiGenerator
             if (!ch.IsMoveChoice() && !ch.IsSwitchChoice() &&
                 ch != Choice.Struggle)
             {
-                throw new ArgumentException("Invalid choice type in doubles choice.", nameof(choice));
+                throw new ArgumentException("Invalid choice type in doubles choice.", nameof(ch));
             }
 
             if (ch.IsMoveChoice())
             {
-                sb.Append(GenerateMoveChoiceString(battle, perspective, choice, (SlotId)i));
+                sb.Append(GenerateMoveChoiceString(battle, perspective, ch, (SlotId)i));
             }
             else if (ch.IsSwitchChoice())
             {
-                sb.Append(GenerateSwitchChoiceString(battle, perspective, choice));
+                sb.Append(GenerateSwitchChoiceString(battle, perspective, ch));
             }
             else if (ch == Choice.Struggle)
             {
@@ -128,33 +128,40 @@ public static partial class UiGenerator
 
     private static string GenerateTeamPreviewChoiceString(Battle battle, PlayerId perspective, Choice choice)
     {
-        (int slot1Index, int slot2Index) = choice.DecodeTeamPreviewChoice();
+        (int slot1Index, int slot2Index, int slot3Index, int slot4Index) = choice.DecodeTeamPreviewChoice();
 
-        if (slot1Index < 0 || slot1Index >= battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
-            slot2Index < 0 || slot2Index >= battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
-            slot1Index == slot2Index)
+        if (slot1Index < 1 || slot1Index > battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
+            slot2Index < 1 || slot2Index > battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
+            slot3Index < 1 || slot3Index > battle.GetSide(perspective).Team.PokemonSet.PokemonCount ||
+            slot4Index < 1 || slot4Index > battle.GetSide(perspective).Team.PokemonSet.PokemonCount)
         {
             throw new ArgumentOutOfRangeException(nameof(choice), "Invalid team preview choice.");
         }
 
-        Side side = battle.GetSide(perspective);
-
-        Pokemon slot1Pokemon = side.Team.PokemonSet.Pokemons[slot1Index];
-        if (slot1Pokemon == null)
+        var selections = new[] { slot1Index, slot2Index, slot3Index, slot4Index };
+        if (selections.Distinct().Count() != 4)
         {
-            throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
+            throw new ArgumentOutOfRangeException(nameof(choice), "Team preview choice must have 4 unique Pokémon.");
         }
 
-        Pokemon slot2Pokemon = side.Team.PokemonSet.Pokemons[slot2Index];
-        if (slot2Pokemon == null)
+        Side side = battle.GetSide(perspective);
+
+        Pokemon slot1Pokemon = side.Team.PokemonSet.Pokemons[slot1Index - 1];
+        Pokemon slot2Pokemon = side.Team.PokemonSet.Pokemons[slot2Index - 1];
+        Pokemon slot3Pokemon = side.Team.PokemonSet.Pokemons[slot3Index - 1];
+        Pokemon slot4Pokemon = side.Team.PokemonSet.Pokemons[slot4Index - 1];
+
+        if (slot1Pokemon == null || slot2Pokemon == null || slot3Pokemon == null || slot4Pokemon == null)
         {
             throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
         }
 
         StringBuilder sb = new();
         sb.Append($"Select: ");
-        sb.Append($"{slot1Pokemon.Name} ({slot1Pokemon.Specie.Name}) - ");
-        sb.Append($"{slot2Pokemon.Name} ({slot2Pokemon.Specie.Name})");
+        sb.Append($"1:{slot1Pokemon.Name} ({slot1Pokemon.Specie.Name}) - ");
+        sb.Append($"2:{slot2Pokemon.Name} ({slot2Pokemon.Specie.Name}) - ");
+        sb.Append($"3:{slot3Pokemon.Name} ({slot3Pokemon.Specie.Name}) - ");
+        sb.Append($"4:{slot4Pokemon.Name} ({slot4Pokemon.Specie.Name})");
         return sb.ToString();
     }
 
