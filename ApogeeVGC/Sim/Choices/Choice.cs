@@ -39,7 +39,6 @@ public abstract record SlotChoice
             {
                 throw new ArgumentException("A fainted Pokémon cannot use moves.", nameof(attacker));
             }
-
             if (move.Target == MoveTarget.Normal && moveNormalTarget == MoveNormalTarget.None)
             {
                 throw new ArgumentException("A normal target move must have a specified normal target.");
@@ -48,18 +47,190 @@ public abstract record SlotChoice
             {
                 throw new ArgumentException("A non-normal target move cannot have a normal target specified.");
             }
-
-            (int minTargets, int maxTargets) = move.Target.GetPossibleTargetMinMax();
-
-            if (possibleTargets.Count < minTargets || possibleTargets.Count > maxTargets)
+            // Check for any duplicates in possibleTargets
+            if (possibleTargets.Distinct().Count() != possibleTargets.Count)
             {
-                throw new ArgumentException(
-                    $"The number of possible targets ({possibleTargets.Count}) is not valid for" +
-                    $"the move target type ({move.Target}). Must be between {minTargets} and {maxTargets}.");
+                throw new ArgumentException("Possible targets list contains duplicate Pokémon.");
             }
+            // Check for fainted Pokémon in possibleTargets
+            if (possibleTargets.Any(p => p.IsFainted))
+            {
+                throw new ArgumentException("Possible targets list contains fainted Pokémon.");
+            }
+
+            //(int minTargets, int maxTargets) = move.Target.GetPossibleTargetMinMax();
+
+            //if (possibleTargets.Count < minTargets || possibleTargets.Count > maxTargets)
+            //{
+            //    throw new ArgumentException(
+            //        $"The number of possible targets ({possibleTargets.Count}) is not valid for" +
+            //        $"the move target type ({move.Target}). Must be between {minTargets} and {maxTargets}.");
+            //}
+
+            ValidatePossibleTargets(attacker, move, moveNormalTarget, possibleTargets);
 
             IsTera = isTera;
             MoveNormalTarget = moveNormalTarget;
+        }
+
+        private static void ValidatePossibleTargets(Pokemon attacker, Move move, MoveNormalTarget moveNormalTarget,
+            IReadOnlyList<Pokemon> possibleTargets)
+        {
+            SideId sideAttacker = attacker.SideId;
+            SideId sideFoe = sideAttacker.GetOppositeSide();
+            SlotId slotAttacker = attacker.SlotId;
+            SlotId slotAlly = slotAttacker.GetAllySlot();
+
+            switch (move.Target)
+            {
+                case MoveTarget.AdjacentAlly:
+                    // Must be 1 possible target
+                    if (possibleTargets.Count != 1)
+                    {
+                        throw new InvalidOperationException("AdjacentAlly move must have exactly one" +
+                                                            "possible target.");
+                    }
+                    // Must be on the same side as the attacker
+                    if (possibleTargets[0].SideId != sideAttacker)
+                    {
+                        throw new InvalidOperationException("AdjacentAlly move target must be on the same side" +
+                                                            "as the attacker.");
+                    }
+                    // Must be in the adjacent slot to the attacker
+                    if (possibleTargets[0].SlotId != slotAlly)
+                    {
+                        throw new InvalidOperationException("AdjacentAlly move target must be in the adjacent slot" +
+                                                            "to the attacker.");
+                    }
+                    break;
+                case MoveTarget.AdjacentAllyOrSelf:
+                case MoveTarget.AdjacentFoe:
+                case MoveTarget.All:
+                case MoveTarget.AllAdjacent:
+                    throw new NotImplementedException();
+                case MoveTarget.AllAdjacentFoes:
+                    // Must be 1 or 2 possible targets
+                    if (possibleTargets.Count is < 1 or > 2)
+                    {
+                        throw new InvalidOperationException("AllAdjacentFoes move must have one or two" +
+                                                            "possible targets.");
+                    }
+                    // Must be on the opposite side as the attacker
+                    if (possibleTargets.Any(p => p.SideId != sideFoe))
+                    {
+                        throw new InvalidOperationException("AllAdjacentFoes move targets must be on the" +
+                                                            "opposite side as the attacker.");
+                    }
+                    break;
+                case MoveTarget.Allies:
+                case MoveTarget.AllySide:
+                case MoveTarget.AllyTeam:
+                case MoveTarget.Any:
+                case MoveTarget.FoeSide:
+                    throw new NotImplementedException();
+                case MoveTarget.Normal:
+                    // Must be exactly 1 possible target
+                    if (possibleTargets.Count != 1)
+                    {
+                        throw new InvalidOperationException("Normal target move must have exactly one" +
+                                                            "possible target.");
+                    }
+                    // Validate based on MoveNormalTarget
+                    switch (moveNormalTarget)
+                    {
+                        case MoveNormalTarget.FoeSlot1:
+                            // Must be on the opposite side as the attacker
+                            if (possibleTargets[0].SideId != sideFoe)
+                            {
+                                throw new InvalidOperationException("FoeSlot1 move target must be on the" +
+                                                                    "opposite side as the attacker.");
+                            }
+                            // Must be in slot 1
+                            if (possibleTargets[0].SlotId != SlotId.Slot1)
+                            {
+                                throw new InvalidOperationException("FoeSlot1 move target must be in slot 1.");
+                            }
+                            break;
+                        case MoveNormalTarget.FoeSlot2:
+                            // Must be on the opposite side as the attacker
+                            if (possibleTargets[0].SideId != sideFoe)
+                            {
+                                throw new InvalidOperationException("FoeSlot2 move target must be on the" +
+                                                                    "opposite side as the attacker.");
+                            }
+                            // Must be in slot 2
+                            if (possibleTargets[0].SlotId != SlotId.Slot2)
+                            {
+                                throw new InvalidOperationException("FoeSlot2 move target must be in slot 2.");
+                            }
+                            break;
+                        case MoveNormalTarget.AllySlot1:
+                            // If attacker is in slot 1, cannot target self
+                            if (slotAttacker == SlotId.Slot1)
+                            {
+                                throw new InvalidOperationException("AllySlot1 move target cannot be the attacker.");
+                            }
+                            // Must be on the same side as the attacker
+                            if (possibleTargets[0].SideId != sideAttacker)
+                            {
+                                throw new InvalidOperationException("AllySlot1 move target must be on the same" +
+                                                                    "side as the attacker.");
+                            }
+                            // Must be in slot 1
+                            if (possibleTargets[0].SlotId != SlotId.Slot1)
+                            {
+                                throw new InvalidOperationException("AllySlot1 move target must be in slot 1.");
+                            }
+                            break;
+                        case MoveNormalTarget.AllySlot2:
+                            // If attacker is in slot 2, cannot target self
+                            if (slotAttacker == SlotId.Slot2)
+                            {
+                                throw new InvalidOperationException("AllySlot2 move target cannot be the attacker.");
+                            }
+                            // Must be on the same side as the attacker
+                            if (possibleTargets[0].SideId != sideAttacker)
+                            {
+                                throw new InvalidOperationException("AllySlot2 move target must be on the same" +
+                                                                    "side as the attacker.");
+                            }
+                            // Must be in slot 2
+                            if (possibleTargets[0].SlotId != SlotId.Slot2)
+                            {
+                                throw new InvalidOperationException("AllySlot2 move target must be in slot 2.");
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(moveNormalTarget), moveNormalTarget, null);
+                    }
+                    break;
+                case MoveTarget.RandomNormal:
+                case MoveTarget.Scripted:
+                    throw new NotImplementedException();
+                case MoveTarget.Self:
+                    // Must be exactly 1 possible target
+                    if (possibleTargets.Count != 1)
+                    {
+                        throw new InvalidOperationException("Self target move must have exactly one possible target.");
+                    }
+                    // Must be the attacker
+                    if (possibleTargets[0] != attacker)
+                    {
+                        throw new InvalidOperationException("Self target move target must be the attacker.");
+                    }
+                    break;
+                case MoveTarget.None:
+                    throw new NotImplementedException();
+                case MoveTarget.Field:
+                    // Must be 0 possible targets
+                    if (possibleTargets.Count != 0)
+                    {
+                        throw new InvalidOperationException("Field target move must have no possible targets.");
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 
