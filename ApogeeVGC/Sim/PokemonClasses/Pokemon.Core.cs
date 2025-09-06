@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 
@@ -45,9 +46,13 @@ public partial class Pokemon
     public MoveType TeraType { get; init; }
     public GenderId Gender { get; init; }
     public bool PrintDebug { get; init; }
+    public Trainer Trainer { get; init; }
+    public SideId SideId { get; init; }
+    public SlotId SlotId { get; set; }
 
     // Core constructor
-    public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level)
+    public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level, Trainer trainer,
+        SideId sideId)
     {
         Specie = specie;
         Evs = evs;
@@ -56,6 +61,8 @@ public partial class Pokemon
         Level = level;
         UnmodifiedStats = CalculateUnmodifiedStats();
         CurrentHp = UnmodifiedStats.Hp;
+        Trainer = trainer;
+        SideId = sideId;
     }
 
     //public override string ToString()

@@ -10,9 +10,9 @@ public partial class Battle
     /// This method creates independent copies of all mutable state while sharing immutable references.
     /// </summary>
     /// <returns>A new Battle instance with copied state</returns>
-    public Core.Battle DeepCopy(bool? printDebug = null)
+    public Battle DeepCopy(bool? printDebug = null)
     {
-        return new Core.Battle
+        return new Battle
         {
             // Shared immutable references
             Library = Library, // Library is read-only, safe to share

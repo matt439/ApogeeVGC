@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -40,6 +41,8 @@ public static class PokemonBuilder
         StatsTable evs,
         NatureType nature,
         MoveType terraType,
+        Trainer trainer,
+        SideId sideId,
         bool pringDebug = false,
         StatsTable? ivs = null,
         string? nickname = null,
@@ -48,14 +51,17 @@ public static class PokemonBuilder
     {
         List<Move> movesList = [];
 
+        int i = 0;
         foreach (MoveSetup moveSetup in moves)
         {
             if (!library.Moves.TryGetValue(moveSetup.Id, out Move? move))
             {
                 throw new ArgumentException($"Move {moveSetup.Id} not found in library.");
             }
-            move.PpUp = moveSetup.PpUp; // Set PP Up
+            move = move with { PpUp = moveSetup.PpUp }; // Set PP Up
+            move = move with { MoveSlot = (MoveSlot)i };
             movesList.Add(move);
+            i++;
         }
 
         Specie spec = library.Species[specie] ??
@@ -63,7 +69,7 @@ public static class PokemonBuilder
         Nature nat = library.Natures[nature] ??
                      throw new ArgumentException($"Nature {nature} not found in library.");
 
-        Pokemon pokemon = new(spec, evs, ivs ?? StatsTable.PerfectIvs, nat, level)
+        Pokemon pokemon = new(spec, evs, ivs ?? StatsTable.PerfectIvs, nat, level, trainer, sideId)
         {
             Moves = movesList.ToArray(),
             Item = library.Items[item] ?? throw new ArgumentException($"Item {item} not found in library."),
@@ -80,7 +86,7 @@ public static class PokemonBuilder
             : throw new ArgumentException("Invalid Pokemon configuration.");
     }
 
-    public static PokemonSet BuildTestSet(Library library, bool printDebug = false)
+    public static PokemonSet BuildTestSet(Library library, Trainer trainer, SideId sideId, bool printDebug = false)
     {
         return new PokemonSet()
         {
@@ -98,6 +104,8 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 236, Atk = 36, SpD = 236 },
                     NatureType.Adamant,
                     MoveType.Water,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
                 Build(
@@ -112,6 +120,8 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 236, Def = 52, SpA = 124, SpD = 68, Spe = 28 },
                     NatureType.Modest,
                     MoveType.Fairy,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
                 Build(
@@ -126,6 +136,8 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
                     NatureType.Adamant,
                     MoveType.Ghost,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
                 Build(
@@ -140,6 +152,8 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 252, Def = 196, SpD = 60 },
                     NatureType.Bold,
                     MoveType.Water,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
                 Build(
@@ -154,6 +168,8 @@ public static class PokemonBuilder
                     new StatsTable { Hp = 236, Atk = 4, Def = 140, SpD = 116, Spe = 12 },
                     NatureType.Careful,
                     MoveType.Ghost,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
                 Build(
@@ -168,9 +184,12 @@ public static class PokemonBuilder
                     new StatsTable { Atk = 236, SpD = 236, Spe = 36 },
                     NatureType.Adamant,
                     MoveType.Bug,
+                    trainer,
+                    sideId,
                     printDebug
                 ),
             ],
+            SideId = sideId,
         };
     }
 }

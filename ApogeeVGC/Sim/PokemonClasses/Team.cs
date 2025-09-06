@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.GameObjects;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -47,6 +48,7 @@ public class Team
     public int SwitchOptionsCount => SwitchOptionIndexes.Length;
     public bool IsDefeated => PokemonSet.AllFainted;
     public int HealthTeamTotal => PokemonSet.Pokemons.Sum(p => p.CurrentHp);
+    public required SideId SideId { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Team for MCTS simulation purposes.
@@ -60,6 +62,7 @@ public class Team
             PokemonSet = PokemonSet.Copy(),
             ActivePokemonIndex = ActivePokemonIndex,
             PrintDebug = PrintDebug,
+            SideId = SideId,
         };
     }
 

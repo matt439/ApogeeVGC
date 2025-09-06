@@ -104,7 +104,7 @@ public partial class Pokemon
 
     public Pokemon Copy()
     {
-        Pokemon copy = new(Specie, Evs, Ivs, Nature, Level)
+        Pokemon copy = new(Specie, Evs, Ivs, Nature, Level, Trainer, SideId)
         {
             Moves = Moves.Select(m => m.Copy()).ToArray(),
             Conditions = Conditions.Select(c => c.Copy()).ToList(),

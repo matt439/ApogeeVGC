@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -6,6 +7,7 @@ public class Side
 {
     public required Team Team { get; init; }
     public required PlayerId PlayerId { get; init; }
+    public required SideId SideId { get; init; }
     public bool PrintDebug { get; init; }
 
     /// <summary>
@@ -19,6 +21,7 @@ public class Side
             PlayerId = PlayerId, // Value type, safe to copy
             Team = Team.Copy(),
             PrintDebug = PrintDebug, // Added missing PrintDebug
+            SideId = SideId // Value type, safe to copy
         };
     }
 }

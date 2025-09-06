@@ -66,7 +66,7 @@ public record Move : IEffect
     public int PpUp
     {
         get;
-        set
+        init
         {
             if (value is < 0 or > 3)
             {
@@ -151,6 +151,9 @@ public record Move : IEffect
     /// </summary>
     public double? Recoil { get; init; }
     public bool Disabled { get; set; }
+
+    /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
+    public MoveSlot MoveSlot { get; init; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

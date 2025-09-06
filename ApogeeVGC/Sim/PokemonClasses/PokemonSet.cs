@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.PokemonClasses;
+﻿using ApogeeVGC.Sim.Core;
+
+namespace ApogeeVGC.Sim.PokemonClasses;
 
 public class PokemonSet
 {
@@ -24,6 +26,7 @@ public class PokemonSet
     public int FaintedCount => PokemonCount - AlivePokemonCount;
     public bool AllFainted => AlivePokemonCount == 0;
     public bool AnyTeraUsed => Pokemons.Any(pokemon => pokemon.IsTeraUsed);
+    public required SideId SideId { get; init; }
 
     /// /// <summary>
     /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
@@ -34,6 +37,7 @@ public class PokemonSet
         return new PokemonSet
         {
             Pokemons = Pokemons.Select(pokemon => pokemon.Copy()).ToArray(),
+            SideId = SideId
         };
     }
 }

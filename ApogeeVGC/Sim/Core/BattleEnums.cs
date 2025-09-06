@@ -1,5 +1,19 @@
 ﻿namespace ApogeeVGC.Sim.Core;
 
+public enum SideId
+{
+    Side1,
+    Side2,
+}
+
+public enum SlotId
+{
+    Slot1,
+    Slot2,
+    Slot3,
+    Slot4,
+}
+
 public enum BattleRequestState
 {
     RequestingPlayer1Input,
