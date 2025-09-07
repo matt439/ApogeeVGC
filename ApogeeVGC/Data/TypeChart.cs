@@ -50,7 +50,7 @@ public record TypeChart
         return typeEffectiveness.ConvertToMoveEffectiveness();
     }
 
-    public MoveEffectiveness GetMoveEffectiveness(List<PokemonType> pokemon, MoveType moveType)
+    public MoveEffectiveness GetMoveEffectiveness(IReadOnlyList<PokemonType> pokemon, MoveType moveType)
     {
         return pokemon.Count switch
         {

@@ -1,11 +1,11 @@
 ﻿namespace ApogeeVGC.Sim.Stats;
 
-public record StatModifiers
+public class StatModifiers
 {
     public int Atk
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -19,7 +19,7 @@ public record StatModifiers
     public int Def
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -33,7 +33,7 @@ public record StatModifiers
     public int SpA
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -47,7 +47,7 @@ public record StatModifiers
     public int SpD
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -61,7 +61,7 @@ public record StatModifiers
     public int Spe
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -75,7 +75,7 @@ public record StatModifiers
     public int Accuracy
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -89,7 +89,7 @@ public record StatModifiers
     public int Evasion
     {
         get;
-        init
+        set
         {
             if (!IsValidStage(value))
             {
@@ -107,6 +107,20 @@ public record StatModifiers
     public double SpeMultiplier => CalculateRegularStatMultiplier(Spe);
     public double AccuracyMultiplier => CalculateAccuracyStatMultiplier(Accuracy);
     public double EvasionMultiplier => CalculateEvasionStatMultiplier(Evasion);
+
+    public StatModifiers Copy()
+    {
+        return new StatModifiers
+        {
+            Atk = Atk,
+            Def = Def,
+            SpA = SpA,
+            SpD = SpD,
+            Spe = Spe,
+            Accuracy = Accuracy,
+            Evasion = Evasion,
+        };
+    }
 
     private static bool IsValidStage(int stage) => stage is >= -6 and <= 6;
 

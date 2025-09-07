@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -12,9 +13,7 @@ public abstract record SlotChoice
 
     public sealed record MoveChoice : SlotChoice
     {
-        // SideId, SlotId, and Trainer can be accessed via Attacker property
         public Pokemon Attacker { get; }
-        // MoveSlot can be accessed via Move property
         public Move Move { get; }
         public bool IsTera { get; }
         public MoveNormalTarget MoveNormalTarget { get; }
@@ -22,6 +21,8 @@ public abstract record SlotChoice
 
         public SideId SideId => Attacker.SideId;
         public SlotId SlotId => Attacker.SlotId;
+        public Trainer Trainer => Attacker.Trainer;
+        public MoveSlot MoveSlot => Move.MoveSlot;
 
         internal MoveChoice(Pokemon attacker, Move move, bool isTera, MoveNormalTarget moveNormalTarget,
             IReadOnlyList<Pokemon> possibleTargets)
@@ -57,15 +58,6 @@ public abstract record SlotChoice
             {
                 throw new ArgumentException("Possible targets list contains fainted Pokémon.");
             }
-
-            //(int minTargets, int maxTargets) = move.Target.GetPossibleTargetMinMax();
-
-            //if (possibleTargets.Count < minTargets || possibleTargets.Count > maxTargets)
-            //{
-            //    throw new ArgumentException(
-            //        $"The number of possible targets ({possibleTargets.Count}) is not valid for" +
-            //        $"the move target type ({move.Target}). Must be between {minTargets} and {maxTargets}.");
-            //}
 
             ValidatePossibleTargets(attacker, move, moveNormalTarget, possibleTargets);
 
@@ -236,13 +228,13 @@ public abstract record SlotChoice
 
     public sealed record SwitchChoice : SlotChoice
     {
-        // SideId can be accessed via SwitchOutPokemon or SwitchInPokemon properties
-        // SlotId can be accessed via SwitchOutPokemon or SwitchInPokemon properties
         public Pokemon SwitchOutPokemon { get; }
         public Pokemon SwitchInPokemon { get; }
-        public SideId SideId => SwitchOutPokemon.SideId;
+        public SideId SwitchOutSideId => SwitchOutPokemon.SideId;
         public SlotId SwitchOutSlot => SwitchOutPokemon.SlotId;
+        public SideId SwitchInSideId => SwitchInPokemon.SideId;
         public SlotId SwitchInSlot => SwitchInPokemon.SlotId;
+        public Trainer Trainer => SwitchOutPokemon.Trainer;
 
         internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon)
         {
@@ -266,6 +258,10 @@ public abstract record SlotChoice
         if (switchOutPokemon.SideId != switchInPokemon.SideId)
         {
             throw new ArgumentException("Cannot switch between different sides.");
+        }
+        if (switchOutPokemon.Trainer != switchInPokemon.Trainer)
+        {
+            throw new ArgumentException("Cannot switch between different trainers.");
         }
         if (switchOutPokemon.SlotId is SlotId.Slot3 or SlotId.Slot4)
         {

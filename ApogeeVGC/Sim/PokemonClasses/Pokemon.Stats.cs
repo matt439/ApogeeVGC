@@ -202,16 +202,29 @@ public partial class Pokemon
             // No change in stage, so no need to update
             return;
         }
-        StatModifiers = stat switch
+
+        switch (stat)
         {
-            StatId.Atk => StatModifiers with { Atk = newStage },
-            StatId.Def => StatModifiers with { Def = newStage },
-            StatId.SpA => StatModifiers with { SpA = newStage },
-            StatId.SpD => StatModifiers with { SpD = newStage },
-            StatId.Spe => StatModifiers with { Spe = newStage },
-            StatId.Hp => throw new ArgumentException("Cannot modify HP stat stage."),
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
-        };
+            case StatId.Atk:
+                StatModifiers.Atk = newStage;
+                break;
+            case StatId.Def:
+                StatModifiers.Def = newStage;
+                break;
+            case StatId.SpA:
+                StatModifiers.SpA = newStage;
+                break;
+            case StatId.SpD:
+                StatModifiers.SpD = newStage;
+                break;
+            case StatId.Spe:
+                StatModifiers.Spe = newStage;
+                break;
+            case StatId.Hp:
+                throw new ArgumentException("Cannot modify HP stat stage.");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+        }
 
         // TODO: Trigger any on-stat-change effects from conditions, abilities, items, etc.
 

@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 
@@ -21,7 +20,7 @@ public record Specie : IEffect
     public string Name { get; init; } = string.Empty;
     public string? BaseSpecies { get; init; }
     public string? Forme { get; init; }
-    public List<PokemonType> Types { get; init; } = [];
+    public IReadOnlyList<PokemonType> Types { get; init; } = [];
     public GenderId Gender { get; init; }
     public StatsTable BaseStats { get; init; } = new();
     public SpeciesAbility Abilities { get; init; } = new();

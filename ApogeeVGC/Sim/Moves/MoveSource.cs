@@ -17,7 +17,7 @@ public class MoveSource
 {
     public int Generation
     {
-        get => field;
+        get;
         init
         {
             if (value is < 1 or > 9)

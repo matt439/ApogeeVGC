@@ -123,7 +123,7 @@ public partial class Pokemon
             copy.Damage(hpDifference);
         }
 
-        copy.StatModifiers = StatModifiers with { };
+        copy.StatModifiers = StatModifiers.Copy();
         copy.LastMoveUsed = LastMoveUsed;
         copy.ActiveMoveActions = ActiveMoveActions;
         copy.IsTeraUsed = IsTeraUsed;

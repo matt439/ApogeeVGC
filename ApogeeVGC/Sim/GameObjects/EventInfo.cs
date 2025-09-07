@@ -2,22 +2,22 @@
 
 namespace ApogeeVGC.Sim.GameObjects;
 
-public class EventInfo
+public record EventInfo
 {
-    public int Generation { get; set; }
-    public int? Level { get; set; }
-    public bool? Shiny { get; set; } // true: always shiny, 1: sometimes shiny, false/null: never shiny
-    public int? ShinySometimes { get; set; } // Use this if you need to distinguish '1'
-    public GenderId? Gender { get; set; }
-    public string? Nature { get; set; }
-    public Dictionary<StatId, int>? Ivs { get; set; }
-    public int? PerfectIvs { get; set; }
-    public bool? IsHidden { get; set; }
-    public List<AbilityId>? Abilities { get; set; }
-    public int? MaxEggMoves { get; set; }
-    public List<string>? Moves { get; set; }
-    public string? Pokeball { get; set; }
-    public string? From { get; set; }
-    public bool? Japan { get; set; }
-    public bool? EmeraldEventEgg { get; set; }
+    public int Generation { get; init; }
+    public int? Level { get; init; }
+    public bool? Shiny { get; init; } // true: always shiny, 1: sometimes shiny, false/null: never shiny
+    public int? ShinySometimes { get; init; } // Use this if you need to distinguish '1'
+    public GenderId? Gender { get; init; }
+    public string? Nature { get; init; }
+    public Dictionary<StatId, int>? Ivs { get; init; }
+    public int? PerfectIvs { get; init; }
+    public bool? IsHidden { get; init; }
+    public List<AbilityId>? Abilities { get; init; }
+    public int? MaxEggMoves { get; init; }
+    public List<string>? Moves { get; init; }
+    public string? Pokeball { get; init; }
+    public string? From { get; init; }
+    public bool? Japan { get; init; }
+    public bool? EmeraldEventEgg { get; init; }
 }

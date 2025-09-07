@@ -12,7 +12,7 @@ public record Condition : IEffect
     public ConditionEffectType ConditionEffectType { get; init; }
     public ConditionVolatility ConditionVolatility { get; init; }
 
-    public Func<Pokemon, Pokemon?, IEffect?, BattleContext, bool>? OnStart;
+    public Func<Pokemon, Pokemon?, IEffect?, BattleContext, bool>? OnStart { get; init; }
     //public int EffectOrder { get; init; }
 
     public int? OnResidualOrder { get; init; }
