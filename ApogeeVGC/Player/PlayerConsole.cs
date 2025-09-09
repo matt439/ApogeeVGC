@@ -1,8 +1,6 @@
-﻿using ApogeeVGC.Sim;
-using ApogeeVGC.Sim.Choices;
+﻿using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Ui;
-using Battle = ApogeeVGC.Sim.Core.Battle;
 
 namespace ApogeeVGC.Player;
 
@@ -11,7 +9,7 @@ public class PlayerConsole(PlayerId playerId, Battle battle) : IPlayer
     public PlayerId PlayerId { get; } = playerId;
     public Battle Battle { get; } = battle;
 
-    public Choice GetNextChoice(Choice[] availableChoices)
+    public BattleChoice GetNextChoice(BattleChoice[] availableChoices)
     {
         if (Battle.IsTeamPreview) // check if in Team Preview phase
         {
@@ -23,11 +21,11 @@ public class PlayerConsole(PlayerId playerId, Battle battle) : IPlayer
         }
 
         UiGenerator.PrintChoices(Battle, PlayerId);
-        Choice choice = GetChoiceFromConsole(availableChoices);
+        BattleChoice choice = GetChoiceFromConsole(availableChoices);
         return choice;
     }
 
-    private static Choice GetChoiceFromConsole(Choice[] availableChoices)
+    private static BattleChoice GetChoiceFromConsole(BattleChoice[] availableChoices)
     {
         while (true)
         {

@@ -22,11 +22,11 @@ public class PokemonMonteCarloTreeSearch(
 
     public struct MoveResult
     {
-        public Choice OptimalChoice = Choice.Invalid;
+        public BattleChoice OptimalChoice;
         public int OptimalChoiceNodeIndex = -1;
         public string Children = string.Empty;
 
-        public MoveResult(Choice optimalChoice, int optimalChoiceNodeIndex, string children)
+        public MoveResult(BattleChoice optimalChoice, int optimalChoiceNodeIndex, string children)
         {
             OptimalChoice = optimalChoice;
             OptimalChoiceNodeIndex = optimalChoiceNodeIndex;
@@ -42,35 +42,22 @@ public class PokemonMonteCarloTreeSearch(
         }
     }
 
-    public MoveResult FindBestChoice(Battle battle, Choice[] availableChoices)
+    public MoveResult FindBestChoice(Battle battle, BattleChoice[] availableChoices)
     {
         // Create a seeded copy of the battle for deterministic simulation
-        Battle battleCopy;
-        try
-        {
-            battleCopy = battle.DeepCopy(false);
-        }
-        catch
-        {
-            // If we can't even copy the battle, fallback to first available choice
-            return new MoveResult(
-                availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
-                -1,
-                "Failed to copy battle state"
-            );
-        }
+        Battle battleCopy = battle.DeepCopy(false);
 
         // Ensure deterministic simulation
         battleCopy.BattleSeed ??= GenerateUniqueBattleSeed();
 
-        var rootNode = new Node(battleCopy, null, Choice.Invalid, explorationParameter, mctsPlayerId);
+        var rootNode = new Node(battleCopy, null, null!, explorationParameter, mctsPlayerId);
         GenerateChildren(rootNode, availableChoices);
 
         // Ensure root node has children before starting MCTS
         if (rootNode.ChildNodes.Count == 0)
         {
             return new MoveResult(
-                availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
+                availableChoices.Length > 0 ? availableChoices[0] : throw new InvalidOperationException(),
                 -1,
                 "No children generated for root node"
             );
@@ -102,16 +89,7 @@ public class PokemonMonteCarloTreeSearch(
                 Node node = Selection(rootNode);
 
                 // Expansion
-                Node? expandedNode = Expansion(node, threadRandom);
-                if (expandedNode == null)
-                {
-                    // Check if the node is terminal before trying to get battle result
-                    if (!node.IsTerminal) return;
-
-                    SimulatorResult battleResult = GetBattleResult(node.Battle);
-                    BackPropagate(node, battleResult);
-                    return;
-                }
+                Node expandedNode = Expansion(node, threadRandom);
 
                 // Simulation
                 Battle simulationBattle = CopyBattle(expandedNode.Battle);
@@ -134,7 +112,8 @@ public class PokemonMonteCarloTreeSearch(
         if (optimalChoiceIndex == -1)
         {
             // Fallback: if no child was visited, return first available choice
-            result.OptimalChoice = availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid;
+            result.OptimalChoice = availableChoices.Length > 0 ? availableChoices[0] :
+                throw new InvalidOperationException("No available choices to select from.");
             result.Children = "No optimal choice found, using fallback";
             return result;
         }
@@ -160,7 +139,7 @@ public class PokemonMonteCarloTreeSearch(
         return current;
     }
 
-    private Node? Expansion(Node node, Random threadRandom)
+    private Node Expansion(Node node, Random threadRandom)
     {
         if (node.IsTerminal)
         {
@@ -214,7 +193,7 @@ public class PokemonMonteCarloTreeSearch(
         }
     }
 
-    private void GenerateChildren(Node parent, Choice[]? availableChoices = null)
+    private void GenerateChildren(Node parent, BattleChoice[]? availableChoices = null)
     {
         if (availableChoices == null)
         {
@@ -247,7 +226,7 @@ public class PokemonMonteCarloTreeSearch(
                 return; // Another thread already generated children
             }
 
-            foreach (Choice choice in availableChoices)
+            foreach (BattleChoice choice in availableChoices)
             {
                 if (!parent.UntriedChoices.Contains(choice)) continue;
 
@@ -287,9 +266,9 @@ public class PokemonMonteCarloTreeSearch(
     private class Node
     {
         public Node? Parent { get; }
-        public Choice Choice { get; }
+        public BattleChoice Choice { get; }
         public Battle Battle { get; }
-        public List<Choice> UntriedChoices { get; }
+        public List<BattleChoice> UntriedChoices { get; }
         public List<Node> ChildNodes { get; }
         
         public readonly object LockObject = new(); // Make it public for external locking
@@ -339,7 +318,7 @@ public class PokemonMonteCarloTreeSearch(
         private readonly double _explorationParameter;
         private readonly PlayerId _mctsPlayerId;
 
-        public Node(Battle battle, Node? parent, Choice choice, double explorationParameter,
+        public Node(Battle battle, Node? parent, BattleChoice choice, double explorationParameter,
             PlayerId mctsPlayerId)
         {
             Parent = parent;
@@ -407,7 +386,7 @@ public class PokemonMonteCarloTreeSearch(
             }
         }
 
-        private Choice[] GetAvailableChoicesForNode()
+        private BattleChoice[] GetAvailableChoicesForNode()
         {
             try
             {

@@ -1,11 +1,8 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
-using ApogeeVGC.Sim;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Utils.Extensions;
-using Battle = ApogeeVGC.Sim.Core.Battle;
 
 namespace ApogeeVGC.Sim.Choices;
 
@@ -30,12 +27,12 @@ public class ChoiceFilter
     private const int MaxMoveCount = 8;
     private const int SuperEffectiveMaxMoveCount = 4;
 
-    public static Choice FilterAndRandomlySelectChoice(Choice[] choices, ChoiceFilterStrategy strategy,
+    public static BattleChoice FilterAndRandomlySelectChoice(BattleChoice[] choices, ChoiceFilterStrategy strategy,
         Battle battle, PlayerId player, Random random)
     {
         if (choices.Length == 0)
         {
-            return Choice.Invalid; // No choices available
+            throw new ArgumentException("Choices array cannot be empty.", nameof(choices));
         }
 
         // check if in team preview phase
@@ -49,13 +46,13 @@ public class ChoiceFilter
         var filteredChoices = Filter(choices, strategy, battle, player, random);
         if (filteredChoices.Length == 0)
         {
-            return Choice.Invalid; // No choices available
+            throw new InvalidOperationException("Filtering resulted in no available choices.");
         }
         int randomIndex = random.Next(filteredChoices.Length);
         return filteredChoices[randomIndex];
     }
 
-    public static Choice[] Filter(Choice[] choices, ChoiceFilterStrategy strategy,
+    public static BattleChoice[] Filter(BattleChoice[] choices, ChoiceFilterStrategy strategy,
         Battle battle, PlayerId player, Random random)
     {
         if (choices.Length == 0)
@@ -80,7 +77,7 @@ public class ChoiceFilter
         };
     }
 
-    private static Choice[] ApplyReducedSwitchingStrategy(Choice[] choices, Random random)
+    private static BattleChoice[] ApplyReducedSwitchingStrategy(BattleChoice[] choices, Random random)
     {
         // Filter for move choices
         var moveChoices = FilterMoveChoices(choices);
@@ -106,33 +103,33 @@ public class ChoiceFilter
         return moveChoices.Concat(switchChoices).ToArray();
     }
 
-    private static Choice[] ApplyReducedSwitchingAndSuperEffectiveOrStabDamagingMoves(Choice[] choices,
+    private static BattleChoice[] ApplyReducedSwitchingAndSuperEffectiveOrStabDamagingMoves(BattleChoice[] choices,
         Battle battle, PlayerId player, Random random)
     {
         var moveChoices = FilterSuperEffectiveOrStabDamagingMoves(choices, battle, player,
             SuperEffectiveMaxMoveCount);
         var switchChoices = FilterSwitchChoices(choices, random, ReducedSwitchingMaxSwitchCount);
-        if (moveChoices.Length == 0 && switchChoices.Length == 0)
+        return moveChoices.Length switch
         {
-            // No move or switch choices available
-            return choices;
-        }
-        if (moveChoices.Length == 0)
-        {
-            // No move choices available, return switch choices
-            return switchChoices;
-        }
-        if (switchChoices.Length == 0)
-        {
-            // No switch choices available, return move choices
-            return moveChoices;
-        }
-        // Combine move and switch choices
-        return moveChoices.Concat(switchChoices).ToArray();
+            0 when switchChoices.Length == 0 =>
+                // No move or switch choices available
+                choices,
+            0 =>
+                // No move choices available, return switch choices
+                switchChoices,
+
+            _ => switchChoices.Length == 0
+                ?
+                // No switch choices available, return move choices
+                moveChoices
+                :
+                // Combine move and switch choices
+                moveChoices.Concat(switchChoices).ToArray(),
+        };
     }
 
-    private static Choice[] ApplySuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves(
-        Choice[] choices, Battle battle, PlayerId player, Random random)
+    private static BattleChoice[] ApplySuperEffectiveMovesFromSwitchInAndSuperEffectiveOrStabDamagingMoves(
+        BattleChoice[] choices, Battle battle, PlayerId player, Random random)
     {
         var moveChoices = FilterSuperEffectiveOrStabDamagingMoves(choices, battle, player,
             SuperEffectiveMaxMoveCount);
@@ -151,7 +148,7 @@ public class ChoiceFilter
         };
     }
 
-    private static Choice[] FilterSuperEffectiveOrStabDamagingMoves(Choice[] choices, Battle battle,
+    private static BattleChoice[] FilterSuperEffectiveOrStabDamagingMoves(BattleChoice[] choices, Battle battle,
         PlayerId player, int maxMoves = MaxMoveCount)
     {
         if (maxMoves < 0)
@@ -160,7 +157,7 @@ public class ChoiceFilter
         }
 
         // Filter for damaging move choices
-        var moveChoices = FilterDamagingMoveChoices(choices, battle, player);
+        var moveChoices = FilterDamagingMoveChoices(choices);
 
         if (moveChoices.Length == 0)
         {
@@ -176,33 +173,14 @@ public class ChoiceFilter
         List<MoveEffectiveness> effectivenessList = [];
         List<bool> isStabList = [];
 
-        foreach (Choice choice in moveChoices)
+        foreach (BattleChoice choice in moveChoices)
         {
-            if (!choice.IsMoveChoice() && !choice.IsMoveWithTeraChoice())
+            if (choice is not SlotChoice.MoveChoice moveChoice)
             {
-                throw new InvalidOperationException("Choice must be a move choice.");
+                continue; // Skip non-move choices
             }
 
-            int moveIndex;
-            if (choice.IsMoveChoice())
-            {
-                moveIndex = choice.GetMoveIndexFromChoice();
-
-            }
-            else
-            {
-                moveIndex = choice.GetMoveWithTeraIndexFromChoice();
-            }
-
-            if (moveIndex < 0 || moveIndex >= playerSide.Team.ActivePokemon.Moves.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
-            }
-            Move move = playerSide.Team.ActivePokemon.Moves[moveIndex];
-            if (move == null)
-            {
-                throw new InvalidOperationException("Move choice cannot be made to a null Move.");
-            }
+            Move move = moveChoice.Move;
 
             MoveEffectiveness effectiveness = battle.Library.TypeChart.GetMoveEffectiveness(
                 defendingPokemon.Specie.Types, move.Type);
@@ -236,29 +214,25 @@ public class ChoiceFilter
     /// Filters switch choices to only include those that would switch in a Pokemon
     /// that has at least one super effective move against the opponent's active Pokemon.
     /// </summary>
-    private static Choice[] FilterSuperEffectiveMovesFromSwitchIn(Choice[] choices, Battle battle,
+    private static BattleChoice[] FilterSuperEffectiveMovesFromSwitchIn(BattleChoice[] choices, Battle battle,
         PlayerId player, Random random)
     {
         // Get all switch choices first (without random filtering)
-        var allSwitchChoices = choices.Where(c => c.IsSwitchChoice()).ToArray();
+        var allSwitchChoices = choices.Where(c => c is SlotChoice.SwitchChoice).ToArray();
         if (allSwitchChoices.Length == 0)
         {
             return choices; // No switch choices available, return original choices
         }
 
-        Side playerSide = battle.GetSide(player);
         Side opponentSide = battle.GetSide(player.OpposingPlayerId());
         Pokemon defendingPokemon = opponentSide.Team.ActivePokemon;
 
         var superEffectiveSwitchChoices = allSwitchChoices.Where(choice =>
         {
-            int switchIndex = choice.GetSwitchIndexFromChoice();
-            if (switchIndex < 0 || switchIndex >= playerSide.Team.PokemonSet.Pokemons.Length)
-            {
-                return false; // Invalid choice, exclude it
-            }
+            if (choice is not SlotChoice.SwitchChoice switchChoice)
+                return false;
 
-            Pokemon switchingInPokemon = playerSide.Team.PokemonSet.Pokemons[switchIndex];
+            Pokemon switchingInPokemon = switchChoice.SwitchInPokemon;
 
             // Check if any move is super effective
             return switchingInPokemon.Moves.Any(move =>
@@ -279,81 +253,54 @@ public class ChoiceFilter
         };
     }
 
-    private static Choice[] FilterMoveChoices(Choice[] availableChoices)
+    private static BattleChoice[] FilterMoveChoices(BattleChoice[] availableChoices)
     {
-        var moveChoices = availableChoices.Where(c => c.IsMoveChoice() ||
-                                                      c.IsMoveWithTeraChoice()).ToArray();
-        return moveChoices;
+        return availableChoices.Where(choice => choice is SlotChoice.MoveChoice).ToArray();
     }
 
-    private static Choice[] FilterPhysicalMoveChoices(Choice[] availableChoices, Battle battle,
-        PlayerId player)
+    private static BattleChoice[] FilterPhysicalMoveChoices(BattleChoice[] availableChoices)
     {
-        return FilterMoveChoicesByCategory(availableChoices, battle, player, MoveCategory.Physical);
+        return FilterMoveChoicesByCategory(availableChoices, MoveCategory.Physical);
     }
 
-    private static Choice[] FilterSpecialMoveChoices(Choice[] availableChoices, Battle battle,
-        PlayerId player)
+    private static BattleChoice[] FilterSpecialMoveChoices(BattleChoice[] availableChoices)
     {
-        return FilterMoveChoicesByCategory(availableChoices, battle, player, MoveCategory.Special);
+        return FilterMoveChoicesByCategory(availableChoices, MoveCategory.Special);
     }
 
-    private static Choice[] FilterStatusMoveChoices(Choice[] availableChoices, Battle battle,
-        PlayerId player)
+    private static BattleChoice[] FilterStatusMoveChoices(BattleChoice[] availableChoices)
     {
-        return FilterMoveChoicesByCategory(availableChoices, battle, player, MoveCategory.Status);
+        return FilterMoveChoicesByCategory(availableChoices, MoveCategory.Status);
     }
 
-    private static Choice[] FilterDamagingMoveChoices(Choice[] availableChoices, Battle battle,
-        PlayerId player)
+    private static BattleChoice[] FilterDamagingMoveChoices(BattleChoice[] availableChoices)
     {
-        var physicalMoves = FilterPhysicalMoveChoices(availableChoices, battle, player);
-        var specialMoves = FilterSpecialMoveChoices(availableChoices, battle, player);
+        var physicalMoves = FilterPhysicalMoveChoices(availableChoices);
+        var specialMoves = FilterSpecialMoveChoices(availableChoices);
         return physicalMoves.Concat(specialMoves).ToArray();
     }
 
-    private static Choice[] FilterMoveChoicesByCategory(Choice[] availableChoices, Battle battle,
-        PlayerId player, MoveCategory category)
+    private static BattleChoice[] FilterMoveChoicesByCategory(BattleChoice[] availableChoices, MoveCategory category)
     {
-        var moveChoices = FilterMoveChoices(availableChoices);
+        var moveChoices = availableChoices.Where(choice => choice is SlotChoice.MoveChoice).ToArray();
         if (moveChoices.Length == 0)
         {
             return [];
         }
-        Side playerSide = battle.GetSide(player);
-        Pokemon attackingPokemon = playerSide.Team.ActivePokemon;
-        var statusMoveChoices = moveChoices.Where(choice =>
+
+        var categoryMoveChoices = moveChoices.Where(choice =>
         {
-            if (!choice.IsMoveChoice() && !choice.IsMoveWithTeraChoice())
-            {
-                throw new InvalidOperationException("Choice must be a move choice.");
-            }
+            if (choice is not SlotChoice.MoveChoice moveChoice)
+                return false;
 
-            int moveIndex;
-            if (choice.IsMoveChoice())
-            {
-                moveIndex = choice.GetMoveIndexFromChoice();
-            }
-            else
-            {
-                moveIndex = choice.GetMoveWithTeraIndexFromChoice();
-            }
-
-            if (moveIndex < 0 || moveIndex >= attackingPokemon.Moves.Length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
-            }
-            Move move = attackingPokemon.Moves[moveIndex];
-            if (move == null)
-            {
-                throw new InvalidOperationException("Move choice cannot be made to a null Move.");
-            }
+            Move move = moveChoice.Move;
             return move.Category == category;
         }).ToArray();
-        return statusMoveChoices;
+        
+        return categoryMoveChoices;
     }
 
-    private static Choice[] FilterSwitchChoices(Choice[] availableChoices, Random random,
+    private static BattleChoice[] FilterSwitchChoices(BattleChoice[] availableChoices, Random random,
         int maxSwitches = MaxSwitchCount)
     {
         switch (maxSwitches)
@@ -364,11 +311,11 @@ public class ChoiceFilter
                 return [];
         }
 
-        var switchChoices = availableChoices.Where(c => c.IsSwitchChoice()).ToArray();
+        var switchChoices = availableChoices.Where(c => c is SlotChoice.SwitchChoice).ToArray();
         if (maxSwitches >= switchChoices.Length)
             return switchChoices;
 
-        var selectedChoices = new HashSet<Choice>();
+        var selectedChoices = new HashSet<BattleChoice>();
         while (selectedChoices.Count < maxSwitches)
         {
             int randomIndex = random.Next(switchChoices.Length);

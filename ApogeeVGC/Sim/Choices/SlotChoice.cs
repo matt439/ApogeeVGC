@@ -6,15 +6,15 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Choices;
 
-public abstract record SlotChoice
+public abstract record SlotChoice : BattleChoice
 {
     private SlotChoice() { }
 
     /// <summary>
     /// Gets the trainer associated with this choice.
     /// </summary>
-    public abstract Trainer Trainer { get; }
-    public abstract SideId SideId { get; }
+    public abstract override Trainer Trainer { get; }
+    public abstract override SideId SideId { get; }
     public abstract SlotId SlotId { get; }
 
     public sealed record MoveChoice : SlotChoice
@@ -247,10 +247,38 @@ public abstract record SlotChoice
 
         internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon)
         {
-            SwitchOutPokemon = switchOutPokemon;
-            SwitchInPokemon = switchInPokemon;
+            SwitchOutPokemon = switchOutPokemon ?? throw new ArgumentNullException(nameof(switchOutPokemon));
+            SwitchInPokemon = switchInPokemon ?? throw new ArgumentNullException(nameof(switchInPokemon));
+
+            // Apply the same validation as the factory method
+            if (SwitchOutPokemon == SwitchInPokemon)
+            {
+                throw new ArgumentException("Cannot switch a Pokemon with itself.");
+            }
+            if (SwitchOutPokemon.SideId != SwitchInPokemon.SideId)
+            {
+                throw new ArgumentException("Cannot switch between different sides.");
+            }
+            if (SwitchOutPokemon.Trainer != SwitchInPokemon.Trainer)
+            {
+                throw new ArgumentException("Cannot switch between different trainers.");
+            }
+            if (SwitchOutPokemon.SlotId is SlotId.Slot3 or SlotId.Slot4)
+            {
+                throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
+            }
+            if (SwitchInPokemon.SlotId is SlotId.Slot1 or SlotId.Slot2)
+            {
+                throw new ArgumentException("Only bench Pokemon can be switched in.");
+            }
+            if (SwitchInPokemon.IsFainted)
+            {
+                throw new ArgumentException("Cannot switch in a fainted Pokémon.");
+            }
         }
     }
+
+    
 
     public static MoveChoice CreateMove(Pokemon pokemon, Move move, bool isTera,
         MoveNormalTarget moveNormalTarget = MoveNormalTarget.None, IReadOnlyList<Pokemon>? possibleTargets = null)
@@ -293,7 +321,6 @@ public abstract record SlotChoice
     public bool IsMoveChoice => this is MoveChoice;
     public bool IsStruggleMove => this is MoveChoice { IsStruggle: true};
     public bool IsTeraMove => this is MoveChoice { IsTera: true };
-
 
     /// <summary>
     /// Gets whether this choice represents a switch action.

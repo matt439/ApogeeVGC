@@ -1,18 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using ApogeeVGC.Data;
-using ApogeeVGC.Sim;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Choices;
-using Battle = ApogeeVGC.Sim.Core.Battle;
+using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
-
-//public enum PlayerRandomStrategy
-//{
-//    AllChoices,
-//    MoveChoices,
-//    ReducedSwitching,
-//    SuperEffectiveOrStabMoves,
-//}
 
 public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
     ChoiceFilterStrategy strategy, int? seed = null) : IPlayer
@@ -24,9 +14,14 @@ public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
 
     private readonly Random _random = seed is null ? new Random() : new Random(seed.Value);
 
-    public Choice GetNextChoice(Choice[] availableChoices)
+    public BattleChoice GetNextChoice(BattleChoice[] availableChoices)
     {
-        Choice selectedChoice = Strategy switch
+        if (availableChoices.Length == 0)
+        {
+            throw new ArgumentException("No available choices to select from.", nameof(availableChoices));
+        }
+
+        BattleChoice selectedChoice = Strategy switch
         {
             ChoiceFilterStrategy.None => GetNextChoiceFromAll(availableChoices),
             ChoiceFilterStrategy.ReducedSwitching
@@ -36,20 +31,15 @@ public class PlayerRandom(PlayerId playerId, Battle battle, Library library,
             _ => throw new NotImplementedException($"Strategy {Strategy} not implemented."),
         };
 
-        if (selectedChoice == Choice.Invalid)
-        {
-            throw new InvalidOperationException("Filtered choice resulted in Invalid choice." +
-                                                "This should not happen.");
-        }
         return selectedChoice;
     }
 
-    private Choice GetNextChoiceFromAll(Choice[] availableChoices)
+    private BattleChoice GetNextChoiceFromAll(BattleChoice[] availableChoices)
     {
         // Select a random choice from all available choices
         if (availableChoices.Length == 0)
         {
-            return Choice.Invalid; // No choices available
+            throw new ArgumentException("No available choices to select from.", nameof(availableChoices));
         }
         int randomIndex = _random.Next(availableChoices.Length);
         return availableChoices[randomIndex];

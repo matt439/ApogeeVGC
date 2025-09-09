@@ -43,7 +43,7 @@ public partial class Battle
     /// <param name="choice">The choice to apply</param>
     /// <param name="printDebug">Manually set debug printing</param>
     /// <returns>A new Battle instance with the choice applied</returns>
-    public Core.Battle DeepCopyAndApplyChoice(PlayerId playerId, Choice choice, bool? printDebug = null)
+    public Battle DeepCopyAndApplyChoice(PlayerId playerId, BattleChoice choice, bool? printDebug = null)
     {
         Core.Battle copy = DeepCopy(printDebug);
 

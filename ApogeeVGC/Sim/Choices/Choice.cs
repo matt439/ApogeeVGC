@@ -1,42 +1,44 @@
 ﻿namespace ApogeeVGC.Sim.Choices;
 
-public enum Choice
-{
-    Move1,
-    Move2,
-    Move3,
-    Move4,
 
-    Move1WithTera,
-    Move2WithTera,
-    Move3WithTera,
-    Move4WithTera,
 
-    Switch1,
-    Switch2,
-    Switch3,
-    Switch4,
-    Switch5,
-    Switch6,
+//public enum Choice
+//{
+//    Move1,
+//    Move2,
+//    Move3,
+//    Move4,
 
-    Select1,
-    Select2,
-    Select3,
-    Select4,
-    Select5,
-    Select6,
+//    Move1WithTera,
+//    Move2WithTera,
+//    Move3WithTera,
+//    Move4WithTera,
 
-    TargetSlot1,
-    TargetSlot2,
-    TargetSlot3,
-    TargetSlot4,
+//    Switch1,
+//    Switch2,
+//    Switch3,
+//    Switch4,
+//    Switch5,
+//    Switch6,
 
-    TargetSide1,
-    TargetSide2,
+//    Select1,
+//    Select2,
+//    Select3,
+//    Select4,
+//    Select5,
+//    Select6,
 
-    Struggle,
+//    TargetSlot1,
+//    TargetSlot2,
+//    TargetSlot3,
+//    TargetSlot4,
 
-    Quit,
-    None,
-    Invalid,
-}
+//    TargetSide1,
+//    TargetSide2,
+
+//    Struggle,
+
+//    Quit,
+//    None,
+//    Invalid,
+//}

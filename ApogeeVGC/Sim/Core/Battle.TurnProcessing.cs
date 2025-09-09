@@ -81,7 +81,7 @@ public partial class Battle
         return executedPlayers;
     }
 
-    private MoveAction ExecutePlayerChoice(PlayerId playerId, Choice choice)
+    private MoveAction ExecutePlayerChoice(PlayerId playerId, BattleChoice choice)
     {
         var action = MoveAction.None;
         PlayerState playerState = GetPlayerState(playerId);

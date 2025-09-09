@@ -9,7 +9,7 @@ public interface IPlayer
 
     PlayerId PlayerId { get; }
 
-    Choice GetNextChoice(Choice[] availableChoices);
+    BattleChoice GetNextChoice(BattleChoice[] availableChoices);
 
     //void InputBattle(Battle battle);
 }

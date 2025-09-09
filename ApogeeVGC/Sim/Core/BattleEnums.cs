@@ -12,6 +12,16 @@ public enum SlotId
     Slot2,
     Slot3,
     Slot4,
+
+    // Only for singles
+    Slot5,
+    Slot6,
+}
+
+public enum BattleFormat
+{
+    Singles,
+    Doubles,
 }
 
 public enum BattleRequestState

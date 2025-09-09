@@ -34,8 +34,8 @@ public partial class Battle
     // Player state management
     private PlayerState Player1State { get; set; } = PlayerState.TeamPreviewSelect;
     private PlayerState Player2State { get; set; } = PlayerState.TeamPreviewSelect;
-    private Choice? Player1PendingChoice { get; set; }
-    private Choice? Player2PendingChoice { get; set; }
+    private BattleChoice? Player1PendingChoice { get; set; }
+    private BattleChoice? Player2PendingChoice { get; set; }
     private object ChoiceLock { get; } = new();
 
     // Constants

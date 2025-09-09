@@ -3,13 +3,13 @@ using ApogeeVGC.Sim.GameObjects;
 
 namespace ApogeeVGC.Sim.Choices;
 
-public record DoubleSlotChoice
+public record DoubleSlotChoice : BattleChoice
 {
     public required SlotChoice Slot1Choice { get; init; }
     public required SlotChoice Slot2Choice { get; init; }
 
-    public Trainer Trainer => Slot1Choice.Trainer;
-    public SideId SideId => Slot1Choice.SideId;
+    public override Trainer Trainer => Slot1Choice.Trainer;
+    public override SideId SideId => Slot1Choice.SideId;
 
     public DoubleSlotChoice(SlotChoice slot1Choice, SlotChoice slot2Choice)
     {

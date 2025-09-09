@@ -9,7 +9,7 @@ namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
-    private void PerformSwitch(PlayerId playerId, Choice choice)
+    private void PerformSwitch(PlayerId playerId, SlotChoice.SwitchChoice choice)
     {
         if (IsWinner() != PlayerId.None)
         {

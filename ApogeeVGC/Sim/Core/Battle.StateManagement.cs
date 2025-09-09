@@ -1,13 +1,11 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
-    private void SetPendingChoice(PlayerId playerId, Choice? choice)
+    private void SetPendingChoice(PlayerId playerId, BattleChoice? choice)
     {
         switch (playerId)
         {
@@ -26,7 +24,7 @@ public partial class Battle
         UpdatePlayerState(playerId, choice);
     }
 
-    private void UpdatePlayerState(PlayerId playerId, Choice? choice)
+    private void UpdatePlayerState(PlayerId playerId, BattleChoice? choice)
     {
         if (choice is null) return; // No choice to update state with
 
@@ -35,8 +33,7 @@ public partial class Battle
         switch (playerState)
         {
             case PlayerState.MoveSwitchSelect:
-                if (choice.Value.IsSwitchChoice() || choice.Value.IsMoveChoice() ||
-                    choice.Value.IsMoveWithTeraChoice() || choice == Choice.Struggle)
+                if (choice is SlotChoice slotChoice && (slotChoice.IsMoveChoice || slotChoice.IsSwitchChoice))
                 {
                     SetPlayerState(playerId, PlayerState.MoveSwitchLocked);
                 }
@@ -47,7 +44,7 @@ public partial class Battle
                 }
                 break;
             case PlayerState.FaintedSelect:
-                if (choice.Value.IsSwitchChoice())
+                if (choice is SlotChoice { IsSwitchChoice: true })
                 {
                     SetPlayerState(playerId, PlayerState.FaintedLocked);
                 }
@@ -58,7 +55,7 @@ public partial class Battle
                 }
                 break;
             case PlayerState.ForceSwitchSelect:
-                if (choice.Value.IsSwitchChoice())
+                if (choice is SlotChoice { IsSwitchChoice: true })
                 {
                     SetPlayerState(playerId, PlayerState.ForceSwitchLocked);
                 }
@@ -69,7 +66,7 @@ public partial class Battle
                 }
                 break;
             case PlayerState.TeamPreviewSelect:
-                if (choice.Value.IsSelectChoice())
+                if (choice is TeamPreviewChoice { IsSinglesTeamPreviewChoice: true })
                 {
                     SetPlayerState(playerId, PlayerState.TeamPreviewLocked);
                 }

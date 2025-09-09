@@ -2,7 +2,6 @@
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using System.Text;
 using ApogeeVGC.Sim.Choices;
@@ -49,137 +48,88 @@ public static partial class UiGenerator
         Console.WriteLine($"{pokemon.Name}'s {stat.ConvertToString()} was boosted.");
     }
 
-    // Choice Generation Methods
-    private static string GenerateChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateDoubleSlotChoiceString(DoubleSlotChoice choice)
     {
-        if (choice.IsSelectChoice())
-        {
-            return GenerateSelectChoiceString(battle, perspective, choice);
-        }
-
-        if (choice.IsMoveChoice())
-        {
-            return GenerateMoveChoiceString(battle, perspective, choice);
-        }
-
-        if (choice.IsMoveWithTeraChoice())
-        {
-            return GenerateMoveWithTeraChoiceString(battle, perspective, choice);
-        }
-
-        if (choice.IsSwitchChoice())
-        {
-            return GenerateSwitchChoiceString(battle, perspective, choice);
-        }
-
-        if (choice == Choice.Struggle)
-        {
-            return GenerateStruggleChoiceString();
-        }
-
-        throw new ArgumentException("Invalid choice type.", nameof(choice));
-    }
-
-    private static string GenerateSelectChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
-    {
-        Side side = battle.GetSide(perspective);
-        int selectIndex = choice.GetSelectIndexFromChoice();
-        if (selectIndex < 0 || selectIndex >= side.Team.PokemonSet.PokemonCount)
-        {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid select choice.");
-        }
-
-        Pokemon pokemon = side.Team.PokemonSet.Pokemons[selectIndex];
-        if (pokemon == null)
-        {
-            throw new InvalidOperationException("Select choice cannot be made to a null Pokemon.");
-        }
-
         StringBuilder sb = new();
-        sb.Append($"Select: ");
-        sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
+        sb.Append("Double Slot Choice: [");
+        sb.Append(GenerateSlotChoiceString(choice.Slot1Choice));
+        sb.Append(" | ");
+        sb.Append(GenerateSlotChoiceString(choice.Slot2Choice));
+        sb.Append("]");
         return sb.ToString();
     }
 
-    private static string GenerateMoveChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateSlotChoiceString(SlotChoice choice)
     {
-        Side side = battle.GetSide(perspective);
-        int moveIndex = choice.GetMoveIndexFromChoice();
-        if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
+        return choice switch
         {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
-        }
-
-        Move move = side.Team.ActivePokemon.Moves[moveIndex];
-        if (move == null)
-        {
-            throw new InvalidOperationException("Move choice cannot be made to a null Move.");
-        }
-
-        StringBuilder sb = new();
-        sb.Append("Move: ");
-        sb.Append(move.Name);
-        sb.Append(" (");
-        sb.Append(move.Pp);
-        sb.Append('/');
-        sb.Append(move.MaxPp);
-        sb.Append(')');
-        return sb.ToString();
+            SlotChoice.MoveChoice moveChoice => GenerateMoveChoiceString(moveChoice),
+            SlotChoice.SwitchChoice switchChoice => GenerateSwitchChoiceString(switchChoice),
+            _ => throw new ArgumentException("Invalid SlotChoice type.", nameof(choice)),
+        };
     }
 
-    private static string GenerateMoveWithTeraChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    private static string GenerateMoveChoiceString(SlotChoice.MoveChoice choice)
     {
-        Side side = battle.GetSide(perspective);
-        int moveIndex = choice.GetMoveWithTeraIndexFromChoice();
-        if (moveIndex < 0 || moveIndex >= side.Team.ActivePokemon.Moves.Length)
+        if (choice.IsStruggle)
         {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid move choice.");
-        }
+            return "Struggle";
 
-        Move move = side.Team.ActivePokemon.Moves[moveIndex];
-        if (move == null)
-        {
-            throw new InvalidOperationException("Move choice cannot be made to a null Move.");
         }
-
+        
         StringBuilder sb = new();
         sb.Append("Move: ");
-        sb.Append(move.Name);
+        sb.Append(choice.Move.Name);
         sb.Append(" (");
-        sb.Append(move.Pp);
+        sb.Append(choice.Move.Pp);
         sb.Append('/');
-        sb.Append(move.MaxPp);
+        sb.Append(choice.Move.MaxPp);
         sb.Append(')');
+
+        if (!choice.IsTera) return sb.ToString();
+
         sb.Append(" + ");
-        sb.Append(side.Team.ActivePokemon.TeraType.ConvertToString());
+        sb.Append(choice.Attacker.TeraType.ConvertToString());
         sb.Append(" Tera");
+
         return sb.ToString();
     }
 
-    private static string GenerateSwitchChoiceString(Core.Battle battle, PlayerId perspective, Choice choice)
+    // Choice Generation Methods
+    private static string GenerateBattleChoiceString(BattleChoice choice)
     {
-        Side side = battle.GetSide(perspective);
-        int switchIndex = choice.GetSwitchIndexFromChoice();
-        if (switchIndex < 0 || switchIndex >= side.Team.PokemonSet.PokemonCount)
+        return choice switch
         {
-            throw new ArgumentOutOfRangeException(nameof(choice), "Invalid switch choice.");
-        }
+            DoubleSlotChoice doubleSlotChoice => GenerateDoubleSlotChoiceString(doubleSlotChoice),
+            SlotChoice slotChoice => GenerateSlotChoiceString(slotChoice),
+            TeamPreviewChoice teamPreviewChoice => GenerateTeamPreviewChoiceString(teamPreviewChoice),
+            _ => throw new ArgumentException("Invalid choice type.", nameof(choice)),
+        };
+    }
 
-        Pokemon pokemon = side.Team.PokemonSet.Pokemons[switchIndex];
-        if (pokemon == null)
-        {
-            throw new InvalidOperationException("Switch choice cannot be made to a null Pokemon.");
-        }
-
+    private static string GenerateTeamPreviewChoiceString(TeamPreviewChoice choice)
+    {
         StringBuilder sb = new();
-        sb.Append($"Switch: ");
-        sb.Append($"{pokemon.Name} ({pokemon.Specie.Name}) ");
+        sb.Append("Select: ");
+        int i = 1;
+        foreach (Pokemon pokemon in choice.Pokemon)
+        {
+            sb.Append($"{i} {pokemon.Name} ({pokemon.Specie.Name}) ");
+            if (i < choice.Pokemon.Count)
+            {
+                sb.Append("| ");
+            }
+            i++;
+        }
         return sb.ToString();
     }
 
-    private static string GenerateStruggleChoiceString()
+    private static string GenerateSwitchChoiceString(SlotChoice.SwitchChoice choice)
     {
-        return "Struggle";
+        StringBuilder sb = new();
+        sb.Append("Switch: ");
+        sb.Append($"{choice.SwitchInPokemon.Name} ({choice.SwitchInPokemon.Specie.Name}) ");
+        return sb.ToString();
     }
 
     // Pokemon Display Methods

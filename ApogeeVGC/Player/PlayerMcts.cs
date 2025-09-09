@@ -1,8 +1,7 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim;
 using ApogeeVGC.Mcts;
 using ApogeeVGC.Sim.Choices;
-using Battle = ApogeeVGC.Sim.Core.Battle;
+using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
@@ -33,7 +32,7 @@ public class PlayerMcts : IPlayer
             _seed, maxDegreeOfParallelism, maxTimer);
     }
 
-    public Choice GetNextChoice(Choice[] availableChoices)
+    public BattleChoice GetNextChoice(BattleChoice[] availableChoices)
     {
         switch (availableChoices.Length)
         {
@@ -48,9 +47,9 @@ public class PlayerMcts : IPlayer
                     // Use MCTS to find the best choice
                     PokemonMonteCarloTreeSearch.MoveResult result = _mcts.FindBestChoice(Battle, availableChoices);
 
-                    if (result.OptimalChoice == Choice.Invalid)
+                    if (result.OptimalChoice == null)
                     {
-                        throw new InvalidOperationException("MCTS returned an invalid optimal choice." +
+                        throw new InvalidOperationException("MCTS returned a null optimal choice." +
                                                             "This should not happen.");
                     }
                     return result.OptimalChoice;
