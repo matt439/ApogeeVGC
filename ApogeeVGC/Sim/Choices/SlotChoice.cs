@@ -29,6 +29,7 @@ public abstract record SlotChoice
         public override SlotId SlotId => Attacker.SlotId;
         public override Trainer Trainer => Attacker.Trainer;
         public MoveSlot MoveSlot => Move.MoveSlot;
+        public bool IsStruggle => Move.Id == MoveId.Struggle;
 
         internal MoveChoice(Pokemon attacker, Move move, bool isTera, MoveNormalTarget moveNormalTarget,
             IReadOnlyList<Pokemon> possibleTargets)
@@ -290,6 +291,9 @@ public abstract record SlotChoice
     /// Gets whether this choice represents a move action.
     /// </summary>
     public bool IsMoveChoice => this is MoveChoice;
+    public bool IsStruggleMove => this is MoveChoice { IsStruggle: true};
+    public bool IsTeraMove => this is MoveChoice { IsTera: true };
+
 
     /// <summary>
     /// Gets whether this choice represents a switch action.
