@@ -20,7 +20,7 @@ public class PlayerConsole(PlayerId playerId, Battle battle) : IPlayer
             UiGenerator.PrintBattleUi(Battle, PlayerId);
         }
 
-        UiGenerator.PrintChoices(Battle, PlayerId);
+        UiGenerator.PrintChoices(availableChoices);
         BattleChoice choice = GetChoiceFromConsole(availableChoices);
         return choice;
     }

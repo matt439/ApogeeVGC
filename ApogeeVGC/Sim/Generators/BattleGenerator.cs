@@ -7,10 +7,10 @@ namespace ApogeeVGC.Sim.Generators;
 
 public static class BattleGenerator
 {
-    public static Core.Battle GenerateTestBattle(Library library, string trainerName1,
-        string trainerName2, bool printDebug = false, int? seed = null)
+    public static Battle GenerateTestBattle(Library library, string trainerName1,
+        string trainerName2, BattleFormat format, bool printDebug = false, int? seed = null)
     {
-        return new Core.Battle
+        return new Battle
         {
             Library = library,
             Field = new Field(),
@@ -18,6 +18,7 @@ public static class BattleGenerator
             Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2, SideId.Side2, printDebug),
             PrintDebug = printDebug,
             BattleSeed = seed,
+            Format = format,
         };
     }
 }

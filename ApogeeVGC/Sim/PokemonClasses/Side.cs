@@ -224,10 +224,6 @@ public class Side
         }
         Pokemon activePokemon = GetSlot(activeSlot);
         Pokemon benchPokemon = GetSlot(benchSlot);
-        if (activePokemon.IsFainted)
-        {
-            throw new InvalidOperationException($"Cannot switch out fainted Pokemon in slot {activeSlot}.");
-        }
         if (benchPokemon.IsFainted)
         {
             throw new InvalidOperationException($"Cannot switch in fainted Pokemon in slot {benchSlot}.");

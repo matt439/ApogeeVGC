@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.FieldClasses;
 using System.Globalization;
 using System.Text;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Ui;
@@ -41,9 +42,8 @@ public static partial class UiGenerator
         }
     }
 
-    public static void PrintChoices(Core.Battle battle, PlayerId perspective)
+    public static void PrintChoices(BattleChoice[] availableChoices)
     {
-        var availableChoices = battle.GetAvailableChoices(perspective);
         if (availableChoices.Length == 0)
         {
             Console.WriteLine("No available choices.");
@@ -56,11 +56,18 @@ public static partial class UiGenerator
         {
             sb.Append($"{i + 1}: ");
 
-            if (availableChoices[i] is not SlotChoice slotChoice)
+            switch (availableChoices[i])
             {
-                throw new InvalidOperationException("Only SlotChoice is supported in console UI.");
+                case TeamPreviewChoice teamPreviewChoice:
+                    sb.AppendLine(GenerateTeamPreviewChoiceString(teamPreviewChoice));
+                    break;
+                case SlotChoice slotChoice:
+                    sb.AppendLine(GenerateSlotChoiceString(slotChoice));
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown choice type: {availableChoices[i].GetType()}");
             }
-            sb.AppendLine(GenerateSlotChoiceString(slotChoice));
+            
         }
 
         sb.Append("Please enter the number of your choice:");

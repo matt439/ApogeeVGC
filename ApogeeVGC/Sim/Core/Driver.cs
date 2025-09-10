@@ -71,7 +71,7 @@ public class Driver
     private void RunConsoleVsMctsTest()
     {
         Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
-            "MCTS", true);
+            "MCTS", BattleFormat.Singles, true);
         Simulator = new Simulator
         {
             Battle = battle,
@@ -86,7 +86,8 @@ public class Driver
 
     private void RunMctsVsRandom()
     {
-        Battle battle = BattleGenerator.GenerateTestBattle(Library, "MCTS", "Random");
+        Battle battle = BattleGenerator.GenerateTestBattle(Library, "MCTS", "Random",
+            BattleFormat.Singles);
         Simulator = new Simulator
         {
             Battle = battle,
@@ -138,7 +139,7 @@ public class Driver
                 int player2Seed = PlayerRandom2Seed + i;
 
                 Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
-                    "Random");
+                    "Random", BattleFormat.Singles);
                 var simulator = new Simulator
                 {
                     Battle = battle,
@@ -206,7 +207,7 @@ public class Driver
                 int player2Seed = PlayerRandom2Seed + currentSeed;
 
                 Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-                    "Random2", false, currentSeed);
+                    "Random2", BattleFormat.Singles, false, currentSeed);
                 var simulator = new Simulator
                 {
                     Battle = battle,
@@ -270,7 +271,7 @@ public class Driver
     private void RunRandomTest()
     {
         Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-            "Random2", true);
+            "Random2", BattleFormat.Singles, true);
         Simulator = new Simulator
         {
             Battle = battle,
@@ -296,7 +297,7 @@ public class Driver
     private void RunConsoleVsRandomTest()
     {
         Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
-            "Random", true);
+            "Random", BattleFormat.Singles, true);
 
         Simulator = new Simulator
         {

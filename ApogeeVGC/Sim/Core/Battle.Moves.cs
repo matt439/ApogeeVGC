@@ -15,7 +15,7 @@ public partial class Battle
     private MoveAction PerformMove(PlayerId playerId, SlotChoice.MoveChoice choice)
     {
         Pokemon attacker = choice.Attacker;
-        Pokemon defender = choice.PossibleTargets[0]; // Default to first target for now
+        Pokemon defender = choice.PossibleTargets.Count > 0 ? choice.PossibleTargets[0] : attacker;
         Move move = choice.Move;
 
         // This is where choice lock and choice benefits come into play

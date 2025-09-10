@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -36,6 +35,7 @@ public partial class Battle
     private PlayerState Player2State { get; set; } = PlayerState.TeamPreviewSelect;
     private BattleChoice? Player1PendingChoice { get; set; }
     private BattleChoice? Player2PendingChoice { get; set; }
+    public required BattleFormat Format { get; init; }
     private object ChoiceLock { get; } = new();
 
     // Constants

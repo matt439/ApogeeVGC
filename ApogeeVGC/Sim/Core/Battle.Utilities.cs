@@ -30,6 +30,7 @@ public partial class Battle
             Player2PendingChoice = Player2PendingChoice,
             PrintDebug = printDebug ?? PrintDebug,
             BattleSeed = BattleSeed,
+            Format = Format,
             // Note: ChoiceLock gets a new instance automatically
             // Note: _battleRandom will be initialized with the same seed when first accessed
         };

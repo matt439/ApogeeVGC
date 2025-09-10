@@ -122,7 +122,20 @@ public abstract record SlotChoice : BattleChoice
                     }
                     break;
                 case MoveTarget.Allies:
+                    throw new NotImplementedException();
                 case MoveTarget.AllySide:
+                    // must be 0 possible targets
+                    if (possibleTargets.Count != 0)
+                    {
+                        throw new InvalidOperationException("AllySide target move must have no possible targets.");
+                    }
+                    // must be on the same side as the attacker
+                    if (possibleTargets.Any(p => p.SideId != sideAttacker))
+                    {
+                        throw new InvalidOperationException("AllySide target move targets must be on the same" +
+                                                            "side as the attacker.");
+                    }
+                    break;
                 case MoveTarget.AllyTeam:
                 case MoveTarget.Any:
                 case MoveTarget.FoeSide:
@@ -245,7 +258,7 @@ public abstract record SlotChoice : BattleChoice
         public override SlotId SlotId => SwitchOutSlot;
         public override Trainer Trainer => SwitchOutPokemon.Trainer;
 
-        internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon)
+        internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon, BattleFormat format)
         {
             SwitchOutPokemon = switchOutPokemon ?? throw new ArgumentNullException(nameof(switchOutPokemon));
             SwitchInPokemon = switchInPokemon ?? throw new ArgumentNullException(nameof(switchInPokemon));
@@ -263,14 +276,33 @@ public abstract record SlotChoice : BattleChoice
             {
                 throw new ArgumentException("Cannot switch between different trainers.");
             }
-            if (SwitchOutPokemon.SlotId is SlotId.Slot3 or SlotId.Slot4)
+
+            switch (format)
             {
-                throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
+                case BattleFormat.Singles:
+                    if (SwitchOutPokemon.SlotId is not SlotId.Slot1)
+                    {
+                        throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
+                    }
+                    if (SwitchInPokemon.SlotId is SlotId.Slot1)
+                    {
+                        throw new ArgumentException("Only bench Pokemon can be switched in.");
+                    }
+                    break;
+                case BattleFormat.Doubles:
+                    if (SwitchOutPokemon.SlotId is SlotId.Slot3 or SlotId.Slot4)
+                    {
+                        throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
+                    }
+                    if (SwitchInPokemon.SlotId is SlotId.Slot1 or SlotId.Slot2)
+                    {
+                        throw new ArgumentException("Only bench Pokemon can be switched in.");
+                    }
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid battle format.");
             }
-            if (SwitchInPokemon.SlotId is SlotId.Slot1 or SlotId.Slot2)
-            {
-                throw new ArgumentException("Only bench Pokemon can be switched in.");
-            }
+            
             if (SwitchInPokemon.IsFainted)
             {
                 throw new ArgumentException("Cannot switch in a fainted Pokémon.");
@@ -286,7 +318,7 @@ public abstract record SlotChoice : BattleChoice
         return new MoveChoice(pokemon, move, isTera, moveNormalTarget, possibleTargets ?? []);
     }
 
-    public static SwitchChoice CreateSwitch(Pokemon switchOutPokemon, Pokemon switchInPokemon)
+    public static SwitchChoice CreateSwitch(Pokemon switchOutPokemon, Pokemon switchInPokemon, BattleFormat format)
     {
         if (switchOutPokemon == switchInPokemon)
         {
@@ -312,7 +344,7 @@ public abstract record SlotChoice : BattleChoice
         {
             throw new ArgumentException("Cannot switch in a fainted Pokémon.");
         }
-        return new SwitchChoice(switchOutPokemon, switchInPokemon);
+        return new SwitchChoice(switchOutPokemon, switchInPokemon, format);
     }
 
     /// <summary>

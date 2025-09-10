@@ -239,7 +239,7 @@ public partial class Battle
                 return GetMoveSwitchChoices(side, side.AnyTeraUsed);
             case PlayerState.FaintedSelect:
             case PlayerState.ForceSwitchSelect:
-                return GetSwitchChoices(side);
+                return GetSwitchChoices(side, Format);
             case PlayerState.TeamPreviewLocked:
             case PlayerState.MoveSwitchLocked:
             case PlayerState.FaintedLocked:
@@ -260,7 +260,7 @@ public partial class Battle
         }
 
         // Get all 6 Pokémon from the team
-        var pokemon = side.AllSlots;
+        var pokemon = side.Team.PokemonSet.Pokemons;
 
         // Generate all permutations of the 6 Pokémon
         var permutations = GeneratePermutations(pokemon.ToArray());
@@ -331,6 +331,12 @@ public partial class Battle
         List<BattleChoice> choices = [];
         Side defendingSide = GetOtherSide(side);
         Pokemon attacker = side.Slot1;
+
+        if (attacker.IsFainted)
+        {
+            throw new InvalidOperationException("Cannot get move choices for a fainted Pokémon.");
+        }
+
         Pokemon defender = defendingSide.Slot1;
 
         foreach (Move move in attacker.Moves)
@@ -338,13 +344,27 @@ public partial class Battle
             // Check if the move is available (has PP left and not disabled)
             if (move is not { Pp: > 0, Disabled: false }) continue;
 
+            MoveTarget target = move.Target;
+            MoveNormalTarget targetType;
+            if (target == MoveTarget.Normal)
+            {
+                targetType = MoveNormalTarget.FoeSlot1;
+            }
+            else
+            {
+                targetType = MoveNormalTarget.None;
+            }
+
+            var possibleTargets = GetPossibleTargets(move, attacker, null, [defender]);
+
             SlotChoice.MoveChoice moveChoice = new(attacker, move,
-                false, MoveNormalTarget.FoeSlot1, [defender]);
+                    false, targetType, possibleTargets);
             choices.Add(moveChoice);
 
             if (isTeraUsed) continue;
+
             SlotChoice.MoveChoice moveChoiceTera = new(attacker, move,
-                true, MoveNormalTarget.FoeSlot1, [defender]);
+                true, targetType, possibleTargets);
             choices.Add(moveChoiceTera);
         }
 
@@ -352,11 +372,11 @@ public partial class Battle
         {
             // If no moves are available, Struggle is the only option
             SlotChoice.MoveChoice struggleChoice = new(attacker, Library.Moves[MoveId.Struggle],
-                false, MoveNormalTarget.FoeSlot1, [defender]);
+                false, MoveNormalTarget.FoeSlot1, [GetStruggleTarget([defender])]);
             choices.Add(struggleChoice);
         }
 
-        var switchChoices = GetSwitchChoices(side);
+        var switchChoices = GetSwitchChoices(side, Format);
         if (switchChoices.Length > 0)
         {
             choices.AddRange(switchChoices);
@@ -365,19 +385,71 @@ public partial class Battle
         return choices.ToArray();
     }
 
+    private Pokemon[] GetPossibleTargets(Move move, Pokemon attacker, Pokemon? ally, Pokemon[] opponents)
+    {
+        switch (move.Target)
+        {
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+                throw new NotImplementedException();
+            case MoveTarget.AllAdjacentFoes:
+                return opponents;
+            case MoveTarget.Allies:
+                throw new NotImplementedException();
+            case MoveTarget.AllySide:
+                return [];
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+                throw new NotImplementedException();
+            case MoveTarget.FoeSide:
+                return [];
+            case MoveTarget.Normal:
+            {
+                var targets = opponents.ToList();
+                if (ally is not null)
+                {
+                    targets.Add(ally);
+                }
+                return targets.ToArray();
+            }
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+                throw new NotImplementedException();
+            case MoveTarget.Self:
+                return [attacker];
+            case MoveTarget.None:
+            case MoveTarget.Field:
+                return [];
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private Pokemon GetStruggleTarget(Pokemon[] targets)
+    {
+        // In a singles battle, Struggle always targets the opposing active Pokémon
+        // In a doubles battle, Struggle randomly targets one of the opposing active Pokémon
+
+        // TODO: Implement for doubles battles
+        return targets[0];
+    }
+
     private Side GetOtherSide(Side side)
     {
         PlayerId player = side.PlayerId;
         return player == PlayerId.Player1 ? Side2 : Side1;
     }
 
-    private static BattleChoice[] GetSwitchChoices(Side side)
+    private static BattleChoice[] GetSwitchChoices(Side side, BattleFormat format)
     {
         List<BattleChoice> choices = [];
         var switchOptionSlots = side.SwitchOptionSlots;
 
         choices.AddRange(switchOptionSlots.Select(pokemon =>
-            new SlotChoice.SwitchChoice(side.Slot1, pokemon)));
+            new SlotChoice.SwitchChoice(side.Slot1, pokemon, format)));
         return choices.ToArray();
     }
 
