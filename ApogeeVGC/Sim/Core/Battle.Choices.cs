@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using ApogeeVGC.Player;
+﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -25,17 +24,35 @@ public partial class Battle
 
             if (IsReadyForTeamPreviewProcessing())
             {
-                PerformTeamPreviewSelect(Player1PendingChoice ??
+                if (Player1PendingChoice is not TeamPreviewChoice)
+                {
+                    throw new InvalidOperationException("Player 1's pending choice is not a TeamPreviewChoice.");
+                }
+                if (Player2PendingChoice is not TeamPreviewChoice)
+                {
+                    throw new InvalidOperationException("Player 2's pending choice is not a TeamPreviewChoice.");
+                }
+
+                PerformTeamPreviewSelect((TeamPreviewChoice)Player1PendingChoice ??
                     throw new ArgumentException("Player1PendingChoice cannot be null"),
-                    Player2PendingChoice ??
+                    (TeamPreviewChoice)Player2PendingChoice ??
                         throw new ArgumentException("Player2PendingChoice cannot be null"));
                 ClearPendingChoices();
             }
             else if (IsReadyForMoveSwitchProcessing())
             {
-                var executedPlayers = PerformMoveSwitches(Player1PendingChoice ??
+                if (Player1PendingChoice is not SlotChoice)
+                {
+                    throw new InvalidOperationException("Player 1's pending choice is not a SlotChoice.");
+                }
+                if (Player2PendingChoice is not SlotChoice)
+                {
+                    throw new InvalidOperationException("Player 2's pending choice is not a SlotChoice.");
+                }
+
+                var executedPlayers = PerformMoveSwitches((SlotChoice)Player1PendingChoice ??
                     throw new ArgumentException("Player1PendingChoice cannot be null"),
-                        Player2PendingChoice ??
+                        (SlotChoice)Player2PendingChoice ??
                             throw new ArgumentException("Player2PendingChoice cannot be null"));
 
                 switch (executedPlayers.Count)
@@ -54,7 +71,7 @@ public partial class Battle
                         Side side = GetSide(executedPlayers[0]);
                         if (PrintDebug)
                         {
-                            UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                            UiGenerator.PrintForceSwitchOutAction(side.Team.Trainer.Name, side.Slot1);
                         }
                         break;
                 }
@@ -171,8 +188,8 @@ public partial class Battle
                 return BattleRequestState.RequestingPlayer2Input;
             }
 
-            bool requestingPlayer1Input = BattleTools.CanSubmitChoice(Player1State);
-            bool requestingPlayer2Input = BattleTools.CanSubmitChoice(Player2State);
+            bool requestingPlayer1Input = Player1State.CanSubmitChoice();
+            bool requestingPlayer2Input = Player2State.CanSubmitChoice();
 
             if (requestingPlayer1Input && requestingPlayer2Input)
             {
@@ -201,8 +218,8 @@ public partial class Battle
 
             return playerId switch
             {
-                PlayerId.Player1 => GetAvailableChoices((Side)Side1),
-                PlayerId.Player2 => GetAvailableChoices((Side)Side2),
+                PlayerId.Player1 => GetAvailableChoices(Side1),
+                PlayerId.Player2 => GetAvailableChoices(Side2),
                 PlayerId.None => throw new ArgumentException("PlayerId cannot be 'None'"),
                 _ => throw new ArgumentException("Invalid player ID", nameof(playerId)),
             };
@@ -219,7 +236,7 @@ public partial class Battle
             case PlayerState.TeamPreviewSelect:
                 return GetTeamPreviewChoices(side);
             case PlayerState.MoveSwitchSelect:
-                return GetMoveSwitchChoices(side, side.Team.PokemonSet.AnyTeraUsed);
+                return GetMoveSwitchChoices(side, side.AnyTeraUsed);
             case PlayerState.FaintedSelect:
             case PlayerState.ForceSwitchSelect:
                 return GetSwitchChoices(side);

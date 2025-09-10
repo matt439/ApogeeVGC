@@ -1,54 +1,52 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Ui;
-using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
     /// <returns>A list of player IDs of players who have executed their choice.</returns>
-    private List<PlayerId> PerformMoveSwitches(Choice player1Choice, Choice player2Choice)
+    private List<PlayerId> PerformMoveSwitches(SlotChoice player1Choice, SlotChoice player2Choice)
     {
         // Check if either player is terastilizing
-        bool player1Tera = player1Choice.IsMoveWithTeraChoice();
-        bool player2Tera = player2Choice.IsMoveWithTeraChoice();
+        bool player1Tera = player1Choice is SlotChoice.MoveChoice { IsTera: true };
+        bool player2Tera = player2Choice is SlotChoice.MoveChoice { IsTera: true };
         if (player1Tera && player2Tera)
         {
             // Both players are terastilizing. Determine order by speed.
-            PlayerId fasterPlayer = CalculateSpeedOrder(Side1.Team.ActivePokemon, Side2.Team.ActivePokemon);
+            PlayerId fasterPlayer = CalculateSpeedOrder(Side1.Slot1, Side2.Slot1);
             if (fasterPlayer == PlayerId.Player1)
             {
-                Side1.Team.ActivePokemon.Terastillize(Context);
-                Side2.Team.ActivePokemon.Terastillize(Context);
+                Side1.Slot1.Terastillize(Context);
+                Side2.Slot1.Terastillize(Context);
             }
             else
             {
-                Side2.Team.ActivePokemon.Terastillize(Context);
-                Side1.Team.ActivePokemon.Terastillize(Context);
+                Side2.Slot1.Terastillize(Context);
+                Side1.Slot1.Terastillize(Context);
             }
 
-            player1Choice = player1Choice.ConvertMoveWithTeraToMove();
-            Player1PendingChoice = player1Choice;
-            player2Choice = player2Choice.ConvertMoveWithTeraToMove();
-            Player2PendingChoice = player2Choice;
+            //player1Choice = player1Choice.ConvertMoveWithTeraToMove();
+            //Player1PendingChoice = player1Choice;
+            //player2Choice = player2Choice.ConvertMoveWithTeraToMove();
+            //Player2PendingChoice = player2Choice;
         }
         else if (player1Tera)
         {
-            Side1.Team.ActivePokemon.Terastillize(Context);
-            player1Choice = player1Choice.ConvertMoveWithTeraToMove();
-            Player1PendingChoice = player1Choice;
+            Side1.Slot1.Terastillize(Context);
+            //player1Choice = player1Choice.ConvertMoveWithTeraToMove();
+            //Player1PendingChoice = player1Choice;
         }
         else if (player2Tera)
         {
-            Side2.Team.ActivePokemon.Terastillize(Context);
-            player2Choice = player2Choice.ConvertMoveWithTeraToMove();
-            Player2PendingChoice = player2Choice;
+            Side2.Slot1.Terastillize(Context);
+            //player2Choice = player2Choice.ConvertMoveWithTeraToMove();
+            //Player2PendingChoice = player2Choice;
         }
 
         PlayerId nextPlayer = MovesNext(player1Choice, player2Choice);
@@ -61,7 +59,7 @@ public partial class Battle
         List<PlayerId> executedPlayers = [];
 
         // Execute choices in priority order
-        foreach ((PlayerId playerId, Choice choice) in executionOrder)
+        foreach ((PlayerId playerId, SlotChoice choice) in executionOrder)
         {
             switch (ExecutePlayerChoice(playerId, choice))
             {
@@ -108,44 +106,44 @@ public partial class Battle
                 throw new ArgumentOutOfRangeException(nameof(playerState), playerState, null);
         }
 
-        if (choice.IsMoveChoice())
+        switch (choice)
         {
-            MoveAction moveAction = PerformMove(playerId, choice);
-            SetPendingChoice(playerId, null);
+            case SlotChoice.MoveChoice moveChoice:
+            {
+                if (moveChoice.IsStruggle)
+                {
+                    PerformStruggle(playerId);
+                    SetPendingChoice(playerId, null);
+                    SetPlayerState(playerId, PlayerState.Idle);
+                }
+                else
+                {
+                    MoveAction moveAction = PerformMove(playerId, moveChoice);
+                    SetPendingChoice(playerId, null);
 
-            // Only set to force switch select if there are valid switch options
-            if (moveAction == MoveAction.SwitchAttackerOut &&
-                GetSide(playerId).Team.SwitchOptionsCount > 0)
-            {
-                SetPlayerState(playerId, PlayerState.ForceSwitchSelect);
-                action = MoveAction.SwitchAttackerOut;
+                    // Only set to force switch select if there are valid switch options
+                    if (moveAction == MoveAction.SwitchAttackerOut &&
+                        GetSide(playerId).SwitchOptionsCount > 0)
+                    {
+                        SetPlayerState(playerId, PlayerState.ForceSwitchSelect);
+                        action = MoveAction.SwitchAttackerOut;
+                    }
+                    else
+                    {
+                        SetPlayerState(playerId, PlayerState.Idle);
+                    }
+                }
+                // Update player states for any fainted Pokemon
+                UpdateFaintedStates();
+                break;
             }
-            else
-            {
+            case SlotChoice.SwitchChoice switchChoice:
+                PerformSwitch(playerId, switchChoice);
+                SetPendingChoice(playerId, null);
                 SetPlayerState(playerId, PlayerState.Idle);
-            }
-
-            // Update player states for any fainted Pokemon
-            UpdateFaintedStates();
-        }
-        else if (choice.IsSwitchChoice())
-        {
-            PerformSwitch(playerId, choice);
-            SetPendingChoice(playerId, null);
-            SetPlayerState(playerId, PlayerState.Idle);
-        }
-        else if (choice == Choice.Struggle)
-        {
-            PerformStruggle(playerId);
-            SetPendingChoice(playerId, null);
-            SetPlayerState(playerId, PlayerState.Idle);
-
-            // Update player states for any fainted Pokemon
-            UpdateFaintedStates();
-        }
-        else
-        {
-            throw new InvalidOperationException($"Invalid choice for {playerId}: {choice}");
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid choice for {playerId}: {choice}");
         }
 
         return action;
@@ -192,30 +190,30 @@ public partial class Battle
     private void HandleResiduals()
     {
         Condition[] side1Residuals = [];
-        if (!Side1.Team.ActivePokemon.IsFainted) // Skip if fainted
+        if (!Side1.Slot1.IsFainted) // Skip if fainted
         {
-            side1Residuals = Side1.Team.ActivePokemon.GetAllResidualConditions();
+            side1Residuals = Side1.Slot1.GetAllResidualConditions();
         }
         List<(Pokemon, Condition, PlayerId)> side1ResidualsList = [];
         foreach (Condition condition in side1Residuals)
         {
             if (condition.OnResidual != null)
             {
-                side1ResidualsList.Add((Side1.Team.ActivePokemon, condition, PlayerId.Player1));
+                side1ResidualsList.Add((Side1.Slot1, condition, PlayerId.Player1));
             }
         }
 
         Condition[] side2Residuals = [];
-        if (!Side2.Team.ActivePokemon.IsFainted) // Skip if fainted
+        if (!Side2.Slot1.IsFainted) // Skip if fainted
         {
-            side2Residuals = Side2.Team.ActivePokemon.GetAllResidualConditions();
+            side2Residuals = Side2.Slot1.GetAllResidualConditions();
         }
         List<(Pokemon, Condition, PlayerId)> side2ResidualsList = [];
         foreach (Condition condition in side2Residuals)
         {
             if (condition.OnResidual != null)
             {
-                side2ResidualsList.Add((Side2.Team.ActivePokemon, condition, PlayerId.Player2));
+                side2ResidualsList.Add((Side2.Slot1, condition, PlayerId.Player2));
             }
         }
 
@@ -248,34 +246,34 @@ public partial class Battle
     private void HandleConditionTurnEnds()
     {
         List<Condition> side1Conditions = [];
-        if (!Side1.Team.ActivePokemon.IsFainted) // Skip if fainted
+        if (!Side1.Slot1.IsFainted) // Skip if fainted
         {
-            side1Conditions = Side1.Team.ActivePokemon.Conditions.ToList();
+            side1Conditions = Side1.Slot1.Conditions.ToList();
         }
         foreach (Condition condition in side1Conditions.ToList())
         {
-            condition.OnTurnEnd?.Invoke(Side1.Team.ActivePokemon, Context);
+            condition.OnTurnEnd?.Invoke(Side1.Slot1, Context);
             if (!condition.Duration.HasValue) continue;
             condition.Duration--;
             if (condition.Duration <= 0)
             {
-                Side1.Team.ActivePokemon.RemoveCondition(condition.Id);
+                Side1.Slot1.RemoveCondition(condition.Id);
             }
         }
 
         List<Condition> side2Conditions = [];
-        if (!Side2.Team.ActivePokemon.IsFainted) // Skip if fainted
+        if (!Side2.Slot1.IsFainted) // Skip if fainted
         {
-            side2Conditions = Side2.Team.ActivePokemon.Conditions.ToList();
+            side2Conditions = Side2.Slot1.Conditions.ToList();
         }
         foreach (Condition condition in side2Conditions.ToList())
         {
-            condition.OnTurnEnd?.Invoke(Side2.Team.ActivePokemon, Context);
+            condition.OnTurnEnd?.Invoke(Side2.Slot1, Context);
             if (!condition.Duration.HasValue) continue;
             condition.Duration--;
             if (condition.Duration <= 0)
             {
-                Side2.Team.ActivePokemon.RemoveCondition(condition.Id);
+                Side2.Slot1.RemoveCondition(condition.Id);
             }
         }
     }
@@ -290,10 +288,10 @@ public partial class Battle
         }
     }
 
-    private PlayerId MovesNext(Choice player1Choice, Choice player2Choice)
+    private PlayerId MovesNext(SlotChoice player1Choice, SlotChoice player2Choice)
     {
-        int player1Priority = Priority(player1Choice, Side1);
-        int player2Priority = Priority(player2Choice, Side2);
+        int player1Priority = Priority(player1Choice);
+        int player2Priority = Priority(player2Choice);
 
         if (player1Priority > player2Priority)
         {
@@ -304,8 +302,8 @@ public partial class Battle
             return PlayerId.Player2;
         }
         // If priorities are equal, use the speed of the active Pokémon to determine who moves first
-        Pokemon player1Pokemon = Side1.Team.ActivePokemon;
-        Pokemon player2Pokemon = Side2.Team.ActivePokemon;
+        Pokemon player1Pokemon = Side1.Slot1;
+        Pokemon player2Pokemon = Side2.Slot1;
 
         return CalculateSpeedOrder(player1Pokemon, player2Pokemon);
     }
@@ -332,22 +330,23 @@ public partial class Battle
         return BattleRandom.Next(2) == 0 ? PlayerId.Player1 : PlayerId.Player2;
     }
 
-    private static int Priority(Choice choice, Side side)
+    private static int Priority(SlotChoice choice)
     {
-        if (choice.IsSwitchChoice())
+        switch (choice)
         {
-            return 6;
+            case SlotChoice.SwitchChoice:
+                return 6;
+            case SlotChoice.MoveChoice moveChoice:
+            {
+                Pokemon attacker = moveChoice.Attacker;
+                Move move = moveChoice.Move;
+                int priority = move.Priority;
+                // Check for abilities that modify move priority
+                priority = attacker.Ability.OnModifyPriority?.Invoke(priority, move) ?? priority;
+                return priority;
+            }
+            default:
+                return 0; // Default priority for other choices
         }
-        if (choice.IsMoveChoice())
-        {
-            int moveIndex = choice.GetMoveIndexFromChoice();
-            Pokemon attacker = side.Team.ActivePokemon;
-            Move move = attacker.Moves[moveIndex];
-            int priority = move.Priority;
-            // Check for abilities that modify move priority
-            priority = attacker.Ability.OnModifyPriority?.Invoke(priority, move) ?? priority;
-            return priority;
-        }
-        return 0; // Default priority for other choices
     }
 }

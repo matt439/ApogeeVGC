@@ -29,7 +29,7 @@ public partial class Battle
         PrintDebug = PrintDebug,
     };
     
-    private Pokemon[] AllActivePokemon => [Side1.Team.ActivePokemon, Side2.Team.ActivePokemon];
+    private Pokemon[] AllActivePokemon => [Side1.Slot1, Side2.Slot1];
     
     // Player state management
     private PlayerState Player1State { get; set; } = PlayerState.TeamPreviewSelect;

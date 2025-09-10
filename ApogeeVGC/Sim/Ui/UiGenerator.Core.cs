@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.FieldClasses;
 using System.Globalization;
 using System.Text;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Ui;
@@ -54,7 +55,12 @@ public static partial class UiGenerator
         for (int i = 0; i < availableChoices.Length; i++)
         {
             sb.Append($"{i + 1}: ");
-            sb.AppendLine(GenerateChoiceString(battle, perspective, availableChoices[i]));
+
+            if (availableChoices[i] is not SlotChoice slotChoice)
+            {
+                throw new InvalidOperationException("Only SlotChoice is supported in console UI.");
+            }
+            sb.AppendLine(GenerateSlotChoiceString(slotChoice));
         }
 
         sb.Append("Please enter the number of your choice:");

@@ -24,8 +24,8 @@ public class Simulator
         while (battleState != BattleRequestState.Player1Win &&
                battleState != BattleRequestState.Player2Win)
         {
-            Choice player1Choice;
-            Choice player2Choice;
+            BattleChoice player1Choice;
+            BattleChoice player2Choice;
 
             switch (battleState)
             {

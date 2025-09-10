@@ -136,7 +136,7 @@ public static partial class UiGenerator
     private static void PrintPrimarySide(Core.Battle battle, PlayerId perspective)
     {
         Side side = battle.GetSide(perspective);
-        Pokemon activePokemon = side.Team.ActivePokemon;
+        Pokemon activePokemon = side.Slot1;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
         string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
@@ -171,7 +171,7 @@ public static partial class UiGenerator
     private static void PrintSecondarySide(Core.Battle battle, PlayerId perspective)
     {
         Side side = battle.GetSide(perspective);
-        Pokemon activePokemon = side.Team.ActivePokemon;
+        Pokemon activePokemon = side.Slot1;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
         string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
@@ -273,7 +273,7 @@ public static partial class UiGenerator
 
     private static string FormatRemainingPokemonInfo(Side side)
     {
-        return $"Remaining Pokemon: {side.Team.PokemonSet.AlivePokemonCount}";
+        return $"Remaining Pokemon: {side.AlivePokemonCount}";
     }
 
     private static string CreateHpBar(Pokemon pokemon)

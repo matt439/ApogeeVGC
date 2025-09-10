@@ -33,7 +33,7 @@ public class SideConditions
                 OnSideResidualSubOrder = 5,
                 OnSideStart = (side, context) =>
                 {
-                    var pokemon = side.Team.AllActivePokemon;
+                    Pokemon[] pokemon = [side.Slot1];
                     
                     // For each pokemon on the side, add the tailwind condition
                     foreach (Pokemon p in pokemon)
@@ -48,7 +48,7 @@ public class SideConditions
                 },
                 OnSideEnd = (side, context) =>
                 {
-                    var pokemon = side.Team.AllActivePokemon;
+                    Pokemon[] pokemon = [side.Slot1];
 
                     // For each pokemon on the side, remove the tailwind condition
                     foreach (Pokemon p in pokemon)
@@ -85,7 +85,7 @@ public class SideConditions
                 DurationCallback = (_, source, _) => source.HasItem(ItemId.LightClay),
                 OnSideStart = (side, context) =>
                 {
-                    var pokemon = side.Team.AllActivePokemon;
+                    Pokemon[] pokemon = [side.Slot1];
 
                     // For each pokemon on the side, add the reflect condition
                     foreach (Pokemon p in pokemon)
@@ -102,7 +102,7 @@ public class SideConditions
                 OnSideResidualSubOrder = 1,
                 OnSideEnd = (side, context) =>
                  {
-                     var pokemon = side.Team.AllActivePokemon;
+                     Pokemon[] pokemon = [side.Slot1];
 
                      // For each pokemon on the side, remove the reflect condition
                      foreach (Pokemon p in pokemon)
@@ -132,7 +132,7 @@ public class SideConditions
                 DurationCallback = (_, source, _) => source.HasItem(ItemId.LightClay),
                 OnSideStart = (side, context) =>
                 {
-                    var pokemon = side.Team.AllActivePokemon;
+                    Pokemon[] pokemon = [side.Slot1];
 
                     // For each pokemon on the side, add the light screen condition
                     foreach (Pokemon p in pokemon)
@@ -149,7 +149,7 @@ public class SideConditions
                 OnSideResidualSubOrder = 2,
                 OnSideEnd = (side, context) =>
                 {
-                    var pokemon = side.Team.AllActivePokemon;
+                    Pokemon[] pokemon = [side.Slot1];
 
                     // For each pokemon on the side, remove the light screen condition
                     foreach (Pokemon p in pokemon)

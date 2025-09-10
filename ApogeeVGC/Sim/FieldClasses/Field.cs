@@ -190,7 +190,7 @@ public class Field
         sideConditionCopy.IsExtended = sideConditionCopy.DurationCallback?.Invoke(null, sourcePokemon, sourceEffect)
             ?? false;
         sideConditionCopy.OnSideStart?.Invoke(side, battleContext);
-        sideConditionCopy.OnStart?.Invoke(side.Team.AllActivePokemon, battleContext);
+        sideConditionCopy.OnStart?.Invoke([side.Slot1], battleContext);
     }
 
     public bool RemoveSideCondition(SideConditionId sideConditionId, Side side, BattleContext battleContext)
@@ -212,7 +212,7 @@ public class Field
         if (sideCondition is null) return false;
         sideConditions.Remove(sideCondition);
         sideCondition.OnSideEnd?.Invoke(side, battleContext);
-        sideCondition.OnEnd?.Invoke(side.Team.AllActivePokemon, battleContext);
+        sideCondition.OnEnd?.Invoke([side.Slot1], battleContext);
         return true;
     }
 
@@ -237,7 +237,7 @@ public class Field
             throw new InvalidOperationException($"Cannot reapply side condition {sideConditionId}" +
                                                 $"when it is not active on the side.");
         }
-        sideCondition.OnReapply?.Invoke(this, side.Team.AllActivePokemon, battleContext);
+        sideCondition.OnReapply?.Invoke(this, [side.Slot1], battleContext);
     }
 
     public void OnPokemonSwitchIn(Pokemon pokemon, PlayerId playerId, BattleContext battleContext)
@@ -285,7 +285,7 @@ public class Field
 
     public void OnTurnEnd(Side side1, Side side2, BattleContext battleContext)
     {
-        var pokemon = side1.Team.AllActivePokemon.Concat(side2.Team.AllActivePokemon).ToArray();
+        Pokemon[] pokemon = [side1.Slot1, side2.Slot1];
         
         Weather?.IncrementTurnCounter();
         Weather?.OnIncrementTurnCounter?.Invoke(pokemon, Weather, battleContext);

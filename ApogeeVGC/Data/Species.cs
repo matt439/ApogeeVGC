@@ -16,6 +16,31 @@ public record Species
 
     private readonly Dictionary<SpecieId, Specie> _species = new()
     {
+        [SpecieId.Bulbasaur] = new Specie
+        {
+            Id = SpecieId.Bulbasaur,
+            Num = 1,
+            Name = "Bulbasaur",
+            Types = [PokemonType.Grass, PokemonType.Poison],
+            Gender = GenderId.M,
+            BaseStats = new StatsTable
+            {
+                Hp = 45,
+                Atk = 49,
+                Def = 49,
+                SpA = 65,
+                SpD = 65,
+                Spe = 45,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.FlameBody,
+                Hidden = AbilityId.Guts,
+            },
+            Height = 0.7,
+            Weight = 6.9,
+            Color = "Green",
+        },
         [SpecieId.CalyrexIce] = new Specie
         {
             Id = SpecieId.CalyrexIce,

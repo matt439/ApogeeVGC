@@ -18,6 +18,9 @@ public enum AbilityId
     ChillingNeigh,
     Unnerve,
     QuickFeet,
+
+    Overgrow,
+    Chlorophyll,
 }
 
 

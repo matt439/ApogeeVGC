@@ -15,16 +15,12 @@ public partial class Battle
         {
             throw new InvalidOperationException("Cannot switch Pokémon when the battle has already ended.");
         }
-        if (!choice.IsSwitchChoice())
-        {
-            throw new ArgumentException("Choice must be a switch choice to switch Pokémon.", nameof(choice));
-        }
 
         Side side = GetSide(playerId);
-        Pokemon prevActive = side.Team.ActivePokemon;
+        Pokemon prevActive = choice.SwitchOutPokemon;
         prevActive.OnSwitchOut();
-        side.Team.ActivePokemonIndex = choice.GetSwitchIndexFromChoice();
-        Pokemon newActive = side.Team.ActivePokemon;
+        side.SwitchSlots(choice.SwitchOutSlot, choice.SwitchInSlot);
+        Pokemon newActive = choice.SwitchInPokemon;
         Field.OnPokemonSwitchIn(newActive, playerId, Context);
         newActive.OnSwitchIn(Field, AllActivePokemon, Context);
 
@@ -37,20 +33,20 @@ public partial class Battle
                 if (PrintDebug)
                 {
                     UiGenerator.PrintSwitchAction(side.Team.Trainer.Name, prevActive,
-                        side.Team.ActivePokemon);
+                        side.Slot1);
                 }
                 break;
             case PlayerState.FaintedLocked:
                 if (PrintDebug)
                 {
                     UiGenerator.PrintFaintedSelectAction(side.Team.Trainer.Name,
-                        side.Team.ActivePokemon);
+                        side.Slot1);
                 }
                 break;
             case PlayerState.ForceSwitchLocked:
                 if (PrintDebug)
                 {
-                    UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, side.Team.ActivePokemon);
+                    UiGenerator.PrintForceSwitchInAction(side.Team.Trainer.Name, side.Slot1);
                 }
                 break;
             case PlayerState.Idle:
@@ -66,52 +62,46 @@ public partial class Battle
         }
     }
 
-    private void PerformTeamPreviewSelect(Choice player1Choice, Choice player2Choice)
+    private void PerformTeamPreviewSelect(TeamPreviewChoice player1Choice, TeamPreviewChoice player2Choice)
     {
         if (IsWinner() != PlayerId.None)
         {
             throw new InvalidOperationException("Cannot perform team preview select when the battle has already ended.");
         }
-        if (!player1Choice.IsSelectChoice() || !player2Choice.IsSelectChoice())
-        {
-            throw new ArgumentException("Both choices must be select choices for team preview select.");
-        }
-        Side side1 = GetSide(PlayerId.Player1);
-        Side side2 = GetSide(PlayerId.Player2);
-        // Set the selected Pokémon for each player
-        side1.Team.ActivePokemonIndex = player1Choice.GetSelectIndexFromChoice();
-        side2.Team.ActivePokemonIndex = player2Choice.GetSelectIndexFromChoice();
+
+        Side1.SetSlotsWithCopies(player1Choice.Pokemon);
+        Side2.SetSlotsWithCopies(player2Choice.Pokemon);
     }
 
     private void UpdateFaintedStates()
     {
-        if (Side1.Team.ActivePokemon.IsFainted && Player1State != PlayerState.FaintedSelect &&
+        if (Side1.Slot1.IsFainted && Player1State != PlayerState.FaintedSelect &&
             Player1State != PlayerState.ForceSwitchSelect)
         {
             Player1State = PlayerState.FaintedSelect;
             if (PrintDebug)
             {
-                UiGenerator.PrintFaintedAction(Side1.Team.ActivePokemon);
+                UiGenerator.PrintFaintedAction(Side1.Slot1);
             }
         }
-        if (Side2.Team.ActivePokemon.IsFainted && Player2State != PlayerState.FaintedSelect &&
+        if (Side2.Slot1.IsFainted && Player2State != PlayerState.FaintedSelect &&
             Player2State != PlayerState.ForceSwitchSelect)
         {
             Player2State = PlayerState.FaintedSelect;
             if (PrintDebug)
             {
-                UiGenerator.PrintFaintedAction(Side2.Team.ActivePokemon);
+                UiGenerator.PrintFaintedAction(Side2.Slot1);
             }
         }
     }
 
     private PlayerId IsWinner()
     {
-        if (Side1.Team.IsDefeated)
+        if (Side1.IsDefeated)
         {
             return PlayerId.Player2;
         }
-        if (Side2.Team.IsDefeated)
+        if (Side2.IsDefeated)
         {
             return PlayerId.Player1;
         }

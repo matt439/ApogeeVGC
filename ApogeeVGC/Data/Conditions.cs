@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Transactions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
@@ -269,10 +268,10 @@ public record Conditions
 
                 if (source is not null)
                 {
-                     int actualHeal = source.Team.ActivePokemon.Heal(damage);
+                     int actualHeal = source.Slot1.Heal(damage);
                     if (context.PrintDebug)
                     {
-                        UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Team.ActivePokemon,
+                        UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Slot1,
                             actualHeal);
                     }
                 }

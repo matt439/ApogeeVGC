@@ -192,4 +192,25 @@ public static class PokemonBuilder
             SideId = sideId,
         };
     }
+
+    public static Pokemon BuildDefaultPokemon(Library library, Trainer trainer, SideId sideId)
+    {
+        return Build(
+            library,
+            SpecieId.Bulbasaur,
+            [new MoveSetup(MoveId.LeechSeed),
+                new MoveSetup(MoveId.HeavySlam),
+                new MoveSetup(MoveId.HeadlongRush),
+                new MoveSetup(MoveId.Protect)],
+            ItemId.Leftovers,
+            AbilityId.Guts,
+            new StatsTable { Hp = 252, SpA = 252, Spe = 4 },
+            NatureType.Modest,
+            MoveType.Fire,
+            trainer,
+            sideId,
+            false,
+            StatsTable.PerfectIvs,
+            "Default");
+    }
 }

@@ -12,10 +12,45 @@ public class Side
     public required BattleFormat BattleFormat { get; init; }
     public bool PrintDebug { get; init; }
 
-    public required Pokemon Slot1 { get; set; }
-    public required Pokemon Slot2 { get; set; }
-    public required Pokemon Slot3 { get; set; }
-    public required Pokemon Slot4 { get; set; }
+    public required Pokemon Slot1
+    {
+        get;
+        set
+        {
+            value.SlotId = SlotId.Slot1;
+            field = value;
+        }
+    }
+
+    public required Pokemon Slot2
+    {
+        get;
+        set
+        {
+            value.SlotId = SlotId.Slot2;
+            field = value;
+        }
+    }
+
+    public required Pokemon Slot3
+    {
+        get;
+        set
+        {
+            value.SlotId = SlotId.Slot3;
+            field = value;
+        }
+    }
+
+    public required Pokemon Slot4
+    {
+        get;
+        set
+        {
+            value.SlotId = SlotId.Slot4;
+            field = value;
+        }
+    }
     public required Pokemon Slot5
     {
         get;
@@ -25,6 +60,7 @@ public class Side
             {
                 throw new InvalidOperationException("Cannot set Slot5 in Doubles format.");
             }
+            value.SlotId = SlotId.Slot5;
             field = value;
         }
     }
@@ -37,6 +73,7 @@ public class Side
             {
                 throw new InvalidOperationException("Cannot set Slot6 in Doubles format.");
             }
+            value.SlotId = SlotId.Slot6;
             field = value;
         }
     }
@@ -57,8 +94,36 @@ public class Side
         }
     }
 
-    public IEnumerable<Pokemon> SwitchOptionSlots => AllSlots
-        .Where(p => p is { IsFainted: false });
+    //public IEnumerable<(SlotId, Pokemon)> AllSlotsWithIds
+    //{
+    //    get
+    //    {
+    //        yield return (SlotId.Slot1, Slot1);
+    //        yield return (SlotId.Slot2, Slot2);
+    //        yield return (SlotId.Slot3, Slot3);
+    //        yield return (SlotId.Slot4, Slot4);
+    //        if (BattleFormat == BattleFormat.Singles)
+    //        {
+    //            yield return (SlotId.Slot5, Slot5);
+    //            yield return (SlotId.Slot6, Slot6);
+    //        }
+    //    }
+    //}
+
+    public IEnumerable<Pokemon> SwitchOptionSlots
+    {
+        get
+        {
+            return BattleFormat switch
+            {
+                BattleFormat.Singles => new[] { Slot2, Slot3, Slot4, Slot5, Slot6 }.Where(p => !p.IsFainted),
+                BattleFormat.Doubles => new[] { Slot3, Slot4 }.Where(p => !p.IsFainted),
+                _ => throw new InvalidOperationException("Invalid battle format."),
+            };
+        }
+    }
+
+    public int SwitchOptionsCount => SwitchOptionSlots.Count();
 
     public bool IsDefeated
     {
@@ -87,6 +152,8 @@ public class Side
         }
     }
 
+    public int AlivePokemonCount => AllSlots.Count(p => !p.IsFainted);
+
     public Pokemon GetSlot(SlotId slotId) => slotId switch
     {
         SlotId.Slot1 => Slot1,
@@ -111,6 +178,87 @@ public class Side
             default:
                 throw new ArgumentOutOfRangeException(nameof(slotId), slotId, null);
         }
+    }
+
+    public void SetSlotsWithCopies(IReadOnlyList<Pokemon> pokemons)
+    {
+        switch (BattleFormat)
+        {
+            case BattleFormat.Singles:
+                if (pokemons.Count != 6)
+                {
+                    throw new ArgumentException("Must provide exactly 6 Pokémon for Singles format.");
+                }
+                Slot1 = pokemons[0].Copy();
+                Slot2 = pokemons[1].Copy();
+                Slot3 = pokemons[2].Copy();
+                Slot4 = pokemons[3].Copy();
+                Slot5 = pokemons[4].Copy();
+                Slot6 = pokemons[5].Copy();
+                break;
+            case BattleFormat.Doubles:
+
+                if (pokemons.Count != 4)
+                {
+                    throw new ArgumentException("Must provide exactly 4 Pokémon for Doubles format.");
+                }
+                Slot1 = pokemons[0].Copy();
+                Slot2 = pokemons[1].Copy();
+                Slot3 = pokemons[2].Copy();
+                Slot4 = pokemons[3].Copy();
+                break;
+            default:
+                throw new InvalidOperationException("Invalid battle format.");
+        }
+    }
+
+    public void SwitchSlots(SlotId activeSlot, SlotId benchSlot)
+    {
+        if (!IsValidActiveSlot(activeSlot))
+        {
+            throw new ArgumentException($"Slot {activeSlot} is not a valid active slot for {BattleFormat} format.");
+        }
+        if (!IsValidBenchSlot(benchSlot))
+        {
+            throw new ArgumentException($"Slot {benchSlot} is not a valid bench slot for {BattleFormat} format.");
+        }
+        Pokemon activePokemon = GetSlot(activeSlot);
+        Pokemon benchPokemon = GetSlot(benchSlot);
+        if (activePokemon.IsFainted)
+        {
+            throw new InvalidOperationException($"Cannot switch out fainted Pokemon in slot {activeSlot}.");
+        }
+        if (benchPokemon.IsFainted)
+        {
+            throw new InvalidOperationException($"Cannot switch in fainted Pokemon in slot {benchSlot}.");
+        }
+        // Perform the switch
+        SetSlot(activeSlot, benchPokemon);
+        SetSlot(benchSlot, activePokemon);
+        // Update their SlotId properties
+        activePokemon.SlotId = benchSlot;
+        benchPokemon.SlotId = activeSlot;
+    }
+
+    private bool IsValidActiveSlot(SlotId slot)
+    {
+        return BattleFormat switch
+        {
+            BattleFormat.Singles => slot is SlotId.Slot1,
+            BattleFormat.Doubles => slot is SlotId.Slot1 or SlotId.Slot2,
+            _ => throw new InvalidOperationException("Invalid battle format."),
+        };
+    }
+
+    private bool IsValidBenchSlot(SlotId slot)
+    {
+        return BattleFormat switch
+        {
+            BattleFormat.Singles => slot is SlotId.Slot2 or SlotId.Slot3 or SlotId.Slot4 or
+                SlotId.Slot5 or SlotId.Slot6,
+            BattleFormat.Doubles => slot is SlotId.Slot3 or SlotId.Slot4,
+            _ => throw new InvalidOperationException("Invalid battle format."),
+        };
     }
 
     /// <summary>

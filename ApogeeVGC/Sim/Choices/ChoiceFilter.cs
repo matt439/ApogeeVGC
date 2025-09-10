@@ -167,8 +167,8 @@ public class ChoiceFilter
 
         Side playerSide = battle.GetSide(player);
         Side opponentSide = battle.GetSide(player.OpposingPlayerId());
-        Pokemon attackingPokemon = playerSide.Team.ActivePokemon;
-        Pokemon defendingPokemon = opponentSide.Team.ActivePokemon;
+        Pokemon attackingPokemon = playerSide.Slot1;
+        Pokemon defendingPokemon = opponentSide.Slot1;
 
         List<MoveEffectiveness> effectivenessList = [];
         List<bool> isStabList = [];
@@ -225,7 +225,7 @@ public class ChoiceFilter
         }
 
         Side opponentSide = battle.GetSide(player.OpposingPlayerId());
-        Pokemon defendingPokemon = opponentSide.Team.ActivePokemon;
+        Pokemon defendingPokemon = opponentSide.Slot1;
 
         var superEffectiveSwitchChoices = allSwitchChoices.Where(choice =>
         {

@@ -11,6 +11,8 @@ public enum GenderId
 
 public enum SpecieId
 {
+    Bulbasaur,
+    
     CalyrexIce,
     Miraidon,
     Ursaluna,

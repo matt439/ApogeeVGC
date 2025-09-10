@@ -7,21 +7,16 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 
 public partial class Battle
 {
-    private MoveAction PerformMove(PlayerId playerId, Choice choice)
+    private MoveAction PerformMove(PlayerId playerId, SlotChoice.MoveChoice choice)
     {
-        Side atkSide = GetSide(playerId);
-        Side defSide = GetSide(playerId.OpposingPlayerId());
-
-        int moveIndex = choice.GetMoveIndexFromChoice();
-        Pokemon attacker = atkSide.Team.ActivePokemon;
-        Pokemon defender = defSide.Team.ActivePokemon;
-        Move move = attacker.Moves[moveIndex];
+        Pokemon attacker = choice.Attacker;
+        Pokemon defender = choice.PossibleTargets[0]; // Default to first target for now
+        Move move = choice.Move;
 
         // This is where choice lock and choice benefits come into play
         attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
@@ -176,7 +171,8 @@ public partial class Battle
         // check for OnAnyModifyDamage conditions on defender
         if (damage > 0)
         {
-            int numPokemonDefendingSide = GetSide(attackingPlayer.OpposingPlayerId()).Team.AllActivePokemonCount;
+            // TODO: numPokemonDefendingSide for multi-battles
+            int numPokemonDefendingSide = 1;
 
             double multiplier = defender.Conditions.Aggregate(1.0, (current, condition) =>
                 current * (condition.OnAnyModifyDamage?.Invoke(damage, attacker, defender, move, isCrit,
@@ -422,14 +418,14 @@ public partial class Battle
         Side atkSide = GetSide(playerId);
         Side defSide = GetSide(playerId.OpposingPlayerId());
 
-        Pokemon attacker = atkSide.Team.ActivePokemon;
+        Pokemon attacker = atkSide.Slot1;
 
         if (!Library.Moves.TryGetValue(MoveId.Struggle, out Move? struggle))
         {
             throw new InvalidOperationException($"Struggle move not found in" +
                                                 $"library for player {playerId}");
         }
-        Pokemon defender = defSide.Team.ActivePokemon;
+        Pokemon defender = defSide.Slot1;
         int damage = CalculateDamage(attacker, defender, struggle, 1.0, false, false);
         defender.Damage(damage);
 
