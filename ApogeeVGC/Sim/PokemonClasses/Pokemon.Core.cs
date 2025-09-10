@@ -8,16 +8,16 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 public partial class Pokemon
 {
     public Specie Specie { get; init; }
-    public required Move[] Moves
+    public required IReadOnlyList<Move> Moves
     {
         get;
         init
         {
-            if (value == null || value.Length == 0)
+            if (value == null || value.Count == 0)
             {
                 throw new ArgumentException("Pokemon must have at least one move.");
             }
-            if (value.Length > 4)
+            if (value.Count > 4)
             {
                 throw new ArgumentException("Pokemon cannot have more than 4 moves.");
             }

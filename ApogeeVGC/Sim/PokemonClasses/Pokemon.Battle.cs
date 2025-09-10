@@ -19,7 +19,7 @@ public partial class Pokemon
     public int ActiveMoveActions { get; set; }
 
     // HP and health management
-    public int CurrentHp { get; private set; } = 0;
+    public int CurrentHp { get; private set; }
     public double CurrentHpRatio => (double)CurrentHp / UnmodifiedHp;
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
@@ -115,6 +115,7 @@ public partial class Pokemon
             TeraType = TeraType,
             Gender = Gender,
             PrintDebug = PrintDebug,
+            SlotId = SlotId,
         };
 
         int hpDifference = UnmodifiedHp - CurrentHp;

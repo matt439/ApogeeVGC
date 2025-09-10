@@ -338,6 +338,14 @@ public partial class Battle
         }
 
         Pokemon defender = defendingSide.Slot1;
+        Pokemon[] aliveDefenders = defender.IsFainted ? [] : [defender];
+
+        if (aliveDefenders.Length == 0)
+        {
+            throw new InvalidOperationException("No alive opposing Pokémon to target with moves.");
+        }
+
+        Pokemon? ally = null;
 
         foreach (Move move in attacker.Moves)
         {
@@ -355,7 +363,7 @@ public partial class Battle
                 targetType = MoveNormalTarget.None;
             }
 
-            var possibleTargets = GetPossibleTargets(move, attacker, null, [defender]);
+            var possibleTargets = GetPossibleTargets(move, attacker, ally, aliveDefenders);
 
             SlotChoice.MoveChoice moveChoice = new(attacker, move,
                     false, targetType, possibleTargets);

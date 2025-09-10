@@ -165,6 +165,8 @@ public partial class Battle
         Field.OnTurnEnd(Side1, Side2, Context);
         HandleBeforeResiduals();
         HandleResiduals();
+        // some residual effects may have caused pokemon to faint
+        UpdateFaintedStates();
         HandleConditionTurnEnds();
     }
 
