@@ -2,7 +2,9 @@
 using ApogeeVGC.Sim.FieldClasses;
 using System.Globalization;
 using System.Text;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Ui;
@@ -18,27 +20,35 @@ public static partial class UiGenerator
     private const int HpBarLength = 20;
     private const string PrimarySpacer = "                               ";
 
-    public static void PrintBattleUi(Core.Battle battle, PlayerId perspective)
+    public static void PrintBattleUi(Battle battle, PlayerId perspective)
     {
         switch (perspective)
         {
             case PlayerId.Player1:
                 PrintTurnStart(battle.Turn);
-                PrintSecondarySide(battle, PlayerId.Player2);
-                PrintPrimarySide(battle, PlayerId.Player1);
-                PrintField(battle);
+                PrintSecondarySide(battle.GetSide(PlayerId.Player2));
+                PrintPrimarySide(battle.GetSide(PlayerId.Player1));
+                PrintField(battle.Field);
                 break;
             case PlayerId.Player2:
                 PrintTurnStart(battle.Turn);
-                PrintSecondarySide(battle, PlayerId.Player1);
-                PrintPrimarySide(battle, PlayerId.Player2);
-                PrintField(battle);
+                PrintSecondarySide(battle.GetSide(PlayerId.Player1));
+                PrintPrimarySide(battle.GetSide(PlayerId.Player2));
+                PrintField(battle.Field);
                 break;
             case PlayerId.None:
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(perspective), perspective, null);
         }
+    }
+
+    public static void PrintBattleUiNew(BattlePerspective perspective)
+    {
+        PrintTurnStart(perspective.TurnCounter);
+        PrintSecondarySide(perspective.OpponentSide);
+        PrintPrimarySide(perspective.PlayerSide);
+        PrintField(perspective.Field);
     }
 
     public static void PrintChoices(BattleChoice[] availableChoices)

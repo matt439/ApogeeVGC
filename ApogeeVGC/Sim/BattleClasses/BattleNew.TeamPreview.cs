@@ -30,8 +30,11 @@ public partial class BattleNew
 
             // Request choices from both players simultaneously
             TimeSpan teamPreviewTimeLimit = TimeSpan.FromSeconds(90);
-            var player1Task = RequestChoiceFromPlayerAsync(PlayerId.Player1, player1Choices, teamPreviewTimeLimit, cancellationToken);
-            var player2Task = RequestChoiceFromPlayerAsync(PlayerId.Player2, player2Choices, teamPreviewTimeLimit, cancellationToken);
+            var player1Task = RequestChoiceFromPlayerAsync(PlayerId.Player1, player1Choices,
+                BattleRequestType.TeamPreview, teamPreviewTimeLimit, cancellationToken);
+
+            var player2Task = RequestChoiceFromPlayerAsync(PlayerId.Player2, player2Choices,
+                BattleRequestType.TeamPreview, teamPreviewTimeLimit, cancellationToken);
 
             // Wait for both players to submit choices
             var choices = await Task.WhenAll(player1Task, player2Task);
@@ -173,17 +176,7 @@ public partial class BattleNew
         if (PrintDebug)
             Console.WriteLine($"Applying team preview choice for {playerId}");
 
-        // Apply the team ordering/selection to the current side state
-        // This modifies the mutable Side object based on player's team preview selection
-        
-        // TODO: Implement the actual team preview logic based on your TeamPreviewChoice structure
-        // This might involve:
-        // - Reordering the team based on player selection
-        // - Setting which Pokemon start as active
-        // - Applying any team preview specific effects
-
-        // Example placeholder logic:
-        // side.ApplyTeamPreviewSelection(tpChoice);
+        side.SetSlotsWithCopies(tpChoice.Pokemon);
 
         if (PrintDebug)
             Console.WriteLine($"Team preview choice applied for {playerId}");

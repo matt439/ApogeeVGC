@@ -21,11 +21,11 @@ public record Condition : IEffect
     public Action<Pokemon, Side?, IEffect?, BattleContext>? OnResidual { get; init; }
     public int? Duration { get; set; }
     //public Func<Pokemon, Pokemon?, int>? DurationCallback { get; init; }
-    //public Action<Field?, Pokemon, IEffect?>? OnFieldStart { get; init; }
-    //public Action<Field, Pokemon?, IEffect?>? OnFieldRestart { get; init; }
+    //public TurnStart<Field?, Pokemon, IEffect?>? OnFieldStart { get; init; }
+    //public TurnStart<Field, Pokemon?, IEffect?>? OnFieldRestart { get; init; }
     //public int? OnFieldResidualOrder { get; init; }
     //public int? OnFieldResidualSubOrder { get; init; }
-    //public Action<Field?>? OnFieldEnd { get; init; }
+    //public TurnStart<Field?>? OnFieldEnd { get; init; }
     public int? CounterMax { get; init; }
     public int? Counter { get; set; }
     public Func<Pokemon, BattleContext, bool>? OnStallMove { get; init; }
@@ -39,7 +39,7 @@ public record Condition : IEffect
     /// </summary>
     public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTryHit { get; init; }
     public Action<Pokemon, BattleContext>? OnTurnEnd { get; init; }
-    //public Action<Field>? OnPseudoWeatherStart { get; init; }
+    //public TurnStart<Field>? OnPseudoWeatherStart { get; init; }
     public Func<Pokemon, double>? OnModifyAtk { get; init; }
     public Func<Pokemon, double>? OnModifyDef { get; init; }
     public Func<Pokemon, double>? OnModifySpA { get; init; }

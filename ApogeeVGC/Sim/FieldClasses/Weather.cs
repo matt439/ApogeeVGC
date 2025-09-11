@@ -24,7 +24,7 @@ public class Weather : FieldElement
             DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
-            // Note: Action delegates (OnEnd, OnStart, etc.) are shared immutable references
+            // Note: TurnStart delegates (OnEnd, OnStart, etc.) are shared immutable references
             // since they don't contain mutable state - they're function pointers
             OnEnd = OnEnd,
             OnStart = OnStart,

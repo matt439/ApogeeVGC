@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using System.Text;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Ui;
@@ -133,9 +134,8 @@ public static partial class UiGenerator
     }
 
     // Pokemon Display Methods
-    private static void PrintPrimarySide(Core.Battle battle, PlayerId perspective)
+    private static void PrintPrimarySide(Side side)
     {
-        Side side = battle.GetSide(perspective);
         Pokemon activePokemon = side.Slot1;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
@@ -168,9 +168,8 @@ public static partial class UiGenerator
         Console.WriteLine(sb.ToString());
     }
 
-    private static void PrintSecondarySide(Core.Battle battle, PlayerId perspective)
+    private static void PrintSecondarySide(Side side)
     {
-        Side side = battle.GetSide(perspective);
         Pokemon activePokemon = side.Slot1;
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
@@ -286,10 +285,8 @@ public static partial class UiGenerator
         return $"[{filledPart}{emptyPart}]";
     }
 
-    private static void PrintField(Core.Battle battle)
+    private static void PrintField(Field field)
     {
-        Field field = battle.Field;
-
         StringBuilder sb = new();
         sb.AppendLine("****** Field State ******");
         sb.Append("Weather: ");

@@ -24,7 +24,7 @@ public class Terrain : FieldElement
             DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
             PrintDebug = PrintDebug, // Added missing PrintDebug
-            // Note: Action delegates are shared immutable references
+            // Note: TurnStart delegates are shared immutable references
             OnEnd = OnEnd,
             OnStart = OnStart,
             OnReapply = OnReapply,

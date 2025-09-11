@@ -103,11 +103,10 @@ public partial class BattleNew
                 }
 
                 // Check turn limit
-                if (TurnCounter >= TurnLimit)
-                {
-                    await HandleTurnLimitReachedAsync();
-                    break;
-                }
+                if (TurnCounter < TurnLimit) continue;
+
+                await HandleTurnLimitReachedAsync();
+                break;
             }
 
             if (PrintDebug)
@@ -163,9 +162,14 @@ public partial class BattleNew
     /// <summary>
     /// Get the current side for a player
     /// </summary>
-    public Side GetSide(PlayerId playerId)
+    public Side GetCurrentSide(PlayerId playerId)
     {
         return playerId == PlayerId.Player1 ? Side1 : Side2;
+    }
+
+    public Side GetSide(PlayerId playerId)
+    {
+        return GetCurrentSide(playerId);
     }
 
     /// <summary>
@@ -174,6 +178,12 @@ public partial class BattleNew
     public Side GetOpponentSide(PlayerId playerId)
     {
         return playerId == PlayerId.Player1 ? Side2 : Side1;
+    }
+
+    public Side GetOpponentSide(Side side)
+    {
+        PlayerId playerId = side.PlayerId;
+        return GetOpponentSide(playerId);
     }
 
     /// <summary>
@@ -242,7 +252,7 @@ public partial class BattleNew
     /// </summary>
     private void CompleteTurnWithEndStates()
     {
-        var currentTurn = Turns[^1];
+        Turn currentTurn = Turns[^1];
         
         Turn completedTurn;
         switch (currentTurn)
@@ -253,7 +263,7 @@ public partial class BattleNew
                     Side1End = Side1.Copy(),
                     Side2End = Side2.Copy(),
                     FieldEnd = Field.Copy(),
-                    TurnEndTime = DateTime.UtcNow
+                    TurnEndTime = DateTime.UtcNow,
                 };
                 break;
                 
@@ -263,7 +273,7 @@ public partial class BattleNew
                     Side1End = Side1.Copy(),
                     Side2End = Side2.Copy(),
                     FieldEnd = Field.Copy(),
-                    TurnEndTime = DateTime.UtcNow
+                    TurnEndTime = DateTime.UtcNow,
                 };
                 break;
                 
@@ -320,7 +330,7 @@ public enum GameEndReason
     GameTimeout,
     Forfeit,
     TurnLimit,
-    Error
+    Error,
 }
 
 public class ChoiceRequestEventArgs : EventArgs

@@ -1,5 +1,7 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Player;
 
@@ -7,22 +9,24 @@ public class PlayerConsoleNew(PlayerId playerId) : IPlayerNew
 {
     public PlayerId PlayerId { get; } = playerId;
 
-    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices,
-        CancellationToken cancellationToken)
+    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
+        BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        // TODO: Re-implement a better console UI for this
-        //if (Battle.IsTeamPreview) // check if in Team Preview phase
-        //{
-        //    UiGenerator.PrintTeamPreviewUi(Battle.GetSide(PlayerId.OpposingPlayerId()));
-        //}
-        //else // In Battle phase
-        //{
-        //    UiGenerator.PrintBattleUi(Battle, PlayerId);
-        //}
+        switch (requestType)
+        {
+            case BattleRequestType.TurnStart:
+            case BattleRequestType.ForceSwitch:
+            case BattleRequestType.FaintSwitch:
+                UiGenerator.PrintBattleUiNew(perspective);
+                break;
+            case BattleRequestType.TeamPreview:
+                UiGenerator.PrintTeamPreviewUi(perspective.OpponentSide);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(requestType), requestType, null);
+        }
 
-        //UiGenerator.PrintChoices(availableChoices);
-        //BattleChoice choice = GetChoiceFromConsole(availableChoices);
-        //return choice;
+        UiGenerator.PrintChoices(availableChoices);
 
         BattleChoice choice = GetChoiceFromConsole(availableChoices);
         ChoiceSubmitted?.Invoke(this, choice);

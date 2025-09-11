@@ -94,6 +94,27 @@ public class Side
         }
     }
 
+    public IEnumerable<Pokemon> ActivePokemon
+    {
+        get
+        {
+            switch (BattleFormat)
+            {
+                case BattleFormat.Singles:
+                    yield return Slot1;
+                    break;
+                case BattleFormat.Doubles:
+                    yield return Slot1;
+                    yield return Slot2;
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid battle format.");
+            }
+        }
+    }
+
+    public IEnumerable<Pokemon> AliveActivePokemon => ActivePokemon.Where(p => !p.IsFainted);
+
     //public IEnumerable<(SlotId, Pokemon)> AllSlotsWithIds
     //{
     //    get

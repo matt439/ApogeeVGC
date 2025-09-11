@@ -8,7 +8,8 @@ public interface IPlayerNew
     PlayerId PlayerId { get; }
 
     // Async choice submission
-    Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, CancellationToken cancellationToken);
+    Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
+        BattlePerspective perspective, CancellationToken cancellationToken);
 
     // Events for notifications
     event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

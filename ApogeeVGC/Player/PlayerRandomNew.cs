@@ -11,7 +11,8 @@ public class PlayerRandomNew(PlayerId playerId, int? seed = null) : IPlayerNew
 
     private readonly Random _random = seed is null ? new Random() : new Random(seed.Value);
 
-    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, CancellationToken cancellationToken)
+    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
+        BattlePerspective perspective, CancellationToken cancellationToken)
     {
         if (availableChoices.Length == 0)
         {
