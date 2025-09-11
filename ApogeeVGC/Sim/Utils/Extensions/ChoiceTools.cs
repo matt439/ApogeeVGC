@@ -1,6 +1,6 @@
-﻿using ApogeeVGC.Sim.Choices;
+﻿//using ApogeeVGC.Sim.Choices;
 
-namespace ApogeeVGC.Sim.Utils.Extensions;
+//namespace ApogeeVGC.Sim.Utils.Extensions;
 
 //public static class ChoiceTools
 //{

@@ -3,7 +3,6 @@ using ApogeeVGC.Sim.FieldClasses;
 using System.Globalization;
 using System.Text;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Ui;

@@ -1,10 +1,10 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
-using ApogeeVGC.Sim;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Generators;
 using System.Collections.Concurrent;
 using System.Text;
+using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -13,6 +13,7 @@ public enum DriverMode
     RandomVsRandom,
     RandomVsRandomEvaluation,
     ConsoleVsRandom,
+    ConsoleVsRandomNew,
     ConsoleVsConsole,
     ConsoleVsMcts,
     MctsVsRandom,
@@ -51,6 +52,9 @@ public class Driver
                 break;
             case DriverMode.ConsoleVsRandom:
                 RunConsoleVsRandomTest();
+                break;
+            case DriverMode.ConsoleVsRandomNew:
+                RunConsoleVsRandomNewTest().GetAwaiter().GetResult();
                 break;
             case DriverMode.ConsoleVsConsole:
                 throw new NotImplementedException("Console vs Console mode is not implemented yet.");
@@ -309,6 +313,35 @@ public class Driver
 
         Simulator.Run();
 
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+
+    private async Task RunConsoleVsRandomNewTest()
+    {
+        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
+        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+
+        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+            "Random", BattleFormat.Singles, true);
+
+        var simulator = new SimulatorNew
+        {
+            Battle = battle,
+            Player1 = player1,
+            Player2 = player2,
+        };
+
+        SimulatorResult result = await simulator.Run();
+
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "Matt",
+            SimulatorResult.Player2Win => "Random",
+            _ => "Unknown",
+        };
+
+        Console.WriteLine($"Battle finished. Winner: {winner}");
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
     }
