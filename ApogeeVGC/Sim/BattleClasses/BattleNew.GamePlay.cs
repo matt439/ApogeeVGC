@@ -276,12 +276,17 @@ public partial class BattleNew
     /// </summary>
     private int GetSpeedPriorityForChoice(BattleChoice choice)
     {
-        return choice switch
+        switch (choice)
         {
-            SlotChoice.MoveChoice moveChoice => moveChoice.Move.Priority,
-            SlotChoice.SwitchChoice => 6,
-            _ => 0,
-        };
+            case SlotChoice.MoveChoice moveChoice:
+                Pokemon attacker = moveChoice.Attacker;
+                int priority = moveChoice.Move.Priority;
+                return attacker.Ability.OnModifyPriority?.Invoke(priority, moveChoice.Move) ?? priority;
+            case SlotChoice.SwitchChoice:
+                return 6;
+            default:
+                return 0;
+        }
     }
 
     /// <summary>
