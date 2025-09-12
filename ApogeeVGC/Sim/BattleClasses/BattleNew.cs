@@ -29,6 +29,12 @@ public partial class BattleNew
     public Turn CurrentTurn => Turns.Last();
     public int TurnCounter { get; private set; } // Starts at 0 for team preview turn
     public bool IsGameComplete => CurrentTurn is PostGameTurn;
+    public BattleContext Context => new()
+    {
+        Library = Library,
+        Random = BattleRandom,
+        PrintDebug = PrintDebug,
+    };
 
 
     // Player management

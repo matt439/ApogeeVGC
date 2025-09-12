@@ -5,6 +5,12 @@ using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Sim.Core;
 
+public enum SimulatorResult
+{
+    Player1Win,
+    Player2Win,
+}
+
 public class SimulatorNew
 {
     public required BattleNew Battle { get; init; }

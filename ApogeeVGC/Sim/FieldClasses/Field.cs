@@ -147,7 +147,6 @@ public class Field
                 return Side1Conditions.Any(sc => sc.Id == sideConditionId);
             case PlayerId.Player2:
                 return Side2Conditions.Any(sc => sc.Id == sideConditionId);
-            case PlayerId.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId.");
         }
@@ -159,7 +158,6 @@ public class Field
         {
             PlayerId.Player1 => Side1Conditions.FirstOrDefault(sc => sc.Id == sideConditionId),
             PlayerId.Player2 => Side2Conditions.FirstOrDefault(sc => sc.Id == sideConditionId),
-            PlayerId.None => throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId."),
             _ => null,
         };
     }
@@ -176,7 +174,6 @@ public class Field
             case PlayerId.Player2:
                 sideConditions = Side2Conditions;
                 break;
-            case PlayerId.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
         }
@@ -204,7 +201,6 @@ public class Field
             case PlayerId.Player2:
                 sideConditions = Side2Conditions;
                 break;
-            case PlayerId.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
         }
@@ -227,7 +223,6 @@ public class Field
             case PlayerId.Player2:
                 sideConditions = Side2Conditions;
                 break;
-            case PlayerId.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(side.PlayerId), "Invalid PlayerId.");
         }
@@ -272,7 +267,6 @@ public class Field
                 }
                 break;
             }
-            case PlayerId.None:
             default:
                 throw new ArgumentOutOfRangeException(nameof(playerId), "Invalid PlayerId.");
         }

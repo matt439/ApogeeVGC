@@ -147,8 +147,7 @@ public partial class BattleNew
         {
             if (action.Choice is SlotChoice.MoveChoice { IsTera: true } moveChoice)
             {
-                // TODO: enable this after deleting old battle
-                //moveChoice.Attacker.Terastillize();
+                moveChoice.Attacker.Terastillize(Context);
             }
         }
     }

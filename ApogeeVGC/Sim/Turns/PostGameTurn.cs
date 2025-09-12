@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Turns;
 
