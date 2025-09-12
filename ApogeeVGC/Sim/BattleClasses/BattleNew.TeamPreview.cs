@@ -29,7 +29,7 @@ public partial class BattleNew
             }
 
             // Request choices from both players simultaneously
-            TimeSpan teamPreviewTimeLimit = TimeSpan.FromSeconds(90);
+            TimeSpan teamPreviewTimeLimit = TimeSpan.FromSeconds(TeamPreviewLimitSeconds);
             var player1Task = RequestChoiceFromPlayerAsync(PlayerId.Player1, player1Choices,
                 BattleRequestType.TeamPreview, teamPreviewTimeLimit, cancellationToken);
 

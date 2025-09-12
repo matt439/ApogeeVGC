@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -66,8 +65,8 @@ public partial class BattleNew
             TimeSpan actionDuration = DateTime.UtcNow - actionStartTime;
             UpdatePlayerTime(playerId, actionDuration);
 
-            if (PrintDebug)
-                Console.WriteLine($"Choice received from {playerId}: {choice} (took {actionDuration.TotalSeconds:F1}s)");
+            //if (PrintDebug)
+            //    Console.WriteLine($"Choice received from {playerId}: {choice} (took {actionDuration.TotalSeconds:F1}s)");
 
             return choice;
         }
@@ -104,11 +103,11 @@ public partial class BattleNew
         {
             try
             {
-                TimeSpan warningDelay = timeLimit.Subtract(TimeSpan.FromSeconds(10));
+                TimeSpan warningDelay = timeLimit.Subtract(TimeSpan.FromSeconds(TimeoutWarningThresholdSeconds));
                 if (warningDelay > TimeSpan.Zero)
                 {
                     await Task.Delay(warningDelay, cancellationToken);
-                    await player.NotifyTimeoutWarningAsync(TimeSpan.FromSeconds(10));
+                    await player.NotifyTimeoutWarningAsync(TimeSpan.FromSeconds(TimeoutWarningThresholdSeconds));
                 }
             }
             catch (OperationCanceledException)

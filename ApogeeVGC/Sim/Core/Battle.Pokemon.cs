@@ -1,9 +1,7 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Ui;
-using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 

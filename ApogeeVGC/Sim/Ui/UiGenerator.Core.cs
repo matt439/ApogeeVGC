@@ -126,8 +126,7 @@ public static partial class UiGenerator
 
     private static void PrintTurnStart(int turn)
     {
-        int turnNumber = turn + 1;
-        string turnString = turnNumber.ToString(CultureInfo.InvariantCulture);
+        string turnString = turn.ToString(CultureInfo.InvariantCulture);
         Console.WriteLine($"\n{TurnSpacer}  Turn {turnString}  {TurnSpacer}\n");
     }
 }

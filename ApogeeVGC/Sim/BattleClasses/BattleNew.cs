@@ -19,10 +19,6 @@ public partial class BattleNew
 
     public required BattleFormat Format { get; init; }
 
-    // Constants
-    private const int TurnLimit = 1000;
-    private const double Epsilon = 1e-10;
-
     // Random number generation
     private Random? _battleRandom;
     private Random BattleRandom => _battleRandom ??= BattleSeed.HasValue ?
@@ -50,8 +46,8 @@ public partial class BattleNew
     private DateTime? _currentPlayerTurnStart;
 
     // Timer limits
-    public static readonly TimeSpan PlayerTotalTimeLimit = TimeSpan.FromMinutes(7);
-    public static readonly TimeSpan GameTimeLimit = TimeSpan.FromMinutes(20);
+    public static readonly TimeSpan PlayerTotalTimeLimit = TimeSpan.FromMinutes(PlayerTotalTimeLimitMinutes);
+    public static readonly TimeSpan GameTimeLimit = TimeSpan.FromMinutes(GameTotalTimeLimitMinutes);
 
     // Events for external observers
     public event EventHandler<Turn>? TurnCompleted;
@@ -218,7 +214,8 @@ public partial class BattleNew
             _player2TotalTime += duration;
 
         if (PrintDebug)
-            Console.WriteLine($"Player {playerId} time updated: +{duration.TotalSeconds:F1}s (Total: {GetPlayerTotalTime(playerId).TotalSeconds:F1}s)");
+            Console.WriteLine($"Player {playerId} time updated: +{duration.TotalSeconds:F1}s" +
+                              $"(Total: {GetPlayerTotalTime(playerId).TotalSeconds:F1}s)");
     }
 
     /// <summary>
@@ -291,6 +288,15 @@ public partial class BattleNew
 
         if (PrintDebug)
             Console.WriteLine($"Turn {TurnCounter} completed");
+    }
+
+    private Pokemon[] GetAllFaintedActivePokemon()
+    {
+
+        List<Pokemon> faintedActive = [];
+        faintedActive.AddRange(Side1.FaintedActivePokemon);
+        faintedActive.AddRange(Side2.FaintedActivePokemon);
+        return faintedActive.ToArray();
     }
 
     /// <summary>

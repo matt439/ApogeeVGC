@@ -1,9 +1,8 @@
-﻿using System.Net.Http.Headers;
-using ApogeeVGC.Player;
+﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Turns;
+using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -79,8 +78,11 @@ public partial class BattleNew
         foreach (Pokemon pokemon in activePokemon)
         {
             var availableChoices = GenerateTurnStartChoices(pokemon);
+
             BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, availableChoices,
-                BattleRequestType.TurnStart, TimeSpan.FromSeconds(45), cancellationToken);
+                BattleRequestType.TurnStart, TimeSpan.FromSeconds(StandardTurnLimitSeconds),
+                cancellationToken);
+
             var pendingAction = new PendingAction
             {
                 PlayerId = playerId,
@@ -95,13 +97,21 @@ public partial class BattleNew
     private async Task ExecuteActionsWithDynamicSwitchesAsync(List<ActionWithChoice> actions,
         CancellationToken cancellationToken)
     {
+        // TODO: Have teras activate after switches but before moves
+        HandleTerastalization(actions);
+        
         // Sort by priority/speed
         var sortedActions = SortActionsBySpeedOrder(actions);
 
         foreach (ActionWithChoice action in sortedActions)
         {
-            if (PrintDebug)
-                Console.WriteLine($"Executing: {action.PlayerId} - {action.Choice}");
+            // Check if executor is still able to act
+            if (action.Executor.IsFainted || !GetCurrentSide(action.PlayerId).IsActivePokemon(action.Executor))
+            {
+                if (PrintDebug)
+                    Console.WriteLine($"Skipping action for {action.Executor.Name} as it can no longer act.");
+                continue;
+            }
 
             await ExecuteSingleActionAsync(action);
 
@@ -113,7 +123,33 @@ public partial class BattleNew
 
             // Check for game end after each action
             if (CheckForGameEndConditions())
+            {
                 break;
+            }
+
+            // Check for fainted Pokémon and notify via UI (switches handled at end of turn)
+            var faintedPokemon = GetAllFaintedActivePokemon();
+            foreach (Pokemon fainted in faintedPokemon)
+            {
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedAction(fainted);
+                }
+            }
+
+            // TODO: Update execution order after each action (dynamic speed)
+        }
+    }
+
+    private void HandleTerastalization(List<ActionWithChoice> actions)
+    {
+        foreach (ActionWithChoice action in actions)
+        {
+            if (action.Choice is SlotChoice.MoveChoice { IsTera: true } moveChoice)
+            {
+                // TODO: enable this after deleting old battle
+                //moveChoice.Attacker.Terastillize();
+            }
         }
     }
 
@@ -138,9 +174,20 @@ public partial class BattleNew
         if (switchChoices.Length > 0)
         {
             BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices,
-                BattleRequestType.ForceSwitch, TimeSpan.FromSeconds(30), cancellationToken);
+                BattleRequestType.ForceSwitch, TimeSpan.FromSeconds(StandardTurnLimitSeconds),
+                cancellationToken);
 
-            await ExecuteSlotChoiceAsync(playerId, (SlotChoice)choice);
+            if (choice is not SlotChoice.SwitchChoice switchChoice)
+            {
+                throw new InvalidOperationException("Expected a SwitchChoice for forced switch.");
+            }
+
+            if (PrintDebug)
+            {
+                UiGenerator.PrintForceSwitchOutAction(switchChoice.Trainer.Name, switchChoice.SwitchOutPokemon);
+            }
+
+            await ExecuteSwitchChoiceAsync(playerId, switchChoice);
         }
     }
 
@@ -161,68 +208,23 @@ public partial class BattleNew
             if (side.SwitchOptionsCount <= 0) continue;
 
             var switchChoices = GenerateFaintedSwitchChoices(pokemon);
-            BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices, BattleRequestType.FaintSwitch,
-                TimeSpan.FromSeconds(30), cancellationToken);
+            BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices,
+                BattleRequestType.FaintSwitch,
+                TimeSpan.FromSeconds(StandardTurnLimitSeconds), cancellationToken);
 
-            await ExecuteSlotChoiceAsync(playerId, (SlotChoice)choice);
+            if (choice is not SlotChoice.SwitchChoice switchChoice)
+            {
+                throw new InvalidOperationException("Expected a SwitchChoice for fainted Pokémon switch.");
+            }
+
+            if (PrintDebug)
+            {
+                UiGenerator.PrintFaintedSelectAction(switchChoice.Trainer.Name, switchChoice.SwitchInPokemon);
+            }
+
+            await ExecuteSwitchChoiceAsync(playerId, switchChoice);
         }
     }
-
-    // Helper methods that need to be implemented
-
-    ///// <summary>
-    ///// Generate standard move/switch choices for a Pokemon
-    ///// </summary>
-    //private BattleChoice[] GenerateStandardChoices(Pokemon pokemon)
-    //{
-    //    var choices = new List<BattleChoice>();
-        
-    //    // Add move choices
-    //    choices.AddRange(GetMoveChoices(pokemon.SideId));
-        
-    //    // Add switch choices if applicable
-    //    Side side = GetCurrentSide(pokemon.SideId == SideId.Side1 ? PlayerId.Player1 : PlayerId.Player2);
-    //    if (CanPokemonSwitch(pokemon))
-    //    {
-    //        choices.AddRange(GetSwitchChoices(side, Format));
-    //    }
-        
-    //    return choices.ToArray();
-    //}
-
-    ///// <summary>
-    ///// Generate forced switch choices for immediate switches (Volt Switch, etc.)
-    ///// </summary>
-    //private BattleChoice[] GenerateForcedSwitchChoices(Side side)
-    //{
-    //    var choices = new List<BattleChoice>();
-        
-    //    // Get the first active Pokemon (the one that used the forcing move)
-    //    var activePokemon = GetAliveActivePokemon(side).FirstOrDefault();
-    //    if (activePokemon != null)
-    //    {
-    //        choices.AddRange(GetSwitchChoices(side, Format));
-    //    }
-        
-    //    return choices.ToArray();
-    //}
-
-    ///// <summary>
-    ///// Generate switch choices for fainted Pokemon
-    ///// </summary>
-    //private BattleChoice[] GenerateFaintedSwitchChoices(Side side, SlotId faintedSlotId)
-    //{
-    //    var choices = new List<BattleChoice>();
-        
-    //    // Create a placeholder Pokemon for the fainted slot to generate switch choices
-    //    Pokemon faintedPokemon = side.GetSlot(faintedSlotId);
-    //    if (faintedPokemon.IsFainted)
-    //    {
-    //        choices.AddRange(GetSwitchChoices(side, Format));
-    //    }
-        
-    //    return choices.ToArray();
-    //}
 
     /// <summary>
     /// Create an ActionWithChoice from a pending action and chosen battle choice
@@ -254,7 +256,7 @@ public partial class BattleNew
             {
                 SlotChoice.MoveChoice moveChoice => moveChoice.Attacker,
                 SlotChoice.SwitchChoice switchChoice => switchChoice.SwitchOutPokemon,
-                _ => throw new InvalidOperationException($"Unknown slot choice type: {slotChoice.GetType().Name}")
+                _ => throw new InvalidOperationException($"Unknown slot choice type: {slotChoice.GetType().Name}"),
             };
         }
 
@@ -280,8 +282,6 @@ public partial class BattleNew
             SlotChoice.SwitchChoice => 6,
             _ => 0,
         };
-
-        // Default priority for other actions
     }
 
     /// <summary>
@@ -295,6 +295,7 @@ public partial class BattleNew
             .ThenByDescending(a => a.Executor.CurrentSpe) // Use Current Speed stat
             .ThenBy(a => a.ActionOrder)
             .ToList();
+        // TODO: Handle trick room (reverse pokemon speed order)
     }
 
     /// <summary>
@@ -307,12 +308,12 @@ public partial class BattleNew
             case SlotChoice slotChoice:
                 await ExecuteSlotChoiceAsync(action.PlayerId, slotChoice);
                 break;
-            
-            // Add other choice types as needed
+            case DoubleSlotChoice doubleSlotChoice:
+                throw new NotImplementedException();
+            case TeamPreviewChoice _:
+                throw new InvalidOperationException("Team preview choices should not be executed during gameplay.");
             default:
-                if (PrintDebug)
-                    Console.WriteLine($"Unknown choice type: {action.Choice.GetType().Name}");
-                break;
+                throw new InvalidOperationException($"Unknown choice type: {action.Choice.GetType().Name}");
         }
     }
 
@@ -321,8 +322,8 @@ public partial class BattleNew
     /// </summary>
     private async Task ExecuteSlotChoiceAsync(PlayerId playerId, SlotChoice slotChoice)
     {
-        if (PrintDebug)
-            Console.WriteLine($"Executing slot choice for {playerId}: {slotChoice}");
+        //if (PrintDebug)
+        //    Console.WriteLine($"Executing slot choice for {playerId}: {slotChoice}");
 
         switch (slotChoice)
         {
@@ -335,50 +336,8 @@ public partial class BattleNew
                 break;
                 
             default:
-                if (PrintDebug)
-                    Console.WriteLine($"Unknown slot choice type: {slotChoice.GetType().Name}");
-                break;
+                throw new InvalidOperationException($"Unknown slot choice type: {slotChoice.GetType().Name}");
         }
-    }
-
-    /// <summary>
-    /// Execute a move choice
-    /// </summary>
-    private async Task ExecuteMoveChoiceAsync(PlayerId playerId, SlotChoice.MoveChoice moveChoice)
-    {
-        if (PrintDebug)
-            Console.WriteLine($"Executing move {moveChoice.Move.Name} by {moveChoice.Attacker.Specie.Name}");
-
-        // TODO: Integrate with actual battle logic
-        // This would involve:
-        // - Move accuracy checks
-        // - Damage calculation
-        // - Effect application
-        // - Target Pokemon updates
-        // - Field condition changes
-
-        await Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Execute a switch choice
-    /// </summary>
-    private async Task ExecuteSwitchChoiceAsync(PlayerId playerId, SlotChoice.SwitchChoice switchChoice)
-    {
-        if (PrintDebug)
-            Console.WriteLine($"Switching {switchChoice.SwitchOutPokemon.Specie.Name} for {switchChoice.SwitchInPokemon.Specie.Name}");
-
-        // Perform the actual switch
-        var side = GetCurrentSide(playerId);
-        side.SwitchSlots(switchChoice.SwitchOutSlot, switchChoice.SwitchInSlot);
-
-        // TODO: Integrate with actual battle logic
-        // This would involve:
-        // - Switch-in abilities triggering
-        // - Field effect interactions
-        // - Status condition transfers if applicable
-
-        await Task.CompletedTask;
     }
 
     /// <summary>
