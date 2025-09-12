@@ -8,14 +8,14 @@ public enum SideId
 
 public enum SlotId
 {
-    Slot1,
-    Slot2,
-    Slot3,
-    Slot4,
+    Slot1 = 1,
+    Slot2 = 2,
+    Slot3 = 3,
+    Slot4 = 4,
 
     // Only for singles
-    Slot5,
-    Slot6,
+    Slot5 = 5,
+    Slot6 = 6,
 }
 
 public enum BattleFormat

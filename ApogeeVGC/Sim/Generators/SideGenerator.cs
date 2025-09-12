@@ -9,7 +9,7 @@ namespace ApogeeVGC.Sim.Generators;
 public static class SideGenerator
 {
     public static Side GenerateTestSide(Library library, string trainerName, PlayerId playerId, SideId sideId,
-        bool printDebug = false)
+        BattleFormat format, bool printDebug = false)
     {
         Trainer defaulTrainer = TrainerGenerator.GenerateTestTrainer("Default", printDebug);
 
@@ -25,7 +25,7 @@ public static class SideGenerator
             Slot4 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
             Slot5 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
             Slot6 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
-            BattleFormat = BattleFormat.Singles,
+            BattleFormat = format,
 
         };
     }

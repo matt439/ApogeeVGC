@@ -75,16 +75,112 @@ public partial class BattleNew
         // Get all 6 Pokémon from the team
         var pokemon = side.Team.PokemonSet.Pokemons;
 
-        // Generate all permutations of the 6 Pokémon
-        var permutations = GeneratePermutations(pokemon.ToArray());
+        switch (side.BattleFormat)
+        {
+            // Check battle format to determine how many Pokémon to select
+            case BattleFormat.Singles:
+            {
+                // Singles: Generate all permutations of the 6 Pokémon (720 choices)
+                var permutations = GeneratePermutations(pokemon.ToArray());
 
-        // Create a TeamPreviewChoice for each permutation
-        choices.AddRange(permutations.Select(permutation =>
-                permutation.Select((p, index) =>
-                    CreatePokemonWithSlot(p, (SlotId)(index + 1))).ToList()).
-            Select(TeamPreviewChoice.CreateSinglesTeamPreview));
+                choices.AddRange(permutations.Select(permutation =>
+                        permutation.Select((p, index) =>
+                            CreatePokemonWithSlot(p, (SlotId)(index + 1))).ToList()).
+                    Select(TeamPreviewChoice.CreateSinglesTeamPreview));
+                break;
+            }
+            case BattleFormat.Doubles:
+            {
+                // Doubles: Select 4 out of 6 Pokémon and arrange them in slots 1-4
+                // Slots 5-6 are not used in doubles format
+                var combinations = GenerateCombinations(pokemon.ToArray(), 4);
+
+                foreach (var combination in combinations)
+                {
+                    // For each combination of 4 Pokémon, generate all permutations
+                    var permutations = GeneratePermutations(combination);
+
+                    foreach (var permutation in permutations)
+                    {
+                        // Create team arrangement with only the 4 selected Pokémon in slots 1-4
+                        var teamArrangement = new List<Pokemon>();
+
+                        // Add the 4 selected Pokémon in slots 1-4 only
+                        for (int i = 0; i < 4; i++)
+                        {
+                            teamArrangement.Add(CreatePokemonWithSlot(permutation[i], (SlotId)(i + 1)));
+                        }
+
+                        // Note: Slots 5-6 are deliberately not populated for doubles format
+                        choices.Add(TeamPreviewChoice.CreateDoublesTeamPreview(teamArrangement));
+                    }
+                }
+                break;
+            }
+            default:
+                throw new InvalidOperationException($"Unsupported battle format: {side.BattleFormat}");
+        }
 
         return choices.ToArray();
+    }
+
+    /// <summary>
+    /// Generates all combinations of r elements from the given array.
+    /// For Doubles: generates all ways to choose 4 Pokémon out of 6 (15 combinations).
+    /// </summary>
+    private static IEnumerable<T[]> GenerateCombinations<T>(T[] array, int r)
+    {
+        if (r > array.Length || r < 0)
+            yield break;
+
+        if (r == 0)
+        {
+            yield return [];
+            yield break;
+        }
+
+        if (r == array.Length)
+        {
+            yield return (T[])array.Clone();
+            yield break;
+        }
+
+        // Generate combinations using bit manipulation
+        int n = array.Length;
+        int totalCombinations = 1 << n; // 2^n
+
+        for (int mask = 0; mask < totalCombinations; mask++)
+        {
+            // Count set bits to see if this mask represents r elements
+            if (CountSetBits(mask) != r) continue;
+
+            var combination = new T[r];
+            int index = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                if ((mask & (1 << i)) != 0)
+                {
+                    combination[index++] = array[i];
+                }
+            }
+
+            yield return combination;
+        }
+    }
+
+    /// <summary>
+    /// Helper method to count set bits in an integer
+    /// </summary>
+    private static int CountSetBits(int n)
+    {
+        int count = 0;
+        while (n != 0)
+        {
+            count++;
+            n &= (n - 1); // Clear the lowest set bit
+        }
+        return count;
     }
 
     /// <summary>

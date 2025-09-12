@@ -14,7 +14,7 @@ public enum DriverMode
     RandomVsRandom,
     RandomVsRandomEvaluation,
     ConsoleVsRandom,
-    ConsoleVsRandomNew,
+    ConsoleVsRandomDoubles,
     ConsoleVsConsole,
     ConsoleVsMcts,
     MctsVsRandom,
@@ -26,7 +26,7 @@ public class Driver
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    private const int RandomEvaluationNumTest = 1000;
+    private const int RandomEvaluationNumTest = 500;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;
@@ -52,11 +52,10 @@ public class Driver
                 RunRandomVsRandomEvaluationTest().GetAwaiter().GetResult();
                 break;
             case DriverMode.ConsoleVsRandom:
-                throw new NotImplementedException();
-                //RunConsoleVsRandomTest();
+                RunConsoleVsRandomTest().GetAwaiter().GetResult();
                 break;
-            case DriverMode.ConsoleVsRandomNew:
-                RunConsoleVsRandomNewTest().GetAwaiter().GetResult();
+            case DriverMode.ConsoleVsRandomDoubles:
+                RunConsoleVsRandomDoublesTest().GetAwaiter().GetResult();
                 break;
             case DriverMode.ConsoleVsConsole:
                 throw new NotImplementedException("Console vs Console mode is not implemented yet.");
@@ -321,13 +320,42 @@ public class Driver
     //    Console.ReadKey();
     //}
 
-    private async Task RunConsoleVsRandomNewTest()
+    private async Task RunConsoleVsRandomTest()
     {
         IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
         IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
 
         BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Singles, true);
+
+        var simulator = new SimulatorNew
+        {
+            Battle = battle,
+            Player1 = player1,
+            Player2 = player2,
+        };
+
+        SimulatorResult result = await simulator.Run();
+
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "Matt",
+            SimulatorResult.Player2Win => "Random",
+            _ => "Unknown",
+        };
+
+        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+
+    private async Task RunConsoleVsRandomDoublesTest()
+    {
+        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
+        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+
+        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+            "Random", BattleFormat.Doubles, true);
 
         var simulator = new SimulatorNew
         {
