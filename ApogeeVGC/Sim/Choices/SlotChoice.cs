@@ -39,7 +39,7 @@ public abstract record SlotChoice : BattleChoice
             PossibleTargets = possibleTargets ?? throw new ArgumentNullException(nameof(possibleTargets));
 
             // Check if move is contained in attacker's moves
-            if (!attacker.Moves.Contains(move))
+            if (!attacker.Moves.Contains(move) && move.Id != MoveId.Struggle)
             {
                 throw new ArgumentException("The specified move is not known by the attacker.");
             }

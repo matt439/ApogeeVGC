@@ -31,8 +31,7 @@ public partial class BattleNew
         Move move = choice.Move;
 
         // This is where choice lock and choice benefits come into play
-        // TODO: Implement choice lock and choice benefits
-        //attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
+        attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
 
         if (move.Pp <= 0)
         {
@@ -41,57 +40,54 @@ public partial class BattleNew
         }
 
         // Check OnDisableMove conditions on attacker
-        // TODO: Implement disabling moves
-        //foreach (Condition condition in attacker.Conditions.ToList())
-        //{
-        //    condition.OnDisableMove?.Invoke(attacker, move, Context);
-        //}
-        //if (move.Disabled)
-        //{
-        //    if (PrintDebug)
-        //    {
-        //        UiGenerator.PrintDisabledMoveTry(attacker, move);
-        //    }
-        //    return MoveAction.None;
-        //}
+        foreach (Condition condition in attacker.Conditions.ToList())
+        {
+            condition.OnDisableMove?.Invoke(attacker, move, Context);
+        }
+        if (move.Disabled)
+        {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintDisabledMoveTry(attacker, move);
+            }
+
+            return;
+        }
 
         move.UsedPp++;  // Decrease PP for the move used
         attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
         attacker.LastMoveUsed = move;
 
         // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
-        // TODO: Re-enable this when we have conditions that use it
-        //if (attacker.Conditions
-        //    .Where(c => c.OnBeforeMove != null)
-        //    .OrderBy(c => c.OnBeforeMovePriority ?? 0)
-        //    .ToList().Any(condition => condition.OnBeforeMove == null ||
-        //                               !condition.OnBeforeMove(attacker, defender, move, Context)))
-        //{
-        //    return MoveAction.None;
-        //}
+        if (attacker.Conditions
+            .Where(c => c.OnBeforeMove != null)
+            .OrderBy(c => c.OnBeforeMovePriority ?? 0)
+            .ToList().Any(condition => condition.OnBeforeMove == null ||
+                                       !condition.OnBeforeMove(attacker, defender, move, Context)))
+        {
+            return;
+        }
 
-        // TODO: Re-enable this when we have stall moves implemented
-        //if (move.StallingMove)
-        //{
-        //    // check for conditions with OnStallMove on attacker
-        //    foreach (Condition condition in attacker.Conditions.ToList())
-        //    {
-        //        if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
-        //        if (PrintDebug)
-        //        {
-        //            UiGenerator.PrintMoveFailAction(attacker, move);
-        //        }
+        if (move.StallingMove)
+        {
+            // check for conditions with OnStallMove on attacker
+            foreach (Condition condition in attacker.Conditions.ToList())
+            {
+                if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintMoveFailAction(attacker, move);
+                }
 
-        //        return MoveAction.None;
-        //    }
-        //}
+                return;
+            }
+        }
 
-        // TODO: Re-enable this when we have moves that use OnTry
-        //// OnTry checks on the attacker's move (incl fake out, etc)
-        //if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
-        //{
-        //    return MoveAction.None;
-        //}
+        // OnTry checks on the attacker's move (incl fake out, etc)
+        if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
+        {
+            return;
+        }
 
         // Miss check
         if (IsMoveMiss(attacker, move, defender))
@@ -106,36 +102,35 @@ public partial class BattleNew
 
         // Immunity check. Note that this does not check for normal immunity, only special cases.
         // Regular immunity check is done in PerformDamagingMove
-        // TODO: Re-enable this when we have moves that use OnTryImmunity or OnPrepareHit
-        //if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
-        //    move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
-        //{
-        //    if (PrintDebug)
-        //    {
-        //        UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-        //    }
-        //    return MoveAction.None;
-        //}
+        if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
+            move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
+        {
+            if (PrintDebug)
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+            }
+
+            return;
+        }
 
         // check every condition on defender for OnTryHit effects
-        // TODO: Re-enable this when we have moves that use OnTryHit
-        //foreach (Condition condition in defender.Conditions.ToList())
-        //{
-        //    if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
+        foreach (Condition condition in defender.Conditions.ToList())
+        {
+            if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
 
-        //    if (!PrintDebug) return MoveAction.None;
+            if (!PrintDebug) return;
 
-        //    // Check if the defender is protected by a stall move like Protect, Detect, etc.
-        //    if (defender.HasCondition(ConditionId.Stall))
-        //    {
-        //        UiGenerator.PrintStallMoveProtection(attacker, move, defender);
-        //    }
-        //    else
-        //    {
-        //        UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-        //    }
-        //    return MoveAction.None;
-        //}
+            // Check if the defender is protected by a stall move like Protect, Detect, etc.
+            if (defender.HasCondition(ConditionId.Stall))
+            {
+                UiGenerator.PrintStallMoveProtection(attacker, move, defender);
+            }
+            else
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+            }
+            return;
+        }
 
         switch (move.Category)
         {
@@ -216,53 +211,49 @@ public partial class BattleNew
             UiGenerator.PrintDamagingMoveAction(attacker, move, damage, defender, effectiveness, isCrit);
         }
 
-        // TODO: Re-enable this when we have moves that use OnHit
-        //move.OnHit?.Invoke(defender, attacker, move, Context);
+        move.OnHit?.Invoke(defender, attacker, move, Context);
 
         // Rocky helmet
-        // TODO: Re-enable this when we have items that use OnDamagingHit
-        //defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
+        defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
 
-        // TODO: Re-enable this when we have conditions that use OnDamagingHit
-        //foreach (Condition condition in defender.Conditions.ToList())
-        //{
-        //    condition.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
-        //}
+        foreach (Condition condition in defender.Conditions.ToList())
+        {
+            condition.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
+        }
 
         // Check for move condition application
-        // TODO: Re-enable this when we have moves that use Condition
-        //if (move.Condition is not null)
-        //{
-        //    // Apply condition based on move target
-        //    switch (move.Target)
-        //    {
-        //        case MoveTarget.Normal:
-        //            defender.AddCondition(move.Condition, Context, attacker, move);
-        //            break;
-        //        case MoveTarget.Self:
-        //            attacker.AddCondition(move.Condition, Context, attacker, move);
-        //            break;
-        //        case MoveTarget.AdjacentAlly:
-        //        case MoveTarget.AdjacentAllyOrSelf:
-        //        case MoveTarget.AdjacentFoe:
-        //        case MoveTarget.All:
-        //        case MoveTarget.AllAdjacent:
-        //        case MoveTarget.AllAdjacentFoes:
-        //        case MoveTarget.Allies:
-        //        case MoveTarget.AllySide:
-        //        case MoveTarget.AllyTeam:
-        //        case MoveTarget.Any:
-        //        case MoveTarget.FoeSide:
-        //        case MoveTarget.RandomNormal:
-        //        case MoveTarget.Scripted:
-        //        case MoveTarget.None:
-        //            throw new NotImplementedException();
-        //        case MoveTarget.Field:
-        //            throw new InvalidOperationException("Field target should be handled separately");
-        //        default:
-        //            throw new ArgumentOutOfRangeException();
-        //    }
-        //}
+        if (move.Condition is not null)
+        {
+            // Apply condition based on move target
+            switch (move.Target)
+            {
+                case MoveTarget.Normal:
+                    defender.AddCondition(move.Condition, Context, attacker, move);
+                    break;
+                case MoveTarget.Self:
+                    attacker.AddCondition(move.Condition, Context, attacker, move);
+                    break;
+                case MoveTarget.AdjacentAlly:
+                case MoveTarget.AdjacentAllyOrSelf:
+                case MoveTarget.AdjacentFoe:
+                case MoveTarget.All:
+                case MoveTarget.AllAdjacent:
+                case MoveTarget.AllAdjacentFoes:
+                case MoveTarget.Allies:
+                case MoveTarget.AllySide:
+                case MoveTarget.AllyTeam:
+                case MoveTarget.Any:
+                case MoveTarget.FoeSide:
+                case MoveTarget.RandomNormal:
+                case MoveTarget.Scripted:
+                case MoveTarget.None:
+                    throw new NotImplementedException();
+                case MoveTarget.Field:
+                    throw new InvalidOperationException("Field target should be handled separately");
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
 
         // check for recoil
         if (move.Recoil is not null)
@@ -279,8 +270,7 @@ public partial class BattleNew
         if (defender.IsFainted)
         {
             // chilling neigh
-            // TODO: Re-enable this when we have abilities that use OnSourceAfterFaint
-            //attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
+            attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
         }
     }
 
@@ -313,38 +303,36 @@ public partial class BattleNew
             return;
         }
 
-        // TODO: Re-enable this when we have moves that use OnHit
-        //move.OnHit?.Invoke(defender, attacker, move, Context);
+        move.OnHit?.Invoke(defender, attacker, move, Context);
 
-        // TODO: Re-enable this when we have moves that use Condition
-        //switch (move.Target)
-        //{
-        //    case MoveTarget.Normal:
-        //        defender.AddCondition(move.Condition, Context, attacker, move);
-        //        break;
-        //    case MoveTarget.Self:
-        //        attacker.AddCondition(move.Condition, Context, attacker, move);
-        //        break;
-        //    case MoveTarget.AdjacentAlly:
-        //    case MoveTarget.AdjacentAllyOrSelf:
-        //    case MoveTarget.AdjacentFoe:
-        //    case MoveTarget.All:
-        //    case MoveTarget.AllAdjacent:
-        //    case MoveTarget.AllAdjacentFoes:
-        //    case MoveTarget.Allies:
-        //    case MoveTarget.AllySide:
-        //    case MoveTarget.AllyTeam:
-        //    case MoveTarget.Any:
-        //    case MoveTarget.FoeSide:
-        //    case MoveTarget.RandomNormal:
-        //    case MoveTarget.Scripted:
-        //    case MoveTarget.None:
-        //        throw new NotImplementedException();
-        //    case MoveTarget.Field:
-        //        throw new InvalidOperationException("Field target should be handled separately");
-        //    default:
-        //        throw new ArgumentOutOfRangeException();
-        //}
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+                defender.AddCondition(move.Condition, Context, attacker, move);
+                break;
+            case MoveTarget.Self:
+                attacker.AddCondition(move.Condition, Context, attacker, move);
+                break;
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.FoeSide:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+                throw new NotImplementedException();
+            case MoveTarget.Field:
+                throw new InvalidOperationException("Field target should be handled separately");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private void HandleSideTargetStatusMove(Move move, PlayerId playerId, Pokemon attacker)
@@ -355,16 +343,15 @@ public partial class BattleNew
         }
 
         SideCondition? condition = Field.GetSideCondition(move.SideCondition.Id, playerId);
-        // TODO: Re-enable this when we have moves that use SideCondition
-        //if (condition is not null)
-        //{
-        //    // If the side condition is already present, reapply it (which may remove it)
-        //    Field.ReapplySideCondition(condition.Id, GetSide(playerId), Context);
-        //}
-        //else // Otherwise, add the new side condition
-        //{
-        //    Field.AddSideCondition(move.SideCondition, GetSide(playerId), attacker, move, Context);
-        //}
+        if (condition is not null)
+        {
+            // If the side condition is already present, reapply it (which may remove it)
+            Field.ReapplySideCondition(condition.Id, GetSide(playerId), Context);
+        }
+        else // Otherwise, add the new side condition
+        {
+            Field.AddSideCondition(move.SideCondition, GetSide(playerId), attacker, move, Context);
+        }
     }
 
     private void HandleFieldTargetStatusMove(Move move, Pokemon attacker)
@@ -374,51 +361,50 @@ public partial class BattleNew
             throw new InvalidOperationException($"Status move {move.Name} has no field effect defined.");
         }
 
-        // TODO: Re-enable this when we have moves that use PseudoWeather, Weather, or Terrain
-        //if (move.PseudoWeather is not null)
-        //{
-        //    // If the pseudo-weather is already present, reapply it (which may remove it)
-        //    if (Field.HasPseudoWeather(move.PseudoWeather.Id))
-        //    {
-        //        Field.ReapplyPseudoWeather(move.PseudoWeather.Id, AllActivePokemon, Context);
-        //    }
-        //    else // Otherwise, add the new pseudo-weather
-        //    {
-        //        Field.AddPseudoWeather(move.PseudoWeather, attacker, move, AllActivePokemon, Context);
-        //    }
-        //}
-        //if (move.Weather is not null)
-        //{
-        //    if (Field.HasWeather(move.Weather.Id)) // Reapply weather if it's the same one
-        //    {
-        //        Field.ReapplyWeather(AllActivePokemon, Context);
-        //    }
-        //    else if (Field.HasAnyWeather) // Replace existing weather
-        //    {
-        //        Field.RemoveWeather(AllActivePokemon, Context);
-        //        Field.AddWeather(move.Weather, attacker, move, AllActivePokemon, Context);
-        //    }
-        //    else // No existing weather, just add the new one
-        //    {
-        //        Field.AddWeather(move.Weather, attacker, move, AllActivePokemon, Context);
-        //    }
-        //}
-        //if (move.Terrain is not null)
-        //{
-        //    if (Field.HasTerrain(move.Terrain.Id)) // Reapply terrain if it's the same one
-        //    {
-        //        Field.ReapplyTerrain(AllActivePokemon, Context);
-        //    }
-        //    else if (Field.HasAnyWeather) // Replace existing terrain
-        //    {
-        //        Field.ReapplyTerrain(AllActivePokemon, Context);
-        //        Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemon, Context);
-        //    }
-        //    else // No existing terrain, just add the new one
-        //    {
-        //        Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemon, Context);
-        //    }
-        //}
+        if (move.PseudoWeather is not null)
+        {
+            // If the pseudo-weather is already present, reapply it (which may remove it)
+            if (Field.HasPseudoWeather(move.PseudoWeather.Id))
+            {
+                Field.ReapplyPseudoWeather(move.PseudoWeather.Id, AllActivePokemonArray, Context);
+            }
+            else // Otherwise, add the new pseudo-weather
+            {
+                Field.AddPseudoWeather(move.PseudoWeather, attacker, move, AllActivePokemonArray, Context);
+            }
+        }
+        if (move.Weather is not null)
+        {
+            if (Field.HasWeather(move.Weather.Id)) // Reapply weather if it's the same one
+            {
+                Field.ReapplyWeather(AllActivePokemonArray, Context);
+            }
+            else if (Field.HasAnyWeather) // Replace existing weather
+            {
+                Field.RemoveWeather(AllActivePokemonArray, Context);
+                Field.AddWeather(move.Weather, attacker, move, AllActivePokemonArray, Context);
+            }
+            else // No existing weather, just add the new one
+            {
+                Field.AddWeather(move.Weather, attacker, move, AllActivePokemonArray, Context);
+            }
+        }
+        if (move.Terrain is not null)
+        {
+            if (Field.HasTerrain(move.Terrain.Id)) // Reapply terrain if it's the same one
+            {
+                Field.ReapplyTerrain(AllActivePokemonArray, Context);
+            }
+            else if (Field.HasAnyWeather) // Replace existing terrain
+            {
+                Field.ReapplyTerrain(AllActivePokemonArray, Context);
+                Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemonArray, Context);
+            }
+            else // No existing terrain, just add the new one
+            {
+                Field.AddTerrain(move.Terrain, attacker, move, AllActivePokemonArray, Context);
+            }
+        }
     }
 
     private bool IsMoveMiss(Pokemon attacker, Move move, Pokemon defender)
@@ -488,12 +474,11 @@ public partial class BattleNew
         int defenseStat = defender.GetDefenseStat(move, crit);
         int basePower = move.BasePowerCallback?.Invoke(attacker, defender, move) ?? move.BasePower;
 
-        // TODO: Re-enable this when we have moves that use OnBasePower
-        //double onBasePowerModifier = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? 1.0;
-        //if (Math.Abs(onBasePowerModifier - 1.0) > Epsilon)
-        //{
-        //    basePower = (int)(basePower * onBasePowerModifier);
-        //}
+        double onBasePowerModifier = move.OnBasePower?.Invoke(attacker, defender, move, Context) ?? 1.0;
+        if (Math.Abs(onBasePowerModifier - 1.0) > Epsilon)
+        {
+            basePower = (int)(basePower * onBasePowerModifier);
+        }
         double critModifier = crit ? 1.5 : 1.0;
         double random = 0.85 + BattleRandom.NextDouble() * 0.15; // Random factor between 0.85 and 1.0
         double stabModifier = applyStab ? attacker.GetStabMultiplier(move) : 1.0;
@@ -526,9 +511,8 @@ public partial class BattleNew
         side.SwitchSlots(choice.SwitchOutSlot, choice.SwitchInSlot);
         Pokemon newActive = choice.SwitchInPokemon;
 
-        // TODO: Re-enable this when we have field effects that use OnPokemonSwitchIn
-        //Field.OnPokemonSwitchIn(newActive, playerId, Context);
-        //newActive.OnSwitchIn(Field, AllActivePokemon, Context);
+        Field.OnPokemonSwitchIn(newActive, playerId, Context);
+        newActive.OnSwitchIn(Field, AllActivePokemonArray, Context);
 
         await Task.CompletedTask;
     }

@@ -36,6 +36,30 @@ public partial class BattleNew
         PrintDebug = PrintDebug,
     };
 
+    public IEnumerable<Pokemon> AllActivePokemon
+    {
+        get
+        {
+            foreach (Pokemon pokemon in Side1.ActivePokemon)
+                yield return pokemon;
+            foreach (Pokemon pokemon in Side2.ActivePokemon)
+                yield return pokemon;
+        }
+    }
+
+    public Pokemon[] AllActivePokemonArray => AllActivePokemon.ToArray();
+
+    public IEnumerable<Pokemon> AllAliveActivePokemon
+    {
+        get
+        {
+            foreach (Pokemon pokemon in Side1.AliveActivePokemon)
+                yield return pokemon;
+            foreach (Pokemon pokemon in Side2.AliveActivePokemon)
+                yield return pokemon;
+        }
+    }
+
 
     // Player management
     public required IPlayerNew Player1 { get; init; }

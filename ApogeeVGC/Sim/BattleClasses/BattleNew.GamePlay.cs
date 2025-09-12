@@ -1,9 +1,11 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Ui;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -16,16 +18,25 @@ public partial class BattleNew
 
         try
         {
-            // Phase 1: Collect turn start choices
+            if (TurnCounter == 1)
+            {
+                // Handle switch-in effects at the start of the first turn
+                HandleEndOfTeamPreviewTurn();
+            }
+
+            // Phase 1: Start-of-turn effects
+            await HandleStartOfTurn();
+
+            // Phase 2: Collect turn start choices
             var initialActions = await CollectTurnStartActionsAsync(cancellationToken);
 
-            // Phase 2: Execute actions in priority order with dynamic interruptions
+            // Phase 3: Execute actions in priority order with dynamic interruptions
             await ExecuteActionsWithDynamicSwitchesAsync(initialActions, cancellationToken);
 
-            // Phase 3: Apply end-of-turn effects
+            // Phase 4: Apply end-of-turn effects
             await ApplyEndOfTurnEffectsAsync();
 
-            // Phase 4: Handle end-of-turn forced switches (fainted Pokémon)
+            // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
             await HandleEndOfTurnForcedSwitchesAsync(cancellationToken);
 
             // Complete the turn
@@ -362,53 +373,156 @@ public partial class BattleNew
     private async Task ApplyEndOfTurnEffectsAsync()
     {
         if (PrintDebug)
-            Console.WriteLine("Applying end-of-turn effects...");
-
-        //// Apply weather effects
-        //ApplyWeatherEffects();
-
-        //// Apply status effects (poison, burn, etc.)
-        //ApplyStatusEffectsToSide(Side1);
-        //ApplyStatusEffectsToSide(Side2);
-
-        //// Update field conditions
-        //UpdateFieldConditions();
-
-        // TODO: Add more end-of-turn effect processing
+        {
+            UiGenerator.PrintBlankLine();
+        }
+        Field.OnTurnEnd(Side1, Side2, Context);
+        HandleBeforeResiduals();
+        HandleResiduals();
+        HandleConditionTurnEnds();
 
         await Task.CompletedTask;
     }
 
-    ///// <summary>
-    ///// Apply weather effects to both sides
-    ///// </summary>
-    //private void ApplyWeatherEffects()
-    //{
-    //    // TODO: Implement weather effect logic
-    //    // This would check current weather and apply appropriate effects
-    //}
+    private async Task HandleStartOfTurn()
+    {
+        Field.OnTurnStart(Side1, Side2, Context);
+        HandleItemTurnStarts();
+        HandleConditionTurnStarts();
+        await Task.CompletedTask;
+    }
 
-    ///// <summary>
-    ///// Apply status effects to a side
-    ///// </summary>
-    //private void ApplyStatusEffectsToSide(Side side)
+    //private void HandleEndOfTurn()
     //{
-    //    foreach (var pokemon in side.AllSlots)
+    //    if (PrintDebug)
     //    {
-    //        if (!pokemon.IsFainted && IsActivePokemon(pokemon, side))
-    //        {
-    //            // TODO: Apply status effects (poison, burn, etc.)
-    //            // pokemon.ApplyStatusEffects();
-    //        }
+    //        UiGenerator.PrintBlankLine();
     //    }
+    //    Field.OnTurnEnd(Side1, Side2, Context);
+    //    HandleBeforeResiduals();
+    //    HandleResiduals();
+    //    // some residual effects may have caused pokemon to faint
+    //    UpdateFaintedStates();
+    //    HandleConditionTurnEnds();
     //}
 
-    ///// <summary>
-    ///// Update field conditions
-    ///// </summary>
-    //private void UpdateFieldConditions()
-    //{
-    //    // TODO: Update field condition durations, apply field effects
-    //    // Field.UpdateConditions();
-    //}
+    private void HandleEndOfTeamPreviewTurn()
+    {
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.OnSwitchIn(Field, AllActivePokemon.ToArray(), Context); // Trigger switch-in effects
+        }
+    }
+
+    private void HandleBeforeResiduals()
+    {
+        // check all active pokemon items with OnBeforeResiduals
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.Item?.OnBeforeResiduals?.Invoke(pokemon, Context);
+        }
+    }
+
+    private void HandleResiduals()
+    {
+        Condition[] side1Residuals = [];
+        if (!Side1.Slot1.IsFainted) // Skip if fainted
+        {
+            side1Residuals = Side1.Slot1.GetAllResidualConditions();
+        }
+        List<(Pokemon, Condition, PlayerId)> side1ResidualsList = [];
+        foreach (Condition condition in side1Residuals)
+        {
+            if (condition.OnResidual != null)
+            {
+                side1ResidualsList.Add((Side1.Slot1, condition, PlayerId.Player1));
+            }
+        }
+
+        Condition[] side2Residuals = [];
+        if (!Side2.Slot1.IsFainted) // Skip if fainted
+        {
+            side2Residuals = Side2.Slot1.GetAllResidualConditions();
+        }
+        List<(Pokemon, Condition, PlayerId)> side2ResidualsList = [];
+        foreach (Condition condition in side2Residuals)
+        {
+            if (condition.OnResidual != null)
+            {
+                side2ResidualsList.Add((Side2.Slot1, condition, PlayerId.Player2));
+            }
+        }
+
+        // Combine and sort by OnResidualOrder
+        var allResiduals = side1ResidualsList.Concat(side2ResidualsList)
+            .OrderBy(t => t.Item2.OnResidualOrder ?? int.MaxValue)
+            .ToList();
+
+        foreach ((Pokemon pokemon, Condition condition, PlayerId playerId) in allResiduals)
+        {
+            Side sourceSide = GetSide(playerId.OpposingPlayerId());
+
+            condition.OnResidual?.Invoke(pokemon, sourceSide, condition, Context);
+
+            if (!condition.Duration.HasValue) continue;
+
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                pokemon.RemoveCondition(condition.Id);
+            }
+        }
+    }
+
+    private void HandleConditionTurnStarts()
+    {
+
+    }
+
+    private void HandleConditionTurnEnds()
+    {
+        List<Condition> side1Conditions = [];
+        if (!Side1.Slot1.IsFainted) // Skip if fainted
+        {
+            side1Conditions = Side1.Slot1.Conditions.ToList();
+        }
+        foreach (Condition condition in side1Conditions.ToList())
+        {
+            condition.OnTurnEnd?.Invoke(Side1.Slot1, Context);
+            if (!condition.Duration.HasValue) continue;
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                Side1.Slot1.RemoveCondition(condition.Id);
+            }
+        }
+
+        List<Condition> side2Conditions = [];
+        if (!Side2.Slot1.IsFainted) // Skip if fainted
+        {
+            side2Conditions = Side2.Slot1.Conditions.ToList();
+        }
+        foreach (Condition condition in side2Conditions.ToList())
+        {
+            condition.OnTurnEnd?.Invoke(Side2.Slot1, Context);
+            if (!condition.Duration.HasValue) continue;
+            condition.Duration--;
+            if (condition.Duration <= 0)
+            {
+                Side2.Slot1.RemoveCondition(condition.Id);
+            }
+        }
+    }
+
+    private void HandleItemTurnStarts()
+    {
+        // check all active pokemon items with OnStart
+        foreach (Pokemon pokemon in AllActivePokemon)
+        {
+            if (pokemon.IsFainted) continue; // Skip if fainted
+            pokemon.Item?.OnStart?.Invoke(pokemon, Context);
+        }
+    }
 }
