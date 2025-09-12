@@ -330,6 +330,19 @@ public partial class BattleNew
     }
 
     /// <summary>
+    /// Clear all turn history. This can only be done after game completion.
+    /// Reduces memory usage for long-running simulations.
+    /// </summary>
+    public void ClearTurns()
+    {
+        if (CurrentTurn is not PostGameTurn)
+        {
+            throw new InvalidOperationException("Can only clear turns after game completion.");
+        }
+        Turns.Clear();
+    }
+
+    /// <summary>
     /// Dispose of battle resources
     /// </summary>
     public void Dispose()

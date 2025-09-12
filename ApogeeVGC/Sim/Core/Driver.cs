@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Generators;
 using System.Collections.Concurrent;
 using System.Text;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -25,7 +26,7 @@ public class Driver
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    private const int RandomEvaluationNumTest = 500;
+    private const int RandomEvaluationNumTest = 1000;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;
@@ -203,7 +204,8 @@ public class Driver
                     IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
 
                     BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
-                        "Random1", "Random2", BattleFormat.Singles, false, currentSeed);
+                        "Random1", "Random2", BattleFormat.Singles, false,
+                        currentSeed);
 
                     var simulator = new SimulatorNew
                     {
@@ -215,6 +217,7 @@ public class Driver
                     SimulatorResult result = await simulator.Run();
                     simResults.Add(result);
                     turnOnBattleEnd.Add(battle.TurnCounter);
+                    simulator.Battle.ClearTurns();
                 }
                 finally
                 {
@@ -345,82 +348,5 @@ public class Driver
         Console.WriteLine($"Battle finished. Winner: {winner}");
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
-    }
-}
-
-public static class Statistics
-{
-    public static double Mean(this IEnumerable<int> source)
-    {
-        if (source == null)
-            throw new ArgumentException("Source cannot be null.");
-        
-        var list = source.ToList();
-        if (list.Count == 0)
-            throw new ArgumentException("Source cannot be empty.");
-        
-        return list.Average();
-    }
-    
-    public static double StandardDeviation(this IEnumerable<int> source)
-    {
-        if (source == null)
-            throw new ArgumentException("Source cannot be null.");
-        
-        var list = source.ToList();
-        if (list.Count == 0)
-            throw new ArgumentException("Source cannot be empty.");
-        
-        double mean = list.Average();
-        double variance = list.Select(x => Math.Pow(x - mean, 2)).Average();
-        return Math.Sqrt(variance);
-    }
-    
-    public static double Median(this IEnumerable<int> source)
-    {
-        if (source == null)
-            throw new ArgumentException("Source cannot be null.");
-        
-        var list = source.ToList();
-        if (list.Count == 0)
-            throw new ArgumentException("Source cannot be empty.");
-        
-        var sorted = list.OrderBy(x => x).ToList();
-        int count = sorted.Count;
-        
-        if (count % 2 == 0)
-        {
-            // Even number of elements - average of middle two
-            return (sorted[count / 2 - 1] + sorted[count / 2]) / 2.0;
-        }
-        else
-        {
-            // Odd number of elements - middle element
-            return sorted[count / 2];
-        }
-    }
-    
-    public static int Minimum(this IEnumerable<int> source)
-    {
-        if (source == null)
-            throw new ArgumentException("Source cannot be null.");
-        
-        var list = source.ToList();
-        if (list.Count == 0)
-            throw new ArgumentException("Source cannot be empty.");
-        
-        return list.Min();
-    }
-    
-    public static int Maximum(this IEnumerable<int> source)
-    {
-        if (source == null)
-            throw new ArgumentException("Source cannot be null.");
-        
-        var list = source.ToList();
-        if (list.Count == 0)
-            throw new ArgumentException("Source cannot be empty.");
-        
-        return list.Max();
     }
 }
