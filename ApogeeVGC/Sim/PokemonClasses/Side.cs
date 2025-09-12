@@ -115,6 +115,31 @@ public class Side
 
     public IEnumerable<Pokemon> AliveActivePokemon => ActivePokemon.Where(p => !p.IsFainted);
 
+    public IEnumerable<Pokemon> FaintedActivePokemon => ActivePokemon.Where(p => p.IsFainted);
+
+    public IEnumerable<SlotId> FaintedActiveSlots => ActivePokemon.Where(p => p.IsFainted).
+        Select(p => p.SlotId);
+
+    public bool IsTurnStartSideValid
+    {
+        get
+        {
+            if (AliveActivePokemonCount == 0)
+            {
+                return false; // No active Pokémon alive
+            }
+            if (BattleFormat == BattleFormat.Singles && AliveActivePokemonCount > 1)
+            {
+                return false; // More than one active Pokémon in Singles
+            }
+            if (BattleFormat == BattleFormat.Doubles && AliveActivePokemonCount > 2)
+            {
+                return false; // More than two active Pokémon in Doubles
+            }
+            return true; // Valid state
+        }
+    }
+
     //public IEnumerable<(SlotId, Pokemon)> AllSlotsWithIds
     //{
     //    get
@@ -174,6 +199,8 @@ public class Side
     }
 
     public int AlivePokemonCount => AllSlots.Count(p => !p.IsFainted);
+
+    public int AliveActivePokemonCount => ActivePokemon.Count(p => !p.IsFainted);
 
     public Pokemon GetSlot(SlotId slotId) => slotId switch
     {
@@ -255,6 +282,11 @@ public class Side
         // Update their SlotId properties
         activePokemon.SlotId = benchSlot;
         benchPokemon.SlotId = activeSlot;
+    }
+
+    public bool IsActivePokemon(Pokemon pokemon)
+    {
+        return ActivePokemon.Contains(pokemon);
     }
 
     private bool IsValidActiveSlot(SlotId slot)

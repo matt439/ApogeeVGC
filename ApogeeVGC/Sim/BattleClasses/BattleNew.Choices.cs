@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -54,7 +55,7 @@ public partial class BattleNew
                 GetPerspective(playerId), combinedTokenSource.Token);
 
             // Validate the choice
-            if (!IsValidChoice(playerId, choice, availableChoices))
+            if (!IsValidChoice())
             {
                 if (PrintDebug)
                     Console.WriteLine($"Invalid choice from {playerId}, using default");
@@ -122,76 +123,53 @@ public partial class BattleNew
         }, cancellationToken);
     }
 
-    /// <summary>
-    /// Generate available choices for a pending action
-    /// </summary>
-    private BattleChoice[] GetAvailableChoicesForAction(PendingAction action)
+    private BattleChoice[] GenerateForcedSwitchChoices(Pokemon pokemon)
     {
-        Side side = GetSide(action.PlayerId);
-        var choices = new List<BattleChoice>();
+        return GenerateSwitchChoices(pokemon);
+    }
 
-        if (PrintDebug)
-            Console.WriteLine($"Generating choices for {action.PlayerId} action {action.ActionIndex}");
+    private BattleChoice[] GenerateDoublesFaintedSwitchChoices(Pokemon slot1Pokemon, Pokemon slot2Pokemon)
+    {
+        List<BattleChoice> choices = [];
+        choices.AddRange(GenerateFaintedSwitchChoices(slot1Pokemon));
+        choices.AddRange(GenerateFaintedSwitchChoices(slot2Pokemon));
+        return choices.ToArray();
+    }
 
-        // Get active Pokemon for this action
-        Pokemon? activePokemon = GetActivePokemonForAction(side, action.ActionIndex);
-        
-        if (activePokemon != null)
-        {
-            // Add move choices
-            choices.AddRange(GetMoveChoices(side));
-            
-            // Add switch choices if Pokemon can switch
-            if (CanPokemonSwitch(activePokemon))
-            {
-                choices.AddRange(GetSwitchChoices(side, Format));
-            }
-        }
+    private BattleChoice[] GenerateFaintedSwitchChoices(Pokemon pokemon)
+    {
+        return GenerateSwitchChoices(pokemon);
+    }
 
-        if (choices.Count == 0)
-        {
-            // Fallback: create a basic struggle choice if no other options
-            choices.Add(CreateStruggleChoice(action.PlayerId));
-        }
-
-        if (PrintDebug)
-            Console.WriteLine($"Generated {choices.Count} choices for {action.PlayerId}");
-
+    private BattleChoice[] GenerateDoublesTurnStartChoices(Pokemon slot1Pokemon, Pokemon slot2Pokemon)
+    {
+        List<BattleChoice> choices = [];
+        choices.AddRange(GenerateTurnStartChoices(slot1Pokemon));
+        choices.AddRange(GenerateTurnStartChoices(slot2Pokemon));
         return choices.ToArray();
     }
 
     /// <summary>
-    /// Get the active Pokemon for a specific action index
+    /// Generate choices at the start of a turn for a given Pokemon.
+    /// These can include move choices and switch choices.
     /// </summary>
-    private Pokemon? GetActivePokemonForAction(Side side, int actionIndex)
+    private BattleChoice[] GenerateTurnStartChoices(Pokemon pokemon)
     {
-        var activePokemon = side.AllSlots.Where(p => !p.IsFainted && IsActivePokemon(p, side)).ToList();
-        
-        if (actionIndex < activePokemon.Count)
-            return activePokemon[actionIndex];
-            
-        return activePokemon.FirstOrDefault();
+        List<BattleChoice> choices = [];
+        choices.AddRange(GenerateMoveChoices(pokemon));
+        choices.AddRange(GenerateSwitchChoices(pokemon));
+        return choices.ToArray();
     }
 
     /// <summary>
-    /// Check if a Pokemon is in an active slot
+    /// Generate move choices for a given Pokemon.
     /// </summary>
-    private bool IsActivePokemon(Pokemon pokemon, Side side)
-    {
-        return side.BattleFormat switch
-        {
-            BattleFormat.Singles => pokemon.SlotId == SlotId.Slot1,
-            BattleFormat.Doubles => pokemon.SlotId is SlotId.Slot1 or SlotId.Slot2,
-            _ => false,
-        };
-    }
-
-    private BattleChoice[] GetMoveChoices(Side side)
+    private BattleChoice[] GenerateMoveChoices(Pokemon pokemon)
     {
         List<BattleChoice> choices = [];
-        Side defendingSide = GetOpponentSide(side);
-        Pokemon attacker = side.Slot1;
-        bool isTeraUsed = side.AnyTeraUsed;
+        Side attackingSide = GetSide(pokemon.SideId);
+        Side defendingSide = GetSide(pokemon.SideId.GetOppositeSide());
+        Pokemon attacker = attackingSide.Slot1;
 
         if (attacker.IsFainted)
         {
@@ -227,10 +205,10 @@ public partial class BattleNew
             var possibleTargets = GetPossibleTargets(move, attacker, ally, aliveDefenders);
 
             SlotChoice.MoveChoice moveChoice = new(attacker, move,
-                    false, targetType, possibleTargets);
+                false, targetType, possibleTargets);
             choices.Add(moveChoice);
 
-            if (isTeraUsed) continue;
+            if (attackingSide.AnyTeraUsed) continue;
 
             SlotChoice.MoveChoice moveChoiceTera = new(attacker, move,
                 true, targetType, possibleTargets);
@@ -269,14 +247,14 @@ public partial class BattleNew
             case MoveTarget.FoeSide:
                 return [];
             case MoveTarget.Normal:
+            {
+                var targets = opponents.ToList();
+                if (ally is not null)
                 {
-                    var targets = opponents.ToList();
-                    if (ally is not null)
-                    {
-                        targets.Add(ally);
-                    }
-                    return targets.ToArray();
+                    targets.Add(ally);
                 }
+                return targets.ToArray();
+            }
             case MoveTarget.RandomNormal:
             case MoveTarget.Scripted:
                 throw new NotImplementedException();
@@ -299,55 +277,19 @@ public partial class BattleNew
         return targets[0];
     }
 
+
     /// <summary>
-    /// Generate switch choices for a Pokemon
+    /// Generate switch choices for a given Pokemon.
     /// </summary>
-    private static BattleChoice[] GetSwitchChoices(Side side, BattleFormat format)
+    private BattleChoice[] GenerateSwitchChoices(Pokemon pokemon)
     {
         List<BattleChoice> choices = [];
+        Side side = GetSide(pokemon.SideId);
         var switchOptionSlots = side.SwitchOptionSlots;
 
-        choices.AddRange(switchOptionSlots.Select(pokemon =>
-            new SlotChoice.SwitchChoice(side.Slot1, pokemon, format)));
+        choices.AddRange(switchOptionSlots.Select(inPokemon =>
+            new SlotChoice.SwitchChoice(side.Slot1, inPokemon, Format)));
         return choices.ToArray();
-    }
-
-    /// <summary>
-    /// Check if a Pokemon can switch out
-    /// </summary>
-    private bool CanPokemonSwitch(Pokemon pokemon)
-    {
-        // TODO: Implement switch checking logic
-        // Check for trapping moves, abilities, etc.
-        return true; // Placeholder
-    }
-
-    /// <summary>
-    /// Create a struggle choice as fallback
-    /// </summary>
-    private BattleChoice CreateStruggleChoice(PlayerId playerId)
-    {
-        // Get the first active Pokemon for this player
-        Side side = GetSide(playerId);
-        Pokemon? activePokemon = side.AllSlots.FirstOrDefault(p => !p.IsFainted && IsActivePokemon(p, side));
-        
-        if (activePokemon == null)
-            throw new InvalidOperationException($"No active Pokemon found for {playerId}");
-
-        // Find struggle move or use the first move as fallback
-        Move struggleMove = activePokemon.Moves.FirstOrDefault(m => m.Id == MoveId.Struggle) 
-                            ?? activePokemon.Moves.First();
-        
-        return SlotChoice.CreateMove(activePokemon, struggleMove, false, MoveNormalTarget.None, []);
-    }
-
-    /// <summary>
-    /// Get default choice for an action (index 0 behavior)
-    /// </summary>
-    private BattleChoice GetDefaultChoiceForAction(PendingAction action)
-    {
-        var availableChoices = GetAvailableChoicesForAction(action);
-        return GetDefaultChoice(action.PlayerId, availableChoices);
     }
 
     /// <summary>
@@ -365,39 +307,8 @@ public partial class BattleNew
         throw new InvalidOperationException($"No available choices for {playerId}");
     }
 
-    /// <summary>
-    /// Validate that a choice is in the available choices
-    /// </summary>
-    private bool IsValidChoice(PlayerId playerId, BattleChoice choice, BattleChoice[] availableChoices)
+    private bool IsValidChoice()
     {
-        // Check if the choice is in the available choices
-        bool isValid = availableChoices.Contains(choice);
-        
-        if (!isValid && PrintDebug)
-            Console.WriteLine($"Invalid choice from {playerId}: {choice} not in available choices");
-            
-        return isValid;
-    }
-
-    /// <summary>
-    /// Event handler for when players submit choices (for external observers)
-    /// </summary>
-    private async void OnChoiceSubmitted(object? sender, BattleChoice choice)
-    {
-        if (sender is not IPlayerNew player) return;
-
-        await _choiceSubmissionLock.WaitAsync();
-        try
-        {
-            if (PrintDebug)
-                Console.WriteLine($"Choice submitted by {player.PlayerId}: {choice}");
-
-            // This event is mainly for logging/observers
-            // The actual choice processing happens in RequestChoiceFromPlayerAsync
-        }
-        finally
-        {
-            _choiceSubmissionLock.Release();
-        }
+        return true; // TODO: Implement actual validation logic
     }
 }

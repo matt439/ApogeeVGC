@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Player;
+﻿using System.Net.Http.Headers;
+using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -15,8 +16,8 @@ public partial class BattleNew
 
         try
         {
-            // Phase 1: Collect initial move/switch choices
-            var initialActions = await CollectInitialActionsAsync(cancellationToken);
+            // Phase 1: Collect turn start choices
+            var initialActions = await CollectTurnStartActionsAsync(cancellationToken);
 
             // Phase 2: Execute actions in priority order with dynamic interruptions
             await ExecuteActionsWithDynamicSwitchesAsync(initialActions, cancellationToken);
@@ -43,13 +44,17 @@ public partial class BattleNew
         }
     }
 
-    private async Task<List<ActionWithChoice>> CollectInitialActionsAsync(CancellationToken cancellationToken)
+
+    private async Task<List<ActionWithChoice>> CollectTurnStartActionsAsync(CancellationToken cancellationToken)
     {
         var actions = new List<ActionWithChoice>();
 
         // Each player submits one choice for each active Pokémon
-        var player1Choices = await RequestPlayerChoicesAsync(PlayerId.Player1, cancellationToken);
-        var player2Choices = await RequestPlayerChoicesAsync(PlayerId.Player2, cancellationToken);
+        var player1Choices = await RequestTurnStartPlayerChoicesAsync(
+            PlayerId.Player1, cancellationToken);
+
+        var player2Choices = await RequestTurnStartPlayerChoicesAsync(
+            PlayerId.Player2, cancellationToken);
 
         actions.AddRange(player1Choices);
         actions.AddRange(player2Choices);
@@ -57,16 +62,23 @@ public partial class BattleNew
         return actions;
     }
 
-    private async Task<List<ActionWithChoice>> RequestPlayerChoicesAsync(PlayerId playerId,
+
+    private async Task<List<ActionWithChoice>> RequestTurnStartPlayerChoicesAsync(PlayerId playerId,
         CancellationToken cancellationToken)
     {
         Side side = GetCurrentSide(playerId);
-        var activePokemon = GetAliveActivePokemon(side);
+
+        if (!side.IsTurnStartSideValid)
+        {
+            throw new InvalidOperationException($"Side {playerId} is not in a valid state to start the turn.");
+        }
+
         var actions = new List<ActionWithChoice>();
+        var activePokemon = side.AliveActivePokemon;
 
         foreach (Pokemon pokemon in activePokemon)
         {
-            var availableChoices = GenerateStandardChoices(pokemon);
+            var availableChoices = GenerateTurnStartChoices(pokemon);
             BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, availableChoices,
                 BattleRequestType.TurnStart, TimeSpan.FromSeconds(45), cancellationToken);
             var pendingAction = new PendingAction
@@ -77,11 +89,11 @@ public partial class BattleNew
             };
             actions.Add(CreateActionWithChoice(pendingAction, choice));
         }
-
         return actions;
     }
 
-    private async Task ExecuteActionsWithDynamicSwitchesAsync(List<ActionWithChoice> actions, CancellationToken cancellationToken)
+    private async Task ExecuteActionsWithDynamicSwitchesAsync(List<ActionWithChoice> actions,
+        CancellationToken cancellationToken)
     {
         // Sort by priority/speed
         var sortedActions = SortActionsBySpeedOrder(actions);
@@ -96,7 +108,7 @@ public partial class BattleNew
             // Check for immediate forced switches (Volt Switch, U-turn, etc.)
             if (RequiresImmediateForcedSwitch(action))
             {
-                await HandleImmediateForcedSwitchAsync(action.PlayerId, cancellationToken);
+                await HandleImmediateForcedSwitchAsync(action.Executor, action.PlayerId, cancellationToken);
             }
 
             // Check for game end after each action
@@ -118,10 +130,10 @@ public partial class BattleNew
         return false;
     }
 
-    private async Task HandleImmediateForcedSwitchAsync(PlayerId playerId, CancellationToken cancellationToken)
+    private async Task HandleImmediateForcedSwitchAsync(Pokemon pokemon, PlayerId playerId,
+        CancellationToken cancellationToken)
     {
-        Side side = GetCurrentSide(playerId);
-        var switchChoices = GenerateForcedSwitchChoices(side);
+        var switchChoices = GenerateForcedSwitchChoices(pokemon);
 
         if (switchChoices.Length > 0)
         {
@@ -142,13 +154,13 @@ public partial class BattleNew
     private async Task HandleFaintedSwitchesForPlayer(PlayerId playerId, CancellationToken cancellationToken)
     {
         Side side = GetCurrentSide(playerId);
-        var faintedActiveSlots = GetFaintedActiveSlots(side);
+        var faintedActivePokemon = side.FaintedActivePokemon;
 
-        foreach (SlotId slotId in faintedActiveSlots)
+        foreach (Pokemon pokemon in faintedActivePokemon)
         {
             if (side.SwitchOptionsCount <= 0) continue;
 
-            var switchChoices = GenerateFaintedSwitchChoices(side, slotId);
+            var switchChoices = GenerateFaintedSwitchChoices(pokemon);
             BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices, BattleRequestType.FaintSwitch,
                 TimeSpan.FromSeconds(30), cancellationToken);
 
@@ -158,101 +170,67 @@ public partial class BattleNew
 
     // Helper methods that need to be implemented
 
-    /// <summary>
-    /// Get alive active Pokemon for a side
-    /// </summary>
-    private List<Pokemon> GetAliveActivePokemon(Side side)
-    {
-        var activePokemon = new List<Pokemon>();
-        foreach (var pokemon in side.AllSlots)
-        {
-            if (!pokemon.IsFainted && IsActivePokemon(pokemon, side))
-            {
-                activePokemon.Add(pokemon);
-            }
-        }
-        return activePokemon;
-    }
+    ///// <summary>
+    ///// Generate standard move/switch choices for a Pokemon
+    ///// </summary>
+    //private BattleChoice[] GenerateStandardChoices(Pokemon pokemon)
+    //{
+    //    var choices = new List<BattleChoice>();
+        
+    //    // Add move choices
+    //    choices.AddRange(GetMoveChoices(pokemon.SideId));
+        
+    //    // Add switch choices if applicable
+    //    Side side = GetCurrentSide(pokemon.SideId == SideId.Side1 ? PlayerId.Player1 : PlayerId.Player2);
+    //    if (CanPokemonSwitch(pokemon))
+    //    {
+    //        choices.AddRange(GetSwitchChoices(side, Format));
+    //    }
+        
+    //    return choices.ToArray();
+    //}
 
-    /// <summary>
-    /// Generate standard move/switch choices for a Pokemon
-    /// </summary>
-    private BattleChoice[] GenerateStandardChoices(Pokemon pokemon)
-    {
-        var choices = new List<BattleChoice>();
+    ///// <summary>
+    ///// Generate forced switch choices for immediate switches (Volt Switch, etc.)
+    ///// </summary>
+    //private BattleChoice[] GenerateForcedSwitchChoices(Side side)
+    //{
+    //    var choices = new List<BattleChoice>();
         
-        // Add move choices
-        choices.AddRange(GenerateMoveChoices(pokemon));
+    //    // Get the first active Pokemon (the one that used the forcing move)
+    //    var activePokemon = GetAliveActivePokemon(side).FirstOrDefault();
+    //    if (activePokemon != null)
+    //    {
+    //        choices.AddRange(GetSwitchChoices(side, Format));
+    //    }
         
-        // Add switch choices if applicable
-        var side = GetCurrentSide(pokemon.SideId == SideId.Side1 ? PlayerId.Player1 : PlayerId.Player2);
-        if (CanPokemonSwitch(pokemon))
-        {
-            choices.AddRange(GenerateSwitchChoices(side, pokemon));
-        }
-        
-        return choices.ToArray();
-    }
+    //    return choices.ToArray();
+    //}
 
-    /// <summary>
-    /// Generate forced switch choices for immediate switches (Volt Switch, etc.)
-    /// </summary>
-    private BattleChoice[] GenerateForcedSwitchChoices(Side side)
-    {
-        var choices = new List<BattleChoice>();
+    ///// <summary>
+    ///// Generate switch choices for fainted Pokemon
+    ///// </summary>
+    //private BattleChoice[] GenerateFaintedSwitchChoices(Side side, SlotId faintedSlotId)
+    //{
+    //    var choices = new List<BattleChoice>();
         
-        // Get the first active Pokemon (the one that used the forcing move)
-        var activePokemon = GetAliveActivePokemon(side).FirstOrDefault();
-        if (activePokemon != null)
-        {
-            choices.AddRange(GenerateSwitchChoices(side, activePokemon));
-        }
+    //    // Create a placeholder Pokemon for the fainted slot to generate switch choices
+    //    Pokemon faintedPokemon = side.GetSlot(faintedSlotId);
+    //    if (faintedPokemon.IsFainted)
+    //    {
+    //        choices.AddRange(GetSwitchChoices(side, Format));
+    //    }
         
-        return choices.ToArray();
-    }
-
-    /// <summary>
-    /// Generate switch choices for fainted Pokemon
-    /// </summary>
-    private BattleChoice[] GenerateFaintedSwitchChoices(Side side, SlotId faintedSlotId)
-    {
-        var choices = new List<BattleChoice>();
-        
-        // Create a placeholder Pokemon for the fainted slot to generate switch choices
-        Pokemon faintedPokemon = side.GetSlot(faintedSlotId);
-        if (faintedPokemon.IsFainted)
-        {
-            choices.AddRange(GenerateSwitchChoices(side, faintedPokemon));
-        }
-        
-        return choices.ToArray();
-    }
-
-    /// <summary>
-    /// Get fainted active slot IDs
-    /// </summary>
-    private List<SlotId> GetFaintedActiveSlots(Side side)
-    {
-        var faintedSlots = new List<SlotId>();
-        
-        foreach (var pokemon in side.AllSlots)
-        {
-            if (pokemon.IsFainted && IsActivePokemon(pokemon, side))
-            {
-                faintedSlots.Add(pokemon.SlotId);
-            }
-        }
-        
-        return faintedSlots;
-    }
+    //    return choices.ToArray();
+    //}
 
     /// <summary>
     /// Create an ActionWithChoice from a pending action and chosen battle choice
     /// </summary>
     private ActionWithChoice CreateActionWithChoice(PendingAction pendingAction, BattleChoice choice)
     {
-        var executor = GetExecutorPokemonForChoice(pendingAction.PlayerId, choice);
-        var speedPriority = GetSpeedPriorityForChoice(choice);
+        Pokemon executor = GetExecutorPokemonForChoice(pendingAction.PlayerId, choice);
+        int speedPriority = GetSpeedPriorityForChoice(choice);
         
         return new ActionWithChoice
         {
@@ -260,7 +238,7 @@ public partial class BattleNew
             Choice = choice,
             SpeedPriority = speedPriority,
             ActionOrder = pendingAction.ActionIndex,
-            Executor = executor
+            Executor = executor,
         };
     }
 
@@ -284,7 +262,7 @@ public partial class BattleNew
         Side side = GetCurrentSide(playerId);
         foreach (Pokemon pokemon in side.AllSlots)
         {
-            if (!pokemon.IsFainted && IsActivePokemon(pokemon, side))
+            if (!pokemon.IsFainted && side.IsActivePokemon(pokemon))
                 return pokemon;
         }
 
@@ -411,51 +389,51 @@ public partial class BattleNew
         if (PrintDebug)
             Console.WriteLine("Applying end-of-turn effects...");
 
-        // Apply weather effects
-        ApplyWeatherEffects();
+        //// Apply weather effects
+        //ApplyWeatherEffects();
 
-        // Apply status effects (poison, burn, etc.)
-        ApplyStatusEffectsToSide(Side1);
-        ApplyStatusEffectsToSide(Side2);
+        //// Apply status effects (poison, burn, etc.)
+        //ApplyStatusEffectsToSide(Side1);
+        //ApplyStatusEffectsToSide(Side2);
 
-        // Update field conditions
-        UpdateFieldConditions();
+        //// Update field conditions
+        //UpdateFieldConditions();
 
         // TODO: Add more end-of-turn effect processing
 
         await Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Apply weather effects to both sides
-    /// </summary>
-    private void ApplyWeatherEffects()
-    {
-        // TODO: Implement weather effect logic
-        // This would check current weather and apply appropriate effects
-    }
+    ///// <summary>
+    ///// Apply weather effects to both sides
+    ///// </summary>
+    //private void ApplyWeatherEffects()
+    //{
+    //    // TODO: Implement weather effect logic
+    //    // This would check current weather and apply appropriate effects
+    //}
 
-    /// <summary>
-    /// Apply status effects to a side
-    /// </summary>
-    private void ApplyStatusEffectsToSide(Side side)
-    {
-        foreach (var pokemon in side.AllSlots)
-        {
-            if (!pokemon.IsFainted && IsActivePokemon(pokemon, side))
-            {
-                // TODO: Apply status effects (poison, burn, etc.)
-                // pokemon.ApplyStatusEffects();
-            }
-        }
-    }
+    ///// <summary>
+    ///// Apply status effects to a side
+    ///// </summary>
+    //private void ApplyStatusEffectsToSide(Side side)
+    //{
+    //    foreach (var pokemon in side.AllSlots)
+    //    {
+    //        if (!pokemon.IsFainted && IsActivePokemon(pokemon, side))
+    //        {
+    //            // TODO: Apply status effects (poison, burn, etc.)
+    //            // pokemon.ApplyStatusEffects();
+    //        }
+    //    }
+    //}
 
-    /// <summary>
-    /// Update field conditions
-    /// </summary>
-    private void UpdateFieldConditions()
-    {
-        // TODO: Update field condition durations, apply field effects
-        // Field.UpdateConditions();
-    }
+    ///// <summary>
+    ///// Update field conditions
+    ///// </summary>
+    //private void UpdateFieldConditions()
+    //{
+    //    // TODO: Update field condition durations, apply field effects
+    //    // Field.UpdateConditions();
+    //}
 }

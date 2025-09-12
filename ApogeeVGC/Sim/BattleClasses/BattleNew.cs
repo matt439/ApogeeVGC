@@ -167,6 +167,11 @@ public partial class BattleNew
         return playerId == PlayerId.Player1 ? Side1 : Side2;
     }
 
+    public Side GetSide(SideId sideId)
+    {
+        return sideId == SideId.Side1 ? Side1 : Side2;
+    }
+
     public Side GetSide(PlayerId playerId)
     {
         return GetCurrentSide(playerId);
