@@ -133,62 +133,125 @@ public static partial class UiGenerator
         return sb.ToString();
     }
 
-    // Pokemon Display Methods
     private static void PrintPrimarySide(Side side)
     {
-        Pokemon activePokemon = side.Slot1;
-
-        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
-        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
-        string conditionsInfo = FormatConditionsInfo(activePokemon);
-        string stats = SingleLineStats(activePokemon);
-        string statMods = SingleLineStatModifiers(activePokemon);
         string remainingInfo = FormatRemainingPokemonInfo(side);
 
         StringBuilder sb = new();
-        sb.Append(PrimarySpacer);
-        sb.AppendLine(pokemonInfo);
-        sb.Append(PrimarySpacer);
-        sb.Append(HpBarSpacer);
-        sb.AppendLine(hpDisplay);
-        if (activePokemon.IsTeraUsed)
+        switch (side.BattleFormat)
         {
-            sb.Append(PrimarySpacer);
-            sb.AppendLine(FormatTeraInfo(activePokemon));
+            case BattleFormat.Singles:
+                sb.Append(FormatPrimarySlot(side, SlotId.Slot1));
+                break;
+            case BattleFormat.Doubles:
+                sb.Append(FormatPrimarySlot(side, SlotId.Slot1));
+                sb.Append(FormatPrimarySlot(side, SlotId.Slot2, PrimarySlot2Spacer));
+                break;
+            default:
+                throw new InvalidOperationException("Unknown battle format.");
         }
-        sb.Append(PrimarySpacer);
-        sb.AppendLine(conditionsInfo);
-        sb.Append(PrimarySpacer);
-        sb.AppendLine(stats);
-        sb.Append(PrimarySpacer);
-        sb.AppendLine(statMods);
+
         sb.Append(PrimarySpacer);
         sb.AppendLine(remainingInfo);
 
         Console.WriteLine(sb.ToString());
     }
 
-    private static void PrintSecondarySide(Side side)
+    private const string SecondarySlot1Spacer = "      ";
+    private const string PrimarySlot2Spacer = "       ";
+
+    private static string FormatPrimarySlot(Side side, SlotId slotId, string spacer = "")
     {
-        Pokemon activePokemon = side.Slot1;
+        if (slotId is not (SlotId.Slot1 or SlotId.Slot2))
+        {
+            throw new ArgumentException("Invalid slot for primary side display.", nameof(slotId));
+        }
+
+        Pokemon activePokemon = side.GetSlot(slotId);
 
         string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
-        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: true);
         string conditionsInfo = FormatConditionsInfo(activePokemon);
-        string remainingInfo = FormatRemainingPokemonInfo(side);
+        string stats = SingleLineStats(activePokemon);
+        string statMods = SingleLineStatModifiers(activePokemon);
 
         StringBuilder sb = new();
+        sb.Append(PrimarySpacer);
+        sb.Append(spacer);
         sb.AppendLine(pokemonInfo);
+        sb.Append(PrimarySpacer);
+        sb.Append(spacer);
         sb.Append(HpBarSpacer);
         sb.AppendLine(hpDisplay);
         if (activePokemon.IsTeraUsed)
         {
+            sb.Append(PrimarySpacer);
+            sb.Append(spacer);
             sb.AppendLine(FormatTeraInfo(activePokemon));
         }
+        sb.Append(PrimarySpacer);
+        sb.Append(spacer);
         sb.AppendLine(conditionsInfo);
+        sb.Append(PrimarySpacer);
+        sb.Append(spacer);
+        sb.AppendLine(stats);
+        sb.Append(PrimarySpacer);
+        sb.Append(spacer);
+        sb.AppendLine(statMods);
+
+        return sb.ToString();
+    }
+
+    private static void PrintSecondarySide(Side side)
+    {
+        string remainingInfo = FormatRemainingPokemonInfo(side);
+
+        StringBuilder sb = new();
+        switch (side.BattleFormat)
+        {
+            case BattleFormat.Singles:
+                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot1));
+                break;
+            case BattleFormat.Doubles:
+                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot1, SecondarySlot1Spacer));
+                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot2));
+                break;
+            default:
+                throw new InvalidOperationException("Unknown battle format.");
+        }
         sb.AppendLine($"{remainingInfo}\n\n");
 
         Console.WriteLine(sb.ToString());
+    }
+
+    
+
+    private static string FormatSecondarySlot(Side side, SlotId slotId, string spacer = "")
+    {
+        if (slotId is not (SlotId.Slot1 or SlotId.Slot2))
+        {
+            throw new ArgumentException("Invalid slot for secondary side display.", nameof(slotId));
+        }
+        Pokemon activePokemon = side.GetSlot(slotId);
+
+        string pokemonInfo = FormatPokemonBasicInfo(activePokemon);
+        string hpDisplay = FormatHpDisplay(activePokemon, showExactHp: false);
+        string conditionsInfo = FormatConditionsInfo(activePokemon);
+
+        StringBuilder sb = new();
+        sb.Append(spacer);
+        sb.AppendLine(pokemonInfo);
+        sb.Append(spacer);
+        sb.Append(HpBarSpacer);
+        sb.AppendLine(hpDisplay);
+        if (activePokemon.IsTeraUsed)
+        {
+            sb.Append(spacer);
+            sb.AppendLine(FormatTeraInfo(activePokemon));
+        }
+        sb.Append(spacer);
+        sb.AppendLine(conditionsInfo);
+        return sb.ToString();
     }
 
     // Formatting Helper Methods

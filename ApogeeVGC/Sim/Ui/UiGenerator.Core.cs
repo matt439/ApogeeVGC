@@ -20,29 +20,6 @@ public static partial class UiGenerator
     private const int HpBarLength = 20;
     private const string PrimarySpacer = "                               ";
 
-    //public static void PrintBattleUi(Battle battle, PlayerId perspective)
-    //{
-    //    switch (perspective)
-    //    {
-    //        case PlayerId.Player1:
-    //            PrintTurnStart(battle.Turn);
-    //            PrintSecondarySide(battle.GetSide(PlayerId.Player2));
-    //            PrintPrimarySide(battle.GetSide(PlayerId.Player1));
-    //            PrintField(battle.Field);
-    //            break;
-    //        case PlayerId.Player2:
-    //            PrintTurnStart(battle.Turn);
-    //            PrintSecondarySide(battle.GetSide(PlayerId.Player1));
-    //            PrintPrimarySide(battle.GetSide(PlayerId.Player2));
-    //            PrintField(battle.Field);
-    //            break;
-    //        case PlayerId.None:
-    //            break;
-    //        default:
-    //            throw new ArgumentOutOfRangeException(nameof(perspective), perspective, null);
-    //    }
-    //}
-
     public static void PrintBattleUiNew(BattlePerspective perspective)
     {
         PrintTurnStart(perspective.TurnCounter);
