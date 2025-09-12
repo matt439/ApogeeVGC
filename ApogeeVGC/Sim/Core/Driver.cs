@@ -25,7 +25,7 @@ public class Driver
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    private const int RandomEvaluationNumTest = 10000;
+    private const int RandomEvaluationNumTest = 500;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;
@@ -37,7 +37,7 @@ public class Driver
     private static readonly int NumThreads = Environment.ProcessorCount;
 
     private const int PlayerRandom1Seed = 439;
-    private const int PlayerRandom2Seed = 1815;
+    private const int PlayerRandom2Seed = 1818;
 
     public void Start(DriverMode mode)
     {
@@ -48,8 +48,7 @@ public class Driver
                 //RunRandomTest();
                 break;
             case DriverMode.RandomVsRandomEvaluation:
-                throw new NotImplementedException();
-                //RunRandomVsRandomEvaluationTest();
+                RunRandomVsRandomEvaluationTest().GetAwaiter().GetResult();
                 break;
             case DriverMode.ConsoleVsRandom:
                 throw new NotImplementedException();
@@ -179,84 +178,100 @@ public class Driver
     //    Console.ReadKey();
     //}
 
-    //private void RunRandomVsRandomEvaluationTest()
-    //{
-    //    var simResults = new ConcurrentBag<SimulatorResult>();
-    //    var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+    private async Task RunRandomVsRandomEvaluationTest()
+    {
+        var simResults = new ConcurrentBag<SimulatorResult>();
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-    //    // Thread-safe counter for seed generation
-    //    int seedCounter = 0;//538;
-    //    List<int> turnOnBattleEnd = [];
+        int seedCounter = 0;
+        var turnOnBattleEnd = new ConcurrentBag<int>();
 
-    //    Parallel.For(0, RandomEvaluationNumTest, new ParallelOptions { MaxDegreeOfParallelism = NumThreads },
-    //        _ =>
-    //            //for (int i = 0; i < RandomEvaluationNumTest; i++)
-    //        {
-    //            int currentSeed = Interlocked.Increment(ref seedCounter);
-    //            int player1Seed = PlayerRandom1Seed + currentSeed;
-    //            int player2Seed = PlayerRandom2Seed + currentSeed;
+        using var semaphore = new SemaphoreSlim(NumThreads, NumThreads);
 
-    //            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-    //                "Random2", BattleFormat.Singles, false, currentSeed);
-    //            var simulator = new Simulator
-    //            {
-    //                Battle = battle,
-    //                Player1 = new PlayerRandom(PlayerId.Player1, battle, Library,
-    //                    ChoiceFilterStrategy.None,
-    //                    player1Seed),
-    //                Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-    //                    ChoiceFilterStrategy.None,
-    //                    player2Seed),
-    //            };
-    //            simResults.Add(simulator.Run());
-    //            turnOnBattleEnd.Add(battle.Turn);
-    //        });
+        // Create tasks for each simulation with concurrency control
+        var tasks = Enumerable.Range(0, RandomEvaluationNumTest)
+            .Select(async _ =>
+            {
+                await semaphore.WaitAsync(); // Wait for available slot
+                try
+                {
+                    int currentSeed = Interlocked.Increment(ref seedCounter);
+                    int player1Seed = PlayerRandom1Seed + currentSeed;
+                    int player2Seed = PlayerRandom2Seed + currentSeed;
 
-    //    stopwatch.Stop();
+                    IPlayerNew player1 = new PlayerRandomNew(PlayerId.Player1, player1Seed);
+                    IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
 
-    //    // Convert to list for counting
-    //    var resultsList = simResults.ToList();
-    //    int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-    //    int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+                    BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+                        "Random1", "Random2", BattleFormat.Singles, false, currentSeed);
 
-    //    // Calculate timing metrics
-    //    double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-    //    double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-    //    double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+                    var simulator = new SimulatorNew
+                    {
+                        Battle = battle,
+                        Player1 = player1,
+                        Player2 = player2,
+                    };
 
-    //    // Calculate turn statistics
-    //    double meanTurns = turnOnBattleEnd.Mean();
-    //    double stdDevTurns = turnOnBattleEnd.StandardDeviation();
-    //    double medianTurns = turnOnBattleEnd.Median();
-    //    int minTurns = turnOnBattleEnd.Minimum();
-    //    int maxTurns = turnOnBattleEnd.Maximum();
+                    SimulatorResult result = await simulator.Run();
+                    simResults.Add(result);
+                    turnOnBattleEnd.Add(battle.TurnCounter);
+                }
+                finally
+                {
+                    semaphore.Release(); // Release the slot
+                }
+            })
+            .ToArray();
 
-    //    // Rest of the method with timing information added...
-    //    StringBuilder sb = new();
-    //    sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
-    //    sb.AppendLine($"Player 1 Wins: {player1Wins}");
-    //    sb.AppendLine($"Player 2 Wins: {player2Wins}");
-    //    sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
-    //    sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / RandomEvaluationNumTest:P2}");
-    //    sb.AppendLine();
-    //    sb.AppendLine("Performance Metrics:");
-    //    sb.AppendLine($"Number of threads: {NumThreads}");
-    //    sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
-    //    sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
-    //    sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
-    //    sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
-    //    sb.AppendLine();
-    //    sb.AppendLine("Turn Statistics:");
-    //    sb.AppendLine($"Mean Turns: {meanTurns:F2}");
-    //    sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
-    //    sb.AppendLine($"Median Turns: {medianTurns:F2}");
-    //    sb.AppendLine($"Minimum Turns: {minTurns}");
-    //    sb.AppendLine($"Maximum Turns: {maxTurns}");
-    //    Console.WriteLine(sb.ToString());
+        // Wait for all simulations to complete
+        await Task.WhenAll(tasks);
 
-    //    Console.WriteLine("Press any key to exit...");
-    //    Console.ReadKey();
-    //}
+        stopwatch.Stop();
+
+        // Convert to list for counting (now from ConcurrentBag)
+        var resultsList = simResults.ToList();
+        var turnsList = turnOnBattleEnd.ToList();
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+
+        // Calculate timing metrics
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+
+        // Calculate turn statistics
+        double meanTurns = turnOnBattleEnd.Mean();
+        double stdDevTurns = turnOnBattleEnd.StandardDeviation();
+        double medianTurns = turnOnBattleEnd.Median();
+        int minTurns = turnOnBattleEnd.Minimum();
+        int maxTurns = turnOnBattleEnd.Maximum();
+
+        // Rest of the method with timing information added...
+        StringBuilder sb = new();
+        sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
+        sb.AppendLine($"Player 1 Wins: {player1Wins}");
+        sb.AppendLine($"Player 2 Wins: {player2Wins}");
+        sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
+        sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / RandomEvaluationNumTest:P2}");
+        sb.AppendLine();
+        sb.AppendLine("Performance Metrics:");
+        sb.AppendLine($"Number of threads: {NumThreads}");
+        sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
+        sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
+        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        sb.AppendLine();
+        sb.AppendLine("Turn Statistics:");
+        sb.AppendLine($"Mean Turns: {meanTurns:F2}");
+        sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
+        sb.AppendLine($"Median Turns: {medianTurns:F2}");
+        sb.AppendLine($"Minimum Turns: {minTurns}");
+        sb.AppendLine($"Maximum Turns: {maxTurns}");
+        Console.WriteLine(sb.ToString());
+
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
 
     //private void RunRandomTest()
     //{

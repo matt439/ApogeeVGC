@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Ui;
@@ -284,17 +285,28 @@ public partial class BattleNew
     }
 
     /// <summary>
-    /// Sort actions by speed/priority order
+    /// Sort actions by speed/priority order. Handles Trick Room logic.
     /// </summary>
     private List<ActionWithChoice> SortActionsBySpeedOrder(List<ActionWithChoice> actions)
     {
-        // Sort by priority (higher first), then by speed (higher first), then by original order
-        return actions
-            .OrderByDescending(a => a.SpeedPriority)
-            .ThenByDescending(a => a.Executor.CurrentSpe) // Use Current Speed stat
-            .ThenBy(a => a.ActionOrder)
+        bool isTrickRoom = Field.HasPseudoWeather(PseudoWeatherId.TrickRoom);
+
+        var sorted = actions.OrderByDescending(a => a.SpeedPriority);
+
+        if (isTrickRoom)
+        {
+            // In Trick Room, slower Pokémon go first (but priority still takes precedence)
+            sorted = sorted.ThenBy(a => a.Executor.CurrentSpe);
+        }
+        else
+        {
+            // Normal: faster Pokémon go first
+            sorted = sorted.ThenByDescending(a => a.Executor.CurrentSpe);
+        }
+
+        return sorted
+            .ThenBy(a => BattleRandom.Next()) // Random tiebreaker
             .ToList();
-        // TODO: Handle trick room (reverse pokemon speed order)
     }
 
     /// <summary>
