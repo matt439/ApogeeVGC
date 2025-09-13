@@ -5,8 +5,8 @@ namespace ApogeeVGC.Sim.Choices;
 
 public record DoubleSlotChoice : BattleChoice
 {
-    public required SlotChoice Slot1Choice { get; init; }
-    public required SlotChoice Slot2Choice { get; init; }
+    public SlotChoice Slot1Choice { get; init; }
+    public SlotChoice Slot2Choice { get; init; }
 
     public override Trainer Trainer => Slot1Choice.Trainer;
     public override SideId SideId => Slot1Choice.SideId;

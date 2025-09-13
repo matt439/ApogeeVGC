@@ -289,6 +289,27 @@ public class Side
         return ActivePokemon.Contains(pokemon);
     }
 
+    public Pokemon? GetAlly(SlotId slotId)
+    {
+        return BattleFormat switch
+        {
+            BattleFormat.Singles => null, // No allies in Singles,
+            BattleFormat.Doubles => slotId switch
+            {
+                SlotId.Slot1 => Slot2,
+                SlotId.Slot2 => Slot1,
+                _ => throw new ArgumentException("Only active slots can have allies in Doubles."),
+            },
+            _ => throw new InvalidOperationException("Invalid battle format."),
+        };
+    }
+
+    public Pokemon? GetAliveAlly(SlotId slotId)
+    {
+        Pokemon? ally = GetAlly(slotId);
+        return ally is { IsFainted: false } ? ally : null;
+    }
+
     private bool IsValidActiveSlot(SlotId slot)
     {
         return BattleFormat switch

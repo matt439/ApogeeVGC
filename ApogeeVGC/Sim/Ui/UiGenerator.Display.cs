@@ -52,11 +52,9 @@ public static partial class UiGenerator
     private static string GenerateDoubleSlotChoiceString(DoubleSlotChoice choice)
     {
         StringBuilder sb = new();
-        sb.Append("Double Slot Choice: [");
         sb.Append(GenerateSlotChoiceString(choice.Slot1Choice));
-        sb.Append(" | ");
+        sb.Append("  |  ");
         sb.Append(GenerateSlotChoiceString(choice.Slot2Choice));
-        sb.Append("]");
         return sb.ToString();
     }
 

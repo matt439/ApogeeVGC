@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -73,7 +74,6 @@ public partial class BattleNew
         return actions;
     }
 
-
     private async Task<List<ActionWithChoice>> RequestTurnStartPlayerChoicesAsync(PlayerId playerId,
         CancellationToken cancellationToken)
     {
@@ -85,35 +85,71 @@ public partial class BattleNew
         }
 
         var actions = new List<ActionWithChoice>();
-        var activePokemon = side.AliveActivePokemon;
+        var activePokemon = side.AliveActivePokemon.ToArray();
 
-        foreach (Pokemon pokemon in activePokemon)
+        var availableChoices = activePokemon.Length switch
         {
-            var availableChoices = GenerateTurnStartChoices(pokemon);
+            1 => GenerateTurnStartChoices(activePokemon[0]),
+            2 => GenerateDoublesTurnStartChoices(activePokemon[0], activePokemon[1]),
+            _ => throw new InvalidOperationException(
+                $"Expected 1 or 2 active Pokémon for {playerId}, but found {activePokemon.Length}."),
+        };
 
-            BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, availableChoices,
-                BattleRequestType.TurnStart, TimeSpan.FromSeconds(StandardTurnLimitSeconds),
-                cancellationToken);
+        BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, availableChoices,
+            BattleRequestType.TurnStart, TimeSpan.FromSeconds(StandardTurnLimitSeconds),
+            cancellationToken);
 
-            var pendingAction = new PendingAction
-            {
-                PlayerId = playerId,
-                ActionIndex = actions.Count, // Maintain order of submission
-                RequestTime = DateTime.UtcNow,
-            };
-            actions.Add(CreateActionWithChoice(pendingAction, choice));
-        }
+        var pendingAction = new PendingAction
+        {
+            PlayerId = playerId,
+            ActionIndex = actions.Count, // Maintain order of submission
+            RequestTime = DateTime.UtcNow,
+        };
+        actions.Add(CreateActionWithChoice(pendingAction, choice));
+
         return actions;
     }
 
     private async Task ExecuteActionsWithDynamicSwitchesAsync(List<ActionWithChoice> actions,
         CancellationToken cancellationToken)
     {
+        // split any double actions into single actions
+        List<ActionWithChoice> singleActions = [];
+        foreach (ActionWithChoice action in actions)
+        {
+            if (action.Choice is DoubleSlotChoice doubleSlotChoice)
+            {
+                // Split into two single actions
+                var action1 = new ActionWithChoice
+                {
+                    PlayerId = action.PlayerId,
+                    Choice = doubleSlotChoice.Slot1Choice,
+                    SpeedPriority = GetSpeedPriorityForChoice(doubleSlotChoice.Slot1Choice),
+                    ActionOrder = action.ActionOrder,
+                    Executor = GetExecutorPokemonForChoice(action.PlayerId, doubleSlotChoice.Slot1Choice),
+                };
+                var action2 = new ActionWithChoice
+                {
+                    PlayerId = action.PlayerId,
+                    Choice = doubleSlotChoice.Slot2Choice,
+                    SpeedPriority = GetSpeedPriorityForChoice(doubleSlotChoice.Slot2Choice),
+                    ActionOrder = action.ActionOrder + 1,
+                    Executor = GetExecutorPokemonForChoice(action.PlayerId, doubleSlotChoice.Slot2Choice),
+                };
+                singleActions.Add(action1);
+                singleActions.Add(action2);
+            }
+            else
+            {
+                singleActions.Add(action);
+            }
+        }
+
         // TODO: Have teras activate after switches but before moves
-        HandleTerastalization(actions);
+        HandleTerastalization(singleActions);
         
         // Sort by priority/speed
-        var sortedActions = SortActionsBySpeedOrder(actions);
+        var sortedActions = SortActionsBySpeedOrder(singleActions);
 
         foreach (ActionWithChoice action in sortedActions)
         {
@@ -335,9 +371,8 @@ public partial class BattleNew
             case SlotChoice slotChoice:
                 await ExecuteSlotChoiceAsync(action.PlayerId, slotChoice);
                 break;
-            case DoubleSlotChoice doubleSlotChoice:
-                throw new NotImplementedException();
-            case TeamPreviewChoice _:
+            case DoubleSlotChoice:
+            case TeamPreviewChoice:
                 throw new InvalidOperationException("Team preview choices should not be executed during gameplay.");
             default:
                 throw new InvalidOperationException($"Unknown choice type: {action.Choice.GetType().Name}");

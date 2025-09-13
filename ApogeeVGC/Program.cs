@@ -7,6 +7,6 @@ public class Program
     public static void Main(string[] args)
     {
         var driver = new Driver();
-        driver.Start(DriverMode.ConsoleVsRandomDoubles);
+        driver.Start(DriverMode.RandomVsRandomEvaluation);
     }
 }

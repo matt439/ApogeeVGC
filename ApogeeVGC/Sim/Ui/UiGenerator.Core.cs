@@ -50,6 +50,9 @@ public static partial class UiGenerator
                 case SlotChoice slotChoice:
                     sb.AppendLine(GenerateSlotChoiceString(slotChoice));
                     break;
+                case DoubleSlotChoice doubleSlotChoice:
+                    sb.AppendLine(GenerateDoubleSlotChoiceString(doubleSlotChoice));
+                    break;
                 default:
                     throw new InvalidOperationException($"Unknown choice type: {availableChoices[i].GetType()}");
             }
