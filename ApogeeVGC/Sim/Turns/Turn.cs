@@ -19,4 +19,23 @@ public abstract record Turn//(Side Side1Start, Side Side2Start, Field FieldStart
     public required int TurnCounter { get; init; }
 
     //public bool HasTurnTimedOut => DateTime.UtcNow - TurnStartTime > TurnTimeLimit;
+
+    /// <summary>
+    /// Creates a deep copy of this Turn for simulation purposes.
+    /// Since Turn is a record, this uses the 'with' expression for copying.
+    /// </summary>
+    public virtual Turn Copy()
+    {
+        return this with
+        {
+            Side1Start = Side1Start.Copy(),
+            Side1End = Side1End?.Copy(),
+            Side2Start = Side2Start.Copy(),
+            Side2End = Side2End?.Copy(),
+            FieldStart = FieldStart.Copy(),
+            FieldEnd = FieldEnd?.Copy(),
+            // DateTime values are copied by value
+            // TurnCounter is copied by value
+        };
+    }
 }

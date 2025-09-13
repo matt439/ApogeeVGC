@@ -20,6 +20,8 @@ public partial class BattleNew
             HandleEndOfTeamPreviewTurn();
         }
 
+        ExecutionStage = GameplayExecutionStage.TurnStart;
+
         // Phase 1: Start-of-turn effects
         await HandleStartOfTurn();
 
@@ -47,6 +49,7 @@ public partial class BattleNew
         }
 
         // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
+        ExecutionStage = GameplayExecutionStage.FaintedSwitch;
         await HandleFaintedSwitchesAsync(cancellationToken);
 
         // Complete the turn
@@ -181,6 +184,8 @@ public partial class BattleNew
             // Check for immediate forced switches (Volt Switch, U-turn, etc.)
             if (RequiresImmediateForcedSwitch(action))
             {
+                ExecutionStage = GameplayExecutionStage.ForceSwitch;
+                ForceSwitcher = action.Executor;
                 await HandleImmediateForcedSwitchAsync(action.Executor, action.PlayerId, cancellationToken);
             }
 
@@ -260,13 +265,13 @@ public partial class BattleNew
         await HandleFaintedSwitchesForPlayer(PlayerId.Player2, cancellationToken);
     }
 
-    private async Task HandleFaintedSwitchesForPlayer(PlayerId playerId, CancellationToken cancellationToken)
+    private BattleChoice[] GenerateFaintedSwitchChoicesForPlayer(PlayerId playerId)
     {
         Side side = GetCurrentSide(playerId);
 
         if (side.SwitchOptionsCount <= 0)
         {
-            return; // No available switches
+            return []; // No available switches
         }
 
         var faintedActivePokemon = side.FaintedActivePokemon.ToArray();
@@ -276,7 +281,7 @@ public partial class BattleNew
         switch (faintedActivePokemon.Length)
         {
             case 0:
-                return; // No fainted Pokémon to switch
+                return []; // No fainted Pokémon to switch
             case 1:
                 switchChoices = GenerateFaintedSwitchChoices(faintedActivePokemon[0]);
                 break;
@@ -286,6 +291,18 @@ public partial class BattleNew
             default:
                 throw new InvalidOperationException(
                     $"Expected 1 or 2 fainted active Pokémon for {playerId}, but found {faintedActivePokemon.Length}.");
+        }
+
+        return switchChoices;
+    }
+
+    private async Task HandleFaintedSwitchesForPlayer(PlayerId playerId, CancellationToken cancellationToken)
+    {
+        var switchChoices = GenerateFaintedSwitchChoicesForPlayer(playerId);
+
+        if (switchChoices.Length == 0)
+        {
+            return; // No switches needed
         }
 
         BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices,

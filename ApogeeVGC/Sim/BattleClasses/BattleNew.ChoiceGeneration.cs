@@ -1,7 +1,9 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -402,5 +404,52 @@ public partial class BattleNew
     private bool IsValidChoice()
     {
         return true; // TODO: Implement actual validation logic
+    }
+
+    private enum GameplayExecutionStage
+    {
+        TurnStart,
+        ForceSwitch,
+        FaintedSwitch,
+    }
+
+    private Pokemon? ForceSwitcher { get; set; }
+
+    private GameplayExecutionStage ExecutionStage { get; set; }
+
+    public BattleChoice[] GenerateChoicesForMcts(PlayerId playerId)
+    {
+        Side side = GetSide(playerId);
+        
+        switch (CurrentTurn)
+        {
+            case TeamPreviewTurn:
+                return GetTeamPreviewChoices(side);
+            case GameplayTurn:
+                switch (ExecutionStage)
+                {
+                    case GameplayExecutionStage.TurnStart:
+                        var actions = RequestTurnStartPlayerChoicesAsync(playerId,
+                                CancellationToken.None).GetAwaiter().GetResult();
+
+                        List<BattleChoice> choices = [];
+                        choices.AddRange(actions.Select(action => action.Choice));
+                        return choices.ToArray();
+
+                    case GameplayExecutionStage.ForceSwitch:
+                        return GenerateForcedSwitchChoices(ForceSwitcher ?? 
+                                                           throw new InvalidOperationException());
+
+                    case GameplayExecutionStage.FaintedSwitch:
+                        return GenerateFaintedSwitchChoicesForPlayer(playerId);
+
+                    default:
+                        throw new InvalidOperationException("Invalid gameplay execution type.");
+                }
+            case PostGameTurn:
+                throw new InvalidOperationException("No choices are available when the game is over.");
+            default:
+                throw new InvalidOperationException("Invalid turn type");
+        }
     }
 }

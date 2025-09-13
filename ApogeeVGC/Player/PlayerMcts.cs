@@ -1,68 +1,102 @@
-﻿//using ApogeeVGC.Data;
-//using ApogeeVGC.Mcts;
-//using ApogeeVGC.Sim.Choices;
-//using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Mcts;
+using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.BattleClasses;
 
-//namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Player;
 
-//public class PlayerMcts : IPlayer
-//{
-//    public PlayerId PlayerId { get; }
-//    public Battle Battle { get; }
-//    private readonly int _seed;
-//    private readonly PokemonMonteCarloTreeSearch _mcts;
+public class PlayerMcts : IPlayerNew
+{
+    public PlayerId PlayerId { get; }
+    
+    private readonly int _seed;
+    private readonly PokemonMcts _mcts;
+    private readonly Random _fallbackRandom;
 
-//    public PlayerMcts(PlayerId playerId, Battle battle, int maxIterations, double explorationParameter,
-//        Library library, int? seed = null, int? maxDegreeOfParallelism = null, int? maxTimer = null)
-//    {
-//        PlayerId = playerId;
-//        Battle = battle;
-//        if (maxIterations <= 0)
-//        {
-//            throw new ArgumentOutOfRangeException(nameof(maxIterations),
-//                "Max iterations must be greater than 0.");
-//        }
-//        if (explorationParameter < 0)
-//        {
-//            throw new ArgumentOutOfRangeException(nameof(explorationParameter),
-//                "Exploration parameter must be 0 or greater.");
-//        }
-//        _seed = seed ?? Environment.TickCount;
-//        _mcts = new PokemonMonteCarloTreeSearch(maxIterations, explorationParameter, playerId, library,
-//            _seed, maxDegreeOfParallelism, maxTimer);
-//    }
+    // Events for IPlayerNew interface
+    public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
+    public event EventHandler<BattleChoice>? ChoiceSubmitted;
 
-//    public BattleChoice GetNextChoice(BattleChoice[] availableChoices)
-//    {
-//        switch (availableChoices.Length)
-//        {
-//            case 0:
-//                throw new ArgumentException("No available choices provided.", nameof(availableChoices));
-//            case 1:
-//                // Only one choice available, no need for MCTS
-//                return availableChoices[0];
-//            default:
-//                try
-//                {
-//                    // Use MCTS to find the best choice
-//                    PokemonMonteCarloTreeSearch.MoveResult result = _mcts.FindBestChoice(Battle, availableChoices);
+    public PlayerMcts(PlayerId playerId, int maxIterations, double explorationParameter,
+        Library library, int? seed = null, int? maxDegreeOfParallelism = null, int? maxTimer = null)
+    {
+        PlayerId = playerId;
+        
+        if (maxIterations <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxIterations),
+                "Max iterations must be greater than 0.");
+        }
+        if (explorationParameter < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(explorationParameter),
+                "Exploration parameter must be 0 or greater.");
+        }
+        
+        _seed = seed ?? Environment.TickCount;
+        _fallbackRandom = new Random(_seed);
+        
+        _mcts = new PokemonMcts(maxIterations, explorationParameter, playerId, library,
+            _seed, maxDegreeOfParallelism, maxTimer);
+    }
 
-//                    if (result.OptimalChoice == null)
-//                    {
-//                        throw new InvalidOperationException("MCTS returned a null optimal choice." +
-//                                                            "This should not happen.");
-//                    }
-//                    return result.OptimalChoice;
-//                }
-//                catch (Exception ex)
-//                {
-//                    // Log the exception if you have logging
-//                    Console.WriteLine($"MCTS failed with exception: {ex.Message}");
+    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
+        BattlePerspective perspective, CancellationToken cancellationToken)
+    {
+        // Notify that a choice has been requested
+        var requestEventArgs = new ChoiceRequestEventArgs
+        {
+            AvailableChoices = availableChoices,
+            TimeLimit = TimeSpan.FromSeconds(45), // Default timeout
+            RequestTime = DateTime.UtcNow,
+        };
+        ChoiceRequested?.Invoke(this, requestEventArgs);
+
+        BattleChoice choice = GetNextChoice(availableChoices, perspective);
+        
+        // Notify that a choice has been submitted
+        ChoiceSubmitted?.Invoke(this, choice);
+        
+        return Task.FromResult(choice);
+    }
+
+    public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
+    {
+        // MCTS player could potentially use this to reduce search time or iterations
+        // For now, just acknowledge the warning
+        return Task.CompletedTask;
+    }
+
+    public Task NotifyChoiceTimeoutAsync()
+    {
+        // MCTS search was interrupted by timeout
+        // The GetNextChoiceAsync method should handle this gracefully
+        return Task.CompletedTask;
+    }
+
+    private BattleChoice GetNextChoice(BattleChoice[] availableChoices, BattlePerspective perspective)
+    {
+        switch (availableChoices.Length)
+        {
+            case 0:
+                throw new ArgumentException("No available choices provided.", nameof(availableChoices));
+            case 1:
+                // Only one choice available, no need for MCTS
+                return availableChoices[0];
+            default:
+                try
+                {
+                    PokemonMcts.MoveResult result = _mcts.FindBestChoice(perspective.Battle, availableChoices);
+                    return result.OptimalChoice;
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception if you have logging
+                    Console.WriteLine($"MCTS failed with exception: {ex.Message}");
             
-//                    // Fallback to random choice
-//                    var random = new Random(_seed);
-//                    return availableChoices[random.Next(availableChoices.Length)];
-//                }
-//        }
-//    }
-//}
+                    // Fallback to random choice
+                    return availableChoices[_fallbackRandom.Next(availableChoices.Length)];
+                }
+        }
+    }
+}
