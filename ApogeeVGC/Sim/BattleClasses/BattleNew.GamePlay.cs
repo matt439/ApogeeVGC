@@ -29,8 +29,22 @@ public partial class BattleNew
         // Phase 3: Execute actions in priority order with dynamic interruptions
         await ExecuteActionsWithDynamicSwitchesAsync(initialActions, cancellationToken);
 
+        // Check for game end conditions
+        if (CheckForGameEndConditions())
+        {
+            await HandleNormalGameEndAsync();
+            return;
+        }
+
         // Phase 4: Apply end-of-turn effects
         await ApplyEndOfTurnEffectsAsync();
+
+        // Check for game end conditions
+        if (CheckForGameEndConditions())
+        {
+            await HandleNormalGameEndAsync();
+            return;
+        }
 
         // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
         await HandleFaintedSwitchesAsync(cancellationToken);
@@ -140,6 +154,20 @@ public partial class BattleNew
 
         foreach (ActionWithChoice action in sortedActions)
         {
+            if (CurrentTurn is not GameplayTurn gameplayTurn)
+            {
+                throw new InvalidOperationException();
+            }
+            // save move history into turn for debugging
+            gameplayTurn.SetChoice(action.Choice.SideId, action.Executor.SlotId, action.Choice);
+            
+            // Check for game end before each action
+            if (CheckForGameEndConditions())
+            {
+                await HandleNormalGameEndAsync();
+                return;
+            }
+
             // Check if executor is still able to act
             if (action.Executor.IsFainted || !GetCurrentSide(action.PlayerId).IsActivePokemon(action.Executor))
             {
@@ -180,7 +208,7 @@ public partial class BattleNew
     {
         foreach (ActionWithChoice action in actions)
         {
-            if (action.Choice is SlotChoice.MoveChoice { IsTera: true } moveChoice)
+            if (action.Choice is MoveChoice { IsTera: true } moveChoice)
             {
                 moveChoice.Attacker.Terastillize(Context);
             }
@@ -190,7 +218,7 @@ public partial class BattleNew
     private bool RequiresImmediateForcedSwitch(ActionWithChoice action)
     {
         // Check if this action causes an immediate forced switch
-        if (action.Choice is SlotChoice.MoveChoice moveChoice)
+        if (action.Choice is MoveChoice moveChoice)
         {
             // Volt Switch, U-turn, Baton Pass, etc.
             return moveChoice.Move.SelfSwitch &&
@@ -211,7 +239,7 @@ public partial class BattleNew
                 BattleRequestType.ForceSwitch, TimeSpan.FromSeconds(StandardTurnLimitSeconds),
                 cancellationToken);
 
-            if (choice is not SlotChoice.SwitchChoice switchChoice)
+            if (choice is not SwitchChoice switchChoice)
             {
                 throw new InvalidOperationException("Expected a SwitchChoice for forced switch.");
             }
@@ -319,8 +347,8 @@ public partial class BattleNew
         {
             return slotChoice switch
             {
-                SlotChoice.MoveChoice moveChoice => moveChoice.Attacker,
-                SlotChoice.SwitchChoice switchChoice => switchChoice.SwitchOutPokemon,
+                MoveChoice moveChoice => moveChoice.Attacker,
+                SwitchChoice switchChoice => switchChoice.SwitchOutPokemon,
                 _ => throw new InvalidOperationException($"Unknown slot choice type: {slotChoice.GetType().Name}"),
             };
         }
@@ -343,11 +371,11 @@ public partial class BattleNew
     {
         switch (choice)
         {
-            case SlotChoice.MoveChoice moveChoice:
+            case MoveChoice moveChoice:
                 Pokemon attacker = moveChoice.Attacker;
                 int priority = moveChoice.Move.Priority;
                 return attacker.Ability.OnModifyPriority?.Invoke(priority, moveChoice.Move) ?? priority;
-            case SlotChoice.SwitchChoice:
+            case SwitchChoice:
                 return 6;
             default:
                 return 0;
@@ -375,7 +403,7 @@ public partial class BattleNew
         }
 
         return sorted
-            .ThenBy(a => BattleRandom.Next()) // Random tiebreaker
+            .ThenBy(_ => BattleRandom.Next()) // Random tiebreaker
             .ToList();
     }
 
@@ -404,11 +432,11 @@ public partial class BattleNew
     {
         switch (slotChoice)
         {
-            case SlotChoice.MoveChoice moveChoice:
+            case MoveChoice moveChoice:
                 await ExecuteMoveChoiceAsync(playerId, moveChoice);
                 break;
                 
-            case SlotChoice.SwitchChoice switchChoice:
+            case SwitchChoice switchChoice:
                 await ExecuteSwitchChoiceAsync(playerId, switchChoice);
                 break;
                 
@@ -477,43 +505,32 @@ public partial class BattleNew
 
     private void HandleResiduals()
     {
-        Condition[] side1Residuals = [];
-        if (!Side1.Slot1.IsFainted) // Skip if fainted
+        var allResiduals = new List<(Pokemon, Condition, PlayerId)>();
+
+        // Process Side1 active Pokemon
+        foreach (Pokemon pokemon in Side1.AliveActivePokemon)
         {
-            side1Residuals = Side1.Slot1.GetAllResidualConditions();
-        }
-        List<(Pokemon, Condition, PlayerId)> side1ResidualsList = [];
-        foreach (Condition condition in side1Residuals)
-        {
-            if (condition.OnResidual != null)
-            {
-                side1ResidualsList.Add((Side1.Slot1, condition, PlayerId.Player1));
-            }
+            AddResidualConditions(allResiduals, pokemon, PlayerId.Player1);
         }
 
-        Condition[] side2Residuals = [];
-        if (!Side2.Slot1.IsFainted) // Skip if fainted
+        // Process Side2 active Pokemon  
+        foreach (Pokemon pokemon in Side2.AliveActivePokemon)
         {
-            side2Residuals = Side2.Slot1.GetAllResidualConditions();
-        }
-        List<(Pokemon, Condition, PlayerId)> side2ResidualsList = [];
-        foreach (Condition condition in side2Residuals)
-        {
-            if (condition.OnResidual != null)
-            {
-                side2ResidualsList.Add((Side2.Slot1, condition, PlayerId.Player2));
-            }
+            AddResidualConditions(allResiduals, pokemon, PlayerId.Player2);
         }
 
-        // Combine and sort by OnResidualOrder
-        var allResiduals = side1ResidualsList.Concat(side2ResidualsList)
+        // Sort and execute residuals
+        var sortedResiduals = allResiduals
             .OrderBy(t => t.Item2.OnResidualOrder ?? int.MaxValue)
+            .ThenBy(t => t.Item3) // Player order as tiebreaker
+            .ThenBy(t => t.Item1.SlotId) // Slot order as secondary tiebreaker
             .ToList();
 
-        foreach ((Pokemon pokemon, Condition condition, PlayerId playerId) in allResiduals)
+        foreach ((Pokemon pokemon, Condition condition, PlayerId playerId) in sortedResiduals)
         {
-            Side sourceSide = GetSide(playerId.OpposingPlayerId());
+            if (pokemon.IsFainted) continue;
 
+            Side sourceSide = GetSide(playerId.OpposingPlayerId());
             condition.OnResidual?.Invoke(pokemon, sourceSide, condition, Context);
 
             if (!condition.Duration.HasValue) continue;
@@ -526,44 +543,51 @@ public partial class BattleNew
         }
     }
 
+    private void HandleConditionTurnEnds()
+    {
+        // Process each side's active Pokemon
+        HandleConditionTurnEndsForSide(Side1);
+        HandleConditionTurnEndsForSide(Side2);
+    }
+
+    // Helper methods
+    private static void AddResidualConditions(List<(Pokemon, Condition, PlayerId)> residuals,
+        Pokemon pokemon, PlayerId playerId)
+    {
+        var conditions = pokemon.GetAllResidualConditions();
+        foreach (Condition condition in conditions)
+        {
+            if (condition.OnResidual != null)
+            {
+                residuals.Add((pokemon, condition, playerId));
+            }
+        }
+    }
+
+    private void HandleConditionTurnEndsForSide(Side side)
+    {
+        foreach (Pokemon pokemon in side.AliveActivePokemon.ToList())
+        {
+            var conditions = pokemon.Conditions.ToList();
+
+            foreach (Condition condition in conditions.TakeWhile(_ => !pokemon.IsFainted))
+            {
+                condition.OnTurnEnd?.Invoke(pokemon, Context);
+
+                if (!condition.Duration.HasValue) continue;
+
+                condition.Duration--;
+                if (condition.Duration <= 0)
+                {
+                    pokemon.RemoveCondition(condition.Id);
+                }
+            }
+        }
+    }
+
     private void HandleConditionTurnStarts()
     {
 
-    }
-
-    private void HandleConditionTurnEnds()
-    {
-        List<Condition> side1Conditions = [];
-        if (!Side1.Slot1.IsFainted) // Skip if fainted
-        {
-            side1Conditions = Side1.Slot1.Conditions.ToList();
-        }
-        foreach (Condition condition in side1Conditions.ToList())
-        {
-            condition.OnTurnEnd?.Invoke(Side1.Slot1, Context);
-            if (!condition.Duration.HasValue) continue;
-            condition.Duration--;
-            if (condition.Duration <= 0)
-            {
-                Side1.Slot1.RemoveCondition(condition.Id);
-            }
-        }
-
-        List<Condition> side2Conditions = [];
-        if (!Side2.Slot1.IsFainted) // Skip if fainted
-        {
-            side2Conditions = Side2.Slot1.Conditions.ToList();
-        }
-        foreach (Condition condition in side2Conditions.ToList())
-        {
-            condition.OnTurnEnd?.Invoke(Side2.Slot1, Context);
-            if (!condition.Duration.HasValue) continue;
-            condition.Duration--;
-            if (condition.Duration <= 0)
-            {
-                Side2.Slot1.RemoveCondition(condition.Id);
-            }
-        }
     }
 
     private void HandleItemTurnStarts()

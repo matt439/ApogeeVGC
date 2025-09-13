@@ -27,7 +27,7 @@ public class Driver
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    private const int RandomEvaluationNumTest = 100;
+    private const int RandomEvaluationNumTest = 5000;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;

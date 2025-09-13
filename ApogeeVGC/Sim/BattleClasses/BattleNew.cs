@@ -131,6 +131,7 @@ public partial class BattleNew
                 // Check turn limit
                 if (TurnCounter < TurnLimit) continue;
 
+                Turn turn  = Turns[TurnLimit - 1];
                 await HandleTurnLimitReachedAsync();
                 break;
             }

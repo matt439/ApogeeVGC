@@ -12,30 +12,12 @@ public partial class BattleNew
     /// </summary>
     private bool CheckForGameEndConditions()
     {
-        // Check if all Pokemon on one side are fainted
-        if (IsAllPokemonFainted(Side1))
-        {
-            if (PrintDebug)
-                Console.WriteLine("Player 1 has no Pokemon remaining");
-            return true;
-        }
-
-        if (IsAllPokemonFainted(Side2))
-        {
-            if (PrintDebug)
-                Console.WriteLine("Player 2 has no Pokemon remaining");
-            return true;
-        }
-
-        return false;
+        return HasNoViablePokemon(Side1) || HasNoViablePokemon(Side2);
     }
 
-    /// <summary>
-    /// Check if all Pokemon on a side are fainted
-    /// </summary>
-    private bool IsAllPokemonFainted(Side side)
+    private static bool HasNoViablePokemon(Side side)
     {
-        return side.AllSlots.All(pokemon => pokemon.IsFainted);
+        return side.IsDefeated || side is { AliveActivePokemonCount: 0, SwitchOptionsCount: 0 };
     }
 
     /// <summary>
@@ -45,11 +27,11 @@ public partial class BattleNew
     {
         PlayerId winner;
 
-        if (IsAllPokemonFainted(Side1))
+        if (Side1.IsDefeated)
         {
             winner = PlayerId.Player2;
         }
-        else if (IsAllPokemonFainted(Side2))
+        else if (Side2.IsDefeated)
         {
             winner = PlayerId.Player1;
         }

@@ -154,6 +154,11 @@ public partial class BattleNew
         {
             // chilling neigh and similar abilities
             attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
+
+            // TODO: clear defender's volatile conditions. This is needed in case it remains in
+            // an active slot (when there is only 1 alive pokemon left on team in doubles)
+
+            // probable need to clear only conditions that heal attacker (leech seed)
         }
     }
 

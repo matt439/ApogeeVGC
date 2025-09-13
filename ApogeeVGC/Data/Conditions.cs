@@ -370,13 +370,13 @@ public record Conditions
             OnTryHitPriority = 3,
             // TODO: Check for smart target (dragon darts), outrage lock
             OnTryHit = (_, _, move, _) => !(move.Flags.Protect ?? false),
-            //OnTurnEnd = (target, _) =>
-            //{
-            //    if (!target.RemoveCondition(ConditionId.Protect))
-            //    {
-            //        throw new InvalidOperationException("Failed to remove Protect condition.");
-            //    }
-            //},
+            OnTurnEnd = (target, _) =>
+            {
+                if (!target.RemoveCondition(ConditionId.Protect))
+                {
+                    throw new InvalidOperationException("Failed to remove Protect condition.");
+                }
+            },
         },
         [ConditionId.Tailwind] = new Condition
         {
