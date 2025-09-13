@@ -1,7 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
@@ -14,12 +13,141 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleNew
 {
-    /// <summary>
-    /// Execute a move choice
-    /// </summary>
+    //private async Task ExecuteMoveChoiceAsync(PlayerId playerId, SlotChoice.MoveChoice choice)
+    //{
+    //    Pokemon attacker = choice.Attacker;
+
+    //    if (attacker.IsFainted)
+    //    {
+    //        throw new InvalidOperationException($"Cannot use move with fainted Pokémon {attacker.Name}" +
+    //                                            $"for player {playerId}");
+    //    }
+
+    //    Pokemon defender = choice.PossibleTargets.Count > 0 ? choice.PossibleTargets[0] : attacker;
+    //    Move move = choice.Move;
+
+    //    // This is where choice lock and choice benefits come into play
+    //    attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
+
+    //    if (move.Pp <= 0)
+    //    {
+    //        throw new InvalidOperationException($"Move {move.Name} has no PP left" +
+    //                                            $"for player {playerId}");
+    //    }
+
+    //    // Check OnDisableMove conditions on attacker
+    //    foreach (Condition condition in attacker.Conditions.ToList())
+    //    {
+    //        condition.OnDisableMove?.Invoke(attacker, move, Context);
+    //    }
+    //    if (move.Disabled)
+    //    {
+    //        if (PrintDebug)
+    //        {
+    //            UiGenerator.PrintDisabledMoveTry(attacker, move);
+    //        }
+
+    //        return;
+    //    }
+
+    //    move.UsedPp++;  // Decrease PP for the move used
+    //    attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
+    //    attacker.LastMoveUsed = move;
+
+    //    // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
+    //    if (attacker.Conditions
+    //        .Where(c => c.OnBeforeMove != null)
+    //        .OrderBy(c => c.OnBeforeMovePriority ?? 0)
+    //        .ToList().Any(condition => condition.OnBeforeMove == null ||
+    //                                   !condition.OnBeforeMove(attacker, defender, move, Context)))
+    //    {
+    //        return;
+    //    }
+
+    //    if (move.StallingMove)
+    //    {
+    //        // check for conditions with OnStallMove on attacker
+    //        foreach (Condition condition in attacker.Conditions.ToList())
+    //        {
+    //            if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
+    //            if (PrintDebug)
+    //            {
+    //                UiGenerator.PrintMoveFailAction(attacker, move);
+    //            }
+
+    //            return;
+    //        }
+    //    }
+
+    //    // OnTry checks on the attacker's move (incl fake out, etc)
+    //    if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
+    //    {
+    //        return;
+    //    }
+
+    //    // Miss check
+    //    if (IsMoveMiss(attacker, move, defender))
+    //    {
+    //        if (PrintDebug)
+    //        {
+    //            UiGenerator.PrintMoveMissAction(attacker, move, defender);
+    //        }
+
+    //        return;
+    //    }
+
+    //    // Immunity check. Note that this does not check for normal immunity, only special cases.
+    //    // Regular immunity check is done in PerformDamagingMove
+    //    if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
+    //        move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
+    //    {
+    //        if (PrintDebug)
+    //        {
+    //            UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+    //        }
+
+    //        return;
+    //    }
+
+    //    // check every condition on defender for OnTryHit effects
+    //    foreach (Condition condition in defender.Conditions.ToList())
+    //    {
+    //        if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
+
+    //        if (!PrintDebug) return;
+
+    //        // Check if the defender is protected by a stall move like Protect, Detect, etc.
+    //        if (defender.HasCondition(ConditionId.Stall))
+    //        {
+    //            UiGenerator.PrintStallMoveProtection(attacker, move, defender);
+    //        }
+    //        else
+    //        {
+    //            UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
+    //        }
+    //        return;
+    //    }
+
+    //    switch (move.Category)
+    //    {
+    //        case MoveCategory.Physical:
+    //        case MoveCategory.Special:
+    //            PerformDamagingMove(attacker, playerId, move, defender);
+    //            break;
+    //        case MoveCategory.Status:
+    //            PerformStatusMove(attacker, playerId, move, defender);
+    //            break;
+    //        default:
+    //            throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}");
+    //    }
+
+    //    await Task.CompletedTask;
+    //}
+
     private async Task ExecuteMoveChoiceAsync(PlayerId playerId, SlotChoice.MoveChoice choice)
     {
         Pokemon attacker = choice.Attacker;
+        Move move = choice.Move;
 
         if (attacker.IsFainted)
         {
@@ -27,128 +155,36 @@ public partial class BattleNew
                                                 $"for player {playerId}");
         }
 
-        Pokemon defender = choice.PossibleTargets.Count > 0 ? choice.PossibleTargets[0] : attacker;
-        Move move = choice.Move;
+        // Resolve actual targets based on move targeting rules
+        var actualTargets = ResolveActualTargets(choice);
 
-        // This is where choice lock and choice benefits come into play
-        attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
-
-        if (move.Pp <= 0)
-        {
-            throw new InvalidOperationException($"Move {move.Name} has no PP left" +
-                                                $"for player {playerId}");
-        }
-
-        // Check OnDisableMove conditions on attacker
-        foreach (Condition condition in attacker.Conditions.ToList())
-        {
-            condition.OnDisableMove?.Invoke(attacker, move, Context);
-        }
-        if (move.Disabled)
+        if (actualTargets.Count == 0)
         {
             if (PrintDebug)
             {
-                UiGenerator.PrintDisabledMoveTry(attacker, move);
+                Console.WriteLine($"Move {move.Name} has no valid targets");
             }
-
             return;
         }
 
-        move.UsedPp++;  // Decrease PP for the move used
-        attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
+        // Pre-move setup (same for all targets)
+        move.UsedPp++;
+        attacker.ActiveMoveActions++;
         attacker.LastMoveUsed = move;
 
-        // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
-        if (attacker.Conditions
-            .Where(c => c.OnBeforeMove != null)
-            .OrderBy(c => c.OnBeforeMovePriority ?? 0)
-            .ToList().Any(condition => condition.OnBeforeMove == null ||
-                                       !condition.OnBeforeMove(attacker, defender, move, Context)))
+        // Execute pre-move checks and effects
+        if (!ExecutePreMoveChecks(attacker, move, actualTargets, playerId))
         {
             return;
         }
 
-        if (move.StallingMove)
-        {
-            // check for conditions with OnStallMove on attacker
-            foreach (Condition condition in attacker.Conditions.ToList())
-            {
-                if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
-                if (PrintDebug)
-                {
-                    UiGenerator.PrintMoveFailAction(attacker, move);
-                }
-
-                return;
-            }
-        }
-
-        // OnTry checks on the attacker's move (incl fake out, etc)
-        if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
-        {
-            return;
-        }
-
-        // Miss check
-        if (IsMoveMiss(attacker, move, defender))
-        {
-            if (PrintDebug)
-            {
-                UiGenerator.PrintMoveMissAction(attacker, move, defender);
-            }
-
-            return;
-        }
-
-        // Immunity check. Note that this does not check for normal immunity, only special cases.
-        // Regular immunity check is done in PerformDamagingMove
-        if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
-            move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
-        {
-            if (PrintDebug)
-            {
-                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-            }
-
-            return;
-        }
-
-        // check every condition on defender for OnTryHit effects
-        foreach (Condition condition in defender.Conditions.ToList())
-        {
-            if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
-
-            if (!PrintDebug) return;
-
-            // Check if the defender is protected by a stall move like Protect, Detect, etc.
-            if (defender.HasCondition(ConditionId.Stall))
-            {
-                UiGenerator.PrintStallMoveProtection(attacker, move, defender);
-            }
-            else
-            {
-                UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-            }
-            return;
-        }
-
-        switch (move.Category)
-        {
-            case MoveCategory.Physical:
-            case MoveCategory.Special:
-                PerformDamagingMove(attacker, playerId, move, defender);
-                break;
-            case MoveCategory.Status:
-                PerformStatusMove(attacker, playerId, move, defender);
-                break;
-            default:
-                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}");
-        }
+        // Execute the move against all targets
+        ExecuteMoveAgainstTargets(attacker, move, actualTargets, playerId);
 
         await Task.CompletedTask;
     }
 
-    private void PerformDamagingMove(Pokemon attacker, PlayerId attackingPlayer, Move move, Pokemon defender)
+    private void PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender, int numDefendingSidePokemon)
     {
         switch (move.Target)
         {
@@ -186,7 +222,6 @@ public partial class BattleNew
             {
                 UiGenerator.PrintMoveImmuneAction(attacker, move, defender);
             }
-
             return;
         }
 
@@ -195,12 +230,9 @@ public partial class BattleNew
         // check for OnAnyModifyDamage conditions on defender
         if (damage > 0)
         {
-            // TODO: numPokemonDefendingSide for multi-battles
-            int numPokemonDefendingSide = 1;
-
             double multiplier = defender.Conditions.Aggregate(1.0, (current, condition) =>
                 current * (condition.OnAnyModifyDamage?.Invoke(damage, attacker, defender, move, isCrit,
-                    numPokemonDefendingSide) ?? 1.0));
+                    numDefendingSidePokemon) ?? 1.0));
             damage = Math.Max(1, (int)(damage * multiplier)); // Always at least 1 damage
         }
 
@@ -281,21 +313,35 @@ public partial class BattleNew
             UiGenerator.PrintStatusMoveAction(attacker, move);
         }
 
-        if (move.Target == MoveTarget.Field)
+        switch (move.Target)
         {
-            HandleFieldTargetStatusMove(move, attacker);
-            return;
-        }
-
-        if (move.Target == MoveTarget.AllySide)
-        {
-            HandleSideTargetStatusMove(move, playerId, attacker);
-            return;
-        }
-        if (move.Target == MoveTarget.FoeSide)
-        {
-            HandleSideTargetStatusMove(move, playerId.OpposingPlayerId(), attacker);
-            return;
+            case MoveTarget.Field:
+                HandleFieldTargetStatusMove(move, attacker);
+                return;
+            case MoveTarget.AllySide:
+                HandleSideTargetStatusMove(move, playerId, attacker);
+                return;
+            case MoveTarget.FoeSide:
+                HandleSideTargetStatusMove(move, playerId.OpposingPlayerId(), attacker);
+                return;
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.Normal:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.Self:
+            case MoveTarget.None:
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid move target type {move.Target} for move {move.Name}" +
+                                                $"used by player {playerId}");
         }
 
         if (move.Condition is null)
@@ -498,6 +544,268 @@ public partial class BattleNew
         int burnModified = RoundedDownAtHalf(burnModifier * typeModified);
         return Math.Max(1, burnModified);
     }
+
+    private List<Pokemon> ResolveActualTargets(SlotChoice.MoveChoice choice)
+    {
+        Move move = choice.Move;
+        Pokemon attacker = choice.Attacker;
+        var targets = new List<Pokemon>();
+
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+                targets.AddRange(ResolveNormalTargets(choice));
+                break;
+
+            case MoveTarget.AllAdjacentFoes:
+                targets.AddRange(GetAllAdjacentFoes(attacker));
+                break;
+
+            case MoveTarget.Self:
+                targets.Add(attacker);
+                break;
+
+            case MoveTarget.AdjacentAlly:
+                Pokemon? ally = GetAdjacentAlly(attacker);
+                if (ally != null) targets.Add(ally);
+                break;
+
+            case MoveTarget.AllySide:
+            case MoveTarget.FoeSide:
+            case MoveTarget.Field:
+                // These don't target specific Pokemon
+                break;
+
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.Allies:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+            default:
+                throw new NotImplementedException($"Move target {move.Target} not implemented");
+        }
+        return targets.Where(t => !t.IsFainted).ToList();
+    }
+
+    private List<Pokemon> ResolveNormalTargets(SlotChoice.MoveChoice choice)
+    {
+        Pokemon attacker = choice.Attacker;
+        Move move = choice.Move;
+
+        // Get the intended target from MoveNormalTarget
+        Pokemon? intendedTarget = GetIntendedTarget(choice.MoveNormalTarget, attacker);
+
+        return intendedTarget is { IsFainted: false } ?
+            [intendedTarget] :
+            // Fallback logic for fainted/invalid targets
+            GetFallbackTargets(choice.MoveNormalTarget, attacker);
+    }
+
+    private Pokemon? GetIntendedTarget(MoveNormalTarget targetType, Pokemon attacker)
+    {
+        Side attackingSide = GetSide(attacker.SideId);
+        Side defendingSide = GetSide(attacker.SideId.GetOppositeSide());
+
+        return targetType switch
+        {
+            MoveNormalTarget.FoeSlot1 => defendingSide.Slot1,
+            MoveNormalTarget.FoeSlot2 => defendingSide.Slot2,
+            MoveNormalTarget.AllySlot1 => attackingSide.Slot1,
+            MoveNormalTarget.AllySlot2 => attackingSide.Slot2,
+            MoveNormalTarget.None => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(targetType)),
+        };
+    }
+
+    private List<Pokemon> GetFallbackTargets(MoveNormalTarget originalTarget, Pokemon attacker)
+    {
+        switch (originalTarget)
+        {
+            // For foe targets, fallback to any alive foe
+            case MoveNormalTarget.FoeSlot1 or MoveNormalTarget.FoeSlot2:
+            {
+                Side defendingSide = GetSide(attacker.SideId.GetOppositeSide());
+                return defendingSide.AliveActivePokemon.ToList();
+            }
+            // For ally targets, fallback to any alive ally
+            case MoveNormalTarget.AllySlot1 or MoveNormalTarget.AllySlot2:
+            {
+                Side attackingSide = GetSide(attacker.SideId);
+                Pokemon? ally = attackingSide.GetAliveAlly(attacker.SlotId);
+                return ally != null ? [ally] : [];
+            }
+            default:
+                return [];
+        }
+    }
+
+    private bool ExecutePreMoveChecks(Pokemon attacker, Move move, List<Pokemon> targets, PlayerId playerId)
+    {
+        // Item modifications (using first target for single-target effects)
+        Pokemon primaryTarget = targets.FirstOrDefault() ?? attacker;
+        attacker.Item?.OnModifyMove?.Invoke(move, attacker, primaryTarget, Context);
+
+        if (move.Pp <= 0)
+        {
+            throw new InvalidOperationException($"Move {move.Name} has no PP left for player {playerId}");
+        }
+
+        // Check disable conditions
+        foreach (Condition condition in attacker.Conditions.ToList())
+        {
+            condition.OnDisableMove?.Invoke(attacker, move, Context);
+        }
+
+        if (move.Disabled)
+        {
+            if (PrintDebug)
+                UiGenerator.PrintDisabledMoveTry(attacker, move);
+            return false;
+        }
+
+        // OnBeforeMove checks
+        if (attacker.Conditions
+            .Where(c => c.OnBeforeMove != null)
+            .OrderBy(c => c.OnBeforeMovePriority ?? 0)
+            .Any(condition => condition.OnBeforeMove?.Invoke(attacker, primaryTarget, move, Context) == false))
+        {
+            return false;
+        }
+
+        // Stalling move checks
+        if (move.StallingMove)
+        {
+            if (attacker.Conditions.ToList().All(condition =>
+                    condition.OnStallMove?.Invoke(attacker, Context) != false))
+            {
+                return move.OnTry?.Invoke(attacker, primaryTarget, move, Context) != false;
+            }
+
+            if (PrintDebug)
+            {
+                UiGenerator.PrintMoveFailAction(attacker, move);
+            }
+            return false;
+        }
+
+        // OnTry checks
+        return move.OnTry?.Invoke(attacker, primaryTarget, move, Context) != false;
+    }
+
+    private void ExecuteMoveAgainstTargets(Pokemon attacker, Move move, List<Pokemon> targets, PlayerId playerId)
+    {
+        switch (move.Target)
+        {
+            case MoveTarget.AllySide:
+            case MoveTarget.FoeSide:
+            case MoveTarget.Field:
+                // Handle side/field effects
+                if (move.Category == MoveCategory.Status)
+                {
+                    PerformStatusMove(attacker, playerId, move, attacker); // defender not used for these
+                }
+                break;
+
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.Normal:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.Self:
+                // Handle individual target effects
+
+                // Count defending side Pokemon for multi-target moves
+                int numDefendingSidePokemon = targets.Count(target => target.SideId != attacker.SideId);
+
+                foreach (Pokemon target in targets)
+                {
+                    ExecuteMoveAgainstSingleTarget(attacker, move, target, playerId, numDefendingSidePokemon);
+                }
+                break;
+
+            case MoveTarget.None:
+            default:
+                throw new InvalidOperationException($"Invalid move target type {move.Target} for move {move.Name}" +
+                                                $"used by player {playerId}" );
+        }
+    }
+
+    private void ExecuteMoveAgainstSingleTarget(Pokemon attacker, Move move, Pokemon target, PlayerId playerId,
+        int numPokemonDefendingSide)
+    {
+        // Miss check per target
+        if (IsMoveMiss(attacker, move, target))
+        {
+            if (PrintDebug)
+                UiGenerator.PrintMoveMissAction(attacker, move, target);
+            return;
+        }
+
+        // Immunity check per target
+        if (move.OnTryImmunity?.Invoke(target) == true ||
+            move.OnPrepareHit?.Invoke(target, attacker, move, Context) == false)
+        {
+            if (PrintDebug)
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
+            return;
+        }
+
+        // OnTryHit checks per target
+        if (target.Conditions.ToList().Any(condition =>
+                condition.OnTryHit?.Invoke(target, attacker, move, Context) == false))
+        {
+            if (!PrintDebug) return;
+
+            if (target.HasCondition(ConditionId.Stall))
+            {
+                UiGenerator.PrintStallMoveProtection(attacker, move, target);
+            }
+            else
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
+            }
+            return;
+        }
+
+        // Execute the move effect
+        switch (move.Category)
+        {
+            case MoveCategory.Physical:
+            case MoveCategory.Special:
+                PerformDamagingMove(attacker, move, target, numPokemonDefendingSide);
+                break;
+            case MoveCategory.Status:
+                PerformStatusMove(attacker, playerId, move, target);
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}" );
+        }
+    }
+
+    private List<Pokemon> GetAllAdjacentFoes(Pokemon attacker)
+    {
+        Side defendingSide = GetSide(attacker.SideId.GetOppositeSide());
+        return defendingSide.AliveActivePokemon.ToList();
+    }
+
+    private Pokemon? GetAdjacentAlly(Pokemon attacker)
+    {
+        Side attackingSide = GetSide(attacker.SideId);
+        return attackingSide.GetAliveAlly(attacker.SlotId);
+    }
+
 
     /// <summary>
     /// Execute a switch choice

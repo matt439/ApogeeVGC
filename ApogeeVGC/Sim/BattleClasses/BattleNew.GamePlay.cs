@@ -384,9 +384,6 @@ public partial class BattleNew
     /// </summary>
     private async Task ExecuteSlotChoiceAsync(PlayerId playerId, SlotChoice slotChoice)
     {
-        //if (PrintDebug)
-        //    Console.WriteLine($"Executing slot choice for {playerId}: {slotChoice}");
-
         switch (slotChoice)
         {
             case SlotChoice.MoveChoice moveChoice:
