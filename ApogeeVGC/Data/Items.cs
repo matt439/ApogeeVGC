@@ -38,8 +38,10 @@ public record Items
                     }
                     if (itemHolder.HasCondition(ConditionId.Leftovers))
                     {
-                        throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Leftovers" +
-                                                            $"condition");
+                        //throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Leftovers" +
+                        //                                    $"condition");
+
+                        return; // do nothing if it already has the condition
                     }
                     itemHolder.AddCondition(context.Library.Conditions[ConditionId.Leftovers], context);
                 },

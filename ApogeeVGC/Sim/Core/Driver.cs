@@ -13,6 +13,7 @@ public enum DriverMode
 {
     RandomVsRandom,
     RandomVsRandomEvaluation,
+    RandomVsRandomEvaluationDoubles,
     ConsoleVsRandom,
     ConsoleVsRandomDoubles,
     ConsoleVsConsole,
@@ -26,7 +27,7 @@ public class Driver
     private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    private const int RandomEvaluationNumTest = 500;
+    private const int RandomEvaluationNumTest = 100;
 
     private const int MctsEvaluationNumTest = 100;
     private const int MctsMaxIterations = 1000000;
@@ -49,7 +50,10 @@ public class Driver
                 //RunRandomTest();
                 break;
             case DriverMode.RandomVsRandomEvaluation:
-                RunRandomVsRandomEvaluationTest().GetAwaiter().GetResult();
+                RunRandomVsRandomEvaluationTest(BattleFormat.Singles).GetAwaiter().GetResult();
+                break;
+            case DriverMode.RandomVsRandomEvaluationDoubles:
+                RunRandomVsRandomEvaluationTest(BattleFormat.Doubles).GetAwaiter().GetResult();
                 break;
             case DriverMode.ConsoleVsRandom:
                 RunConsoleVsRandomTest().GetAwaiter().GetResult();
@@ -178,7 +182,7 @@ public class Driver
     //    Console.ReadKey();
     //}
 
-    private async Task RunRandomVsRandomEvaluationTest()
+    private async Task RunRandomVsRandomEvaluationTest(BattleFormat format)
     {
         var simResults = new ConcurrentBag<SimulatorResult>();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -203,8 +207,7 @@ public class Driver
                     IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
 
                     BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
-                        "Random1", "Random2", BattleFormat.Singles, false,
-                        currentSeed);
+                        "Random1", "Random2", format, false, currentSeed);
 
                     var simulator = new SimulatorNew
                     {
@@ -251,6 +254,17 @@ public class Driver
         // Rest of the method with timing information added...
         StringBuilder sb = new();
         sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
+        switch (format)
+        {
+            case BattleFormat.Singles:
+                sb.AppendLine("Format: Singles");
+                break;
+            case BattleFormat.Doubles:
+                sb.AppendLine("Format: Doubles");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(format), format, null);
+        }
         sb.AppendLine($"Player 1 Wins: {player1Wins}");
         sb.AppendLine($"Player 2 Wins: {player2Wins}");
         sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
@@ -301,24 +315,24 @@ public class Driver
     //    Console.ReadKey();
     //}
 
-    //private void RunConsoleVsRandomTest()
-    //{
-    //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
-    //        "Random", BattleFormat.Singles, true);
+        //private void RunConsoleVsRandomTest()
+        //{
+        //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
+        //        "Random", BattleFormat.Singles, true);
 
-    //    Simulator = new Simulator
-    //    {
-    //        Battle = battle,
-    //        Player1 = new PlayerConsole(PlayerId.Player1, battle),
-    //        Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-    //            ChoiceFilterStrategy.ReducedSwitching, PlayerRandom2Seed),
-    //    };
+        //    Simulator = new Simulator
+        //    {
+        //        Battle = battle,
+        //        Player1 = new PlayerConsole(PlayerId.Player1, battle),
+        //        Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+        //            ChoiceFilterStrategy.ReducedSwitching, PlayerRandom2Seed),
+        //    };
 
-    //    Simulator.Run();
+        //    Simulator.Run();
 
-    //    Console.WriteLine("Press any key to exit...");
-    //    Console.ReadKey();
-    //}
+        //    Console.WriteLine("Press any key to exit...");
+        //    Console.ReadKey();
+        //}
 
     private async Task RunConsoleVsRandomTest()
     {

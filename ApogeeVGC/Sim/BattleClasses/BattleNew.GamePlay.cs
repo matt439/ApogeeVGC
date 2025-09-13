@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static ApogeeVGC.Sim.Choices.SlotChoice;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -32,7 +33,7 @@ public partial class BattleNew
         await ApplyEndOfTurnEffectsAsync();
 
         // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
-        await HandleEndOfTurnForcedSwitchesAsync(cancellationToken);
+        await HandleFaintedSwitchesAsync(cancellationToken);
 
         // Complete the turn
         CompleteTurnWithEndStates();
@@ -224,7 +225,7 @@ public partial class BattleNew
         }
     }
 
-    private async Task HandleEndOfTurnForcedSwitchesAsync(CancellationToken cancellationToken)
+    private async Task HandleFaintedSwitchesAsync(CancellationToken cancellationToken)
     {
         // Handle fainted Pokémon switches in player order
         await HandleFaintedSwitchesForPlayer(PlayerId.Player1, cancellationToken);
@@ -234,28 +235,59 @@ public partial class BattleNew
     private async Task HandleFaintedSwitchesForPlayer(PlayerId playerId, CancellationToken cancellationToken)
     {
         Side side = GetCurrentSide(playerId);
-        var faintedActivePokemon = side.FaintedActivePokemon;
 
-        foreach (Pokemon pokemon in faintedActivePokemon)
+        if (side.SwitchOptionsCount <= 0)
         {
-            if (side.SwitchOptionsCount <= 0) continue;
+            return; // No available switches
+        }
 
-            var switchChoices = GenerateFaintedSwitchChoices(pokemon);
-            BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices,
-                BattleRequestType.FaintSwitch,
-                TimeSpan.FromSeconds(StandardTurnLimitSeconds), cancellationToken);
+        var faintedActivePokemon = side.FaintedActivePokemon.ToArray();
 
-            if (choice is not SlotChoice.SwitchChoice switchChoice)
-            {
-                throw new InvalidOperationException("Expected a SwitchChoice for fainted Pokémon switch.");
-            }
+        BattleChoice[] switchChoices;
 
-            if (PrintDebug)
-            {
-                UiGenerator.PrintFaintedSelectAction(switchChoice.Trainer.Name, switchChoice.SwitchInPokemon);
-            }
+        switch (faintedActivePokemon.Length)
+        {
+            case 0:
+                return; // No fainted Pokémon to switch
+            case 1:
+                switchChoices = GenerateFaintedSwitchChoices(faintedActivePokemon[0]);
+                break;
+            case 2:
+                switchChoices = GenerateDoublesFaintedSwitchChoices(faintedActivePokemon[0], faintedActivePokemon[1]);
+                break;
+            default:
+                throw new InvalidOperationException(
+                    $"Expected 1 or 2 fainted active Pokémon for {playerId}, but found {faintedActivePokemon.Length}.");
+        }
 
-            await ExecuteSwitchChoiceAsync(playerId, switchChoice);
+        BattleChoice choice = await RequestChoiceFromPlayerAsync(playerId, switchChoices,
+            BattleRequestType.FaintSwitch, TimeSpan.FromSeconds(StandardTurnLimitSeconds), cancellationToken);
+
+        switch (choice)
+        { 
+            case SwitchChoice switchChoice:
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedSelectAction(switchChoice.Trainer.Name, switchChoice.SwitchInPokemon);
+                }
+                await ExecuteSwitchChoiceAsync(playerId, switchChoice);
+                break;
+            case DoubleSlotChoice doubleSlotChoice:
+
+                if (doubleSlotChoice.Slot1Choice is not SwitchChoice switchChoice1 ||
+                    doubleSlotChoice.Slot2Choice is not SwitchChoice switchChoice2)
+                {
+                    throw new InvalidOperationException("Both choices in DoubleSlotChoice must be SwitchChoices.");
+                }
+                if (PrintDebug)
+                {
+                    UiGenerator.PrintFaintedSelectAction(switchChoice1.Trainer.Name, switchChoice2.SwitchInPokemon);
+                }
+                await ExecuteSwitchChoiceAsync(playerId, switchChoice1);
+                await ExecuteSwitchChoiceAsync(playerId, switchChoice2);
+                break;
+            default:
+                throw new InvalidOperationException("Expected a SwitchChoice or DoubleSlotChoice for fainted switch.");
         }
     }
 

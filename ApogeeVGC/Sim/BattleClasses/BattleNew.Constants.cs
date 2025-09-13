@@ -7,6 +7,6 @@ public partial class BattleNew
     private const int PlayerTotalTimeLimitMinutes = 70; // TODO: Change back to 7 minutes
     private const int GameTotalTimeLimitMinutes = 200; // TODO: Change back to 20 minutes
     private const int TimeoutWarningThresholdSeconds = 10;
-    private const int TurnLimit = 1000;
+    private const int TurnLimit = 250;
     private const double Epsilon = 1e-10;
 }
