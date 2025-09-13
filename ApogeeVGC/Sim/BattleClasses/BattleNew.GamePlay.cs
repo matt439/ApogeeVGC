@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -14,48 +13,35 @@ public partial class BattleNew
 {
     public async Task ProcessGameplayTurnAsync(GameplayTurn turn, CancellationToken cancellationToken)
     {
-        if (PrintDebug)
-            Console.WriteLine($"Processing Gameplay turn {turn.TurnCounter}...");
-
-        try
+        if (TurnCounter == 1)
         {
-            if (TurnCounter == 1)
-            {
-                // Handle switch-in effects at the start of the first turn
-                HandleEndOfTeamPreviewTurn();
-            }
-
-            // Phase 1: Start-of-turn effects
-            await HandleStartOfTurn();
-
-            // Phase 2: Collect turn start choices
-            var initialActions = await CollectTurnStartActionsAsync(cancellationToken);
-
-            // Phase 3: Execute actions in priority order with dynamic interruptions
-            await ExecuteActionsWithDynamicSwitchesAsync(initialActions, cancellationToken);
-
-            // Phase 4: Apply end-of-turn effects
-            await ApplyEndOfTurnEffectsAsync();
-
-            // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
-            await HandleEndOfTurnForcedSwitchesAsync(cancellationToken);
-
-            // Complete the turn
-            CompleteTurnWithEndStates();
-
-            if (!CheckForGameEndConditions())
-            {
-                await CreateNextTurnAsync();
-            }
+            // Handle switch-in effects at the start of the first turn
+            HandleEndOfTeamPreviewTurn();
         }
-        catch (Exception ex)
+
+        // Phase 1: Start-of-turn effects
+        await HandleStartOfTurn();
+
+        // Phase 2: Collect turn start choices
+        var initialActions = await CollectTurnStartActionsAsync(cancellationToken);
+
+        // Phase 3: Execute actions in priority order with dynamic interruptions
+        await ExecuteActionsWithDynamicSwitchesAsync(initialActions, cancellationToken);
+
+        // Phase 4: Apply end-of-turn effects
+        await ApplyEndOfTurnEffectsAsync();
+
+        // Phase 5: Handle end-of-turn forced switches (fainted Pokémon)
+        await HandleEndOfTurnForcedSwitchesAsync(cancellationToken);
+
+        // Complete the turn
+        CompleteTurnWithEndStates();
+
+        if (!CheckForGameEndConditions())
         {
-            if (PrintDebug)
-                Console.WriteLine($"Gameplay turn error: {ex.Message}");
-            throw;
+            await CreateNextTurnAsync();
         }
     }
-
 
     private async Task<List<ActionWithChoice>> CollectTurnStartActionsAsync(CancellationToken cancellationToken)
     {

@@ -102,8 +102,9 @@ public record Items
                     }
                     if (itemHolder.HasCondition(ConditionId.FlameOrb))
                     {
-                        throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Flame Orb" +
-                                                            $"condition");
+                        //throw new InvalidOperationException($"{itemHolder.Specie.Name} already has Flame Orb" +
+                        //                                    $"condition");
+                        return; // do nothing if it already has the condition
                     }
                     itemHolder.AddCondition(context.Library.Conditions[ConditionId.FlameOrb], context);
                 },

@@ -149,6 +149,7 @@ public partial class BattleNew
             if (PrintDebug)
                 Console.WriteLine($"Battle error: {ex.Message}");
             await HandleBattleErrorAsync(ex);
+            throw;
         }
         finally
         {

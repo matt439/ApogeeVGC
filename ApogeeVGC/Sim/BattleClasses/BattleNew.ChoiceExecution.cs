@@ -13,137 +13,6 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleNew
 {
-    //private async Task ExecuteMoveChoiceAsync(PlayerId playerId, SlotChoice.MoveChoice choice)
-    //{
-    //    Pokemon attacker = choice.Attacker;
-
-    //    if (attacker.IsFainted)
-    //    {
-    //        throw new InvalidOperationException($"Cannot use move with fainted Pokémon {attacker.Name}" +
-    //                                            $"for player {playerId}");
-    //    }
-
-    //    Pokemon defender = choice.PossibleTargets.Count > 0 ? choice.PossibleTargets[0] : attacker;
-    //    Move move = choice.Move;
-
-    //    // This is where choice lock and choice benefits come into play
-    //    attacker.Item?.OnModifyMove?.Invoke(move, attacker, defender, Context);
-
-    //    if (move.Pp <= 0)
-    //    {
-    //        throw new InvalidOperationException($"Move {move.Name} has no PP left" +
-    //                                            $"for player {playerId}");
-    //    }
-
-    //    // Check OnDisableMove conditions on attacker
-    //    foreach (Condition condition in attacker.Conditions.ToList())
-    //    {
-    //        condition.OnDisableMove?.Invoke(attacker, move, Context);
-    //    }
-    //    if (move.Disabled)
-    //    {
-    //        if (PrintDebug)
-    //        {
-    //            UiGenerator.PrintDisabledMoveTry(attacker, move);
-    //        }
-
-    //        return;
-    //    }
-
-    //    move.UsedPp++;  // Decrease PP for the move used
-    //    attacker.ActiveMoveActions++; // Increment the count of moves used this battle (for fake out, etc.)
-    //    attacker.LastMoveUsed = move;
-
-    //    // Check for conditions with OnBeforeMove on attacker (e.g. flinch, paralysis)
-    //    if (attacker.Conditions
-    //        .Where(c => c.OnBeforeMove != null)
-    //        .OrderBy(c => c.OnBeforeMovePriority ?? 0)
-    //        .ToList().Any(condition => condition.OnBeforeMove == null ||
-    //                                   !condition.OnBeforeMove(attacker, defender, move, Context)))
-    //    {
-    //        return;
-    //    }
-
-    //    if (move.StallingMove)
-    //    {
-    //        // check for conditions with OnStallMove on attacker
-    //        foreach (Condition condition in attacker.Conditions.ToList())
-    //        {
-    //            if (condition.OnStallMove == null || condition.OnStallMove(attacker, Context)) continue;
-    //            if (PrintDebug)
-    //            {
-    //                UiGenerator.PrintMoveFailAction(attacker, move);
-    //            }
-
-    //            return;
-    //        }
-    //    }
-
-    //    // OnTry checks on the attacker's move (incl fake out, etc)
-    //    if (move.OnTry?.Invoke(attacker, defender, move, Context) == false)
-    //    {
-    //        return;
-    //    }
-
-    //    // Miss check
-    //    if (IsMoveMiss(attacker, move, defender))
-    //    {
-    //        if (PrintDebug)
-    //        {
-    //            UiGenerator.PrintMoveMissAction(attacker, move, defender);
-    //        }
-
-    //        return;
-    //    }
-
-    //    // Immunity check. Note that this does not check for normal immunity, only special cases.
-    //    // Regular immunity check is done in PerformDamagingMove
-    //    if (move.OnTryImmunity != null && move.OnTryImmunity(defender) ||
-    //        move.OnPrepareHit?.Invoke(defender, attacker, move, Context) == false)
-    //    {
-    //        if (PrintDebug)
-    //        {
-    //            UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-    //        }
-
-    //        return;
-    //    }
-
-    //    // check every condition on defender for OnTryHit effects
-    //    foreach (Condition condition in defender.Conditions.ToList())
-    //    {
-    //        if (condition.OnTryHit == null || condition.OnTryHit(defender, attacker, move, Context)) continue;
-
-    //        if (!PrintDebug) return;
-
-    //        // Check if the defender is protected by a stall move like Protect, Detect, etc.
-    //        if (defender.HasCondition(ConditionId.Stall))
-    //        {
-    //            UiGenerator.PrintStallMoveProtection(attacker, move, defender);
-    //        }
-    //        else
-    //        {
-    //            UiGenerator.PrintMoveNoEffectAction(attacker, move, defender);
-    //        }
-    //        return;
-    //    }
-
-    //    switch (move.Category)
-    //    {
-    //        case MoveCategory.Physical:
-    //        case MoveCategory.Special:
-    //            PerformDamagingMove(attacker, playerId, move, defender);
-    //            break;
-    //        case MoveCategory.Status:
-    //            PerformStatusMove(attacker, playerId, move, defender);
-    //            break;
-    //        default:
-    //            throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}");
-    //    }
-
-    //    await Task.CompletedTask;
-    //}
-
     private async Task ExecuteMoveChoiceAsync(PlayerId playerId, SlotChoice.MoveChoice choice)
     {
         Pokemon attacker = choice.Attacker;
@@ -158,7 +27,7 @@ public partial class BattleNew
         // Resolve actual targets based on move targeting rules
         var actualTargets = ResolveActualTargets(choice);
 
-        if (actualTargets.Count == 0)
+        if (actualTargets.Count == 0 && RequiresTargets(move))
         {
             if (PrintDebug)
             {
@@ -168,7 +37,7 @@ public partial class BattleNew
         }
 
         // Pre-move setup (same for all targets)
-        move.UsedPp++;
+        
         attacker.ActiveMoveActions++;
         attacker.LastMoveUsed = move;
 
@@ -178,10 +47,24 @@ public partial class BattleNew
             return;
         }
 
+        move.UsedPp++;
+
         // Execute the move against all targets
-        ExecuteMoveAgainstTargets(attacker, move, actualTargets, playerId);
+        var moveResults = ExecuteMoveAgainstTargets(attacker, move, actualTargets, playerId);
+
+        // Handle post-move effects (like recoil) - calculated once per move
+        HandlePostMoveEffects(attacker, move, moveResults);
 
         await Task.CompletedTask;
+    }
+
+    private static bool RequiresTargets(Move move)
+    {
+        return move.Target switch
+        {
+            MoveTarget.AllySide or MoveTarget.FoeSide or MoveTarget.Field => false,
+            _ => true,
+        };
     }
 
     private void PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender, int numDefendingSidePokemon)
@@ -190,9 +73,9 @@ public partial class BattleNew
         {
             case MoveTarget.Normal:
             case MoveTarget.AllAdjacentFoes:
-                break;
             case MoveTarget.Self:
             case MoveTarget.AdjacentAlly:
+                break;
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
             case MoveTarget.All:
@@ -225,7 +108,14 @@ public partial class BattleNew
             return;
         }
 
+        // Calculate base damage
         int damage = CalculateDamage(attacker, defender, move, effectiveness.GetMultiplier(), isCrit);
+
+        // Apply spread move damage reduction for multi-target moves
+        if (numDefendingSidePokemon > 1 && IsSpreadMove(move))
+        {
+            damage = RoundedDownAtHalf(damage * 0.75); // 25% damage reduction for spread moves
+        }
 
         // check for OnAnyModifyDamage conditions on defender
         if (damage > 0)
@@ -245,7 +135,7 @@ public partial class BattleNew
 
         move.OnHit?.Invoke(defender, attacker, move, Context);
 
-        // Rocky helmet
+        // Rocky helmet and other contact damage
         defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, Context);
 
         foreach (Condition condition in defender.Conditions.ToList())
@@ -256,41 +146,173 @@ public partial class BattleNew
         // Check for move condition application
         if (move.Condition is not null)
         {
-            // Apply condition based on move target
-            switch (move.Target)
-            {
-                case MoveTarget.Normal:
-                    defender.AddCondition(move.Condition, Context, attacker, move);
-                    break;
-                case MoveTarget.Self:
-                    attacker.AddCondition(move.Condition, Context, attacker, move);
-                    break;
-                case MoveTarget.AdjacentAlly:
-                case MoveTarget.AdjacentAllyOrSelf:
-                case MoveTarget.AdjacentFoe:
-                case MoveTarget.All:
-                case MoveTarget.AllAdjacent:
-                case MoveTarget.AllAdjacentFoes:
-                case MoveTarget.Allies:
-                case MoveTarget.AllySide:
-                case MoveTarget.AllyTeam:
-                case MoveTarget.Any:
-                case MoveTarget.FoeSide:
-                case MoveTarget.RandomNormal:
-                case MoveTarget.Scripted:
-                case MoveTarget.None:
-                    throw new NotImplementedException();
-                case MoveTarget.Field:
-                    throw new InvalidOperationException("Field target should be handled separately");
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            ApplyMoveCondition(move, attacker, defender);
         }
 
-        // check for recoil
-        if (move.Recoil is not null)
+        // check if defender fainted
+        if (defender.IsFainted)
         {
-            int recoilDamage = (int)(damage * move.Recoil.Value);
+            // chilling neigh and similar abilities
+            attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
+        }
+    }
+
+    private static bool IsSpreadMove(Move move)
+    {
+        return move.Target == MoveTarget.AllAdjacentFoes;
+    }
+
+    private void ApplyMoveCondition(Move move, Pokemon attacker, Pokemon target)
+    {
+        // Apply condition based on move target
+        switch (move.Target)
+        {
+            case MoveTarget.Normal:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.AdjacentAlly:
+                target.AddCondition(move.Condition!, Context, attacker, move);
+                break;
+            case MoveTarget.Self:
+                attacker.AddCondition(move.Condition!, Context, attacker, move);
+                break;
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.Allies:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.FoeSide:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.None:
+                throw new NotImplementedException();
+            case MoveTarget.Field:
+                throw new InvalidOperationException("Field target should be handled separately");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private List<MoveTargetResult> ExecuteMoveAgainstTargets(Pokemon attacker, Move move, List<Pokemon> targets,
+        PlayerId playerId)
+    {
+        var results = new List<MoveTargetResult>();
+
+        switch (move.Target)
+        {
+            case MoveTarget.AllySide:
+            case MoveTarget.FoeSide:
+            case MoveTarget.Field:
+                // Handle side/field effects
+                if (move.Category == MoveCategory.Status)
+                {
+                    PerformStatusMove(attacker, playerId, move, attacker); // defender not used for these
+                }
+                results.Add(new MoveTargetResult { Target = attacker, Damage = 0, Hit = true });
+                break;
+
+            case MoveTarget.AdjacentAlly:
+            case MoveTarget.AdjacentAllyOrSelf:
+            case MoveTarget.AdjacentFoe:
+            case MoveTarget.All:
+            case MoveTarget.AllAdjacent:
+            case MoveTarget.AllAdjacentFoes:
+            case MoveTarget.Allies:
+            case MoveTarget.AllyTeam:
+            case MoveTarget.Any:
+            case MoveTarget.Normal:
+            case MoveTarget.RandomNormal:
+            case MoveTarget.Scripted:
+            case MoveTarget.Self:
+                // Handle individual target effects
+
+                // Count defending side Pokemon for multi-target moves
+                int numDefendingSidePokemon = targets.Count(target => target.SideId != attacker.SideId);
+
+                results.AddRange(targets.Select(target =>
+                    ExecuteMoveAgainstSingleTarget(attacker, move, target, playerId, numDefendingSidePokemon)));
+                break;
+
+            case MoveTarget.None:
+            default:
+                throw new InvalidOperationException($"Invalid move target type {move.Target} for move {move.Name}" +
+                                                $"used by player {playerId}" );
+        }
+
+        return results;
+    }
+
+    private MoveTargetResult ExecuteMoveAgainstSingleTarget(Pokemon attacker, Move move, Pokemon target,
+        PlayerId playerId, int numPokemonDefendingSide)
+    {
+        var result = new MoveTargetResult { Target = target, Damage = 0, Hit = false };
+
+        // Miss check per target
+        if (IsMoveMiss(attacker, move, target))
+        {
+            if (PrintDebug)
+                UiGenerator.PrintMoveMissAction(attacker, move, target);
+            return result;
+        }
+
+        // Immunity check per target
+        if (move.OnTryImmunity?.Invoke(target) == true ||
+            move.OnPrepareHit?.Invoke(target, attacker, move, Context) == false)
+        {
+            if (PrintDebug)
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
+            return result;
+        }
+
+        // OnTryHit checks per target
+        if (target.Conditions.ToList().Any(condition =>
+                condition.OnTryHit?.Invoke(target, attacker, move, Context) == false))
+        {
+            if (!PrintDebug) return result;
+
+            if (target.HasCondition(ConditionId.Stall))
+            {
+                UiGenerator.PrintStallMoveProtection(attacker, move, target);
+            }
+            else
+            {
+                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
+            }
+            return result;
+        }
+
+        result.Hit = true;
+
+        // Execute the move effect
+        switch (move.Category)
+        {
+            case MoveCategory.Physical:
+            case MoveCategory.Special:
+                int initialHp = target.CurrentHp;
+                PerformDamagingMove(attacker, move, target, numPokemonDefendingSide);
+                result.Damage = initialHp - target.CurrentHp;
+                break;
+            case MoveCategory.Status:
+                PerformStatusMove(attacker, playerId, move, target);
+                break;
+            default:
+                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}" );
+        }
+
+        return result;
+    }
+
+    private void HandlePostMoveEffects(Pokemon attacker, Move move, List<MoveTargetResult> results)
+    {
+        // Calculate total damage dealt for recoil moves
+        int totalDamage = results.Where(r => r.Hit).Sum(r => r.Damage);
+
+        // Handle recoil - calculated once per move based on total damage
+        if (move.Recoil is not null && totalDamage > 0)
+        {
+            int recoilDamage = (int)(totalDamage * move.Recoil.Value);
             attacker.Damage(recoilDamage);
             if (PrintDebug)
             {
@@ -298,12 +320,15 @@ public partial class BattleNew
             }
         }
 
-        // check if defender fainted
-        if (defender.IsFainted)
-        {
-            // chilling neigh
-            attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, Context);
-        }
+        // Handle other post-move effects here (life orb, etc.)
+    }
+
+    // Helper class to track move results
+    private class MoveTargetResult
+    {
+        public required Pokemon Target { get; init; }
+        public int Damage { get; set; }
+        public bool Hit { get; set; }
     }
 
     private void PerformStatusMove(Pokemon attacker, PlayerId playerId, Move move, Pokemon defender)
@@ -697,103 +722,6 @@ public partial class BattleNew
         return move.OnTry?.Invoke(attacker, primaryTarget, move, Context) != false;
     }
 
-    private void ExecuteMoveAgainstTargets(Pokemon attacker, Move move, List<Pokemon> targets, PlayerId playerId)
-    {
-        switch (move.Target)
-        {
-            case MoveTarget.AllySide:
-            case MoveTarget.FoeSide:
-            case MoveTarget.Field:
-                // Handle side/field effects
-                if (move.Category == MoveCategory.Status)
-                {
-                    PerformStatusMove(attacker, playerId, move, attacker); // defender not used for these
-                }
-                break;
-
-            case MoveTarget.AdjacentAlly:
-            case MoveTarget.AdjacentAllyOrSelf:
-            case MoveTarget.AdjacentFoe:
-            case MoveTarget.All:
-            case MoveTarget.AllAdjacent:
-            case MoveTarget.AllAdjacentFoes:
-            case MoveTarget.Allies:
-            case MoveTarget.AllyTeam:
-            case MoveTarget.Any:
-            case MoveTarget.Normal:
-            case MoveTarget.RandomNormal:
-            case MoveTarget.Scripted:
-            case MoveTarget.Self:
-                // Handle individual target effects
-
-                // Count defending side Pokemon for multi-target moves
-                int numDefendingSidePokemon = targets.Count(target => target.SideId != attacker.SideId);
-
-                foreach (Pokemon target in targets)
-                {
-                    ExecuteMoveAgainstSingleTarget(attacker, move, target, playerId, numDefendingSidePokemon);
-                }
-                break;
-
-            case MoveTarget.None:
-            default:
-                throw new InvalidOperationException($"Invalid move target type {move.Target} for move {move.Name}" +
-                                                $"used by player {playerId}" );
-        }
-    }
-
-    private void ExecuteMoveAgainstSingleTarget(Pokemon attacker, Move move, Pokemon target, PlayerId playerId,
-        int numPokemonDefendingSide)
-    {
-        // Miss check per target
-        if (IsMoveMiss(attacker, move, target))
-        {
-            if (PrintDebug)
-                UiGenerator.PrintMoveMissAction(attacker, move, target);
-            return;
-        }
-
-        // Immunity check per target
-        if (move.OnTryImmunity?.Invoke(target) == true ||
-            move.OnPrepareHit?.Invoke(target, attacker, move, Context) == false)
-        {
-            if (PrintDebug)
-                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
-            return;
-        }
-
-        // OnTryHit checks per target
-        if (target.Conditions.ToList().Any(condition =>
-                condition.OnTryHit?.Invoke(target, attacker, move, Context) == false))
-        {
-            if (!PrintDebug) return;
-
-            if (target.HasCondition(ConditionId.Stall))
-            {
-                UiGenerator.PrintStallMoveProtection(attacker, move, target);
-            }
-            else
-            {
-                UiGenerator.PrintMoveNoEffectAction(attacker, move, target);
-            }
-            return;
-        }
-
-        // Execute the move effect
-        switch (move.Category)
-        {
-            case MoveCategory.Physical:
-            case MoveCategory.Special:
-                PerformDamagingMove(attacker, move, target, numPokemonDefendingSide);
-                break;
-            case MoveCategory.Status:
-                PerformStatusMove(attacker, playerId, move, target);
-                break;
-            default:
-                throw new InvalidOperationException($"Invalid move category for move {move.Name}: {move.Category}" );
-        }
-    }
-
     private List<Pokemon> GetAllAdjacentFoes(Pokemon attacker)
     {
         Side defendingSide = GetSide(attacker.SideId.GetOppositeSide());
@@ -805,7 +733,6 @@ public partial class BattleNew
         Side attackingSide = GetSide(attacker.SideId);
         return attackingSide.GetAliveAlly(attacker.SlotId);
     }
-
 
     /// <summary>
     /// Execute a switch choice
