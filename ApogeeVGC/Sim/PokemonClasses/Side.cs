@@ -12,6 +12,9 @@ public class Side
     public required BattleFormat BattleFormat { get; init; }
     public bool PrintDebug { get; init; }
 
+    // Track whether team preview choice has been made
+    private bool _hasTeamPreviewChoiceBeenMade = false;
+
     public required Pokemon Slot1
     {
         get;
@@ -202,6 +205,12 @@ public class Side
 
     public int AliveActivePokemonCount => ActivePokemon.Count(p => !p.IsFainted);
 
+    /// <summary>
+    /// Returns true if this side has made their team preview choice.
+    /// Used by MCTS to determine when to advance from team preview to gameplay.
+    /// </summary>
+    public bool HasMadeTeamPreviewChoice() => _hasTeamPreviewChoiceBeenMade;
+
     public Pokemon GetSlot(SlotId slotId) => slotId switch
     {
         SlotId.Slot1 => Slot1,
@@ -258,6 +267,9 @@ public class Side
             default:
                 throw new InvalidOperationException("Invalid battle format.");
         }
+        
+        // Mark that team preview choice has been made
+        _hasTeamPreviewChoiceBeenMade = true;
     }
 
     public void SwitchSlots(SlotId activeSlot, SlotId benchSlot)
@@ -350,6 +362,7 @@ public class Side
             Slot5 = Slot5.Copy(),
             Slot6 = Slot6.Copy(),
             BattleFormat = BattleFormat,
+            _hasTeamPreviewChoiceBeenMade = _hasTeamPreviewChoiceBeenMade, // Copy the team preview state
         };
     }
 }

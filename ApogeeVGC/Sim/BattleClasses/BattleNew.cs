@@ -28,7 +28,7 @@ public partial class BattleNew
     public List<Turn> Turns { get; private set; } = [];
     public Turn CurrentTurn => Turns.Last();
     public int TurnCounter { get; private set; } // Starts at 0 for team preview turn
-    public bool IsGameComplete => CurrentTurn is PostGameTurn;
+    public bool IsGameComplete => Turns.Count > 0 && CurrentTurn is PostGameTurn;
     public BattleContext Context => new()
     {
         Library = Library,

@@ -84,19 +84,22 @@ public class PlayerMcts : IPlayerNew
                 // Only one choice available, no need for MCTS
                 return availableChoices[0];
             default:
-                try
-                {
-                    PokemonMcts.MoveResult result = _mcts.FindBestChoice(perspective.Battle, availableChoices);
-                    return result.OptimalChoice;
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception if you have logging
-                    Console.WriteLine($"MCTS failed with exception: {ex.Message}");
+                PokemonMcts.MoveResult result = _mcts.FindBestChoice(perspective.Battle, availableChoices);
+                return result.OptimalChoice;
+
+                //try
+                //{
+                //    PokemonMcts.MoveResult result = _mcts.FindBestChoice(perspective.Battle, availableChoices);
+                //    return result.OptimalChoice;
+                //}
+                //catch (Exception ex)
+                //{
+                //    // Log the exception if you have logging
+                //    Console.WriteLine($"MCTS failed with exception: {ex.Message}");
             
-                    // Fallback to random choice
-                    return availableChoices[_fallbackRandom.Next(availableChoices.Length)];
-                }
+                //    // Fallback to random choice
+                //    return availableChoices[_fallbackRandom.Next(availableChoices.Length)];
+                //}
         }
     }
 }

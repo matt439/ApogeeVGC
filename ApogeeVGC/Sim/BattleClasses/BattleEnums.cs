@@ -26,3 +26,10 @@ public enum BattleRequestType
     /// </summary>
     TeamPreview,
 }
+
+public enum GameplayExecutionStage
+{
+    TurnStart,
+    ForceSwitch,
+    FaintedSwitch,
+}

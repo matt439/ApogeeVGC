@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -94,7 +95,7 @@ public partial class BattleNew
         var availableChoices = activePokemon.Length switch
         {
             1 => GenerateTurnStartChoices(activePokemon[0]),
-            2 => GenerateDoublesTurnStartChoices(activePokemon[0], activePokemon[1]),
+            2 => GenerateDoublesTurnStartChoices(side.GetSlot(SlotId.Slot1), side.GetSlot(SlotId.Slot2)),
             _ => throw new InvalidOperationException(
                 $"Expected 1 or 2 active Pokémon for {playerId}, but found {activePokemon.Length}."),
         };

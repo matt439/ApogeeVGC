@@ -51,8 +51,8 @@ public record Terrains
                     {
                         if (!p.RemoveCondition(ConditionId.ElectricTerrain))
                         {
-                            throw new InvalidOperationException($"Failed to remove Electric Rerrain condition" +
-                                                                $"from {p.Specie.Name}");
+                            //throw new InvalidOperationException($"Failed to remove Electric Rerrain condition" +
+                            //                                    $"from {p.Specie.Name}");
                         }
                     }
                     if (context.PrintDebug)

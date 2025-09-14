@@ -198,6 +198,16 @@ public partial class BattleNew
 
     private BattleChoice[] GenerateDoublesTurnStartChoices(Pokemon slot1Pokemon, Pokemon slot2Pokemon)
     {
+        // Ensure slot1Pokemon is actually in slot 1 and slot2Pokemon is in slot 2
+        if (slot1Pokemon.SlotId != SlotId.Slot1)
+        {
+            throw new ArgumentException($"slot1Pokemon must be in Slot1, but was in {slot1Pokemon.SlotId}");
+        }
+        if (slot2Pokemon.SlotId != SlotId.Slot2)
+        {
+            throw new ArgumentException($"slot2Pokemon must be in Slot2, but was in {slot2Pokemon.SlotId}");
+        }
+
         var slot1Choices = GenerateTurnStartChoices(slot1Pokemon).Cast<SlotChoice>().ToList();
         var slot2Choices = GenerateTurnStartChoices(slot2Pokemon).Cast<SlotChoice>().ToList();
 
@@ -406,13 +416,6 @@ public partial class BattleNew
         return true; // TODO: Implement actual validation logic
     }
 
-    private enum GameplayExecutionStage
-    {
-        TurnStart,
-        ForceSwitch,
-        FaintedSwitch,
-    }
-
     private Pokemon? ForceSwitcher { get; set; }
 
     private GameplayExecutionStage ExecutionStage { get; set; }
@@ -420,6 +423,11 @@ public partial class BattleNew
     public BattleChoice[] GenerateChoicesForMcts(PlayerId playerId)
     {
         Side side = GetSide(playerId);
+
+        if (Turns.Count == 0)
+        {
+            throw new InvalidOperationException("Battle has not been started. The Turns list is empty, which indicates that Battle.Start() was not called before generating choices for MCTS.");
+        }
         
         switch (CurrentTurn)
         {
@@ -429,12 +437,8 @@ public partial class BattleNew
                 switch (ExecutionStage)
                 {
                     case GameplayExecutionStage.TurnStart:
-                        var actions = RequestTurnStartPlayerChoicesAsync(playerId,
-                                CancellationToken.None).GetAwaiter().GetResult();
-
-                        List<BattleChoice> choices = [];
-                        choices.AddRange(actions.Select(action => action.Choice));
-                        return choices.ToArray();
+                        // Use direct synchronous choice generation instead of async player requests
+                        return GenerateTurnStartChoicesForMcts(playerId);
 
                     case GameplayExecutionStage.ForceSwitch:
                         return GenerateForcedSwitchChoices(ForceSwitcher ?? 
@@ -450,6 +454,66 @@ public partial class BattleNew
                 throw new InvalidOperationException("No choices are available when the game is over.");
             default:
                 throw new InvalidOperationException("Invalid turn type");
+        }
+    }
+
+    /// <summary>
+    /// Generate turn start choices for MCTS without going through async player request system
+    /// This prevents infinite recursion when MCTS is generating choices
+    /// </summary>
+    private BattleChoice[] GenerateTurnStartChoicesForMcts(PlayerId playerId)
+    {
+        Side side = GetCurrentSide(playerId);
+
+        if (!side.IsTurnStartSideValid)
+        {
+            throw new InvalidOperationException($"Side {playerId} is not in a valid state to start the turn.");
+        }
+
+        switch (Format)
+        {
+            case BattleFormat.Singles:
+                // Singles: only one active Pokémon
+                Pokemon activePokemon = side.ActivePokemon.First();
+                
+                // If the active Pokémon is fainted, we should be in FaintedSwitch stage instead
+                if (activePokemon.IsFainted)
+                {
+                    throw new InvalidOperationException($"Cannot generate turn start choices for fainted Pokémon {activePokemon.Name}. Should be in FaintedSwitch stage.");
+                }
+                
+                return GenerateTurnStartChoices(activePokemon);
+
+            case BattleFormat.Doubles:
+                // Doubles: two active Pokémon - check for fainted Pokémon
+                Pokemon slot1Pokemon = side.GetSlot(SlotId.Slot1);
+                Pokemon slot2Pokemon = side.GetSlot(SlotId.Slot2);
+                
+                // Count alive active Pokémon
+                var alivePokemon = new List<Pokemon>();
+                if (!slot1Pokemon.IsFainted) alivePokemon.Add(slot1Pokemon);
+                if (!slot2Pokemon.IsFainted) alivePokemon.Add(slot2Pokemon);
+                
+                switch (alivePokemon.Count)
+                {
+                    case 0:
+                        // Both Pokémon are fainted - should be in FaintedSwitch stage
+                        throw new InvalidOperationException("Cannot generate turn start choices when both active Pokémon are fainted. Should be in FaintedSwitch stage.");
+                    
+                    case 1:
+                        // Only one Pokémon alive - generate single choices
+                        return GenerateTurnStartChoices(alivePokemon[0]);
+                        
+                    case 2:
+                        // Both Pokémon alive - generate double choices
+                        return GenerateDoublesTurnStartChoices(slot1Pokemon, slot2Pokemon);
+                        
+                    default:
+                        throw new InvalidOperationException($"Unexpected number of alive active Pokémon: {alivePokemon.Count}");
+                }
+
+            default:
+                throw new InvalidOperationException($"Unsupported battle format: {Format}");
         }
     }
 }

@@ -680,7 +680,7 @@ public partial class BattleNew
         Pokemon primaryTarget = targets.FirstOrDefault() ?? attacker;
         attacker.Item?.OnModifyMove?.Invoke(move, attacker, primaryTarget, Context);
 
-        if (move.Pp <= 0)
+        if (move.Pp <= 0 && move.Id != MoveId.Struggle)
         {
             throw new InvalidOperationException($"Move {move.Name} has no PP left for player {playerId}");
         }

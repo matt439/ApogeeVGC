@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.BattleClasses;
+﻿using System.Reflection;
+
+namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleNew
 {
@@ -21,7 +23,7 @@ public partial class BattleNew
         var newPlayer1CancellationTokenSource = new CancellationTokenSource();
         var newPlayer2CancellationTokenSource = new CancellationTokenSource();
 
-        return new BattleNew
+        var copy = new BattleNew
         {
             // Required init properties - these are immutable references
             Library = Library, // Shared reference - Library is immutable
@@ -39,11 +41,23 @@ public partial class BattleNew
             BattleSeed = BattleSeed,
 
             // Note: _battleRandom is private and will be recreated lazily using BattleSeed
-            // Note: Turns list is not copied - MCTS simulations typically start from current state
-            // Note: TurnCounter is not directly settable - it's managed by the battle system
             // Note: Events are not copied - MCTS simulations don't need event notifications
             // Note: Timing state (_gameStartTime, player times) are not copied for simulations
             // Note: _choiceSubmissionLock is not copied - each copy gets its own synchronization
         };
+
+        // Copy the Turns list - this is essential for MCTS to work correctly
+        copy.Turns.AddRange(Turns.Select(turn => turn.Copy()));
+        
+        // Copy other battle state properties needed for choice generation
+        copy.ExecutionStage = ExecutionStage;
+        copy.ForceSwitcher = ForceSwitcher;
+        
+        // Set the TurnCounter using reflection since it has a private setter
+        var turnCounterProperty = typeof(BattleNew).GetProperty(nameof(TurnCounter));
+        var turnCounterSetter = turnCounterProperty?.GetSetMethod(true);
+        turnCounterSetter?.Invoke(copy, new object[] { TurnCounter });
+
+        return copy;
     }
 }

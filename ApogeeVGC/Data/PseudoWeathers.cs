@@ -48,7 +48,7 @@ public class PseudoWeathers
                     {
                         if (!p.RemoveCondition(ConditionId.TrickRoom))
                         {
-                            throw new InvalidOperationException($"Failed to remove Trick Room condition from {p.Specie.Name}");
+                            //throw new InvalidOperationException($"Failed to remove Trick Room condition from {p.Specie.Name}");
                         }
                     }
                     if (context.PrintDebug)

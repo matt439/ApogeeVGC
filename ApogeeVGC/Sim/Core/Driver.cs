@@ -20,6 +20,7 @@ public enum DriverMode
     ConsoleVsMcts,
     MctsVsRandom,
     MctsVsRandomEvaluation,
+    MctsVsRandomEvaluationDoubles,
 }
 
 public class Driver
@@ -30,10 +31,10 @@ public class Driver
     private const int RandomEvaluationNumTest = 1000;
 
     private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 1000000;
-    private const double MctsExplorationParameter = 0.0;
-    private const ChoiceFilterStrategy MctsEvaluationChoiceFilterStrategy =
-        ChoiceFilterStrategy.ReducedSwitching;
+    private const int MctsMaxIterations = 10000;
+    private const double MctsExplorationParameter = Root2;
+    //private const ChoiceFilterStrategy MctsEvaluationChoiceFilterStrategy =
+    //    ChoiceFilterStrategy.ReducedSwitching;
     private readonly int? _mctsMaxTimer = null; // in milliseconds
 
     private static readonly int NumThreads = Environment.ProcessorCount;
@@ -64,62 +65,81 @@ public class Driver
             case DriverMode.ConsoleVsConsole:
                 throw new NotImplementedException("Console vs Console mode is not implemented yet.");
             case DriverMode.ConsoleVsMcts:
-                throw new NotImplementedException();
-                //RunConsoleVsMctsTest();
+                RunConsoleVsMctsTest().GetAwaiter().GetResult();
                 break;
             case DriverMode.MctsVsRandom:
-                throw new NotImplementedException();
-                //RunMctsVsRandom();
+                RunMctsVsRandom().GetAwaiter().GetResult();
                 break;
             case DriverMode.MctsVsRandomEvaluation:
-                throw new NotImplementedException();
-                //RunMctsVsRandomEvaluation();
+                 RunMctsVsRandomEvaluation(BattleFormat.Singles).GetAwaiter().GetResult();
+                break;
+            case DriverMode.MctsVsRandomEvaluationDoubles:
+                RunMctsVsRandomEvaluation(BattleFormat.Doubles).GetAwaiter().GetResult();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
         }
     }
 
-    //private void RunConsoleVsMctsTest()
-    //{
-    //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
-    //        "MCTS", BattleFormat.Singles, true);
-    //    Simulator = new Simulator
-    //    {
-    //        Battle = battle,
-    //        Player1 = new PlayerConsole(PlayerId.Player1, battle),
-    //        Player2 = new PlayerMcts(PlayerId.Player2, battle, MctsMaxIterations,
-    //            MctsExplorationParameter, Library, PlayerRandom2Seed, NumThreads, _mctsMaxTimer),
-    //    };
-    //    Simulator.Run();
-    //    Console.WriteLine("Press any key to exit...");
-    //    Console.ReadKey();
-    //}
+    private async Task RunConsoleVsMctsTest()
+    {
+        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
+        IPlayerNew player2 = new PlayerMcts(PlayerId.Player2, MctsMaxIterations,
+            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
 
-    //private void RunMctsVsRandom()
-    //{
-    //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "MCTS", "Random",
-    //        BattleFormat.Singles);
-    //    Simulator = new Simulator
-    //    {
-    //        Battle = battle,
-    //        Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
-    //            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads),
-    //        Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-    //            ChoiceFilterStrategy.None,
-    //            PlayerRandom2Seed),
-    //    };
-    //    SimulatorResult result = Simulator.Run();
-    //    string winner = result switch
-    //    {
-    //        SimulatorResult.Player1Win => "MCTS",
-    //        SimulatorResult.Player2Win => "Random",
-    //        _ => "Unknown"
-    //    };
-    //    Console.WriteLine($"Battle finished. Winner: {winner}");
-    //    Console.WriteLine("Press any key to exit...");
-    //    Console.ReadKey();
-    //}
+        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+            "MCTS", BattleFormat.Doubles);
+
+        var simulator = new SimulatorNew
+        {
+            Battle = battle,
+            Player1 = player1,
+            Player2 = player2,
+        };
+
+        SimulatorResult result = await simulator.Run();
+
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "Matt",
+            SimulatorResult.Player2Win => "MCTS",
+            _ => "Unknown",
+        };
+
+        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+
+    private async Task RunMctsVsRandom()
+    {
+        IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
+            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
+        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+
+        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
+            "Random", BattleFormat.Doubles);
+
+        var simulator = new SimulatorNew
+        {
+            Battle = battle,
+            Player1 = player1,
+            Player2 = player2,
+        };
+
+        SimulatorResult result = await simulator.Run();
+
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "MCTS",
+            SimulatorResult.Player2Win => "Random",
+            _ => "Unknown",
+        };
+
+        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
 
     //private void RunMctsVsRandomEvaluation()
     //{
@@ -181,6 +201,110 @@ public class Driver
     //    Console.WriteLine("Press any key to exit...");
     //    Console.ReadKey();
     //}
+
+    private async Task RunMctsVsRandomEvaluation(BattleFormat format)
+    {
+        var simResults = new ConcurrentBag<SimulatorResult>();
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        int seedCounter = 0;
+        var turnOnBattleEnd = new ConcurrentBag<int>();
+
+        // Run simulations sequentially instead of in parallel
+        for (int i = 0; i < MctsEvaluationNumTest; i++)
+        {
+            int currentSeed = ++seedCounter;
+            int player1Seed = PlayerRandom1Seed + currentSeed;
+            int player2Seed = PlayerRandom2Seed + currentSeed;
+
+            IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
+                MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
+            IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
+
+            BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+                "MCTS", "Random", format, false, currentSeed);
+
+            var simulator = new SimulatorNew
+            {
+                Battle = battle,
+                Player1 = player1,
+                Player2 = player2,
+            };
+
+            SimulatorResult result = await simulator.Run();
+            simResults.Add(result);
+            turnOnBattleEnd.Add(battle.TurnCounter);
+            simulator.Battle.ClearTurns();
+            
+            // Optional: Progress reporting for long-running sequential tests
+            if ((i + 1) % 10 == 0 || i == MctsEvaluationNumTest - 1)
+            {
+                Console.WriteLine($"Completed {i + 1}/{MctsEvaluationNumTest} simulations");
+            }
+        }
+
+        stopwatch.Stop();
+
+        // Convert to list for counting (now from ConcurrentBag)
+        var resultsList = simResults.ToList();
+        var turnsList = turnOnBattleEnd.ToList();
+        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+
+        // Calculate timing metrics
+        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        double timePerSimulation = totalSeconds / MctsEvaluationNumTest;
+        double simulationsPerSecond = MctsEvaluationNumTest / totalSeconds;
+
+        // Calculate turn statistics
+        double meanTurns = turnOnBattleEnd.Mean();
+        double stdDevTurns = turnOnBattleEnd.StandardDeviation();
+        double medianTurns = turnOnBattleEnd.Median();
+        int minTurns = turnOnBattleEnd.Minimum();
+        int maxTurns = turnOnBattleEnd.Maximum();
+
+        // Generate comprehensive report
+        StringBuilder sb = new();
+        sb.AppendLine($"MCTS vs Random Evaluation Results ({MctsEvaluationNumTest} battles):");
+        switch (format)
+        {
+            case BattleFormat.Singles:
+                sb.AppendLine("Format: Singles");
+                break;
+            case BattleFormat.Doubles:
+                sb.AppendLine("Format: Doubles");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(format), format, null);
+        }
+        sb.AppendLine($"MCTS Wins: {player1Wins}");
+        sb.AppendLine($"Random Wins: {player2Wins}");
+        sb.AppendLine($"Win Rate for MCTS: {(double)player1Wins / MctsEvaluationNumTest:P2}");
+        sb.AppendLine($"Win Rate for Random: {(double)player2Wins / MctsEvaluationNumTest:P2}");
+        sb.AppendLine();
+        sb.AppendLine("MCTS Parameters:");
+        sb.AppendLine($"Max Iterations: {MctsMaxIterations}");
+        sb.AppendLine($"Exploration Parameter: {MctsExplorationParameter}");
+        sb.AppendLine($"Max Timer: {_mctsMaxTimer?.ToString() ?? "None"} ms");
+        sb.AppendLine();
+        sb.AppendLine("Performance Metrics:");
+        sb.AppendLine($"Number of threads: {NumThreads}");
+        sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
+        sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
+        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        sb.AppendLine();
+        sb.AppendLine("Turn Statistics:");
+        sb.AppendLine($"Mean Turns: {meanTurns:F2}");
+        sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
+        sb.AppendLine($"Median Turns: {medianTurns:F2}");
+        sb.AppendLine($"Minimum Turns: {minTurns}");
+        sb.AppendLine($"Maximum Turns: {maxTurns}");
+        Console.WriteLine(sb.ToString());
+
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
 
     private async Task RunRandomVsRandomEvaluationTest(BattleFormat format)
     {
