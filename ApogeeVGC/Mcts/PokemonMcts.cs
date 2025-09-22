@@ -24,25 +24,29 @@ public class PokemonMonteCarloTreeSearch(
         public Choice OptimalChoice = Choice.Invalid;
         public int OptimalChoiceNodeIndex = -1;
         public string Children = string.Empty;
+        public double ExecutionTimeMs = 0.0;
 
-        public MoveResult(Choice optimalChoice, int optimalChoiceNodeIndex, string children)
+        public MoveResult(Choice optimalChoice, int optimalChoiceNodeIndex, string children, double executionTimeMs = 0.0)
         {
             OptimalChoice = optimalChoice;
             OptimalChoiceNodeIndex = optimalChoiceNodeIndex;
             Children = children;
+            ExecutionTimeMs = executionTimeMs;
         }
 
         public override string ToString()
         {
             string result = string.Empty;
             result += Children;
-            result += $"Optimal Choice: {OptimalChoice}, Optimal Choice Node Index: {OptimalChoiceNodeIndex}";
+            result += $"Optimal Choice: {OptimalChoice}, Optimal Choice Node Index: {OptimalChoiceNodeIndex}, Execution Time: {ExecutionTimeMs:F3} ms";
             return result;
         }
     }
 
     public MoveResult FindBestChoice(Battle battle, Choice[] availableChoices)
     {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
         // Create a seeded copy of the battle for deterministic simulation
         Battle battleCopy;
         try
@@ -51,11 +55,13 @@ public class PokemonMonteCarloTreeSearch(
         }
         catch
         {
+            stopwatch.Stop();
             // If we can't even copy the battle, fallback to first available choice
             return new MoveResult(
                 availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
                 -1,
-                "Failed to copy battle state"
+                "Failed to copy battle state",
+                stopwatch.Elapsed.TotalMilliseconds
             );
         }
 
@@ -68,10 +74,12 @@ public class PokemonMonteCarloTreeSearch(
         // Ensure root node has children before starting MCTS
         if (rootNode.ChildNodes.Count == 0)
         {
+            stopwatch.Stop();
             return new MoveResult(
                 availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
                 -1,
-                "No children generated for root node"
+                "No children generated for root node",
+                stopwatch.Elapsed.TotalMilliseconds
             );
         }
 
@@ -125,20 +133,30 @@ public class PokemonMonteCarloTreeSearch(
             // Timer expired - this is expected behavior, not an error
         }
 
+        stopwatch.Stop();
+
         // Calculate optimal choice (always runs whether completed naturally or timed out)
         var result = new MoveResult();
 
         int optimalChoiceIndex = rootNode.SelectMostVisitedChild();
-        result.OptimalChoiceNodeIndex = optimalChoiceIndex;
         if (optimalChoiceIndex == -1)
         {
             // Fallback: if no child was visited, return first available choice
-            result.OptimalChoice = availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid;
-            result.Children = "No optimal choice found, using fallback";
-            return result;
+            return new MoveResult(
+                availableChoices.Length > 0 ? availableChoices[0] : Choice.Invalid,
+                -1,
+                "No optimal choice found, using fallback",
+                stopwatch.Elapsed.TotalMilliseconds
+            );
         }
-        result.OptimalChoice = rootNode.ChildNodes[optimalChoiceIndex].Choice;
-        result.Children = rootNode.ToStringWithChildren();
+        
+        result = new MoveResult(
+            rootNode.ChildNodes[optimalChoiceIndex].Choice,
+            optimalChoiceIndex,
+            rootNode.ToStringWithChildren(),
+            stopwatch.Elapsed.TotalMilliseconds
+        );
+        
         return result;
     }
 

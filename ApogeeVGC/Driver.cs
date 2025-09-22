@@ -15,6 +15,7 @@ public enum DriverMode
     ConsoleVsMcts,
     MctsVsRandom,
     MctsVsRandomEvaluation,
+    MctsIterationComparison,
 }
 
 public class Driver
@@ -26,8 +27,8 @@ public class Driver
     private const int RandomEvaluationNumTest = 100000;
 
     private const int MctsEvaluationNumTest = 100;
-    private const int MctsMaxIterations = 1000000;
-    private const double MctsExplorationParameter = 0.0;
+    private const int MctsMaxIterations = 10000;
+    private const double MctsExplorationParameter = Root2;
     private const ChoiceFilterStrategy MctsEvaluationChoiceFilterStrategy =
         ChoiceFilterStrategy.ReducedSwitching;
     private readonly int? _mctsMaxTimer = null; // in milliseconds
@@ -61,6 +62,9 @@ public class Driver
             case DriverMode.MctsVsRandomEvaluation:
                 RunMctsVsRandomEvaluation();
                 break;
+            case DriverMode.MctsIterationComparison:
+                RunMctsIterationComparison();
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
         }
@@ -85,16 +89,23 @@ public class Driver
     private void RunMctsVsRandom()
     {
         Battle battle = BattleGenerator.GenerateTestBattle(Library, "MCTS", "Random");
+        
+        var mctsPlayer = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
+            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads);
+        
         Simulator = new Simulator
         {
             Battle = battle,
-            Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
-                MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads),
+            Player1 = mctsPlayer,
             Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
                 ChoiceFilterStrategy.None,
                 PlayerRandom2Seed),
         };
         SimulatorResult result = Simulator.Run();
+        
+        // Get timing statistics
+        var timingStats = mctsPlayer.GetTimingStats();
+        
         string winner = result switch
         {
             SimulatorResult.Player1Win => "MCTS",
@@ -102,33 +113,27 @@ public class Driver
             _ => "Unknown"
         };
         Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine($"MCTS Timing Statistics:");
+        Console.WriteLine($"  Total choices made: {timingStats.TotalChoices}");
+        Console.WriteLine($"  Average time per choice: {timingStats.AverageTimeMs:F3} ms");
+        Console.WriteLine($"  Min time: {timingStats.MinTimeMs:F3} ms");
+        Console.WriteLine($"  Max time: {timingStats.MaxTimeMs:F3} ms");
+        Console.WriteLine($"  Total MCTS time: {timingStats.TotalTimeMs:F3} ms");
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
     }
 
     private void RunMctsVsRandomEvaluation()
     {
+        // Run evaluation with current settings
+        RunMctsVsRandomEvaluationWithIterations(MctsMaxIterations);
+    }
+
+    private void RunMctsVsRandomEvaluationWithIterations(int maxIterations)
+    {
         var simResults = new ConcurrentBag<SimulatorResult>();
+        var mctsTimingStats = new ConcurrentBag<MctsTimingStats>();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-        //Parallel.For(0, MctsEvaluationNumTest,
-        //    new ParallelOptions { MaxDegreeOfParallelism = 1 }, i =>
-        //{
-        //    int player1Seed = PlayerRandom1Seed + i;
-        //    int player2Seed = PlayerRandom2Seed + i;
-
-        //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
-        //        "Random");
-        //    var simulator = new Simulator
-        //    {
-        //        Battle = battle,
-        //        Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
-        //            MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer),
-        //        Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
-        //            MctsEvaluationChoiceFilterStrategy, player2Seed),
-        //    };
-        //    simResults.Add(simulator.Run());
-        //});
 
         for (int i = 0; i < MctsEvaluationNumTest; i++)
         {
@@ -137,21 +142,29 @@ public class Driver
 
                 Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
                     "Random");
+                
+                var mctsPlayer = new PlayerMcts(PlayerId.Player1, battle, maxIterations,
+                    MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
+                
                 var simulator = new Simulator
                 {
                     Battle = battle,
-                    Player1 = new PlayerMcts(PlayerId.Player1, battle, MctsMaxIterations,
-                        MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer),
+                    Player1 = mctsPlayer,
                     Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
                         MctsEvaluationChoiceFilterStrategy, player2Seed),
                 };
+                
                 simResults.Add(simulator.Run());
+                
+                // Collect timing statistics from the MCTS player
+                mctsTimingStats.Add(mctsPlayer.GetTimingStats());
         }
 
         stopwatch.Stop();
 
         // Convert to list for counting
         var resultsList = simResults.ToList();
+        var timingStatsList = mctsTimingStats.ToList();
         int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
         int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
 
@@ -159,6 +172,23 @@ public class Driver
         double totalSeconds = stopwatch.Elapsed.TotalSeconds;
         double timePerSimulation = totalSeconds / MctsEvaluationNumTest;
         double simulationsPerSecond = MctsEvaluationNumTest / totalSeconds;
+
+        // Calculate MCTS timing statistics
+        var allChoiceTimes = timingStatsList.Where(stats => stats.TotalChoices > 0).ToList();
+        double avgMctsChoiceTime = 0.0;
+        double totalMctsChoices = 0;
+        double totalMctsTime = 0.0;
+        double minMctsChoiceTime = double.MaxValue;
+        double maxMctsChoiceTime = 0.0;
+        
+        if (allChoiceTimes.Count > 0)
+        {
+            totalMctsChoices = allChoiceTimes.Sum(stats => stats.TotalChoices);
+            totalMctsTime = allChoiceTimes.Sum(stats => stats.TotalTimeMs);
+            avgMctsChoiceTime = totalMctsTime / totalMctsChoices;
+            minMctsChoiceTime = allChoiceTimes.Min(stats => stats.MinTimeMs);
+            maxMctsChoiceTime = allChoiceTimes.Max(stats => stats.MaxTimeMs);
+        }
 
         // Rest of the method with timing information added...
         StringBuilder sb = new();
@@ -169,7 +199,7 @@ public class Driver
         sb.AppendLine($"Win Rate for Random: {(double)player2Wins / MctsEvaluationNumTest:P2}");
         sb.AppendLine();
         sb.AppendLine("MCTS Parameters:");
-        sb.AppendLine($"Max Iterations: {MctsMaxIterations}");
+        sb.AppendLine($"Max Iterations: {maxIterations}");
         sb.AppendLine($"Exploration Parameter: {MctsExplorationParameter}");
         sb.AppendLine($"Choice Filter Strategy: {MctsEvaluationChoiceFilterStrategy}");
         sb.AppendLine($"Max turn timer: {_mctsMaxTimer} ms");
@@ -180,10 +210,92 @@ public class Driver
         sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
         sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
         sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F1}");
+        sb.AppendLine();
+        sb.AppendLine("MCTS Choice Selection Timing:");
+        sb.AppendLine($"Total MCTS Choices Made: {totalMctsChoices:F0}");
+        sb.AppendLine($"Average Time per MCTS Choice: {avgMctsChoiceTime:F3} ms");
+        sb.AppendLine($"Minimum MCTS Choice Time: {minMctsChoiceTime:F3} ms");
+        sb.AppendLine($"Maximum MCTS Choice Time: {maxMctsChoiceTime:F3} ms");
+        sb.AppendLine($"Total MCTS Time: {totalMctsTime:F3} ms");
+        sb.AppendLine($"MCTS Time as % of Total: {(totalMctsTime / (totalSeconds * 1000)):P2}");
         Console.WriteLine(sb.ToString());
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
+    }
+
+    /// <summary>
+    /// Runs MCTS evaluation with multiple iteration counts to compare performance
+    /// </summary>
+    private void RunMctsIterationComparison()
+    {
+        int[] iterationCounts = { 1, 5, 10, 20, 50, 100 };
+        
+        Console.WriteLine("Running MCTS iteration comparison...");
+        Console.WriteLine($"Testing iteration counts: [{string.Join(", ", iterationCounts)}]");
+        Console.WriteLine($"Number of battles per test: {MctsEvaluationNumTest}");
+        Console.WriteLine();
+
+        var results = new List<(int iterations, double avgChoiceTime, double winRate, int totalChoices)>();
+
+        foreach (int iterations in iterationCounts)
+        {
+            Console.WriteLine($"Testing with {iterations} iterations...");
+            
+            var simResults = new List<SimulatorResult>();
+            var mctsTimingStats = new List<MctsTimingStats>();
+
+            for (int i = 0; i < MctsEvaluationNumTest; i++)
+            {
+                int player1Seed = PlayerRandom1Seed + i;
+                int player2Seed = PlayerRandom2Seed + i;
+
+                Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts", "Random");
+                
+                var mctsPlayer = new PlayerMcts(PlayerId.Player1, battle, iterations,
+                    MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
+                
+                var simulator = new Simulator
+                {
+                    Battle = battle,
+                    Player1 = mctsPlayer,
+                    Player2 = new PlayerRandom(PlayerId.Player2, battle, Library,
+                        MctsEvaluationChoiceFilterStrategy, player2Seed),
+                };
+                
+                simResults.Add(simulator.Run());
+                mctsTimingStats.Add(mctsPlayer.GetTimingStats());
+            }
+
+            // Calculate statistics
+            int wins = simResults.Count(result => result == SimulatorResult.Player1Win);
+            double winRate = (double)wins / MctsEvaluationNumTest;
+            
+            var validStats = mctsTimingStats.Where(stats => stats.TotalChoices > 0).ToList();
+            double avgChoiceTime = 0.0;
+            int totalChoices = 0;
+            
+            if (validStats.Count > 0)
+            {
+                totalChoices = validStats.Sum(stats => stats.TotalChoices);
+                double totalTime = validStats.Sum(stats => stats.TotalTimeMs);
+                avgChoiceTime = totalTime / totalChoices;
+            }
+
+            results.Add((iterations, avgChoiceTime, winRate, totalChoices));
+            Console.WriteLine($"  Win rate: {winRate:P2}, Avg choice time: {avgChoiceTime:F3} ms");
+        }
+
+        // Display summary
+        Console.WriteLine();
+        Console.WriteLine("MCTS Iteration Comparison Summary:");
+        Console.WriteLine($"{"Iterations",-12} {"Win Rate",-10} {"Avg Choice Time",-16} {"Total Choices",-14}");
+        Console.WriteLine(new string('-', 60));
+        
+        foreach (var (iterations, avgChoiceTime, winRate, totalChoices) in results)
+        {
+            Console.WriteLine($"{iterations,-12} {winRate:P2,-10} {avgChoiceTime:F3} ms{"",-8} {totalChoices,-14}");
+        }
     }
 
     private void RunRandomVsRandomEvaluationTest()
