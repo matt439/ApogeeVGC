@@ -29,25 +29,30 @@ public class PokemonMcts(
         public BattleChoice OptimalChoice;
         public int OptimalChoiceNodeIndex = -1;
         public string Children = string.Empty;
+        public double ExecutionTimeMs; // Time taken to find optimal choice in milliseconds
 
-        public MoveResult(BattleChoice optimalChoice, int optimalChoiceNodeIndex, string children)
+        public MoveResult(BattleChoice optimalChoice, int optimalChoiceNodeIndex, string children, double executionTimeMs = 0.0)
         {
             OptimalChoice = optimalChoice;
             OptimalChoiceNodeIndex = optimalChoiceNodeIndex;
             Children = children;
+            ExecutionTimeMs = executionTimeMs;
         }
 
         public override string ToString()
         {
             string result = string.Empty;
             result += Children;
-            result += $"Optimal Choice: {OptimalChoice}, Optimal Choice Node Index: {OptimalChoiceNodeIndex}";
+            result += $"Optimal Choice: {OptimalChoice}, Optimal Choice Node Index: {OptimalChoiceNodeIndex}, Execution Time: {ExecutionTimeMs:F3}ms";
             return result;
         }
     }
 
     public MoveResult FindBestChoice(BattleNew battle, BattleChoice[] availableChoices)
     {
+        // Start timing MCTS execution
+        var mctsStopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
         // Create a seeded copy of the battle for deterministic simulation
         BattleNew battleCopy = CopyBattle(battle);
 
@@ -60,11 +65,13 @@ public class PokemonMcts(
         // Ensure root node has children before starting MCTS
         if (rootNode.ChildNodes.Count == 0)
         {
+            mctsStopwatch.Stop();
             Console.WriteLine($"Warning: No children generated for root node. Available choices: {availableChoices.Length}");
             return new MoveResult(
                 availableChoices.Length > 0 ? availableChoices[0] : throw new InvalidOperationException(),
                 -1,
-                "No children generated for root node"
+                "No children generated for root node",
+                mctsStopwatch.Elapsed.TotalMilliseconds
             );
         }
 
@@ -112,11 +119,17 @@ public class PokemonMcts(
             }
         }
 
+        // Stop timing MCTS execution
+        mctsStopwatch.Stop();
+        double executionTimeMs = mctsStopwatch.Elapsed.TotalMilliseconds;
+
         // Calculate optimal choice (always runs whether completed naturally or timed out)
         var result = new MoveResult();
 
         int optimalChoiceIndex = rootNode.SelectMostVisitedChild();
         result.OptimalChoiceNodeIndex = optimalChoiceIndex;
+        result.ExecutionTimeMs = executionTimeMs;
+        
         if (optimalChoiceIndex == -1)
         {
             // Fallback: if no child was visited, return first available choice
@@ -137,7 +150,7 @@ public class PokemonMcts(
     {
         Node current = root;
         int depth = 0;
-        const int maxDepth = 50; // Prevent infinite loops
+        const int maxDepth = 1000; // Prevent infinite loops
         
         while (current is { IsLeaf: false, IsTerminal: false } && depth < maxDepth)
         {
@@ -307,7 +320,7 @@ public class PokemonMcts(
         // Limit the number of children created to prevent memory explosion
         // For large choice spaces, only create a subset of the most promising choices
         var choicesToCreate = availableChoices;
-        const int maxChildrenPerNode = 50; // Limit to prevent memory issues
+        const int maxChildrenPerNode = 1000; // Limit to prevent memory issues
         
         if (availableChoices.Length > maxChildrenPerNode)
         {

@@ -17,6 +17,9 @@ public class PlayerMcts : IPlayerNew
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<BattleChoice>? ChoiceSubmitted;
 
+    // Property to expose the last MCTS execution time
+    public double LastMctsExecutionTimeMs { get; private set; }
+
     public PlayerMcts(PlayerId playerId, int maxIterations, double explorationParameter,
         Library library, int? seed = null, int? maxDegreeOfParallelism = null, int? maxTimer = null)
     {
@@ -82,9 +85,11 @@ public class PlayerMcts : IPlayerNew
                 throw new ArgumentException("No available choices provided.", nameof(availableChoices));
             case 1:
                 // Only one choice available, no need for MCTS
+                LastMctsExecutionTimeMs = 0.0; // No MCTS time needed for single choice
                 return availableChoices[0];
             default:
                 PokemonMcts.MoveResult result = _mcts.FindBestChoice(perspective.Battle, availableChoices);
+                LastMctsExecutionTimeMs = result.ExecutionTimeMs; // Store the execution time
                 return result.OptimalChoice;
 
                 //try
