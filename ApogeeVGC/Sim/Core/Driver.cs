@@ -83,7 +83,7 @@ public class Driver
 
     private async Task RunConsoleVsMctsTest()
     {
-        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
+        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
         IPlayerNew player2 = new PlayerMcts(PlayerId.Player2, MctsMaxIterations,
             MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
 
@@ -115,7 +115,7 @@ public class Driver
     {
         IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
             MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
-        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
         BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
             "Random", BattleFormat.Doubles);
@@ -219,7 +219,7 @@ public class Driver
 
             IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
                 MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
-            IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
+            IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
             BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                 "MCTS", "Random", format, false, currentSeed);
@@ -327,8 +327,8 @@ public class Driver
                     int player1Seed = PlayerRandom1Seed + currentSeed;
                     int player2Seed = PlayerRandom2Seed + currentSeed;
 
-                    IPlayerNew player1 = new PlayerRandomNew(PlayerId.Player1, player1Seed);
-                    IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, player2Seed);
+                    IPlayerNew player1 = new PlayerRandom(PlayerId.Player1, player1Seed);
+                    IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
                     BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                         "Random1", "Random2", format, false, currentSeed);
@@ -460,8 +460,8 @@ public class Driver
 
     private async Task RunConsoleVsRandomTest()
     {
-        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
-        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
+        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
         BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Singles, true);
@@ -489,8 +489,8 @@ public class Driver
 
     private async Task RunConsoleVsRandomDoublesTest()
     {
-        IPlayerNew player1 = new PlayerConsoleNew(PlayerId.Player1);
-        IPlayerNew player2 = new PlayerRandomNew(PlayerId.Player2, PlayerRandom2Seed);
+        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
+        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
         BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Doubles, true);

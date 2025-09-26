@@ -5,17 +5,13 @@ using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerMcts : IPlayerNew
+public class PlayerMcts : IPlayer
 {
     public PlayerId PlayerId { get; }
     
     private readonly int _seed;
     private readonly PokemonMcts _mcts;
     private readonly Random _fallbackRandom;
-
-    // Events for IPlayerNew interface
-    public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
-    public event EventHandler<BattleChoice>? ChoiceSubmitted;
 
     public PlayerMcts(PlayerId playerId, int maxIterations, double explorationParameter,
         Library library, int? seed = null, int? maxDegreeOfParallelism = null, int? maxTimer = null)
@@ -40,6 +36,22 @@ public class PlayerMcts : IPlayerNew
             _seed, maxDegreeOfParallelism, maxTimer);
     }
 
+    // Fast sync version for MCTS rollouts (IPlayer)
+    public BattleChoice GetNextChoiceSync(BattleChoice[] choices, BattlePerspective perspective)
+    {
+        return GetNextChoice(choices, perspective);
+    }
+
+    // Simplified async version (IPlayer)
+    public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] choices, BattlePerspective perspective,
+        CancellationToken cancellationToken)
+    {
+        BattleChoice choice = GetNextChoice(choices, perspective);
+        ChoiceSubmitted?.Invoke(this, choice);
+        return Task.FromResult(choice);
+    }
+
+    // Full async version for backward compatibility (IPlayerNew)
     public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
@@ -60,6 +72,11 @@ public class PlayerMcts : IPlayerNew
         return Task.FromResult(choice);
     }
 
+    // Events from interfaces
+    public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
+    public event EventHandler<BattleChoice>? ChoiceSubmitted;
+
+    // Timeout methods from IPlayerNew
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         // MCTS player could potentially use this to reduce search time or iterations

@@ -19,3 +19,13 @@ public interface IPlayerNew
     Task NotifyTimeoutWarningAsync(TimeSpan remainingTime);
     Task NotifyChoiceTimeoutAsync();
 }
+
+public interface IPlayer : IPlayerNew
+{
+    // Sync version for MCTS (fast)
+    BattleChoice GetNextChoiceSync(BattleChoice[] choices, BattlePerspective perspective);
+
+    // Simplified async version for human players (with events, timeouts)
+    Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] choices, BattlePerspective perspective,
+        CancellationToken cancellationToken);
+}
