@@ -90,7 +90,7 @@ public class Driver
         BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "MCTS", BattleFormat.Doubles);
 
-        var simulator = new SimulatorNew
+        var simulator = new Simulator
         {
             Battle = battle,
             Player1 = player1,
@@ -120,7 +120,7 @@ public class Driver
         BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
             "Random", BattleFormat.Doubles);
 
-        var simulator = new SimulatorNew
+        var simulator = new Simulator
         {
             Battle = battle,
             Player1 = player1,
@@ -224,7 +224,7 @@ public class Driver
             BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                 "MCTS", "Random", format, false, currentSeed);
 
-            var simulator = new SimulatorNew
+            var simulator = new Simulator
             {
                 Battle = battle,
                 Player1 = player1,
@@ -333,7 +333,7 @@ public class Driver
                     BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                         "Random1", "Random2", format, false, currentSeed);
 
-                    var simulator = new SimulatorNew
+                    var simulator = new Simulator
                     {
                         Battle = battle,
                         Player1 = player1,
@@ -466,7 +466,7 @@ public class Driver
         BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Singles, true);
 
-        var simulator = new SimulatorNew
+        var simulator = new Simulator
         {
             Battle = battle,
             Player1 = player1,
@@ -495,7 +495,7 @@ public class Driver
         BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Doubles, true);
 
-        var simulator = new SimulatorNew
+        var simulator = new Simulator
         {
             Battle = battle,
             Player1 = player1,

@@ -11,7 +11,7 @@ public enum SimulatorResult
     Player2Win,
 }
 
-public class SimulatorNew
+public class Simulator
 {
     public required BattleAsync Battle { get; init; }
     public required IPlayerNew Player1 { get; init; }
