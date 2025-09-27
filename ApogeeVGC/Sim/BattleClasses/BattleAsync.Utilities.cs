@@ -4,16 +4,6 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
-    private static int RoundedDownAtHalf(double value)
-    {
-        return (int)(value + 0.5 - double.Epsilon);
-    }
-
-    private static int RoundedUpAtHald(double value)
-    {
-        return (int)(value + 0.5 + double.Epsilon);
-    }
-
     /// <summary>
     /// Deep copy the battle state for MCTS simulation
     /// </summary>

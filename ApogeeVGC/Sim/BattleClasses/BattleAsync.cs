@@ -121,19 +121,19 @@ public partial class BattleAsync
                 // Process the current turn
                 await ProcessCurrentTurnAsync(cancellationToken);
 
-                // Check for game end conditions after turn processing
-                if (CheckForGameEndConditions())
+                // Check for game end conditions after turn processing using BattleCore
+                if (BattleCore.CheckForGameEndConditions(Side1, Side2))
                 {
                     await HandleNormalGameEndAsync();
                     break;
                 }
 
-                // Check turn limit
-                if (TurnCounter < TurnLimit) continue;
-
-                Turn turn  = Turns[TurnLimit - 1];
-                await HandleTurnLimitReachedAsync();
-                break;
+                // Check turn limit using BattleCore
+                if (BattleCore.HasExceededTurnLimit(TurnCounter))
+                {
+                    await HandleTurnLimitReachedAsync();
+                    break;
+                }
             }
 
             if (PrintDebug)

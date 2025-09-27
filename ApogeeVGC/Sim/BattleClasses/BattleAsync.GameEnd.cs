@@ -8,16 +8,11 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class BattleAsync
 {
     /// <summary>
-    /// Check for game end conditions
+    /// Check for game end conditions using BattleCore
     /// </summary>
     private bool CheckForGameEndConditions()
     {
-        return HasNoViablePokemon(Side1) || HasNoViablePokemon(Side2);
-    }
-
-    private static bool HasNoViablePokemon(Side side)
-    {
-        return side.IsDefeated || side is { AliveActivePokemonCount: 0, SwitchOptionsCount: 0 };
+        return BattleCore.CheckForGameEndConditions(Side1, Side2);
     }
 
     /// <summary>
@@ -25,26 +20,20 @@ public partial class BattleAsync
     /// </summary>
     private async Task HandleNormalGameEndAsync()
     {
-        PlayerId winner;
-
-        if (Side1.IsDefeated)
+        // Use BattleCore to determine the winner
+        PlayerId? winner = BattleCore.DetermineWinner(Side1, Side2);
+        
+        if (winner == null)
         {
-            winner = PlayerId.Player2;
-        }
-        else if (Side2.IsDefeated)
-        {
-            winner = PlayerId.Player1;
-        }
-        else
-        {
-            // Should not happen if CheckForGameEndConditions returned true
-            throw new InvalidOperationException("Normal game end called but no clear winner");
+            // This shouldn't happen if CheckForGameEndConditions returned true
+            // Fall back to tie-breaker logic or throw exception
+            throw new InvalidOperationException("Normal game end called but BattleCore couldn't determine winner");
         }
 
         if (PrintDebug)
             Console.WriteLine($"Normal game end: {winner} wins");
 
-        await EndGameAsync(winner, GameEndReason.Normal);
+        await EndGameAsync(winner.Value, GameEndReason.Normal);
     }
 
     /// <summary>
@@ -145,7 +134,7 @@ public partial class BattleAsync
         if (HasPlayerTimedOut(PlayerId.Player1) || HasPlayerTimedOut(PlayerId.Player2))
             return GameEndReason.PlayerTimeout;
             
-        if (TurnCounter >= TurnLimit)
+        if (BattleCore.HasExceededTurnLimit(TurnCounter))
             return GameEndReason.TurnLimit;
 
         return GameEndReason.Normal;

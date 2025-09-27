@@ -52,7 +52,7 @@ public partial class BattleAsync
     private async Task HandleTurnLimitReachedAsync()
     {
         if (PrintDebug)
-            Console.WriteLine($"Turn limit ({TurnLimit}) reached, calling tiebreak");
+            Console.WriteLine($"Turn limit reached (turn {TurnCounter}), calling tiebreak");
 
         var winner = PerformTiebreak();
         await EndGameAsync(winner, GameEndReason.TurnLimit);
