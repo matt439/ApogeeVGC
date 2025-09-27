@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.Turns;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     /// <summary>
     /// Check for game end conditions

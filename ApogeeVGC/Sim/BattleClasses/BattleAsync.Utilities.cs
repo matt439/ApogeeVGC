@@ -2,7 +2,7 @@
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     private static int RoundedDownAtHalf(double value)
     {
@@ -17,13 +17,13 @@ public partial class BattleNew
     /// <summary>
     /// Deep copy the battle state for MCTS simulation
     /// </summary>
-    public BattleNew Copy()
+    public BattleAsync Copy()
     {
         // Create new cancellation token sources for the copy
         var newPlayer1CancellationTokenSource = new CancellationTokenSource();
         var newPlayer2CancellationTokenSource = new CancellationTokenSource();
 
-        var copy = new BattleNew
+        var copy = new BattleAsync
         {
             // Required init properties - these are immutable references
             Library = Library, // Shared reference - Library is immutable
@@ -54,7 +54,7 @@ public partial class BattleNew
         copy.ForceSwitcher = ForceSwitcher;
         
         // Set the TurnCounter using reflection since it has a private setter
-        var turnCounterProperty = typeof(BattleNew).GetProperty(nameof(TurnCounter));
+        var turnCounterProperty = typeof(BattleAsync).GetProperty(nameof(TurnCounter));
         var turnCounterSetter = turnCounterProperty?.GetSetMethod(true);
         turnCounterSetter?.Invoke(copy, new object[] { TurnCounter });
 

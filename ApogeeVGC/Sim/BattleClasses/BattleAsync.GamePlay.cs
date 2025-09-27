@@ -11,7 +11,7 @@ using static ApogeeVGC.Sim.Choices.SlotChoice;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     public async Task ProcessGameplayTurnAsync(GameplayTurn turn, CancellationToken cancellationToken)
     {

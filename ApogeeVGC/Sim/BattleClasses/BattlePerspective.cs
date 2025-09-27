@@ -15,13 +15,13 @@ public record BattlePerspective
     public required int TurnCounter { get; init; }
 
     // Reference to the full battle (not copied). Needed by MCTS to simulate future turns.
-    public required BattleNew Battle { get; init; } 
+    public required BattleAsync Battle { get; init; } 
 
     /// <summary>
     /// Creates a battle perspective with deep copies to prevent external modification
     /// </summary>
     public static BattlePerspective CreateSafe(Side playerSide, Side opponentSide, Field field,
-        int turnCounter, BattleNew battle)
+        int turnCounter, BattleAsync battle)
     {
         return new BattlePerspective
         {

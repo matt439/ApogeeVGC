@@ -4,7 +4,7 @@
 
 //namespace ApogeeVGC.Sim.BattleClasses;
 
-//public partial class BattleNew
+//public partial class BattleAsync
 //{
 //    /// <summary>
 //    /// Create a deep copy of the current battle state

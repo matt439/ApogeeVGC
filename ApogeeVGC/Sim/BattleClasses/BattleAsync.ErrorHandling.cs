@@ -4,7 +4,7 @@ using ApogeeVGC.Sim.FieldClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     /// <summary>
     /// Handle battle cancellation

@@ -13,7 +13,7 @@ public enum SimulatorResult
 
 public class SimulatorNew
 {
-    public required BattleNew Battle { get; init; }
+    public required BattleAsync Battle { get; init; }
     public required IPlayerNew Player1 { get; init; }
     public required IPlayerNew Player2 { get; init; }
     public bool PrintDebug { get; set; }

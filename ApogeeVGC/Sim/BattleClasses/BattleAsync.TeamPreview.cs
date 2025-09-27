@@ -6,7 +6,7 @@ using ApogeeVGC.Sim.Turns;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     /// <summary>
     /// Process team preview turn - both players select simultaneously

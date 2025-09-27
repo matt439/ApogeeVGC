@@ -2,7 +2,7 @@
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     private BattlePerspective GetPerspective(PlayerId playerId)
     {

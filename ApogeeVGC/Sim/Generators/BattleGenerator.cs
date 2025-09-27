@@ -9,12 +9,12 @@ namespace ApogeeVGC.Sim.Generators;
 
 public static class BattleGenerator
 {
-    public static BattleNew GenerateTestBattleNew(Library library, IPlayerNew player1,
+    public static BattleAsync GenerateTestBattleNew(Library library, IPlayerNew player1,
         IPlayerNew player2, string trainerName1, string trainerName2, BattleFormat format,
         bool printDebug = false, int? seed = null, CancellationTokenSource? player1TokenSource = null,
         CancellationTokenSource? player2TokenSource = null)
     {
-        return new BattleNew
+        return new BattleAsync
         {
             Library = library,
             Field = new Field(),

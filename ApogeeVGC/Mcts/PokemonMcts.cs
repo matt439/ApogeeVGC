@@ -46,10 +46,10 @@ public class PokemonMcts(
         }
     }
 
-    public MoveResult FindBestChoice(BattleNew battle, BattleChoice[] availableChoices)
+    public MoveResult FindBestChoice(BattleAsync battle, BattleChoice[] availableChoices)
     {
         // Create a seeded copy of the battle for deterministic simulation
-        BattleNew battleCopy = CopyBattle(battle);
+        BattleAsync battleCopy = CopyBattle(battle);
 
         // Ensure deterministic simulation
         battleCopy.BattleSeed ??= GenerateUniqueBattleSeed();
@@ -96,7 +96,7 @@ public class PokemonMcts(
                 Node expandedNode = Expansion(node, iterationRandom);
 
                 // Simulation phase - run random playout from expanded node
-                BattleNew simulationBattle = CopyBattle(expandedNode.Battle);
+                BattleAsync simulationBattle = CopyBattle(expandedNode.Battle);
                 SimulatorResult simulationResult = Simulation(simulationBattle, iterationRandom);
 
                 // Backpropagation phase - update statistics up the tree
@@ -183,7 +183,7 @@ public class PokemonMcts(
         return node.ChildNodes[randomChildIndex];
     }
 
-    private SimulatorResult Simulation(BattleNew battle, Random threadRandom)
+    private SimulatorResult Simulation(BattleAsync battle, Random threadRandom)
     {
         // For MCTS, we don't need to run a full battle simulation
         // Instead, we can use a simplified approach that evaluates the current position
@@ -341,7 +341,7 @@ public class PokemonMcts(
         }
     }
 
-    private static BattleNew CopyBattle(BattleNew original)
+    private static BattleAsync CopyBattle(BattleAsync original)
     {
         try
         {
@@ -365,7 +365,7 @@ public class PokemonMcts(
         return (int)(seed % int.MaxValue);
     }
 
-    private static BattleRequestState GetBattleRequestState(BattleNew battle)
+    private static BattleRequestState GetBattleRequestState(BattleAsync battle)
     {
         if (battle.IsGameComplete)
         {
@@ -394,12 +394,12 @@ public class PokemonMcts(
         return side.AllSlots.All(pokemon => pokemon.IsFainted);
     }
 
-    private static BattleChoice[] GetAvailableChoices(BattleNew battle, PlayerId playerId)
+    private static BattleChoice[] GetAvailableChoices(BattleAsync battle, PlayerId playerId)
     {
         return battle.GenerateChoicesForMcts(playerId);
     }
 
-    private static SimulatorResult GetBattleResult(BattleNew battle)
+    private static SimulatorResult GetBattleResult(BattleAsync battle)
     {
         BattleRequestState state = GetBattleRequestState(battle);
         return state switch
@@ -422,10 +422,10 @@ public class PokemonMcts(
         public List<Node> ChildNodes { get; }
         
         // Lazy battle state management
-        private readonly BattleNew _parentBattle;
-        private BattleNew? _battleCache;
+        private readonly BattleAsync _parentBattle;
+        private BattleAsync? _battleCache;
         
-        public BattleNew Battle
+        public BattleAsync Battle
         {
             get
             {
@@ -462,7 +462,7 @@ public class PokemonMcts(
         private readonly PlayerId _mctsPlayerId;
         private readonly Library _library;
 
-        public Node(BattleNew battle, Node? parent, BattleChoice choice, double explorationParameter,
+        public Node(BattleAsync battle, Node? parent, BattleChoice choice, double explorationParameter,
             PlayerId mctsPlayerId, Library library)
         {
             Parent = parent;
@@ -646,19 +646,19 @@ public class PokemonMcts(
             return sb.ToString();
         }
 
-        private BattleNew CreateBattleWithChoice(BattleNew battle, BattleChoice choice, PlayerId playerId)
+        private BattleAsync CreateBattleWithChoice(BattleAsync battle, BattleChoice choice, PlayerId playerId)
         {
             try
             {
                 // Create a deep copy of the battle for simulation
-                BattleNew newBattle = battle.Copy();
+                BattleAsync asyncBattle = battle.Copy();
                 
-                if (newBattle is IBattleMctsOperations mctsOps)
+                if (asyncBattle is IBattleMctsOperations mctsOps)
                 {
                     mctsOps.ApplyChoiceSync(playerId, choice);
                 }
                 
-                return newBattle;
+                return asyncBattle;
             }
             catch (StackOverflowException)
             {

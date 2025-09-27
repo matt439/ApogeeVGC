@@ -7,7 +7,7 @@ using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew : IBattleMctsOperations
+public partial class BattleAsync : IBattleMctsOperations
 {
     void IBattleMctsOperations.ApplyChoiceSync(PlayerId playerId, BattleChoice choice)
     {

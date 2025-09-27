@@ -1,6 +1,6 @@
 ﻿namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     private const int TeamPreviewLimitSeconds = 900; // TODO: Change back to 90 seconds
     private const int StandardTurnLimitSeconds = 4500; // TODO: Change back to 45 seconds

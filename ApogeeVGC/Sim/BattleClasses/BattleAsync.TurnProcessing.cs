@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Turns;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     /// <summary>
     /// Main turn processing dispatcher

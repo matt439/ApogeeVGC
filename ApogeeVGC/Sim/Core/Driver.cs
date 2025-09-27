@@ -87,7 +87,7 @@ public class Driver
         IPlayerNew player2 = new PlayerMcts(PlayerId.Player2, MctsMaxIterations,
             MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
 
-        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "MCTS", BattleFormat.Doubles);
 
         var simulator = new SimulatorNew
@@ -117,7 +117,7 @@ public class Driver
             MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
         IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
+        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
             "Random", BattleFormat.Doubles);
 
         var simulator = new SimulatorNew
@@ -221,7 +221,7 @@ public class Driver
                 MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
             IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
-            BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+            BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                 "MCTS", "Random", format, false, currentSeed);
 
             var simulator = new SimulatorNew
@@ -330,7 +330,7 @@ public class Driver
                     IPlayerNew player1 = new PlayerRandom(PlayerId.Player1, player1Seed);
                     IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
-                    BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+                    BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
                         "Random1", "Random2", format, false, currentSeed);
 
                     var simulator = new SimulatorNew
@@ -463,7 +463,7 @@ public class Driver
         IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
         IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Singles, true);
 
         var simulator = new SimulatorNew
@@ -492,7 +492,7 @@ public class Driver
         IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
         IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleNew battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
             "Random", BattleFormat.Doubles, true);
 
         var simulator = new SimulatorNew

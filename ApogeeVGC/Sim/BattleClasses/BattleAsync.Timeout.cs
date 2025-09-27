@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleNew
+public partial class BattleAsync
 {
     /// <summary>
     /// Check if game time limit has been exceeded
