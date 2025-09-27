@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Types;
 using System.Collections;
 using System.Reflection;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Events;
 
 namespace ApogeeVGC.Data;
 
@@ -13,6 +14,7 @@ public record Library
 {
     private readonly Abilities _abilities;
     private readonly Conditions _conditions = new();
+    private readonly Events _events;
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
     private readonly Moves _moves;
@@ -82,6 +84,7 @@ public record Library
 
     public Library()
     {
+        _events = new Events(this);
         _pseudoWeathers = new PseudoWeathers(this);
         _sideConditions = new SideConditions(this);
         _terrains = new Terrains(this);
@@ -92,6 +95,117 @@ public record Library
         _moves = new Moves(this);
         _abilities = new Abilities(this);
     }
+
+    #region Delegate Management Methods
+    
+    /// <summary>
+    /// Register a delegate for a specific effect
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID (move, ability, etc.)</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterDelegate<T>(EventId eventId, string effectId, T handler) where T : Delegate
+    {
+        _events.RegisterDelegate(eventId, effectId, handler);
+    }
+    
+    /// <summary>
+    /// Get a delegate for a specific effect
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID</param>
+    /// <returns>The delegate if found, null otherwise</returns>
+    public T? GetDelegate<T>(EventId eventId, string effectId) where T : Delegate
+    {
+        return _events.GetDelegate<T>(eventId, effectId);
+    }
+    
+    /// <summary>
+    /// Check if a delegate exists for a specific effect
+    /// </summary>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID</param>
+    /// <returns>True if delegate exists</returns>
+    public bool HasDelegate(EventId eventId, string effectId)
+    {
+        return _events.HasDelegate(eventId, effectId);
+    }
+    
+    /// <summary>
+    /// Register a delegate for a move using MoveId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="moveId">The move ID</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterMoveDelegate<T>(EventId eventId, MoveId moveId, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, moveId.ToString(), handler);
+    }
+    
+    /// <summary>
+    /// Get a delegate for a move using MoveId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="moveId">The move ID</param>
+    /// <returns>The delegate if found, null otherwise</returns>
+    public T? GetMoveDelegate<T>(EventId eventId, MoveId moveId) where T : Delegate
+    {
+        return GetDelegate<T>(eventId, moveId.ToString());
+    }
+    
+    /// <summary>
+    /// Register a delegate for an ability using AbilityId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="abilityId">The ability ID</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterAbilityDelegate<T>(EventId eventId, AbilityId abilityId, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, abilityId.ToString(), handler);
+    }
+    
+    /// <summary>
+    /// Get a delegate for an ability using AbilityId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="abilityId">The ability ID</param>
+    /// <returns>The delegate if found, null otherwise</returns>
+    public T? GetAbilityDelegate<T>(EventId eventId, AbilityId abilityId) where T : Delegate
+    {
+        return GetDelegate<T>(eventId, abilityId.ToString());
+    }
+    
+    /// <summary>
+    /// Register a delegate for an item using ItemId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="itemId">The item ID</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterItemDelegate<T>(EventId eventId, ItemId itemId, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, itemId.ToString(), handler);
+    }
+    
+    /// <summary>
+    /// Get a delegate for an item using ItemId
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="itemId">The item ID</param>
+    /// <returns>The delegate if found, null otherwise</returns>
+    public T? GetItemDelegate<T>(EventId eventId, ItemId itemId) where T : Delegate
+    {
+        return GetDelegate<T>(eventId, itemId.ToString());
+    }
+    
+    #endregion
 }
 
 /// <summary>
