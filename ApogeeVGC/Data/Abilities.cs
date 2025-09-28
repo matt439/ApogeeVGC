@@ -1,10 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
+using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Events;
 
 namespace ApogeeVGC.Data;
 
@@ -19,135 +21,159 @@ public record Abilities
         AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
     }
 
-    private static Dictionary<AbilityId, Ability> CreateAbilities()
+    private Dictionary<AbilityId, Ability> CreateAbilities()
     {
-        return new Dictionary<AbilityId, Ability>
+        Dictionary<AbilityId, Ability> abilities = [];
+
+        // As One (Glastrier)
+        Ability asOneGlastrier = new()
         {
-            [AbilityId.AsOneGlastrier] = new()
+            Id = AbilityId.AsOneGlastrier,
+            Name = "As One (Glastrier)",
+            Num = 266,
+            Rating = 3.5,
+            OnSwitchInPriority = 1,
+            Flags = new AbilityFlags
             {
-                Id = AbilityId.AsOneGlastrier,
-                Name = "As One (Glastrier)",
-                Num = 266,
-                Rating = 3.5,
-                OnSwitchInPriority = 1,
-                Flags = new AbilityFlags
-                {
-                    FailRolePlay = true,
-                    NoReceiver = true,
-                    NoEntrain = true,
-                    NoTrace = true,
-                    FailSkillSwap = true,
-                    CantSuppress = true,
-                },
-                OnSourceAfterFaint = (length, _, source, effect, context) =>
-                {
-                    if (effect.EffectType != EffectType.Move) return;
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintChillingNeighActivation(source);
-                    }
-                    source.AlterStatModifier(StatId.Atk, length, context);
-                },
+                FailRolePlay = true,
+                NoReceiver = true,
+                NoEntrain = true,
+                NoTrace = true,
+                FailSkillSwap = true,
+                CantSuppress = true,
             },
-            [AbilityId.HadronEngine] = new()
+            OnSourceAfterFaint = (length, _, source, effect, context) =>
             {
-                Id = AbilityId.HadronEngine,
-                Name = "Hadron Engine",
-                Num = 289,
-                Rating = 4.5,
-                OnStart = (pokemon, field, pokemons, effect, context) =>
+                if (effect.EffectType != EffectType.Move) return;
+                if (context.PrintDebug)
                 {
-                    field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, effect, pokemons, context);
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
-                },
-            },
-            [AbilityId.Guts] = new()
-            {
-                Id = AbilityId.Guts,
-                Name = "Guts",
-                Num = 62,
-                Rating = 3.5,
-                OnStart = (pokemon, _, _, _, context) =>
-                {
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.Guts], context);
-                },
-            },
-            [AbilityId.FlameBody] = new()
-            {
-                Id = AbilityId.FlameBody,
-                Name = "Flame Body",
-                Num = 49,
-                Rating = 2.0,
-                OnStart = (pokemon, _, _, _, context) =>
-                {
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.FlameBody], context);
-                },
-            },
-            [AbilityId.Prankster] = new()
-            {
-                Id = AbilityId.Prankster,
-                Name = "Prankster",
-                Num = 158,
-                Rating = 4.0,
-                OnModifyPriority = (priority, move) =>
-                {
-                    if (move.Category != MoveCategory.Status) return priority;
-                    return priority + 1;
-                },
-            },
-            [AbilityId.QuarkDrive] = new()
-            {
-                Id = AbilityId.QuarkDrive,
-                Name = "Quark Drive",
-                Num = 282,
-                Rating = 3.0,
-                OnSwitchInPriority = -2,
-                OnStart = (pokemon, field, _, _, context) =>
-                {
-                    if (field.HasTerrain(TerrainId.Electric))
-                    {
-                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
-                        //if (context.PrintDebug)
-                        //{
-                        //    UiGenerator.PrintQuarkDriveStart(pokemon);
-                        //}
-                    }
-                    else
-                    {
-                        if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
-                        {
-                            UiGenerator.PrintQuarkDriveEnd(pokemon);
-                        }
-                    }
-                },
-                OnTerrainChange = (pokemon, field, context) =>
-                {
-                    if (field.HasTerrain(TerrainId.Electric))
-                    {
-                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
-                        //if (context.PrintDebug)
-                        //{
-                        //    UiGenerator.PrintQuarkDriveStart(pokemon);
-                        //}
-                    }
-                    else
-                    {
-                        if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
-                        {
-                            UiGenerator.PrintQuarkDriveEnd(pokemon);
-                        }
-                    }
-                },
-                Flags = new AbilityFlags
-                {
-                    FailRolePlay = true,
-                    NoReceiver = true,
-                    NoEntrain = true,
-                    NoTrace = true,
-                    FailSkillSwap = true,
-                    NoTransform = true,
-                },
+                    UiGenerator.PrintChillingNeighActivation(source);
+                }
+
+                source.AlterStatModifier(StatId.Atk, length, context);
             },
         };
+        abilities[AbilityId.AsOneGlastrier] = asOneGlastrier;
+
+        // Hadron Engine
+        Ability hadronEngine = new()
+        {
+            Id = AbilityId.HadronEngine,
+            Name = "Hadron Engine",
+            Num = 289,
+            Rating = 4.5,
+            OnStart = (pokemon, field, pokemons, effect, context) =>
+            {
+                field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, effect, pokemons, context);
+                pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
+            },
+        };
+        _library.RegisterDelegate<OnStartHandler>(EventId.OnStart, hadronEngine,
+            (battleContext, target) =>
+            {
+
+            });
+        abilities[AbilityId.HadronEngine] = hadronEngine;
+
+        // Guts
+        Ability guts = new()
+        {
+            Id = AbilityId.Guts,
+            Name = "Guts",
+            Num = 62,
+            Rating = 3.5,
+            OnStart = (pokemon, _, _, _, context) =>
+            {
+                pokemon.AddCondition(context.Library.Conditions[ConditionId.Guts], context);
+            },
+        };
+        abilities[AbilityId.Guts] = guts;
+
+        // Flame Body
+        Ability flameBody = new()
+        {
+            Id = AbilityId.FlameBody,
+            Name = "Flame Body",
+            Num = 49,
+            Rating = 2.0,
+            OnStart = (pokemon, _, _, _, context) =>
+            {
+                pokemon.AddCondition(context.Library.Conditions[ConditionId.FlameBody], context);
+            },
+        };
+        abilities[AbilityId.FlameBody] = flameBody;
+
+        // Prankster
+        Ability prankster = new()
+        {
+            Id = AbilityId.Prankster,
+            Name = "Prankster",
+            Num = 158,
+            Rating = 4.0,
+            OnModifyPriority = (priority, move) =>
+            {
+                if (move.Category != MoveCategory.Status) return priority;
+                return priority + 1;
+            },
+        };
+        abilities[AbilityId.Prankster] = prankster;
+
+        // Quark Drive
+        Ability quarkDrive = new()
+        {
+            Id = AbilityId.QuarkDrive,
+            Name = "Quark Drive",
+            Num = 282,
+            Rating = 3.0,
+            OnSwitchInPriority = -2,
+            OnStart = (pokemon, field, _, _, context) =>
+            {
+                if (field.HasTerrain(TerrainId.Electric))
+                {
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
+                    //if (context.PrintDebug)
+                    //{
+                    //    UiGenerator.PrintQuarkDriveStart(pokemon);
+                    //}
+                }
+                else
+                {
+                    if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
+                    {
+                        UiGenerator.PrintQuarkDriveEnd(pokemon);
+                    }
+                }
+            },
+            OnTerrainChange = (pokemon, field, context) =>
+            {
+                if (field.HasTerrain(TerrainId.Electric))
+                {
+                    pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
+                    //if (context.PrintDebug)
+                    //{
+                    //    UiGenerator.PrintQuarkDriveStart(pokemon);
+                    //}
+                }
+                else
+                {
+                    if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
+                    {
+                        UiGenerator.PrintQuarkDriveEnd(pokemon);
+                    }
+                }
+            },
+            Flags = new AbilityFlags
+            {
+                FailRolePlay = true,
+                NoReceiver = true,
+                NoEntrain = true,
+                NoTrace = true,
+                FailSkillSwap = true,
+                NoTransform = true,
+            },
+        };
+        abilities[AbilityId.QuarkDrive] = quarkDrive;
+
+        return abilities;
     }
 }
