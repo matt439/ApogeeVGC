@@ -4,14 +4,13 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
-using ApogeeVGC.Sim.FieldClasses;
 
 namespace ApogeeVGC.Data;
 
 public record Events
 {
     private readonly Library _library;
-    private readonly Dictionary<EventId, Dictionary<string, Delegate>> _registeredDelegates = new();
+    private readonly Dictionary<EventId, Dictionary<EffectIdUnion, Delegate>> _registeredDelegates = new();
 
     public Events(Library library)
     {
@@ -24,7 +23,7 @@ public record Events
         // Initialize the registry structure for each EventId
         foreach (EventId eventId in Enum.GetValues<EventId>())
         {
-            _registeredDelegates[eventId] = new Dictionary<string, Delegate>();
+            _registeredDelegates[eventId] = new Dictionary<EffectIdUnion, Delegate>();
         }
     }
     
@@ -35,7 +34,7 @@ public record Events
     /// <param name="eventId">The type of event handler</param>
     /// <param name="effectId">The ID of the effect (move ID, ability ID, etc.)</param>
     /// <param name="handler">The actual delegate implementation</param>
-    public void RegisterDelegate<T>(EventId eventId, string effectId, T handler) where T : Delegate
+    public void RegisterDelegate<T>(EventId eventId, EffectIdUnion effectId, T handler) where T : Delegate
     {
         // Validate the delegate type matches the expected type for this EventId
         Type? expectedType = GetExpectedDelegateType(eventId);
@@ -55,7 +54,7 @@ public record Events
     /// <param name="eventId">The type of event handler</param>
     /// <param name="effectId">The ID of the effect</param>
     /// <returns>The delegate if found, null otherwise</returns>
-    public T? GetDelegate<T>(EventId eventId, string effectId) where T : Delegate
+    public T? GetDelegate<T>(EventId eventId, EffectIdUnion effectId) where T : Delegate
     {
         if (_registeredDelegates.TryGetValue(eventId, out var effectDict) &&
             effectDict.TryGetValue(effectId, out Delegate? handler) &&
@@ -72,7 +71,7 @@ public record Events
     /// <param name="eventId">The type of event handler</param>
     /// <param name="effectId">The ID of the effect</param>
     /// <returns>True if a delegate is registered</returns>
-    public bool HasDelegate(EventId eventId, string effectId)
+    public bool HasDelegate(EventId eventId, EffectIdUnion effectId)
     {
         return _registeredDelegates.TryGetValue(eventId, out var effectDict) &&
                effectDict.ContainsKey(effectId);
@@ -83,7 +82,7 @@ public record Events
     /// </summary>
     /// <param name="eventId">The type of event handler</param>
     /// <returns>Collection of effect IDs that have registered delegates</returns>
-    public IReadOnlyCollection<string> GetRegisteredEffects(EventId eventId)
+    public IReadOnlyCollection<EffectIdUnion> GetRegisteredEffects(EventId eventId)
     {
         if (_registeredDelegates.TryGetValue(eventId, out var effectDict))
         {
@@ -98,7 +97,7 @@ public record Events
     /// <param name="eventId">The type of event handler</param>
     /// <param name="effectId">The ID of the effect</param>
     /// <returns>True if the delegate was removed</returns>
-    public bool UnregisterDelegate(EventId eventId, string effectId)
+    public bool UnregisterDelegate(EventId eventId, EffectIdUnion effectId)
     {
         return _registeredDelegates.TryGetValue(eventId, out var effectDict) &&
                effectDict.Remove(effectId);

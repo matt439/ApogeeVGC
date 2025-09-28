@@ -3,10 +3,9 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
-using System.Collections;
-using System.Reflection;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
 
@@ -96,45 +95,123 @@ public record Library
         _abilities = new Abilities(this);
     }
 
-    #region Delegate Management Methods
+    #region Type-Safe Delegate Management Methods (Primary API)
     
     /// <summary>
-    /// Register a delegate for a specific effect
+    /// Register a delegate for a specific effect using type-safe IEffect interface
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
-    /// <param name="effectId">The effect ID (move, ability, etc.)</param>
+    /// <param name="effect">The effect (move, ability, item, etc.)</param>
     /// <param name="handler">The delegate implementation</param>
-    public void RegisterDelegate<T>(EventId eventId, string effectId, T handler) where T : Delegate
+    public void RegisterDelegate<T>(EventId eventId, IEffect effect, T handler) where T : Delegate
     {
+        EffectIdUnion effectId = GetEffectId(effect);
         _events.RegisterDelegate(eventId, effectId, handler);
     }
     
     /// <summary>
-    /// Get a delegate for a specific effect
+    /// Get a delegate for a specific effect using type-safe IEffect interface
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
-    /// <param name="effectId">The effect ID</param>
+    /// <param name="effect">The effect</param>
     /// <returns>The delegate if found, null otherwise</returns>
-    public T? GetDelegate<T>(EventId eventId, string effectId) where T : Delegate
+    public T? GetDelegate<T>(EventId eventId, IEffect effect) where T : Delegate
     {
+        EffectIdUnion effectId = GetEffectId(effect);
         return _events.GetDelegate<T>(eventId, effectId);
     }
     
     /// <summary>
-    /// Check if a delegate exists for a specific effect
+    /// Check if a delegate exists for a specific effect using type-safe IEffect interface
     /// </summary>
     /// <param name="eventId">The event type</param>
-    /// <param name="effectId">The effect ID</param>
+    /// <param name="effect">The effect</param>
     /// <returns>True if delegate exists</returns>
-    public bool HasDelegate(EventId eventId, string effectId)
+    public bool HasDelegate(EventId eventId, IEffect effect)
     {
+        EffectIdUnion effectId = GetEffectId(effect);
         return _events.HasDelegate(eventId, effectId);
     }
     
     /// <summary>
-    /// Register a delegate for a move using MoveId
+    /// Helper method to extract ID string from different effect types
+    /// </summary>
+    /// <param name="effect">The effect to get ID from</param>
+    /// <returns>String representation of the effect's ID</returns>
+    private static EffectIdUnion GetEffectId(IEffect effect)
+    {
+        return effect switch
+        {
+            Move move => move.Id,
+            Ability ability => ability.Id,
+            Item item => item.Id,
+            Condition condition => condition.Id,
+            Specie specie => specie.Id,
+            Format => throw new NotImplementedException(),
+            _ => throw new ArgumentException($"Unsupported effect type: {effect.GetType().Name}", nameof(effect)),
+        };
+    }
+    
+    #endregion
+    
+    #region Specific Type Convenience Methods (Type-Safe)
+    
+    /// <summary>
+    /// Register a delegate for a move using Move object (type-safe)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="move">The move object</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterDelegate<T>(EventId eventId, Move move, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, (IEffect)move, handler);
+    }
+    
+    /// <summary>
+    /// Register a delegate for an ability using Ability object (type-safe)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="ability">The ability object</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterDelegate<T>(EventId eventId, Ability ability, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, (IEffect)ability, handler);
+    }
+    
+    /// <summary>
+    /// Register a delegate for an item using Item object (type-safe)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="item">The item object</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterDelegate<T>(EventId eventId, Item item, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, (IEffect)item, handler);
+    }
+    
+    /// <summary>
+    /// Register a delegate for a condition using Condition object (type-safe)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="condition">The condition object</param>
+    /// <param name="handler">The delegate implementation</param>
+    public void RegisterDelegate<T>(EventId eventId, Condition condition, T handler) where T : Delegate
+    {
+        RegisterDelegate(eventId, (IEffect)condition, handler);
+    }
+    
+    #endregion
+    
+    #region Enum-Based Convenience Methods (Backward Compatible)
+    
+    /// <summary>
+    /// Register a delegate for a move using MoveId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -142,11 +219,12 @@ public record Library
     /// <param name="handler">The delegate implementation</param>
     public void RegisterMoveDelegate<T>(EventId eventId, MoveId moveId, T handler) where T : Delegate
     {
-        RegisterDelegate(eventId, moveId.ToString(), handler);
+        Move move = Moves[moveId];
+        RegisterDelegate(eventId, move, handler);
     }
     
     /// <summary>
-    /// Get a delegate for a move using MoveId
+    /// Get a delegate for a move using MoveId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -154,11 +232,12 @@ public record Library
     /// <returns>The delegate if found, null otherwise</returns>
     public T? GetMoveDelegate<T>(EventId eventId, MoveId moveId) where T : Delegate
     {
-        return GetDelegate<T>(eventId, moveId.ToString());
+        Move move = Moves[moveId];
+        return GetDelegate<T>(eventId, move);
     }
     
     /// <summary>
-    /// Register a delegate for an ability using AbilityId
+    /// Register a delegate for an ability using AbilityId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -166,11 +245,12 @@ public record Library
     /// <param name="handler">The delegate implementation</param>
     public void RegisterAbilityDelegate<T>(EventId eventId, AbilityId abilityId, T handler) where T : Delegate
     {
-        RegisterDelegate(eventId, abilityId.ToString(), handler);
+        Ability ability = Abilities[abilityId];
+        RegisterDelegate(eventId, ability, handler);
     }
     
     /// <summary>
-    /// Get a delegate for an ability using AbilityId
+    /// Get a delegate for an ability using AbilityId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -178,11 +258,12 @@ public record Library
     /// <returns>The delegate if found, null otherwise</returns>
     public T? GetAbilityDelegate<T>(EventId eventId, AbilityId abilityId) where T : Delegate
     {
-        return GetDelegate<T>(eventId, abilityId.ToString());
+        Ability ability = Abilities[abilityId];
+        return GetDelegate<T>(eventId, ability);
     }
     
     /// <summary>
-    /// Register a delegate for an item using ItemId
+    /// Register a delegate for an item using ItemId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -190,11 +271,12 @@ public record Library
     /// <param name="handler">The delegate implementation</param>
     public void RegisterItemDelegate<T>(EventId eventId, ItemId itemId, T handler) where T : Delegate
     {
-        RegisterDelegate(eventId, itemId.ToString(), handler);
+        Item item = Items[itemId];
+        RegisterDelegate(eventId, item, handler);
     }
     
     /// <summary>
-    /// Get a delegate for an item using ItemId
+    /// Get a delegate for an item using ItemId (convenience method)
     /// </summary>
     /// <typeparam name="T">The delegate type</typeparam>
     /// <param name="eventId">The event type</param>
@@ -202,70 +284,51 @@ public record Library
     /// <returns>The delegate if found, null otherwise</returns>
     public T? GetItemDelegate<T>(EventId eventId, ItemId itemId) where T : Delegate
     {
-        return GetDelegate<T>(eventId, itemId.ToString());
+        Item item = Items[itemId];
+        return GetDelegate<T>(eventId, item);
     }
     
     #endregion
-}
-
-/// <summary>
-/// A wrapper around IReadOnlyDictionary that returns copies of objects when accessed.
-/// This ensures that mutable fields in the objects cannot be accidentally shared between different users of the Library.
-/// </summary>
-/// <typeparam name="TKey">The type of the dictionary keys</typeparam>
-/// <typeparam name="TValue">The type of the dictionary values, must have a Copy() method</typeparam>
-internal class ReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> innerDictionary)
-    : IReadOnlyDictionary<TKey, TValue>
-    where TValue : class
-{
-    public TValue this[TKey key] 
-    { 
-        get 
-        { 
-            TValue value = innerDictionary[key];
-            return CopyValue(value);
-        } 
-    }
-
-    public IEnumerable<TKey> Keys => innerDictionary.Keys;
-
-    public IEnumerable<TValue> Values => innerDictionary.Values.Select(CopyValue);
-
-    public int Count => innerDictionary.Count;
-
-    public bool ContainsKey(TKey key) => innerDictionary.ContainsKey(key);
-
-    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+    
+    #region Legacy String-Based Methods (Deprecated but Kept for Compatibility)
+    
+    /// <summary>
+    /// Register a delegate for a specific effect using string ID (DEPRECATED - use IEffect overloads)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID (move, ability, etc.)</param>
+    /// <param name="handler">The delegate implementation</param>
+    [Obsolete("Use RegisterDelegate(EventId, IEffect, T) for type safety. This method will be removed in a future version.")]
+    public void RegisterDelegate<T>(EventId eventId, EffectIdUnion effectId, T handler) where T : Delegate
     {
-        return innerDictionary.Select(kvp =>
-            new KeyValuePair<TKey, TValue>(kvp.Key, CopyValue(kvp.Value))).GetEnumerator();
+        _events.RegisterDelegate(eventId, effectId, handler);
     }
-
-    public bool TryGetValue(TKey key, out TValue value)
+    
+    /// <summary>
+    /// Get a delegate for a specific effect using string ID (DEPRECATED - use IEffect overloads)
+    /// </summary>
+    /// <typeparam name="T">The delegate type</typeparam>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID</param>
+    /// <returns>The delegate if found, null otherwise</returns>
+    [Obsolete("Use GetDelegate(EventId, IEffect) for type safety. This method will be removed in a future version.")]
+    public T? GetDelegate<T>(EventId eventId, EffectIdUnion effectId) where T : Delegate
     {
-        if (innerDictionary.TryGetValue(key, out TValue? originalValue))
-        {
-            value = CopyValue(originalValue);
-            return true;
-        }
-        value = null!;
-        return false;
+        return _events.GetDelegate<T>(eventId, effectId);
     }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    private static TValue CopyValue(TValue value)
+    
+    /// <summary>
+    /// Check if a delegate exists for a specific effect using string ID (DEPRECATED - use IEffect overloads)
+    /// </summary>
+    /// <param name="eventId">The event type</param>
+    /// <param name="effectId">The effect ID</param>
+    /// <returns>True if delegate exists</returns>
+    [Obsolete("Use HasDelegate(EventId, IEffect) for type safety. This method will be removed in a future version.")]
+    public bool HasDelegate(EventId eventId, EffectIdUnion effectId)
     {
-        // Use reflection to call the Copy method dynamically
-        MethodInfo? copyMethod = typeof(TValue).GetMethod("Copy");
-        if (copyMethod != null)
-        {
-            return (TValue)copyMethod.Invoke(value, null)!;
-        }
-        
-        // If no Copy method exists, throw an exception with helpful information
-        throw new InvalidOperationException($"Type {typeof(TValue).Name} does not have a Copy() method. " +
-                                          "All types used in Library must implement a Copy() method for" +
-                                          "proper isolation.");
+        return _events.HasDelegate(eventId, effectId);
     }
+    
+    #endregion
 }

@@ -19,7 +19,7 @@ public record Abilities
         AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
     }
 
-    private Dictionary<AbilityId, Ability> CreateAbilities()
+    private static Dictionary<AbilityId, Ability> CreateAbilities()
     {
         return new Dictionary<AbilityId, Ability>
         {

@@ -1,4 +1,24 @@
-﻿///** The entire event system revolves around this function and runEvent. */
+﻿//interface EventListenerWithoutPriority
+//{
+//    effect: Effect;
+//    target?: Pokemon;
+//    index?: number;
+//    callback?: Function;
+//    state: EffectState | null;
+//    end: Function | null;
+//    endCallArgs?: any[];
+//    effectHolder: Pokemon | Side | Field | Battle;
+//}
+//interface EventListener extends EventListenerWithoutPriority
+//{
+//    order: number | false;
+//    priority: number;
+//    subOrder: number;
+//    effectOrder?: number;
+//    speed?: number;
+//}
+
+///** The entire event system revolves around this function and runEvent. */
 //singleEvent(
 //    eventid: string, effect: Effect, state: EffectState | Record<string, never> | null,
 //    target: string | Pokemon | Side | Field | Battle | null, source ?: string | Pokemon | Effect | false | null,
@@ -413,19 +433,7 @@
 //		return Array.isArray(target) ? targetRelayVars : relayVar;
 //}
 
-//using ApogeeVGC.Sim.PokemonClasses;
-/////** The entire event system revolves around this function and runEvent. */
-/////**
-//using System;
-/////** The entire event system revolves around this function and runEvent. */
-/////**
-//using System.Diagnostics.Tracing;
-/////** The entire event system revolves around this function and runEvent. */
-/////**
-//using static System.Runtime.InteropServices.JavaScript.JSType;
 
-/////** The entire event system revolves around this function and runEvent. */
-/////**
 //findEventHandlers(target: Pokemon | Pokemon[] | Side | Battle, eventName: string, source ?: Pokemon | null) {
 //    let handlers: EventListener[] = [];
 //    if (Array.isArray(target))
@@ -496,6 +504,155 @@
 //    }
 //    handlers.push(...this.findFieldEventHandlers(this.field, `on${ eventName}`));
 //    handlers.push(...this.findBattleEventHandlers(`on${ eventName}`));
+//    return handlers;
+//}
+
+
+//findPokemonEventHandlers(pokemon: Pokemon, callbackName: string, getKey ?: 'duration') {
+//    const handlers: EventListener[] = [];
+
+//    const status = pokemon.getStatus();
+//    let callback = this.getCallback(pokemon, status, callbackName);
+//    if (callback !== undefined || (getKey && pokemon.statusState[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: status, callback, state: pokemon.statusState, end: pokemon.clearStatus, effectHolder: pokemon,
+//			}, callbackName));
+//    }
+//    for (const id in pokemon.volatiles) {
+//        const volatileState = pokemon.volatiles[id];
+//        const volatile = this.dex.conditions.getByID(id as ID);
+//        callback = this.getCallback(pokemon, volatile, callbackName);
+//        if (callback !== undefined || (getKey && volatileState[getKey]))
+//        {
+//            handlers.push(this.resolvePriority({
+//            effect: volatile, callback, state: volatileState, end: pokemon.removeVolatile, effectHolder: pokemon,
+//				}, callbackName));
+//        }
+//    }
+//    const ability = pokemon.getAbility();
+//    callback = this.getCallback(pokemon, ability, callbackName);
+//    if (callback !== undefined || (getKey && pokemon.abilityState[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: ability, callback, state: pokemon.abilityState, end: pokemon.clearAbility, effectHolder: pokemon,
+//			}, callbackName));
+//    }
+//    const item = pokemon.getItem();
+//    callback = this.getCallback(pokemon, item, callbackName);
+//    if (callback !== undefined || (getKey && pokemon.itemState[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: item, callback, state: pokemon.itemState, end: pokemon.clearItem, effectHolder: pokemon,
+//			}, callbackName));
+//    }
+//    const species = pokemon.baseSpecies;
+//    callback = this.getCallback(pokemon, species, callbackName);
+//    if (callback !== undefined)
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: species, callback, state: pokemon.speciesState, end() { }, effectHolder: pokemon,
+//			}, callbackName));
+//    }
+//    const side = pokemon.side;
+//    for (const conditionid in side.slotConditions[pokemon.position]) {
+//        const slotConditionState = side.slotConditions[pokemon.position][conditionid];
+//        const slotCondition = this.dex.conditions.getByID(conditionid as ID);
+//        callback = this.getCallback(pokemon, slotCondition, callbackName);
+//        if (callback !== undefined || (getKey && slotConditionState[getKey]))
+//        {
+//            handlers.push(this.resolvePriority({
+//            effect: slotCondition,
+//					callback,
+//					state: slotConditionState,
+//					end: side.removeSlotCondition,
+//					endCallArgs: [side, pokemon, slotCondition.id],
+//					effectHolder: pokemon,
+//				}, callbackName));
+//        }
+//    }
+
+//    return handlers;
+//}
+
+//findBattleEventHandlers(callbackName: string, getKey ?: 'duration', customHolder ?: Pokemon) {
+//    const handlers: EventListener[] = [];
+
+//    let callback;
+//    const format = this.format;
+//    callback = this.getCallback(this, format, callbackName);
+//    if (callback !== undefined || (getKey && this.formatData[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: format, callback, state: this.formatData, end: null, effectHolder: customHolder || this,
+//			}, callbackName));
+//    }
+//    if (this.events && (callback = this.events[callbackName]) !== undefined)
+//    {
+//        for (const handler of callback) {
+//            const state = (handler.target.effectType === 'Format') ? this.formatData : null;
+//            handlers.push({
+//            effect: handler.target, callback: handler.callback, state, end: null, effectHolder: customHolder || this,
+//					priority: handler.priority, order: handler.order, subOrder: handler.subOrder,
+//				});
+//        }
+//    }
+//    return handlers;
+//}
+
+//findFieldEventHandlers(field: Field, callbackName: string, getKey ?: 'duration', customHolder ?: Pokemon) {
+//    const handlers: EventListener[] = [];
+
+//    let callback;
+//    for (const id in field.pseudoWeather) {
+//        const pseudoWeatherState = field.pseudoWeather[id];
+//        const pseudoWeather = this.dex.conditions.getByID(id as ID);
+//        callback = this.getCallback(field, pseudoWeather, callbackName);
+//        if (callback !== undefined || (getKey && pseudoWeatherState[getKey]))
+//        {
+//            handlers.push(this.resolvePriority({
+//            effect: pseudoWeather, callback, state: pseudoWeatherState,
+//					end: customHolder ? null : field.removePseudoWeather, effectHolder: customHolder || field,
+//				}, callbackName));
+//        }
+//    }
+//    const weather = field.getWeather();
+//    callback = this.getCallback(field, weather, callbackName);
+//    if (callback !== undefined || (getKey && this.field.weatherState[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: weather, callback, state: this.field.weatherState,
+//				end: customHolder ? null : field.clearWeather, effectHolder: customHolder || field,
+//			}, callbackName));
+//    }
+//    const terrain = field.getTerrain();
+//    callback = this.getCallback(field, terrain, callbackName);
+//    if (callback !== undefined || (getKey && field.terrainState[getKey]))
+//    {
+//        handlers.push(this.resolvePriority({
+//        effect: terrain, callback, state: field.terrainState,
+//				end: customHolder ? null : field.clearTerrain, effectHolder: customHolder || field,
+//			}, callbackName));
+//    }
+
+//    return handlers;
+//}
+
+//findSideEventHandlers(side: Side, callbackName: string, getKey ?: 'duration', customHolder ?: Pokemon) {
+//    const handlers: EventListener[] = [];
+
+//    for (const id in side.sideConditions) {
+//        const sideConditionData = side.sideConditions[id];
+//        const sideCondition = this.dex.conditions.getByID(id as ID);
+//        const callback = this.getCallback(side, sideCondition, callbackName);
+//        if (callback !== undefined || (getKey && sideConditionData[getKey]))
+//        {
+//            handlers.push(this.resolvePriority({
+//            effect: sideCondition, callback, state: sideConditionData,
+//					end: customHolder ? null : side.removeSideCondition, effectHolder: customHolder || side,
+//				}, callbackName));
+//        }
+//    }
 //    return handlers;
 //}
 
