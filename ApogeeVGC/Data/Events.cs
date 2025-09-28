@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
@@ -149,7 +150,14 @@ public record Events
             EventId.OnTryHit => typeof(OnTryHitHandler),
             EventId.OnPrepareHit => typeof(OnPrepareHitHandler),
             EventId.OnTryMove => typeof(OnTryMoveHandler),
-            
+
+            // Ability-specific delegate types
+            EventId.OnCheckShow => typeof(OnCheckShowHandler),
+            EventId.OnEndPokemon => typeof(OnEndPokemonHandler),
+            EventId.OnEndSide => typeof(OnEndSideHandler),
+            EventId.OnEndField => typeof(OnEndFieldHandler),
+            EventId.OnStart => typeof(OnStartHandler),
+
             _ => null,
         };
     }
@@ -214,5 +222,17 @@ public delegate bool? OnTryHandler(BattleContext battle, Pokemon source, Pokemon
 public delegate IntBoolUnion? OnTryHitHandler(BattleContext battle, Pokemon source, Pokemon target, Move move);
 public delegate bool? OnPrepareHitHandler(BattleContext battle, Pokemon target, Pokemon source, Move move);
 public delegate bool? OnTryMoveHandler(BattleContext battle, Pokemon source, Pokemon target, Move move);
+
+#endregion
+
+#region Ability-Specific Event Handlers
+
+public delegate void OnCheckShowHandler(BattleContext battle, Pokemon pokemon);
+
+public delegate void OnEndPokemonHandler(BattleContext battle, Pokemon target);
+public delegate void OnEndSideHandler(BattleContext battle, Side target);
+public delegate void OnEndFieldHandler(BattleContext battle, Field target);
+
+public delegate void OnStartHandler(BattleContext battle, Pokemon target);
 
 #endregion

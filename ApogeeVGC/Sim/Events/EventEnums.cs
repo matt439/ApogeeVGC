@@ -35,14 +35,20 @@ public enum EventId
     OnUseMoveMessage,
     
     // Additional handlers that don't match CommonHandlers exactly
-    OnDamagePriority, // This is an int property, not a delegate
     OnTryHitField,
     OnTryImmunity,
     OnTry,
     OnTryHit,
     OnPrepareHit,
     OnTryMove,
-    
+
+    // Ability-specific event handlers
+    OnCheckShow,
+    OnEndPokemon,
+    OnEndSide,
+    OnEndField,
+    OnStart,
+
     // Note: Many handlers in the interface comments map to CommonHandlers:
     // OnAfterHit -> VoidSourceMoveHandler
     // OnAfterMoveSecondarySelf -> VoidSourceMoveHandler  
