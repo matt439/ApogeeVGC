@@ -1,6 +1,8 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Utils;
 
@@ -33,74 +35,97 @@ public record IntIntFalseUnion(int Value) : IntFalseUnion;
 public record FalseIntFalseUnion : IntFalseUnion;
 
 
-[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
-public readonly struct EffectIdUnion : IEquatable<EffectIdUnion>
+/// <summary>
+/// CommonHandlers['ModifierSourceMove'] | -0.1
+/// </summary>
+public abstract record OnFractionalPriority
 {
-    [System.Runtime.InteropServices.FieldOffset(0)]
-    private readonly int _value;
-    [System.Runtime.InteropServices.FieldOffset(4)]
-    private readonly EffectType _type;
+    public static implicit operator OnFractionalPriority(
+        Func<BattleContext, int, Pokemon, Pokemon, Move, int?> function) =>
+        new OnFractionalPriorityFunc(function);
 
-    public EffectIdUnion(MoveId moveId)
-    {
-        _value = (int)moveId;
-        _type = EffectType.Move;
-    }
+    private const double Tolerance = 0.0001;
 
-    public EffectIdUnion(AbilityId abilityId)
-    {
-        _value = (int)abilityId;
-        _type = EffectType.Ability;
-    }
-
-    public EffectIdUnion(ItemId itemId)
-    {
-        _value = (int)itemId;
-        _type = EffectType.Item;
-    }
-
-    public EffectIdUnion(ConditionId conditionId)
-    {
-        _value = (int)conditionId;
-        _type = EffectType.Condition;
-    }
-
-    public EffectIdUnion(SpecieId specieId)
-    {
-        _value = (int)specieId;
-        _type = EffectType.Specie;
-    }
-
-    public override string ToString()
-    {
-        return _type switch
-        {
-            EffectType.Move => ((MoveId)_value).ToString(),
-            EffectType.Ability => ((AbilityId)_value).ToString(),
-            EffectType.Item => ((ItemId)_value).ToString(),
-            EffectType.Condition => ((ConditionId)_value).ToString(),
-            EffectType.Specie => ((SpecieId)_value).ToString(),
-            _ => _value.ToString(),
-        };
-    }
-
-    // Implicit conversions for ease of use
-    public static implicit operator EffectIdUnion(MoveId moveId) => new(moveId);
-    public static implicit operator EffectIdUnion(AbilityId abilityId) => new(abilityId);
-    public static implicit operator EffectIdUnion(ItemId itemId) => new(itemId);
-    public static implicit operator EffectIdUnion(ConditionId conditionId) => new(conditionId);
-    public static implicit operator EffectIdUnion(SpecieId specieId) => new(specieId);
-
-    public bool Equals(EffectIdUnion other) => _value == other._value && _type == other._type;
-    public override bool Equals(object? obj) => obj is EffectIdUnion other && Equals(other);
-    public override int GetHashCode() => HashCode.Combine(_value, _type);
-    public static bool operator ==(EffectIdUnion left, EffectIdUnion right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(EffectIdUnion left, EffectIdUnion right)
-    {
-        return !(left == right);
-    }
+    public static implicit operator OnFractionalPriority(double value) =>
+        Math.Abs(value - (-0.1)) < Tolerance
+            ? new OnFrationalPriorityNeg(value)
+            : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
 }
+
+public record OnFractionalPriorityFunc(
+    Func<BattleContext, int, Pokemon, Pokemon, Move, int?> Function) : OnFractionalPriority;
+
+public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
+
+
+//[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+//public readonly struct EffectIdUnion : IEquatable<EffectIdUnion>
+//{
+//    [System.Runtime.InteropServices.FieldOffset(0)]
+//    private readonly int _value;
+//    [System.Runtime.InteropServices.FieldOffset(4)]
+//    private readonly EffectType _type;
+
+//    public EffectIdUnion(MoveId moveId)
+//    {
+//        _value = (int)moveId;
+//        _type = EffectType.Move;
+//    }
+
+//    public EffectIdUnion(AbilityId abilityId)
+//    {
+//        _value = (int)abilityId;
+//        _type = EffectType.Ability;
+//    }
+
+//    public EffectIdUnion(ItemId itemId)
+//    {
+//        _value = (int)itemId;
+//        _type = EffectType.Item;
+//    }
+
+//    public EffectIdUnion(ConditionId conditionId)
+//    {
+//        _value = (int)conditionId;
+//        _type = EffectType.Condition;
+//    }
+
+//    public EffectIdUnion(SpecieId specieId)
+//    {
+//        _value = (int)specieId;
+//        _type = EffectType.Specie;
+//    }
+
+//    public override string ToString()
+//    {
+//        return _type switch
+//        {
+//            EffectType.Move => ((MoveId)_value).ToString(),
+//            EffectType.Ability => ((AbilityId)_value).ToString(),
+//            EffectType.Item => ((ItemId)_value).ToString(),
+//            EffectType.Condition => ((ConditionId)_value).ToString(),
+//            EffectType.Specie => ((SpecieId)_value).ToString(),
+//            _ => _value.ToString(),
+//        };
+//    }
+
+//    // Implicit conversions for ease of use
+//    public static implicit operator EffectIdUnion(MoveId moveId) => new(moveId);
+//    public static implicit operator EffectIdUnion(AbilityId abilityId) => new(abilityId);
+//    public static implicit operator EffectIdUnion(ItemId itemId) => new(itemId);
+//    public static implicit operator EffectIdUnion(ConditionId conditionId) => new(conditionId);
+//    public static implicit operator EffectIdUnion(SpecieId specieId) => new(specieId);
+
+//    public bool Equals(EffectIdUnion other) => _value == other._value && _type == other._type;
+//    public override bool Equals(object? obj) => obj is EffectIdUnion other && Equals(other);
+//    public override int GetHashCode() => HashCode.Combine(_value, _type);
+//    public static bool operator ==(EffectIdUnion left, EffectIdUnion right)
+//    {
+//        return left.Equals(right);
+//    }
+
+//    public static bool operator !=(EffectIdUnion left, EffectIdUnion right)
+//    {
+//        return !(left == right);
+//    }
+//}
