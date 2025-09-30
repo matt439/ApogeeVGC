@@ -1,7 +1,5 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -78,9 +76,6 @@ public record Ability : IEffect
     public Action<Pokemon, Field, Pokemon[], IEffect, BattleContext>? OnStart { get; init; }
     public Func<int, Move, int>? OnModifyPriority { get; init; }
     public Action<Pokemon, Field, BattleContext>? OnTerrainChange { get; init; }
-
-    public ModifierEffectHandler? EffectHandler { get; init; }
-    public IReadOnlyList<IEventHandler> EventHandlers { get; init; } = [];
 
     public Ability Copy()
     {

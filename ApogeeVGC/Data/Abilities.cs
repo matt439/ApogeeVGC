@@ -5,8 +5,6 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.Events;
 
 namespace ApogeeVGC.Data;
 
@@ -52,10 +50,6 @@ public record Abilities
 
                 source.AlterStatModifier(StatId.Atk, length, context);
             },
-            EventHandlers =
-            [
-                new AbilityEventHandler(EventId.BasePowerCallback, "", BasePowerCallbackHandler => ),
-            ],
         };
         abilities[AbilityId.AsOneGlastrier] = asOneGlastrier;
 
@@ -72,11 +66,6 @@ public record Abilities
                 pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
             },
         };
-        _library.RegisterDelegate<OnStartHandler>(EventId.OnStart, hadronEngine,
-            (battleContext, target) =>
-            {
-
-            });
         abilities[AbilityId.HadronEngine] = hadronEngine;
 
         // Guts
