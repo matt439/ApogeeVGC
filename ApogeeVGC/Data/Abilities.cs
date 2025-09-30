@@ -52,6 +52,10 @@ public record Abilities
 
                 source.AlterStatModifier(StatId.Atk, length, context);
             },
+            EventHandlers =
+            [
+                new AbilityEventHandler(EventId.BasePowerCallback, "", BasePowerCallbackHandler => ),
+            ],
         };
         abilities[AbilityId.AsOneGlastrier] = asOneGlastrier;
 

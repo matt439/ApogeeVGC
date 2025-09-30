@@ -1,5 +1,16 @@
 ﻿namespace ApogeeVGC.Sim.Events;
 
+public enum EventScope
+{
+    Global,
+    Pokemon,
+    Move,
+    Ability,
+    Item,
+    Field,
+    Side,
+}
+
 public enum EventId
 {
     // From CommonHandlers
