@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
@@ -20,6 +21,15 @@ public interface IBattle
 
     BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false);
+
+    double ChainModify(int numerator, int denominator = 1);
+    double ChainModify(int[] numerator, int denominator = 1);
+    double ChainModify(double numerator, int denominator = 1);
+    double ChainModify(double[] numerator, int denominator = 1);
+
+    bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
+
+    bool RandomChance(int numerator, int denominator);
 
     Library Library { get; }
     Random Random { get; }

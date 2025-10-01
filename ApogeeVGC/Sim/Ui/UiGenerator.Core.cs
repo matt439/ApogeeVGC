@@ -104,6 +104,11 @@ public static partial class UiGenerator
         Console.WriteLine($"{element.Name} has {element.RemainingTurns} turns remaining.");
     }
 
+    public static void PrintAbilityActivation(string ability)
+    {
+        Console.WriteLine($"{ability} activated!");
+    }
+
     private static void PrintTurnStart(int turn)
     {
         string turnString = turn.ToString(CultureInfo.InvariantCulture);

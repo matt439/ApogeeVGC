@@ -47,8 +47,6 @@ public record Abilities
                         UiGenerator.PrintChillingNeighActivation(source);
                     }
 
-                    //source.AlterStatModifier(StatId.Atk, length, context);
-
                     battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
                         _library.Abilities[AbilityId.ChillingNeigh]);
                 },
@@ -59,16 +57,22 @@ public record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = (battle, pokemon) =>
+                OnStart = (battle, _) =>
                 {
-                    //battle.Field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, context);
-                    //pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
-
                     if (!battle.Field.SetTerrain(battle, _library.Terrains[TerrainId.Electric]) &&
-                        battle.Field.HasTerrain(TerrainId.Electric))
+                        battle.Field.HasTerrain(TerrainId.Electric) && battle.PrintDebug)
                     {
-
+                        UiGenerator.PrintAbilityActivation("Hadron Engine");
                     }
+                },
+                OnModifySpAPriority = 5,
+                OnModifySpA = (battle, _, _, _, _) =>
+                {
+                    if (battle.Field.HasTerrain(TerrainId.Electric))
+                    {
+                        return battle.ChainModify([5461, 4096]);
+                    }
+                    return null;
                 },
             },
             [AbilityId.Guts] = new()
@@ -77,9 +81,14 @@ public record Abilities
                 Name = "Guts",
                 Num = 62,
                 Rating = 3.5,
-                OnStart = (pokemon, _, _, _, context) =>
+                OnModifyAtkPriority = 5,
+                OnModifyAtk = (battle, _, pokemon, _, _) =>
                 {
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.Guts], context);
+                    if (pokemon.HasStatus)
+                    {
+                        return battle.ChainModify(1.5);
+                    }
+                    return null;
                 },
             },
             [AbilityId.FlameBody] = new()
@@ -88,9 +97,14 @@ public record Abilities
                 Name = "Flame Body",
                 Num = 49,
                 Rating = 2.0,
-                OnStart = (pokemon, _, _, _, context) =>
+                OnDamagingHit = (battle, _, target, source, move) =>
                 {
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.FlameBody], context);
+                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+
+                    if (battle.RandomChance(3, 10))
+                    {
+                        source.TrySetStatus(_library.Conditions[ConditionId.Burn], target, null);
+                    }
                 },
             },
             [AbilityId.Prankster] = new()
@@ -99,9 +113,11 @@ public record Abilities
                 Name = "Prankster",
                 Num = 158,
                 Rating = 4.0,
-                OnModifyPriority = (priority, move) =>
+                OnModifyPriority = (_, priority, _, _, move) =>
                 {
-                    if (move.Category != MoveCategory.Status) return priority;
+                    if (move.Category != MoveCategory.Status) return null;
+
+                    move.PranksterBooster = true;
                     return priority + 1;
                 },
             },

@@ -24,6 +24,8 @@ public partial class Pokemon
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
 
+    public bool HasStatus => false; // TODO: implement status conditions
+
     // HP modification methods
     public int Heal(int amount)
     {
@@ -48,6 +50,12 @@ public partial class Pokemon
     public Condition? GetCondition(ConditionId conditionId)
     {
         return Conditions.FirstOrDefault(c => c.Id == conditionId);
+    }
+
+    public bool TrySetStatus(Condition status, Pokemon? source, IEffect? sourceEffect)
+    {
+        return true;
+        // TODO: implement status conditions
     }
 
     public void AddCondition(Condition condition, BattleContext context, Pokemon? source = null, IEffect? sourceEffect = null)

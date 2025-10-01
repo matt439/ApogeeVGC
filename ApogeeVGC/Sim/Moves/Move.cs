@@ -155,6 +155,8 @@ public record Move : IEffect
     /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
     public MoveSlot MoveSlot { get; init; }
 
+    public bool? PranksterBooster { get; set; }
+
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.
     /// This method creates an independent copy with the same state while sharing immutable references.

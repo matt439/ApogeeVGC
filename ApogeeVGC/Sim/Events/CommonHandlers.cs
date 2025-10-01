@@ -71,10 +71,10 @@ namespace ApogeeVGC.Sim.Events;
 
 
 
-public delegate int? ModifierEffectHandler(IBattle battle, int relayVar, Pokemon target,
+public delegate double? ModifierEffectHandler(IBattle battle, int relayVar, Pokemon target,
     Pokemon source, IEffect effect);
 
-public delegate int? ModifierMoveHandler(IBattle battle, int relayVar, Pokemon target,
+public delegate double? ModifierMoveHandler(IBattle battle, int relayVar, Pokemon target,
     Pokemon source, Move move);
 
 public delegate bool? ResultMoveHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
@@ -83,10 +83,10 @@ public delegate void VoidEffectHandler(IBattle battle, Pokemon target, Pokemon s
 public delegate void VoidMoveHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
 
 // Source-based variants (source comes first in parameters)
-public delegate int? ModifierSourceEffectHandler(IBattle battle, int relayVar, Pokemon source,
+public delegate double? ModifierSourceEffectHandler(IBattle battle, int relayVar, Pokemon source,
     Pokemon target, IEffect effect);
 
-public delegate int? ModifierSourceMoveHandler(IBattle battle, int relayVar, Pokemon source,
+public delegate double? ModifierSourceMoveHandler(IBattle battle, int relayVar, Pokemon source,
     Pokemon target, Move move);
 
 public delegate bool? ResultSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target, Move move);
