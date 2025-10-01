@@ -1,0 +1,28 @@
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FieldClasses;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
+
+namespace ApogeeVGC.Sim.BattleClasses;
+
+public interface IBattle
+{
+    RelayVar? SingleEvent(EventId eventId, IEffect effect, SingleEventTarget? target,
+        SingleEventSource? source, IEffect? sourceEffect, RelayVar? relayVar, Delegate? customCallback);
+
+    RelayVar? RunEvent(EventId eventId, RunEventTarget? target, PokemonFalseUnion? source, IEffect? sourceEffect,
+        RelayVar? relayVar, bool? onEffect, bool? fastExit);
+
+    void EachEvent(EventId eventId, IEffect? effect, bool? relayVar);
+
+    BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
+        IEffect? effect = null, bool isSecondary = false, bool isSelf = false);
+
+    Library Library { get; }
+    Random Random { get; }
+    bool PrintDebug { get; }
+    Field Field { get; }
+}

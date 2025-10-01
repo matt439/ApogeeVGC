@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
@@ -9,15 +9,15 @@ public interface IAbilityEventMethods
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<BattleContext, Pokemon>? OnCheckShow { get; }
+    Action<IBattle, Pokemon>? OnCheckShow { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<BattleContext, PokemonSideFieldUnion>? OnEnd { get; }
+    Action<IBattle, PokemonSideFieldUnion>? OnEnd { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<BattleContext, Pokemon>? OnStart { get; }
+    Action<IBattle, Pokemon>? OnStart { get; }
 }

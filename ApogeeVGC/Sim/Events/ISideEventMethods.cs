@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 
@@ -9,22 +9,22 @@ public interface ISideEventMethods : IEventMethods
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<BattleContext, Side, Pokemon, IEffect>? OnSideStart { get; }
+    Action<IBattle, Side, Pokemon, IEffect>? OnSideStart { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<BattleContext, Side, Pokemon, IEffect>? OnSideRestart { get; }
+    Action<IBattle, Side, Pokemon, IEffect>? OnSideRestart { get; }
 
     /// <summary>
     /// battle, target, source, effect
     /// </summary>
-    Action<BattleContext, Side, Pokemon, IEffect>? OnSideResidual { get; }
+    Action<IBattle, Side, Pokemon, IEffect>? OnSideResidual { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<BattleContext, Side>? OnSideEnd { get; }
+    Action<IBattle, Side>? OnSideEnd { get; }
     int? OnSideResidualOrder { get; }
     int? OnSideResidualPriority { get; }
     int? OnSideResidualSubOrder { get; }

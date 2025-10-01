@@ -1,4 +1,6 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -63,11 +65,11 @@ public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 /// </summary>
 public abstract record OnCriticalHit
 {
-    public static implicit operator OnCriticalHit(Func<BattleContext, Pokemon, object?, Move, bool?> function) =>
+    public static implicit operator OnCriticalHit(Func<IBattle, Pokemon, object?, Move, bool?> function) =>
         new OnCriticalHitFunc(function);
     public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
 }
-public record OnCriticalHitFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Function) : OnCriticalHit;
+public record OnCriticalHitFunc(Func<IBattle, Pokemon, object?, Move, bool?> Function) : OnCriticalHit;
 public record OnCriticalHitBool(bool Value) : OnCriticalHit;
 
 
@@ -104,15 +106,15 @@ public record PokemonSideFieldField(Field Field) : PokemonSideFieldUnion;
 public abstract record OnTryHeal
 {
     public static implicit operator OnTryHeal(
-        Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> func) =>
+        Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> func) =>
         new OnTryHealFunc1(func);
-    public static implicit operator OnTryHeal(Func<BattleContext, Pokemon, bool?> func) =>
+    public static implicit operator OnTryHeal(Func<IBattle, Pokemon, bool?> func) =>
         new OnTryHealFunc2(func);
     public static implicit operator OnTryHeal(bool value) => new OnTryHealBool(value);
 }
-public record OnTryHealFunc1(Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> Func) :
+public record OnTryHealFunc1(Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> Func) :
     OnTryHeal;
-public record OnTryHealFunc2(Func<BattleContext, Pokemon, bool?> Func) : OnTryHeal;
+public record OnTryHealFunc2(Func<IBattle, Pokemon, bool?> Func) : OnTryHeal;
 public record OnTryHealBool(bool Value) : OnTryHeal;
 
 
@@ -121,11 +123,11 @@ public record OnTryHealBool(bool Value) : OnTryHeal;
 /// </summary>
 public abstract record OnFlinch
 {
-    public static implicit operator OnFlinch(Func<BattleContext, Pokemon, object?, Move, bool?> func) =>
+    public static implicit operator OnFlinch(Func<IBattle, Pokemon, object?, Move, bool?> func) =>
         new OnFlinchFunc(func);
     public static implicit operator OnFlinch(bool value) => new OnFlinchBool(value);
 }
-public record OnFlinchFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Func) : OnFlinch;
+public record OnFlinchFunc(Func<IBattle, Pokemon, object?, Move, bool?> Func) : OnFlinch;
 public record OnFlinchBool(bool Value) : OnFlinch;
 
 
@@ -134,11 +136,11 @@ public record OnFlinchBool(bool Value) : OnFlinch;
 /// </summary>
 public abstract record OnNegateImmunity
 {
-    public static implicit operator OnNegateImmunity(Func<BattleContext, Pokemon, PokemonType, bool?> func) =>
+    public static implicit operator OnNegateImmunity(Func<IBattle, Pokemon, PokemonType, bool?> func) =>
         new OnNegateImmunityFunc(func);
     public static implicit operator OnNegateImmunity(bool value) => new OnNegateImmunityBool(value);
 }
-public record OnNegateImmunityFunc(Func<BattleContext, Pokemon, PokemonType, bool?> Func) : OnNegateImmunity;
+public record OnNegateImmunityFunc(Func<IBattle, Pokemon, PokemonType, bool?> Func) : OnNegateImmunity;
 public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
 
 
@@ -147,16 +149,147 @@ public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
 /// </summary>
 public abstract record OnTakeItem
 {
-    public static implicit operator OnTakeItem(Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?> func) =>
+    public static implicit operator OnTakeItem(Func<IBattle, Item, Pokemon, Pokemon, Move?, bool?> func) =>
         new OnTakeItemFunc(func);
     public static implicit operator OnTakeItem(bool value) => new OnTakeItemBool(value);
 }
-public record OnTakeItemFunc(Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?> Func) : OnTakeItem;
+public record OnTakeItemFunc(Func<IBattle, Item, Pokemon, Pokemon, Move?, bool?> Func) : OnTakeItem;
 public record OnTakeItemBool(bool Value) : OnTakeItem;
 
 
 
 
+/// <summary>
+/// Pokemon | Side | Field | Battle
+/// </summary>
+public abstract record SingleEventTarget
+{
+    public static implicit operator SingleEventTarget(Pokemon pokemon) =>
+        new PokemonSingleEventTarget(pokemon);
+
+    public static implicit operator SingleEventTarget(Side side) => new SideSingleEventTarget(side);
+    public static implicit operator SingleEventTarget(Field field) => new FieldSingleEventTarget(field);
+
+    public static SingleEventTarget FromIBattle(IBattle battle) => new BattleSingleEventTarget(battle);
+}
+public record PokemonSingleEventTarget(Pokemon Pokemon) : SingleEventTarget;
+public record SideSingleEventTarget(Side Side) : SingleEventTarget;
+public record FieldSingleEventTarget(Field Field) : SingleEventTarget;
+public record BattleSingleEventTarget(IBattle Battle) : SingleEventTarget;
+
+
+
+/// <summary>
+/// Pokemon | Effect | false
+/// </summary>
+public abstract record SingleEventSource
+{
+    public static implicit operator SingleEventSource(Pokemon pokemon) =>
+        new PokemonSingleEventSource(pokemon);
+
+    public static implicit operator SingleEventSource(Ability ability) =>
+        EffectUnionFactory.ToSingleEventSource(ability);
+
+    public static implicit operator SingleEventSource(Item item) =>
+        EffectUnionFactory.ToSingleEventSource(item);
+
+    public static implicit operator SingleEventSource(Move activeMove) =>
+        EffectUnionFactory.ToSingleEventSource(activeMove);
+
+    public static implicit operator SingleEventSource(Specie specie) =>
+        EffectUnionFactory.ToSingleEventSource(specie);
+
+    public static SingleEventSource FromICondition(ICondition condition) =>
+        EffectUnionFactory.ToSingleEventSource(condition);
+
+    public static implicit operator SingleEventSource(Format format) =>
+        EffectUnionFactory.ToSingleEventSource(format);
+
+    public static SingleEventSource FromFalse() => new FalseSingleEventSource();
+}
+public record PokemonSingleEventSource(Pokemon Pokemon) : SingleEventSource;
+public record EffectSingleEventSource(IEffect Effect) : SingleEventSource;
+public record FalseSingleEventSource : SingleEventSource;
+
+
+/// <summary>
+/// bool | int
+/// </summary>
+public abstract record RelayVar
+{
+    public static implicit operator RelayVar(bool value) => new BoolRelayVar(value);
+    public static implicit operator RelayVar(int value) => new IntRelayVar(value);
+}
+public record BoolRelayVar(bool Value) : RelayVar;
+public record IntRelayVar(int Value) : RelayVar;
+
+
+
+public static class EffectUnionFactory
+{
+    public static SingleEventSource ToSingleEventSource(IEffect effect) => effect switch
+    {
+        Ability ability => new EffectSingleEventSource(ability),
+        Item item => new EffectSingleEventSource(item),
+        Move activeMove => new EffectSingleEventSource(activeMove),
+        Specie specie => new EffectSingleEventSource(specie),
+        ICondition condition => new EffectSingleEventSource(condition),
+        Format format => new EffectSingleEventSource(format),
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource")
+    };
+}
+
+
+
+/// <summary>
+/// Pokemon | Pokemon[] | Side | Battle
+/// </summary>
+public abstract record RunEventTarget
+{
+    public static implicit operator RunEventTarget(Pokemon pokemon) =>
+        new PokemonRunEventTarget(pokemon);
+
+    public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
+        new PokemonArrayRunEventTarget(pokemonList);
+
+    public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
+    public static RunEventTarget FromIBattle(IBattle battle) => new BattleRunEventTarget(battle);
+}
+
+public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;
+public record PokemonArrayRunEventTarget(Pokemon[] PokemonList) : RunEventTarget;
+public record SideRunEventTarget(Side Side) : RunEventTarget;
+public record BattleRunEventTarget(IBattle Battle) : RunEventTarget;
+
+
+
+
+
+
+/// <summary>
+/// pokemon | false
+/// </summary>
+public abstract record PokemonFalseUnion
+{
+    public static implicit operator PokemonFalseUnion(Pokemon pokemon) => new PokemonPokemonUnion(pokemon);
+
+    public static PokemonFalseUnion FromFalse() => new FalsePokemonUnion();
+}
+public record PokemonPokemonUnion(Pokemon Pokemon) : PokemonFalseUnion;
+public record FalsePokemonUnion : PokemonFalseUnion;
+
+
+
+/// <summary>
+/// bool| 0
+/// </summary>
+public abstract record BoolZeroUnion
+{
+    public static implicit operator BoolZeroUnion(bool value) => new BoolBoolZeroUnion(value);
+    public static BoolZeroUnion FromZero() => new ZeroBoolZeroUnion();
+}
+public record BoolBoolZeroUnion(bool Value) : BoolZeroUnion;
+public record ZeroBoolZeroUnion : BoolZeroUnion;
 
 
 

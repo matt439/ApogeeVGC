@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -10,22 +10,22 @@ public interface IFieldEventMethods : IEventMethods
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<BattleContext, Field, Pokemon, IEffect>? OnFieldStart { get; }
+    Action<IBattle, Field, Pokemon, IEffect>? OnFieldStart { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<BattleContext, Field, Pokemon, IEffect>? OnFieldRestart { get; }
+    Action<IBattle, Field, Pokemon, IEffect>? OnFieldRestart { get; }
 
     /// <summary>
     /// battle, target, source, effect
     /// </summary>
-    Action<BattleContext, Field, Pokemon, IEffect>? OnFieldResidual { get; }
+    Action<IBattle, Field, Pokemon, IEffect>? OnFieldResidual { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<BattleContext, Field>? OnFieldEnd { get; }
+    Action<IBattle, Field>? OnFieldEnd { get; }
     int? OnFieldResidualOrder { get; }
     int? OnFieldResidualPriority { get; }
     int? OnFieldResidualSubOrder { get; }

@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Player;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -53,7 +54,8 @@ public class Field
         return Terrain?.Id == terrainId;
     }
 
-    public bool SetTerrain(Terrain terrain, Pokemon? source = null, IEffect? sourceEffect = null)
+    public bool SetTerrain(IBattle battle, Terrain terrain, Pokemon? source = null,
+        IEffect? sourceEffect = null)
     {
         if (HasTerrain(terrain.Id))
         {
@@ -61,7 +63,13 @@ public class Field
         }
 
         Terrain = terrain.Copy();
-        Terrain.IsExtended = Terrain.DurationCallback?.Invoke(null, source, sourceEffect) ?? false;
+
+        if (Terrain.DurationCallback is not null && source is not null && sourceEffect is not null)
+        {
+            Terrain.Duration = Terrain.DurationCallback.Invoke(context, source, source, sourceEffect);
+        }
+
+        
 
         return true;
     }

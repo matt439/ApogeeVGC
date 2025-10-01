@@ -20,19 +20,12 @@ public class Weather : FieldElement
         {
             Id = Id,
             Name = Name,
-            IsExtended = IsExtended,
-            BaseDuration = BaseDuration,
-            DurationExtension = DurationExtension,
+            Duration = Duration,
             DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
-            PrintDebug = PrintDebug, // Added missing PrintDebug
-            // Note: TurnStart delegates (OnEnd, OnStart, etc.) are shared immutable references
-            // since they don't contain mutable state - they're function pointers
-            OnEnd = OnEnd,
-            OnStart = OnStart,
-            OnReapply = OnReapply,
-            OnIncrementTurnCounter = OnIncrementTurnCounter,
-            OnPokemonSwitchIn = OnPokemonSwitchIn,
+            PrintDebug = PrintDebug,
+
+            // TODO: add delegate properties here
         };
     }
 

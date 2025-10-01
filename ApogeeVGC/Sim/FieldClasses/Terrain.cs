@@ -20,18 +20,12 @@ public class Terrain : FieldElement
         {
             Id = Id,
             Name = Name,
-            IsExtended = IsExtended,
-            BaseDuration = BaseDuration,
-            DurationExtension = DurationExtension,
+            Duration = Duration,
             DurationCallback = DurationCallback,
             ElapsedTurns = ElapsedTurns,
-            PrintDebug = PrintDebug, // Added missing PrintDebug
-            // Note: TurnStart delegates are shared immutable references
-            OnEnd = OnEnd,
-            OnStart = OnStart,
-            OnReapply = OnReapply,
-            OnIncrementTurnCounter = OnIncrementTurnCounter,
-            OnPokemonSwitchIn = OnPokemonSwitchIn,
+            PrintDebug = PrintDebug,
+
+            //TODO: add delegate properties here
         };
     }
 

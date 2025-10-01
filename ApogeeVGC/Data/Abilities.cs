@@ -19,7 +19,7 @@ public record Abilities
         AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
     }
 
-    private static Dictionary<AbilityId, Ability> CreateAbilities()
+    private Dictionary<AbilityId, Ability> CreateAbilities()
     {
         return new Dictionary<AbilityId, Ability>
         {
@@ -39,15 +39,18 @@ public record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                OnSourceAfterFaint = (context, length, _, source, effect) =>
+                OnSourceAfterFaint = (battle, length, _, source, effect) =>
                 {
                     if (effect.EffectType != EffectType.Move) return;
-                    if (context.PrintDebug)
+                    if (battle.PrintDebug)
                     {
                         UiGenerator.PrintChillingNeighActivation(source);
                     }
 
-                    source.AlterStatModifier(StatId.Atk, length, context);
+                    //source.AlterStatModifier(StatId.Atk, length, context);
+
+                    battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
+                        _library.Abilities[AbilityId.ChillingNeigh]);
                 },
             },
             [AbilityId.HadronEngine] = new()
@@ -56,10 +59,16 @@ public record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = (context, pokemon) =>
+                OnStart = (battle, pokemon) =>
                 {
-                    context.Field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, context);
-                    pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
+                    //battle.Field.AddTerrain(context.Library.Terrains[TerrainId.Electric], pokemon, context);
+                    //pokemon.AddCondition(context.Library.Conditions[ConditionId.HadronEngine], context);
+
+                    if (!battle.Field.SetTerrain(battle, _library.Terrains[TerrainId.Electric]) &&
+                        battle.Field.HasTerrain(TerrainId.Electric))
+                    {
+
+                    }
                 },
             },
             [AbilityId.Guts] = new()

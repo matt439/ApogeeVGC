@@ -8,7 +8,7 @@ using ApogeeVGC.Sim.Turns;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class BattleAsync : IBattle
 {
     public required Library Library { get; init; }
     public required Field Field { get; init; }

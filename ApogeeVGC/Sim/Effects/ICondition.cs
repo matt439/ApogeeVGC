@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 
@@ -11,25 +11,25 @@ public interface ICondition : ISideEventMethods, IFieldEventMethods, IPokemonEve
     /// <summary>
     /// battle, target, source, effect -> number
     /// </summary>
-    Func<BattleContext, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<BattleContext, Pokemon>? OnCopy { get; }
+    Action<IBattle, Pokemon>? OnCopy { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<BattleContext, Pokemon>? OnEnd { get; }
+    Action<IBattle, Pokemon>? OnEnd { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<BattleContext, Pokemon, Pokemon, IEffect, bool?>? OnRestart { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, bool?>? OnRestart { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<BattleContext, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; }
 }
