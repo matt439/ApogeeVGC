@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -80,6 +81,19 @@ public abstract record PokemonSideUnion
 }
 public record PokemonSidePokemon(Pokemon Pokemon) : PokemonSideUnion;
 public record PokemonSideSide(Side Side) : PokemonSideUnion;
+
+/// <summary>
+/// Pokemon | Side | Field
+/// </summary>
+public abstract record PokemonSideFieldUnion
+{
+    public static implicit operator PokemonSideFieldUnion(Pokemon pokemon) => new PokemonSideFieldPokemon(pokemon);
+    public static implicit operator PokemonSideFieldUnion(Side side) => new PokemonSideFieldSide(side);
+    public static implicit operator PokemonSideFieldUnion(Field field) => new PokemonSideFieldField(field);
+}
+public record PokemonSideFieldPokemon(Pokemon Pokemon) : PokemonSideFieldUnion;
+public record PokemonSideFieldSide(Side Side) : PokemonSideFieldUnion;
+public record PokemonSideFieldField(Field Field) : PokemonSideFieldUnion;
 
 
 /// <summary>
