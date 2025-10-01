@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.FieldClasses;
@@ -52,4 +53,6 @@ public class SideCondition : FieldElement
             OnPokemonSwitchIn = OnPokemonSwitchIn,
         };
     }
+
+    public override ConditionEffectType ConditionEffectType => ConditionEffectType.SideCondition;
 }

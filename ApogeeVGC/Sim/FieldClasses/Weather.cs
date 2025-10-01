@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.FieldClasses;
+﻿using ApogeeVGC.Sim.Effects;
+
+namespace ApogeeVGC.Sim.FieldClasses;
 
 public enum WeatherId
 {
@@ -33,4 +35,6 @@ public class Weather : FieldElement
             OnPokemonSwitchIn = OnPokemonSwitchIn,
         };
     }
+
+    public override ConditionEffectType ConditionEffectType => ConditionEffectType.Weather;
 }
