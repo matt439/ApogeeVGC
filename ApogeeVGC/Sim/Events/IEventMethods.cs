@@ -10,6 +10,9 @@ namespace ApogeeVGC.Sim.Events;
 
 public interface IEventMethods
 {
+    /// <summary>
+    /// battle, damage, terget, source, move
+    /// </summary>
     Action<BattleContext, int, Pokemon, Pokemon, Move>? OnDamagingHit { get; }
     Action<BattleContext, Pokemon>? OnEmergencyExit { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; }
@@ -28,7 +31,11 @@ public interface IEventMethods
     VoidSourceMoveHandler? OnAfterMove { get; } // MoveEventMethods['onAfterMove']
     VoidSourceMoveHandler? OnAfterMoveSelf { get; } // CommonHandlers['VoidSourceMove']
     Action<BattleContext, Pokemon, Pokemon>? OnAttract { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, Move, object?>? OnAccuracy { get; }
+
+    /// <summary>
+    /// battle, accuracy, target, source, move -> number | boolean | null
+    /// </summary>
+    Func<BattleContext, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAccuracy { get; }
     ModifierSourceMoveHandler? OnBasePower { get; } // CommonHandlers['ModifierSourceMove']
     Action<BattleContext, Pokemon, IEffect>? OnBeforeFaint { get; }
     VoidSourceMoveHandler? OnBeforeMove { get; } // CommonHandlers['VoidSourceMove']
@@ -38,8 +45,8 @@ public interface IEventMethods
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; }
     VoidSourceMoveHandler? OnChargeMove { get; } // CommonHandlers['VoidSourceMove']
-    Func<BattleContext, Pokemon, object?, Move, bool?>? OnCriticalHit { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, IEffect, object?>? OnDamage { get; }
+    OnCriticalHit? OnCriticalHit { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; }
     Func<BattleContext, Pokemon, Pokemon, int?>? OnDeductPp { get; }
     Action<BattleContext, Pokemon>? OnDisableMove { get; }
     Action<BattleContext, Pokemon, Pokemon?, Move?>? OnDragOut { get; }
@@ -47,11 +54,11 @@ public interface IEventMethods
     OnEffectivenessHandler? OnEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     Action<BattleContext, Pokemon>? OnEntryHazard { get; }
     VoidEffectHandler? OnFaint { get; } // CommonHandlers['VoidEffect']
-    Func<BattleContext, Pokemon, bool?>? OnFlinch { get; }
+    OnFlinch? OnFlinch { get; }
     OnFractionalPriority? OnFractionalPriority { get; }
     ResultMoveHandler? OnHit { get; } // MoveEventMethods['onHit']
-    Action<BattleContext, string, Pokemon>? OnImmunity { get; }
-    Func<BattleContext, Pokemon, string?>? OnLockMove { get; }
+    Action<BattleContext, PokemonType, Pokemon>? OnImmunity { get; }
+    Func<BattleContext, Pokemon, Move?>? OnLockMove { get; }
     Action<BattleContext, Pokemon>? OnMaybeTrapPokemon { get; }
     ModifierMoveHandler? OnModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
@@ -70,13 +77,13 @@ public interface IEventMethods
     ModifierSourceMoveHandler? OnModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     Func<BattleContext, int, Pokemon, int?>? OnModifyWeight { get; }
     VoidMoveHandler? OnMoveAborted { get; } // CommonHandlers['VoidMove']
-    Func<BattleContext, Pokemon, string, bool?>? OnNegateImmunity { get; }
-    Func<BattleContext, Pokemon, Pokemon, Move, string?>? OnOverrideAction { get; }
+    OnNegateImmunity? OnNegateImmunity { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, Delegate?>? OnOverrideAction { get; }
     ResultSourceMoveHandler? OnPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     Action<BattleContext, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; }
     Func<BattleContext, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnRedirectTarget { get; }
     Action<BattleContext, Pokemon, Pokemon, IEffect>? OnResidual { get; }
-    Func<BattleContext, string, Pokemon, Pokemon, IEffect, object?>? OnSetAbility { get; }
+    Action<BattleContext, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSetStatus { get; }
     Func<BattleContext, Pokemon, Pokemon, Condition, bool?>? OnSetWeather { get; }
     Action<BattleContext, Side, Pokemon, Condition>? OnSideConditionStart { get; }
@@ -84,31 +91,26 @@ public interface IEventMethods
     Action<BattleContext, Pokemon>? OnSwitchIn { get; }
     Action<BattleContext, Pokemon>? OnSwitchOut { get; }
     Action<BattleContext, Pokemon, Pokemon>? OnSwap { get; }
-    Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?>? OnTakeItem { get; }
+    OnTakeItem? OnTakeItem { get; }
     Action<BattleContext, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; }
     Action<BattleContext, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; }
     Action<BattleContext, Pokemon>? OnTrapPokemon { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnTryAddVolatile { get; }
     Func<BattleContext, Item, Pokemon, bool?>? OnTryEatItem { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, IEffect, object?>? OnTryHeal { get; }
-
-
-
+    Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnTryHeal { get; }
     ExtResultSourceMoveHandler? OnTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnTryHitField { get; } // MoveEventMethods['onTryHitField']
     ResultMoveHandler? OnTryHitSide { get; } // CommonHandlers['ResultMove']
     ExtResultMoveHandler? OnInvulnerability { get; } // CommonHandlers['ExtResultMove']
     ResultSourceMoveHandler? OnTryMove { get; } // MoveEventMethods['onTryMove']
-    Func<BattleContext, Pokemon, Pokemon, Move, object?>? OnTryPrimaryHit { get; }
-    Func<BattleContext, List<string>, Pokemon, List<string>?>? OnType { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, IntBoolUnion?>? OnTryPrimaryHit { get; }
+    Func<BattleContext, PokemonType[], Pokemon, List<PokemonType>?>? OnType { get; }
     Action<BattleContext, Item, Pokemon>? OnUseItem { get; }
     Action<BattleContext, Pokemon>? OnUpdate { get; }
     Action<BattleContext, Pokemon, object?, Condition>? OnWeather { get; }
     ModifierSourceMoveHandler? OnWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnModifyDamagePhase2 { get; } // CommonHandlers['ModifierSourceMove']
-
-    // Foe event handlers (triggered by opponent actions)
     Action<BattleContext, int, Pokemon, Pokemon, Move>? OnFoeDamagingHit { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; }
     VoidSourceMoveHandler? OnFoeAfterHit { get; } // MoveEventMethods['onAfterHit']
@@ -123,7 +125,7 @@ public interface IEventMethods
     VoidSourceMoveHandler? OnFoeAfterMove { get; } // MoveEventMethods['onAfterMove']
     VoidSourceMoveHandler? OnFoeAfterMoveSelf { get; } // CommonHandlers['VoidSourceMove']
     Action<BattleContext, Pokemon, Pokemon>? OnFoeAttract { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, Move, object?>? OnFoeAccuracy { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnFoeAccuracy { get; }
     ModifierSourceMoveHandler? OnFoeBasePower { get; } // CommonHandlers['ModifierSourceMove']
     Action<BattleContext, Pokemon, IEffect>? OnFoeBeforeFaint { get; }
     VoidSourceMoveHandler? OnFoeBeforeMove { get; } // CommonHandlers['VoidSourceMove']
@@ -131,18 +133,18 @@ public interface IEventMethods
     Action<BattleContext, Pokemon>? OnFoeBeforeSwitchOut { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; }
     VoidSourceMoveHandler? OnFoeChargeMove { get; } // CommonHandlers['VoidSourceMove']
-    Func<BattleContext, Pokemon, object?, Move, bool?>? OnFoeCriticalHit { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, IEffect, object?>? OnFoeDamage { get; }
+    OnCriticalHit? OnFoeCriticalHit { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnFoeDamage { get; }
     Func<BattleContext, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; }
     Action<BattleContext, Pokemon>? OnFoeDisableMove { get; }
     Action<BattleContext, Pokemon, Pokemon?, Move?>? OnFoeDragOut { get; }
     Action<BattleContext, Item, Pokemon>? OnFoeEatItem { get; }
     OnEffectivenessHandler? OnFoeEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnFoeFaint { get; } // CommonHandlers['VoidEffect']
-    Func<BattleContext, Pokemon, bool?>? OnFoeFlinch { get; }
+    OnFlinch? OnFoeFlinch { get; }
     ResultMoveHandler? OnFoeHit { get; } // MoveEventMethods['onHit']
-    Action<BattleContext, string, Pokemon>? OnFoeImmunity { get; }
-    Func<BattleContext, Pokemon, string?>? OnFoeLockMove { get; }
+    Action<BattleContext, PokemonType, Pokemon>? OnFoeImmunity { get; }
+    Func<BattleContext, Pokemon, Move?>? OnFoeLockMove { get; }
     Action<BattleContext, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; }
     ModifierMoveHandler? OnFoeModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnFoeModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
@@ -161,36 +163,32 @@ public interface IEventMethods
     OnModifyTargetHandler? OnFoeModifyTarget { get; } // MoveEventMethods['onModifyTarget']
     Func<BattleContext, int, Pokemon, int?>? OnFoeModifyWeight { get; }
     VoidMoveHandler? OnFoeMoveAborted { get; } // CommonHandlers['VoidMove']
-    Func<BattleContext, Pokemon, string, bool?>? OnFoeNegateImmunity { get; }
-    Func<BattleContext, Pokemon, Pokemon, Move, string?>? OnFoeOverrideAction { get; }
+    OnNegateImmunity? OnFoeNegateImmunity { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, Delegate?>? OnFoeOverrideAction { get; }
     ResultSourceMoveHandler? OnFoePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     Func<BattleContext, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnFoeRedirectTarget { get; }
-    Action<BattleContext, object, Pokemon, IEffect>? OnFoeResidual { get; }
-    Func<BattleContext, string, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetAbility { get; }
+    Action<BattleContext, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; }
+    Func<BattleContext, Ability, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetAbility { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetStatus { get; }
     Func<BattleContext, Pokemon, Pokemon, Condition, bool?>? OnFoeSetWeather { get; }
     Func<BattleContext, Pokemon, bool?>? OnFoeStallMove { get; }
     Action<BattleContext, Pokemon>? OnFoeSwitchOut { get; }
-    Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?>? OnFoeTakeItem { get; }
+    OnTakeItem? OnFoeTakeItem { get; }
     Action<BattleContext, Pokemon>? OnFoeTerrain { get; }
     Action<BattleContext, Pokemon>? OnFoeTrapPokemon { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnFoeTryAddVolatile { get; }
     Func<BattleContext, Item, Pokemon, bool?>? OnFoeTryEatItem { get; }
-    Func<BattleContext, object, object?, object?, object?, object?>? OnFoeTryHeal { get; }
+    OnTryHeal? OnFoeTryHeal { get; }
     ExtResultSourceMoveHandler? OnFoeTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnFoeTryHitField { get; } // MoveEventMethods['onTryHitField']
     ResultMoveHandler? OnFoeTryHitSide { get; } // CommonHandlers['ResultMove']
     ExtResultMoveHandler? OnFoeInvulnerability { get; } // CommonHandlers['ExtResultMove']
     ResultSourceMoveHandler? OnFoeTryMove { get; } // MoveEventMethods['onTryMove']
-    Func<BattleContext, Pokemon, Pokemon, Move, object?>? OnFoeTryPrimaryHit { get; }
-
-
-    Func<BattleContext, List<string>, Pokemon, List<string>?>? OnFoeType { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, IntBoolUnion?>? OnFoeTryPrimaryHit { get; }
+    Func<BattleContext, PokemonType[], Pokemon, PokemonType[]?>? OnFoeType { get; }
     ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamagePhase2 { get; } // CommonHandlers['ModifierSourceMove']
-
-    // Source event handlers (triggered when this Pokémon is the source)
     Action<BattleContext, int, Pokemon, Pokemon, Move>? OnSourceDamagingHit { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; }
     VoidSourceMoveHandler? OnSourceAfterHit { get; } // MoveEventMethods['onAfterHit']
@@ -205,7 +203,7 @@ public interface IEventMethods
     VoidSourceMoveHandler? OnSourceAfterMove { get; } // MoveEventMethods['onAfterMove']
     VoidSourceMoveHandler? OnSourceAfterMoveSelf { get; } // CommonHandlers['VoidSourceMove']
     Action<BattleContext, Pokemon, Pokemon>? OnSourceAttract { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, Move, object?>? OnSourceAccuracy { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnSourceAccuracy { get; }
     ModifierSourceMoveHandler? OnSourceBasePower { get; } // CommonHandlers['ModifierSourceMove']
     Action<BattleContext, Pokemon, IEffect>? OnSourceBeforeFaint { get; }
     VoidSourceMoveHandler? OnSourceBeforeMove { get; } // CommonHandlers['VoidSourceMove']
@@ -213,18 +211,18 @@ public interface IEventMethods
     Action<BattleContext, Pokemon>? OnSourceBeforeSwitchOut { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; }
     VoidSourceMoveHandler? OnSourceChargeMove { get; } // CommonHandlers['VoidSourceMove']
-    Func<BattleContext, Pokemon, object?, Move, bool?>? OnSourceCriticalHit { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, IEffect, object?>? OnSourceDamage { get; }
+    OnCriticalHit? OnSourceCriticalHit { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnSourceDamage { get; }
     Func<BattleContext, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; }
     Action<BattleContext, Pokemon>? OnSourceDisableMove { get; }
     Action<BattleContext, Pokemon, Pokemon?, Move?>? OnSourceDragOut { get; }
     Action<BattleContext, Item, Pokemon>? OnSourceEatItem { get; }
     OnEffectivenessHandler? OnSourceEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnSourceFaint { get; } // CommonHandlers['VoidEffect']
-    Func<BattleContext, Pokemon, bool?>? OnSourceFlinch { get; }
+    OnFlinch? OnSourceFlinch { get; }
     ResultMoveHandler? OnSourceHit { get; } // MoveEventMethods['onHit']
-    Action<BattleContext, string, Pokemon>? OnSourceImmunity { get; }
-    Func<BattleContext, Pokemon, string?>? OnSourceLockMove { get; }
+    Action<BattleContext, PokemonType, Pokemon>? OnSourceImmunity { get; }
+    Func<BattleContext, Pokemon, Move?>? OnSourceLockMove { get; }
     Action<BattleContext, Pokemon>? OnSourceMaybeTrapPokemon { get; }
     ModifierMoveHandler? OnSourceModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnSourceModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
@@ -243,34 +241,32 @@ public interface IEventMethods
     OnModifyTargetHandler? OnSourceModifyTarget { get; } // MoveEventMethods['onModifyTarget']
     Func<BattleContext, int, Pokemon, int?>? OnSourceModifyWeight { get; }
     VoidMoveHandler? OnSourceMoveAborted { get; } // CommonHandlers['VoidMove']
-    Func<BattleContext, Pokemon, string, bool?>? OnSourceNegateImmunity { get; }
-    Func<BattleContext, Pokemon, Pokemon, Move, string?>? OnSourceOverrideAction { get; }
+    OnNegateImmunity? OnSourceNegateImmunity { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, Delegate?>? OnSourceOverrideAction { get; }
     ResultSourceMoveHandler? OnSourcePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     Func<BattleContext, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnSourceRedirectTarget { get; }
-    Action<BattleContext, object, Pokemon, IEffect>? OnSourceResidual { get; }
-    Func<BattleContext, string, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetAbility { get; }
+    Action<BattleContext, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; }
+    Func<BattleContext, Ability, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetAbility { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetStatus { get; }
     Func<BattleContext, Pokemon, Pokemon, Condition, bool?>? OnSourceSetWeather { get; }
     Func<BattleContext, Pokemon, bool?>? OnSourceStallMove { get; }
     Action<BattleContext, Pokemon>? OnSourceSwitchOut { get; }
-    Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?>? OnSourceTakeItem { get; }
+    OnTakeItem? OnSourceTakeItem { get; }
     Action<BattleContext, Pokemon>? OnSourceTerrain { get; }
     Action<BattleContext, Pokemon>? OnSourceTrapPokemon { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSourceTryAddVolatile { get; }
     Func<BattleContext, Item, Pokemon, bool?>? OnSourceTryEatItem { get; }
-    Func<BattleContext, object, object?, object?, object?, object?>? OnSourceTryHeal { get; }
+    OnTryHeal? OnSourceTryHeal { get; }
     ExtResultSourceMoveHandler? OnSourceTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnSourceTryHitField { get; } // MoveEventMethods['onTryHitField']
     ResultMoveHandler? OnSourceTryHitSide { get; } // CommonHandlers['ResultMove']
     ExtResultMoveHandler? OnSourceInvulnerability { get; } // CommonHandlers['ExtResultMove']
     ResultSourceMoveHandler? OnSourceTryMove { get; } // MoveEventMethods['onTryMove']
-    Func<BattleContext, Pokemon, Pokemon, Move, object?>? OnSourceTryPrimaryHit { get; }
-    Func<BattleContext, List<string>, Pokemon, List<string>?>? OnSourceType { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, IntBoolUnion?>? OnSourceTryPrimaryHit { get; }
+    Func<BattleContext, PokemonType[], Pokemon, PokemonType[]?>? OnSourceType { get; }
     ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamagePhase2 { get; } // CommonHandlers['ModifierSourceMove']
-
-    // Any event handlers (triggered for any Pokémon action in BattleContext)
     Action<BattleContext, int, Pokemon, Pokemon, Move>? OnAnyDamagingHit { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; }
     VoidSourceMoveHandler? OnAnyAfterHit { get; } // MoveEventMethods['onAfterHit']
@@ -287,7 +283,7 @@ public interface IEventMethods
     VoidSourceMoveHandler? OnAnyAfterMoveSelf { get; } // CommonHandlers['VoidSourceMove']
     Action<BattleContext, Pokemon>? OnAnyAfterTerastallization { get; }
     Action<BattleContext, Pokemon, Pokemon>? OnAnyAttract { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, Move, object?>? OnAnyAccuracy { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAnyAccuracy { get; }
     ModifierSourceMoveHandler? OnAnyBasePower { get; } // CommonHandlers['ModifierSourceMove']
     Action<BattleContext, Pokemon, IEffect>? OnAnyBeforeFaint { get; }
     VoidSourceMoveHandler? OnAnyBeforeMove { get; } // CommonHandlers['VoidSourceMove']
@@ -295,18 +291,18 @@ public interface IEventMethods
     Action<BattleContext, Pokemon>? OnAnyBeforeSwitchOut { get; }
     Action<BattleContext, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; }
     VoidSourceMoveHandler? OnAnyChargeMove { get; } // CommonHandlers['VoidSourceMove']
-    Func<BattleContext, Pokemon, object?, Move, bool?>? OnAnyCriticalHit { get; }
-    Func<BattleContext, int, Pokemon, Pokemon, IEffect, object?>? OnAnyDamage { get; }
+    OnCriticalHit? OnAnyCriticalHit { get; }
+    Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnAnyDamage { get; }
     Func<BattleContext, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; }
     Action<BattleContext, Pokemon>? OnAnyDisableMove { get; }
     Action<BattleContext, Pokemon, Pokemon?, Move?>? OnAnyDragOut { get; }
     Action<BattleContext, Item, Pokemon>? OnAnyEatItem { get; }
     OnEffectivenessHandler? OnAnyEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnAnyFaint { get; } // CommonHandlers['VoidEffect']
-    Func<BattleContext, Pokemon, bool?>? OnAnyFlinch { get; }
+    OnFlinch? OnAnyFlinch { get; }
     ResultMoveHandler? OnAnyHit { get; } //  MoveEventMethods['onHit']
-    Action<BattleContext, string, Pokemon>? OnAnyImmunity { get; }
-    Func<BattleContext, Pokemon, string?>? OnAnyLockMove { get; }
+    Action<BattleContext, PokemonType, Pokemon>? OnAnyImmunity { get; }
+    Func<BattleContext, Pokemon, Move?>? OnAnyLockMove { get; }
     Action<BattleContext, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; }
     ModifierMoveHandler? OnAnyModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnAnyModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
@@ -325,31 +321,31 @@ public interface IEventMethods
     OnModifyTargetHandler? OnAnyModifyTarget { get; } // MoveEventMethods['onModifyTarget']
     Func<BattleContext, int, Pokemon, int?>? OnAnyModifyWeight { get; }
     Action<BattleContext, Pokemon, Pokemon, Move>? OnAnyMoveAborted { get; }
-    Func<BattleContext, Pokemon, string, bool?>? OnAnyNegateImmunity { get; }
-    Func<BattleContext, Pokemon, Pokemon, Move, string?>? OnAnyOverrideAction { get; }
+    OnNegateImmunity? OnAnyNegateImmunity { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, Delegate?>? OnAnyOverrideAction { get; }
     ResultSourceMoveHandler? OnAnyPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     Action<BattleContext, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; }
     Func<BattleContext, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnAnyRedirectTarget { get; }
-    Action<BattleContext, object, Pokemon, IEffect>? OnAnyResidual { get; }
-    Func<BattleContext, string, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; }
+    Action<BattleContext, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; }
+    Func<BattleContext, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnySetStatus { get; }
     Func<BattleContext, Pokemon, Pokemon, Condition, bool?>? OnAnySetWeather { get; }
     Func<BattleContext, Pokemon, bool?>? OnAnyStallMove { get; }
     Action<BattleContext, Pokemon>? OnAnySwitchIn { get; }
     Action<BattleContext, Pokemon>? OnAnySwitchOut { get; }
-    Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?>? OnAnyTakeItem { get; }
+    OnTakeItem? OnAnyTakeItem { get; }
     Action<BattleContext, Pokemon>? OnAnyTerrain { get; }
     Action<BattleContext, Pokemon>? OnAnyTrapPokemon { get; }
     Func<BattleContext, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnyTryAddVolatile { get; }
     Func<BattleContext, Item, Pokemon, bool?>? OnAnyTryEatItem { get; }
-    Func<BattleContext, object, object?, object?, object?, object?>? OnAnyTryHeal { get; }
+    OnTryHeal? OnAnyTryHeal { get; }
     ExtResultSourceMoveHandler? OnAnyTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnAnyTryHitField { get; } // MoveEventMethods['onTryHitField']
     ResultMoveHandler? OnAnyTryHitSide { get; } // CommonHandlers['ResultMove']
     ExtResultMoveHandler? OnAnyInvulnerability { get; } // CommonHandlers['ExtResultMove']
     ResultSourceMoveHandler? OnAnyTryMove { get; } // MoveEventMethods['onTryMove']
-    Func<BattleContext, Pokemon, Pokemon, Move, object?>? OnAnyTryPrimaryHit { get; }
-    Func<BattleContext, List<string>, Pokemon, List<string>?>? OnAnyType { get; }
+    Func<BattleContext, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAnyTryPrimaryHit { get; }
+    Func<BattleContext, PokemonType[], Pokemon, PokemonType[]?>? OnAnyType { get; }
     ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamagePhase2 { get; } // CommonHandlers['ModifierSourceMove']

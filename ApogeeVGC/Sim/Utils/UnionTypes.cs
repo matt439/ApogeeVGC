@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -40,8 +41,7 @@ public record FalseIntFalseUnion : IntFalseUnion;
 /// </summary>
 public abstract record OnFractionalPriority
 {
-    public static implicit operator OnFractionalPriority(
-        Func<BattleContext, int, Pokemon, Pokemon, Move, int?> function) =>
+    public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
         new OnFractionalPriorityFunc(function);
 
     private const double Tolerance = 0.0001;
@@ -52,10 +52,113 @@ public abstract record OnFractionalPriority
             : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
 }
 
-public record OnFractionalPriorityFunc(
-    Func<BattleContext, int, Pokemon, Pokemon, Move, int?> Function) : OnFractionalPriority;
+public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
 
 public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
+
+
+/// <summary>
+/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) =&gt; boolean | void) | boolean
+/// </summary>
+public abstract record OnCriticalHit
+{
+    public static implicit operator OnCriticalHit(Func<BattleContext, Pokemon, object?, Move, bool?> function) =>
+        new OnCriticalHitFunc(function);
+    public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
+}
+public record OnCriticalHitFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Function) : OnCriticalHit;
+public record OnCriticalHitBool(bool Value) : OnCriticalHit;
+
+
+/// <summary>
+/// Pokemon | Side
+/// </summary>
+public abstract record PokemonSideUnion
+{
+    public static implicit operator PokemonSideUnion(Pokemon pokemon) => new PokemonSidePokemon(pokemon);
+    public static implicit operator PokemonSideUnion(Side side) => new PokemonSideSide(side);
+}
+public record PokemonSidePokemon(Pokemon Pokemon) : PokemonSideUnion;
+public record PokemonSideSide(Side Side) : PokemonSideUnion;
+
+
+/// <summary>
+/// ((this: Battle, relayVar: number, target: Pokemon, source: Pokemon, effect: Effect) => number | boolean | void)
+/// | ((this: Battle, pokemon: Pokemon) => boolean | void)
+/// | boolean
+/// </summary>
+public abstract record OnTryHeal
+{
+    public static implicit operator OnTryHeal(
+        Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> func) =>
+        new OnTryHealFunc1(func);
+    public static implicit operator OnTryHeal(Func<BattleContext, Pokemon, bool?> func) =>
+        new OnTryHealFunc2(func);
+    public static implicit operator OnTryHeal(bool value) => new OnTryHealBool(value);
+}
+public record OnTryHealFunc1(Func<BattleContext, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> Func) :
+    OnTryHeal;
+public record OnTryHealFunc2(Func<BattleContext, Pokemon, bool?> Func) : OnTryHeal;
+public record OnTryHealBool(bool Value) : OnTryHeal;
+
+
+/// <summary>
+/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
+/// </summary>
+public abstract record OnFlinch
+{
+    public static implicit operator OnFlinch(Func<BattleContext, Pokemon, object?, Move, bool?> func) =>
+        new OnFlinchFunc(func);
+    public static implicit operator OnFlinch(bool value) => new OnFlinchBool(value);
+}
+public record OnFlinchFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Func) : OnFlinch;
+public record OnFlinchBool(bool Value) : OnFlinch;
+
+
+/// <summary>
+/// ((this: Battle, pokemon: Pokemon, type: string) => boolean | void) | boolean
+/// </summary>
+public abstract record OnNegateImmunity
+{
+    public static implicit operator OnNegateImmunity(Func<BattleContext, Pokemon, PokemonType, bool?> func) =>
+        new OnNegateImmunityFunc(func);
+    public static implicit operator OnNegateImmunity(bool value) => new OnNegateImmunityBool(value);
+}
+public record OnNegateImmunityFunc(Func<BattleContext, Pokemon, PokemonType, bool?> Func) : OnNegateImmunity;
+public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
+
+
+/// <summary>
+/// (this: Battle, item: Item, pokemon: Pokemon, source: Pokemon, move?: ActiveMove) => boolean | void) | boolean
+/// </summary>
+public abstract record OnTakeItem
+{
+    public static implicit operator OnTakeItem(Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?> func) =>
+        new OnTakeItemFunc(func);
+    public static implicit operator OnTakeItem(bool value) => new OnTakeItemBool(value);
+}
+public record OnTakeItemFunc(Func<BattleContext, Item, Pokemon, Pokemon, Move?, bool?> Func) : OnTakeItem;
+public record OnTakeItemBool(bool Value) : OnTakeItem;
+
+
+
+
+
+
+
+///// <summary>
+///// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
+///// </summary>
+//public abstract record OnCriticalHit
+//{
+//    public static implicit operator OnCriticalHit(Func<BattleContext, Pokemon, object?, Move, bool?> func) =>
+//        new OnSourceCriticalHitFunc(func);
+//    public static implicit operator OnCriticalHit(bool value) => new OnSourceCriticalHitBool(value);
+//}
+//public record OnSourceCriticalHitFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Func) : OnCriticalHit;
+//public record OnSourceCriticalHitBool(bool Value) : OnCriticalHit;
+
+
 
 
 //[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
