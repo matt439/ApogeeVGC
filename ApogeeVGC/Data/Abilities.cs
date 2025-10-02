@@ -5,6 +5,8 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography.X509Certificates;
+using ApogeeVGC.Sim.Events;
 
 namespace ApogeeVGC.Data;
 
@@ -128,41 +130,18 @@ public record Abilities
                 Num = 282,
                 Rating = 3.0,
                 OnSwitchInPriority = -2,
-                OnStart = (pokemon, field, _, _, context) =>
+                OnStart = (battle, pokemon) =>
                 {
-                    if (field.HasTerrain(TerrainId.Electric))
-                    {
-                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
-                        //if (context.PrintDebug)
-                        //{
-                        //    UiGenerator.PrintQuarkDriveStart(pokemon);
-                        //}
-                    }
-                    else
-                    {
-                        if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
-                        {
-                            UiGenerator.PrintQuarkDriveEnd(pokemon);
-                        }
-                    }
+                    battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState, pokemon,
+                        null, null, null, null);
                 },
-                OnTerrainChange = (pokemon, field, context) =>
+                OnTerrainChange = (battle, pokemon, _, _) =>
                 {
-                    if (field.HasTerrain(TerrainId.Electric))
+                    if (battle.Field.HasTerrain(TerrainId.Electric))
                     {
-                        pokemon.AddCondition(context.Library.Conditions[ConditionId.QuarkDrive], context);
-                        //if (context.PrintDebug)
-                        //{
-                        //    UiGenerator.PrintQuarkDriveStart(pokemon);
-                        //}
+                        pokemon.AddVolatile(_library.Conditions[ConditionId.QuarkDrive]);
                     }
-                    else
-                    {
-                        if (pokemon.RemoveCondition(ConditionId.QuarkDrive) && context.PrintDebug)
-                        {
-                            UiGenerator.PrintQuarkDriveEnd(pokemon);
-                        }
-                    }
+                    else if ()
                 },
                 Flags = new AbilityFlags
                 {

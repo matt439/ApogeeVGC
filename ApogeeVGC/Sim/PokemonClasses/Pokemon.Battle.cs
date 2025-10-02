@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
+using ApogeeVGC.Sim.Utils;
 
 
 namespace ApogeeVGC.Sim.PokemonClasses;
@@ -24,7 +25,7 @@ public partial class Pokemon
     public int CurrentHpPercentage => (int)Math.Ceiling(CurrentHpRatio * 100);
     public bool IsFainted => CurrentHp <= 0;
 
-    public bool HasStatus => false; // TODO: implement status conditions
+    public bool HasStatus => throw new NotImplementedException();
 
     // HP modification methods
     public int Heal(int amount)
@@ -54,8 +55,13 @@ public partial class Pokemon
 
     public bool TrySetStatus(Condition status, Pokemon? source, IEffect? sourceEffect)
     {
-        return true;
-        // TODO: implement status conditions
+        throw new NotImplementedException();
+    }
+
+    public RelayVar AddVolatile(ICondition status, Pokemon? source = null, IEffect? sourceEffect = null,
+        ICondition? linkedStatus = null)
+    {
+        throw new NotImplementedException();
     }
 
     public void AddCondition(Condition condition, BattleContext context, Pokemon? source = null, IEffect? sourceEffect = null)

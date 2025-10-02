@@ -11,7 +11,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public interface IBattle
 {
-    RelayVar? SingleEvent(EventId eventId, IEffect effect, SingleEventTarget? target,
+    RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state, SingleEventTarget? target,
         SingleEventSource? source, IEffect? sourceEffect, RelayVar? relayVar, Delegate? customCallback);
 
     RelayVar? RunEvent(EventId eventId, RunEventTarget? target, PokemonFalseUnion? source, IEffect? sourceEffect,
@@ -35,4 +35,7 @@ public interface IBattle
     Random Random { get; }
     bool PrintDebug { get; }
     Field Field { get; }
+
+    IEffect Effect { get; }
+    EffectState EffectState { get; }
 }
