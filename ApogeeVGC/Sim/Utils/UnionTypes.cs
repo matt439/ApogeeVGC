@@ -1,6 +1,4 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -96,6 +94,21 @@ public abstract record PokemonSideFieldUnion
 public record PokemonSideFieldPokemon(Pokemon Pokemon) : PokemonSideFieldUnion;
 public record PokemonSideFieldSide(Side Side) : PokemonSideFieldUnion;
 public record PokemonSideFieldField(Field Field) : PokemonSideFieldUnion;
+
+
+/// <summary>
+/// Pokemon | Side | Battle
+/// </summary>
+public abstract record PokemonSideBattleUnion
+{
+    public static implicit operator PokemonSideBattleUnion(Pokemon pokemon) =>
+        new PokemonSideBattlePokemon(pokemon);
+    public static implicit operator PokemonSideBattleUnion(Side side) => new PokemonSideBattleSide(side);
+    public static PokemonSideBattleUnion FromIBattle(IBattle battle) => new PokemonSideBattleBattle(battle);
+}
+public record PokemonSideBattlePokemon(Pokemon Pokemon) : PokemonSideBattleUnion;
+public record PokemonSideBattleSide(Side Side) : PokemonSideBattleUnion;
+public record PokemonSideBattleBattle(IBattle Battle) : PokemonSideBattleUnion;
 
 
 /// <summary>
@@ -199,7 +212,7 @@ public abstract record SingleEventSource
     public static implicit operator SingleEventSource(Specie specie) =>
         EffectUnionFactory.ToSingleEventSource(specie);
 
-    public static SingleEventSource FromICondition(ICondition condition) =>
+    public static implicit operator SingleEventSource(Condition condition) =>
         EffectUnionFactory.ToSingleEventSource(condition);
 
     public static implicit operator SingleEventSource(Format format) =>
@@ -233,7 +246,7 @@ public static class EffectUnionFactory
         Item item => new EffectSingleEventSource(item),
         Move activeMove => new EffectSingleEventSource(activeMove),
         Specie specie => new EffectSingleEventSource(specie),
-        ICondition condition => new EffectSingleEventSource(condition),
+        Condition condition => new EffectSingleEventSource(condition),
         Format format => new EffectSingleEventSource(format),
         _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource")
     };

@@ -1,4 +1,6 @@
-﻿namespace ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Stats;
+
+namespace ApogeeVGC.Sim.Effects;
 
 public enum EffectStateId
 {
@@ -12,4 +14,7 @@ public class EffectState
     public int? Duration { get; init; }
 
     // other properties that might be relevant to effect state
+
+    public bool? FromBooster { get; set; }
+    public StatIdExceptHp? BestStat { get; set; }
 }

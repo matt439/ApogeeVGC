@@ -1,10 +1,13 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -38,4 +41,17 @@ public interface IBattle
 
     IEffect Effect { get; }
     EffectState EffectState { get; }
+
+    Side Side1 { get; }
+    Side Side2 { get; }
+    int? BattleSeed { get; set; }
+
+    IBattle Copy();
+
+    bool IsGameComplete { get; }
+    Turn CurrentTurn { get; }
+
+    BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
+
+    void Start();
 }

@@ -35,12 +35,4 @@ public enum ConditionEffectType
     Weather,
     Status,
     Terrain,
-    PseudoWeather,
-    SideCondition,
-}
-
-public enum ConditionVolatility
-{
-    Volatile,
-    NonVolatile,
 }

@@ -134,7 +134,7 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
     public ModifierSourceMoveHandler? OnModifySpA { get; init; }
     public ModifierMoveHandler? OnModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, int?>? OnModifySpe { get; init; }
+    public Func<IBattle, int, Pokemon, double?>? OnModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnModifyStab { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnModifyWeight { get; init; }
     public VoidMoveHandler? OnMoveAborted { get; init; }

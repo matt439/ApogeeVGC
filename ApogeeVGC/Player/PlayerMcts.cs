@@ -55,14 +55,14 @@ public class PlayerMcts : IPlayer
     public Task<BattleChoice> GetNextChoiceAsync(BattleChoice[] availableChoices, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        // Notify that a choice has been requested
-        var requestEventArgs = new ChoiceRequestEventArgs
-        {
-            AvailableChoices = availableChoices,
-            TimeLimit = TimeSpan.FromSeconds(45), // Default timeout
-            RequestTime = DateTime.UtcNow,
-        };
-        ChoiceRequested?.Invoke(this, requestEventArgs);
+        //// Notify that a choice has been requested
+        //var requestEventArgs = new ChoiceRequestEventArgs
+        //{
+        //    AvailableChoices = availableChoices,
+        //    TimeLimit = TimeSpan.FromSeconds(45), // Default timeout
+        //    RequestTime = DateTime.UtcNow,
+        //};
+        //ChoiceRequested?.Invoke(this, requestEventArgs);
 
         BattleChoice choice = GetNextChoice(availableChoices, perspective);
         
@@ -73,7 +73,7 @@ public class PlayerMcts : IPlayer
     }
 
     // Events from interfaces
-    public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
+    //public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<BattleChoice>? ChoiceSubmitted;
 
     // Timeout methods from IPlayerNew

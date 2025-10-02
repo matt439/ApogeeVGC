@@ -6,7 +6,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var driver = new Driver();
-        driver.Start(DriverMode.ConsoleVsRandom);
+        //var driver = new Driver();
+        //driver.Start(DriverMode.ConsoleVsRandom);
     }
 }

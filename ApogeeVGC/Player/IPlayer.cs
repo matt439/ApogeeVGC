@@ -12,7 +12,7 @@ public interface IPlayerNew
         BattlePerspective perspective, CancellationToken cancellationToken);
 
     // Events for notifications
-    event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
+    //event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     event EventHandler<BattleChoice>? ChoiceSubmitted;
 
     // Optional: For handling timeouts gracefully

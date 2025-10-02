@@ -83,62 +83,62 @@ public class Driver
 
     private async Task RunConsoleVsMctsTest()
     {
-        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
-        IPlayerNew player2 = new PlayerMcts(PlayerId.Player2, MctsMaxIterations,
-            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
+        //IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
+        //IPlayerNew player2 = new PlayerMcts(PlayerId.Player2, MctsMaxIterations,
+        //    MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
 
-        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-            "MCTS", BattleFormat.Doubles);
+        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        //    "MCTS", BattleFormat.Doubles);
 
-        var simulator = new Simulator
-        {
-            Battle = battle,
-            Player1 = player1,
-            Player2 = player2,
-        };
+        //var simulator = new Simulator
+        //{
+        //    Battle = battle,
+        //    Player1 = player1,
+        //    Player2 = player2,
+        //};
 
-        SimulatorResult result = await simulator.Run();
+        //SimulatorResult result = await simulator.Run();
 
-        string winner = result switch
-        {
-            SimulatorResult.Player1Win => "Matt",
-            SimulatorResult.Player2Win => "MCTS",
-            _ => "Unknown",
-        };
+        //string winner = result switch
+        //{
+        //    SimulatorResult.Player1Win => "Matt",
+        //    SimulatorResult.Player2Win => "MCTS",
+        //    _ => "Unknown",
+        //};
 
-        Console.WriteLine($"Battle finished. Winner: {winner}");
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine($"Battle finished. Winner: {winner}");
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 
     private async Task RunMctsVsRandom()
     {
-        IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
-            MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
-        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
+        //IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
+        //    MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
+        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
-            "Random", BattleFormat.Doubles);
+        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
+        //    "Random", BattleFormat.Doubles);
 
-        var simulator = new Simulator
-        {
-            Battle = battle,
-            Player1 = player1,
-            Player2 = player2,
-        };
+        //var simulator = new Simulator
+        //{
+        //    Battle = battle,
+        //    Player1 = player1,
+        //    Player2 = player2,
+        //};
 
-        SimulatorResult result = await simulator.Run();
+        //SimulatorResult result = await simulator.Run();
 
-        string winner = result switch
-        {
-            SimulatorResult.Player1Win => "MCTS",
-            SimulatorResult.Player2Win => "Random",
-            _ => "Unknown",
-        };
+        //string winner = result switch
+        //{
+        //    SimulatorResult.Player1Win => "MCTS",
+        //    SimulatorResult.Player2Win => "Random",
+        //    _ => "Unknown",
+        //};
 
-        Console.WriteLine($"Battle finished. Winner: {winner}");
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine($"Battle finished. Winner: {winner}");
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 
     //private void RunMctsVsRandomEvaluation()
@@ -204,213 +204,213 @@ public class Driver
 
     private async Task RunMctsVsRandomEvaluation(BattleFormat format)
     {
-        var simResults = new ConcurrentBag<SimulatorResult>();
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        //var simResults = new ConcurrentBag<SimulatorResult>();
+        //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        int seedCounter = 0;
-        var turnOnBattleEnd = new ConcurrentBag<int>();
+        //int seedCounter = 0;
+        //var turnOnBattleEnd = new ConcurrentBag<int>();
 
-        // Run simulations sequentially instead of in parallel
-        for (int i = 0; i < MctsEvaluationNumTest; i++)
-        {
-            int currentSeed = ++seedCounter;
-            int player1Seed = PlayerRandom1Seed + currentSeed;
-            int player2Seed = PlayerRandom2Seed + currentSeed;
+        //// Run simulations sequentially instead of in parallel
+        //for (int i = 0; i < MctsEvaluationNumTest; i++)
+        //{
+        //    int currentSeed = ++seedCounter;
+        //    int player1Seed = PlayerRandom1Seed + currentSeed;
+        //    int player2Seed = PlayerRandom2Seed + currentSeed;
 
-            IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
-                MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
-            IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
+        //    IPlayerNew player1 = new PlayerMcts(PlayerId.Player1, MctsMaxIterations,
+        //        MctsExplorationParameter, Library, player1Seed, NumThreads, _mctsMaxTimer);
+        //    IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
-            BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
-                "MCTS", "Random", format, false, currentSeed);
+        //    BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+        //        "MCTS", "Random", format, false, currentSeed);
 
-            var simulator = new Simulator
-            {
-                Battle = battle,
-                Player1 = player1,
-                Player2 = player2,
-            };
+        //    var simulator = new Simulator
+        //    {
+        //        Battle = battle,
+        //        Player1 = player1,
+        //        Player2 = player2,
+        //    };
 
-            SimulatorResult result = await simulator.Run();
-            simResults.Add(result);
-            turnOnBattleEnd.Add(battle.TurnCounter);
-            simulator.Battle.ClearTurns();
+        //    SimulatorResult result = await simulator.Run();
+        //    simResults.Add(result);
+        //    turnOnBattleEnd.Add(battle.TurnCounter);
+        //    simulator.Battle.ClearTurns();
             
-            // Optional: Progress reporting for long-running sequential tests
-            if ((i + 1) % 10 == 0 || i == MctsEvaluationNumTest - 1)
-            {
-                Console.WriteLine($"Completed {i + 1}/{MctsEvaluationNumTest} simulations");
-            }
-        }
+        //    // Optional: Progress reporting for long-running sequential tests
+        //    if ((i + 1) % 10 == 0 || i == MctsEvaluationNumTest - 1)
+        //    {
+        //        Console.WriteLine($"Completed {i + 1}/{MctsEvaluationNumTest} simulations");
+        //    }
+        //}
 
-        stopwatch.Stop();
+        //stopwatch.Stop();
 
-        // Convert to list for counting (now from ConcurrentBag)
-        var resultsList = simResults.ToList();
-        var turnsList = turnOnBattleEnd.ToList();
-        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        //// Convert to list for counting (now from ConcurrentBag)
+        //var resultsList = simResults.ToList();
+        //var turnsList = turnOnBattleEnd.ToList();
+        //int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        //int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
 
-        // Calculate timing metrics
-        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        double timePerSimulation = totalSeconds / MctsEvaluationNumTest;
-        double simulationsPerSecond = MctsEvaluationNumTest / totalSeconds;
+        //// Calculate timing metrics
+        //double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        //double timePerSimulation = totalSeconds / MctsEvaluationNumTest;
+        //double simulationsPerSecond = MctsEvaluationNumTest / totalSeconds;
 
-        // Calculate turn statistics
-        double meanTurns = turnOnBattleEnd.Mean();
-        double stdDevTurns = turnOnBattleEnd.StandardDeviation();
-        double medianTurns = turnOnBattleEnd.Median();
-        int minTurns = turnOnBattleEnd.Minimum();
-        int maxTurns = turnOnBattleEnd.Maximum();
+        //// Calculate turn statistics
+        //double meanTurns = turnOnBattleEnd.Mean();
+        //double stdDevTurns = turnOnBattleEnd.StandardDeviation();
+        //double medianTurns = turnOnBattleEnd.Median();
+        //int minTurns = turnOnBattleEnd.Minimum();
+        //int maxTurns = turnOnBattleEnd.Maximum();
 
-        // Generate comprehensive report
-        StringBuilder sb = new();
-        sb.AppendLine($"MCTS vs Random Evaluation Results ({MctsEvaluationNumTest} battles):");
-        switch (format)
-        {
-            case BattleFormat.Singles:
-                sb.AppendLine("Format: Singles");
-                break;
-            case BattleFormat.Doubles:
-                sb.AppendLine("Format: Doubles");
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(format), format, null);
-        }
-        sb.AppendLine($"MCTS Wins: {player1Wins}");
-        sb.AppendLine($"Random Wins: {player2Wins}");
-        sb.AppendLine($"Win Rate for MCTS: {(double)player1Wins / MctsEvaluationNumTest:P2}");
-        sb.AppendLine($"Win Rate for Random: {(double)player2Wins / MctsEvaluationNumTest:P2}");
-        sb.AppendLine();
-        sb.AppendLine("MCTS Parameters:");
-        sb.AppendLine($"Max Iterations: {MctsMaxIterations}");
-        sb.AppendLine($"Exploration Parameter: {MctsExplorationParameter}");
-        sb.AppendLine($"Max Timer: {_mctsMaxTimer?.ToString() ?? "None"} ms");
-        sb.AppendLine();
-        sb.AppendLine("Performance Metrics:");
-        sb.AppendLine($"Number of threads: {NumThreads}");
-        sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
-        sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
-        sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
-        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
-        sb.AppendLine();
-        sb.AppendLine("Turn Statistics:");
-        sb.AppendLine($"Mean Turns: {meanTurns:F2}");
-        sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
-        sb.AppendLine($"Median Turns: {medianTurns:F2}");
-        sb.AppendLine($"Minimum Turns: {minTurns}");
-        sb.AppendLine($"Maximum Turns: {maxTurns}");
-        Console.WriteLine(sb.ToString());
+        //// Generate comprehensive report
+        //StringBuilder sb = new();
+        //sb.AppendLine($"MCTS vs Random Evaluation Results ({MctsEvaluationNumTest} battles):");
+        //switch (format)
+        //{
+        //    case BattleFormat.Singles:
+        //        sb.AppendLine("Format: Singles");
+        //        break;
+        //    case BattleFormat.Doubles:
+        //        sb.AppendLine("Format: Doubles");
+        //        break;
+        //    default:
+        //        throw new ArgumentOutOfRangeException(nameof(format), format, null);
+        //}
+        //sb.AppendLine($"MCTS Wins: {player1Wins}");
+        //sb.AppendLine($"Random Wins: {player2Wins}");
+        //sb.AppendLine($"Win Rate for MCTS: {(double)player1Wins / MctsEvaluationNumTest:P2}");
+        //sb.AppendLine($"Win Rate for Random: {(double)player2Wins / MctsEvaluationNumTest:P2}");
+        //sb.AppendLine();
+        //sb.AppendLine("MCTS Parameters:");
+        //sb.AppendLine($"Max Iterations: {MctsMaxIterations}");
+        //sb.AppendLine($"Exploration Parameter: {MctsExplorationParameter}");
+        //sb.AppendLine($"Max Timer: {_mctsMaxTimer?.ToString() ?? "None"} ms");
+        //sb.AppendLine();
+        //sb.AppendLine("Performance Metrics:");
+        //sb.AppendLine($"Number of threads: {NumThreads}");
+        //sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        //sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
+        //sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
+        //sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        //sb.AppendLine();
+        //sb.AppendLine("Turn Statistics:");
+        //sb.AppendLine($"Mean Turns: {meanTurns:F2}");
+        //sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
+        //sb.AppendLine($"Median Turns: {medianTurns:F2}");
+        //sb.AppendLine($"Minimum Turns: {minTurns}");
+        //sb.AppendLine($"Maximum Turns: {maxTurns}");
+        //Console.WriteLine(sb.ToString());
 
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 
     private async Task RunRandomVsRandomEvaluationTest(BattleFormat format)
     {
-        var simResults = new ConcurrentBag<SimulatorResult>();
-        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        //var simResults = new ConcurrentBag<SimulatorResult>();
+        //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        int seedCounter = 0;
-        var turnOnBattleEnd = new ConcurrentBag<int>();
+        //int seedCounter = 0;
+        //var turnOnBattleEnd = new ConcurrentBag<int>();
 
-        using var semaphore = new SemaphoreSlim(NumThreads, NumThreads);
+        //using var semaphore = new SemaphoreSlim(NumThreads, NumThreads);
 
-        // Create tasks for each simulation with concurrency control
-        var tasks = Enumerable.Range(0, RandomEvaluationNumTest)
-            .Select(async _ =>
-            {
-                await semaphore.WaitAsync(); // Wait for available slot
-                try
-                {
-                    int currentSeed = Interlocked.Increment(ref seedCounter);
-                    int player1Seed = PlayerRandom1Seed + currentSeed;
-                    int player2Seed = PlayerRandom2Seed + currentSeed;
+        //// Create tasks for each simulation with concurrency control
+        //var tasks = Enumerable.Range(0, RandomEvaluationNumTest)
+        //    .Select(async _ =>
+        //    {
+        //        await semaphore.WaitAsync(); // Wait for available slot
+        //        try
+        //        {
+        //            int currentSeed = Interlocked.Increment(ref seedCounter);
+        //            int player1Seed = PlayerRandom1Seed + currentSeed;
+        //            int player2Seed = PlayerRandom2Seed + currentSeed;
 
-                    IPlayerNew player1 = new PlayerRandom(PlayerId.Player1, player1Seed);
-                    IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
+        //            IPlayerNew player1 = new PlayerRandom(PlayerId.Player1, player1Seed);
+        //            IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, player2Seed);
 
-                    BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
-                        "Random1", "Random2", format, false, currentSeed);
+        //            BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2,
+        //                "Random1", "Random2", format, false, currentSeed);
 
-                    var simulator = new Simulator
-                    {
-                        Battle = battle,
-                        Player1 = player1,
-                        Player2 = player2,
-                    };
+        //            var simulator = new Simulator
+        //            {
+        //                Battle = battle,
+        //                Player1 = player1,
+        //                Player2 = player2,
+        //            };
 
-                    SimulatorResult result = await simulator.Run();
-                    simResults.Add(result);
-                    turnOnBattleEnd.Add(battle.TurnCounter);
-                    simulator.Battle.ClearTurns();
-                }
-                finally
-                {
-                    semaphore.Release(); // Release the slot
-                }
-            })
-            .ToArray();
+        //            SimulatorResult result = await simulator.Run();
+        //            simResults.Add(result);
+        //            turnOnBattleEnd.Add(battle.TurnCounter);
+        //            simulator.Battle.ClearTurns();
+        //        }
+        //        finally
+        //        {
+        //            semaphore.Release(); // Release the slot
+        //        }
+        //    })
+        //    .ToArray();
 
-        // Wait for all simulations to complete
-        await Task.WhenAll(tasks);
+        //// Wait for all simulations to complete
+        //await Task.WhenAll(tasks);
 
-        stopwatch.Stop();
+        //stopwatch.Stop();
 
-        // Convert to list for counting (now from ConcurrentBag)
-        var resultsList = simResults.ToList();
-        var turnsList = turnOnBattleEnd.ToList();
-        int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
-        int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
+        //// Convert to list for counting (now from ConcurrentBag)
+        //var resultsList = simResults.ToList();
+        //var turnsList = turnOnBattleEnd.ToList();
+        //int player1Wins = resultsList.Count(result => result == SimulatorResult.Player1Win);
+        //int player2Wins = resultsList.Count(result => result == SimulatorResult.Player2Win);
 
-        // Calculate timing metrics
-        double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-        double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
-        double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
+        //// Calculate timing metrics
+        //double totalSeconds = stopwatch.Elapsed.TotalSeconds;
+        //double timePerSimulation = totalSeconds / RandomEvaluationNumTest;
+        //double simulationsPerSecond = RandomEvaluationNumTest / totalSeconds;
 
-        // Calculate turn statistics
-        double meanTurns = turnOnBattleEnd.Mean();
-        double stdDevTurns = turnOnBattleEnd.StandardDeviation();
-        double medianTurns = turnOnBattleEnd.Median();
-        int minTurns = turnOnBattleEnd.Minimum();
-        int maxTurns = turnOnBattleEnd.Maximum();
+        //// Calculate turn statistics
+        //double meanTurns = turnOnBattleEnd.Mean();
+        //double stdDevTurns = turnOnBattleEnd.StandardDeviation();
+        //double medianTurns = turnOnBattleEnd.Median();
+        //int minTurns = turnOnBattleEnd.Minimum();
+        //int maxTurns = turnOnBattleEnd.Maximum();
 
-        // Rest of the method with timing information added...
-        StringBuilder sb = new();
-        sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
-        switch (format)
-        {
-            case BattleFormat.Singles:
-                sb.AppendLine("Format: Singles");
-                break;
-            case BattleFormat.Doubles:
-                sb.AppendLine("Format: Doubles");
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(format), format, null);
-        }
-        sb.AppendLine($"Player 1 Wins: {player1Wins}");
-        sb.AppendLine($"Player 2 Wins: {player2Wins}");
-        sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
-        sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / RandomEvaluationNumTest:P2}");
-        sb.AppendLine();
-        sb.AppendLine("Performance Metrics:");
-        sb.AppendLine($"Number of threads: {NumThreads}");
-        sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
-        sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
-        sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
-        sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
-        sb.AppendLine();
-        sb.AppendLine("Turn Statistics:");
-        sb.AppendLine($"Mean Turns: {meanTurns:F2}");
-        sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
-        sb.AppendLine($"Median Turns: {medianTurns:F2}");
-        sb.AppendLine($"Minimum Turns: {minTurns}");
-        sb.AppendLine($"Maximum Turns: {maxTurns}");
-        Console.WriteLine(sb.ToString());
+        //// Rest of the method with timing information added...
+        //StringBuilder sb = new();
+        //sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
+        //switch (format)
+        //{
+        //    case BattleFormat.Singles:
+        //        sb.AppendLine("Format: Singles");
+        //        break;
+        //    case BattleFormat.Doubles:
+        //        sb.AppendLine("Format: Doubles");
+        //        break;
+        //    default:
+        //        throw new ArgumentOutOfRangeException(nameof(format), format, null);
+        //}
+        //sb.AppendLine($"Player 1 Wins: {player1Wins}");
+        //sb.AppendLine($"Player 2 Wins: {player2Wins}");
+        //sb.AppendLine($"Win Rate for Player 1: {(double)player1Wins / RandomEvaluationNumTest:P2}");
+        //sb.AppendLine($"Win Rate for Player 2: {(double)player2Wins / RandomEvaluationNumTest:P2}");
+        //sb.AppendLine();
+        //sb.AppendLine("Performance Metrics:");
+        //sb.AppendLine($"Number of threads: {NumThreads}");
+        //sb.AppendLine($@"Total Execution Time: {stopwatch.Elapsed:hh\:mm\:ss\.fff}");
+        //sb.AppendLine($"Total Execution Time (seconds): {totalSeconds:F3}");
+        //sb.AppendLine($"Time per Simulation: {timePerSimulation * 1000:F3} ms");
+        //sb.AppendLine($"Simulations per Second: {simulationsPerSecond:F0}");
+        //sb.AppendLine();
+        //sb.AppendLine("Turn Statistics:");
+        //sb.AppendLine($"Mean Turns: {meanTurns:F2}");
+        //sb.AppendLine($"Standard Deviation of Turns: {stdDevTurns:F2}");
+        //sb.AppendLine($"Median Turns: {medianTurns:F2}");
+        //sb.AppendLine($"Minimum Turns: {minTurns}");
+        //sb.AppendLine($"Maximum Turns: {maxTurns}");
+        //Console.WriteLine(sb.ToString());
 
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 
     //private void RunRandomTest()
@@ -460,59 +460,59 @@ public class Driver
 
     private async Task RunConsoleVsRandomTest()
     {
-        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
-        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
+        //IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
+        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-            "Random", BattleFormat.Singles, true);
+        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        //    "Random", BattleFormat.Singles, true);
 
-        var simulator = new Simulator
-        {
-            Battle = battle,
-            Player1 = player1,
-            Player2 = player2,
-        };
+        //var simulator = new Simulator
+        //{
+        //    Battle = battle,
+        //    Player1 = player1,
+        //    Player2 = player2,
+        //};
 
-        SimulatorResult result = await simulator.Run();
+        //SimulatorResult result = await simulator.Run();
 
-        string winner = result switch
-        {
-            SimulatorResult.Player1Win => "Matt",
-            SimulatorResult.Player2Win => "Random",
-            _ => "Unknown",
-        };
+        //string winner = result switch
+        //{
+        //    SimulatorResult.Player1Win => "Matt",
+        //    SimulatorResult.Player2Win => "Random",
+        //    _ => "Unknown",
+        //};
 
-        Console.WriteLine($"Battle finished. Winner: {winner}");
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine($"Battle finished. Winner: {winner}");
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 
     private async Task RunConsoleVsRandomDoublesTest()
     {
-        IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
-        IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
+        //IPlayerNew player1 = new PlayerConsole(PlayerId.Player1);
+        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
-        BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-            "Random", BattleFormat.Doubles, true);
+        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
+        //    "Random", BattleFormat.Doubles, true);
 
-        var simulator = new Simulator
-        {
-            Battle = battle,
-            Player1 = player1,
-            Player2 = player2,
-        };
+        //var simulator = new Simulator
+        //{
+        //    Battle = battle,
+        //    Player1 = player1,
+        //    Player2 = player2,
+        //};
 
-        SimulatorResult result = await simulator.Run();
+        //SimulatorResult result = await simulator.Run();
 
-        string winner = result switch
-        {
-            SimulatorResult.Player1Win => "Matt",
-            SimulatorResult.Player2Win => "Random",
-            _ => "Unknown",
-        };
+        //string winner = result switch
+        //{
+        //    SimulatorResult.Player1Win => "Matt",
+        //    SimulatorResult.Player2Win => "Random",
+        //    _ => "Unknown",
+        //};
 
-        Console.WriteLine($"Battle finished. Winner: {winner}");
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine($"Battle finished. Winner: {winner}");
+        //Console.WriteLine("Press any key to exit...");
+        //Console.ReadKey();
     }
 }

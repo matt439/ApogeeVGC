@@ -83,7 +83,7 @@ public static class BattleCore
     /// Execute a move choice synchronously
     /// </summary>
     public static MoveExecutionResult ExecuteMove(Pokemon attacker, Move move, List<Pokemon> targets, 
-        BattleContext context, PlayerId playerId)
+        IBattle context, PlayerId playerId)
     {
         var result = new MoveExecutionResult();
 
@@ -123,7 +123,7 @@ public static class BattleCore
     /// Execute a switch choice synchronously
     /// </summary>
     public static SwitchExecutionResult ExecuteSwitch(Side side, SlotId switchOutSlot, SlotId switchInSlot, 
-        Field field, Pokemon[] allActivePokemon, BattleContext context, PlayerId playerId)
+        Field field, Pokemon[] allActivePokemon, IBattle context, PlayerId playerId)
     {
         var result = new SwitchExecutionResult();
 
@@ -146,11 +146,7 @@ public static class BattleCore
         }
 
         // Execute the switch
-        prevActive.OnSwitchOut();
         side.SwitchSlots(switchOutSlot, switchInSlot);
-
-        field.OnPokemonSwitchIn(newActive, playerId, context);
-        newActive.OnSwitchIn(field, allActivePokemon, context);
 
         result.Success = true;
         result.SwitchedOutPokemon = prevActive;
@@ -163,7 +159,7 @@ public static class BattleCore
     #region Move Resolution
 
     private static List<MoveTargetResult> ExecuteMoveAgainstTargets(Pokemon attacker, Move move, 
-        List<Pokemon> targets, BattleContext context, PlayerId playerId)
+        List<Pokemon> targets, IBattle context, PlayerId playerId)
     {
         var results = new List<MoveTargetResult>();
 
@@ -208,26 +204,12 @@ public static class BattleCore
     }
 
     private static MoveTargetResult ExecuteMoveAgainstSingleTarget(Pokemon attacker, Move move, Pokemon target,
-        int numPokemonDefendingSide, BattleContext context)
+        int numPokemonDefendingSide, IBattle context)
     {
         var result = new MoveTargetResult { Target = target, Damage = 0, Hit = false };
 
         // Miss check per target
         if (IsMoveMiss(attacker, move, target, context.Random))
-        {
-            return result;
-        }
-
-        // Immunity check per target
-        if (move.OnTryImmunity?.Invoke(target) == true ||
-            move.OnPrepareHit?.Invoke(target, attacker, move, context) == false)
-        {
-            return result;
-        }
-
-        // OnTryHit checks per target
-        if (target.Conditions.ToList().Any(condition =>
-                condition.OnTryHit?.Invoke(target, attacker, move, context) == false))
         {
             return result;
         }
@@ -254,7 +236,7 @@ public static class BattleCore
     }
 
     private static void PerformDamagingMove(Pokemon attacker, Move move, Pokemon defender, 
-        int numDefendingSidePokemon, BattleContext context)
+        int numDefendingSidePokemon, IBattle context)
     {
         bool isCrit = context.Random.NextDouble() < 1.0 / 16.0; // 1 in 16 chance of critical hit
         MoveEffectiveness effectiveness = context.Library.TypeChart.GetMoveEffectiveness(
@@ -277,23 +259,11 @@ public static class BattleCore
         // Check for OnAnyModifyDamage conditions on defender
         if (damage > 0)
         {
-            double multiplier = defender.Conditions.Aggregate(1.0, (current, condition) =>
-                current * (condition.OnAnyModifyDamage?.Invoke(damage, attacker, defender, move, isCrit,
-                    numDefendingSidePokemon) ?? 1.0));
+            double multiplier = 1.0;
             damage = Math.Max(1, (int)(damage * multiplier)); // Always at least 1 damage
         }
 
         int actualDefenderDamage = defender.Damage(damage);
-
-        move.OnHit?.Invoke(defender, attacker, move, context);
-
-        // Rocky helmet and other contact damage
-        defender.Item?.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, context);
-
-        foreach (Condition condition in defender.Conditions.ToList())
-        {
-            condition.OnDamagingHit?.Invoke(actualDefenderDamage, defender, attacker, move, context);
-        }
 
         // Check for move condition application
         if (move.Condition is not null)
@@ -305,26 +275,24 @@ public static class BattleCore
         if (defender.IsFainted)
         {
             // Chilling neigh and similar abilities
-            attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, context);
+            //attacker.Ability.OnSourceAfterFaint?.Invoke(1, defender, attacker, move, context);
         }
     }
 
-    private static void PerformStatusMove(Pokemon attacker, Move move, Pokemon defender, BattleContext context)
+    private static void PerformStatusMove(Pokemon attacker, Move move, Pokemon defender, IBattle context)
     {
         if (move.Condition is null)
         {
             return;
         }
 
-        move.OnHit?.Invoke(defender, attacker, move, context);
-
         switch (move.Target)
         {
             case MoveTarget.Normal:
-                defender.AddCondition(move.Condition, context, attacker, move);
+                //defender.AddCondition(move.Condition, context, attacker, move);
                 break;
             case MoveTarget.Self:
-                attacker.AddCondition(move.Condition, context, attacker, move);
+                //attacker.AddCondition(move.Condition, context, attacker, move);
                 break;
             case MoveTarget.AdjacentAlly:
             case MoveTarget.AdjacentAllyOrSelf:
@@ -352,21 +320,14 @@ public static class BattleCore
 
     #region Utility Methods
 
-    private static bool ExecutePreMoveChecks(Pokemon attacker, Move move, List<Pokemon> targets, BattleContext context)
+    private static bool ExecutePreMoveChecks(Pokemon attacker, Move move, List<Pokemon> targets, IBattle context)
     {
         // Item modifications (using first target for single-target effects)
         Pokemon primaryTarget = targets.FirstOrDefault() ?? attacker;
-        attacker.Item?.OnModifyMove?.Invoke(move, attacker, primaryTarget, context);
 
         if (move.Pp <= 0 && move.Id != MoveId.Struggle)
         {
             return false;
-        }
-
-        // Check disable conditions
-        foreach (Condition condition in attacker.Conditions.ToList())
-        {
-            condition.OnDisableMove?.Invoke(attacker, move, context);
         }
 
         if (move.Disabled)
@@ -374,31 +335,10 @@ public static class BattleCore
             return false;
         }
 
-        // OnBeforeMove checks
-        if (attacker.Conditions
-            .Where(c => c.OnBeforeMove != null)
-            .OrderBy(c => c.OnBeforeMovePriority ?? 0)
-            .Any(condition => condition.OnBeforeMove?.Invoke(attacker, primaryTarget, move, context) == false))
-        {
-            return false;
-        }
-
-        // Stalling move checks
-        if (move.StallingMove)
-        {
-            if (attacker.Conditions.ToList().All(condition =>
-                    condition.OnStallMove?.Invoke(attacker, context) != false))
-            {
-                return move.OnTry?.Invoke(attacker, primaryTarget, move, context) != false;
-            }
-            return false;
-        }
-
-        // OnTry checks
-        return move.OnTry?.Invoke(attacker, primaryTarget, move, context) != false;
+        return true;
     }
 
-    private static void HandlePostMoveEffects(Pokemon attacker, Move move, List<MoveTargetResult> results, BattleContext context)
+    private static void HandlePostMoveEffects(Pokemon attacker, Move move, List<MoveTargetResult> results, IBattle context)
     {
         // Calculate total damage dealt for recoil moves
         int totalDamage = results.Where(r => r.Hit).Sum(r => r.Damage);
@@ -413,7 +353,7 @@ public static class BattleCore
         // Handle other post-move effects here (life orb, etc.)
     }
 
-    private static void ApplyMoveCondition(Move move, Pokemon attacker, Pokemon target, BattleContext context)
+    private static void ApplyMoveCondition(Move move, Pokemon attacker, Pokemon target, IBattle context)
     {
         // Apply condition based on move target
         switch (move.Target)
@@ -421,10 +361,10 @@ public static class BattleCore
             case MoveTarget.Normal:
             case MoveTarget.AllAdjacentFoes:
             case MoveTarget.AdjacentAlly:
-                target.AddCondition(move.Condition!, context, attacker, move);
+                //target.AddCondition(move.Condition!, context, attacker, move);
                 break;
             case MoveTarget.Self:
-                attacker.AddCondition(move.Condition!, context, attacker, move);
+                //attacker.AddCondition(move.Condition!, context, attacker, move);
                 break;
             case MoveTarget.AdjacentAllyOrSelf:
             case MoveTarget.AdjacentFoe:
@@ -473,7 +413,7 @@ public static class BattleCore
     }
 
     private static int CalculateDamage(Pokemon attacker, Pokemon defender, Move move,
-        double moveEffectiveness, bool crit, BattleContext context, bool applyStab = true)
+        double moveEffectiveness, bool crit, IBattle context, bool applyStab = true)
     {
         if (Math.Abs(moveEffectiveness) < Epsilon)
         {
@@ -483,9 +423,9 @@ public static class BattleCore
         int level = attacker.Level;
         int attackStat = attacker.GetAttackStat(move, crit);
         int defenseStat = defender.GetDefenseStat(move, crit);
-        int basePower = move.BasePowerCallback?.Invoke(attacker, defender, move) ?? move.BasePower;
+        int basePower = move.BasePower;
 
-        double onBasePowerModifier = move.OnBasePower?.Invoke(attacker, defender, move, context) ?? 1.0;
+        double onBasePowerModifier = 1.0;
         if (Math.Abs(onBasePowerModifier - 1.0) > Epsilon)
         {
             basePower = (int)(basePower * onBasePowerModifier);
@@ -496,11 +436,6 @@ public static class BattleCore
         double stabModifier = applyStab ? attacker.GetStabMultiplier(move) : 1.0;
 
         double burnModifier = 1.0;
-        if (attacker.HasCondition(ConditionId.Burn) && move.Category == MoveCategory.Physical &&
-            attacker.Ability.Id != AbilityId.Guts)
-        {
-            burnModifier = 0.5;
-        }
 
         int baseDamage = (int)((2 * level / 5.0 + 2) * basePower * attackStat / defenseStat / 50.0 + 2);
         int critModified = RoundedDownAtHalf(critModifier * baseDamage);

@@ -190,7 +190,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnModifySpe { get; }
+    Func<IBattle, int, Pokemon, double?>? OnModifySpe { get; }
 
     ModifierSourceMoveHandler? OnModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>

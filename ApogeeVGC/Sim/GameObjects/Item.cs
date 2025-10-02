@@ -13,6 +13,8 @@ public enum ItemId
     RockyHelmet,
     LightClay,
     AssaultVest,
+
+    BoosterEnergy,
 }
 
 public record FlingData
@@ -32,30 +34,6 @@ public record Item : IEffect
     public int Gen { get; init; }
     public Condition? Condition { get; init; }
 
-    /// <summary>
-    /// itemHolder, context
-    /// </summary>
-    public Action<Pokemon, BattleContext>? OnBeforeResiduals { get; init; }
-    public bool IsChoice { get; init; }
-
-    /// <summary>
-    /// user, context
-    /// </summary>
-    public Action<Pokemon, BattleContext>? OnStart { get; init; }
-    /// <summary>
-    /// move, user, target, context
-    /// </summary>
-    public Action<Move, Pokemon, Pokemon?, BattleContext>? OnModifyMove { get; init; }
-
-    public int OnDamagingHitOrder { get; init; }
-
-    /// <summary>
-    /// damage, target, source, move, context
-    /// </summary>
-    public Action<int, Pokemon, Pokemon, Move, BattleContext>? OnDamagingHit { get; init; }
-
-    //public int? OnResidualOrder { get; init; }
-    //public int? OnResidualSubOrder { get; init; }
 
     public Item Copy()
     {
@@ -68,12 +46,6 @@ public record Item : IEffect
             Num = Num,
             Gen = Gen,
             Condition = Condition?.Copy(),
-            OnBeforeResiduals = OnBeforeResiduals,
-            IsChoice = IsChoice,
-            OnStart = OnStart,
-            OnModifyMove = OnModifyMove,
-            OnDamagingHitOrder = OnDamagingHitOrder,
-            OnDamagingHit = OnDamagingHit,
         };
     }
 }

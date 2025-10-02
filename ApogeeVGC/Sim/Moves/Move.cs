@@ -117,34 +117,10 @@ public record Move : IEffect
     public bool AlwaysHit { get; init; }
     public bool StallingMove { get; init; }
 
-    public Func<Pokemon, bool>? OnTryImmunity { get; init; }
-    /// <summary>
-    /// target, source, move, context
-    /// </summary>
-    public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnPrepareHit { get; init; }
-    /// <summary>
-    /// target, source, move, context
-    /// </summary>
-    public Func<Pokemon, Pokemon?, Move?, BattleContext, bool>? OnHit { get; init; }
-    /// <summary>
-    /// source, target, move, context. Returns a multiplier for the base power.
-    /// </summary>
-    public Func<Pokemon, Pokemon, Move, BattleContext, double>? OnBasePower { get; init; }
-    public Weather? Weather { get; init; }
-    public Terrain? Terrain { get; init; }
-    public PseudoWeather? PseudoWeather { get; init; }
-    public SideCondition? SideCondition { get; init; }
+
     public bool SelfSwitch { get; init; }
     public bool Infiltrates { get; init; }
-    /// <summary>
-    /// source, target, move. Returns true to allow the move to be attempted.
-    /// </summary>
-    public Func<Pokemon, Pokemon, Move, BattleContext, bool>? OnTry { get; init; }
 
-    /// <summary>
-    /// source, target, move. Returns the modified base power.
-    /// </summary>
-    public Func<Pokemon, Pokemon, Move, int>? BasePowerCallback { get; init; }
 
     /// <summary>
     /// The recoil damage as a fraction of the damage dealt (e.g., 0.25 for 1/4 recoil).

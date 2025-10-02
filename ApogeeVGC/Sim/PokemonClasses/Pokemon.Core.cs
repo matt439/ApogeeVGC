@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
@@ -25,7 +26,9 @@ public partial class Pokemon
         }
     }
     public Item? Item { get; init; }
-    public required Ability Ability { get; init; }
+    public required Ability Ability { get; set; }
+    //public Ability BaseAbility { get; }
+    //public EffectState 
     public StatsTable Evs { get; init; }
     public Nature Nature { get; init; }
     public StatsTable Ivs { get; init; }

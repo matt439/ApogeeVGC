@@ -46,10 +46,10 @@ public class PokemonMcts(
         }
     }
 
-    public MoveResult FindBestChoice(BattleAsync battle, BattleChoice[] availableChoices)
+    public MoveResult FindBestChoice(IBattle battle, BattleChoice[] availableChoices)
     {
         // Create a seeded copy of the battle for deterministic simulation
-        BattleAsync battleCopy = CopyBattle(battle);
+        IBattle battleCopy = CopyBattle(battle);
 
         // Ensure deterministic simulation
         battleCopy.BattleSeed ??= GenerateUniqueBattleSeed();
@@ -96,7 +96,7 @@ public class PokemonMcts(
                 Node expandedNode = Expansion(node, iterationRandom);
 
                 // Simulation phase - run random playout from expanded node
-                BattleAsync simulationBattle = CopyBattle(expandedNode.Battle);
+                IBattle simulationBattle = CopyBattle(expandedNode.Battle);
                 SimulatorResult simulationResult = Simulation(simulationBattle, iterationRandom);
 
                 // Backpropagation phase - update statistics up the tree
@@ -183,7 +183,7 @@ public class PokemonMcts(
         return node.ChildNodes[randomChildIndex];
     }
 
-    private SimulatorResult Simulation(BattleAsync battle, Random threadRandom)
+    private SimulatorResult Simulation(IBattle battle, Random threadRandom)
     {
         // For MCTS, we don't need to run a full battle simulation
         // Instead, we can use a simplified approach that evaluates the current position
@@ -341,7 +341,7 @@ public class PokemonMcts(
         }
     }
 
-    private static BattleAsync CopyBattle(BattleAsync original)
+    private static IBattle CopyBattle(IBattle original)
     {
         try
         {
@@ -365,7 +365,7 @@ public class PokemonMcts(
         return (int)(seed % int.MaxValue);
     }
 
-    private static BattleRequestState GetBattleRequestState(BattleAsync battle)
+    private static BattleRequestState GetBattleRequestState(IBattle battle)
     {
         if (battle.IsGameComplete)
         {
@@ -394,12 +394,12 @@ public class PokemonMcts(
         return side.AllSlots.All(pokemon => pokemon.IsFainted);
     }
 
-    private static BattleChoice[] GetAvailableChoices(BattleAsync battle, PlayerId playerId)
+    private static BattleChoice[] GetAvailableChoices(IBattle battle, PlayerId playerId)
     {
         return battle.GenerateChoicesForMcts(playerId);
     }
 
-    private static SimulatorResult GetBattleResult(BattleAsync battle)
+    private static SimulatorResult GetBattleResult(IBattle battle)
     {
         BattleRequestState state = GetBattleRequestState(battle);
         return state switch
@@ -422,10 +422,10 @@ public class PokemonMcts(
         public List<Node> ChildNodes { get; }
         
         // Lazy battle state management
-        private readonly BattleAsync _parentBattle;
-        private BattleAsync? _battleCache;
+        private readonly IBattle _parentBattle;
+        private IBattle? _battleCache;
         
-        public BattleAsync Battle
+        public IBattle Battle
         {
             get
             {
@@ -462,7 +462,7 @@ public class PokemonMcts(
         private readonly PlayerId _mctsPlayerId;
         private readonly Library _library;
 
-        public Node(BattleAsync battle, Node? parent, BattleChoice choice, double explorationParameter,
+        public Node(IBattle battle, Node? parent, BattleChoice choice, double explorationParameter,
             PlayerId mctsPlayerId, Library library)
         {
             Parent = parent;
@@ -646,12 +646,12 @@ public class PokemonMcts(
             return sb.ToString();
         }
 
-        private BattleAsync CreateBattleWithChoice(BattleAsync battle, BattleChoice choice, PlayerId playerId)
+        private IBattle CreateBattleWithChoice(IBattle battle, BattleChoice choice, PlayerId playerId)
         {
             try
             {
                 // Create a deep copy of the battle for simulation
-                BattleAsync asyncBattle = battle.Copy();
+                IBattle asyncBattle = battle.Copy();
                 
                 if (asyncBattle is IBattleMctsOperations mctsOps)
                 {

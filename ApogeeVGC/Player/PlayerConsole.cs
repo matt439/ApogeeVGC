@@ -49,18 +49,18 @@ public class PlayerConsole(PlayerId playerId) : IPlayer
         UiGenerator.PrintChoices(availableChoices);
 
         BattleChoice choice = GetChoiceFromConsole(availableChoices);
-        ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
-        {
-            AvailableChoices = availableChoices,
-            TimeLimit = TimeSpan.FromSeconds(45),
-            RequestTime = DateTime.UtcNow,
-        });
+        //ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
+        //{
+        //    AvailableChoices = availableChoices,
+        //    TimeLimit = TimeSpan.FromSeconds(45),
+        //    RequestTime = DateTime.UtcNow,
+        //});
         ChoiceSubmitted?.Invoke(this, choice);
         return Task.FromResult(choice);
     }
 
     // Events from interfaces
-    public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
+    //public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<BattleChoice>? ChoiceSubmitted;
 
     // Timeout methods from IPlayerNew

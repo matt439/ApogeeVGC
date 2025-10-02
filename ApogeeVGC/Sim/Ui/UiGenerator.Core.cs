@@ -99,11 +99,6 @@ public static partial class UiGenerator
         Console.WriteLine();
     }
 
-    public static void PrintFieldElementCounter(FieldElement element)
-    {
-        Console.WriteLine($"{element.Name} has {element.RemainingTurns} turns remaining.");
-    }
-
     public static void PrintAbilityActivation(string ability)
     {
         Console.WriteLine($"{ability} activated!");

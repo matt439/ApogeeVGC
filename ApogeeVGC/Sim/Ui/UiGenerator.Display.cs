@@ -313,20 +313,7 @@ public static partial class UiGenerator
     {
         StringBuilder sb = new();
         sb.Append("Conditions: ");
-
-        foreach (Condition condition in activePokemon.Conditions)
-        {
-            sb.Append(condition.Name);
-            if (condition.Duration.HasValue)
-            {
-                sb.Append($"({condition.Duration} turns)");
-            }
-            if (condition.Counter.HasValue)
-            {
-                sb.Append($"[Count: {condition.Counter}]");
-            }
-            sb.Append(", ");
-        }
+        sb.AppendLine("NEED TO IMPLEMTENT");
 
         return sb.ToString();
     }
@@ -350,69 +337,7 @@ public static partial class UiGenerator
     {
         StringBuilder sb = new();
         sb.AppendLine("****** Field State ******");
-        sb.Append("Weather: ");
-        if (field.HasAnyWeather)
-        {
-            sb.Append($"{field.Weather!.Name} ({field.Weather.RemainingTurns} turns remaining)");
-        }
-        else
-        {
-            sb.Append("None");
-        }
-        sb.AppendLine();
-
-        sb.Append("Terrain: ");
-        if (field.HasAnyTerrain)
-        {
-            sb.Append($"{field.Terrain!.Name} ({field.Terrain.RemainingTurns} turns remaining)");
-        }
-        else
-        {
-            sb.Append("None");
-        }
-        sb.AppendLine();
-
-        if (!field.HasAnyPseudoWeather)
-        {
-            sb.AppendLine("Pseudo-Weathers: None");
-        }
-        else
-        {
-            sb.AppendLine("Pseudo-Weathers:");
-            foreach (PseudoWeather pseudoWeather in field.PseudoWeatherList)
-            {
-                sb.AppendLine($"{pseudoWeather.Name} ({pseudoWeather.RemainingTurns} turns remaining)");
-            }
-        }
-
-        sb.Append("Player 1 Side Conditions: ");
-        if (!field.HasAnySide1Conditions)
-        {
-            sb.Append("None");
-        }
-        else
-        {
-            foreach (SideCondition sideCondition in field.Side1Conditions)
-            {
-                sb.Append($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining), ");
-            }
-        }
-        sb.AppendLine();
-
-        sb.Append("Player 2 Side Conditions: ");
-        if (!field.HasAnySide2Conditions)
-        {
-            sb.Append("None");
-        }
-        else
-        {
-            foreach (SideCondition sideCondition in field.Side2Conditions)
-            {
-                sb.Append($"{sideCondition.Name} ({sideCondition.RemainingTurns} turns remaining), ");
-            }
-        }
-
-        sb.AppendLine();
+        sb.AppendLine("NEED TO IMPLEMENT THIS");
         Console.WriteLine(sb.ToString());
     }
 }

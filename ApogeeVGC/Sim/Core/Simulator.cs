@@ -13,7 +13,7 @@ public enum SimulatorResult
 
 public class Simulator
 {
-    public required BattleAsync Battle { get; init; }
+    public required IBattle Battle { get; init; }
     public required IPlayerNew Player1 { get; init; }
     public required IPlayerNew Player2 { get; init; }
     public bool PrintDebug { get; set; }
@@ -36,24 +36,24 @@ public class Simulator
             // Set a reasonable timeout for the entire battle
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
 
-            await Battle.RunBattleAsync(cancellationTokenSource.Token);
+            //await Battle.RunBattleAsync(cancellationTokenSource.Token);
 
-            // Determine the winner
-            if (Battle.IsGameComplete)
-            {
-                GameResults gameResults = Battle.GetGameResults();
-                PlayerId winner = gameResults.Winner;
+            //// Determine the winner
+            //if (Battle.IsGameComplete)
+            //{
+            //    GameResults gameResults = Battle.GetGameResults();
+            //    PlayerId winner = gameResults.Winner;
 
-                if (!PrintDebug)
-                    return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+            //    if (!PrintDebug)
+            //        return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
 
-                string winnerName = winner == PlayerId.Player1
-                    ? Battle.Side1.Team.Trainer.Name
-                    : Battle.Side2.Team.Trainer.Name;
-                UiGenerator.PrintBattleEnd(winnerName);
+            //    string winnerName = winner == PlayerId.Player1
+            //        ? Battle.Side1.Team.Trainer.Name
+            //        : Battle.Side2.Team.Trainer.Name;
+            //    UiGenerator.PrintBattleEnd(winnerName);
 
-                return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
-            }
+            //    return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+            //}
 
             // Battle was cancelled or timed out
             if (PrintDebug)

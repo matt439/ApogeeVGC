@@ -9,14 +9,23 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Effects;
 
-public record Condition : ICondition
+public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect
 {
     public required ConditionId Id { get; init; }
     public EffectType EffectType => EffectType.Condition;
     public string Name { get; init; } = string.Empty;
     public ConditionEffectType ConditionEffectType { get; init; }
-    
-    public ConditionVolatility ConditionVolatility { get; init; }
+
+    ///// <summary>
+    ///// Many conditions are defined by a source effect, such as a move or ability.
+    ///// This property tracks that source effect, if any.
+    ///// </summary>
+    //public IEffect? Source { get; init; }
+
+    public AbilityId? AssociatedAbility { get; init; }
+    public ItemId? AssociatedItem { get; init; }
+    public MoveId? AssociatedMove { get; init; }
+    public SpecieId? AssociatedSpecies { get; init; }
 
     public int? Duration { get; set; }
     public int? CounterMax { get; init; }
@@ -35,13 +44,31 @@ public record Condition : ICondition
         };
     }
 
-    #region ICondition Implementation
-    
+    /// <summary>
+    /// battle, target, source, effect -> number
+    /// </summary>
     public Func<IBattle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
+
+    /// <summary>
+    /// battle, pokemon
+    /// </summary>
     public Action<IBattle, Pokemon>? OnCopy { get; init; }
+
+    /// <summary>
+    /// battle, pokemon
+    /// </summary>
     public Action<IBattle, Pokemon>? OnEnd { get; init; }
+
+    /// <summary>
+    /// battle, target, source, sourceEffect -> boolean | null
+    /// </summary>
     public Func<IBattle, Pokemon, Pokemon, IEffect, bool?>? OnRestart { get; init; }
+
+    /// <summary>
+    /// battle, target, source, sourceEffect -> boolean | null
+    /// </summary>
     public Func<IBattle, Pokemon, Pokemon, IEffect, bool?>? OnStart { get; init; }
+
 
 
     public Action<IBattle, int, Pokemon, Pokemon, Move>? OnDamagingHit { get; init; }
@@ -100,7 +127,7 @@ public record Condition : ICondition
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
     public ModifierSourceMoveHandler? OnModifySpA { get; init; }
     public ModifierMoveHandler? OnModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, int?>? OnModifySpe { get; init; }
+    public Func<IBattle, int, Pokemon, double?>? OnModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnModifyStab { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnModifyWeight { get; init; }
     public VoidMoveHandler? OnMoveAborted { get; init; }
@@ -534,6 +561,4 @@ public record Condition : ICondition
     public ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase2 { get; init; }
-
-    #endregion
 }

@@ -1,12 +1,11 @@
 ﻿using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using System.Collections.ObjectModel;
-using System.Security.Cryptography.X509Certificates;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
 
@@ -61,8 +60,8 @@ public record Abilities
                 Rating = 4.5,
                 OnStart = (battle, _) =>
                 {
-                    if (!battle.Field.SetTerrain(battle, _library.Terrains[TerrainId.Electric]) &&
-                        battle.Field.HasTerrain(TerrainId.Electric) && battle.PrintDebug)
+                    if (!battle.Field.SetTerrain(battle, _library.Conditions[ConditionId.ElectricTerrain]) &&
+                        battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
                         UiGenerator.PrintAbilityActivation("Hadron Engine");
                     }
@@ -70,7 +69,7 @@ public record Abilities
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, _, _, _) =>
                 {
-                    if (battle.Field.HasTerrain(TerrainId.Electric))
+                    if (battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
                         return battle.ChainModify([5461, 4096]);
                     }
@@ -137,11 +136,25 @@ public record Abilities
                 },
                 OnTerrainChange = (battle, pokemon, _, _) =>
                 {
-                    if (battle.Field.HasTerrain(TerrainId.Electric))
+                    Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
+
+                    if (battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
-                        pokemon.AddVolatile(_library.Conditions[ConditionId.QuarkDrive]);
+                        pokemon.AddVolatile(battle, quarkDrive);
                     }
-                    else if ()
+                    else if (!pokemon.GetVolatile(ConditionId.QuarkDrive)?.FromBooster ?? false)
+                    {
+                        pokemon.RemoveVolatile(battle, quarkDrive);
+                    }
+                },
+                OnEnd = (_, pokemon) =>
+                {
+                    if (pokemon is PokemonSideFieldPokemon pok)
+                    {
+                        pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
+                        // TODO: print to UI
+                    }
+                    throw new ArgumentException("Expecting a Pokemon here.");
                 },
                 Flags = new AbilityFlags
                 {

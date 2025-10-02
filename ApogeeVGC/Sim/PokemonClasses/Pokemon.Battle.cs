@@ -1,7 +1,11 @@
-﻿using ApogeeVGC.Sim.Core;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
@@ -12,7 +16,7 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 public partial class Pokemon
 {
     // Battle state properties
-    public List<Condition> Conditions { get; init; } = [];
+    public Dictionary<ConditionId, EffectState> Volatiles { get; } = [];
     public bool IsTeraUsed { get; private set; }
     public bool IgnoringItem => false;
     public Move? LastMoveUsed { get; set; }
@@ -26,6 +30,8 @@ public partial class Pokemon
     public bool IsFainted => CurrentHp <= 0;
 
     public bool HasStatus => throw new NotImplementedException();
+
+    
 
     // HP modification methods
     public int Heal(int amount)
@@ -43,85 +49,47 @@ public partial class Pokemon
     }
 
     // Condition management
-    public bool HasCondition(ConditionId conditionId)
-    {
-        return Conditions.Any(c => c.Id == conditionId);
-    }
-
-    public Condition? GetCondition(ConditionId conditionId)
-    {
-        return Conditions.FirstOrDefault(c => c.Id == conditionId);
-    }
-
     public bool TrySetStatus(Condition status, Pokemon? source, IEffect? sourceEffect)
     {
         throw new NotImplementedException();
     }
 
-    public RelayVar AddVolatile(ICondition status, Pokemon? source = null, IEffect? sourceEffect = null,
-        ICondition? linkedStatus = null)
+    public RelayVar AddVolatile(IBattle battle, Condition status, Pokemon? source = null,
+        IEffect? sourceEffect = null, Condition? linkedStatus = null)
     {
         throw new NotImplementedException();
     }
 
-    public void AddCondition(Condition condition, BattleContext context, Pokemon? source = null, IEffect? sourceEffect = null)
+    public EffectState? GetVolatile(ConditionId volatileId)
     {
-        Condition? existingCondition = GetCondition(condition.Id);
-
-        if (existingCondition is null)
-        {
-            Conditions.Add(condition);
-            condition.OnStart?.Invoke(this, source, sourceEffect, context);
-        }
-        else
-        {
-            existingCondition.OnRestart?.Invoke(this, source, sourceEffect, context);
-        }
+        return Volatiles.GetValueOrDefault(volatileId);
     }
 
-    public bool RemoveCondition(ConditionId conditionId)
+    public bool RemoveVolatile(IBattle battle, IEffect status)
     {
-        Condition? condition = GetCondition(conditionId);
-        return condition != null && Conditions.Remove(condition);
+        throw new NotImplementedException();
     }
 
-    public Condition[] GetAllResidualConditions()
+    /// <summary>
+    /// Deletes a volatile condition without running the extra logic from RemoveVolatile
+    /// </summary>
+    public bool DeleteVolatile(ConditionId volatileId)
     {
-        return Conditions.Where(c => c.OnResidual != null).ToArray();
+        return Volatiles.Remove(volatileId);
     }
 
-    // Battle event handlers
-    public void OnSwitchOut()
+    public bool IgnoringAbility(IBattle battle)
     {
-        Conditions.RemoveAll(c => c.ConditionVolatility == ConditionVolatility.Volatile);
-        StatModifiers = new StatModifiers();
-        ActiveMoveActions = 0;
-        foreach (Move move in Moves)
-        {
-            move.Disabled = false;
-        }
+        throw new NotImplementedException();
     }
 
-    public void OnSwitchIn(Field field, Pokemon[] pokemons, BattleContext context)
-    {
-        Ability.OnStart?.Invoke(this, field, pokemons, Ability, context);
-    }
-
-    public void Terastillize(BattleContext context)
-    {
-        IsTeraUsed = true;
-        if (context.PrintDebug)
-        {
-            UiGenerator.PrintTeraStart(this);
-        }
-    }
+    
 
     public Pokemon Copy()
     {
         Pokemon copy = new(Specie, Evs, Ivs, Nature, Level, Trainer, SideId)
         {
             Moves = Moves.Select(m => m.Copy()).ToArray(),
-            Conditions = Conditions.Select(c => c.Copy()).ToList(),
             Item = Item,
             Ability = Ability,
             Name = Name,

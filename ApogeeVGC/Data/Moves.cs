@@ -58,7 +58,6 @@ public record Moves
                     Metronome = true,
                 },
                 Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = (target) => target.HasType(MoveType.Grass),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
             },
@@ -78,8 +77,6 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                //Condition = _library.Conditions[ConditionId.TrickRoom],
-                PseudoWeather = _library.PseudoWeathers[PseudoWeatherId.TrickRoom],
                 Target = MoveTarget.Field,
                 Type = MoveType.Psychic,
             },
@@ -100,17 +97,6 @@ public record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
-                // TODO: check if protect can be used
-                OnPrepareHit = (_, _, _, _) => true,
-                OnHit = (_, source, _, context) =>
-                {
-                    if (source is null)
-                    {
-                        throw new ArgumentNullException(nameof(source), "Source cannot be null in Protect move.");
-                    }
-                    source.AddCondition(context.Library.Conditions[ConditionId.Stall], context);
-                    return true;
-                },
                 Condition = _library.Conditions[ConditionId.Protect],
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
@@ -170,24 +156,6 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnBasePower = (_, target, move, context) =>
-                {
-                    // if the move is super effective, increase power by 33% (5461 / 4,096)
-                    if (target is null || move is null)
-                    {
-                        throw new ArgumentNullException("Target and move cannot be null in Electro" +
-                                                        "Drift move.");
-                    }
-
-                    MoveEffectiveness effectiveness = context.Library.TypeChart.GetMoveEffectiveness(
-                        target.Specie.Types, move.Type);
-
-                    if (effectiveness is MoveEffectiveness.SuperEffective2X or MoveEffectiveness.SuperEffective4X)
-                    {
-                        return 5461.0 / 4096.0;
-                    }
-                    return 1.0;
-                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -206,17 +174,6 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                     Metronome = true,
-                },
-                OnHit = (_, source, _, context) =>
-                {
-                    // lower the user's Special Attack by 2 stages
-                    if (source is null)
-                    {
-                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
-                                                                        "Draco Meteor move.");
-                    }
-                    source.AlterStatModifier(StatId.SpA, -2, context);
-                    return true;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
@@ -237,22 +194,6 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                     Metronome = true,
-                },
-                OnBasePower = (source, _, move, _) =>
-                {
-                    // If the user is poisoned, burned, or paralyzed, double the power of this move
-                    if (source is null || move is null)
-                    {
-                        throw new ArgumentNullException("Source and move cannot be null in Facade move.");
-                    }
-                    if (source.HasCondition(ConditionId.Poison) ||
-                        source.HasCondition(ConditionId.Toxic) ||
-                        source.HasCondition(ConditionId.Burn) ||
-                        source.HasCondition(ConditionId.Paralysis))
-                    {
-                        return 2.0;
-                    }
-                    return 1.0;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -275,17 +216,6 @@ public record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                OnHit = (target, _, _, context) =>
-                {
-                    // 20% chance to lower the target's Defense by 1 stage
-                    //ArgumentNullException.ThrowIfNull(target, nameof(target));
-
-                    if (context.Random.Next(100) < 20)
-                    {
-                        target.AlterStatModifier(StatId.Def, -1, context);
-                    }
-                    return true;
-                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
             },
@@ -307,18 +237,6 @@ public record Moves
                     Punch = true,
                     Metronome = true,
                 },
-                OnHit = (_, source, _, context) =>
-                {
-                    // lowers the user's Defence and Special Defense by 1 stage
-                    if (source is null)
-                    {
-                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
-                                                                        "Headlong Rush move.");
-                    }
-                    source.AlterStatModifier(StatId.Def, -1, context);
-                    source.AlterStatModifier(StatId.SpD, -1, context);
-                    return true;
-                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
             },
@@ -338,17 +256,6 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnHit = (target, _, _, context) =>
-                {
-                    // lowers the target's Special Attack by 1 stage
-                    if (target is null)
-                    {
-                        throw new ArgumentNullException(nameof(target), "Target cannot be null in" +
-                                                                        "Struggle Bug move.");
-                    }
-                    target.AlterStatModifier(StatId.SpA, -1, context);
-                    return true;
-                },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Bug,
             },
@@ -367,17 +274,6 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                     Metronome = true,
-                },
-                OnHit = (_, source, _, context) =>
-                {
-                    // lowers the user's Special Attack by 2 stages
-                    if (source is null)
-                    {
-                        throw new ArgumentNullException(nameof(source), "Source cannot be null in" +
-                                                                        "Overheat move.");
-                    }
-                    source.AlterStatModifier(StatId.SpA, -2, context);
-                    return true;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
@@ -399,7 +295,6 @@ public record Moves
                     Metronome = true,
                     Wind = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.Tailwind],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Flying,
             },
@@ -418,17 +313,6 @@ public record Moves
                     Contact = true,
                     Protect = true,
                     Mirror = true,
-                },
-                OnHit = (target, _, _, context) =>
-                {
-                    // lowers the target's Special Attack by 1 stage
-                    if (target is null)
-                    {
-                        throw new ArgumentNullException(nameof(target), "Target cannot be null in" +
-                                                                        "Spirit Break move.");
-                    }
-                    target.AlterStatModifier(StatId.SpA, -1, context);
-                    return true;
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
@@ -451,7 +335,6 @@ public record Moves
                     Metronome = true,
                 },
                 Condition = _library.Conditions[ConditionId.Paralysis],
-                OnTryImmunity = (target) => target.HasType(MoveType.Electric),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -471,7 +354,6 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.Reflect],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -491,7 +373,6 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
-                SideCondition = _library.SideConditions[SideConditionId.LightScreen],
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -512,17 +393,6 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                // Fake Out only works on the first turn a Pokémon is out
-                OnTry = (source, target, _, context) =>
-                {
-                    if (source.ActiveMoveActions <= 1) return true;
-
-                    if (context.PrintDebug)
-                    {
-                        UiGenerator.PrintFakeOutOnTryFail(source, target);
-                    }
-                    return false;
-                },
                 Condition = _library.Conditions[ConditionId.Flinch],
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -533,33 +403,6 @@ public record Moves
                 Num = 484,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (source, target, _) =>
-                {
-                    double targetWeight = target.Specie.Weight;
-                    double sourceWeight = source.Specie.Weight;
-                    int basePower;
-                    if (sourceWeight >= targetWeight * 5)
-                    {
-                        basePower = 120;
-                    }
-                    else if (sourceWeight >= targetWeight * 4)
-                    {
-                        basePower = 100;
-                    }
-                    else if (sourceWeight >= targetWeight * 3)
-                    {
-                        basePower = 80;
-                    }
-                    else if (sourceWeight >= targetWeight * 2)
-                    {
-                        basePower = 60;
-                    }
-                    else
-                    {
-                        basePower = 40;
-                    }
-                    return basePower;
-                },
                 Category = MoveCategory.Physical,
                 Name = "Heavy Slam",
                 BasePp = 10,
@@ -581,21 +424,6 @@ public record Moves
                 Num = 67,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (_, target, _) =>
-                {
-                    // Power depends on the target's weight
-                    double targetWeight = target.Specie.Weight;
-                    int basePower = targetWeight switch
-                    {
-                        >= 2000 => 120,
-                        >= 1000 => 100,
-                        >= 500 => 80,
-                        >= 250 => 60,
-                        >= 100 => 40,
-                        _ => 20,
-                    };
-                    return basePower;
-                },
                 Category = MoveCategory.Physical,
                 Name = "Low Kick",
                 BasePp = 20,
