@@ -248,7 +248,7 @@ public static class EffectUnionFactory
         Specie specie => new EffectSingleEventSource(specie),
         Condition condition => new EffectSingleEventSource(condition),
         Format format => new EffectSingleEventSource(format),
-        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource")
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
     };
 }
 
@@ -305,6 +305,29 @@ public record BoolBoolZeroUnion(bool Value) : BoolZeroUnion;
 public record ZeroBoolZeroUnion : BoolZeroUnion;
 
 
+/// <summary>
+/// MoveId | bool
+/// </summary>
+public abstract record MoveIdBoolUnion
+{
+    public static implicit operator MoveIdBoolUnion(MoveId moveId) => new MoveIdMoveIdBoolUnion(moveId);
+    public static implicit operator MoveIdBoolUnion(bool value) => new BoolMoveIdBoolUnion(value);
+}
+public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion;
+public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion;
+
+
+/// <summary>
+/// MoveType | false
+/// </summary>
+public abstract record MoveTypeFalseUnion
+{
+    public static implicit operator MoveTypeFalseUnion(PokemonType moveType) =>
+        new MoveTypeMoveTypeFalseUnion(moveType);
+    public static MoveTypeFalseUnion FromFalse() => new FalseMoveTypeFalseUnion();
+}
+public record MoveTypeMoveTypeFalseUnion(PokemonType MoveType) : MoveTypeFalseUnion;
+public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
 
 ///// <summary>
 ///// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
