@@ -1,12 +1,96 @@
 ﻿using ApogeeVGC.Player;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
 public class Side
 {
-    public SideId SideId { get; init; }
+    //public Battle Battle { get; }
+    public SideId Id { get; }
+    //public int N { get; }
+
+    public required string Name { get; set; }
+    public required string Avatar { get; set; }
+    //public Side Foe { get; init; } = null!; // set in battle.start()
+    //public Side? AllySide { get; init; } = null; // set in battle.start()
+    public required List<PokemonTemplate> Team { get; set; }
+    public required List<Pokemon> Pokemon { get; set; }
+    public required List<Pokemon> Active { get; set; }
+
+    public int PokemonLeft { get; set; }
+
+    public Pokemon? FaintedLastTurn { get; set; }
+    public Pokemon? FaintedThisTurn { get; set; }
+    public int TotalFainted { get; set; }
+
+    //public required Dictionary<string, EffectState> SideConditions { get; init; }
+    //public required List<Dictionary<string, EffectState>> SlotConditions { get; init; }
+
+    public IChoiceRequest? ActiveRequest { get; set; }
+    public required Choice Choice { get; init; }
+
+    public Side(string name, IBattle battle, SideId sideNum, PokemonTemplate[] team)
+    {
+        // Copy side scripts from battle if needed
+
+        //Battle = battle;
+        Id = sideNum;
+        //N = sideNum;
+
+        Name = name;
+        Avatar = string.Empty;
+
+        Team = team.ToList();
+        Pokemon = [];
+
+        foreach (PokemonTemplate template in Team)
+        {
+            AddPokemon(set);
+        }
+
+        // Initialize active slots based on game type
+        Active = Battle.GameType switch
+        {
+            GameType.Doubles => [null!, null!],
+            GameType.Triples or GameType.Rotation => [null!, null!, null!],
+            _ => [null!]
+        };
+
+        PokemonLeft = Pokemon.Count;
+        FaintedLastTurn = null;
+        FaintedThisTurn = null;
+        TotalFainted = 0;
+        ZMoveUsed = false;
+        DynamaxUsed = Battle.Gen != 8;
+
+        SideConditions = [];
+        SlotConditions = [];
+
+        // Initialize slot conditions for each active slot
+        for (int i = 0; i < Active.Count; i++)
+        {
+            SlotConditions.Add(new Dictionary<string, EffectState>());
+        }
+
+        ActiveRequest = null;
+        Choice = new Choice
+        {
+            CantUndo = false,
+            Actions = [],
+            ForcedSwitchesLeft = 0,
+            ForcedPassesLeft = 0,
+            SwitchIns = [],
+            Terastallize = false,
+        };
+
+        LastMove = null;
+    }
 }
 
 
