@@ -75,10 +75,10 @@
 //        // Get all 6 Pokémon from the team
 //        var pokemon = side.Team.PokemonSet.Pokemons;
 
-//        switch (side.BattleFormat)
+//        switch (side.GameType)
 //        {
 //            // Check battle format to determine how many Pokémon to select
-//            case BattleFormat.Singles:
+//            case GameType.Singles:
 //            {
 //                // Singles: Generate all permutations of the 6 Pokémon (720 choices)
 //                var permutations = GeneratePermutations(pokemon.ToArray());
@@ -89,7 +89,7 @@
 //                    Select(TeamPreviewChoice.CreateSinglesTeamPreview));
 //                break;
 //            }
-//            case BattleFormat.Doubles:
+//            case GameType.Doubles:
 //            {
 //                // Doubles: Select 4 out of 6 Pokémon and arrange them in slots 1-4
 //                // Slots 5-6 are not used in doubles format
@@ -118,7 +118,7 @@
 //                break;
 //            }
 //            default:
-//                throw new InvalidOperationException($"Unsupported battle format: {side.BattleFormat}");
+//                throw new InvalidOperationException($"Unsupported battle format: {side.GameType}");
 //        }
 
 //        return choices.ToArray();

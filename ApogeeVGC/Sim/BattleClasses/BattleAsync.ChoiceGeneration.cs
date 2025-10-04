@@ -472,7 +472,7 @@
 
 //        switch (Format)
 //        {
-//            case BattleFormat.Singles:
+//            case GameType.Singles:
 //                // Singles: only one active Pokémon
 //                Pokemon activePokemon = side.ActivePokemon.First();
                 
@@ -484,7 +484,7 @@
                 
 //                return GenerateTurnStartChoices(activePokemon);
 
-//            case BattleFormat.Doubles:
+//            case GameType.Doubles:
 //                // Doubles: two active Pokémon - check for fainted Pokémon
 //                Pokemon slot1Pokemon = side.GetSlot(SlotId.Slot1);
 //                Pokemon slot2Pokemon = side.GetSlot(SlotId.Slot2);

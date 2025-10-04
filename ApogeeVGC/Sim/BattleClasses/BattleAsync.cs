@@ -17,7 +17,7 @@
 //    public bool PrintDebug { get; set; }
 //    public int? BattleSeed { get; set; }
 
-//    public required BattleFormat Format { get; init; }
+//    public required GameType Format { get; init; }
 
 //    // Random number generation
 //    private Random? _battleRandom;
@@ -1069,7 +1069,7 @@
 //{
 //    public required Guid BattleId { get; init; }
 //    public required int? Seed { get; init; }
-//    public required BattleFormat Format { get; init; }
+//    public required GameType Format { get; init; }
 //    public required Dictionary<PlayerId, string> Players { get; init; }
 //    public required IReadOnlyList<Turn> TurnHistory { get; init; }
 //    public required GameResults? GameResults { get; init; }

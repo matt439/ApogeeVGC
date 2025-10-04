@@ -13,24 +13,24 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 public class Pokemon
 {
     public SideId Side { get; }
-    public PokemonTemplate Template { get; }
-    public string Name => Template.Name[..20];
+    public PokemonSet Set { get; }
+    public string Name => Set.Name[..20];
 
     public string Fullname => $"{Side.GetSideIdName()}: {Name}";
-    public int Level => Template.Level;
-    public GenderId Gender => Template.Gender;
-    public int Happiness => Template.Happiness;
-    public PokeballId Pokeball => Template.Pokeball;
+    public int Level => Set.Level;
+    public GenderId Gender => Set.Gender;
+    public int Happiness => Set.Happiness;
+    public PokeballId Pokeball => Set.Pokeball;
 
-    public IReadOnlyList<Move> BaseMoveSlots => Template.Moves;
-    public StatsTable Evs => Template.Evs;
-    public StatsTable Ivs => Template.Ivs;
+    public IReadOnlyList<Move> BaseMoveSlots => Set.Moves;
+    public StatsTable Evs => Set.Evs;
+    public StatsTable Ivs => Set.Ivs;
     public List<Move> MoveSlots { get; set; }
 
     public SlotId Position { get; set; }
 
-    public Specie BaseSpecies => Template.Specie;
-    public Specie Species => Template.Specie;
+    public Specie BaseSpecies => Set.Specie;
+    public Specie Species => Set.Specie;
     public EffectState SpeciesState { get; set; }
 
     public ConditionId? Status { get; set; }
@@ -43,7 +43,7 @@ public class Pokemon
     public StatsTable StoredStats { get; set; }
     public BoostsTable Boosts { get; set; }
 
-    public Ability BaseAbility => Template.Ability;
+    public Ability BaseAbility => Set.Ability;
     public Ability Ability { get; set; }
     public EffectState AbilityState { get; set; }
 
@@ -136,18 +136,18 @@ public class Pokemon
         }
     }
 
-    public Pokemon(IBattle battle, PokemonTemplate template, Side side)
+    public Pokemon(IBattle battle, PokemonSet set, Side side)
     {
-        Side = side.SideId;
-        Template = template;
+        Side = side.Id;
+        Set = set;
 
-        SpeciesState = battle.InitEffectState(template.Specie.Id, null, null);
+        SpeciesState = battle.InitEffectState(set.Specie.Id, null, null);
 
-        if (template.Moves.Count == 0)
+        if (set.Moves.Count == 0)
         {
-            throw new InvalidOperationException($"Template {Name} has no moves");
+            throw new InvalidOperationException($"Set {Name} has no moves");
         }
-        MoveSlots = template.Moves.ToList();
+        MoveSlots = set.Moves.ToList();
 
         Position = SlotId.Slot1;
         StatusState = battle.InitEffectState(null, null, null);
@@ -169,7 +169,7 @@ public class Pokemon
         Ability = BaseAbility;
         AbilityState = battle.InitEffectState(Ability.Id, null, this);
 
-        Item = template.Item;
+        Item = set.Item;
         ItemState = battle.InitEffectState(Item?.Id ?? null, null, this);
 
         Trapped = PokemonTrapped.False;
@@ -178,7 +178,7 @@ public class Pokemon
         BaseTypes = Types;
         KnownType = true;
         ApparentType = BaseTypes;
-        TeraType = Template.TeraType;
+        TeraType = Set.TeraType;
 
         SwitchFlag = false;
 

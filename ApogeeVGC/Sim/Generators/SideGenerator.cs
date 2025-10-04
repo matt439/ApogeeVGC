@@ -9,7 +9,7 @@
 //public static class SideGenerator
 //{
 //    public static Side GenerateTestSide(Library library, string trainerName, PlayerId playerId, SideId sideId,
-//        BattleFormat format, bool printDebug = false)
+//        GameType format, bool printDebug = false)
 //    {
 //        Trainer defaulTrainer = TrainerGenerator.GenerateTestTrainer("Default", printDebug);
 
@@ -25,7 +25,7 @@
 //            Slot4 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
 //            Slot5 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
 //            Slot6 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
-//            BattleFormat = format,
+//            GameType = format,
 
 //        };
 //    }

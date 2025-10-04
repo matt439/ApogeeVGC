@@ -18,7 +18,7 @@ public enum SlotId
     Slot6 = 6,
 }
 
-public enum BattleFormat
+public enum GameType
 {
     Singles,
     Doubles,

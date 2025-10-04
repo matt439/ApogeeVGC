@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Core;
 //using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -50,6 +51,9 @@ public interface IBattle
     IBattle Copy();
 
     bool IsGameComplete { get; }
+
+    GameType GameType { get; }
+
     //Turn CurrentTurn { get; }
 
     //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);

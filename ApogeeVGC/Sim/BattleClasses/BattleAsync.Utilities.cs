@@ -20,7 +20,7 @@
 //            Field = Field.Copy(), // Deep copy the field state
 //            Side1 = Side1.Copy(), // Deep copy side 1
 //            Side2 = Side2.Copy(), // Deep copy side 2
-//            Format = Format, // Shared reference - BattleFormat is immutable
+//            Format = Format, // Shared reference - GameType is immutable
 //            Player1 = Player1, // Shared reference - players are external
 //            Player2 = Player2, // Shared reference - players are external
 //            Player1CancellationTokenSource = newPlayer1CancellationTokenSource,

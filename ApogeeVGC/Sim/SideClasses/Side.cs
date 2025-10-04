@@ -1,10 +1,7 @@
-﻿using ApogeeVGC.Player;
-using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.GameObjects;
-using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.SideClasses;
@@ -19,7 +16,7 @@ public class Side
     public required string Avatar { get; set; }
     //public Side Foe { get; init; } = null!; // set in battle.start()
     //public Side? AllySide { get; init; } = null; // set in battle.start()
-    public required List<PokemonTemplate> Team { get; set; }
+    public required List<PokemonSet> Team { get; set; }
     public required List<Pokemon> Pokemon { get; set; }
     public required List<Pokemon> Active { get; set; }
 
@@ -29,13 +26,13 @@ public class Side
     public Pokemon? FaintedThisTurn { get; set; }
     public int TotalFainted { get; set; }
 
-    //public required Dictionary<string, EffectState> SideConditions { get; init; }
-    //public required List<Dictionary<string, EffectState>> SlotConditions { get; init; }
+    public required Dictionary<ConditionId, EffectState> SideConditions { get; set; }
+    public required List<Dictionary<ConditionId, EffectState>> SlotConditions { get; set; }
 
     public IChoiceRequest? ActiveRequest { get; set; }
-    public required Choice Choice { get; init; }
+    public required Choice Choice { get; set; }
 
-    public Side(string name, IBattle battle, SideId sideNum, PokemonTemplate[] team)
+    public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
     {
         // Copy side scripts from battle if needed
 
@@ -48,26 +45,18 @@ public class Side
 
         Team = team.ToList();
         Pokemon = [];
-
-        foreach (PokemonTemplate template in Team)
+        foreach (PokemonSet set in Team)
         {
             AddPokemon(set);
         }
 
-        // Initialize active slots based on game type
-        Active = Battle.GameType switch
+        Active = battle.GameType switch
         {
             GameType.Doubles => [null!, null!],
-            GameType.Triples or GameType.Rotation => [null!, null!, null!],
-            _ => [null!]
+            _ => [null!],
         };
 
         PokemonLeft = Pokemon.Count;
-        FaintedLastTurn = null;
-        FaintedThisTurn = null;
-        TotalFainted = 0;
-        ZMoveUsed = false;
-        DynamaxUsed = Battle.Gen != 8;
 
         SideConditions = [];
         SlotConditions = [];
@@ -75,10 +64,9 @@ public class Side
         // Initialize slot conditions for each active slot
         for (int i = 0; i < Active.Count; i++)
         {
-            SlotConditions.Add(new Dictionary<string, EffectState>());
+            SlotConditions.Add(new Dictionary<ConditionId, EffectState>());
         }
 
-        ActiveRequest = null;
         Choice = new Choice
         {
             CantUndo = false,
@@ -88,8 +76,12 @@ public class Side
             SwitchIns = [],
             Terastallize = false,
         };
+    }
 
-        LastMove = null;
+
+    private Pokemon AddPokemon(PokemonSet set)
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -99,7 +91,7 @@ public class Side
 //    public required Team Team { get; init; }
 //    public required PlayerId PlayerId { get; init; }
 //    public required SideId SideId { get; init; }
-//    public required BattleFormat BattleFormat { get; init; }
+//    public required GameType GameType { get; init; }
 //    public bool PrintDebug { get; init; }
 
 //    // Track whether team preview choice has been made
@@ -149,7 +141,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            if (BattleFormat == BattleFormat.Doubles)
+//            if (GameType == GameType.Doubles)
 //            {
 //                throw new InvalidOperationException("Cannot set Slot5 in Doubles format.");
 //            }
@@ -162,7 +154,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            if (BattleFormat == BattleFormat.Doubles)
+//            if (GameType == GameType.Doubles)
 //            {
 //                throw new InvalidOperationException("Cannot set Slot6 in Doubles format.");
 //            }
@@ -179,7 +171,7 @@ public class Side
 //            yield return Slot2;
 //            yield return Slot3;
 //            yield return Slot4;
-//            if (BattleFormat == BattleFormat.Singles)
+//            if (GameType == GameType.Singles)
 //            {
 //                yield return Slot5;
 //                yield return Slot6;
@@ -191,12 +183,12 @@ public class Side
 //    {
 //        get
 //        {
-//            switch (BattleFormat)
+//            switch (GameType)
 //            {
-//                case BattleFormat.Singles:
+//                case GameType.Singles:
 //                    yield return Slot1;
 //                    break;
-//                case BattleFormat.Doubles:
+//                case GameType.Doubles:
 //                    yield return Slot1;
 //                    yield return Slot2;
 //                    break;
@@ -221,11 +213,11 @@ public class Side
 //            {
 //                return false; // No active Pokémon alive
 //            }
-//            if (BattleFormat == BattleFormat.Singles && AliveActivePokemonCount > 1)
+//            if (GameType == GameType.Singles && AliveActivePokemonCount > 1)
 //            {
 //                return false; // More than one active Pokémon in Singles
 //            }
-//            if (BattleFormat == BattleFormat.Doubles && AliveActivePokemonCount > 2)
+//            if (GameType == GameType.Doubles && AliveActivePokemonCount > 2)
 //            {
 //                return false; // More than two active Pokémon in Doubles
 //            }
@@ -241,7 +233,7 @@ public class Side
 //    //        yield return (SlotId.Slot2, Slot2);
 //    //        yield return (SlotId.Slot3, Slot3);
 //    //        yield return (SlotId.Slot4, Slot4);
-//    //        if (BattleFormat == BattleFormat.Singles)
+//    //        if (GameType == GameType.Singles)
 //    //        {
 //    //            yield return (SlotId.Slot5, Slot5);
 //    //            yield return (SlotId.Slot6, Slot6);
@@ -253,10 +245,10 @@ public class Side
 //    {
 //        get
 //        {
-//            return BattleFormat switch
+//            return GameType switch
 //            {
-//                BattleFormat.Singles => new[] { Slot2, Slot3, Slot4, Slot5, Slot6 }.Where(p => !p.IsFainted),
-//                BattleFormat.Doubles => new[] { Slot3, Slot4 }.Where(p => !p.IsFainted),
+//                GameType.Singles => new[] { Slot2, Slot3, Slot4, Slot5, Slot6 }.Where(p => !p.IsFainted),
+//                GameType.Doubles => new[] { Slot3, Slot4 }.Where(p => !p.IsFainted),
 //                _ => throw new InvalidOperationException("Invalid battle format."),
 //            };
 //        }
@@ -329,9 +321,9 @@ public class Side
 
 //    public void SetSlotsWithCopies(IReadOnlyList<Pokemon> pokemons)
 //    {
-//        switch (BattleFormat)
+//        switch (GameType)
 //        {
-//            case BattleFormat.Singles:
+//            case GameType.Singles:
 //                if (pokemons.Count != 6)
 //                {
 //                    throw new ArgumentException("Must provide exactly 6 Pokémon for Singles format.");
@@ -343,7 +335,7 @@ public class Side
 //                Slot5 = pokemons[4].Copy();
 //                Slot6 = pokemons[5].Copy();
 //                break;
-//            case BattleFormat.Doubles:
+//            case GameType.Doubles:
 
 //                if (pokemons.Count != 4)
 //                {
@@ -366,11 +358,11 @@ public class Side
 //    {
 //        if (!IsValidActiveSlot(activeSlot))
 //        {
-//            throw new ArgumentException($"Slot {activeSlot} is not a valid active slot for {BattleFormat} format.");
+//            throw new ArgumentException($"Slot {activeSlot} is not a valid active slot for {GameType} format.");
 //        }
 //        if (!IsValidBenchSlot(benchSlot))
 //        {
-//            throw new ArgumentException($"Slot {benchSlot} is not a valid bench slot for {BattleFormat} format.");
+//            throw new ArgumentException($"Slot {benchSlot} is not a valid bench slot for {GameType} format.");
 //        }
 //        Pokemon activePokemon = GetSlot(activeSlot);
 //        Pokemon benchPokemon = GetSlot(benchSlot);
@@ -393,10 +385,10 @@ public class Side
 
 //    public Pokemon? GetAlly(SlotId slotId)
 //    {
-//        return BattleFormat switch
+//        return GameType switch
 //        {
-//            BattleFormat.Singles => null, // No allies in Singles,
-//            BattleFormat.Doubles => slotId switch
+//            GameType.Singles => null, // No allies in Singles,
+//            GameType.Doubles => slotId switch
 //            {
 //                SlotId.Slot1 => Slot2,
 //                SlotId.Slot2 => Slot1,
@@ -414,21 +406,21 @@ public class Side
 
 //    private bool IsValidActiveSlot(SlotId slot)
 //    {
-//        return BattleFormat switch
+//        return GameType switch
 //        {
-//            BattleFormat.Singles => slot is SlotId.Slot1,
-//            BattleFormat.Doubles => slot is SlotId.Slot1 or SlotId.Slot2,
+//            GameType.Singles => slot is SlotId.Slot1,
+//            GameType.Doubles => slot is SlotId.Slot1 or SlotId.Slot2,
 //            _ => throw new InvalidOperationException("Invalid battle format."),
 //        };
 //    }
 
 //    private bool IsValidBenchSlot(SlotId slot)
 //    {
-//        return BattleFormat switch
+//        return GameType switch
 //        {
-//            BattleFormat.Singles => slot is SlotId.Slot2 or SlotId.Slot3 or SlotId.Slot4 or
+//            GameType.Singles => slot is SlotId.Slot2 or SlotId.Slot3 or SlotId.Slot4 or
 //                SlotId.Slot5 or SlotId.Slot6,
-//            BattleFormat.Doubles => slot is SlotId.Slot3 or SlotId.Slot4,
+//            GameType.Doubles => slot is SlotId.Slot3 or SlotId.Slot4,
 //            _ => throw new InvalidOperationException("Invalid battle format."),
 //        };
 //    }
@@ -451,7 +443,7 @@ public class Side
 //            Slot4 = Slot4.Copy(),
 //            Slot5 = Slot5.Copy(),
 //            Slot6 = Slot6.Copy(),
-//            BattleFormat = BattleFormat,
+//            GameType = GameType,
 //            _hasTeamPreviewChoiceBeenMade = _hasTeamPreviewChoiceBeenMade, // Copy the team preview state
 //        };
 //    }

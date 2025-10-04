@@ -51,10 +51,10 @@
 //                //RunRandomTest();
 //                break;
 //            case DriverMode.RandomVsRandomEvaluation:
-//                RunRandomVsRandomEvaluationTest(BattleFormat.Singles).GetAwaiter().GetResult();
+//                RunRandomVsRandomEvaluationTest(GameType.Singles).GetAwaiter().GetResult();
 //                break;
 //            case DriverMode.RandomVsRandomEvaluationDoubles:
-//                RunRandomVsRandomEvaluationTest(BattleFormat.Doubles).GetAwaiter().GetResult();
+//                RunRandomVsRandomEvaluationTest(GameType.Doubles).GetAwaiter().GetResult();
 //                break;
 //            case DriverMode.ConsoleVsRandom:
 //                RunConsoleVsRandomTest().GetAwaiter().GetResult();
@@ -71,10 +71,10 @@
 //                RunMctsVsRandom().GetAwaiter().GetResult();
 //                break;
 //            case DriverMode.MctsVsRandomEvaluation:
-//                 RunMctsVsRandomEvaluation(BattleFormat.Singles).GetAwaiter().GetResult();
+//                 RunMctsVsRandomEvaluation(GameType.Singles).GetAwaiter().GetResult();
 //                break;
 //            case DriverMode.MctsVsRandomEvaluationDoubles:
-//                RunMctsVsRandomEvaluation(BattleFormat.Doubles).GetAwaiter().GetResult();
+//                RunMctsVsRandomEvaluation(GameType.Doubles).GetAwaiter().GetResult();
 //                break;
 //            default:
 //                throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
@@ -88,7 +88,7 @@
 //        //    MctsExplorationParameter, Library, PlayerRandom1Seed, NumThreads, _mctsMaxTimer);
 
 //        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-//        //    "MCTS", BattleFormat.Doubles);
+//        //    "MCTS", GameType.Doubles);
 
 //        //var simulator = new Simulator
 //        //{
@@ -118,7 +118,7 @@
 //        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
 //        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "MCTS",
-//        //    "Random", BattleFormat.Doubles);
+//        //    "Random", GameType.Doubles);
 
 //        //var simulator = new Simulator
 //        //{
@@ -152,7 +152,7 @@
 //    //            int player2Seed = PlayerRandom2Seed + i;
 
 //    //            Battle battle = BattleGenerator.GenerateTestBattle(Library, "Mcts",
-//    //                "Random", BattleFormat.Singles);
+//    //                "Random", GameType.Singles);
 //    //            var simulator = new Simulator
 //    //            {
 //    //                Battle = battle,
@@ -202,7 +202,7 @@
 //    //    Console.ReadKey();
 //    //}
 
-//    private async Task RunMctsVsRandomEvaluation(BattleFormat format)
+//    private async Task RunMctsVsRandomEvaluation(GameType format)
 //    {
 //        //var simResults = new ConcurrentBag<SimulatorResult>();
 //        //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -268,10 +268,10 @@
 //        //sb.AppendLine($"MCTS vs Random Evaluation Results ({MctsEvaluationNumTest} battles):");
 //        //switch (format)
 //        //{
-//        //    case BattleFormat.Singles:
+//        //    case GameType.Singles:
 //        //        sb.AppendLine("Format: Singles");
 //        //        break;
-//        //    case BattleFormat.Doubles:
+//        //    case GameType.Doubles:
 //        //        sb.AppendLine("Format: Doubles");
 //        //        break;
 //        //    default:
@@ -306,7 +306,7 @@
 //        //Console.ReadKey();
 //    }
 
-//    private async Task RunRandomVsRandomEvaluationTest(BattleFormat format)
+//    private async Task RunRandomVsRandomEvaluationTest(GameType format)
 //    {
 //        //var simResults = new ConcurrentBag<SimulatorResult>();
 //        //var stopwatch = System.Diagnostics.Stopwatch.StartNew();
@@ -380,10 +380,10 @@
 //        //sb.AppendLine($"Random vs Random Evaluation Results ({RandomEvaluationNumTest} battles):");
 //        //switch (format)
 //        //{
-//        //    case BattleFormat.Singles:
+//        //    case GameType.Singles:
 //        //        sb.AppendLine("Format: Singles");
 //        //        break;
-//        //    case BattleFormat.Doubles:
+//        //    case GameType.Doubles:
 //        //        sb.AppendLine("Format: Doubles");
 //        //        break;
 //        //    default:
@@ -416,7 +416,7 @@
 //    //private void RunRandomTest()
 //    //{
 //    //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Random1",
-//    //        "Random2", BattleFormat.Singles, true);
+//    //        "Random2", GameType.Singles, true);
 //    //    Simulator = new Simulator
 //    //    {
 //    //        Battle = battle,
@@ -442,7 +442,7 @@
 //        //private void RunConsoleVsRandomTest()
 //        //{
 //        //    Battle battle = BattleGenerator.GenerateTestBattle(Library, "Matt", 
-//        //        "Random", BattleFormat.Singles, true);
+//        //        "Random", GameType.Singles, true);
 
 //        //    Simulator = new Simulator
 //        //    {
@@ -464,7 +464,7 @@
 //        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
 //        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-//        //    "Random", BattleFormat.Singles, true);
+//        //    "Random", GameType.Singles, true);
 
 //        //var simulator = new Simulator
 //        //{
@@ -493,7 +493,7 @@
 //        //IPlayerNew player2 = new PlayerRandom(PlayerId.Player2, PlayerRandom2Seed);
 
 //        //BattleAsync battle = BattleGenerator.GenerateTestBattleNew(Library, player1, player2, "Matt",
-//        //    "Random", BattleFormat.Doubles, true);
+//        //    "Random", GameType.Doubles, true);
 
 //        //var simulator = new Simulator
 //        //{

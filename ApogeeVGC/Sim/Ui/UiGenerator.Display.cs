@@ -136,12 +136,12 @@
 //        string remainingInfo = FormatRemainingPokemonInfo(side);
 
 //        StringBuilder sb = new();
-//        switch (side.BattleFormat)
+//        switch (side.GameType)
 //        {
-//            case BattleFormat.Singles:
+//            case GameType.Singles:
 //                sb.Append(FormatPrimarySlot(side, SlotId.Slot1));
 //                break;
-//            case BattleFormat.Doubles:
+//            case GameType.Doubles:
 //                sb.Append(FormatPrimarySlot(side, SlotId.Slot1));
 //                sb.Append(FormatPrimarySlot(side, SlotId.Slot2, PrimarySlot2Spacer));
 //                break;
@@ -205,12 +205,12 @@
 //        string remainingInfo = FormatRemainingPokemonInfo(side);
 
 //        StringBuilder sb = new();
-//        switch (side.BattleFormat)
+//        switch (side.GameType)
 //        {
-//            case BattleFormat.Singles:
+//            case GameType.Singles:
 //                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot1));
 //                break;
-//            case BattleFormat.Doubles:
+//            case GameType.Doubles:
 //                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot1, SecondarySlot1Spacer));
 //                sb.AppendLine(FormatSecondarySlot(side, SlotId.Slot2));
 //                break;

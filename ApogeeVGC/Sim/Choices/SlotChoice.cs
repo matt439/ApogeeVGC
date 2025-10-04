@@ -258,7 +258,7 @@
 //        public override SlotId SlotId => SwitchOutSlot;
 //        public override Trainer Trainer => SwitchOutPokemon.Trainer;
 
-//        internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon, BattleFormat format)
+//        internal SwitchChoice(Pokemon switchOutPokemon, Pokemon switchInPokemon, GameType format)
 //        {
 //            SwitchOutPokemon = switchOutPokemon ?? throw new ArgumentNullException(nameof(switchOutPokemon));
 //            SwitchInPokemon = switchInPokemon ?? throw new ArgumentNullException(nameof(switchInPokemon));
@@ -279,7 +279,7 @@
 
 //            switch (format)
 //            {
-//                case BattleFormat.Singles:
+//                case GameType.Singles:
 //                    if (SwitchOutPokemon.SlotId is not SlotId.Slot1)
 //                    {
 //                        throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
@@ -289,7 +289,7 @@
 //                        throw new ArgumentException("Only bench Pokemon can be switched in.");
 //                    }
 //                    break;
-//                case BattleFormat.Doubles:
+//                case GameType.Doubles:
 //                    if (SwitchOutPokemon.SlotId is SlotId.Slot3 or SlotId.Slot4)
 //                    {
 //                        throw new ArgumentException("Cannot switch out a Pokemon from a bench slot.");
@@ -318,7 +318,7 @@
 //        return new MoveChoice(pokemon, move, isTera, moveNormalTarget, possibleTargets ?? []);
 //    }
 
-//    public static SwitchChoice CreateSwitch(Pokemon switchOutPokemon, Pokemon switchInPokemon, BattleFormat format)
+//    public static SwitchChoice CreateSwitch(Pokemon switchOutPokemon, Pokemon switchInPokemon, GameType format)
 //    {
 //        if (switchOutPokemon == switchInPokemon)
 //        {
