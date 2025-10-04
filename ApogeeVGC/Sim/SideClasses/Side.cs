@@ -8,7 +8,7 @@ namespace ApogeeVGC.Sim.SideClasses;
 
 public class Side
 {
-    //public Battle Battle { get; }
+    public IBattle Battle { get; }
     public SideId Id { get; }
     //public int N { get; }
 
@@ -36,7 +36,7 @@ public class Side
     {
         // Copy side scripts from battle if needed
 
-        //Battle = battle;
+        Battle = battle;
         Id = sideNum;
         //N = sideNum;
 

@@ -12,11 +12,12 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 
 public class Pokemon
 {
-    public SideId Side { get; }
+    public Side Side { get; }
+    public IBattle Battle => Side.Battle;
     public PokemonSet Set { get; }
     public string Name => Set.Name[..20];
 
-    public string Fullname => $"{Side.GetSideIdName()}: {Name}";
+    public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
     public int Level => Set.Level;
     public GenderId Gender => Set.Gender;
     public int Happiness => Set.Happiness;
@@ -138,7 +139,7 @@ public class Pokemon
 
     public Pokemon(IBattle battle, PokemonSet set, Side side)
     {
-        Side = side.Id;
+        Side = side;
         Set = set;
 
         SpeciesState = battle.InitEffectState(set.Specie.Id, null, null);
