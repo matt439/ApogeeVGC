@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Utils;
 
@@ -328,6 +329,34 @@ public abstract record MoveTypeFalseUnion
 }
 public record MoveTypeMoveTypeFalseUnion(PokemonType MoveType) : MoveTypeFalseUnion;
 public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
+
+
+/// <summary>
+/// SpecieId | AbilityId | ItemId | ConditionId | MoveId
+/// </summary>
+public abstract record EffectStateId
+{
+    public static implicit operator EffectStateId(SpecieId specieId) => new SpecieEffectStateId(specieId);
+    public static implicit operator EffectStateId(AbilityId abilityId) => new AbilityEffectStateId(abilityId);
+    public static implicit operator EffectStateId(ItemId itemId) => new ItemEffectStateId(itemId);
+    public static implicit operator EffectStateId(ConditionId conditionId) => new ConditionEffectStateId(conditionId);
+    public static implicit operator EffectStateId(MoveId moveId) => new MoveEffectStateId(moveId);
+}
+public record SpecieEffectStateId(SpecieId SpecieId) : EffectStateId;
+public record AbilityEffectStateId(AbilityId AbilityId) : EffectStateId;
+public record ItemEffectStateId(ItemId ItemId) : EffectStateId;
+public record ConditionEffectStateId(ConditionId ConditionId) : EffectStateId;
+public record MoveEffectStateId(MoveId MoveId) : EffectStateId;
+
+
+
+
+
+
+
+
+
+
 
 ///// <summary>
 ///// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean

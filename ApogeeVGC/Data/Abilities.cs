@@ -45,7 +45,7 @@ public record Abilities
                     if (effect.EffectType != EffectType.Move) return;
                     if (battle.PrintDebug)
                     {
-                        UiGenerator.PrintChillingNeighActivation(source);
+                        //UiGenerator.PrintChillingNeighActivation(source);
                     }
 
                     battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
@@ -63,7 +63,7 @@ public record Abilities
                     if (!battle.Field.SetTerrain(battle, _library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
-                        UiGenerator.PrintAbilityActivation("Hadron Engine");
+                        //UiGenerator.PrintAbilityActivation("Hadron Engine");
                     }
                 },
                 OnModifySpAPriority = 5,
@@ -85,7 +85,7 @@ public record Abilities
                 OnModifyAtkPriority = 5,
                 OnModifyAtk = (battle, _, pokemon, _, _) =>
                 {
-                    if (pokemon.HasStatus)
+                    if (pokemon.Status is not null)
                     {
                         return battle.ChainModify(1.5);
                     }

@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Events;
 

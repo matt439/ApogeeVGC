@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -12,7 +13,6 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 public class Pokemon
 {
     public SideId Side { get; }
-    //public IBattle Battle { get; }
     public PokemonTemplate Template { get; }
     public string Name => Template.Name[..20];
 
@@ -22,21 +22,16 @@ public class Pokemon
     public int Happiness => Template.Happiness;
     public PokeballId Pokeball => Template.Pokeball;
 
-    public PokemonType BaseHpType => Template.HiddenPowerType;
-    public int BaseHpPower { get; } // CONSTRUCTOR ONLY
-
     public IReadOnlyList<Move> BaseMoveSlots => Template.Moves;
-    public IReadOnlyList<Move> MoveSlots { get; set; } // CONSTRUCTOR ONLY
+    public StatsTable Evs => Template.Evs;
+    public StatsTable Ivs => Template.Ivs;
+    public List<Move> MoveSlots { get; set; }
 
-    public PokemonType HpType { get; set; } // CONSTRUCTOR ONLY
-    public int HpPower { get; set; } // CONSTRUCTOR ONLY
-
-    public SlotId Position { get; set; } // CONSTRUCTOR ONLY
-    //public string Details { get; set; }
+    public SlotId Position { get; set; }
 
     public Specie BaseSpecies => Template.Specie;
     public Specie Species => Template.Specie;
-    public EffectState SpeciesState { get; set; } // CONSTRUCTOR ONLY
+    public EffectState SpeciesState { get; set; }
 
     public ConditionId? Status { get; set; }
     public EffectState StatusState { get; set; }
@@ -76,9 +71,9 @@ public class Pokemon
     public bool FormeRegression { get; set; }
 
     public List<PokemonType> Types { get; set; }
-    public PokemonType AddedType { get; set; }
+    public PokemonType? AddedType { get; set; }
     public bool KnownType { get; set; }
-    public string ApparentType { get; set; }
+    public List<PokemonType> ApparentType { get; set; }
 
     public MoveIdBoolUnion SwitchFlag { get; set; }
     public bool ForceSwitchFlag { get; set; }
@@ -91,10 +86,7 @@ public class Pokemon
     public Move? LastMoveEncore { get; set; } // Gen 2 only
     public Move? LastMoveUsed { get; set; }
     public int? LastMoveTargetLoc { get; set; }
-    /// <summary>
-    /// supposed to be string | bool
-    /// </summary>
-    public bool MoveThisTurn { get; set; }
+    public MoveIdBoolUnion MoveThisTurn { get; set; }
     public bool StatsRaisedThisTurn { get; set; }
     public bool StatsLoweredThisTurn { get; set; }
     public bool? MoveLastTurnResult { get; set; }
@@ -122,7 +114,7 @@ public class Pokemon
     public int Speed { get; set; }
 
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
-    public PokemonType TeraType { get; set; }
+    public MoveType TeraType { get; set; }
     public List<PokemonType> BaseTypes { get; set; }
     public MoveType? Terastallized { get; set; }
 
@@ -144,262 +136,114 @@ public class Pokemon
         }
     }
 
-    //// Gen 1 only
-    //public StatsTable? ModifiedStats { get; init; }
-    //public Action<StatIdExceptHp, double>? ModifyStat { get; init; }
-
-    //// Stadium only
-    //public Action? RecalculateStats { get; init; }
-    //public Dictionary<string, object> M { get; init; } = [];
-
     public Pokemon(IBattle battle, PokemonTemplate template, Side side)
     {
-        Side = side;
-
-        BaseSpecies = Battle.Dex.Species.Get(set.Species);
-        if (!BaseSpecies.Exists)
-            throw new ArgumentException($"Unidentified species: {BaseSpecies.Name}");
-
+        Side = side.SideId;
         Template = template;
 
-        Species = BaseSpecies;
+        SpeciesState = battle.InitEffectState(template.Specie.Id, null, null);
 
-        // Name setup
-        if (string.IsNullOrEmpty(set.Name) || set.Name == set.Species)
+        if (template.Moves.Count == 0)
         {
-            set.Name = BaseSpecies.BaseSpecies;
+            throw new InvalidOperationException($"Template {Name} has no moves");
         }
+        MoveSlots = template.Moves.ToList();
 
-        SpeciesState = Battle.InitEffectState(new EffectState
-        {
-            Id = Species.Id,
-            EffectOrder = 0
-        });
-
-        Name = set.Name.Length > 20 ? set.Name[..20] : set.Name;
-
-        // Level setup
-        Level = Utilities.ClampIntRange(set.AdjustLevel ?? set.Level, 1, 9999);
-
-        Gender = set.Gender;
-
-        // Happiness, Pokeball, Dynamax
-        Happiness = set.Happiness is { } h ? Utilities.ClampIntRange(h, 0, 255) : 255;
-        Pokeball = new Id(set.Pokeball ?? "pokeball");
-        DynamaxLevel = set.DynamaxLevel is { } dl ? Utilities.ClampIntRange(dl, 0, 10) : 10;
-        Gigantamax = set.Gigantamax ?? false;
-
-        // Move slots initialization
-        BaseMoveSlots = [];
-        MoveSlots = [];
-
-        if (set.Moves.Count == 0)
-        {
-            throw new InvalidOperationException($"Set {Name} has no moves");
-        }
-
-        foreach (string moveId in set.Moves)
-        {
-            Move move = Battle.Dex.Moves.Get(moveId);
-            if (move.Id.IsEmpty) continue;
-
-            if (move.Id.ToString() == "hiddenpower" && move.Type != PokemonType.Normal)
-            {
-                if (set.HpType == PokemonType.Unknown)
-                    set.HpType = move.Type;
-                move = Battle.Dex.Moves.Get("hiddenpower");
-            }
-
-            int basePp = (move.NoPpBoosts ?? false) ? move.Pp : move.Pp * 8 / 5;
-            if (Battle.Gen < 3) basePp = Math.Min(61, basePp);
-
-            BaseMoveSlots.Add(new MoveSlot
-            {
-                Move = move.Name,
-                Id = move.Id,
-                Pp = basePp,
-                MaxPp = basePp,
-                Target = move.Target,
-                Disabled = false,
-                DisabledSource = string.Empty,
-                Used = false
-            });
-        }
-
-        Position = 0;
-        Details = GetUpdatedDetails();
-
-        // Status initialization
-        Status = new Id("");
-        StatusState = Battle.InitEffectState(new EffectState
-        {
-            Id = new Id(),
-            EffectOrder = 0
-        });
-
-
+        Position = SlotId.Slot1;
+        StatusState = battle.InitEffectState(null, null, null);
         Volatiles = [];
-        ShowCure = null;
 
-        // EV/IV setup
-        Set!.Evs = new StatsTable { Hp = 0, Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
-        Set.Ivs = new StatsTable { Hp = 31, Atk = 31, Def = 31, Spa = 31, Spd = 31, Spe = 31 };
-
-        foreach (StatId stat in Enum.GetValues<StatId>())
-        {
-            if (Set.Evs.GetStat(stat) == 0) Set.Evs.SetStat(stat, 0);
-            if (Set.Ivs.GetStat(stat) == 0) Set.Ivs.SetStat(stat, 31);
-        }
-
-        foreach (StatId stat in Enum.GetValues<StatId>())
-        {
-            Set.Evs.SetStat(stat, Utilities.ClampIntRange(Set.Evs.GetStat(stat), 0, 255));
-            Set.Ivs.SetStat(stat, Utilities.ClampIntRange(Set.Ivs.GetStat(stat), 0, 31));
-        }
-
-        // Gen 1-2 DV handling
-        if (Battle.Gen <= 2)
-        {
-            foreach (StatId stat in Enum.GetValues<StatId>())
-            {
-                Set.Ivs.SetStat(stat, Set.Ivs.GetStat(stat) & 30); // Ensure even values
-            }
-        }
-
-        // Hidden Power calculation
-        HiddenPower hpData = Battle.Dex.GetHiddenPower(Set.Ivs);
-        HpType = set.HpType ?? hpData.Type;
-        HpPower = hpData.Power;
-
-        BaseHpType = HpType;
-        BaseHpPower = HpPower;
-
-        // Stats initialization
         BaseStoredStats = new StatsTable(); // Will be initialized in SetSpecies
-        StoredStats = new StatsTable { Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
+        StoredStats = new StatsTable { Atk = 0, Def = 0, SpA = 0, SpD = 0, Spe = 0 };
         Boosts = new BoostsTable
         {
-            [BoostId.Atk] = 0,
-            [BoostId.Def] = 0,
-            [BoostId.Spa] = 0,
-            [BoostId.Spd] = 0,
-            [BoostId.Spe] = 0,
-            [BoostId.Accuracy] = 0,
-            [BoostId.Evasion] = 0
+            Atk = 0,
+            Def = 0,
+            SpA = 0,
+            SpD = 0,
+            Spe = 0,
+            Accuracy = 0,
+            Evasion = 0,
         };
 
-        // Ability setup
-        BaseAbility = new Id(set.Ability);
         Ability = BaseAbility;
-        AbilityState = Battle.InitEffectState(new EffectState
-        {
-            Id = Ability,
-            ExtraData = new Dictionary<string, object>()
-            {
-                ["target"] = this
-            },
-            EffectOrder = 0
-        });
+        AbilityState = battle.InitEffectState(Ability.Id, null, this);
 
-        // Item setup
-        Item = new Id(set.Item);
-        ItemState = Battle.InitEffectState(new EffectState
-        {
-            Id = Item,
-            ExtraData = new Dictionary<string, object>()
-            {
-                ["target"] = this
-            },
-            EffectOrder = 0
-        });
-        LastItem = new Id("");
-        UsedItemThisTurn = false;
-        AteBerry = false;
+        Item = template.Item;
+        ItemState = battle.InitEffectState(Item?.Id ?? null, null, this);
 
-        // Trap states
-        Trapped = false;
-        MaybeTrapped = false;
-        MaybeDisabled = false;
-        MaybeLocked = false;
+        Trapped = PokemonTrapped.False;
 
-        // Transform states
-        Illusion = null;
-        Transformed = false;
-
-        // HP and fainting
-        Fainted = false;
-        FaintQueued = false;
-        SubFainted = null;
-
-        // Forme
-        FormeRegression = false;
-
-        // Types
-        Types = BaseSpecies.Types;
+        Types = BaseSpecies.Types.ToList();
         BaseTypes = Types;
-        AddedType = string.Empty;
         KnownType = true;
-        ApparentType = string.Join("/", BaseSpecies.Types);
-        TeraType = set.TeraType ?? Types[0];
+        ApparentType = BaseTypes;
+        TeraType = Template.TeraType;
 
-        // Switch flags
         SwitchFlag = false;
-        ForceSwitchFlag = false;
-        SkipBeforeSwitchOutEventFlag = false;
-        DraggedIn = null;
-        NewlySwitched = false;
-        BeingCalledBack = false;
 
-        // Move tracking
-        LastMove = null;
-        if (Battle.Gen == 2) LastMoveEncore = null;
         LastMoveUsed = null;
-        MoveThisTurn = string.Empty;
-        StatsRaisedThisTurn = false;
-        StatsLoweredThisTurn = false;
-        HurtThisTurn = null;
-        LastDamage = 0;
+        MoveThisTurn = false;
         AttackedBy = [];
-        TimesAttacked = 0;
 
-        // Activity states
-        IsActive = false;
-        ActiveTurns = 0;
-        ActiveMoveActions = 0;
-        PreviouslySwitchedIn = 0;
-        TruantTurn = false;
-        BondTriggered = false;
-        SwordBoost = false;
-        ShieldBoost = false;
-        SyrupTriggered = false;
         StellarBoostedTypes = [];
-        IsStarted = false;
-        DuringMove = false;
 
-        // Physical properties
-        WeightHg = 1;
-        Speed = 0;
+        WeightKg = 1.0;
 
-        // Special abilities
-        CanMegaEvo = Battle.Actions.CanMegaEvo(this);
-        CanMegaEvoX = Battle.Actions.CanMegaEvoX?.Invoke(Battle.Actions, this);
-        CanMegaEvoY = Battle.Actions.CanMegaEvoY?.Invoke(Battle.Actions, this);
-        CanUltraBurst = Battle.Actions.CanUltraBurst(this);
-        CanGigantamax = BaseSpecies.CanGigantamax;
-        CanTerastallize = Battle.Actions.CanTerastallize(this);
+        CanTerastallize = BattleActions.CanTerastallize(battle, this);
 
-        // Gen-specific stats
-        if (Battle.Gen == 1)
-        {
-            ModifiedStats = new StatsTable { Atk = 0, Def = 0, Spa = 0, Spd = 0, Spe = 0 };
-        }
-
-        // HP initialization
-        MaxHp = 0;
-        BaseMaxHp = 0;
-        Hp = 0;
         ClearVolatile();
         Hp = MaxHp;
+    }
+
+
+    public void ClearVolatile(bool? includeSwitchFlags = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool TrySetStatus(Condition status, Pokemon? source, IEffect? sourceEffect)
+    {
+        throw new NotImplementedException();
+    }
+
+    public RelayVar AddVolatile(IBattle battle, Condition status, Pokemon? source = null,
+        IEffect? sourceEffect = null, Condition? linkedStatus = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public EffectState? GetVolatile(ConditionId volatileId)
+    {
+        return Volatiles.GetValueOrDefault(volatileId);
+    }
+
+    public bool RemoveVolatile(IBattle battle, IEffect status)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Deletes a volatile condition without running the extra logic from RemoveVolatile
+    /// </summary>
+    public bool DeleteVolatile(ConditionId volatileId)
+    {
+        return Volatiles.Remove(volatileId);
+    }
+
+    public bool IgnoringAbility(IBattle battle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public StatIdExceptHp GetBestStat(bool? unboosted, bool? unmodified)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Pokemon Copy()
+    {
+        throw new NotImplementedException();
     }
 }
 

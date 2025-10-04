@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Events;

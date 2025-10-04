@@ -1,13 +1,14 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
-using ApogeeVGC.Sim.Choices;
+//using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Turns;
+//using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -49,9 +50,11 @@ public interface IBattle
     IBattle Copy();
 
     bool IsGameComplete { get; }
-    Turn CurrentTurn { get; }
+    //Turn CurrentTurn { get; }
 
-    BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
+    //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
+
+    EffectState InitEffectState(EffectStateId? id, int? effectOrder, Pokemon? target);
 
     void Start();
 }

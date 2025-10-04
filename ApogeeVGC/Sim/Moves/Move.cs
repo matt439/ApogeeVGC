@@ -1,7 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.FieldClasses;
-using ApogeeVGC.Sim.PokemonClasses;
+﻿using ApogeeVGC.Sim.Effects;
 
 namespace ApogeeVGC.Sim.Moves;
 
