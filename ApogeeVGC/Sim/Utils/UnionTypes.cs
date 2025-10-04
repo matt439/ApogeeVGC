@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.Utils;
 
@@ -350,10 +351,31 @@ public record MoveEffectStateId(MoveId MoveId) : EffectStateId;
 
 
 
+/// <summary>
+/// SparseBoostsTable | false
+/// </summary>
+public abstract record ItemBoosts
+{
+    public static implicit operator ItemBoosts(SparseBoostsTable table) =>
+        new SparseBoostsTableItemBoosts(table);
+
+    public static ItemBoosts FromFalse() => new FalseItemBoosts();
+}
+public record SparseBoostsTableItemBoosts(SparseBoostsTable Table) : ItemBoosts;
+public record FalseItemBoosts : ItemBoosts;
 
 
-
-
+/// <summary>
+/// (this: Battle, pokemon: Pokemon) => void) | false
+/// </summary>
+public abstract record OnItemEatUse
+{
+    public static implicit operator OnItemEatUse(Action<IBattle, Pokemon> func) =>
+        new OnItemEatUseFunc(func);
+    public static OnItemEatUse FromFalse() => new OnItemEatUseFalse();
+}
+public record OnItemEatUseFunc(Action<IBattle, Pokemon> Func) : OnItemEatUse;
+public record OnItemEatUseFalse : OnItemEatUse;
 
 
 
