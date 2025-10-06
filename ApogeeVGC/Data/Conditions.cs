@@ -44,22 +44,19 @@ public record Conditions
                     switch (sourceEffect.EffectType)
                     {
                         case EffectType.Item:
-                            if (sourceEffect is Item { Id: ItemId.FlameOrb } && debug)
+                            if (sourceEffect is Item { Id: ItemId.FlameOrb })
                             {
                                 UiGenerator.PrintStatusEvent(target, burn, sourceEffect);
                             }
                             break;
                         case EffectType.Ability:
-                            if (sourceEffect is Ability ability && debug)
+                            if (sourceEffect is Ability ability)
                             {
                                 UiGenerator.PrintStatusEvent(target, burn, ability, source);
                             }
                             break;
                         case EffectType.Move:
-                            if (debug)
-                            {
-                                UiGenerator.PrintStatusEvent(target, burn);
-                            }
+                            UiGenerator.PrintStatusEvent(target, burn);
                             break;
                         case EffectType.Specie:
                         case EffectType.Condition:
@@ -257,12 +254,28 @@ public record Conditions
                     }
                 },
             },
-            //[ConditionId.Poison] = new Condition
-            //{
-            //    Id = ConditionId.Poison,
-            //    Name = "Poison",
-            //    ConditionVolatility = ConditionVolatility.NonVolatile,
-            //},
+            [ConditionId.Poison] = new()
+            {
+                Id = ConditionId.Poison,
+                Name = "Poison",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    if (!battle.PrintDebug) return null;
+
+                    Condition poison = _library.Conditions[ConditionId.Poison];
+
+                    if (sourceEffect.EffectType == EffectType.Ability)
+                    {
+                        UiGenerator.PrintStatusEvent(target, poison, sourceEffect, source);
+                    }
+                    else
+                    {
+                        UiGenerator.PrintStatusEvent(target, poison);
+                    }
+                    return null;
+                },
+            },
             //[ConditionId.Toxic] = new Condition
             //{
             //    Id = ConditionId.Toxic,
