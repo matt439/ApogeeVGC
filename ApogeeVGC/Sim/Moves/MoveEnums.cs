@@ -164,3 +164,14 @@ public enum MoveTarget
     /// </summary>
     Field,
 }
+
+public enum MoveOverridePokemon
+{
+    Target,
+    Source,
+}
+
+public enum MoveMultiHitType
+{
+    ParentBond,
+}

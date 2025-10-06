@@ -119,7 +119,7 @@ public record Item : IPokemonEventMethods, IEffect
 
     #region PokemonMoveEventMethods Implementation
 
-    public Action<IBattle, int, Pokemon, Pokemon, Move>? OnDamagingHit { get; init; }
+    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
     public Action<IBattle, Pokemon>? OnEmergencyExit { get; init; }
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAfterHit { get; init; }
@@ -137,7 +137,7 @@ public record Item : IPokemonEventMethods, IEffect
     public VoidSourceMoveHandler? OnAfterMove { get; init; }
     public VoidSourceMoveHandler? OnAfterMoveSelf { get; init; }
     public Action<IBattle, Pokemon, Pokemon>? OnAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAccuracy { get; init; }
+    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnBasePower { get; init; }
     public Action<IBattle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnBeforeMove { get; init; }
@@ -151,7 +151,7 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; init; }
     public Func<IBattle, Pokemon, Pokemon, int?>? OnDeductPp { get; init; }
     public Action<IBattle, Pokemon>? OnDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, Move?>? OnDragOut { get; init; }
+    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; init; }
     public Action<IBattle, Item, Pokemon>? OnEatItem { get; init; }
     public OnEffectivenessHandler? OnEffectiveness { get; init; }
     public Action<IBattle, Pokemon>? OnEntryHazard { get; init; }
@@ -160,7 +160,7 @@ public record Item : IPokemonEventMethods, IEffect
     public OnFractionalPriority? OnFractionalPriority { get; init; }
     public ResultMoveHandler? OnHit { get; init; }
     public Action<IBattle, PokemonType, Pokemon>? OnImmunity { get; init; }
-    public Func<IBattle, Pokemon, Move?>? OnLockMove { get; init; }
+    public Func<IBattle, Pokemon, ActiveMove?>? OnLockMove { get; init; }
     public Action<IBattle, Pokemon>? OnMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnModifyAtk { get; init; }
@@ -170,7 +170,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierMoveHandler? OnModifyDef { get; init; }
     public OnModifyMoveHandler? OnModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, Move>? OnModifySecondaries { get; init; }
+    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
     public OnModifyTypeHandler? OnModifyType { get; init; }
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
     public ModifierSourceMoveHandler? OnModifySpA { get; init; }
@@ -180,10 +180,10 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, int?>? OnModifyWeight { get; init; }
     public VoidMoveHandler? OnMoveAborted { get; init; }
     public OnNegateImmunity? OnNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, Delegate?>? OnOverrideAction { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnPrepareHit { get; init; }
     public Action<IBattle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnRedirectTarget { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnRedirectTarget { get; init; }
     public Action<IBattle, Pokemon, Pokemon, IEffect>? OnResidual { get; init; }
     public Action<IBattle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSetStatus { get; init; }
@@ -205,7 +205,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ResultMoveHandler? OnTryHitSide { get; init; }
     public ExtResultMoveHandler? OnInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, IntBoolUnion?>? OnTryPrimaryHit { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryPrimaryHit { get; init; }
     public Func<IBattle, PokemonType[], Pokemon, List<PokemonType>?>? OnType { get; init; }
     public Action<IBattle, Item, Pokemon>? OnUseItem { get; init; }
     public Action<IBattle, Pokemon>? OnUpdate { get; init; }
@@ -213,7 +213,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierSourceMoveHandler? OnWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, Move>? OnFoeDamagingHit { get; init; }
+    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; init; }
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterHit { get; init; }
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; init; }
@@ -227,7 +227,7 @@ public record Item : IPokemonEventMethods, IEffect
     public VoidSourceMoveHandler? OnFoeAfterMove { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterMoveSelf { get; init; }
     public Action<IBattle, Pokemon, Pokemon>? OnFoeAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnFoeAccuracy { get; init; }
+    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnFoeAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnFoeBasePower { get; init; }
     public Action<IBattle, Pokemon, IEffect>? OnFoeBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnFoeBeforeMove { get; init; }
@@ -239,14 +239,14 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnFoeDamage { get; init; }
     public Func<IBattle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; init; }
     public Action<IBattle, Pokemon>? OnFoeDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, Move?>? OnFoeDragOut { get; init; }
+    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; init; }
     public Action<IBattle, Item, Pokemon>? OnFoeEatItem { get; init; }
     public OnEffectivenessHandler? OnFoeEffectiveness { get; init; }
     public VoidEffectHandler? OnFoeFaint { get; init; }
     public OnFlinch? OnFoeFlinch { get; init; }
     public ResultMoveHandler? OnFoeHit { get; init; }
     public Action<IBattle, PokemonType, Pokemon>? OnFoeImmunity { get; init; }
-    public Func<IBattle, Pokemon, Move?>? OnFoeLockMove { get; init; }
+    public Func<IBattle, Pokemon, ActiveMove?>? OnFoeLockMove { get; init; }
     public Action<IBattle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnFoeModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyAtk { get; init; }
@@ -256,7 +256,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierMoveHandler? OnFoeModifyDef { get; init; }
     public OnModifyMoveHandler? OnFoeModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, Move>? OnFoeModifySecondaries { get; init; }
+    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifySpA { get; init; }
     public ModifierMoveHandler? OnFoeModifySpD { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnFoeModifySpe { get; init; }
@@ -266,9 +266,9 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, int?>? OnFoeModifyWeight { get; init; }
     public VoidMoveHandler? OnFoeMoveAborted { get; init; }
     public OnNegateImmunity? OnFoeNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, Delegate?>? OnFoeOverrideAction { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnFoeOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnFoePrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnFoeRedirectTarget { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnFoeRedirectTarget { get; init; }
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; init; }
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetStatus { get; init; }
@@ -286,12 +286,12 @@ public record Item : IPokemonEventMethods, IEffect
     public ResultMoveHandler? OnFoeTryHitSide { get; init; }
     public ExtResultMoveHandler? OnFoeInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnFoeTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, IntBoolUnion?>? OnFoeTryPrimaryHit { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnFoeTryPrimaryHit { get; init; }
     public Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnFoeType { get; init; }
     public ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, Move>? OnSourceDamagingHit { get; init; }
+    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; init; }
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterHit { get; init; }
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; init; }
@@ -305,7 +305,7 @@ public record Item : IPokemonEventMethods, IEffect
     public VoidSourceMoveHandler? OnSourceAfterMove { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterMoveSelf { get; init; }
     public Action<IBattle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnSourceAccuracy { get; init; }
+    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnSourceAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnSourceBasePower { get; init; }
     public Action<IBattle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnSourceBeforeMove { get; init; }
@@ -317,14 +317,14 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnSourceDamage { get; init; }
     public Func<IBattle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; init; }
     public Action<IBattle, Pokemon>? OnSourceDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, Move?>? OnSourceDragOut { get; init; }
+    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; init; }
     public Action<IBattle, Item, Pokemon>? OnSourceEatItem { get; init; }
     public OnEffectivenessHandler? OnSourceEffectiveness { get; init; }
     public VoidEffectHandler? OnSourceFaint { get; init; }
     public OnFlinch? OnSourceFlinch { get; init; }
     public ResultMoveHandler? OnSourceHit { get; init; }
     public Action<IBattle, PokemonType, Pokemon>? OnSourceImmunity { get; init; }
-    public Func<IBattle, Pokemon, Move?>? OnSourceLockMove { get; init; }
+    public Func<IBattle, Pokemon, ActiveMove?>? OnSourceLockMove { get; init; }
     public Action<IBattle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnSourceModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyAtk { get; init; }
@@ -334,7 +334,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierMoveHandler? OnSourceModifyDef { get; init; }
     public OnModifyMoveHandler? OnSourceModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, Move>? OnSourceModifySecondaries { get; init; }
+    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifySpA { get; init; }
     public ModifierMoveHandler? OnSourceModifySpD { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnSourceModifySpe { get; init; }
@@ -344,9 +344,9 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, int?>? OnSourceModifyWeight { get; init; }
     public VoidMoveHandler? OnSourceMoveAborted { get; init; }
     public OnNegateImmunity? OnSourceNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, Delegate?>? OnSourceOverrideAction { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnSourceOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnSourcePrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnSourceRedirectTarget { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnSourceRedirectTarget { get; init; }
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; init; }
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetStatus { get; init; }
@@ -364,12 +364,12 @@ public record Item : IPokemonEventMethods, IEffect
     public ResultMoveHandler? OnSourceTryHitSide { get; init; }
     public ExtResultMoveHandler? OnSourceInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnSourceTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, IntBoolUnion?>? OnSourceTryPrimaryHit { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnSourceTryPrimaryHit { get; init; }
     public Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnSourceType { get; init; }
     public ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, Move>? OnAnyDamagingHit { get; init; }
+    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; init; }
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAnyAfterHit { get; init; }
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; init; }
@@ -385,7 +385,7 @@ public record Item : IPokemonEventMethods, IEffect
     public VoidSourceMoveHandler? OnAnyAfterMoveSelf { get; init; }
     public Action<IBattle, Pokemon>? OnAnyAfterTerastallization { get; init; }
     public Action<IBattle, Pokemon, Pokemon>? OnAnyAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAnyAccuracy { get; init; }
+    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAnyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAnyBasePower { get; init; }
     public Action<IBattle, Pokemon, IEffect>? OnAnyBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnAnyBeforeMove { get; init; }
@@ -397,14 +397,14 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnAnyDamage { get; init; }
     public Func<IBattle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; init; }
     public Action<IBattle, Pokemon>? OnAnyDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, Move?>? OnAnyDragOut { get; init; }
+    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; init; }
     public Action<IBattle, Item, Pokemon>? OnAnyEatItem { get; init; }
     public OnEffectivenessHandler? OnAnyEffectiveness { get; init; }
     public VoidEffectHandler? OnAnyFaint { get; init; }
     public OnFlinch? OnAnyFlinch { get; init; }
     public ResultMoveHandler? OnAnyHit { get; init; }
     public Action<IBattle, PokemonType, Pokemon>? OnAnyImmunity { get; init; }
-    public Func<IBattle, Pokemon, Move?>? OnAnyLockMove { get; init; }
+    public Func<IBattle, Pokemon, ActiveMove?>? OnAnyLockMove { get; init; }
     public Action<IBattle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnAnyModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyAtk { get; init; }
@@ -414,7 +414,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierMoveHandler? OnAnyModifyDef { get; init; }
     public OnModifyMoveHandler? OnAnyModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, Move>? OnAnyModifySecondaries { get; init; }
+    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifySpA { get; init; }
     public ModifierMoveHandler? OnAnyModifySpD { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnAnyModifySpe { get; init; }
@@ -422,12 +422,12 @@ public record Item : IPokemonEventMethods, IEffect
     public OnModifyTypeHandler? OnAnyModifyType { get; init; }
     public OnModifyTargetHandler? OnAnyModifyTarget { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnAnyModifyWeight { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, Move>? OnAnyMoveAborted { get; init; }
+    public Action<IBattle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; init; }
     public OnNegateImmunity? OnAnyNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, Delegate?>? OnAnyOverrideAction { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnAnyOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnAnyPrepareHit { get; init; }
     public Action<IBattle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnAnyRedirectTarget { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnAnyRedirectTarget { get; init; }
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; init; }
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnySetStatus { get; init; }
@@ -446,7 +446,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ResultMoveHandler? OnAnyTryHitSide { get; init; }
     public ExtResultMoveHandler? OnAnyInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnAnyTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAnyTryPrimaryHit { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAnyTryPrimaryHit { get; init; }
     public Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnAnyType { get; init; }
     public ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; init; }
@@ -517,7 +517,7 @@ public record Item : IPokemonEventMethods, IEffect
     public int? OnTryMovePriority { get; init; }
     public int? OnTryPrimaryHitPriority { get; init; }
     public int? OnTypePriority { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, Move>? OnAllyDamagingHit { get; init; }
+    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; init; }
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterHit { get; init; }
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; init; }
@@ -531,7 +531,7 @@ public record Item : IPokemonEventMethods, IEffect
     public VoidSourceMoveHandler? OnAllyAfterMove { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterMoveSelf { get; init; }
     public Action<IBattle, Pokemon, Pokemon>? OnAllyAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAllyAccuracy { get; init; }
+    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAllyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAllyBasePower { get; init; }
     public Action<IBattle, Pokemon, IEffect>? OnAllyBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnAllyBeforeMove { get; init; }
@@ -543,14 +543,14 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnAllyDamage { get; init; }
     public Func<IBattle, Pokemon, Pokemon, int?>? OnAllyDeductPp { get; init; }
     public Action<IBattle, Pokemon>? OnAllyDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, Move?>? OnAllyDragOut { get; init; }
+    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; init; }
     public Action<IBattle, Item, Pokemon>? OnAllyEatItem { get; init; }
     public OnEffectivenessHandler? OnAllyEffectiveness { get; init; }
     public VoidEffectHandler? OnAllyFaint { get; init; }
     public OnFlinch? OnAllyFlinch { get; init; }
     public ResultMoveHandler? OnAllyHit { get; init; }
     public Action<IBattle, PokemonType, Pokemon>? OnAllyImmunity { get; init; }
-    public Func<IBattle, Pokemon, Move?>? OnAllyLockMove { get; init; }
+    public Func<IBattle, Pokemon, ActiveMove?>? OnAllyLockMove { get; init; }
     public Action<IBattle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnAllyModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyAtk { get; init; }
@@ -560,7 +560,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ModifierMoveHandler? OnAllyModifyDef { get; init; }
     public OnModifyMoveHandler? OnAllyModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, Move>? OnAllyModifySecondaries { get; init; }
+    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifySpA { get; init; }
     public ModifierMoveHandler? OnAllyModifySpD { get; init; }
     public Func<IBattle, int, Pokemon, int?>? OnAllyModifySpe { get; init; }
@@ -570,9 +570,9 @@ public record Item : IPokemonEventMethods, IEffect
     public Func<IBattle, int, Pokemon, int?>? OnAllyModifyWeight { get; init; }
     public VoidMoveHandler? OnAllyMoveAborted { get; init; }
     public OnNegateImmunity? OnAllyNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, Delegate?>? OnAllyOverrideAction { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnAllyOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnAllyPrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, Move, Pokemon?>? OnAllyRedirectTarget { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnAllyRedirectTarget { get; init; }
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; init; }
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAllySetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAllySetStatus { get; init; }
@@ -590,7 +590,7 @@ public record Item : IPokemonEventMethods, IEffect
     public ResultMoveHandler? OnAllyTryHitSide { get; init; }
     public ExtResultMoveHandler? OnAllyInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnAllyTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Move, IntBoolUnion?>? OnAllyTryPrimaryHit { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAllyTryPrimaryHit { get; init; }
     public Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnAllyType { get; init; }
     public ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; init; }

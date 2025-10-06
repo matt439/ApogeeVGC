@@ -9,32 +9,60 @@ namespace ApogeeVGC.Sim.Events;
 
 
 // Move callback delegates (from the original IMoveEventMethods interface)
-public delegate IntFalseUnion? BasePowerCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, Move move);
-public delegate bool? BeforeMoveCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon? target, Move move);
-public delegate void BeforeTurnCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, Move move);
-public delegate IntFalseUnion? DamageCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, Move move);
+public delegate IntFalseUnion? BasePowerCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate bool? BeforeMoveCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon? target, ActiveMove move);
+public delegate void BeforeTurnCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate IntFalseUnion? DamageCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
 public delegate void PriorityChargeCallbackHandler(IBattle battle, Pokemon pokemon);
 
 // Move event delegates
 public delegate void OnDisableMoveHandler(IBattle battle, Pokemon pokemon);
-public delegate void OnAfterSubDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source, Move move);
+public delegate void OnAfterSubDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source, ActiveMove move);
 public delegate IntBoolUnion? OnDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source, IEffect effect);
-public delegate int? OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, string type, Move move);
-public delegate bool? OnHitSideHandler(IBattle battle, Side side, Pokemon source, Move move);
-public delegate void OnModifyMoveHandler(IBattle battle, Move move, Pokemon pokemon, Pokemon? target);
-public delegate void OnModifyTypeHandler(IBattle battle, Move move, Pokemon pokemon, Pokemon target);
-public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target, Move move);
-public delegate bool? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source, Move move);
+public delegate int? OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, PokemonType type, ActiveMove move);
+public delegate bool? OnHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
+public delegate void OnModifyMoveHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
+public delegate void OnModifyTypeHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
+public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate bool? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
 
 // Additional move event delegates
-public delegate void OnMoveFailHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
-public delegate void OnUseMoveMessageHandler(IBattle battle, Pokemon source, Pokemon target, Move move);
-public delegate bool? OnTryHitFieldHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
-public delegate bool? OnTryImmunityHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
-public delegate bool? OnTryHandler(IBattle battle, Pokemon source, Pokemon target, Move move);
-public delegate IntBoolUnion? OnTryHitHandler(IBattle battle, Pokemon source, Pokemon target, Move move);
-public delegate bool? OnPrepareHitHandler(IBattle battle, Pokemon target, Pokemon source, Move move);
-public delegate bool? OnTryMoveHandler(IBattle battle, Pokemon source, Pokemon target, Move move);
+public delegate void OnMoveFailHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+public delegate void OnUseMoveMessageHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+public delegate bool? OnTryHitFieldHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+public delegate bool? OnTryImmunityHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+public delegate bool? OnTryHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+public delegate IntBoolUnion? OnTryHitHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+public delegate bool? OnPrepareHitHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+public delegate bool? OnTryMoveHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+
+public interface IMoveEventHandlers
+{
+    BasePowerCallbackHandler? BasePowerCallback { get; }
+    BeforeMoveCallbackHandler? BeforeMoveCallback { get; }
+    BeforeTurnCallbackHandler? BeforeTurnCallback { get; }
+    DamageCallbackHandler? DamageCallback { get; }
+    PriorityChargeCallbackHandler? PriorityChargeCallback { get; }
+
+    OnDisableMoveHandler? OnDisableMove { get; }
+    OnAfterSubDamageHandler? OnAfterSubDamage { get; }
+    OnDamageHandler? OnDamage { get; }
+    OnEffectivenessHandler? OnEffectiveness { get; }
+    OnHitSideHandler? OnHitSide { get; }
+    OnModifyMoveHandler? OnModifyMove { get; }
+    OnModifyTypeHandler? OnModifyType { get; }
+    OnModifyTargetHandler? OnModifyTarget { get; }
+    OnTryHitSideHandler? OnTryHitSide { get; }
+
+    OnMoveFailHandler? OnMoveFail { get; }
+    OnUseMoveMessageHandler? OnUseMoveMessage { get; }
+    OnTryHitFieldHandler? OnTryHitField { get; }
+    OnTryImmunityHandler? OnTryImmunity { get; }
+    OnTryHandler? OnTry { get; }
+    OnTryHitHandler? OnTryHit { get; }
+    OnPrepareHitHandler? OnPrepareHit { get; }
+    OnTryMoveHandler? OnTryMove { get; }
+}
 
 // Common move event handlers mapping to common handler types
 

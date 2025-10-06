@@ -1,12 +1,45 @@
 ﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record Move : IEffect
+public record Move : IMoveEventHandlers
 {
-    public EffectType EffectType => EffectType.Move;
-    public required MoveId Id { get; init; }
-    public required int Num
+    #region IMoveEventHandlers Implementation
+
+    public BasePowerCallbackHandler? BasePowerCallback { get; init; }
+    public BeforeMoveCallbackHandler? BeforeMoveCallback { get; init; }
+    public BeforeTurnCallbackHandler? BeforeTurnCallback { get; init; }
+    public DamageCallbackHandler? DamageCallback { get; init; }
+    public PriorityChargeCallbackHandler? PriorityChargeCallback { get; init; }
+
+    public OnDisableMoveHandler? OnDisableMove { get; init; }
+    public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
+    public OnDamageHandler? OnDamage { get; init; }
+    public OnEffectivenessHandler? OnEffectiveness { get; init; }
+    public OnHitSideHandler? OnHitSide { get; init; }
+    public OnModifyMoveHandler? OnModifyMove { get; init; }
+    public OnModifyTypeHandler? OnModifyType { get; init; }
+    public OnModifyTargetHandler? OnModifyTarget { get; init; }
+    public OnTryHitSideHandler? OnTryHitSide { get; init; }
+
+    public OnMoveFailHandler? OnMoveFail { get; init; }
+    public OnUseMoveMessageHandler? OnUseMoveMessage { get; init; }
+    public OnTryHitFieldHandler? OnTryHitField { get; init; }
+    public OnTryImmunityHandler? OnTryImmunity { get; init; }
+    public OnTryHandler? OnTry { get; init; }
+    public OnTryHitHandler? OnTryHit { get; init; }
+    public OnPrepareHitHandler? OnPrepareHit { get; init; }
+    public OnTryMoveHandler? OnTryMove { get; init; }
+
+    #endregion
+
+
+    public MoveId Id { get; init; }
+    public required string Name { get; init; }
+    public int Num
     {
         get;
         init
@@ -18,33 +51,32 @@ public record Move : IEffect
             field = value;
         }
     }
-    public string Name { get; init; } = string.Empty;
-    public required int Accuracy
-    {
-        get;
-        init
-        {
-            if (value is < 1 or > 100)
-            {
-                throw new ArgumentOutOfRangeException(nameof(Accuracy), "Accuracy must be between 1 and 100.");
-            }
-            field = value;
-        }
-    }
+    public Condition? Condition { get; init; }
     public int BasePower
     {
         get;
         init
         {
-            if (value < 0 )
+            if (value < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(BasePower), "Base power must be non-negative.");
             }
             field = value;
         }
     }
-    public required MoveCategory Category { get; init; }
-    public required int BasePp
+    public required IntTrueUnion Accuracy
+    {
+        get;
+        init
+        {
+            if (value is IntIntTrueUnion { Value: < 1 or > 100 })
+            {
+                throw new ArgumentOutOfRangeException(nameof(Accuracy), "Accuracy must be between 1 and 100.");
+            }
+            field = value;
+        }
+    }
+    public int BasePp
     {
         get;
         init
@@ -60,40 +92,8 @@ public record Move : IEffect
             field = value;
         }
     }
-    public int PpUp
-    {
-        get;
-        init
-        {
-            if (value is < 0 or > 3)
-            {
-                throw new ArgumentOutOfRangeException(nameof(PpUp), "PP Ups must be between 0 and 3.");
-            }
-
-            field = value;
-        }
-    } = 0;
-    public int MaxPp => BasePp + (int)(0.2 * BasePp * PpUp);
-    public int UsedPp
-    {
-        get;
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(UsedPp), "Used PP cannot be negative.");
-            }
-            field = value;
-        }
-    } = 0;
-    public int Pp
-    {
-        get
-        {
-            int pp = MaxPp - UsedPp;
-            return pp > 0 ? pp : 0;
-        }
-    }
+    public MoveCategory Category { get; init; }
+    public MoveType Type { get; init; }
     public int Priority
     {
         get;
@@ -105,30 +105,70 @@ public record Move : IEffect
             }
             field = value;
         }
-    } = 0;
-    public MoveFlags Flags { get; init; } = new();
+    }
     public MoveTarget Target { get; init; }
-    public MoveType Type { get; init; }
+    public MoveFlags Flags { get; init; } = new();
+    
+    public MoveDamage? Damage { get; init; }
+
+
+    // Hit effects
+    public MoveOhko? Ohko { get; init; }
+    public bool? ThawsTarget { get;init; }
+    public int[]? Heal { get; init; }
+    public bool? ForceSwitch { get; init; }
+    public MoveSelfSwitch? SelfSwitch { get; init; }
+    public SparseBoostsTable? SelfBoost { get; init; }
+    public MoveSelfDestruct? SelfDestruct { get; init; }
+    public bool? BreaksProtect { get; init; }
+
+
+    public (int, int)? Recoil { get; init; }
+    public (int, int)? Drain { get; init; }
+    public bool? MindBlownRecoil { get; init; }
+    public bool? StealsBoosts { get; init; }
+    public bool? StruggleRecoil { get; init; }
     public SecondaryEffect? Secondary { get; init; }
-    public Condition? Condition { get; init; }
-    public bool AlwaysHit { get; init; }
-    public bool StallingMove { get; init; }
+    public SecondaryEffect[]? Secondaries { get; init; }
+    public SecondaryEffect? Self { get; init; }
+    public bool? HasSheerForce { get; init; }
 
 
-    public bool SelfSwitch { get; init; }
-    public bool Infiltrates { get; init; }
+    // Hit effect modifiers
+    public MoveType? BaseMoveType { get;init; }
+    public int? BasePowerModifier { get; init; }
+    public int? CritModifier { get; init; }
+    public int? CritRatio { get; init; }
+    public MoveOverridePokemon? OverrideOffensivePokemon { get; init; }
+    public StatIdExceptHp? OverrideOffensiveStat { get; init; }
+    public MoveOverridePokemon? OverrideDefensivePokemon { get; init; }
+    public StatIdExceptHp? OverrideDefensiveStat { get; init; }
+    public bool? ForceStab { get; init; }
+    public bool? IgnoreAbility { get; init; }
+    public bool? IgnoreAccuracy { get; init; }
+    public bool? IgnoreDefensive { get; init; }
+    public bool? IgnoreEvasion { get; init; }
+    public MoveIgnoreImmunity? IgnoreImmunity { get; init; }
+    public bool? IgnoreNegativeOffensive { get; init; }
+    public bool? IgnoreOffensive { get; init; }
+    public bool? IgnorePositiveDefensive { get; init; }
+    public bool? IgnorePositiveEvasion { get; init; }
+    public bool? MultiAccuracy { get; init; }
+    public IntIntArrayUnion? MultiHit { get; init; }
+    public MoveMultiHitType? MultiHitType { get; init; }
+    public bool? NoDamageVariance { get; init; }
+    public MoveTarget? NonGhostTarget { get; init; }
+    public double? SpreadModifier { get; init; }
+    public bool? SleepUsable { get; init; }
+    public bool? SmartTarget { get; init; }
+    public bool? TracksTarget { get; init; }
+    public bool? WillCrit { get; init; }
+    public bool? CallsMove { get; init; }
+    public bool? HasCrashDamage { get; init; }
+    public bool? IsConfusionSelfHit { get; init; }
+    public bool? StallingMove { get; init; }
+    public MoveId? BaseMove { get; init; }
 
-
-    /// <summary>
-    /// The recoil damage as a fraction of the damage dealt (e.g., 0.25 for 1/4 recoil).
-    /// </summary>
-    public double? Recoil { get; init; }
-    public bool Disabled { get; set; }
-
-    /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
-    public MoveSlot MoveSlot { get; init; }
-
-    public bool? PranksterBooster { get; set; }
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

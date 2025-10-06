@@ -39,6 +39,20 @@ public record IntIntFalseUnion(int Value) : IntFalseUnion;
 public record FalseIntFalseUnion : IntFalseUnion;
 
 
+
+/// <summary>
+/// int | true
+/// </summary>
+public abstract record IntTrueUnion
+{
+    public static IntTrueUnion FromInt(int value) => new IntIntTrueUnion(value);
+    public static IntTrueUnion FromTrue() => new TrueIntTrueUnion();
+    public static implicit operator IntTrueUnion(int value) => new IntIntTrueUnion(value);
+}
+public record IntIntTrueUnion(int Value) : IntTrueUnion;
+public record TrueIntTrueUnion : IntTrueUnion;
+
+
 /// <summary>
 /// CommonHandlers['ModifierSourceMove'] | -0.1
 /// </summary>
@@ -208,7 +222,7 @@ public abstract record SingleEventSource
     public static implicit operator SingleEventSource(Item item) =>
         EffectUnionFactory.ToSingleEventSource(item);
 
-    public static implicit operator SingleEventSource(Move activeMove) =>
+    public static implicit operator SingleEventSource(ActiveMove activeMove) =>
         EffectUnionFactory.ToSingleEventSource(activeMove);
 
     public static implicit operator SingleEventSource(Specie specie) =>
@@ -246,7 +260,7 @@ public static class EffectUnionFactory
     {
         Ability ability => new EffectSingleEventSource(ability),
         Item item => new EffectSingleEventSource(item),
-        Move activeMove => new EffectSingleEventSource(activeMove),
+        ActiveMove activeMove => new EffectSingleEventSource(activeMove),
         Specie specie => new EffectSingleEventSource(specie),
         Condition condition => new EffectSingleEventSource(condition),
         Format format => new EffectSingleEventSource(format),
@@ -365,6 +379,7 @@ public record SparseBoostsTableItemBoosts(SparseBoostsTable Table) : ItemBoosts;
 public record FalseItemBoosts : ItemBoosts;
 
 
+
 /// <summary>
 /// (this: Battle, pokemon: Pokemon) => void) | false
 /// </summary>
@@ -378,6 +393,94 @@ public record OnItemEatUseFunc(Action<IBattle, Pokemon> Func) : OnItemEatUse;
 public record OnItemEatUseFalse : OnItemEatUse;
 
 
+/// <summary>
+/// int | 'level' | false
+/// </summary>
+public abstract record MoveDamage
+{
+    public static implicit operator MoveDamage(int value) => new IntMoveDamage(value);
+    public static MoveDamage FromLevel() => new LevelMoveDamage();
+    public static MoveDamage FromFalse() => new FalseMoveDamage();
+}
+public record IntMoveDamage(int Value) : MoveDamage;
+public record LevelMoveDamage : MoveDamage;
+public record FalseMoveDamage : MoveDamage;
+
+
+
+/// <summary>
+/// bool | 'ice'
+/// </summary>
+public abstract record MoveOhko
+{
+    public static implicit operator MoveOhko(bool value) => new BoolMoveOhko(value);
+    public static MoveOhko FromIce() => new IceMoveOhko();
+}
+public record BoolMoveOhko(bool Value) : MoveOhko;
+public record IceMoveOhko : MoveOhko;
+
+
+
+
+/// <summary>
+/// 'copyvolatile' | 'shedtail' | bool
+/// </summary>
+public abstract record MoveSelfSwitch
+{
+    public static MoveSelfSwitch FromCopyVolatile() => new CopyVolatileMoveSelfSwitch();
+    public static MoveSelfSwitch FromShedTail() => new ShedTailMoveSelfSwitch();
+    public static implicit operator MoveSelfSwitch(bool value) => new BoolMoveSelfSwitch(value);
+}
+public record CopyVolatileMoveSelfSwitch : MoveSelfSwitch;
+public record ShedTailMoveSelfSwitch : MoveSelfSwitch;
+public record BoolMoveSelfSwitch(bool Value) : MoveSelfSwitch;
+
+
+
+/// <summary>
+/// 'always' | 'ifHit' | bool
+/// </summary>
+public abstract record MoveSelfDestruct
+{
+    public static MoveSelfDestruct FromAlways() => new AlwaysMoveSelfDestruct();
+    public static MoveSelfDestruct FromIfHit() => new IfHitMoveSelfDestruct();
+    public static implicit operator MoveSelfDestruct(bool value) => new BoolMoveSelfDestruct(value);
+}
+public record AlwaysMoveSelfDestruct : MoveSelfDestruct;
+public record IfHitMoveSelfDestruct : MoveSelfDestruct;
+public record BoolMoveSelfDestruct(bool Value) : MoveSelfDestruct;
+
+
+
+
+/// <summary>
+/// boolean | { [PokemonType: string]: boolean }
+/// </summary>
+public abstract record MoveIgnoreImmunity
+{
+    public static implicit operator MoveIgnoreImmunity(bool value) =>
+        new BoolMoveDataIgnoreImmunity(value);
+
+    public static implicit operator MoveIgnoreImmunity(Dictionary<PokemonType, bool> typeImmunities) =>
+        new TypeMoveDataIgnoreImmunity(typeImmunities);
+}
+public record BoolMoveDataIgnoreImmunity(bool Value) : MoveIgnoreImmunity;
+public record TypeMoveDataIgnoreImmunity(Dictionary<PokemonType, bool> TypeImmunities) :
+    MoveIgnoreImmunity;
+
+
+
+
+/// <summary>
+/// int | int[]
+/// </summary>
+public abstract record IntIntArrayUnion
+{
+    public static implicit operator IntIntArrayUnion(int value) => new IntIntIntArrayUnion(value);
+    public static implicit operator IntIntArrayUnion(int[] values) => new IntArrayIntIntArrayUnion(values);
+}
+public record IntIntIntArrayUnion(int Value) : IntIntArrayUnion;
+public record IntArrayIntIntArrayUnion(int[] Values) : IntIntArrayUnion;
 
 
 ///// <summary>

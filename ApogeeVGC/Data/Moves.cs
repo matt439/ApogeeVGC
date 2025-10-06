@@ -3,6 +3,8 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
+
 //using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Data;
@@ -65,8 +67,7 @@ public record Moves
             {
                 Id = MoveId.TrickRoom,
                 Num = 433,
-                Accuracy = 100,
-                AlwaysHit = true,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 0,
                 Category = MoveCategory.Status,
                 Name = "Trick Room",
@@ -84,8 +85,7 @@ public record Moves
             {
                 Id = MoveId.Protect,
                 Num = 182,
-                Accuracy = 100,
-                AlwaysHit = true,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 0,
                 Category = MoveCategory.Status,
                 Name = "Protect",
@@ -282,8 +282,7 @@ public record Moves
             {
                 Id = MoveId.Tailwind,
                 Num = 366,
-                Accuracy = 100,
-                AlwaysHit = true,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 0,
                 Category = MoveCategory.Status,
                 Name = "Tailwind",
@@ -342,8 +341,7 @@ public record Moves
             {
                 Id = MoveId.Reflect,
                 Num = 115,
-                Accuracy = 100,
-                AlwaysHit = true,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 0,
                 Category = MoveCategory.Status,
                 Name = "Reflect",
@@ -361,8 +359,7 @@ public record Moves
             {
                 Id = MoveId.LightScreen,
                 Num = 113,
-                Accuracy = 100,
-                AlwaysHit = true,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 0,
                 Category = MoveCategory.Status,
                 Name = "Light Screen",
@@ -455,7 +452,7 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Recoil = 1.0 / 4.0,
+                Recoil = (1,  4),
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
