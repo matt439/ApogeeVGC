@@ -121,6 +121,7 @@ public class Pokemon
 
     public Staleness? Staleness { get; set; }
     public Staleness? PendingStaleness { get; set; }
+
     public Staleness? VolatileStaleness
     {
         get;
@@ -148,6 +149,7 @@ public class Pokemon
         {
             throw new InvalidOperationException($"Set {Name} has no moves");
         }
+
         MoveSlots = set.Moves.ToList();
 
         Position = SlotId.Slot1;
@@ -238,6 +240,45 @@ public class Pokemon
     }
 
     public StatIdExceptHp GetBestStat(bool? unboosted, bool? unmodified)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasAbility(AbilityId ability)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasAbility(AbilityId[] abilities)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool CureStatus(bool silent = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Unlike CureStatus, this does not give any cure messages.
+    /// </summary>
+    public bool ClearStatus()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool FormeChange(SpecieId specieId, IEffect? source, bool? isPermanent, int abilitySlot = 0,
+        string? message = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasType(PokemonType type)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasType(PokemonType[] types)
     {
         throw new NotImplementedException();
     }

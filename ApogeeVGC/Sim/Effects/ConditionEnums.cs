@@ -27,6 +27,8 @@ public enum ConditionId
     Guts,
     FlameBody,
     QuarkDrive,
+
+    Nightmare,
 }
 
 public enum ConditionEffectType

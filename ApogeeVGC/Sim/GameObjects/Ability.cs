@@ -24,6 +24,7 @@ public enum AbilityId
 
     Overgrow,
     Chlorophyll,
+    EarlyBird,
 }
 
 

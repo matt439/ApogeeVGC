@@ -26,6 +26,8 @@ public enum MoveId
     LowKick,
     WildCharge,
     MeFirst,
+    BurnUp,
+    PolarFlare,
 
     Struggle,
 

@@ -16,6 +16,8 @@ namespace ApogeeVGC.Sim.Ui;
 //    Fail,
 //    Prepare,
 //    Ability,
+//    Cant,
+//    CureStatus,
 //}
 
 public static class UiGenerator
@@ -72,5 +74,22 @@ public static class UiGenerator
     public static void PrintStartEvent(Pokemon pokemon, IEffect effect)
     {
         Console.WriteLine($"{effect.Name} started on {pokemon.Name}!");
+    }
+
+    public static void PrintCantEvent(Pokemon pokemon, IEffect effect)
+    {
+        Console.WriteLine($"{pokemon.Name} can't use {effect.Name}!");
+    }
+
+    public static void PrintCureStatusEvent(Pokemon pokemon, Condition status, IEffect? sourceEffect = null)
+    {
+        if (sourceEffect is not null)
+        {
+            Console.WriteLine($"{pokemon.Name} is cured of {status.Name} due to {sourceEffect.Name}!");
+        }
+        else
+        {
+            Console.WriteLine($"{pokemon.Name} is cured of {status.Name}!");
+        }
     }
 }

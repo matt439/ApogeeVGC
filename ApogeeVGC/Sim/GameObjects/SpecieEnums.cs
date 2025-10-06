@@ -21,6 +21,8 @@ public enum SpecieId
     IronHands,
 
     Calyrex,
+    ShayminSky,
+    Shaymin,
 }
 
 public enum FormeId

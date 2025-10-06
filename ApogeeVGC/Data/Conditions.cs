@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 
@@ -78,80 +80,183 @@ public record Conditions
                     battle.Damage(pokemon.BaseMaxHp / 16);
                 },
             },
-            //[ConditionId.Paralysis] = new Condition
-            //{
-            //    Id = ConditionId.Paralysis,
-            //    Name = "Paralysis",
-            //    ConditionEffectType = ConditionEffectType.Status,
-            //    ConditionVolatility = ConditionVolatility.NonVolatile,
-            //    OnStart = (target, _, sourceEffect, context) =>
-            //    {
-            //        if (sourceEffect is null)
-            //        {
-            //            throw new ArgumentNullException($"Source effect is null when trying to apply" +
-            //                                            $"{ConditionId.Paralysis} to" + $"pokemon {target.Name}.");
-            //        }
+            [ConditionId.Paralysis] = new()
+            {
+                Id = ConditionId.Paralysis,
+                Name = "Paralysis",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    if (!battle.PrintDebug) return null;
 
-            //        bool debug = context.PrintDebug;
+                    Condition paralysis = _library.Conditions[ConditionId.Paralysis];
 
-            //        switch (sourceEffect.EffectType)
-            //        {
-            //            case EffectType.Ability:
-            //                if (sourceEffect is Ability ability && debug)
-            //                {
-            //                    UiGenerator.PrintParalysisStartFromAbility(target, ability);
-            //                }
-            //                break;
-            //            case EffectType.Move:
-            //                if (debug)
-            //                {
-            //                    UiGenerator.PrintParalysisStart(target);
-            //                }
-            //                break;
-            //            case EffectType.Specie:
-            //            case EffectType.Condition:
-            //            case EffectType.Format:
-            //            case EffectType.Item:
-            //                throw new InvalidOperationException($"Effect type {sourceEffect.EffectType} cannot" +
-            //                                                    $"apply {ConditionId.Paralysis} to" +
-            //                                                    $"pokemon {target.Name}.");
-            //            default:
-            //                throw new InvalidOperationException($"Unknown effect type {sourceEffect.EffectType}" +
-            //                                                    $"when trying to apply {ConditionId.Paralysis} to" +
-            //                                                    $"pokemon {target.Name}.");
-            //        }
+                    if (sourceEffect is Ability ability)
+                    {
+                        UiGenerator.PrintStatusEvent(target, paralysis, ability, source);
+                    }
+                    else
+                    {
+                        UiGenerator.PrintStatusEvent(target, paralysis);
+                    }
+                    return null;
+                },
+                OnModifySpePriority = -101,
+                OnModifySpe = (battle, spe, pokemon) =>
+                {
+                    spe = battle.FinalModify(spe);
+                    if (!pokemon.HasAbility(AbilityId.QuickFeet))
+                    {
+                        spe = (int)Math.Floor(spe * 50.0 / 100);
+                    }
+                    return spe;
+                },
+                OnBeforeMovePriority = 1,
+                OnBeforeMove = (battle, pokemon, _, _) =>
+                {
+                    if (!battle.RandomChance(1, 4)) return true;
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Paralysis]);
+                    }
+                    return false;
+                },
+            },
+            [ConditionId.Sleep] = new()
+            {
+                Id = ConditionId.Sleep,
+                Name = "Sleep",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        Condition sleep = _library.Conditions[ConditionId.Sleep];
+                        switch (sourceEffect)
+                        {
+                            case Ability ability:
+                                UiGenerator.PrintStatusEvent(target, sleep, ability, source);
+                                break;
+                            case ActiveMove move:
+                                UiGenerator.PrintStatusEvent(target, sleep, move);
+                                break;
+                            default:
+                                UiGenerator.PrintStatusEvent(target, sleep);
+                                break;
+                        }
+                    }
 
-            //        return true;
-            //    },
-            //    OnModifySpePriority = -101,
-            //    // Quick Feet negates the speed drop from paralysis
-            //    // It also increases speed by 50% when the pokemon is burned, paralyzed or poisoned
-            //    // but that is handled in the Ability effects.
-            //    OnModifySpe = (pokemon) => pokemon.Ability.Id == AbilityId.QuickFeet ? 1.0 : 0.5,
-            //    OnBeforeMovePriority = 1,
-            //    OnBeforeMove = (source, _, _, context) =>
-            //    {
-            //        bool paralyzed = context.Random.NextDouble() < 0.25;
-            //        if (paralyzed && context.PrintDebug)
-            //        {
-            //            UiGenerator.PrintParalysisPrevention(source);
-            //        }
-            //        return !paralyzed;
-            //    },
+                    battle.EffectState.StartTime = battle.Random(2, 5);
+                    battle.EffectState.Time = battle.EffectState.StartTime;
 
-            //},
-            //[ConditionId.Sleep] = new Condition
-            //{
-            //    Id = ConditionId.Sleep,
-            //    Name = "Sleep",
-            //    ConditionVolatility = ConditionVolatility.NonVolatile,
-            //},
-            //[ConditionId.Freeze] = new Condition
-            //{
-            //    Id = ConditionId.Freeze,
-            //    Name = "Freeze",
-            //    ConditionVolatility = ConditionVolatility.NonVolatile,
-            //},
+                    Condition nightmare = _library.Conditions[ConditionId.Nightmare];
+
+                    if (!target.RemoveVolatile(battle, nightmare)) return null;
+
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintEndEvent(target, nightmare);
+                    }
+                    return null;
+                },
+                OnBeforeMovePriority = 10,
+                OnBeforeMove = (battle, pokemon, _, move) =>
+                {
+                    if (pokemon.HasAbility(AbilityId.EarlyBird))
+                    {
+                        pokemon.StatusState.Time--;
+                    }
+
+                    pokemon.StatusState.Time--;
+
+                    if (pokemon.StatusState.Time <= 0)
+                    {
+                        pokemon.CureStatus();
+                        return null;
+                    }
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Sleep]);
+                    }
+                    if (move.SleepUsable ?? false)
+                    {
+                        return null;
+                    }
+                    return false;
+                },
+            },
+            [ConditionId.Freeze] = new()
+            {
+                Id = ConditionId.Freeze,
+                Name = "Freeze",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        Condition freeze = _library.Conditions[ConditionId.Freeze];
+                        switch (sourceEffect)
+                        {
+                            case Ability ability:
+                                UiGenerator.PrintStatusEvent(target, freeze, ability, source);
+                                break;
+                            default:
+                                UiGenerator.PrintStatusEvent(target, freeze);
+                                break;
+                        }
+                    }
+
+                    if (target.Species.Id == SpecieId.ShayminSky &&
+                        target.BaseSpecies.BaseSpecies == SpecieId.Shaymin)
+                    {
+                        target.FormeChange(SpecieId.Shaymin, battle.Effect, true);
+                    }
+                    return null;
+                },
+                OnBeforeMovePriority = 10,
+                OnBeforeMove = (battle, pokemon, _, move) =>
+                {
+                    if ((move.Flags.Defrost ?? false) &&
+                        !(move.Id == MoveId.BurnUp && !pokemon.HasType(PokemonType.Fire)))
+                    {
+                        return null;
+                    }
+                    if (battle.RandomChance(1, 5))
+                    {
+                        pokemon.CureStatus();
+                        return null;
+                    }
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Freeze]);
+                    }
+                    return false;
+                },
+                OnModifyMove = (battle, move, pokemon, _) =>
+                {
+                    if (!(move.Flags.Defrost ?? false)) return;
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCureStatusEvent(pokemon, _library.Conditions[ConditionId.Freeze], move);
+                    }
+                    pokemon.ClearStatus();
+                },
+                OnAfterMoveSecondary = (_, target, _, move) =>
+                {
+                    if (move.ThawsTarget ?? false)
+                    {
+                        target.CureStatus();
+                    }
+                },
+                OnDamagingHit = (_, _, target, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status &&
+                        move.Id != MoveId.PolarFlare)
+                    {
+                        target.CureStatus();
+                    }
+                },
+            },
             //[ConditionId.Poison] = new Condition
             //{
             //    Id = ConditionId.Poison,

@@ -30,6 +30,8 @@ public interface IBattle
     IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false);
 
+    int FinalModify(int relayVar);
+
     double ChainModify(int numerator, int denominator = 1);
     double ChainModify(int[] numerator, int denominator = 1);
     double ChainModify(double numerator, int denominator = 1);
@@ -39,8 +41,31 @@ public interface IBattle
 
     bool RandomChance(int numerator, int denominator);
 
+    /// <summary>
+    /// Returns a random integer within the specified range.
+    /// </summary>
+    /// <param name="m">The inclusive minimum value.</param>
+    /// <param name="n">The exclusive maximum value.</param>
+    /// <returns>A random integer x where m ≤ x &lt; n.</returns>
+    /// <exception cref="ArgumentException">Thrown when m is greater than or equal to n.</exception>
+    int Random(int m, int n);
+
+    /// <summary>
+    /// Returns a random integer from 0 up to but not including the specified maximum.
+    /// </summary>
+    /// <param name="n">The exclusive maximum value.</param>
+    /// <returns>A random integer x where 0 ≤ x &lt; n.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when n is less than or equal to 0.</exception>
+    int Random(int n);
+
+    /// <summary>
+    /// Returns a random double-precision floating-point number.
+    /// </summary>
+    /// <returns>A random double x where 0.0 ≤ x &lt; 1.0.</returns>
+    double Random();
+
     Library Library { get; }
-    Random Random { get; }
+    //Random Random { get; }
     bool PrintDebug { get; }
     Field Field { get; }
 
