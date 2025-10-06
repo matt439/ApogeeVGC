@@ -15,4 +15,5 @@ public class EffectState
     public bool? FromBooster { get; set; }
     public StatIdExceptHp? BestStat { get; set; }
     public Pokemon? Target { get; init; }
+    public bool? Unnerved { get; set; }
 }

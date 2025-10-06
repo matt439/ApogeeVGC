@@ -2,9 +2,9 @@
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
-//using ApogeeVGC.Sim.Ui;
 using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
@@ -31,6 +31,28 @@ public record Abilities
                 Num = 266,
                 Rating = 3.5,
                 OnSwitchInPriority = 1,
+                OnStart = (battle, pokemon) =>
+                {
+                    if (battle.EffectState.Unnerved is true) return;
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintAbilityEvent(pokemon, "As One");
+                        UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
+                    }
+                    battle.EffectState.Unnerved = true;
+                },
+                OnEnd = (battle, _) =>
+                {
+                    battle.EffectState.Unnerved = false;
+                },
+                OnFoeTryEatItem = (battle, _, _) => !battle.EffectState.Unnerved ?? false,
+                OnSourceAfterFaint = (battle, length, _, source, effect) =>
+                {
+                    if (effect.EffectType != EffectType.Move) return;
+
+                    battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
+                        _library.Abilities[AbilityId.ChillingNeigh]);
+                },
                 Flags = new AbilityFlags
                 {
                     FailRolePlay = true,
@@ -40,17 +62,6 @@ public record Abilities
                     FailSkillSwap = true,
                     CantSuppress = true,
                 },
-                OnSourceAfterFaint = (battle, length, _, source, effect) =>
-                {
-                    if (effect.EffectType != EffectType.Move) return;
-                    if (battle.PrintDebug)
-                    {
-                        //UiGenerator.PrintChillingNeighActivation(source);
-                    }
-
-                    battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
-                        _library.Abilities[AbilityId.ChillingNeigh]);
-                },
             },
             [AbilityId.HadronEngine] = new()
             {
@@ -58,12 +69,15 @@ public record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = (battle, _) =>
+                OnStart = (battle, pokemon) =>
                 {
                     if (!battle.Field.SetTerrain(battle, _library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
-                        //UiGenerator.PrintAbilityActivation("Hadron Engine");
+                        if (battle.PrintDebug)
+                        {
+                            UiGenerator.PrintActivateEvent(pokemon, pokemon.Ability);
+                        }
                     }
                 },
                 OnModifySpAPriority = 5,
@@ -128,6 +142,7 @@ public record Abilities
                 Name = "Quark Drive",
                 Num = 282,
                 Rating = 3.0,
+                Condition = ConditionId.QuarkDrive,
                 OnSwitchInPriority = -2,
                 OnStart = (battle, pokemon) =>
                 {
@@ -149,12 +164,12 @@ public record Abilities
                 },
                 OnEnd = (_, pokemon) =>
                 {
-                    if (pokemon is PokemonSideFieldPokemon pok)
+                    if (pokemon is not PokemonSideFieldPokemon pok)
                     {
-                        pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-                        // TODO: print to UI
+                        throw new ArgumentException("Expecting a Pokemon here.");
                     }
-                    throw new ArgumentException("Expecting a Pokemon here.");
+                    pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
+                    UiGenerator.PrintEndEvent(pok.Pokemon, pok.Pokemon.Ability);
                 },
                 Flags = new AbilityFlags
                 {

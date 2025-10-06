@@ -3,4 +3,5 @@
 public interface IEffect
 {
     EffectType EffectType { get; }
+    string Name { get; }
 }

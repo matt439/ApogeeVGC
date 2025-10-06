@@ -27,6 +27,9 @@ public interface IBattle
     BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false);
 
+    IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
+        BattleDamageEffect? effect = null, bool instafaint = false);
+
     double ChainModify(int numerator, int denominator = 1);
     double ChainModify(int[] numerator, int denominator = 1);
     double ChainModify(double numerator, int denominator = 1);

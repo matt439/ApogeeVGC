@@ -71,6 +71,7 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods
     public string Name { get; init; } = string.Empty;
     public int Num { get; init; } = 0;
     public AbilityFlags Flags { get; init; } = new();
+    public ConditionId? Condition { get; init; }
 
     #region IAbilityEventMethods Implementation
     public Action<IBattle, Pokemon>? OnCheckShow { get; init; }

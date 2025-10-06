@@ -5,4 +5,5 @@ namespace ApogeeVGC.Sim.GameObjects;
 public record Format : IEffect
 {
     public EffectType EffectType => EffectType.Format;
+    public required string Name { get; init; }
 }

@@ -1,11 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
-
-//using ApogeeVGC.Sim.Ui;
 
 namespace ApogeeVGC.Data;
 
