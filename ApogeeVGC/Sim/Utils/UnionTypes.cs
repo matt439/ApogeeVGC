@@ -483,6 +483,23 @@ public record IntIntIntArrayUnion(int Value) : IntIntArrayUnion;
 public record IntArrayIntIntArrayUnion(int[] Values) : IntIntArrayUnion;
 
 
+
+/// <summary>
+/// bool | 'past'
+/// </summary>
+public abstract record SpecieUnreleasedHidden
+{
+    public static implicit operator SpecieUnreleasedHidden(bool value) => new BoolSpecieUnreleasedHidden(value);
+    public static SpecieUnreleasedHidden FromPast() => new PastSpecieUnreleasedHidden();
+}
+public record BoolSpecieUnreleasedHidden(bool Value) : SpecieUnreleasedHidden;
+public record PastSpecieUnreleasedHidden : SpecieUnreleasedHidden;
+
+
+
+
+
+
 ///// <summary>
 ///// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
 ///// </summary>

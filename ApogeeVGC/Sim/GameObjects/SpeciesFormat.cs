@@ -11,7 +11,7 @@ public record SpeciesFormat
         get;
         init // TierTypes.Doubles | TierTypes.Other
         {
-            if (value == null || TierTools.IsDoublesOrOtherTier(value))
+            if (value == null || value.IsDoublesOrOtherTier())
             {
                 field = value;
             }
@@ -24,7 +24,7 @@ public record SpeciesFormat
         get;
         init // TierTypes.Singles | TierTypes.Other
         {
-            if (value == null || TierTools.IsSinglesOrOtherTier(value))
+            if (value == null || value.IsSinglesOrOtherTier())
             {
                 field = value;
             }
@@ -36,7 +36,7 @@ public record SpeciesFormat
         get;
         init // TierTypes.Singles | TierTypes.Other
         {
-            if (value == null || TierTools.IsSinglesOrOtherTier(value))
+            if (value == null || value.IsSinglesOrOtherTier())
             {
                 field = value;
             }

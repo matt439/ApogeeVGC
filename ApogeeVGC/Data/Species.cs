@@ -37,8 +37,8 @@ public record Species
                 Slot0 = AbilityId.FlameBody,
                 Hidden = AbilityId.Guts,
             },
-            Height = 0.7,
-            Weight = 6.9,
+            HeightM = 0.7,
+            WeightKg = 6.9,
             Color = "Green",
         },
         [SpecieId.CalyrexIce] = new Specie
@@ -46,8 +46,8 @@ public record Species
             Id = SpecieId.CalyrexIce,
             Num = 898,
             Name = "Calyrex-Ice",
-            BaseSpecies = "Calyrex",
-            Forme = "Ice",
+            BaseSpecies = SpecieId.Calyrex,
+            Forme = FormeId.Ice,
             Types = [PokemonType.Psychic, PokemonType.Ice],
             Gender = GenderId.N,
             BaseStats = new StatsTable()
@@ -60,8 +60,8 @@ public record Species
                 Spe = 50,
             },
             Abilities = new SpeciesAbility { Slot0 = AbilityId.AsOneGlastrier },
-            Height = 2.4,
-            Weight = 809.1,
+            HeightM = 2.4,
+            WeightKg = 809.1,
             Color = "White",
         },
         [SpecieId.Miraidon] = new Specie
@@ -81,8 +81,8 @@ public record Species
                 Spe = 135,
             },
             Abilities = new SpeciesAbility { Slot0 = AbilityId.HadronEngine },
-            Height = 3.5,
-            Weight = 240,
+            HeightM = 3.5,
+            WeightKg = 240,
             Color = "Purple",
         },
         [SpecieId.Ursaluna] = new Specie
@@ -107,8 +107,8 @@ public record Species
                 //Slot1 = "Bulletproof",
                 //Hidden = "Unnerve"
             },
-            Height = 2.4,
-            Weight = 290,
+            HeightM = 2.4,
+            WeightKg = 290,
             Color = "Brown",
         },
         [SpecieId.Volcarona] = new Specie
@@ -132,8 +132,8 @@ public record Species
                 Slot0 = AbilityId.FlameBody,
                 // Hidden = "Swarm"
             },
-            Height = 1.6,
-            Weight = 46,
+            HeightM = 1.6,
+            WeightKg = 46,
             Color = "White",
         },
         [SpecieId.Grimmsnarl] = new Specie
@@ -158,8 +158,8 @@ public record Species
                 //Slot1 = "Frisk",
                 //Hidden = "Pickpocket"
             },
-            Height = 1.5,
-            Weight = 61,
+            HeightM = 1.5,
+            WeightKg = 61,
             Color = "Purple",
         },
         [SpecieId.IronHands] = new Specie
@@ -182,8 +182,8 @@ public record Species
             {
                 Slot0 = AbilityId.QuarkDrive,
             },
-            Height = 1.8,
-            Weight = 380.7,
+            HeightM = 1.8,
+            WeightKg = 380.7,
             Color = "Gray",
         },
     };
