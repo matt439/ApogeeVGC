@@ -45,7 +45,7 @@ public record Abilities
                 {
                     battle.EffectState.Unnerved = false;
                 },
-                OnFoeTryEatItem = (battle, _, _) => !battle.EffectState.Unnerved ?? false,
+                OnFoeTryEatItem = (battle, _, _) => !(battle.EffectState.Unnerved ?? false),
                 OnSourceAfterFaint = (battle, length, _, source, effect) =>
                 {
                     if (effect.EffectType != EffectType.Move) return;
@@ -146,8 +146,7 @@ public record Abilities
                 OnSwitchInPriority = -2,
                 OnStart = (battle, pokemon) =>
                 {
-                    battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState, pokemon,
-                        null, null, null, null);
+                    battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState, pokemon);
                 },
                 OnTerrainChange = (battle, pokemon, _, _) =>
                 {
@@ -157,7 +156,7 @@ public record Abilities
                     {
                         pokemon.AddVolatile(battle, quarkDrive);
                     }
-                    else if (!pokemon.GetVolatile(ConditionId.QuarkDrive)?.FromBooster ?? false)
+                    else if (!(pokemon.GetVolatile(ConditionId.QuarkDrive)?.FromBooster ?? false))
                     {
                         pokemon.RemoveVolatile(battle, quarkDrive);
                     }

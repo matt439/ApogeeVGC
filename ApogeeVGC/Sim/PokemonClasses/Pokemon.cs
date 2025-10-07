@@ -235,7 +235,7 @@ public class Pokemon
         return Volatiles.GetValueOrDefault(volatileId);
     }
 
-    public bool RemoveVolatile(IBattle battle, IEffect status)
+    public bool RemoveVolatile(IBattle battle, Condition status)
     {
         throw new NotImplementedException();
     }

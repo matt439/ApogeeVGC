@@ -432,7 +432,7 @@ public record Conditions
                 },
                 OnBeforeMove = (battle, pokemon, _, move) =>
                 {
-                    if (!pokemon.GetItem()?.IsChoice ?? false)
+                    if (!(pokemon.GetItem()?.IsChoice ?? false))
                     {
                         pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
                         return null;
