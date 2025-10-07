@@ -1,4 +1,7 @@
-﻿namespace ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Stats;
+
+namespace ApogeeVGC.Sim.Moves;
 
 public record SecondaryEffect
 {
@@ -15,4 +18,7 @@ public record SecondaryEffect
     //public Ability? Ability { get; init; }
     //public bool? KingsRock { get; init; }
     //public IHitEffect? Self { get; init; }
+    public SparseBoostsTable? Boosts { get; init; }
+    public int? Chance { get; init; }
+    public ConditionId? VolatileStatus { get; init; }
 }

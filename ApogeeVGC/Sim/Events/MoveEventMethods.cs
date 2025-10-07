@@ -19,22 +19,23 @@ public delegate void PriorityChargeCallbackHandler(IBattle battle, Pokemon pokem
 public delegate void OnDisableMoveHandler(IBattle battle, Pokemon pokemon);
 public delegate void OnAfterSubDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source, ActiveMove move);
 public delegate IntBoolUnion? OnDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source, IEffect effect);
-public delegate int? OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, PokemonType type, ActiveMove move);
+
+public delegate int? OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, PokemonType type,
+    ActiveMove move);
 public delegate bool? OnHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
 public delegate void OnModifyMoveHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
 public delegate void OnModifyTypeHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
 public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target, ActiveMove move);
 public delegate bool? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
 
-// Additional move event delegates
-public delegate void OnMoveFailHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
-public delegate void OnUseMoveMessageHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
-public delegate bool? OnTryHitFieldHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
-public delegate bool? OnTryImmunityHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
-public delegate bool? OnTryHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
-public delegate IntBoolUnion? OnTryHitHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
-public delegate bool? OnPrepareHitHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
-public delegate bool? OnTryMoveHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+//// Additional move event delegates
+//public delegate void OnUseMoveMessageHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+//public delegate bool? OnTryHitFieldHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+//public delegate bool? OnTryImmunityHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+//public delegate bool? OnTryHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+//public delegate IntBoolUnion? OnTryHitHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+//public delegate bool? OnPrepareHitHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+//public delegate bool? OnTryMoveHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
 
 public interface IMoveEventHandlers
 {
@@ -45,23 +46,30 @@ public interface IMoveEventHandlers
     PriorityChargeCallbackHandler? PriorityChargeCallback { get; }
 
     OnDisableMoveHandler? OnDisableMove { get; }
+    VoidSourceMoveHandler? OnAfterHit { get; }
     OnAfterSubDamageHandler? OnAfterSubDamage { get; }
+    VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; }
+    VoidMoveHandler? OnAfterMoveSecondary { get; }
+    VoidSourceMoveHandler? OnAfterMove { get; }
     OnDamageHandler? OnDamage { get; }
+    ModifierSourceMoveHandler? OnBasePower { get; }
     OnEffectivenessHandler? OnEffectiveness { get; }
+    ResultMoveHandler? OnHit { get; }
+    ResultMoveHandler? OnHitField { get; }
     OnHitSideHandler? OnHitSide { get; }
     OnModifyMoveHandler? OnModifyMove { get; }
+    ModifierSourceMoveHandler? OnModifyPriority { get; }
+    VoidMoveHandler? OnMoveFail { get; }
     OnModifyTypeHandler? OnModifyType { get; }
     OnModifyTargetHandler? OnModifyTarget { get; }
+    ResultMoveHandler? OnPrepareHit { get; }
+    ResultSourceMoveHandler? OnTry { get; }
+    ExtResultSourceMoveHandler? OnTryHit { get; }
+    ResultMoveHandler? OnTryHitField { get; }
     OnTryHitSideHandler? OnTryHitSide { get; }
-
-    OnMoveFailHandler? OnMoveFail { get; }
-    OnUseMoveMessageHandler? OnUseMoveMessage { get; }
-    OnTryHitFieldHandler? OnTryHitField { get; }
-    OnTryImmunityHandler? OnTryImmunity { get; }
-    OnTryHandler? OnTry { get; }
-    OnTryHitHandler? OnTryHit { get; }
-    OnPrepareHitHandler? OnPrepareHit { get; }
-    OnTryMoveHandler? OnTryMove { get; }
+    ResultMoveHandler? OnTryImmunity { get; }
+    ResultSourceMoveHandler? OnTryMove { get; }
+    VoidSourceMoveHandler? OnUseMoveMessage { get; }
 }
 
 // Common move event handlers mapping to common handler types

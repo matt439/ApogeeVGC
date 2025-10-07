@@ -14,25 +14,31 @@ public record Move : IMoveEventHandlers
     public BeforeTurnCallbackHandler? BeforeTurnCallback { get; init; }
     public DamageCallbackHandler? DamageCallback { get; init; }
     public PriorityChargeCallbackHandler? PriorityChargeCallback { get; init; }
-
     public OnDisableMoveHandler? OnDisableMove { get; init; }
+    public VoidSourceMoveHandler? OnAfterHit { get; init; }
     public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
+    public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
+    public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
+    public VoidSourceMoveHandler? OnAfterMove { get; init; }
     public OnDamageHandler? OnDamage { get; init; }
+    public ModifierSourceMoveHandler? OnBasePower { get; init; }
     public OnEffectivenessHandler? OnEffectiveness { get; init; }
+    public ResultMoveHandler? OnHit { get; init; }
+    public ResultMoveHandler? OnHitField { get; init; }
     public OnHitSideHandler? OnHitSide { get; init; }
     public OnModifyMoveHandler? OnModifyMove { get; init; }
+    public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
+    public VoidMoveHandler? OnMoveFail { get; init; }
     public OnModifyTypeHandler? OnModifyType { get; init; }
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
+    public ResultMoveHandler? OnPrepareHit { get; init; }
+    public ResultSourceMoveHandler? OnTry { get; init; }
+    public ExtResultSourceMoveHandler? OnTryHit { get; init; }
+    public ResultMoveHandler? OnTryHitField { get; init; }
     public OnTryHitSideHandler? OnTryHitSide { get; init; }
-
-    public OnMoveFailHandler? OnMoveFail { get; init; }
-    public OnUseMoveMessageHandler? OnUseMoveMessage { get; init; }
-    public OnTryHitFieldHandler? OnTryHitField { get; init; }
-    public OnTryImmunityHandler? OnTryImmunity { get; init; }
-    public OnTryHandler? OnTry { get; init; }
-    public OnTryHitHandler? OnTryHit { get; init; }
-    public OnPrepareHitHandler? OnPrepareHit { get; init; }
-    public OnTryMoveHandler? OnTryMove { get; init; }
+    public ResultMoveHandler? OnTryImmunity { get; init; }
+    public ResultSourceMoveHandler? OnTryMove { get; init; }
+    public VoidSourceMoveHandler? OnUseMoveMessage { get; init; }
 
     #endregion
 
@@ -93,7 +99,7 @@ public record Move : IMoveEventHandlers
         }
     }
     public MoveCategory Category { get; init; }
-    public MoveType Type { get; init; }
+    public MoveType Type { get; set; }
     public int Priority
     {
         get;
@@ -168,6 +174,10 @@ public record Move : IMoveEventHandlers
     public bool? IsConfusionSelfHit { get; init; }
     public bool? StallingMove { get; init; }
     public MoveId? BaseMove { get; init; }
+    public ConditionId? PseudoWeather { get; init; }
+    public ConditionId? VolatileStatus { get; init; }
+    public ConditionId? SideCondition { get; init; }
+    public ConditionId? Status { get; init; }
 
     public ActiveMove ToActiveMove()
     {

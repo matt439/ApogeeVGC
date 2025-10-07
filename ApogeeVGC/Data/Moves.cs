@@ -1,6 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
@@ -56,6 +60,8 @@ public record Moves
                     Metronome = true,
                 },
                 Condition = _library.Conditions[ConditionId.LeechSeed],
+                OnTryImmunity = (_, target, _, _) => !target.HasType(PokemonType.Grass),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
             },
@@ -74,7 +80,10 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Target = MoveTarget.Field,
+                PseudoWeather = ConditionId.TrickRoom,
+                Condition = _library.Conditions[ConditionId.TrickRoom],
+                Secondary = null,
+                Target = MoveTarget.All,
                 Type = MoveType.Psychic,
             },
             [MoveId.Protect] = new()
@@ -93,7 +102,16 @@ public record Moves
                     FailCopycat = true,
                 },
                 StallingMove = true,
+                VolatileStatus = ConditionId.Protect,
+                OnPrepareHit = (battle, pokemon, _, _) => battle.Queue.WillAct() is null &&
+                                                          battle.RunEvent(EventId.StallMove, pokemon) is not null,
+                OnHit = (battle, pokemon, _, _) =>
+                {
+                    pokemon.AddVolatile(battle, _library.Conditions[ConditionId.Stall]);
+                    return null;
+                },
                 Condition = _library.Conditions[ConditionId.Protect],
+                Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
@@ -114,6 +132,7 @@ public record Moves
                     Metronome = true,
                 },
                 SelfSwitch = true,
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -152,6 +171,15 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                 },
+                OnBasePower = (battle, _, _, target, move) =>
+                {
+                    if (target.RunEffectiveness(move) > 0.0)
+                    {
+                        return battle.ChainModify([5461, 4096]);
+                    }
+                    return null;
+                },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -171,6 +199,8 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                Self = new SecondaryEffect { Boosts = new SparseBoostsTable { SpA = -2, }, },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dragon,
             },
@@ -191,6 +221,15 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                OnBasePower = (battle, _, pokemon, _, _) =>
+                {
+                    if (pokemon.Status is not null && pokemon.Status != ConditionId.Sleep)
+                    {
+                        return battle.ChainModify(2);
+                    }
+                    return null;
+                },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -211,6 +250,11 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                     Bite = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 20,
+                    Boosts = new SparseBoostsTable { Def = -1, },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Dark,
@@ -233,6 +277,15 @@ public record Moves
                     Punch = true,
                     Metronome = true,
                 },
+                Self = new SecondaryEffect
+                {
+                    Boosts = new SparseBoostsTable
+                    {
+                        Def = -1,
+                        SpD = -1,
+                    },
+                },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ground,
             },
@@ -251,6 +304,11 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                     Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { SpA = -1 },
                 },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Bug,
@@ -271,6 +329,11 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                Self = new SecondaryEffect
+                {
+                    Boosts = new SparseBoostsTable { SpA = -2, },
+                },
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fire,
             },
@@ -290,6 +353,9 @@ public record Moves
                     Metronome = true,
                     Wind = true,
                 },
+                SideCondition = ConditionId.Tailwind,
+                Condition = _library.Conditions[ConditionId.Tailwind],
+                Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Flying,
             },
@@ -308,6 +374,11 @@ public record Moves
                     Contact = true,
                     Protect = true,
                     Mirror = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { SpA = -1 },
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fairy,
@@ -329,7 +400,9 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.Paralysis],
+                Status = ConditionId.Paralysis,
+                IgnoreImmunity = false,
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -348,6 +421,9 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
+                SideCondition = ConditionId.Reflect,
+                Condition = _library.Conditions[ConditionId.Reflect],
+                Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -366,6 +442,9 @@ public record Moves
                     Snatch = true,
                     Metronome = true,
                 },
+                SideCondition = ConditionId.LightScreen,
+                Condition = _library.Conditions[ConditionId.LightScreen],
+                Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
             },
@@ -386,7 +465,19 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Condition = _library.Conditions[ConditionId.Flinch],
+                OnTry = (_, source, _, _) =>
+                {
+                    if (source.ActiveMoveActions > 1)
+                    {
+                        return false;
+                    }
+                    return null;
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    VolatileStatus = ConditionId.Flinch,
+                },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
@@ -396,6 +487,33 @@ public record Moves
                 Num = 484,
                 Accuracy = 100,
                 BasePower = 0,
+                BasePowerCallback = (_, pokemon, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int pokemonWeight = pokemon.GetWeight();
+                    int bp;
+                    if (pokemonWeight >= targetWeight * 5)
+                    {
+                        bp = 120;
+                    }
+                    else if (pokemonWeight >= targetWeight * 4)
+                    {
+                        bp = 100;
+                    }
+                    else if (pokemonWeight >= targetWeight * 3)
+                    {
+                        bp = 80;
+                    }
+                    else if (pokemonWeight >= targetWeight * 2)
+                    {
+                        bp = 60;
+                    }
+                    else
+                    {
+                        bp = 40;
+                    }
+                    return bp;
+                },
                 Category = MoveCategory.Physical,
                 Name = "Heavy Slam",
                 BasePp = 10,
@@ -408,6 +526,8 @@ public record Moves
                     NonSky = true,
                     Metronome = true,
                 },
+                // OnTryHit
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Steel,
             },
@@ -417,6 +537,20 @@ public record Moves
                 Num = 67,
                 Accuracy = 100,
                 BasePower = 0,
+                BasePowerCallback = (_, _, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int bp = targetWeight switch
+                    {
+                        >= 2000 => 120,
+                        >= 1000 => 100,
+                        >= 500 => 80,
+                        >= 250 => 60,
+                        >= 100 => 40,
+                        _ => 20,
+                    };
+                    return bp;
+                },
                 Category = MoveCategory.Physical,
                 Name = "Low Kick",
                 BasePp = 20,
@@ -428,6 +562,8 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                // OnTryHit
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
@@ -449,6 +585,7 @@ public record Moves
                     Metronome = true,
                 },
                 Recoil = (1,  4),
+                Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
@@ -460,8 +597,8 @@ public record Moves
             [MoveId.Struggle] = new()
             {
                 Id = MoveId.Struggle,
-                Num = 10000,
-                Accuracy = 100,
+                Num = 165,
+                Accuracy = IntTrueUnion.FromTrue(),
                 BasePower = 50,
                 Category = MoveCategory.Physical,
                 Name = "Struggle",
@@ -469,11 +606,29 @@ public record Moves
                 Priority = 0,
                 Flags = new MoveFlags
                 {
+                    Contact = true,
                     Protect = true,
-                    Mirror = true,
-                    Metronome = true,
+                    FailEncore = true,
+                    FailMeFirst = true,
+                    NoSleepTalk = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                    FailMimic = true,
+                    FailInstruct = true,
+                    NoSketch = true,
                 },
-                Target = MoveTarget.Normal,
+                OnModifyMove = (battle, move, pokemon, _) =>
+                {
+                    move.Type = MoveType.Fighting;
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintActivateEvent(pokemon,
+                            _library.Moves[MoveId.Struggle].ToActiveMove());
+                    }
+                },
+                StruggleRecoil = true,
+                Secondary = null,
+                Target = MoveTarget.RandomNormal,
                 Type = MoveType.Normal,
             },
             //[MoveId.Confused] = new()

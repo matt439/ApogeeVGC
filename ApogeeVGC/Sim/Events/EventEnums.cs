@@ -4,6 +4,7 @@ public enum EventId
 {
     TerrainChange,
     Flinch,
+    StallMove,
 }
 
 public enum EventType

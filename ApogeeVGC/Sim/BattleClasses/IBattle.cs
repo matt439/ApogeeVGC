@@ -104,5 +104,7 @@ public interface IBattle
 
     int ActivePerHalf { get; }
 
+    BattleQueue Queue { get; }
+
     void Start();
 }

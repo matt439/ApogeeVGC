@@ -337,6 +337,16 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    public double RunEffectiveness(ActiveMove move)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int GetWeight()
+    {
+        throw new NotImplementedException();
+    }
+
     public Pokemon Copy()
     {
         throw new NotImplementedException();
