@@ -34,7 +34,7 @@
 //{
 //    public static Pokemon Build(
 //        Library library,
-//        SpecieId specie,
+//        SpecieId species,
 //        MoveSetup[] moves,
 //        ItemId item,
 //        AbilityId ability,
@@ -64,8 +64,8 @@
 //            i++;
 //        }
 
-//        Specie spec = library.SpeciesData[specie] ??
-//                      throw new ArgumentException($"Specie {specie} not found in library.");
+//        Species spec = library.SpeciesData[species] ??
+//                      throw new ArgumentException($"Species {species} not found in library.");
 //        Nature nat = library.Natures[nature] ??
 //                     throw new ArgumentException($"Nature {nature} not found in library.");
 
@@ -76,7 +76,7 @@
 //            Ability = library.Abilities[ability] ??
 //                      throw new ArgumentException($"Ability {ability} not found in library."),
 //            Evs = evs,
-//            Name = nickname ?? library.SpeciesData[specie].Name,
+//            Name = nickname ?? library.SpeciesData[species].Name,
 //            Shiny = shiny,
 //            PrintDebug = pringDebug,
 //            TeraType = terraType,

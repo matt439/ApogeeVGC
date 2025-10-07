@@ -26,7 +26,7 @@ public record Library
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
     private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
     private IReadOnlyDictionary<NatureType, Nature> NaturesData => _natures.NatureData;
-    private IReadOnlyDictionary<SpecieId, Specie> SpeciesData => _speciesData.SpeciesDataDictionary;
+    private IReadOnlyDictionary<SpecieId, Species> SpeciesData => _speciesData.SpeciesDataDictionary;
     private IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
 
     public IReadOnlyDictionary<AbilityId, Ability> Abilities => 
@@ -47,8 +47,8 @@ public record Library
     public IReadOnlyDictionary<NatureType, Nature> Natures => 
         new ReadOnlyDictionaryWrapper<NatureType, Nature>(NaturesData);
     
-    public IReadOnlyDictionary<SpecieId, Specie> Species => 
-        new ReadOnlyDictionaryWrapper<SpecieId, Specie>(SpeciesData);
+    public IReadOnlyDictionary<SpecieId, Species> Species => 
+        new ReadOnlyDictionaryWrapper<SpecieId, Species>(SpeciesData);
     
     public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => 
         new ReadOnlyDictionaryWrapper<SpecieId, SpeciesFormat>(SpeciesFormatsData);

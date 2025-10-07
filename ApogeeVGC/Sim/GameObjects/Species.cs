@@ -7,7 +7,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
-public record Specie : IEffect
+public record Species : IEffect
 {
     public const double Epsilon = 0.0001;
 
@@ -165,7 +165,7 @@ public record Specie : IEffect
     }
 
 
-    public Specie Copy()
+    public Species Copy()
     {
         return this with
         {
@@ -222,7 +222,7 @@ public record GenderRatio
     public GenderRatio(double m, double f)
     {
         if (m < 0.0 || m > 1.0 || f < 0.0 || f > 1.0 ||
-            (Math.Abs(m + f - 1.0) > Specie.Epsilon && m != 0.0 && f != 0.0))
+            (Math.Abs(m + f - 1.0) > Species.Epsilon && m != 0.0 && f != 0.0))
         {
             throw new ArgumentException();
         }

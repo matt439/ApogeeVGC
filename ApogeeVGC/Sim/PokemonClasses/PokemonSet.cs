@@ -8,10 +8,10 @@ public record PokemonSet
 {
     public string Name
     {
-        get => field == string.Empty ? Specie.Name : field;
+        get => field == string.Empty ? Species.Name : field;
         init;
     } = string.Empty;
-    public required Specie Specie { get; init; }
+    public required Species Species { get; init; }
     public Item? Item { get; init; }
     public required Ability Ability { get; init; }
     public required IReadOnlyList<Move> Moves

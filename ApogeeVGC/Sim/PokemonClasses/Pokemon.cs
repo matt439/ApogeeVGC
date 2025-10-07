@@ -31,8 +31,8 @@ public class Pokemon
 
     public PokemonSlotId Position { get; set; }
 
-    public Specie BaseSpecies => Set.Specie;
-    public Specie Species => Set.Specie;
+    public Species BaseSpecies => Set.Species;
+    public Species Species => Set.Species;
     public EffectState SpeciesState { get; set; }
 
     public ConditionId? Status { get; set; }
@@ -144,7 +144,7 @@ public class Pokemon
         Side = side;
         Set = set;
 
-        SpeciesState = battle.InitEffectState(set.Specie.Id, null, null);
+        SpeciesState = battle.InitEffectState(set.Species.Id, null, null);
 
         if (set.Moves.Count == 0)
         {
@@ -361,9 +361,9 @@ public class Pokemon
     /// <summary>
     /// Default is Battle.Effect for source.
     /// </summary>
-    Specie? SetSpecie(Specie rawSpecie, IEffect? source, bool isTransform = false)
+    Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
     {
-        RelayVar? specie = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecie);
+        RelayVar? specie = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
 
         throw new NotImplementedException();
     }
@@ -434,7 +434,7 @@ public record MoveHitData
 //public class Pokemon
 //{
 //    // Core properties
-//    public Specie Specie { get; init; }
+//    public Species Species { get; init; }
 //    public required IReadOnlyList<Move> Moves
 //    {
 //        get;
@@ -527,9 +527,9 @@ public record MoveHitData
 //        {
 //            if (IsTeraUsed)
 //            {
-//                return TeraType == MoveType.Stellar ? Specie.Types.ToArray() : [TeraType.ConvertToPokemonType()];
+//                return TeraType == MoveType.Stellar ? Species.Types.ToArray() : [TeraType.ConvertToPokemonType()];
 //            }
-//            return Specie.Types.ToArray();
+//            return Species.Types.ToArray();
 //        }
 //    }
 
@@ -542,23 +542,23 @@ public record MoveHitData
 
 //            if (!IsTeraUsed)
 //            {
-//                return Specie.Types.Select(type => (type, NormalStab: normalStab)).ToArray();
+//                return Species.Types.Select(type => (type, NormalStab: normalStab)).ToArray();
 //            }
 
 //            var stabTypes = new List<(PokemonType, double)>();
 //            PokemonType teraType = TeraType.ConvertToPokemonType();
 
-//            if (Specie.Types.Contains(teraType))
+//            if (Species.Types.Contains(teraType))
 //            {
 //                stabTypes.AddRange(
-//                    Specie.Types.Select(type =>
+//                    Species.Types.Select(type =>
 //                        (type, type == teraType ? enhancedStab : normalStab))
 //                );
 //            }
 //            else
 //            {
 //                stabTypes.Add((teraType, normalStab));
-//                stabTypes.AddRange(Specie.Types.Select(type => (type, NormalStab: normalStab)));
+//                stabTypes.AddRange(Species.Types.Select(type => (type, NormalStab: normalStab)));
 //            }
 
 //            return stabTypes.ToArray();
@@ -566,10 +566,10 @@ public record MoveHitData
 //    }
 
 //    // Core constructor
-//    public Pokemon(Specie specie, StatsTable evs, StatsTable ivs, Nature nature, int level, Trainer trainer,
+//    public Pokemon(Species species, StatsTable evs, StatsTable ivs, Nature nature, int level, Trainer trainer,
 //        SideId sideId)
 //    {
-//        Specie = specie;
+//        Species = species;
 //        Evs = evs;
 //        Ivs = ivs;
 //        Nature = nature;
@@ -653,12 +653,12 @@ public record MoveHitData
 
 //    public bool HasType(PokemonType type)
 //    {
-//        return Specie.Types.Contains(type);
+//        return Species.Types.Contains(type);
 //    }
 
 //    public bool HasType(MoveType type)
 //    {
-//        return Specie.Types.Contains(type.ConvertToPokemonType());
+//        return Species.Types.Contains(type.ConvertToPokemonType());
 //    }
 
 //    public bool HasItem(ItemId item)
@@ -822,7 +822,7 @@ public record MoveHitData
 
 //    public Pokemon Copy()
 //    {
-//        Pokemon copy = new(Specie, Evs, Ivs, Nature, Level, Trainer, SideId)
+//        Pokemon copy = new(Species, Evs, Ivs, Nature, Level, Trainer, SideId)
 //        {
 //            Moves = Moves.Select(m => m.Copy()).ToArray(),
 //            Item = Item,
@@ -889,7 +889,7 @@ public record MoveHitData
 
 //    private int CalculateUnmodifiedStat(StatId stat)
 //    {
-//        int baseStat = Specie.BaseStats.GetStat(stat);
+//        int baseStat = Species.BaseStats.GetStat(stat);
 //        int iv = Ivs.GetStat(stat);
 //        int ev = Evs.GetStat(stat);
 
@@ -918,7 +918,7 @@ public record MoveHitData
 
 //    //public override string ToString()
 //    //{
-//    //    string line1 = $"{Name} ({Specie.Name}) - Lv. {Level}";
+//    //    string line1 = $"{Name} ({Species.Name}) - Lv. {Level}";
 //    //    string line2 = $"{CurrentHp}/{UnmodifiedStats.Hp} HP";
 //    //    string line3 = $"Ability: {Ability.Name} - Item: {Item.Name}";
 //    //    string movesLine = string.Join(", ", Moves.Select(m => m.Name));

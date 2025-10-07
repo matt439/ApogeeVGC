@@ -225,8 +225,8 @@ public abstract record SingleEventSource
     public static implicit operator SingleEventSource(ActiveMove activeMove) =>
         EffectUnionFactory.ToSingleEventSource(activeMove);
 
-    public static implicit operator SingleEventSource(Specie specie) =>
-        EffectUnionFactory.ToSingleEventSource(specie);
+    public static implicit operator SingleEventSource(Species species) =>
+        EffectUnionFactory.ToSingleEventSource(species);
 
     public static implicit operator SingleEventSource(Condition condition) =>
         EffectUnionFactory.ToSingleEventSource(condition);
@@ -242,17 +242,17 @@ public record FalseSingleEventSource : SingleEventSource;
 
 
 /// <summary>
-/// bool | int | Specie
+/// bool | int | Species
 /// </summary>
 public abstract record RelayVar
 {
     public static implicit operator RelayVar(bool value) => new BoolRelayVar(value);
     public static implicit operator RelayVar(int value) => new IntRelayVar(value);
-    public static implicit operator RelayVar(Specie specie) => new SpecieRelayVar(specie);
+    public static implicit operator RelayVar(Species species) => new SpecieRelayVar(species);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
-public record SpecieRelayVar(Specie Specie) : RelayVar;
+public record SpecieRelayVar(Species Species) : RelayVar;
 
 
 
@@ -264,7 +264,7 @@ public static class EffectUnionFactory
         Ability ability => new EffectSingleEventSource(ability),
         Item item => new EffectSingleEventSource(item),
         ActiveMove activeMove => new EffectSingleEventSource(activeMove),
-        Specie specie => new EffectSingleEventSource(specie),
+        Species specie => new EffectSingleEventSource(specie),
         Condition condition => new EffectSingleEventSource(condition),
         Format format => new EffectSingleEventSource(format),
         _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
@@ -608,7 +608,7 @@ public record SideEffectStateTarget(Side Side) : EffectStateTarget;
 //    public EffectIdUnion(SpecieId specieId)
 //    {
 //        _value = (int)specieId;
-//        _type = EffectType.Specie;
+//        _type = EffectType.Species;
 //    }
 
 //    public override string ToString()
@@ -619,7 +619,7 @@ public record SideEffectStateTarget(Side Side) : EffectStateTarget;
 //            EffectType.Ability => ((AbilityId)_value).ToString(),
 //            EffectType.Item => ((ItemId)_value).ToString(),
 //            EffectType.Condition => ((ConditionId)_value).ToString(),
-//            EffectType.Specie => ((SpecieId)_value).ToString(),
+//            EffectType.Species => ((SpecieId)_value).ToString(),
 //            _ => _value.ToString(),
 //        };
 //    }

@@ -7,16 +7,16 @@ namespace ApogeeVGC.Data;
 
 public record SpeciesData
 {
-    public IReadOnlyDictionary<SpecieId, Specie> SpeciesDataDictionary { get; }
+    public IReadOnlyDictionary<SpecieId, Species> SpeciesDataDictionary { get; }
 
     public SpeciesData()
     {
-        SpeciesDataDictionary = new ReadOnlyDictionary<SpecieId, Specie>(_species);
+        SpeciesDataDictionary = new ReadOnlyDictionary<SpecieId, Species>(_species);
     }
 
-    private readonly Dictionary<SpecieId, Specie> _species = new()
+    private readonly Dictionary<SpecieId, Species> _species = new()
     {
-        [SpecieId.Bulbasaur] = new Specie
+        [SpecieId.Bulbasaur] = new Species
         {
             Id = SpecieId.Bulbasaur,
             Num = 1,
@@ -41,7 +41,7 @@ public record SpeciesData
             WeightKg = 6.9,
             Color = "Green",
         },
-        [SpecieId.CalyrexIce] = new Specie
+        [SpecieId.CalyrexIce] = new Species
         {
             Id = SpecieId.CalyrexIce,
             Num = 898,
@@ -64,7 +64,7 @@ public record SpeciesData
             WeightKg = 809.1,
             Color = "White",
         },
-        [SpecieId.Miraidon] = new Specie
+        [SpecieId.Miraidon] = new Species
         {
             Id = SpecieId.Miraidon,
             Num = 1008,
@@ -85,7 +85,7 @@ public record SpeciesData
             WeightKg = 240,
             Color = "Purple",
         },
-        [SpecieId.Ursaluna] = new Specie
+        [SpecieId.Ursaluna] = new Species
         {
             Id = SpecieId.Ursaluna,
             Num = 901,
@@ -111,7 +111,7 @@ public record SpeciesData
             WeightKg = 290,
             Color = "Brown",
         },
-        [SpecieId.Volcarona] = new Specie
+        [SpecieId.Volcarona] = new Species
         {
             Id = SpecieId.Volcarona,
             Num = 637,
@@ -136,7 +136,7 @@ public record SpeciesData
             WeightKg = 46,
             Color = "White",
         },
-        [SpecieId.Grimmsnarl] = new Specie
+        [SpecieId.Grimmsnarl] = new Species
         {
             Id = SpecieId.Grimmsnarl,
             Num = 861,
@@ -162,7 +162,7 @@ public record SpeciesData
             WeightKg = 61,
             Color = "Purple",
         },
-        [SpecieId.IronHands] = new Specie
+        [SpecieId.IronHands] = new Species
         {
             Id = SpecieId.IronHands,
             Num = 992,
