@@ -10,6 +10,6 @@ public record Attacker
     public int Damage { get; init; }
     public bool ThisTurn { get; init; }
     public Move? Move { get; init; }
-    public SlotId Slot { get; init; }
+    public PokemonSlotId PokemonSlot { get; init; }
     public IntBoolUnion? DamageValue { get; init; }
 }

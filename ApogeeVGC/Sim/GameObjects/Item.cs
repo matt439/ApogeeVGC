@@ -19,6 +19,7 @@ public enum ItemId
     AssaultVest,
 
     BoosterEnergy,
+    ToxicOrb,
 }
 
 public record FlingData

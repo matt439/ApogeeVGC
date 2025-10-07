@@ -6,7 +6,7 @@ public enum SideId
     Side2,
 }
 
-public enum SlotId
+public enum PokemonSlotId
 {
     Slot1 = 1,
     Slot2 = 2,

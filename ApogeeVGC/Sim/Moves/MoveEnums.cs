@@ -28,8 +28,11 @@ public enum MoveId
     MeFirst,
     BurnUp,
     PolarFlare,
+    AxeKick,
+    Snatch,
 
     Struggle,
+    Confused, // The move pokemon use to hit themselves in confusion
 
     //// Custom moves
     //NormalBasic,
@@ -59,13 +62,13 @@ public enum MoveCategory
     Status,
 }
 
-public enum MoveSlot
-{
-    Move1,
-    Move2,
-    Move3,
-    Move4,
-}
+//public enum MoveSlot
+//{
+//    Move1,
+//    Move2,
+//    Move3,
+//    Move4,
+//}
 
 public enum MoveNormalTarget
 {

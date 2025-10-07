@@ -160,7 +160,7 @@ public record Move : IMoveEventHandlers
     public MoveTarget? NonGhostTarget { get; init; }
     public double? SpreadModifier { get; init; }
     public bool? SleepUsable { get; init; }
-    public bool? SmartTarget { get; init; }
+    public bool? SmartTarget { get; set; }
     public bool? TracksTarget { get; init; }
     public bool? WillCrit { get; init; }
     public bool? CallsMove { get; init; }
@@ -168,6 +168,11 @@ public record Move : IMoveEventHandlers
     public bool? IsConfusionSelfHit { get; init; }
     public bool? StallingMove { get; init; }
     public MoveId? BaseMove { get; init; }
+
+    public ActiveMove ToActiveMove()
+    {
+        throw new NotImplementedException();
+    }
 
 
     /// <summary>

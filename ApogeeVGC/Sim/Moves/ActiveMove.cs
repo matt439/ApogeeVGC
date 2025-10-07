@@ -44,6 +44,10 @@ public record ActiveMove : Move, IEffect
     public Pokemon? RuinedSpD { get; set; }
 
 
+    // additional properties
+    public EffectStateId? SourceEffect { get; set; }
+
+
     /// PP management
     public int PpUp
     {
@@ -90,4 +94,4 @@ public record MoveHitResult
     public int TypeMod { get; init; }
 }
 
-public class MoveHitData : Dictionary<SlotId, MoveHitResult>;
+public class MoveHitData : Dictionary<PokemonSlotId, MoveHitResult>;

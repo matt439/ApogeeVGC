@@ -476,6 +476,14 @@ public record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            //[MoveId.Confused] = new()
+            //{
+            //    Id = MoveId.Confused,
+            //    Num = 10019,
+            //    Accuracy = IntTrueUnion.FromTrue(),
+            //    Name = "Confused",
+            //    Type = MoveType.Normal,
+            //},
 
 
 

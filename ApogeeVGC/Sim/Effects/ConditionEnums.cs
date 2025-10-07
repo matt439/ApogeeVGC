@@ -29,6 +29,7 @@ public enum ConditionId
     QuarkDrive,
 
     Nightmare,
+    LockedMove,
 }
 
 public enum ConditionEffectType

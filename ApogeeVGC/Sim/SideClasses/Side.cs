@@ -83,6 +83,11 @@ public class Side
     {
         throw new NotImplementedException();
     }
+
+    public bool HasAlly(Pokemon pokemon)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 
@@ -102,7 +107,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            value.SlotId = SlotId.Slot1;
+//            value.PokemonSlotId = PokemonSlotId.Slot1;
 //            field = value;
 //        }
 //    }
@@ -112,7 +117,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            value.SlotId = SlotId.Slot2;
+//            value.PokemonSlotId = PokemonSlotId.Slot2;
 //            field = value;
 //        }
 //    }
@@ -122,7 +127,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            value.SlotId = SlotId.Slot3;
+//            value.PokemonSlotId = PokemonSlotId.Slot3;
 //            field = value;
 //        }
 //    }
@@ -132,7 +137,7 @@ public class Side
 //        get;
 //        set
 //        {
-//            value.SlotId = SlotId.Slot4;
+//            value.PokemonSlotId = PokemonSlotId.Slot4;
 //            field = value;
 //        }
 //    }
@@ -145,7 +150,7 @@ public class Side
 //            {
 //                throw new InvalidOperationException("Cannot set Slot5 in Doubles format.");
 //            }
-//            value.SlotId = SlotId.Slot5;
+//            value.PokemonSlotId = PokemonSlotId.Slot5;
 //            field = value;
 //        }
 //    }
@@ -158,7 +163,7 @@ public class Side
 //            {
 //                throw new InvalidOperationException("Cannot set Slot6 in Doubles format.");
 //            }
-//            value.SlotId = SlotId.Slot6;
+//            value.PokemonSlotId = PokemonSlotId.Slot6;
 //            field = value;
 //        }
 //    }
@@ -202,8 +207,8 @@ public class Side
 
 //    public IEnumerable<Pokemon> FaintedActivePokemon => ActivePokemon.Where(p => p.IsFainted);
 
-//    public IEnumerable<SlotId> FaintedActiveSlots => ActivePokemon.Where(p => p.IsFainted).
-//        Select(p => p.SlotId);
+//    public IEnumerable<PokemonSlotId> FaintedActiveSlots => ActivePokemon.Where(p => p.IsFainted).
+//        Select(p => p.PokemonSlotId);
 
 //    public bool IsTurnStartSideValid
 //    {
@@ -225,18 +230,18 @@ public class Side
 //        }
 //    }
 
-//    //public IEnumerable<(SlotId, Pokemon)> AllSlotsWithIds
+//    //public IEnumerable<(PokemonSlotId, Pokemon)> AllSlotsWithIds
 //    //{
 //    //    get
 //    //    {
-//    //        yield return (SlotId.Slot1, Slot1);
-//    //        yield return (SlotId.Slot2, Slot2);
-//    //        yield return (SlotId.Slot3, Slot3);
-//    //        yield return (SlotId.Slot4, Slot4);
+//    //        yield return (PokemonSlotId.Slot1, Slot1);
+//    //        yield return (PokemonSlotId.Slot2, Slot2);
+//    //        yield return (PokemonSlotId.Slot3, Slot3);
+//    //        yield return (PokemonSlotId.Slot4, Slot4);
 //    //        if (GameType == GameType.Singles)
 //    //        {
-//    //            yield return (SlotId.Slot5, Slot5);
-//    //            yield return (SlotId.Slot6, Slot6);
+//    //            yield return (PokemonSlotId.Slot5, Slot5);
+//    //            yield return (PokemonSlotId.Slot6, Slot6);
 //    //        }
 //    //    }
 //    //}
@@ -293,29 +298,29 @@ public class Side
 //    /// </summary>
 //    public bool HasMadeTeamPreviewChoice() => _hasTeamPreviewChoiceBeenMade;
 
-//    public Pokemon GetSlot(SlotId slotId) => slotId switch
+//    public Pokemon GetSlot(PokemonSlotId pokemonSlotId) => pokemonSlotId switch
 //    {
-//        SlotId.Slot1 => Slot1,
-//        SlotId.Slot2 => Slot2,
-//        SlotId.Slot3 => Slot3,
-//        SlotId.Slot4 => Slot4,
-//        SlotId.Slot5 => Slot5,
-//        SlotId.Slot6 => Slot6,
+//        PokemonSlotId.Slot1 => Slot1,
+//        PokemonSlotId.Slot2 => Slot2,
+//        PokemonSlotId.Slot3 => Slot3,
+//        PokemonSlotId.Slot4 => Slot4,
+//        PokemonSlotId.Slot5 => Slot5,
+//        PokemonSlotId.Slot6 => Slot6,
 //        _ => null,
-//    } ?? throw new InvalidOperationException($"Slot {slotId} is null.");
+//    } ?? throw new InvalidOperationException($"PokemonSlot {pokemonSlotId} is null.");
 
-//    public void SetSlot(SlotId slotId, Pokemon pokemon)
+//    public void SetSlot(PokemonSlotId pokemonSlotId, Pokemon pokemon)
 //    {
-//        switch (slotId)
+//        switch (pokemonSlotId)
 //        {
-//            case SlotId.Slot1: Slot1 = pokemon; break;
-//            case SlotId.Slot2: Slot2 = pokemon; break;
-//            case SlotId.Slot3: Slot3 = pokemon; break;
-//            case SlotId.Slot4: Slot4 = pokemon; break;
-//            case SlotId.Slot5: Slot5 = pokemon; break;
-//            case SlotId.Slot6: Slot6 = pokemon; break;
+//            case PokemonSlotId.Slot1: Slot1 = pokemon; break;
+//            case PokemonSlotId.Slot2: Slot2 = pokemon; break;
+//            case PokemonSlotId.Slot3: Slot3 = pokemon; break;
+//            case PokemonSlotId.Slot4: Slot4 = pokemon; break;
+//            case PokemonSlotId.Slot5: Slot5 = pokemon; break;
+//            case PokemonSlotId.Slot6: Slot6 = pokemon; break;
 //            default:
-//                throw new ArgumentOutOfRangeException(nameof(slotId), slotId, null);
+//                throw new ArgumentOutOfRangeException(nameof(pokemonSlotId), pokemonSlotId, null);
 //        }
 //    }
 
@@ -354,15 +359,15 @@ public class Side
 //        _hasTeamPreviewChoiceBeenMade = true;
 //    }
 
-//    public void SwitchSlots(SlotId activeSlot, SlotId benchSlot)
+//    public void SwitchSlots(PokemonSlotId activeSlot, PokemonSlotId benchSlot)
 //    {
 //        if (!IsValidActiveSlot(activeSlot))
 //        {
-//            throw new ArgumentException($"Slot {activeSlot} is not a valid active slot for {GameType} format.");
+//            throw new ArgumentException($"PokemonSlot {activeSlot} is not a valid active slot for {GameType} format.");
 //        }
 //        if (!IsValidBenchSlot(benchSlot))
 //        {
-//            throw new ArgumentException($"Slot {benchSlot} is not a valid bench slot for {GameType} format.");
+//            throw new ArgumentException($"PokemonSlot {benchSlot} is not a valid bench slot for {GameType} format.");
 //        }
 //        Pokemon activePokemon = GetSlot(activeSlot);
 //        Pokemon benchPokemon = GetSlot(benchSlot);
@@ -373,9 +378,9 @@ public class Side
 //        // Perform the switch
 //        SetSlot(activeSlot, benchPokemon);
 //        SetSlot(benchSlot, activePokemon);
-//        // Update their SlotId properties
-//        activePokemon.SlotId = benchSlot;
-//        benchPokemon.SlotId = activeSlot;
+//        // Update their PokemonSlotId properties
+//        activePokemon.PokemonSlotId = benchSlot;
+//        benchPokemon.PokemonSlotId = activeSlot;
 //    }
 
 //    public bool IsActivePokemon(Pokemon pokemon)
@@ -383,44 +388,44 @@ public class Side
 //        return ActivePokemon.Contains(pokemon);
 //    }
 
-//    public Pokemon? GetAlly(SlotId slotId)
+//    public Pokemon? GetAlly(PokemonSlotId pokemonSlotId)
 //    {
 //        return GameType switch
 //        {
 //            GameType.Singles => null, // No allies in Singles,
-//            GameType.Doubles => slotId switch
+//            GameType.Doubles => pokemonSlotId switch
 //            {
-//                SlotId.Slot1 => Slot2,
-//                SlotId.Slot2 => Slot1,
+//                PokemonSlotId.Slot1 => Slot2,
+//                PokemonSlotId.Slot2 => Slot1,
 //                _ => throw new ArgumentException("Only active slots can have allies in Doubles."),
 //            },
 //            _ => throw new InvalidOperationException("Invalid battle format."),
 //        };
 //    }
 
-//    public Pokemon? GetAliveAlly(SlotId slotId)
+//    public Pokemon? GetAliveAlly(PokemonSlotId pokemonSlotId)
 //    {
-//        Pokemon? ally = GetAlly(slotId);
+//        Pokemon? ally = GetAlly(pokemonSlotId);
 //        return ally is { IsFainted: false } ? ally : null;
 //    }
 
-//    private bool IsValidActiveSlot(SlotId slot)
+//    private bool IsValidActiveSlot(PokemonSlotId slot)
 //    {
 //        return GameType switch
 //        {
-//            GameType.Singles => slot is SlotId.Slot1,
-//            GameType.Doubles => slot is SlotId.Slot1 or SlotId.Slot2,
+//            GameType.Singles => slot is PokemonSlotId.Slot1,
+//            GameType.Doubles => slot is PokemonSlotId.Slot1 or PokemonSlotId.Slot2,
 //            _ => throw new InvalidOperationException("Invalid battle format."),
 //        };
 //    }
 
-//    private bool IsValidBenchSlot(SlotId slot)
+//    private bool IsValidBenchSlot(PokemonSlotId slot)
 //    {
 //        return GameType switch
 //        {
-//            GameType.Singles => slot is SlotId.Slot2 or SlotId.Slot3 or SlotId.Slot4 or
-//                SlotId.Slot5 or SlotId.Slot6,
-//            GameType.Doubles => slot is SlotId.Slot3 or SlotId.Slot4,
+//            GameType.Singles => slot is PokemonSlotId.Slot2 or PokemonSlotId.Slot3 or PokemonSlotId.Slot4 or
+//                PokemonSlotId.Slot5 or PokemonSlotId.Slot6,
+//            GameType.Doubles => slot is PokemonSlotId.Slot3 or PokemonSlotId.Slot4,
 //            _ => throw new InvalidOperationException("Invalid battle format."),
 //        };
 //    }

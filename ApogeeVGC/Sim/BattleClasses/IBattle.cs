@@ -19,8 +19,8 @@ public interface IBattle
     RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state, SingleEventTarget? target,
         SingleEventSource? source, IEffect? sourceEffect, RelayVar? relayVar, Delegate? customCallback);
 
-    RelayVar? RunEvent(EventId eventId, RunEventTarget? target, PokemonFalseUnion? source, IEffect? sourceEffect,
-        RelayVar? relayVar, bool? onEffect, bool? fastExit);
+    RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, PokemonFalseUnion? source = null,
+        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null);
 
     void EachEvent(EventId eventId, IEffect? effect, bool? relayVar);
 
@@ -29,6 +29,8 @@ public interface IBattle
 
     IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false);
+
+    IntFalseUnion? Heal(int damage, Pokemon? target, Pokemon? source = null, BattleHealEffect? effect = null);
 
     int FinalModify(int relayVar);
 
@@ -82,11 +84,24 @@ public interface IBattle
 
     GameType GameType { get; }
 
+    int ClampIntRange(int num, int? min, int? max);
+
+    Pokemon? ActiveTarget { get; set; }
+    ActiveMove? ActiveMove { get; set; }
+
+    Pokemon? GetAtSlot(PokemonSlotId? slot);
+
+    int GetConfusionDamage(Pokemon pokemon, int basePower);
+
     //Turn CurrentTurn { get; }
 
     //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
 
     EffectState InitEffectState(EffectStateId? id, int? effectOrder, Pokemon? target);
+
+    MoveCategory GetCategory(ActiveMove move);
+
+    int ActivePerHalf { get; }
 
     void Start();
 }

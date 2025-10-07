@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
 
@@ -276,267 +278,436 @@ public record Conditions
                     return null;
                 },
             },
-            //[ConditionId.Toxic] = new Condition
-            //{
-            //    Id = ConditionId.Toxic,
-            //    Name = "Toxic",
-            //    ConditionVolatility = ConditionVolatility.NonVolatile,
-            //},
-            //[ConditionId.Confusion] = new Condition
-            //{
-            //    Id = ConditionId.Confusion,
-            //    Name = "Confusion",
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //},
-            //[ConditionId.Flinch] = new Condition
-            //{
-            //    Id = ConditionId.Flinch,
-            //    Name = "Flinch",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    Duration = 1,
-            //    OnBeforeMovePriority = 8,
-            //    OnBeforeMove = (source, _, _, context) =>
-            //    {
-            //        if (context.PrintDebug)
-            //        {
-            //            UiGenerator.PrintFlinch(source);
-            //        }
-            //        return false;
-            //    },
-            //},
-            //[ConditionId.ChoiceLock] = new Condition
-            //{
-            //    Id = ConditionId.ChoiceLock,
-            //    NoCopy = true,
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    // TODO: Check if hasBounced and snatch effects need to be handled
-            //    OnStart = (_, _, _, _) => true,
-            //    OnBeforeMove = (source, _, move, _) =>
-            //    {
-            //        if (!source.Item?.IsChoice ?? false)
-            //        {
-            //            // If the source no longer has a choice item, remove the condition
-            //            if (!source.RemoveCondition(ConditionId.ChoiceLock))
-            //            {
-            //                throw new InvalidOperationException("Failed to remove Choice Lock condition.");
-            //            }
-            //            return true;
-            //        }
+            [ConditionId.Toxic] = new()
+            {
+                Id = ConditionId.Toxic,
+                Name = "Toxic",
+                ConditionEffectType = ConditionEffectType.Status,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    battle.EffectState.Stage = 0;
+                    if (!battle.PrintDebug) return null;
 
-            //        if (source.IgnoringItem) return true;
-            //        if (source.LastMoveUsed is null) return true;
-            //        if (move.Id == source.LastMoveUsed.Id) return true;
-            //        if (move.Id == MoveId.Struggle) return true;
+                    Condition toxic = _library.Conditions[ConditionId.Toxic];
+                    switch (sourceEffect)
+                    {
+                        case Item { Id: ItemId.ToxicOrb }:
+                            UiGenerator.PrintStatusEvent(target, toxic, sourceEffect);
+                            break;
+                        case Ability ability:
+                            UiGenerator.PrintStatusEvent(target, toxic, ability, source);
+                            break;
+                        default:
+                            UiGenerator.PrintStatusEvent(target, toxic);
+                            break;
+                    }
+                    return null;
+                },
+                OnSwitchIn = (battle, _) =>
+                {
+                    battle.EffectState.Stage = 0;
+                },
+                OnResidualOrder = 9,
+                OnResidual = (battle, pokemon, _, _) =>
+                {
+                    if (battle.EffectState.Stage < 15)
+                    {
+                        battle.EffectState.Stage++;
+                    }
+                    battle.Damage(battle.ClampIntRange(pokemon.BaseMaxHp / 16, 1, null) *
+                                  (battle.EffectState.Stage ?? 0));
+                },
+            },
+            [ConditionId.Confusion] = new()
+            {
+                Id = ConditionId.Confusion,
+                Name = "Confusion",
+                ConditionEffectType = ConditionEffectType.Condition,
+                OnStart = (battle, target, source, sourceEffect) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        Condition confusion = _library.Conditions[ConditionId.Confusion];
+                        switch (sourceEffect)
+                        {
+                            case Condition { Id: ConditionId.LockedMove }:
+                                UiGenerator.PrintStartEvent(target, confusion,
+                                    _library.Conditions[ConditionId.LockedMove]);
+                                break;
+                            case Ability ability:
+                                UiGenerator.PrintStartEvent(target, confusion, ability,
+                                    source);
+                                break;
+                            default:
+                                UiGenerator.PrintStartEvent(target, confusion);
+                                break;
+                        }
+                    }
+                    int min = 2;
+                    if (sourceEffect is ActiveMove { Id: MoveId.AxeKick })
+                    {
+                        min = 3;
+                    }
+                    battle.EffectState.Time = battle.Random(min, 6);
+                    return null;
+                },
+                OnEnd = (battle, target) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintEndEvent(target, _library.Conditions[ConditionId.Confusion]);
+                    }
+                },
+                OnBeforeMovePriority = 3,
+                OnBeforeMove = (battle, pokemon, _, _) =>
+                {
+                    pokemon.Volatiles[ConditionId.Confusion].Time--;
+                    if (pokemon.Volatiles[ConditionId.Confusion].Time < 1)
+                    {
+                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.Confusion]);
+                        return null;
+                    }
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintActivateEvent(pokemon, _library.Conditions[ConditionId.Confusion]);
+                    }
+                    if (!battle.RandomChance(33, 100))
+                    {
+                        return null;
+                    }
+                    battle.ActiveTarget = pokemon;
+                    int damage = battle.GetConfusionDamage(pokemon, 40);
 
-            //        return false;
-            //    },
-            //    OnDisableMove = (pokeon, usedMove, _) =>
-            //    {
-            //        if (!pokeon.Item?.IsChoice ?? false)
-            //        {
-            //            // If the source no longer has a choice item, remove the condition
-            //            if (!pokeon.RemoveCondition(ConditionId.ChoiceLock))
-            //            {
-            //                throw new InvalidOperationException("Failed to remove Choice Lock condition.");
-            //            }
-            //            return;
-            //        }
-            //        if (pokeon.IgnoringItem) return;
-            //        foreach (Move move in pokeon.Moves)
-            //        {
-            //            if (move.Id != usedMove.Id)
-            //            {
-            //                move.Disabled = true;
-            //            }
-            //        }
-            //    },
-            //},
-            //[ConditionId.LeechSeed] = new Condition
-            //{
-            //    Id = ConditionId.LeechSeed,
-            //    Name = "Leech Seed",
-            //    ConditionEffectType = ConditionEffectType.Status,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnStart = (target, _, _, context) =>
-            //    {
-            //        if (context.PrintDebug)
-            //        {
-            //            UiGenerator.PrintLeechSeedStart(target);
-            //        }
-            //        return true;
-            //    },
-            //    OnResidualOrder = 8,
-            //    OnResidual = (target, source, _, context) =>
-            //    {
-            //        if (target.CurrentHp <= 0)
-            //        {
-            //            //throw new InvalidOperationException("Target has fainted.");
+                    ActiveMove activeMove = new()
+                    {
+                        Name = "Confused",
+                        Id = MoveId.Confused,
+                        Accuracy = IntTrueUnion.FromTrue(),
+                        Num = 100200,
+                        Type = MoveType.Normal,
+                    };
+                    battle.Damage(damage, pokemon, pokemon, BattleDamageEffect.FromIEffect(activeMove));
+                    return false;
+                },
+            },
+            [ConditionId.Flinch] = new()
+            {
+                Id = ConditionId.Flinch,
+                Name = "Flinch",
+                ConditionEffectType = ConditionEffectType.Condition,
+                Duration = 1,
+                OnBeforeMovePriority = 8,
+                OnBeforeMove = (battle, pokemon, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Flinch]);
+                    }
+                    battle.RunEvent(EventId.Flinch, pokemon);
+                    return false;
+                },
+            },
+            [ConditionId.ChoiceLock] = new()
+            {
+                Id = ConditionId.ChoiceLock,
+                NoCopy = true,
+                ConditionEffectType = ConditionEffectType.Condition,
+                OnStart = (battle, _, _, _) =>
+                {
+                    if (battle.ActiveMove is null)
+                    {
+                        throw new InvalidOperationException("Active move is null when trying to apply" +
+                                                            $"{ConditionId.ChoiceLock}.");
+                    }
+                    if (battle.ActiveMove.HasBounced ?? false)
+                    {
+                        return false;
+                    }
+                    if (battle.ActiveMove.SourceEffect is MoveEffectStateId { MoveId: MoveId.Snatch })
+                    {
+                        return false;
+                    }
+                    battle.EffectState.Move = battle.ActiveMove.Id;
+                    return null;
+                },
+                OnBeforeMove = (battle, pokemon, _, move) =>
+                {
+                    if (!pokemon.GetItem()?.IsChoice ?? false)
+                    {
+                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                        return null;
+                    }
 
-            //            // If the target has fainted, do not apply Leech Seed damage.
-            //            return;
-            //        }
+                    if (pokemon.IgnoringItem() ||
+                        move.Id == battle.EffectState.Move ||
+                        move.Id == MoveId.Struggle) return null;
 
-            //        int damage = target.UnmodifiedHp / 8;
-            //        if (damage < 1) damage = 1;
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintFailEvent(pokemon);
+                    }
+                    return false;
+                },
+                OnDisableMove = (battle, pokemon) =>
+                {
+                    if (!pokemon.GetItem()?.IsChoice == true ||
+                        battle.EffectState.Move != null && !pokemon.HasMove((MoveId)battle.EffectState.Move))
+                    {
+                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                        return;
+                    }
+                    if (pokemon.IgnoringItem())
+                    {
+                        return;
+                    }
 
-            //        int actualDamage = target.Damage(damage);
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
+                                 moveSlot.Move.Id != battle.EffectState.Move))
+                    {
+                        pokemon.DisableMove(moveSlot.Id, false, battle.EffectState.SourceEffect);
+                    }
+                },
+            },
+            [ConditionId.LeechSeed] = new()
+            {
+                Id = ConditionId.LeechSeed,
+                Name = "Leech Seed",
+                ConditionEffectType = ConditionEffectType.Condition,
+                AssociatedMove = MoveId.LeechSeed,
+                OnStart = (battle, target, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintStartEvent(target, _library.Moves[MoveId.LeechSeed].ToActiveMove());
+                    }
+                    return null;
+                },
+                OnResidualOrder = 8,
+                OnResidual = (battle, pokemon, _, _) =>
+                {
+                    Pokemon? target = battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
+                    if (target is null || target.Fainted || target.Hp <= 0)
+                    {
+                        return;
+                    }
 
-            //        if (source is not null)
-            //        {
-            //             int actualHeal = source.Slot1.Heal(damage);
-            //            if (context.PrintDebug)
-            //            {
-            //                UiGenerator.PrintLeechSeedDamage(target, actualDamage, source.Slot1,
-            //                    actualHeal);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            throw new ArgumentNullException($"Source is null when trying to apply" +
-            //                                            $"{ConditionId.LeechSeed} damage to" + $"pokemon {target.Name}.");
-            //        }
-            //    },
-            //},
-            //// This condition is the effect placed on each Pokemon by Trick Room.
-            //// Trick Room itself is a PseudoWeather condition on the field which applies
-            //// this condition to each Pokemon.
-            //// This condition doesn't have apply any effect to the Pokemon itself but could
-            //// be useful for UI etc.
-            //[ConditionId.TrickRoom] = new Condition
-            //{
-            //    Id = ConditionId.TrickRoom,
-            //    Name = "Trick Room",
-            //    ConditionEffectType = ConditionEffectType.PseudoWeather,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //},
-            //[ConditionId.Stall] = new Condition
-            //{
-            //    Id = ConditionId.Stall,
-            //    Name = "Stall",
-            //    Duration = 2,
-            //    CounterMax = 729,
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnStart = (target, _, _, _) =>
-            //    {
-            //        Condition? condition = target.GetCondition(ConditionId.Stall);
-            //        if (condition is null)
-            //        {
-            //            throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
-            //                                             $"pokemon {target.Name}.");
-            //        }
+                    IntFalseUnion? damage = battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
+                    if (damage is IntIntFalseUnion d)
+                    {
+                        battle.Heal(d.Value, target, pokemon);
+                    }
+                },
+            },
+            [ConditionId.TrickRoom] = new()
+            {
+                Id = ConditionId.TrickRoom,
+                Name = "Trick Room",
+                ConditionEffectType = ConditionEffectType.Condition,
+                Duration = 5,
+                DurationCallback = (_, _, _, _) => 5,
+                OnFieldStart = (battle, _, source, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintFieldStartEvent(_library.Conditions[ConditionId.TrickRoom], source);
+                    }
+                },
+                OnFieldRestart = (battle, _, _, _) =>
+                {
+                    battle.Field.RemovePseudoWeather(_library.Conditions[ConditionId.TrickRoom]);
+                },
+                OnFieldResidualOrder = 27,
+                OnFieldResidualSubOrder = 1,
+                OnFieldEnd = (battle, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.TrickRoom]);
+                    }
+                },
+            },
+            [ConditionId.Stall] = new()
+            {
+                // Protect, Detect, Endure counter
+                Id = ConditionId.Stall,
+                Name = "Stall",
+                Duration = 2,
+                CounterMax = 729,
+                ConditionEffectType = ConditionEffectType.Condition,
+                OnStart = (battle, _, _, _) =>
+                {
+                    battle.EffectState.Counter = 3;
+                    return null;
+                },
+                OnStallMove = (battle, pokemon) =>
+                {
+                    int counter = battle.EffectState.Counter ?? 1;
+                    bool success = battle.RandomChance(1, counter);
+                    if (!success)
+                    {
+                        pokemon.DeleteVolatile(ConditionId.Stall);
+                    }
+                    return success;
+                },
+                OnRestart = (battle, _, _, _) =>
+                {
+                    if (battle.Effect is Condition condition && battle.EffectState.Counter < condition.CounterMax)
+                    {
+                        battle.EffectState.Counter *= 3;
+                    }
+                    battle.EffectState.Duration = 2;
+                    return null;
+                },
+            },
+            [ConditionId.Protect] = new()
+            {
+                Id = ConditionId.Protect,
+                Name = "Protect",
+                Duration = 1,
+                ConditionEffectType = ConditionEffectType.Condition,
+                AssociatedMove = MoveId.Protect,
+                OnStart = (battle, target, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSingleTurnEvent(target, _library.Conditions[ConditionId.Protect]);
+                    }
+                    return null;
+                },
+                OnTryHitPriority = 3,
+                OnTryHit = (battle, target, source, move) =>
+                {
+                    if (!(move.Flags.Protect ?? false))
+                    {
+                        return null;
+                    }
+                    if (move.SmartTarget ?? false)
+                    {
+                        move.SmartTarget = false;
+                    }
+                    else if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.Protect]);
+                    }
 
-            //        condition.Counter = 3;
-            //        return true;
-            //    },
-            //    OnStallMove = (pokemon, context) =>
-            //    {
-            //        Condition? condition = pokemon.GetCondition(ConditionId.Stall);
-            //        if (condition is null)
-            //        {
-            //            throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
-            //                                             $"pokemon {pokemon.Name}.");
-            //        }
-
-            //        int counter = condition.Counter ?? 1;
-            //        double successChance = 1.0 / counter;
-            //        bool success = context.Random.NextDouble() < successChance;
-
-            //        //success = false; // For testing purposes only, force stall to always fail.
-
-            //        if (success) return success;
-
-            //        if (!pokemon.RemoveCondition(ConditionId.Stall))
-            //        {
-            //            throw new InvalidOperationException("Failed to remove Stall condition.");
-            //        }
-            //        return success;
-            //    },
-            //    OnRestart = (target, _, _, _) =>
-            //    {
-            //        Condition? condition = target.GetCondition(ConditionId.Stall);
-            //        if (condition is null)
-            //        {
-            //            throw new NullReferenceException($"Condition {ConditionId.Stall} not found on" +
-            //                                             $"pokemon {target.Name}.");
-            //        }
-
-            //        int counter = condition.Counter ?? 1;
-            //        int counterMax = condition.CounterMax ?? 729;
-
-            //        if (counter < counterMax)
-            //        {
-            //            condition.Counter = counter * 3;
-            //        }
-
-            //        condition.Duration = 2;
-
-            //        return true;
-            //    },
-            //},
-            //[ConditionId.Protect] = new Condition
-            //{
-            //    Id = ConditionId.Protect,
-            //    Name = "Protect",
-            //    Duration = 1,
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    // OnStart
-            //    OnTryHitPriority = 3,
-            //    // TODO: Check for smart target (dragon darts), outrage lock
-            //    OnTryHit = (_, _, move, _) => !(move.Flags.Protect ?? false),
-            //    OnTurnEnd = (target, _) =>
-            //    {
-            //        if (!target.RemoveCondition(ConditionId.Protect))
-            //        {
-            //            throw new InvalidOperationException("Failed to remove Protect condition.");
-            //        }
-            //    },
-            //},
-            //[ConditionId.Tailwind] = new Condition
-            //{
-            //    Id = ConditionId.Tailwind,
-            //    Name = "Tailwind",
-            //    ConditionEffectType = ConditionEffectType.SideCondition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnModifySpe = (_) => 2.0,
-            //},
-            //[ConditionId.Reflect] = new Condition
-            //{
-            //    Id = ConditionId.Reflect,
-            //    Name = "Reflect",
-            //    ConditionEffectType = ConditionEffectType.SideCondition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnAnyModifyDamage = (_, source, target, move, isCrit, numPokemonSide) =>
-            //    {
-            //        if (target == source || move.Category != MoveCategory.Physical) return 1.0;
-            //        if (isCrit || move.Infiltrates) return 1.0;
-            //        if (numPokemonSide > 1) // 2 pokemon on the side
-            //        {
-            //            return 2732 / 4096.0;
-            //        }
-            //        return 0.5;
-            //    },
-            //},
-            //[ConditionId.LightScreen] = new Condition
-            //{
-            //    Id = ConditionId.LightScreen,
-            //    Name = "Light Screen",
-            //    ConditionEffectType = ConditionEffectType.SideCondition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnAnyModifyDamage = (_, source, target, move, isCrit, numPokemonSide) =>
-            //    {
-            //        if (target == source || move.Category != MoveCategory.Special) return 1.0;
-            //        if (isCrit || move.Infiltrates) return 1.0;
-            //        if (numPokemonSide > 1) // 2 pokemon on the side
-            //        {
-            //            return 2732 / 4096.0;
-            //        }
-            //        return 0.5;
-            //    },
-            //},
+                    EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                    if (lockedMove is not null && source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    {
+                        source.RemoveVolatile(battle, _library.Conditions[ConditionId.LockedMove]);
+                    }
+                    return true;
+                },
+            },
+            [ConditionId.Tailwind] = new()
+            {
+                Id = ConditionId.Tailwind,
+                Name = "Tailwind",
+                ConditionEffectType = ConditionEffectType.Condition,
+                AssociatedMove = MoveId.Tailwind,
+                Duration = 4,
+                DurationCallback = (_, _, _, _) => 4,
+                OnSideStart = (battle, side, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Tailwind]);
+                    }
+                },
+                OnModifySpe = (battle, _, _) =>
+                {
+                    battle.ChainModify(2);
+                    return null;
+                },
+                OnSideResidualOrder = 26,
+                OnSideResidualSubOrder = 5,
+                OnSideEnd = (battle, side) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Tailwind]);
+                    }
+                },
+            },
+            [ConditionId.Reflect] = new()
+            {
+                Id = ConditionId.Reflect,
+                Name = "Reflect",
+                ConditionEffectType = ConditionEffectType.Condition,
+                AssociatedMove = MoveId.Reflect,
+                Duration = 5,
+                DurationCallback = (_, _, source, _) => source.HasItem(ItemId.LightClay) ? 8 : 5,
+                OnAnyModifyDamage = (battle, _, source, target, move) =>
+                {
+                    if (target != source &&
+                        battle.EffectState.Target is SideEffectStateTarget side &&
+                        side.Side.HasAlly(target) &&
+                        battle.GetCategory(move) == MoveCategory.Physical)
+                    {
+                        if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
+                        {
+                            return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
+                                battle.ChainModify(0.5);
+                        }
+                    }
+                    return null;
+                },
+                OnSideStart = (battle, side, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Reflect]);
+                    }
+                },
+                OnSideResidualOrder = 26,
+                OnSideResidualSubOrder = 1,
+                OnSideEnd = (battle, side) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Reflect]);
+                    }
+                },
+            },
+            [ConditionId.LightScreen] = new()
+            {
+                Id = ConditionId.LightScreen,
+                Name = "Light Screen",
+                ConditionEffectType = ConditionEffectType.Condition,
+                AssociatedMove = MoveId.LightScreen,
+                Duration = 5,
+                DurationCallback = (_, _, source, _) => source.HasItem(ItemId.LightClay) ? 8 : 5,
+                OnAnyModifyDamage = (battle, _, source, target, move) =>
+                {
+                    if (target != source &&
+                        battle.EffectState.Target is SideEffectStateTarget side &&
+                        side.Side.HasAlly(target) &&
+                        battle.GetCategory(move) == MoveCategory.Special)
+                    {
+                        if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
+                        {
+                            return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
+                                battle.ChainModify(0.5);
+                        }
+                    }
+                    return null;
+                },
+                OnSideStart = (battle, side, _, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.LightScreen]);
+                    }
+                },
+                OnSideResidualOrder = 26,
+                OnSideResidualSubOrder = 2,
+                OnSideEnd = (battle, side) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.LightScreen]);
+                    }
+                },
+            },
             //[ConditionId.Leftovers] = new Condition
             //{
             //    Id = ConditionId.Leftovers,

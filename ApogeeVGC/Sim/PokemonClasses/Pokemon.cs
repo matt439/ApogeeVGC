@@ -23,12 +23,12 @@ public class Pokemon
     public int Happiness => Set.Happiness;
     public PokeballId Pokeball => Set.Pokeball;
 
-    public IReadOnlyList<Move> BaseMoveSlots => Set.Moves;
+    public IReadOnlyList<MoveSlot> BaseMoveSlots { get; }
     public StatsTable Evs => Set.Evs;
     public StatsTable Ivs => Set.Ivs;
-    public List<Move> MoveSlots { get; set; }
+    public List<MoveSlot> MoveSlots { get; set; }
 
-    public SlotId Position { get; set; }
+    public PokemonSlotId Position { get; set; }
 
     public Specie BaseSpecies => Set.Specie;
     public Specie Species => Set.Specie;
@@ -150,9 +150,23 @@ public class Pokemon
             throw new InvalidOperationException($"Set {Name} has no moves");
         }
 
-        MoveSlots = set.Moves.ToList();
+        MoveSlots = [];
+        BaseMoveSlots = [];
 
-        Position = SlotId.Slot1;
+        List<MoveSlot> baseMoveSlots = [];
+        foreach (Move move in set.Moves)
+        {
+            MoveSlot moveSlot = new()
+            {
+                Move = move.Copy(),
+                Pp = move.BasePp,
+                MaxPp = move.BasePp,
+            };
+            baseMoveSlots.Add(moveSlot);
+        }
+        BaseMoveSlots = baseMoveSlots;
+
+        Position = PokemonSlotId.Slot1;
         StatusState = battle.InitEffectState(null, null, null);
         Volatiles = [];
 
@@ -283,10 +297,47 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    public Item? GetItem()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IgnoringItem(bool isFling = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasMove(MoveId move)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DisableMove(MoveId moveId, bool? isHidden = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasItem(ItemId item)
+    {
+        throw new NotImplementedException();
+    }
+
+    public MoveHitData GetMoveHitData(ActiveMove move)
+    {
+        throw new NotImplementedException();
+    }
+
     public Pokemon Copy()
     {
         throw new NotImplementedException();
     }
+}
+
+
+public record MoveHitData
+{
+    public bool Crit { get; init; }
+    public double TypeMod { get; init; }
 }
 
 //public class Pokemon
@@ -335,7 +386,7 @@ public class Pokemon
 //    public bool PrintDebug { get; init; }
 //    public Trainer Trainer { get; init; }
 //    public SideId SideId { get; init; }
-//    public SlotId SlotId { get; set; }
+//    public PokemonSlotId PokemonSlotId { get; set; }
 
 //    // Stat-related properties
 //    private StatsTable UnmodifiedStats { get; }
@@ -690,7 +741,7 @@ public class Pokemon
 //            TeraType = TeraType,
 //            Gender = Gender,
 //            PrintDebug = PrintDebug,
-//            SlotId = SlotId,
+//            PokemonSlotId = PokemonSlotId,
 //        };
 
 //        int hpDifference = UnmodifiedHp - CurrentHp;

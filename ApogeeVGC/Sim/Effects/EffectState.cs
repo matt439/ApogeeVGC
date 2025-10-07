@@ -1,4 +1,6 @@
-﻿using ApogeeVGC.Sim.PokemonClasses;
+﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 
@@ -8,14 +10,19 @@ public class EffectState
 {
     public required EffectStateId Id { get; init; }
     public int EffectOrder { get; init; }
-    public int? Duration { get; init; }
+    public int? Duration { get; set; }
 
     // other properties that might be relevant to effect state
 
     public bool? FromBooster { get; set; }
     public StatIdExceptHp? BestStat { get; set; }
-    public Pokemon? Target { get; init; }
+    public EffectStateTarget? Target { get; set; }
     public bool? Unnerved { get; set; }
     public int? StartTime { get; set; }
     public int? Time { get; set; }
+    public int? Stage { get; set; }
+    public MoveId? Move { get; set; }
+    public IEffect? SourceEffect { get; set; }
+    public PokemonSlotId? SourceSlot { get; set; }
+    public int? Counter { get; set; }
 }

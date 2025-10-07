@@ -511,6 +511,47 @@ public record DrainBattleDamageEffect : BattleDamageEffect;
 public record RecoilBattleDamageEffect : BattleDamageEffect;
 
 
+/// <summary>
+/// Effect | 'drain'
+/// </summary>
+public abstract record BattleHealEffect
+{
+    public static BattleHealEffect FromIEffect(IEffect effect) => new EffectBattleHealEffect(effect);
+    public static BattleHealEffect FromDrain() => new DrainBattleHealEffect();
+}
+public record EffectBattleHealEffect(IEffect Effect) : BattleHealEffect;
+public record DrainBattleHealEffect : BattleHealEffect;
+
+
+
+
+/// <summary>
+/// bool | 'hidden'
+/// </summary>
+public abstract record BoolHiddenUnion
+{
+    public static implicit operator BoolHiddenUnion(bool value) => new BoolBoolHiddenUnion(value);
+    public static BoolHiddenUnion FromHidden() => new HiddenBoolHiddenUnion();
+}
+public record BoolBoolHiddenUnion(bool Value) : BoolHiddenUnion;
+public record HiddenBoolHiddenUnion : BoolHiddenUnion;
+
+
+/// <summary>
+/// Pokemon | Side
+/// </summary>
+public abstract record EffectStateTarget
+{
+    public static implicit operator EffectStateTarget(Pokemon pokemon) => new PokemonEffectStateTarget(pokemon);
+    public static implicit operator EffectStateTarget(Side side) => new SideEffectStateTarget(side);
+}
+public record PokemonEffectStateTarget(Pokemon Pokemon) : EffectStateTarget;
+public record SideEffectStateTarget(Side Side) : EffectStateTarget;
+
+
+
+
+
 
 
 

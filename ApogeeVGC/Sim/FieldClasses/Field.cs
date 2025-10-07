@@ -28,6 +28,11 @@ public class Field
         throw new NotImplementedException();
     }
 
+    public bool RemovePseudoWeather(Condition status)
+    {
+        throw new NotImplementedException();
+    }
+
     public Field Copy()
     {
         return new Field
