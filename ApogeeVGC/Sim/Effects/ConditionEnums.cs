@@ -18,18 +18,12 @@ public enum ConditionId
     Tailwind,
     Reflect,
     LightScreen,
-    Leftovers,
-    ChoiceSpecs,
-    FlameOrb,
-    AssaultVest,
     ElectricTerrain,
-    HadronEngine,
-    Guts,
-    FlameBody,
     QuarkDrive,
 
     Nightmare,
     LockedMove,
+    Yawn,
 }
 
 public enum ConditionEffectType

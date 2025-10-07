@@ -327,6 +327,16 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    public bool IsGrounded(bool negateImmunity = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsSemiInvulnerable()
+    {
+        throw new NotImplementedException();
+    }
+
     public Pokemon Copy()
     {
         throw new NotImplementedException();

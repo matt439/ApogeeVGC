@@ -20,6 +20,7 @@ public enum ItemId
 
     BoosterEnergy,
     ToxicOrb,
+    TerrainExtender,
 }
 
 public record FlingData

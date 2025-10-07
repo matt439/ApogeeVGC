@@ -509,7 +509,7 @@ public record Conditions
                 {
                     if (battle.PrintDebug)
                     {
-                        UiGenerator.PrintFieldStartEvent(_library.Conditions[ConditionId.TrickRoom], source);
+                        UiGenerator.PrintFieldStartEvent(_library.Conditions[ConditionId.TrickRoom], null, source);
                     }
                 },
                 OnFieldRestart = (battle, _, _, _) =>
@@ -708,149 +708,76 @@ public record Conditions
                     }
                 },
             },
-            //[ConditionId.Leftovers] = new Condition
-            //{
-            //    Id = ConditionId.Leftovers,
-            //    Name = "Leftovers",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnResidualOrder = 5,
-            //    OnResidualSubOrder = 4,
-            //    Duration = 1, // Condition is refreshed each turn by the item effect
-            //    OnResidual = (target, _, _, context) =>
-            //    {
-            //        int heal = target.UnmodifiedHp / 16;
-            //        if (heal < 1) heal = 1;
-            //        int actualHeal = target.Heal(heal);
-            //        if (context.PrintDebug)
-            //        {
-            //            UiGenerator.PrintLeftoversHeal(target, actualHeal);
-            //        }
-            //    },
-            //},
-            //[ConditionId.ChoiceSpecs] = new Condition
-            //{
-            //    Id = ConditionId.ChoiceSpecs,
-            //    Name = "Choice Specs",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnModifySpAPriority = 1,
-            //    OnModifySpA = (_) => 1.5,
-            //},
-            //[ConditionId.FlameOrb] = new Condition
-            //{
-            //    Id = ConditionId.FlameOrb,
-            //    Name = "Flame Orb",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnResidualOrder = 28,
-            //    OnResidualSubOrder = 3,
-            //    Duration = 1,
-            //    OnResidual = (target, _, _, context) =>
-            //    {
-            //        if (target.HasCondition(ConditionId.Burn)) return;
-            //        target.AddCondition(context.Library.Conditions[ConditionId.Burn], context, target,
-            //            target.Item ?? throw new InvalidOperationException("The target should always be holding" +
-            //                                                               "a flame orb here"));
-            //    },
-            //},
-            //[ConditionId.AssaultVest] = new Condition
-            //{
-            //    Id = ConditionId.AssaultVest,
-            //    Name = "Assault Vest",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnModifySpDPriority = 1,
-            //    OnModifySpD = (_) => 1.5,
-            //    OnDisableMove = (pokemon, _, _) =>
-            //    {
-            //        // disable all moves which are status type (except me first)
-            //        foreach (Move move in pokemon.Moves)
-            //        {
-            //            if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
-            //            {
-            //                move.Disabled = true;
-            //            }
-            //        }
-            //    },
-            //    OnStart = (pokemon, _, _, _) =>
-            //    {
-            //        // disable all moves which are status type (except me first)
-            //        foreach (Move move in pokemon.Moves)
-            //        {
-            //            if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
-            //            {
-            //                move.Disabled = true;
-            //            }
-            //        }
-            //        return true;
-            //    },
-            //},
-            //[ConditionId.ElectricTerrain] = new Condition
-            //{
-            //    Id = ConditionId.ElectricTerrain,
-            //    Name = "Electric Terrain",
-            //    ConditionEffectType = ConditionEffectType.Terrain,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //},
-            //[ConditionId.HadronEngine] = new Condition
-            //{
-            //    Id = ConditionId.HadronEngine,
-            //    Name = "Hadron Engine",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnModifySpAPriority = 5,
-            //    OnModifySpA = (pokemon) => pokemon.HasCondition(ConditionId.ElectricTerrain) ? 5461.0 / 4096.0 : 1.0,
-            //},
-            //[ConditionId.Guts] = new Condition
-            //{
-            //    Id = ConditionId.Guts,
-            //    Name = "Guts",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnModifyAtkPriority = 5,
-            //    OnModifyAtk = (pokemon) =>
-            //    {
-            //        if (pokemon.HasCondition(ConditionId.Burn) ||
-            //            pokemon.HasCondition(ConditionId.Paralysis) ||
-            //            pokemon.HasCondition(ConditionId.Poison) ||
-            //            pokemon.HasCondition(ConditionId.Toxic))
-            //        {
-            //            return 1.5;
-            //        }
-            //        return 1.0;
-            //    },
-            //},
-            //[ConditionId.FlameBody] = new Condition
-            //{
-            //    Id = ConditionId.FlameBody,
-            //    Name = "Flame Body",
-            //    ConditionEffectType = ConditionEffectType.Condition,
-            //    ConditionVolatility = ConditionVolatility.Volatile,
-            //    OnDamagingHit = (_, target, source, move, context) =>
-            //    {
-            //        if (!(move.Flags.Contact ?? false)) return;
+            [ConditionId.ElectricTerrain] = new()
+            {
+                Id = ConditionId.ElectricTerrain,
+                Name = "Electric Terrain",
+                ConditionEffectType = ConditionEffectType.Terrain,
+                Duration = 5,
+                DurationCallback = (_, source, _, _) => source.HasItem(ItemId.TerrainExtender) ? 8 : 5,
+                OnSetStatus = (battle, status, target, _, effect) =>
+                {
+                    if (status.Id == ConditionId.Sleep &&
+                        target.IsGrounded() &&
+                        !target.IsSemiInvulnerable())
+                    {
+                        if (battle.PrintDebug && effect is Condition { Id: ConditionId.Yawn } or
+                                Move { Id: MoveId.Yawn } or
+                                    ActiveMove { Secondaries: not null })
+                        {
+                            UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.ElectricTerrain]);
+                        }
+                    }
+                    return false;
+                },
+                OnTryAddVolatile = (battle, status, target, _, _) =>
+                {
+                    if (!target.IsGrounded() || target.IsSemiInvulnerable()) return null;
+                    if (status.Id == ConditionId.Yawn)
+                    {
+                        if (battle.PrintDebug)
+                        {
+                            UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.ElectricTerrain]);
+                        }
+                    }
+                    return null;
+                },
+                OnBasePowerPriority = 6,
+                OnBasePower = (battle, _, attacker, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric &&
+                        attacker.IsGrounded() &&
+                        !attacker.IsSemiInvulnerable())
+                    {
+                        return battle.ChainModify([5325, 4096]);
+                    }
+                    return null;
+                },
+                OnFieldStart = (battle, _, source, effect) =>
+                {
+                    if (!battle.PrintDebug) return;
 
-            //        if (source.HasCondition(ConditionId.Burn) ||
-            //            source.HasCondition(ConditionId.Freeze) ||
-            //            source.HasCondition(ConditionId.Sleep) ||
-            //            source.HasCondition(ConditionId.Paralysis) ||
-            //            source.HasCondition(ConditionId.Poison) ||
-            //            source.HasCondition(ConditionId.Toxic)) return;
+                    Condition et = _library.Conditions[ConditionId.ElectricTerrain];
 
-            //        bool burned = context.Random.NextDouble() < 0.3;
-
-            //        if (!burned) return;
-
-            //        source.AddCondition(context.Library.Conditions[ConditionId.Burn], context, target,
-            //            target.Ability ?? throw new InvalidOperationException("The target should always have" +
-            //                                                                  "flame body ability here"));
-            //        //if (context.PrintDebug)
-            //        //{
-            //        //    UiGenerator.PrintFlameBodyBurn(source, target);
-            //        //}
-            //    },
-            //},
+                    if (effect is Ability ability)
+                    {
+                        UiGenerator.PrintFieldStartEvent(et, ability, source);
+                    }
+                    else
+                    {
+                        UiGenerator.PrintFieldStartEvent(et);
+                    }
+                },
+                OnFieldResidualOrder = 27,
+                OnFieldResidualSubOrder = 7,
+                OnFieldEnd = (battle, _) =>
+                {
+                    if (battle.PrintDebug)
+                    {
+                        UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.ElectricTerrain]);
+                    }
+                },
+            },
             [ConditionId.QuarkDrive] = new()
             {
                 Id = ConditionId.QuarkDrive,

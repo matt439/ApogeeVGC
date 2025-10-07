@@ -116,11 +116,16 @@ public static class UiGenerator
         Console.WriteLine($"{pokemon.Name}'s move failed!");
     }
 
-    public static void PrintFieldStartEvent(Condition fieldCondition, Pokemon? sourcePokemon = null)
+    public static void PrintFieldStartEvent(Condition fieldCondition, IEffect? sourceEffect = null,
+        Pokemon? sourcePokemon = null)
     {
-        if (sourcePokemon is not null)
+        if (sourceEffect is not null && sourcePokemon is not null)
         {
-            Console.WriteLine($"{fieldCondition.Name} started due to {sourcePokemon.Name}!");
+            Console.WriteLine($"{fieldCondition.Name} started due to {sourcePokemon.Name}'s {sourceEffect.Name}!");
+        }
+        else if (sourceEffect is not null)
+        {
+            Console.WriteLine($"{fieldCondition.Name} started due to {sourceEffect.Name}!");
         }
         else
         {

@@ -28,7 +28,6 @@ public record Items
                 Fling = new FlingData { BasePower = 10 },
                 SpriteNum = 242,
                 Gen = 2,
-                Condition = _library.Conditions[ConditionId.Leftovers],
                 //OnResidualOrder = 5,
                 //OnResidualSubOrder = 4,
                 //OnResidual

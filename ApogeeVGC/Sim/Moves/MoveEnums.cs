@@ -30,6 +30,7 @@ public enum MoveId
     PolarFlare,
     AxeKick,
     Snatch,
+    Yawn,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion
