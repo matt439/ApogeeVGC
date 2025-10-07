@@ -242,15 +242,18 @@ public record FalseSingleEventSource : SingleEventSource;
 
 
 /// <summary>
-/// bool | int
+/// bool | int | Specie
 /// </summary>
 public abstract record RelayVar
 {
     public static implicit operator RelayVar(bool value) => new BoolRelayVar(value);
     public static implicit operator RelayVar(int value) => new IntRelayVar(value);
+    public static implicit operator RelayVar(Specie specie) => new SpecieRelayVar(specie);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
+public record SpecieRelayVar(Specie Specie) : RelayVar;
+
 
 
 
@@ -338,11 +341,11 @@ public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion;
 /// </summary>
 public abstract record MoveTypeFalseUnion
 {
-    public static implicit operator MoveTypeFalseUnion(PokemonType moveType) =>
+    public static implicit operator MoveTypeFalseUnion(MoveType moveType) =>
         new MoveTypeMoveTypeFalseUnion(moveType);
     public static MoveTypeFalseUnion FromFalse() => new FalseMoveTypeFalseUnion();
 }
-public record MoveTypeMoveTypeFalseUnion(PokemonType MoveType) : MoveTypeFalseUnion;
+public record MoveTypeMoveTypeFalseUnion(MoveType MoveType) : MoveTypeFalseUnion;
 public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
 
 

@@ -25,4 +25,7 @@ public class EffectState
     public IEffect? SourceEffect { get; set; }
     public PokemonSlotId? SourceSlot { get; set; }
     public int? Counter { get; set; }
+    public Condition? LinkedStatus { get; set; }
+    public Pokemon[]? LinkedPokemon { get; set; }
+    public bool? Started { get; set; }
 }

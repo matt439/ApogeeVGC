@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
@@ -214,7 +215,67 @@ public class Pokemon
     }
 
 
-    public void ClearVolatile(bool? includeSwitchFlags = true)
+    public void ClearVolatile(bool includeSwitchFlags = true)
+    {
+        Boosts = new BoostsTable
+        {
+            Atk = 0,
+            Def = 0,
+            SpA = 0,
+            SpD = 0,
+            Spe = 0,
+            Accuracy = 0,
+            Evasion = 0,
+        };
+
+        MoveSlots = BaseMoveSlots.ToList();
+
+        Transformed = false;
+        Ability = BaseAbility;
+        if (CanTerastallize is FalseMoveTypeFalseUnion)
+        {
+            CanTerastallize = TeraType;
+        }
+
+        var volatileKeys = Volatiles.Keys.ToList();
+        foreach (ConditionId conditionId in volatileKeys)
+        {
+            if (Volatiles.TryGetValue(conditionId, out EffectState? effectState) &&
+                effectState.LinkedStatus is not null)
+            {
+                RemoveLinkedVolatiles(effectState.LinkedStatus, effectState.LinkedPokemon ?? []);
+            }
+        }
+
+        Volatiles.Clear();
+
+        if (includeSwitchFlags)
+        {
+            SwitchFlag = false;
+            ForceSwitchFlag = false;
+        }
+
+        LastMove = null;
+        LastMoveUsed = null;
+        MoveThisTurn = false; // Should be ''
+        MoveLastTurnResult = null;
+        MoveThisTurnResult = null;
+
+        LastDamage = 0;
+        AttackedBy.Clear();
+        HurtThisTurn = null;
+        NewlySwitched = true;
+        BeingCalledBack = false;
+
+        VolatileStaleness = null;
+
+        AbilityState.Started = null;
+        ItemState.Started = null;
+
+        SetSpecie(BaseSpecies, Battle.Effect);
+    }
+
+    public void RemoveLinkedVolatiles(IEffect linkedStatus, Pokemon[] linkedPokemon)
     {
         throw new NotImplementedException();
     }
@@ -294,6 +355,16 @@ public class Pokemon
 
     public bool HasType(PokemonType[] types)
     {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Default is Battle.Effect for source.
+    /// </summary>
+    Specie? SetSpecie(Specie rawSpecie, IEffect? source, bool isTransform = false)
+    {
+        RelayVar? specie = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecie);
+
         throw new NotImplementedException();
     }
 

@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Core;
 //using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
