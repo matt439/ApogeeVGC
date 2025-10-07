@@ -25,6 +25,10 @@ public enum AbilityId
     Overgrow,
     Chlorophyll,
     EarlyBird,
+    BulletProof,
+    Swarm,
+    Frisk,
+    Pickpocket,
 }
 
 

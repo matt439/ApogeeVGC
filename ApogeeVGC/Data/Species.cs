@@ -22,7 +22,7 @@ public record Species
             Num = 1,
             Name = "Bulbasaur",
             Types = [PokemonType.Grass, PokemonType.Poison],
-            Gender = GenderId.M,
+            Gender = GenderId.Empty,
             BaseStats = new StatsTable
             {
                 Hp = 45,
@@ -91,7 +91,7 @@ public record Species
             Num = 901,
             Name = "Ursaluna",
             Types = [PokemonType.Ground, PokemonType.Normal],
-            Gender = GenderId.M, // Default, or use GenderId.N if genderless
+            Gender = GenderId.N,
             BaseStats = new StatsTable
             {
                 Hp = 130,
@@ -104,8 +104,8 @@ public record Species
             Abilities = new SpeciesAbility
             {
                 Slot0 = AbilityId.Guts,
-                //Slot1 = "Bulletproof",
-                //Hidden = "Unnerve"
+                Slot1 = AbilityId.BulletProof,
+                Hidden = AbilityId.Unnerve,
             },
             HeightM = 2.4,
             WeightKg = 290,
@@ -117,7 +117,7 @@ public record Species
             Num = 637,
             Name = "Volcarona",
             Types = [PokemonType.Bug, PokemonType.Fire],
-            Gender = GenderId.M, // or GenderId.N if genderless, adjust as needed
+            Gender = GenderId.N,
             BaseStats = new StatsTable
             {
                 Hp = 85,
@@ -130,7 +130,7 @@ public record Species
             Abilities = new SpeciesAbility
             {
                 Slot0 = AbilityId.FlameBody,
-                // Hidden = "Swarm"
+                Hidden = AbilityId.Swarm,
             },
             HeightM = 1.6,
             WeightKg = 46,
@@ -155,8 +155,8 @@ public record Species
             Abilities = new SpeciesAbility
             {
                 Slot0 = AbilityId.Prankster,
-                //Slot1 = "Frisk",
-                //Hidden = "Pickpocket"
+                Slot1 = AbilityId.Frisk,
+                Hidden = AbilityId.Pickpocket,
             },
             HeightM = 1.5,
             WeightKg = 61,
