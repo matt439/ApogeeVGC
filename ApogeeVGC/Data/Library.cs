@@ -16,7 +16,7 @@ public record Library
     private readonly Moves _moves;
     private readonly Natures _natures = new();
     private readonly Rulesets _rulesets = new();
-    private readonly Species _species = new();
+    private readonly SpeciesData _speciesData = new();
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
 
@@ -26,7 +26,7 @@ public record Library
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
     private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
     private IReadOnlyDictionary<NatureType, Nature> NaturesData => _natures.NatureData;
-    private IReadOnlyDictionary<SpecieId, Specie> SpeciesData => _species.SpeciesData;
+    private IReadOnlyDictionary<SpecieId, Specie> SpeciesData => _speciesData.SpeciesDataDictionary;
     private IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
 
     public IReadOnlyDictionary<AbilityId, Ability> Abilities => 

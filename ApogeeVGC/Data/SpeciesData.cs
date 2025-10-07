@@ -5,13 +5,13 @@ using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Data;
 
-public record Species
+public record SpeciesData
 {
-    public IReadOnlyDictionary<SpecieId, Specie> SpeciesData { get; }
+    public IReadOnlyDictionary<SpecieId, Specie> SpeciesDataDictionary { get; }
 
-    public Species()
+    public SpeciesData()
     {
-        SpeciesData = new ReadOnlyDictionary<SpecieId, Specie>(_species);
+        SpeciesDataDictionary = new ReadOnlyDictionary<SpecieId, Specie>(_species);
     }
 
     private readonly Dictionary<SpecieId, Specie> _species = new()
