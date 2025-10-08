@@ -15,10 +15,10 @@ public enum MoveSlotId
 public class MoveSlot
 {
     public MoveId Id { get; init; }
-    public required Move Move { get; init; }
+    public MoveId Move { get; init; }
     public int Pp { get; set; }
     public int MaxPp { get; set; }
-    // target
+    public MoveTarget? Target { get; set; }
     public BoolHiddenUnion Disabled { get; set; } = false;
     public ConditionId? DisabledSource { get; set; }
     public bool Used { get; set; }

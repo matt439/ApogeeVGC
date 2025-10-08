@@ -79,7 +79,7 @@ public record Abilities
                     {
                         if (battle.PrintDebug)
                         {
-                            UiGenerator.PrintActivateEvent(pokemon, pokemon.Ability);
+                            UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
                         }
                     }
                 },
@@ -171,7 +171,7 @@ public record Abilities
                         throw new ArgumentException("Expecting a Pokemon here.");
                     }
                     pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-                    UiGenerator.PrintEndEvent(pok.Pokemon, pok.Pokemon.Ability);
+                    UiGenerator.PrintEndEvent(pok.Pokemon, _library.Abilities[pok.Pokemon.Ability]);
                 },
                 Flags = new AbilityFlags
                 {

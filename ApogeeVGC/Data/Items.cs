@@ -116,7 +116,7 @@ public record Items
                 {
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots)
                     {
-                        Move move = moveSlot.Move;
+                        Move move = _library.Moves[moveSlot.Move];
                         if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
                         {
                             pokemon.DisableMove(moveSlot.Id);

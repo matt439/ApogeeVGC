@@ -35,6 +35,8 @@ public enum MoveId
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion
 
+    None,
+
     //// Custom moves
     //NormalBasic,
     //FireBasic,

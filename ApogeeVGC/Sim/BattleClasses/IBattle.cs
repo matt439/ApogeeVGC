@@ -32,6 +32,8 @@ public interface IBattle
 
     IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null, BattleHealEffect? effect = null);
 
+    StatsTable SpreadModify(StatsTable baseStats, PokemonSet set);
+
     int FinalModify(int relayVar);
 
     double ChainModify(int numerator, int denominator = 1);

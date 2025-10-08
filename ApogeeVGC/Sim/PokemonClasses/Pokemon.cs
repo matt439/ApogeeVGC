@@ -31,8 +31,9 @@ public class Pokemon
 
     public PokemonSlotId Position { get; set; }
 
-    public Species BaseSpecies => Set.Species;
-    public Species Species => Set.Species;
+    public Species BaseSpecies { get; set; }
+    public Species Species { get; set; }
+
     public EffectState SpeciesState { get; set; }
 
     public ConditionId? Status { get; set; }
@@ -42,16 +43,16 @@ public class Pokemon
     public bool? ShowCure { get; set; }
 
     public StatsTable BaseStoredStats { get; set; }
-    public StatsTable StoredStats { get; set; }
+    public StatsExceptHpTable StoredStats { get; set; }
     public BoostsTable Boosts { get; set; }
 
-    public Ability BaseAbility => Set.Ability;
-    public Ability Ability { get; set; }
+    public AbilityId BaseAbility { get; set; }
+    public AbilityId Ability { get; set; }
     public EffectState AbilityState { get; set; }
 
-    public Item? Item { get; set; }
+    public ItemId Item { get; set; }
     public EffectState ItemState { get; set; }
-    public Item? LastItem { get; set; }
+    public ItemId LastItem { get; set; }
     public bool UsedItemThisTurn { get; set; }
 
     public bool AteBerry { get; set; }
@@ -113,6 +114,7 @@ public class Pokemon
     public bool DuringMove { get; set; }
 
     public double WeightKg { get; set; }
+    public int WeightHg { get; set; }
     public int Speed { get; set; }
 
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
@@ -143,8 +145,10 @@ public class Pokemon
     {
         Side = side;
         Set = set;
+        BaseSpecies = battle.Library.Species[set.Species];
+        Species = BaseSpecies;
 
-        SpeciesState = battle.InitEffectState(set.Species.Id, null, null);
+        SpeciesState = battle.InitEffectState(Species.Id, null, null);
 
         if (set.Moves.Count == 0)
         {
@@ -155,16 +159,22 @@ public class Pokemon
         BaseMoveSlots = [];
 
         List<MoveSlot> baseMoveSlots = [];
-        foreach (Move move in set.Moves)
-        {
-            MoveSlot moveSlot = new()
+
+        baseMoveSlots.AddRange(from moveId in Set.Moves
+            let move = battle.Library.Moves[moveId]
+            let basePp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5
+            select new MoveSlot
             {
-                Move = move.Copy(),
-                Pp = move.BasePp,
-                MaxPp = move.BasePp,
-            };
-            baseMoveSlots.Add(moveSlot);
-        }
+                Id = moveId,
+                Move = moveId,
+                Pp = basePp,
+                MaxPp = basePp,
+                Target = move.Target,
+                Disabled = false,
+                DisabledSource = null,
+                Used = false, 
+                }
+            );
         BaseMoveSlots = baseMoveSlots;
 
         Position = PokemonSlotId.Slot1;
@@ -172,7 +182,7 @@ public class Pokemon
         Volatiles = [];
 
         BaseStoredStats = new StatsTable(); // Will be initialized in SetSpecies
-        StoredStats = new StatsTable { Atk = 0, Def = 0, SpA = 0, SpD = 0, Spe = 0 };
+        StoredStats = new StatsExceptHpTable { Atk = 0, Def = 0, SpA = 0, SpD = 0, Spe = 0 };
         Boosts = new BoostsTable
         {
             Atk = 0,
@@ -185,10 +195,11 @@ public class Pokemon
         };
 
         Ability = BaseAbility;
-        AbilityState = battle.InitEffectState(Ability.Id, null, this);
+        AbilityState = battle.InitEffectState(Ability, null, this);
 
         Item = set.Item;
-        ItemState = battle.InitEffectState(Item?.Id ?? null, null, this);
+        ItemState = battle.InitEffectState(Item, null, this);
+        LastItem = ItemId.None;
 
         Trapped = PokemonTrapped.False;
 
@@ -257,7 +268,7 @@ public class Pokemon
 
         LastMove = null;
         LastMoveUsed = null;
-        MoveThisTurn = false; // Should be ''
+        MoveThisTurn = MoveId.None;
         MoveLastTurnResult = null;
         MoveThisTurnResult = null;
 
@@ -358,14 +369,61 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    public bool SetType(PokemonType type, bool enforce = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool SetType(PokemonType[] types, bool enforce = false)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Default is Battle.Effect for source.
     /// </summary>
-    Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
+    public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
     {
-        RelayVar? specie = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
+        RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
+        if (rv is null) return null;
 
-        throw new NotImplementedException();
+        if (rv is SpecieRelayVar srv)
+        {
+            Species = srv.Species;
+        }
+        else
+        {
+            throw new InvalidOperationException("species must be a SpecieRelayVar" );
+        }
+        Species species = srv.Species;
+
+        SetType(species.Types.ToArray(), true);
+        ApparentType = rawSpecies.Types.ToList();
+        AddedType = species.AddedType;
+        KnownType = true;
+        WeightHg = species.WeightHg;
+
+        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set);
+        if (Species.MaxHp is not null)
+        {
+            stats.Hp = Species.MaxHp.Value;
+        }
+
+        if (MaxHp != 0)
+        {
+            BaseMaxHp = stats.Hp;
+            MaxHp = stats.Hp;
+            Hp = stats.Hp;
+        }
+
+        if (!isTransform) BaseStoredStats = stats;
+        foreach (var statName in StoredStats)
+        {
+            StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
+        }
+
+        Speed = StoredStats.Spe;
+        return species;
     }
 
     public Item? GetItem()

@@ -462,7 +462,7 @@ public record Conditions
                     }
 
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move.Id != battle.EffectState.Move))
+                                 moveSlot.Move != battle.EffectState.Move))
                     {
                         pokemon.DisableMove(moveSlot.Id, false, battle.EffectState.SourceEffect);
                     }
@@ -799,7 +799,8 @@ public record Conditions
                             if (battle.PrintDebug)
                             {
                                 UiGenerator.PrintActivateEvent(pokemon,
-                                    _library.Conditions[ConditionId.QuarkDrive], pokemon.Item);
+                                    _library.Conditions[ConditionId.QuarkDrive],
+                                    _library.Items[pokemon.Item]);
                             }
                         }
                     }

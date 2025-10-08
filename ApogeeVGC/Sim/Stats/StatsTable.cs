@@ -1,95 +1,108 @@
 ﻿namespace ApogeeVGC.Sim.Stats;
 
-public record StatsTable
+public class StatsTable : Dictionary<StatId, int>
 {
-    public int Hp
+    public StatsTable()
     {
-        get;
-        init
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException("value must be positive.");
-            }
+        this[StatId.Hp] = 0;
+        this[StatId.Atk] = 0;
+        this[StatId.Def] = 0;
+        this[StatId.SpA] = 0;
+        this[StatId.SpD] = 0;
+        this[StatId.Spe] = 0;
+    }
 
-            field = value;
+    public StatsTable(StatsTable other) : this()
+    {
+        foreach (var kvp in other)
+        {
+            this[kvp.Key] = kvp.Value;
         }
     }
+
+    public int Hp
+    {
+        get => this[StatId.Hp];
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("value must be positive.");
+            }
+            this[StatId.Hp] = value;
+        }
+    }
+
     public int Atk
     {
-        get;
-        init
+        get => this[StatId.Atk];
+        set
         {
             if (value < 0)
             {
                 throw new ArgumentException("value must be positive.");
             }
-            field = value;
+            this[StatId.Atk] = value;
         }
-    } = 0;
+    }
+
     public int Def
     {
-        get;
-        init
+        get => this[StatId.Def];
+        set
         {
             if (value < 0)
             {
                 throw new ArgumentException("value must be positive.");
             }
-            field = value;
+            this[StatId.Def] = value;
         }
-    } = 0;
+    }
+
     public int SpA
     {
-        get;
-        init
+        get => this[StatId.SpA];
+        set
         {
             if (value < 0)
             {
                 throw new ArgumentException("value must be positive.");
             }
-            field = value;
+            this[StatId.SpA] = value;
         }
-    } = 0;
+    }
+
     public int SpD
     {
-        get;
-        init
+        get => this[StatId.SpD];
+        set
         {
             if (value < 0)
             {
                 throw new ArgumentException("value must be positive.");
             }
-            field = value;
+            this[StatId.SpD] = value;
         }
-    } = 0;
+    }
+
     public int Spe
     {
-        get;
-        init
+        get => this[StatId.Spe];
+        set
         {
             if (value < 0)
             {
                 throw new ArgumentException("value must be positive.");
             }
-            field = value;
+            this[StatId.Spe] = value;
         }
-    } = 0;
+    }
 
     public int BaseStatTotal => Hp + Atk + Def + SpA + SpD + Spe;
 
     public int GetStat(StatId stat)
     {
-        return stat switch
-        {
-            StatId.Hp => Hp,
-            StatId.Atk => Atk,
-            StatId.Def => Def,
-            StatId.SpA => SpA,
-            StatId.SpD => SpD,
-            StatId.Spe => Spe,
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
-        };
+        return this[stat];
     }
 
     public static bool IsValidIv(int stat)
@@ -124,20 +137,6 @@ public record StatsTable
         SpD = 31,
         Spe = 31,
     };
-
-    public StatsTable(StatsTable other)
-    {
-        Hp = other.Hp;
-        Atk = other.Atk;
-        Def = other.Def;
-        SpA = other.SpA;
-        SpD = other.SpD;
-        Spe = other.Spe;
-    }
-
-    public StatsTable()
-    {
-    }
 
     public StatsTable Copy()
     {

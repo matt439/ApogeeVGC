@@ -6,15 +6,11 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 
 public record PokemonSet
 {
-    public string Name
-    {
-        get => field == string.Empty ? Species.Name : field;
-        init;
-    } = string.Empty;
-    public required Species Species { get; init; }
-    public Item? Item { get; init; }
-    public required Ability Ability { get; init; }
-    public required IReadOnlyList<Move> Moves
+    public required string Name { get; init; }
+    public SpecieId Species { get; init; }
+    public ItemId Item { get; init; }
+    public AbilityId Ability { get; init; }
+    public required IReadOnlyList<MoveId> Moves
     {
         get;
         init

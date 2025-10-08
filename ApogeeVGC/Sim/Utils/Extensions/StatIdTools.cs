@@ -13,7 +13,7 @@ public static class StatIdTools
             StatIdExceptHp.SpA => StatId.SpA,
             StatIdExceptHp.SpD => StatId.SpD,
             StatIdExceptHp.Spe => StatId.Spe,
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID except HP.")
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID except HP."),
         };
     }
 
@@ -28,7 +28,7 @@ public static class StatIdTools
             StatId.Spe => StatIdExceptHp.Spe,
             StatId.Hp => throw new ArgumentOutOfRangeException(nameof(stat),
                 "Cannot convert HP to StatIdExceptHp."),
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
         };
     }
 
@@ -48,7 +48,7 @@ public static class StatIdTools
             (StatId.SpD, false) => "special defense",
             (StatId.Spe, true) => "Speed",
             (StatId.Spe, false) => "speed",
-            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.")
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
         };
     }
 

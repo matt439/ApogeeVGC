@@ -98,6 +98,7 @@ public record Move : IMoveEventHandlers
             field = value;
         }
     }
+    public bool NoPpBoosts { get; init; } = false;
     public MoveCategory Category { get; init; }
     public MoveType Type { get; set; }
     public int Priority
