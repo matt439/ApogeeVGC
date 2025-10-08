@@ -29,4 +29,6 @@ public class EffectState
     public List<Pokemon>? LinkedPokemon { get; set; }
     public bool? Started { get; set; }
     public Pokemon? Source { get; set; }
+    public bool? KnockedOff { get; set; }
+    public bool? Ending { get; set; }
 }

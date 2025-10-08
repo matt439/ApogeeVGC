@@ -434,7 +434,7 @@ public record FalseSingleEventSource : SingleEventSource;
 
 
 /// <summary>
-/// bool | int | IEffect | PokemonType | SpecialImmunityId
+/// bool | int | IEffect | PokemonType | ConditionId?
 /// </summary>
 public abstract record RelayVar
 {
@@ -446,15 +446,15 @@ public abstract record RelayVar
     public static implicit operator RelayVar(Species species) => EffectUnionFactory.ToRelayVar(species);
     public static implicit operator RelayVar(Condition condition) => EffectUnionFactory.ToRelayVar(condition);
     public static implicit operator RelayVar(Format format) => EffectUnionFactory.ToRelayVar(format);
-    public static implicit operator RelayVar(PokemonType type) => new IntRelayVar((int)type);
-    public static implicit operator RelayVar(SpecialImmunityId id) => new IntRelayVar((int)id);
+    public static implicit operator RelayVar(PokemonType type) => new PokemonTypeRelayVar(type);
+    public static implicit operator RelayVar(ConditionId? id) => new ConditionIdRelayVar(id);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
 public record EffectRelayVar(IEffect Effect) : RelayVar;
 public record SpecieRelayVar(Species Species) : RelayVar;
 public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;
-public record SpecialImmunityIdRelayVar(SpecialImmunityId Id) : RelayVar;
+public record ConditionIdRelayVar(ConditionId? Id) : RelayVar;
 
 
 

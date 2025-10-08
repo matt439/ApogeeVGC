@@ -36,7 +36,7 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
 
     public bool NoCopy { get; init; }
 
-    public SpecialImmunityId? SpecialImmunity { get; init; }
+    public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
 
     public Condition Copy()
     {

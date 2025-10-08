@@ -31,6 +31,8 @@ public enum AbilityId
     Frisk,
     Pickpocket,
     Corrosion,
+    NeutralizingGas,
+    Klutz,
 }
 
 

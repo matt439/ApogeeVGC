@@ -10,6 +10,20 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
 
+//public enum SpecialImmunityId
+//{
+//    Prankster,
+//    Paralysis,
+//    Burn,
+//    Trapped,
+//    Powder,
+//    Sandstorm,
+//    Hail,
+//    Freeze,
+//    Poison,
+//    Toxic,
+//}
+
 public record Conditions
 {
     public IReadOnlyDictionary<ConditionId, Condition> ConditionsData { get; }
@@ -30,6 +44,7 @@ public record Conditions
                 Id = ConditionId.Burn,
                 Name = "Burn",
                 ConditionEffectType = ConditionEffectType.Status,
+                ImmuneTypes = [PokemonType.Fire],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     if (sourceEffect is null)
@@ -84,6 +99,7 @@ public record Conditions
                 Id = ConditionId.Paralysis,
                 Name = "Paralysis",
                 ConditionEffectType = ConditionEffectType.Status,
+                ImmuneTypes = [PokemonType.Electric],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     if (!battle.PrintDebug) return new VoidReturn();
@@ -189,6 +205,7 @@ public record Conditions
                 Id = ConditionId.Freeze,
                 Name = "Freeze",
                 ConditionEffectType = ConditionEffectType.Status,
+                ImmuneTypes = [PokemonType.Ice],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     if (battle.PrintDebug)
@@ -261,6 +278,7 @@ public record Conditions
                 Id = ConditionId.Poison,
                 Name = "Poison",
                 ConditionEffectType = ConditionEffectType.Status,
+                ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     if (!battle.PrintDebug) return new VoidReturn();
@@ -283,6 +301,7 @@ public record Conditions
                 Id = ConditionId.Toxic,
                 Name = "Toxic",
                 ConditionEffectType = ConditionEffectType.Status,
+                ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     battle.EffectState.Stage = 0;
@@ -473,6 +492,7 @@ public record Conditions
                 Id = ConditionId.LeechSeed,
                 Name = "Leech Seed",
                 ConditionEffectType = ConditionEffectType.Condition,
+                ImmuneTypes = [PokemonType.Grass],
                 AssociatedMove = MoveId.LeechSeed,
                 OnStart = (battle, target, _, _) =>
                 {

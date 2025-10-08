@@ -1,4 +1,3 @@
-using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -313,76 +312,8 @@ public class Pokemon
         return SetStatus(Status ?? status, source, sourceEffect);
     }
 
-
-    // setStatus(
-    // 	status: string | Condition,
-    // 	source: Pokemon | null = null,
-    // 	sourceEffect: Effect | null = null,
-    // 	ignoreImmunities = false
-    // ) {
-    // 	if (!this.hp) return false;
-    // 	status = this.battle.dex.conditions.get(status);
-    // 	if (this.battle.event) {
-    // 		if (!source) source = this.battle.event.source;
-    // 		if (!sourceEffect) sourceEffect = this.battle.effect;
-    // 	}
-    // 	if (!source) source = this;
-
-    // 	if (this.status === status.id) {
-    // 		if ((sourceEffect as Move)?.status === this.status) {
-    // 			this.battle.add('-fail', this, this.status);
-    // 		} else if ((sourceEffect as Move)?.status) {
-    // 			this.battle.add('-fail', source);
-    // 			this.battle.attrLastMove('[still]');
-    // 		}
-    // 		return false;
-    // 	}
-
-    // 	if (
-    // 		!ignoreImmunities && status.id && !(source?.hasAbility('corrosion') && ['tox', 'psn'].includes(status.id))
-    // 	) {
-    // 		// the game currently never ignores immunities
-    // 		if (!this.runStatusImmunity(status.id === 'tox' ? 'psn' : status.id)) {
-    // 			this.battle.debug('immune to status');
-    // 			if ((sourceEffect as Move)?.status) {
-    // 				this.battle.add('-immune', this);
-    // 			}
-    // 			return false;
-    // 		}
-    // 	}
-    // 	const prevStatus = this.status;
-    // 	const prevStatusState = this.statusState;
-    // 	if (status.id) {
-    // 		const result: boolean = this.battle.runEvent('SetStatus', this, source, sourceEffect, status);
-    // 		if (!result) {
-    // 			this.battle.debug('set status [' + status.id + '] interrupted');
-    // 			return result;
-    // 		}
-    // 	}
-
-    // 	this.status = status.id;
-    // 	this.statusState = this.battle.initEffectState({ id: status.id, target: this });
-    // 	if (source) this.statusState.source = source;
-    // 	if (status.duration) this.statusState.duration = status.duration;
-    // 	if (status.durationCallback) {
-    // 		this.statusState.duration = status.durationCallback.call(this.battle, this, source, sourceEffect);
-    // 	}
-
-    // 	if (status.id && !this.battle.singleEvent('Start', status, this.statusState, this, source, sourceEffect)) {
-    // 		this.battle.debug('status start [' + status.id + '] interrupted');
-    // 		// cancel the setstatus
-    // 		this.status = prevStatus;
-    // 		this.statusState = prevStatusState;
-    // 		return false;
-    // 	}
-    // 	if (status.id && !this.battle.runEvent('AfterSetStatus', this, source, sourceEffect, status)) {
-    // 		return false;
-    // 	}
-    // 	return true;
-    // }
-
     public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
-        bool ignoreImmunities = false)
+    bool ignoreImmunities = false)
     {
         // Initial HP check
         if (Hp <= 0) return false;
@@ -395,7 +326,7 @@ public class Pokemon
             source ??= Battle.Event.Source;
             sourceEffect ??= Battle.Event.Effect;
         }
-        source ??= this;
+        source ??= this; // This ensures source is never null after this point
 
         // Check for duplicate status
         if (Status is not null && Status == status.Id)
@@ -404,7 +335,7 @@ public class Pokemon
             {
                 UiGenerator.PrintFailEvent(this, Battle.Library.Conditions[(ConditionId)Status]);
             }
-            else if (sourceEffect is ActiveMove { Status: not null } move2)
+            else if (sourceEffect is ActiveMove { Status: not null })
             {
                 UiGenerator.PrintFailEvent(source);
                 // Battle.AttrLastMove("[still]"); // Skipping visual effect
@@ -417,15 +348,12 @@ public class Pokemon
         {
             // Special case for Corrosion ability bypassing poison immunity
             bool corrosionBypass = source.HasAbility(AbilityId.Corrosion) &&
-                                  status.Id is ConditionId.Toxic or ConditionId.Poison;
+                                   status.Id is ConditionId.Toxic or ConditionId.Poison;
 
             if (!corrosionBypass)
             {
-                // Convert toxic to poison for immunity check
-                PokemonType? immunityType = status.Id == ConditionId.Toxic ? PokemonType.Poison : null;
-                var specialImmunityId = status.SpecialImmunity;
-
-                if (!RunStatusImmunity(immunityType) && !RunStatusImmunity(specialImmunityId))
+                // Check condition-specific immunity using the new overload
+                if (!RunStatusImmunity(status.Id))
                 {
                     if (Battle.PrintDebug)
                     {
@@ -449,7 +377,7 @@ public class Pokemon
         if (status.Id != ConditionId.None)
         {
             RelayVar? result = Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
-            if (result is BoolRelayVar brv && !brv.Value)
+            if (result is BoolRelayVar { Value: false })
             {
                 if (Battle.PrintDebug)
                 {
@@ -463,11 +391,12 @@ public class Pokemon
         Status = status.Id;
         StatusState = Battle.InitEffectState(status.Id, null, this);
 
-        if (source is not null)
-            StatusState.Source = source;
+        StatusState.Source = source;
 
         if (status.Duration is not null)
+        {
             StatusState.Duration = status.Duration;
+        }
 
         if (status.DurationCallback is not null)
         {
@@ -477,9 +406,19 @@ public class Pokemon
         // Run Start event (with rollback on failure)
         if (status.Id != ConditionId.None)
         {
+            // FIXED: Proper boolean handling for SingleEvent
             RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, StatusState, this,
                 source, sourceEffect);
-            if (startResult is BoolRelayVar && startResult == false)
+
+            // Convert RelayVar to boolean - if it's a BoolRelayVar with false, or null, treat as failure
+            bool startSucceeded = startResult switch
+            {
+                BoolRelayVar brv => brv.Value,
+                null => false,
+                _ => true, // Non-boolean RelayVar types are treated as success
+            };
+
+            if (!startSucceeded)
             {
                 if (Battle.PrintDebug)
                 {
@@ -496,8 +435,8 @@ public class Pokemon
         // Run AfterSetStatus event
         if (status.Id != ConditionId.None)
         {
-            RelayVar? afterResult = Battle.RunEvent(EventId.AfterSetStatus, this, source,
-                sourceEffect, status);
+            RelayVar? afterResult = Battle.RunEvent(EventId.AfterSetStatus, this, source, sourceEffect,
+                status);
             if (afterResult is BoolRelayVar { Value: false })
             {
                 return false;
@@ -506,29 +445,6 @@ public class Pokemon
 
         return true;
     }
-
-    // runStatusImmunity(type: string, message?: string) {
-    // 	if (this.fainted) return false;
-    // 	if (!type) return true;
-
-    // 	if (!this.battle.dex.getImmunity(type, this)) {
-    // 		this.battle.debug('natural status immunity');
-    // 		if (message) {
-    // 			this.battle.add('-immune', this);
-    // 		}
-    // 		return false;
-    // 	}
-    // 	const immunity = this.battle.runEvent('Immunity', this, null, null, type);
-    // 	if (!immunity) {
-    // 		this.battle.debug('artificial status immunity');
-    // 		if (message && immunity !== null) {
-    // 			this.battle.add('-immune', this);
-    // 		}
-    // 		return false;
-    // 	}
-    // 	return true;
-    // }
-
 
     /// <summary>
     /// Checks status immunity based on Pokemon type (e.g., Fire-types immune to Burn)
@@ -582,22 +498,25 @@ public class Pokemon
     }
 
     /// <summary>
-    /// Checks special immunity effects (e.g., Prankster immunity for Dark-types)
+    /// Checks immunity for specific conditions (e.g., Sleep immunity for certain Pokemon types)
     /// </summary>
-    public bool RunStatusImmunity(SpecialImmunityId? immunityId, string? message = null)
+    public bool RunStatusImmunity(ConditionId? conditionId, string? message = null)
     {
         // Check if Pokemon is fainted
         if (Fainted) return false;
 
         // Equivalent to TypeScript: if (!type) return true;
-        if (immunityId == null) return true;
+        if (conditionId == null) return true;
 
-        // Check special immunity using battle's dex
-        if (!Battle.Dex.GetSpecialImmunity(immunityId.Value, this))
+        // Get the condition from the library
+        Condition condition = Battle.Library.Conditions[conditionId.Value];
+
+        // Check natural condition immunity using ModdedDex static method
+        if (!ModdedDex.GetImmunity(condition, Types))
         {
             if (Battle.PrintDebug)
             {
-                // Battle.Debug("natural special immunity");
+                // Battle.Debug("natural condition immunity");
             }
 
             if (!string.IsNullOrEmpty(message))
@@ -607,16 +526,16 @@ public class Pokemon
             return false;
         }
 
-        // Check artificial immunity (abilities, items, etc.) for special effects
+        // Check artificial immunity (abilities, items, etc.) for conditions
         RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null,
-            immunityId);
+            conditionId);
 
         // TypeScript logic: if (!immunity) - means if immunity is falsy/false
         if (immunity is BoolRelayVar { Value: false } or null)
         {
             if (Battle.PrintDebug)
             {
-                // Battle.Debug("artificial special immunity");
+                // Battle.Debug("artificial condition immunity");
             }
 
             // TypeScript: if (message && immunity !== null)
@@ -677,10 +596,41 @@ public class Pokemon
         return Volatiles.Remove(volatileId);
     }
 
+    /// <summary>
+    /// Checks if the Pokemon's ability is being ignored due to various effects
+    /// </summary>
+    /// <returns>True if the Pokemon's ability is being ignored</returns>
     public bool IgnoringAbility()
     {
-        throw new NotImplementedException();
+        // In Gen 5+, inactive Pokemon have their abilities suppressed
+        if (Battle.Gen >= 5 && !IsActive) return true;
+
+        Ability ability = GetAbility();
+
+        // Certain abilities won't activate while Transformed, even if they ordinarily couldn't be suppressed
+        if (ability.Flags.NoTransform == true && Transformed) return true;
+
+        // Some abilities can't be suppressed at all
+        if (ability.Flags.CantSuppress == true) return false;
+
+        // Gastro Acid suppresses abilities
+        if (Volatiles.ContainsKey(ConditionId.GastroAcid)) return true;
+
+        // Ability Shield protects from ability suppression, and Neutralizing Gas can't suppress itself
+        if (HasItem(ItemId.AbilityShield) || Ability == AbilityId.NeutralizingGas) return false;
+
+        // Check if any active Pokemon have Neutralizing Gas ability
+        return Battle.GetAllActive().Any(pokemon => pokemon.Ability == AbilityId.NeutralizingGas &&
+                                                    !pokemon.Volatiles.ContainsKey(ConditionId.GastroAcid) &&
+                                                    !pokemon.Transformed && pokemon.AbilityState.Ending != true &&
+                                                    !Volatiles.ContainsKey(ConditionId.Commanding));
     }
+
+    public Ability GetAbility()
+    {
+        return Battle.Library.Abilities[Ability];
+    }
+
 
     public StatIdExceptHp GetBestStat(bool? unboosted, bool? unmodified)
     {
@@ -788,9 +738,44 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Checks if the Pokemon is ignoring its held item due to various effects
+    /// </summary>
+    /// <param name="isFling">If true, this check is for Fling move (prevents infinite recursion)</param>
+    /// <returns>True if the Pokemon is ignoring its item</returns>
     public bool IgnoringItem(bool isFling = false)
     {
-        throw new NotImplementedException();
+        // Get the actual item object to check its properties
+        Item? item = GetItem();
+
+        // Primal Orbs are never ignored
+        if (item?.IsPrimalOrb == true) return false;
+
+        // Items that were knocked off are ignored (Gen 3-4 mechanic)
+        if (ItemState.KnockedOff == true) return true;
+
+        // In Gen 5+, inactive Pokemon ignore their items
+        if (Battle.Gen >= 5 && !IsActive) return true;
+
+        // Embargo volatile condition causes item ignoring
+        if (Volatiles.ContainsKey(ConditionId.Embargo)) return true;
+
+        // Magic Room pseudo-weather causes item ignoring
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.MagicRoom)) return true;
+
+        // Check Fling first to avoid infinite recursion
+        if (isFling)
+        {
+            return Battle.Gen >= 5 && HasAbility(AbilityId.Klutz);
+        }
+
+        // Regular Klutz check - ignores item unless item specifically ignores Klutz
+        if (HasAbility(AbilityId.Klutz))
+        {
+            return item?.IgnoreKlutz != true;
+        }
+
+        return false;
     }
 
     public bool HasMove(MoveId move)
@@ -803,9 +788,28 @@ public class Pokemon
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Checks if the Pokemon has a specific item and is not ignoring it
+    /// </summary>
     public bool HasItem(ItemId item)
     {
-        throw new NotImplementedException();
+        // Check if Pokemon has the specified item
+        if (Item != item) return false;
+
+        // Check if Pokemon is ignoring its item
+        return !IgnoringItem();
+    }
+
+    /// <summary>
+    /// Checks if the Pokemon has any of the specified items and is not ignoring it
+    /// </summary>
+    public bool HasItem(ItemId[] items)
+    {
+        // Check if Pokemon's current item is in the array
+        if (!items.Contains(Item)) return false;
+
+        // Check if Pokemon is ignoring its item
+        return !IgnoringItem();
     }
 
     public MoveHitData GetMoveHitData(ActiveMove move)

@@ -112,4 +112,8 @@ public interface IBattle
     ModdedDex Dex { get; }
 
     void Start();
+
+    int Gen => 9;
+
+    public List<Pokemon> GetAllActive(bool? includeFainted = null);
 }

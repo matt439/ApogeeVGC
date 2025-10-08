@@ -24,6 +24,10 @@ public enum ConditionId
     Nightmare,
     LockedMove,
     Yawn,
+    GastroAcid,
+    Commanding,
+    Embargo,
+    MagicRoom,
 
     None,
 }
