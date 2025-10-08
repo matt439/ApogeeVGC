@@ -150,7 +150,7 @@ public record Conditions
 
                     Condition nightmare = _library.Conditions[ConditionId.Nightmare];
 
-                    if (!target.RemoveVolatile(battle, nightmare)) return new VoidReturn();
+                    if (!target.RemoveVolatile(nightmare)) return new VoidReturn();
 
                     if (battle.PrintDebug)
                     {
@@ -364,7 +364,7 @@ public record Conditions
                     pokemon.Volatiles[ConditionId.Confusion].Time--;
                     if (pokemon.Volatiles[ConditionId.Confusion].Time < 1)
                     {
-                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.Confusion]);
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Confusion]);
                         return new VoidReturn();
                     }
                     if (battle.PrintDebug)
@@ -434,7 +434,7 @@ public record Conditions
                 {
                     if (!(pokemon.GetItem()?.IsChoice ?? false))
                     {
-                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return new VoidReturn();
                     }
 
@@ -453,7 +453,7 @@ public record Conditions
                     if (!pokemon.GetItem()?.IsChoice == true ||
                         battle.EffectState.Move != null && !pokemon.HasMove((MoveId)battle.EffectState.Move))
                     {
-                        pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return;
                     }
                     if (pokemon.IgnoringItem())
@@ -594,7 +594,7 @@ public record Conditions
                     EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
                     if (lockedMove is not null && source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
-                        source.RemoveVolatile(battle, _library.Conditions[ConditionId.LockedMove]);
+                        source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
                     }
                     return new Undefined();
                 },
@@ -818,7 +818,7 @@ public record Conditions
                 OnModifyAtkPriority = 5,
                 OnModifyAtk = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Atk || pokemon.IgnoringAbility(battle))
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Atk || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
@@ -827,7 +827,7 @@ public record Conditions
                 OnModifyDefPriority = 6,
                 OnModifyDef = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Def || pokemon.IgnoringAbility(battle))
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Def || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
@@ -836,7 +836,7 @@ public record Conditions
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.SpA || pokemon.IgnoringAbility(battle))
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpA || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
@@ -845,7 +845,7 @@ public record Conditions
                 OnModifySpDPriority = 6,
                 OnModifySpD = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.SpD || pokemon.IgnoringAbility(battle))
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpD || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
@@ -853,7 +853,7 @@ public record Conditions
                 },
                 OnModifySpe = (battle, _, pokemon) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Spe || pokemon.IgnoringAbility(battle))
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Spe || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }

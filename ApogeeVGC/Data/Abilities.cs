@@ -161,7 +161,7 @@ public record Abilities
                     }
                     else if (!(pokemon.GetVolatile(ConditionId.QuarkDrive)?.FromBooster ?? false))
                     {
-                        pokemon.RemoveVolatile(battle, quarkDrive);
+                        pokemon.RemoveVolatile(quarkDrive);
                     }
                 },
                 OnEnd = (_, pokemon) =>

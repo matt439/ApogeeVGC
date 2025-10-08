@@ -47,7 +47,7 @@ public record Items
                 OnStart = (battle, pokemon) =>
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock)) return;
-                    pokemon.RemoveVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 },
                 OnModifyMove = (battle, _, pokemon, _) =>
                 {

@@ -26,6 +26,6 @@ public class EffectState
     public PokemonSlotId? SourceSlot { get; set; }
     public int? Counter { get; set; }
     public Condition? LinkedStatus { get; set; }
-    public Pokemon[]? LinkedPokemon { get; set; }
+    public List<Pokemon>? LinkedPokemon { get; set; }
     public bool? Started { get; set; }
 }

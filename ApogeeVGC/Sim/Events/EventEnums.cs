@@ -6,6 +6,7 @@ public enum EventId
     Flinch,
     StallMove,
     ModifySpecie,
+    End,
 }
 
 public enum EventType
