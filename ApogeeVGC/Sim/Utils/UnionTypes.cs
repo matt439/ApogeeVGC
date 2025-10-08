@@ -54,6 +54,65 @@ public record TrueIntTrueUnion : IntTrueUnion;
 
 
 /// <summary>
+/// double | void
+/// </summary>
+public abstract record DoubleVoidUnion
+{
+    public static DoubleVoidUnion FromDouble(double value) => new DoubleDoubleVoidUnion(value);
+    public static DoubleVoidUnion FromVoid() => new VoidDoubleVoidUnion();
+    public static implicit operator DoubleVoidUnion(double value) => new DoubleDoubleVoidUnion(value);
+}
+public record DoubleDoubleVoidUnion(double Value) : DoubleVoidUnion;
+public record VoidDoubleVoidUnion : DoubleVoidUnion;
+
+
+/// <summary>
+/// bool | undefined | void
+/// </summary>
+public abstract record BoolUndefinedVoidUnion
+{
+    public static BoolUndefinedVoidUnion FromBool(bool value) => new BoolBoolUndefinedVoidUnion(value);
+    public static BoolUndefinedVoidUnion FromUndefined() => new UndefinedBoolUndefinedVoidUnion();
+    public static BoolUndefinedVoidUnion FromVoid() => new VoidUnionBoolUndefinedVoidUnion();
+    public static implicit operator BoolUndefinedVoidUnion(bool value) => new BoolBoolUndefinedVoidUnion(value);
+}
+public record BoolBoolUndefinedVoidUnion(bool Value) : BoolUndefinedVoidUnion;
+public record UndefinedBoolUndefinedVoidUnion : BoolUndefinedVoidUnion;
+public record VoidUnionBoolUndefinedVoidUnion : BoolUndefinedVoidUnion;
+
+
+/// <summary>
+/// bool | int | undefined | void
+/// </summary>
+public abstract record BoolIntUndefinedVoidUnion
+{
+    public static BoolIntUndefinedVoidUnion FromBool(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
+    public static BoolIntUndefinedVoidUnion FromInt(int value) => new IntBoolIntUndefinedVoidUnion(value);
+    public static BoolIntUndefinedVoidUnion FromUndefined() => new UndefinedBoolIntUndefinedVoidUnion();
+    public static BoolIntUndefinedVoidUnion FromVoid() => new VoidUnionBoolIntUndefinedVoidUnion();
+    public static implicit operator BoolIntUndefinedVoidUnion(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
+    public static implicit operator BoolIntUndefinedVoidUnion(int value) => new IntBoolIntUndefinedVoidUnion(value);
+}
+public record BoolBoolIntUndefinedVoidUnion(bool Value) : BoolIntUndefinedVoidUnion;
+public record IntBoolIntUndefinedVoidUnion(int Value) : BoolIntUndefinedVoidUnion;
+public record UndefinedBoolIntUndefinedVoidUnion : BoolIntUndefinedVoidUnion;
+public record VoidUnionBoolIntUndefinedVoidUnion : BoolIntUndefinedVoidUnion;
+
+
+/// <summary>
+/// bool | void
+/// </summary>
+public abstract record BoolVoidUnion
+{
+    public static BoolVoidUnion FromBool(bool value) => new BoolBoolVoidUnion(value);
+    public static BoolVoidUnion FromVoid() => new VoidBoolVoidUnion();
+    public static implicit operator BoolVoidUnion(bool value) => new BoolBoolVoidUnion(value);
+}
+public record BoolBoolVoidUnion(bool Value) : BoolVoidUnion;
+public record VoidBoolVoidUnion : BoolVoidUnion;
+
+
+/// <summary>
 /// CommonHandlers['ModifierSourceMove'] | -0.1
 /// </summary>
 public abstract record OnFractionalPriority
@@ -550,97 +609,3 @@ public abstract record EffectStateTarget
 }
 public record PokemonEffectStateTarget(Pokemon Pokemon) : EffectStateTarget;
 public record SideEffectStateTarget(Side Side) : EffectStateTarget;
-
-
-
-
-
-
-
-
-///// <summary>
-///// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
-///// </summary>
-//public abstract record OnCriticalHit
-//{
-//    public static implicit operator OnCriticalHit(Func<BattleContext, Pokemon, object?, Move, bool?> func) =>
-//        new OnSourceCriticalHitFunc(func);
-//    public static implicit operator OnCriticalHit(bool value) => new OnSourceCriticalHitBool(value);
-//}
-//public record OnSourceCriticalHitFunc(Func<BattleContext, Pokemon, object?, Move, bool?> Func) : OnCriticalHit;
-//public record OnSourceCriticalHitBool(bool Value) : OnCriticalHit;
-
-
-
-
-//[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
-//public readonly struct EffectIdUnion : IEquatable<EffectIdUnion>
-//{
-//    [System.Runtime.InteropServices.FieldOffset(0)]
-//    private readonly int _value;
-//    [System.Runtime.InteropServices.FieldOffset(4)]
-//    private readonly EffectType _type;
-
-//    public EffectIdUnion(MoveId moveId)
-//    {
-//        _value = (int)moveId;
-//        _type = EffectType.Move;
-//    }
-
-//    public EffectIdUnion(AbilityId abilityId)
-//    {
-//        _value = (int)abilityId;
-//        _type = EffectType.Ability;
-//    }
-
-//    public EffectIdUnion(ItemId itemId)
-//    {
-//        _value = (int)itemId;
-//        _type = EffectType.Item;
-//    }
-
-//    public EffectIdUnion(ConditionId conditionId)
-//    {
-//        _value = (int)conditionId;
-//        _type = EffectType.Condition;
-//    }
-
-//    public EffectIdUnion(SpecieId specieId)
-//    {
-//        _value = (int)specieId;
-//        _type = EffectType.Species;
-//    }
-
-//    public override string ToString()
-//    {
-//        return _type switch
-//        {
-//            EffectType.Move => ((MoveId)_value).ToString(),
-//            EffectType.Ability => ((AbilityId)_value).ToString(),
-//            EffectType.Item => ((ItemId)_value).ToString(),
-//            EffectType.Condition => ((ConditionId)_value).ToString(),
-//            EffectType.Species => ((SpecieId)_value).ToString(),
-//            _ => _value.ToString(),
-//        };
-//    }
-
-//    // Implicit conversions for ease of use
-//    public static implicit operator EffectIdUnion(MoveId moveId) => new(moveId);
-//    public static implicit operator EffectIdUnion(AbilityId abilityId) => new(abilityId);
-//    public static implicit operator EffectIdUnion(ItemId itemId) => new(itemId);
-//    public static implicit operator EffectIdUnion(ConditionId conditionId) => new(conditionId);
-//    public static implicit operator EffectIdUnion(SpecieId specieId) => new(specieId);
-
-//    public bool Equals(EffectIdUnion other) => _value == other._value && _type == other._type;
-//    public override bool Equals(object? obj) => obj is EffectIdUnion other && Equals(other);
-//    public override int GetHashCode() => HashCode.Combine(_value, _type);
-//    public static bool operator ==(EffectIdUnion left, EffectIdUnion right)
-//    {
-//        return left.Equals(right);
-//    }
-
-//    public static bool operator !=(EffectIdUnion left, EffectIdUnion right)
-//    {
-//        return !(left == right);
-//    }
-//}
