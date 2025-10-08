@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.GameObjects;
@@ -29,6 +30,7 @@ public enum AbilityId
     Swarm,
     Frisk,
     Pickpocket,
+    Corrosion,
 }
 
 

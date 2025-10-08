@@ -73,7 +73,7 @@ public record Items
                 OnResidualSubOrder = 3,
                 OnResidual = (_, pokemon, _, _) =>
                 {
-                    pokemon.TrySetStatus(_library.Conditions[ConditionId.Burn], pokemon, null);
+                    pokemon.TrySetStatus(ConditionId.Burn, pokemon, null);
                 },
                 Num = 273,
                 Gen = 4,

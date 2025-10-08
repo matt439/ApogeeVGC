@@ -24,6 +24,7 @@ public enum UiType
     SingleTurn,
     SideStart,
     SideEnd,
+    Immune,
 }
 
 public static class UiGenerator
@@ -111,9 +112,16 @@ public static class UiGenerator
         }
     }
 
-    public static void PrintFailEvent(Pokemon pokemon)
+    public static void PrintFailEvent(Pokemon pokemon, IEffect? effect = null)
     {
-        Console.WriteLine($"{pokemon.Name}'s move failed!");
+        if (effect is not null)
+        {
+            Console.WriteLine($"{pokemon.Name}'s {effect.Name} failed!");
+        }
+        else
+        {
+            Console.WriteLine($"{pokemon.Name} failed!");
+        }
     }
 
     public static void PrintFieldStartEvent(Condition fieldCondition, IEffect? sourceEffect = null,
@@ -152,4 +160,8 @@ public static class UiGenerator
         Console.WriteLine($"{sideCondition.Name} has ended on {side.Name}!");
     }
 
+    public static void PrintImmuneEvent(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name} is immune!");
+    }
 }

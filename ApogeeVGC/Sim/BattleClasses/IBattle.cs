@@ -107,5 +107,9 @@ public interface IBattle
 
     BattleQueue Queue { get; }
 
+    Event? Event { get; }
+
+    ModdedDex Dex { get; }
+
     void Start();
 }

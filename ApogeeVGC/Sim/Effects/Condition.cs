@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
@@ -6,6 +7,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Effects;
@@ -33,6 +35,8 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public int? Counter { get; set; }
 
     public bool NoCopy { get; init; }
+
+    public SpecialImmunityId? SpecialImmunity { get; init; }
 
     public Condition Copy()
     {

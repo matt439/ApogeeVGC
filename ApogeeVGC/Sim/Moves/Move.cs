@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Moves;

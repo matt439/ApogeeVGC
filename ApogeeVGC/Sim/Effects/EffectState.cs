@@ -28,4 +28,5 @@ public class EffectState
     public Condition? LinkedStatus { get; set; }
     public List<Pokemon>? LinkedPokemon { get; set; }
     public bool? Started { get; set; }
+    public Pokemon? Source { get; set; }
 }

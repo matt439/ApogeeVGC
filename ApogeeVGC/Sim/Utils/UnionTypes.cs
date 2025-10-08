@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -433,17 +434,29 @@ public record FalseSingleEventSource : SingleEventSource;
 
 
 /// <summary>
-/// bool | int | Species
+/// bool | int | IEffect | PokemonType | SpecialImmunityId
 /// </summary>
 public abstract record RelayVar
 {
     public static implicit operator RelayVar(bool value) => new BoolRelayVar(value);
     public static implicit operator RelayVar(int value) => new IntRelayVar(value);
-    public static implicit operator RelayVar(Species species) => new SpecieRelayVar(species);
+    public static implicit operator RelayVar(Ability ability) => EffectUnionFactory.ToRelayVar(ability);
+    public static implicit operator RelayVar(Item item) => EffectUnionFactory.ToRelayVar(item);
+    public static implicit operator RelayVar(ActiveMove activeMove) => EffectUnionFactory.ToRelayVar(activeMove);
+    public static implicit operator RelayVar(Species species) => EffectUnionFactory.ToRelayVar(species);
+    public static implicit operator RelayVar(Condition condition) => EffectUnionFactory.ToRelayVar(condition);
+    public static implicit operator RelayVar(Format format) => EffectUnionFactory.ToRelayVar(format);
+    public static implicit operator RelayVar(PokemonType type) => new IntRelayVar((int)type);
+    public static implicit operator RelayVar(SpecialImmunityId id) => new IntRelayVar((int)id);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
+public record EffectRelayVar(IEffect Effect) : RelayVar;
 public record SpecieRelayVar(Species Species) : RelayVar;
+public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;
+public record SpecialImmunityIdRelayVar(SpecialImmunityId Id) : RelayVar;
+
+
 
 
 
@@ -459,6 +472,17 @@ public static class EffectUnionFactory
         Condition condition => new EffectSingleEventSource(condition),
         Format format => new EffectSingleEventSource(format),
         _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
+    };
+
+    public static RelayVar ToRelayVar(IEffect effect) => effect switch
+    {
+        Ability ability => new EffectRelayVar(ability),
+        Item item => new EffectRelayVar(item),
+        ActiveMove activeMove => new EffectRelayVar(activeMove),
+        Species specie => new SpecieRelayVar(specie),
+        Condition condition => new EffectRelayVar(condition),
+        Format format => new EffectRelayVar(format),
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to RelayVar"),
     };
 }
 

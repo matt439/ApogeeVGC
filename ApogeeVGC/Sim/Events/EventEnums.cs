@@ -7,6 +7,10 @@ public enum EventId
     StallMove,
     ModifySpecie,
     End,
+    SetStatus,
+    Start,
+    AfterSetStatus,
+    Immunity,
 }
 
 public enum EventType

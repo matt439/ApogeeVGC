@@ -24,6 +24,8 @@ public enum ConditionId
     Nightmare,
     LockedMove,
     Yawn,
+
+    None,
 }
 
 public enum ConditionEffectType

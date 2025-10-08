@@ -1,3 +1,4 @@
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -6,6 +7,7 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
@@ -286,20 +288,6 @@ public class Pokemon
         SetSpecie(BaseSpecies, Battle.Effect);
     }
 
-    //removeLinkedVolatiles(linkedStatus: string | Effect, linkedPokemon: Pokemon[])
-    //{
-    //    linkedStatus = linkedStatus.toString();
-    //    for (const linkedPoke of linkedPokemon) {
-    //        const volatileData = linkedPoke.volatiles[linkedStatus];
-    //        if (!volatileData) continue;
-    //        volatileData.linkedPokemon.splice(volatileData.linkedPokemon.indexOf(this), 1);
-    //        if (volatileData.linkedPokemon.length === 0)
-    //        {
-    //            linkedPoke.removeVolatile(linkedStatus);
-    //        }
-    //    }
-    //}
-
     public void RemoveLinkedVolatiles(Condition linkedStatus, List<Pokemon> linkedPokemon)
     {
         foreach (Pokemon linkedPoke in linkedPokemon)
@@ -320,9 +308,326 @@ public class Pokemon
         }
     }
 
-    public bool TrySetStatus(Condition status, Pokemon? source, IEffect? sourceEffect)
+    public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        return SetStatus(Status ?? status, source, sourceEffect);
+    }
+
+
+    // setStatus(
+    // 	status: string | Condition,
+    // 	source: Pokemon | null = null,
+    // 	sourceEffect: Effect | null = null,
+    // 	ignoreImmunities = false
+    // ) {
+    // 	if (!this.hp) return false;
+    // 	status = this.battle.dex.conditions.get(status);
+    // 	if (this.battle.event) {
+    // 		if (!source) source = this.battle.event.source;
+    // 		if (!sourceEffect) sourceEffect = this.battle.effect;
+    // 	}
+    // 	if (!source) source = this;
+
+    // 	if (this.status === status.id) {
+    // 		if ((sourceEffect as Move)?.status === this.status) {
+    // 			this.battle.add('-fail', this, this.status);
+    // 		} else if ((sourceEffect as Move)?.status) {
+    // 			this.battle.add('-fail', source);
+    // 			this.battle.attrLastMove('[still]');
+    // 		}
+    // 		return false;
+    // 	}
+
+    // 	if (
+    // 		!ignoreImmunities && status.id && !(source?.hasAbility('corrosion') && ['tox', 'psn'].includes(status.id))
+    // 	) {
+    // 		// the game currently never ignores immunities
+    // 		if (!this.runStatusImmunity(status.id === 'tox' ? 'psn' : status.id)) {
+    // 			this.battle.debug('immune to status');
+    // 			if ((sourceEffect as Move)?.status) {
+    // 				this.battle.add('-immune', this);
+    // 			}
+    // 			return false;
+    // 		}
+    // 	}
+    // 	const prevStatus = this.status;
+    // 	const prevStatusState = this.statusState;
+    // 	if (status.id) {
+    // 		const result: boolean = this.battle.runEvent('SetStatus', this, source, sourceEffect, status);
+    // 		if (!result) {
+    // 			this.battle.debug('set status [' + status.id + '] interrupted');
+    // 			return result;
+    // 		}
+    // 	}
+
+    // 	this.status = status.id;
+    // 	this.statusState = this.battle.initEffectState({ id: status.id, target: this });
+    // 	if (source) this.statusState.source = source;
+    // 	if (status.duration) this.statusState.duration = status.duration;
+    // 	if (status.durationCallback) {
+    // 		this.statusState.duration = status.durationCallback.call(this.battle, this, source, sourceEffect);
+    // 	}
+
+    // 	if (status.id && !this.battle.singleEvent('Start', status, this.statusState, this, source, sourceEffect)) {
+    // 		this.battle.debug('status start [' + status.id + '] interrupted');
+    // 		// cancel the setstatus
+    // 		this.status = prevStatus;
+    // 		this.statusState = prevStatusState;
+    // 		return false;
+    // 	}
+    // 	if (status.id && !this.battle.runEvent('AfterSetStatus', this, source, sourceEffect, status)) {
+    // 		return false;
+    // 	}
+    // 	return true;
+    // }
+
+    public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
+        bool ignoreImmunities = false)
+    {
+        // Initial HP check
+        if (Hp <= 0) return false;
+
+        Condition status = Battle.Library.Conditions[statusId];
+
+        // Resolve source and sourceEffect from battle event if not provided
+        if (Battle.Event is not null)
+        {
+            source ??= Battle.Event.Source;
+            sourceEffect ??= Battle.Event.Effect;
+        }
+        source ??= this;
+
+        // Check for duplicate status
+        if (Status is not null && Status == status.Id)
+        {
+            if (sourceEffect is ActiveMove move && move.Status == Status)
+            {
+                UiGenerator.PrintFailEvent(this, Battle.Library.Conditions[(ConditionId)Status]);
+            }
+            else if (sourceEffect is ActiveMove { Status: not null } move2)
+            {
+                UiGenerator.PrintFailEvent(source);
+                // Battle.AttrLastMove("[still]"); // Skipping visual effect
+            }
+            return false;
+        }
+
+        // Immunity checks (unless ignored)
+        if (!ignoreImmunities && status.Id != ConditionId.None)
+        {
+            // Special case for Corrosion ability bypassing poison immunity
+            bool corrosionBypass = source.HasAbility(AbilityId.Corrosion) &&
+                                  status.Id is ConditionId.Toxic or ConditionId.Poison;
+
+            if (!corrosionBypass)
+            {
+                // Convert toxic to poison for immunity check
+                PokemonType? immunityType = status.Id == ConditionId.Toxic ? PokemonType.Poison : null;
+                var specialImmunityId = status.SpecialImmunity;
+
+                if (!RunStatusImmunity(immunityType) && !RunStatusImmunity(specialImmunityId))
+                {
+                    if (Battle.PrintDebug)
+                    {
+                        // Battle.Debug("immune to status");
+                    }
+
+                    if (sourceEffect is ActiveMove { Status: not null })
+                    {
+                        UiGenerator.PrintImmuneEvent(this);
+                    }
+                    return false;
+                }
+            }
+        }
+
+        // Store previous status for potential rollback
+        var prevStatus = Status;
+        EffectState prevStatusState = StatusState;
+
+        // Run SetStatus event
+        if (status.Id != ConditionId.None)
+        {
+            RelayVar? result = Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
+            if (result is BoolRelayVar brv && !brv.Value)
+            {
+                if (Battle.PrintDebug)
+                {
+                    // Battle.Debug($"set status [{status.Id}] interrupted");
+                }
+                return false;
+            }
+        }
+
+        // Apply the status
+        Status = status.Id;
+        StatusState = Battle.InitEffectState(status.Id, null, this);
+
+        if (source is not null)
+            StatusState.Source = source;
+
+        if (status.Duration is not null)
+            StatusState.Duration = status.Duration;
+
+        if (status.DurationCallback is not null)
+        {
+            StatusState.Duration = status.DurationCallback(Battle, this, source, sourceEffect);
+        }
+
+        // Run Start event (with rollback on failure)
+        if (status.Id != ConditionId.None)
+        {
+            RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, StatusState, this,
+                source, sourceEffect);
+            if (startResult is BoolRelayVar && startResult == false)
+            {
+                if (Battle.PrintDebug)
+                {
+                    // Battle.Debug($"status start [{status.Id}] interrupted");
+                }
+
+                // Rollback the status change
+                Status = prevStatus;
+                StatusState = prevStatusState;
+                return false;
+            }
+        }
+
+        // Run AfterSetStatus event
+        if (status.Id != ConditionId.None)
+        {
+            RelayVar? afterResult = Battle.RunEvent(EventId.AfterSetStatus, this, source,
+                sourceEffect, status);
+            if (afterResult is BoolRelayVar { Value: false })
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // runStatusImmunity(type: string, message?: string) {
+    // 	if (this.fainted) return false;
+    // 	if (!type) return true;
+
+    // 	if (!this.battle.dex.getImmunity(type, this)) {
+    // 		this.battle.debug('natural status immunity');
+    // 		if (message) {
+    // 			this.battle.add('-immune', this);
+    // 		}
+    // 		return false;
+    // 	}
+    // 	const immunity = this.battle.runEvent('Immunity', this, null, null, type);
+    // 	if (!immunity) {
+    // 		this.battle.debug('artificial status immunity');
+    // 		if (message && immunity !== null) {
+    // 			this.battle.add('-immune', this);
+    // 		}
+    // 		return false;
+    // 	}
+    // 	return true;
+    // }
+
+
+    /// <summary>
+    /// Checks status immunity based on Pokemon type (e.g., Fire-types immune to Burn)
+    /// </summary>
+    public bool RunStatusImmunity(PokemonType? type, string? message = null)
+    {
+        // Check if Pokemon is fainted
+        if (Fainted) return false;
+
+        // Equivalent to TypeScript: if (!type) return true;
+        if (type == null) return true;
+
+        // Convert PokemonType to MoveType for immunity check
+        MoveType moveType = type.Value.ConvertToMoveType();
+
+        // Check natural type immunity using battle's dex
+        if (!Battle.Dex.GetImmunity(moveType, this))
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("natural status immunity");
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
+        }
+
+        // Check artificial immunity (abilities, items, etc.)
+        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null, type);
+
+        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
+        if (immunity is BoolRelayVar { Value: false } or null)
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("artificial status immunity");
+            }
+
+            // TypeScript: if (message && immunity !== null)
+            if (!string.IsNullOrEmpty(message) && immunity is not null)
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Checks special immunity effects (e.g., Prankster immunity for Dark-types)
+    /// </summary>
+    public bool RunStatusImmunity(SpecialImmunityId? immunityId, string? message = null)
+    {
+        // Check if Pokemon is fainted
+        if (Fainted) return false;
+
+        // Equivalent to TypeScript: if (!type) return true;
+        if (immunityId == null) return true;
+
+        // Check special immunity using battle's dex
+        if (!Battle.Dex.GetSpecialImmunity(immunityId.Value, this))
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("natural special immunity");
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
+        }
+
+        // Check artificial immunity (abilities, items, etc.) for special effects
+        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null,
+            immunityId);
+
+        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
+        if (immunity is BoolRelayVar { Value: false } or null)
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("artificial special immunity");
+            }
+
+            // TypeScript: if (message && immunity !== null)
+            if (!string.IsNullOrEmpty(message) && immunity is not null)
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
+        }
+
+        return true;
     }
 
     public RelayVar AddVolatile(IBattle battle, Condition status, Pokemon? source = null,

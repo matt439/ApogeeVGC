@@ -13,7 +13,7 @@ public record ActiveMove : Move, IEffect
 
     public EffectType EffectType => EffectType.Move;
     public ConditionId? Weather { get; set; }
-    public ConditionId? Status { get; set; }
+    //public ConditionId? Status { get; set; }
     public int Hit { get; set; }
     public MoveHitData? MoveHitData { get; set; }
     public List<Pokemon>? HitTargets { get; set; }

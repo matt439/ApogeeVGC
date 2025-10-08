@@ -121,7 +121,7 @@ public record Abilities
 
                     if (battle.RandomChance(3, 10))
                     {
-                        source.TrySetStatus(_library.Conditions[ConditionId.Burn], target, null);
+                        source.TrySetStatus(ConditionId.Burn, target);
                     }
                 },
             },
