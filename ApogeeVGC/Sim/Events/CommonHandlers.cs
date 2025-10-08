@@ -36,6 +36,6 @@ public delegate BoolIntUndefinedVoidUnion? ExtResultSourceMoveHandler(IBattle ba
 
 public delegate void VoidSourceEffectHandler(IBattle battle, Pokemon source, Pokemon target, IEffect effect);
 
-// Note: The name "VoidSourceMoveHandler" might be a bit misleading since it returns a bool?.
+// Note: The name "VoidSourceMoveHandler" might be a bit misleading since it returns a BoolVoidUnion.
 // This was changed due to Paralysis' OnBeforeMove event needing to return a bool value.
 public delegate BoolVoidUnion VoidSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);

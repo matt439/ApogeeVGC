@@ -108,7 +108,7 @@ public record Moves
                 OnHit = (battle, pokemon, _, _) =>
                 {
                     pokemon.AddVolatile(battle, _library.Conditions[ConditionId.Stall]);
-                    return null;
+                    return new VoidReturn();
                 },
                 Condition = _library.Conditions[ConditionId.Protect],
                 Secondary = null,
@@ -177,7 +177,7 @@ public record Moves
                     {
                         return battle.ChainModify([5461, 4096]);
                     }
-                    return null;
+                    return new VoidReturn();
                 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -227,7 +227,7 @@ public record Moves
                     {
                         return battle.ChainModify(2);
                     }
-                    return null;
+                    return new VoidReturn();
                 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -471,7 +471,7 @@ public record Moves
                     {
                         return false;
                     }
-                    return null;
+                    return new VoidReturn();
                 },
                 Secondary = new SecondaryEffect
                 {

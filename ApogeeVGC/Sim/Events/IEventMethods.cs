@@ -80,7 +80,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAccuracy { get; }
+    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; }
 
     ModifierSourceMoveHandler? OnBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
@@ -120,12 +120,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnDamage { get; }
+    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, int?>? OnDeductPp { get; }
+    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -160,7 +160,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon -> move
     /// </summary>
-    Func<IBattle, Pokemon, ActiveMove?>? OnLockMove { get; }
+    OnLockMove? OnLockMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -172,7 +172,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnModifyBoost { get; }
+    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -191,13 +191,13 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, double?>? OnModifySpe { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; }
 
     ModifierSourceMoveHandler? OnModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnModifyWeight { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; }
 
     VoidMoveHandler? OnMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnNegateImmunity { get; }
@@ -205,7 +205,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnOverrideAction { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; }
 
     ResultSourceMoveHandler? OnPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
@@ -216,7 +216,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnRedirectTarget { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; }
 
     /// <summary>
     /// battle, target, source, effect
@@ -231,12 +231,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSetStatus { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, bool?>? OnSetWeather { get; }
+    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; }
 
     /// <summary>
     /// battle, target, source, sideCondition
@@ -246,7 +246,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, bool?>? OnStallMove { get; }
+    Func<IBattle, Pokemon, BoolVoidUnion>? OnStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -283,17 +283,17 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnTryAddVolatile { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Item, Pokemon, bool?>? OnTryEatItem { get; }
+    OnTryEatItem? OnTryEatItem { get; }
 
     /// <summary>
     /// battle, relayVar, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnTryHeal { get; }
+    OnTryHeal? OnTryHeal { get; }
 
     ExtResultSourceMoveHandler? OnTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnTryHitField { get; } // MoveEventMethods['onTryHitField']
@@ -304,12 +304,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnTryPrimaryHit { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, List<PokemonType>?>? OnType { get; }
+    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; }
 
     /// <summary>
     /// battle, item, pokemon
@@ -378,7 +378,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnFoeAccuracy { get; }
+    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; }
 
     ModifierSourceMoveHandler? OnFoeBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
@@ -408,12 +408,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnFoeDamage { get; }
+    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, int?>? OnFoeDeductPp { get; }
+    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -442,7 +442,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon -> move
     /// </summary>
-    Func<IBattle, Pokemon, ActiveMove?>? OnFoeLockMove { get; }
+    OnLockMove? OnFoeLockMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?
@@ -454,7 +454,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnFoeModifyBoost { get; }
+    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnFoeModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -471,7 +471,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnFoeModifySpe { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; }
 
     ModifierSourceMoveHandler? OnFoeModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnFoeModifyType { get; } // MoveEventMethods['onModifyType']
@@ -479,7 +479,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnFoeModifyWeight { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; }
 
     VoidMoveHandler? OnFoeMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnFoeNegateImmunity { get; }
@@ -487,13 +487,13 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnFoeOverrideAction { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; }
 
     ResultSourceMoveHandler? OnFoePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnFoeRedirectTarget { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
@@ -503,22 +503,22 @@ public interface IEventMethods
     /// <summary>
     /// battle, ability, target, source, effect -> boolean
     /// </summary>
-    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetAbility { get; }
+    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnFoeSetStatus { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, bool?>? OnFoeSetWeather { get; }
+    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, bool?>? OnFoeStallMove { get; }
+    Func<IBattle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -540,14 +540,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnFoeTryAddVolatile { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Item, Pokemon, bool?>? OnFoeTryEatItem { get; }
+    OnTryEatItem? OnFoeTryEatItem { get; }
 
-    OnTryHeal? OnFoeTryHeal { get; } // MoveEventMethods['onTryHeal']
+    OnTryHeal? OnFoeTryHeal { get; }
     ExtResultSourceMoveHandler? OnFoeTryHit { get; } // MoveEventMethods['onTryHit']
     ResultMoveHandler? OnFoeTryHitField { get; } // MoveEventMethods['onTryHitField']
     ResultMoveHandler? OnFoeTryHitSide { get; } // CommonHandlers['ResultMove']
@@ -556,12 +556,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnFoeTryPrimaryHit { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnFoeType { get; }
+    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; }
 
     ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
@@ -615,7 +615,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnSourceAccuracy { get; }
+    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; }
 
     ModifierSourceMoveHandler? OnSourceBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
@@ -645,12 +645,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnSourceDamage { get; }
+    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, int?>? OnSourceDeductPp { get; }
+    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -679,7 +679,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon -> move
     /// </summary>
-    Func<IBattle, Pokemon, ActiveMove?>? OnSourceLockMove { get; }
+    OnLockMove? OnSourceLockMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -691,7 +691,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnSourceModifyBoost { get; }
+    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnSourceModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -708,7 +708,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnSourceModifySpe { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; }
 
     ModifierSourceMoveHandler? OnSourceModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnSourceModifyType { get; } // MoveEventMethods['onModifyType']
@@ -716,7 +716,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnSourceModifyWeight { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; }
 
     VoidMoveHandler? OnSourceMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnSourceNegateImmunity { get; }
@@ -724,13 +724,13 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnSourceOverrideAction { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; }
 
     ResultSourceMoveHandler? OnSourcePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnSourceRedirectTarget { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
@@ -740,22 +740,22 @@ public interface IEventMethods
     /// <summary>
     /// battle, ability, target, source, effect -> boolean
     /// </summary>
-    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetAbility { get; }
+    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSourceSetStatus { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, bool?>? OnSourceSetWeather { get; }
+    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, bool?>? OnSourceStallMove { get; }
+    Func<IBattle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -777,12 +777,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnSourceTryAddVolatile { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Item, Pokemon, bool?>? OnSourceTryEatItem { get; }
+    OnTryEatItem? OnSourceTryEatItem { get; }
 
     OnTryHeal? OnSourceTryHeal { get; } // MoveEventMethods['onTryHeal']
     ExtResultSourceMoveHandler? OnSourceTryHit { get; } // MoveEventMethods['onTryHit']
@@ -793,12 +793,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnSourceTryPrimaryHit { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnSourceType { get; }
+    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; }
 
     ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
@@ -861,7 +861,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAnyAccuracy { get; }
+    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; }
 
     ModifierSourceMoveHandler? OnAnyBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
@@ -890,12 +890,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>? OnAnyDamage { get; }
+    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, int?>? OnAnyDeductPp { get; }
+    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -924,7 +924,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon -> move
     /// </summary>
-    Func<IBattle, Pokemon, ActiveMove?>? OnAnyLockMove { get; }
+    OnLockMove? OnAnyLockMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?
@@ -936,7 +936,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTable?>? OnAnyModifyBoost { get; }
+    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnAnyModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -953,7 +953,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnAnyModifySpe { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; }
 
     ModifierSourceMoveHandler? OnAnyModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnAnyModifyType { get; } // MoveEventMethods['onModifyType']
@@ -961,7 +961,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, int?>? OnAnyModifyWeight { get; }
+    Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; }
 
     /// <summary>
     /// battle, target, source, move
@@ -972,7 +972,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, Delegate?>? OnAnyOverrideAction { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; }
 
     ResultSourceMoveHandler? OnAnyPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
@@ -983,7 +983,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, Pokemon?>? OnAnyRedirectTarget { get; }
+    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
@@ -998,17 +998,17 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnySetStatus { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, bool?>? OnAnySetWeather { get; }
+    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, bool?>? OnAnyStallMove { get; }
+    Func<IBattle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
@@ -1034,12 +1034,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, bool?>? OnAnyTryAddVolatile { get; }
+    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Item, Pokemon, bool?>? OnAnyTryEatItem { get; }
+    OnTryEatItem? OnAnyTryEatItem { get; }
 
     OnTryHeal? OnAnyTryHeal { get; } // MoveEventMethods['onTryHeal']
     ExtResultSourceMoveHandler? OnAnyTryHit { get; } // MoveEventMethods['onTryHit']
@@ -1050,12 +1050,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolUnion?>? OnAnyTryPrimaryHit { get; }
+    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, PokemonType[]?>? OnAnyType { get; }
+    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; }
 
     ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;

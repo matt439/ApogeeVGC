@@ -11,6 +11,13 @@ using ApogeeVGC.Sim.Stats;
 namespace ApogeeVGC.Sim.Utils;
 
 /// <summary>
+/// The 'void' type, representing the absence of a value.
+/// </summary>
+public record VoidReturn;
+
+public record Undefined;
+
+/// <summary>
 /// int | bool
 /// </summary>
 public abstract record IntBoolUnion
@@ -59,11 +66,26 @@ public record TrueIntTrueUnion : IntTrueUnion;
 public abstract record DoubleVoidUnion
 {
     public static DoubleVoidUnion FromDouble(double value) => new DoubleDoubleVoidUnion(value);
-    public static DoubleVoidUnion FromVoid() => new VoidDoubleVoidUnion();
+    public static DoubleVoidUnion FromVoid() => new VoidDoubleVoidUnion(new VoidReturn());
     public static implicit operator DoubleVoidUnion(double value) => new DoubleDoubleVoidUnion(value);
+    public static implicit operator DoubleVoidUnion(VoidReturn value) => new VoidDoubleVoidUnion(value);
 }
 public record DoubleDoubleVoidUnion(double Value) : DoubleVoidUnion;
-public record VoidDoubleVoidUnion : DoubleVoidUnion;
+public record VoidDoubleVoidUnion(VoidReturn Value) : DoubleVoidUnion;
+
+
+/// <summary>
+/// int | void
+/// </summary>
+public abstract record IntVoidUnion
+{
+    public static IntVoidUnion FromInt(int value) => new IntIntVoidUnion(value);
+    public static IntVoidUnion FromVoid() => new VoidIntVoidUnion(new VoidReturn());
+    public static implicit operator IntVoidUnion(int value) => new IntIntVoidUnion(value);
+    public static implicit operator IntVoidUnion(VoidReturn value) => new VoidIntVoidUnion(value);
+}
+public record IntIntVoidUnion(int Value) : IntVoidUnion;
+public record VoidIntVoidUnion(VoidReturn Value) : IntVoidUnion;
 
 
 /// <summary>
@@ -72,13 +94,18 @@ public record VoidDoubleVoidUnion : DoubleVoidUnion;
 public abstract record BoolUndefinedVoidUnion
 {
     public static BoolUndefinedVoidUnion FromBool(bool value) => new BoolBoolUndefinedVoidUnion(value);
-    public static BoolUndefinedVoidUnion FromUndefined() => new UndefinedBoolUndefinedVoidUnion();
-    public static BoolUndefinedVoidUnion FromVoid() => new VoidUnionBoolUndefinedVoidUnion();
+    public static BoolUndefinedVoidUnion FromUndefined() => new UndefinedBoolUndefinedVoidUnion(new Undefined());
+    public static BoolUndefinedVoidUnion FromVoid() => new VoidUnionBoolUndefinedVoidUnion(new VoidReturn());
     public static implicit operator BoolUndefinedVoidUnion(bool value) => new BoolBoolUndefinedVoidUnion(value);
+    public static implicit operator BoolUndefinedVoidUnion(VoidReturn value) =>
+        new VoidUnionBoolUndefinedVoidUnion(value);
+
+    public static implicit operator BoolUndefinedVoidUnion(Undefined value) =>
+        new UndefinedBoolUndefinedVoidUnion(value);
 }
 public record BoolBoolUndefinedVoidUnion(bool Value) : BoolUndefinedVoidUnion;
-public record UndefinedBoolUndefinedVoidUnion : BoolUndefinedVoidUnion;
-public record VoidUnionBoolUndefinedVoidUnion : BoolUndefinedVoidUnion;
+public record UndefinedBoolUndefinedVoidUnion(Undefined Value) : BoolUndefinedVoidUnion;
+public record VoidUnionBoolUndefinedVoidUnion(VoidReturn Value) : BoolUndefinedVoidUnion;
 
 
 /// <summary>
@@ -88,15 +115,20 @@ public abstract record BoolIntUndefinedVoidUnion
 {
     public static BoolIntUndefinedVoidUnion FromBool(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
     public static BoolIntUndefinedVoidUnion FromInt(int value) => new IntBoolIntUndefinedVoidUnion(value);
-    public static BoolIntUndefinedVoidUnion FromUndefined() => new UndefinedBoolIntUndefinedVoidUnion();
-    public static BoolIntUndefinedVoidUnion FromVoid() => new VoidUnionBoolIntUndefinedVoidUnion();
+    public static BoolIntUndefinedVoidUnion FromUndefined() =>
+        new UndefinedBoolIntUndefinedVoidUnion(new Undefined());
+    public static BoolIntUndefinedVoidUnion FromVoid() => new VoidUnionBoolIntUndefinedVoidUnion(new VoidReturn());
     public static implicit operator BoolIntUndefinedVoidUnion(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
     public static implicit operator BoolIntUndefinedVoidUnion(int value) => new IntBoolIntUndefinedVoidUnion(value);
+    public static implicit operator BoolIntUndefinedVoidUnion(VoidReturn value) =>
+        new VoidUnionBoolIntUndefinedVoidUnion(value);
+    public static implicit operator BoolIntUndefinedVoidUnion(Undefined value) =>
+        new UndefinedBoolIntUndefinedVoidUnion(value);
 }
 public record BoolBoolIntUndefinedVoidUnion(bool Value) : BoolIntUndefinedVoidUnion;
 public record IntBoolIntUndefinedVoidUnion(int Value) : BoolIntUndefinedVoidUnion;
-public record UndefinedBoolIntUndefinedVoidUnion : BoolIntUndefinedVoidUnion;
-public record VoidUnionBoolIntUndefinedVoidUnion : BoolIntUndefinedVoidUnion;
+public record UndefinedBoolIntUndefinedVoidUnion(Undefined Value) : BoolIntUndefinedVoidUnion;
+public record VoidUnionBoolIntUndefinedVoidUnion(VoidReturn Value) : BoolIntUndefinedVoidUnion;
 
 
 /// <summary>
@@ -105,11 +137,31 @@ public record VoidUnionBoolIntUndefinedVoidUnion : BoolIntUndefinedVoidUnion;
 public abstract record BoolVoidUnion
 {
     public static BoolVoidUnion FromBool(bool value) => new BoolBoolVoidUnion(value);
-    public static BoolVoidUnion FromVoid() => new VoidBoolVoidUnion();
+    public static BoolVoidUnion FromVoid() => new VoidBoolVoidUnion(new VoidReturn());
     public static implicit operator BoolVoidUnion(bool value) => new BoolBoolVoidUnion(value);
+    public static implicit operator BoolVoidUnion(VoidReturn value) => new VoidBoolVoidUnion(value);
 }
 public record BoolBoolVoidUnion(bool Value) : BoolVoidUnion;
-public record VoidBoolVoidUnion : BoolVoidUnion;
+public record VoidBoolVoidUnion(VoidReturn Value) : BoolVoidUnion;
+
+
+/// <summary>
+/// int | bool | void
+/// </summary>
+public abstract record IntBoolVoidUnion
+{
+    public static IntBoolVoidUnion FromInt(int value) => new IntIntBoolVoidUnion(value);
+    public static IntBoolVoidUnion FromBool(bool value) => new BoolIntBoolVoidUnion(value);
+    public static IntBoolVoidUnion FromVoid() => new VoidIntBoolVoidUnion(new VoidReturn());
+    public static implicit operator IntBoolVoidUnion(int value) => new IntIntBoolVoidUnion(value);
+    public static implicit operator IntBoolVoidUnion(bool value) => new BoolIntBoolVoidUnion(value);
+    public static implicit operator IntBoolVoidUnion(VoidReturn value) => new VoidIntBoolVoidUnion(value);
+}
+public record IntIntBoolVoidUnion(int Value) : IntBoolVoidUnion;
+public record BoolIntBoolVoidUnion(bool Value) : IntBoolVoidUnion;
+public record VoidIntBoolVoidUnion(VoidReturn Value) : IntBoolVoidUnion;
+
+
 
 
 /// <summary>
@@ -123,13 +175,11 @@ public abstract record OnFractionalPriority
     private const double Tolerance = 0.0001;
 
     public static implicit operator OnFractionalPriority(double value) =>
-        Math.Abs(value - (-0.1)) < Tolerance
+        Math.Abs(value - -0.1) < Tolerance
             ? new OnFrationalPriorityNeg(value)
             : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
 }
-
 public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
-
 public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 
 
@@ -138,11 +188,11 @@ public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
 /// </summary>
 public abstract record OnCriticalHit
 {
-    public static implicit operator OnCriticalHit(Func<IBattle, Pokemon, object?, Move, bool?> function) =>
+    public static implicit operator OnCriticalHit(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> function) =>
         new OnCriticalHitFunc(function);
     public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
 }
-public record OnCriticalHitFunc(Func<IBattle, Pokemon, object?, Move, bool?> Function) : OnCriticalHit;
+public record OnCriticalHitFunc(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> Function) : OnCriticalHit;
 public record OnCriticalHitBool(bool Value) : OnCriticalHit;
 
 
@@ -211,12 +261,56 @@ public record OnTryHealBool(bool Value) : OnTryHeal;
 /// </summary>
 public abstract record OnFlinch
 {
-    public static implicit operator OnFlinch(Func<IBattle, Pokemon, object?, Move, bool?> func) =>
+    public static implicit operator OnFlinch(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> func) =>
         new OnFlinchFunc(func);
     public static implicit operator OnFlinch(bool value) => new OnFlinchBool(value);
 }
-public record OnFlinchFunc(Func<IBattle, Pokemon, object?, Move, bool?> Func) : OnFlinch;
+public record OnFlinchFunc(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> Func) : OnFlinch;
 public record OnFlinchBool(bool Value) : OnFlinch;
+
+
+
+/// <summary>
+/// string | ((this: Battle, pokemon: Pokemon) => void | string)    
+/// </summary>
+public abstract record OnLockMove
+{
+    public static implicit operator OnLockMove(MoveId moveId) => new OnLockMoveMoveId(moveId);
+    public static implicit operator OnLockMove(Func<IBattle, Pokemon, MoveIdVoidUnion> func) =>
+        new OnLockMoveFunc(func);
+}
+public record OnLockMoveMoveId(MoveId Id) : OnLockMove;
+public record OnLockMoveFunc(Func<IBattle, Pokemon, MoveIdVoidUnion> Func) : OnLockMove;
+
+
+/// <summary>
+/// SparseBoostsTable | void
+/// </summary>
+public abstract record SparseBoostsTableVoidUnion
+{
+    public static implicit operator SparseBoostsTableVoidUnion(SparseBoostsTable table) =>
+        new SparseBoostsTableSparseBoostsTableVoidUnion(table);
+    public static implicit operator SparseBoostsTableVoidUnion(VoidReturn value) =>
+        new VoidSparseBoostsTableVoidUnion(value);
+    public static SparseBoostsTableVoidUnion FromVoid() => new VoidSparseBoostsTableVoidUnion(new VoidReturn());
+}
+public record SparseBoostsTableSparseBoostsTableVoidUnion(SparseBoostsTable Table) :
+    SparseBoostsTableVoidUnion;
+public record VoidSparseBoostsTableVoidUnion(VoidReturn Value) : SparseBoostsTableVoidUnion;
+
+
+
+/// <summary>
+/// MoveId | void
+/// </summary>
+public abstract record MoveIdVoidUnion
+{
+    public static implicit operator MoveIdVoidUnion(MoveId moveId) => new MoveIdMoveIdVoidUnion(moveId);
+    public static implicit operator MoveIdVoidUnion(VoidReturn value) => new VoidMoveIdVoidUnion(value);
+    public static MoveIdVoidUnion FromVoid() => new VoidMoveIdVoidUnion(new VoidReturn());
+}
+public record MoveIdMoveIdVoidUnion(MoveId MoveId) : MoveIdVoidUnion;
+public record VoidMoveIdVoidUnion(VoidReturn Value) : MoveIdVoidUnion;
 
 
 /// <summary>
@@ -224,12 +318,38 @@ public record OnFlinchBool(bool Value) : OnFlinch;
 /// </summary>
 public abstract record OnNegateImmunity
 {
-    public static implicit operator OnNegateImmunity(Func<IBattle, Pokemon, PokemonType, bool?> func) =>
+    public static implicit operator OnNegateImmunity(Func<IBattle, Pokemon, PokemonType, BoolVoidUnion> func) =>
         new OnNegateImmunityFunc(func);
     public static implicit operator OnNegateImmunity(bool value) => new OnNegateImmunityBool(value);
 }
-public record OnNegateImmunityFunc(Func<IBattle, Pokemon, PokemonType, bool?> Func) : OnNegateImmunity;
+public record OnNegateImmunityFunc(Func<IBattle, Pokemon, PokemonType, BoolVoidUnion> Func) : OnNegateImmunity;
 public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
+
+
+/// <summary>
+/// Delegate | void
+/// </summary>
+public abstract record DelegateVoidUnion
+{
+    public static implicit operator DelegateVoidUnion(Delegate del) => new DelegateDelegateVoidUnion(del);
+    public static implicit operator DelegateVoidUnion(VoidReturn value) => new VoidDelegateVoidUnion(value);
+    public static DelegateVoidUnion FromVoid() => new VoidDelegateVoidUnion(new VoidReturn());
+}
+public record DelegateDelegateVoidUnion(Delegate Del) : DelegateVoidUnion;
+public record VoidDelegateVoidUnion(VoidReturn Value) : DelegateVoidUnion;
+
+
+/// <summary>
+/// Pokemon | void
+/// </summary>
+public abstract record PokemonVoidUnion
+{
+    public static implicit operator PokemonVoidUnion(Pokemon pokemon) => new PokemonPokemonVoidUnion(pokemon);
+    public static implicit operator PokemonVoidUnion(VoidReturn value) => new VoidPokemonVoidUnion(value);
+    public static PokemonVoidUnion FromVoid() => new VoidPokemonVoidUnion(new VoidReturn());
+}
+public record PokemonPokemonVoidUnion(Pokemon Pokemon) : PokemonVoidUnion;
+public record VoidPokemonVoidUnion(VoidReturn Value) : PokemonVoidUnion;
 
 
 /// <summary>
@@ -237,13 +357,25 @@ public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
 /// </summary>
 public abstract record OnTakeItem
 {
-    public static implicit operator OnTakeItem(Func<IBattle, Item, Pokemon, Pokemon, Move?, bool?> func) =>
-        new OnTakeItemFunc(func);
+    public static implicit operator OnTakeItem(Func<IBattle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> func)
+        => new OnTakeItemFunc(func);
     public static implicit operator OnTakeItem(bool value) => new OnTakeItemBool(value);
 }
-public record OnTakeItemFunc(Func<IBattle, Item, Pokemon, Pokemon, Move?, bool?> Func) : OnTakeItem;
+public record OnTakeItemFunc(Func<IBattle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> Func) : OnTakeItem;
 public record OnTakeItemBool(bool Value) : OnTakeItem;
 
+
+/// <summary>
+/// PokemonType[] | void
+/// </summary>
+public abstract record TypesVoidUnion
+{
+    public static implicit operator TypesVoidUnion(PokemonType[] types) => new TypesTypesVoidUnion(types);
+    public static implicit operator TypesVoidUnion(VoidReturn value) => new VoidTypesVoidUnion(value);
+    public static TypesVoidUnion FromVoid() => new VoidTypesVoidUnion(new VoidReturn());
+}
+public record TypesTypesVoidUnion(PokemonType[] Types) : TypesVoidUnion;
+public record VoidTypesVoidUnion(VoidReturn Value) : TypesVoidUnion;
 
 
 
@@ -453,6 +585,20 @@ public abstract record OnItemEatUse
 }
 public record OnItemEatUseFunc(Action<IBattle, Pokemon> Func) : OnItemEatUse;
 public record OnItemEatUseFalse : OnItemEatUse;
+
+
+/// <summary>
+/// bool | ((this: Battle, item: Item, pokemon: Pokemon) => boolean | void)
+/// </summary>
+public abstract record OnTryEatItem
+{
+    public static implicit operator OnTryEatItem(bool value) => new BoolOnTryEatItem(value);
+    public static implicit operator OnTryEatItem(Func<IBattle, Item, Pokemon, BoolVoidUnion> func) =>
+        new FuncOnTryEatItem(func);
+}
+public record BoolOnTryEatItem(bool Value) : OnTryEatItem;
+public record FuncOnTryEatItem(Func<IBattle, Item, Pokemon, BoolVoidUnion> Func) : OnTryEatItem;
+
 
 
 /// <summary>

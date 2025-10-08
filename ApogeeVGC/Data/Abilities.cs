@@ -1,11 +1,13 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
-using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
+using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Data;
 
@@ -45,7 +47,8 @@ public record Abilities
                 {
                     battle.EffectState.Unnerved = false;
                 },
-                OnFoeTryEatItem = (battle, _, _) => !(battle.EffectState.Unnerved ?? false),
+                OnFoeTryEatItem = (Func<IBattle, Item, Pokemon, BoolVoidUnion>)((battle, _, _) =>
+                    BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
                 OnSourceAfterFaint = (battle, length, _, source, effect) =>
                 {
                     if (effect.EffectType != EffectType.Move) return;
@@ -87,7 +90,7 @@ public record Abilities
                     {
                         return battle.ChainModify([5461, 4096]);
                     }
-                    return null;
+                    return new VoidReturn();
                 },
             },
             [AbilityId.Guts] = new()
@@ -103,7 +106,7 @@ public record Abilities
                     {
                         return battle.ChainModify(1.5);
                     }
-                    return null;
+                    return new VoidReturn();
                 },
             },
             [AbilityId.FlameBody] = new()
@@ -130,7 +133,7 @@ public record Abilities
                 Rating = 4.0,
                 OnModifyPriority = (_, priority, _, _, move) =>
                 {
-                    if (move.Category != MoveCategory.Status) return null;
+                    if (move.Category != MoveCategory.Status) return new VoidReturn();
 
                     move.PranksterBooster = true;
                     return priority + 1;
