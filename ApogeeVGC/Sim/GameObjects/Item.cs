@@ -22,6 +22,8 @@ public enum ItemId
     ToxicOrb,
     TerrainExtender,
     AbilityShield,
+    IronBall,
+    AirBalloon,
 
     None,
 }

@@ -404,6 +404,7 @@ public record Conditions
                         Accuracy = IntTrueUnion.FromTrue(),
                         Num = 100200,
                         Type = MoveType.Normal,
+                        MoveSlot = new MoveSlot(),
                     };
                     battle.Damage(damage, pokemon, pokemon, BattleDamageEffect.FromIEffect(activeMove));
                     return false;
@@ -739,7 +740,7 @@ public record Conditions
                 OnSetStatus = (battle, status, target, _, effect) =>
                 {
                     if (status.Id == ConditionId.Sleep &&
-                        target.IsGrounded() &&
+                        (target.IsGrounded() ?? false) &&
                         !target.IsSemiInvulnerable())
                     {
                         if (battle.PrintDebug && effect is Condition { Id: ConditionId.Yawn } or
@@ -755,7 +756,7 @@ public record Conditions
                 },
                 OnTryAddVolatile = (battle, status, target, _, _) =>
                 {
-                    if (!target.IsGrounded() || target.IsSemiInvulnerable()) return new VoidReturn();
+                    if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable()) return new VoidReturn();
                     if (status.Id == ConditionId.Yawn)
                     {
                         if (battle.PrintDebug)
@@ -770,7 +771,7 @@ public record Conditions
                 OnBasePower = (battle, _, attacker, _, move) =>
                 {
                     if (move.Type == MoveType.Electric &&
-                        attacker.IsGrounded() &&
+                        (attacker.IsGrounded() ?? false) &&
                         !attacker.IsSemiInvulnerable())
                     {
                         return battle.ChainModify([5325, 4096]);

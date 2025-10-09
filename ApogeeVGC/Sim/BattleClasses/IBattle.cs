@@ -91,7 +91,7 @@ public interface IBattle
     Pokemon? ActiveTarget { get; set; }
     ActiveMove? ActiveMove { get; set; }
 
-    Pokemon? GetAtSlot(PokemonSlotId? slot);
+    Pokemon? GetAtSlot(PokemonSlot? slot);
 
     int GetConfusionDamage(Pokemon pokemon, int basePower);
 
@@ -115,5 +115,9 @@ public interface IBattle
 
     int Gen => 9;
 
-    public List<Pokemon> GetAllActive(bool? includeFainted = null);
+    List<Pokemon> GetAllActive(bool? includeFainted = null);
+
+    int StatModify(StatsTable baseStats, PokemonSet set, StatId statName);
+
+    BoolVoidUnion? SuppressingAbility(Pokemon? target = null);
 }

@@ -19,6 +19,7 @@ public class Side
     public required List<PokemonSet> Team { get; set; }
     public required List<Pokemon> Pokemon { get; set; }
     public required List<Pokemon> Active { get; set; }
+    public Side Foe { get; set; } = null!; // set in battle.start()
 
     public int PokemonLeft { get; set; }
 

@@ -35,6 +35,9 @@ public enum AbilityId
     Klutz,
     IceFace,
     Disguise,
+    Multitype,
+    Levitate,
+    TeraShell,
 
     None,
 }

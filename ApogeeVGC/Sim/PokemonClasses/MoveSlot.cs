@@ -20,7 +20,7 @@ public class MoveSlot
     public int MaxPp { get; set; }
     public MoveTarget? Target { get; set; }
     public BoolHiddenUnion Disabled { get; set; } = false;
-    public ConditionId? DisabledSource { get; set; }
+    public IEffect? DisabledSource { get; set; }
     public bool Used { get; set; }
     public bool? Virtual { get; set; }
 }

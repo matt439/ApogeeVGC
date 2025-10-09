@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -439,7 +438,7 @@ public record FalseSingleEventSource : SingleEventSource;
 
 
 /// <summary>
-/// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable
+/// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType
 /// </summary>
 public abstract record RelayVar
 {
@@ -454,6 +453,8 @@ public abstract record RelayVar
     public static implicit operator RelayVar(PokemonType type) => new PokemonTypeRelayVar(type);
     public static implicit operator RelayVar(ConditionId? id) => new ConditionIdRelayVar(id);
     public static implicit operator RelayVar(BoostsTable table) => new BoostsTableRelayVar(table);
+    public static implicit operator RelayVar(List<PokemonType> types) => new TypesRelayVar(types);
+    public static implicit operator RelayVar(MoveType type) => new PokemonTypeRelayVar((PokemonType)type);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -462,6 +463,8 @@ public record SpecieRelayVar(Species Species) : RelayVar;
 public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;
 public record ConditionIdRelayVar(ConditionId? Id) : RelayVar;
 public record BoostsTableRelayVar(BoostsTable Table) : RelayVar;
+public record TypesRelayVar(List<PokemonType> Types) : RelayVar;
+public record MoveTypeRelayVar(MoveType Type) : RelayVar;
 
 
 

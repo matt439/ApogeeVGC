@@ -21,4 +21,5 @@ public enum MoveType
     Steel,
     Fairy,
     Stellar,
+    Unknown,
 }

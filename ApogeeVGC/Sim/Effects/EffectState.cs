@@ -23,7 +23,7 @@ public class EffectState
     public int? Stage { get; set; }
     public MoveId? Move { get; set; }
     public IEffect? SourceEffect { get; set; }
-    public PokemonSlotId? SourceSlot { get; set; }
+    public PokemonSlot? SourceSlot { get; set; }
     public int? Counter { get; set; }
     public Condition? LinkedStatus { get; set; }
     public List<Pokemon>? LinkedPokemon { get; set; }

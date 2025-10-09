@@ -44,12 +44,12 @@ public record Items
                 Name = "Choice Specs",
                 SpriteNum = 70,
                 Fling = new FlingData { BasePower = 10 },
-                OnStart = (battle, pokemon) =>
+                OnStart = (_, pokemon) =>
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock)) return;
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 },
-                OnModifyMove = (battle, _, pokemon, _) =>
+                OnModifyMove = (_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
                 },
@@ -73,7 +73,7 @@ public record Items
                 OnResidualSubOrder = 3,
                 OnResidual = (_, pokemon, _, _) =>
                 {
-                    pokemon.TrySetStatus(ConditionId.Burn, pokemon, null);
+                    pokemon.TrySetStatus(ConditionId.Burn, pokemon);
                 },
                 Num = 273,
                 Gen = 4,
@@ -125,6 +125,15 @@ public record Items
                 },
                 Num = 640,
                 Gen = 6,
+            },
+
+            [ItemId.None] = new()
+            {
+                Id = ItemId.None,
+                Name = "None",
+                SpriteNum = 0,
+                Num = 0,
+                Gen = 0,
             },
         };
     }

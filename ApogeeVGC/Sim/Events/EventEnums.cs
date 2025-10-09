@@ -20,6 +20,10 @@ public enum EventId
     ModifySpD,
     ModifySpe,
     SetAbility,
+    Type,
+    ModifyWeight,
+    Effectiveness,
+    NegateImmunity,
 }
 
 public enum EventType

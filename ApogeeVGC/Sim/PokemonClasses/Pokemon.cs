@@ -1,3 +1,4 @@
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -9,6 +10,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -30,7 +32,7 @@ public class Pokemon
     public StatsTable Ivs => Set.Ivs;
     public List<MoveSlot> MoveSlots { get; set; }
 
-    public PokemonSlotId Position { get; set; }
+    public PokemonSlot Position { get; set; }
 
     public Species BaseSpecies { get; set; }
     public Species Species { get; set; }
@@ -180,7 +182,11 @@ public class Pokemon
             );
         BaseMoveSlots = baseMoveSlots;
 
-        Position = PokemonSlotId.Slot1;
+        Position = new PokemonSlot
+        {
+            SideId = SideId.Side1,
+            PositionLetter = PositionLetter.A,
+        };
         StatusState = battle.InitEffectState(null, null, null);
         Volatiles = [];
 
@@ -902,83 +908,6 @@ public class Pokemon
         return true;
     }
 
- //   /**
-	// * Changes this Pokemon's forme to match the given speciesId (or species).
-	// * This function handles all changes to stats, ability, type, species, etc.
-	// * as well as sending all relevant messages sent to the client.
-	// */
-	//formeChange(
-	//	speciesId: string | Species, source: Effect | null = this.battle.effect,
-	//	isPermanent?: boolean, abilitySlot = '0', message?: string
-	//) {
-	//	const rawSpecies = this.battle.dex.species.get(speciesId);
-
-	//	const species = this.setSpecies(rawSpecies, source);
-	//	if (!species) return false;
-
-	//	if (this.battle.gen <= 2) return true;
-
-	//	// The species the opponent sees
-	//	const apparentSpecies =
-	//		this.illusion ? this.illusion.species.name : species.baseSpecies;
-	//	if (isPermanent) {
-	//		this.baseSpecies = rawSpecies;
-	//		this.details = this.getUpdatedDetails();
-	//		let details = (this.illusion || this).details;
-	//		if (this.terastallized) details += `, tera:${this.terastallized}`;
-	//		this.battle.add('detailschange', this, details);
-	//		this.updateMaxHp();
-	//		if (!source) {
-	//			// Tera forme
-	//			// Ogerpon/Terapagos text goes here
-	//			this.formeRegression = true;
-	//		} else if (source.effectType === 'Item') {
-	//			this.canTerastallize = null; // National Dex behavior
-	//			if (source.zMove) {
-	//				this.battle.add('-burst', this, apparentSpecies, species.requiredItem);
-	//				this.moveThisTurnResult = true; // Ultra Burst counts as an action for Truant
-	//			} else if (source.isPrimalOrb) {
-	//				if (this.illusion) {
-	//					this.ability = '';
-	//					this.battle.add('-primal', this.illusion, species.requiredItem);
-	//				} else {
-	//					this.battle.add('-primal', this, species.requiredItem);
-	//				}
-	//			} else {
-	//				this.battle.add('-mega', this, apparentSpecies, species.requiredItem);
-	//				this.moveThisTurnResult = true; // Mega Evolution counts as an action for Truant
-	//			}
-	//			this.formeRegression = true;
-	//		} else if (source.effectType === 'Status') {
-	//			// Shaymin-Sky -> Shaymin
-	//			this.battle.add('-formechange', this, species.name, message);
-	//		}
-	//	} else {
-	//		if (source?.effectType === 'Ability') {
-	//			this.battle.add('-formechange', this, species.name, message, `[from] ability: ${source.name}`);
-	//		} else {
-	//			this.battle.add('-formechange', this, this.illusion ? this.illusion.species.name : species.name, message);
-	//		}
-	//	}
-	//	if (isPermanent && (!source || !['disguise', 'iceface'].includes(source.id))) {
-	//		if (this.illusion && source) {
-	//			// Tera forme by Ogerpon or Terapagos breaks the Illusion
-	//			this.ability = ''; // Don't allow Illusion to wear off
-	//		}
-	//		const ability = species.abilities[abilitySlot] || species.abilities['0'];
-	//		// Ogerpon's forme change doesn't override permanent abilities
-	//		if (source || !this.getAbility().flags['cantsuppress']) this.setAbility(ability, null, null, true);
-	//		// However, its ability does reset upon switching out
-	//		this.baseAbility = toID(ability);
-	//	}
-	//	if (this.terastallized) {
-	//		this.knownType = true;
-	//		this.apparentType = this.terastallized;
-	//	}
-	//	return true;
-	//}
-
-
     /// <summary>
     /// Changes this Pokemon's forme to match the given speciesId (or species).
     /// This function handles all changes to stats, ability, type, species, etc.
@@ -1181,27 +1110,114 @@ public class Pokemon
 
     public void UpdateMaxHp()
     {
-        throw new NotImplementedException();
+        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp);
+        if (newBaseMaxHp == BaseMaxHp) return;
+        BaseMaxHp = newBaseMaxHp;
+        int newMaxHp = BaseMaxHp;
+        Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
+        MaxHp = newMaxHp;
+        if (Hp > 0)
+        {
+            UiGenerator.PrintHealEvent(this, Hp);
+        }
     }
 
     public bool HasType(PokemonType type)
     {
-        throw new NotImplementedException();
+        return GetTypes().Contains(type);
     }
 
     public bool HasType(PokemonType[] types)
     {
-        throw new NotImplementedException();
+        return types.Any(t => GetTypes().Contains(t));
     }
 
+    /// <summary>
+    /// Sets a type (except on Arceus/Silvally, who resist type changes)
+    /// </summary>
     public bool SetType(PokemonType type, bool enforce = false)
     {
-        throw new NotImplementedException();
+        return SetType([type], enforce);
     }
 
+    /// <summary>
+    /// Sets types (except on Arceus/Silvally, who resist type changes)
+    /// </summary>
     public bool SetType(PokemonType[] types, bool enforce = false)
     {
-        throw new NotImplementedException();
+        if (!enforce)
+        {
+            // First type of Arceus, Silvally cannot be normally changed
+            if ((Battle.Gen >= 5 && Species.Num is 493 or 773) || 
+                (Battle.Gen == 4 && HasAbility(AbilityId.Multitype)))
+            {
+                return false;
+            }
+
+            // Terastallized Pokemon cannot have their base type changed except via forme change
+            if (Terastallized != null)
+            {
+                return false;
+            }
+        }
+
+        // Validate that types array is not empty
+        if (types.Length == 0)
+        {
+            throw new ArgumentException("Must pass type to SetType");
+        }
+
+        // Set the new types
+        Types = types.ToList();
+
+        // Clear any added type
+        AddedType = null;
+
+        // Mark type as known
+        KnownType = true;
+
+        // Update apparent type for display (join types with '/')
+        ApparentType = Types.ToList();
+
+        return true;
+    }
+
+    public PokemonType[] GetTypes(bool? excludeAdded = null, bool? preterastallized = null)
+    {
+        // Handle Terastallization - match TypeScript's !preterastallized logic
+        if (preterastallized != true && Terastallized is not null && Terastallized != MoveType.Stellar)
+        {
+            return [Terastallized.Value.ConvertToPokemonType()];
+        }
+
+        // Run Type event to allow abilities/items/conditions to modify types
+        RelayVar? rv = Battle.RunEvent(EventId.Type, this, null, null, Types);
+
+        List<PokemonType> resultTypes;
+        if (rv is TypesRelayVar typesRelayVar)
+        {
+            resultTypes = typesRelayVar.Types.ToList();
+        }
+        else
+        {
+            // Fallback to current types if event doesn't return expected type
+            // This matches TypeScript behavior where unexpected event results are ignored
+            resultTypes = Types.ToList();
+        }
+
+        // Add fallback type if no types exist
+        if (resultTypes.Count == 0)
+        {
+            resultTypes.Add(Battle.Gen >= 5 ? PokemonType.Normal : PokemonType.Unknown);
+        }
+
+        // Add the added type if it exists and not excluded
+        if (excludeAdded != true && AddedType is not null)
+        {
+            resultTypes.Add(AddedType.Value);
+        }
+
+        return resultTypes.ToArray();
     }
 
     /// <summary>
@@ -1251,9 +1267,9 @@ public class Pokemon
         return species;
     }
 
-    public Item? GetItem()
+    public Item GetItem()
     {
-        throw new NotImplementedException();
+        return Battle.Library.Items[Item];
     }
 
     /// <summary>
@@ -1264,10 +1280,10 @@ public class Pokemon
     public bool IgnoringItem(bool isFling = false)
     {
         // Get the actual item object to check its properties
-        Item? item = GetItem();
+        Item item = GetItem();
 
         // Primal Orbs are never ignored
-        if (item?.IsPrimalOrb == true) return false;
+        if (item.IsPrimalOrb) return false;
 
         // Items that were knocked off are ignored (Gen 3-4 mechanic)
         if (ItemState.KnockedOff == true) return true;
@@ -1290,7 +1306,7 @@ public class Pokemon
         // Regular Klutz check - ignores item unless item specifically ignores Klutz
         if (HasAbility(AbilityId.Klutz))
         {
-            return item?.IgnoreKlutz != true;
+            return item.IgnoreKlutz != true;
         }
 
         return false;
@@ -1298,12 +1314,22 @@ public class Pokemon
 
     public bool HasMove(MoveId move)
     {
-        throw new NotImplementedException();
+        return MoveSlots.Any(ms => ms.Id == move);
     }
 
-    public void DisableMove(MoveId moveId, bool? isHidden = null, IEffect? sourceEffect = null)
+    public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        if (sourceEffect is not null && Battle.Event is not null)
+        {
+            sourceEffect = Battle.Event.Effect;
+        }
+
+        foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
+                     moveSlot.Id != moveId && moveSlot.Disabled != true))
+        {
+            moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
+            moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
+        }
     }
 
     /// <summary>
@@ -1330,40 +1356,291 @@ public class Pokemon
         return !IgnoringItem();
     }
 
-    public MoveHitData GetMoveHitData(ActiveMove move)
+    /// <summary>
+    /// Gets the full slot identifier combining side ID and position letter.
+    /// Simplified version for standard battle formats.
+    /// </summary>
+    public PokemonSlot GetSlot()
     {
-        throw new NotImplementedException();
+        return new PokemonSlot
+        {
+            SideId = Side.Id,
+            PositionLetter = Position.PositionLetter,
+        };
     }
 
-    public bool IsGrounded(bool negateImmunity = false)
+    /// <summary>
+    /// Gets or creates the move hit data for this Pokemon's slot.
+    /// Tracks per-target information like critical hits and type effectiveness.
+    /// </summary>
+    public MoveHitResult GetMoveHitData(ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Lazy initialization of the moveHitData dictionary if it doesn't exist
+        move.MoveHitData ??= new MoveHitData();
+
+        // Get this Pokemon's slot identifier
+        PokemonSlot slot = GetSlot();
+
+        // Try to get existing hit data for this slot
+        if (!move.MoveHitData.TryGetValue(slot, out MoveHitResult? hitResult))
+        {
+            // Create default hit data if it doesn't exist
+            hitResult = new MoveHitResult
+            {
+                Crit = false,
+                TypeMod = 0,
+                ZBrokeProtect = false,
+            };
+
+            // Store it in the dictionary
+            move.MoveHitData[slot] = hitResult;
+        }
+
+        return hitResult;
     }
 
+    /// <summary>
+    /// Checks if the Pokemon is grounded (affected by Ground-type moves and terrain).
+    /// Returns true if grounded, false if not grounded, null if Levitate provides immunity.
+    /// </summary>
+    /// <param name="negateImmunity">If true, ignore type-based immunity (for moves like Thousand Arrows)</param>
+    /// <returns>True if grounded, false if not grounded, null if Levitate ability</returns>
+    public bool? IsGrounded(bool negateImmunity = false)
+    {
+        // Gravity forces all Pokemon to be grounded
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.Gravity))
+        {
+            return true;
+        }
+
+        // Ingrain grounds the Pokemon (Gen 4+)
+        if (Volatiles.ContainsKey(ConditionId.Ingrain) && Battle.Gen >= 4)
+        {
+            return true;
+        }
+
+        // Smackdown grounds the Pokemon
+        if (Volatiles.ContainsKey(ConditionId.SmackDown))
+        {
+            return true;
+        }
+
+        // Get effective item (empty if ignoring item)
+        ItemId effectiveItem = IgnoringItem() ? ItemId.None : Item;
+
+        // Iron Ball grounds the Pokemon
+        if (effectiveItem == ItemId.IronBall)
+        {
+            return true;
+        }
+
+        // Flying-type immunity check (unless negated)
+        // Special case: Fire/Flying using Burn Up + Roost becomes ???/Flying but is still grounded
+        if (!negateImmunity && HasType(PokemonType.Flying))
+        {
+            // Exception: ???-type + Roost active means it's still grounded
+            bool roosting = HasType(PokemonType.Unknown) && Volatiles.ContainsKey(ConditionId.Roost);
+            if (!roosting)
+            {
+                return false;
+            }
+        }
+
+        // Levitate ability provides immunity (unless ability is being suppressed)
+        if (HasAbility(AbilityId.Levitate))
+        {
+            return null; // Special return value indicating Levitate immunity
+        }
+
+        // Magnet Rise makes Pokemon airborne
+        if (Volatiles.ContainsKey(ConditionId.MagnetRise))
+        {
+            return false;
+        }
+
+        // Telekinesis makes Pokemon airborne
+        if (Volatiles.ContainsKey(ConditionId.Telekinesis))
+        {
+            return false;
+        }
+
+        // Air Balloon makes Pokemon airborne (unless popped)
+        return effectiveItem != ItemId.AirBalloon;
+    }
+
+    /// <summary>
+    /// Checks if this Pokemon is affected by Sky Drop (either as target or source).
+    /// </summary>
+    public bool IsSkyDropped()
+    {
+        // Check if this Pokemon is the target of Sky Drop
+        if (Volatiles.ContainsKey(ConditionId.SkyDrop))
+        {
+            return true;
+        }
+
+        // Check if this Pokemon is the source of Sky Drop on any opponent
+        return Side.Foe.Active.Any(foeActive =>
+            foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
+            state.Source == this);
+    }
+
+    /// <summary>
+    /// Checks if the Pokemon is semi-invulnerable (untargetable due to two-turn moves).
+    /// </summary>
     public bool IsSemiInvulnerable()
     {
-        throw new NotImplementedException();
+        // List of all semi-invulnerable conditions
+        ConditionId[] semiInvulnerableConditions =
+        [
+            ConditionId.Fly,
+            ConditionId.Bounce,
+            ConditionId.Dive,
+            ConditionId.Dig,
+            ConditionId.PhantomForce,
+            ConditionId.ShadowForce,
+        ];
+
+        return semiInvulnerableConditions.Any(Volatiles.ContainsKey) || IsSkyDropped();
     }
 
-    public double RunEffectiveness(ActiveMove move)
+    //runEffectiveness(move: ActiveMove)
+    //{
+    //    let totalTypeMod = 0;
+    //    if (this.terastallized && move.type === 'Stellar')
+    //    {
+    //        totalTypeMod = 1;
+    //    }
+    //    else
+    //    {
+    //        for (const type of this.getTypes()) {
+    //            let typeMod = this.battle.dex.getEffectiveness(move, type);
+    //            typeMod = this.battle.singleEvent('Effectiveness', move, null, this, type, move, typeMod);
+    //            totalTypeMod += this.battle.runEvent('Effectiveness', this, type, move, typeMod);
+    //        }
+    //    }
+    //    if (this.species.name === 'Terapagos-Terastal' && this.hasAbility('Tera Shell') &&
+    //                              !this.battle.suppressingAbility(this))
+    //    {
+    //        if (this.abilityState.resisted) return -1; // all hits of multi-hit move should be not very effective
+    //        if (move.category === 'Status' || move.id === 'struggle' || !this.runImmunity(move) ||
+    //                                                      totalTypeMod < 0 || this.hp < this.maxhp)
+    //        {
+    //            return totalTypeMod;
+    //        }
+
+    //        this.battle.add('-activate', this, 'ability: Tera Shell');
+    //        this.abilityState.resisted = true;
+    //        return -1;
+    //    }
+    //    return totalTypeMod;
+    //}
+
+    public int RunEffectiveness(ActiveMove move)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Checks if the Pokemon is immune to a specific move type.
+    /// </summary>
+    /// <param name="source">The move or type string to check immunity against</param>
+    /// <param name="message">If true/non-empty, display immunity messages</param>
+    /// <returns>True if not immune (move can hit), false if immune</returns>
+    public bool RunImmunity(ActiveMove source, bool message = false)
+    {
+        return RunImmunity(source.Type, message);
+    }
+
+    /// <summary>
+    /// Checks if the Pokemon is immune to a specific type.
+    /// </summary>
+    /// <param name="source">The type to check immunity against</param>
+    /// <param name="message">If true, display immunity messages</param>
+    /// <returns>True if not immune, false if immune</returns>
+    public bool RunImmunity(MoveType source, bool message = false)
+    {
+        // Null or unknown type is never immune
+        if (source == MoveType.Unknown)
+        {
+            return true;
+        }
+
+        // Run NegateImmunity event
+        RelayVar? negateEvent = Battle.RunEvent(EventId.NegateImmunity, this, null, null,
+            source);
+        bool negateImmunity = negateEvent is not BoolRelayVar { Value: true };
+
+        // Special handling for Ground-type
+        bool? notImmune;
+        if (source == MoveType.Ground)
+        {
+            notImmune = IsGrounded(negateImmunity);
+        }
+        else
+        {
+            // Check type immunity using the dex
+            notImmune = negateImmunity || Battle.Dex.GetImmunity(source, this);
+        }
+
+        // If not immune, return true
+        if (notImmune == true)
+        {
+            return true;
+        }
+
+        // If no message requested, just return false
+        if (!message)
+        {
+            return false;
+        }
+
+        // Display appropriate immunity message
+        if (notImmune == null)
+        {
+            // Levitate ability immunity
+            UiGenerator.PrintImmuneEvent(this, Battle.Library.Abilities[AbilityId.Levitate]);
+        }
+        else
+        {
+            // General immunity
+            UiGenerator.PrintImmuneEvent(this);
+        }
+
+        return false;
+    }
+
+
+
+    /// <summary>
+    /// Gets the Pokemon's current weight in hectograms, accounting for modifying effects.
+    /// Weight is used for moves like Heavy Slam, Grass Knot, and Low Kick.
+    /// Minimum weight is 1 hectogram (0.1 kg).
+    /// </summary>
+    /// <returns>Weight in hectograms (1 hg = 0.1 kg)</returns>
     public int GetWeight()
     {
-        throw new NotImplementedException();
+        // Run ModifyWeight event to allow abilities/items/conditions to modify weight
+        RelayVar? weightEvent = Battle.RunEvent(EventId.ModifyWeight, this, null, null,
+            WeightHg);
+
+        int modifiedWeight;
+        if (weightEvent is IntRelayVar irv)
+        {
+            modifiedWeight = irv.Value;
+        }
+        else
+        {
+            // Fallback to base weight if event doesn't return an integer
+            modifiedWeight = WeightHg;
+        }
+
+        // Ensure minimum weight of 1 hectogram
+        return Math.Max(1, modifiedWeight);
     }
 
     public Pokemon Copy()
     {
         throw new NotImplementedException();
     }
-}
-
-
-public record MoveHitData
-{
-    public bool Crit { get; init; }
-    public double TypeMod { get; init; }
 }

@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
@@ -9,7 +8,7 @@ namespace ApogeeVGC.Sim.Moves;
 public record ActiveMove : Move, IEffect
 {
     /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
-    public MoveSlot MoveSlot { get; init; }
+    public required MoveSlot MoveSlot { get; init; }
 
     public EffectType EffectType => EffectType.Move;
     public ConditionId? Weather { get; set; }
@@ -92,6 +91,7 @@ public record MoveHitResult
 {
     public bool Crit { get; init; }
     public int TypeMod { get; init; }
+    public bool ZBrokeProtect { get; set; }
 }
 
-public class MoveHitData : Dictionary<PokemonSlotId, MoveHitResult>;
+public class MoveHitData : Dictionary<PokemonSlot, MoveHitResult>;

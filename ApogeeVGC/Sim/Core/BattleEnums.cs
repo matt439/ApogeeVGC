@@ -6,16 +6,14 @@ public enum SideId
     Side2,
 }
 
-public enum PokemonSlotId
+public enum PositionLetter
 {
-    Slot1 = 1,
-    Slot2 = 2,
-    Slot3 = 3,
-    Slot4 = 4,
-
-    // Only for singles
-    Slot5 = 5,
-    Slot6 = 6,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
 }
 
 public enum GameType

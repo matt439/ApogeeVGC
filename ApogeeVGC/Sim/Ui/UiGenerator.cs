@@ -178,7 +178,7 @@ public static class UiGenerator
         Console.WriteLine($"{sideCondition.Name} has ended on {side.Name}!");
     }
 
-    public static void PrintImmuneEvent(Pokemon pokemon)
+    public static void PrintImmuneEvent(Pokemon pokemon, IEffect? source = null)
     {
         Console.WriteLine($"{pokemon.Name} is immune!");
     }
@@ -192,5 +192,10 @@ public static class UiGenerator
         IEffect? sourceEffect = null)
     {
         Console.WriteLine($"{pokemon.Name} changed forme to {newForme}!");
+    }
+
+    public static void PrintHealEvent(Pokemon pokemon, int health)
+    {
+        Console.WriteLine($"{pokemon.Name} healed {health} HP!");
     }
 }
