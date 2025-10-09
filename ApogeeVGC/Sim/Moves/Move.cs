@@ -6,7 +6,7 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record Move : IMoveEventHandlers
+public record Move : IMoveEventHandlers, IBasicEffect
 {
     #region IMoveEventHandlers Implementation
 
@@ -180,6 +180,8 @@ public record Move : IMoveEventHandlers
     public ConditionId? VolatileStatus { get; init; }
     public ConditionId? SideCondition { get; init; }
     public ConditionId? Status { get; init; }
+
+    public bool AffectsFainted { get; init; }
 
     public ActiveMove ToActiveMove()
     {

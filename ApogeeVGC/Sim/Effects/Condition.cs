@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Effects;
 
-public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect
+public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect
 {
     public required ConditionId Id { get; init; }
     public EffectType EffectType => EffectType.Condition;
@@ -37,6 +37,8 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public bool NoCopy { get; init; }
 
     public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
+
+    public bool AffectsFainted { get; init; }
 
     public Condition Copy()
     {

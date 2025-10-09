@@ -549,10 +549,138 @@ public class Pokemon
         return true;
     }
 
-    public RelayVar AddVolatile(IBattle battle, Condition status, Pokemon? source = null,
-        IEffect? sourceEffect = null, Condition? linkedStatus = null)
+    public RelayVar AddVolatile(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null,
+        ConditionId? linkedStatus = null)
     {
-        throw new NotImplementedException();
+        // Get the condition from the battle library
+        Condition condition = Battle.Library.Conditions[status];
+
+        // Early exit if Pokemon is fainted and condition doesn't affect fainted Pokemon
+        if (Hp <= 0 && condition.AffectsFainted != true)
+            return new BoolRelayVar(false);
+
+        // Early exit if linked status and source is fainted
+        if (linkedStatus != null && source is { Hp: <= 0 })
+            return new BoolRelayVar(false);
+
+        // Resolve source and sourceEffect from battle event if not provided
+        if (Battle.Event is not null)
+        {
+            source ??= Battle.Event.Source;
+            sourceEffect ??= Battle.Event.Effect;
+        }
+        source ??= this; // Default source to this Pokemon
+
+        // Check if volatile already exists
+        if (Volatiles.TryGetValue(status, out EffectState? existingState))
+        {
+            // If no restart callback, fail
+            if (condition.OnRestart == null)
+                return new BoolRelayVar(false);
+
+            // Try to restart the existing volatile
+            return Battle.SingleEvent(EventId.Restart, condition, existingState, this, source,
+                       sourceEffect) ?? new BoolRelayVar(false);
+        }
+
+        // Check status immunity
+        if (!RunStatusImmunity(status))
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("immune to volatile status");
+            }
+
+            // Show immunity message if source effect is a move with status
+            if (sourceEffect is ActiveMove { Status: not null })
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return new BoolRelayVar(false);
+        }
+
+        // Run TryAddVolatile event
+        RelayVar? tryResult = Battle.RunEvent(EventId.TryAddVolatile, this, source, sourceEffect,
+            condition);
+
+        if (tryResult is BoolRelayVar { Value: false } or null)
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug($"add volatile [{status}] interrupted");
+            }
+            return tryResult ?? new BoolRelayVar(false);
+        }
+
+        // Create the volatile effect state
+        Volatiles[status] = Battle.InitEffectState(status, null, this);
+        EffectState volatileState = Volatiles[status];
+
+        // Set source information
+        volatileState.Source = source;
+        volatileState.SourceSlot = source.Position; // Assuming getSlot() maps to Position
+
+        // Set source effect
+        if (sourceEffect != null)
+        {
+            volatileState.SourceEffect = sourceEffect;
+        }
+
+        // Set duration from condition
+        if (condition.Duration != null)
+        {
+            volatileState.Duration = condition.Duration;
+        }
+
+        // Set duration from callback
+        if (condition.DurationCallback != null)
+        {
+            volatileState.Duration = condition.DurationCallback(Battle, this, source, sourceEffect);
+        }
+
+        // Run the Start event
+        RelayVar? startResult = Battle.SingleEvent(EventId.Start, condition, volatileState,
+            this, source, sourceEffect);
+
+        // Check if start event failed
+        bool startSucceeded = startResult switch
+        {
+            BoolRelayVar brv => brv.Value,
+            null => false,
+            _ => true, // Non-boolean RelayVar types treated as success
+        };
+
+        if (!startSucceeded)
+        {
+            // Cancel - remove the volatile we just added
+            Volatiles.Remove(status);
+            return startResult ?? new BoolRelayVar(false);
+        }
+
+        // Handle linked status setup
+        if (linkedStatus != null)
+        {
+            if (!source.Volatiles.TryGetValue(linkedStatus.Value, out EffectState? linkedState))
+            {
+                // Source doesn't have the linked status - add it
+                source.AddVolatile(linkedStatus.Value, this, sourceEffect);
+                linkedState = source.Volatiles[linkedStatus.Value];
+                linkedState.LinkedPokemon = [this];
+                linkedState.LinkedStatus = condition;
+            }
+            else
+            {
+                // Source already has linked status - add this Pokemon to the list
+                linkedState.LinkedPokemon ??= [];
+                linkedState.LinkedPokemon.Add(this);
+            }
+
+            // Set up reverse linking on this Pokemon's volatile
+            volatileState.LinkedPokemon = [source];
+            volatileState.LinkedStatus = Battle.Library.Conditions[linkedStatus.Value];
+        }
+
+        return new BoolRelayVar(true);
     }
 
     public EffectState? GetVolatile(ConditionId volatileId)
@@ -631,10 +759,83 @@ public class Pokemon
         return Battle.Library.Abilities[Ability];
     }
 
-
-    public StatIdExceptHp GetBestStat(bool? unboosted, bool? unmodified)
+    public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
     {
-        throw new NotImplementedException();
+        int bestStatValue = int.MinValue;
+        var bestStatName = StatIdExceptHp.Atk;
+
+        // Iterate through all stat types except HP
+        foreach (StatIdExceptHp statId in Enum.GetValues<StatIdExceptHp>())
+        {
+            int currentStatValue = GetStat(statId, unboosted, unmodified);
+            if (currentStatValue <= bestStatValue) continue;
+            bestStatValue = currentStatValue;
+            bestStatName = statId;
+        }
+        return bestStatName;
+    }
+
+    public int GetStat(StatIdExceptHp statName, bool unboosted = false, bool unmodified = false)
+    {
+        int stat = StoredStats[statName];
+
+        // Wonder Room swaps Def and SpD
+        if (unmodified && Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
+        {
+            statName = statName switch
+            {
+                StatIdExceptHp.Def => StatIdExceptHp.SpD,
+                StatIdExceptHp.SpD => StatIdExceptHp.Def,
+                _ => statName,
+            };
+        }
+
+        // Stat boosts
+        if (!unboosted)
+        {
+            BoostsTable boosts = Boosts;
+            if (!unmodified)
+            {
+                RelayVar? relayVar = Battle.RunEvent(EventId.ModifyBoost, this, null,
+                    null, boosts);
+
+                if (relayVar is BoostsTableRelayVar brv)
+                {
+                    boosts = brv.Table;
+                }
+                else
+                {
+                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar" );
+                }
+            }
+            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName));
+        }
+
+        // Stat modifier effects
+        if (!unmodified)
+        {
+            EventId eventId = statName switch
+            {
+                StatIdExceptHp.Atk => EventId.ModifyAtk,
+                StatIdExceptHp.Def => EventId.ModifyDef,
+                StatIdExceptHp.SpA => EventId.ModifySpA,
+                StatIdExceptHp.SpD => EventId.ModifySpD,
+                StatIdExceptHp.Spe => EventId.ModifySpe,
+                _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
+            };
+            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, stat);
+            if (relayVar is IntRelayVar irv)
+            {
+                stat = irv.Value;
+            }
+            else
+            {
+                throw new InvalidOperationException("stat must be an IntRelayVar" );
+            }
+        }
+
+        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
+        return stat;
     }
 
     public bool HasAbility(AbilityId ability)

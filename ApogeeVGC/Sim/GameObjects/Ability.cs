@@ -36,7 +36,7 @@ public enum AbilityId
 }
 
 
-public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods
+public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect
 {
     public EffectType EffectType => EffectType.Ability;
     public required AbilityId Id { get; init; }
@@ -81,6 +81,8 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods
     public int Num { get; init; } = 0;
     public AbilityFlags Flags { get; init; } = new();
     public ConditionId? Condition { get; init; }
+
+    public bool AffectsFainted { get; init; }
 
     public Ability Copy()
     {

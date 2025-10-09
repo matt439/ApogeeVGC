@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Stats;
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
@@ -31,7 +32,7 @@ public enum NatureType
     Timid,
 }
 
-public record Nature
+public record Nature : IBasicEffect
 {
     public required NatureType Type { get; init; }
     public StatIdExceptHp? Plus { get; init; }
@@ -49,6 +50,8 @@ public record Nature
         }
         return 1.0; // no change
     }
+
+    public bool AffectsFainted { get; init; }
 
     public Nature Copy()
     {

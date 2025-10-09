@@ -28,6 +28,7 @@ public enum ConditionId
     Commanding,
     Embargo,
     MagicRoom,
+    WonderRoom,
 
     None,
 }

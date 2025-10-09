@@ -32,7 +32,7 @@ public record FlingData
     public ConditionId? Status { get; init; }
 }
 
-public record Item : IPokemonEventMethods, IEffect
+public record Item : IPokemonEventMethods, IEffect, IBasicEffect
 {
     public ItemId Id { get; init; }
     public EffectType EffectType => EffectType.Item;
@@ -106,6 +106,7 @@ public record Item : IPokemonEventMethods, IEffect
     public Action<IBattle, Pokemon>? OnStart { get; init; }
     public Action<IBattle, Pokemon>? OnEnd { get; init; }
 
+    public bool AffectsFainted { get; init; }
 
     public Item Copy()
     {

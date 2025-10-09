@@ -11,6 +11,14 @@ public enum EventId
     Start,
     AfterSetStatus,
     Immunity,
+    TryAddVolatile,
+    Restart,
+    ModifyBoost,
+    ModifyAtk,
+    ModifyDef,
+    ModifySpA,
+    ModifySpD,
+    ModifySpe,
 }
 
 public enum EventType
