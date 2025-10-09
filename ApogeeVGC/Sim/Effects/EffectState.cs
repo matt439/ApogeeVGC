@@ -31,4 +31,5 @@ public class EffectState
     public Pokemon? Source { get; set; }
     public bool? KnockedOff { get; set; }
     public bool? Ending { get; set; }
+    public bool? Resisted { get; set; }
 }

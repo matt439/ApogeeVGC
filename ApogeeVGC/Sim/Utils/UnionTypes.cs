@@ -400,7 +400,7 @@ public record BattleSingleEventTarget(IBattle Battle) : SingleEventTarget;
 
 
 /// <summary>
-/// Pokemon | Effect | false
+/// Pokemon | Effect | false | PokemonType
 /// </summary>
 public abstract record SingleEventSource
 {
@@ -431,10 +431,31 @@ public abstract record SingleEventSource
         EffectUnionFactory.ToSingleEventSource(format);
 
     public static SingleEventSource FromFalse() => new FalseSingleEventSource();
+    public static implicit operator SingleEventSource(PokemonType type) => new PokemonTypeSingleEventSource(type);
 }
 public record PokemonSingleEventSource(Pokemon Pokemon) : SingleEventSource;
 public record EffectSingleEventSource(IEffect Effect) : SingleEventSource;
 public record FalseSingleEventSource : SingleEventSource;
+public record PokemonTypeSingleEventSource(PokemonType Type) : SingleEventSource;
+
+
+/// <summary>
+/// Pokemon | Pokemon? | false | Type
+/// </summary>
+public abstract record RunEventSource
+{
+    public static implicit operator RunEventSource(Pokemon pokemon) => new PokemonRunEventSource(pokemon);
+    public static RunEventSource? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonRunEventSource(pokemon);
+    }
+    public static RunEventSource FromFalse() => new FalseRunEventSource();
+    public static implicit operator RunEventSource(PokemonType type) => new TypeRunEventSource(type);
+}
+public record PokemonRunEventSource(Pokemon Pokemon) : RunEventSource;
+public record FalseRunEventSource : RunEventSource;
+public record TypeRunEventSource(PokemonType Type) : RunEventSource;
+
 
 
 /// <summary>

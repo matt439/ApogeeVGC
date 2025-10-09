@@ -7,38 +7,60 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public class ModdedDex(TypeChart typeChart, Library library)
 {
-    //    getEffectiveness(
-    //        source: { type: string } | string,
-    //target: { getTypes: () => string[]
-    //} | { types: string[] } | string[] | string
-    //    ): number {
-    //    const sourceType: string = typeof source !== 'string' ? source.type : source;
-    //// @ts-expect-error really wish TS would support this
-    //    const targetTyping: string[] | string = target.getTypes?.() || target.types || target;
-    //    let totalTypeMod = 0;
-    //    if (Array.isArray(targetTyping))
-    //    {
-    //        for (const type of targetTyping) {
-    //            totalTypeMod += this.getEffectiveness(sourceType, type);
-    //        }
-    //        return totalTypeMod;
-    //    }
-    //    const typeData = this.types.get(targetTyping);
-    //    if (!typeData) return 0;
-    //    switch (typeData.damageTaken[sourceType])
-    //    {
-    //        case 1: return 1; // super-effective
-    //        case 2: return -1; // resist
-    //        // in case of weird situations like Gravity, immunity is handled elsewhere
-    //        default: return 0;
-    //    }
-    //}
-    
-    
-    
-    
-    
-    
+    /// <summary>
+    /// Calculates type effectiveness for a move against a target.
+    /// Returns a MoveEffectiveness enum value representing the combined effectiveness.
+    /// </summary>
+    /// <param name="source">Move to check effectiveness for</param>
+    /// <param name="target">Pokemon target</param>
+    /// <returns>MoveEffectiveness enum value</returns>
+    public MoveEffectiveness GetEffectiveness(ActiveMove source, Pokemon target)
+    {
+        return GetEffectiveness(source.Type, target.GetTypes());
+    }
+
+    /// <summary>
+    /// Calculates type effectiveness for a move type against a Pokemon.
+    /// </summary>
+    public MoveEffectiveness GetEffectiveness(MoveType sourceType, Pokemon target)
+    {
+        return GetEffectiveness(sourceType, target.GetTypes());
+    }
+
+    /// <summary>
+    /// Calculates type effectiveness for a move type against an array of types.
+    /// Delegates to TypeChart which already handles combining effectiveness.
+    /// </summary>
+    public MoveEffectiveness GetEffectiveness(MoveType sourceType, PokemonType[] targetTypes)
+    {
+        // TypeChart already has this exact logic!
+        return typeChart.GetMoveEffectiveness(targetTypes, sourceType);
+    }
+
+    /// <summary>
+    /// Calculates type effectiveness for a move type against target types.
+    /// Delegates to TypeChart which already handles combining effectiveness.
+    /// </summary>
+    public MoveEffectiveness GetEffectiveness(MoveType sourceType, IReadOnlyList<PokemonType> targetTypes)
+    {
+        // TypeChart already has this exact logic!
+        return typeChart.GetMoveEffectiveness(targetTypes, sourceType);
+    }
+
+    /// <summary>
+    /// Calculates type effectiveness for a move type against a single target type.
+    /// Delegates to TypeChart for the base lookup.
+    /// </summary>
+    /// <param name="sourceType">The attacking move's type</param>
+    /// <param name="targetType">The defending Pokemon's type</param>
+    /// <returns>MoveEffectiveness enum value for single-type matchup</returns>
+    public MoveEffectiveness GetEffectiveness(MoveType sourceType, PokemonType targetType)
+    {
+        // TypeChart already has this exact logic!
+        return typeChart.GetMoveEffectiveness(targetType, sourceType);
+    }
+
+
     /// <summary>
     /// Returns false if the target is immune; true otherwise.
     /// Also checks immunity to some statuses.

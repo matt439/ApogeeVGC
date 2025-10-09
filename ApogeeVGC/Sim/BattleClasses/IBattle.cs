@@ -19,7 +19,7 @@ public interface IBattle
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
         RelayVar? relayVar = null, Delegate? customCallback = null);
 
-    RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, PokemonFalseUnion? source = null,
+    RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null);
 
     void EachEvent(EventId eventId, IEffect? effect, bool? relayVar);
