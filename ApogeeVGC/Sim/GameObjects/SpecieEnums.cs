@@ -23,6 +23,8 @@ public enum SpecieId
     Calyrex,
     ShayminSky,
     Shaymin,
+    GreninjaBond,
+    RockruffDusk,
 }
 
 public enum FormeId

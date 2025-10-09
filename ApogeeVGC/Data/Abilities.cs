@@ -157,7 +157,7 @@ public record Abilities
 
                     if (battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
                     {
-                        pokemon.AddVolatile(battle, quarkDrive);
+                        pokemon.AddVolatile(quarkDrive.Id);
                     }
                     else if (!(pokemon.GetVolatile(ConditionId.QuarkDrive)?.FromBooster ?? false))
                     {

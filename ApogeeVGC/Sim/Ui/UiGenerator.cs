@@ -25,6 +25,8 @@ public enum UiType
     SideStart,
     SideEnd,
     Immune,
+    DetailsChange,
+    FormeChange,
 }
 
 public static class UiGenerator
@@ -64,6 +66,22 @@ public static class UiGenerator
     public static void PrintAbilityEvent(Pokemon pokemon, string ability)
     {
         Console.WriteLine($"{pokemon.Name}'s {ability} activated!");
+    }
+
+    public static void PrintAbilityChangeEvent(Pokemon pokemon, Ability oldAbility,
+        Ability newAbility, IEffect sourceEffect, Pokemon? sourcePokemon = null)
+    {
+        if (sourcePokemon is not null)
+        {
+            Console.WriteLine(
+                $"{pokemon.Name}'s {oldAbility.Name} was changed to {newAbility.Name} due to" +
+                $"{sourcePokemon.Name}'s {sourceEffect.Name}!");
+        }
+        else
+        {
+            Console.WriteLine(
+                $"{pokemon.Name}'s {oldAbility.Name} was changed to {newAbility.Name} due to {sourceEffect.Name}!");
+        }
     }
 
     public static void PrintActivateEvent(Pokemon pokemon, IEffect effect, IEffect? sourceEffect = null)
@@ -163,5 +181,16 @@ public static class UiGenerator
     public static void PrintImmuneEvent(Pokemon pokemon)
     {
         Console.WriteLine($"{pokemon.Name} is immune!");
+    }
+
+    public static void PrintDetailsChangeEvent(Pokemon pokemon, Pokemon.PokemonDetails details)
+    {
+        Console.WriteLine($"{pokemon.Name}'s details changed: {details}");
+    }
+
+    public static void PrintFormeChangeEvent(Pokemon pokemon, SpecieId newForme, string? message = null,
+        IEffect? sourceEffect = null)
+    {
+        Console.WriteLine($"{pokemon.Name} changed forme to {newForme}!");
     }
 }

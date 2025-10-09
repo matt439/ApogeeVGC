@@ -33,6 +33,10 @@ public enum AbilityId
     Corrosion,
     NeutralizingGas,
     Klutz,
+    IceFace,
+    Disguise,
+
+    None,
 }
 
 

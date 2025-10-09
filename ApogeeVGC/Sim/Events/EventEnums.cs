@@ -19,6 +19,7 @@ public enum EventId
     ModifySpA,
     ModifySpD,
     ModifySpe,
+    SetAbility,
 }
 
 public enum EventType

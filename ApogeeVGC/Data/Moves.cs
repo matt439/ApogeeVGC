@@ -105,9 +105,9 @@ public record Moves
                 VolatileStatus = ConditionId.Protect,
                 OnPrepareHit = (battle, pokemon, _, _) => battle.Queue.WillAct() is null &&
                                                           battle.RunEvent(EventId.StallMove, pokemon) is not null,
-                OnHit = (battle, pokemon, _, _) =>
+                OnHit = (_, pokemon, _, _) =>
                 {
-                    pokemon.AddVolatile(battle, _library.Conditions[ConditionId.Stall]);
+                    pokemon.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
                 },
                 Condition = _library.Conditions[ConditionId.Protect],

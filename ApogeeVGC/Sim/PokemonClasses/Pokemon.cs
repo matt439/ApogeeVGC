@@ -142,6 +142,8 @@ public class Pokemon
         }
     }
 
+    public PokemonDetails Details { get; set; }
+
     public Pokemon(IBattle battle, PokemonSet set, Side side)
     {
         Side = side;
@@ -224,6 +226,7 @@ public class Pokemon
 
         ClearVolatile();
         Hp = MaxHp;
+        Details = GetUpdatedDetails();
     }
 
 
@@ -840,17 +843,38 @@ public class Pokemon
 
     public bool HasAbility(AbilityId ability)
     {
-        throw new NotImplementedException();
+        if (ability != Ability) return false;
+        return !IgnoringAbility();
     }
 
     public bool HasAbility(AbilityId[] abilities)
     {
-        throw new NotImplementedException();
+        return abilities.Contains(Ability) && !IgnoringAbility();
     }
 
     public bool CureStatus(bool silent = false)
     {
-        throw new NotImplementedException();
+        // Early exit if Pokemon is fainted or has no status
+        if (Hp <= 0 || Status == null) return false;
+
+        // Add cure status message to battle log
+        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status.Value]);
+
+        // Special case: If curing sleep, also remove Nightmare volatile
+        if (Status == ConditionId.Sleep)
+        {
+            // Check if Pokemon has Nightmare volatile and remove it
+            if (Volatiles.ContainsKey(ConditionId.Nightmare))
+            {
+                DeleteVolatile(ConditionId.Nightmare); // Use DeleteVolatile to avoid extra logic
+                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+            }
+        }
+
+        // Clear the status (equivalent to setStatus(''))
+        SetStatus(ConditionId.None);
+
+        return true;
     }
 
     /// <summary>
@@ -858,11 +882,304 @@ public class Pokemon
     /// </summary>
     public bool ClearStatus()
     {
-        throw new NotImplementedException();
+        // Early exit if Pokemon is fainted or has no status
+        if (Hp <= 0 || Status == null) return false;
+
+        // Special case: If clearing sleep, also remove Nightmare volatile (silent)
+        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
+        {
+            // Remove Nightmare volatile and add silent end message
+            if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
+            {
+                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+            }
+        }
+
+        // Clear the status directly (no events, no messages)
+        Status = null;
+        StatusState = Battle.InitEffectState(null, null, null);
+
+        return true;
     }
 
-    public bool FormeChange(SpecieId specieId, IEffect? source, bool? isPermanent, int abilitySlot = 0,
-        string? message = null)
+ //   /**
+	// * Changes this Pokemon's forme to match the given speciesId (or species).
+	// * This function handles all changes to stats, ability, type, species, etc.
+	// * as well as sending all relevant messages sent to the client.
+	// */
+	//formeChange(
+	//	speciesId: string | Species, source: Effect | null = this.battle.effect,
+	//	isPermanent?: boolean, abilitySlot = '0', message?: string
+	//) {
+	//	const rawSpecies = this.battle.dex.species.get(speciesId);
+
+	//	const species = this.setSpecies(rawSpecies, source);
+	//	if (!species) return false;
+
+	//	if (this.battle.gen <= 2) return true;
+
+	//	// The species the opponent sees
+	//	const apparentSpecies =
+	//		this.illusion ? this.illusion.species.name : species.baseSpecies;
+	//	if (isPermanent) {
+	//		this.baseSpecies = rawSpecies;
+	//		this.details = this.getUpdatedDetails();
+	//		let details = (this.illusion || this).details;
+	//		if (this.terastallized) details += `, tera:${this.terastallized}`;
+	//		this.battle.add('detailschange', this, details);
+	//		this.updateMaxHp();
+	//		if (!source) {
+	//			// Tera forme
+	//			// Ogerpon/Terapagos text goes here
+	//			this.formeRegression = true;
+	//		} else if (source.effectType === 'Item') {
+	//			this.canTerastallize = null; // National Dex behavior
+	//			if (source.zMove) {
+	//				this.battle.add('-burst', this, apparentSpecies, species.requiredItem);
+	//				this.moveThisTurnResult = true; // Ultra Burst counts as an action for Truant
+	//			} else if (source.isPrimalOrb) {
+	//				if (this.illusion) {
+	//					this.ability = '';
+	//					this.battle.add('-primal', this.illusion, species.requiredItem);
+	//				} else {
+	//					this.battle.add('-primal', this, species.requiredItem);
+	//				}
+	//			} else {
+	//				this.battle.add('-mega', this, apparentSpecies, species.requiredItem);
+	//				this.moveThisTurnResult = true; // Mega Evolution counts as an action for Truant
+	//			}
+	//			this.formeRegression = true;
+	//		} else if (source.effectType === 'Status') {
+	//			// Shaymin-Sky -> Shaymin
+	//			this.battle.add('-formechange', this, species.name, message);
+	//		}
+	//	} else {
+	//		if (source?.effectType === 'Ability') {
+	//			this.battle.add('-formechange', this, species.name, message, `[from] ability: ${source.name}`);
+	//		} else {
+	//			this.battle.add('-formechange', this, this.illusion ? this.illusion.species.name : species.name, message);
+	//		}
+	//	}
+	//	if (isPermanent && (!source || !['disguise', 'iceface'].includes(source.id))) {
+	//		if (this.illusion && source) {
+	//			// Tera forme by Ogerpon or Terapagos breaks the Illusion
+	//			this.ability = ''; // Don't allow Illusion to wear off
+	//		}
+	//		const ability = species.abilities[abilitySlot] || species.abilities['0'];
+	//		// Ogerpon's forme change doesn't override permanent abilities
+	//		if (source || !this.getAbility().flags['cantsuppress']) this.setAbility(ability, null, null, true);
+	//		// However, its ability does reset upon switching out
+	//		this.baseAbility = toID(ability);
+	//	}
+	//	if (this.terastallized) {
+	//		this.knownType = true;
+	//		this.apparentType = this.terastallized;
+	//	}
+	//	return true;
+	//}
+
+
+    /// <summary>
+    /// Changes this Pokemon's forme to match the given speciesId (or species).
+    /// This function handles all changes to stats, ability, type, species, etc.
+    /// as well as sending all relevant messages sent to the client.
+    /// </summary>
+    public bool FormeChange(SpecieId specieId, IEffect? source = null, bool? isPermanent = null,
+        SpeciesAbilityType abilitySlot = SpeciesAbilityType.Slot0, string? message = null)
+    {
+        // Default source to battle effect if not provided
+        source ??= Battle.Effect;
+
+        // Get the raw species from the battle library
+        Species rawSpecies = Battle.Library.Species[specieId];
+
+        // Attempt to set the species
+        Species? species = SetSpecie(rawSpecies, source);
+        if (species == null) return false;
+
+        // Early return for Gen 1-2 battles
+        if (Battle.Gen <= 2) return true;
+
+        // Determine the species the opponent sees (accounting for Illusion)
+        //SpecieId apparentSpecies = Illusion?.Species.BaseSpecies ?? species.BaseSpecies;
+
+        if (isPermanent == true)
+        {
+            // Update base species for permanent changes
+            BaseSpecies = rawSpecies;
+
+            // Update details and send to client
+            Details = GetUpdatedDetails();
+            PokemonDetails details = (Illusion ?? this).GetUpdatedDetails();
+
+            // Add Tera type to details if Terastallized
+            if (Terastallized != null)
+            {
+                details.TeraType = Terastallized.Value;
+            }
+            UiGenerator.PrintDetailsChangeEvent(this, details);
+
+            // Update max HP based on new species
+            UpdateMaxHp();
+
+            // Handle different source types for permanent changes
+            if (source.EffectType == EffectType.Condition)
+            {
+                // Status-based forme change (e.g., Shaymin-Sky -> Shaymin)
+                UiGenerator.PrintFormeChangeEvent(this, species.Id, message);
+            }
+        }
+        else
+        {
+            // Handle temporary forme changes
+            if (source.EffectType == EffectType.Ability)
+            {
+                UiGenerator.PrintFormeChangeEvent(this, species.Id, message, source);
+            }
+            else
+            {
+                UiGenerator.PrintFormeChangeEvent(this, Illusion is not null ? Illusion.Species.Id :
+                    species.Id, message);
+            }
+        }
+
+        // Handle ability changes for permanent forme changes
+        if (isPermanent == true &&
+            source is Ability ability && ability.Id != AbilityId.Disguise && ability.Id != AbilityId.IceFace)
+        {
+            // Break Illusion for certain Tera forme changes
+            if (Illusion != null)
+            {
+                // Tera forme by Ogerpon or Terapagos breaks the Illusion
+                Ability = AbilityId.None; // Don't allow Illusion to wear off
+            }
+
+            // Get the new ability from the species
+            AbilityId newAbility = species.Abilities.GetAbility(abilitySlot) ?? species.Abilities.Slot0;
+
+            SetAbility(newAbility, isFromFormeChange: true);
+
+            // Reset base ability (ability resets upon switching out)
+            BaseAbility = newAbility;
+        }
+
+        // Update type visibility for Terastallized Pokemon
+        if (Terastallized != null)
+        {
+            KnownType = true;
+            ApparentType = [Terastallized.Value.ConvertToPokemonType()];
+        }
+
+        return true;
+    }
+
+    public class PokemonDetails
+    {
+        public SpecieId Id{ get; init; }
+        public int Level { get; init; }
+        public GenderId Gender { get; init; }
+        public bool Shiny { get; init; }
+        public MoveType? TeraType { get; set; }
+    }
+
+    public PokemonDetails GetUpdatedDetails(int? level = null)
+    {
+        SpecieId id = Species.Id;
+        
+        // Handle special forms that should use base species name
+        if (id is SpecieId.GreninjaBond or SpecieId.RockruffDusk)
+        {
+            id = Species.BaseSpecies;
+        }
+        
+        // Use provided level or fall back to Pokemon's level
+        int displayLevel = level ?? Level;
+        
+        var details = new PokemonDetails
+        {
+            Id = id,
+            Level = displayLevel,
+            Gender = Gender,
+            Shiny = Set.Shiny,
+        };
+
+        return details;
+    }
+
+    public AbilityIdFalseUnion? SetAbility(AbilityId ability, Pokemon? source = null, IEffect? sourceEffect = null,
+        bool isFromFormeChange = false, bool isTransform = false)
+    {
+        // Early exit if Pokemon is fainted
+        if (Hp <= 0) return AbilityIdFalseUnion.FromFalse();
+
+        // Get the ability object from the battle library
+        Ability newAbility = Battle.Library.Abilities[ability];
+
+        // Default sourceEffect to battle effect if not provided
+        sourceEffect ??= Battle.Effect;
+
+        // Get the old ability for comparison and return value
+        Ability oldAbility = GetAbility();
+
+        // Check suppression flags (unless from forme change)
+        if (!isFromFormeChange)
+        {
+            if (newAbility.Flags.CantSuppress == true || oldAbility.Flags.CantSuppress == true)
+            {
+                return AbilityIdFalseUnion.FromFalse();
+            }
+        }
+
+        // Run SetAbility event for validation (unless from forme change or transform)
+        if (!isFromFormeChange && !isTransform)
+        {
+            RelayVar? setAbilityEvent = Battle.RunEvent(EventId.SetAbility, this,
+                PokemonFalseUnion.FromNullablePokemon(source), sourceEffect, newAbility);
+
+            // Return the actual event result (matching TypeScript behavior)
+            if (setAbilityEvent is BoolRelayVar { Value: false })
+            {
+                return AbilityIdFalseUnion.FromFalse();
+            }
+            if (setAbilityEvent is null)
+            {
+                return null;
+            }
+        }
+
+        // End the old ability's effects
+        Battle.SingleEvent(EventId.End, oldAbility, AbilityState, this,
+            SingleEventSource.FromNullablePokemon(source));
+
+        // Set the new ability
+        Ability = ability;
+        AbilityState = Battle.InitEffectState(ability, null, this);
+
+        // Send battle message ONLY if sourceEffect exists (matching TypeScript)
+        if (!isFromFormeChange && !isTransform)
+        {
+            if (source != null)
+            {
+                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect, source);
+            }
+            else
+            {
+                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect);
+            }
+        }
+
+        // Start the new ability's effects (Gen 4+ only)
+        if (ability != AbilityId.None && Battle.Gen > 3 &&
+            (!isTransform || oldAbility.Id != newAbility.Id || Battle.Gen <= 4))
+        {
+            Battle.SingleEvent(EventId.Start, newAbility, AbilityState, this,
+                SingleEventSource.FromNullablePokemon(source));
+        }
+
+        return oldAbility.Id;
+    }
+
+    public void UpdateMaxHp()
     {
         throw new NotImplementedException();
     }

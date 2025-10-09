@@ -408,6 +408,11 @@ public abstract record SingleEventSource
     public static implicit operator SingleEventSource(Pokemon pokemon) =>
         new PokemonSingleEventSource(pokemon);
 
+    public static SingleEventSource? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonSingleEventSource(pokemon);
+    }
+
     public static implicit operator SingleEventSource(Ability ability) =>
         EffectUnionFactory.ToSingleEventSource(ability);
 
@@ -458,6 +463,19 @@ public record PokemonTypeRelayVar(PokemonType Type) : RelayVar;
 public record ConditionIdRelayVar(ConditionId? Id) : RelayVar;
 public record BoostsTableRelayVar(BoostsTable Table) : RelayVar;
 
+
+
+/// <summary>
+/// AbilityId | false
+/// </summary>
+public abstract record AbilityIdFalseUnion
+{
+    public static implicit operator AbilityIdFalseUnion(AbilityId abilityId) =>
+        new AbilityIdAbilityIdFalseUnion(abilityId);
+    public static AbilityIdFalseUnion FromFalse() => new FalseAbilityIdFalseUnion();
+}
+public record AbilityIdAbilityIdFalseUnion(AbilityId AbilityId) : AbilityIdFalseUnion;
+public record FalseAbilityIdFalseUnion : AbilityIdFalseUnion;
 
 
 
@@ -521,8 +539,12 @@ public record BattleRunEventTarget(IBattle Battle) : RunEventTarget;
 public abstract record PokemonFalseUnion
 {
     public static implicit operator PokemonFalseUnion(Pokemon pokemon) => new PokemonPokemonUnion(pokemon);
-
     public static PokemonFalseUnion FromFalse() => new FalsePokemonUnion();
+
+    public static PokemonFalseUnion? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonPokemonUnion(pokemon);
+    }
 }
 public record PokemonPokemonUnion(Pokemon Pokemon) : PokemonFalseUnion;
 public record FalsePokemonUnion : PokemonFalseUnion;

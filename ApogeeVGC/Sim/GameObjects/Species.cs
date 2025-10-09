@@ -182,12 +182,57 @@ public record Species : IEffect
     }
 }
 
-public record SpeciesAbility
+public enum SpeciesAbilityType
 {
-    public AbilityId Slot0 { get; init; }
-    public AbilityId? Slot1 { get; init; }
-    public AbilityId? Hidden { get; init; }
-    public AbilityId? Special { get; init; }
+    Slot0,
+    Slot1,
+    Hidden,
+    Special,
+}
+
+public class SpeciesAbility
+{
+    public AbilityId Slot0 { get; set; }
+    public AbilityId? Slot1 { get; set; }
+    public AbilityId? Hidden { get; set; }
+    public AbilityId? Special { get; set; }
+
+    public AbilityId? GetAbility(SpeciesAbilityType type)
+    {
+        return type switch
+        {
+            SpeciesAbilityType.Slot0 => Slot0,
+            SpeciesAbilityType.Slot1 => Slot1,
+            SpeciesAbilityType.Hidden => Hidden,
+            SpeciesAbilityType.Special => Special,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+        };
+    }
+
+    public void SetAbility(SpeciesAbilityType type, AbilityId? abilityId)
+    {
+        switch (type)
+        {
+            case SpeciesAbilityType.Slot0:
+                if (abilityId == null)
+                {
+                    throw new ArgumentNullException(nameof(abilityId), "Slot0 ability cannot be null.");
+                }
+                Slot0 = abilityId.Value;
+                break;
+            case SpeciesAbilityType.Slot1:
+                Slot1 = abilityId;
+                break;
+            case SpeciesAbilityType.Hidden:
+                Hidden = abilityId;
+                break;
+            case SpeciesAbilityType.Special:
+                Special = abilityId;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+    }
 }
 
 

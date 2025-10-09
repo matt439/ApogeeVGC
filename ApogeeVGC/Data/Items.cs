@@ -51,7 +51,7 @@ public record Items
                 },
                 OnModifyMove = (battle, _, pokemon, _) =>
                 {
-                    pokemon.AddVolatile(battle, _library.Conditions[ConditionId.ChoiceLock]);
+                    pokemon.AddVolatile(ConditionId.ChoiceLock);
                 },
                 OnModifySpAPriority = 1,
                 OnModifySpA = (battle, _, _, _, _) => battle.ChainModify(1.5),
