@@ -15,6 +15,32 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public interface IBattle
 {
+    int ActivePerHalf { get; }
+    BattleQueue Queue { get; }
+    Event? Event { get; }
+    ModdedDex Dex { get; }
+    int Gen { get; }
+
+    Library Library { get; }
+    //Random Random { get; }
+    bool PrintDebug { get; }
+    Field Field { get; }
+
+    IEffect Effect { get; }
+    EffectState EffectState { get; }
+
+    Side Side1 { get; }
+    Side Side2 { get; }
+    int? BattleSeed { get; set; }
+
+    bool IsGameComplete { get; }
+
+    GameType GameType { get; }
+
+    Pokemon? ActiveTarget { get; set; }
+    ActiveMove? ActiveMove { get; set; }
+
+
     RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
         RelayVar? relayVar = null, Delegate? customCallback = null);
@@ -68,28 +94,9 @@ public interface IBattle
     /// <returns>A random double x where 0.0 ≤ x &lt; 1.0.</returns>
     double Random();
 
-    Library Library { get; }
-    //Random Random { get; }
-    bool PrintDebug { get; }
-    Field Field { get; }
-
-    IEffect Effect { get; }
-    EffectState EffectState { get; }
-
-    Side Side1 { get; }
-    Side Side2 { get; }
-    int? BattleSeed { get; set; }
-
     IBattle Copy();
 
-    bool IsGameComplete { get; }
-
-    GameType GameType { get; }
-
     int ClampIntRange(int num, int? min, int? max);
-
-    Pokemon? ActiveTarget { get; set; }
-    ActiveMove? ActiveMove { get; set; }
 
     Pokemon? GetAtSlot(PokemonSlot? slot);
 
@@ -103,17 +110,7 @@ public interface IBattle
 
     MoveCategory GetCategory(ActiveMove move);
 
-    int ActivePerHalf { get; }
-
-    BattleQueue Queue { get; }
-
-    Event? Event { get; }
-
-    ModdedDex Dex { get; }
-
     void Start();
-
-    int Gen => 9;
 
     List<Pokemon> GetAllActive(bool? includeFainted = null);
 
