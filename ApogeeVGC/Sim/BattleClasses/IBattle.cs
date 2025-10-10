@@ -1,14 +1,11 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Core;
-//using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-//using ApogeeVGC.Sim.Turns;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -29,16 +26,16 @@ public interface IBattle
     IEffect Effect { get; }
     EffectState EffectState { get; }
 
-    Side Side1 { get; }
-    Side Side2 { get; }
-    int? BattleSeed { get; set; }
-
-    bool IsGameComplete { get; }
+    //Side Side1 { get; }
+    //Side Side2 { get; }
+    //int? BattleSeed { get; set; }
 
     GameType GameType { get; }
 
     Pokemon? ActiveTarget { get; set; }
     ActiveMove? ActiveMove { get; set; }
+
+    public BattleActions Actions { get; }
 
 
     RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
@@ -97,6 +94,7 @@ public interface IBattle
     IBattle Copy();
 
     int ClampIntRange(int num, int? min, int? max);
+    //Func<int, int?, int?, int> ClampIntRange { get; }
 
     Pokemon? GetAtSlot(PokemonSlot? slot);
 

@@ -11,6 +11,7 @@ public record Library
 {
     private readonly Abilities _abilities;
     private readonly Conditions _conditions;
+    private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
     private readonly Moves _moves;
@@ -22,10 +23,12 @@ public record Library
 
     private IReadOnlyDictionary<AbilityId, Ability> AbilitiesData => _abilities.AbilitiesData;
     private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
+    private IReadOnlyDictionary<FormatId, Format> FormatsData => _formats.FormatData;
     private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
     private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
     private IReadOnlyDictionary<NatureType, Nature> NaturesData => _natures.NatureData;
+    private IReadOnlyDictionary<RuleId, Format> RulesetsData => _rulesets.RulesetData;
     private IReadOnlyDictionary<SpecieId, Species> SpeciesData => _speciesData.SpeciesDataDictionary;
     private IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
 
@@ -34,7 +37,10 @@ public record Library
     
     public IReadOnlyDictionary<ConditionId, Condition> Conditions => 
         new ReadOnlyDictionaryWrapper<ConditionId, Condition>(ConditionsData);
-    
+
+    public IReadOnlyDictionary<FormatId, Format> Formats => 
+        new ReadOnlyDictionaryWrapper<FormatId, Format>(FormatsData);
+
     public IReadOnlyDictionary<ItemId, Item> Items => 
         new ReadOnlyDictionaryWrapper<ItemId, Item>(ItemsData);
     
@@ -46,7 +52,10 @@ public record Library
     
     public IReadOnlyDictionary<NatureType, Nature> Natures => 
         new ReadOnlyDictionaryWrapper<NatureType, Nature>(NaturesData);
-    
+
+    public IReadOnlyDictionary<RuleId, Format> Rulesets =>
+        new ReadOnlyDictionaryWrapper<RuleId, Format>(RulesetsData);
+
     public IReadOnlyDictionary<SpecieId, Species> Species => 
         new ReadOnlyDictionaryWrapper<SpecieId, Species>(SpeciesData);
     

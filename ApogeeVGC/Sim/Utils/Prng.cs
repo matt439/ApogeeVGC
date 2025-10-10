@@ -3,3 +3,5 @@
 public class Prng
 {
 }
+
+public record PrngSeed;

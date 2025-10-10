@@ -22,13 +22,12 @@ public enum GameType
     Doubles,
 }
 
-public enum BattleRequestState
+public enum RequestState
 {
-    RequestingPlayer1Input,
-    RequestingPlayer2Input,
-    RequestingBothPlayersInput,
-    Player1Win,
-    Player2Win,
+    TeamPreview,
+    Move,
+    SwitchIn,
+    None,
 }
 
 public enum PlayerState

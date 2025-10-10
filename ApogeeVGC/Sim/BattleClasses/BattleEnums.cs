@@ -33,3 +33,13 @@ public enum GameplayExecutionStage
     ForceSwitch,
     FaintedSwitch,
 }
+
+public enum BattleId
+{
+    Default,
+}
+
+public enum SendType
+{
+    Message,
+}
