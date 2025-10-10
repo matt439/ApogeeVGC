@@ -13,8 +13,8 @@ public record BattleOptions
     public bool? Rated { get; init; } // Rated string
     public PlayerOptions? P1 { get; init; } // Player 1 data
     public PlayerOptions? P2 { get; init; } // Player 2 data
-    public PlayerOptions? P3 { get; init; } // Player 3 data
-    public PlayerOptions? P4 { get; init; } // Player 4 data
+    //public PlayerOptions? P3 { get; init; } // Player 3 data
+    //public PlayerOptions? P4 { get; init; } // Player 4 data
     public bool Debug { get; init; } // show debug mode option
     public bool? ForceRandomChance { get; init; } // force Battle#randomChance to always return true or false (used in some tests)
     public bool Deserialized { get; init; }

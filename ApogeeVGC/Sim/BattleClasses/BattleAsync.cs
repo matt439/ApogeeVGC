@@ -136,8 +136,8 @@ public class BattleAsync : IBattle
         GameType = Format.GameType;
         Sides = new List<Side>(2);
         ActivePerHalf = 1;
-        //Prng = options.Prng ?? new Prng(options.Seed); TODO: Implement PRNG
-        //PrngSeed = Prng.StartingSeed;
+        Prng = options.Prng ?? new Prng(options.Seed);
+        PrngSeed = Prng.StartingSeed;
 
         Rated = options.Rated ?? false;
 

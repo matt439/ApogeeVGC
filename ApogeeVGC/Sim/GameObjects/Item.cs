@@ -115,7 +115,7 @@ public record Item : IPokemonEventMethods, IEffect, IBasicEffect
         throw new NotImplementedException();
         //return new Item
         //{
-        //    Id = Id,
+        //    Choice = Choice,
         //    Name = Name,
         //    SpriteNum = SpriteNum,
         //    Fling = Fling with { },

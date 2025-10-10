@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Utils.Extensions;
 
@@ -9,8 +8,8 @@ public static class SideIdTools
     {
         return sideId switch
         {
-            SideId.Side1 => SideId.Side2,
-            SideId.Side2 => SideId.Side1,
+            SideId.P1 => SideId.P2,
+            SideId.P2 => SideId.P1,
             _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid SideId."),
         };
     }
@@ -19,8 +18,8 @@ public static class SideIdTools
     {
         return sideId switch
         {
-            SideId.Side1 => "Side1",
-            SideId.Side2 => "Side2",
+            SideId.P1 => "P1",
+            SideId.P2 => "P2",
             _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid SideId."),
         };
     }

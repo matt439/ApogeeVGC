@@ -10,7 +10,7 @@
 
 //public struct MoveSetup
 //{
-//    public MoveId Id { get; init; }
+//    public MoveId Choice { get; init; }
 //    public int PpUp
 //    {
 //        get;
@@ -25,7 +25,7 @@
 //    } = 0;
 //    public MoveSetup(MoveId id, int ppUp = 0)
 //    {
-//        Id = id;
+//        Choice = id;
 //        PpUp = ppUp;
 //    }
 //}
@@ -54,9 +54,9 @@
 //        int i = 0;
 //        foreach (MoveSetup moveSetup in moves)
 //        {
-//            if (!library.Moves.TryGetValue(moveSetup.Id, out Move? move))
+//            if (!library.Moves.TryGetValue(moveSetup.Choice, out Move? move))
 //            {
-//                throw new ArgumentException($"Move {moveSetup.Id} not found in library.");
+//                throw new ArgumentException($"Move {moveSetup.Choice} not found in library.");
 //            }
 //            move = move with { PpUp = moveSetup.PpUp }; // Set PP Up
 //            move = move with { MoveSlot = (MoveSlot)i };

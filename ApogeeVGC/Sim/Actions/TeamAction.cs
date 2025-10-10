@@ -1,0 +1,26 @@
+﻿using ApogeeVGC.Sim.PokemonClasses;
+
+namespace ApogeeVGC.Sim.Actions;
+
+public record TeamAction : IAction
+{
+    public ActionId Choice
+    {
+        get;
+        init
+        {
+            if (value is ActionId.Team)
+            {
+                field = value;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(Choice), "Invalid ActionId for TeamAction.");
+            }
+        }
+    }
+    public int Priority { get; init; }
+    public int Speed => 1;
+    public required Pokemon Pokemon { get; init; }
+    public int Index { get; init; }
+}

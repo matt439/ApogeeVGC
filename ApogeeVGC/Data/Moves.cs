@@ -633,7 +633,7 @@ public record Moves
             },
             //[MoveId.Confused] = new()
             //{
-            //    Id = MoveId.Confused,
+            //    Choice = MoveId.Confused,
             //    Num = 10019,
             //    Accuracy = IntTrueUnion.FromTrue(),
             //    Name = "Confused",
@@ -647,7 +647,7 @@ public record Moves
             //// Custom moves
             //[MoveId.NormalBasic] = new Move
             //{
-            //    Id = MoveId.NormalBasic,
+            //    Choice = MoveId.NormalBasic,
             //    Num = 10001,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -664,7 +664,7 @@ public record Moves
             //},
             //[MoveId.IceBasic] = new Move
             //{
-            //    Id = MoveId.IceBasic,
+            //    Choice = MoveId.IceBasic,
             //    Num = 10002,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -681,7 +681,7 @@ public record Moves
             //},
             //[MoveId.DragonBasic] = new Move
             //{
-            //    Id = MoveId.DragonBasic,
+            //    Choice = MoveId.DragonBasic,
             //    Num = 10003,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -698,7 +698,7 @@ public record Moves
             //},
             //[MoveId.FireBasic] = new Move
             //{
-            //    Id = MoveId.FireBasic,
+            //    Choice = MoveId.FireBasic,
             //    Num = 10004,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -715,7 +715,7 @@ public record Moves
             //},
             //[MoveId.BugBasic] = new Move
             //{
-            //    Id = MoveId.BugBasic,
+            //    Choice = MoveId.BugBasic,
             //    Num = 10005,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -732,7 +732,7 @@ public record Moves
             //},
             //[MoveId.FairyBasic] = new Move
             //{
-            //    Id = MoveId.FairyBasic,
+            //    Choice = MoveId.FairyBasic,
             //    Num = 10006,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -749,7 +749,7 @@ public record Moves
             //},
             //[MoveId.GroundBasic] = new Move
             //{
-            //    Id = MoveId.GroundBasic,
+            //    Choice = MoveId.GroundBasic,
             //    Num = 10007,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -766,7 +766,7 @@ public record Moves
             //},
             //[MoveId.FightingBasic] = new Move
             //{
-            //    Id = MoveId.FightingBasic,
+            //    Choice = MoveId.FightingBasic,
             //    Num = 10008,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -783,7 +783,7 @@ public record Moves
             //},
             //[MoveId.SteelBasic] = new Move
             //{
-            //    Id = MoveId.SteelBasic,
+            //    Choice = MoveId.SteelBasic,
             //    Num = 10009,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -800,7 +800,7 @@ public record Moves
             //},
             //[MoveId.DarkBasic] = new Move
             //{
-            //    Id = MoveId.DarkBasic,
+            //    Choice = MoveId.DarkBasic,
             //    Num = 10010,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -817,7 +817,7 @@ public record Moves
             //},
             //[MoveId.ElectricBasic] = new Move
             //{
-            //    Id = MoveId.ElectricBasic,
+            //    Choice = MoveId.ElectricBasic,
             //    Num = 10011,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -834,7 +834,7 @@ public record Moves
             //},
             //[MoveId.GrassBasic] = new Move
             //{
-            //    Id = MoveId.GrassBasic,
+            //    Choice = MoveId.GrassBasic,
             //    Num = 10012,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -851,7 +851,7 @@ public record Moves
             //},
             //[MoveId.PsychicBasic] = new Move
             //{
-            //    Id = MoveId.PsychicBasic,
+            //    Choice = MoveId.PsychicBasic,
             //    Num = 10013,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -868,7 +868,7 @@ public record Moves
             //},
             //[MoveId.PoisonBasic] = new Move
             //{
-            //    Id = MoveId.PoisonBasic,
+            //    Choice = MoveId.PoisonBasic,
             //    Num = 10014,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -885,7 +885,7 @@ public record Moves
             //},
             //[MoveId.FlyingBasic] = new Move
             //{
-            //    Id = MoveId.FlyingBasic,
+            //    Choice = MoveId.FlyingBasic,
             //    Num = 10015,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -902,7 +902,7 @@ public record Moves
             //},
             //[MoveId.RockBasic] = new Move
             //{
-            //    Id = MoveId.RockBasic,
+            //    Choice = MoveId.RockBasic,
             //    Num = 10016,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -919,7 +919,7 @@ public record Moves
             //},
             //[MoveId.WaterBasic] = new Move
             //{
-            //    Id = MoveId.WaterBasic,
+            //    Choice = MoveId.WaterBasic,
             //    Num = 10017,
             //    Accuracy = 90,
             //    BasePower = 70,
@@ -936,7 +936,7 @@ public record Moves
             //},
             //[MoveId.GhostBasic] = new Move
             //{
-            //    Id = MoveId.GhostBasic,
+            //    Choice = MoveId.GhostBasic,
             //    Num = 10018,
             //    Accuracy = 90,
             //    BasePower = 70,

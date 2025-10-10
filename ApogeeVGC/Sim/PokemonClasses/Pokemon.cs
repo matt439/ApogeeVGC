@@ -152,7 +152,7 @@ public class Pokemon
         BaseSpecies = battle.Library.Species[set.Species];
         Species = BaseSpecies;
 
-        SpeciesState = battle.InitEffectState(Species.Id, null, null);
+        SpeciesState = battle.InitEffectState(Species.Id);
 
         if (set.Moves.Count == 0)
         {
@@ -183,10 +183,10 @@ public class Pokemon
 
         Position = new PokemonSlot
         {
-            SideId = SideId.Side1,
+            SideId = SideId.P1,
             PositionLetter = PositionLetter.A,
         };
-        StatusState = battle.InitEffectState(null, null, null);
+        StatusState = battle.InitEffectState();
         Volatiles = [];
 
         BaseStoredStats = new StatsTable(); // Will be initialized in SetSpecies
@@ -389,7 +389,7 @@ public class Pokemon
             {
                 if (Battle.PrintDebug)
                 {
-                    // Battle.Debug($"set status [{status.Id}] interrupted");
+                    // Battle.Debug($"set status [{status.Choice}] interrupted");
                 }
                 return false;
             }
@@ -430,7 +430,7 @@ public class Pokemon
             {
                 if (Battle.PrintDebug)
                 {
-                    // Battle.Debug($"status start [{status.Id}] interrupted");
+                    // Battle.Debug($"status start [{status.Choice}] interrupted");
                 }
 
                 // Rollback the status change
@@ -902,7 +902,7 @@ public class Pokemon
 
         // Clear the status directly (no events, no messages)
         Status = null;
-        StatusState = Battle.InitEffectState(null, null, null);
+        StatusState = Battle.InitEffectState();
 
         return true;
     }
