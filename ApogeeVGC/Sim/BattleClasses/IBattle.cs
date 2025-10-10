@@ -104,7 +104,7 @@ public interface IBattle
 
     //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
 
-    EffectState InitEffectState(EffectStateId? id, int? effectOrder, Pokemon? target);
+    EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null, Pokemon? target = null);
 
     MoveCategory GetCategory(ActiveMove move);
 

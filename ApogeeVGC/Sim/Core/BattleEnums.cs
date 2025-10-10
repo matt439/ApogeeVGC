@@ -2,8 +2,8 @@
 
 public enum SideId
 {
-    Side1,
-    Side2,
+    P1,
+    P2,
 }
 
 public enum PositionLetter

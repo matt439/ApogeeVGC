@@ -613,7 +613,7 @@ public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
 
 
 /// <summary>
-/// SpecieId | AbilityId | ItemId | ConditionId | MoveId
+/// SpecieId | AbilityId | ItemId | ConditionId | MoveId | FormatId
 /// </summary>
 public abstract record EffectStateId
 {
@@ -622,12 +622,14 @@ public abstract record EffectStateId
     public static implicit operator EffectStateId(ItemId itemId) => new ItemEffectStateId(itemId);
     public static implicit operator EffectStateId(ConditionId conditionId) => new ConditionEffectStateId(conditionId);
     public static implicit operator EffectStateId(MoveId moveId) => new MoveEffectStateId(moveId);
+    public static implicit operator EffectStateId(FormatId formatId) => new FormatEffectStateId(formatId);
 }
 public record SpecieEffectStateId(SpecieId SpecieId) : EffectStateId;
 public record AbilityEffectStateId(AbilityId AbilityId) : EffectStateId;
 public record ItemEffectStateId(ItemId ItemId) : EffectStateId;
 public record ConditionEffectStateId(ConditionId ConditionId) : EffectStateId;
 public record MoveEffectStateId(MoveId MoveId) : EffectStateId;
+public record FormatEffectStateId(FormatId FormatId) : EffectStateId;
 
 
 

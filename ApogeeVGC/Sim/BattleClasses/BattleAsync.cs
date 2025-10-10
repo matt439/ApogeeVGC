@@ -13,6 +13,13 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
+public record FaintQueue
+{
+    public required Pokemon Target { get; init; }
+    public Pokemon? Source { get; init; }
+    public IEffect? Effect { get; init; }
+}
+
 public class BattleAsync : IBattle
 {
     public BattleId Id { get; init; }
@@ -28,14 +35,15 @@ public class BattleAsync : IBattle
         get;
         init
         {
-            if (value is not 1 or 2 or 3)
+            if (value is not 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(ActivePerHalf), "ActivePerHalf must be 1, 2, or 3.");
+                throw new ArgumentOutOfRangeException(nameof(ActivePerHalf), "ActivePerHalf must be 1.");
             }
             field = value;
         }
     }
-    public Field Field { get; init; }
+    public Field Field { get; init; } = new();
+
     public IReadOnlyList<Side> Sides
     {
         get;
@@ -55,50 +63,45 @@ public class BattleAsync : IBattle
 
     Prng Prng { get; set; }
     public bool Rated { get; set; }
-    public bool ReportExactHp { get; set; }
-    public bool ReportPercentages { get; set; }
-    public bool SupportCancel { get; set; }
+    public bool ReportExactHp { get; set; } = false;
+    public bool ReportPercentages { get; set; } = false;
+    public bool SupportCancel { get; set; } = false;
 
     public BattleActions Actions { get; set; }
     public BattleQueue Queue { get; set; }
-    public record FaintQueue
-    {
-        public required Pokemon Target { get; init; }
-        public Pokemon? Source { get; init; }
-        public IEffect? Effect { get; init; }
-    }
+    public List<FaintQueue> FaintQueue { get; init; } = [];
 
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
     public List<string> MessageLog { get; set; } = [];
-    public int SentLogPos { get; set; }
-    public bool SentEnd { get; set; }
+    public int SentLogPos { get; set; } = 0;
+    public bool SentEnd { get; set; } = false;
     public static bool SentRequests => true;
 
-    public RequestState RequestState { get; set; }
-    public int Turn { get; set; }
-    public bool MidTurn { get; set; }
-    public bool Started { get; set; }
-    public bool Ended { get; set; }
+    public RequestState RequestState { get; set; } = RequestState.None;
+    public int Turn { get; set; } = 0;
+    public bool MidTurn { get; set; } = false;
+    public bool Started { get; set; } = false;
+    public bool Ended { get; set; } = false;
     public PlayerId? Winnder { get; set; }
 
     public IEffect Effect { get; set; }
     public EffectState EffectState { get; set; }
 
-    public Event Event { get; set; }
-    public Event? Events { get; set; }
-    public int EventDepth { get; set; }
-    
-    public ActiveMove? ActiveMove { get; set; }
-    public Pokemon? ActivePokemon { get; set; }
-    public Pokemon? ActiveTarget { get; set; }
+    public Event Event { get; set; } = new();
+    public Event? Events { get; set; } = null;
+    public int EventDepth { get; set; } = 0;
 
-    public ActiveMove? LastMove { get; set; }
-    public MoveId? LastSuccessfulMoveThisTurn { get; set; }
-    public int LastMoveLine { get; set; }
-    public int LastDamage { get; set; }
-    public int EffectOrder { get; set; }
-    public bool QuickClawRoll { get; set; }
+    public ActiveMove? ActiveMove { get; set; } = null;
+    public Pokemon? ActivePokemon { get; set; } = null;
+    public Pokemon? ActiveTarget { get; set; } = null;
+
+    public ActiveMove? LastMove { get; set; } = null;
+    public MoveId? LastSuccessfulMoveThisTurn { get; set; } = null;
+    public int LastMoveLine { get; set; } = -1;
+    public int LastDamage { get; set; } = 0;
+    public int EffectOrder { get; set; } = 0;
+    public bool QuickClawRoll { get; set; } = false;
     public List<int> SpeedOrder { get; set; } = [];
 
     // TeamGenerator
@@ -124,6 +127,46 @@ public class BattleAsync : IBattle
 
         Format = options.Format ?? Library.Formats[options.Id];
         // RuleTable
+        Id = BattleId.Default;
+        DebugMode = options.Debug;
+        ForceRandomChange = options.ForceRandomChance;
+        Deserialized = options.Deserialized;
+        StrictChoices = options.StrictChoices;
+        FormatData = InitEffectState(Format.FormatId);
+        GameType = Format.GameType;
+        Sides = new List<Side>(2);
+        ActivePerHalf = 1;
+        //Prng = options.Prng ?? new Prng(options.Seed); TODO: Implement PRNG
+        //PrngSeed = Prng.StartingSeed;
+
+        Rated = options.Rated ?? false;
+
+        //Queue = new BattleQueue(this);
+        //Actions = new BattleActions(this);
+
+        //Effect = EmptyEffect
+        EffectState = InitEffectState();
+
+        for (int i = 0; i < ActivePerHalf * 2; i++)
+        {
+            SpeedOrder.Add(i);
+        }
+
+        // TeamGenerator
+        // Hints
+
+        Send = options.Send ?? ((_, _) => { });
+
+        // InputOptions
+
+        if (options.P1 is not null)
+        {
+            SetPlayer(SideId.P1, options.P1);
+        }
+        if (options.P2 is not null)
+        {
+            SetPlayer(SideId.P2, options.P2);
+        }
     }
 
     public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
@@ -242,7 +285,7 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    public EffectState InitEffectState(EffectStateId? id, int? effectOrder, Pokemon? target)
+    public EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null, Pokemon? target = null)
     {
         throw new NotImplementedException();
     }
@@ -268,6 +311,11 @@ public class BattleAsync : IBattle
     }
 
     public BoolVoidUnion? SuppressingAbility(Pokemon? target = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void SetPlayer(SideId slot, PlayerOptions options)
     {
         throw new NotImplementedException();
     }
