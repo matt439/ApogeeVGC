@@ -9,7 +9,9 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -59,9 +61,9 @@ public class BattleAsync : IBattle
     public PrngSeed PrngSeed { get; init; }
     public ModdedDex Dex { get; set; }
     public int Gen => 9;
-    // RuleTable
+    public RuleTable RuleTable { get; set; }
 
-    Prng Prng { get; set; }
+    public Prng Prng { get; set; }
     public bool Rated { get; set; }
     public bool ReportExactHp { get; set; } = false;
     public bool ReportPercentages { get; set; } = false;
@@ -124,6 +126,8 @@ public class BattleAsync : IBattle
     public BattleAsync(BattleOptions options, Library library)
     {
         Library = library;
+        Dex = new ModdedDex(Library);
+        RuleTable = new RuleTable();
 
         Format = options.Format ?? Library.Formats[options.Id];
         // RuleTable
@@ -141,10 +145,10 @@ public class BattleAsync : IBattle
 
         Rated = options.Rated ?? false;
 
-        //Queue = new BattleQueue(this);
-        //Actions = new BattleActions(this);
+        Queue = new BattleQueue(this);
+        Actions = new BattleActions(this);
 
-        //Effect = EmptyEffect
+        Effect = null!; // TODO: Fix nullability
         EffectState = InitEffectState();
 
         for (int i = 0; i < ActivePerHalf * 2; i++)
@@ -237,27 +241,34 @@ public class BattleAsync : IBattle
 
     public bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false)
     {
-        throw new NotImplementedException();
+        if (move.Flags.Contact is not true || !attacker.HasItem(ItemId.ProtectivePads))
+        {
+            return move.Flags.Contact is true;
+        }
+        if (!announcePads) return false;
+        UiGenerator.PrintActivateEvent(defender, Effect);
+        UiGenerator.PrintActivateEvent(attacker, Library.Items[ItemId.ProtectivePads]);
+        return false;
     }
 
     public bool RandomChance(int numerator, int denominator)
     {
-        throw new NotImplementedException();
+        return ForceRandomChange ?? Prng.RandomChance(numerator, denominator);
     }
 
     public int Random(int m, int n)
     {
-        throw new NotImplementedException();
+        return Prng.Random(m, n);
     }
 
     public int Random(int n)
-    {
-        throw new NotImplementedException();
+    { 
+        return Prng.Random(n);
     }
 
     public double Random()
     {
-        throw new NotImplementedException();
+        return Prng.Random();
     }
 
     public IBattle Copy()
@@ -267,17 +278,30 @@ public class BattleAsync : IBattle
 
     public int ClampIntRange(int num, int? min, int? max)
     {
-        throw new NotImplementedException();
-    }
-
-    public int Trunc(int num, int bits = 0)
-    {
-        throw new NotImplementedException();
+        if (num < min)
+        {
+            return min.Value;
+        }
+        return num > max ? max.Value : num;
     }
 
     public Pokemon? GetAtSlot(PokemonSlot? slot)
     {
-        throw new NotImplementedException();
+        if (slot is null) return null;
+        Side side = GetSide(slot.SideId);
+        int position = (int)slot.PositionLetter;
+        int positionOffset = (int)Math.Floor(side.N / 2.0) * side.Active.Count;
+        return side.Active[position - positionOffset];
+    }
+
+    private Side GetSide(SideId id)
+    {
+        return id switch
+        {
+            SideId.P1 => Sides[0],
+            SideId.P2 => Sides[1],
+            _ => throw new ArgumentOutOfRangeException(nameof(id), $"Invalid SideId: {id}"),
+        };
     }
 
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
@@ -292,7 +316,7 @@ public class BattleAsync : IBattle
 
     public MoveCategory GetCategory(ActiveMove move)
     {
-        throw new NotImplementedException();
+        return move.Category;
     }
 
     public void Start()
@@ -300,14 +324,85 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    public List<Pokemon> GetAllActive(bool? includeFainted = null)
+    public List<Pokemon> GetAllActive(bool includeFainted = false)
     {
-        throw new NotImplementedException();
+        List<Pokemon> pokemnoList = [];
+        foreach (Side side in Sides)
+        {
+            pokemnoList.AddRange(side.Active.Where(pokemon => includeFainted || !pokemon.Fainted));
+        }
+        return pokemnoList;
     }
 
+    /// <summary>
+    /// Truncate a number to an unsigned 32-bit integer.
+    /// If bits is specified, the number is scaled, truncated, then unscaled.
+    /// This is used for precise damage calculations in Pokemon battles.
+    /// </summary>
+    private static int Trunc(int num, int bits = 0)
+    {
+        if (bits == 0)
+        {
+            // Simple case: just return the integer as-is
+            return num;
+        }
+
+        // For 16-bit truncation (used in nature calculations):
+        // Truncate to 16 bits by masking with 0xFFFF (65535)
+        // This matches the game's behavior for overflow prevention
+        if (bits == 16)
+        {
+            return num & 0xFFFF;
+        }
+
+        // For other bit counts, scale up by 2^bits, truncate, then scale back down
+        // This effectively performs: Math.Floor(num / (2^bits)) * (2^bits)
+        int divisor = 1 << bits; // 2^bits
+        return (num / divisor) * divisor;
+    }
+
+    /// <summary>
+    /// Calculate a single stat value using Pokemon's official stat calculation formula.
+    /// HP uses: floor(floor(2 * base + IV + floor(EV/4) + 100) * level / 100 + 10)
+    /// Other stats use: floor(floor(2 * base + IV + floor(EV/4)) * level / 100 + 5)
+    /// Then nature modifiers are applied with 16-bit truncation.
+    /// </summary>
     public int StatModify(StatsTable baseStats, PokemonSet set, StatId statName)
     {
-        throw new NotImplementedException();
+        int stat = baseStats.GetStat(statName);
+        int iv = set.Ivs.GetStat(statName);
+        int ev = set.Evs.GetStat(statName);
+
+        // HP calculation uses a different formula
+        if (statName == StatId.Hp)
+        {
+            // HP = floor(floor(2 * base + IV + floor(EV/4) + 100) * level / 100 + 10)
+            return Trunc(Trunc(2 * stat + iv + Trunc(ev / 4) + 100) * set.Level / 100 + 10);
+        }
+
+        // Other stats: floor(floor(2 * base + IV + floor(EV/4)) * level / 100 + 5)
+        stat = Trunc(Trunc(2 * stat + iv + Trunc(ev / 4)) * set.Level / 100 + 5);
+
+        // Apply nature modifiers
+        Nature nature = set.Nature;
+
+        // Natures are calculated with 16-bit truncation
+        // This only affects Eternatus-Eternamax in Pure Hackmons
+        if (nature.Plus == statName.ConvertToStatIdExceptId())
+        {
+            // Positive nature: multiply by 1.1 (110/100)
+            // Overflow protection: cap at 595 if rule is enabled
+            stat = RuleTable.Has(RuleId.OverflowStatMod) ? Math.Min(stat, 595) : stat;
+            stat = Trunc(Trunc(stat * 110, 16) / 100);
+        }
+        else if (nature.Minus == statName.ConvertToStatIdExceptId())
+        {
+            // Negative nature: multiply by 0.9 (90/100)
+            // Overflow protection: cap at 728 if rule is enabled
+            stat = RuleTable.Has(RuleId.OverflowStatMod) ? Math.Min(stat, 728) : stat;
+            stat = Trunc(Trunc(stat * 90, 16) / 100);
+        }
+        return stat;
     }
 
     public BoolVoidUnion? SuppressingAbility(Pokemon? target = null)

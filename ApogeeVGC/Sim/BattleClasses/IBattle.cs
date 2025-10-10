@@ -110,7 +110,7 @@ public interface IBattle
 
     void Start();
 
-    List<Pokemon> GetAllActive(bool? includeFainted = null);
+    List<Pokemon> GetAllActive(bool includeFainted = false);
 
     int StatModify(StatsTable baseStats, PokemonSet set, StatId statName);
 

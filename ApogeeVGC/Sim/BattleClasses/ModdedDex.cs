@@ -5,8 +5,11 @@ using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public class ModdedDex(TypeChart typeChart, Library library)
+public class ModdedDex(Library library)
 {
+    private readonly TypeChart _typeChart = library.TypeChart;
+
+
     /// <summary>
     /// Calculates type effectiveness for a move against a target.
     /// Returns a MoveEffectiveness enum value representing the combined effectiveness.
@@ -34,7 +37,7 @@ public class ModdedDex(TypeChart typeChart, Library library)
     public MoveEffectiveness GetEffectiveness(MoveType sourceType, PokemonType[] targetTypes)
     {
         // TypeChart already has this exact logic!
-        return typeChart.GetMoveEffectiveness(targetTypes, sourceType);
+        return _typeChart.GetMoveEffectiveness(targetTypes, sourceType);
     }
 
     /// <summary>
@@ -44,7 +47,7 @@ public class ModdedDex(TypeChart typeChart, Library library)
     public MoveEffectiveness GetEffectiveness(MoveType sourceType, IReadOnlyList<PokemonType> targetTypes)
     {
         // TypeChart already has this exact logic!
-        return typeChart.GetMoveEffectiveness(targetTypes, sourceType);
+        return _typeChart.GetMoveEffectiveness(targetTypes, sourceType);
     }
 
     /// <summary>
@@ -57,7 +60,7 @@ public class ModdedDex(TypeChart typeChart, Library library)
     public MoveEffectiveness GetEffectiveness(MoveType sourceType, PokemonType targetType)
     {
         // TypeChart already has this exact logic!
-        return typeChart.GetMoveEffectiveness(targetType, sourceType);
+        return _typeChart.GetMoveEffectiveness(targetType, sourceType);
     }
 
 
@@ -87,7 +90,7 @@ public class ModdedDex(TypeChart typeChart, Library library)
     /// </summary>
     public bool GetImmunity(MoveType sourceType, PokemonType targetType)
     {
-        MoveEffectiveness effectiveness = typeChart.GetMoveEffectiveness(targetType, sourceType);
+        MoveEffectiveness effectiveness = _typeChart.GetMoveEffectiveness(targetType, sourceType);
         return effectiveness != MoveEffectiveness.Immune;
     }
 

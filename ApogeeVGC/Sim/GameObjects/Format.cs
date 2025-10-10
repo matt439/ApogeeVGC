@@ -27,6 +27,7 @@ public enum FormatEffectType
 public enum RuleId
 {
     Standard,
+    OverflowStatMod,
 }
 
 public record Format : IEffect, IBasicEffect, IEventMethods

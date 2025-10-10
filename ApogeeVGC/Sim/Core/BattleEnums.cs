@@ -2,18 +2,18 @@
 
 public enum SideId
 {
-    P1,
-    P2,
+    P1 = 0,
+    P2 = 1,
 }
 
 public enum PositionLetter
 {
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3,
+    E = 4,
+    F = 5,
 }
 
 public enum GameType

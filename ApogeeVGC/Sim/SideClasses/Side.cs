@@ -10,7 +10,7 @@ public class Side
 {
     public IBattle Battle { get; }
     public SideId Id { get; }
-    //public int N { get; }
+    public int N { get; set; }
 
     public required string Name { get; set; }
     public required string Avatar { get; set; }

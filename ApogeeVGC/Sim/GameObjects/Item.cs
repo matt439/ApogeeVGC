@@ -24,6 +24,7 @@ public enum ItemId
     AbilityShield,
     IronBall,
     AirBalloon,
+    ProtectivePads,
 
     None,
 }
