@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Ui;
 
-public enum UiType
+public enum BattleAddId
 {
     Status,
     Start,
@@ -27,6 +27,7 @@ public enum UiType
     Immune,
     DetailsChange,
     FormeChange,
+    Player,
 }
 
 public static class UiGenerator

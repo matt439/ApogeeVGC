@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -57,6 +58,8 @@ public interface IBattle
 
     StatsTable SpreadModify(StatsTable baseStats, PokemonSet set);
 
+    //void Add(BattleAddId id);
+
     int FinalModify(int relayVar);
 
     double ChainModify(int numerator, int denominator = 1);
@@ -98,8 +101,6 @@ public interface IBattle
 
     Pokemon? GetAtSlot(PokemonSlot? slot);
 
-    int GetConfusionDamage(Pokemon pokemon, int basePower);
-
     //Turn CurrentTurn { get; }
 
     //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
@@ -114,5 +115,5 @@ public interface IBattle
 
     int StatModify(StatsTable baseStats, PokemonSet set, StatId statName);
 
-    BoolVoidUnion? SuppressingAbility(Pokemon? target = null);
+    bool SuppressingAbility(Pokemon? target = null);
 }

@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -46,7 +47,7 @@ public class BattleAsync : IBattle
     }
     public Field Field { get; init; } = new();
 
-    public IReadOnlyList<Side> Sides
+    public List<Side> Sides
     {
         get;
         init
@@ -138,7 +139,11 @@ public class BattleAsync : IBattle
         StrictChoices = options.StrictChoices;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
-        Sides = new List<Side>(2);
+        Sides = new List<Side>(2)
+        {
+            [0] = new Side(this),
+            [1] = new Side(this),
+        };
         ActivePerHalf = 1;
         Prng = options.Prng ?? new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
@@ -239,6 +244,11 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
+    public int Modify(int value, int numerator, int denominator = 1)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false)
     {
         if (move.Flags.Contact is not true || !attacker.HasItem(ItemId.ProtectivePads))
@@ -304,14 +314,47 @@ public class BattleAsync : IBattle
         };
     }
 
-    public int GetConfusionDamage(Pokemon pokemon, int basePower)
-    {
-        throw new NotImplementedException();
-    }
-
+    /// <summary>
+    /// Initializes an EffectState object with proper effect ordering.
+    /// Effect order is used to determine priority when multiple effects trigger.
+    /// - Effects with explicit effectOrder use that value
+    /// - Effects on active Pokemon/entities get auto-incremented order
+    /// - Effects on inactive targets get order 0
+    /// </summary>
     public EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null, Pokemon? target = null)
     {
-        throw new NotImplementedException();
+        // Create new EffectState with the provided or default ID
+        EffectStateId effectId = id ?? EffectStateId.FromEmpty();
+
+        int finalEffectOrder;
+
+        if (effectOrder.HasValue)
+        {
+            // If an effect order is explicitly provided, use it
+            finalEffectOrder = effectOrder.Value;
+        }
+        else if (effectId != EffectStateId.FromEmpty() && target != null)
+        {
+            // Auto-assign effect order for effects on targets
+            // Only increment for active Pokemon, otherwise use 0
+            // Use the battle's master counter for active effects
+            finalEffectOrder = target.IsActive ? EffectOrder++ : 0;
+        }
+        else
+        {
+            // Effects with no ID or no target get a default order of 0
+            finalEffectOrder = 0;
+        }
+
+        // Create and return the EffectState
+        return new EffectState
+        {
+            Id = effectId,
+            EffectOrder = finalEffectOrder,
+            Duration = null,
+
+            // TODO: Initialize other properties as needed
+        };
     }
 
     public MoveCategory GetCategory(ActiveMove move)
@@ -405,13 +448,164 @@ public class BattleAsync : IBattle
         return stat;
     }
 
-    public BoolVoidUnion? SuppressingAbility(Pokemon? target = null)
+    /// <summary>
+    /// Determines if the current active move is suppressing abilities.
+    /// Returns true if:
+    /// - There's an active Pokemon that is active (not fainted)
+    /// - The active Pokemon is not the target (or Gen &lt; 8)
+    /// - There's an active move that ignores abilities
+    /// - The target doesn't have an Ability Shield
+    /// Used for abilities like Mold Breaker, Teravolt, Turboblaze and moves like
+    /// Sunsteel Strike, Moongeist Beam that ignore target abilities.
+    /// </summary>
+    public bool SuppressingAbility(Pokemon? target = null)
     {
-        throw new NotImplementedException();
+        // Check if there's an active Pokemon and it's currently active
+        if (ActivePokemon is not { IsActive: true })
+        {
+            return false;
+        }
+
+        // In Gen 8+, moves can't suppress their user's own ability
+        // In earlier gens, they could
+        if (ActivePokemon == target && Gen >= 8)
+        {
+            return false;
+        }
+
+        // Check if there's an active move that ignores abilities
+        if (ActiveMove is not { IgnoreAbility: true })
+        {
+            return false;
+        }
+
+        // Ability Shield protects against ability suppression
+        return target?.HasItem(ItemId.AbilityShield) != true;
     }
+
+    //setPlayer(slot: SideID, options: PlayerOptions)
+    //{
+    //    let side;
+    //    let didSomething = true;
+    //    const slotNum = parseInt(slot[1]) - 1;
+    //    if (!this.sides[slotNum])
+    //    {
+    //        // create player
+    //        const team = this.getTeam(options);
+    //        side = new Side(options.name || `Player ${ slotNum + 1 }`, this, slotNum, team);
+    //        if (options.avatar) side.avatar = `${ options.avatar}`;
+    //        this.sides[slotNum] = side;
+    //    }
+    //    else
+    //    {
+    //        // edit player
+    //        side = this.sides[slotNum];
+    //        didSomething = false;
+    //        if (options.name && side.name !== options.name)
+    //        {
+    //            side.name = options.name;
+    //            didSomething = true;
+    //        }
+    //        if (options.avatar && side.avatar !== `${ options.avatar}`) {
+    //            side.avatar = `${ options.avatar}`;
+    //            didSomething = true;
+    //        }
+    //        if (options.team) throw new Error(`Player ${ slot } already has a team!`);
+    //    }
+    //    if (options.team && typeof options.team !== 'string')
+    //    {
+    //        options.team = Teams.pack(options.team);
+    //    }
+    //    if (!didSomething) return;
+    //    this.inputLog.push(`> player ${ slot} ` +JSON.stringify(options));
+    //    this.add('player', side.id, side.name, side.avatar, options.rating || '');
+
+    //    // Start the battle if it's ready to start
+    //    if (this.sides.every(playerSide => !!playerSide) && !this.started) this.start();
+    //}
 
     private void SetPlayer(SideId slot, PlayerOptions options)
     {
-        throw new NotImplementedException();
+        Side? side;
+        bool didSomething = true;
+
+        // Convert SideId enum to array index (P1=0, P2=1)
+        int slotNum = slot == SideId.P1 ? 0 : 1;
+
+        if (!Sides[slotNum].Initialised)
+        {
+            // Create new player
+            var team = GetTeam(options);
+            string playerName = options.Name ?? $"Player {slotNum + 1}";
+            side = new Side(playerName, this, slot, [.. team])
+            {
+                Name = playerName,
+                Avatar = options.Avatar ?? string.Empty,
+                Team = [.. team],
+                Pokemon = [],
+                Active = [],
+                SideConditions = [],
+                SlotConditions = [],
+                Choice = new Choice
+                {
+                    CantUndo = false,
+                    Actions = [],
+                    ForcedSwitchesLeft = 0,
+                    ForcedPassesLeft = 0,
+                    SwitchIns = [],
+                    Terastallize = false,
+                },
+            };
+
+            Sides[slotNum] = side;
+        }
+        else
+        {
+            // Edit existing player
+            side = Sides[slotNum];
+            didSomething = false;
+
+            // Update name if different
+            if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
+            {
+                side.Name = options.Name;
+                didSomething = true;
+            }
+
+            // Update avatar if different
+            if (!string.IsNullOrEmpty(options.Avatar) && side.Avatar != options.Avatar)
+            {
+                side.Avatar = options.Avatar;
+                didSomething = true;
+            }
+
+            // Prevent team changes for existing players
+            if (options.Team != null)
+            {
+                throw new InvalidOperationException($"Player {slot} already has a team!");
+            }
+        }
+
+        // Exit early if no changes were made
+        if (!didSomething) return;
+
+        // Log the player setup
+        string optionsJson = System.Text.Json.JsonSerializer.Serialize(options);
+        InputLog.Add($"> player {slot} {optionsJson}");
+
+        // Add player info to battle log
+        string rating = options.Rating?.ToString() ?? string.Empty;
+        Log.Add($"|player|{side.Id}|{side.Name}|{side.Avatar}|{rating}");
+
+        // Start battle if all sides are ready and battle hasn't started
+        if (Sides.All(playerSide => !playerSide.Initialised) && !Started)
+        {
+            Start();
+        }
+    }
+
+    private static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
+    {
+        return options.Team ?? throw new InvalidOperationException();
     }
 }

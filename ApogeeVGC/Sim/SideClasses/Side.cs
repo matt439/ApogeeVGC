@@ -12,13 +12,13 @@ public class Side
     public SideId Id { get; }
     public int N { get; set; }
 
-    public required string Name { get; set; }
-    public required string Avatar { get; set; }
+    public string Name { get; set; }
+    public string Avatar { get; set; }
     //public Side Foe { get; init; } = null!; // set in battle.start()
     //public Side? AllySide { get; init; } = null; // set in battle.start()
-    public required List<PokemonSet> Team { get; set; }
-    public required List<Pokemon> Pokemon { get; set; }
-    public required List<Pokemon> Active { get; set; }
+    public List<PokemonSet> Team { get; set; }
+    public List<Pokemon> Pokemon { get; set; }
+    public List<Pokemon> Active { get; set; }
     public Side Foe { get; set; } = null!; // set in battle.start()
 
     public int PokemonLeft { get; set; }
@@ -27,11 +27,12 @@ public class Side
     public Pokemon? FaintedThisTurn { get; set; }
     public int TotalFainted { get; set; }
 
-    public required Dictionary<ConditionId, EffectState> SideConditions { get; set; }
-    public required List<Dictionary<ConditionId, EffectState>> SlotConditions { get; set; }
+    public Dictionary<ConditionId, EffectState> SideConditions { get; set; }
+    public List<Dictionary<ConditionId, EffectState>> SlotConditions { get; set; }
 
     public IChoiceRequest? ActiveRequest { get; set; }
-    public required Choice Choice { get; set; }
+    public Choice Choice { get; set; }
+    public bool Initialised { get; init; }
 
     public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
     {
@@ -77,6 +78,31 @@ public class Side
             SwitchIns = [],
             Terastallize = false,
         };
+        Initialised = true;
+    }
+
+    public Side(IBattle battle)
+    {
+        Battle = battle;
+        Id = SideId.P1;
+        Name = string.Empty;
+        Avatar = string.Empty;
+        Team = [];
+        Pokemon = [];
+        Active = [];
+        PokemonLeft = 0;
+        SideConditions = [];
+        SlotConditions = [];
+        Choice = new Choice
+        {
+            CantUndo = false,
+            Actions = [],
+            ForcedSwitchesLeft = 0,
+            ForcedPassesLeft = 0,
+            SwitchIns = [],
+            Terastallize = false,
+        };
+        Initialised = false;
     }
 
 

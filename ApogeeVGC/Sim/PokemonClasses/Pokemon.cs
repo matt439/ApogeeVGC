@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -1567,9 +1568,8 @@ public class Pokemon
 
         // Special handling for Terapagos-Terastal with Tera Shell ability
         // ✅ FIXED: Changed != false to !
-        if (Species.Id == SpecieId.TerapagosTerastal &&
-            HasAbility(AbilityId.TeraShell) &&
-            Battle.SuppressingAbility(this) is not BoolBoolVoidUnion { Value: true })
+        if (Species.Id == SpecieId.TerapagosTerastal && HasAbility(AbilityId.TeraShell) &&
+            !Battle.SuppressingAbility(this))
         {
             // If ability already triggered, keep effectiveness at not very effective
             if (AbilityState.Resisted == true)
@@ -1699,6 +1699,55 @@ public class Pokemon
 
         // Ensure minimum weight of 1 hectogram
         return Math.Max(1, modifiedWeight);
+    }
+
+    //calculateStat(statName: StatIDExceptHP, boost: number, modifier?: number, statUser?: Pokemon)
+    //{
+    //    statName = toID(statName) as StatIDExceptHP;
+    //    // @ts-expect-error type checking prevents 'hp' from being passed, but we're paranoid
+    //    if (statName === 'hp') throw new Error("Please read `maxhp` directly");
+
+    //    // base stat
+    //    let stat = this.storedStats[statName];
+
+    //    // Wonder Room swaps defenses before calculating anything else
+    //    if ('wonderroom' in this.battle.field.pseudoWeather) {
+    //        if (statName === 'def')
+    //        {
+    //            stat = this.storedStats['spd'];
+    //        }
+    //        else if (statName === 'spd')
+    //        {
+    //            stat = this.storedStats['def'];
+    //        }
+    //    }
+
+    //    // stat boosts
+    //    let boosts: SparseBoostsTable = { }
+    //    ;
+    //    const boostName = statName as BoostID;
+    //    boosts[boostName] = boost;
+    //    boosts = this.battle.runEvent('ModifyBoost', statUser || this, null, null, boosts);
+    //    boost = boosts[boostName]!;
+    //    const boostTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
+    //    if (boost > 6) boost = 6;
+    //    if (boost < -6) boost = -6;
+    //    if (boost >= 0)
+    //    {
+    //        stat = Math.floor(stat * boostTable[boost]);
+    //    }
+    //    else
+    //    {
+    //        stat = Math.floor(stat / boostTable[-boost]);
+    //    }
+
+    //    // stat modifier
+    //    return this.battle.modify(stat, (modifier || 1));
+    //}
+
+    public int CalculateStat(StatIdExceptHp statName, int boost, int? modifier = null, Pokemon? statUser = null)
+    {
+        throw new NotImplementedException();
     }
 
     public Pokemon Copy()

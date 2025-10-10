@@ -395,7 +395,7 @@ public record Conditions
                         return new VoidReturn();
                     }
                     battle.ActiveTarget = pokemon;
-                    int damage = battle.GetConfusionDamage(pokemon, 40);
+                    int damage = battle.Actions.GetConfusionDamage(pokemon, 40);
 
                     ActiveMove activeMove = new()
                     {
@@ -452,7 +452,7 @@ public record Conditions
                 },
                 OnBeforeMove = (battle, pokemon, _, move) =>
                 {
-                    if (!(pokemon.GetItem()?.IsChoice ?? false))
+                    if (!(pokemon.GetItem().IsChoice ?? false))
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return new VoidReturn();
@@ -470,7 +470,7 @@ public record Conditions
                 },
                 OnDisableMove = (battle, pokemon) =>
                 {
-                    if (!pokemon.GetItem()?.IsChoice == true ||
+                    if (!pokemon.GetItem().IsChoice == true ||
                         battle.EffectState.Move != null && !pokemon.HasMove((MoveId)battle.EffectState.Move))
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
