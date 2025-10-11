@@ -118,4 +118,9 @@ public static class StatIdTools
     {
         return stat.ConvertToStatId().ConvertToString(leadingCapital);
     }
+
+    public static string ConvertToString(this BoostId boost, bool leadingCapital = false)
+    {
+        return boost.ConvertToStatId().ConvertToString();
+    }
 }

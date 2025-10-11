@@ -115,6 +115,11 @@ public class Side
     {
         throw new NotImplementedException();
     }
+
+    public int FoePokemonLeft()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 

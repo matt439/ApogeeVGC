@@ -38,6 +38,7 @@ public enum AbilityId
     Multitype,
     Levitate,
     TeraShell,
+    AngerPoint,
 
     None,
 }

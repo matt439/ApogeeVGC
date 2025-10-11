@@ -31,6 +31,7 @@ public enum MoveId
     AxeKick,
     Snatch,
     Yawn,
+    BellyDrum,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

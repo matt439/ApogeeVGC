@@ -10,7 +10,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -1729,16 +1728,17 @@ public class Pokemon
         // Create sparse boosts table with only the stat we're calculating
         var boosts = new SparseBoostsTable();
         BoostId boostName = statName.ConvertToBoostId();
-        boosts[boostName] = boost;
+        boosts.SetBoost(boostName, boost);
 
         // Run ModifyBoost event to allow abilities/items/conditions to modify boosts
         // Example: Simple ability doubles boost stages
-        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null, null, boosts);
+        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null,
+            null, boosts);
 
-        if (boostEvent is BoostsTableRelayVar brv)
+        if (boostEvent is SparseBoostsTableRelayVar brv)
         {
             boosts = brv.Table;
-            boost = boosts[boostName] ?? 0;
+            boost = boosts.GetBoost(boostName) ?? 0;
         }
 
         // Clamp boost to valid range

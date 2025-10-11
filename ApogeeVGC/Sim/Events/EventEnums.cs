@@ -24,6 +24,9 @@ public enum EventId
     ModifyWeight,
     Effectiveness,
     NegateImmunity,
+    ChangeBoost,
+    TryBoost,
+    AfterEachBoost,
 }
 
 public enum EventType

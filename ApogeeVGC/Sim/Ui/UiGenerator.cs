@@ -2,6 +2,8 @@
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Ui;
 
@@ -28,6 +30,9 @@ public enum BattleAddId
     DetailsChange,
     FormeChange,
     Player,
+    SetBoost,
+    Boost,
+    Unboost,
 }
 
 public static class UiGenerator
@@ -198,5 +203,26 @@ public static class UiGenerator
     public static void PrintHealEvent(Pokemon pokemon, int health)
     {
         Console.WriteLine($"{pokemon.Name} healed {health} HP!");
+    }
+
+    public static void PrintSetBoostEvent(Pokemon target, BoostId boostId, int boost, IEffect sourceEffect)
+    {
+        string statName = boostId.ConvertToString();
+        string boostText = boost > 0 ? $"rose by {boost} stage(s)" : $"fell by {-boost} stage(s)";
+        Console.WriteLine($"{target.Name}'s {statName} {boostText} due to {sourceEffect.Name}!");
+    }
+
+    public static void PrintBoostEvent(Pokemon target, BoostId boostId, int boost, IEffect sourceEffect)
+    {
+        string statName = boostId.ConvertToString();
+        string boostText = boost > 0 ? $"rose by {boost} stage(s)" : $"fell by {-boost} stage(s)";
+        Console.WriteLine($"{target.Name}'s {statName} {boostText} due to {sourceEffect.Name}!");
+    }
+
+    public static void PrintUnboostEvent(Pokemon target, BoostId boostId, int boost, IEffect sourceEffect)
+    {
+        string statName = boostId.ConvertToString();
+        string boostText = boost > 0 ? $"rose by {boost} stage(s)" : $"fell by {-boost} stage(s)";
+        Console.WriteLine($"{target.Name}'s {statName} {boostText} due to {sourceEffect.Name}!");
     }
 }
