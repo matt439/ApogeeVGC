@@ -17,6 +17,23 @@ public static class StatIdTools
         };
     }
 
+    public static StatId ConvertToStatId(this BoostId stat)
+    {
+        return stat switch
+        {
+            BoostId.Atk => StatId.Atk,
+            BoostId.Def => StatId.Def,
+            BoostId.SpA => StatId.SpA,
+            BoostId.SpD => StatId.SpD,
+            BoostId.Spe => StatId.Spe,
+            BoostId.Accuracy => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert Accuracy to StatId."),
+            BoostId.Evasion => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert Evasion to StatId."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid boost ID."),
+        };
+    }
+
     public static StatIdExceptHp ConvertToStatIdExceptId(this StatId stat)
     {
         return stat switch
@@ -28,6 +45,51 @@ public static class StatIdTools
             StatId.Spe => StatIdExceptHp.Spe,
             StatId.Hp => throw new ArgumentOutOfRangeException(nameof(stat),
                 "Cannot convert HP to StatIdExceptHp."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+        };
+    }
+
+    public static StatIdExceptHp ConvertToStatIdExceptId(this BoostId stat)
+    {
+        return stat switch
+        {
+            BoostId.Atk => StatIdExceptHp.Atk,
+            BoostId.Def => StatIdExceptHp.Def,
+            BoostId.SpA => StatIdExceptHp.SpA,
+            BoostId.SpD => StatIdExceptHp.SpD,
+            BoostId.Spe => StatIdExceptHp.Spe,
+            BoostId.Accuracy => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert Accuracy to StatId."),
+            BoostId.Evasion => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert Evasion to StatId."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid boost ID."),
+        };
+    }
+
+    public static BoostId ConvertToBoostId(this StatId stat)
+    {
+        return stat switch
+        {
+            StatId.Atk => BoostId.Atk,
+            StatId.Def => BoostId.Def,
+            StatId.SpA => BoostId.SpA,
+            StatId.SpD => BoostId.SpD,
+            StatId.Spe => BoostId.Spe,
+            StatId.Hp => throw new ArgumentOutOfRangeException(nameof(stat),
+                "Cannot convert HP to BoostId."),
+            _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
+        };
+    }
+
+    public static BoostId ConvertToBoostId(this StatIdExceptHp stat)
+    {
+        return stat switch
+        {
+            StatIdExceptHp.Atk => BoostId.Atk,
+            StatIdExceptHp.Def => BoostId.Def,
+            StatIdExceptHp.SpA => BoostId.SpA,
+            StatIdExceptHp.SpD => BoostId.SpD,
+            StatIdExceptHp.Spe => BoostId.Spe,
             _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
         };
     }

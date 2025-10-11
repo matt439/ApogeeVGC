@@ -817,7 +817,7 @@ public class Pokemon
                     throw new InvalidOperationException("boosts must be a BoostsTableRelayVar" );
                 }
             }
-            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName));
+            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
         }
 
         // Stat modifier effects
@@ -1701,53 +1701,63 @@ public class Pokemon
         return Math.Max(1, modifiedWeight);
     }
 
-    //calculateStat(statName: StatIDExceptHP, boost: number, modifier?: number, statUser?: Pokemon)
-    //{
-    //    statName = toID(statName) as StatIDExceptHP;
-    //    // @ts-expect-error type checking prevents 'hp' from being passed, but we're paranoid
-    //    if (statName === 'hp') throw new Error("Please read `maxhp` directly");
-
-    //    // base stat
-    //    let stat = this.storedStats[statName];
-
-    //    // Wonder Room swaps defenses before calculating anything else
-    //    if ('wonderroom' in this.battle.field.pseudoWeather) {
-    //        if (statName === 'def')
-    //        {
-    //            stat = this.storedStats['spd'];
-    //        }
-    //        else if (statName === 'spd')
-    //        {
-    //            stat = this.storedStats['def'];
-    //        }
-    //    }
-
-    //    // stat boosts
-    //    let boosts: SparseBoostsTable = { }
-    //    ;
-    //    const boostName = statName as BoostID;
-    //    boosts[boostName] = boost;
-    //    boosts = this.battle.runEvent('ModifyBoost', statUser || this, null, null, boosts);
-    //    boost = boosts[boostName]!;
-    //    const boostTable = [1, 1.5, 2, 2.5, 3, 3.5, 4];
-    //    if (boost > 6) boost = 6;
-    //    if (boost < -6) boost = -6;
-    //    if (boost >= 0)
-    //    {
-    //        stat = Math.floor(stat * boostTable[boost]);
-    //    }
-    //    else
-    //    {
-    //        stat = Math.floor(stat / boostTable[-boost]);
-    //    }
-
-    //    // stat modifier
-    //    return this.battle.modify(stat, (modifier || 1));
-    //}
-
+    /// <summary>
+    /// Calculates a Pokemon's stat value with boosts and modifiers applied.
+    /// This is used during battle for damage calculations and speed comparisons.
+    /// </summary>
+    /// <param name="statName">The stat to calculate (Atk, Def, SpA, SpD, Spe)</param>
+    /// <param name="boost">Boost stage from -6 to +6</param>
+    /// <param name="modifier">Optional modifier to apply (e.g., 1.5 for 50% increase)</param>
+    /// <param name="statUser">Pokemon whose stats are being calculated (defaults to this)</param>
+    /// <returns>The calculated stat value</returns>
     public int CalculateStat(StatIdExceptHp statName, int boost, int? modifier = null, Pokemon? statUser = null)
     {
-        throw new NotImplementedException();
+        // Get base stat from stored stats
+        int stat = StoredStats[statName];
+
+        // Wonder Room swaps Defense and Special Defense BEFORE any other calculations
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
+        {
+            stat = statName switch
+            {
+                StatIdExceptHp.Def => StoredStats[StatIdExceptHp.SpD],
+                StatIdExceptHp.SpD => StoredStats[StatIdExceptHp.Def],
+                _ => stat,
+            };
+        }
+
+        // Create sparse boosts table with only the stat we're calculating
+        var boosts = new SparseBoostsTable();
+        BoostId boostName = statName.ConvertToBoostId();
+        boosts[boostName] = boost;
+
+        // Run ModifyBoost event to allow abilities/items/conditions to modify boosts
+        // Example: Simple ability doubles boost stages
+        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null, null, boosts);
+
+        if (boostEvent is BoostsTableRelayVar brv)
+        {
+            boosts = brv.Table;
+            boost = boosts[boostName] ?? 0;
+        }
+
+        // Clamp boost to valid range
+        boost = BoostsTable.ClampBoost(boost);
+
+        // Apply boost multiplier
+        if (boost >= 0)
+        {
+            // Positive boosts multiply the stat
+            stat = (int)Math.Floor(stat * BoostsTable.CalculateRegularStatMultiplier(boost));
+        }
+        else
+        {
+            // Negative boosts divide the stat
+            stat = (int)Math.Floor(stat / BoostsTable.CalculateRegularStatMultiplier(-boost));
+        }
+
+        // Apply modifier using battle's modify function
+        return Battle.Modify(stat, modifier ?? 1);
     }
 
     public Pokemon Copy()

@@ -18,28 +18,32 @@ public class BoostsTable
     public double AccuracyMultiplier => CalculateAccuracyStatMultiplier(Accuracy);
     public double EvasionMultiplier => CalculateEvasionStatMultiplier(Evasion);
 
-    public int GetBoost(StatIdExceptHp stat)
+    public int GetBoost(BoostId stat)
     {
         return stat switch
         {
-            StatIdExceptHp.Atk => Atk,
-            StatIdExceptHp.Def => Def,
-            StatIdExceptHp.SpA => SpA,
-            StatIdExceptHp.SpD => SpD,
-            StatIdExceptHp.Spe => Spe,
+            BoostId.Atk => Atk,
+            BoostId.Def => Def,
+            BoostId.SpA => SpA,
+            BoostId.SpD => SpD,
+            BoostId.Spe => Spe,
+            BoostId.Accuracy => Accuracy,
+            BoostId.Evasion => Evasion,
             _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
         };
     }
 
-    public double GetBoostMultiplier(StatIdExceptHp stat)
+    public double GetBoostMultiplier(BoostId stat)
     {
         return stat switch
         {
-            StatIdExceptHp.Atk => AtkMultiplier,
-            StatIdExceptHp.Def => DefMultiplier,
-            StatIdExceptHp.SpA => SpAMultiplier,
-            StatIdExceptHp.SpD => SpDMultiplier,
-            StatIdExceptHp.Spe => SpeMultiplier,
+            BoostId.Atk => AtkMultiplier,
+            BoostId.Def => DefMultiplier,
+            BoostId.SpA => SpAMultiplier,
+            BoostId.SpD => SpDMultiplier,
+            BoostId.Spe => SpeMultiplier,
+            BoostId.Accuracy => AccuracyMultiplier,
+            BoostId.Evasion => EvasionMultiplier,
             _ => throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID."),
         };
     }
@@ -58,7 +62,7 @@ public class BoostsTable
         };
     }
 
-    private static int ClampBoost(int boost)
+    public static int ClampBoost(int boost)
     {
         return boost switch
         {
@@ -68,7 +72,7 @@ public class BoostsTable
         };
     }
 
-    private static double CalculateRegularStatMultiplier(int stage)
+    public static double CalculateRegularStatMultiplier(int stage)
     {
         return ClampBoost(stage) switch
         {
@@ -89,7 +93,7 @@ public class BoostsTable
         };
     }
 
-    private static double CalculateAccuracyStatMultiplier(int stage)
+    public static double CalculateAccuracyStatMultiplier(int stage)
     {
         return ClampBoost(stage) switch
         {
@@ -110,7 +114,7 @@ public class BoostsTable
         };
     }
 
-    private static double CalculateEvasionStatMultiplier(int stage)
+    public static double CalculateEvasionStatMultiplier(int stage)
     {
         return ClampBoost(stage) switch
         {

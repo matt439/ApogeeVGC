@@ -67,6 +67,8 @@ public interface IBattle
     double ChainModify(double numerator, int denominator = 1);
     double ChainModify(double[] numerator, int denominator = 1);
 
+    int Modify(int value, int numerator, int denominator = 1);
+
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 
     bool RandomChance(int numerator, int denominator);
