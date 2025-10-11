@@ -77,6 +77,8 @@ public interface IBattle
 
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 
+    int Trunc(int num, int bits = 0);
+
     bool RandomChance(int numerator, int denominator);
 
     /// <summary>
@@ -101,6 +103,8 @@ public interface IBattle
     /// </summary>
     /// <returns>A random double x where 0.0 ≤ x &lt; 1.0.</returns>
     double Random();
+
+    int Randomizer(int baseDamage);
 
     IBattle Copy();
 

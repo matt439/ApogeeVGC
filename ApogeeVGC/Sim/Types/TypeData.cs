@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.Types;

@@ -1,7 +1,7 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -10,34 +10,52 @@ public class BattleActions(IBattle battle)
     public IBattle Battle { get; init; } = battle;
     public Library Library => Battle.Library;
 
-    public MoveTypeFalseUnion CanTerastallize(IBattle battle, Pokemon pokemon)
+    public MoveType? CanTerastallize(IBattle battle, Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        if (Battle.Gen != 9)
+        {
+            return null;
+        }
+        return pokemon.TeraType;
     }
 
-    ///**
-    // * Confusion damage is unique - most typical modifiers that get run when calculating
-    // * damage (e.g. Huge Power, Life Orb, critical hits) don't apply. It also uses a 16-bit
-    // * context for its damage, unlike the regular damage formula (though this only comes up
-    // * for base damage).
-    // */
-    //getConfusionDamage(pokemon: Pokemon, basePower: number)
-    //{
-    //    const tr = this.battle.trunc;
-
-    //    const attack = pokemon.calculateStat('atk', pokemon.boosts['atk']);
-    //    const defense = pokemon.calculateStat('def', pokemon.boosts['def']);
-    //    const level = pokemon.level;
-    //    const baseDamage = tr(tr(tr(tr(2 * level / 5 + 2) * basePower * attack) / defense) / 50) + 2;
-
-    //    // Damage is 16-bit context in self-hit confusion damage
-    //    let damage = tr(baseDamage, 16);
-    //    damage = this.battle.randomizer(damage);
-    //    return Math.max(1, damage);
-    //}
-
+    /// <summary>
+    /// Calculates confusion self-hit damage.
+    /// 
+    /// Confusion damage is unique - most typical modifiers that get run when calculating
+    /// damage (e.g. Huge Power, Life Orb, critical hits) don't apply. It also uses a 16-bit
+    /// context for its damage, unlike the regular damage formula (though this only comes up
+    /// for base damage).
+    /// </summary>
+    /// <param name="pokemon">The confused Pokémon hitting itself</param>
+    /// <param name="basePower">Base power of the confusion damage (typically 40)</param>
+    /// <returns>The calculated damage amount (minimum 1)</returns>
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
     {
-        throw new NotImplementedException();
+        // Get the Pokémon's attack and defense stats with current boosts applied
+        int attack = pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
+        int defense = pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
+        int level = pokemon.Level;
+
+        // Calculate base damage using the standard Pokémon damage formula
+        // Formula: ((2 * level / 5 + 2) * basePower * attack / defense) / 50 + 2
+        // Each step is truncated to match game behavior
+        int baseDamage = Battle.Trunc(
+            Battle.Trunc(
+                Battle.Trunc(
+                    Battle.Trunc(2 * level / 5 + 2) * basePower * attack
+                ) / defense
+            ) / 50
+        ) + 2;
+
+        // Apply 16-bit truncation for confusion damage
+        // This only matters for extremely high damage values (Eternatus-Eternamax level stats)
+        int damage = Battle.Trunc(baseDamage, 16);
+
+        // Apply random damage variance (85-100% of calculated damage)
+        damage = Battle.Randomizer(damage);
+
+        // Ensure at least 1 damage is dealt
+        return Math.Max(1, damage);
     }
 }

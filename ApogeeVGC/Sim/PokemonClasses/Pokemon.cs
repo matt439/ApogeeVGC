@@ -227,7 +227,8 @@ public class Pokemon
 
         WeightKg = 1.0;
 
-        CanTerastallize = Battle.Actions.CanTerastallize(battle, this);
+        var canTerastallize = Battle.Actions.CanTerastallize(battle, this);
+        CanTerastallize = canTerastallize ?? null;
 
         ClearVolatile();
         Hp = MaxHp;

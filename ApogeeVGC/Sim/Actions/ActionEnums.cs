@@ -38,4 +38,5 @@ public enum ActionOrder
     S199 = 199,
     S106 = 106,
     S103 = 103,
+    Max = int.MaxValue,
 }

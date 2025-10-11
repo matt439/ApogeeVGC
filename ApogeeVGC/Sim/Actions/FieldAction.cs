@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.PokemonClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Actions;
 
@@ -22,4 +23,9 @@ public record FieldAction : IAction
     public int Priority { get; init; }
     public int Speed => 1;
     public Pokemon? Pokemon => null;
+
+    // Properties to satisfy IPriorityComparison
+    public int Order => 0;
+    public int SubOrder => 0;
+    public int EffectOrder => 0;
 }

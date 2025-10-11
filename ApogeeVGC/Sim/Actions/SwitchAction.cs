@@ -41,4 +41,7 @@ public record SwitchAction : IAction
     public required Pokemon Pokemon { get; init; }
     public required Pokemon Target { get; init; }
     public IEffect? SourceEffect { get; init; }
+
+    public int SubOrder => 0;
+    public int EffectOrder => 0;
 }

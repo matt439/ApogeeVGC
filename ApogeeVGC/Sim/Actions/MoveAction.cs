@@ -47,4 +47,9 @@ public record MoveAction : IAction
     public MoveId MoveId { get; init; }
     public required Move Move { get; init; }
     public IEffect? SourceEffect { get; init; }
+
+
+    // To satisfy IPriorityComparison
+    public int SubOrder => 0;
+    public int EffectOrder => 0;
 }

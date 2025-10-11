@@ -616,7 +616,7 @@ public class BattleAsync : IBattle
     /// If bits is specified, the number is scaled, truncated, then unscaled.
     /// This is used for precise damage calculations in Pokemon battles.
     /// </summary>
-    private static int Trunc(int num, int bits = 0)
+    public int Trunc(int num, int bits = 0)
     {
         if (bits == 0)
         {
@@ -800,5 +800,36 @@ public class BattleAsync : IBattle
     private static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
     {
         return options.Team ?? throw new InvalidOperationException();
+    }
+
+    public int Randomizer(int baseDamage)
+    {
+        return Trunc(Trunc(baseDamage * (100 - Random(16))) / 100);
+    }
+
+    ///**
+    // * The default sort order for actions, but also event listeners.
+    // *
+    // * 1. Order, low to high (default last)
+    // * 2. Priority, high to low (default 0)
+    // * 3. Speed, high to low (default 0)
+    // * 4. SubOrder, low to high (default 0)
+    // * 5. EffectOrder, low to high (default 0)
+    // *
+    // * Doesn't reference `this` so doesn't need to be bound.
+    // */
+    //comparePriority(this: void, a: AnyObject, b: AnyObject)
+    //{
+    //    return -((b.order || 4294967296) - (a.order || 4294967296)) ||
+    //           ((b.priority || 0) - (a.priority || 0)) ||
+    //           ((b.speed || 0) - (a.speed || 0)) ||
+    //           -((b.subOrder || 0) - (a.subOrder || 0)) ||
+    //           -((b.effectOrder || 0) - (a.effectOrder || 0)) ||
+    //           0;
+    //}
+
+    public int ComparePriority(int a, int b)
+    {
+        throw new NotImplementedException();
     }
 }

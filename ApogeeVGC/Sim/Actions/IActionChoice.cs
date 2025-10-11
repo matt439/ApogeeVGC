@@ -1,5 +1,7 @@
-﻿namespace ApogeeVGC.Sim.Actions;
+﻿using ApogeeVGC.Sim.BattleClasses;
 
-public interface IActionChoice
+namespace ApogeeVGC.Sim.Actions;
+
+public interface IActionChoice : IPriorityComparison
 {
 }

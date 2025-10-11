@@ -834,3 +834,20 @@ public abstract record EffectStateTarget
 }
 public record PokemonEffectStateTarget(Pokemon Pokemon) : EffectStateTarget;
 public record SideEffectStateTarget(Side Side) : EffectStateTarget;
+
+
+
+/// <summary>
+/// Pokemon | Side | Field | Battle
+/// </summary>
+public abstract record EffectHolder
+{
+    public static implicit operator EffectHolder(Pokemon pokemon) => new PokemonEffectHolder(pokemon);
+    public static implicit operator EffectHolder(Side side) => new SideEffectHolder(side);
+    public static implicit operator EffectHolder(Field field) => new FieldEffectHolder(field);
+    public static EffectHolder FromIBattle(IBattle battle) => new BattleEffectHolder(battle);
+}
+public record PokemonEffectHolder(Pokemon Pokemon) : EffectHolder;
+public record SideEffectHolder(Side Side) : EffectHolder;
+public record FieldEffectHolder(Field Field) : EffectHolder;
+public record BattleEffectHolder(IBattle Battle) : EffectHolder;

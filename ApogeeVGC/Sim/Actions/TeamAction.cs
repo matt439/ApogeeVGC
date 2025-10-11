@@ -19,8 +19,14 @@ public record TeamAction : IAction
             }
         }
     }
+
     public int Priority { get; init; }
     public int Speed => 1;
     public required Pokemon Pokemon { get; init; }
     public int Index { get; init; }
+
+
+    public ActionOrder Order => ActionOrder.Max;
+    public int SubOrder => 0;
+    public int EffectOrder => 0;
 }
