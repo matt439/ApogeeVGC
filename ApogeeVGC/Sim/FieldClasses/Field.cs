@@ -33,6 +33,11 @@ public class Field
         throw new NotImplementedException();
     }
 
+    public bool SuppressingWeather()
+    {
+        throw new NotImplementedException();
+    }
+
     public Field Copy()
     {
         return new Field

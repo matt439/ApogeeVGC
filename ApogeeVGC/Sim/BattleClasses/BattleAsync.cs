@@ -807,29 +807,112 @@ public class BattleAsync : IBattle
         return Trunc(Trunc(baseDamage * (100 - Random(16))) / 100);
     }
 
-    ///**
-    // * The default sort order for actions, but also event listeners.
-    // *
-    // * 1. Order, low to high (default last)
-    // * 2. Priority, high to low (default 0)
-    // * 3. Speed, high to low (default 0)
-    // * 4. SubOrder, low to high (default 0)
-    // * 5. EffectOrder, low to high (default 0)
-    // *
-    // * Doesn't reference `this` so doesn't need to be bound.
-    // */
-    //comparePriority(this: void, a: AnyObject, b: AnyObject)
-    //{
-    //    return -((b.order || 4294967296) - (a.order || 4294967296)) ||
-    //           ((b.priority || 0) - (a.priority || 0)) ||
-    //           ((b.speed || 0) - (a.speed || 0)) ||
-    //           -((b.subOrder || 0) - (a.subOrder || 0)) ||
-    //           -((b.effectOrder || 0) - (a.effectOrder || 0)) ||
-    //           0;
-    //}
-
-    public int ComparePriority(int a, int b)
+    /// <summary>
+    /// The default sort order for actions, but also event listeners.
+    /// 
+    /// 1. Order, low to high (default last)
+    /// 2. Priority, high to low (default 0)
+    /// 3. Speed, high to low (default 0)
+    /// 4. SubOrder, low to high (default 0)
+    /// 5. EffectOrder, low to high (default 0)
+    /// 
+    /// This is a static comparison function that doesn't reference battle state.
+    /// </summary>
+    public static int ComparePriority(IPriorityComparison a, IPriorityComparison b)
     {
-        throw new NotImplementedException();
+        // 1. Order comparison (lower values first, Max = last)
+        // ActionOrder.Max represents items without explicit order
+        int orderResult = a.Order.CompareTo(b.Order);
+        if (orderResult != 0) return orderResult;
+
+        // 2. Priority comparison (higher values first)
+        int priorityResult = b.Priority.CompareTo(a.Priority); // Reversed for descending
+        if (priorityResult != 0) return priorityResult;
+
+        // 3. Speed comparison (higher values first)
+        int speedResult = b.Speed.CompareTo(a.Speed); // Reversed for descending
+        if (speedResult != 0) return speedResult;
+
+        // 4. SubOrder comparison (lower values first)
+        int subOrderResult = a.SubOrder.CompareTo(b.SubOrder);
+        if (subOrderResult != 0) return subOrderResult;
+
+        // 5. EffectOrder comparison (lower values first)
+        return a.EffectOrder.CompareTo(b.EffectOrder);
+    }
+
+
+    /// <summary>
+    /// Sort a list, resolving speed ties the way the games do.
+    /// 
+    /// This uses a Selection Sort algorithm - not the fastest sort in general, but
+    /// actually faster than QuickSort for small arrays like the ones SpeedSort is used for.
+    /// More importantly, it makes it easiest to resolve speed ties properly through
+    /// randomization via Prng.Shuffle().
+    /// </summary>
+    /// <typeparam name="T">Type that implements IPriorityComparison for sorting</typeparam>
+    /// <param name="list">List to sort in-place</param>
+    /// <param name="comparator">Comparison function (defaults to ComparePriority)</param>
+    public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) 
+        where T : IPriorityComparison
+    {
+        // Default to ComparePriority if no comparator provided
+        comparator ??= (a, b) => ComparePriority(a, b);
+
+        // Nothing to sort for lists with less than 2 elements
+        if (list.Count < 2) return;
+
+        int sorted = 0;
+
+        // Selection Sort with speed tie resolution
+        while (sorted + 1 < list.Count)
+        {
+            // Start with the first unsorted element
+            List<int> nextIndexes = [sorted];
+
+            // Find all elements that should come next (including ties)
+            for (int i = sorted + 1; i < list.Count; i++)
+            {
+                int delta = comparator(list[nextIndexes[0]], list[i]);
+
+                switch (delta)
+                {
+                    case < 0:
+                        // Current element is already better, skip
+                        continue;
+                    case > 0:
+                        // Found a better element, start new list
+                        nextIndexes = [i];
+                        break;
+                    // delta == 0
+                    default:
+                        // Speed tie - add to list of tied elements
+                        nextIndexes.Add(i);
+                        break;
+                }
+            }
+
+            // Place the next elements in their sorted positions
+            for (int i = 0; i < nextIndexes.Count; i++)
+            {
+                int index = nextIndexes[i];
+                if (index != sorted + i)
+                {
+                    // Swap elements into place
+                    // nextIndexes is guaranteed to be in order, so it will never have
+                    // been disturbed by an earlier swap
+                    (list[sorted + i], list[index]) = (list[index], list[sorted + i]);
+                }
+            }
+
+            // If there are multiple elements with the same priority (speed ties),
+            // shuffle them randomly to fairly resolve the tie
+            if (nextIndexes.Count > 1)
+            {
+                Prng.Shuffle(list, sorted, sorted + nextIndexes.Count);
+            }
+
+            sorted += nextIndexes.Count;
+        }
     }
 }

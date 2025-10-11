@@ -25,7 +25,7 @@ public record FieldAction : IAction
     public Pokemon? Pokemon => null;
 
     // Properties to satisfy IPriorityComparison
-    public int Order => 0;
+    public ActionOrder Order => ActionOrder.Max;
     public int SubOrder => 0;
     public int EffectOrder => 0;
 }
