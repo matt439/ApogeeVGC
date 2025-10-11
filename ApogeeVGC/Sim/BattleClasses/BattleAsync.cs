@@ -103,7 +103,7 @@ public class BattleAsync : IBattle
     public MoveId? LastSuccessfulMoveThisTurn { get; set; } = null;
     public int LastMoveLine { get; set; } = -1;
     public int LastDamage { get; set; } = 0;
-    public int EffectOrder { get; set; } = 0;
+    public int EffectOrder { get; set; }
     public bool QuickClawRoll { get; set; } = false;
     public List<int> SpeedOrder { get; set; } = [];
 
@@ -182,13 +182,13 @@ public class BattleAsync : IBattle
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
         RelayVar? relayVar = null, Delegate? customCallback = null)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public void EachEvent(EventId eventId, IEffect? effect, bool? relayVar)
@@ -196,110 +196,201 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    //    boost(
-    //        boost: SparseBoostsTable, target: Pokemon | null = null, source: Pokemon | null = null,
-    //        effect: Effect | null = null, isSecondary = false, isSelf = false
-    //    )
-    //    {
-    //        if (this.event) {
-    //        target ||= this.event.target;
-    //    source ||= this.event.source;
-    //    effect ||= this.effect;
-    //    }
-    //		if (!target?.hp) return 0;
-    //		if (!target.isActive) return false;
-    //		if (this.gen > 5 && !target.side.foePokemonLeft()) return false;
-    //    boost = this.runEvent('ChangeBoost', target, source, effect, { ...boost
-    //});
-    //		boost = target.getCappedBoost(boost);
-    //		boost = this.runEvent('TryBoost', target, source, effect, { ...boost });
-    //		let success = null;
-    //let boosted = isSecondary;
-    //let boostName: BoostID;
-    //		for (boostName in boost) {
-    //			const currentBoost: SparseBoostsTable = {
-    //				[boostName]: boost[boostName],
-    //			};
-    //let boostBy = target.boostBy(currentBoost);
-    //let msg = '-boost';
-    //if (boost[boostName]! < 0 || target.boosts[boostName] === -6)
-    //{
-    //    msg = '-unboost';
-    //    boostBy = -boostBy;
-    //}
-    //if (boostBy)
-    //{
-    //    success = true;
-    //    switch (effect?.id)
-    //    {
-    //        case 'bellydrum':
-    //        case 'angerpoint':
-    //            this.add('-setboost', target, 'atk', target.boosts['atk'], '[from] ' + effect.fullname);
-    //            break;
-    //        case 'bellydrum2':
-    //            this.add(msg, target, boostName, boostBy, '[silent]');
-    //            this.hint("In Gen 2, Belly Drum boosts by 2 when it fails.");
-    //            break;
-    //        case 'zpower':
-    //            this.add(msg, target, boostName, boostBy, '[zeffect]');
-    //            break;
-    //        default:
-    //            if (!effect) break;
-    //            if (effect.effectType === 'Move')
-    //            {
-    //                this.add(msg, target, boostName, boostBy);
-    //            }
-    //            else if (effect.effectType === 'Item')
-    //            {
-    //                this.add(msg, target, boostName, boostBy, '[from] item: ' + effect.name);
-    //            }
-    //            else
-    //            {
-    //                if (effect.effectType === 'Ability' && !boosted)
-    //                {
-    //                    this.add('-ability', target, effect.name, 'boost');
-    //                    boosted = true;
-    //                }
-    //                this.add(msg, target, boostName, boostBy);
-    //            }
-    //            break;
-    //    }
-    //    this.runEvent('AfterEachBoost', target, source, effect, currentBoost);
-    //}
-    //else if (effect?.effectType === 'Ability')
-    //{
-    //    if (isSecondary || isSelf) this.add(msg, target, boostName, boostBy);
-    //}
-    //else if (!isSecondary && !isSelf)
-    //{
-    //    this.add(msg, target, boostName, boostBy);
-    //}
-    //		}
-    //		this.runEvent('AfterBoost', target, source, effect, boost);
-    //if (success)
-    //{
-    //    if (Object.values(boost).some(x => x > 0)) target.statsRaisedThisTurn = true;
-    //    if (Object.values(boost).some(x => x < 0)) target.statsLoweredThisTurn = true;
-    //}
-    //return success;
-    //	}
-
+    /// <summary>
+    /// Modifies a Pokémon's stat stages (boosts) during battle.
+    /// 
+    /// Process:
+    /// 1. Validates the target has HP and is active
+    /// 2. Runs ChangeBoost and TryBoost events for modification
+    /// 3. Applies boosts via target.BoostBy() for each stat
+    /// 4. Logs boost messages using UiGenerator methods
+    /// 5. Triggers AfterEachBoost and AfterBoost events
+    /// 6. Updates statsRaisedThisTurn/statsLoweredThisTurn flags
+    /// 
+    /// Returns:
+    /// - null if boost succeeded
+    /// - 0 if target has no HP
+    /// - false if target is inactive or no foes remain (Gen 6+)
+    /// </summary>
     public BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
     {
-        throw new NotImplementedException();
+        target ??= Event.Target;
+        source ??= Event.Source;
+        effect ??= Event.Effect;
+
+        // Validate target has HP
+        if (target?.Hp <= 0) return new ZeroBoolZeroUnion();
+
+        // Validate target is active
+        if (!(target?.IsActive ?? false)) return new BoolBoolZeroUnion(false);
+
+        // Gen 6+: Check if any foes remain
+        if (Gen > 5 && target.Side.FoePokemonLeft() <= 0) return new BoolBoolZeroUnion(false);
+
+        // Run ChangeBoost event to allow modifications
+        RelayVar modifiedBoost = RunEvent(EventId.ChangeBoost, target, 
+            RunEventSource.FromNullablePokemon(source), effect, boost) ?? boost;
+
+        if (modifiedBoost is not SparseBoostsTableRelayVar modifiedBoostTable)
+        {
+            throw new InvalidOperationException("ChangeBoost event did not return a valid SparseBoostsTable.");
+        }
+
+        // Cap the boosts to valid ranges (-6 to +6)
+        SparseBoostsTable cappedBoost = target.GetCappedBoost(modifiedBoostTable.Table);
+
+        // Run TryBoost event to allow prevention
+        RelayVar finalBoost = RunEvent(EventId.TryBoost, target, RunEventSource.FromNullablePokemon(source),
+                                   effect, cappedBoost) ?? cappedBoost;
+
+        if (finalBoost is not SparseBoostsTableRelayVar finalBoostTable)
+        {
+            throw new InvalidOperationException("ChangeBoost event did not return a valid SparseBoostsTable.");
+        }
+
+        bool? success = null;
+
+        // Apply each boost
+        foreach (BoostId boostId in Enum.GetValues<BoostId>())
+        {
+            int? boostValue = finalBoostTable.Table.GetBoost(boostId);
+            if (!boostValue.HasValue) continue;
+
+            // Create a sparse table for just this stat
+            var currentBoost = new SparseBoostsTable();
+            currentBoost.SetBoost(boostId, boostValue.Value);
+
+            // Apply the boost and get the actual change
+            int boostBy = target.BoostBy(currentBoost);
+
+            // Determine if this is a boost or unboost for messaging
+            bool isUnboost = boostValue.Value < 0 || target.Boosts.GetBoost(boostId) == -6;
+
+            if (boostBy != 0)
+            {
+                success = true;
+
+                // Handle special cases
+                EffectStateId effectId = effect?.EffectStateId ?? EffectStateId.FromEmpty();
+                if (effectId is MoveEffectStateId { MoveId: MoveId.BellyDrum } or
+                    AbilityEffectStateId { AbilityId: AbilityId.AngerPoint })
+                {
+                    // Use PrintSetBoostEvent for moves that set boosts to maximum
+                    UiGenerator.PrintSetBoostEvent(target, boostId, boostBy, effect ??
+                        throw new ArgumentNullException(nameof(effect)));
+                }
+                else if (effect is not null)
+                {
+                    switch (effect.EffectType)
+                    {
+                        case EffectType.Move:
+                            // Regular move boost/unboost
+                            break;
+
+                        case EffectType.Item:
+                            // Item-triggered boost/unboost (messages handled by UI)
+                            break;
+
+                        default:
+                            // Ability or other effect type
+                            if (effect.EffectType == EffectType.Ability && !isSecondary)
+                            {
+                                if (effect is not Ability ability)
+                                {
+                                    throw new InvalidOperationException("Effect is not an Ability.");
+                                }
+                                UiGenerator.PrintAbilityEvent(target, ability);
+                                //boosted = true;
+                            }
+                            break;
+                    }
+
+                    if (isUnboost)
+                    {
+                        UiGenerator.PrintUnboostEvent(target, boostId, -boostBy, effect);
+                    }
+                    else
+                    {
+                        UiGenerator.PrintBoostEvent(target, boostId, boostBy, effect);
+                    }
+
+                    break;
+                }
+                // Trigger AfterEachBoost event
+                RunEvent(EventId.AfterEachBoost, target, RunEventSource.FromNullablePokemon(source), effect,
+                    currentBoost);
+            }
+            else if (effect?.EffectType == EffectType.Ability)
+            {
+                // Ability boost that failed
+                if (!isSecondary && !isSelf) continue;
+                if (isUnboost)
+                {
+                    UiGenerator.PrintUnboostEvent(target, boostId, 0, effect);
+                }
+                else
+                {
+                    UiGenerator.PrintBoostEvent(target, boostId, 0, effect);
+                }
+            }
+            else if (!isSecondary && !isSelf)
+            {
+                // Failed boost that should be announced
+                if (isUnboost)
+                {
+                    UiGenerator.PrintUnboostEvent(target, boostId, 0, effect ?? throw new ArgumentNullException(nameof(effect)));
+                }
+                else
+                {
+                    UiGenerator.PrintBoostEvent(target, boostId, 0, effect ?? throw new ArgumentNullException(nameof(effect)));
+                }
+            }
+        }
+
+        // Trigger AfterBoost event
+        RunEvent(EventId.AfterBoost, target, RunEventSource.FromNullablePokemon(source), effect, finalBoost);
+
+        // Update turn flags
+        if (success == true)
+        {
+            // Check if any boosts were positive
+            bool hasPositiveBoost = false;
+            bool hasNegativeBoost = false;
+
+            foreach (BoostId boostId in Enum.GetValues<BoostId>())
+            {
+                int? boostValue = finalBoostTable.Table.GetBoost(boostId);
+                switch (boostValue)
+                {
+                    case null:
+                        continue;
+                    case > 0:
+                        hasPositiveBoost = true;
+                        break;
+                    case < 0:
+                        hasNegativeBoost = true;
+                        break;
+                }
+            }
+
+            if (hasPositiveBoost) target.StatsRaisedThisTurn = true;
+            if (hasNegativeBoost) target.StatsLoweredThisTurn = true;
+        }
+
+        return success.HasValue ? new BoolBoolZeroUnion(success.Value) : null;
     }
 
     public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleHealEffect? effect = null)
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     public StatsTable SpreadModify(StatsTable baseStats, PokemonSet set)
@@ -570,47 +661,6 @@ public class BattleAsync : IBattle
         // Ability Shield protects against ability suppression
         return target?.HasItem(ItemId.AbilityShield) != true;
     }
-
-    //setPlayer(slot: SideID, options: PlayerOptions)
-    //{
-    //    let side;
-    //    let didSomething = true;
-    //    const slotNum = parseInt(slot[1]) - 1;
-    //    if (!this.sides[slotNum])
-    //    {
-    //        // create player
-    //        const team = this.getTeam(options);
-    //        side = new Side(options.name || `Player ${ slotNum + 1 }`, this, slotNum, team);
-    //        if (options.avatar) side.avatar = `${ options.avatar}`;
-    //        this.sides[slotNum] = side;
-    //    }
-    //    else
-    //    {
-    //        // edit player
-    //        side = this.sides[slotNum];
-    //        didSomething = false;
-    //        if (options.name && side.name !== options.name)
-    //        {
-    //            side.name = options.name;
-    //            didSomething = true;
-    //        }
-    //        if (options.avatar && side.avatar !== `${ options.avatar}`) {
-    //            side.avatar = `${ options.avatar}`;
-    //            didSomething = true;
-    //        }
-    //        if (options.team) throw new Error(`Player ${ slot } already has a team!`);
-    //    }
-    //    if (options.team && typeof options.team !== 'string')
-    //    {
-    //        options.team = Teams.pack(options.team);
-    //    }
-    //    if (!didSomething) return;
-    //    this.inputLog.push(`> player ${ slot} ` +JSON.stringify(options));
-    //    this.add('player', side.id, side.name, side.avatar, options.rating || '');
-
-    //    // Start the battle if it's ready to start
-    //    if (this.sides.every(playerSide => !!playerSide) && !this.started) this.start();
-    //}
 
     private void SetPlayer(SideId slot, PlayerOptions options)
     {

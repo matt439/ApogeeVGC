@@ -27,6 +27,7 @@ public enum EventId
     ChangeBoost,
     TryBoost,
     AfterEachBoost,
+    AfterBoost,
 }
 
 public enum EventType

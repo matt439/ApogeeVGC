@@ -1760,6 +1760,16 @@ public class Pokemon
         return Battle.Modify(stat, modifier ?? 1);
     }
 
+    public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int BoostBy(SparseBoostsTable boosts)
+    {
+        throw new NotImplementedException();
+    }
+
     public Pokemon Copy()
     {
         throw new NotImplementedException();
