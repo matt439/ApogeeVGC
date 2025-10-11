@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
@@ -45,6 +46,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
 
 
     public MoveId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
     public required string Name { get; init; }
     public int Num
     {

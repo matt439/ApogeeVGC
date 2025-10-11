@@ -395,37 +395,92 @@ public class BattleAsync : IBattle
 
     public StatsTable SpreadModify(StatsTable baseStats, PokemonSet set)
     {
-        throw new NotImplementedException();
+        StatsTable modStats = new();
+
+        // iterate through all stats in baseStats
+        foreach (StatId statName in baseStats.Keys)
+        {
+            modStats[statName] = StatModify(baseStats, set, statName);
+        }
+        return modStats;
     }
 
     public int FinalModify(int relayVar)
     {
-        throw new NotImplementedException();
+        relayVar = Modify(relayVar, Event.Modifier ?? 1.0);
+        Event.Modifier = 1.0;
+        return relayVar;
     }
 
     public double ChainModify(int numerator, int denominator = 1)
     {
-        throw new NotImplementedException();
+        // Get the current modifier from the event state as fixed-point
+        // Default to 1.0 (4096 in fixed-point) if null
+        int previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
+
+        // Convert the new modifier to fixed-point format
+        int nextMod = Trunc(numerator * 4096 / denominator);
+
+        // Chain the modifiers together and store back in the event
+        // The >> 12 is a right shift by 12 bits (equivalent to dividing by 4096)
+        // Add 2048 for proper rounding before the shift
+        Event.Modifier = ((previousMod * nextMod + 2048) >> 12) / 4096.0;
+        return nextMod;
     }
 
-    public double ChainModify(int[] numerator, int denominator = 1)
+    public double ChainModify(int[] fraction)
     {
-        throw new NotImplementedException();
+        if (fraction.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]", nameof(fraction));
+        }
+
+        return ChainModify(fraction[0], fraction[1]);
     }
 
-    public double ChainModify(double numerator, int denominator = 1)
+    public double ChainModify(double fraction)
     {
-        throw new NotImplementedException();
-    }
-
-    public double ChainModify(double[] numerator, int denominator = 1)
-    {
-        throw new NotImplementedException();
+        if (fraction <= 0.0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(fraction), "Fraction must be greater than 0.");
+        }
+        // Convert the double fraction to a fixed-point representation
+        int fixedPointFraction = Trunc((int)(fraction * 4096));
+        // Chain the fixed-point modification
+        int previousMod = Trunc((int)((Event.Modifier ?? 1.0) * 4096));
+        Event.Modifier = ((previousMod * fixedPointFraction + 2048) >> 12) / 4096.0;
+        return fixedPointFraction;
     }
 
     public int Modify(int value, int numerator, int denominator = 1)
     {
-        throw new NotImplementedException();
+        // Calculate the 4096-based fixed-point modifier
+        int modifier = Trunc(numerator * 4096 / denominator);
+        
+        // Apply the modifier with proper rounding
+        return Trunc((Trunc(value * modifier) + 2048 - 1) / 4096);
+    }
+
+    public int Modify(int value, int[] fraction)
+    {
+        if (fraction.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]", nameof(fraction));
+        }
+
+        return Modify(value, fraction[0], fraction[1]);
+    }
+
+    public int Modify(int value, double fraction)
+    {
+        if (fraction <= 0.0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(fraction), "Fraction must be greater than 0.");
+        }
+        // Convert the double fraction to a fixed-point representation
+        int fixedPointFraction = Trunc((int)(fraction * 4096));
+        // Apply the fixed-point modification
+        return Trunc((Trunc(value * fixedPointFraction) + 2048 - 1) / 4096);
     }
 
     public bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false)

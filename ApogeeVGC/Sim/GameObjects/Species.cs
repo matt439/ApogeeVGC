@@ -12,6 +12,7 @@ public record Species : IEffect
     public const double Epsilon = 0.0001;
 
     public SpecieId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
     public EffectType EffectType => EffectType.Specie;
     public int Num { get; init; }
     public required string Name { get; init; }

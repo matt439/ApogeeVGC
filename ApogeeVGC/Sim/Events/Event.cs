@@ -13,4 +13,5 @@ public class Event
     public Pokemon? Source { get; set; }
     public Pokemon? Target { get; set; }
     public IEffect? Effect { get; set; }
+    public double? Modifier { get; set; }
 }

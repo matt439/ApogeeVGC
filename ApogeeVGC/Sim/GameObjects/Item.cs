@@ -38,6 +38,7 @@ public record FlingData
 public record Item : IPokemonEventMethods, IEffect, IBasicEffect
 {
     public ItemId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
     public EffectType EffectType => EffectType.Item;
     public required string Name { get; init; }
     public string FullName => $"Item: {Name}";

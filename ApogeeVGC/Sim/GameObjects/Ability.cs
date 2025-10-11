@@ -48,6 +48,7 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
 {
     public EffectType EffectType => EffectType.Ability;
     public required AbilityId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
 
     /// <summary>
     /// Rating from -1 Detrimental to +5 Essential

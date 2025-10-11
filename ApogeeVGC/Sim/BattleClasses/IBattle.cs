@@ -62,12 +62,18 @@ public interface IBattle
 
     int FinalModify(int relayVar);
 
+    //double ChainModify(int numerator, int denominator = 1);
+    //double ChainModify(int[] numerator, int denominator = 1);
+    //double ChainModify(double numerator, int denominator = 1);
+    //double ChainModify(double[] numerator, int denominator = 1);
+
     double ChainModify(int numerator, int denominator = 1);
-    double ChainModify(int[] numerator, int denominator = 1);
-    double ChainModify(double numerator, int denominator = 1);
-    double ChainModify(double[] numerator, int denominator = 1);
+    double ChainModify(int[] fraction);
+    double ChainModify(double fraction);
 
     int Modify(int value, int numerator, int denominator = 1);
+    int Modify(int value, int[] fraction);
+    int Modify(int value, double fraction);
 
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 

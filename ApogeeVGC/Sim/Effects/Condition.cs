@@ -15,6 +15,7 @@ namespace ApogeeVGC.Sim.Effects;
 public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect
 {
     public required ConditionId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
     public EffectType EffectType => EffectType.Condition;
     public string Name { get; init; } = string.Empty;
     public ConditionEffectType ConditionEffectType { get; init; }
