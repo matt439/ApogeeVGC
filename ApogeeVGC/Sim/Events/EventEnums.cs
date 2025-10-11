@@ -28,6 +28,7 @@ public enum EventId
     TryBoost,
     AfterEachBoost,
     AfterBoost,
+    FieldStart,
 }
 
 public enum EventType

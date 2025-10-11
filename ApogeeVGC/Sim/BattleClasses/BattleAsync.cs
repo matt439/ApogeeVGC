@@ -45,7 +45,7 @@ public class BattleAsync : IBattle
             field = value;
         }
     }
-    public Field Field { get; init; } = new();
+    public Field Field { get; init; }
 
     public List<Side> Sides
     {
@@ -129,6 +129,7 @@ public class BattleAsync : IBattle
         Library = library;
         Dex = new ModdedDex(Library);
         RuleTable = new RuleTable();
+        Field = new Field(this);
 
         Format = options.Format ?? Library.Formats[options.Id];
         // RuleTable
@@ -589,6 +590,11 @@ public class BattleAsync : IBattle
 
             // TODO: Initialize other properties as needed
         };
+    }
+
+    public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot, int? duration)
+    {
+        throw new NotImplementedException();
     }
 
     public MoveCategory GetCategory(ActiveMove move)

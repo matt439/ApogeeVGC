@@ -74,8 +74,8 @@ public record Abilities
                 Rating = 4.5,
                 OnStart = (battle, pokemon) =>
                 {
-                    if (!battle.Field.SetTerrain(battle, _library.Conditions[ConditionId.ElectricTerrain]) &&
-                        battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
+                    if (!battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]) &&
+                        battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         if (battle.PrintDebug)
                         {
@@ -86,7 +86,7 @@ public record Abilities
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, _, _, _) =>
                 {
-                    if (battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         return battle.ChainModify([5461, 4096]);
                     }
@@ -155,7 +155,7 @@ public record Abilities
                 {
                     Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
 
-                    if (battle.Field.IsTerrain(battle, ConditionId.ElectricTerrain, null))
+                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         pokemon.AddVolatile(quarkDrive.Id);
                     }

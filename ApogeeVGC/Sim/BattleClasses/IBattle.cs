@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
@@ -46,7 +47,7 @@ public interface IBattle
     RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null);
 
-    void EachEvent(EventId eventId, IEffect? effect, bool? relayVar);
+    void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null);
 
     BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false);
@@ -77,6 +78,7 @@ public interface IBattle
 
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 
+    List<Side> Sides { get; }
     int Trunc(int num, int bits = 0);
 
     bool RandomChance(int numerator, int denominator);
@@ -118,6 +120,8 @@ public interface IBattle
     //BattleChoice[] GenerateChoicesForMcts(PlayerId playerId);
 
     EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null, Pokemon? target = null);
+
+    EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot, int? duration);
 
     MoveCategory GetCategory(ActiveMove move);
 
