@@ -222,7 +222,7 @@ public record PokemonSideFieldField(Field Field) : PokemonSideFieldUnion;
 
 
 /// <summary>
-/// Pokemon | Side | Battle
+/// Pokemon | Side | Battle | Pokemon?
 /// </summary>
 public abstract record PokemonSideBattleUnion
 {
@@ -230,10 +230,15 @@ public abstract record PokemonSideBattleUnion
         new PokemonSideBattlePokemon(pokemon);
     public static implicit operator PokemonSideBattleUnion(Side side) => new PokemonSideBattleSide(side);
     public static PokemonSideBattleUnion FromIBattle(IBattle battle) => new PokemonSideBattleBattle(battle);
+    public static PokemonSideBattleUnion? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonSideBattleNullablePokemon(pokemon);
+    }
 }
 public record PokemonSideBattlePokemon(Pokemon Pokemon) : PokemonSideBattleUnion;
 public record PokemonSideBattleSide(Side Side) : PokemonSideBattleUnion;
 public record PokemonSideBattleBattle(IBattle Battle) : PokemonSideBattleUnion;
+public record PokemonSideBattleNullablePokemon(Pokemon? Pokemon) : PokemonSideBattleUnion;
 
 
 /// <summary>
@@ -536,7 +541,7 @@ public static class EffectUnionFactory
 
 
 /// <summary>
-/// Pokemon | Pokemon[] | Side | Battle
+/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion?
 /// </summary>
 public abstract record RunEventTarget
 {
@@ -548,6 +553,17 @@ public abstract record RunEventTarget
 
     public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
     public static RunEventTarget FromIBattle(IBattle battle) => new BattleRunEventTarget(battle);
+    public static RunEventTarget? FromNullablePokemonSideBattleUnion(PokemonSideBattleUnion? target)
+    {
+        return target switch
+        {
+            null => null,
+            PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
+            PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
+            PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),
+            _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
+        };
+    }
 }
 
 public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;

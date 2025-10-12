@@ -29,6 +29,8 @@ public enum EventId
     AfterEachBoost,
     AfterBoost,
     FieldStart,
+    TryTerrain,
+    FieldEnd,
 }
 
 public enum EventType

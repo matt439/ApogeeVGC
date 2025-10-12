@@ -96,14 +96,43 @@ public class Field
         return true;
     }
 
+    public ConditionId EffectiveTerrain(PokemonSideBattleUnion? target)
+    {
+        if (Battle.Event is not null && target is null)
+        {
+            target = PokemonSideBattleUnion.FromNullablePokemon(Battle.Event.Target);
+        }
+
+        return Battle.RunEvent(EventId.TryTerrain,
+            RunEventTarget.FromNullablePokemonSideBattleUnion(target)) is not (null or BoolRelayVar { Value: false })
+            ? Terrain
+            : ConditionId.None;
+    }
+
     public bool IsTerrain(ConditionId terrain, PokemonSideBattleUnion? target)
     {
-        throw new NotImplementedException();
+        ConditionId ourTerrain = EffectiveTerrain(target);
+        return ourTerrain == terrain;
+    }
+
+    public bool IsTerrain(IReadOnlyList<ConditionId> terrain, PokemonSideBattleUnion? target)
+    {
+        ConditionId ourTerrain = EffectiveTerrain(target);
+        return terrain.Contains(ourTerrain);
     }
 
     public bool RemovePseudoWeather(Condition status)
     {
-        throw new NotImplementedException();
+        PseudoWeather.TryGetValue(status.Id, out EffectState? state);
+        if (state is null) return false;
+        Battle.SingleEvent(EventId.FieldEnd, status, state, this);
+        PseudoWeather.Remove(status.Id);
+        return true;
+    }
+
+    public bool RemovePseudoWeather(ConditionId status)
+    {
+        return RemovePseudoWeather(Battle.Library.Conditions[status]);
     }
 
     /// <summary>

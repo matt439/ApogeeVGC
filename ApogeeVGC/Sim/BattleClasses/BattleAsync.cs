@@ -549,6 +549,18 @@ public class BattleAsync : IBattle
         };
     }
 
+    //initEffectState(obj: Partial<EffectState>, effectOrder?: number) : EffectState {
+    //    if (!obj.id) obj.id = '';
+    //    if (effectOrder !== undefined) {
+    //        obj.effectOrder = effectOrder;
+    //    } else if (obj.id && obj.target && (!(obj.target instanceof Pokemon) || obj.target.isActive)) {
+    //        obj.effectOrder = this.effectOrder++;
+    //    } else {
+    //        obj.effectOrder = 0;
+    //    }
+    //    return obj as EffectState;
+    //}
+
     /// <summary>
     /// Initializes an EffectState object with proper effect ordering.
     /// Effect order is used to determine priority when multiple effects trigger.
@@ -594,7 +606,16 @@ public class BattleAsync : IBattle
 
     public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot, int? duration)
     {
-        throw new NotImplementedException();
+        // Use the first overload to handle basic initialization and effect ordering
+        // Pass the source Pokemon as the target for effect ordering purposes
+        EffectState state = InitEffectState(id, effectOrder: null, target: source);
+
+        // Add the additional properties specific to this overload
+        state.Source = source;
+        state.SourceSlot = sourceSlot;
+        state.Duration = duration;
+
+        return state;
     }
 
     public MoveCategory GetCategory(ActiveMove move)
