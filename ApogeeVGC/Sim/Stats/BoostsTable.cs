@@ -33,6 +33,37 @@ public class BoostsTable
         };
     }
 
+    public void SetBoost(BoostId stat, int value)
+    {
+        value = ClampBoost(value);
+        switch (stat)
+        {
+            case BoostId.Atk:
+                Atk = value;
+                break;
+            case BoostId.Def:
+                Def = value;
+                break;
+            case BoostId.SpA:
+                SpA = value;
+                break;
+            case BoostId.SpD:
+                SpD = value;
+                break;
+            case BoostId.Spe:
+                Spe = value;
+                break;
+            case BoostId.Accuracy:
+                Accuracy = value;
+                break;
+            case BoostId.Evasion:
+                Evasion = value;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(stat), "Invalid stat ID.");
+        }
+    }
+
     public double GetBoostMultiplier(BoostId stat)
     {
         return stat switch

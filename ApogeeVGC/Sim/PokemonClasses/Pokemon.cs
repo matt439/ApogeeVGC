@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
@@ -31,7 +30,7 @@ public class Pokemon
     public StatsTable Ivs => Set.Ivs;
     public List<MoveSlot> MoveSlots { get; set; }
 
-    public PokemonSlot Position { get; set; }
+    public int Position { get; set; }
 
     public Species BaseSpecies { get; set; }
     public Species Species { get; set; }
@@ -181,11 +180,7 @@ public class Pokemon
             );
         BaseMoveSlots = baseMoveSlots;
 
-        Position = new PokemonSlot
-        {
-            SideId = SideId.P1,
-            PositionLetter = PositionLetter.A,
-        };
+        // Position = 0;
         StatusState = battle.InitEffectState();
         Volatiles = [];
 
@@ -627,7 +622,7 @@ public class Pokemon
 
         // Set source information
         volatileState.Source = source;
-        volatileState.SourceSlot = source.Position; // Assuming getSlot() maps to Position
+        volatileState.SourceSlot = source.GetSlot();
 
         // Set source effect
         if (sourceEffect != null)
@@ -1362,11 +1357,8 @@ public class Pokemon
     /// </summary>
     public PokemonSlot GetSlot()
     {
-        return new PokemonSlot
-        {
-            SideId = Side.Id,
-            PositionLetter = Position.PositionLetter,
-        };
+        int poistionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
+        return new PokemonSlot(Side.Id, poistionOffset);
     }
 
     /// <summary>
@@ -1763,12 +1755,42 @@ public class Pokemon
 
     public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
     {
-        throw new NotImplementedException();
+        SparseBoostsTable cappedBoost = new();
+        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        {
+            // Get current boost value for this stat
+            int currentBoost = Boosts.GetBoost(boostId);
+            
+            // Calculate capped boost: clamp(current + incoming) - current
+            // This gives us the actual amount we can boost (respecting -6 to +6 limits)
+            int cappedValue = Battle.ClampIntRange(currentBoost + value, -6, 6) - currentBoost;
+            cappedBoost.SetBoost(boostId, cappedValue);
+        }
+        return cappedBoost;
     }
 
+    /// <summary>
+    /// Applies stat boosts to this Pokemon, respecting the -6 to +6 boost limits.
+    /// Returns the delta (change amount) of the last boost that was applied.
+    /// </summary>
+    /// <param name="boosts">The boosts to apply (will be capped to valid ranges)</param>
+    /// <returns>The change amount of the last stat that was boosted (0 if no boosts were applied)</returns>
     public int BoostBy(SparseBoostsTable boosts)
     {
-        throw new NotImplementedException();
+        // Cap all boosts to respect -6 to +6 limits
+        boosts = GetCappedBoost(boosts);
+        
+        int delta = 0;
+        
+        // Apply each boost to the Pokemon's current boosts
+        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        {
+            delta = value;
+            Boosts.SetBoost(boostId, Boosts.GetBoost(boostId) + delta);
+        }
+        
+        // Return the last delta (change amount of the last stat modified)
+        return delta;
     }
 
     public Pokemon Copy()

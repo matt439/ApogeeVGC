@@ -98,4 +98,33 @@ public class SparseBoostsTable
             Evasion = boosts.Evasion,
         };
     }
+
+    /// <summary>
+    /// Enumerates all non-null boost values in this table.
+    /// Only yields boosts that have been explicitly set (non-null).
+    /// </summary>
+    /// <returns>An enumerable of (BoostId, value) pairs for all non-null boosts</returns>
+    public IEnumerable<(BoostId BoostId, int Value)> GetNonNullBoosts()
+    {
+        if (Atk.HasValue)
+            yield return (BoostId.Atk, Atk.Value);
+        
+        if (Def.HasValue)
+            yield return (BoostId.Def, Def.Value);
+        
+        if (SpA.HasValue)
+            yield return (BoostId.SpA, SpA.Value);
+        
+        if (SpD.HasValue)
+            yield return (BoostId.SpD, SpD.Value);
+        
+        if (Spe.HasValue)
+            yield return (BoostId.Spe, Spe.Value);
+        
+        if (Accuracy.HasValue)
+            yield return (BoostId.Accuracy, Accuracy.Value);
+        
+        if (Evasion.HasValue)
+            yield return (BoostId.Evasion, Evasion.Value);
+    }
 }

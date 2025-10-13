@@ -79,6 +79,7 @@ public interface IBattle
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 
     List<Side> Sides { get; }
+
     int Trunc(int num, int bits = 0);
 
     bool RandomChance(int numerator, int denominator);

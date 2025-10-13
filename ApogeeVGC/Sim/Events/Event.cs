@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Events;
 
@@ -9,9 +10,9 @@ public class Event
     //public double Modifier { get; set; } = 1.0;
     //public Pokemon? Target { get; set; }
 
-
-    public Pokemon? Source { get; set; }
-    public Pokemon? Target { get; set; }
+    public EventId Id { get; set; }
+    public SingleEventSource? Source { get; set; }
+    public SingleEventTarget? Target { get; set; }
     public IEffect? Effect { get; set; }
     public double? Modifier { get; set; }
 }

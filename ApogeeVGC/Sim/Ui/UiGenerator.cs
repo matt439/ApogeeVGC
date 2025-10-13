@@ -33,6 +33,7 @@ public enum BattleAddId
     SetBoost,
     Boost,
     Unboost,
+    Message,
 }
 
 public static class UiGenerator
@@ -224,5 +225,10 @@ public static class UiGenerator
         string statName = boostId.ConvertToString();
         string boostText = boost > 0 ? $"rose by {boost} stage(s)" : $"fell by {-boost} stage(s)";
         Console.WriteLine($"{target.Name}'s {statName} {boostText} due to {sourceEffect.Name}!");
+    }
+
+    public static void PrintMessage(string message)
+    {
+        Console.WriteLine(message);
     }
 }

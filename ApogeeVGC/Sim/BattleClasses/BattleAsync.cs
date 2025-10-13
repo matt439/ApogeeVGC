@@ -13,6 +13,9 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Diagnostics.Metrics;
+using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -179,11 +182,253 @@ public class BattleAsync : IBattle
         }
     }
 
+    //    singleEvent(
+    //        eventid: string, effect: Effect, state: EffectState | Record<string, never> | null,
+    //        target: string | Pokemon | Side | Field | Battle | null, source?: string | Pokemon | Effect | false | null,
+    //        sourceEffect?: Effect | string | null, relayVar?: any, customCallback?: unknown
+
+    //    )
+    //    {
+    //        if (this.eventDepth >= 8)
+    //        {
+    //            // oh fuck
+    //            this.add('message', 'STACK LIMIT EXCEEDED');
+    //            this.add('message', 'PLEASE REPORT IN BUG THREAD');
+    //            this.add('message', 'Event: ' + eventid);
+    //            this.add('message', 'Parent event: ' + this.event.id);
+    //			throw new Error("Stack overflow");
+    //}
+    //		if (this.log.length - this.sentLogPos > 1000) {
+    //    this.add('message', 'LINE LIMIT EXCEEDED');
+    //    this.add('message', 'PLEASE REPORT IN BUG THREAD');
+    //    this.add('message', 'Event: ' + eventid);
+    //    this.add('message', 'Parent event: ' + this.event.id);
+    //    throw new Error("Infinite loop");
+    //}
+    //// this.add('Event: ' + eventid + ' (depth ' + this.eventDepth + ')');
+    //let hasRelayVar = true;
+    //		if (relayVar === undefined) {
+    //    relayVar = true;
+    //    hasRelayVar = false;
+    //}
+
+    //		if (effect.effectType === 'Status' && (target instanceof Pokemon) && target.status !== effect.id) {
+    //    // it's changed; call it off
+    //    return relayVar;
+    //}
+    //		if (eventid === 'SwitchIn' && effect.effectType === 'Ability' && effect.flags['breakable'] &&
+
+    //            this.suppressingAbility(target as Pokemon)) {
+    //    this.debug(eventid + ' handler suppressed by Mold Breaker');
+    //    return relayVar;
+    //}
+    //		if (eventid !== 'Start' && eventid !== 'TakeItem' && effect.effectType === 'Item' &&
+    //			(target instanceof Pokemon) && target.ignoringItem()) {
+    //    this.debug(eventid + ' handler suppressed by Embargo, Klutz or Magic Room');
+    //    return relayVar;
+    //}
+    //		if (eventid !== 'End' && effect.effectType === 'Ability' && (target instanceof Pokemon) && target.ignoringAbility()) {
+    //    this.debug(eventid + ' handler suppressed by Gastro Acid or Neutralizing Gas');
+    //    return relayVar;
+    //}
+    //		if (
+    //			effect.effectType === 'Weather' && eventid !== 'FieldStart' && eventid !== 'FieldResidual' &&
+    //			eventid !== 'FieldEnd' && this.field.suppressingWeather()
+    //		) {
+    //    this.debug(eventid + ' handler suppressed by Air Lock');
+    //    return relayVar;
+    //}
+
+    //		const callback = customCallback || (effect as any)[`on${eventid}`];
+    //		if (callback === undefined) return relayVar;
+
+    //		const parentEffect = this.effect;
+    //const parentEffectState = this.effectState;
+    //const parentEvent = this.event;
+
+    //		this.effect = effect;
+    //		this.effectState = state as EffectState || this.initEffectState({ });
+    //		this.event = { id: eventid, target, source, effect: sourceEffect };
+    //		this.eventDepth++;
+
+    //		const args = [target, source, sourceEffect];
+    //		if (hasRelayVar) args.unshift(relayVar);
+
+    //let returnVal;
+    //		if (typeof callback === 'function') {
+    //    returnVal = callback.apply(this, args);
+    //} else {
+    //    returnVal = callback;
+    //}
+
+    //		this.eventDepth--;
+    //		this.effect = parentEffect;
+    //		this.effectState = parentEffectState;
+    //		this.event = parentEvent;
+
+    //		return returnVal === undefined ? relayVar : returnVal;
+    //}
+
     public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
         RelayVar? relayVar = null, Delegate? customCallback = null)
     {
-        return null;
+        // Check for stack overflow
+        if (EventDepth >= 8)
+        {
+            UiGenerator.PrintMessage("STACK LIMIT EXCEEDED");
+            UiGenerator.PrintMessage($"Event: {eventId}");
+            UiGenerator.PrintMessage($"Parent event: {Event.Id}");
+            throw new InvalidOperationException("Stack overflow");
+        }
+
+        // Check for infinite loop
+        if (Log.Count - SentLogPos > 1000)
+        {
+            UiGenerator.PrintMessage("STACK LIMIT EXCEEDED");
+            UiGenerator.PrintMessage($"Event: {eventId}");
+            UiGenerator.PrintMessage($"Parent event: {Event.Id}");
+            throw new InvalidOperationException("Infinite loop");
+        }
+
+        // Track if relayVar was explicitly provided
+        bool hasRelayVar = relayVar != null;
+        relayVar ??= new BoolRelayVar(true);
+
+        // Check if status effect has changed
+        if (effect is Condition { ConditionEffectType: ConditionEffectType.Status} &&
+            target is PokemonSingleEventTarget pokemonTarget)
+        {
+            Pokemon targetPokemon = pokemonTarget.Pokemon;
+            if (effect is Condition condition && targetPokemon.Status != condition.Id)
+            {
+                // Status has changed; abort the event
+                return relayVar;
+            }
+        }
+
+        // Check if ability is suppressed by Mold Breaker
+        if (eventId == EventId.SwitchIn && 
+            effect.EffectType == EffectType.Ability && 
+            effect is Ability { Flags.Breakable: true } &&
+            target is PokemonSingleEventTarget moldbreakerTarget &&
+            SuppressingAbility(moldbreakerTarget.Pokemon))
+        {
+            return relayVar;
+        }
+
+        // Check if item is suppressed
+        if (eventId != EventId.Start && 
+            eventId != EventId.TakeItem && 
+            effect.EffectType == EffectType.Item &&
+            target is PokemonSingleEventTarget itemTarget &&
+            itemTarget.Pokemon.IgnoringItem())
+        {
+            return relayVar;
+        }
+
+        // Check if ability is suppressed by Gastro Acid/Neutralizing Gas
+        if (eventId != EventId.End && 
+            effect.EffectType == EffectType.Ability &&
+            target is PokemonSingleEventTarget abilityTarget &&
+            abilityTarget.Pokemon.IgnoringAbility())
+        {
+            return relayVar;
+        }
+
+        // Check if weather is suppressed
+        if (effect is Condition { ConditionEffectType:ConditionEffectType.Weather } &&
+            eventId != EventId.FieldStart &&
+            eventId != EventId.FieldResidual &&
+            eventId != EventId.FieldEnd &&
+            Field.SuppressingWeather())
+        {
+            return relayVar;
+        }
+
+        // Get the callback - either custom or from the effect
+        Delegate? callback = customCallback ?? GetEventCallback(effect, eventId);
+        if (callback == null) return relayVar;
+
+        // Save parent context
+        IEffect? parentEffect = Effect;
+        EffectState? parentEffectState = EffectState;
+        Event parentEvent = Event;
+
+        // Set up new event context
+        Effect = effect;
+        EffectState = state ?? InitEffectState();
+        Event = new Event
+        {
+            Id = eventId,
+            Target = target,
+            Source = source,
+            Effect = sourceEffect,
+        };
+        EventDepth++;
+
+        // Invoke the callback with appropriate parameters
+        RelayVar? returnVal;
+        try
+        {
+            returnVal = InvokeEventCallback(callback, hasRelayVar, relayVar, target, source, sourceEffect);
+        }
+        finally
+        {
+            // Restore parent context
+            EventDepth--;
+            Effect = parentEffect;
+            EffectState = parentEffectState;
+            Event = parentEvent;
+        }
+
+        return returnVal ?? relayVar;
+    }
+
+    /// <summary>
+    /// Gets the event callback from an effect based on the event ID.
+    /// </summary>
+    private static Delegate? GetEventCallback(IEffect effect, EventId eventId)
+    {
+        // Use reflection to get the callback property (e.g., "OnDamage", "OnStart", etc.)
+        string propertyName = $"On{eventId}";
+        PropertyInfo? property = effect.GetType().GetProperty(propertyName);
+        return property?.GetValue(effect) as Delegate;
+    }
+
+    /// <summary>
+    /// Invokes an event callback with the appropriate parameters based on its signature.
+    /// </summary>
+    private static RelayVar? InvokeEventCallback(Delegate callback, bool hasRelayVar, RelayVar relayVar, 
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    {
+        // Build parameter list based on callback signature
+        var parameters = callback.Method.GetParameters();
+        var args = new List<object?>();
+
+        // Add relayVar as first parameter if it was explicitly provided
+        if (hasRelayVar)
+        {
+            args.Add(relayVar);
+        }
+
+        // Add standard parameters: target, source, sourceEffect
+        // Note: The actual parameter types may vary, so this is a simplified version
+        if (parameters.Length > args.Count) args.Add(target);
+        if (parameters.Length > args.Count) args.Add(source);
+        if (parameters.Length > args.Count) args.Add(sourceEffect);
+
+        // Invoke the callback
+        object? result = callback.DynamicInvoke([.. args]);
+
+        // Convert result to RelayVar if it's not null
+        return result switch
+        {
+            RelayVar rv => rv,
+            bool b => new BoolRelayVar(b),
+            int i => new IntRelayVar(i),
+            _ => null,
+        };
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,

@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -180,6 +181,12 @@ public record Species : IEffect
                 Special = Abilities.Special,
             },
         };
+    }
+
+    public Delegate? GetDelegate(EventId id)
+    {
+        // Species doesn't have any event handlers, so always return null
+        return null;
     }
 }
 

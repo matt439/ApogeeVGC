@@ -14,12 +14,22 @@ public class Side
 
     public string Name { get; set; }
     public string Avatar { get; set; }
-    //public Side Foe { get; init; } = null!; // set in battle.start()
     //public Side? AllySide { get; init; } = null; // set in battle.start()
     public List<PokemonSet> Team { get; set; }
     public List<Pokemon> Pokemon { get; set; }
     public List<Pokemon> Active { get; set; }
-    public Side Foe { get; set; } = null!; // set in battle.start()
+    public Side Foe
+    {
+        get
+        {
+            if (field is null)
+            {
+                throw new InvalidOperationException("Foe side not set yet");
+            }
+            return field;
+        }
+        set;
+    } = null!; // set in battle.start()
 
     public int PokemonLeft { get; set; }
 
@@ -108,17 +118,24 @@ public class Side
 
     private Pokemon AddPokemon(PokemonSet set)
     {
-        throw new NotImplementedException();
+        if (Pokemon.Count >= 24) return null;
+        var newPokemon = new Pokemon(Battle, set, this)
+        {
+            Position = Pokemon.Count,
+        };
+        Pokemon.Add(newPokemon);
+        PokemonLeft++;
+        return newPokemon;
     }
 
     public bool HasAlly(Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        return pokemon.Side == this;
     }
 
     public int FoePokemonLeft()
     {
-        throw new NotImplementedException();
+        return Foe.PokemonLeft;
     }
 }
 
