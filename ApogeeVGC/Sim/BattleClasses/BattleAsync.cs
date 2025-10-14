@@ -513,39 +513,42 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    //getCallback(target: Pokemon | Side | Field | Battle, effect: Effect, callbackName: string)
-    //{
-    //    let callback: Function | undefined = (effect as any)[callbackName];
-    //    // Abilities and items Start at different times during the SwitchIn event, so we run their onStart handlers
-    //    // during the SwitchIn event instead of running the Start event during switch-ins
-    //    // gens 4 and before still use the old system, though
-    //    if (
-    //        callback === undefined && target instanceof Pokemon && this.gen >= 5 && callbackName === 'onSwitchIn' &&
-    //        !(effect as any).onAnySwitchIn && (['Ability', 'Item'].includes(effect.effectType) || (
-    //            // Innate abilities/items
-    //            effect.effectType === 'Status' && ['ability', 'item'].includes(effect.id.split(':')[0])
-    //        ))
-    //        ) {
-    //        callback = (effect as any).onStart;
-    //    }
-    //    return callback;
-    //}
-
     private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
     {
         EffectDelegate? del = effect.GetDelegate(callbackName);
         Delegate? callback = del?.GetDelegate();
 
-        if (callback is null && target is PokemonRunEventTarget &&
-            Gen >= 5 && callbackName == EventId.SwitchIn &&
-            effect.EffectType is EffectType.Ability or EffectType.Item ||
-                effect is Condition { ConditionEffectType: ConditionEffectType.Status } &&
-                effect.EffectType is EffectType.Ability or EffectType.Item)
+        // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
+        // instead of having a separate Start event
+        if (callback is null &&
+            target is PokemonRunEventTarget &&
+            Gen >= 5 &&
+            callbackName == EventId.SwitchIn &&
+            effect.GetDelegate(EventId.AnySwitchIn) == null && // Check onAnySwitchIn doesn't exist
+            (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
         {
             del = effect.GetDelegate(EventId.Start);
             callback = del?.GetDelegate();
         }
+
         return EffectDelegate.FromNullableDelegate(callback);
+    }
+
+    // Helper method to check if effect is Ability or Item
+    private static bool IsAbilityOrItem(IEffect effect)
+    {
+        return effect.EffectType is EffectType.Ability or EffectType.Item;
+    }
+
+    // Helper method to check if effect is an innate ability/item
+    private static bool IsInnateAbilityOrItem(IEffect effect)
+    {
+        if (effect is not Condition { ConditionEffectType: ConditionEffectType.Status } condition)
+        {
+            return false;
+        }
+
+        return condition.AssociatedItem is not null || condition.AssociatedAbility is not null;
     }
 
     private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
