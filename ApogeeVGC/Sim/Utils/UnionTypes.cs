@@ -674,6 +674,92 @@ public record EmptyEffectStateId : EffectStateId;
 
 
 /// <summary>
+/// Pokemon | Side | Field | IBattle
+/// Represents the resolved target parameter type for event callbacks.
+/// </summary>
+public abstract record EventTargetParameter
+{
+    public static EventTargetParameter? FromSingleEventTarget(SingleEventTarget? target, Type expectedType)
+    {
+        if (target == null) return null;
+
+        return target switch
+        {
+            PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) => 
+                new PokemonEventTargetParameter(p.Pokemon),
+            SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) => 
+                new SideEventTargetParameter(s.Side),
+            FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) => 
+                new FieldEventTargetParameter(f.Field),
+            BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) => 
+                new BattleEventTargetParameter(b.Battle),
+            _ => null,
+        };
+    }
+
+    public object? ToObject()
+    {
+        return this switch
+        {
+            PokemonEventTargetParameter p => p.Pokemon,
+            SideEventTargetParameter s => s.Side,
+            FieldEventTargetParameter f => f.Field,
+            BattleEventTargetParameter b => b.Battle,
+            _ => null,
+        };
+    }
+}
+public record PokemonEventTargetParameter(Pokemon Pokemon) : EventTargetParameter;
+public record SideEventTargetParameter(Side Side) : EventTargetParameter;
+public record FieldEventTargetParameter(Field Field) : EventTargetParameter;
+public record BattleEventTargetParameter(IBattle Battle) : EventTargetParameter;
+
+
+
+/// <summary>
+/// Pokemon | IEffect | PokemonType | bool (false)
+/// Represents the resolved source parameter type for event callbacks.
+/// </summary>
+public abstract record EventSourceParameter
+{
+    public static EventSourceParameter? FromSingleEventSource(SingleEventSource? source, Type expectedType)
+    {
+        if (source == null) return null;
+
+        return source switch
+        {
+            PokemonSingleEventSource p when expectedType.IsAssignableFrom(typeof(Pokemon)) => 
+                new PokemonEventSourceParameter(p.Pokemon),
+            EffectSingleEventSource e when expectedType.IsAssignableFrom(typeof(IEffect)) => 
+                new EffectEventSourceParameter(e.Effect),
+            PokemonTypeSingleEventSource t when expectedType.IsAssignableFrom(typeof(PokemonType)) => 
+                new PokemonTypeEventSourceParameter(t.Type),
+            FalseSingleEventSource when expectedType == typeof(bool) => 
+                new BoolEventSourceParameter(false),
+            _ => null,
+        };
+    }
+
+    public object? ToObject()
+    {
+        return this switch
+        {
+            PokemonEventSourceParameter p => p.Pokemon,
+            EffectEventSourceParameter e => e.Effect,
+            PokemonTypeEventSourceParameter t => t.Type,
+            BoolEventSourceParameter b => b.Value,
+            _ => null,
+        };
+    }
+}
+public record PokemonEventSourceParameter(Pokemon Pokemon) : EventSourceParameter;
+public record EffectEventSourceParameter(IEffect Effect) : EventSourceParameter;
+public record PokemonTypeEventSourceParameter(PokemonType Type) : EventSourceParameter;
+public record BoolEventSourceParameter(bool Value) : EventSourceParameter;
+
+
+
+/// <summary>
 /// SparseBoostsTable | false
 /// </summary>
 public abstract record ItemBoosts
