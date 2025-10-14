@@ -1025,6 +1025,21 @@ public class Pokemon
         return pokemon != null && Side == pokemon.Side;
     }
 
+    public List<Pokemon> AlliesAndSelf()
+    {
+        return Side.Allies();
+    }
+
+    public List<Pokemon> Allies()
+    {
+        return Side.Allies().Where(p => p != this).ToList();
+    }
+
+    public List<Pokemon> Foes(bool all = false)
+    {
+        return Side.Foes(all);
+    }
+
 
     /// <summary>
     /// Changes this Pokemon's forme to match the given speciesId (or species).

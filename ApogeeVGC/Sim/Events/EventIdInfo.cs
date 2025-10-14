@@ -30,4 +30,53 @@ public record EventIdInfo
     /// True for events like Invulnerability, TryHit, DamagingHit, EntryHazard.
     /// </summary>
     public bool UsesLeftToRightOrder { get; init; }
+
+    /// <summary>
+    /// Gets the base EventId by removing any prefix from the current event.
+    /// For example, AllyBasePower returns BasePower, SourceModifyAtk returns ModifyAtk.
+    /// </summary>
+    public EventId GetBaseEventId()
+    {
+        if (Prefix == EventPrefix.None)
+        {
+            return Id;
+        }
+
+        // The base event name is the Id with the prefix removed
+        string idString = Id.ToString();
+        string prefixString = Prefix.ToString();
+
+        if (idString.StartsWith(prefixString))
+        {
+            string baseEventName = idString.Substring(prefixString.Length);
+            if (Enum.TryParse<EventId>(baseEventName, out EventId baseId))
+            {
+                return baseId;
+            }
+        }
+
+        return Id;
+    }
+
+    /// <summary>
+    /// Creates an EventId by combining a prefix with a base event.
+    /// For example, combining Ally + BasePower returns AllyBasePower.
+    /// Returns the original eventId if prefix is None or if the combination doesn't exist.
+    /// </summary>
+    public static EventId CombinePrefixWithEvent(EventPrefix prefix, EventId baseEventId)
+    {
+        if (prefix == EventPrefix.None)
+        {
+            return baseEventId;
+        }
+
+        string combinedName = $"{prefix}{baseEventId}";
+        if (Enum.TryParse<EventId>(combinedName, out EventId combinedId))
+        {
+            return combinedId;
+        }
+
+        // If the combination doesn't exist, return the base event
+        return baseEventId;
+    }
 }

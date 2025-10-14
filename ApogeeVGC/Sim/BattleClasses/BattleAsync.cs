@@ -411,158 +411,286 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    //findEventHandlers(target: Pokemon | Pokemon[] | Side | Battle, eventName: string, source?: Pokemon | null)
-    //{
-    //    let handlers: EventListener[] = [];
-    //    if (Array.isArray(target))
-    //    {
-    //        for (const [i, pokemon] of target.entries()) {
-    //            // console.log(`Event: ${eventName}, Target: ${pokemon}, ${i}`);
-    //            const curHandlers = this.findEventHandlers(pokemon, eventName, source);
-    //            for (const handler of curHandlers) {
-    //                handler.target = pokemon; // Original "effectHolder"
-    //                handler.index = i;
-    //            }
-    //            handlers = handlers.concat(curHandlers);
-    //        }
-    //        return handlers;
-    //    }
-    //    // events that target a Pokemon normally bubble up to the Side
-    //    const shouldBubbleDown = target instanceof Side;
-    //    // events usually run through EachEvent should never have any handlers besides `on${eventName}` so don't check for them
-    //    const prefixedHandlers = ! ['BeforeTurn', 'Update', 'Weather', 'WeatherChange', 'TerrainChange'].includes(eventName);
-    //    if (target instanceof Pokemon && (target.isActive || source?.isActive)) {
-    //        handlers = this.findPokemonEventHandlers(target, `on${ eventName}`);
-    //        if (prefixedHandlers)
-    //        {
-    //            for (const allyActive of target.alliesAndSelf()) {
-    //                handlers.push(...this.findPokemonEventHandlers(allyActive, `onAlly${ eventName}`));
-    //                handlers.push(...this.findPokemonEventHandlers(allyActive, `onAny${ eventName}`));
-    //            }
-    //            for (const foeActive of target.foes()) {
-    //                handlers.push(...this.findPokemonEventHandlers(foeActive, `onFoe${ eventName}`));
-    //                handlers.push(...this.findPokemonEventHandlers(foeActive, `onAny${ eventName}`));
-    //            }
-    //        }
-    //        target = target.side;
-    //    }
-    //    if (source && prefixedHandlers)
-    //    {
-    //        handlers.push(...this.findPokemonEventHandlers(source, `onSource${ eventName}`));
-    //    }
-    //    if (target instanceof Side) {
-    //        for (const side of this.sides) {
-    //            if (shouldBubbleDown)
-    //            {
-    //                for (const active of side.active) {
-    //                    if (side === target || side === target.allySide)
-    //                    {
-    //                        handlers = handlers.concat(this.findPokemonEventHandlers(active, `on${ eventName}`));
-    //                    }
-    //                    else if (prefixedHandlers)
-    //                    {
-    //                        handlers = handlers.concat(this.findPokemonEventHandlers(active, `onFoe${ eventName}`));
-    //                    }
-    //                    if (prefixedHandlers) handlers = handlers.concat(this.findPokemonEventHandlers(active, `onAny${ eventName}`));
-    //                }
-    //            }
-    //            if (side.n < 2 || !side.allySide)
-    //            {
-    //                if (side === target || side === target.allySide)
-    //                {
-    //                    handlers.push(...this.findSideEventHandlers(side, `on${ eventName}`));
-    //                }
-    //                else if (prefixedHandlers)
-    //                {
-    //                    handlers.push(...this.findSideEventHandlers(side, `onFoe${ eventName}`));
-    //                }
-    //                if (prefixedHandlers) handlers.push(...this.findSideEventHandlers(side, `onAny${ eventName}`));
-    //            }
-    //        }
-    //    }
-    //    handlers.push(...this.findFieldEventHandlers(this.field, `on${ eventName}`));
-    //    handlers.push(...this.findBattleEventHandlers(`on${ eventName}`));
-    //    return handlers;
-    //}
-
-    private static List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
-        Pokemon? source = null)
+    /// <summary>
+    /// Finds all event handlers for a given target and event.
+    /// Handles Pokemon arrays, event bubbling between Pokemon/Side, and prefixed event variants.
+    /// </summary>
+    private List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName, Pokemon? source = null)
     {
-        throw new NotImplementedException();
+        List<EventListener> handlers = [];
+
+        // Handle array of Pokemon
+        if (target is PokemonArrayRunEventTarget arrayTarget)
+        {
+            for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
+            {
+                Pokemon pokemon = arrayTarget.PokemonList[i];
+                // Recursively find handlers for each Pokemon
+                var curHandlers = FindEventHandlers(
+                    new PokemonRunEventTarget(pokemon), 
+                    eventName,
+                    source
+                );
+                
+                // Set the target and index for each handler
+                foreach (EventListener handler in curHandlers)
+                {
+                    handler.Target = pokemon; // Original "effectHolder"
+                    handler.Index = i;
+                }
+                
+                handlers.AddRange(curHandlers);
+            }
+            return handlers;
+        }
+
+        // Events that target a Pokemon normally bubble up to the Side
+        bool shouldBubbleDown = target is SideRunEventTarget;
+        
+        // Events usually run through EachEvent should never have any handlers besides the base event
+        // so don't check for prefixed variants
+        bool prefixedHandlers = eventName is not (
+            EventId.BeforeTurn or 
+            EventId.Update or 
+            EventId.Weather or 
+            EventId.WeatherChange or 
+            EventId.TerrainChange
+        );
+
+        // Handle Pokemon target
+        if (target is PokemonRunEventTarget pokemonTarget)
+        {
+            Pokemon pokemon = pokemonTarget.Pokemon;
+            
+            if (pokemon.IsActive || (source?.IsActive ?? false))
+            {
+                handlers = FindPokemonEventHandlers(pokemon, eventName);
+                
+                if (prefixedHandlers)
+                {
+                    // Check allies (including self) for Ally and Any prefixed events
+                    foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
+                    {
+                        EventId allyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Ally, eventName);
+                        handlers.AddRange(FindPokemonEventHandlers(allyActive, allyEventId));
+                        
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        handlers.AddRange(FindPokemonEventHandlers(allyActive, anyEventId));
+                    }
+                    
+                    // Check foes for Foe and Any prefixed events
+                    foreach (Pokemon foeActive in pokemon.Foes())
+                    {
+                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                        handlers.AddRange(FindPokemonEventHandlers(foeActive, foeEventId));
+                        
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        handlers.AddRange(FindPokemonEventHandlers(foeActive, anyEventId));
+                    }
+                }
+                
+                // Bubble up to the Side
+                target = new SideRunEventTarget(pokemon.Side);
+            }
+        }
+
+        // Check source Pokemon for Source prefixed events
+        if (source != null && prefixedHandlers)
+        {
+            EventId sourceEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Source, eventName);
+            handlers.AddRange(FindPokemonEventHandlers(source, sourceEventId));
+        }
+
+        // Handle Side target
+        if (target is SideRunEventTarget sideTarget)
+        {
+            Side targetSide = sideTarget.Side;
+            
+            foreach (Side side in Sides)
+            {
+                // Handle bubble down from Side to active Pokemon
+                if (shouldBubbleDown)
+                {
+                    foreach (Pokemon active in side.Active)
+                    {
+                        if (side == targetSide)
+                        {
+                            handlers.AddRange(FindPokemonEventHandlers(active, eventName));
+                        }
+                        else if (prefixedHandlers)
+                        {
+                            EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                            handlers.AddRange(FindPokemonEventHandlers(active, foeEventId));
+                        }
+                        
+                        if (prefixedHandlers)
+                        {
+                            EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                            handlers.AddRange(FindPokemonEventHandlers(active, anyEventId));
+                        }
+                    }
+                }
+
+                // Handle Side conditions (but not for ally sides in multi battles)
+                if (side.N < 2)
+                {
+                    if (side == targetSide)
+                    {
+                        handlers.AddRange(FindSideEventHandlers(side, eventName));
+                    }
+                    else if (prefixedHandlers)
+                    {
+                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                        handlers.AddRange(FindSideEventHandlers(side, foeEventId));
+                    }
+                    
+                    if (prefixedHandlers)
+                    {
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        handlers.AddRange(FindSideEventHandlers(side, anyEventId));
+                    }
+                }
+            }
+        }
+
+        // Always check Field and Battle handlers
+        handlers.AddRange(FindFieldEventHandlers(Field, eventName));
+        handlers.AddRange(FindBattleEventHandlers(eventName));
+
+        return handlers;
     }
 
-   // findPokemonEventHandlers(pokemon: Pokemon, callbackName: string, getKey?: 'duration')
-   // {
-   //     const handlers: EventListener[] = [];
-
-   //     const status = pokemon.getStatus();
-   //     let callback = this.getCallback(pokemon, status, callbackName);
-   //     if (callback !== undefined || (getKey && pokemon.statusState[getKey]))
-   //     {
-   //         handlers.push(this.resolvePriority({
-   //         effect: status, callback, state: pokemon.statusState, end: pokemon.clearStatus, effectHolder: pokemon,
-			//}, callbackName));
-   //     }
-   //     for (const id in pokemon.volatiles) {
-   //         const volatileState = pokemon.volatiles[id];
-   //         const volatile = this.dex.conditions.getByID(id as ID);
-   //         callback = this.getCallback(pokemon, volatile, callbackName);
-   //         if (callback !== undefined || (getKey && volatileState[getKey]))
-   //         {
-   //             handlers.push(this.resolvePriority({
-   //             effect: volatile, callback, state: volatileState, end: pokemon.removeVolatile, effectHolder: pokemon,
-			//	}, callbackName));
-   //         }
-   //     }
-   //     const ability = pokemon.getAbility();
-   //     callback = this.getCallback(pokemon, ability, callbackName);
-   //     if (callback !== undefined || (getKey && pokemon.abilityState[getKey]))
-   //     {
-   //         handlers.push(this.resolvePriority({
-   //         effect: ability, callback, state: pokemon.abilityState, end: pokemon.clearAbility, effectHolder: pokemon,
-			//}, callbackName));
-   //     }
-   //     const item = pokemon.getItem();
-   //     callback = this.getCallback(pokemon, item, callbackName);
-   //     if (callback !== undefined || (getKey && pokemon.itemState[getKey]))
-   //     {
-   //         handlers.push(this.resolvePriority({
-   //         effect: item, callback, state: pokemon.itemState, end: pokemon.clearItem, effectHolder: pokemon,
-			//}, callbackName));
-   //     }
-   //     const species = pokemon.baseSpecies;
-   //     callback = this.getCallback(pokemon, species, callbackName);
-   //     if (callback !== undefined)
-   //     {
-   //         handlers.push(this.resolvePriority({
-   //         effect: species, callback, state: pokemon.speciesState, end() { }, effectHolder: pokemon,
-			//}, callbackName));
-   //     }
-   //     const side = pokemon.side;
-   //     for (const conditionid in side.slotConditions[pokemon.position]) {
-   //         const slotConditionState = side.slotConditions[pokemon.position][conditionid];
-   //         const slotCondition = this.dex.conditions.getByID(conditionid as ID);
-   //         callback = this.getCallback(pokemon, slotCondition, callbackName);
-   //         if (callback !== undefined || (getKey && slotConditionState[getKey]))
-   //         {
-   //             handlers.push(this.resolvePriority({
-   //             effect: slotCondition,
-			//		callback,
-			//		state: slotConditionState,
-			//		end: side.removeSlotCondition,
-			//		endCallArgs: [side, pokemon, slotCondition.id],
-			//		effectHolder: pokemon,
-			//	}, callbackName));
-   //         }
-   //     }
-
-   //     return handlers;
-   // }
-
-    private static List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
-        EffectStateKey? getKey = null)
+    /// <summary>
+    /// Finds all event handlers for a Pokemon by checking its status, volatiles, ability, item, species, and slot conditions.
+    /// This collects all effects that might respond to a specific event for this Pokemon.
+    /// </summary>
+    /// <param name="pokemon">The Pokemon to find handlers for</param>
+    /// <param name="callbackName">The event to find handlers for</param>
+    /// <param name="getKey">Optional property key to check in effect states (e.g., "duration")</param>
+    /// <param name="customHolder">Optional custom effect holder (for special cases)</param>
+    /// <returns>List of event listeners that can handle this event</returns>
+    private List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        throw new NotImplementedException();
+        return FindPokemonEventHandlersInternal(pokemon, callbackName, getKey, customHolder).ToList();
+    }
+
+    private IEnumerable<EventListener> FindPokemonEventHandlersInternal(Pokemon pokemon, EventId callbackName,
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+    {
+        // Check status condition (paralysis, burn, etc.)
+        Condition status = pokemon.GetStatus();
+        EffectDelegate? callback = GetCallback(pokemon, status, callbackName);
+        if (callback != null || (getKey != null && pokemon.StatusState.GetProperty(getKey) != null))
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = status,
+                Callback = callback,
+                State = pokemon.StatusState,
+                End = customHolder == null
+                    ? EffectDelegate.FromNullableDelegate(new Action<bool>(_ => pokemon.ClearStatus()))
+                    : null,
+                EffectHolder = customHolder ?? pokemon,
+            }, callbackName);
+        }
+
+        // Check volatile conditions (confusion, flinch, etc.)
+        foreach (ConditionId id in pokemon.Volatiles.Keys)
+        {
+            EffectState volatileState = pokemon.Volatiles[id];
+            Condition volatileCondition = Library.Conditions[id];
+            callback = GetCallback(pokemon, volatileCondition, callbackName);
+            if (callback != null || (getKey != null && volatileState.GetProperty(getKey) != null))
+            {
+                yield return ResolvePriority(new EventListenerWithoutPriority
+                {
+                    Effect = volatileCondition,
+                    Callback = callback,
+                    State = volatileState,
+                    End = customHolder == null
+                        ? EffectDelegate.FromNullableDelegate((Func<Condition, bool>)pokemon.RemoveVolatile)
+                        : null,
+                    EffectHolder = customHolder ?? pokemon,
+                }, callbackName);
+            }
+        }
+
+        // Check ability
+        Ability ability = pokemon.GetAbility();
+        callback = GetCallback(pokemon, ability, callbackName);
+        if (callback != null || (getKey != null && pokemon.AbilityState.GetProperty(getKey) != null))
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = ability,
+                Callback = callback,
+                State = pokemon.AbilityState,
+                End = customHolder == null
+                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearAbility)
+                    : null,
+                EffectHolder = customHolder ?? pokemon,
+            }, callbackName);
+        }
+
+        // Check held item
+        Item item = pokemon.GetItem();
+        callback = GetCallback(pokemon, item, callbackName);
+        if (callback != null || (getKey != null && pokemon.ItemState.GetProperty(getKey) != null))
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = item,
+                Callback = callback,
+                State = pokemon.ItemState,
+                End = customHolder == null
+                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
+                    : null,
+                EffectHolder = customHolder ?? pokemon,
+            }, callbackName);
+        }
+
+        // Check species (for species-specific events)
+        Species species = pokemon.BaseSpecies;
+        callback = GetCallback(pokemon, species, callbackName);
+        if (callback != null)
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = species,
+                Callback = callback,
+                State = pokemon.SpeciesState,
+                End = null, // Species can't be removed
+                EffectHolder = customHolder ?? pokemon,
+            }, callbackName);
+        }
+
+        // Check slot conditions (Stealth Rock trap, etc.)
+        Side side = pokemon.Side;
+        if (pokemon.Position < side.SlotConditions.Count)
+        {
+            Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
+            foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions)
+            {
+                Condition slotCondition = Library.Conditions[conditionId];
+                callback = GetCallback(pokemon, slotCondition, callbackName);
+                if (callback != null || (getKey != null && slotConditionState.GetProperty(getKey) != null))
+                {
+                    yield return ResolvePriority(new EventListenerWithoutPriority
+                    {
+                        Effect = slotCondition,
+                        Callback = callback,
+                        State = slotConditionState,
+                        End = customHolder == null
+                            ? EffectDelegate.FromNullableDelegate(new Action<ConditionId>(id =>
+                                side.RemoveSideCondition(id)))
+                            : null,
+                        EndCallArgs = [side, pokemon, conditionId],
+                        EffectHolder = customHolder ?? pokemon,
+                    }, callbackName);
+                }
+            }
+        }
     }
 
     private List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateKey? getKey = null,
@@ -742,6 +870,21 @@ public class BattleAsync : IBattle
         }
 
         return EffectDelegate.FromNullableDelegate(callback);
+    }
+
+    private EffectDelegate? GetCallback(Pokemon pokemon, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new PokemonRunEventTarget(pokemon), effect, callbackName);
+    }
+
+    private EffectDelegate? GetCallback(Field field, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new FieldRunEventTarget(field), effect, callbackName);
+    }
+
+    private EffectDelegate? GetCallback(Side side, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new SideRunEventTarget(side), effect, callbackName);
     }
 
     // Helper method to check if effect is Ability or Item
