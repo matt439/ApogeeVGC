@@ -26,6 +26,14 @@ public enum ItemId
     AirBalloon,
     ProtectivePads,
 
+    LeppaBerry,
+    AguavBerry,
+    EnigmaBerry,
+    FigyBerry,
+    IapapaBerry,
+    MagoBerry,
+    SitrusBerry,
+
     None,
 }
 

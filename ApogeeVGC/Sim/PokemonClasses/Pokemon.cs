@@ -37,7 +37,7 @@ public class Pokemon
 
     public EffectState SpeciesState { get; set; }
 
-    public ConditionId? Status { get; set; }
+    public ConditionId Status { get; set; }
     public EffectState StatusState { get; set; }
 
     public Dictionary<ConditionId, EffectState> Volatiles { get; set; }
@@ -123,15 +123,15 @@ public class Pokemon
     public List<PokemonType> BaseTypes { get; set; }
     public MoveType? Terastallized { get; set; }
 
-    public Staleness? Staleness { get; set; }
-    public Staleness? PendingStaleness { get; set; }
+    public StalenessId? Staleness { get; set; }
+    public StalenessId? PendingStaleness { get; set; }
 
-    public Staleness? VolatileStaleness
+    public StalenessId? VolatileStaleness
     {
         get;
         set // must be 'external' or null
         {
-            if (value is PokemonClasses.Staleness.External or null)
+            if (value is PokemonClasses.StalenessId.External or null)
             {
                 field = value;
             }
@@ -313,7 +313,7 @@ public class Pokemon
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        return SetStatus(Status ?? status, source, sourceEffect);
+        return SetStatus(Status == ConditionId.None ? status : ConditionId.None, source, sourceEffect);
     }
 
     public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
@@ -336,7 +336,7 @@ public class Pokemon
         source ??= this; // This ensures source is never null after this point
 
         // Check for duplicate status
-        if (Status is not null && Status == status.Id)
+        if (Status == status.Id)
         {
             if (sourceEffect is ActiveMove move && move.Status == Status)
             {
@@ -770,6 +770,11 @@ public class Pokemon
         return Battle.Library.Abilities[Ability];
     }
 
+    public Condition GetStatus()
+    {
+        return Battle.Library.Conditions[Status];
+    }
+
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
     {
         int bestStatValue = int.MinValue;
@@ -863,10 +868,10 @@ public class Pokemon
     public bool CureStatus(bool silent = false)
     {
         // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0 || Status == null) return false;
+        if (Hp <= 0) return false;
 
         // Add cure status message to battle log
-        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status.Value]);
+        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status]);
 
         // Special case: If curing sleep, also remove Nightmare volatile
         if (Status == ConditionId.Sleep)
@@ -891,7 +896,7 @@ public class Pokemon
     public bool ClearStatus()
     {
         // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0 || Status == null) return false;
+        if (Hp <= 0) return false;
 
         // Special case: If clearing sleep, also remove Nightmare volatile (silent)
         if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
@@ -904,11 +909,122 @@ public class Pokemon
         }
 
         // Clear the status directly (no events, no messages)
-        Status = null;
+        Status = ConditionId.None;
         StatusState = Battle.InitEffectState();
 
         return true;
     }
+
+    //setItem(item: string | Item, source?: Pokemon, effect?: Effect)
+    //{
+    //    if (!this.hp || !this.isActive) return false;
+    //    if (this.itemState.knockedOff && !(effect?.id === 'recycle')) return false;
+    //    delete this.itemState.knockedOff;
+    //    if (typeof item === 'string') item = this.battle.dex.items.get(item);
+
+    //    const effectid = this.battle.effect ? this.battle.effect.id : '';
+    //    if (RESTORATIVE_BERRIES.has('leppaberry' as ID))
+    //    {
+    //        const inflicted = ['trick', 'switcheroo'].includes(effectid);
+    //        const external = inflicted && source && !source.isAlly(this);
+    //        this.pendingStaleness = external ? 'external' : 'internal';
+    //    }
+    //    else
+    //    {
+    //        this.pendingStaleness = undefined;
+    //    }
+    //    const oldItem = this.getItem();
+    //    const oldItemState = this.itemState;
+    //    this.item = item.id;
+    //    this.itemState = this.battle.initEffectState({ id: item.id, target: this });
+    //    if (oldItem.exists) this.battle.singleEvent('End', oldItem, oldItemState, this);
+    //    if (item.id)
+    //    {
+    //        this.battle.singleEvent('Start', item, this.itemState, this, source, effect);
+    //    }
+    //    return true;
+    //}
+
+    private static readonly HashSet<ItemId> RestorativeBerries =
+    [
+        ItemId.LeppaBerry,
+        ItemId.AguavBerry,
+        ItemId.EnigmaBerry,
+        ItemId.FigyBerry,
+        ItemId.IapapaBerry,
+        ItemId.MagoBerry,
+        ItemId.SitrusBerry,
+    ];
+
+    public bool SetItem(ItemId item, Pokemon? source = null, IEffect? effect = null)
+    {
+        // Early exit if Pokemon is fainted or not active
+        if (Hp <= 0 || !IsActive) return false;
+
+        // Check if item was knocked off (except for Recycle move)
+        if (ItemState.KnockedOff == true && effect is ActiveMove { Id: MoveId.Recycle })
+        {
+            return false;
+        }
+
+        // Clear knocked off flag
+        ItemState.KnockedOff = null;
+
+        // Determine current effect ID
+        EffectStateId effectId = Battle.Effect.EffectStateId;
+
+        // Check if this is a restorative berry (like Leppa Berry)
+        // Note: You'll need to define RESTORATIVE_BERRIES set/list somewhere
+        if (RestorativeBerries.Contains(ItemId.LeppaBerry))
+        {
+            // Check if item was inflicted by Trick or Switcheroo
+            bool inflicted = effectId is MoveEffectStateId { MoveId: MoveId.Trick or MoveId.Switcheroo};
+
+            // Check if it's external (from opponent)
+            bool external = inflicted && source != null && !source.IsAlly(this);
+
+            // Set pending staleness
+            PendingStaleness = external ? StalenessId.External : StalenessId.Internal;
+        }
+        else
+        {
+            PendingStaleness = null;
+        }
+
+        // Store old item and state
+        Item oldItem = GetItem();
+        EffectState oldItemState = ItemState;
+
+        // Set new item
+        Item = item;
+        ItemState = Battle.InitEffectState(item, null, this);
+
+        // Trigger End event on old item if it existed
+        if (oldItem.Id != ItemId.None)
+        {
+            Battle.SingleEvent(EventId.End, oldItem, oldItemState, this);
+        }
+
+        // Trigger Start event on new item if it exists
+        if (item != ItemId.None)
+        {
+            Battle.SingleEvent(EventId.Start, Battle.Library.Items[item], ItemState,
+                this, SingleEventSource.FromNullablePokemon(source), effect);
+        }
+
+        return true;
+    }
+
+    public bool ClearItem()
+    {
+        return SetItem(ItemId.None);
+    }
+
+    public bool IsAlly(Pokemon? pokemon = null)
+    {
+        return pokemon != null && Side == pokemon.Side;
+    }
+
 
     /// <summary>
     /// Changes this Pokemon's forme to match the given speciesId (or species).
@@ -1108,6 +1224,11 @@ public class Pokemon
         }
 
         return oldAbility.Id;
+    }
+
+    public AbilityIdFalseUnion? ClearAbility()
+    {
+        return SetAbility(AbilityId.None);
     }
 
     public void UpdateMaxHp()

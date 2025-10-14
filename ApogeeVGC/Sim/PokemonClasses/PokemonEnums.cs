@@ -30,7 +30,7 @@ public enum PokemonTrapped
     Hidden,
 }
 
-public enum Staleness
+public enum StalenessId
 {
     Internal,
     External,

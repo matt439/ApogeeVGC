@@ -32,6 +32,9 @@ public enum MoveId
     Snatch,
     Yawn,
     BellyDrum,
+    Recycle,
+    Trick,
+    Switcheroo,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

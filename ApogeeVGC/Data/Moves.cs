@@ -223,7 +223,7 @@ public record Moves
                 },
                 OnBasePower = (battle, _, pokemon, _, _) =>
                 {
-                    if (pokemon.Status is not null && pokemon.Status != ConditionId.Sleep)
+                    if (pokemon.Status is not ConditionId.None && pokemon.Status != ConditionId.Sleep)
                     {
                         return battle.ChainModify(2);
                     }

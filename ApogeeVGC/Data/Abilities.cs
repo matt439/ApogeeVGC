@@ -102,7 +102,7 @@ public record Abilities
                 OnModifyAtkPriority = 5,
                 OnModifyAtk = (battle, _, pokemon, _, _) =>
                 {
-                    if (pokemon.Status is not null)
+                    if (pokemon.Status is not ConditionId.None)
                     {
                         return battle.ChainModify(1.5);
                     }
