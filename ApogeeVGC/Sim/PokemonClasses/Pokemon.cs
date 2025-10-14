@@ -327,8 +327,11 @@ public class Pokemon
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
         {
-            source ??= Battle.Event.Source;
             sourceEffect ??= Battle.Event.Effect;
+            if (source == null && Battle.Event.Source is PokemonSingleEventSource pses)
+            {
+                source = pses.Pokemon;
+            }
         }
         source ??= this; // This ensures source is never null after this point
 
@@ -570,8 +573,12 @@ public class Pokemon
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
         {
-            source ??= Battle.Event.Source;
+            //source ??= Battle.Event.Source;
             sourceEffect ??= Battle.Event.Effect;
+            if (source == null && Battle.Event.Source is PokemonSingleEventSource pses)
+            {
+                source = pses.Pokemon;
+            }
         }
         source ??= this; // Default source to this Pokemon
 

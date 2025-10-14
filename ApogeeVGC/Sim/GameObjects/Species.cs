@@ -183,11 +183,13 @@ public record Species : IEffect
         };
     }
 
-    public Delegate? GetDelegate(EventId id)
+    public EffectDelegate? GetDelegate(EventId id)
     {
         // Species doesn't have any event handlers, so always return null
         return null;
     }
+
+    public int? GetPriority(EventId id) => null;
 }
 
 public enum SpeciesAbilityType

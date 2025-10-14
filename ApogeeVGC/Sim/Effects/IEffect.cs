@@ -8,5 +8,6 @@ public interface IEffect
     EffectType EffectType { get; }
     string Name { get; }
     EffectStateId EffectStateId { get; }
-    Delegate? GetDelegate(EventId id);
+    EffectDelegate? GetDelegate(EventId id);
+    int? GetPriority(EventId id);
 }

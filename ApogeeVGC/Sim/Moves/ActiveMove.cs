@@ -12,7 +12,9 @@ public record ActiveMove : Move, IEffect
     public required MoveSlot MoveSlot { get; init; }
 
     public EffectType EffectType => EffectType.Move;
+
     public ConditionId? Weather { get; set; }
+
     //public ConditionId? Status { get; set; }
     public int Hit { get; set; }
     public MoveHitData? MoveHitData { get; set; }
@@ -23,14 +25,18 @@ public record ActiveMove : Move, IEffect
     public bool? CausedCrashDamage { get; set; }
     public ConditionId? ForceStatus { get; set; }
     public bool? HasAuraBreak { get; set; }
+
     public bool? HasBounced { get; set; }
+
     //public bool? HasSheerForce { get; init; }
     public bool? IsExternal { get; set; }
     public bool? LastHit { get; set; }
     public int? Magnitude { get; set; }
     public bool? PranksterBooster { get; set; }
     public bool? PranksterBoosted { get; set; }
+
     public bool? SelfDropped { get; set; }
+
     //public object? SelfSwitch { get; init; } // "copyvolatile", "shedtail", or bool
     public ConditionId? StatusRoll { get; set; }
     public bool? StellarBoosted { get; set; }
@@ -62,7 +68,9 @@ public record ActiveMove : Move, IEffect
             field = value;
         }
     } = 0;
+
     public int MaxPp => BasePp + (int)(0.2 * BasePp * PpUp);
+
     public int UsedPp
     {
         get;
@@ -72,9 +80,11 @@ public record ActiveMove : Move, IEffect
             {
                 throw new ArgumentOutOfRangeException(nameof(UsedPp), "Used PP cannot be negative.");
             }
+
             field = value;
         }
     } = 0;
+
     public int Pp
     {
         get
@@ -82,44 +92,6 @@ public record ActiveMove : Move, IEffect
             int pp = MaxPp - UsedPp;
             return pp > 0 ? pp : 0;
         }
-    }
-
-    public Delegate? GetDelegate(EventId id)
-    {
-        return id switch
-        {
-            EventId.BasePowerCallback => BasePowerCallback,
-            EventId.BeforeMoveCallback => BeforeMoveCallback,
-            EventId.BeforeTurnCallback => BeforeTurnCallback,
-            EventId.DamageCallback => DamageCallback,
-            EventId.PriorityChargeCallback => PriorityChargeCallback,
-            EventId.DisableMove => OnDisableMove,
-            EventId.AfterHit => OnAfterHit,
-            EventId.AfterSubDamage => OnAfterSubDamage,
-            EventId.AfterMoveSecondarySelf => OnAfterMoveSecondarySelf,
-            EventId.AfterMoveSecondary => OnAfterMoveSecondary,
-            EventId.AfterMove => OnAfterMove,
-            EventId.Damage => OnDamage,
-            EventId.BasePower => OnBasePower,
-            EventId.Effectiveness => OnEffectiveness,
-            EventId.Hit => OnHit,
-            EventId.HitField => OnHitField,
-            EventId.HitSide => OnHitSide,
-            EventId.ModifyMove => OnModifyMove,
-            EventId.ModifyPriority => OnModifyPriority,
-            EventId.MoveFail => OnMoveFail,
-            EventId.ModifyType => OnModifyType,
-            EventId.ModifyTarget => OnModifyTarget,
-            EventId.PrepareHit => OnPrepareHit,
-            EventId.Try => OnTry,
-            EventId.TryHit => OnTryHit,
-            EventId.TryHitField => OnTryHitField,
-            EventId.TryHitSide => OnTryHitSide,
-            EventId.TryImmunity => OnTryImmunity,
-            EventId.TryMove => OnTryMove,
-            EventId.UseMoveMessage => OnUseMoveMessage,
-            _ => null,
-        };
     }
 }
 

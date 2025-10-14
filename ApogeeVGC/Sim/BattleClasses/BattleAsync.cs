@@ -461,8 +461,14 @@ public class BattleAsync : IBattle
     public BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
     {
-        target ??= Event.Target;
-        source ??= Event.Source;
+        if (target is null && Event.Target is PokemonSingleEventTarget eventTarget)
+        {
+            target = eventTarget.Pokemon;
+        }
+        if (source is null && Event.Source is PokemonSingleEventSource eventSource)
+        {
+            source = eventSource.Pokemon;
+        }
         effect ??= Event.Effect;
 
         // Validate target has HP

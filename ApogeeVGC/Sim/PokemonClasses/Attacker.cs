@@ -10,6 +10,6 @@ public record Attacker
     public int Damage { get; init; }
     public bool ThisTurn { get; init; }
     public Move? Move { get; init; }
-    public PokemonSlot PokemonSlot { get; init; } = new();
+    public PokemonSlot PokemonSlot { get; init; } = new(SideId.P1, 0);
     public IntBoolUnion? DamageValue { get; init; }
 }

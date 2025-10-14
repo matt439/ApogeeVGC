@@ -121,6 +121,31 @@ public enum EventId
     TryImmunity,
     Try,
     UseMoveMessage,
+
+    AnyBasePower,
+    AnyInvulnerability,
+    AnyModifyAccuracy,
+    AnyFaint,
+    AnyPrepareHit,
+    AnySwitchIn,
+    AllyBasePower,
+    AllyModifyAtk,
+    AllyModifySpA,
+    AllyModifySpD,
+    FoeBasePower,
+    FoeBeforeMove,
+    FoeModifyDef,
+    FoeModifySpD,
+    FoeRedirectTarget,
+    FoeTrapPokemon,
+    SourceBasePower,
+    SourceInvulnerability,
+    SourceModifyAccuracy,
+    SourceModifyAtk,
+    SourceModifyDamage,
+    SourceModifySpA,
+
+    WeatherChange,
 }
 
 public enum EventType

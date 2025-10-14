@@ -188,6 +188,46 @@ public record Move : IMoveEventHandlers, IBasicEffect
         throw new NotImplementedException();
     }
 
+    public EffectDelegate? GetDelegate(EventId id)
+    {
+        return id switch
+        {
+            EventId.BasePowerCallback => EffectDelegate.FromNullableDelegate(BasePowerCallback),
+            EventId.BeforeMoveCallback => EffectDelegate.FromNullableDelegate(BeforeMoveCallback),
+            EventId.BeforeTurnCallback => EffectDelegate.FromNullableDelegate(BeforeTurnCallback),
+            EventId.DamageCallback => EffectDelegate.FromNullableDelegate(DamageCallback),
+            EventId.PriorityChargeCallback => EffectDelegate.FromNullableDelegate(PriorityChargeCallback),
+            EventId.DisableMove => EffectDelegate.FromNullableDelegate(OnDisableMove),
+            EventId.AfterHit => EffectDelegate.FromNullableDelegate(OnAfterHit),
+            EventId.AfterSubDamage => EffectDelegate.FromNullableDelegate(OnAfterSubDamage),
+            EventId.AfterMoveSecondarySelf => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondarySelf),
+            EventId.AfterMoveSecondary => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondary),
+            EventId.AfterMove => EffectDelegate.FromNullableDelegate(OnAfterMove),
+            EventId.Damage => EffectDelegate.FromNullableDelegate(OnDamage),
+            EventId.BasePower => EffectDelegate.FromNullableDelegate(OnBasePower),
+            EventId.Effectiveness => EffectDelegate.FromNullableDelegate(OnEffectiveness),
+            EventId.Hit => EffectDelegate.FromNullableDelegate(OnHit),
+            EventId.HitField => EffectDelegate.FromNullableDelegate(OnHitField),
+            EventId.HitSide => EffectDelegate.FromNullableDelegate(OnHitSide),
+            EventId.ModifyMove => EffectDelegate.FromNullableDelegate(OnModifyMove),
+            EventId.ModifyPriority => EffectDelegate.FromNullableDelegate(OnModifyPriority),
+            EventId.MoveFail => EffectDelegate.FromNullableDelegate(OnMoveFail),
+            EventId.ModifyType => EffectDelegate.FromNullableDelegate(OnModifyType),
+            EventId.ModifyTarget => EffectDelegate.FromNullableDelegate(OnModifyTarget),
+            EventId.PrepareHit => EffectDelegate.FromNullableDelegate(OnPrepareHit),
+            EventId.Try => EffectDelegate.FromNullableDelegate(OnTry),
+            EventId.TryHit => EffectDelegate.FromNullableDelegate(OnTryHit),
+            EventId.TryHitField => EffectDelegate.FromNullableDelegate(OnTryHitField),
+            EventId.TryHitSide => EffectDelegate.FromNullableDelegate(OnTryHitSide),
+            EventId.TryImmunity => EffectDelegate.FromNullableDelegate(OnTryImmunity),
+            EventId.TryMove => EffectDelegate.FromNullableDelegate(OnTryMove),
+            EventId.UseMoveMessage => EffectDelegate.FromNullableDelegate(OnUseMoveMessage),
+            _ => null,
+        };
+    }
+
+    public int? GetPriority(EventId id) => null;
+
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

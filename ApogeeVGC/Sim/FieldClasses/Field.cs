@@ -40,9 +40,9 @@ public class Field
         sourceEffect ??= Battle.Effect;
         
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event?.Target is not null)
+        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
         {
-            source = Battle.Event.Target;
+            source = pset.Pokemon;
         }
         
         // Source is required
@@ -100,7 +100,7 @@ public class Field
     {
         if (Battle.Event is not null && target is null)
         {
-            target = PokemonSideBattleUnion.FromNullablePokemon(Battle.Event.Target);
+            target = PokemonSideBattleUnion.FromNullableSingleEventTarget(Battle.Event.Target);
         }
 
         return Battle.RunEvent(EventId.TryTerrain,
