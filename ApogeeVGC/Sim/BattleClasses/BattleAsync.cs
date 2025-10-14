@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -490,37 +491,79 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
+   // findPokemonEventHandlers(pokemon: Pokemon, callbackName: string, getKey?: 'duration')
+   // {
+   //     const handlers: EventListener[] = [];
+
+   //     const status = pokemon.getStatus();
+   //     let callback = this.getCallback(pokemon, status, callbackName);
+   //     if (callback !== undefined || (getKey && pokemon.statusState[getKey]))
+   //     {
+   //         handlers.push(this.resolvePriority({
+   //         effect: status, callback, state: pokemon.statusState, end: pokemon.clearStatus, effectHolder: pokemon,
+			//}, callbackName));
+   //     }
+   //     for (const id in pokemon.volatiles) {
+   //         const volatileState = pokemon.volatiles[id];
+   //         const volatile = this.dex.conditions.getByID(id as ID);
+   //         callback = this.getCallback(pokemon, volatile, callbackName);
+   //         if (callback !== undefined || (getKey && volatileState[getKey]))
+   //         {
+   //             handlers.push(this.resolvePriority({
+   //             effect: volatile, callback, state: volatileState, end: pokemon.removeVolatile, effectHolder: pokemon,
+			//	}, callbackName));
+   //         }
+   //     }
+   //     const ability = pokemon.getAbility();
+   //     callback = this.getCallback(pokemon, ability, callbackName);
+   //     if (callback !== undefined || (getKey && pokemon.abilityState[getKey]))
+   //     {
+   //         handlers.push(this.resolvePriority({
+   //         effect: ability, callback, state: pokemon.abilityState, end: pokemon.clearAbility, effectHolder: pokemon,
+			//}, callbackName));
+   //     }
+   //     const item = pokemon.getItem();
+   //     callback = this.getCallback(pokemon, item, callbackName);
+   //     if (callback !== undefined || (getKey && pokemon.itemState[getKey]))
+   //     {
+   //         handlers.push(this.resolvePriority({
+   //         effect: item, callback, state: pokemon.itemState, end: pokemon.clearItem, effectHolder: pokemon,
+			//}, callbackName));
+   //     }
+   //     const species = pokemon.baseSpecies;
+   //     callback = this.getCallback(pokemon, species, callbackName);
+   //     if (callback !== undefined)
+   //     {
+   //         handlers.push(this.resolvePriority({
+   //         effect: species, callback, state: pokemon.speciesState, end() { }, effectHolder: pokemon,
+			//}, callbackName));
+   //     }
+   //     const side = pokemon.side;
+   //     for (const conditionid in side.slotConditions[pokemon.position]) {
+   //         const slotConditionState = side.slotConditions[pokemon.position][conditionid];
+   //         const slotCondition = this.dex.conditions.getByID(conditionid as ID);
+   //         callback = this.getCallback(pokemon, slotCondition, callbackName);
+   //         if (callback !== undefined || (getKey && slotConditionState[getKey]))
+   //         {
+   //             handlers.push(this.resolvePriority({
+   //             effect: slotCondition,
+			//		callback,
+			//		state: slotConditionState,
+			//		end: side.removeSlotCondition,
+			//		endCallArgs: [side, pokemon, slotCondition.id],
+			//		effectHolder: pokemon,
+			//	}, callbackName));
+   //         }
+   //     }
+
+   //     return handlers;
+   // }
+
     private static List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
         EffectStateKey? getKey = null)
     {
         throw new NotImplementedException();
     }
-
-    //findBattleEventHandlers(callbackName: string, getKey?: 'duration', customHolder?: Pokemon)
-    //{
-    //    const handlers: EventListener[] = [];
-
-    //    let callback;
-    //    const format = this.format;
-    //    callback = this.getCallback(this, format, callbackName);
-    //    if (callback !== undefined || (getKey && this.formatData[getKey]))
-    //    {
-    //        handlers.push(this.resolvePriority({
-    //            effect: format, callback, state: this.formatData, end: null, effectHolder: customHolder || this,
-    //        }, callbackName));
-    //    }
-    //    if (this.events && (callback = this.events[callbackName]) !== undefined)
-    //    {
-    //        for (const handler of callback) {
-    //            const state = (handler.target.effectType === 'Format') ? this.formatData : null;
-    //            handlers.push({
-    //                effect: handler.target, callback: handler.callback, state, end: null, effectHolder: customHolder || this,
-    //                priority: handler.priority, order: handler.order, subOrder: handler.subOrder,
-    //            });
-    //        }
-    //    }
-    //    return handlers;
-    //}
 
     private List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateKey? getKey = null,
     Pokemon? customHolder = null)
@@ -555,6 +598,8 @@ public class BattleAsync : IBattle
             // - target (the effect)
             // - callback (the function)
             // - priority, order, subOrder (for sorting)
+
+            // TODO: Implement full handling of Events with priorities and multiple handlers
 
             // For now, just add a basic handler
             EffectState? state = null;
