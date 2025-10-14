@@ -386,144 +386,183 @@ public class BattleAsync : IBattle
     /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
     /// </summary>
-    private static RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar, 
+    private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar, 
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
-        Delegate del;
-        
+        // Handle non-function callbacks (constants)
         switch (callback)
         {
-            case DelegateEffectDelegate ded:
-                del = ded.Del;
-                break;
-            case OnFlinchEffectDelegate onFlinch:
-                switch (onFlinch.OnFlinch)
-                {
-                    case OnFlinchBool ofb:
-                        return new BoolRelayVar(ofb.Value);
-                    case OnFlinchFunc off:
-                        del = off.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnFlinch type.");
-                }
-                break;
-            case OnCriticalHitEffectDelegate onCrit:
-                switch (onCrit.OnCriticalHit)
-                {
-                    case OnCriticalHitBool ocb:
-                        return new BoolRelayVar(ocb.Value);
-                    case OnCriticalHitFunc ocf:
-                        del = ocf.Function;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnCriticalHit type.");
-                }
-                break;
-            case OnFractionalPriorityEffectDelegate onFractionalPriority:
-                switch (onFractionalPriority.OnFractionalPriority)
-                {
-                    case OnFrationalPriorityNeg ofpn:
-                        return new DecimalRelayVar(ofpn.Value);
-                    case OnFractionalPriorityFunc ofpf:
-                        del = ofpf.Function;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnFractionalPriority type.");
-                }
-                break;
-            case OnTakeItemEffectDelegate onTakeItem:
-                switch (onTakeItem.OnTakeItem)
-                {
-                    case OnTakeItemBool otib:
-                        return new BoolRelayVar(otib.Value);
-                    case OnTakeItemFunc otif:
-                        del = otif.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnTakeItem type.");
-                }
-                break;
-            case OnTryHealEffectDelegate onTryHeal:
-                switch (onTryHeal.OnTryHeal)
-                {
-                    case OnTryHealBool othb:
-                        return new BoolRelayVar(othb.Value);
-                    case OnTryHealFunc1 othf1:
-                        del = othf1.Func;
-                        break;
-                    case OnTryHealFunc2 othf2:
-                        del = othf2.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnTryHeal type.");
-                }
-                break;
-            case OnTryEatItemEffectDelegate onTryEatItem:
-                switch (onTryEatItem.OnTryEatItem)
-                {
-                    case BoolOnTryEatItem boteı:
-                        return new BoolRelayVar(boteı.Value);
-                    case FuncOnTryEatItem fotei:
-                        del = fotei.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnTryEatItem type.");
-                }
-                break;
-            case OnNegateImmunityEffectDelegate onNegateImmunity:
-                switch (onNegateImmunity.OnNegateImmunity)
-                {
-                    case OnNegateImmunityBool onib:
-                        return new BoolRelayVar(onib.Value);
-                    case OnNegateImmunityFunc onif:
-                        del = onif.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnNegateImmunity type.");
-                }
-                break;
-            case OnLockMoveEffectDelegate onLockMove:
-                switch (onLockMove.OnLockMove)
-                {
-                    case OnLockMoveMoveId olmmi:
-                        return new MoveIdRelayVar(olmmi.Id);
-                    case OnLockMoveFunc olmf:
-                        del = olmf.Func;
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown OnLockMove type.");
-                }
-                break;
-            default:
-                throw new InvalidOperationException($"Unknown EffectDelegate type: {callback.GetType().Name}");
+            case OnFlinchEffectDelegate { OnFlinch: OnFlinchBool ofb }:
+                return new BoolRelayVar(ofb.Value);
+            case OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitBool ocb }:
+                return new BoolRelayVar(ocb.Value);
+            case OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFrationalPriorityNeg ofpn }:
+                return new DecimalRelayVar(ofpn.Value);
+            case OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemBool otib }:
+                return new BoolRelayVar(otib.Value);
+            case OnTryHealEffectDelegate { OnTryHeal: OnTryHealBool othb }:
+                return new BoolRelayVar(othb.Value);
+            case OnTryEatItemEffectDelegate { OnTryEatItem: BoolOnTryEatItem botei }:
+                return new BoolRelayVar(botei.Value);
+            case OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityBool onib }:
+                return new BoolRelayVar(onib.Value);
+            case OnLockMoveEffectDelegate { OnLockMove: OnLockMoveMoveId olmmi }:
+                return new MoveIdRelayVar(olmmi.Id);
         }
-        
-        // Build parameter list based on callback signature
-        var parameters = del.Method.GetParameters();
-        var args = new List<object?>();
 
-        // Add relayVar as first parameter if it was explicitly provided
-        if (hasRelayVar)
+        // Extract the actual delegate
+        Delegate del = callback switch
+        {
+            DelegateEffectDelegate ded => ded.Del,
+            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => off.Func,
+            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } => ocf.Function,
+            OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFractionalPriorityFunc ofpf } => ofpf.Function,
+            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => otif.Func,
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => othf1.Func,
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => othf2.Func,
+            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } => fotei.Func,
+            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } => onif.Func,
+            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => olmf.Func,
+            _ => throw new InvalidOperationException($"Unknown EffectDelegate type: {callback.GetType().Name}"),
+        };
+        
+        // Build parameter list - most delegates expect (IBattle, ...) as first parameter(s)
+        var args = new List<object?>();
+        var parameters = del.Method.GetParameters();
+        
+        // First parameter is typically IBattle (this)
+        if (parameters.Length > 0 && parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle)))
+        {
+            args.Add(this);
+        }
+
+        // Add relayVar if it was explicitly provided and if the delegate expects it
+        // This is typically the second parameter after IBattle
+        if (hasRelayVar && args.Count < parameters.Length)
         {
             args.Add(relayVar);
         }
 
-        // Add standard parameters: target, source, sourceEffect
-        // Note: The actual parameter types may vary, so this is a simplified version
-        if (parameters.Length > args.Count) args.Add(target);
-        if (parameters.Length > args.Count) args.Add(source);
-        if (parameters.Length > args.Count) args.Add(sourceEffect);
+        // Add remaining standard parameters: target, source, sourceEffect
+        // Convert union types to the expected parameter types
+        while (args.Count < parameters.Length)
+        {
+            Type paramType = parameters[args.Count].ParameterType;
+            
+            // Try to match target parameter
+            if (args.Count < parameters.Length && target != null)
+            {
+                object? targetArg = ConvertSingleEventTarget(target, paramType);
+                if (targetArg != null)
+                {
+                    args.Add(targetArg);
+                    continue;
+                }
+            }
+            
+            // Try to match source parameter
+            if (args.Count < parameters.Length && source != null)
+            {
+                object? sourceArg = ConvertSingleEventSource(source, paramType);
+                if (sourceArg != null)
+                {
+                    args.Add(sourceArg);
+                    continue;
+                }
+            }
+            
+            // Try to match sourceEffect parameter
+            if (args.Count < parameters.Length && sourceEffect != null)
+            {
+                if (paramType.IsInstanceOfType(sourceEffect))
+                {
+                    args.Add(sourceEffect);
+                    continue;
+                }
+            }
+            
+            // If we couldn't match, add null
+            args.Add(null);
+        }
 
         // Invoke the callback
         object? result = del.DynamicInvoke([.. args]);
 
-        // Convert result to RelayVar if it's not null
+        // Convert result to RelayVar
+        return ConvertToRelayVar(result);
+    }
+
+    /// <summary>
+    /// Converts a SingleEventTarget to the expected parameter type.
+    /// </summary>
+    private static object? ConvertSingleEventTarget(SingleEventTarget target, Type expectedType)
+    {
+        return target switch
+        {
+            PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) => p.Pokemon,
+            SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) => s.Side,
+            FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) => f.Field,
+            BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) => b.Battle,
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// Converts a SingleEventSource to the expected parameter type.
+    /// </summary>
+    private static object? ConvertSingleEventSource(SingleEventSource source, Type expectedType)
+    {
+        return source switch
+        {
+            PokemonSingleEventSource p when expectedType.IsAssignableFrom(typeof(Pokemon)) => p.Pokemon,
+            EffectSingleEventSource e when expectedType.IsAssignableFrom(typeof(IEffect)) => e.Effect,
+            PokemonTypeSingleEventSource t when expectedType.IsAssignableFrom(typeof(PokemonType)) => t.Type,
+            FalseSingleEventSource when expectedType == typeof(bool) => false,
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// Converts a result object to a RelayVar.
+    /// </summary>
+    private static RelayVar? ConvertToRelayVar(object? result)
+    {
         return result switch
         {
+            null => null,
             RelayVar rv => rv,
             bool b => new BoolRelayVar(b),
             int i => new IntRelayVar(i),
+            decimal d => new DecimalRelayVar(d),
+            double d => new DecimalRelayVar((decimal)d),
+            MoveId moveId => new MoveIdRelayVar(moveId),
+            ConditionId conditionId => new ConditionIdRelayVar(conditionId),
+            SparseBoostsTable table => new SparseBoostsTableRelayVar(table),
+            BoostsTable table => new BoostsTableRelayVar(table),
+            List<PokemonType> types => new TypesRelayVar(types),
+            PokemonType type => new PokemonTypeRelayVar(type),
+            MoveType moveType => new PokemonTypeRelayVar((PokemonType)moveType),
+            IEffect effect => new EffectRelayVar(effect),
+            VoidReturn => new BoolRelayVar(true), // VoidReturn typically means success
+            // Handle union types that can be returned
+            IntBoolUnion ibu => ibu switch
+            {
+                IntIntBoolUnion iibu => new IntRelayVar(iibu.Value),
+                BoolIntBoolUnion bibu => new BoolRelayVar(bibu.Value),
+                _ => null,
+            },
+            BoolVoidUnion bvu => bvu switch
+            {
+                BoolBoolVoidUnion bbvu => new BoolRelayVar(bbvu.Value),
+                VoidBoolVoidUnion => new BoolRelayVar(true), // void means success
+                _ => null,
+            },
+            MoveIdVoidUnion mvu => mvu switch
+            {
+                MoveIdMoveIdVoidUnion mmvu => new MoveIdRelayVar(mmvu.MoveId),
+                VoidMoveIdVoidUnion => null, // void means no move
+                _ => null,
+            },
             _ => null,
         };
     }
