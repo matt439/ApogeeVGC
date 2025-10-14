@@ -1,4 +1,6 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Xml;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -173,15 +175,15 @@ public abstract record OnFractionalPriority
     public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
         new OnFractionalPriorityFunc(function);
 
-    private const double Tolerance = 0.0001;
+    private static readonly decimal PriorityValue = new(-0.1);
 
-    public static implicit operator OnFractionalPriority(double value) =>
-        Math.Abs(value - -0.1) < Tolerance
+    public static implicit operator OnFractionalPriority(decimal value) =>
+        value == PriorityValue
             ? new OnFrationalPriorityNeg(value)
             : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
 }
 public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
-public record OnFrationalPriorityNeg(double Value) : OnFractionalPriority;
+public record OnFrationalPriorityNeg(decimal Value) : OnFractionalPriority;
 
 
 /// <summary>
@@ -478,7 +480,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable
+/// SparseBoostsTable | decimal | MoveId
 /// </summary>
 public abstract record RelayVar
 {
@@ -496,6 +498,8 @@ public abstract record RelayVar
     public static implicit operator RelayVar(List<PokemonType> types) => new TypesRelayVar(types);
     public static implicit operator RelayVar(MoveType type) => new PokemonTypeRelayVar((PokemonType)type);
     public static implicit operator RelayVar(SparseBoostsTable table) => new SparseBoostsTableRelayVar(table);
+    public static implicit operator RelayVar(decimal value) => new DecimalRelayVar(value);
+    public static implicit operator RelayVar(MoveId moveId) => new MoveIdRelayVar(moveId);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -507,6 +511,8 @@ public record BoostsTableRelayVar(BoostsTable Table) : RelayVar;
 public record TypesRelayVar(List<PokemonType> Types) : RelayVar;
 public record MoveTypeRelayVar(MoveType Type) : RelayVar;
 public record SparseBoostsTableRelayVar(SparseBoostsTable Table) : RelayVar;
+public record DecimalRelayVar(decimal Value) : RelayVar;
+public record MoveIdRelayVar(MoveId MoveId) : RelayVar;
 
 
 

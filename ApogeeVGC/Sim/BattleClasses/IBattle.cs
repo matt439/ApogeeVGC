@@ -42,7 +42,7 @@ public interface IBattle
 
     RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
-        RelayVar? relayVar = null, Delegate? customCallback = null);
+        RelayVar? relayVar = null, EffectDelegate? customCallback = null);
 
     RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null);

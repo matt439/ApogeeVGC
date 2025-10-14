@@ -13,9 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Diagnostics.Metrics;
 using System.Reflection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -271,7 +269,7 @@ public class BattleAsync : IBattle
 
     public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
-        RelayVar? relayVar = null, Delegate? customCallback = null)
+        RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
         // Check for stack overflow
         if (EventDepth >= 8)
@@ -347,12 +345,12 @@ public class BattleAsync : IBattle
         }
 
         // Get the callback - either custom or from the effect
-        Delegate? callback = customCallback ?? GetEventCallback(effect, eventId);
+        EffectDelegate? callback = customCallback ?? effect.GetDelegate(eventId);
         if (callback == null) return relayVar;
 
         // Save parent context
-        IEffect? parentEffect = Effect;
-        EffectState? parentEffectState = EffectState;
+        IEffect parentEffect = Effect;
+        EffectState parentEffectState = EffectState;
         Event parentEvent = Event;
 
         // Set up new event context
@@ -386,24 +384,123 @@ public class BattleAsync : IBattle
     }
 
     /// <summary>
-    /// Gets the event callback from an effect based on the event ID.
-    /// </summary>
-    private static Delegate? GetEventCallback(IEffect effect, EventId eventId)
-    {
-        // Use reflection to get the callback property (e.g., "OnDamage", "OnStart", etc.)
-        string propertyName = $"On{eventId}";
-        PropertyInfo? property = effect.GetType().GetProperty(propertyName);
-        return property?.GetValue(effect) as Delegate;
-    }
-
-    /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
     /// </summary>
-    private static RelayVar? InvokeEventCallback(Delegate callback, bool hasRelayVar, RelayVar relayVar, 
+    private static RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar, 
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
+        Delegate del;
+        
+        switch (callback)
+        {
+            case DelegateEffectDelegate ded:
+                del = ded.Del;
+                break;
+            case OnFlinchEffectDelegate onFlinch:
+                switch (onFlinch.OnFlinch)
+                {
+                    case OnFlinchBool ofb:
+                        return new BoolRelayVar(ofb.Value);
+                    case OnFlinchFunc off:
+                        del = off.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnFlinch type.");
+                }
+                break;
+            case OnCriticalHitEffectDelegate onCrit:
+                switch (onCrit.OnCriticalHit)
+                {
+                    case OnCriticalHitBool ocb:
+                        return new BoolRelayVar(ocb.Value);
+                    case OnCriticalHitFunc ocf:
+                        del = ocf.Function;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnCriticalHit type.");
+                }
+                break;
+            case OnFractionalPriorityEffectDelegate onFractionalPriority:
+                switch (onFractionalPriority.OnFractionalPriority)
+                {
+                    case OnFrationalPriorityNeg ofpn:
+                        return new DecimalRelayVar(ofpn.Value);
+                    case OnFractionalPriorityFunc ofpf:
+                        del = ofpf.Function;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnFractionalPriority type.");
+                }
+                break;
+            case OnTakeItemEffectDelegate onTakeItem:
+                switch (onTakeItem.OnTakeItem)
+                {
+                    case OnTakeItemBool otib:
+                        return new BoolRelayVar(otib.Value);
+                    case OnTakeItemFunc otif:
+                        del = otif.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnTakeItem type.");
+                }
+                break;
+            case OnTryHealEffectDelegate onTryHeal:
+                switch (onTryHeal.OnTryHeal)
+                {
+                    case OnTryHealBool othb:
+                        return new BoolRelayVar(othb.Value);
+                    case OnTryHealFunc1 othf1:
+                        del = othf1.Func;
+                        break;
+                    case OnTryHealFunc2 othf2:
+                        del = othf2.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnTryHeal type.");
+                }
+                break;
+            case OnTryEatItemEffectDelegate onTryEatItem:
+                switch (onTryEatItem.OnTryEatItem)
+                {
+                    case BoolOnTryEatItem boteı:
+                        return new BoolRelayVar(boteı.Value);
+                    case FuncOnTryEatItem fotei:
+                        del = fotei.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnTryEatItem type.");
+                }
+                break;
+            case OnNegateImmunityEffectDelegate onNegateImmunity:
+                switch (onNegateImmunity.OnNegateImmunity)
+                {
+                    case OnNegateImmunityBool onib:
+                        return new BoolRelayVar(onib.Value);
+                    case OnNegateImmunityFunc onif:
+                        del = onif.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnNegateImmunity type.");
+                }
+                break;
+            case OnLockMoveEffectDelegate onLockMove:
+                switch (onLockMove.OnLockMove)
+                {
+                    case OnLockMoveMoveId olmmi:
+                        return new MoveIdRelayVar(olmmi.Id);
+                    case OnLockMoveFunc olmf:
+                        del = olmf.Func;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown OnLockMove type.");
+                }
+                break;
+            default:
+                throw new InvalidOperationException($"Unknown EffectDelegate type: {callback.GetType().Name}");
+        }
+        
         // Build parameter list based on callback signature
-        var parameters = callback.Method.GetParameters();
+        var parameters = del.Method.GetParameters();
         var args = new List<object?>();
 
         // Add relayVar as first parameter if it was explicitly provided
@@ -419,7 +516,7 @@ public class BattleAsync : IBattle
         if (parameters.Length > args.Count) args.Add(sourceEffect);
 
         // Invoke the callback
-        object? result = callback.DynamicInvoke([.. args]);
+        object? result = del.DynamicInvoke([.. args]);
 
         // Convert result to RelayVar if it's not null
         return result switch
