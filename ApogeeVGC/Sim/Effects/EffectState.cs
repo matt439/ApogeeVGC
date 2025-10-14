@@ -6,6 +6,12 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Effects;
 
+public enum EffectStateKey
+{
+    Duration,
+}
+
+
 public class EffectState
 {
     public required EffectStateId Id { get; init; }
@@ -33,4 +39,14 @@ public class EffectState
     public bool? Ending { get; set; }
     public bool? Resisted { get; set; }
     public bool? IsSlotCondition { get; init; }
+
+    public int? GetProperty(EffectStateKey? key)
+    {
+        return key switch
+        {
+            EffectStateKey.Duration => Duration,
+            null => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(key), key, null),
+        };
+    }
 }

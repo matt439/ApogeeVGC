@@ -509,9 +509,33 @@ public class BattleAsync : IBattle
     }
 
     private List<EventListener> FindSideEventHandlers(Side side, EventId callbackName,
-        EffectStateId? getKey = null, Pokemon? customHolder = null)
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        throw new NotImplementedException();
+        return FindSideEventHandlersInternal(side, callbackName, getKey, customHolder).ToList();
+    }
+
+    private IEnumerable<EventListener> FindSideEventHandlersInternal(Side side, EventId callbackName,
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+    {
+        foreach (ConditionId id in side.SideConditions.Keys)
+        {
+            EffectState sideConditionData = side.SideConditions[id];
+            Condition sideCondition = Library.Conditions[id];
+            EffectDelegate? callback = GetCallback(side, sideCondition, callbackName);
+            if (callback != null || (getKey != null && sideConditionData.GetProperty(getKey) != null))
+            {
+                yield return ResolvePriority(new EventListenerWithoutPriority
+                {
+                    Effect = sideCondition,
+                    Callback = callback,
+                    State = sideConditionData,
+                    End = customHolder == null
+                        ? EffectDelegate.FromNullableDelegate(side.RemoveSideCondition)
+                        : null,
+                    EffectHolder = customHolder is null ? side : customHolder,
+                }, callbackName);
+            }
+        }
     }
 
     private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)

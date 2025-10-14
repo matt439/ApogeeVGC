@@ -11,9 +11,9 @@ public record EventListenerWithoutPriority
     public required IEffect Effect { get; init; }
     public Pokemon? Target { get; set; }
     public int? Index { get; set; }
-    public Delegate? Callback { get; init; }
+    public EffectDelegate? Callback { get; init; }
     public EffectState? State { get; init; }
-    public Delegate? End { get; init; }
+    public EffectDelegate? End { get; init; }
     public List<object>? EndCallArgs { get; init; }
     public required EffectHolder EffectHolder { get; init; } 
 }

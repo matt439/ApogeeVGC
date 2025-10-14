@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.SideClasses;
@@ -136,6 +137,15 @@ public class Side
     public int FoePokemonLeft()
     {
         return Foe.PokemonLeft;
+    }
+
+    public bool RemoveSideCondition(ConditionId status)
+    {
+        Condition condition = Battle.Library.Conditions[status];
+        if (!SideConditions.TryGetValue(condition.Id, out EffectState? sideCondition)) return false;
+        Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, this);
+        SideConditions.Remove(condition.Id);
+        return true;
     }
 }
 
