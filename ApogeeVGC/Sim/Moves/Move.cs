@@ -226,8 +226,15 @@ public record Move : IMoveEventHandlers, IBasicEffect
         };
     }
 
+    // Moves do not define event priorities
     public int? GetPriority(EventId id) => null;
 
+    // Moves do not define event orders
+    public IntFalseUnion? GetOrder(EventId id) => null;
+
+    // Moves do not define event sub-orders
+    public int? GetSubOrder(EventId id) => null;
+    
 
     /// <summary>
     /// Creates a deep copy of this Move for simulation purposes.

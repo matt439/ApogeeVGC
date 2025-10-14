@@ -6,6 +6,13 @@ public enum EffectType
     Item,
     Move,
     Specie,
-    Condition,
     Format,
+
+    Condition,
+    Weather,
+    Status,
+    Terrain,
+
+    Rule,
+    Ruleset,
 }

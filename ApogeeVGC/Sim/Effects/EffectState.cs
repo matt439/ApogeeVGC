@@ -32,4 +32,5 @@ public class EffectState
     public bool? KnockedOff { get; set; }
     public bool? Ending { get; set; }
     public bool? Resisted { get; set; }
+    public bool? IsSlotCondition { get; init; }
 }

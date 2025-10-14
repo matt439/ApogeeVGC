@@ -22,6 +22,7 @@ public enum EventId
     AllyModifyAtk,
     AllyModifySpA,
     AllyModifySpD,
+    AllyTryHitSide,
     AnyBasePower,
     AnyFaint,
     AnyInvulnerability,

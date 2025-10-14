@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -206,7 +207,7 @@ public class BattleAsync : IBattle
         relayVar ??= new BoolRelayVar(true);
 
         // Check if status effect has changed
-        if (effect is Condition { ConditionEffectType: ConditionEffectType.Status} &&
+        if (effect.EffectType ==  EffectType.Status &&
             target is PokemonSingleEventTarget pokemonTarget)
         {
             Pokemon targetPokemon = pokemonTarget.Pokemon;
@@ -247,7 +248,7 @@ public class BattleAsync : IBattle
         }
 
         // Check if weather is suppressed
-        if (effect is Condition { ConditionEffectType:ConditionEffectType.Weather } &&
+        if (effect.EffectType == EffectType.Weather &&
             eventId != EventId.FieldStart &&
             eventId != EventId.FieldResidual &&
             eventId != EventId.FieldEnd &&
@@ -543,17 +544,117 @@ public class BattleAsync : IBattle
     // Helper method to check if effect is an innate ability/item
     private static bool IsInnateAbilityOrItem(IEffect effect)
     {
-        if (effect is not Condition { ConditionEffectType: ConditionEffectType.Status } condition)
+        if (effect.EffectType != EffectType.Status)
         {
             return false;
         }
-
+        var condition = (Condition)effect;
         return condition.AssociatedItem is not null || condition.AssociatedAbility is not null;
     }
 
     private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
     {
-        throw new NotImplementedException();
+        // Get event metadata from Library
+        EventIdInfo eventInfo = Library.Events[callbackName];
+
+        // Look up order/priority/subOrder from the effect using the delegate system
+        // These would need to be added to IEffect interface or accessed via reflection once
+        IntFalseUnion? order = h.Effect.GetOrder(callbackName);
+        int? priority = h.Effect.GetPriority(callbackName);
+        int? subOrder = h.Effect.GetSubOrder(callbackName);
+
+        // Calculate default subOrder if not set
+        if (subOrder == 0)
+        {
+            subOrder = CalculateDefaultSubOrder(h);
+        }
+
+        // Determine effectOrder based on event type
+        int effectOrder = eventInfo.UsesEffectOrder
+            ? (h.State?.EffectOrder ?? 0)
+            : 0;
+
+        // Calculate speed if needed
+        int speed = 0;
+        if (eventInfo.UsesSpeed && h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
+        {
+            Pokemon pokemon = pokemonEffectHolder.Pokemon;
+            speed = pokemon.Speed;
+
+            // Special case for Magic Bounce
+            if (h.Effect.EffectType == EffectType.Ability &&
+                h.Effect is Ability { Id: AbilityId.MagicBounce } &&
+                callbackName == EventId.AllyTryHitSide)
+            {
+                speed = pokemon.GetStat(StatIdExceptHp.Spe, unmodified: true, unboosted: true);
+            }
+
+            // Apply fractional speed adjustment for switch-in events
+            if (eventInfo.UsesFractionalSpeed)
+            {
+                int fieldPositionValue = pokemon.Side.N * Sides.Count + pokemon.Position;
+                speed -= SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
+            }
+        }
+
+        return new EventListener
+        {
+            Effect = h.Effect,
+            Target = h.Target,
+            Index = h.Index,
+            Callback = h.Callback,
+            State = h.State,
+            End = h.End,
+            EndCallArgs = h.EndCallArgs,
+            EffectHolder = h.EffectHolder,
+            Order = order ?? IntFalseUnion.FromFalse(),
+            Priority = priority ?? 0,
+            Speed = speed,
+            SubOrder = subOrder ?? 0,
+            EffectOrder = effectOrder,
+        };
+    }
+
+    private int CalculateDefaultSubOrder(EventListenerWithoutPriority listener)
+    {
+        // Effect type hierarchy for subOrder
+        int subOrder = listener.Effect.EffectType switch
+        {
+            EffectType.Condition => 2,
+            EffectType.Weather => 5,
+            EffectType.Format => 5,
+            EffectType.Rule => 5,
+            EffectType.Ruleset => 5,
+            EffectType.Ability => 7,
+            EffectType.Item => 8,
+            _ => 0,
+        };
+
+        // Refine for conditions
+        if (listener.Effect.EffectType == EffectType.Condition && listener.State?.Target != null)
+        {
+            subOrder = listener.State.Target switch
+            {
+                SideEffectStateTarget when listener.State.IsSlotCondition == true => 3,  // Slot condition
+                SideEffectStateTarget => 4,                                       // Side condition
+                FieldEffectStateTarget => 5,                                      // Field condition
+                _ => subOrder,
+            };
+        }
+
+        // Special abilities
+        if (listener.Effect is Ability ability)
+        {
+            subOrder = ability.Id switch
+            {
+                AbilityId.PoisonTouch => 6,
+                AbilityId.PerishBody => 6,
+                AbilityId.Stall => 9,
+                _ => subOrder,
+            };
+        }
+
+        return subOrder;
     }
 
     public void EachEvent(EventId eventId, IEffect? effect, bool? relayVar)

@@ -790,4 +790,29 @@ public record Item : IPokemonEventMethods, IEffect, IBasicEffect
             _ => null,
         };
     }
+
+    public IntFalseUnion? GetOrder(EventId id)
+    {
+        return id switch
+        {
+            EventId.DamagingHit => OnDamagingHitOrder is not null ?
+                IntFalseUnion.FromInt(OnDamagingHitOrder.Value) : null,
+
+            EventId.Residual => OnResidualOrder is not null ?
+                IntFalseUnion.FromInt(OnResidualOrder.Value) : null,
+
+            _ => null,
+        };
+    }
+
+    public int? GetSubOrder(EventId id)
+    {
+        return id switch
+        {
+            EventId.AnySwitchIn => OnAnySwitchInSubOrder,
+            EventId.Residual => OnResidualSubOrder,
+            EventId.SwitchIn => OnSwitchInSubOrder,
+            _ => null,
+        };
+    }
 }

@@ -12,7 +12,7 @@ public record Library
 {
     private readonly Abilities _abilities;
     private readonly Conditions _conditions;
-    private readonly EventInfoData _eventInfoData = new();
+    private readonly EventIdInfoData _eventInfoData = new();
     private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();

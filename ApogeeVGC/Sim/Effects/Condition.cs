@@ -16,9 +16,20 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
 {
     public required ConditionId Id { get; init; }
     public EffectStateId EffectStateId => Id;
-    public EffectType EffectType => EffectType.Condition;
+    public EffectType EffectType
+    {
+        get;
+        init
+        {
+            if (value is not (EffectType.Condition or EffectType.Weather or EffectType.Status or EffectType.Terrain))
+            {
+                throw new ArgumentException("Condition EffectType must be Condition, Weather, Status, or Terrain.");
+            }
+            field = value;
+        }
+    }
     public string Name { get; init; } = string.Empty;
-    public ConditionEffectType ConditionEffectType { get; init; }
+    //public ConditionEffectType ConditionEffectType { get; init; }
 
     ///// <summary>
     ///// Many conditions are defined by a source effect, such as a move or ability.
@@ -750,6 +761,36 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
             EventId.Type => OnTypePriority,
             EventId.SideResidual => OnSideResidualPriority,
             EventId.FieldResidual => OnFieldResidualPriority,
+            _ => null,
+        };
+    }
+
+    public IntFalseUnion? GetOrder(EventId id)
+    {
+        return id switch
+        {
+            EventId.DamagingHit => OnDamagingHitOrder.HasValue ? IntFalseUnion.FromInt(OnDamagingHitOrder.Value) :
+                null,
+            EventId.Residual => OnResidualOrder.HasValue ? IntFalseUnion.FromInt(OnResidualOrder.Value) : null,
+            EventId.SideResidual => OnSideResidualOrder.HasValue ? IntFalseUnion.FromInt(OnSideResidualOrder.Value) :
+                null,
+
+            EventId.FieldResidual => OnFieldResidualOrder.HasValue ?
+                IntFalseUnion.FromInt(OnFieldResidualOrder.Value) : null,
+
+            _ => null,
+        };
+    }
+
+    public int? GetSubOrder(EventId id)
+    {
+        return id switch
+        {
+            EventId.AnySwitchIn => OnAnySwitchInSubOrder,
+            EventId.Residual => OnResidualSubOrder,
+            EventId.SwitchIn => OnSwitchInSubOrder,
+            EventId.SideResidual => OnSideResidualSubOrder,
+            EventId.FieldResidual => OnFieldResidualSubOrder,
             _ => null,
         };
     }

@@ -46,10 +46,10 @@ public enum ConditionId
     None,
 }
 
-public enum ConditionEffectType
-{
-    Condition,
-    Weather,
-    Status,
-    Terrain,
-}
+//public enum ConditionEffectType
+//{
+//    Condition,
+//    Weather,
+//    Status,
+//    Terrain,
+//}

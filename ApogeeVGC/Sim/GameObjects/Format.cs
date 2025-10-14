@@ -623,4 +623,26 @@ public record Format : IEffect, IBasicEffect, IEventMethods
             _ => null,
         };
     }
+
+    public IntFalseUnion? GetOrder(EventId id)
+    {
+        int? order = id switch
+        {
+            EventId.DamagingHit => OnDamagingHitOrder,
+            EventId.Residual => OnResidualOrder,
+            _ => null,
+        };
+        return order.HasValue ? IntFalseUnion.FromInt(order.Value) : null;
+    }
+
+    public int? GetSubOrder(EventId id)
+    {
+        return id switch
+        {
+            EventId.AnySwitchIn => OnAnySwitchInSubOrder,
+            EventId.Residual => OnResidualSubOrder,
+            EventId.SwitchIn => OnSwitchInSubOrder,
+            _ => null,
+        };
+    }
 }

@@ -9,5 +9,8 @@ public interface IEffect
     string Name { get; }
     EffectStateId EffectStateId { get; }
     EffectDelegate? GetDelegate(EventId id);
+
+    IntFalseUnion? GetOrder(EventId id);
     int? GetPriority(EventId id);
+    int? GetSubOrder(EventId id);
 }

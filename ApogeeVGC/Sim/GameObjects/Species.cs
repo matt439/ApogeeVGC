@@ -190,6 +190,8 @@ public record Species : IEffect
     }
 
     public int? GetPriority(EventId id) => null;
+    public IntFalseUnion? GetOrder(EventId id) => null;
+    public int? GetSubOrder(EventId id) => null;
 }
 
 public enum SpeciesAbilityType
