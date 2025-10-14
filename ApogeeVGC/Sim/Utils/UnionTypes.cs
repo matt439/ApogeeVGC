@@ -606,7 +606,7 @@ public static class EffectUnionFactory
 
 
 /// <summary>
-/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion?
+/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | Field
 /// </summary>
 public abstract record RunEventTarget
 {
@@ -629,12 +629,15 @@ public abstract record RunEventTarget
             _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
         };
     }
+    public static implicit operator RunEventTarget(Field field) => new FieldRunEventTarget(field);
 }
 
 public record PokemonRunEventTarget(Pokemon Pokemon) : RunEventTarget;
 public record PokemonArrayRunEventTarget(Pokemon[] PokemonList) : RunEventTarget;
 public record SideRunEventTarget(Side Side) : RunEventTarget;
 public record BattleRunEventTarget(IBattle Battle) : RunEventTarget;
+public record FieldRunEventTarget(Field Field) : RunEventTarget;
+
 
 
 

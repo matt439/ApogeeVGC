@@ -135,6 +135,38 @@ public class Field
         return RemovePseudoWeather(Battle.Library.Conditions[status]);
     }
 
+    public bool ClearWeather()
+    {
+        if (Weather == ConditionId.None) return false;
+        Condition prevWeather = GetWeather();
+        Battle.SingleEvent(EventId.FieldEnd, prevWeather, WeatherState, this);
+        Weather = ConditionId.None;
+        Battle.ClearEffectState(WeatherState);
+        Battle.EachEvent(EventId.WeatherChange);
+        return true;
+    }
+
+    public bool ClearTerrain()
+    {
+        if (Terrain == ConditionId.None) return false;
+        Condition prevTerrain = GetTerrain();
+        Battle.SingleEvent(EventId.FieldEnd, prevTerrain, TerrainState, this);
+        Terrain = ConditionId.None;
+        Battle.ClearEffectState(TerrainState);
+        Battle.EachEvent(EventId.TerrainChange);
+        return true;
+    }
+
+    public Condition GetTerrain()
+    {
+        return Battle.Library.Conditions[Terrain];
+    }
+
+    public Condition GetWeather()
+    {
+        return Battle.Library.Conditions[Weather];
+    }
+
     /// <summary>
     /// Checks if any active Pokémon has an ability that suppresses weather effects.
     /// 
@@ -160,4 +192,5 @@ public class Field
         throw new NotImplementedException();
     }
 }
+
 

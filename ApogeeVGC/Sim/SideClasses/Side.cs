@@ -147,6 +147,11 @@ public class Side
         SideConditions.Remove(condition.Id);
         return true;
     }
+
+    public bool RemoveSideCondition(Condition status)
+    {
+        return RemoveSideCondition(status.Id);
+    }
 }
 
 

@@ -15,4 +15,10 @@ public class Event
     public SingleEventTarget? Target { get; set; }
     public IEffect? Effect { get; set; }
     public double? Modifier { get; set; }
+
+    public EffectDelegate? GetDelegate(EventId id)
+    {
+        return null;
+        // TODO: Implement logic to return the appropriate delegate based on the EventId
+    }
 }

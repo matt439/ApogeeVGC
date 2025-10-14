@@ -76,6 +76,8 @@ public interface IBattle
     int Modify(int value, int[] fraction);
     int Modify(int value, double fraction);
 
+    void ClearEffectState(EffectState state);
+
     bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false);
 
     List<Side> Sides { get; }

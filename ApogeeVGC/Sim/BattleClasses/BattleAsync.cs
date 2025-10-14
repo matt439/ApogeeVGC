@@ -491,21 +491,115 @@ public class BattleAsync : IBattle
     }
 
     private static List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
-        EffectStateId? getKey = null)
+        EffectStateKey? getKey = null)
     {
         throw new NotImplementedException();
     }
 
-    private static List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateId? getKey = null,
+    /// <summary>
+    /// Finds event handlers registered at the battle level.
+    /// This includes handlers from the format (ruleset) and custom event handlers.
+    /// </summary>
+    /// <param name="callbackName">The event callback name to search for</param>
+    /// <param name="getKey">Optional property key to check in effect state (e.g., "duration")</param>
+    /// <param name="customHolder">Optional custom effect holder (defaults to this battle)</param>
+    /// <returns>List of event listeners found at the battle level</returns>
+    private List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateKey? getKey = null,
         Pokemon? customHolder = null)
     {
-        throw new NotImplementedException();
+        List<EventListener> handlers = [];
+
+        // Check format (ruleset) for handlers
+        EffectDelegate? callback = GetCallback(RunEventTarget.FromIBattle(this), Format, callbackName);
+        
+        if (callback != null || (getKey != null && FormatData.GetProperty(getKey) != null))
+        {
+            handlers.Add(ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = Format,
+                Callback = callback,
+                State = FormatData,
+                End = null,
+                EffectHolder = customHolder ?? EffectHolder.FromIBattle(this),
+            }, callbackName));
+        }
+
+        // Check custom event handlers registered in this.Events
+
+        EffectDelegate? effectDelegate = Events?.GetDelegate(callbackName);
+        if (Events != null && effectDelegate is not null)
+        {
+
+
+        }
+
+        return handlers;
     }
 
-    private static List<EventListener> FindFieldEventHandlers(Field field, EventId callbackName,
-        EffectStateId? getKey = null, Pokemon? customHolder = null)
+    private List<EventListener> FindFieldEventHandlers(Field field, EventId callbackName,
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        throw new NotImplementedException();
+        return FindFieldEventHandlersInternal(field, callbackName, getKey, customHolder).ToList();
+    }
+
+    private IEnumerable<EventListener> FindFieldEventHandlersInternal(Field field, EventId callbackName,
+        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+    {
+        // Check pseudo-weather effects (Trick Room, Gravity, etc.)
+        foreach (ConditionId id in field.PseudoWeather.Keys)
+        {
+            EffectState pseudoWeatherState = field.PseudoWeather[id];
+            Condition pseudoWeather = Library.Conditions[id];
+            EffectDelegate? callback = GetCallback(field, pseudoWeather, callbackName);
+            
+            if (callback != null || (getKey != null && pseudoWeatherState.GetProperty(getKey) != null))
+            {
+                yield return ResolvePriority(new EventListenerWithoutPriority
+                {
+                    Effect = pseudoWeather,
+                    Callback = callback,
+                    State = pseudoWeatherState,
+                    End = customHolder == null
+                        ? EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)field.RemovePseudoWeather)
+                        : null,
+                    EffectHolder = customHolder is null ? field : customHolder,
+                }, callbackName);
+            }
+        }
+
+        // Check weather effect
+        Condition weather = field.GetWeather();
+        EffectDelegate? weatherCallback = GetCallback(field, weather, callbackName);
+        if (weatherCallback != null || (getKey != null && Field.WeatherState.GetProperty(getKey) != null))
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = weather,
+                Callback = weatherCallback,
+                State = Field.WeatherState,
+                End = customHolder == null
+                    ? EffectDelegate.FromNullableDelegate(field.ClearWeather)
+                    : null,
+                EffectHolder = customHolder is null ? field : customHolder,
+            }, callbackName);
+        }
+
+        // Check terrain effect
+        Condition terrain = field.GetTerrain();
+        EffectDelegate? terrainCallback = GetCallback(field, terrain, callbackName);
+        if (terrainCallback != null || (getKey != null && field.TerrainState.GetProperty(getKey) != null))
+        {
+            yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+                Effect = terrain,
+                Callback = terrainCallback,
+                State = field.TerrainState,
+                End = customHolder == null
+                    ? EffectDelegate.FromNullableDelegate(field.ClearTerrain)
+                    : null,
+                EffectHolder = customHolder is null ? field : customHolder,
+            }, callbackName);
+        }
     }
 
     private List<EventListener> FindSideEventHandlers(Side side, EventId callbackName,
@@ -530,7 +624,7 @@ public class BattleAsync : IBattle
                     Callback = callback,
                     State = sideConditionData,
                     End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(side.RemoveSideCondition)
+                        ? EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)side.RemoveSideCondition)
                         : null,
                     EffectHolder = customHolder is null ? side : customHolder,
                 }, callbackName);
@@ -1436,5 +1530,16 @@ public class BattleAsync : IBattle
 
             sorted += nextIndexes.Count;
         }
+    }
+
+    public void ClearEffectState(EffectState state)
+    {
+        EffectStateTarget? prevTarget = state.Target;
+        state = new EffectState()
+        {
+            Id = EffectStateId.FromEmpty(),
+            Target = prevTarget,
+            EffectOrder = 0,
+        };
     }
 }
