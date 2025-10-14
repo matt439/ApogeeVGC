@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
@@ -11,6 +12,7 @@ public record Library
 {
     private readonly Abilities _abilities;
     private readonly Conditions _conditions;
+    private readonly EventInfoData _eventInfoData = new();
     private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
@@ -23,6 +25,7 @@ public record Library
 
     private IReadOnlyDictionary<AbilityId, Ability> AbilitiesData => _abilities.AbilitiesData;
     private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
+    private IReadOnlyDictionary<EventId, EventIdInfo> EventData => _eventInfoData.EventData;
     private IReadOnlyDictionary<FormatId, Format> FormatsData => _formats.FormatData;
     private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
@@ -37,6 +40,9 @@ public record Library
     
     public IReadOnlyDictionary<ConditionId, Condition> Conditions => 
         new ReadOnlyDictionaryWrapper<ConditionId, Condition>(ConditionsData);
+
+    public IReadOnlyDictionary<EventId, EventIdInfo> Events =>
+        new ReadOnlyDictionaryWrapper<EventId, EventIdInfo>(EventData);
 
     public IReadOnlyDictionary<FormatId, Format> Formats => 
         new ReadOnlyDictionaryWrapper<FormatId, Format>(FormatsData);

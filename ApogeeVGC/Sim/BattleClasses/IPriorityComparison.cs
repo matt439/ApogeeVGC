@@ -1,10 +1,11 @@
 ﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
 public interface IPriorityComparison
 {
-    ActionOrder Order { get; }
+    IntFalseUnion Order { get; }
     int Priority { get; }
     int Speed { get; }
     int SubOrder { get; }

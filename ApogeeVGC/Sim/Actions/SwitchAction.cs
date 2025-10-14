@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Actions;
 
@@ -20,19 +21,30 @@ public record SwitchAction : IAction
             }
         }
     }
-
-    public ActionOrder Order
+    public required IntFalseUnion Order
     {
         get;
         init
         {
-            if (value is ActionOrder.S3 or ActionOrder.S6 or ActionOrder.S103)
+            switch (value)
             {
-                field = value;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(Order), "Invalid ActionOrder for SwitchAction.");
+                case IntIntFalseUnion iifu:
+                    int i = iifu.Value;
+                    if (i is 3 or 6 or 103)
+                    {
+                        field = i;
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(value),
+                            "Order must be one of the predefined values.");
+                    }
+                    break;
+                case FalseIntFalseUnion f:
+                    throw new ArgumentException("Order cannot be of type FalseIntFalseUnion.", nameof(value));
+                default:
+                    throw new ArgumentException("Order must be of type FalseIntFalseUnion or IntIntFalseUnion.",
+                        nameof(value));
             }
         }
     }

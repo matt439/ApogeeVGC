@@ -981,6 +981,8 @@ public record BattleEffectHolder(IBattle Battle) : EffectHolder;
 /// </summary>
 public abstract record EffectDelegate
 {
+    public abstract Delegate? GetDelegate(int index = 0);
+
     public static implicit operator EffectDelegate(Delegate del) => new DelegateEffectDelegate(del);
     public static EffectDelegate? FromNullableDelegate(Delegate? del)
     {
@@ -1042,15 +1044,87 @@ public abstract record EffectDelegate
         return del is null ? null : new OnLockMoveEffectDelegate(del);
     }
 }
-public record DelegateEffectDelegate(Delegate Del) : EffectDelegate;
-public record OnFlinchEffectDelegate(OnFlinch OnFlinch) : EffectDelegate;
-public record OnCriticalHitEffectDelegate(OnCriticalHit OnCriticalHit) : EffectDelegate;
-public record OnFractionalPriorityEffectDelegate(OnFractionalPriority OnFractionalPriority) : EffectDelegate;
-public record OnTakeItemEffectDelegate(OnTakeItem OnTakeItem) : EffectDelegate;
-public record OnTryHealEffectDelegate(OnTryHeal OnTryHeal) : EffectDelegate;
-public record OnTryEatItemEffectDelegate(OnTryEatItem OnTryEatItem) : EffectDelegate;
-public record OnNegateImmunityEffectDelegate(OnNegateImmunity OnNegateImmunity) : EffectDelegate;
-public record OnLockMoveEffectDelegate(OnLockMove OnLockMove) : EffectDelegate;
+
+public record DelegateEffectDelegate(Delegate Del) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => Del;
+}
+
+public record OnFlinchEffectDelegate(OnFlinch OnFlinch) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnFlinch switch
+    {
+        OnFlinchFunc f => f.Func,
+        _ => null,
+    };
+}
+
+public record OnCriticalHitEffectDelegate(OnCriticalHit OnCriticalHit) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnCriticalHit switch
+    {
+        OnCriticalHitFunc f => f.Function,
+        _ => null,
+    };
+}
+
+public record OnFractionalPriorityEffectDelegate(OnFractionalPriority OnFractionalPriority) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnFractionalPriority switch
+    {
+        OnFractionalPriorityFunc f => f.Function,
+        _ => null,
+    };
+}
+
+public record OnTakeItemEffectDelegate(OnTakeItem OnTakeItem) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnTakeItem switch
+    {
+        OnTakeItemFunc f => f.Func,
+        _ => null,
+    };
+}
+
+public record OnTryHealEffectDelegate(OnTryHeal OnTryHeal) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0)
+    {
+        if (OnTryHeal is OnTryHealBool) return null;
+        return index switch
+        {
+            0 when OnTryHeal is OnTryHealFunc1 f1 => f1.Func,
+            1 when OnTryHeal is OnTryHealFunc2 f2 => f2.Func,
+            _ => null,
+        };
+    }
+}
+public record OnTryEatItemEffectDelegate(OnTryEatItem OnTryEatItem) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnTryEatItem switch
+    {
+        FuncOnTryEatItem f => f.Func,
+        _ => null,
+    };
+}
+
+public record OnNegateImmunityEffectDelegate(OnNegateImmunity OnNegateImmunity) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnNegateImmunity switch
+    {
+        OnNegateImmunityFunc f => f.Func,
+        _ => null,
+    };
+}
+
+public record OnLockMoveEffectDelegate(OnLockMove OnLockMove) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => OnLockMove switch
+    {
+        OnLockMoveFunc f => f.Func,
+        _ => null,
+    };
+}
 
 
 

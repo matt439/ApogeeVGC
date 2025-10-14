@@ -295,6 +295,12 @@ public class BattleAsync : IBattle
         return returnVal ?? relayVar;
     }
 
+     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
+        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
     /// </summary>
@@ -400,59 +406,178 @@ public class BattleAsync : IBattle
         // Invoke the callback
         object? result = del.DynamicInvoke([.. args]);
 
-        // Convert result to RelayVar
-        return ConvertToRelayVar(result);
+        return (RelayVar?)result;
+    }
+
+    //findEventHandlers(target: Pokemon | Pokemon[] | Side | Battle, eventName: string, source?: Pokemon | null)
+    //{
+    //    let handlers: EventListener[] = [];
+    //    if (Array.isArray(target))
+    //    {
+    //        for (const [i, pokemon] of target.entries()) {
+    //            // console.log(`Event: ${eventName}, Target: ${pokemon}, ${i}`);
+    //            const curHandlers = this.findEventHandlers(pokemon, eventName, source);
+    //            for (const handler of curHandlers) {
+    //                handler.target = pokemon; // Original "effectHolder"
+    //                handler.index = i;
+    //            }
+    //            handlers = handlers.concat(curHandlers);
+    //        }
+    //        return handlers;
+    //    }
+    //    // events that target a Pokemon normally bubble up to the Side
+    //    const shouldBubbleDown = target instanceof Side;
+    //    // events usually run through EachEvent should never have any handlers besides `on${eventName}` so don't check for them
+    //    const prefixedHandlers = ! ['BeforeTurn', 'Update', 'Weather', 'WeatherChange', 'TerrainChange'].includes(eventName);
+    //    if (target instanceof Pokemon && (target.isActive || source?.isActive)) {
+    //        handlers = this.findPokemonEventHandlers(target, `on${ eventName}`);
+    //        if (prefixedHandlers)
+    //        {
+    //            for (const allyActive of target.alliesAndSelf()) {
+    //                handlers.push(...this.findPokemonEventHandlers(allyActive, `onAlly${ eventName}`));
+    //                handlers.push(...this.findPokemonEventHandlers(allyActive, `onAny${ eventName}`));
+    //            }
+    //            for (const foeActive of target.foes()) {
+    //                handlers.push(...this.findPokemonEventHandlers(foeActive, `onFoe${ eventName}`));
+    //                handlers.push(...this.findPokemonEventHandlers(foeActive, `onAny${ eventName}`));
+    //            }
+    //        }
+    //        target = target.side;
+    //    }
+    //    if (source && prefixedHandlers)
+    //    {
+    //        handlers.push(...this.findPokemonEventHandlers(source, `onSource${ eventName}`));
+    //    }
+    //    if (target instanceof Side) {
+    //        for (const side of this.sides) {
+    //            if (shouldBubbleDown)
+    //            {
+    //                for (const active of side.active) {
+    //                    if (side === target || side === target.allySide)
+    //                    {
+    //                        handlers = handlers.concat(this.findPokemonEventHandlers(active, `on${ eventName}`));
+    //                    }
+    //                    else if (prefixedHandlers)
+    //                    {
+    //                        handlers = handlers.concat(this.findPokemonEventHandlers(active, `onFoe${ eventName}`));
+    //                    }
+    //                    if (prefixedHandlers) handlers = handlers.concat(this.findPokemonEventHandlers(active, `onAny${ eventName}`));
+    //                }
+    //            }
+    //            if (side.n < 2 || !side.allySide)
+    //            {
+    //                if (side === target || side === target.allySide)
+    //                {
+    //                    handlers.push(...this.findSideEventHandlers(side, `on${ eventName}`));
+    //                }
+    //                else if (prefixedHandlers)
+    //                {
+    //                    handlers.push(...this.findSideEventHandlers(side, `onFoe${ eventName}`));
+    //                }
+    //                if (prefixedHandlers) handlers.push(...this.findSideEventHandlers(side, `onAny${ eventName}`));
+    //            }
+    //        }
+    //    }
+    //    handlers.push(...this.findFieldEventHandlers(this.field, `on${ eventName}`));
+    //    handlers.push(...this.findBattleEventHandlers(`on${ eventName}`));
+    //    return handlers;
+    //}
+
+    private static List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
+        Pokemon? source = null)
+    {
+        List<EventListener> handlers = [];
+
+        if (target is PokemonArrayRunEventTarget arrayTarget)
+        {
+            for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
+            {
+                Pokemon pokemon = arrayTarget.PokemonList[i];
+
+                var curHandlers = FindEventHandlers(pokemon, eventName, source);
+                foreach (EventListener handler in curHandlers)
+                {
+                    handler.Target = pokemon;
+                    handler.Index = i;
+                }
+                handlers.AddRange(curHandlers);
+            }
+            return handlers;
+        }
+
+        return handlers;
+    }
+
+    private static List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
+        EffectStateId? getKey = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateId? getKey = null,
+        Pokemon? customHolder = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static List<EventListener> FindFieldEventHandlers(Field field, EventId callbackName,
+        EffectStateId? getKey = null, Pokemon? customHolder = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    private List<EventListener> FindSideEventHandlers(Side side, EventId callbackName,
+        EffectStateId? getKey = null, Pokemon? customHolder = null)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
-    /// Converts a result object to a RelayVar.
+    /// Gets the event callback from an effect, with special handling for Gen 5+ abilities/items
+    /// during switch-in events.
+    /// 
+    /// In Gen 5+, abilities and items start at different times during the SwitchIn event,
+    /// so we run their onStart handlers during the SwitchIn event instead of running 
+    /// the Start event during switch-ins. Gens 4 and before use the old system.
     /// </summary>
-    private static RelayVar? ConvertToRelayVar(object? result)
+    private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
     {
-        return result switch
+        // Get the callback from the effect
+        EffectDelegate? callback = effect.GetDelegate(callbackName);
+
+        // Special Gen 5+ logic for abilities/items during switch-in
+        if (callback == null && target is PokemonRunEventTarget)
         {
-            null => null,
-            RelayVar rv => rv,
-            bool b => new BoolRelayVar(b),
-            int i => new IntRelayVar(i),
-            decimal d => new DecimalRelayVar(d),
-            double d => new DecimalRelayVar((decimal)d),
-            MoveId moveId => new MoveIdRelayVar(moveId),
-            ConditionId conditionId => new ConditionIdRelayVar(conditionId),
-            SparseBoostsTable table => new SparseBoostsTableRelayVar(table),
-            BoostsTable table => new BoostsTableRelayVar(table),
-            List<PokemonType> types => new TypesRelayVar(types),
-            PokemonType type => new PokemonTypeRelayVar(type),
-            MoveType moveType => new PokemonTypeRelayVar((PokemonType)moveType),
-            IEffect effect => new EffectRelayVar(effect),
-            VoidReturn => new BoolRelayVar(true), // VoidReturn typically means success
-            // Handle union types that can be returned
-            IntBoolUnion ibu => ibu switch
+            // Check if we should use the fallback event
+            var fallbackEvent = EventIdMapper.GetSwitchInFallback(callbackName, Gen);
+            
+            if (fallbackEvent.HasValue)
             {
-                IntIntBoolUnion iibu => new IntRelayVar(iibu.Value),
-                BoolIntBoolUnion bibu => new BoolRelayVar(bibu.Value),
-                _ => null,
-            },
-            BoolVoidUnion bvu => bvu switch
-            {
-                BoolBoolVoidUnion bbvu => new BoolRelayVar(bbvu.Value),
-                VoidBoolVoidUnion => new BoolRelayVar(true), // void means success
-                _ => null,
-            },
-            MoveIdVoidUnion mvu => mvu switch
-            {
-                MoveIdMoveIdVoidUnion mmvu => new MoveIdRelayVar(mmvu.MoveId),
-                VoidMoveIdVoidUnion => null, // void means no move
-                _ => null,
-            },
-            _ => null,
-        };
+                // Check if the effect has onAnySwitchIn - if so, don't use the fallback
+                if (effect.GetDelegate(EventId.AnySwitchIn) != null)
+                {
+                    return null;
+                }
+
+                // Check if this is an ability or item (or innate ability/item via status)
+                bool isAbilityOrItem = effect.EffectType is EffectType.Ability or EffectType.Item;
+                bool isInnateAbilityOrItem = effect is Condition { ConditionEffectType: ConditionEffectType.Status } &&
+                                            EventIdMapper.IsInnateAbilityOrItem(effect.EffectStateId);
+
+                // If it's an ability or item, use the fallback event
+                if (isAbilityOrItem || isInnateAbilityOrItem)
+                {
+                    callback = effect.GetDelegate(fallbackEvent.Value);
+                }
+            }
+        }
+
+        return callback;
     }
 
-    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
-        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
+    private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
     {
-        return null;
+        throw new NotImplementedException();
     }
 
     public void EachEvent(EventId eventId, IEffect? effect, bool? relayVar)

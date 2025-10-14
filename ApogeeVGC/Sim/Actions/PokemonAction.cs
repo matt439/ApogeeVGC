@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Actions;
 
@@ -30,5 +31,5 @@ public record PokemonAction : IAction
 
     public int SubOrder => 0;
     public int EffectOrder => 0;
-    public ActionOrder Order => ActionOrder.Max;
+    public IntFalseUnion Order => int.MaxValue;
 }
