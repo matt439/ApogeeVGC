@@ -496,22 +496,40 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Finds event handlers registered at the battle level.
-    /// This includes handlers from the format (ruleset) and custom event handlers.
-    /// </summary>
-    /// <param name="callbackName">The event callback name to search for</param>
-    /// <param name="getKey">Optional property key to check in effect state (e.g., "duration")</param>
-    /// <param name="customHolder">Optional custom effect holder (defaults to this battle)</param>
-    /// <returns>List of event listeners found at the battle level</returns>
+    //findBattleEventHandlers(callbackName: string, getKey?: 'duration', customHolder?: Pokemon)
+    //{
+    //    const handlers: EventListener[] = [];
+
+    //    let callback;
+    //    const format = this.format;
+    //    callback = this.getCallback(this, format, callbackName);
+    //    if (callback !== undefined || (getKey && this.formatData[getKey]))
+    //    {
+    //        handlers.push(this.resolvePriority({
+    //            effect: format, callback, state: this.formatData, end: null, effectHolder: customHolder || this,
+    //        }, callbackName));
+    //    }
+    //    if (this.events && (callback = this.events[callbackName]) !== undefined)
+    //    {
+    //        for (const handler of callback) {
+    //            const state = (handler.target.effectType === 'Format') ? this.formatData : null;
+    //            handlers.push({
+    //                effect: handler.target, callback: handler.callback, state, end: null, effectHolder: customHolder || this,
+    //                priority: handler.priority, order: handler.order, subOrder: handler.subOrder,
+    //            });
+    //        }
+    //    }
+    //    return handlers;
+    //}
+
     private List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateKey? getKey = null,
-        Pokemon? customHolder = null)
+    Pokemon? customHolder = null)
     {
         List<EventListener> handlers = [];
 
         // Check format (ruleset) for handlers
         EffectDelegate? callback = GetCallback(RunEventTarget.FromIBattle(this), Format, callbackName);
-        
+
         if (callback != null || (getKey != null && FormatData.GetProperty(getKey) != null))
         {
             handlers.Add(ResolvePriority(new EventListenerWithoutPriority
@@ -525,12 +543,40 @@ public class BattleAsync : IBattle
         }
 
         // Check custom event handlers registered in this.Events
-
-        EffectDelegate? effectDelegate = Events?.GetDelegate(callbackName);
-        if (Events != null && effectDelegate is not null)
+        // In TypeScript: if (this.events && (callback = this.events[callbackName]) !== undefined)
+        if (Events?.GetDelegate(callbackName) is { } eventDelegate)
         {
+            // The Events object contains dynamically registered handlers with their priorities
+            // These need to be processed differently from the static Format handlers
 
+            // Since we don't have the full EventHandlerData structure yet,
+            // this is a placeholder for when Events is properly implemented
+            // In the TypeScript version, each handler in callback array has:
+            // - target (the effect)
+            // - callback (the function)
+            // - priority, order, subOrder (for sorting)
 
+            // For now, just add a basic handler
+            EffectState? state = null;
+            if (Events.Effect is { EffectType: EffectType.Format })
+            {
+                state = FormatData;
+            }
+
+            handlers.Add(new EventListener
+            {
+                Effect = Events.Effect ?? Format,
+                Callback = eventDelegate,
+                State = state,
+                End = null,
+                EffectHolder = customHolder ?? EffectHolder.FromIBattle(this),
+                // These would come from the handler data in a full implementation
+                Order = IntFalseUnion.FromInt(0),
+                Priority = 0,
+                SubOrder = 0,
+                EffectOrder = 0,
+                Speed = 0,
+            });
         }
 
         return handlers;
