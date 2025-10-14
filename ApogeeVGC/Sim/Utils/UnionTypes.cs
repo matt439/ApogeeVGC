@@ -251,6 +251,26 @@ public record PokemonSideFieldField(Field Field) : PokemonSideFieldUnion;
 
 
 /// <summary>
+/// Pokemon | Side | Field | Battle
+/// </summary>
+public abstract record PokemonSideFieldBattleUnion
+{
+    public static implicit operator PokemonSideFieldBattleUnion(Pokemon pokemon) =>
+        new PokemonSideFieldBattlePokemon(pokemon);
+    public static implicit operator PokemonSideFieldBattleUnion(Side side) =>
+        new PokemonSideFieldBattleSide(side);
+    public static implicit operator PokemonSideFieldBattleUnion(Field field) =>
+        new PokemonSideFieldBattleField(field);
+    public static PokemonSideFieldBattleUnion FromIBattle(IBattle battle) =>
+        new PokemonSideFieldBattleBattle(battle);
+}
+public record PokemonSideFieldBattlePokemon(Pokemon Pokemon) : PokemonSideFieldBattleUnion;
+public record PokemonSideFieldBattleSide(Side Side) : PokemonSideFieldBattleUnion;
+public record PokemonSideFieldBattleField(Field Field) : PokemonSideFieldBattleUnion;
+public record PokemonSideFieldBattleBattle(IBattle Battle) : PokemonSideFieldBattleUnion;
+
+
+/// <summary>
 /// Pokemon | Side | Battle | Pokemon?
 /// </summary>
 public abstract record PokemonSideBattleUnion

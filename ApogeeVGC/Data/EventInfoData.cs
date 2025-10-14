@@ -18,5 +18,6 @@ public record EventInfoData
         {
             Id = EventId.Accuracy,
         },
+        // TODO: Fill in the rest of the event infos
     };
 }

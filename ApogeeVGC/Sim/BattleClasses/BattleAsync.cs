@@ -295,12 +295,6 @@ public class BattleAsync : IBattle
         return returnVal ?? relayVar;
     }
 
-     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
-        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
-    {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
     /// </summary>
@@ -409,6 +403,12 @@ public class BattleAsync : IBattle
         return (RelayVar?)result;
     }
 
+    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
+        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
+    {
+        throw new NotImplementedException();
+    }
+
     //findEventHandlers(target: Pokemon | Pokemon[] | Side | Battle, eventName: string, source?: Pokemon | null)
     //{
     //    let handlers: EventListener[] = [];
@@ -486,26 +486,7 @@ public class BattleAsync : IBattle
     private static List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
         Pokemon? source = null)
     {
-        List<EventListener> handlers = [];
-
-        if (target is PokemonArrayRunEventTarget arrayTarget)
-        {
-            for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
-            {
-                Pokemon pokemon = arrayTarget.PokemonList[i];
-
-                var curHandlers = FindEventHandlers(pokemon, eventName, source);
-                foreach (EventListener handler in curHandlers)
-                {
-                    handler.Target = pokemon;
-                    handler.Index = i;
-                }
-                handlers.AddRange(curHandlers);
-            }
-            return handlers;
-        }
-
-        return handlers;
+        throw new NotImplementedException();
     }
 
     private static List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
@@ -532,47 +513,27 @@ public class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Gets the event callback from an effect, with special handling for Gen 5+ abilities/items
-    /// during switch-in events.
-    /// 
-    /// In Gen 5+, abilities and items start at different times during the SwitchIn event,
-    /// so we run their onStart handlers during the SwitchIn event instead of running 
-    /// the Start event during switch-ins. Gens 4 and before use the old system.
-    /// </summary>
-    private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
+    //getCallback(target: Pokemon | Side | Field | Battle, effect: Effect, callbackName: string)
+    //{
+    //    let callback: Function | undefined = (effect as any)[callbackName];
+    //    // Abilities and items Start at different times during the SwitchIn event, so we run their onStart handlers
+    //    // during the SwitchIn event instead of running the Start event during switch-ins
+    //    // gens 4 and before still use the old system, though
+    //    if (
+    //        callback === undefined && target instanceof Pokemon && this.gen >= 5 && callbackName === 'onSwitchIn' &&
+    //        !(effect as any).onAnySwitchIn && (['Ability', 'Item'].includes(effect.effectType) || (
+    //            // Innate abilities/items
+    //            effect.effectType === 'Status' && ['ability', 'item'].includes(effect.id.split(':')[0])
+    //        ))
+    //        ) {
+    //        callback = (effect as any).onStart;
+    //    }
+    //    return callback;
+    //}
+
+    private EffectDelegate? GetCallback(PokemonSideFieldBattleUnion target, IEffect effect, EventId callbackName)
     {
-        // Get the callback from the effect
-        EffectDelegate? callback = effect.GetDelegate(callbackName);
-
-        // Special Gen 5+ logic for abilities/items during switch-in
-        if (callback == null && target is PokemonRunEventTarget)
-        {
-            // Check if we should use the fallback event
-            var fallbackEvent = EventIdMapper.GetSwitchInFallback(callbackName, Gen);
-            
-            if (fallbackEvent.HasValue)
-            {
-                // Check if the effect has onAnySwitchIn - if so, don't use the fallback
-                if (effect.GetDelegate(EventId.AnySwitchIn) != null)
-                {
-                    return null;
-                }
-
-                // Check if this is an ability or item (or innate ability/item via status)
-                bool isAbilityOrItem = effect.EffectType is EffectType.Ability or EffectType.Item;
-                bool isInnateAbilityOrItem = effect is Condition { ConditionEffectType: ConditionEffectType.Status } &&
-                                            EventIdMapper.IsInnateAbilityOrItem(effect.EffectStateId);
-
-                // If it's an ability or item, use the fallback event
-                if (isAbilityOrItem || isInnateAbilityOrItem)
-                {
-                    callback = effect.GetDelegate(fallbackEvent.Value);
-                }
-            }
-        }
-
-        return callback;
+        throw new NotImplementedException();
     }
 
     private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
