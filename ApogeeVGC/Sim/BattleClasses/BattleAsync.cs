@@ -531,9 +531,21 @@ public class BattleAsync : IBattle
     //    return callback;
     //}
 
-    private EffectDelegate? GetCallback(PokemonSideFieldBattleUnion target, IEffect effect, EventId callbackName)
+    private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
     {
-        throw new NotImplementedException();
+        EffectDelegate? del = effect.GetDelegate(callbackName);
+        Delegate? callback = del?.GetDelegate();
+
+        if (callback is null && target is PokemonRunEventTarget &&
+            Gen >= 5 && callbackName == EventId.SwitchIn &&
+            effect.EffectType is EffectType.Ability or EffectType.Item ||
+                effect is Condition { ConditionEffectType: ConditionEffectType.Status } &&
+                effect.EffectType is EffectType.Ability or EffectType.Item)
+        {
+            del = effect.GetDelegate(EventId.Start);
+            callback = del?.GetDelegate();
+        }
+        return EffectDelegate.FromNullableDelegate(callback);
     }
 
     private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
