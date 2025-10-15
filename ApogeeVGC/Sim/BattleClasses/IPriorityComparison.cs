@@ -10,4 +10,5 @@ public interface IPriorityComparison
     int Speed { get; }
     int SubOrder { get; }
     int EffectOrder { get; }
+    //EffectHolder? EffectHolder { get; }
 }
