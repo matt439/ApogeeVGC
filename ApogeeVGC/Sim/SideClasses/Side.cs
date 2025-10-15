@@ -166,4 +166,9 @@ public class Side
     {
         return RemoveSideCondition(status.Id);
     }
+
+    public void ClearChoice()
+    {
+        throw new NotImplementedException();
+    }
 }

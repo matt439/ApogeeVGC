@@ -14,6 +14,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Drawing;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -89,11 +90,11 @@ public partial class BattleAsync : IBattle
     public Event? Events { get; set; } = null;
     public int EventDepth { get; set; }
 
-    public ActiveMove? ActiveMove { get; set; } = null;
-    public Pokemon? ActivePokemon { get; set; } = null;
-    public Pokemon? ActiveTarget { get; set; } = null;
+    public ActiveMove? ActiveMove { get; set; }
+    public Pokemon? ActivePokemon { get; set; }
+    public Pokemon? ActiveTarget { get; set; }
 
-    public ActiveMove? LastMove { get; set; } = null;
+    public ActiveMove? LastMove { get; set; }
     public MoveId? LastSuccessfulMoveThisTurn { get; set; } = null;
     public int LastMoveLine { get; set; } = -1;
     public int LastDamage { get; set; } = 0;
@@ -111,16 +112,12 @@ public partial class BattleAsync : IBattle
 
     public Action<SendType, IReadOnlyList<string>> Send { get; init; }
 
-    //public Func<int, int?, int> Trunc { get; init; }
-    //public Func<int, int?, int?, int> ClampIntRange { get; init; }
-
-
     public Library Library { get; init; }
     public bool PrintDebug { get; init; }
     public Side P1 => Sides[0];
     public Side P2 => Sides[1];
-    public Side P3 => throw new NotImplementedException("3v3 battles are not implemented.");
-    public Side P4 => throw new NotImplementedException("4v4 battles are not implemented.");
+    public static Side P3 => throw new Exception("3v3 battles are not implemented.");
+    public static Side P4 => throw new Exception("4v4 battles are not implemented.");
 
     public BattleAsync(BattleOptions options, Library library)
     {
@@ -196,7 +193,10 @@ public partial class BattleAsync : IBattle
         return ForceRandomChange ?? Prng.RandomChance(numerator, denominator);
     }
 
-    // TODO: Sample()
+    public T Sample<T>(IReadOnlyList<T> items)
+    {
+        return Prng.Sample(items);
+    }
 
     /// <summary>
     /// Determines if the current active move is suppressing abilities.
@@ -233,9 +233,34 @@ public partial class BattleAsync : IBattle
         return target?.HasItem(ItemId.AbilityShield) != true;
     }
 
-    // TODO: SetActiveMove()
-    // TODO: ClearActiveMove()
-    // TODO: UpdateSpeed()
+    public void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null)
+    {
+        ActiveMove = move;
+        ActivePokemon = pokemon;
+        ActiveTarget = target ?? pokemon;
+    }
+
+    public void ClearActiveMove(bool failed = false)
+    {
+        if (ActiveMove != null)
+        {
+            if (!failed)
+            {
+                LastMove = ActiveMove;
+            }
+            ActiveMove = null;
+            ActivePokemon = null;
+            ActiveTarget = null;
+        }
+    }
+
+    public void UpdateSpeed()
+    {
+        foreach (Pokemon pokemon in GetAllActive())
+        {
+            pokemon.UpdateSpeed();
+        }
+    }
 
     /// <summary>
     /// The default sort order for actions, but also event listeners.
@@ -494,8 +519,42 @@ public partial class BattleAsync : IBattle
         return false;
     }
 
-    // TODO: GetPokemon()
-    // TODO: GetAllPokemon()
+    /// <summary>
+    /// Gets a Pokemon by its full name string.
+    /// Searches through all sides and returns the first Pokemon with a matching fullname.
+    /// </summary>
+    /// <param name="fullname">The full name of the Pokemon to find</param>
+    /// <returns>The Pokemon if found, otherwise null</returns>
+    public Pokemon? GetPokemon(string fullname)
+    {
+        return Sides.SelectMany(side =>
+            side.Pokemon.Where(pokemon => pokemon.Fullname == fullname)).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Gets a Pokemon by another Pokemon's full name.
+    /// This overload extracts the fullname from the provided Pokemon and searches for a match.
+    /// </summary>
+    /// <param name="pokemon">The Pokemon whose fullname to search for</param>
+    /// <returns>The Pokemon if found, otherwise null</returns>
+    public Pokemon? GetPokemon(Pokemon pokemon)
+    {
+        return GetPokemon(pokemon.Fullname);
+    }
+
+    /// <summary>
+    /// Gets all Pokemon from all sides in the battle.
+    /// </summary>
+    /// <returns>A list containing all Pokemon from both sides</returns>
+    public List<Pokemon> GetAllPokemon()
+    {
+        List<Pokemon> pokemonList = [];
+        foreach (Side side in Sides)
+        {
+            pokemonList.AddRange(side.Pokemon);
+        }
+        return pokemonList;
+    }
 
     public List<Pokemon> GetAllActive(bool includeFainted = false)
     {
@@ -508,7 +567,21 @@ public partial class BattleAsync : IBattle
     }
 
     // TODO: MakeRequest()
-    // TODO: ClearRequest()
+
+    /// <summary>
+    /// Clears the current request state and resets all sides' active requests and choices.
+    /// Called when a turn's decision phase is complete or when canceling pending requests.
+    /// </summary>
+    public void ClearRequest()
+    {
+        RequestState = RequestState.None;
+        foreach (Side side in Sides)
+        {
+            side.ActiveRequest = null;
+            side.ClearChoice();
+        }
+    }
+
     // TODO: GetRequests()
     // TODO: Tiebreak()
     // TODO: ForceWin()

@@ -36,6 +36,8 @@ public enum MoveId
     Trick,
     Switcheroo,
     Recharge,
+    Frustration,
+    Return,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

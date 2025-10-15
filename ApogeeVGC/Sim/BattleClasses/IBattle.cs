@@ -26,6 +26,19 @@ public interface IBattle
     bool PrintDebug { get; }
     Field Field { get; }
 
+    /// <summary>
+    /// Whether to report exact HP values in battle output.
+    /// When true, shows "HP/MaxHP" format for all players.
+    /// When false, uses percentage (Gen 7+) or pixel-based display.
+    /// </summary>
+    bool ReportExactHp { get; }
+
+    /// <summary>
+    /// Whether to report HP as percentages instead of pixels (Gen 3-6).
+    /// Overridden by ReportExactHp if that is true.
+    /// </summary>
+    bool ReportPercentages { get; }
+
     IEffect Effect { get; }
     EffectState EffectState { get; }
 

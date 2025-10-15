@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
@@ -456,6 +457,16 @@ public class Pokemon : IPriorityComparison
         }
 
         return true;
+    }
+
+    public void UpdateSpeed()
+    {
+        Speed = GetActionSpeed();
+    }
+
+    public int GetActionSpeed()
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -1958,6 +1969,191 @@ public class Pokemon : IPriorityComparison
 
         // Return the Pokemon at the calculated position (adjust for 0-based indexing)
         return side.Active[targetLoc - 1];
+    }
+
+    /// <summary>
+    /// Generates switch request data for this Pokemon, containing all information
+    /// needed for a player to make switching decisions (stats, moves, ability, item, etc.)
+    /// </summary>
+    /// <param name="forAlly">If true, returns base moves instead of current moves (for ally info)</param>
+    /// <returns>Pokemon switch request data object</returns>
+    public PokemonSwitchRequestData GetSwitchRequestData(bool forAlly = false)
+    {
+        // Build stats dictionary from base stored stats
+        var stats = new StatsTable
+        {
+            [StatId.Atk] = BaseStoredStats[StatId.Atk],
+            [StatId.Def] = BaseStoredStats[StatId.Def],
+            [StatId.SpA] = BaseStoredStats[StatId.SpA],
+            [StatId.SpD] = BaseStoredStats[StatId.SpD],
+            [StatId.Spe] = BaseStoredStats[StatId.Spe],
+        };
+
+        // Get move list - either base moves (for allies) or current moves
+        var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
+        
+        // Convert move slots to Move objects
+        var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
+
+        // Create the base entry
+        var entry = new PokemonSwitchRequestData
+        {
+            Condition = GetHealth().Secret.StatusCondition ?? ConditionId.None,
+            Active = Position < Side.Active.Count,
+            Stats = stats,
+            Moves = moves,
+            BaseAbility = Battle.Library.Abilities[BaseAbility],
+            Item = Battle.Library.Items[Item],
+            Pokeball = Pokeball,
+            // Default values for Gen 9+ fields
+            Ability = Battle.Library.Abilities[Ability],
+            Commanding = false,
+            Reviving = false,
+            TeraType = TeraType,
+            Terastallized = false,
+        };
+
+        // Gen 7+ includes current ability
+        if (Battle.Gen > 6)
+        {
+            entry = entry with { Ability = Battle.Library.Abilities[Ability] };
+        }
+
+        // Gen 9+ includes commanding and reviving status
+        if (Battle.Gen >= 9)
+        {
+            // Commanding: Pokemon has the Commanding volatile and is not fainted
+            bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
+            
+            // Reviving: Pokemon is active and has Revival Blessing slot condition
+            // Note: SlotConditions is not implemented in the current codebase
+            // You may need to add this when implementing slot conditions
+            const bool reviving = false;
+            
+            entry = entry with 
+            { 
+                Commanding = commanding,
+                Reviving = reviving,
+            };
+        }
+
+        // Gen 9 includes Tera type and Terastallized status
+        if (Battle.Gen == 9)
+        {
+            entry = entry with
+            {
+                TeraType = TeraType,
+                Terastallized = Terastallized != null,
+            };
+        }
+
+        return entry;
+    }
+
+    /// <summary>
+    /// Gets the current health status of this Pokemon.
+    /// Returns both secret (exact) and shared (observable) health data.
+    /// The shared data varies based on battle settings and generation:
+    /// - Exact HP if battle.ReportExactHp is true
+    /// - Percentage if battle.ReportPercentages is true or Gen 7+
+    /// - Pixel-based display (48 pixels) for Gen 3-6 with color indicators in Gen 5+
+    /// </summary>
+    public PokemonHealth GetHealth()
+    {
+        // Fainted Pokemon
+        if (Hp <= 0)
+        {
+            return new PokemonHealth
+            {
+                SideId = Side.Id,
+                Secret = FaintedHealthData.Instance with
+                {
+                    StatusCondition = Status != ConditionId.None
+                        ? Status
+                        : null,
+                },
+                Shared = FaintedHealthData.Instance with
+                {
+                    StatusCondition = Status != ConditionId.None
+                        ? Status
+                        : null,
+                },
+            };
+        }
+
+        // Secret data is always exact HP
+        var secret = new ExactHealthData
+        {
+            CurrentHp = Hp,
+            MaxHp = MaxHp,
+            StatusCondition = Status != ConditionId.None ? Status : null,
+        };
+
+        // Determine shared health data format based on battle settings
+        HealthData shared;
+        
+        if (Battle.ReportExactHp)
+        {
+            // Exact HP reporting (same as secret)
+            shared = secret;
+        }
+        else if (Battle.ReportPercentages || Battle.Gen >= 7)
+        {
+            // HP Percentage Mod mechanics
+            int percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
+            
+            // Cap at 99% if not at full HP
+            if (percentage == 100 && Hp < MaxHp)
+            {
+                percentage = 99;
+            }
+            
+            shared = new PercentageHealthData
+            {
+                Percentage = percentage,
+                StatusCondition = Status != ConditionId.None ? Status : null,
+            };
+        }
+        else
+        {
+            // In-game accurate pixel health mechanics (Gen 3-6)
+            // PS doesn't use pixels after Gen 6, but for reference:
+            // - [Gen 7] SM uses 99 pixels
+            // - [Gen 7] USUM uses 86 pixels
+            int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
+            if (pixels == 0) pixels = 1; // Minimum 1 pixel if alive
+
+            PixelColorIndicator? colorIndicator = null;
+            
+            // Gen 5+ adds color indicators at specific thresholds
+            if (Battle.Gen >= 5)
+            {
+                if (pixels == 9)
+                {
+                    // 9 pixels: yellow if HP > 20%, red if HP <= 20%
+                    colorIndicator = Hp * 5 > MaxHp ? PixelColorIndicator.Yellow : PixelColorIndicator.Red;
+                }
+                else if (pixels == 24)
+                {
+                    // 24 pixels: green if HP > 50%, yellow if HP <= 50%
+                    colorIndicator = Hp * 2 > MaxHp ? PixelColorIndicator.Green : PixelColorIndicator.Yellow;
+                }
+            }
+            
+            shared = new PixelHealthData
+            {
+                Pixels = pixels,
+                ColorIndicator = colorIndicator,
+                StatusCondition = Status != ConditionId.None ? Status : null,
+            };
+        }
+
+        return new PokemonHealth
+        {
+            SideId = Side.Id,
+            Secret = secret,
+            Shared = shared,
+        };
     }
 
     public Pokemon Copy()
