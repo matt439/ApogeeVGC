@@ -1527,6 +1527,358 @@ public class BattleAsync : IBattle
         }
     }
 
+  //  /**
+	 //* Runs an event with no source on each effect on the field, in Speed order.
+	 //*
+	 //* Unlike `eachEvent`, this contains a lot of other handling and is only intended for
+	 //* the 'Residual' and 'SwitchIn' events.
+	 //*/
+  //  fieldEvent(eventid: string, targets?: Pokemon[])
+  //  {
+  //      const callbackName = `on${ eventid}`;
+  //      let getKey: undefined | 'duration';
+  //      if (eventid === 'Residual')
+  //      {
+  //          getKey = 'duration';
+  //      }
+  //      let handlers = this.findFieldEventHandlers(this.field, `onField${ eventid}`, getKey);
+  //      for (const side of this.sides) {
+  //          if (side.n < 2 || !side.allySide)
+  //          {
+  //              handlers = handlers.concat(this.findSideEventHandlers(side, `onSide${ eventid}`, getKey));
+  //          }
+  //          for (const active of side.active) {
+  //              if (!active) continue;
+  //              if (eventid === 'SwitchIn')
+  //              {
+  //                  handlers = handlers.concat(this.findPokemonEventHandlers(active, `onAny${ eventid}`));
+  //              }
+  //              if (targets && !targets.includes(active)) continue;
+  //              handlers = handlers.concat(this.findPokemonEventHandlers(active, callbackName, getKey));
+  //              handlers = handlers.concat(this.findSideEventHandlers(side, callbackName, undefined, active));
+  //              handlers = handlers.concat(this.findFieldEventHandlers(this.field, callbackName, undefined, active));
+  //              handlers = handlers.concat(this.findBattleEventHandlers(callbackName, getKey, active));
+  //          }
+  //      }
+  //      this.speedSort(handlers);
+  //      while (handlers.length)
+  //      {
+  //          const handler = handlers[0];
+  //          handlers.shift();
+  //          const effect = handler.effect;
+  //          if ((handler.effectHolder as Pokemon).fainted)
+  //          {
+  //              if (!(handler.state?.isSlotCondition)) continue;
+  //          }
+  //          if (eventid === 'Residual' && handler.end && handler.state?.duration)
+  //          {
+  //              handler.state.duration--;
+  //              if (!handler.state.duration)
+  //              {
+  //                  const endCallArgs = handler.endCallArgs || [handler.effectHolder, effect.id];
+  //                  handler.end.call(...endCallArgs as [any, ...any[]]);
+  //                  if (this.ended) return;
+  //                  continue;
+  //              }
+  //          }
+
+  //          // effect may have been removed by a prior handler, i.e. Toxic Spikes being absorbed during a double switch
+  //          if (handler.state?.target instanceof Pokemon) {
+  //              let expectedStateLocation;
+  //              if (effect.effectType === 'Ability' && !handler.state.id.startsWith('ability:'))
+  //              {
+  //                  expectedStateLocation = handler.state.target.abilityState;
+  //              }
+  //              else if (effect.effectType === 'Item' && !handler.state.id.startsWith('item:'))
+  //              {
+  //                  expectedStateLocation = handler.state.target.itemState;
+  //              }
+  //              else if (effect.effectType === 'Status')
+  //              {
+  //                  expectedStateLocation = handler.state.target.statusState;
+  //              }
+  //              else
+  //              {
+  //                  expectedStateLocation = handler.state.target.volatiles[effect.id];
+  //              }
+  //              if (expectedStateLocation !== handler.state)
+  //              {
+  //                  continue;
+  //              }
+  //          } else if (handler.state?.target instanceof Side && !handler.state.isSlotCondition) {
+  //              if ((handler.state.target.sideConditions[effect.id] !== handler.state))
+  //              {
+  //                  continue;
+  //              }
+  //          } else if (handler.state?.target instanceof Field) {
+  //              let expectedStateLocation;
+  //              if (effect.effectType === 'Weather')
+  //              {
+  //                  expectedStateLocation = handler.state.target.weatherState;
+  //              }
+  //              else if (effect.effectType === 'Terrain')
+  //              {
+  //                  expectedStateLocation = handler.state.target.terrainState;
+  //              }
+  //              else
+  //              {
+  //                  expectedStateLocation = handler.state.target.pseudoWeather[effect.id];
+  //              }
+  //              if (expectedStateLocation !== handler.state)
+  //              {
+  //                  continue;
+  //              }
+  //          }
+
+  //          let handlerEventid = eventid;
+  //          if ((handler.effectHolder as Side).sideConditions) handlerEventid = `Side${ eventid}`;
+  //          if ((handler.effectHolder as Field).pseudoWeather) handlerEventid = `Field${ eventid}`;
+  //          if (handler.callback)
+  //          {
+  //              this.singleEvent(handlerEventid, effect, handler.state, handler.effectHolder, null, null, undefined, handler.callback);
+  //          }
+
+  //          this.faintMessages();
+  //          if (this.ended) return;
+  //      }
+  //  }
+
+    /// <summary>
+    /// Runs an event with no source on each effect on the field, in Speed order.
+    /// 
+    /// Unlike EachEvent, this contains a lot of other handling and is only intended for
+    /// the 'Residual' and 'SwitchIn' events.
+    /// </summary>
+    /// <param name="eventId">The event to trigger (typically Residual or SwitchIn)</param>
+    /// <param name="targets">Optional list of Pokemon to filter handlers for</param>
+    public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
+    {
+        // Determine if we should track duration for this event
+        EffectStateKey? getKey = eventId == EventId.Residual ? EffectStateKey.Duration : null;
+
+        // Build the field and side event IDs based on the base event
+        // e.g., "Residual" becomes "FieldResidual" and "SideResidual"
+        EventId fieldEventId = GetFieldEventId(eventId);
+        EventId sideEventId = GetSideEventId(eventId);
+        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventId, Library.Events);
+
+        // Collect all handlers from field-level effects
+        var handlers = FindFieldEventHandlers(Field, fieldEventId, getKey);
+
+        // Collect handlers from sides and active Pokemon
+        foreach (Side side in Sides)
+        {
+            // Add side condition handlers (but not for ally sides in multi battles)
+            // In single battles, side.N is always < 2, so this always executes
+            if (side.N < 2)
+            {
+                handlers.AddRange(FindSideEventHandlers(side, sideEventId, getKey));
+            }
+
+            // Process each active Pokemon on this side
+            foreach (Pokemon active in side.Active)
+            {
+                // Skip null slots (inactive positions)
+                if (active == null) continue;
+
+                // For SwitchIn events, also trigger AnySwitchIn handlers
+                if (eventId == EventId.SwitchIn)
+                {
+                    handlers.AddRange(FindPokemonEventHandlers(active, anyEventId));
+                }
+
+                // If targets were specified, only process those Pokemon
+                if (targets != null && !targets.Contains(active)) continue;
+
+                // Collect handlers from this Pokemon and related effects
+                handlers.AddRange(FindPokemonEventHandlers(active, eventId, getKey));
+                handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
+                handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
+                handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
+            }
+        }
+
+        // Sort handlers by speed order
+        SpeedSort(handlers);
+
+        // Execute each handler in order
+        while (handlers.Count > 0)
+        {
+            EventListener handler = handlers[0];
+            handlers.RemoveAt(0);
+
+            IEffect effect = handler.Effect;
+
+            // Skip fainted Pokemon unless this is a slot condition
+            if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
+            {
+                if (handler.State?.IsSlotCondition != true) continue;
+            }
+
+            // Handle duration tracking for Residual events
+            if (eventId == EventId.Residual && handler is { End: not null, State.Duration: not null })
+            {
+                handler.State.Duration--;
+                if (handler.State.Duration <= 0)
+                {
+                    // Effect has expired, trigger its end callback
+                    List<object?> endCallArgsList = [.. handler.EndCallArgs ?? []];
+                    if (endCallArgsList.Count == 0)
+                    {
+                        endCallArgsList.Add(handler.EffectHolder);
+                        endCallArgsList.Add(effect.EffectStateId);
+                    }
+                    
+                    // Invoke the end callback
+                    Delegate? endDelegate = handler.End.GetDelegate();
+                    endDelegate?.DynamicInvoke([.. endCallArgsList]);
+
+                    if (Ended) return;
+                    continue;
+                }
+            }
+
+            // Verify the effect hasn't been removed by a prior handler
+            // (e.g., Toxic Spikes being absorbed during a double switch)
+            if (handler.State?.Target != null)
+            {
+                EffectState? expectedStateLocation = null;
+
+                if (handler.State.Target is PokemonEffectStateTarget pokemonTarget)
+                {
+                    Pokemon pokemon = pokemonTarget.Pokemon;
+                    
+                    // Determine where this effect's state should be stored
+                    // Check if this is an ability state (not starting with "ability:" prefix means it's the main ability)
+                    if (effect is { EffectType: EffectType.Ability, EffectStateId: not AbilityEffectStateId })
+                    {
+                        expectedStateLocation = pokemon.AbilityState;
+                    }
+                    // Check if this is an item state (not starting with "item:" prefix means it's the main item)
+                    else if (effect is { EffectType: EffectType.Item, EffectStateId: not ItemEffectStateId })
+                    {
+                        expectedStateLocation = pokemon.ItemState;
+                    }
+                    else if (effect.EffectType == EffectType.Status)
+                    {
+                        expectedStateLocation = pokemon.StatusState;
+                    }
+                    else if (effect.EffectStateId is ConditionEffectStateId conditionId)
+                    {
+                        pokemon.Volatiles.TryGetValue(conditionId.ConditionId, out expectedStateLocation);
+                    }
+
+                    // If the state doesn't match, the effect was removed
+                    if (expectedStateLocation != handler.State)
+                    {
+                        continue;
+                    }
+                }
+                else if (handler.State.Target is SideEffectStateTarget sideTarget && 
+                         handler.State.IsSlotCondition != true)
+                {
+                    Side targetSide = sideTarget.Side;
+                    
+                    // Check if side condition still exists
+                    if (effect.EffectStateId is ConditionEffectStateId conditionId)
+                    {
+                        if (!targetSide.SideConditions.TryGetValue(conditionId.ConditionId, 
+                            out EffectState? sideConditionState) || 
+                            sideConditionState != handler.State)
+                        {
+                            continue;
+                        }
+                    }
+                }
+                else if (handler.State.Target is FieldEffectStateTarget fieldTarget)
+                {
+                    Field targetField = fieldTarget.Field;
+                    
+                    // Determine where this field effect's state should be stored
+                    if (effect.EffectType == EffectType.Weather)
+                    {
+                        expectedStateLocation = targetField.WeatherState;
+                    }
+                    else if (effect.EffectType == EffectType.Terrain)
+                    {
+                        expectedStateLocation = targetField.TerrainState;
+                    }
+                    else if (effect.EffectStateId is ConditionEffectStateId conditionId)
+                    {
+                        targetField.PseudoWeather.TryGetValue(conditionId.ConditionId, 
+                            out expectedStateLocation);
+                    }
+
+                    // If the state doesn't match, the effect was removed
+                    if (expectedStateLocation != handler.State)
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            // Determine the appropriate event ID based on the effect holder type
+            EventId handlerEventId = eventId;
+            if (handler.EffectHolder is SideEffectHolder)
+            {
+                handlerEventId = GetSideEventId(eventId);
+            }
+            else if (handler.EffectHolder is FieldEffectHolder)
+            {
+                handlerEventId = GetFieldEventId(eventId);
+            }
+
+            // Execute the handler's callback
+            if (handler.Callback != null)
+            {
+                SingleEventTarget? singleEventTarget = handler.EffectHolder switch
+                {
+                    PokemonEffectHolder pokemonEh => new PokemonSingleEventTarget(pokemonEh.Pokemon),
+                    SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
+                    FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
+                    BattleEffectHolder battleEh => SingleEventTarget.FromIBattle(battleEh.Battle),
+                    _ => null,
+                };
+
+                SingleEvent(handlerEventId, effect, handler.State, singleEventTarget, 
+                    null, null, null, handler.Callback);
+            }
+
+            // Process any faint messages and check if battle has ended
+            // TODO: Implement FaintMessages method
+            // FaintMessages();
+            if (Ended) return;
+        }
+    }
+
+    /// <summary>
+    /// Converts a base event ID to its Field-prefixed variant.
+    /// For example, Residual becomes FieldResidual.
+    /// </summary>
+    private EventId GetFieldEventId(EventId baseEvent)
+    {
+        string eventName = $"Field{baseEvent}";
+        if (Enum.TryParse(eventName, out EventId fieldEvent))
+        {
+            return fieldEvent;
+        }
+        return baseEvent;
+    }
+
+    /// <summary>
+    /// Converts a base event ID to its Side-prefixed variant.
+    /// For example, Residual becomes SideResidual.
+    /// </summary>
+    private EventId GetSideEventId(EventId baseEvent)
+    {
+        string eventName = $"Side{baseEvent}";
+        if (Enum.TryParse(eventName, out EventId sideEvent))
+        {
+            return sideEvent;
+        }
+        return baseEvent;
+    }
+
     /// <summary>
     /// Modifies a Pokémon's stat stages (boosts) during battle.
     /// 
