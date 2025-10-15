@@ -182,4 +182,39 @@ public class Side
     {
         throw new NotImplementedException();
     }
+
+    /// <summary>
+    /// The number of pokemon you must choose in Team Preview.
+    /// 
+    /// Note that PS doesn't support choosing fewer than this number of pokemon.
+    /// In the games, it is sometimes possible to bring fewer than this, but
+    /// since that's nearly always a mistake, we haven't gotten around to
+    /// supporting it.
+    /// </summary>
+    public int PickedTeamSize()
+    {
+        int pokemonLength = Pokemon.Count;
+        int ruleTableSize = Battle.RuleTable.PickedTeamSize ?? int.MaxValue;
+        return Math.Min(pokemonLength, ruleTableSize);
+    }
+
+    //isChoiceDone()
+    //{
+    //    if (!this.requestState) return true;
+    //    if (this.choice.forcedSwitchesLeft) return false;
+
+    //    if (this.requestState === 'teampreview')
+    //    {
+    //        return this.choice.actions.length >= this.pickedTeamSize();
+    //    }
+
+    //    // current request is move/switch
+    //    this.getChoiceIndex(); // auto-pass
+    //    return this.choice.actions.length >= this.active.length;
+    //}
+
+    public bool IsChoiceDone()
+    {
+
+    }
 }

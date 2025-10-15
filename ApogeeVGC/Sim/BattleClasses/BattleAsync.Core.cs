@@ -14,7 +14,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Drawing;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -582,70 +581,6 @@ public partial class BattleAsync : IBattle
         }
     }
 
-    //getRequests(type: RequestState)
-    //{
-    //    // default to no request
-    //    const requests: ChoiceRequest[] = Array(this.sides.length).fill(null);
-
-    //    switch (type)
-    //    {
-    //        case 'switch':
-    //            for (let i = 0; i < this.sides.length; i++)
-    //            {
-    //                const side = this.sides[i];
-    //                if (!side.pokemonLeft) continue;
-    //                const switchTable = side.active.map(pokemon => !!pokemon?.switchFlag);
-    //                if (switchTable.some(Boolean))
-    //                {
-    //                    requests[i] = { forceSwitch: switchTable, side: side.getRequestData() }
-    //                    ;
-    //                }
-    //            }
-    //            break;
-
-    //        case 'teampreview':
-    //            for (let i = 0; i < this.sides.length; i++)
-    //            {
-    //                const side = this.sides[i];
-    //                const maxChosenTeamSize = this.ruleTable.pickedTeamSize || undefined;
-    //                requests[i] = { teamPreview: true, maxChosenTeamSize, side: side.getRequestData() }
-    //                ;
-    //            }
-    //            break;
-
-    //        default:
-    //            for (let i = 0; i < this.sides.length; i++)
-    //            {
-    //                const side = this.sides[i];
-    //                if (!side.pokemonLeft) continue;
-    //                const activeData = side.active.map(pokemon => pokemon?.getMoveRequestData());
-    //                requests[i] = { active: activeData, side: side.getRequestData() }
-    //                ;
-    //                if (side.allySide)
-    //                {
-    //                    (requests[i] as MoveRequest).ally = side.allySide.getRequestData(true);
-    //                }
-    //            }
-    //            break;
-    //    }
-
-    //    const multipleRequestsExist = requests.filter(Boolean).length >= 2;
-    //    for (let i = 0; i < this.sides.length; i++)
-    //    {
-    //        if (requests[i])
-    //        {
-    //            if (!this.supportCancel || !multipleRequestsExist) requests[i].noCancel = true;
-    //        }
-    //        else
-    //        {
-    //            requests[i] = { wait: true, side: this.sides[i].getRequestData() }
-    //            ;
-    //        }
-    //    }
-
-    //    return requests;
-    //}
-
     public List<IChoiceRequest> GetRequests(RequestState type)
     {
         // Default to no request (null for each side)
@@ -702,9 +637,8 @@ public partial class BattleAsync : IBattle
 
                     // Get move request data for each active Pokemon
                     var activeData = side.Active
-                        .Select(pokemon => pokemon?.GetMoveRequestData())
-                        .Where(data => data != null)
-                        .Cast<PokemonMoveRequestData>()
+                        .Select(pokemon => pokemon.GetMoveRequestData())
+                        .Where(_ => true)
                         .ToList();
 
                     var moveRequest = new MoveRequest
@@ -750,7 +684,6 @@ public partial class BattleAsync : IBattle
 
         return requests.Where(r => r != null).Cast<IChoiceRequest>().ToList();
     }
-
 
     // TODO: Tiebreak()
     // TODO: ForceWin()
