@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -1938,6 +1939,25 @@ public class Pokemon : IPriorityComparison
         
         // Return the last delta (change amount of the last stat modified)
         return delta;
+    }
+
+    public Pokemon GetAtLoc(int targetLoc)
+    {
+        // Determine which side based on targetLoc sign
+        Side side = Battle.Sides[targetLoc < 0 ? Side.N % 2 : (Side.N + 1) % 2];
+
+        // Use absolute value for position calculation
+        targetLoc = Math.Abs(targetLoc);
+
+        // Handle wrap-around for multi-battle formats (e.g., if position exceeds active Pokemon count)
+        if (targetLoc > side.Active.Count)
+        {
+            targetLoc -= side.Active.Count;
+            side = Battle.Sides[side.N + 2];
+        }
+
+        // Return the Pokemon at the calculated position (adjust for 0-based indexing)
+        return side.Active[targetLoc - 1];
     }
 
     public Pokemon Copy()

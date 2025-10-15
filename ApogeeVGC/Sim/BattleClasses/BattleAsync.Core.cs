@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -898,11 +899,26 @@ public partial class BattleAsync : IBattle
     // TODO: ValidTargetLoc()
     // TODO: ValidTarget()
     // TODO: GetTarget()
-    // TODO: GetRandomTarget()
+
+    public Pokemon? GetRandomTarget(Pokemon pokemon, MoveId move)
+    {
+        return GetRandomTarget(pokemon, Library.Moves[move]);
+    }
+
+    public Pokemon? GetRandomTarget(Pokemon pokemon, Move move)
+    {
+        throw new NotImplementedException();
+    }
+
     // TODO: CheckFainted()
     // TODO: FaintMessages()
     // TODO: CheckWin()
-    // TODO: GetActionSpeed()
+
+    public void GetActionSpeed(IAction action)
+    {
+        throw new NotImplementedException();
+    }
+
     // TODO: RunAction()
     // TODO: TurnLoop()
     // TODO: Choose()

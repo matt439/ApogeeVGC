@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -56,6 +57,11 @@ public interface IBattle
         BattleDamageEffect? effect = null, bool instafaint = false);
 
     IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null, BattleHealEffect? effect = null);
+
+    Pokemon? GetRandomTarget(Pokemon pokemon, MoveId move);
+    Pokemon? GetRandomTarget(Pokemon pokemon, Move move);
+
+    void GetActionSpeed(IAction action);
 
     StatsTable SpreadModify(StatsTable baseStats, PokemonSet set);
 
