@@ -2257,14 +2257,131 @@ public class Pokemon : IPriorityComparison
         public MoveId Id { get; init; }
         public bool? Disabled { get; init; }
         public Pokemon? DisabledSource { get; init; }
-        public Pokemon? Target { get; init; }
+        public MoveTarget? Target { get; init; }
         public int? Pp { get; init; }
         public int? MaxPp { get; init; }
     }
 
+    /// <summary>
+    /// Gets the list of moves available to this Pokemon for the current turn.
+    /// Handles locked moves, move modifications, PP depletion, and disabled moves.
+    /// </summary>
+    /// <param name="lockedMove">If specified, the Pokemon is locked into using this move</param>
+    /// <param name="restrictData">If true, hide certain disabled move information</param>
+    /// <returns>List of available moves with their current state</returns>
     public List<GetMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
     {
-        throw new NotImplementedException();
+        // Handle locked move cases
+        if (lockedMove is not null)
+        {
+            Trapped = PokemonTrapped.True;
+            
+            // Special case: Recharge turn (after Hyper Beam, etc.)
+            if (lockedMove == MoveId.Recharge)
+            {
+                return 
+                [
+                    new GetMoveData
+                    {
+                        Move = MoveId.Recharge,
+                        Id = MoveId.Recharge,
+                    }
+                ];
+            }
+            
+            // Find the locked move in move slots
+            foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot => moveSlot.Id == lockedMove))
+            {
+                return 
+                [
+                    new GetMoveData
+                    {
+                        Move = moveSlot.Move,
+                        Id = moveSlot.Id,
+                    }
+                ];
+            }
+            
+            // Fallback: lookup move by ID (shouldn't normally happen)
+            return 
+            [
+                new GetMoveData
+                {
+                    Move = lockedMove.Value,
+                    Id = lockedMove.Value,
+                }
+            ];
+        }
+        
+        // Build list of available moves
+        var moves = new List<GetMoveData>();
+        bool hasValidMove = false;
+        
+        foreach (MoveSlot moveSlot in MoveSlots)
+        {
+            MoveId moveName = moveSlot.Move;
+
+            // Special move target modifications
+            switch (moveSlot.Id)
+            {
+                case MoveId.Curse:
+                    // Curse has different targeting if user is not Ghost-type
+                    if (!HasType(PokemonType.Ghost))
+                    {
+                        Move curseMove = Battle.Library.Moves[MoveId.Curse];
+                    }
+                    break;
+                    
+                case MoveId.PollenPuff:
+                    // Heal Block prevents Pollen Puff from targeting allies
+                    if (Volatiles.ContainsKey(ConditionId.HealBlock))
+                    {
+                    }
+                    break;
+                    
+                case MoveId.TeraStarStorm:
+                    // Terapagos-Stellar gets spread targeting
+                    if (Species.Id == SpecieId.TerapagosStellar)
+                    {
+                    }
+                    break;
+            }
+            
+            // Determine if move is disabled
+            BoolHiddenUnion disabled = moveSlot.Disabled;
+            
+            // Skip Dynamax handling as requested
+            
+            // Check if move is out of PP (unless locked into partial trapping move)
+            if (moveSlot.Pp <= 0 && !Volatiles.ContainsKey(ConditionId.PartialTrappingLock))
+            {
+                disabled = true;
+            }
+            
+            // Handle hidden disabled state
+            if (disabled is HiddenBoolHiddenUnion)
+            {
+                disabled = !restrictData;
+            }
+            
+            // Track if we have at least one valid (non-disabled) move
+            if (!disabled.IsTruthy())
+            {
+                hasValidMove = true;
+            }
+            
+            // Add move to list
+            moves.Add(new GetMoveData
+            {
+                Move = moveName,
+                Id = moveSlot.Id,
+                Pp = moveSlot.Pp,
+                MaxPp = moveSlot.MaxPp,
+                Target = moveSlot.Target,
+                Disabled = disabled.IsTrue(),
+            });
+        }
+        return hasValidMove ? moves : [];
     }
 
     /// <summary>

@@ -38,6 +38,9 @@ public enum MoveId
     Recharge,
     Frustration,
     Return,
+    Curse,
+    PollenPuff,
+    TeraStarStorm,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

@@ -26,6 +26,7 @@ public enum SpecieId
     GreninjaBond,
     RockruffDusk,
     TerapagosTerastal,
+    TerapagosStellar,
 }
 
 public enum FormeId

@@ -23,6 +23,7 @@ public enum ConditionId
 
     Nightmare,
     LockedMove,
+    PartialTrappingLock,
     Yawn,
     GastroAcid,
     Commanding,
@@ -43,6 +44,7 @@ public enum ConditionId
     PhantomForce,
     ShadowForce,
     RevivalBlessing,
+    HealBlock,
 
     None,
 }
