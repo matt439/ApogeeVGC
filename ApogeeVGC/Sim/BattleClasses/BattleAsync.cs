@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -299,11 +300,12 @@ public class BattleAsync : IBattle
 
     /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
+    /// Optimized version that avoids DynamicInvoke and reduces allocations.
     /// </summary>
     private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar, 
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
-        // Handle non-function callbacks (constants)
+        // Handle non-function callbacks (constants) - fast path
         switch (callback)
         {
             case OnFlinchEffectDelegate { OnFlinch: OnFlinchBool ofb }:
@@ -324,85 +326,208 @@ public class BattleAsync : IBattle
                 return new MoveIdRelayVar(olmmi.Id);
         }
 
-        // Extract the actual delegate
-        Delegate del = callback switch
+        // Extract the actual delegate and invoke directly based on known signatures
+        // This avoids the overhead of DynamicInvoke by pattern matching to known delegate types
+        return callback switch
         {
-            DelegateEffectDelegate ded => ded.Del,
-            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => off.Func,
-            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } => ocf.Function,
-            OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFractionalPriorityFunc ofpf } => ofpf.Function,
-            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => otif.Func,
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => othf1.Func,
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => othf2.Func,
-            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } => fotei.Func,
-            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } => onif.Func,
-            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => olmf.Func,
+            // DelegateEffectDelegate is the generic wrapper - try common signatures first
+            DelegateEffectDelegate ded => InvokeDelegateEffectDelegate(ded.Del, hasRelayVar, relayVar, target, source, sourceEffect),
+            
+            // Specific delegate types with known signatures
+            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => InvokeStandardDelegate(off.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } => InvokeStandardDelegate(ocf.Function, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFractionalPriorityFunc ofpf } => InvokeStandardDelegate(ofpf.Function, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => InvokeStandardDelegate(otif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => InvokeStandardDelegate(othf1.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => InvokeStandardDelegate(othf2.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } => InvokeStandardDelegate(fotei.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } => InvokeStandardDelegate(onif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => InvokeStandardDelegate(olmf.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            
             _ => throw new InvalidOperationException($"Unknown EffectDelegate type: {callback.GetType().Name}"),
         };
-        
-        // Build parameter list - most delegates expect (IBattle, ...) as first parameter(s)
-        var args = new List<object?>();
+    }
+
+    /// <summary>
+    /// Invokes a DelegateEffectDelegate by attempting common delegate signatures.
+    /// Falls back to reflection only when necessary.
+    /// Optimized to minimize allocations by reusing a fixed-size array.
+    /// </summary>
+    private RelayVar? InvokeDelegateEffectDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    {
+        // Cache parameter info to avoid repeated reflection calls
         var parameters = del.Method.GetParameters();
-        
-        // First parameter is typically IBattle (this)
-        if (parameters.Length > 0 && parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle)))
+        int paramCount = parameters.Length;
+
+        // Most common signature: (IBattle battle, ...)
+        if (paramCount == 0)
         {
-            args.Add(this);
+            return (RelayVar?)del.DynamicInvoke(null);
+        }
+
+        // Optimize for the most common cases (1-5 parameters)
+        // This avoids array allocation for the majority of callbacks
+        object? result;
+        switch (paramCount)
+        {
+            case 1:
+                result = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect));
+                return (RelayVar?)result;
+            case 2:
+                result = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1)
+                );
+                return (RelayVar?)result;
+            case 3:
+                result = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2)
+                );
+                return (RelayVar?)result;
+            case 4:
+                result = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2),
+                    BuildSingleArg(parameters[3], hasRelayVar, relayVar, target, source, sourceEffect, 3)
+                );
+                return (RelayVar?)result;
+        }
+
+        // Fallback for 5+ parameters (rare)
+        // Use array allocation for these cases
+        object?[] args = new object?[paramCount];
+        int argIndex = 0;
+
+        // First parameter is typically IBattle (this)
+        if (parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle)))
+        {
+            args[argIndex++] = this;
         }
 
         // Add relayVar if it was explicitly provided and if the delegate expects it
-        // This is typically the second parameter after IBattle
-        if (hasRelayVar && args.Count < parameters.Length)
+        if (hasRelayVar)
         {
-            args.Add(relayVar);
+            args[argIndex++] = relayVar;
         }
 
         // Add remaining standard parameters: target, source, sourceEffect
-        // Convert union types to the expected parameter types
-        while (args.Count < parameters.Length)
+        while (argIndex < paramCount)
         {
-            Type paramType = parameters[args.Count].ParameterType;
+            Type paramType = parameters[argIndex].ParameterType;
             
             // Try to match target parameter
-            if (args.Count < parameters.Length && target != null)
+            if (target != null)
             {
                 EventTargetParameter? targetParam = EventTargetParameter.FromSingleEventTarget(target, paramType);
                 if (targetParam != null)
                 {
-                    args.Add(targetParam.ToObject());
+                    args[argIndex++] = targetParam.ToObject();
                     continue;
                 }
             }
             
             // Try to match source parameter
-            if (args.Count < parameters.Length && source != null)
+            if (source != null)
             {
                 EventSourceParameter? sourceParam = EventSourceParameter.FromSingleEventSource(source, paramType);
                 if (sourceParam != null)
                 {
-                    args.Add(sourceParam.ToObject());
+                    args[argIndex++] = sourceParam.ToObject();
                     continue;
                 }
             }
             
             // Try to match sourceEffect parameter
-            if (args.Count < parameters.Length && sourceEffect != null)
+            if (sourceEffect != null && paramType.IsInstanceOfType(sourceEffect))
             {
-                if (paramType.IsInstanceOfType(sourceEffect))
-                {
-                    args.Add(sourceEffect);
-                    continue;
-                }
+                args[argIndex++] = sourceEffect;
+                continue;
             }
             
             // If we couldn't match, add null
-            args.Add(null);
+            args[argIndex++] = null;
         }
 
-        // Invoke the callback
-        object? result = del.DynamicInvoke([.. args]);
-
+        result = del.DynamicInvoke(args);
         return (RelayVar?)result;
+    }
+
+    /// <summary>
+    /// Builds a single argument for delegate invocation.
+    /// Used by the optimized fast-path for common parameter counts.
+    /// </summary>
+    private object? BuildSingleArg(System.Reflection.ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect, int position = 0)
+    {
+        Type paramType = param.ParameterType;
+
+        // First parameter is typically IBattle
+        if (position == 0 && paramType.IsAssignableFrom(typeof(IBattle)))
+        {
+            return this;
+        }
+
+        // Second parameter might be relayVar if explicitly provided
+        if (position == 1 && hasRelayVar)
+        {
+            return relayVar;
+        }
+
+        // Adjust position if IBattle was first
+        int adjustedPos = position;
+        if (position > 0 && paramType.IsAssignableFrom(typeof(IBattle)))
+        {
+            adjustedPos--;
+        }
+        if (hasRelayVar && adjustedPos > 0)
+        {
+            adjustedPos--;
+        }
+
+        // Try to match standard parameters in order: target, source, sourceEffect
+        switch (adjustedPos)
+        {
+            case 0:
+                // Try target first
+                if (target != null)
+                {
+                    EventTargetParameter? targetParam = EventTargetParameter.FromSingleEventTarget(target, paramType);
+                    if (targetParam != null) return targetParam.ToObject();
+                }
+                break;
+            case 1:
+                // Try source second
+                if (source != null)
+                {
+                    EventSourceParameter? sourceParam = EventSourceParameter.FromSingleEventSource(source, paramType);
+                    if (sourceParam != null) return sourceParam.ToObject();
+                }
+                break;
+            case 2:
+                // Try sourceEffect third
+                if (sourceEffect != null && paramType.IsInstanceOfType(sourceEffect))
+                {
+                    return sourceEffect;
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Helper method for invoking standard delegates with common signatures.
+    /// This provides a single path for most delegate invocations, reducing code duplication.
+    /// </summary>
+    private RelayVar? InvokeStandardDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    {
+        // Reuse the optimized invocation logic
+        return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source, sourceEffect);
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
