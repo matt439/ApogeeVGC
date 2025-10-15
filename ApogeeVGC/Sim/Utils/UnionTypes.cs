@@ -720,11 +720,20 @@ public record ZeroBoolZeroUnion : BoolZeroUnion;
 /// </summary>
 public abstract record MoveIdBoolUnion
 {
+    public abstract bool IsTrue();
     public static implicit operator MoveIdBoolUnion(MoveId moveId) => new MoveIdMoveIdBoolUnion(moveId);
     public static implicit operator MoveIdBoolUnion(bool value) => new BoolMoveIdBoolUnion(value);
 }
-public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion;
-public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion;
+
+public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion
+{
+    public override bool IsTrue() => true;
+}
+
+public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion
+{
+    public override bool IsTrue() => Value;
+}
 
 
 /// <summary>

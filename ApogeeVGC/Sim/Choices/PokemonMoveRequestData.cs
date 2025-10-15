@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
@@ -10,7 +11,7 @@ public record PokemonMoveData
     public MoveId Id => Move.Id;
     public Pokemon? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; init; }
-    public Pokemon? DisabledSource { get; init; }
+    public IEffect? DisabledSource { get; init; }
 }
 
 public record PokemonMoveRequestData
@@ -20,5 +21,5 @@ public record PokemonMoveRequestData
     public bool? MaybeLocked { get; init; }
     public bool? Trapped { get; init; }
     public bool? MaybeTrapped { get; init; }
-    public bool? CanTerastallize { get; init; }
+    public MoveTypeFalseUnion? CanTerastallize { get; init; }
 }

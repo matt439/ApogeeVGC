@@ -582,7 +582,176 @@ public partial class BattleAsync : IBattle
         }
     }
 
-    // TODO: GetRequests()
+    //getRequests(type: RequestState)
+    //{
+    //    // default to no request
+    //    const requests: ChoiceRequest[] = Array(this.sides.length).fill(null);
+
+    //    switch (type)
+    //    {
+    //        case 'switch':
+    //            for (let i = 0; i < this.sides.length; i++)
+    //            {
+    //                const side = this.sides[i];
+    //                if (!side.pokemonLeft) continue;
+    //                const switchTable = side.active.map(pokemon => !!pokemon?.switchFlag);
+    //                if (switchTable.some(Boolean))
+    //                {
+    //                    requests[i] = { forceSwitch: switchTable, side: side.getRequestData() }
+    //                    ;
+    //                }
+    //            }
+    //            break;
+
+    //        case 'teampreview':
+    //            for (let i = 0; i < this.sides.length; i++)
+    //            {
+    //                const side = this.sides[i];
+    //                const maxChosenTeamSize = this.ruleTable.pickedTeamSize || undefined;
+    //                requests[i] = { teamPreview: true, maxChosenTeamSize, side: side.getRequestData() }
+    //                ;
+    //            }
+    //            break;
+
+    //        default:
+    //            for (let i = 0; i < this.sides.length; i++)
+    //            {
+    //                const side = this.sides[i];
+    //                if (!side.pokemonLeft) continue;
+    //                const activeData = side.active.map(pokemon => pokemon?.getMoveRequestData());
+    //                requests[i] = { active: activeData, side: side.getRequestData() }
+    //                ;
+    //                if (side.allySide)
+    //                {
+    //                    (requests[i] as MoveRequest).ally = side.allySide.getRequestData(true);
+    //                }
+    //            }
+    //            break;
+    //    }
+
+    //    const multipleRequestsExist = requests.filter(Boolean).length >= 2;
+    //    for (let i = 0; i < this.sides.length; i++)
+    //    {
+    //        if (requests[i])
+    //        {
+    //            if (!this.supportCancel || !multipleRequestsExist) requests[i].noCancel = true;
+    //        }
+    //        else
+    //        {
+    //            requests[i] = { wait: true, side: this.sides[i].getRequestData() }
+    //            ;
+    //        }
+    //    }
+
+    //    return requests;
+    //}
+
+    public List<IChoiceRequest> GetRequests(RequestState type)
+    {
+        // Default to no request (null for each side)
+        var requests = new IChoiceRequest?[Sides.Count];
+
+        switch (type)
+        {
+            case RequestState.SwitchIn:
+                for (int i = 0; i < Sides.Count; i++)
+                {
+                    Side side = Sides[i];
+                    if (side.PokemonLeft <= 0) continue;
+
+                    // Create a table of which active Pokemon need to switch
+                    // Convert MoveIdBoolUnion to bool using IsTrue() method
+                    var switchTable = side.Active
+                        .Select(pokemon => pokemon.SwitchFlag.IsTrue())
+                        .ToList();
+
+                    // Only create a switch request if at least one Pokemon needs to switch
+                    if (switchTable.Any(flag => flag))
+                    {
+                        requests[i] = new SwitchRequest
+                        {
+                            ForceSwitch = switchTable,
+                            Side = side.GetRequestData(),
+                        };
+                    }
+                }
+                break;
+
+            case RequestState.TeamPreview:
+                for (int i = 0; i < Sides.Count; i++)
+                {
+                    Side side = Sides[i];
+                    int? maxChosenTeamSize = RuleTable.PickedTeamSize > 0
+                        ? RuleTable.PickedTeamSize
+                        : null;
+
+                    requests[i] = new TeamPreviewRequest
+                    {
+                        MaxChosenTeamSize = maxChosenTeamSize,
+                        Side = side.GetRequestData(),
+                    };
+                }
+                break;
+
+            default:
+                // Regular move requests
+                for (int i = 0; i < Sides.Count; i++)
+                {
+                    Side side = Sides[i];
+                    if (side.PokemonLeft <= 0) continue;
+
+                    // Get move request data for each active Pokemon
+                    var activeData = side.Active
+                        .Select(pokemon => pokemon?.GetMoveRequestData())
+                        .Where(data => data != null)
+                        .Cast<PokemonMoveRequestData>()
+                        .ToList();
+
+                    var moveRequest = new MoveRequest
+                    {
+                        Active = activeData,
+                        Side = side.GetRequestData()
+                    };
+
+                    requests[i] = moveRequest;
+                }
+                break;
+        }
+
+        // Check if multiple requests exist (multiple players need to make choices)
+        bool multipleRequestsExist = requests.Count(r => r != null) >= 2;
+
+        // Finalize all requests
+        for (int i = 0; i < Sides.Count; i++)
+        {
+            if (requests[i] != null)
+            {
+                // Set noCancel if cancellation is not supported or only one player is choosing
+                if (!SupportCancel || !multipleRequestsExist)
+                {
+                    requests[i] = requests[i] switch
+                    {
+                        SwitchRequest sr => sr with { NoCancel = true },
+                        TeamPreviewRequest tpr => tpr with { NoCancel = true },
+                        MoveRequest mr => mr with { NoCancel = true },
+                        _ => requests[i],
+                    };
+                }
+            }
+            else
+            {
+                // Create a wait request for sides that don't need to make a choice
+                requests[i] = new WaitRequest
+                {
+                    Side = Sides[i].GetRequestData(),
+                };
+            }
+        }
+
+        return requests.Where(r => r != null).Cast<IChoiceRequest>().ToList();
+    }
+
+
     // TODO: Tiebreak()
     // TODO: ForceWin()
     // TODO: Tie()

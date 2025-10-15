@@ -2074,192 +2074,123 @@ public class Pokemon : IPriorityComparison
         return true;
     }
 
-    //getMoveRequestData()
-    //{
-    //    let lockedMove = this.maybeLocked ? null : this.getLockedMove();
-
-    //    // Information should be restricted for the last active Pokémon
-    //    const isLastActive = this.isLastActive();
-    //    const canSwitchIn = this.battle.canSwitch(this.side) > 0;
-    //    let moves = this.getMoves(lockedMove, isLastActive);
-
-    //    if (!moves.length)
-    //    {
-    //        moves = [{ move: 'Struggle', id: 'struggle' as ID, target: 'randomNormal', disabled: false }];
-    //        lockedMove = 'struggle' as ID;
-    //    }
-
-    //    const data: PokemonMoveRequestData = {
-    //        moves,
-    //    }
-    //    ;
-
-    //    if (isLastActive)
-    //    {
-    //        this.maybeDisabled = this.maybeDisabled && !lockedMove;
-    //        this.maybeLocked = this.maybeLocked || this.maybeDisabled;
-    //        if (this.maybeDisabled)
-    //        {
-    //            data.maybeDisabled = this.maybeDisabled;
-    //        }
-    //        if (this.maybeLocked)
-    //        {
-    //            data.maybeLocked = this.maybeLocked;
-    //        }
-    //        if (canSwitchIn)
-    //        {
-    //            if (this.trapped === true)
-    //            {
-    //                data.trapped = true;
-    //            }
-    //            else if (this.maybeTrapped)
-    //            {
-    //                data.maybeTrapped = true;
-    //            }
-    //        }
-    //    }
-    //    else
-    //    {
-    //        this.maybeDisabled = false;
-    //        this.maybeLocked = false;
-    //        if (canSwitchIn)
-    //        {
-    //            // Discovered by selecting a valid Pokémon as a switch target and cancelling.
-    //            if (this.trapped) data.trapped = true;
-    //        }
-    //        this.maybeTrapped = false;
-    //    }
-
-    //    if (!lockedMove)
-    //    {
-    //        if (this.canMegaEvo) data.canMegaEvo = true;
-    //        if (this.canMegaEvoX) data.canMegaEvoX = true;
-    //        if (this.canMegaEvoY) data.canMegaEvoY = true;
-    //        if (this.canUltraBurst) data.canUltraBurst = true;
-    //        const canZMove = this.battle.actions.canZMove(this);
-    //        if (canZMove) data.canZMove = canZMove;
-
-    //        if (this.getDynamaxRequest()) data.canDynamax = true;
-    //        if (data.canDynamax || this.volatiles['dynamax']) data.maxMoves = this.getDynamaxRequest(true);
-    //        if (this.canTerastallize) data.canTerastallize = this.canTerastallize;
-    //    }
-
-    //    return data;
-    //}
-
-    public PokemonMoveRequestData GetMoveRequestData()
+    /// <summary>
+    /// This refers to multi-turn moves like SolarBeam and Outrage and
+    /// Sky Drop, which remove all choice (no dynamax, switching, etc).
+    /// Don't use it for "soft locks" like Choice Band.
+    /// </summary>
+    public MoveId? GetLockedMove()
     {
-        throw new NotImplementedException();
+        RelayVar? lockedMove = Battle.RunEvent(EventId.LockMove, this);
+
+        // If event returns true, there's no locked move
+        if (lockedMove is BoolRelayVar { Value: true })
+        {
+            return null;
+        }
+
+        // Otherwise, try to extract MoveId from the RelayVar
+        if (lockedMove is MoveIdRelayVar moveIdRelayVar)
+        {
+            return moveIdRelayVar.MoveId;
+        }
+
+        // If RelayVar is null or another type, no locked move
+        return null;
     }
 
-    //    getMoves(lockedMove?: ID | null, restrictData?: boolean) : {
-    //    move: string, id: ID, disabled ?: string | boolean, disabledSource ?: string,
-    //		target ?: string, pp ?: number, maxpp ?: number,
-    //	}
-    //    [] {
-    //		if (lockedMove) {
-    //			lockedMove = toID(lockedMove);
-    //			this.trapped = true;
-    //			if (lockedMove === 'recharge') {
-    //				return [{
-
-    //                    move: 'Recharge',
-    //                    id: 'recharge' as ID,
-
-    //                }];
-    //			}
-    //			for (const moveSlot of this.moveSlots) {
-    //    if (moveSlot.id !== lockedMove) continue;
-    //    return [{
-    //    move: moveSlot.move,
-    //					id: moveSlot.id,
-    //				}];
-    //}
-    //// does this happen?
-    //return [{
-    //move: this.battle.dex.moves.get(lockedMove).name,
-    //				id: lockedMove,
-    //			}];
-    //		}
-    //		const moves = [];
-    //let hasValidMove = false;
-    //for (const moveSlot of this.moveSlots) {
-    //    let moveName = moveSlot.move;
-    //    if (moveSlot.id === 'hiddenpower')
-    //    {
-    //        moveName = `Hidden Power ${ this.hpType}`;
-    //        if (this.battle.gen < 6) moveName += ` ${ this.hpPower}`;
-    //    }
-    //    else if (moveSlot.id === 'return' || moveSlot.id === 'frustration')
-    //    {
-    //        const basePowerCallback = this.battle.dex.moves.get(moveSlot.id).basePowerCallback as (pokemon: Pokemon) => number;
-    //        moveName += ` ${ basePowerCallback(this)}`;
-    //    }
-    //    let target = moveSlot.target;
-    //    switch (moveSlot.id)
-    //    {
-    //        case 'curse':
-    //            if (!this.hasType('Ghost'))
-    //            {
-    //                target = this.battle.dex.moves.get('curse').nonGhostTarget;
-    //            }
-    //            break;
-    //        case 'pollenpuff':
-    //            // Heal Block only prevents Pollen Puff from targeting an ally when the user has Heal Block
-    //            if (this.volatiles['healblock'])
-    //            {
-    //                target = 'adjacentFoe';
-    //            }
-    //            break;
-    //        case 'terastarstorm':
-    //            if (this.species.name === 'Terapagos-Stellar')
-    //            {
-    //                target = 'allAdjacentFoes';
-    //            }
-    //            break;
-    //    }
-    //    let disabled = moveSlot.disabled;
-    //    if (this.volatiles['dynamax'])
-    //    {
-    //        // if each of a Pokemon's base moves are disabled by one of these effects, it will Struggle
-    //        const canCauseStruggle = ['Encore', 'Disable', 'Taunt', 'Assault Vest', 'Belch', 'Stuff Cheeks'];
-    //        disabled = this.maxMoveDisabled(moveSlot.id) || disabled && canCauseStruggle.includes(moveSlot.disabledSource!);
-    //    }
-    //    else if (moveSlot.pp <= 0 && !this.volatiles['partialtrappinglock'])
-    //    {
-    //        disabled = true;
-    //    }
-
-    //    if (disabled === 'hidden')
-    //    {
-    //        disabled = !restrictData;
-    //    }
-    //    if (!disabled)
-    //    {
-    //        hasValidMove = true;
-    //    }
-
-    //    moves.push({
-    //    move: moveName,
-    //				id: moveSlot.id,
-    //				pp: moveSlot.pp,
-    //				maxpp: moveSlot.maxpp,
-    //				target,
-    //				disabled,
-    //			});
-    //}
-    //return hasValidMove ? moves : [];
-    //	}
-
-    public record GetMoveData
+    /// <summary>
+    /// Generates move request data for this Pokemon, containing information about
+    /// available moves, restrictions, and special mechanics for the current turn.
+    /// </summary>
+    public PokemonMoveRequestData GetMoveRequestData()
     {
-        public MoveId Move { get; init; }
-        public MoveId Id { get; init; }
-        public bool? Disabled { get; init; }
-        public Pokemon? DisabledSource { get; init; }
-        public MoveTarget? Target { get; init; }
-        public int? Pp { get; init; }
-        public int? MaxPp { get; init; }
+        // Get locked move if Pokemon is not maybe-locked
+        var lockedMove = MaybeLocked == true ? null : GetLockedMove();
+
+        // Information should be restricted for the last active Pokemon
+        bool isLastActive = IsLastActive();
+        int canSwitchIn = Battle.CanSwitch(Side);
+        var moves = GetMoves(lockedMove, isLastActive);
+
+        // If no moves available, default to Struggle
+        if (moves.Count == 0)
+        {
+            moves =
+            [
+                new PokemonMoveData
+                {
+                    Move = Battle.Library.Moves[MoveId.Struggle],
+                    Target = null,
+                    Disabled = null,
+                    DisabledSource = null,
+                }
+            ];
+            lockedMove = MoveId.Struggle;
+        }
+
+        // Create base request data
+        var data = new PokemonMoveRequestData
+        {
+            Moves = moves,
+        };
+
+        if (isLastActive)
+        {
+            // Update maybe-disabled/maybe-locked state for last active Pokemon
+            MaybeDisabled = MaybeDisabled && lockedMove == null;
+            MaybeLocked = MaybeLocked ?? MaybeDisabled;
+
+            if (MaybeDisabled)
+            {
+                data = data with { MaybeDisabled = true };
+            }
+
+            if (MaybeLocked == true)
+            {
+                data = data with { MaybeLocked = true };
+            }
+
+            if (canSwitchIn > 0)
+            {
+                if (Trapped == PokemonTrapped.True)
+                {
+                    data = data with { Trapped = true };
+                }
+                else if (MaybeTrapped)
+                {
+                    data = data with { MaybeTrapped = true };
+                }
+            }
+        }
+        else
+        {
+            // Reset maybe-disabled/maybe-locked for non-last active Pokemon
+            MaybeDisabled = false;
+            MaybeLocked = null;
+
+            if (canSwitchIn > 0)
+            {
+                // Discovered by selecting a valid Pokemon as a switch target and cancelling
+                if (Trapped == PokemonTrapped.True)
+                {
+                    data = data with { Trapped = true };
+                }
+            }
+
+            MaybeTrapped = false;
+        }
+
+        // Handle Terastallization if not locked into a move
+        if (lockedMove == null)
+        {
+            if (CanTerastallize is not null and not FalseMoveTypeFalseUnion)
+            {
+                data = data with { CanTerastallize = CanTerastallize };
+            }
+        }
+
+        return data;
     }
 
     /// <summary>
@@ -2269,7 +2200,7 @@ public class Pokemon : IPriorityComparison
     /// <param name="lockedMove">If specified, the Pokemon is locked into using this move</param>
     /// <param name="restrictData">If true, hide certain disabled move information</param>
     /// <returns>List of available moves with their current state</returns>
-    public List<GetMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
+    public List<PokemonMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
     {
         // Handle locked move cases
         if (lockedMove is not null)
@@ -2281,11 +2212,13 @@ public class Pokemon : IPriorityComparison
             {
                 return 
                 [
-                    new GetMoveData
+                    new PokemonMoveData
                     {
-                        Move = MoveId.Recharge,
-                        Id = MoveId.Recharge,
-                    }
+                        Move = Battle.Library.Moves[MoveId.Recharge],
+                        Target = null,
+                        Disabled = null,
+                        DisabledSource = null,
+                    },
                 ];
             }
             
@@ -2294,27 +2227,31 @@ public class Pokemon : IPriorityComparison
             {
                 return 
                 [
-                    new GetMoveData
+                    new PokemonMoveData
                     {
-                        Move = moveSlot.Move,
-                        Id = moveSlot.Id,
-                    }
+                        Move = Battle.Library.Moves[moveSlot.Move],
+                        Target = null,
+                        Disabled = null,
+                        DisabledSource = null,
+                    },
                 ];
             }
             
             // Fallback: lookup move by ID (shouldn't normally happen)
             return 
             [
-                new GetMoveData
+                new PokemonMoveData
                 {
-                    Move = lockedMove.Value,
-                    Id = lockedMove.Value,
-                }
+                    Move = Battle.Library.Moves[lockedMove.Value],
+                    Target = null,
+                    Disabled = null,
+                    DisabledSource = null,
+                },
             ];
         }
         
         // Build list of available moves
-        var moves = new List<GetMoveData>();
+        var moves = new List<PokemonMoveData>();
         bool hasValidMove = false;
         
         foreach (MoveSlot moveSlot in MoveSlots)
@@ -2370,15 +2307,23 @@ public class Pokemon : IPriorityComparison
                 hasValidMove = true;
             }
             
-            // Add move to list
-            moves.Add(new GetMoveData
+            // Convert disabled state to MoveIdBoolUnion
+            MoveIdBoolUnion? disabledUnion = null;
+            if (disabled.IsTruthy())
             {
-                Move = moveName,
-                Id = moveSlot.Id,
-                Pp = moveSlot.Pp,
-                MaxPp = moveSlot.MaxPp,
-                Target = moveSlot.Target,
-                Disabled = disabled.IsTrue(),
+                disabledUnion = disabled.IsTrue() ? true : null;
+            }
+            
+            // Get the Move object from the library
+            Move moveObject = Battle.Library.Moves[moveName];
+            
+            // Add move to list
+            moves.Add(new PokemonMoveData
+            {
+                Move = moveObject,
+                Target = null, // Target is not set in this context
+                Disabled = disabledUnion,
+                DisabledSource = moveSlot.DisabledSource,
             });
         }
         return hasValidMove ? moves : [];
