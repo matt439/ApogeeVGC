@@ -1,9 +1,9 @@
 ﻿using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -243,9 +243,48 @@ public class BattleQueue(IBattle battle)
         List.Insert(0, prioritizedAction);
     }
 
+    /// <summary>
+    /// Changes a pokemon's action, and inserts its new action
+    /// in priority order.
+    ///
+    /// You'd normally want the OverrideAction event (which doesn't
+    /// change priority order).
+    /// </summary>
     public void ChangeAction(Pokemon pokemon, IActionChoice action)
     {
-        throw new NotImplementedException();
+        // Cancel any existing actions for this Pokémon
+        CancelAction(pokemon);
+
+        // Ensure the action has the Pokémon reference set
+        if (action is IAction actionWithPokemon && actionWithPokemon.Pokemon != pokemon)
+        {
+            // Update the action with the correct Pokémon
+            action = action switch
+            {
+                MoveAction ma => ma with { Pokemon = pokemon },
+                SwitchAction sa => sa with { Pokemon = pokemon },
+                PokemonAction pa => pa with { Pokemon = pokemon },
+                TeamAction ta => ta with { Pokemon = pokemon },
+                _ => action,
+            };
+        }
+
+        // Insert the new action in priority order
+        AddChoice(action);
+    }
+
+    public void AddChoice(IActionChoice choice)
+    {
+        var resolvedChoices = ResolveAction(choice);
+        List.AddRange(resolvedChoices);
+    }
+
+    public void AddChoice(List<IActionChoice> choices)
+    {
+        foreach (var resolvedChoices in choices.Select(choice => ResolveAction(choice)))
+        {
+            List.AddRange(resolvedChoices);
+        }
     }
 
     public IAction? WillAct()
@@ -255,6 +294,89 @@ public class BattleQueue(IBattle battle)
             if (action.Choice is ActionId.Move or ActionId.Switch or ActionId.InstaSwitch or ActionId.Shift)
             {
                 return action;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Checks if the specified Pokémon has a queued move action.
+    /// Returns the move action if found, or null if the Pokémon has fainted or has no move queued.
+    /// </summary>
+    /// <param name="pokemon">The Pokémon to check for a queued move</param>
+    /// <returns>The queued MoveAction if found, otherwise null</returns>
+    public MoveAction? WillMove(Pokemon pokemon)
+    {
+        if (pokemon.Fainted) return null;
+        
+        foreach (IAction action in List)
+        {
+            if (action.Choice is ActionId.Move && action is MoveAction moveAction && action.Pokemon == pokemon)
+            {
+                return moveAction;
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Removes all actions associated with the specified Pokémon from the queue.
+    /// </summary>
+    /// <param name="pokemon">The Pokémon whose actions should be cancelled</param>
+    /// <returns>True if any actions were removed, false otherwise</returns>
+    public bool CancelAction(Pokemon pokemon)
+    {
+        int oldLength = List.Count;
+
+        for (int i = 0; i < List.Count; i++)
+        {
+            if (List[i].Pokemon != pokemon) continue;
+            List.RemoveAt(i);
+            i--; // Decrement to account for the removed item
+        }
+
+        return List.Count != oldLength;
+    }
+
+    /// <summary>
+    /// Removes the first queued move action for the specified Pokémon from the queue.
+    /// </summary>
+    /// <param name="pokemon">The Pokémon whose move action should be cancelled</param>
+    /// <returns>True if a move action was removed, false otherwise</returns>
+    public bool CancelMove(Pokemon pokemon)
+    {
+        for (int i = 0; i < List.Count; i++)
+        {
+            if (List[i].Choice is not ActionId.Move || List[i].Pokemon != pokemon) continue;
+            List.RemoveAt(i);
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the specified Pokémon has a queued switch or instaswitch action.
+    /// Returns the switch action if found, or null if the Pokémon has no switch queued.
+    /// </summary>
+    /// <param name="pokemon">The Pokémon to check for a queued switch</param>
+    /// <returns>The queued switch action (MoveAction, SwitchAction, TeamAction, or PokemonAction) if found,
+    /// otherwise null
+    /// </returns>
+    public MoveSwitchTeamPokemonActionUnion? WillSwitch(Pokemon pokemon)
+    {
+        foreach (IAction action in List)
+        {
+            if (action.Choice is ActionId.Switch or ActionId.InstaSwitch && action.Pokemon == pokemon)
+            {
+                // Return the appropriate union type based on the action type
+                return action switch
+                {
+                    MoveAction ma => new MoveActionMoveSwitchTeamPokemonActionUnion(ma),
+                    SwitchAction sa => new SwitchActionMoveSwitchTeamPokemonActionUnion(sa),
+                    TeamAction ta => new TeamActionMoveSwitchTeamPokemonActionUnion(ta),
+                    PokemonAction pa => new PokemonActionMoveSwitchTeamPokemonActionUnion(pa),
+                    _ => null,
+                };
             }
         }
         return null;
