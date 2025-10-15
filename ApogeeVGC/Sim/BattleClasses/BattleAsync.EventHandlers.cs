@@ -10,6 +10,42 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
+    private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
+    {
+        EffectDelegate? del = effect.GetDelegate(callbackName);
+        Delegate? callback = del?.GetDelegate();
+
+        // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
+        // instead of having a separate Start event
+        if (callback is null &&
+            target is PokemonRunEventTarget &&
+            Gen >= 5 &&
+            callbackName == EventId.SwitchIn &&
+            effect.GetDelegate(EventId.AnySwitchIn) == null && // Check onAnySwitchIn doesn't exist
+            (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
+        {
+            del = effect.GetDelegate(EventId.Start);
+            callback = del?.GetDelegate();
+        }
+
+        return EffectDelegate.FromNullableDelegate(callback);
+    }
+
+    private EffectDelegate? GetCallback(Pokemon pokemon, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new PokemonRunEventTarget(pokemon), effect, callbackName);
+    }
+
+    private EffectDelegate? GetCallback(Field field, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new FieldRunEventTarget(field), effect, callbackName);
+    }
+
+    private EffectDelegate? GetCallback(Side side, IEffect effect, EventId callbackName)
+    {
+        return GetCallback(new SideRunEventTarget(side), effect, callbackName);
+    }
+
     /// <summary>
     /// Finds all event handlers for a given target and event.
     /// Handles Pokemon arrays, event bubbling between Pokemon/Side, and prefixed event variants.
@@ -451,42 +487,6 @@ public partial class BattleAsync
     }
 
     #region Helpers
-
-    private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
-    {
-        EffectDelegate? del = effect.GetDelegate(callbackName);
-        Delegate? callback = del?.GetDelegate();
-
-        // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
-        // instead of having a separate Start event
-        if (callback is null &&
-            target is PokemonRunEventTarget &&
-            Gen >= 5 &&
-            callbackName == EventId.SwitchIn &&
-            effect.GetDelegate(EventId.AnySwitchIn) == null && // Check onAnySwitchIn doesn't exist
-            (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
-        {
-            del = effect.GetDelegate(EventId.Start);
-            callback = del?.GetDelegate();
-        }
-
-        return EffectDelegate.FromNullableDelegate(callback);
-    }
-
-    private EffectDelegate? GetCallback(Pokemon pokemon, IEffect effect, EventId callbackName)
-    {
-        return GetCallback(new PokemonRunEventTarget(pokemon), effect, callbackName);
-    }
-
-    private EffectDelegate? GetCallback(Field field, IEffect effect, EventId callbackName)
-    {
-        return GetCallback(new FieldRunEventTarget(field), effect, callbackName);
-    }
-
-    private EffectDelegate? GetCallback(Side side, IEffect effect, EventId callbackName)
-    {
-        return GetCallback(new SideRunEventTarget(side), effect, callbackName);
-    }
 
     // Helper method to check if effect is Ability or Item
     private static bool IsAbilityOrItem(IEffect effect)

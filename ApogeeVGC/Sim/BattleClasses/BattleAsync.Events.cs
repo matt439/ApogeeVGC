@@ -668,6 +668,7 @@ public partial class BattleAsync
 
 
     // TODO: PriorityEvent()
+    // TODO: OnEvent()
 
     #region Helpers
 
