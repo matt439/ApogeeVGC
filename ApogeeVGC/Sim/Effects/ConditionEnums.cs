@@ -42,6 +42,7 @@ public enum ConditionId
     Dig,
     PhantomForce,
     ShadowForce,
+    RevivalBlessing,
 
     None,
 }

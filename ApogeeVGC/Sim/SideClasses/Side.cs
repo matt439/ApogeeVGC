@@ -167,6 +167,17 @@ public class Side
         return RemoveSideCondition(status.Id);
     }
 
+    public SideRequestData GetRequestData(bool forAlly = false)
+    {
+        SideRequestData data = new()
+        {
+            Name = Name,
+            Id = Id,
+            Pokemon = Pokemon.Select(p => p.GetSwitchRequestData(forAlly)).ToList(),
+        };
+        return data;
+    }
+
     public void ClearChoice()
     {
         throw new NotImplementedException();

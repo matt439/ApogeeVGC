@@ -5,11 +5,13 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
@@ -2024,14 +2026,14 @@ public class Pokemon : IPriorityComparison
         {
             // Commanding: Pokemon has the Commanding volatile and is not fainted
             bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
-            
-            // Reviving: Pokemon is active and has Revival Blessing slot condition
-            // Note: SlotConditions is not implemented in the current codebase
-            // You may need to add this when implementing slot conditions
-            const bool reviving = false;
-            
-            entry = entry with 
-            { 
+
+            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
+            bool reviving = IsActive &&
+                            Position < Side.SlotConditions.Count &&
+                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
+
+            entry = entry with
+            {
                 Commanding = commanding,
                 Reviving = reviving,
             };
@@ -2048,6 +2050,221 @@ public class Pokemon : IPriorityComparison
         }
 
         return entry;
+    }
+
+    public bool IsLastActive()
+    {
+        // If this Pokémon isn't active, it can't be the last active
+        if (!IsActive) return false;
+
+        // Get all active Pokémon on this side
+        var allyActive = Side.Active;
+
+        // Check all positions after this Pokémon
+        for (int i = Position + 1; i < allyActive.Count; i++)
+        {
+            // If there's a living Pokémon at a later position, this isn't the last
+            if (!allyActive[i].Fainted)
+            {
+                return false;
+            }
+        }
+
+        // No living Pokémon found after this position - this is the last active
+        return true;
+    }
+
+    //getMoveRequestData()
+    //{
+    //    let lockedMove = this.maybeLocked ? null : this.getLockedMove();
+
+    //    // Information should be restricted for the last active Pokémon
+    //    const isLastActive = this.isLastActive();
+    //    const canSwitchIn = this.battle.canSwitch(this.side) > 0;
+    //    let moves = this.getMoves(lockedMove, isLastActive);
+
+    //    if (!moves.length)
+    //    {
+    //        moves = [{ move: 'Struggle', id: 'struggle' as ID, target: 'randomNormal', disabled: false }];
+    //        lockedMove = 'struggle' as ID;
+    //    }
+
+    //    const data: PokemonMoveRequestData = {
+    //        moves,
+    //    }
+    //    ;
+
+    //    if (isLastActive)
+    //    {
+    //        this.maybeDisabled = this.maybeDisabled && !lockedMove;
+    //        this.maybeLocked = this.maybeLocked || this.maybeDisabled;
+    //        if (this.maybeDisabled)
+    //        {
+    //            data.maybeDisabled = this.maybeDisabled;
+    //        }
+    //        if (this.maybeLocked)
+    //        {
+    //            data.maybeLocked = this.maybeLocked;
+    //        }
+    //        if (canSwitchIn)
+    //        {
+    //            if (this.trapped === true)
+    //            {
+    //                data.trapped = true;
+    //            }
+    //            else if (this.maybeTrapped)
+    //            {
+    //                data.maybeTrapped = true;
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        this.maybeDisabled = false;
+    //        this.maybeLocked = false;
+    //        if (canSwitchIn)
+    //        {
+    //            // Discovered by selecting a valid Pokémon as a switch target and cancelling.
+    //            if (this.trapped) data.trapped = true;
+    //        }
+    //        this.maybeTrapped = false;
+    //    }
+
+    //    if (!lockedMove)
+    //    {
+    //        if (this.canMegaEvo) data.canMegaEvo = true;
+    //        if (this.canMegaEvoX) data.canMegaEvoX = true;
+    //        if (this.canMegaEvoY) data.canMegaEvoY = true;
+    //        if (this.canUltraBurst) data.canUltraBurst = true;
+    //        const canZMove = this.battle.actions.canZMove(this);
+    //        if (canZMove) data.canZMove = canZMove;
+
+    //        if (this.getDynamaxRequest()) data.canDynamax = true;
+    //        if (data.canDynamax || this.volatiles['dynamax']) data.maxMoves = this.getDynamaxRequest(true);
+    //        if (this.canTerastallize) data.canTerastallize = this.canTerastallize;
+    //    }
+
+    //    return data;
+    //}
+
+    public PokemonMoveRequestData GetMoveRequestData()
+    {
+        throw new NotImplementedException();
+    }
+
+    //    getMoves(lockedMove?: ID | null, restrictData?: boolean) : {
+    //    move: string, id: ID, disabled ?: string | boolean, disabledSource ?: string,
+    //		target ?: string, pp ?: number, maxpp ?: number,
+    //	}
+    //    [] {
+    //		if (lockedMove) {
+    //			lockedMove = toID(lockedMove);
+    //			this.trapped = true;
+    //			if (lockedMove === 'recharge') {
+    //				return [{
+
+    //                    move: 'Recharge',
+    //                    id: 'recharge' as ID,
+
+    //                }];
+    //			}
+    //			for (const moveSlot of this.moveSlots) {
+    //    if (moveSlot.id !== lockedMove) continue;
+    //    return [{
+    //    move: moveSlot.move,
+    //					id: moveSlot.id,
+    //				}];
+    //}
+    //// does this happen?
+    //return [{
+    //move: this.battle.dex.moves.get(lockedMove).name,
+    //				id: lockedMove,
+    //			}];
+    //		}
+    //		const moves = [];
+    //let hasValidMove = false;
+    //for (const moveSlot of this.moveSlots) {
+    //    let moveName = moveSlot.move;
+    //    if (moveSlot.id === 'hiddenpower')
+    //    {
+    //        moveName = `Hidden Power ${ this.hpType}`;
+    //        if (this.battle.gen < 6) moveName += ` ${ this.hpPower}`;
+    //    }
+    //    else if (moveSlot.id === 'return' || moveSlot.id === 'frustration')
+    //    {
+    //        const basePowerCallback = this.battle.dex.moves.get(moveSlot.id).basePowerCallback as (pokemon: Pokemon) => number;
+    //        moveName += ` ${ basePowerCallback(this)}`;
+    //    }
+    //    let target = moveSlot.target;
+    //    switch (moveSlot.id)
+    //    {
+    //        case 'curse':
+    //            if (!this.hasType('Ghost'))
+    //            {
+    //                target = this.battle.dex.moves.get('curse').nonGhostTarget;
+    //            }
+    //            break;
+    //        case 'pollenpuff':
+    //            // Heal Block only prevents Pollen Puff from targeting an ally when the user has Heal Block
+    //            if (this.volatiles['healblock'])
+    //            {
+    //                target = 'adjacentFoe';
+    //            }
+    //            break;
+    //        case 'terastarstorm':
+    //            if (this.species.name === 'Terapagos-Stellar')
+    //            {
+    //                target = 'allAdjacentFoes';
+    //            }
+    //            break;
+    //    }
+    //    let disabled = moveSlot.disabled;
+    //    if (this.volatiles['dynamax'])
+    //    {
+    //        // if each of a Pokemon's base moves are disabled by one of these effects, it will Struggle
+    //        const canCauseStruggle = ['Encore', 'Disable', 'Taunt', 'Assault Vest', 'Belch', 'Stuff Cheeks'];
+    //        disabled = this.maxMoveDisabled(moveSlot.id) || disabled && canCauseStruggle.includes(moveSlot.disabledSource!);
+    //    }
+    //    else if (moveSlot.pp <= 0 && !this.volatiles['partialtrappinglock'])
+    //    {
+    //        disabled = true;
+    //    }
+
+    //    if (disabled === 'hidden')
+    //    {
+    //        disabled = !restrictData;
+    //    }
+    //    if (!disabled)
+    //    {
+    //        hasValidMove = true;
+    //    }
+
+    //    moves.push({
+    //    move: moveName,
+    //				id: moveSlot.id,
+    //				pp: moveSlot.pp,
+    //				maxpp: moveSlot.maxpp,
+    //				target,
+    //				disabled,
+    //			});
+    //}
+    //return hasValidMove ? moves : [];
+    //	}
+
+    public record GetMoveData
+    {
+        public MoveId Move { get; init; }
+        public MoveId Id { get; init; }
+        public bool? Disabled { get; init; }
+        public Pokemon? DisabledSource { get; init; }
+        public Pokemon? Target { get; init; }
+        public int? Pp { get; init; }
+        public int? MaxPp { get; init; }
+    }
+
+    public List<GetMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>

@@ -588,9 +588,19 @@ public partial class BattleAsync : IBattle
     // TODO: Tie()
     // TODO: Win()
     // TODO: Lose()
-    // TODO: CanSwitch()
+
+    public int CanSwitch(Side side)
+    {
+        return PossibleSwitches(side).Count;
+    }
+
     // TODO: GetRandomSwitchable()
-    // TODO: PossibleSwitches()
+
+    private List<Pokemon> PossibleSwitches(Side side)
+    {
+        throw new NotImplementedException();
+    }
+
     // TODO: SwapPosition()
 
     public Pokemon? GetAtSlot(PokemonSlot? slot)

@@ -51,7 +51,7 @@ public interface IBattle
     Pokemon? ActiveTarget { get; set; }
     ActiveMove? ActiveMove { get; set; }
 
-    public BattleActions Actions { get; }
+    BattleActions Actions { get; }
 
 
     RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
@@ -154,4 +154,6 @@ public interface IBattle
     int StatModify(StatsTable baseStats, PokemonSet set, StatId statName);
 
     bool SuppressingAbility(Pokemon? target = null);
+
+    int CanSwitch(Side side);
 }
