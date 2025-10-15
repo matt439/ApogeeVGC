@@ -38,6 +38,7 @@ public record EventIdInfoData
             Id = EventId.AnySwitchIn,
             Prefix = EventPrefix.Any,
             Suffix = EventSuffix.SwitchIn,
+            BaseEventId = EventId.SwitchIn,
             UsesEffectOrder = true,
             UsesSpeed = true,
             UsesFractionalSpeed = true,

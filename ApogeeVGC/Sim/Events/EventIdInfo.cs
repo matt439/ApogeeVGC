@@ -8,6 +8,13 @@ public record EventIdInfo
     public EventType Type { get; init; } = EventType.None;
 
     /// <summary>
+    /// The base EventId without any prefix.
+    /// For example, AllyBasePower has BasePower as its base, SourceModifyAtk has ModifyAtk.
+    /// If not explicitly set, defaults to Id (for events without a prefix).
+    /// </summary>
+    public EventId BaseEventId { get; init; }
+
+    /// <summary>
     /// Indicates whether this event uses effect order for tie-breaking.
     /// True for events like SwitchIn and RedirectTarget where creation order matters.
     /// </summary>
@@ -37,25 +44,8 @@ public record EventIdInfo
     /// </summary>
     public EventId GetBaseEventId()
     {
-        if (Prefix == EventPrefix.None)
-        {
-            return Id;
-        }
-
-        // The base event name is the Id with the prefix removed
-        string idString = Id.ToString();
-        string prefixString = Prefix.ToString();
-
-        if (idString.StartsWith(prefixString))
-        {
-            string baseEventName = idString[prefixString.Length..];
-            if (Enum.TryParse<EventId>(baseEventName, out EventId baseId))
-            {
-                return baseId;
-            }
-        }
-
-        return Id;
+        // If BaseEventId was explicitly set, use it; otherwise fall back to Id
+        return BaseEventId != default ? BaseEventId : Id;
     }
 
     /// <summary>
