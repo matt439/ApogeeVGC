@@ -471,20 +471,20 @@ public class BattleAsync : IBattle
                     // Check allies (including self) for Ally and Any prefixed events
                     foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
                     {
-                        EventId allyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Ally, eventName);
+                        EventId allyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Ally, eventName, Library.Events);
                         handlers.AddRange(FindPokemonEventHandlers(allyActive, allyEventId));
                         
-                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName, Library.Events);
                         handlers.AddRange(FindPokemonEventHandlers(allyActive, anyEventId));
                     }
                     
                     // Check foes for Foe and Any prefixed events
                     foreach (Pokemon foeActive in pokemon.Foes())
                     {
-                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName, Library.Events);
                         handlers.AddRange(FindPokemonEventHandlers(foeActive, foeEventId));
                         
-                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName, Library.Events);
                         handlers.AddRange(FindPokemonEventHandlers(foeActive, anyEventId));
                     }
                 }
@@ -497,7 +497,7 @@ public class BattleAsync : IBattle
         // Check source Pokemon for Source prefixed events
         if (source != null && prefixedHandlers)
         {
-            EventId sourceEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Source, eventName);
+            EventId sourceEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Source, eventName, Library.Events);
             handlers.AddRange(FindPokemonEventHandlers(source, sourceEventId));
         }
 
@@ -519,13 +519,13 @@ public class BattleAsync : IBattle
                         }
                         else if (prefixedHandlers)
                         {
-                            EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                            EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName, Library.Events);
                             handlers.AddRange(FindPokemonEventHandlers(active, foeEventId));
                         }
                         
                         if (prefixedHandlers)
                         {
-                            EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                            EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName, Library.Events);
                             handlers.AddRange(FindPokemonEventHandlers(active, anyEventId));
                         }
                     }
@@ -540,13 +540,13 @@ public class BattleAsync : IBattle
                     }
                     else if (prefixedHandlers)
                     {
-                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName);
+                        EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName, Library.Events);
                         handlers.AddRange(FindSideEventHandlers(side, foeEventId));
                     }
                     
                     if (prefixedHandlers)
                     {
-                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName);
+                        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName, Library.Events);
                         handlers.AddRange(FindSideEventHandlers(side, anyEventId));
                     }
                 }
