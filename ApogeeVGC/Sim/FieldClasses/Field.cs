@@ -139,9 +139,10 @@ public class Field
     {
         if (Weather == ConditionId.None) return false;
         Condition prevWeather = GetWeather();
-        Battle.SingleEvent(EventId.FieldEnd, prevWeather, WeatherState, this);
+        EffectState weatherState = WeatherState;
+        Battle.SingleEvent(EventId.FieldEnd, prevWeather, weatherState, this);
         Weather = ConditionId.None;
-        Battle.ClearEffectState(WeatherState);
+        Battle.ClearEffectState(ref weatherState);
         Battle.EachEvent(EventId.WeatherChange);
         return true;
     }
@@ -150,9 +151,10 @@ public class Field
     {
         if (Terrain == ConditionId.None) return false;
         Condition prevTerrain = GetTerrain();
-        Battle.SingleEvent(EventId.FieldEnd, prevTerrain, TerrainState, this);
+        EffectState terrainState = TerrainState;
+        Battle.SingleEvent(EventId.FieldEnd, prevTerrain, terrainState, this);
         Terrain = ConditionId.None;
-        Battle.ClearEffectState(TerrainState);
+        Battle.ClearEffectState(ref terrainState);
         Battle.EachEvent(EventId.TerrainChange);
         return true;
     }
