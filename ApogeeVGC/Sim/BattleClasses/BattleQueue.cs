@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -195,6 +196,56 @@ public class BattleQueue(IBattle battle)
         // Add the action to the list
         actions.Add(currentAction);
         return actions;
+    }
+
+    /// <summary>
+    /// Makes the passed action happen next (skipping speed order).
+    /// Removes the action from its current position in the queue,
+    /// sets its order to 3 (InstaSwitch priority), and places it at the front.
+    /// </summary>
+    public void PrioritizeAction(MoveSwitchActionUnion action, IEffect? sourceEffect = null)
+    {
+        // Extract the actual action from the union
+        IAction actualAction = action switch
+        {
+            MoveActionMoveSwitchActionUnion ma => ma.MoveAction,
+            SwitchActionMoveSwitchActionUnion sa => sa.SwitchAction,
+            _ => throw new InvalidOperationException("Unknown action type in MoveSwitchActionUnion"),
+        };
+
+        // Remove the action from its current position if it exists
+        for (int i = 0; i < List.Count; i++)
+        {
+            if (List[i] == actualAction)
+            {
+                List.RemoveAt(i);
+                break;
+            }
+        }
+
+        // Update the action with the source effect and priority order
+        IAction prioritizedAction = action switch
+        {
+            MoveActionMoveSwitchActionUnion ma => ma.MoveAction with
+            {
+                SourceEffect = sourceEffect,
+                Order = 3, // InstaSwitch priority
+            },
+            SwitchActionMoveSwitchActionUnion sa => sa.SwitchAction with
+            {
+                SourceEffect = sourceEffect,
+                Order = 3, // InstaSwitch priority
+            },
+            _ => throw new InvalidOperationException("Unknown action type in MoveSwitchActionUnion"),
+        };
+
+        // Add to the front of the queue
+        List.Insert(0, prioritizedAction);
+    }
+
+    public void ChangeAction(Pokemon pokemon, IActionChoice action)
+    {
+        throw new NotImplementedException();
     }
 
     public IAction? WillAct()

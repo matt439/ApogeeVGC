@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -580,7 +581,18 @@ public record AbilityIdAbilityIdFalseUnion(AbilityId AbilityId) : AbilityIdFalse
 public record FalseAbilityIdFalseUnion : AbilityIdFalseUnion;
 
 
-
+/// <summary>
+/// MoveAction | SwitchAction
+/// </summary>
+public abstract record MoveSwitchActionUnion
+{
+    public static implicit operator MoveSwitchActionUnion(MoveAction moveAction) =>
+        new MoveActionMoveSwitchActionUnion(moveAction);
+    public static implicit operator MoveSwitchActionUnion(SwitchAction switchAction) =>
+        new SwitchActionMoveSwitchActionUnion(switchAction);
+}
+public record MoveActionMoveSwitchActionUnion(MoveAction MoveAction) : MoveSwitchActionUnion;
+public record SwitchActionMoveSwitchActionUnion(SwitchAction SwitchAction) : MoveSwitchActionUnion;
 
 
 public static class EffectUnionFactory
