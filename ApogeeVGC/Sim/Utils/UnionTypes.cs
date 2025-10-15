@@ -526,7 +526,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable | decimal | MoveId
+/// SparseBoostsTable | decimal | MoveId | string | RelayVar[]
 /// </summary>
 public abstract record RelayVar
 {
@@ -546,6 +546,9 @@ public abstract record RelayVar
     public static implicit operator RelayVar(SparseBoostsTable table) => new SparseBoostsTableRelayVar(table);
     public static implicit operator RelayVar(decimal value) => new DecimalRelayVar(value);
     public static implicit operator RelayVar(MoveId moveId) => new MoveIdRelayVar(moveId);
+    public static implicit operator RelayVar(string value) => new StringRelayVar(value);
+    public static implicit operator RelayVar(RelayVar[] values) => new ArrayRelayVar([.. values]);
+    public static implicit operator RelayVar(List<RelayVar> values) => new ArrayRelayVar(values);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -559,6 +562,8 @@ public record MoveTypeRelayVar(MoveType Type) : RelayVar;
 public record SparseBoostsTableRelayVar(SparseBoostsTable Table) : RelayVar;
 public record DecimalRelayVar(decimal Value) : RelayVar;
 public record MoveIdRelayVar(MoveId MoveId) : RelayVar;
+public record StringRelayVar(string Value) : RelayVar;
+public record ArrayRelayVar(List<RelayVar> Values) : RelayVar;
 
 
 
@@ -995,17 +1000,19 @@ public record HiddenBoolHiddenUnion : BoolHiddenUnion;
 
 
 /// <summary>
-/// Pokemon | Side | Field
+/// Pokemon | Side | Field | Battle
 /// </summary>
 public abstract record EffectStateTarget
 {
     public static implicit operator EffectStateTarget(Pokemon pokemon) => new PokemonEffectStateTarget(pokemon);
     public static implicit operator EffectStateTarget(Side side) => new SideEffectStateTarget(side);
     public static implicit operator EffectStateTarget(Field field) => new FieldEffectStateTarget(field);
+    public static EffectStateTarget FromIBattle(IBattle battle) => new BattleEffectStateTarget(battle);
 }
 public record PokemonEffectStateTarget(Pokemon Pokemon) : EffectStateTarget;
 public record SideEffectStateTarget(Side Side) : EffectStateTarget;
 public record FieldEffectStateTarget(Field Field) : EffectStateTarget;
+public record BattleEffectStateTarget(IBattle Battle) : EffectStateTarget;
 
 
 
