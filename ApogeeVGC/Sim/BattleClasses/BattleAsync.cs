@@ -1495,9 +1495,36 @@ public class BattleAsync : IBattle
         return subOrder;
     }
 
-    public void EachEvent(EventId eventId, IEffect? effect, bool? relayVar)
+    /// <summary>
+    /// Runs an event with no source on each Pokémon on the field, in Speed order.
+    /// Speed ties are resolved randomly using the battle's PRNG.
+    /// </summary>
+    public void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null)
     {
-        throw new NotImplementedException();
+        // Get all active Pokémon on the field
+        var actives = GetAllActive();
+
+        // Use current battle effect if none provided
+        effect ??= Effect;
+
+        // Sort by speed (highest to lowest) with proper speed tie resolution
+        SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
+
+        // Convert bool? to RelayVar? for RunEvent
+        RelayVar? relayVarConverted = relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
+
+        // Run the event on each Pokémon
+        foreach (Pokemon pokemon in actives)
+        {
+            RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect, relayVarConverted);
+        }
+
+        // Special handling for Weather events in Gen 7+
+        if (eventId == EventId.Weather && Gen >= 7)
+        {
+            // TODO: further research when updates happen
+            EachEvent(EventId.Update);
+        }
     }
 
     /// <summary>

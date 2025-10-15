@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
-public class Pokemon
+public class Pokemon : IPriorityComparison
 {
     public Side Side { get; }
     public IBattle Battle => Side.Battle;
@@ -116,7 +116,11 @@ public class Pokemon
 
     public double WeightKg { get; set; }
     public int WeightHg { get; set; }
+    public IntFalseUnion Order =>int.MaxValue;
+    public int Priority => 0;
     public int Speed { get; set; }
+    public int SubOrder => 0;
+    public int EffectOrder => 0;
 
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
     public MoveType TeraType { get; set; }
