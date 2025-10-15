@@ -1,6 +1,8 @@
 ﻿using ApogeeVGC.Sim.Actions;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -43,140 +45,156 @@ public class BattleQueue(IBattle battle)
         return List.Select((action, index) => (index, action));
     }
 
-    //    /**
-    //	 * Takes an ActionChoice, and fills it out into a full Action object.
-    //	 *
-    //	 * Returns an array of Actions because some ActionChoices (like mega moves)
-    //	 * resolve to two Actions (mega evolution + use move)
-    //	 */
-    //    resolveAction(action: ActionChoice, midTurn = false) : Action[] {
-    //		if (!action) throw new Error(`Action not passed to resolveAction`);
-    //		if (action.choice === 'pass') return [];
-    //		const actions = [action];
-
-    //		if (!action.side && action.pokemon) action.side = action.pokemon.side;
-    //		if (!action.move && action.moveid) action.move = this.battle.dex.getActiveMove(action.moveid);
-    //		if (!action.order) {
-    //			const orders: { [choice: string]: number
-    //} = {
-    //				team: 1,
-    //				start: 2,
-    //				instaswitch: 3,
-    //				beforeTurn: 4,
-    //				beforeTurnMove: 5,
-    //				revivalblessing: 6,
-
-    //				runSwitch: 101,
-    //				switch: 103,
-    //				megaEvo: 104,
-    //				megaEvoX: 104,
-    //				megaEvoY: 104,
-    //				runDynamax: 105,
-    //				terastallize: 106,
-    //				priorityChargeMove: 107,
-
-    //				shift: 200,
-    //				// default is 200 (for moves)
-
-    //				residual: 300,
-    //			};
-    //if (action.choice in orders) {
-    //				action.order = orders[action.choice] ;
-    //			} else
-    //{
-    //    action.order = 200;
-    //    if (! ['move', 'event'].includes(action.choice))
-    //    {
-    //        throw new Error(`Unexpected orderless action ${ action.choice }`);
-    //    }
-    //}
-    //		}
-    //		if (!midTurn)
-    //{
-    //    if (action.choice === 'move')
-    //    {
-    //        if (!action.maxMove && !action.zmove && action.move.beforeTurnCallback)
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'beforeTurnMove', pokemon: action.pokemon, move: action.move, targetLoc: action.targetLoc,
-    //					}));
-    //        }
-    //        if (action.mega && !action.pokemon.isSkyDropped())
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'megaEvo',
-    //						pokemon: action.pokemon,
-    //					}));
-    //        }
-    //        if (action.megax && !action.pokemon.isSkyDropped())
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'megaEvoX',
-    //						pokemon: action.pokemon,
-    //					}));
-    //        }
-    //        if (action.megay && !action.pokemon.isSkyDropped())
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'megaEvoY',
-    //						pokemon: action.pokemon,
-    //					}));
-    //        }
-    //        if (action.terastallize && !action.pokemon.terastallized)
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'terastallize',
-    //						pokemon: action.pokemon,
-    //					}));
-    //        }
-    //        if (action.maxMove && !action.pokemon.volatiles['dynamax'])
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'runDynamax',
-    //						pokemon: action.pokemon,
-    //					}));
-    //        }
-    //        if (!action.maxMove && !action.zmove && action.move.priorityChargeCallback)
-    //        {
-    //            actions.unshift(...this.resolveAction({
-    //            choice: 'priorityChargeMove',
-    //						pokemon: action.pokemon,
-    //						move: action.move,
-    //					}));
-    //        }
-    //        action.fractionalPriority = this.battle.runEvent('FractionalPriority', action.pokemon, null, action.move, 0);
-    //    }
-    //    else if (['switch', 'instaswitch'].includes(action.choice))
-    //    {
-    //        if (typeof action.pokemon.switchFlag === 'string')
-    //        {
-    //            action.sourceEffect = this.battle.dex.moves.get(action.pokemon.switchFlag as ID) as any;
-    //        }
-    //        action.pokemon.switchFlag = false;
-    //    }
-    //}
-
-    //const deferPriority = this.battle.gen === 7 && action.mega && action.mega !== 'done';
-    //if (action.move)
-    //{
-    //    let target = null;
-    //    action.move = this.battle.dex.getActiveMove(action.move);
-
-    //    if (!action.targetLoc)
-    //    {
-    //        target = this.battle.getRandomTarget(action.pokemon, action.move);
-    //        // TODO: what actually happens here?
-    //        if (target) action.targetLoc = action.pokemon.getLocOf(target);
-    //    }
-    //    action.originalTarget = action.pokemon.getAtLoc(action.targetLoc);
-    //}
-    //if (!deferPriority) this.battle.getActionSpeed(action);
-    //return actions as any;
-    //	}
-
+    /// <summary>
+    /// Takes an ActionChoice, and fills it out into a full Action object.
+    /// 
+    /// Returns a list of Actions because some ActionChoices (like mega moves)
+    /// resolve to multiple Actions (mega evolution + use move)
+    /// </summary>
     public List<IAction> ResolveAction(IActionChoice action, bool midTurn = false)
     {
-        throw new NotImplementedException();
+        switch (action)
+        {
+            case null:
+                throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
+            // Pass actions return empty list
+            case IAction { Choice: ActionId.Pass }:
+                return [];
+        }
+
+        // Start with the action itself
+        List<IAction> actions = [];
+
+        // Cast to IAction - all ActionChoices should be IActions in practice
+        IAction currentAction = action as IAction ??
+                                throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+
+        // Populate move if missing (from moveId)
+        if (currentAction is MoveAction moveAction)
+        {
+            // Ensure we have the Move object, not just the ID
+            currentAction = moveAction with
+            {
+                Move = moveAction.Move,
+            };
+        }
+
+        // Set order if not already set
+        if (currentAction.Order is FalseIntFalseUnion)
+        {
+            if (_orders.TryGetValue(currentAction.Choice, out int order))
+            {
+                // Update order based on action type
+                currentAction = currentAction switch
+                {
+                    MoveAction ma => ma with { Order = order },
+                    SwitchAction sa => sa with { Order = order },
+                    PokemonAction pa => pa, // PokemonAction.Order returns int.MaxValue
+                    _ => currentAction,
+                };
+            }
+            else
+            {
+                // Default order is 200 for moves and events
+                if (currentAction.Choice is not (ActionId.Move or ActionId.Event))
+                {
+                    throw new InvalidOperationException($"Unexpected orderless action {currentAction.Choice}");
+                }
+
+                if (currentAction is MoveAction maDefault)
+                {
+                    currentAction = maDefault with { Order = 200 };
+                }
+            }
+        }
+
+        // Process pre-turn actions (not during midTurn)
+        if (!midTurn)
+        {
+            if (currentAction is MoveAction ma)
+            {
+                // Note: BeforeTurnCallback, Mega Evolution, and Dynamax are deliberately excluded
+                // as per requirements
+
+                // Add Terastallize action if applicable
+                if (ma.Pokemon is { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
+                {
+                    // Insert Terastallize action before the move
+                    actions.InsertRange(0, ResolveAction(new PokemonAction
+                    {
+                        Choice = ActionId.Terastallize,
+                        Pokemon = ma.Pokemon,
+                    }));
+                }
+
+                // Calculate fractional priority from events
+                RelayVar? fractionalPriorityEvent = Battle.RunEvent(
+                    EventId.FractionalPriority,
+                    ma.Pokemon,
+                    null,
+                    ma.Move.ToActiveMove(),
+                    0
+                );
+
+                int fractionalPriority = fractionalPriorityEvent switch
+                {
+                    IntRelayVar irv => irv.Value,
+                    DecimalRelayVar drv => (int)drv.Value,
+                    _ => 0,
+                };
+
+                currentAction = ma with { FractionalPriority = fractionalPriority };
+            }
+            else if (currentAction.Choice is ActionId.Switch or ActionId.InstaSwitch)
+            {
+                // Handle switch source effect if switch was forced by a move
+                if (currentAction is SwitchAction sa)
+                {
+                    // Check if the switch was caused by a move (stored in SwitchFlag)
+                    if (sa.Pokemon.SwitchFlag is MoveIdMoveIdBoolUnion moveIdUnion)
+                    {
+                        // Set the source effect to the move that caused the switch
+                        currentAction = sa with
+                        {
+                            SourceEffect = Battle.Library.Moves[moveIdUnion.MoveId].ToActiveMove(),
+                        };
+                    }
+
+                    // Clear the switch flag now that we've processed it
+                    sa.Pokemon.SwitchFlag = false;
+                }
+            }
+        }
+
+        // Handle target resolution for moves
+        if (currentAction is MoveAction moveAct)
+        {
+            Move move = moveAct.Move;
+
+            // If no target location specified, get a random target
+            if (moveAct.TargetLoc == 0)
+            {
+                Pokemon? target = Battle.GetRandomTarget(moveAct.Pokemon, move);
+                if (target is not null)
+                {
+                    moveAct = moveAct with { TargetLoc =
+                        moveAct.Pokemon.GetSlot().GetRelativeLocation(target.GetSlot()) };
+                }
+            }
+
+            // Set the original target based on target location
+            currentAction = moveAct with
+            {
+                OriginalTarget = moveAct.Pokemon.GetAtLoc(moveAct.TargetLoc),
+            };
+        }
+
+        // Calculate action speed for queue sorting
+        Battle.GetActionSpeed(currentAction);
+
+        // Add the action to the list
+        actions.Add(currentAction);
+        return actions;
     }
 
     public IAction? WillAct()
@@ -190,4 +208,28 @@ public class BattleQueue(IBattle battle)
         }
         return null;
     }
+
+    #region Helpers
+
+    private readonly Dictionary<ActionId, int> _orders = new()
+    {
+        { ActionId.Team, 1 },
+        { ActionId.Start, 2 },
+        { ActionId.InstaSwitch, 3 },
+        { ActionId.BeforeTurn, 4 },
+        { ActionId.BeforeTurnMove, 5 },
+        { ActionId.RevivalBlessing, 6 },
+
+        { ActionId.RunSwitch, 101 },
+        { ActionId.Switch, 103 },
+        { ActionId.Terastallize, 106 },
+        { ActionId.PriorityChargeMove, 107 },
+
+        { ActionId.Shift, 200 },
+        // Default for moves is 200
+
+        { ActionId.Residual, 300 },
+    };
+
+    #endregion
 }
