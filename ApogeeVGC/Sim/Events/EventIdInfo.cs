@@ -15,6 +15,20 @@ public record EventIdInfo
     public EventId BaseEventId { get; init; }
 
     /// <summary>
+    /// The Field-prefixed variant of this event ID.
+    /// For example, Residual -> FieldResidual.
+    /// If no Field variant exists, this will equal the base event ID.
+    /// </summary>
+    public EventId FieldEventId { get; init; }
+
+    /// <summary>
+    /// The Side-prefixed variant of this event ID.
+    /// For example, Residual -> SideResidual.
+    /// If no Side variant exists, this will equal the base event ID.
+    /// </summary>
+    public EventId SideEventId { get; init; }
+
+    /// <summary>
     /// Indicates whether this event uses effect order for tie-breaking.
     /// True for events like SwitchIn and RedirectTarget where creation order matters.
     /// </summary>

@@ -1527,122 +1527,6 @@ public class BattleAsync : IBattle
         }
     }
 
-  //  /**
-	 //* Runs an event with no source on each effect on the field, in Speed order.
-	 //*
-	 //* Unlike `eachEvent`, this contains a lot of other handling and is only intended for
-	 //* the 'Residual' and 'SwitchIn' events.
-	 //*/
-  //  fieldEvent(eventid: string, targets?: Pokemon[])
-  //  {
-  //      const callbackName = `on${ eventid}`;
-  //      let getKey: undefined | 'duration';
-  //      if (eventid === 'Residual')
-  //      {
-  //          getKey = 'duration';
-  //      }
-  //      let handlers = this.findFieldEventHandlers(this.field, `onField${ eventid}`, getKey);
-  //      for (const side of this.sides) {
-  //          if (side.n < 2 || !side.allySide)
-  //          {
-  //              handlers = handlers.concat(this.findSideEventHandlers(side, `onSide${ eventid}`, getKey));
-  //          }
-  //          for (const active of side.active) {
-  //              if (!active) continue;
-  //              if (eventid === 'SwitchIn')
-  //              {
-  //                  handlers = handlers.concat(this.findPokemonEventHandlers(active, `onAny${ eventid}`));
-  //              }
-  //              if (targets && !targets.includes(active)) continue;
-  //              handlers = handlers.concat(this.findPokemonEventHandlers(active, callbackName, getKey));
-  //              handlers = handlers.concat(this.findSideEventHandlers(side, callbackName, undefined, active));
-  //              handlers = handlers.concat(this.findFieldEventHandlers(this.field, callbackName, undefined, active));
-  //              handlers = handlers.concat(this.findBattleEventHandlers(callbackName, getKey, active));
-  //          }
-  //      }
-  //      this.speedSort(handlers);
-  //      while (handlers.length)
-  //      {
-  //          const handler = handlers[0];
-  //          handlers.shift();
-  //          const effect = handler.effect;
-  //          if ((handler.effectHolder as Pokemon).fainted)
-  //          {
-  //              if (!(handler.state?.isSlotCondition)) continue;
-  //          }
-  //          if (eventid === 'Residual' && handler.end && handler.state?.duration)
-  //          {
-  //              handler.state.duration--;
-  //              if (!handler.state.duration)
-  //              {
-  //                  const endCallArgs = handler.endCallArgs || [handler.effectHolder, effect.id];
-  //                  handler.end.call(...endCallArgs as [any, ...any[]]);
-  //                  if (this.ended) return;
-  //                  continue;
-  //              }
-  //          }
-
-  //          // effect may have been removed by a prior handler, i.e. Toxic Spikes being absorbed during a double switch
-  //          if (handler.state?.target instanceof Pokemon) {
-  //              let expectedStateLocation;
-  //              if (effect.effectType === 'Ability' && !handler.state.id.startsWith('ability:'))
-  //              {
-  //                  expectedStateLocation = handler.state.target.abilityState;
-  //              }
-  //              else if (effect.effectType === 'Item' && !handler.state.id.startsWith('item:'))
-  //              {
-  //                  expectedStateLocation = handler.state.target.itemState;
-  //              }
-  //              else if (effect.effectType === 'Status')
-  //              {
-  //                  expectedStateLocation = handler.state.target.statusState;
-  //              }
-  //              else
-  //              {
-  //                  expectedStateLocation = handler.state.target.volatiles[effect.id];
-  //              }
-  //              if (expectedStateLocation !== handler.state)
-  //              {
-  //                  continue;
-  //              }
-  //          } else if (handler.state?.target instanceof Side && !handler.state.isSlotCondition) {
-  //              if ((handler.state.target.sideConditions[effect.id] !== handler.state))
-  //              {
-  //                  continue;
-  //              }
-  //          } else if (handler.state?.target instanceof Field) {
-  //              let expectedStateLocation;
-  //              if (effect.effectType === 'Weather')
-  //              {
-  //                  expectedStateLocation = handler.state.target.weatherState;
-  //              }
-  //              else if (effect.effectType === 'Terrain')
-  //              {
-  //                  expectedStateLocation = handler.state.target.terrainState;
-  //              }
-  //              else
-  //              {
-  //                  expectedStateLocation = handler.state.target.pseudoWeather[effect.id];
-  //              }
-  //              if (expectedStateLocation !== handler.state)
-  //              {
-  //                  continue;
-  //              }
-  //          }
-
-  //          let handlerEventid = eventid;
-  //          if ((handler.effectHolder as Side).sideConditions) handlerEventid = `Side${ eventid}`;
-  //          if ((handler.effectHolder as Field).pseudoWeather) handlerEventid = `Field${ eventid}`;
-  //          if (handler.callback)
-  //          {
-  //              this.singleEvent(handlerEventid, effect, handler.state, handler.effectHolder, null, null, undefined, handler.callback);
-  //          }
-
-  //          this.faintMessages();
-  //          if (this.ended) return;
-  //      }
-  //  }
-
     /// <summary>
     /// Runs an event with no source on each effect on the field, in Speed order.
     /// 
@@ -1678,9 +1562,6 @@ public class BattleAsync : IBattle
             // Process each active Pokemon on this side
             foreach (Pokemon active in side.Active)
             {
-                // Skip null slots (inactive positions)
-                if (active == null) continue;
-
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)
                 {
@@ -1852,31 +1733,27 @@ public class BattleAsync : IBattle
     }
 
     /// <summary>
-    /// Converts a base event ID to its Field-prefixed variant.
+    /// Gets the Field-prefixed variant of an event ID.
     /// For example, Residual becomes FieldResidual.
+    /// Uses the pre-computed EventIdInfo metadata for fast lookup.
     /// </summary>
     private EventId GetFieldEventId(EventId baseEvent)
     {
-        string eventName = $"Field{baseEvent}";
-        if (Enum.TryParse(eventName, out EventId fieldEvent))
-        {
-            return fieldEvent;
-        }
-        return baseEvent;
+        return Library.Events.TryGetValue(baseEvent, out EventIdInfo? eventInfo)
+            ? eventInfo.FieldEventId
+            : baseEvent;
     }
 
     /// <summary>
-    /// Converts a base event ID to its Side-prefixed variant.
+    /// Gets the Side-prefixed variant of an event ID.
     /// For example, Residual becomes SideResidual.
+    /// Uses the pre-computed EventIdInfo metadata for fast lookup.
     /// </summary>
     private EventId GetSideEventId(EventId baseEvent)
     {
-        string eventName = $"Side{baseEvent}";
-        if (Enum.TryParse(eventName, out EventId sideEvent))
-        {
-            return sideEvent;
-        }
-        return baseEvent;
+        return Library.Events.TryGetValue(baseEvent, out EventIdInfo? eventInfo)
+            ? eventInfo.SideEventId
+            : baseEvent;
     }
 
     /// <summary>
