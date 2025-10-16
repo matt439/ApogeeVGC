@@ -934,6 +934,31 @@ public record BoolMoveOhko(bool Value) : MoveOhko;
 public record IceMoveOhko : MoveOhko;
 
 
+/// <summary>
+/// ConditionId | bool
+/// </summary>
+public abstract record ConditionIdBoolUnion
+{
+    public static implicit operator ConditionIdBoolUnion(ConditionId conditionId) =>
+        new ConditionIdConditionIdBoolUnion(conditionId);
+    public static implicit operator ConditionIdBoolUnion(bool value) => new BoolConditionIdBoolUnion(value);
+}
+public record ConditionIdConditionIdBoolUnion(ConditionId ConditionId) : ConditionIdBoolUnion;
+public record BoolConditionIdBoolUnion(bool Value) : ConditionIdBoolUnion;
+
+
+/// <summary>
+/// Item | false
+/// </summary>
+public abstract record ItemFalseUnion
+{
+    public static implicit operator ItemFalseUnion(Item item) => new ItemItemFalseUnion(item);
+    public static ItemFalseUnion FromFalse() => new FalseItemFalseUnion();
+}
+public record ItemItemFalseUnion(Item Item) : ItemFalseUnion;
+public record FalseItemFalseUnion : ItemFalseUnion;
+
+
 
 
 /// <summary>

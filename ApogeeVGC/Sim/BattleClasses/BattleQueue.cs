@@ -382,6 +382,31 @@ public class BattleQueue(IBattle battle)
         return null;
     }
 
+    public void InserChoice(IActionChoice choice, bool midTurn = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void InserChoice(List<IActionChoice> choices, bool midTurn = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Clear()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string Debug(IAction? action = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public BattleQueue Sort()
+    {
+        throw new NotImplementedException();
+    }
+
     #region Helpers
 
     private readonly Dictionary<ActionId, int> _orders = new()

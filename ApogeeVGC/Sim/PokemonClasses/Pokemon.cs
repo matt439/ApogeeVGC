@@ -5,14 +5,11 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -139,7 +136,7 @@ public class Pokemon : IPriorityComparison
         get;
         set // must be 'external' or null
         {
-            if (value is PokemonClasses.StalenessId.External or null)
+            if (value is StalenessId.External or null)
             {
                 field = value;
             }
@@ -151,6 +148,10 @@ public class Pokemon : IPriorityComparison
     }
 
     public PokemonDetails Details { get; set; }
+
+    public List<MoveId> Moves => throw new NotImplementedException();
+
+    public List<MoveId> BaseMoves => throw new NotImplementedException();
 
     public Pokemon(IBattle battle, PokemonSet set, Side side)
     {
@@ -238,6 +239,1047 @@ public class Pokemon : IPriorityComparison
         Details = GetUpdatedDetails();
     }
 
+    /// <summary>
+    /// Gets the full slot identifier combining side ID and position letter.
+    /// Simplified version for standard battle formats.
+    /// </summary>
+    public PokemonSlot GetSlot()
+    {
+        int poistionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
+        return new PokemonSlot(Side.Id, poistionOffset);
+    }
+
+    public override string ToString()
+    {
+        throw new NotImplementedException();
+    }
+
+    public class PokemonDetails
+    {
+        public SpecieId Id { get; init; }
+        public int Level { get; init; }
+        public GenderId Gender { get; init; }
+        public bool Shiny { get; init; }
+        public MoveType? TeraType { get; set; }
+    }
+
+    public PokemonDetails GetUpdatedDetails(int? level = null)
+    {
+        SpecieId id = Species.Id;
+
+        // Handle special forms that should use base species name
+        if (id is SpecieId.GreninjaBond or SpecieId.RockruffDusk)
+        {
+            id = Species.BaseSpecies;
+        }
+
+        // Use provided level or fall back to Pokemon's level
+        int displayLevel = level ?? Level;
+
+        var details = new PokemonDetails
+        {
+            Id = id,
+            Level = displayLevel,
+            Gender = Gender,
+            Shiny = Set.Shiny,
+        };
+
+        return details;
+    }
+
+    public PokemonHealth GetFullDetails()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UpdateSpeed()
+    {
+        Speed = GetActionSpeed();
+    }
+
+    /// <summary>
+    /// Calculates a Pokemon's stat value with boosts and modifiers applied.
+    /// This is used during battle for damage calculations and speed comparisons.
+    /// </summary>
+    /// <param name="statName">The stat to calculate (Atk, Def, SpA, SpD, Spe)</param>
+    /// <param name="boost">Boost stage from -6 to +6</param>
+    /// <param name="modifier">Optional modifier to apply (e.g., 1.5 for 50% increase)</param>
+    /// <param name="statUser">Pokemon whose stats are being calculated (defaults to this)</param>
+    /// <returns>The calculated stat value</returns>
+    public int CalculateStat(StatIdExceptHp statName, int boost, int? modifier = null, Pokemon? statUser = null)
+    {
+        // Get base stat from stored stats
+        int stat = StoredStats[statName];
+
+        // Wonder Room swaps Defense and Special Defense BEFORE any other calculations
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
+        {
+            stat = statName switch
+            {
+                StatIdExceptHp.Def => StoredStats[StatIdExceptHp.SpD],
+                StatIdExceptHp.SpD => StoredStats[StatIdExceptHp.Def],
+                _ => stat,
+            };
+        }
+
+        // Create sparse boosts table with only the stat we're calculating
+        var boosts = new SparseBoostsTable();
+        BoostId boostName = statName.ConvertToBoostId();
+        boosts.SetBoost(boostName, boost);
+
+        // Run ModifyBoost event to allow abilities/items/conditions to modify boosts
+        // Example: Simple ability doubles boost stages
+        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null,
+            null, boosts);
+
+        if (boostEvent is SparseBoostsTableRelayVar brv)
+        {
+            boosts = brv.Table;
+            boost = boosts.GetBoost(boostName) ?? 0;
+        }
+
+        // Clamp boost to valid range
+        boost = BoostsTable.ClampBoost(boost);
+
+        // Apply boost multiplier
+        if (boost >= 0)
+        {
+            // Positive boosts multiply the stat
+            stat = (int)Math.Floor(stat * BoostsTable.CalculateRegularStatMultiplier(boost));
+        }
+        else
+        {
+            // Negative boosts divide the stat
+            stat = (int)Math.Floor(stat / BoostsTable.CalculateRegularStatMultiplier(-boost));
+        }
+
+        // Apply modifier using battle's modify function
+        return Battle.Modify(stat, modifier ?? 1);
+    }
+
+    public int GetStat(StatIdExceptHp statName, bool unboosted = false, bool unmodified = false)
+    {
+        int stat = StoredStats[statName];
+
+        // Wonder Room swaps Def and SpD
+        if (unmodified && Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
+        {
+            statName = statName switch
+            {
+                StatIdExceptHp.Def => StatIdExceptHp.SpD,
+                StatIdExceptHp.SpD => StatIdExceptHp.Def,
+                _ => statName,
+            };
+        }
+
+        // Stat boosts
+        if (!unboosted)
+        {
+            BoostsTable boosts = Boosts;
+            if (!unmodified)
+            {
+                RelayVar? relayVar = Battle.RunEvent(EventId.ModifyBoost, this, null,
+                    null, boosts);
+
+                if (relayVar is BoostsTableRelayVar brv)
+                {
+                    boosts = brv.Table;
+                }
+                else
+                {
+                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar");
+                }
+            }
+            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
+        }
+
+        // Stat modifier effects
+        if (!unmodified)
+        {
+            EventId eventId = statName switch
+            {
+                StatIdExceptHp.Atk => EventId.ModifyAtk,
+                StatIdExceptHp.Def => EventId.ModifyDef,
+                StatIdExceptHp.SpA => EventId.ModifySpA,
+                StatIdExceptHp.SpD => EventId.ModifySpD,
+                StatIdExceptHp.Spe => EventId.ModifySpe,
+                _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
+            };
+            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, stat);
+            if (relayVar is IntRelayVar irv)
+            {
+                stat = irv.Value;
+            }
+            else
+            {
+                throw new InvalidOperationException("stat must be an IntRelayVar");
+            }
+        }
+
+        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
+        return stat;
+    }
+
+    public int GetActionSpeed()
+    {
+        throw new NotImplementedException();
+    }
+
+    public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
+    {
+        int bestStatValue = int.MinValue;
+        var bestStatName = StatIdExceptHp.Atk;
+
+        // Iterate through all stat types except HP
+        foreach (StatIdExceptHp statId in Enum.GetValues<StatIdExceptHp>())
+        {
+            int currentStatValue = GetStat(statId, unboosted, unmodified);
+            if (currentStatValue <= bestStatValue) continue;
+            bestStatValue = currentStatValue;
+            bestStatName = statId;
+        }
+        return bestStatName;
+    }
+
+    /// <summary>
+    /// Gets the Pokemon's current weight in hectograms, accounting for modifying effects.
+    /// Weight is used for moves like Heavy Slam, Grass Knot, and Low Kick.
+    /// Minimum weight is 1 hectogram (0.1 kg).
+    /// </summary>
+    /// <returns>Weight in hectograms (1 hg = 0.1 kg)</returns>
+    public int GetWeight()
+    {
+        // Run ModifyWeight event to allow abilities/items/conditions to modify weight
+        RelayVar? weightEvent = Battle.RunEvent(EventId.ModifyWeight, this, null, null,
+            WeightHg);
+
+        int modifiedWeight;
+        if (weightEvent is IntRelayVar irv)
+        {
+            modifiedWeight = irv.Value;
+        }
+        else
+        {
+            // Fallback to base weight if event doesn't return an integer
+            modifiedWeight = WeightHg;
+        }
+
+        // Ensure minimum weight of 1 hectogram
+        return Math.Max(1, modifiedWeight);
+    }
+
+    public MoveSlot? GetMoveData(MoveId move)
+    {
+        throw new NotImplementedException();
+    }
+
+    public MoveSlot? GetMoveData(Move move)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Gets or creates the move hit data for this Pokemon's slot.
+    /// Tracks per-target information like critical hits and type effectiveness.
+    /// </summary>
+    public MoveHitResult GetMoveHitData(ActiveMove move)
+    {
+        // Lazy initialization of the moveHitData dictionary if it doesn't exist
+        move.MoveHitData ??= new MoveHitData();
+
+        // Get this Pokemon's slot identifier
+        PokemonSlot slot = GetSlot();
+
+        // Try to get existing hit data for this slot
+        if (!move.MoveHitData.TryGetValue(slot, out MoveHitResult? hitResult))
+        {
+            // Create default hit data if it doesn't exist
+            hitResult = new MoveHitResult
+            {
+                Crit = false,
+                TypeMod = 0,
+                ZBrokeProtect = false,
+            };
+
+            // Store it in the dictionary
+            move.MoveHitData[slot] = hitResult;
+        }
+
+        return hitResult;
+    }
+
+    public List<Pokemon> AlliesAndSelf()
+    {
+        return Side.Allies();
+    }
+
+    public List<Pokemon> Allies()
+    {
+        return Side.Allies().Where(p => p != this).ToList();
+    }
+
+    public List<Pokemon> AdjacentAllies()
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<Pokemon> Foes(bool all = false)
+    {
+        return Side.Foes(all);
+    }
+
+    public List<Pokemon> AdjacentFoes()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsAlly(Pokemon? pokemon = null)
+    {
+        return pokemon != null && Side == pokemon.Side;
+    }
+
+    public bool IsAdjacent(Pokemon pokemon2)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int GetUndynamaxedHp(int? amount = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<Pokemon> GetSmartTargets(Pokemon target, ActiveMove move)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Pokemon GetAtLoc(int targetLoc)
+    {
+        // Determine which side based on targetLoc sign
+        Side side = Battle.Sides[targetLoc < 0 ? Side.N % 2 : (Side.N + 1) % 2];
+
+        // Use absolute value for position calculation
+        targetLoc = Math.Abs(targetLoc);
+
+        // Handle wrap-around for multi-battle formats (e.g., if position exceeds active Pokemon count)
+        if (targetLoc > side.Active.Count)
+        {
+            targetLoc -= side.Active.Count;
+            side = Battle.Sides[side.N + 2];
+        }
+
+        // Return the Pokemon at the calculated position (adjust for 0-based indexing)
+        return side.Active[targetLoc - 1];
+    }
+
+    public int GetLocOf(Pokemon target)
+    {
+        throw new NotImplementedException();
+    }
+
+    public record MoveTargets
+    {
+        public required List<Pokemon> Targets { get; init; }
+        public required List<Pokemon> PressureTargets { get; init; }
+    }
+
+    public MoveTargets GetMoveTargets(ActiveMove move, Pokemon target)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Checks if the Pokemon's ability is being ignored due to various effects
+    /// </summary>
+    /// <returns>True if the Pokemon's ability is being ignored</returns>
+    public bool IgnoringAbility()
+    {
+        // In Gen 5+, inactive Pokemon have their abilities suppressed
+        if (Battle.Gen >= 5 && !IsActive) return true;
+
+        Ability ability = GetAbility();
+
+        // Certain abilities won't activate while Transformed, even if they ordinarily couldn't be suppressed
+        if (ability.Flags.NoTransform == true && Transformed) return true;
+
+        // Some abilities can't be suppressed at all
+        if (ability.Flags.CantSuppress == true) return false;
+
+        // Gastro Acid suppresses abilities
+        if (Volatiles.ContainsKey(ConditionId.GastroAcid)) return true;
+
+        // Ability Shield protects from ability suppression, and Neutralizing Gas can't suppress itself
+        if (HasItem(ItemId.AbilityShield) || Ability == AbilityId.NeutralizingGas) return false;
+
+        // Check if any active Pokemon have Neutralizing Gas ability
+        return Battle.GetAllActive().Any(pokemon => pokemon.Ability == AbilityId.NeutralizingGas &&
+                                                    !pokemon.Volatiles.ContainsKey(ConditionId.GastroAcid) &&
+                                                    !pokemon.Transformed && pokemon.AbilityState.Ending != true &&
+                                                    !Volatiles.ContainsKey(ConditionId.Commanding));
+    }
+
+    /// <summary>
+    /// Checks if the Pokemon is ignoring its held item due to various effects
+    /// </summary>
+    /// <param name="isFling">If true, this check is for Fling move (prevents infinite recursion)</param>
+    /// <returns>True if the Pokemon is ignoring its item</returns>
+    public bool IgnoringItem(bool isFling = false)
+    {
+        // Get the actual item object to check its properties
+        Item item = GetItem();
+
+        // Primal Orbs are never ignored
+        if (item.IsPrimalOrb) return false;
+
+        // Items that were knocked off are ignored (Gen 3-4 mechanic)
+        if (ItemState.KnockedOff == true) return true;
+
+        // In Gen 5+, inactive Pokemon ignore their items
+        if (Battle.Gen >= 5 && !IsActive) return true;
+
+        // Embargo volatile condition causes item ignoring
+        if (Volatiles.ContainsKey(ConditionId.Embargo)) return true;
+
+        // Magic Room pseudo-weather causes item ignoring
+        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.MagicRoom)) return true;
+
+        // Check Fling first to avoid infinite recursion
+        if (isFling)
+        {
+            return Battle.Gen >= 5 && HasAbility(AbilityId.Klutz);
+        }
+
+        // Regular Klutz check - ignores item unless item specifically ignores Klutz
+        if (HasAbility(AbilityId.Klutz))
+        {
+            return item.IgnoreKlutz != true;
+        }
+
+        return false;
+    }
+
+    public int DeductPp(MoveId move, int? amount = null, PokemonFalseUnion? target = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int DeductPp(Move move, int? amount = null, PokemonFalseUnion? target = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void MoveUsed(ActiveMove move, int? targetLoc = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GotAttacked(MoveId move, IntFalseUnion? damage, Pokemon source)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void GotAttacked(Move move, IntFalseUnion? damage, Pokemon source)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Attacker? GetLastAttackedBy()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Attacker? GetLastDamagedBy()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// This refers to multi-turn moves like SolarBeam and Outrage and
+    /// Sky Drop, which remove all choice (no dynamax, switching, etc).
+    /// Don't use it for "soft locks" like Choice Band.
+    /// </summary>
+    public MoveId? GetLockedMove()
+    {
+        RelayVar? lockedMove = Battle.RunEvent(EventId.LockMove, this);
+
+        // If event returns true, there's no locked move
+        if (lockedMove is BoolRelayVar { Value: true })
+        {
+            return null;
+        }
+
+        // Otherwise, try to extract MoveId from the RelayVar
+        if (lockedMove is MoveIdRelayVar moveIdRelayVar)
+        {
+            return moveIdRelayVar.MoveId;
+        }
+
+        // If RelayVar is null or another type, no locked move
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the list of moves available to this Pokemon for the current turn.
+    /// Handles locked moves, move modifications, PP depletion, and disabled moves.
+    /// </summary>
+    /// <param name="lockedMove">If specified, the Pokemon is locked into using this move</param>
+    /// <param name="restrictData">If true, hide certain disabled move information</param>
+    /// <returns>List of available moves with their current state</returns>
+    public List<PokemonMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
+    {
+        // Handle locked move cases
+        if (lockedMove is not null)
+        {
+            Trapped = PokemonTrapped.True;
+
+            // Special case: Recharge turn (after Hyper Beam, etc.)
+            if (lockedMove == MoveId.Recharge)
+            {
+                return
+                [
+                    new PokemonMoveData
+                    {
+                        Move = Battle.Library.Moves[MoveId.Recharge],
+                        Target = null,
+                        Disabled = null,
+                        DisabledSource = null,
+                    },
+                ];
+            }
+
+            // Find the locked move in move slots
+            foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot => moveSlot.Id == lockedMove))
+            {
+                return
+                [
+                    new PokemonMoveData
+                    {
+                        Move = Battle.Library.Moves[moveSlot.Move],
+                        Target = null,
+                        Disabled = null,
+                        DisabledSource = null,
+                    },
+                ];
+            }
+
+            // Fallback: lookup move by ID (shouldn't normally happen)
+            return
+            [
+                new PokemonMoveData
+                {
+                    Move = Battle.Library.Moves[lockedMove.Value],
+                    Target = null,
+                    Disabled = null,
+                    DisabledSource = null,
+                },
+            ];
+        }
+
+        // Build list of available moves
+        var moves = new List<PokemonMoveData>();
+        bool hasValidMove = false;
+
+        foreach (MoveSlot moveSlot in MoveSlots)
+        {
+            MoveId moveName = moveSlot.Move;
+
+            // Special move target modifications
+            switch (moveSlot.Id)
+            {
+                case MoveId.Curse:
+                    // Curse has different targeting if user is not Ghost-type
+                    if (!HasType(PokemonType.Ghost))
+                    {
+                        Move curseMove = Battle.Library.Moves[MoveId.Curse];
+                    }
+                    break;
+
+                case MoveId.PollenPuff:
+                    // Heal Block prevents Pollen Puff from targeting allies
+                    if (Volatiles.ContainsKey(ConditionId.HealBlock))
+                    {
+                    }
+                    break;
+
+                case MoveId.TeraStarStorm:
+                    // Terapagos-Stellar gets spread targeting
+                    if (Species.Id == SpecieId.TerapagosStellar)
+                    {
+                    }
+                    break;
+            }
+
+            // Determine if move is disabled
+            BoolHiddenUnion disabled = moveSlot.Disabled;
+
+            // Skip Dynamax handling as requested
+
+            // Check if move is out of PP (unless locked into partial trapping move)
+            if (moveSlot.Pp <= 0 && !Volatiles.ContainsKey(ConditionId.PartialTrappingLock))
+            {
+                disabled = true;
+            }
+
+            // Handle hidden disabled state
+            if (disabled is HiddenBoolHiddenUnion)
+            {
+                disabled = !restrictData;
+            }
+
+            // Track if we have at least one valid (non-disabled) move
+            if (!disabled.IsTruthy())
+            {
+                hasValidMove = true;
+            }
+
+            // Convert disabled state to MoveIdBoolUnion
+            MoveIdBoolUnion? disabledUnion = null;
+            if (disabled.IsTruthy())
+            {
+                disabledUnion = disabled.IsTrue() ? true : null;
+            }
+
+            // Get the Move object from the library
+            Move moveObject = Battle.Library.Moves[moveName];
+
+            // Add move to list
+            moves.Add(new PokemonMoveData
+            {
+                Move = moveObject,
+                Target = null, // Target is not set in this context
+                Disabled = disabledUnion,
+                DisabledSource = moveSlot.DisabledSource,
+            });
+        }
+        return hasValidMove ? moves : [];
+    }
+
+    //public bool MaxMoveDisables(MoveId baseMove)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    //public bool MaxMoveDisables(Move baseMove)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    // GetDynamaxRequest() // Skipping Dynamax for now
+
+    /// <summary>
+    /// Generates move request data for this Pokemon, containing information about
+    /// available moves, restrictions, and special mechanics for the current turn.
+    /// </summary>
+    public PokemonMoveRequestData GetMoveRequestData()
+    {
+        // Get locked move if Pokemon is not maybe-locked
+        var lockedMove = MaybeLocked == true ? null : GetLockedMove();
+
+        // Information should be restricted for the last active Pokemon
+        bool isLastActive = IsLastActive();
+        int canSwitchIn = Battle.CanSwitch(Side);
+        var moves = GetMoves(lockedMove, isLastActive);
+
+        // If no moves available, default to Struggle
+        if (moves.Count == 0)
+        {
+            moves =
+            [
+                new PokemonMoveData
+                {
+                    Move = Battle.Library.Moves[MoveId.Struggle],
+                    Target = null,
+                    Disabled = null,
+                    DisabledSource = null,
+                }
+            ];
+            lockedMove = MoveId.Struggle;
+        }
+
+        // Create base request data
+        var data = new PokemonMoveRequestData
+        {
+            Moves = moves,
+        };
+
+        if (isLastActive)
+        {
+            // Update maybe-disabled/maybe-locked state for last active Pokemon
+            MaybeDisabled = MaybeDisabled && lockedMove == null;
+            MaybeLocked = MaybeLocked ?? MaybeDisabled;
+
+            if (MaybeDisabled)
+            {
+                data = data with { MaybeDisabled = true };
+            }
+
+            if (MaybeLocked == true)
+            {
+                data = data with { MaybeLocked = true };
+            }
+
+            if (canSwitchIn > 0)
+            {
+                if (Trapped == PokemonTrapped.True)
+                {
+                    data = data with { Trapped = true };
+                }
+                else if (MaybeTrapped)
+                {
+                    data = data with { MaybeTrapped = true };
+                }
+            }
+        }
+        else
+        {
+            // Reset maybe-disabled/maybe-locked for non-last active Pokemon
+            MaybeDisabled = false;
+            MaybeLocked = null;
+
+            if (canSwitchIn > 0)
+            {
+                // Discovered by selecting a valid Pokemon as a switch target and cancelling
+                if (Trapped == PokemonTrapped.True)
+                {
+                    data = data with { Trapped = true };
+                }
+            }
+
+            MaybeTrapped = false;
+        }
+
+        // Handle Terastallization if not locked into a move
+        if (lockedMove == null)
+        {
+            if (CanTerastallize is not null and not FalseMoveTypeFalseUnion)
+            {
+                data = data with { CanTerastallize = CanTerastallize };
+            }
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// Generates switch request data for this Pokemon, containing all information
+    /// needed for a player to make switching decisions (stats, moves, ability, item, etc.)
+    /// </summary>
+    /// <param name="forAlly">If true, returns base moves instead of current moves (for ally info)</param>
+    /// <returns>Pokemon switch request data object</returns>
+    public PokemonSwitchRequestData GetSwitchRequestData(bool forAlly = false)
+    {
+        // Build stats dictionary from base stored stats
+        var stats = new StatsTable
+        {
+            [StatId.Atk] = BaseStoredStats[StatId.Atk],
+            [StatId.Def] = BaseStoredStats[StatId.Def],
+            [StatId.SpA] = BaseStoredStats[StatId.SpA],
+            [StatId.SpD] = BaseStoredStats[StatId.SpD],
+            [StatId.Spe] = BaseStoredStats[StatId.Spe],
+        };
+
+        // Get move list - either base moves (for allies) or current moves
+        var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
+
+        // Convert move slots to Move objects
+        var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
+
+        // Create the base entry
+        var entry = new PokemonSwitchRequestData
+        {
+            Condition = GetHealth().Secret.StatusCondition ?? ConditionId.None,
+            Active = Position < Side.Active.Count,
+            Stats = stats,
+            Moves = moves,
+            BaseAbility = Battle.Library.Abilities[BaseAbility],
+            Item = Battle.Library.Items[Item],
+            Pokeball = Pokeball,
+            // Default values for Gen 9+ fields
+            Ability = Battle.Library.Abilities[Ability],
+            Commanding = false,
+            Reviving = false,
+            TeraType = TeraType,
+            Terastallized = false,
+        };
+
+        // Gen 7+ includes current ability
+        if (Battle.Gen > 6)
+        {
+            entry = entry with { Ability = Battle.Library.Abilities[Ability] };
+        }
+
+        // Gen 9+ includes commanding and reviving status
+        if (Battle.Gen >= 9)
+        {
+            // Commanding: Pokemon has the Commanding volatile and is not fainted
+            bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
+
+            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
+            bool reviving = IsActive &&
+                            Position < Side.SlotConditions.Count &&
+                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
+
+            entry = entry with
+            {
+                Commanding = commanding,
+                Reviving = reviving,
+            };
+        }
+
+        // Gen 9 includes Tera type and Terastallized status
+        if (Battle.Gen == 9)
+        {
+            entry = entry with
+            {
+                TeraType = TeraType,
+                Terastallized = Terastallized != null,
+            };
+        }
+
+        return entry;
+    }
+
+    public bool IsLastActive()
+    {
+        // If this Pokémon isn't active, it can't be the last active
+        if (!IsActive) return false;
+
+        // Get all active Pokémon on this side
+        var allyActive = Side.Active;
+
+        // Check all positions after this Pokémon
+        for (int i = Position + 1; i < allyActive.Count; i++)
+        {
+            // If there's a living Pokémon at a later position, this isn't the last
+            if (!allyActive[i].Fainted)
+            {
+                return false;
+            }
+        }
+
+        // No living Pokémon found after this position - this is the last active
+        return true;
+    }
+
+    public int PositiveBoosts()
+    {
+        throw new NotImplementedException();
+    }
+
+    public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
+    {
+        SparseBoostsTable cappedBoost = new();
+        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        {
+            // Get current boost value for this stat
+            int currentBoost = Boosts.GetBoost(boostId);
+
+            // Calculate capped boost: clamp(current + incoming) - current
+            // This gives us the actual amount we can boost (respecting -6 to +6 limits)
+            int cappedValue = Battle.ClampIntRange(currentBoost + value, -6, 6) - currentBoost;
+            cappedBoost.SetBoost(boostId, cappedValue);
+        }
+        return cappedBoost;
+    }
+
+    /// <summary>
+    /// Applies stat boosts to this Pokemon, respecting the -6 to +6 boost limits.
+    /// Returns the delta (change amount) of the last boost that was applied.
+    /// </summary>
+    /// <param name="boosts">The boosts to apply (will be capped to valid ranges)</param>
+    /// <returns>The change amount of the last stat that was boosted (0 if no boosts were applied)</returns>
+    public int BoostBy(SparseBoostsTable boosts)
+    {
+        // Cap all boosts to respect -6 to +6 limits
+        boosts = GetCappedBoost(boosts);
+
+        int delta = 0;
+
+        // Apply each boost to the Pokemon's current boosts
+        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
+        {
+            delta = value;
+            Boosts.SetBoost(boostId, Boosts.GetBoost(boostId) + delta);
+        }
+
+        // Return the last delta (change amount of the last stat modified)
+        return delta;
+    }
+
+    public void ClearBoosts()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SetBoost(SparseBoostsTable boosts)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CopyVolatileFrom(Pokemon pokemon, ConditionIdBoolUnion? switchCause = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool TransformInto(Pokemon pokemon, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Default is Battle.Effect for source.
+    /// </summary>
+    public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
+    {
+        RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
+        if (rv is null) return null;
+
+        if (rv is SpecieRelayVar srv)
+        {
+            Species = srv.Species;
+        }
+        else
+        {
+            throw new InvalidOperationException("species must be a SpecieRelayVar");
+        }
+        Species species = srv.Species;
+
+        SetType(species.Types.ToArray(), true);
+        ApparentType = rawSpecies.Types.ToList();
+        AddedType = species.AddedType;
+        KnownType = true;
+        WeightHg = species.WeightHg;
+
+        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set);
+        if (Species.MaxHp is not null)
+        {
+            stats.Hp = Species.MaxHp.Value;
+        }
+
+        if (MaxHp != 0)
+        {
+            BaseMaxHp = stats.Hp;
+            MaxHp = stats.Hp;
+            Hp = stats.Hp;
+        }
+
+        if (!isTransform) BaseStoredStats = stats;
+        foreach (var statName in StoredStats)
+        {
+            StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
+        }
+
+        Speed = StoredStats.Spe;
+        return species;
+    }
+
+    /// <summary>
+    /// Changes this Pokemon's forme to match the given speciesId (or species).
+    /// This function handles all changes to stats, ability, type, species, etc.
+    /// as well as sending all relevant messages sent to the client.
+    /// </summary>
+    public bool FormeChange(SpecieId specieId, IEffect? source = null, bool? isPermanent = null,
+        SpeciesAbilityType abilitySlot = SpeciesAbilityType.Slot0, string? message = null)
+    {
+        // Default source to battle effect if not provided
+        source ??= Battle.Effect;
+
+        // Get the raw species from the battle library
+        Species rawSpecies = Battle.Library.Species[specieId];
+
+        // Attempt to set the species
+        Species? species = SetSpecie(rawSpecies, source);
+        if (species == null) return false;
+
+        // Early return for Gen 1-2 battles
+        if (Battle.Gen <= 2) return true;
+
+        // Determine the species the opponent sees (accounting for Illusion)
+        //SpecieId apparentSpecies = Illusion?.Species.BaseSpecies ?? species.BaseSpecies;
+
+        if (isPermanent == true)
+        {
+            // Update base species for permanent changes
+            BaseSpecies = rawSpecies;
+
+            // Update details and send to client
+            Details = GetUpdatedDetails();
+            PokemonDetails details = (Illusion ?? this).GetUpdatedDetails();
+
+            // Add Tera type to details if Terastallized
+            if (Terastallized != null)
+            {
+                details.TeraType = Terastallized.Value;
+            }
+            UiGenerator.PrintDetailsChangeEvent(this, details);
+
+            // Update max HP based on new species
+            UpdateMaxHp();
+
+            // Handle different source types for permanent changes
+            if (source.EffectType == EffectType.Condition)
+            {
+                // Status-based forme change (e.g., Shaymin-Sky -> Shaymin)
+                UiGenerator.PrintFormeChangeEvent(this, species.Id, message);
+            }
+        }
+        else
+        {
+            // Handle temporary forme changes
+            if (source.EffectType == EffectType.Ability)
+            {
+                UiGenerator.PrintFormeChangeEvent(this, species.Id, message, source);
+            }
+            else
+            {
+                UiGenerator.PrintFormeChangeEvent(this, Illusion is not null ? Illusion.Species.Id :
+                    species.Id, message);
+            }
+        }
+
+        // Handle ability changes for permanent forme changes
+        if (isPermanent == true &&
+            source is Ability ability && ability.Id != AbilityId.Disguise && ability.Id != AbilityId.IceFace)
+        {
+            // Break Illusion for certain Tera forme changes
+            if (Illusion != null)
+            {
+                // Tera forme by Ogerpon or Terapagos breaks the Illusion
+                Ability = AbilityId.None; // Don't allow Illusion to wear off
+            }
+
+            // Get the new ability from the species
+            AbilityId newAbility = species.Abilities.GetAbility(abilitySlot) ?? species.Abilities.Slot0;
+
+            SetAbility(newAbility, isFromFormeChange: true);
+
+            // Reset base ability (ability resets upon switching out)
+            BaseAbility = newAbility;
+        }
+
+        // Update type visibility for Terastallized Pokemon
+        if (Terastallized != null)
+        {
+            KnownType = true;
+            ApparentType = [Terastallized.Value.ConvertToPokemonType()];
+        }
+
+        return true;
+    }
+
+    public void UpdateMaxHp()
+    {
+        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp);
+        if (newBaseMaxHp == BaseMaxHp) return;
+        BaseMaxHp = newBaseMaxHp;
+        int newMaxHp = BaseMaxHp;
+        Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
+        MaxHp = newMaxHp;
+        if (Hp > 0)
+        {
+            UiGenerator.PrintHealEvent(this, Hp);
+        }
+    }
 
     public void ClearVolatile(bool includeSwitchFlags = true)
     {
@@ -299,24 +1341,59 @@ public class Pokemon : IPriorityComparison
         SetSpecie(BaseSpecies, Battle.Effect);
     }
 
-    public void RemoveLinkedVolatiles(Condition linkedStatus, List<Pokemon> linkedPokemon)
+    public bool HasType(PokemonType type)
     {
-        foreach (Pokemon linkedPoke in linkedPokemon)
-        {
-            if (!linkedPoke.Volatiles.TryGetValue(linkedStatus.Id, out EffectState? volatileData) ||
-                volatileData.LinkedPokemon is null)
-            {
-                continue;
-            }
-            // Remove this Pokemon from the linked Pokemon list
-            volatileData.LinkedPokemon.Remove(this);
+        return GetTypes().Contains(type);
+    }
 
-            // If no linked Pokemon remain, remove the volatile status
-            if (volatileData.LinkedPokemon.Count == 0)
-            {
-                linkedPoke.RemoveVolatile(linkedStatus);
-            }
+    public bool HasType(PokemonType[] types)
+    {
+        return types.Any(t => GetTypes().Contains(t));
+    }
+
+    public int Faint(Pokemon? source = null, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Damage(int d, Pokemon? source = null, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool TryTrap(bool isHidden = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasMove(MoveId move)
+    {
+        return MoveSlots.Any(ms => ms.Id == move);
+    }
+
+    public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)
+    {
+        if (sourceEffect is not null && Battle.Event is not null)
+        {
+            sourceEffect = Battle.Event.Effect;
         }
+
+        foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
+                     moveSlot.Id != moveId && moveSlot.Disabled != true))
+        {
+            moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
+            moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
+        }
+    }
+
+    public IntFalseUnion Heal(int d, Pokemon? source = null, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int? SetHp(int d)
+    {
+        throw new NotImplementedException();
     }
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
@@ -324,8 +1401,33 @@ public class Pokemon : IPriorityComparison
         return SetStatus(Status == ConditionId.None ? status : ConditionId.None, source, sourceEffect);
     }
 
+    public bool CureStatus(bool silent = false)
+    {
+        // Early exit if Pokemon is fainted or has no status
+        if (Hp <= 0) return false;
+
+        // Add cure status message to battle log
+        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status]);
+
+        // Special case: If curing sleep, also remove Nightmare volatile
+        if (Status == ConditionId.Sleep)
+        {
+            // Check if Pokemon has Nightmare volatile and remove it
+            if (Volatiles.ContainsKey(ConditionId.Nightmare))
+            {
+                DeleteVolatile(ConditionId.Nightmare); // Use DeleteVolatile to avoid extra logic
+                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+            }
+        }
+
+        // Clear the status (equivalent to setStatus(''))
+        SetStatus(ConditionId.None);
+
+        return true;
+    }
+
     public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
-    bool ignoreImmunities = false)
+        bool ignoreImmunities = false)
     {
         // Initial HP check
         if (Hp <= 0) return false;
@@ -348,7 +1450,7 @@ public class Pokemon : IPriorityComparison
         {
             if (sourceEffect is ActiveMove move && move.Status == Status)
             {
-                UiGenerator.PrintFailEvent(this, Battle.Library.Conditions[(ConditionId)Status]);
+                UiGenerator.PrintFailEvent(this, Battle.Library.Conditions[Status]);
             }
             else if (sourceEffect is ActiveMove { Status: not null })
             {
@@ -385,7 +1487,7 @@ public class Pokemon : IPriorityComparison
         }
 
         // Store previous status for potential rollback
-        var prevStatus = Status;
+        ConditionId prevStatus = Status;
         EffectState prevStatusState = StatusState;
 
         // Run SetStatus event
@@ -461,117 +1563,241 @@ public class Pokemon : IPriorityComparison
         return true;
     }
 
-    public void UpdateSpeed()
+    /// <summary>
+    /// Unlike CureStatus, this does not give any cure messages.
+    /// </summary>
+    public bool ClearStatus()
     {
-        Speed = GetActionSpeed();
+        // Early exit if Pokemon is fainted or has no status
+        if (Hp <= 0) return false;
+
+        // Special case: If clearing sleep, also remove Nightmare volatile (silent)
+        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
+        {
+            // Remove Nightmare volatile and add silent end message
+            if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
+            {
+                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+            }
+        }
+
+        // Clear the status directly (no events, no messages)
+        Status = ConditionId.None;
+        StatusState = Battle.InitEffectState();
+
+        return true;
     }
 
-    public int GetActionSpeed()
+    public Condition GetStatus()
+    {
+        return Battle.Library.Conditions[Status];
+    }
+
+    public bool EatItem(bool force = false, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Checks status immunity based on Pokemon type (e.g., Fire-types immune to Burn)
-    /// </summary>
-    public bool RunStatusImmunity(PokemonType? type, string? message = null)
+    public bool UseItem(Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        // Check if Pokemon is fainted
-        if (Fainted) return false;
+        throw new NotImplementedException();
+    }
 
-        // Equivalent to TypeScript: if (!type) return true;
-        if (type == null) return true;
+    public ItemFalseUnion TakeItem(Pokemon? source = null)
+    {
+        throw new NotImplementedException();
+    }
 
-        // Convert PokemonType to MoveType for immunity check
-        MoveType moveType = type.Value.ConvertToMoveType();
+    public bool SetItem(ItemId item, Pokemon? source = null, IEffect? effect = null)
+    {
+        // Early exit if Pokemon is fainted or not active
+        if (Hp <= 0 || !IsActive) return false;
 
-        // Check natural type immunity using battle's dex
-        if (!Battle.Dex.GetImmunity(moveType, this))
+        // Check if item was knocked off (except for Recycle move)
+        if (ItemState.KnockedOff == true && effect is ActiveMove { Id: MoveId.Recycle })
         {
-            if (Battle.PrintDebug)
-            {
-                // Battle.Debug("natural status immunity");
-            }
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                UiGenerator.PrintImmuneEvent(this);
-            }
             return false;
         }
 
-        // Check artificial immunity (abilities, items, etc.)
-        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null, type);
+        // Clear knocked off flag
+        ItemState.KnockedOff = null;
 
-        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
-        if (immunity is BoolRelayVar { Value: false } or null)
+        // Determine current effect ID
+        EffectStateId effectId = Battle.Effect.EffectStateId;
+
+        // Check if this is a restorative berry (like Leppa Berry)
+        // Note: You'll need to define RESTORATIVE_BERRIES set/list somewhere
+        if (RestorativeBerries.Contains(ItemId.LeppaBerry))
         {
-            if (Battle.PrintDebug)
-            {
-                // Battle.Debug("artificial status immunity");
-            }
+            // Check if item was inflicted by Trick or Switcheroo
+            bool inflicted = effectId is MoveEffectStateId { MoveId: MoveId.Trick or MoveId.Switcheroo };
 
-            // TypeScript: if (message && immunity !== null)
-            if (!string.IsNullOrEmpty(message) && immunity is not null)
-            {
-                UiGenerator.PrintImmuneEvent(this);
-            }
-            return false;
+            // Check if it's external (from opponent)
+            bool external = inflicted && source != null && !source.IsAlly(this);
+
+            // Set pending staleness
+            PendingStaleness = external ? StalenessId.External : StalenessId.Internal;
+        }
+        else
+        {
+            PendingStaleness = null;
+        }
+
+        // Store old item and state
+        Item oldItem = GetItem();
+        EffectState oldItemState = ItemState;
+
+        // Set new item
+        Item = item;
+        ItemState = Battle.InitEffectState(item, null, this);
+
+        // Trigger End event on old item if it existed
+        if (oldItem.Id != ItemId.None)
+        {
+            Battle.SingleEvent(EventId.End, oldItem, oldItemState, this);
+        }
+
+        // Trigger Start event on new item if it exists
+        if (item != ItemId.None)
+        {
+            Battle.SingleEvent(EventId.Start, Battle.Library.Items[item], ItemState,
+                this, SingleEventSource.FromNullablePokemon(source), effect);
         }
 
         return true;
     }
 
-    /// <summary>
-    /// Checks immunity for specific conditions (e.g., Sleep immunity for certain Pokemon types)
-    /// </summary>
-    public bool RunStatusImmunity(ConditionId? conditionId, string? message = null)
+    public Item GetItem()
     {
-        // Check if Pokemon is fainted
-        if (Fainted) return false;
+        return Battle.Library.Items[Item];
+    }
 
-        // Equivalent to TypeScript: if (!type) return true;
-        if (conditionId == null) return true;
+    /// <summary>
+    /// Checks if the Pokemon has a specific item and is not ignoring it
+    /// </summary>
+    public bool HasItem(ItemId item)
+    {
+        // Check if Pokemon has the specified item
+        if (Item != item) return false;
 
-        // Get the condition from the library
-        Condition condition = Battle.Library.Conditions[conditionId.Value];
+        // Check if Pokemon is ignoring its item
+        return !IgnoringItem();
+    }
 
-        // Check natural condition immunity using ModdedDex static method
-        if (!ModdedDex.GetImmunity(condition, Types))
+    /// <summary>
+    /// Checks if the Pokemon has any of the specified items and is not ignoring it
+    /// </summary>
+    public bool HasItem(ItemId[] items)
+    {
+        // Check if Pokemon's current item is in the array
+        if (!items.Contains(Item)) return false;
+
+        // Check if Pokemon is ignoring its item
+        return !IgnoringItem();
+    }
+
+    public bool ClearItem()
+    {
+        return SetItem(ItemId.None);
+    }
+
+    public AbilityIdFalseUnion? SetAbility(AbilityId ability, Pokemon? source = null, IEffect? sourceEffect = null,
+        bool isFromFormeChange = false, bool isTransform = false)
+    {
+        // Early exit if Pokemon is fainted
+        if (Hp <= 0) return AbilityIdFalseUnion.FromFalse();
+
+        // Get the ability object from the battle library
+        Ability newAbility = Battle.Library.Abilities[ability];
+
+        // Default sourceEffect to battle effect if not provided
+        sourceEffect ??= Battle.Effect;
+
+        // Get the old ability for comparison and return value
+        Ability oldAbility = GetAbility();
+
+        // Check suppression flags (unless from forme change)
+        if (!isFromFormeChange)
         {
-            if (Battle.PrintDebug)
+            if (newAbility.Flags.CantSuppress == true || oldAbility.Flags.CantSuppress == true)
             {
-                // Battle.Debug("natural condition immunity");
+                return AbilityIdFalseUnion.FromFalse();
             }
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                UiGenerator.PrintImmuneEvent(this);
-            }
-            return false;
         }
 
-        // Check artificial immunity (abilities, items, etc.) for conditions
-        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null,
-            conditionId);
-
-        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
-        if (immunity is BoolRelayVar { Value: false } or null)
+        // Run SetAbility event for validation (unless from forme change or transform)
+        if (!isFromFormeChange && !isTransform)
         {
-            if (Battle.PrintDebug)
-            {
-                // Battle.Debug("artificial condition immunity");
-            }
+            RelayVar? setAbilityEvent = Battle.RunEvent(EventId.SetAbility, this,
+                RunEventSource.FromNullablePokemon(source), sourceEffect, newAbility);
 
-            // TypeScript: if (message && immunity !== null)
-            if (!string.IsNullOrEmpty(message) && immunity is not null)
+            // Return the actual event result (matching TypeScript behavior)
+            if (setAbilityEvent is BoolRelayVar { Value: false })
             {
-                UiGenerator.PrintImmuneEvent(this);
+                return AbilityIdFalseUnion.FromFalse();
             }
-            return false;
+            if (setAbilityEvent is null)
+            {
+                return null;
+            }
         }
 
-        return true;
+        // End the old ability's effects
+        Battle.SingleEvent(EventId.End, oldAbility, AbilityState, this,
+            SingleEventSource.FromNullablePokemon(source));
+
+        // Set the new ability
+        Ability = ability;
+        AbilityState = Battle.InitEffectState(ability, null, this);
+
+        // Send battle message ONLY if sourceEffect exists (matching TypeScript)
+        if (!isFromFormeChange && !isTransform)
+        {
+            if (source != null)
+            {
+                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect, source);
+            }
+            else
+            {
+                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect);
+            }
+        }
+
+        // Start the new ability's effects (Gen 4+ only)
+        if (ability != AbilityId.None && Battle.Gen > 3 &&
+            (!isTransform || oldAbility.Id != newAbility.Id || Battle.Gen <= 4))
+        {
+            Battle.SingleEvent(EventId.Start, newAbility, AbilityState, this,
+                SingleEventSource.FromNullablePokemon(source));
+        }
+
+        return oldAbility.Id;
+    }
+
+    public Ability GetAbility()
+    {
+        return Battle.Library.Abilities[Ability];
+    }
+
+    public bool HasAbility(AbilityId ability)
+    {
+        if (ability != Ability) return false;
+        return !IgnoringAbility();
+    }
+
+    public bool HasAbility(AbilityId[] abilities)
+    {
+        return abilities.Contains(Ability) && !IgnoringAbility();
+    }
+
+    public AbilityIdFalseUnion? ClearAbility()
+    {
+        return SetAbility(AbilityId.None);
+    }
+
+    public Nature GetNature()
+    {
+        throw new NotImplementedException();
     }
 
     public RelayVar AddVolatile(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null,
@@ -745,547 +1971,130 @@ public class Pokemon : IPriorityComparison
         return true;
     }
 
-    /// <summary>
-    /// Deletes a volatile condition without running the extra logic from RemoveVolatile
-    /// </summary>
-    public bool DeleteVolatile(ConditionId volatileId)
+    public void RemoveLinkedVolatiles(Condition linkedStatus, List<Pokemon> linkedPokemon)
     {
-        return Volatiles.Remove(volatileId);
-    }
-
-    /// <summary>
-    /// Checks if the Pokemon's ability is being ignored due to various effects
-    /// </summary>
-    /// <returns>True if the Pokemon's ability is being ignored</returns>
-    public bool IgnoringAbility()
-    {
-        // In Gen 5+, inactive Pokemon have their abilities suppressed
-        if (Battle.Gen >= 5 && !IsActive) return true;
-
-        Ability ability = GetAbility();
-
-        // Certain abilities won't activate while Transformed, even if they ordinarily couldn't be suppressed
-        if (ability.Flags.NoTransform == true && Transformed) return true;
-
-        // Some abilities can't be suppressed at all
-        if (ability.Flags.CantSuppress == true) return false;
-
-        // Gastro Acid suppresses abilities
-        if (Volatiles.ContainsKey(ConditionId.GastroAcid)) return true;
-
-        // Ability Shield protects from ability suppression, and Neutralizing Gas can't suppress itself
-        if (HasItem(ItemId.AbilityShield) || Ability == AbilityId.NeutralizingGas) return false;
-
-        // Check if any active Pokemon have Neutralizing Gas ability
-        return Battle.GetAllActive().Any(pokemon => pokemon.Ability == AbilityId.NeutralizingGas &&
-                                                    !pokemon.Volatiles.ContainsKey(ConditionId.GastroAcid) &&
-                                                    !pokemon.Transformed && pokemon.AbilityState.Ending != true &&
-                                                    !Volatiles.ContainsKey(ConditionId.Commanding));
-    }
-
-    public Ability GetAbility()
-    {
-        return Battle.Library.Abilities[Ability];
-    }
-
-    public Condition GetStatus()
-    {
-        return Battle.Library.Conditions[Status];
-    }
-
-    public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
-    {
-        int bestStatValue = int.MinValue;
-        var bestStatName = StatIdExceptHp.Atk;
-
-        // Iterate through all stat types except HP
-        foreach (StatIdExceptHp statId in Enum.GetValues<StatIdExceptHp>())
+        foreach (Pokemon linkedPoke in linkedPokemon)
         {
-            int currentStatValue = GetStat(statId, unboosted, unmodified);
-            if (currentStatValue <= bestStatValue) continue;
-            bestStatValue = currentStatValue;
-            bestStatName = statId;
-        }
-        return bestStatName;
-    }
-
-    public int GetStat(StatIdExceptHp statName, bool unboosted = false, bool unmodified = false)
-    {
-        int stat = StoredStats[statName];
-
-        // Wonder Room swaps Def and SpD
-        if (unmodified && Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
-        {
-            statName = statName switch
+            if (!linkedPoke.Volatiles.TryGetValue(linkedStatus.Id, out EffectState? volatileData) ||
+                volatileData.LinkedPokemon is null)
             {
-                StatIdExceptHp.Def => StatIdExceptHp.SpD,
-                StatIdExceptHp.SpD => StatIdExceptHp.Def,
-                _ => statName,
+                continue;
+            }
+            // Remove this Pokemon from the linked Pokemon list
+            volatileData.LinkedPokemon.Remove(this);
+
+            // If no linked Pokemon remain, remove the volatile status
+            if (volatileData.LinkedPokemon.Count == 0)
+            {
+                linkedPoke.RemoveVolatile(linkedStatus);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the current health status of this Pokemon.
+    /// Returns both secret (exact) and shared (observable) health data.
+    /// The shared data varies based on battle settings and generation:
+    /// - Exact HP if battle.ReportExactHp is true
+    /// - Percentage if battle.ReportPercentages is true or Gen 7+
+    /// - Pixel-based display (48 pixels) for Gen 3-6 with color indicators in Gen 5+
+    /// </summary>
+    public PokemonHealth GetHealth()
+    {
+        // Fainted Pokemon
+        if (Hp <= 0)
+        {
+            return new PokemonHealth
+            {
+                SideId = Side.Id,
+                Secret = FaintedHealthData.Instance with
+                {
+                    StatusCondition = Status != ConditionId.None
+                        ? Status
+                        : null,
+                },
+                Shared = FaintedHealthData.Instance with
+                {
+                    StatusCondition = Status != ConditionId.None
+                        ? Status
+                        : null,
+                },
             };
         }
 
-        // Stat boosts
-        if (!unboosted)
+        // Secret data is always exact HP
+        var secret = new ExactHealthData
         {
-            BoostsTable boosts = Boosts;
-            if (!unmodified)
-            {
-                RelayVar? relayVar = Battle.RunEvent(EventId.ModifyBoost, this, null,
-                    null, boosts);
-
-                if (relayVar is BoostsTableRelayVar brv)
-                {
-                    boosts = brv.Table;
-                }
-                else
-                {
-                    throw new InvalidOperationException("boosts must be a BoostsTableRelayVar" );
-                }
-            }
-            stat = (int)Math.Floor(stat * boosts.GetBoostMultiplier(statName.ConvertToBoostId()));
-        }
-
-        // Stat modifier effects
-        if (!unmodified)
-        {
-            EventId eventId = statName switch
-            {
-                StatIdExceptHp.Atk => EventId.ModifyAtk,
-                StatIdExceptHp.Def => EventId.ModifyDef,
-                StatIdExceptHp.SpA => EventId.ModifySpA,
-                StatIdExceptHp.SpD => EventId.ModifySpD,
-                StatIdExceptHp.Spe => EventId.ModifySpe,
-                _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
-            };
-            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, stat);
-            if (relayVar is IntRelayVar irv)
-            {
-                stat = irv.Value;
-            }
-            else
-            {
-                throw new InvalidOperationException("stat must be an IntRelayVar" );
-            }
-        }
-
-        if (statName == StatIdExceptHp.Spe && stat > 10000) stat = 10000;
-        return stat;
-    }
-
-    public bool HasAbility(AbilityId ability)
-    {
-        if (ability != Ability) return false;
-        return !IgnoringAbility();
-    }
-
-    public bool HasAbility(AbilityId[] abilities)
-    {
-        return abilities.Contains(Ability) && !IgnoringAbility();
-    }
-
-    public bool CureStatus(bool silent = false)
-    {
-        // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0) return false;
-
-        // Add cure status message to battle log
-        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status]);
-
-        // Special case: If curing sleep, also remove Nightmare volatile
-        if (Status == ConditionId.Sleep)
-        {
-            // Check if Pokemon has Nightmare volatile and remove it
-            if (Volatiles.ContainsKey(ConditionId.Nightmare))
-            {
-                DeleteVolatile(ConditionId.Nightmare); // Use DeleteVolatile to avoid extra logic
-                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
-            }
-        }
-
-        // Clear the status (equivalent to setStatus(''))
-        SetStatus(ConditionId.None);
-
-        return true;
-    }
-
-    /// <summary>
-    /// Unlike CureStatus, this does not give any cure messages.
-    /// </summary>
-    public bool ClearStatus()
-    {
-        // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0) return false;
-
-        // Special case: If clearing sleep, also remove Nightmare volatile (silent)
-        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
-        {
-            // Remove Nightmare volatile and add silent end message
-            if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
-            {
-                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
-            }
-        }
-
-        // Clear the status directly (no events, no messages)
-        Status = ConditionId.None;
-        StatusState = Battle.InitEffectState();
-
-        return true;
-    }
-
-    //setItem(item: string | Item, source?: Pokemon, effect?: Effect)
-    //{
-    //    if (!this.hp || !this.isActive) return false;
-    //    if (this.itemState.knockedOff && !(effect?.id === 'recycle')) return false;
-    //    delete this.itemState.knockedOff;
-    //    if (typeof item === 'string') item = this.battle.dex.items.get(item);
-
-    //    const effectid = this.battle.effect ? this.battle.effect.id : '';
-    //    if (RESTORATIVE_BERRIES.has('leppaberry' as ID))
-    //    {
-    //        const inflicted = ['trick', 'switcheroo'].includes(effectid);
-    //        const external = inflicted && source && !source.isAlly(this);
-    //        this.pendingStaleness = external ? 'external' : 'internal';
-    //    }
-    //    else
-    //    {
-    //        this.pendingStaleness = undefined;
-    //    }
-    //    const oldItem = this.getItem();
-    //    const oldItemState = this.itemState;
-    //    this.item = item.id;
-    //    this.itemState = this.battle.initEffectState({ id: item.id, target: this });
-    //    if (oldItem.exists) this.battle.singleEvent('End', oldItem, oldItemState, this);
-    //    if (item.id)
-    //    {
-    //        this.battle.singleEvent('Start', item, this.itemState, this, source, effect);
-    //    }
-    //    return true;
-    //}
-
-    private static readonly HashSet<ItemId> RestorativeBerries =
-    [
-        ItemId.LeppaBerry,
-        ItemId.AguavBerry,
-        ItemId.EnigmaBerry,
-        ItemId.FigyBerry,
-        ItemId.IapapaBerry,
-        ItemId.MagoBerry,
-        ItemId.SitrusBerry,
-    ];
-
-    public bool SetItem(ItemId item, Pokemon? source = null, IEffect? effect = null)
-    {
-        // Early exit if Pokemon is fainted or not active
-        if (Hp <= 0 || !IsActive) return false;
-
-        // Check if item was knocked off (except for Recycle move)
-        if (ItemState.KnockedOff == true && effect is ActiveMove { Id: MoveId.Recycle })
-        {
-            return false;
-        }
-
-        // Clear knocked off flag
-        ItemState.KnockedOff = null;
-
-        // Determine current effect ID
-        EffectStateId effectId = Battle.Effect.EffectStateId;
-
-        // Check if this is a restorative berry (like Leppa Berry)
-        // Note: You'll need to define RESTORATIVE_BERRIES set/list somewhere
-        if (RestorativeBerries.Contains(ItemId.LeppaBerry))
-        {
-            // Check if item was inflicted by Trick or Switcheroo
-            bool inflicted = effectId is MoveEffectStateId { MoveId: MoveId.Trick or MoveId.Switcheroo};
-
-            // Check if it's external (from opponent)
-            bool external = inflicted && source != null && !source.IsAlly(this);
-
-            // Set pending staleness
-            PendingStaleness = external ? StalenessId.External : StalenessId.Internal;
-        }
-        else
-        {
-            PendingStaleness = null;
-        }
-
-        // Store old item and state
-        Item oldItem = GetItem();
-        EffectState oldItemState = ItemState;
-
-        // Set new item
-        Item = item;
-        ItemState = Battle.InitEffectState(item, null, this);
-
-        // Trigger End event on old item if it existed
-        if (oldItem.Id != ItemId.None)
-        {
-            Battle.SingleEvent(EventId.End, oldItem, oldItemState, this);
-        }
-
-        // Trigger Start event on new item if it exists
-        if (item != ItemId.None)
-        {
-            Battle.SingleEvent(EventId.Start, Battle.Library.Items[item], ItemState,
-                this, SingleEventSource.FromNullablePokemon(source), effect);
-        }
-
-        return true;
-    }
-
-    public bool ClearItem()
-    {
-        return SetItem(ItemId.None);
-    }
-
-    public bool IsAlly(Pokemon? pokemon = null)
-    {
-        return pokemon != null && Side == pokemon.Side;
-    }
-
-    public List<Pokemon> AlliesAndSelf()
-    {
-        return Side.Allies();
-    }
-
-    public List<Pokemon> Allies()
-    {
-        return Side.Allies().Where(p => p != this).ToList();
-    }
-
-    public List<Pokemon> Foes(bool all = false)
-    {
-        return Side.Foes(all);
-    }
-
-
-    /// <summary>
-    /// Changes this Pokemon's forme to match the given speciesId (or species).
-    /// This function handles all changes to stats, ability, type, species, etc.
-    /// as well as sending all relevant messages sent to the client.
-    /// </summary>
-    public bool FormeChange(SpecieId specieId, IEffect? source = null, bool? isPermanent = null,
-        SpeciesAbilityType abilitySlot = SpeciesAbilityType.Slot0, string? message = null)
-    {
-        // Default source to battle effect if not provided
-        source ??= Battle.Effect;
-
-        // Get the raw species from the battle library
-        Species rawSpecies = Battle.Library.Species[specieId];
-
-        // Attempt to set the species
-        Species? species = SetSpecie(rawSpecies, source);
-        if (species == null) return false;
-
-        // Early return for Gen 1-2 battles
-        if (Battle.Gen <= 2) return true;
-
-        // Determine the species the opponent sees (accounting for Illusion)
-        //SpecieId apparentSpecies = Illusion?.Species.BaseSpecies ?? species.BaseSpecies;
-
-        if (isPermanent == true)
-        {
-            // Update base species for permanent changes
-            BaseSpecies = rawSpecies;
-
-            // Update details and send to client
-            Details = GetUpdatedDetails();
-            PokemonDetails details = (Illusion ?? this).GetUpdatedDetails();
-
-            // Add Tera type to details if Terastallized
-            if (Terastallized != null)
-            {
-                details.TeraType = Terastallized.Value;
-            }
-            UiGenerator.PrintDetailsChangeEvent(this, details);
-
-            // Update max HP based on new species
-            UpdateMaxHp();
-
-            // Handle different source types for permanent changes
-            if (source.EffectType == EffectType.Condition)
-            {
-                // Status-based forme change (e.g., Shaymin-Sky -> Shaymin)
-                UiGenerator.PrintFormeChangeEvent(this, species.Id, message);
-            }
-        }
-        else
-        {
-            // Handle temporary forme changes
-            if (source.EffectType == EffectType.Ability)
-            {
-                UiGenerator.PrintFormeChangeEvent(this, species.Id, message, source);
-            }
-            else
-            {
-                UiGenerator.PrintFormeChangeEvent(this, Illusion is not null ? Illusion.Species.Id :
-                    species.Id, message);
-            }
-        }
-
-        // Handle ability changes for permanent forme changes
-        if (isPermanent == true &&
-            source is Ability ability && ability.Id != AbilityId.Disguise && ability.Id != AbilityId.IceFace)
-        {
-            // Break Illusion for certain Tera forme changes
-            if (Illusion != null)
-            {
-                // Tera forme by Ogerpon or Terapagos breaks the Illusion
-                Ability = AbilityId.None; // Don't allow Illusion to wear off
-            }
-
-            // Get the new ability from the species
-            AbilityId newAbility = species.Abilities.GetAbility(abilitySlot) ?? species.Abilities.Slot0;
-
-            SetAbility(newAbility, isFromFormeChange: true);
-
-            // Reset base ability (ability resets upon switching out)
-            BaseAbility = newAbility;
-        }
-
-        // Update type visibility for Terastallized Pokemon
-        if (Terastallized != null)
-        {
-            KnownType = true;
-            ApparentType = [Terastallized.Value.ConvertToPokemonType()];
-        }
-
-        return true;
-    }
-
-    public class PokemonDetails
-    {
-        public SpecieId Id{ get; init; }
-        public int Level { get; init; }
-        public GenderId Gender { get; init; }
-        public bool Shiny { get; init; }
-        public MoveType? TeraType { get; set; }
-    }
-
-    public PokemonDetails GetUpdatedDetails(int? level = null)
-    {
-        SpecieId id = Species.Id;
-        
-        // Handle special forms that should use base species name
-        if (id is SpecieId.GreninjaBond or SpecieId.RockruffDusk)
-        {
-            id = Species.BaseSpecies;
-        }
-        
-        // Use provided level or fall back to Pokemon's level
-        int displayLevel = level ?? Level;
-        
-        var details = new PokemonDetails
-        {
-            Id = id,
-            Level = displayLevel,
-            Gender = Gender,
-            Shiny = Set.Shiny,
+            CurrentHp = Hp,
+            MaxHp = MaxHp,
+            StatusCondition = Status != ConditionId.None ? Status : null,
         };
 
-        return details;
-    }
+        // Determine shared health data format based on battle settings
+        HealthData shared;
 
-    public AbilityIdFalseUnion? SetAbility(AbilityId ability, Pokemon? source = null, IEffect? sourceEffect = null,
-        bool isFromFormeChange = false, bool isTransform = false)
-    {
-        // Early exit if Pokemon is fainted
-        if (Hp <= 0) return AbilityIdFalseUnion.FromFalse();
-
-        // Get the ability object from the battle library
-        Ability newAbility = Battle.Library.Abilities[ability];
-
-        // Default sourceEffect to battle effect if not provided
-        sourceEffect ??= Battle.Effect;
-
-        // Get the old ability for comparison and return value
-        Ability oldAbility = GetAbility();
-
-        // Check suppression flags (unless from forme change)
-        if (!isFromFormeChange)
+        if (Battle.ReportExactHp)
         {
-            if (newAbility.Flags.CantSuppress == true || oldAbility.Flags.CantSuppress == true)
+            // Exact HP reporting (same as secret)
+            shared = secret;
+        }
+        else if (Battle.ReportPercentages || Battle.Gen >= 7)
+        {
+            // HP Percentage Mod mechanics
+            int percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
+
+            // Cap at 99% if not at full HP
+            if (percentage == 100 && Hp < MaxHp)
             {
-                return AbilityIdFalseUnion.FromFalse();
+                percentage = 99;
             }
+
+            shared = new PercentageHealthData
+            {
+                Percentage = percentage,
+                StatusCondition = Status != ConditionId.None ? Status : null,
+            };
+        }
+        else
+        {
+            // In-game accurate pixel health mechanics (Gen 3-6)
+            // PS doesn't use pixels after Gen 6, but for reference:
+            // - [Gen 7] SM uses 99 pixels
+            // - [Gen 7] USUM uses 86 pixels
+            int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
+            if (pixels == 0) pixels = 1; // Minimum 1 pixel if alive
+
+            PixelColorIndicator? colorIndicator = null;
+
+            // Gen 5+ adds color indicators at specific thresholds
+            if (Battle.Gen >= 5)
+            {
+                if (pixels == 9)
+                {
+                    // 9 pixels: yellow if HP > 20%, red if HP <= 20%
+                    colorIndicator = Hp * 5 > MaxHp ? PixelColorIndicator.Yellow : PixelColorIndicator.Red;
+                }
+                else if (pixels == 24)
+                {
+                    // 24 pixels: green if HP > 50%, yellow if HP <= 50%
+                    colorIndicator = Hp * 2 > MaxHp ? PixelColorIndicator.Green : PixelColorIndicator.Yellow;
+                }
+            }
+
+            shared = new PixelHealthData
+            {
+                Pixels = pixels,
+                ColorIndicator = colorIndicator,
+                StatusCondition = Status != ConditionId.None ? Status : null,
+            };
         }
 
-        // Run SetAbility event for validation (unless from forme change or transform)
-        if (!isFromFormeChange && !isTransform)
+        return new PokemonHealth
         {
-            RelayVar? setAbilityEvent = Battle.RunEvent(EventId.SetAbility, this,
-                RunEventSource.FromNullablePokemon(source), sourceEffect, newAbility);
-
-            // Return the actual event result (matching TypeScript behavior)
-            if (setAbilityEvent is BoolRelayVar { Value: false })
-            {
-                return AbilityIdFalseUnion.FromFalse();
-            }
-            if (setAbilityEvent is null)
-            {
-                return null;
-            }
-        }
-
-        // End the old ability's effects
-        Battle.SingleEvent(EventId.End, oldAbility, AbilityState, this,
-            SingleEventSource.FromNullablePokemon(source));
-
-        // Set the new ability
-        Ability = ability;
-        AbilityState = Battle.InitEffectState(ability, null, this);
-
-        // Send battle message ONLY if sourceEffect exists (matching TypeScript)
-        if (!isFromFormeChange && !isTransform)
-        {
-            if (source != null)
-            {
-                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect, source);
-            }
-            else
-            {
-                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect);
-            }
-        }
-
-        // Start the new ability's effects (Gen 4+ only)
-        if (ability != AbilityId.None && Battle.Gen > 3 &&
-            (!isTransform || oldAbility.Id != newAbility.Id || Battle.Gen <= 4))
-        {
-            Battle.SingleEvent(EventId.Start, newAbility, AbilityState, this,
-                SingleEventSource.FromNullablePokemon(source));
-        }
-
-        return oldAbility.Id;
-    }
-
-    public AbilityIdFalseUnion? ClearAbility()
-    {
-        return SetAbility(AbilityId.None);
-    }
-
-    public void UpdateMaxHp()
-    {
-        int newBaseMaxHp = Battle.StatModify(Species.BaseStats, Set, StatId.Hp);
-        if (newBaseMaxHp == BaseMaxHp) return;
-        BaseMaxHp = newBaseMaxHp;
-        int newMaxHp = BaseMaxHp;
-        Hp = Hp <= 0 ? 0 : Math.Max(1, newMaxHp - (MaxHp - Hp));
-        MaxHp = newMaxHp;
-        if (Hp > 0)
-        {
-            UiGenerator.PrintHealEvent(this, Hp);
-        }
-    }
-
-    public bool HasType(PokemonType type)
-    {
-        return GetTypes().Contains(type);
-    }
-
-    public bool HasType(PokemonType[] types)
-    {
-        return types.Any(t => GetTypes().Contains(t));
+            SideId = Side.Id,
+            Secret = secret,
+            Shared = shared,
+        };
     }
 
     /// <summary>
@@ -1304,7 +2113,7 @@ public class Pokemon : IPriorityComparison
         if (!enforce)
         {
             // First type of Arceus, Silvally cannot be normally changed
-            if ((Battle.Gen >= 5 && Species.Num is 493 or 773) || 
+            if ((Battle.Gen >= 5 && Species.Num is 493 or 773) ||
                 (Battle.Gen == 4 && HasAbility(AbilityId.Multitype)))
             {
                 return false;
@@ -1336,6 +2145,11 @@ public class Pokemon : IPriorityComparison
         ApparentType = Types.ToList();
 
         return true;
+    }
+
+    public bool AddType(PokemonType newType)
+    {
+        throw new NotImplementedException();
     }
 
     public PokemonType[] GetTypes(bool? excludeAdded = null, bool? preterastallized = null)
@@ -1374,182 +2188,6 @@ public class Pokemon : IPriorityComparison
         }
 
         return resultTypes.ToArray();
-    }
-
-    /// <summary>
-    /// Default is Battle.Effect for source.
-    /// </summary>
-    public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
-    {
-        RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
-        if (rv is null) return null;
-
-        if (rv is SpecieRelayVar srv)
-        {
-            Species = srv.Species;
-        }
-        else
-        {
-            throw new InvalidOperationException("species must be a SpecieRelayVar" );
-        }
-        Species species = srv.Species;
-
-        SetType(species.Types.ToArray(), true);
-        ApparentType = rawSpecies.Types.ToList();
-        AddedType = species.AddedType;
-        KnownType = true;
-        WeightHg = species.WeightHg;
-
-        StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set);
-        if (Species.MaxHp is not null)
-        {
-            stats.Hp = Species.MaxHp.Value;
-        }
-
-        if (MaxHp != 0)
-        {
-            BaseMaxHp = stats.Hp;
-            MaxHp = stats.Hp;
-            Hp = stats.Hp;
-        }
-
-        if (!isTransform) BaseStoredStats = stats;
-        foreach (var statName in StoredStats)
-        {
-            StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
-        }
-
-        Speed = StoredStats.Spe;
-        return species;
-    }
-
-    public Item GetItem()
-    {
-        return Battle.Library.Items[Item];
-    }
-
-    /// <summary>
-    /// Checks if the Pokemon is ignoring its held item due to various effects
-    /// </summary>
-    /// <param name="isFling">If true, this check is for Fling move (prevents infinite recursion)</param>
-    /// <returns>True if the Pokemon is ignoring its item</returns>
-    public bool IgnoringItem(bool isFling = false)
-    {
-        // Get the actual item object to check its properties
-        Item item = GetItem();
-
-        // Primal Orbs are never ignored
-        if (item.IsPrimalOrb) return false;
-
-        // Items that were knocked off are ignored (Gen 3-4 mechanic)
-        if (ItemState.KnockedOff == true) return true;
-
-        // In Gen 5+, inactive Pokemon ignore their items
-        if (Battle.Gen >= 5 && !IsActive) return true;
-
-        // Embargo volatile condition causes item ignoring
-        if (Volatiles.ContainsKey(ConditionId.Embargo)) return true;
-
-        // Magic Room pseudo-weather causes item ignoring
-        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.MagicRoom)) return true;
-
-        // Check Fling first to avoid infinite recursion
-        if (isFling)
-        {
-            return Battle.Gen >= 5 && HasAbility(AbilityId.Klutz);
-        }
-
-        // Regular Klutz check - ignores item unless item specifically ignores Klutz
-        if (HasAbility(AbilityId.Klutz))
-        {
-            return item.IgnoreKlutz != true;
-        }
-
-        return false;
-    }
-
-    public bool HasMove(MoveId move)
-    {
-        return MoveSlots.Any(ms => ms.Id == move);
-    }
-
-    public void DisableMove(MoveId moveId, bool isHidden = false, IEffect? sourceEffect = null)
-    {
-        if (sourceEffect is not null && Battle.Event is not null)
-        {
-            sourceEffect = Battle.Event.Effect;
-        }
-
-        foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
-                     moveSlot.Id != moveId && moveSlot.Disabled != true))
-        {
-            moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
-            moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
-        }
-    }
-
-    /// <summary>
-    /// Checks if the Pokemon has a specific item and is not ignoring it
-    /// </summary>
-    public bool HasItem(ItemId item)
-    {
-        // Check if Pokemon has the specified item
-        if (Item != item) return false;
-
-        // Check if Pokemon is ignoring its item
-        return !IgnoringItem();
-    }
-
-    /// <summary>
-    /// Checks if the Pokemon has any of the specified items and is not ignoring it
-    /// </summary>
-    public bool HasItem(ItemId[] items)
-    {
-        // Check if Pokemon's current item is in the array
-        if (!items.Contains(Item)) return false;
-
-        // Check if Pokemon is ignoring its item
-        return !IgnoringItem();
-    }
-
-    /// <summary>
-    /// Gets the full slot identifier combining side ID and position letter.
-    /// Simplified version for standard battle formats.
-    /// </summary>
-    public PokemonSlot GetSlot()
-    {
-        int poistionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        return new PokemonSlot(Side.Id, poistionOffset);
-    }
-
-    /// <summary>
-    /// Gets or creates the move hit data for this Pokemon's slot.
-    /// Tracks per-target information like critical hits and type effectiveness.
-    /// </summary>
-    public MoveHitResult GetMoveHitData(ActiveMove move)
-    {
-        // Lazy initialization of the moveHitData dictionary if it doesn't exist
-        move.MoveHitData ??= new MoveHitData();
-
-        // Get this Pokemon's slot identifier
-        PokemonSlot slot = GetSlot();
-
-        // Try to get existing hit data for this slot
-        if (!move.MoveHitData.TryGetValue(slot, out MoveHitResult? hitResult))
-        {
-            // Create default hit data if it doesn't exist
-            hitResult = new MoveHitResult
-            {
-                Crit = false,
-                TypeMod = 0,
-                ZBrokeProtect = false,
-            };
-
-            // Store it in the dictionary
-            move.MoveHitData[slot] = hitResult;
-        }
-
-        return hitResult;
     }
 
     /// <summary>
@@ -1622,23 +2260,6 @@ public class Pokemon : IPriorityComparison
     }
 
     /// <summary>
-    /// Checks if this Pokemon is affected by Sky Drop (either as target or source).
-    /// </summary>
-    public bool IsSkyDropped()
-    {
-        // Check if this Pokemon is the target of Sky Drop
-        if (Volatiles.ContainsKey(ConditionId.SkyDrop))
-        {
-            return true;
-        }
-
-        // Check if this Pokemon is the source of Sky Drop on any opponent
-        return Side.Foe.Active.Any(foeActive =>
-            foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
-            state.Source == this);
-    }
-
-    /// <summary>
     /// Checks if the Pokemon is semi-invulnerable (untargetable due to two-turn moves).
     /// </summary>
     public bool IsSemiInvulnerable()
@@ -1655,6 +2276,33 @@ public class Pokemon : IPriorityComparison
         ];
 
         return semiInvulnerableConditions.Any(Volatiles.ContainsKey) || IsSkyDropped();
+    }
+
+    /// <summary>
+    /// Checks if this Pokemon is affected by Sky Drop (either as target or source).
+    /// </summary>
+    public bool IsSkyDropped()
+    {
+        // Check if this Pokemon is the target of Sky Drop
+        if (Volatiles.ContainsKey(ConditionId.SkyDrop))
+        {
+            return true;
+        }
+
+        // Check if this Pokemon is the source of Sky Drop on any opponent
+        return Side.Foe.Active.Any(foeActive =>
+            foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
+            state.Source == this);
+    }
+
+    public bool IsProtected()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ConditionId EffectiveWeather()
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -1825,618 +2473,134 @@ public class Pokemon : IPriorityComparison
         return false;
     }
 
-
-
     /// <summary>
-    /// Gets the Pokemon's current weight in hectograms, accounting for modifying effects.
-    /// Weight is used for moves like Heavy Slam, Grass Knot, and Low Kick.
-    /// Minimum weight is 1 hectogram (0.1 kg).
+    /// Checks status immunity based on Pokemon type (e.g., Fire-types immune to Burn)
     /// </summary>
-    /// <returns>Weight in hectograms (1 hg = 0.1 kg)</returns>
-    public int GetWeight()
+    public bool RunStatusImmunity(PokemonType? type, string? message = null)
     {
-        // Run ModifyWeight event to allow abilities/items/conditions to modify weight
-        RelayVar? weightEvent = Battle.RunEvent(EventId.ModifyWeight, this, null, null,
-            WeightHg);
+        // Check if Pokemon is fainted
+        if (Fainted) return false;
 
-        int modifiedWeight;
-        if (weightEvent is IntRelayVar irv)
+        // Equivalent to TypeScript: if (!type) return true;
+        if (type == null) return true;
+
+        // Convert PokemonType to MoveType for immunity check
+        MoveType moveType = type.Value.ConvertToMoveType();
+
+        // Check natural type immunity using battle's dex
+        if (!Battle.Dex.GetImmunity(moveType, this))
         {
-            modifiedWeight = irv.Value;
-        }
-        else
-        {
-            // Fallback to base weight if event doesn't return an integer
-            modifiedWeight = WeightHg;
-        }
-
-        // Ensure minimum weight of 1 hectogram
-        return Math.Max(1, modifiedWeight);
-    }
-
-    /// <summary>
-    /// Calculates a Pokemon's stat value with boosts and modifiers applied.
-    /// This is used during battle for damage calculations and speed comparisons.
-    /// </summary>
-    /// <param name="statName">The stat to calculate (Atk, Def, SpA, SpD, Spe)</param>
-    /// <param name="boost">Boost stage from -6 to +6</param>
-    /// <param name="modifier">Optional modifier to apply (e.g., 1.5 for 50% increase)</param>
-    /// <param name="statUser">Pokemon whose stats are being calculated (defaults to this)</param>
-    /// <returns>The calculated stat value</returns>
-    public int CalculateStat(StatIdExceptHp statName, int boost, int? modifier = null, Pokemon? statUser = null)
-    {
-        // Get base stat from stored stats
-        int stat = StoredStats[statName];
-
-        // Wonder Room swaps Defense and Special Defense BEFORE any other calculations
-        if (Battle.Field.PseudoWeather.ContainsKey(ConditionId.WonderRoom))
-        {
-            stat = statName switch
+            if (Battle.PrintDebug)
             {
-                StatIdExceptHp.Def => StoredStats[StatIdExceptHp.SpD],
-                StatIdExceptHp.SpD => StoredStats[StatIdExceptHp.Def],
-                _ => stat,
-            };
-        }
-
-        // Create sparse boosts table with only the stat we're calculating
-        var boosts = new SparseBoostsTable();
-        BoostId boostName = statName.ConvertToBoostId();
-        boosts.SetBoost(boostName, boost);
-
-        // Run ModifyBoost event to allow abilities/items/conditions to modify boosts
-        // Example: Simple ability doubles boost stages
-        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, statUser ?? this, null,
-            null, boosts);
-
-        if (boostEvent is SparseBoostsTableRelayVar brv)
-        {
-            boosts = brv.Table;
-            boost = boosts.GetBoost(boostName) ?? 0;
-        }
-
-        // Clamp boost to valid range
-        boost = BoostsTable.ClampBoost(boost);
-
-        // Apply boost multiplier
-        if (boost >= 0)
-        {
-            // Positive boosts multiply the stat
-            stat = (int)Math.Floor(stat * BoostsTable.CalculateRegularStatMultiplier(boost));
-        }
-        else
-        {
-            // Negative boosts divide the stat
-            stat = (int)Math.Floor(stat / BoostsTable.CalculateRegularStatMultiplier(-boost));
-        }
-
-        // Apply modifier using battle's modify function
-        return Battle.Modify(stat, modifier ?? 1);
-    }
-
-    public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
-    {
-        SparseBoostsTable cappedBoost = new();
-        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
-        {
-            // Get current boost value for this stat
-            int currentBoost = Boosts.GetBoost(boostId);
-            
-            // Calculate capped boost: clamp(current + incoming) - current
-            // This gives us the actual amount we can boost (respecting -6 to +6 limits)
-            int cappedValue = Battle.ClampIntRange(currentBoost + value, -6, 6) - currentBoost;
-            cappedBoost.SetBoost(boostId, cappedValue);
-        }
-        return cappedBoost;
-    }
-
-    /// <summary>
-    /// Applies stat boosts to this Pokemon, respecting the -6 to +6 boost limits.
-    /// Returns the delta (change amount) of the last boost that was applied.
-    /// </summary>
-    /// <param name="boosts">The boosts to apply (will be capped to valid ranges)</param>
-    /// <returns>The change amount of the last stat that was boosted (0 if no boosts were applied)</returns>
-    public int BoostBy(SparseBoostsTable boosts)
-    {
-        // Cap all boosts to respect -6 to +6 limits
-        boosts = GetCappedBoost(boosts);
-        
-        int delta = 0;
-        
-        // Apply each boost to the Pokemon's current boosts
-        foreach ((BoostId boostId, int value) in boosts.GetNonNullBoosts())
-        {
-            delta = value;
-            Boosts.SetBoost(boostId, Boosts.GetBoost(boostId) + delta);
-        }
-        
-        // Return the last delta (change amount of the last stat modified)
-        return delta;
-    }
-
-    public Pokemon GetAtLoc(int targetLoc)
-    {
-        // Determine which side based on targetLoc sign
-        Side side = Battle.Sides[targetLoc < 0 ? Side.N % 2 : (Side.N + 1) % 2];
-
-        // Use absolute value for position calculation
-        targetLoc = Math.Abs(targetLoc);
-
-        // Handle wrap-around for multi-battle formats (e.g., if position exceeds active Pokemon count)
-        if (targetLoc > side.Active.Count)
-        {
-            targetLoc -= side.Active.Count;
-            side = Battle.Sides[side.N + 2];
-        }
-
-        // Return the Pokemon at the calculated position (adjust for 0-based indexing)
-        return side.Active[targetLoc - 1];
-    }
-
-    /// <summary>
-    /// Generates switch request data for this Pokemon, containing all information
-    /// needed for a player to make switching decisions (stats, moves, ability, item, etc.)
-    /// </summary>
-    /// <param name="forAlly">If true, returns base moves instead of current moves (for ally info)</param>
-    /// <returns>Pokemon switch request data object</returns>
-    public PokemonSwitchRequestData GetSwitchRequestData(bool forAlly = false)
-    {
-        // Build stats dictionary from base stored stats
-        var stats = new StatsTable
-        {
-            [StatId.Atk] = BaseStoredStats[StatId.Atk],
-            [StatId.Def] = BaseStoredStats[StatId.Def],
-            [StatId.SpA] = BaseStoredStats[StatId.SpA],
-            [StatId.SpD] = BaseStoredStats[StatId.SpD],
-            [StatId.Spe] = BaseStoredStats[StatId.Spe],
-        };
-
-        // Get move list - either base moves (for allies) or current moves
-        var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
-        
-        // Convert move slots to Move objects
-        var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
-
-        // Create the base entry
-        var entry = new PokemonSwitchRequestData
-        {
-            Condition = GetHealth().Secret.StatusCondition ?? ConditionId.None,
-            Active = Position < Side.Active.Count,
-            Stats = stats,
-            Moves = moves,
-            BaseAbility = Battle.Library.Abilities[BaseAbility],
-            Item = Battle.Library.Items[Item],
-            Pokeball = Pokeball,
-            // Default values for Gen 9+ fields
-            Ability = Battle.Library.Abilities[Ability],
-            Commanding = false,
-            Reviving = false,
-            TeraType = TeraType,
-            Terastallized = false,
-        };
-
-        // Gen 7+ includes current ability
-        if (Battle.Gen > 6)
-        {
-            entry = entry with { Ability = Battle.Library.Abilities[Ability] };
-        }
-
-        // Gen 9+ includes commanding and reviving status
-        if (Battle.Gen >= 9)
-        {
-            // Commanding: Pokemon has the Commanding volatile and is not fainted
-            bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
-
-            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
-            bool reviving = IsActive &&
-                            Position < Side.SlotConditions.Count &&
-                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
-
-            entry = entry with
-            {
-                Commanding = commanding,
-                Reviving = reviving,
-            };
-        }
-
-        // Gen 9 includes Tera type and Terastallized status
-        if (Battle.Gen == 9)
-        {
-            entry = entry with
-            {
-                TeraType = TeraType,
-                Terastallized = Terastallized != null,
-            };
-        }
-
-        return entry;
-    }
-
-    public bool IsLastActive()
-    {
-        // If this Pokémon isn't active, it can't be the last active
-        if (!IsActive) return false;
-
-        // Get all active Pokémon on this side
-        var allyActive = Side.Active;
-
-        // Check all positions after this Pokémon
-        for (int i = Position + 1; i < allyActive.Count; i++)
-        {
-            // If there's a living Pokémon at a later position, this isn't the last
-            if (!allyActive[i].Fainted)
-            {
-                return false;
+                // Battle.Debug("natural status immunity");
             }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
         }
 
-        // No living Pokémon found after this position - this is the last active
+        // Check artificial immunity (abilities, items, etc.)
+        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null, type);
+
+        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
+        if (immunity is BoolRelayVar { Value: false } or null)
+        {
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("artificial status immunity");
+            }
+
+            // TypeScript: if (message && immunity !== null)
+            if (!string.IsNullOrEmpty(message) && immunity is not null)
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
+        }
+
         return true;
     }
 
     /// <summary>
-    /// This refers to multi-turn moves like SolarBeam and Outrage and
-    /// Sky Drop, which remove all choice (no dynamax, switching, etc).
-    /// Don't use it for "soft locks" like Choice Band.
+    /// Checks immunity for specific conditions (e.g., Sleep immunity for certain Pokemon types)
     /// </summary>
-    public MoveId? GetLockedMove()
+    public bool RunStatusImmunity(ConditionId? conditionId, string? message = null)
     {
-        RelayVar? lockedMove = Battle.RunEvent(EventId.LockMove, this);
+        // Check if Pokemon is fainted
+        if (Fainted) return false;
 
-        // If event returns true, there's no locked move
-        if (lockedMove is BoolRelayVar { Value: true })
+        // Equivalent to TypeScript: if (!type) return true;
+        if (conditionId == null) return true;
+
+        // Get the condition from the library
+        Condition condition = Battle.Library.Conditions[conditionId.Value];
+
+        // Check natural condition immunity using ModdedDex static method
+        if (!ModdedDex.GetImmunity(condition, Types))
         {
-            return null;
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("natural condition immunity");
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
         }
 
-        // Otherwise, try to extract MoveId from the RelayVar
-        if (lockedMove is MoveIdRelayVar moveIdRelayVar)
+        // Check artificial immunity (abilities, items, etc.) for conditions
+        RelayVar? immunity = Battle.RunEvent(EventId.Immunity, this, null, null,
+            conditionId);
+
+        // TypeScript logic: if (!immunity) - means if immunity is falsy/false
+        if (immunity is BoolRelayVar { Value: false } or null)
         {
-            return moveIdRelayVar.MoveId;
+            if (Battle.PrintDebug)
+            {
+                // Battle.Debug("artificial condition immunity");
+            }
+
+            // TypeScript: if (message && immunity !== null)
+            if (!string.IsNullOrEmpty(message) && immunity is not null)
+            {
+                UiGenerator.PrintImmuneEvent(this);
+            }
+            return false;
         }
 
-        // If RelayVar is null or another type, no locked move
-        return null;
+        return true;
     }
 
-    /// <summary>
-    /// Generates move request data for this Pokemon, containing information about
-    /// available moves, restrictions, and special mechanics for the current turn.
-    /// </summary>
-    public PokemonMoveRequestData GetMoveRequestData()
-    {
-        // Get locked move if Pokemon is not maybe-locked
-        var lockedMove = MaybeLocked == true ? null : GetLockedMove();
-
-        // Information should be restricted for the last active Pokemon
-        bool isLastActive = IsLastActive();
-        int canSwitchIn = Battle.CanSwitch(Side);
-        var moves = GetMoves(lockedMove, isLastActive);
-
-        // If no moves available, default to Struggle
-        if (moves.Count == 0)
-        {
-            moves =
-            [
-                new PokemonMoveData
-                {
-                    Move = Battle.Library.Moves[MoveId.Struggle],
-                    Target = null,
-                    Disabled = null,
-                    DisabledSource = null,
-                }
-            ];
-            lockedMove = MoveId.Struggle;
-        }
-
-        // Create base request data
-        var data = new PokemonMoveRequestData
-        {
-            Moves = moves,
-        };
-
-        if (isLastActive)
-        {
-            // Update maybe-disabled/maybe-locked state for last active Pokemon
-            MaybeDisabled = MaybeDisabled && lockedMove == null;
-            MaybeLocked = MaybeLocked ?? MaybeDisabled;
-
-            if (MaybeDisabled)
-            {
-                data = data with { MaybeDisabled = true };
-            }
-
-            if (MaybeLocked == true)
-            {
-                data = data with { MaybeLocked = true };
-            }
-
-            if (canSwitchIn > 0)
-            {
-                if (Trapped == PokemonTrapped.True)
-                {
-                    data = data with { Trapped = true };
-                }
-                else if (MaybeTrapped)
-                {
-                    data = data with { MaybeTrapped = true };
-                }
-            }
-        }
-        else
-        {
-            // Reset maybe-disabled/maybe-locked for non-last active Pokemon
-            MaybeDisabled = false;
-            MaybeLocked = null;
-
-            if (canSwitchIn > 0)
-            {
-                // Discovered by selecting a valid Pokemon as a switch target and cancelling
-                if (Trapped == PokemonTrapped.True)
-                {
-                    data = data with { Trapped = true };
-                }
-            }
-
-            MaybeTrapped = false;
-        }
-
-        // Handle Terastallization if not locked into a move
-        if (lockedMove == null)
-        {
-            if (CanTerastallize is not null and not FalseMoveTypeFalseUnion)
-            {
-                data = data with { CanTerastallize = CanTerastallize };
-            }
-        }
-
-        return data;
-    }
+    #region Helpers
 
     /// <summary>
-    /// Gets the list of moves available to this Pokemon for the current turn.
-    /// Handles locked moves, move modifications, PP depletion, and disabled moves.
+    /// Deletes a volatile condition without running the extra logic from RemoveVolatile
     /// </summary>
-    /// <param name="lockedMove">If specified, the Pokemon is locked into using this move</param>
-    /// <param name="restrictData">If true, hide certain disabled move information</param>
-    /// <returns>List of available moves with their current state</returns>
-    public List<PokemonMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
+    public bool DeleteVolatile(ConditionId volatileId)
     {
-        // Handle locked move cases
-        if (lockedMove is not null)
-        {
-            Trapped = PokemonTrapped.True;
-            
-            // Special case: Recharge turn (after Hyper Beam, etc.)
-            if (lockedMove == MoveId.Recharge)
-            {
-                return 
-                [
-                    new PokemonMoveData
-                    {
-                        Move = Battle.Library.Moves[MoveId.Recharge],
-                        Target = null,
-                        Disabled = null,
-                        DisabledSource = null,
-                    },
-                ];
-            }
-            
-            // Find the locked move in move slots
-            foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot => moveSlot.Id == lockedMove))
-            {
-                return 
-                [
-                    new PokemonMoveData
-                    {
-                        Move = Battle.Library.Moves[moveSlot.Move],
-                        Target = null,
-                        Disabled = null,
-                        DisabledSource = null,
-                    },
-                ];
-            }
-            
-            // Fallback: lookup move by ID (shouldn't normally happen)
-            return 
-            [
-                new PokemonMoveData
-                {
-                    Move = Battle.Library.Moves[lockedMove.Value],
-                    Target = null,
-                    Disabled = null,
-                    DisabledSource = null,
-                },
-            ];
-        }
-        
-        // Build list of available moves
-        var moves = new List<PokemonMoveData>();
-        bool hasValidMove = false;
-        
-        foreach (MoveSlot moveSlot in MoveSlots)
-        {
-            MoveId moveName = moveSlot.Move;
-
-            // Special move target modifications
-            switch (moveSlot.Id)
-            {
-                case MoveId.Curse:
-                    // Curse has different targeting if user is not Ghost-type
-                    if (!HasType(PokemonType.Ghost))
-                    {
-                        Move curseMove = Battle.Library.Moves[MoveId.Curse];
-                    }
-                    break;
-                    
-                case MoveId.PollenPuff:
-                    // Heal Block prevents Pollen Puff from targeting allies
-                    if (Volatiles.ContainsKey(ConditionId.HealBlock))
-                    {
-                    }
-                    break;
-                    
-                case MoveId.TeraStarStorm:
-                    // Terapagos-Stellar gets spread targeting
-                    if (Species.Id == SpecieId.TerapagosStellar)
-                    {
-                    }
-                    break;
-            }
-            
-            // Determine if move is disabled
-            BoolHiddenUnion disabled = moveSlot.Disabled;
-            
-            // Skip Dynamax handling as requested
-            
-            // Check if move is out of PP (unless locked into partial trapping move)
-            if (moveSlot.Pp <= 0 && !Volatiles.ContainsKey(ConditionId.PartialTrappingLock))
-            {
-                disabled = true;
-            }
-            
-            // Handle hidden disabled state
-            if (disabled is HiddenBoolHiddenUnion)
-            {
-                disabled = !restrictData;
-            }
-            
-            // Track if we have at least one valid (non-disabled) move
-            if (!disabled.IsTruthy())
-            {
-                hasValidMove = true;
-            }
-            
-            // Convert disabled state to MoveIdBoolUnion
-            MoveIdBoolUnion? disabledUnion = null;
-            if (disabled.IsTruthy())
-            {
-                disabledUnion = disabled.IsTrue() ? true : null;
-            }
-            
-            // Get the Move object from the library
-            Move moveObject = Battle.Library.Moves[moveName];
-            
-            // Add move to list
-            moves.Add(new PokemonMoveData
-            {
-                Move = moveObject,
-                Target = null, // Target is not set in this context
-                Disabled = disabledUnion,
-                DisabledSource = moveSlot.DisabledSource,
-            });
-        }
-        return hasValidMove ? moves : [];
-    }
-
-    /// <summary>
-    /// Gets the current health status of this Pokemon.
-    /// Returns both secret (exact) and shared (observable) health data.
-    /// The shared data varies based on battle settings and generation:
-    /// - Exact HP if battle.ReportExactHp is true
-    /// - Percentage if battle.ReportPercentages is true or Gen 7+
-    /// - Pixel-based display (48 pixels) for Gen 3-6 with color indicators in Gen 5+
-    /// </summary>
-    public PokemonHealth GetHealth()
-    {
-        // Fainted Pokemon
-        if (Hp <= 0)
-        {
-            return new PokemonHealth
-            {
-                SideId = Side.Id,
-                Secret = FaintedHealthData.Instance with
-                {
-                    StatusCondition = Status != ConditionId.None
-                        ? Status
-                        : null,
-                },
-                Shared = FaintedHealthData.Instance with
-                {
-                    StatusCondition = Status != ConditionId.None
-                        ? Status
-                        : null,
-                },
-            };
-        }
-
-        // Secret data is always exact HP
-        var secret = new ExactHealthData
-        {
-            CurrentHp = Hp,
-            MaxHp = MaxHp,
-            StatusCondition = Status != ConditionId.None ? Status : null,
-        };
-
-        // Determine shared health data format based on battle settings
-        HealthData shared;
-        
-        if (Battle.ReportExactHp)
-        {
-            // Exact HP reporting (same as secret)
-            shared = secret;
-        }
-        else if (Battle.ReportPercentages || Battle.Gen >= 7)
-        {
-            // HP Percentage Mod mechanics
-            int percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
-            
-            // Cap at 99% if not at full HP
-            if (percentage == 100 && Hp < MaxHp)
-            {
-                percentage = 99;
-            }
-            
-            shared = new PercentageHealthData
-            {
-                Percentage = percentage,
-                StatusCondition = Status != ConditionId.None ? Status : null,
-            };
-        }
-        else
-        {
-            // In-game accurate pixel health mechanics (Gen 3-6)
-            // PS doesn't use pixels after Gen 6, but for reference:
-            // - [Gen 7] SM uses 99 pixels
-            // - [Gen 7] USUM uses 86 pixels
-            int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
-            if (pixels == 0) pixels = 1; // Minimum 1 pixel if alive
-
-            PixelColorIndicator? colorIndicator = null;
-            
-            // Gen 5+ adds color indicators at specific thresholds
-            if (Battle.Gen >= 5)
-            {
-                if (pixels == 9)
-                {
-                    // 9 pixels: yellow if HP > 20%, red if HP <= 20%
-                    colorIndicator = Hp * 5 > MaxHp ? PixelColorIndicator.Yellow : PixelColorIndicator.Red;
-                }
-                else if (pixels == 24)
-                {
-                    // 24 pixels: green if HP > 50%, yellow if HP <= 50%
-                    colorIndicator = Hp * 2 > MaxHp ? PixelColorIndicator.Green : PixelColorIndicator.Yellow;
-                }
-            }
-            
-            shared = new PixelHealthData
-            {
-                Pixels = pixels,
-                ColorIndicator = colorIndicator,
-                StatusCondition = Status != ConditionId.None ? Status : null,
-            };
-        }
-
-        return new PokemonHealth
-        {
-            SideId = Side.Id,
-            Secret = secret,
-            Shared = shared,
-        };
+        return Volatiles.Remove(volatileId);
     }
 
     public Pokemon Copy()
     {
         throw new NotImplementedException();
     }
+
+    private static readonly HashSet<ItemId> RestorativeBerries =
+    [
+        ItemId.LeppaBerry,
+        ItemId.AguavBerry,
+        ItemId.EnigmaBerry,
+        ItemId.FigyBerry,
+        ItemId.IapapaBerry,
+        ItemId.MagoBerry,
+        ItemId.SitrusBerry,
+    ];
+
+    #endregion
 }

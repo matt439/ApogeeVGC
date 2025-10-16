@@ -29,6 +29,72 @@ public class Field
         TerrainState = Battle.InitEffectState();
     }
 
+    public bool SetWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool SetWeather(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ClearWeather()
+    {
+        if (Weather == ConditionId.None) return false;
+        Condition prevWeather = GetWeather();
+        EffectState weatherState = WeatherState;
+        Battle.SingleEvent(EventId.FieldEnd, prevWeather, weatherState, this);
+        Weather = ConditionId.None;
+        Battle.ClearEffectState(ref weatherState);
+        Battle.EachEvent(EventId.WeatherChange);
+        return true;
+    }
+
+    public ConditionId EffectiveWeather()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Checks if any active Pokémon has an ability that suppresses weather effects.
+    /// 
+    /// Abilities like Cloud Nine and Air Lock prevent weather from having any effect
+    /// on the battle while the Pokémon with the ability is active.
+    /// 
+    /// Returns true if:
+    /// - There is an active Pokémon that is not fainted
+    /// - The Pokémon is not ignoring its ability (e.g. from Gastro Acid)
+    /// - The Pokémon's ability has the SuppressWeather flag set to true
+    /// - The ability state is not ending (ability hasn't been removed this turn)
+    /// </summary>
+    public bool SuppressingWeather()
+    {
+        return Battle.Sides.Any(side =>
+            (from pokemon in side.Active
+                where !pokemon.Fainted
+                where !pokemon.IgnoringAbility()
+                let ability = pokemon.GetAbility()
+                where ability.SuppressWeather
+                select pokemon).Any(pokemon =>
+                !(pokemon.AbilityState.Ending ?? false)));
+    }
+
+    public bool IsWeather(ConditionId weather)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsWeather(List<ConditionId> weather)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Condition GetWeather()
+    {
+        return Battle.Library.Conditions[Weather];
+    }
+
     public bool SetTerrain(IEffect status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         if (status is not Condition condition)
@@ -96,6 +162,18 @@ public class Field
         return true;
     }
 
+    public bool ClearTerrain()
+    {
+        if (Terrain == ConditionId.None) return false;
+        Condition prevTerrain = GetTerrain();
+        EffectState terrainState = TerrainState;
+        Battle.SingleEvent(EventId.FieldEnd, prevTerrain, terrainState, this);
+        Terrain = ConditionId.None;
+        Battle.ClearEffectState(ref terrainState);
+        Battle.EachEvent(EventId.TerrainChange);
+        return true;
+    }
+
     public ConditionId EffectiveTerrain(PokemonSideBattleUnion? target)
     {
         if (Battle.Event is not null && target is null)
@@ -121,6 +199,31 @@ public class Field
         return terrain.Contains(ourTerrain);
     }
 
+    public Condition GetTerrain()
+    {
+        return Battle.Library.Conditions[Terrain];
+    }
+
+    public bool AddPseudoWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool AddPseudoWeather(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Condition GetPseudoWeather(ConditionId status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Condition GetPseudoWeather(Condition status)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool RemovePseudoWeather(Condition status)
     {
         PseudoWeather.TryGetValue(status.Id, out EffectState? state);
@@ -135,60 +238,11 @@ public class Field
         return RemovePseudoWeather(Battle.Library.Conditions[status]);
     }
 
-    public bool ClearWeather()
+    public void Destroy()
     {
-        if (Weather == ConditionId.None) return false;
-        Condition prevWeather = GetWeather();
-        EffectState weatherState = WeatherState;
-        Battle.SingleEvent(EventId.FieldEnd, prevWeather, weatherState, this);
-        Weather = ConditionId.None;
-        Battle.ClearEffectState(ref weatherState);
-        Battle.EachEvent(EventId.WeatherChange);
-        return true;
+        throw new NotImplementedException();
     }
-
-    public bool ClearTerrain()
-    {
-        if (Terrain == ConditionId.None) return false;
-        Condition prevTerrain = GetTerrain();
-        EffectState terrainState = TerrainState;
-        Battle.SingleEvent(EventId.FieldEnd, prevTerrain, terrainState, this);
-        Terrain = ConditionId.None;
-        Battle.ClearEffectState(ref terrainState);
-        Battle.EachEvent(EventId.TerrainChange);
-        return true;
-    }
-
-    public Condition GetTerrain()
-    {
-        return Battle.Library.Conditions[Terrain];
-    }
-
-    public Condition GetWeather()
-    {
-        return Battle.Library.Conditions[Weather];
-    }
-
-    /// <summary>
-    /// Checks if any active Pokémon has an ability that suppresses weather effects.
-    /// 
-    /// Abilities like Cloud Nine and Air Lock prevent weather from having any effect
-    /// on the battle while the Pokémon with the ability is active.
-    /// 
-    /// Returns true if:
-    /// - There is an active Pokémon that is not fainted
-    /// - The Pokémon is not ignoring its ability (e.g. from Gastro Acid)
-    /// - The Pokémon's ability has the SuppressWeather flag set to true
-    /// - The ability state is not ending (ability hasn't been removed this turn)
-    /// </summary>
-    public bool SuppressingWeather()
-    {
-        return Battle.Sides.Any(side =>
-            (from pokemon in side.Active where !pokemon.Fainted where !pokemon.IgnoringAbility()
-                let ability = pokemon.GetAbility() where ability.SuppressWeather select pokemon).Any(pokemon =>
-                !(pokemon.AbilityState.Ending ?? false)));
-    }
-
+    
     public Field Copy()
     {
         throw new NotImplementedException();
