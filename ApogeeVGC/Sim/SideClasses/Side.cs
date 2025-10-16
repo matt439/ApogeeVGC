@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -46,6 +47,8 @@ public class Side
     public IChoiceRequest? ActiveRequest { get; set; }
     public Choice Choice { get; set; }
     public bool Initialised { get; init; }
+
+    public RequestState RequestState { get; set; }
 
     public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
     {
@@ -118,8 +121,7 @@ public class Side
         Initialised = false;
     }
 
-
-    private Pokemon AddPokemon(PokemonSet set)
+    private Pokemon? AddPokemon(PokemonSet set)
     {
         if (Pokemon.Count >= 24) return null;
         var newPokemon = new Pokemon(Battle, set, this)
@@ -131,9 +133,42 @@ public class Side
         return newPokemon;
     }
 
-    public bool HasAlly(Pokemon pokemon)
+    // CanDynamaxNow() // not implemented
+
+    public Choice GetChoice()
     {
-        return pokemon.Side == this;
+        throw new NotImplementedException();
+    }
+
+    public override string ToString()
+    {
+        throw new NotImplementedException();
+    }
+
+    public SideRequestData GetRequestData(bool forAlly = false)
+    {
+        SideRequestData data = new()
+        {
+            Name = Name,
+            Id = Id,
+            Pokemon = Pokemon.Select(p => p.GetSwitchRequestData(forAlly)).ToList(),
+        };
+        return data;
+    }
+
+    public Pokemon? RandomFoe()
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<Side> FoeSidesWithConditions()
+    {
+        throw new NotImplementedException();
+    }
+
+    public int FoePokemonLeft()
+    {
+        return Foe.PokemonLeft;
     }
 
     public List<Pokemon> Allies(bool all = false)
@@ -142,15 +177,50 @@ public class Side
         if (!all) allies = allies.Where(ally => ally.Hp > 0).ToList();
         return allies;
     }
-    
+
     public List<Pokemon> Foes(bool all = false)
     {
         return Foe.Allies(all);
     }
 
-    public int FoePokemonLeft()
+    public List<Pokemon> ActiveTeam()
     {
-        return Foe.PokemonLeft;
+        throw new NotImplementedException();
+    }
+
+    public bool HasAlly(Pokemon pokemon)
+    {
+        return pokemon.Side == this;
+    }
+
+    public bool AddSideCondition(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSideCondition(ConditionId status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSideCondition(IEffect status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSideConditionData(ConditionId status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSideConditionData(IEffect status)
+    {
+        throw new NotImplementedException();
     }
 
     public bool RemoveSideCondition(ConditionId status)
@@ -167,18 +237,79 @@ public class Side
         return RemoveSideCondition(status.Id);
     }
 
-    public SideRequestData GetRequestData(bool forAlly = false)
+    public RelayVar AddSlotCondition(PokemonIntUnion target, ConditionId status, Pokemon? source = null,
+        IEffect? sourceEffect = null)
     {
-        SideRequestData data = new()
-        {
-            Name = Name,
-            Id = Id,
-            Pokemon = Pokemon.Select(p => p.GetSwitchRequestData(forAlly)).ToList(),
-        };
-        return data;
+        throw new NotImplementedException();
     }
 
-    public void ClearChoice()
+    public RelayVar AddSlotCondition(PokemonIntUnion target, Condition status, Pokemon? source = null,
+        IEffect? sourceEffect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSlotCondition(PokemonIntUnion target, IEffect status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEffect? GetSlotCondition(PokemonIntUnion target, ConditionId status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool RemoveSlotCondition(PokemonIntUnion target, IEffect status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool RemoveSlotCondition(PokemonIntUnion target, ConditionId status)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Send(List<object> parts)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EmitRequest(IChoiceRequest update, bool updatedRequest = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EmitChoiceError(string message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsChoiceDone()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ChooseMove(string? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ChooseMove(int? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool UpdateDisabledRequest(Pokemon pokemon, PokemonMoveRequestData req)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool UpdateRequestForPokemon(Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SideBoolUnion ChooseSwitch(string? slotText = null)
     {
         throw new NotImplementedException();
     }
@@ -198,22 +329,42 @@ public class Side
         return Math.Min(pokemonLength, ruleTableSize);
     }
 
-    //isChoiceDone()
-    //{
-    //    if (!this.requestState) return true;
-    //    if (this.choice.forcedSwitchesLeft) return false;
+    public bool ChooseTeam(object data)
+    {
+        throw new NotImplementedException();
+    }
 
-    //    if (this.requestState === 'teampreview')
-    //    {
-    //        return this.choice.actions.length >= this.pickedTeamSize();
-    //    }
+    public bool ChooseShift()
+    {
+        throw new NotImplementedException();
+    }
 
-    //    // current request is move/switch
-    //    this.getChoiceIndex(); // auto-pass
-    //    return this.choice.actions.length >= this.active.length;
-    //}
+    public void ClearChoice()
+    {
+        throw new NotImplementedException();
+    }
 
-    public bool IsChoiceDone()
+    public bool Choose(object input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int GetChoiceIndex(bool isPass = false)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SideBoolUnion ChoosePass()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool AutoChoose()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Destroy()
     {
         throw new NotImplementedException();
     }

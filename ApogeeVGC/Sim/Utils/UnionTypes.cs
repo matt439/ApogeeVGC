@@ -960,6 +960,30 @@ public record FalseItemFalseUnion : ItemFalseUnion;
 
 
 
+/// <summary>
+/// Pokemon | int
+/// </summary>
+public abstract record PokemonIntUnion
+{
+    public static implicit operator PokemonIntUnion(Pokemon pokemon) => new PokemonPokemonIntUnion(pokemon);
+    public static implicit operator PokemonIntUnion(int value) => new IntPokemonIntUnion(value);
+}
+public record PokemonPokemonIntUnion(Pokemon Pokemon) : PokemonIntUnion;
+public record IntPokemonIntUnion(int Value) : PokemonIntUnion;
+
+
+
+/// <summary>
+/// Side | bool
+/// </summary>
+public abstract record SideBoolUnion
+{
+    public static implicit operator SideBoolUnion(Side side) => new SideSideBoolUnion(side);
+    public static implicit operator SideBoolUnion(bool value) => new BoolSideBoolUnion(value);
+}
+public record SideSideBoolUnion(Side Side) : SideBoolUnion;
+public record BoolSideBoolUnion(bool Value) : SideBoolUnion;
+
 
 /// <summary>
 /// 'copyvolatile' | 'shedtail' | bool
