@@ -565,7 +565,10 @@ public partial class BattleAsync : IBattle
         return pokemnoList;
     }
 
-    // TODO: MakeRequest()
+    public void MakeRequest(RequestState? type = null)
+    {
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Clears the current request state and resets all sides' active requests and choices.
@@ -685,25 +688,60 @@ public partial class BattleAsync : IBattle
         return requests.Where(r => r != null).Cast<IChoiceRequest>().ToList();
     }
 
-    // TODO: Tiebreak()
-    // TODO: ForceWin()
-    // TODO: Tie()
-    // TODO: Win()
-    // TODO: Lose()
+    public bool Tiebreak()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ForceWin(SideId? side = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Tie()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Win(SideId? side = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Win(Side? side = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Lose(SideId side)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Lose(Side side)
+    {
+        throw new NotImplementedException();
+    }
 
     public int CanSwitch(Side side)
     {
         return PossibleSwitches(side).Count;
     }
 
-    // TODO: GetRandomSwitchable()
+    public Pokemon? GetRandomSwitchable(Side side)
+    {
+        throw new NotImplementedException();
+    }
 
     private List<Pokemon> PossibleSwitches(Side side)
     {
         throw new NotImplementedException();
     }
 
-    // TODO: SwapPosition()
+    public bool SwapPosition(Pokemon pokemon, int newPosition, string? attribures = null)
+    {
+        throw new NotImplementedException();
+    }
 
     public Pokemon? GetAtSlot(PokemonSlot? slot)
     {
@@ -714,18 +752,40 @@ public partial class BattleAsync : IBattle
         return side.Active[position - positionOffset];
     }
 
-    // TODO: Faint()
-    // TODO: EndTurn()
-    // TODO: MaybeTriggerEndlessBattleClause()
+    public void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void EndTurn()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool MaybeTriggerEndlessBattleClause(List<bool> trappedBySide, List<StalenessId?> stalenessBySide)
+    {
+        throw new NotImplementedException();
+    }
 
     public void Start()
     {
         throw new NotImplementedException();
     }
 
-    // TODO: Restart()
-    // TODO: RunPickTeam()
-    // TODO: CheckEvBalance()
+    public void Restart(Action<string, List<string>>? send)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RunPickTeam()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CheckEvBalance()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Modifies a Pokémon's stat stages (boosts) during battle.
@@ -918,7 +978,11 @@ public partial class BattleAsync : IBattle
         return success.HasValue ? new BoolBoolZeroUnion(success.Value) : null;
     }
 
-    // TODO: SpreadDamage()
+    public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage, List<PokemonFalseUnion?>? targetArray,
+        Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
+    {
+        throw new NotImplementedException();
+    }
 
     public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false)
@@ -926,7 +990,10 @@ public partial class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    // TODO: DirectDamage()
+    public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null, IEffect? effect = null)
+    {
+        throw new NotImplementedException();
+    }
 
     public IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleHealEffect? effect = null)
@@ -934,7 +1001,25 @@ public partial class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    // TODO: Chain()
+    public int Chain(int previousMod, int nextMod)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Chain(List<int> previousMod, int nextMod)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Chain(int previousMod, List<int> nextMod)
+    {
+        throw new NotImplementedException();
+    }
+
+    public int Chain(List<int> previousMod, List<int> nextMod)
+    {
+        throw new NotImplementedException();
+    }
 
     public double ChainModify(int numerator, int denominator = 1)
     {
@@ -1081,9 +1166,25 @@ public partial class BattleAsync : IBattle
         return Trunc(Trunc(baseDamage * (100 - Random(16))) / 100);
     }
 
-    // TODO: ValidTargetLoc()
-    // TODO: ValidTarget()
-    // TODO: GetTarget()
+    public bool ValidTargetLoc(int targetLoc, Pokemon source, PokemonType targetType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool ValidTarget(Pokemon target, Pokemon source, PokemonType targetType)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Pokemon? GetTarget(Pokemon pokemon, MoveId move, int targetLoc, Pokemon? originalTarget = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Pokemon? GetTarget(Pokemon pokemon, Move move, int targetLoc, Pokemon? originalTarget = null)
+    {
+        throw new NotImplementedException();
+    }
 
     public Pokemon? GetRandomTarget(Pokemon pokemon, MoveId move)
     {
@@ -1095,40 +1196,100 @@ public partial class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    // TODO: CheckFainted()
-    // TODO: FaintMessages()
-    // TODO: CheckWin()
+    public void CheckFainted()
+    {
+        throw new NotImplementedException();
+    }
+    public bool? FaintMessages(bool lastFirst = false, bool forceCheck = false, bool checkWin = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool? CheckWin(FaintQueue? faintData = null)
+    {
+        faintData = FaintQueue[0];
+        throw new NotImplementedException();
+    }
 
     public void GetActionSpeed(IAction action)
     {
         throw new NotImplementedException();
     }
 
-    // TODO: RunAction()
-    // TODO: TurnLoop()
-    // TODO: Choose()
-    // TODO: MakeChoices()
-    // TODO: CommitChoices()
-    // TODO: UndoChoice()
-    // TODO: AllChoicesDone()
-    // TODO: Hint()
+    public bool RunAction(IAction action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void TurnLoop()
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Choose(SideId sideId, Choice input)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void MakeChoices(List<Choice> inputs)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void CommitChoices()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UndoChoice(SideId sideId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool AllChoicesDone()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Hint(string hint, bool? once = null, Side? side = null)
+    {
+        throw new NotImplementedException();
+    }
 
     // AddSplit()
     // Add()
     // AddMove()
     // AttrLastMove()
 
-    // TODO: RetargetLastMove()
-    // TODO: Debug()
-    // TODO: GetDebugLog()
-    // TODO: DebugError()
+    public void RetargetLastMove(Pokemon newTarget)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Debug(string activityString)
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetDebugLog()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DebugError()
+    {
+        throw new NotImplementedException();
+    }
 
     private static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
     {
         return options.Team ?? throw new InvalidOperationException();
     }
 
-    // TODO: ShowOpenTeamSheets()
+    public void ShowOpenTeamSheets()
+    {
+        throw new NotImplementedException();
+    }
 
     private void SetPlayer(SideId slot, PlayerOptions options)
     {
@@ -1210,7 +1371,10 @@ public partial class BattleAsync : IBattle
         }
     }
 
-    // TODO: SendUpdates()
+    public void SendUpdates()
+    {
+        throw new NotImplementedException();
+    }
 
     private Side GetSide(SideId id)
     {
@@ -1221,8 +1385,10 @@ public partial class BattleAsync : IBattle
             _ => throw new ArgumentOutOfRangeException(nameof(id), $"Invalid SideId: {id}"),
         };
     }
-
-    // TODO: GetOverflowedTurnCount()
+    public int GetOverflowedTurnCount()
+    {
+        throw new NotImplementedException();
+    }
 
     /// <summary>
     /// Initializes an EffectState object with proper effect ordering.
@@ -1292,7 +1458,10 @@ public partial class BattleAsync : IBattle
         };
     }
 
-    // TODO: Destroy()
+    public void Destroy()
+    {
+        throw new NotImplementedException();
+    }
 
     public IBattle Copy()
     {

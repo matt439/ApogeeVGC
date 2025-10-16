@@ -215,6 +215,6 @@ public class Side
 
     public bool IsChoiceDone()
     {
-
+        throw new NotImplementedException();
     }
 }
