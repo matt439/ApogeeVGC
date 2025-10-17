@@ -737,12 +737,20 @@ public partial class BattleAsync : IBattle
 
     public bool ForceWin(SideId? side = null)
     {
-        throw new NotImplementedException();
+        // Battle already ended - cannot force a win
+        if (Ended) return false;
+
+        // Log the force win/tie command to input log
+        string logEntry = side.HasValue ? $"> forcewin {side.Value}" : "> forcetie";
+        InputLog.Add(logEntry);
+
+        // Delegate to the Win method to handle the actual logic
+        return Win(side);
     }
 
     public bool Tie()
     {
-        throw new NotImplementedException();
+        return Win((Side?)null);
     }
 
     public bool Win(SideId? side = null)
