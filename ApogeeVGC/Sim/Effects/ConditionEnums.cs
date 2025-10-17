@@ -46,6 +46,11 @@ public enum ConditionId
     RevivalBlessing,
     HealBlock,
     Trapped,
+    Drain,
+    Recoil,
+    StruggleRecoil,
+    PartiallyTrapped,
+    Powder,
 
     None,
 }

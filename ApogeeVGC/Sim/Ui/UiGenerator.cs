@@ -273,4 +273,66 @@ public static class UiGenerator
     {
         Console.WriteLine(error);
     }
+
+    /// <summary>
+    /// Prints a damage event message.
+    /// Handles various damage scenarios including damage from effects, abilities, and conditions.
+    /// </summary>
+    /// <param name="target">The Pokemon taking damage</param>
+    /// <param name="fromEffect">Optional effect name causing the damage (e.g., "burn", "confusion")</param>
+    /// <param name="ofPokemon">Optional source Pokemon for the damage</param>
+    /// <param name="silent">If true, prints a silent damage message (no console output)</param>
+    /// <param name="isPartiallyTrapped">If true, includes the [partiallytrapped] tag</param>
+    public static void PrintDamageEvent(Pokemon target, string? fromEffect = null,
+        Pokemon? ofPokemon = null, bool silent = false, bool isPartiallyTrapped = false)
+    {
+        PokemonHealth health = target.GetHealth();
+        string healthStatus = FormatHealthStatus(health);
+
+        if (silent)
+        {
+            // Silent damage (e.g., from Powder)
+            Console.WriteLine($"-damage|{target}|{healthStatus}|[silent]");
+            return;
+        }
+
+        if (isPartiallyTrapped && !string.IsNullOrEmpty(fromEffect))
+        {
+            // Partially trapped damage (e.g., from Bind, Wrap)
+            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[partiallytrapped]");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(fromEffect))
+        {
+            // Simple damage (from move or no effect)
+            Console.WriteLine($"-damage|{target}|{healthStatus}");
+        }
+        else if (ofPokemon != null)
+        {
+            // Damage from effect with source Pokemon
+            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
+        }
+        else
+        {
+            // Damage from effect without source
+            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}");
+        }
+    }
+
+    /// <summary>
+    /// Formats a Pokemon's health status for display in messages.
+    /// Returns format like "100/100" or "50/100 slp" depending on status.
+    /// </summary>
+    private static string FormatHealthStatus(PokemonHealth health)
+    {
+        string baseHealth = $"{health.Secret.Hp}/{health.Secret.MaxHp}";
+
+        if (!string.IsNullOrEmpty(health.Secret.Status))
+        {
+            return $"{baseHealth} {health.Secret.Status}";
+        }
+
+        return baseHealth;
+    }
 }
