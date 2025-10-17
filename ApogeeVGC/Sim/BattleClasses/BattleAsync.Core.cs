@@ -17,6 +17,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 using System.Diagnostics.Metrics;
 using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using String = System.String;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -82,8 +83,8 @@ public partial class BattleAsync : IBattle
     public int Turn { get; set; } = 0;
     public bool MidTurn { get; set; } = false;
     public bool Started { get; set; } = false;
-    public bool Ended { get; set; } = false;
-    public PlayerId? Winnder { get; set; }
+    public bool Ended { get; set; }
+    public string? Winner { get; set; }
 
     public IEffect Effect { get; set; }
     public EffectState EffectState { get; set; }
@@ -732,7 +733,73 @@ public partial class BattleAsync : IBattle
 
     public bool Tiebreak()
     {
-        throw new NotImplementedException();
+        if (Ended) return false;
+
+        InputLog.Add("> tiebreak");
+        UiGenerator.PrintMessage("Time's up! Going to tiebreaker...");
+
+        // Count non-fainted Pokemon for each side
+        var notFainted = Sides.Select(side =>
+            side.Pokemon.Count(pokemon => !pokemon.Fainted)
+        ).ToList();
+
+        // Display Pokemon count per side
+        string pokemonCountMessage = string.Join("; ",
+            Sides.Select((side, i) => $"{side.Name}: {notFainted[i]} Pokemon left")
+        );
+        UiGenerator.PrintMessage(pokemonCountMessage);
+
+        // Filter sides with maximum Pokemon count
+        int maxNotFainted = notFainted.Max();
+        var tiedSides = Sides.Where((_, i) => notFainted[i] == maxNotFainted).ToList();
+
+        if (tiedSides.Count <= 1)
+        {
+            return Win(tiedSides.FirstOrDefault());
+        }
+
+        // Calculate HP percentages
+        var hpPercentage = tiedSides.Select(side =>
+            side.Pokemon.Sum(pokemon => (double)pokemon.Hp / pokemon.MaxHp) * 100 / 6
+        ).ToList();
+
+        // Display HP percentage per side
+        string hpPercentageMessage = string.Join("; ",
+            tiedSides.Select((side, i) => $"{side.Name}: {Math.Round(hpPercentage[i])}% total HP left")
+        );
+        UiGenerator.PrintMessage(hpPercentageMessage);
+
+        // Filter sides with maximum HP percentage
+        double maxPercentage = hpPercentage.Max();
+        tiedSides = tiedSides.Where((_, i) => Math.Abs(hpPercentage[i] - maxPercentage) < double.Epsilon).
+            ToList();
+
+        if (tiedSides.Count <= 1)
+        {
+            return Win(tiedSides.FirstOrDefault());
+        }
+
+        // Calculate total HP
+        var hpTotal = tiedSides.Select(side =>
+            side.Pokemon.Sum(pokemon => pokemon.Hp)
+        ).ToList();
+
+        // Display total HP per side
+        string hpTotalMessage = string.Join("; ",
+            tiedSides.Select((side, i) => $"{side.Name}: {hpTotal[i]} total HP left")
+        );
+        UiGenerator.PrintMessage(hpTotalMessage);
+
+        // Filter sides with maximum total HP
+        int maxTotal = hpTotal.Max();
+        tiedSides = tiedSides.Where((_, i) => hpTotal[i] == maxTotal).ToList();
+
+        if (tiedSides.Count <= 1)
+        {
+            return Win(tiedSides.FirstOrDefault());
+        }
+
+        return Tie();
     }
 
     public bool ForceWin(SideId? side = null)
@@ -771,9 +838,7 @@ public partial class BattleAsync : IBattle
             side = null;
         }
 
-        // Set the winner - store the side's name since we don't have a PlayerId property
-        // The TypeScript version stores side.name in this.winner
-        Winnder = null; // TODO: Update when PlayerId system is implemented
+        Winner = side?.Name ?? string.Empty;
 
         // Print empty line for formatting
         UiGenerator.PrintEmptyLine();
