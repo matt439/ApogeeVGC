@@ -13,6 +13,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1970,17 +1972,154 @@ public partial class BattleAsync : IBattle
         }
     }
 
+    /// <summary>
+    /// Applies damage to a single Pokémon.
+    /// This is a convenience wrapper around SpreadDamage for single-target damage.
+    /// </summary>
+    /// <param name="damage">Amount of damage to deal</param>
+    /// <param name="target">Target Pokémon (defaults to event target)</param>
+    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
+    /// <param name="instafaint">If true, immediately processes fainting instead of queueing it</param>
+    /// <returns>
+    /// - The actual damage dealt (as int) if successful
+    /// - 0 if target has no HP
+    /// - false if target is not active
+    /// - null if damage was prevented by an event
+    /// </returns>
     public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false)
     {
-        throw new NotImplementedException();
+        // Default target to event target if available
+        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        {
+            target = eventTarget.Pokemon;
+        }
+
+        // Default source to event source if available
+        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        {
+            source = eventSource.Pokemon;
+        }
+
+        // Default effect to current effect if available
+        effect ??= BattleDamageEffect.FromIEffect(Effect);
+
+        // Create single-element arrays for SpreadDamage
+        var damageArray = new SpreadMoveDamage { damage };
+        var targetArray = new List<PokemonFalseUnion?>
+        {
+            PokemonFalseUnion.FromNullablePokemon(target),
+        };
+
+        // Call SpreadDamage and return the first (only) result
+        var results = SpreadDamage(damageArray, targetArray, source, effect, instafaint);
+        return results[0];
     }
 
+    //    directDamage(damage: number, target?: Pokemon, source: Pokemon | null = null, effect: Effect | null = null)
+    //    {
+    //        if (this.event) {
+    //        target ||= this.event.target;
+    //    source ||= this.event.source;
+    //    effect ||= this.effect;
+    //    }
+    //		if (!target?.hp) return 0;
+    //		if (!damage) return 0;
+    //		damage = this.clampIntRange(damage, 1);
+    //
+    //    damage = target.damage(damage, source, effect);
+    //		switch (effect.id) {
+    //		case 'strugglerecoil':
+    //			this.add('-damage', target, target.getHealth, '[from] recoil');
+    //			break;
+    //		case 'confusion':
+    //			this.add('-damage', target, target.getHealth, '[from] confusion');
+    //			break;
+    //		default:
+    //			this.add('-damage', target, target.getHealth);
+    //			break;
+    //		}
+    //		if (target.fainted) this.faint(target);
+    //		return damage;
+    //}
+
+    /// <summary>
+    /// Applies damage directly to a Pokémon without triggering the Damage event.
+    /// Used for recoil damage, struggle damage, confusion damage, and other effects
+    /// that should bypass normal damage modification abilities/items.
+    /// </summary>
+    /// <param name="damage">Amount of damage to deal</param>
+    /// <param name="target">Target Pokémon (defaults to event target)</param>
+    /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
+    /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
+    /// <returns>The actual amount of damage dealt (0 if target has no HP or damage was 0)</returns>
     public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null, IEffect? effect = null)
     {
-        throw new NotImplementedException();
-    }
+        // Default target to event target if available
+        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        {
+            target = eventTarget.Pokemon;
+        }
 
+        // Default source to event source if available
+        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        {
+            source = eventSource.Pokemon;
+        }
+
+        // Default effect to current effect if available
+        effect ??= Effect;
+
+        // Return 0 if target has no HP
+        if (target?.Hp <= 0) return 0;
+
+        // Return 0 if no damage to deal
+        if (damage == 0) return 0;
+
+        // Clamp damage to minimum of 1
+        damage = ClampIntRange(damage, 1, null);
+
+        // Apply damage directly (bypasses Damage event)
+        if (target == null) return damage;
+
+        damage = target.Damage(damage, source, effect);
+
+        // Log the damage with special cases for certain effects
+        if (effect is Condition condition)
+        {
+            switch (condition.Id)
+            {
+                case ConditionId.StruggleRecoil:
+                    // Struggle recoil has special messaging
+                    UiGenerator.PrintDamageEvent(target, fromEffect: "recoil");
+                    break;
+
+                case ConditionId.Confusion:
+                    // Confusion damage has special messaging
+                    UiGenerator.PrintDamageEvent(target, fromEffect: "confusion");
+                    break;
+
+                default:
+                    // Regular direct damage message
+                    UiGenerator.PrintDamageEvent(target);
+                    break;
+            }
+        }
+        else
+        {
+            // No effect or non-condition effect - simple damage message
+            UiGenerator.PrintDamageEvent(target);
+        }
+
+        // If target fainted from the damage, trigger faint immediately
+        if (target.Fainted)
+        {
+            Faint(target);
+        }
+
+        return damage;
+    }
     public IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleHealEffect? effect = null)
     {
