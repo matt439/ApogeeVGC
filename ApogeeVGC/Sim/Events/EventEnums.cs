@@ -63,6 +63,7 @@ public enum EventId
     Flinch,
     FoeBasePower,
     FoeBeforeMove,
+    FoeMaybeTrapPokemon,
     FoeModifyDef,
     FoeModifySpD,
     FoeRedirectTarget,

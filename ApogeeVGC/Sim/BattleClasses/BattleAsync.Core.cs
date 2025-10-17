@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -14,10 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Diagnostics.Metrics;
 using System.Drawing;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using String = System.String;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -80,7 +76,7 @@ public partial class BattleAsync : IBattle
     public static bool SentRequests => true;
 
     public RequestState RequestState { get; set; } = RequestState.None;
-    public int Turn { get; set; } = 0;
+    public int Turn { get; set; }
     public bool MidTurn { get; set; } = false;
     public bool Started { get; set; } = false;
     public bool Ended { get; set; }
@@ -98,11 +94,11 @@ public partial class BattleAsync : IBattle
     public Pokemon? ActiveTarget { get; set; }
 
     public ActiveMove? LastMove { get; set; }
-    public MoveId? LastSuccessfulMoveThisTurn { get; set; } = null;
+    public MoveId? LastSuccessfulMoveThisTurn { get; set; }
     public int LastMoveLine { get; set; } = -1;
     public int LastDamage { get; set; } = 0;
     public int EffectOrder { get; set; }
-    public bool QuickClawRoll { get; set; } = false;
+    public bool QuickClawRoll { get; set; }
     public List<int> SpeedOrder { get; set; } = [];
 
     // TeamGenerator
@@ -1022,13 +1018,320 @@ public partial class BattleAsync : IBattle
 
     public void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null)
     {
-        throw new NotImplementedException();
+        pokemon.Faint(source, effect);
     }
 
     public void EndTurn()
     {
-        throw new NotImplementedException();
+        // Increment turn counter and reset last successful move
+        Turn++;
+        LastSuccessfulMoveThisTurn = null;
+
+        // Process each side
+        var trappedBySide = new List<bool>();
+        var stalenessBySide = new List<StalenessId?>();
+
+        foreach (Side side in Sides)
+        {
+            bool sideTrapped = true;
+            StalenessId? sideStaleness = null;
+
+            foreach (Pokemon pokemon in side.Active)
+            {
+                // Reset move tracking
+                pokemon.MoveThisTurn = false;
+                pokemon.NewlySwitched = false;
+                pokemon.MoveLastTurnResult = pokemon.MoveThisTurnResult;
+                pokemon.MoveThisTurnResult = null;
+
+                // Reset turn-specific flags (except on turn 1)
+                if (Turn != 1)
+                {
+                    pokemon.UsedItemThisTurn = false;
+                    pokemon.StatsRaisedThisTurn = false;
+                    pokemon.StatsLoweredThisTurn = false;
+                    pokemon.HurtThisTurn = null;
+                }
+
+                // Reset move disable tracking
+                pokemon.MaybeDisabled = false;
+                pokemon.MaybeLocked = null;
+
+                // Clear disabled flags on all move slots
+                foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                {
+                    moveSlot.Disabled = false;
+                    moveSlot.DisabledSource = null;
+                }
+
+                // Run DisableMove event to determine which moves should be disabled
+                RunEvent(EventId.DisableMove, pokemon);
+
+                // Check each move for specific disable conditions
+                foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                {
+                    var activeMove = Library.Moves[moveSlot.Id].ToActiveMove();
+
+                    // Run DisableMove event on the specific move
+                    SingleEvent(EventId.DisableMove, activeMove, null, pokemon);
+
+                    // Disable moves with "cantusetwice" flag if used last turn
+                    if (activeMove.Flags.CantUseTwice == true &&
+                        pokemon.LastMove?.Id == moveSlot.Id)
+                    {
+                        pokemon.DisableMove(pokemon.LastMove.Id);
+                    }
+                }
+
+                // Update type visibility (Gen 7+)
+                // If Pokemon was attacked and illusion wasn't broken, reveal its type
+                if (pokemon.GetLastAttackedBy() != null && Gen >= 7)
+                {
+                    pokemon.KnownType = true;
+                }
+
+                // Clean up attack tracking
+                for (int i = pokemon.AttackedBy.Count - 1; i >= 0; i--)
+                {
+                    Attacker attack = pokemon.AttackedBy[i];
+                    if (attack.Source.IsActive)
+                    {
+                        // Mark attack as not from this turn (create new record since it's immutable)
+                        pokemon.AttackedBy[i] = attack with { ThisTurn = false };
+                    }
+                    else
+                    {
+                        // Remove attacks from Pokemon that are no longer active
+                        pokemon.AttackedBy.RemoveAt(i);
+                    }
+                }
+
+                // Update apparent type display (Gen 7+ and not Terastallized)
+                if (Gen >= 7 && pokemon.Terastallized == null)
+                {
+                    // Get the visible Pokemon (accounting for Illusion)
+                    Pokemon seenPokemon = pokemon.Illusion ?? pokemon;
+
+                    // Get actual types as a string (e.g., "Fire/Flying")
+                    string realTypeString = string.Join("/",
+                        seenPokemon.GetTypes(excludeAdded: true).Select(t => t.ToString()));
+
+                    // Update apparent type if it changed
+                    string currentApparentType = string.Join("/", seenPokemon.ApparentType);
+                    if (realTypeString != currentApparentType)
+                    {
+                        // Update apparent type (this is for display purposes)
+                        seenPokemon.ApparentType = seenPokemon.GetTypes(excludeAdded: true).ToList();
+                    }
+                }
+
+                // Reset trapping status
+                pokemon.Trapped = PokemonTrapped.False;
+                pokemon.MaybeTrapped = false;
+
+                // Run trap events
+                RunEvent(EventId.TrapPokemon, pokemon);
+
+                // Check if Pokemon can potentially be trapped
+                if (!pokemon.KnownType || Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                {
+                    RunEvent(EventId.MaybeTrapPokemon, pokemon);
+                }
+
+                // Check foe abilities for potential trapping (Gen 3+)
+                if (Gen > 2)
+                {
+                    foreach (Pokemon source in pokemon.Foes())
+                    {
+                        // Get the species to check (accounting for Illusion)
+                        Species species = (source.Illusion ?? source).Species;
+
+                        // Check each ability slot the species could have
+                        foreach (SpeciesAbilityType abilitySlot in Enum.GetValues<SpeciesAbilityType>())
+                        {
+                            var abilityId = species.Abilities.GetAbility(abilitySlot);
+                            if (abilityId == null) continue;
+
+                            // Skip if this is the source's current ability (already checked above)
+                            if (abilityId == source.Ability) continue;
+
+                            // Get the ability
+                            Ability ability = Library.Abilities[abilityId.Value];
+
+                            // Check if ability is banned
+                            if (RuleTable.Has(ability.Id)) continue;
+
+                            // Skip immunity check if type is known and already immune
+                            if (pokemon.KnownType && !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                                continue;
+
+                            // Run the FoeMaybeTrapPokemon event for this potential ability
+                            SingleEvent(EventId.FoeMaybeTrapPokemon, ability, null, pokemon, source);
+                        }
+                    }
+                }
+
+                // Skip if Pokemon fainted
+                if (pokemon.Fainted) continue;
+
+                // Update side-wide trap status
+                sideTrapped = sideTrapped && pokemon.Trapped == PokemonTrapped.True;
+
+                // Update side-wide staleness
+                StalenessId? staleness = pokemon.VolatileStaleness ?? pokemon.Staleness;
+                if (staleness != null)
+                {
+                    // External staleness takes priority
+                    sideStaleness = sideStaleness == StalenessId.External ? sideStaleness : staleness;
+                }
+
+                // Increment active turn counter
+                pokemon.ActiveTurns++;
+            }
+
+            // Store trap and staleness status for this side
+            trappedBySide.Add(sideTrapped);
+            stalenessBySide.Add(sideStaleness);
+
+            // Update fainted Pokemon tracking
+            side.FaintedLastTurn = side.FaintedThisTurn;
+            side.FaintedThisTurn = null;
+        }
+
+        // Check for endless battle clause
+        if (MaybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
+        {
+            return;
+        }
+
+        // Display turn number
+        UiGenerator.PrintTurnEvent(Turn);
+
+        // Pre-calculate Quick Claw roll for Gen 2-3
+        if (Gen == 2)
+        {
+            QuickClawRoll = RandomChance(60, 256);
+        }
+        if (Gen == 3)
+        {
+            QuickClawRoll = RandomChance(1, 5);
+        }
+
+        // Request move choices for the new turn
+        MakeRequest(RequestState.Move);
     }
+
+    //    maybeTriggerEndlessBattleClause(
+    //        trappedBySide: boolean[], stalenessBySide: ('internal' | 'external' | undefined)[]
+    //	) {
+    //		// Gen 1 Endless Battle Clause triggers
+    //		// These are checked before the 100 turn minimum as the battle cannot progress if they are true
+    //		if (this.gen <= 1) {
+    //        const noProgressPossible = this.sides.every(side => {
+    //            const foeAllGhosts = side.foe.pokemon.every(pokemon => pokemon.fainted || pokemon.hasType('Ghost'));
+    //            const foeAllTransform = side.foe.pokemon.every(pokemon => (
+    //                pokemon.fainted ||
+    //                // true if transforming into this pokemon would lead to an endless battle
+    //                // Transform will fail (depleting PP) if used against Ditto in Stadium 1
+    //                (this.dex.currentMod !== 'gen1stadium' || pokemon.species.id !== 'ditto') &&
+    //                // there are some subtleties such as a Mew with only Transform and auto-fail moves,
+    //                // but it's unlikely to come up in a real game so there's no need to handle it
+    //                pokemon.moves.every(moveid => moveid === 'transform')
+    //            ));
+    //            return side.pokemon.every(pokemon => (
+    //                pokemon.fainted ||
+    //                // frozen pokemon can't thaw in gen 1 without outside help
+    //                pokemon.status === 'frz' ||
+    //                // a pokemon can't lose PP if it Transforms into a pokemon with only Transform
+    //                (pokemon.moves.every(moveid => moveid === 'transform') && foeAllTransform) ||
+    //                // Struggle can't damage yourself if every foe is a Ghost
+    //                (pokemon.moveSlots.every(slot => slot.pp === 0) && foeAllGhosts)
+    //            ));
+    //        });
+    //        if (noProgressPossible)
+    //        {
+    //            this.add('-message', `This battle cannot progress.Endless Battle Clause activated!`);
+    //            return this.tie();
+    //        }
+    //    }
+
+    //		if (this.turn <= 100) return;
+
+    //		// the turn limit is not a part of Endless Battle Clause
+    //		if (this.turn >= 1000) {
+    //        this.add('message', `It is turn 1000.You have hit the turn limit!`);
+    //        this.tie();
+    //        return true;
+    //    }
+    //		if (
+    //            (this.turn >= 500 && this.turn % 100 === 0) || // every 100 turns past turn 500,
+
+    //            (this.turn >= 900 && this.turn % 10 === 0) || // every 10 turns past turn 900,
+    //			this.turn >= 990 // every turn past turn 990
+    //		) {
+    //        const turnsLeft = 1000 - this.turn;
+    //        const turnsLeftText = (turnsLeft === 1 ? `1 turn` : `${ turnsLeft}
+    //        turns`);
+    //        this.add('bigerror', `You will auto - tie if the battle doesn't end in ${turnsLeftText} (on turn 1000).`);
+
+    //        }
+
+    //		if (!this.ruleTable.has('endlessbattleclause')) return;
+    //		// for now, FFA doesn't support Endless Battle Clause
+    //		if (this.format.gameType === 'freeforall') return;
+
+    //		// Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
+    //		if (!stalenessBySide.every(s => !!s) || !stalenessBySide.some(s => s === 'external')) return;
+
+    //		// Can both sides switch to a non-stale Pokemon?
+    //		const canSwitch = [];
+    //		for (const [i, trapped] of trappedBySide.entries()) {
+    //			canSwitch[i] = false;
+    //			if (trapped) break;
+    //			const side = this.sides[i];
+
+    //			for (const pokemon of side.pokemon) {
+    //				if (!pokemon.fainted && !(pokemon.volatileStaleness || pokemon.staleness)) {
+    //					canSwitch[i] = true;
+    //					break;
+    //				}
+    //			}
+    //		}
+    //		if (canSwitch.every(s => s)) return;
+
+    //// Endless Battle Clause activates - we determine the winner by looking at each side's sets.
+    //const losers: Side[] = [];
+    //for (const side of this.sides) {
+    //    let berry = false; // Restorative Berry
+    //    let cycle = false; // Harvest or Recycle
+    //    for (const pokemon of side.pokemon) {
+    //        berry = RESTORATIVE_BERRIES.has(toID(pokemon.set.item));
+    //        if (['harvest', 'pickup'].includes(toID(pokemon.set.ability)) ||
+    //            pokemon.set.moves.map(toID).includes('recycle' as ID))
+    //        {
+    //            cycle = true;
+    //        }
+    //        if (berry && cycle) break;
+    //    }
+    //    if (berry && cycle) losers.push(side);
+    //}
+
+    //if (losers.length === 1)
+    //{
+    //    const loser = losers[0];
+    //    this.add('-message', `${ loser.name}
+    //    's team started with the rudimentary means to perform restorative berry-cycling and thus loses.`);
+
+    //            return this.win(loser.foe);
+    //}
+    //if (losers.length === this.sides.length)
+    //{
+    //    this.add('-message', `Each side's team started with the rudimentary means to perform restorative berry-cycling.`);
+
+    //        }
+
+    //return this.tie();
+    //	}
 
     public bool MaybeTriggerEndlessBattleClause(List<bool> trappedBySide, List<StalenessId?> stalenessBySide)
     {

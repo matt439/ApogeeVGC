@@ -45,6 +45,7 @@ public enum ConditionId
     ShadowForce,
     RevivalBlessing,
     HealBlock,
+    Trapped,
 
     None,
 }

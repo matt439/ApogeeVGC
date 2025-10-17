@@ -6,7 +6,7 @@ public record MoveFlags
     public bool? BypassSub { get; init; }
     public bool? Bite { get; init; }
     public bool? Bullet { get; init; }
-    public bool? CantUinitwice { get; init; }
+    public bool? CantUseTwice { get; init; }
     public bool? Charge { get; init; }
     public bool? Contact { get; init; }
     public bool? Dance { get; init; }

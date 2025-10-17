@@ -263,4 +263,9 @@ public static class UiGenerator
         string attributesText = !string.IsNullOrEmpty(attributes) ? $" ({attributes})" : "";
         Console.WriteLine($"{pokemon.Name} swapped to position {newPosition}{attributesText}!");
     }
+
+    public static void PrintTurnEvent(int turnNumber)
+    {
+        Console.WriteLine($"Turn {turnNumber}");
+    }
 }

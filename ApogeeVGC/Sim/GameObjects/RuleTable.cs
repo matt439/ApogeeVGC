@@ -8,4 +8,9 @@ public class RuleTable
     {
         throw new NotImplementedException();
     }
+
+    public bool Has(AbilityId ability)
+    {
+        throw new NotImplementedException();
+    }
 }
