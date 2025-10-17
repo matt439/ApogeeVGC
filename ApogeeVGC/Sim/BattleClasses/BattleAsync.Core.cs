@@ -14,6 +14,9 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Diagnostics.Metrics;
+using System.Drawing;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -567,7 +570,46 @@ public partial class BattleAsync : IBattle
 
     public void MakeRequest(RequestState? type = null)
     {
-        throw new NotImplementedException();
+        // Update request state if provided, otherwise use current state
+        if (type.HasValue)
+        {
+            RequestState = type.Value;
+
+            // Clear all sides' choices when starting a new request
+            foreach (Side side in Sides)
+            {
+                side.ClearChoice();
+            }
+        }
+        else
+        {
+            type = RequestState;
+        }
+
+        // Clear all active requests before generating new ones
+        foreach (Side side in Sides)
+        {
+            side.ActiveRequest = null;
+        }
+
+        // Generate appropriate requests for the current state
+        List<IChoiceRequest> requests = GetRequests(type.Value);
+
+        // Assign requests to each side
+        for (int i = 0; i < Sides.Count; i++)
+        {
+            Sides[i].ActiveRequest = requests[i];
+        }
+
+        // Note: In the TypeScript version, sentRequests is set to false
+        // The C# version has SentRequests as a static property that always returns true
+        // This may need to be changed to an instance property if the behavior is needed
+
+        // Verify that choices aren't already done (would indicate a bug)
+        if (Sides.All(side => side.IsChoiceDone()))
+        {
+            throw new InvalidOperationException("Choices are done immediately after a request");
+        }
     }
 
     /// <summary>
@@ -705,12 +747,54 @@ public partial class BattleAsync : IBattle
 
     public bool Win(SideId? side = null)
     {
-        throw new NotImplementedException();
+        // Convert SideId to Side if provided
+        Side? winningSide = side.HasValue ? GetSide(side.Value) : null;
+        return Win(winningSide);
     }
 
     public bool Win(Side? side = null)
     {
-        throw new NotImplementedException();
+        // Battle already ended
+        if (Ended) return false;
+
+        // Validate the side exists in the battle
+        if (side != null && !Sides.Contains(side))
+        {
+            side = null;
+        }
+
+        // Set the winner - store the side's name since we don't have a PlayerId property
+        // The TypeScript version stores side.name in this.winner
+        Winnder = null; // TODO: Update when PlayerId system is implemented
+
+        // Print empty line for formatting
+        UiGenerator.PrintEmptyLine();
+
+        // Print the appropriate win/tie message
+        // Note: AllySide is not implemented in this codebase (see Side class)
+        // The original TypeScript code checks for side?.allySide here
+        if (side != null)
+        {
+            // Single side wins
+            UiGenerator.PrintWinEvent(side);
+        }
+        else
+        {
+            // Tie
+            UiGenerator.PrintTieEvent();
+        }
+
+        // End the battle
+        Ended = true;
+        RequestState = RequestState.None;
+
+        // Clear all active requests
+        foreach (Side s in Sides)
+        {
+            s.ActiveRequest = null;
+        }
+
+        return true;
     }
 
     public bool Lose(SideId side)

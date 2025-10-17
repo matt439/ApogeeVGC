@@ -34,6 +34,7 @@ public enum BattleAddId
     Boost,
     Unboost,
     Message,
+    TeamPreview,
 }
 
 public static class UiGenerator
@@ -230,5 +231,30 @@ public static class UiGenerator
     public static void PrintMessage(string message)
     {
         Console.WriteLine(message);
+    }
+
+    public static void PrintTeamPreview()
+    {
+
+    }
+
+    public static void PrintWinEvent(Side side)
+    {
+        Console.WriteLine($"{side.Name} wins!");
+    }
+
+    public static void PrintWinEvent(string sideName, string allySideName)
+    {
+        Console.WriteLine($"{sideName} & {allySideName} win!");
+    }
+
+    public static void PrintTieEvent()
+    {
+        Console.WriteLine("The battle ended in a tie!");
+    }
+
+    public static void PrintEmptyLine()
+    {
+        Console.WriteLine();
     }
 }
