@@ -51,6 +51,8 @@ public record BoolIntBoolUnion(bool Value) : IntBoolUnion
 /// </summary>
 public abstract record IntFalseUnion
 {
+    public abstract int ToInt();
+    
     public static IntFalseUnion FromInt(int value) => new IntIntFalseUnion(value);
     public static IntFalseUnion FromFalse() => new FalseIntFalseUnion();
 
@@ -82,8 +84,16 @@ public abstract record IntFalseUnion
         };
     }
 }
-public record IntIntFalseUnion(int Value) : IntFalseUnion;
-public record FalseIntFalseUnion : IntFalseUnion;
+
+public record IntIntFalseUnion(int Value) : IntFalseUnion
+{
+    public override int ToInt() => Value;
+}
+
+public record FalseIntFalseUnion : IntFalseUnion
+{
+    public override int ToInt() => 0;
+}
 
 
 
@@ -657,14 +667,18 @@ public static class EffectUnionFactory
 
 
 /// <summary>
-/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | Field
+/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | Field | Pokemon?
 /// </summary>
 public abstract record RunEventTarget
 {
     public static implicit operator RunEventTarget(Pokemon pokemon) =>
         new PokemonRunEventTarget(pokemon);
+    public static RunEventTarget? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonRunEventTarget(pokemon);
+    }
 
-    public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
+public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
         new PokemonArrayRunEventTarget(pokemonList);
 
     public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);

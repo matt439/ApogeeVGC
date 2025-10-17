@@ -202,9 +202,42 @@ public static class UiGenerator
         Console.WriteLine($"{pokemon.Name} changed forme to {newForme}!");
     }
 
-    public static void PrintHealEvent(Pokemon pokemon, int health)
+    /// <summary>
+    /// Prints a heal event message.
+    /// Handles various healing scenarios including healing from effects, abilities, and conditions.
+    /// </summary>
+    /// <param name="target">The Pokemon being healed</param>
+    /// <param name="fromEffect">Optional effect name causing the healing (e.g., "drain", "wish")</param>
+    /// <param name="ofPokemon">Optional source Pokemon for the healing</param>
+    /// <param name="silent">If true, prints a silent heal message</param>
+    public static void PrintHealEvent(Pokemon target, string? fromEffect = null,
+        Pokemon? ofPokemon = null, bool silent = false)
     {
-        Console.WriteLine($"{pokemon.Name} healed {health} HP!");
+        PokemonHealth health = target.GetHealth();
+        string healthStatus = FormatHealthStatus(health);
+
+        if (silent)
+        {
+            // Silent heal (e.g., from Leech Seed, Rest)
+            Console.WriteLine($"-heal|{target}|{healthStatus}|[silent]");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(fromEffect))
+        {
+            // Simple heal (from move or no effect)
+            Console.WriteLine($"-heal|{target}|{healthStatus}");
+        }
+        else if (ofPokemon != null)
+        {
+            // Heal from effect with source Pokemon
+            Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
+        }
+        else
+        {
+            // Heal from effect without source
+            Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}");
+        }
     }
 
     public static void PrintSetBoostEvent(Pokemon target, BoostId boostId, int boost, IEffect sourceEffect)

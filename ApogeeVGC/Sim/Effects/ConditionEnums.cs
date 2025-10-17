@@ -51,6 +51,8 @@ public enum ConditionId
     StruggleRecoil,
     PartiallyTrapped,
     Powder,
+    Rest,
+    Wish,
 
     None,
 }

@@ -13,8 +13,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1642,127 +1640,6 @@ public partial class BattleAsync : IBattle
         return success.HasValue ? new BoolBoolZeroUnion(success.Value) : null;
     }
 
-
-    //   spreadDamage(
-    //	damage: SpreadMoveDamage, targetArray: (false | Pokemon | null)[] | null = null,
-    //	source: Pokemon | null = null, effect: 'drain' | 'recoil' | Effect | null = null, instafaint = false
-    //) {
-    //	if (!targetArray) return [0];
-    //	const retVals: (number | false | undefined)[] = [];
-    //	if (typeof effect === 'string' || !effect) effect = this.dex.conditions.getByID((effect || '') as ID);
-    //	for (const [i, curDamage] of damage.entries()) {
-    //		const target = targetArray[i];
-    //		let targetDamage = curDamage;
-    //		if (!(targetDamage || targetDamage === 0)) {
-    //			retVals[i] = targetDamage;
-    //			continue;
-    //		}
-    //		if (!target || !target.hp) {
-    //			retVals[i] = 0;
-    //			continue;
-    //		}
-    //		if (!target.isActive) {
-    //			retVals[i] = false;
-    //			continue;
-    //		}
-    //		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
-
-    //		if (effect.id !== 'struggle-recoil') { // Struggle recoil is not affected by effects
-    //			if (effect.effectType === 'Weather' && !target.runStatusImmunity(effect.id)) {
-    //				this.debug('weather immunity');
-    //				retVals[i] = 0;
-    //				continue;
-    //			}
-    //			targetDamage = this.runEvent('Damage', target, source, effect, targetDamage, true);
-    //			if (!(targetDamage || targetDamage === 0)) {
-    //				this.debug('damage event failed');
-    //				retVals[i] = curDamage === true ? undefined : targetDamage;
-    //				continue;
-    //			}
-    //		}
-    //		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
-
-    //		if (this.gen <= 1) {
-    //			if (this.dex.currentMod === 'gen1stadium' ||
-    //				!['recoil', 'drain', 'leechseed'].includes(effect.id) && effect.effectType !== 'Status') {
-    //				this.lastDamage = targetDamage;
-    //			}
-    //		}
-
-    //		retVals[i] = targetDamage = target.damage(targetDamage, source, effect);
-    //		if (targetDamage !== 0) target.hurtThisTurn = target.hp;
-    //		if (source && effect.effectType === 'Move') source.lastDamage = targetDamage;
-
-    //		const name = effect.fullname === 'tox' ? 'psn' : effect.fullname;
-    //		switch (effect.id) {
-    //		case 'partiallytrapped':
-    //			this.add('-damage', target, target.getHealth, '[from] ' + target.volatiles['partiallytrapped'].sourceEffect.fullname, '[partiallytrapped]');
-    //			break;
-    //		case 'powder':
-    //			this.add('-damage', target, target.getHealth, '[silent]');
-    //			break;
-    //		case 'confused':
-    //			this.add('-damage', target, target.getHealth, '[from] confusion');
-    //			break;
-    //		default:
-    //			if (effect.effectType === 'Move' || !name) {
-    //				this.add('-damage', target, target.getHealth);
-    //			} else if (source && (source !== target || effect.effectType === 'Ability')) {
-    //				this.add('-damage', target, target.getHealth, `[from] ${name}`, `[of] ${source}`);
-    //			} else {
-    //				this.add('-damage', target, target.getHealth, `[from] ${name}`);
-    //			}
-    //			break;
-    //		}
-
-    //		if (targetDamage && effect.effectType === 'Move') {
-    //			if (this.gen <= 1 && effect.recoil && source) {
-    //				if (this.dex.currentMod !== 'gen1stadium' || target.hp > 0) {
-    //					const amount = this.clampIntRange(Math.floor(targetDamage * effect.recoil[0] / effect.recoil[1]), 1);
-    //					this.damage(amount, source, target, 'recoil');
-    //				}
-    //			}
-    //			if (this.gen <= 4 && effect.drain && source) {
-    //				const amount = this.clampIntRange(Math.floor(targetDamage * effect.drain[0] / effect.drain[1]), 1);
-    //				// Draining can be countered in gen 1
-    //				if (this.gen <= 1) this.lastDamage = amount;
-    //				this.heal(amount, source, target, 'drain');
-    //			}
-    //			if (this.gen > 4 && effect.drain && source) {
-    //				const amount = Math.round(targetDamage * effect.drain[0] / effect.drain[1]);
-    //				this.heal(amount, source, target, 'drain');
-    //			}
-    //		}
-    //	}
-
-    //	if (instafaint) {
-    //		for (const [i, target] of targetArray.entries()) {
-    //			if (!retVals[i] || !target) continue;
-
-    //			if (target.hp <= 0) {
-    //				this.debug(`instafaint: ${this.faintQueue.map(entry => entry.target.name)}`);
-    //				this.faintMessages(true);
-    //				if (this.gen <= 2) {
-    //					target.faint();
-    //					if (this.gen <= 1) {
-    //						this.queue.clear();
-    //						// Fainting clears accumulated Bide damage
-    //						for (const pokemon of this.getAllActive()) {
-    //							if (pokemon.volatiles['bide']?.damage) {
-    //								pokemon.volatiles['bide'].damage = 0;
-    //								this.hint("Desync Clause Mod activated!");
-    //								this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
-    //							}
-    //						}
-    //					}
-    //				}
-    //			}
-    //		}
-    //	}
-
-    //	return retVals;
-    //}
-
     public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage, List<PokemonFalseUnion?>? targetArray,
     Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
     {
@@ -2017,33 +1894,6 @@ public partial class BattleAsync : IBattle
         return results[0];
     }
 
-    //    directDamage(damage: number, target?: Pokemon, source: Pokemon | null = null, effect: Effect | null = null)
-    //    {
-    //        if (this.event) {
-    //        target ||= this.event.target;
-    //    source ||= this.event.source;
-    //    effect ||= this.effect;
-    //    }
-    //		if (!target?.hp) return 0;
-    //		if (!damage) return 0;
-    //		damage = this.clampIntRange(damage, 1);
-    //
-    //    damage = target.damage(damage, source, effect);
-    //		switch (effect.id) {
-    //		case 'strugglerecoil':
-    //			this.add('-damage', target, target.getHealth, '[from] recoil');
-    //			break;
-    //		case 'confusion':
-    //			this.add('-damage', target, target.getHealth, '[from] confusion');
-    //			break;
-    //		default:
-    //			this.add('-damage', target, target.getHealth);
-    //			break;
-    //		}
-    //		if (target.fainted) this.faint(target);
-    //		return damage;
-    //}
-
     /// <summary>
     /// Applies damage directly to a Pokémon without triggering the Damage event.
     /// Used for recoil damage, struggle damage, confusion damage, and other effects
@@ -2120,10 +1970,152 @@ public partial class BattleAsync : IBattle
 
         return damage;
     }
-    public IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null,
+
+    public IntFalseUnion Heal(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleHealEffect? effect = null)
     {
-        throw new NotImplementedException();
+        // Default target to event target if available
+        if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
+        {
+            target = eventTarget.Pokemon;
+        }
+
+        // Default source to event source if available
+        if (source == null && Event.Source is PokemonSingleEventSource eventSource)
+        {
+            source = eventSource.Pokemon;
+        }
+
+        // Convert BattleHealEffect to Condition
+        Condition? effectCondition = effect switch
+        {
+            DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
+            EffectBattleHealEffect ebhe => ebhe.Effect as Condition,
+            null => Effect as Condition,
+            _ => throw new InvalidOperationException("Unknown BattleHealEffect type."),
+        };
+
+        // Clamp damage to minimum of 1 if non-zero
+        if (damage != 0 && damage <= 1)
+        {
+            damage = 1;
+        }
+
+        // Truncate damage
+        damage = Trunc(damage);
+
+        // Run TryHeal event (allows effects like Liquid Ooze to trigger even when nothing is healed)
+        RelayVar? tryHealResult = RunEvent(
+            EventId.TryHeal,
+            RunEventTarget.FromNullablePokemon(target),
+            RunEventSource.FromNullablePokemon(source),
+            effectCondition,
+            new IntRelayVar(damage)
+        );
+
+        // If event prevented healing, return the result
+        if (tryHealResult is not IntRelayVar healAmount)
+        {
+            return new IntIntFalseUnion(0);
+        }
+
+        if (healAmount.Value == 0)
+        {
+            return new IntIntFalseUnion(0);
+        }
+
+        damage = healAmount.Value;
+
+        // Return false if target has no HP
+        if (target?.Hp <= 0)
+        {
+            return new FalseIntFalseUnion();
+        }
+
+        // Return false if target is not active
+        if (target is { IsActive: false })
+        {
+            return new FalseIntFalseUnion();
+        }
+
+        // Return false if target is already at max HP
+        if (target != null && target.Hp >= target.MaxHp)
+        {
+            return new FalseIntFalseUnion();
+        }
+
+        if (target is null)
+        {
+            throw new InvalidOperationException("Target Pokémon is null.");
+        }
+
+        // Apply healing to target
+        int finalDamage = target.Heal(damage, source, effectCondition).ToInt();
+
+        // Log healing messages based on effect type
+        PrintHealMessage(target, source, effectCondition);
+
+        // Run Heal event
+        RunEvent(
+            EventId.Heal,
+            target,
+            RunEventSource.FromNullablePokemon(source),
+            effectCondition,
+            new IntRelayVar(finalDamage)
+        );
+
+        return new IntIntFalseUnion(finalDamage);
+    }
+
+    /// <summary>
+    /// Helper method to print heal messages based on the effect type.
+    /// Handles special cases like Leech Seed, Rest, Drain, and Wish.
+    /// </summary>
+    private void PrintHealMessage(Pokemon target, Pokemon? source = null, IEffect? effect = null)
+    {
+        // Handle special condition-specific messages
+        if (effect is Condition condition)
+        {
+            switch (condition.Id)
+            {
+                case ConditionId.LeechSeed:
+                case ConditionId.Rest:
+                    // Silent heal message
+                    UiGenerator.PrintHealEvent(target, silent: true);
+                    return;
+
+                case ConditionId.Drain:
+                    // Drain shows the source
+                    UiGenerator.PrintHealEvent(target, fromEffect: "drain", ofPokemon: source);
+                    return;
+
+                case ConditionId.Wish:
+                    // Wish has no heal message (handled by Wish's end effect)
+                    return;
+            }
+        }
+
+        // Default heal message formatting
+        if (effect == null)
+        {
+            return;
+        }
+
+        if (effect.EffectType == EffectType.Move)
+        {
+            // Simple heal message (from move)
+            UiGenerator.PrintHealEvent(target);
+        }
+        else if (source != null && source != target)
+        {
+            // Heal from effect with source attribution
+            UiGenerator.PrintHealEvent(target, fromEffect: effect.Name, ofPokemon: source);
+        }
+        else
+        {
+            // Heal from effect without source
+            UiGenerator.PrintHealEvent(target, fromEffect: effect.Name);
+        }
     }
 
     public int Chain(int previousMod, int nextMod)
