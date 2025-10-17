@@ -257,4 +257,10 @@ public static class UiGenerator
     {
         Console.WriteLine();
     }
+
+    public static void PrintSwapEvent(Pokemon pokemon, int newPosition, string? attributes = null)
+    {
+        string attributesText = !string.IsNullOrEmpty(attributes) ? $" ({attributes})" : "";
+        Console.WriteLine($"{pokemon.Name} swapped to position {newPosition}{attributesText}!");
+    }
 }

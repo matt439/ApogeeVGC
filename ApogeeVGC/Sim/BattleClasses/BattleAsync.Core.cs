@@ -960,9 +960,55 @@ public partial class BattleAsync : IBattle
         return canSwitchIn;
     }
 
-    public bool SwapPosition(Pokemon pokemon, int newPosition, string? attribures = null)
+    /// <summary>
+    /// Swaps a Pokémon's position with another Pokémon on the same side.
+    /// Used for moves like Ally Switch or game mechanics that change field positions.
+    /// </summary>
+    /// <param name="pokemon">The Pokémon to swap</param>
+    /// <param name="newPosition">The target position index (0-based)</param>
+    /// <param name="attributes">Optional attributes for the swap event</param>
+    /// <returns>True if swap succeeded, false if invalid</returns>
+    public bool SwapPosition(Pokemon pokemon, int newPosition, string? attributes = null)
     {
-        throw new NotImplementedException();
+        // Validate the new position is within the active slots
+        if (newPosition >= pokemon.Side.Active.Count)
+        {
+            throw new ArgumentException("Invalid swap position", nameof(newPosition));
+        }
+
+        // Get the Pokémon at the target position
+        Pokemon target = pokemon.Side.Active[newPosition];
+
+        // Special check: position 1 can be swapped even if empty/fainted
+        // Other positions require a valid, non-fainted target
+        if (newPosition != 1 && (target.Fainted))
+        {
+            return false;
+        }
+
+        // Log the swap event
+        UiGenerator.PrintSwapEvent(pokemon, newPosition, attributes);
+
+        // Perform the swap
+        Side side = pokemon.Side;
+        
+        // Swap in the Pokemon array (full team roster)
+        side.Pokemon[pokemon.Position] = target;
+        side.Pokemon[newPosition] = pokemon;
+        
+        // Swap in the Active array (currently active Pokemon)
+        side.Active[pokemon.Position] = side.Pokemon[pokemon.Position];
+        side.Active[newPosition] = side.Pokemon[newPosition];
+        
+        // Update position properties
+        target.Position = pokemon.Position;
+        pokemon.Position = newPosition;
+
+        // Trigger swap events for both Pokemon
+        RunEvent(EventId.Swap, target, RunEventSource.FromNullablePokemon(pokemon));
+        RunEvent(EventId.Swap, pokemon, RunEventSource.FromNullablePokemon(target));
+
+        return true;
     }
 
     public Pokemon? GetAtSlot(PokemonSlot? slot)
