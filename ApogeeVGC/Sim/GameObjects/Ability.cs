@@ -42,6 +42,8 @@ public enum AbilityId
     PerishBody,
     Stall,
     MagicBounce,
+    Harvest,
+    Pickup,
 
     None,
 }

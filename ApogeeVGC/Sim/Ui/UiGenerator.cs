@@ -268,4 +268,9 @@ public static class UiGenerator
     {
         Console.WriteLine($"Turn {turnNumber}");
     }
+
+    public static void PrintBigError(string error)
+    {
+        Console.WriteLine(error);
+    }
 }

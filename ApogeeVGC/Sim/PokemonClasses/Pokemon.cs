@@ -2591,7 +2591,7 @@ public class Pokemon : IPriorityComparison
         throw new NotImplementedException();
     }
 
-    private static readonly HashSet<ItemId> RestorativeBerries =
+    public static readonly HashSet<ItemId> RestorativeBerries =
     [
         ItemId.LeppaBerry,
         ItemId.AguavBerry,

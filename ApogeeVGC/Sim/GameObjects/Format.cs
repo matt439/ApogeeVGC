@@ -28,6 +28,7 @@ public enum RuleId
 {
     Standard,
     OverflowStatMod,
+    EndlessBattleClause,
 }
 
 public record Format : IEffect, IBasicEffect, IEventMethods
