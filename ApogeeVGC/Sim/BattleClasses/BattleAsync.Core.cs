@@ -1422,26 +1422,32 @@ public partial class BattleAsync : IBattle
         throw new NotImplementedException();
     }
 
-    //checkEVBalance()
-    //{
-    //    let limitedEVs: boolean | null = null;
-    //    for (const side of this.sides) {
-    //        const sideLimitedEVs = !side.pokemon.some(
-    //            pokemon => Object.values(pokemon.set.evs).reduce((a, b) => a + b, 0) > 510
-    //        );
-    //        if (limitedEVs === null)
-    //        {
-    //            limitedEVs = sideLimitedEVs;
-    //        }
-    //        else if (limitedEVs !== sideLimitedEVs)
-    //        {
-    //            this.add('bigerror', "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
-    //        }
-    //    }
-    //}
     public void CheckEvBalance()
     {
-        throw new NotImplementedException();
+        bool? limitedEVs = null;
+
+        foreach (Side side in Sides)
+        {
+            // Check if this side's Pokémon all have 510 or fewer total EVs
+            bool sideLimitedEVs = !side.Pokemon.Any(pokemon =>
+            {
+                // Sum all EV values for this Pokémon
+                int totalEvs = pokemon.Set.Evs.Values.Sum();
+                return totalEvs > 510;
+            });
+
+            if (limitedEVs == null)
+            {
+                // First side - just record the limit status
+                limitedEVs = sideLimitedEVs;
+            }
+            else if (limitedEVs != sideLimitedEVs)
+            {
+                // Sides have different EV limit adherence - show warning
+                UiGenerator.PrintBigError(
+                    "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
+            }
+        }
     }
 
     /// <summary>
