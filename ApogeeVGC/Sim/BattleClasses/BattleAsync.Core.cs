@@ -920,14 +920,44 @@ public partial class BattleAsync : IBattle
         return PossibleSwitches(side).Count;
     }
 
+    /// <summary>
+    /// Gets a random Pokémon that can be switched in for the given side.
+    /// Returns null if no Pokémon are available to switch in.
+    /// </summary>
+    /// <param name="side">The side to get a random switchable Pokémon for</param>
+    /// <returns>A random switchable Pokémon, or null if none available</returns>
     public Pokemon? GetRandomSwitchable(Side side)
     {
-        throw new NotImplementedException();
+        var canSwitchIn = PossibleSwitches(side);
+        return canSwitchIn.Count > 0 ? Sample(canSwitchIn) : null;
     }
 
-    private List<Pokemon> PossibleSwitches(Side side)
+    /// <summary>
+    /// Gets all Pokémon that can be switched in for the given side.
+    /// Only includes non-fainted Pokémon that are not currently active.
+    /// </summary>
+    /// <param name="side">The side to get possible switches for</param>
+    /// <returns>A list of all Pokémon that can be switched in</returns>
+    private static List<Pokemon> PossibleSwitches(Side side)
     {
-        throw new NotImplementedException();
+        // No Pokémon left on the side
+        if (side.PokemonLeft <= 0) return [];
+
+        List<Pokemon> canSwitchIn = [];
+        
+        // Iterate through Pokemon starting after the active slots
+        // Active Pokemon are at indices [0, side.Active.Count)
+        // Bench Pokemon are at indices [side.Active.Count, side.Pokemon.Count)
+        for (int i = side.Active.Count; i < side.Pokemon.Count; i++)
+        {
+            Pokemon pokemon = side.Pokemon[i];
+            if (!pokemon.Fainted)
+            {
+                canSwitchIn.Add(pokemon);
+            }
+        }
+        
+        return canSwitchIn;
     }
 
     public bool SwapPosition(Pokemon pokemon, int newPosition, string? attribures = null)
