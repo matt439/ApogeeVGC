@@ -326,13 +326,6 @@ public static class UiGenerator
     /// </summary>
     private static string FormatHealthStatus(PokemonHealth health)
     {
-        string baseHealth = $"{health.Secret.Hp}/{health.Secret.MaxHp}";
-
-        if (!string.IsNullOrEmpty(health.Secret.Status))
-        {
-            return $"{baseHealth} {health.Secret.Status}";
-        }
-
-        return baseHealth;
+        throw new NotImplementedException();
     }
 }

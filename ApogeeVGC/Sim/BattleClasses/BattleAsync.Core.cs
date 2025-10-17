@@ -13,10 +13,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Drawing;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1645,128 +1641,128 @@ public partial class BattleAsync : IBattle
     }
 
 
- //   spreadDamage(
-	//	damage: SpreadMoveDamage, targetArray: (false | Pokemon | null)[] | null = null,
-	//	source: Pokemon | null = null, effect: 'drain' | 'recoil' | Effect | null = null, instafaint = false
-	//) {
-	//	if (!targetArray) return [0];
-	//	const retVals: (number | false | undefined)[] = [];
-	//	if (typeof effect === 'string' || !effect) effect = this.dex.conditions.getByID((effect || '') as ID);
-	//	for (const [i, curDamage] of damage.entries()) {
-	//		const target = targetArray[i];
-	//		let targetDamage = curDamage;
-	//		if (!(targetDamage || targetDamage === 0)) {
-	//			retVals[i] = targetDamage;
-	//			continue;
-	//		}
-	//		if (!target || !target.hp) {
-	//			retVals[i] = 0;
-	//			continue;
-	//		}
-	//		if (!target.isActive) {
-	//			retVals[i] = false;
-	//			continue;
-	//		}
-	//		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
+    //   spreadDamage(
+    //	damage: SpreadMoveDamage, targetArray: (false | Pokemon | null)[] | null = null,
+    //	source: Pokemon | null = null, effect: 'drain' | 'recoil' | Effect | null = null, instafaint = false
+    //) {
+    //	if (!targetArray) return [0];
+    //	const retVals: (number | false | undefined)[] = [];
+    //	if (typeof effect === 'string' || !effect) effect = this.dex.conditions.getByID((effect || '') as ID);
+    //	for (const [i, curDamage] of damage.entries()) {
+    //		const target = targetArray[i];
+    //		let targetDamage = curDamage;
+    //		if (!(targetDamage || targetDamage === 0)) {
+    //			retVals[i] = targetDamage;
+    //			continue;
+    //		}
+    //		if (!target || !target.hp) {
+    //			retVals[i] = 0;
+    //			continue;
+    //		}
+    //		if (!target.isActive) {
+    //			retVals[i] = false;
+    //			continue;
+    //		}
+    //		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
 
-	//		if (effect.id !== 'struggle-recoil') { // Struggle recoil is not affected by effects
-	//			if (effect.effectType === 'Weather' && !target.runStatusImmunity(effect.id)) {
-	//				this.debug('weather immunity');
-	//				retVals[i] = 0;
-	//				continue;
-	//			}
-	//			targetDamage = this.runEvent('Damage', target, source, effect, targetDamage, true);
-	//			if (!(targetDamage || targetDamage === 0)) {
-	//				this.debug('damage event failed');
-	//				retVals[i] = curDamage === true ? undefined : targetDamage;
-	//				continue;
-	//			}
-	//		}
-	//		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
+    //		if (effect.id !== 'struggle-recoil') { // Struggle recoil is not affected by effects
+    //			if (effect.effectType === 'Weather' && !target.runStatusImmunity(effect.id)) {
+    //				this.debug('weather immunity');
+    //				retVals[i] = 0;
+    //				continue;
+    //			}
+    //			targetDamage = this.runEvent('Damage', target, source, effect, targetDamage, true);
+    //			if (!(targetDamage || targetDamage === 0)) {
+    //				this.debug('damage event failed');
+    //				retVals[i] = curDamage === true ? undefined : targetDamage;
+    //				continue;
+    //			}
+    //		}
+    //		if (targetDamage !== 0) targetDamage = this.clampIntRange(targetDamage, 1);
 
-	//		if (this.gen <= 1) {
-	//			if (this.dex.currentMod === 'gen1stadium' ||
-	//				!['recoil', 'drain', 'leechseed'].includes(effect.id) && effect.effectType !== 'Status') {
-	//				this.lastDamage = targetDamage;
-	//			}
-	//		}
+    //		if (this.gen <= 1) {
+    //			if (this.dex.currentMod === 'gen1stadium' ||
+    //				!['recoil', 'drain', 'leechseed'].includes(effect.id) && effect.effectType !== 'Status') {
+    //				this.lastDamage = targetDamage;
+    //			}
+    //		}
 
-	//		retVals[i] = targetDamage = target.damage(targetDamage, source, effect);
-	//		if (targetDamage !== 0) target.hurtThisTurn = target.hp;
-	//		if (source && effect.effectType === 'Move') source.lastDamage = targetDamage;
+    //		retVals[i] = targetDamage = target.damage(targetDamage, source, effect);
+    //		if (targetDamage !== 0) target.hurtThisTurn = target.hp;
+    //		if (source && effect.effectType === 'Move') source.lastDamage = targetDamage;
 
-	//		const name = effect.fullname === 'tox' ? 'psn' : effect.fullname;
-	//		switch (effect.id) {
-	//		case 'partiallytrapped':
-	//			this.add('-damage', target, target.getHealth, '[from] ' + target.volatiles['partiallytrapped'].sourceEffect.fullname, '[partiallytrapped]');
-	//			break;
-	//		case 'powder':
-	//			this.add('-damage', target, target.getHealth, '[silent]');
-	//			break;
-	//		case 'confused':
-	//			this.add('-damage', target, target.getHealth, '[from] confusion');
-	//			break;
-	//		default:
-	//			if (effect.effectType === 'Move' || !name) {
-	//				this.add('-damage', target, target.getHealth);
-	//			} else if (source && (source !== target || effect.effectType === 'Ability')) {
-	//				this.add('-damage', target, target.getHealth, `[from] ${name}`, `[of] ${source}`);
-	//			} else {
-	//				this.add('-damage', target, target.getHealth, `[from] ${name}`);
-	//			}
-	//			break;
-	//		}
+    //		const name = effect.fullname === 'tox' ? 'psn' : effect.fullname;
+    //		switch (effect.id) {
+    //		case 'partiallytrapped':
+    //			this.add('-damage', target, target.getHealth, '[from] ' + target.volatiles['partiallytrapped'].sourceEffect.fullname, '[partiallytrapped]');
+    //			break;
+    //		case 'powder':
+    //			this.add('-damage', target, target.getHealth, '[silent]');
+    //			break;
+    //		case 'confused':
+    //			this.add('-damage', target, target.getHealth, '[from] confusion');
+    //			break;
+    //		default:
+    //			if (effect.effectType === 'Move' || !name) {
+    //				this.add('-damage', target, target.getHealth);
+    //			} else if (source && (source !== target || effect.effectType === 'Ability')) {
+    //				this.add('-damage', target, target.getHealth, `[from] ${name}`, `[of] ${source}`);
+    //			} else {
+    //				this.add('-damage', target, target.getHealth, `[from] ${name}`);
+    //			}
+    //			break;
+    //		}
 
-	//		if (targetDamage && effect.effectType === 'Move') {
-	//			if (this.gen <= 1 && effect.recoil && source) {
-	//				if (this.dex.currentMod !== 'gen1stadium' || target.hp > 0) {
-	//					const amount = this.clampIntRange(Math.floor(targetDamage * effect.recoil[0] / effect.recoil[1]), 1);
-	//					this.damage(amount, source, target, 'recoil');
-	//				}
-	//			}
-	//			if (this.gen <= 4 && effect.drain && source) {
-	//				const amount = this.clampIntRange(Math.floor(targetDamage * effect.drain[0] / effect.drain[1]), 1);
-	//				// Draining can be countered in gen 1
-	//				if (this.gen <= 1) this.lastDamage = amount;
-	//				this.heal(amount, source, target, 'drain');
-	//			}
-	//			if (this.gen > 4 && effect.drain && source) {
-	//				const amount = Math.round(targetDamage * effect.drain[0] / effect.drain[1]);
-	//				this.heal(amount, source, target, 'drain');
-	//			}
-	//		}
-	//	}
+    //		if (targetDamage && effect.effectType === 'Move') {
+    //			if (this.gen <= 1 && effect.recoil && source) {
+    //				if (this.dex.currentMod !== 'gen1stadium' || target.hp > 0) {
+    //					const amount = this.clampIntRange(Math.floor(targetDamage * effect.recoil[0] / effect.recoil[1]), 1);
+    //					this.damage(amount, source, target, 'recoil');
+    //				}
+    //			}
+    //			if (this.gen <= 4 && effect.drain && source) {
+    //				const amount = this.clampIntRange(Math.floor(targetDamage * effect.drain[0] / effect.drain[1]), 1);
+    //				// Draining can be countered in gen 1
+    //				if (this.gen <= 1) this.lastDamage = amount;
+    //				this.heal(amount, source, target, 'drain');
+    //			}
+    //			if (this.gen > 4 && effect.drain && source) {
+    //				const amount = Math.round(targetDamage * effect.drain[0] / effect.drain[1]);
+    //				this.heal(amount, source, target, 'drain');
+    //			}
+    //		}
+    //	}
 
-	//	if (instafaint) {
-	//		for (const [i, target] of targetArray.entries()) {
-	//			if (!retVals[i] || !target) continue;
+    //	if (instafaint) {
+    //		for (const [i, target] of targetArray.entries()) {
+    //			if (!retVals[i] || !target) continue;
 
-	//			if (target.hp <= 0) {
-	//				this.debug(`instafaint: ${this.faintQueue.map(entry => entry.target.name)}`);
-	//				this.faintMessages(true);
-	//				if (this.gen <= 2) {
-	//					target.faint();
-	//					if (this.gen <= 1) {
-	//						this.queue.clear();
-	//						// Fainting clears accumulated Bide damage
-	//						for (const pokemon of this.getAllActive()) {
-	//							if (pokemon.volatiles['bide']?.damage) {
-	//								pokemon.volatiles['bide'].damage = 0;
-	//								this.hint("Desync Clause Mod activated!");
-	//								this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
-	//							}
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
+    //			if (target.hp <= 0) {
+    //				this.debug(`instafaint: ${this.faintQueue.map(entry => entry.target.name)}`);
+    //				this.faintMessages(true);
+    //				if (this.gen <= 2) {
+    //					target.faint();
+    //					if (this.gen <= 1) {
+    //						this.queue.clear();
+    //						// Fainting clears accumulated Bide damage
+    //						for (const pokemon of this.getAllActive()) {
+    //							if (pokemon.volatiles['bide']?.damage) {
+    //								pokemon.volatiles['bide'].damage = 0;
+    //								this.hint("Desync Clause Mod activated!");
+    //								this.hint("In Gen 1, Bide's accumulated damage is reset to 0 when a Pokemon faints.");
+    //							}
+    //						}
+    //					}
+    //				}
+    //			}
+    //		}
+    //	}
 
-	//	return retVals;
-	//}
+    //	return retVals;
+    //}
 
     public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage, List<PokemonFalseUnion?>? targetArray,
-        Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
+    Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
     {
         // Return early if no targets
         if (targetArray == null)
@@ -1774,22 +1770,28 @@ public partial class BattleAsync : IBattle
 
         var retVals = new List<IntFalseUnion?>();
 
-        Condition effectCondition;
-
+        // Convert effect to Condition
+        Condition? effectCondition;
         switch (effect)
         {
             case EffectBattleDamageEffect ebde:
-                if (ebde.Effect is not Condition cond)
+                if (ebde.Effect is Condition cond)
                 {
-                    throw new InvalidOperationException("EffectBattleDamageEffect does not contain a Condition.");
+                    effectCondition = cond;
                 }
-                effectCondition = cond;
+                else
+                {
+                    effectCondition = null;
+                }
                 break;
             case DrainBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Drain];
                 break;
             case RecoilBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Recoil];
+                break;
+            case null:
+                effectCondition = null;
                 break;
             default:
                 throw new InvalidOperationException("Unknown BattleDamageEffect type.");
@@ -1881,24 +1883,8 @@ public partial class BattleAsync : IBattle
             if (source != null && effectCondition?.EffectType == EffectType.Move)
                 source.LastDamage = targetDamage;
 
-            switch (effectCondition?.Id)
-            {
-                case ConditionId.PartiallyTrapped:
-                    break;
-
-                case ConditionId.Powder:
-                    break;
-
-                case ConditionId.Confusion:
-                    break;
-
-                default:
-                    string effectName = effectCondition?.Name == "Toxic" ? "Poison" : effectCondition?.Name ?? "";
-                    break;
-            }
-
-            // Note: Gen 5+ drain/recoil handling removed since you're Gen 9 only
-            // Those effects are now handled in the move's effect handlers
+            // Log damage messages
+            PrintDamageMessage(target, source, effectCondition);
         }
 
         // Handle instafaint if requested
@@ -1912,7 +1898,7 @@ public partial class BattleAsync : IBattle
                 Pokemon? target = targetArray[i] switch
                 {
                     PokemonPokemonUnion p => p.Pokemon,
-                    _ => null,
+                    _ => null
                 };
 
                 if (target?.Hp <= 0)
@@ -1924,6 +1910,64 @@ public partial class BattleAsync : IBattle
         }
 
         return retVals;
+    }
+
+    /// <summary>
+    /// Helper method to print damage messages based on the effect type.
+    /// Handles special cases like PartiallyTrapped, Powder, and Confusion.
+    /// </summary>
+    private void PrintDamageMessage(Pokemon target, Pokemon? source = null, IEffect? effect = null)
+    {
+        // Get effect name (convert 'tox' to 'psn' for display)
+        string effectName = effect?.Name == "Toxic" ? "Poison" : effect?.Name ?? "";
+
+        // Handle special condition-specific messages
+        if (effect is Condition condition)
+        {
+            switch (condition.Id)
+            {
+                case ConditionId.PartiallyTrapped:
+                    // Get the source effect from the volatile condition
+                    EffectState? partiallyTrappedState =
+                        target.Volatiles.GetValueOrDefault(ConditionId.PartiallyTrapped);
+                    if (partiallyTrappedState?.SourceEffect != null)
+                    {
+                        UiGenerator.PrintDamageEvent(target,
+                            fromEffect: partiallyTrappedState.SourceEffect.Name,
+                            isPartiallyTrapped: true);
+                    }
+                    else
+                    {
+                        UiGenerator.PrintDamageEvent(target);
+                    }
+                    return;
+
+                case ConditionId.Powder:
+                    UiGenerator.PrintDamageEvent(target, silent: true);
+                    return;
+
+                case ConditionId.Confusion:
+                    UiGenerator.PrintDamageEvent(target, fromEffect: "confusion");
+                    return;
+            }
+        }
+
+        // Default damage message formatting
+        if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
+        {
+            // Simple damage message (from move or no effect)
+            UiGenerator.PrintDamageEvent(target);
+        }
+        else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
+        {
+            // Damage from effect with source attribution
+            UiGenerator.PrintDamageEvent(target, fromEffect: effectName, ofPokemon: source);
+        }
+        else
+        {
+            // Damage from effect without source
+            UiGenerator.PrintDamageEvent(target, fromEffect: effectName);
+        }
     }
 
     public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
