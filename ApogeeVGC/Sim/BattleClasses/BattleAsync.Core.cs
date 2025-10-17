@@ -870,14 +870,49 @@ public partial class BattleAsync : IBattle
         return true;
     }
 
-    public bool Lose(SideId side)
+    public bool Lose(SideId sideId)
     {
-        throw new NotImplementedException();
+        Side side = GetSide(sideId);
+        return Lose(side);
     }
 
-    public bool Lose(Side side)
+    public bool Lose(Side? side)
     {
-        throw new NotImplementedException();
+        // Can happen if a battle crashes
+        if (side is null) return false;
+        
+        // Already no Pokémon left
+        if (side.PokemonLeft <= 0) return false;
+
+        // Force the side to lose by setting their Pokémon count to 0
+        side.PokemonLeft = 0;
+
+        // Faint the first active Pokémon if present
+        side.Active.FirstOrDefault()?.Faint();
+
+        // Show faint messages (lastFirst: false, forceCheck: true)
+        FaintMessages(lastFirst: false, forceCheck: true);
+
+        // Update requests if battle hasn't ended and this side had an active request
+        if (!Ended && side.ActiveRequest != null)
+        {
+            // Send a wait request
+            side.EmitRequest(new WaitRequest
+            {
+                Side = side.GetRequestData(),
+            });
+            
+            // Clear any pending choices
+            side.ClearChoice();
+            
+            // Commit choices if all sides are done choosing
+            if (AllChoicesDone())
+            {
+                CommitChoices();
+            }
+        }
+
+        return true;
     }
 
     public int CanSwitch(Side side)
