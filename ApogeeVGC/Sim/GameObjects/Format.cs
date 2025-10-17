@@ -50,6 +50,8 @@ public record Format : IEffect, IBasicEffect, IEventMethods
     public IReadOnlyList<RuleId> Unbanlist { get; init; } = [];
     public IReadOnlyList<RuleId>? CustomRules { get; init; }
     public RuleTable? RuleTable { get; set; }
+    public Action<IBattle>? OnBegin { get; init; }
+    public bool NoLog { get; init; }
 
     #region IEventMethods Implementation
 

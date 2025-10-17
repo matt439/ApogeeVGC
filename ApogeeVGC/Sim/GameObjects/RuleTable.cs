@@ -1,6 +1,8 @@
-﻿namespace ApogeeVGC.Sim.GameObjects;
+﻿using System.Data;
 
-public class RuleTable
+namespace ApogeeVGC.Sim.GameObjects;
+
+public class RuleTable : Dictionary<RuleId, Rule>
 {
     public int? PickedTeamSize { get; set; }
 

@@ -77,8 +77,8 @@ public partial class BattleAsync : IBattle
 
     public RequestState RequestState { get; set; } = RequestState.None;
     public int Turn { get; set; }
-    public bool MidTurn { get; set; } = false;
-    public bool Started { get; set; } = false;
+    public bool MidTurn { get; set; }
+    public bool Started { get; set; }
     public bool Ended { get; set; }
     public string? Winner { get; set; }
 
@@ -1333,19 +1333,112 @@ public partial class BattleAsync : IBattle
 
     public void Start()
     {
-        throw new NotImplementedException();
+        // Deserialized games should use Restart()
+        if (Deserialized) return;
+
+        // Need all players to start
+        if (!Sides.All(_ => true))
+        {
+            throw new InvalidOperationException($"Missing sides.");
+        }
+
+        if (Started)
+        {
+            throw new InvalidOperationException("Battle already started");
+        }
+
+        Started = true;
+
+        // Set up foe relationships (standard 1v1 or 2v2)
+        Sides[1].Foe = Sides[0];
+        Sides[0].Foe = Sides[1];
+
+        // If there are more than 2 sides (FFA - free-for-all)
+        if (Sides.Count > 2)
+        {
+            Sides[2].Foe = Sides[3];
+            Sides[3].Foe = Sides[2];
+        }
+
+        // Log generation
+        UiGenerator.PrintMessage($"gen|{Gen}");
+
+        // Log tier
+        UiGenerator.PrintMessage($"tier|{Format.Name}");
+
+        // Log rated status
+        if (Rated)
+        {
+            string ratedMessage = Rated ? "" : Rated.ToString();
+            UiGenerator.PrintMessage($"rated|{ratedMessage}");
+        }
+
+        // Call format's OnBegin handler
+        Format.OnBegin?.Invoke(this);
+
+        // Call OnBegin for each rule in the rule table
+        foreach (Format subFormat in from rule in RuleTable.Keys let ruleString = rule.ToString()
+                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0]) select Library.Rulesets[rule])
+        {
+            subFormat.OnBegin?.Invoke(this);
+        }
+
+        // Validate that all sides have at least one Pokemon
+        if (Sides.Any(side => side.Pokemon.Count == 0))
+        {
+            throw new InvalidOperationException("Battle not started: A player has an empty team.");
+        }
+
+        // Check EV balance in debug mode
+        if (DebugMode)
+        {
+            CheckEvBalance();
+        }
+
+        // Run team preview/selection phase
+        RunPickTeam();
+
+        // Add start action to queue
+        Queue.InserChoice(new StartGameChoice());
+
+        // Set mid-turn flag
+        MidTurn = true;
+
+        // Start turn loop if no request is pending
+        if (RequestState == RequestState.None)
+        {
+            TurnLoop();
+        }
     }
 
-    public void Restart(Action<string, List<string>>? send)
-    {
-        throw new NotImplementedException();
-    }
+    //public void Restart(Action<string, List<string>>? send)
+    //{
+    //    throw new InvalidOperationException("This method relies on the battle being serialized which" +
+    //                                        "cannot be done in this simulator implmentation.");
+    //}
 
     public void RunPickTeam()
     {
         throw new NotImplementedException();
     }
 
+    //checkEVBalance()
+    //{
+    //    let limitedEVs: boolean | null = null;
+    //    for (const side of this.sides) {
+    //        const sideLimitedEVs = !side.pokemon.some(
+    //            pokemon => Object.values(pokemon.set.evs).reduce((a, b) => a + b, 0) > 510
+    //        );
+    //        if (limitedEVs === null)
+    //        {
+    //            limitedEVs = sideLimitedEVs;
+    //        }
+    //        else if (limitedEVs !== sideLimitedEVs)
+    //        {
+    //            this.add('bigerror', "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
+    //        }
+    //    }
+    //}
     public void CheckEvBalance()
     {
         throw new NotImplementedException();
