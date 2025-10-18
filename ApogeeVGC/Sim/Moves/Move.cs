@@ -105,7 +105,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
     public int Priority
     {
         get;
-        init
+        set
         {
             if (value is > 5 or < -7)
             {

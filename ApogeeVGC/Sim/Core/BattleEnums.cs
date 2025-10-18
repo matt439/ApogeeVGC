@@ -46,9 +46,9 @@ public enum PlayerState
     Idle,
 }
 
-public enum MoveAction
-{
-    None,
-    SwitchAttackerOut,
-}
+//public enum MoveAction
+//{
+//    None,
+//    SwitchAttackerOut,
+//}
 

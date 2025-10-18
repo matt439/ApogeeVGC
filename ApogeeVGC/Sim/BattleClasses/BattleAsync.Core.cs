@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System;
 using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -2662,13 +2663,98 @@ public partial class BattleAsync : IBattle
 
     public bool? CheckWin(FaintQueue? faintData = null)
     {
-        faintData = FaintQueue[0];
-        throw new NotImplementedException();
+        // If all sides have no Pokemon left, it's a tie (or last-faint-wins in Gen 5+)
+        if (Sides.All(side => side.PokemonLeft <= 0))
+        {
+            // In Gen 5+, the side whose Pokemon fainted last loses (so their foe wins)
+            // In earlier gens, it's a tie
+            if (faintData != null && Gen > 4)
+            {
+                return Win(faintData.Target.Side.Foe);
+            }
+            else
+            {
+                return Win((Side?)null); // Tie
+            }
+        }
+
+        // Check if any side has defeated all opposing Pokemon
+        foreach (Side side in Sides)
+        {
+            if (side.FoePokemonLeft() <= 0)
+            {
+                return Win(side);
+            }
+        }
+
+        // Battle hasn't ended yet
+        return null;
     }
 
     public void GetActionSpeed(IAction action)
     {
-        throw new NotImplementedException();
+        // Only process move actions for priority calculation
+        if (action is MoveAction moveAction)
+        {
+            var move = moveAction.Move.ToActiveMove();
+
+            // Get base priority from the original move data (not the active move)
+            // This ensures abilities like Prankster only apply once, not repeatedly
+            int priority = Library.Moves[move.Id].Priority;
+
+            // Run ModifyPriority events to allow effects to change priority
+            // SingleEvent: for move-specific priority changes (e.g., Grassy Glide in Grassy Terrain)
+            RelayVar? singleEventResult = SingleEvent(
+                EventId.ModifyPriority,
+                move,
+                null,
+                moveAction.Pokemon,
+                null,
+                null,
+                priority
+            );
+
+            if (singleEventResult is IntRelayVar singlePriority)
+            {
+                priority = singlePriority.Value;
+            }
+
+            // RunEvent: for Pokemon-based priority changes (e.g., Prankster ability)
+            RelayVar? runEventResult = RunEvent(
+                EventId.ModifyPriority,
+                moveAction.Pokemon,
+                null,
+                move,
+                priority
+            );
+
+            if (runEventResult is IntRelayVar modifiedPriority)
+            {
+                priority = modifiedPriority.Value;
+            }
+
+            // Set the action's priority (includes fractional priority for tie-breaking)
+            moveAction.Priority = priority + moveAction.FractionalPriority;
+
+            // In Gen 6+, update the move's priority property
+            // This is used by Quick Guard to block moves with artificially enhanced priority
+            if (Gen > 5)
+            {
+                moveAction.Move.Priority = priority;
+            }
+        }
+
+        // Get the Pokemon's action speed (factors in speed stat, paralysis, etc.)
+        // The other Action types have constant speed values so do not need to be set.
+        switch (action)
+        {
+            case SwitchAction switchAction:
+                switchAction.Speed = switchAction.Pokemon.GetActionSpeed();
+                break;
+            case PokemonAction pokemonAction:
+                pokemonAction.Speed = pokemonAction.Pokemon.GetActionSpeed();
+                break;
+        }
     }
 
     public bool RunAction(IAction action)

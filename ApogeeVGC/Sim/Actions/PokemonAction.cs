@@ -23,7 +23,7 @@ public record PokemonAction : IAction
     }
 
     public int Priority { get; init; }
-    public int Speed { get; init; }
+    public int Speed { get; set; }
     
     public required Pokemon Pokemon { get; init; }
     public Pokemon? Dragger { get; init; }
