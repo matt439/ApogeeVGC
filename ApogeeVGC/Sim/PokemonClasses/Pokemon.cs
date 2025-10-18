@@ -572,9 +572,25 @@ public class Pokemon : IPriorityComparison
         return side.Active[targetLoc - 1];
     }
 
+    /// <summary>
+    /// Returns a relative location: 1-3, positive for foe, and negative for ally.
+    /// Use <see cref="GetAtLoc"/> to reverse this operation.
+    /// </summary>
+    /// <param name="target">The target Pokémon to get the location of</param>
+    /// <returns>Relative location as an integer (negative for allies, positive for foes)</returns>
     public int GetLocOf(Pokemon target)
     {
-        throw new NotImplementedException();
+        // Calculate position offset based on which half of the field the target is on
+        int positionOffset = (int)Math.Floor(target.Side.N / 2.0) * target.Side.Active.Count;
+
+        // Calculate 1-indexed position
+        int position = target.Position + positionOffset + 1;
+
+        // Check if both Pokemon are on the same half of the field
+        bool sameHalf = (Side.N % 2) == (target.Side.N % 2);
+
+        // Return negative for allies, positive for foes
+        return sameHalf ? -position : position;
     }
 
     public record MoveTargets
@@ -1277,7 +1293,7 @@ public class Pokemon : IPriorityComparison
         MaxHp = newMaxHp;
         if (Hp > 0)
         {
-            UiGenerator.PrintHealEvent(this, Hp);
+            UiGenerator.PrintHealEvent(this, Hp.ToString());
         }
     }
 

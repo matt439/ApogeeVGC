@@ -53,6 +53,10 @@ public enum ConditionId
     Powder,
     Rest,
     Wish,
+    TwoTurnMove,
+    IceBall,
+    Rollout,
+    Fainted,
 
     None,
 }

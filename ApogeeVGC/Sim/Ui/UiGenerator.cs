@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
 
 namespace ApogeeVGC.Sim.Ui;
 
@@ -360,5 +361,22 @@ public static class UiGenerator
     private static string FormatHealthStatus(PokemonHealth health)
     {
         throw new NotImplementedException();
+    }
+
+    public static void PrintFaintEvent(Pokemon pokemon)
+    {
+        Console.WriteLine($"{pokemon.Name} fainted!");
+    }
+
+    public static void PrintDetailsChangeEvent(Pokemon pokemon, PokemonDetails details, bool silent = false)
+    {
+        if (silent)
+        {
+            Console.WriteLine($"-detailschange|{pokemon}|{details}|[silent]");
+        }
+        else
+        {
+            Console.WriteLine($"-detailschange|{pokemon}|{details}");
+        }
     }
 }

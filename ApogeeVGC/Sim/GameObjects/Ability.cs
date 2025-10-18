@@ -44,6 +44,8 @@ public enum AbilityId
     MagicBounce,
     Harvest,
     Pickup,
+    Stalwart,
+    PropellerTail,
 
     None,
 }
