@@ -178,6 +178,46 @@ public record UndefinedBoolIntUndefinedVoidUnion(Undefined Value) : BoolIntUndef
 public record VoidUnionBoolIntUndefinedVoidUnion(VoidReturn Value) : BoolIntUndefinedVoidUnion;
 
 
+
+/// <summary>
+/// bool | int | undefined
+/// </summary>
+public abstract record BoolIntUndefinedUnion
+{
+    public abstract bool IsTruthy();
+    public abstract bool IsZero();
+
+    public static BoolIntUndefinedUnion FromBool(bool value) => new BoolBoolIntUndefinedUnion(value);
+    public static BoolIntUndefinedUnion FromInt(int value) => new IntBoolIntUndefinedUnion(value);
+    public static BoolIntUndefinedUnion FromUndefined() =>
+        new UndefinedBoolIntUndefinedUnion(new Undefined());
+    public static implicit operator BoolIntUndefinedUnion(bool value) => new BoolBoolIntUndefinedUnion(value);
+    public static implicit operator BoolIntUndefinedUnion(int value) => new IntBoolIntUndefinedUnion(value);
+    public static implicit operator BoolIntUndefinedUnion(Undefined value) =>
+        new UndefinedBoolIntUndefinedUnion(value);
+}
+
+public record BoolBoolIntUndefinedUnion(bool Value) : BoolIntUndefinedUnion
+{
+    public override bool IsTruthy() => Value;
+    public override bool IsZero() => !Value;
+}
+
+public record IntBoolIntUndefinedUnion(int Value) : BoolIntUndefinedUnion
+{
+    public override bool IsTruthy() => Value != 0;
+    public override bool IsZero() => Value == 0;
+}
+
+public record UndefinedBoolIntUndefinedUnion(Undefined Value) : BoolIntUndefinedUnion
+{
+    public override bool IsTruthy() => false;
+    public override bool IsZero() => false;
+}
+
+
+
+
 /// <summary>
 /// bool | void
 /// </summary>
@@ -755,11 +795,32 @@ public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion
 }
 
 
+/// <summary>
+/// int | Undefined | false
+/// </summary>
+public abstract record IntUndefinedFalseUnion
+{
+    public static implicit operator IntUndefinedFalseUnion(int value) =>
+        new IntIntUndefinedFalseUnion(value);
+    public static implicit operator IntUndefinedFalseUnion(Undefined value) =>
+        new UndefinedIntUndefinedFalseUnion(value);
+    public static IntUndefinedFalseUnion FromFalse() => new FalseIntUndefinedFalseUnion();
+}
+public record IntIntUndefinedFalseUnion(int Value) : IntUndefinedFalseUnion;
+public record UndefinedIntUndefinedFalseUnion(Undefined Value) : IntUndefinedFalseUnion;
+public record FalseIntUndefinedFalseUnion : IntUndefinedFalseUnion;
+
+
+
 
 /// <summary>
 /// (int | bool | undefined)[]
 /// </summary>
-public class SpreadMoveDamage : List<IntBoolUnion?>
+public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
+{
+}
+
+public class SpreadMoveTargets : List<PokemonFalseUnion>
 {
 }
 

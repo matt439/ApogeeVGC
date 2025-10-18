@@ -3415,7 +3415,7 @@ public partial class BattleAsync : IBattle
                         Dictionary<SpecieId, MoveId> behemothMoves = new()
                 {
                     { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
-                    { SpecieId.ZamazentaCrowned, MoveId.BehemothBash }
+                    { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
                 };
 
                         int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
@@ -3438,14 +3438,14 @@ public partial class BattleAsync : IBattle
                     }
 
                     // Call format's OnBattleStart handler
-                    Format.OnBattleStart
+                    Format.OnBattleStart?.Invoke(this);
 
                     foreach (RuleId rule in RuleTable.Keys)
                     {
                         string ruleString = rule.ToString();
                         if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
                         Format subFormat = Library.Rulesets[rule];
-                        subFormat.GetDelegate(EventId.BattleStart)?.Invoke(this);
+                        subFormat.OnBattleStart?.Invoke(this);
                     }
 
                     foreach (Side side in Sides)
@@ -3674,7 +3674,7 @@ public partial class BattleAsync : IBattle
         }
 
         // Check for switches
-        List<bool> switches = Sides
+        var switches = Sides
             .Select(side => side.Active.Any(p => p.SwitchFlag.IsTrue()))
             .ToList();
 

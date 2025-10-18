@@ -64,41 +64,28 @@ public record Format : IEffect, IBasicEffect, IEventMethods
     // Threads // TODO: Implement thread handling
     public bool? TournamentShow { get; init; }
 
-    //declare readonly checkCanLearn?: (
 
-    //this: TeamValidator, move: Move, species: Species, setSources: PokemonSources, set: PokemonSet
-    //) => string | null;
-    //declare readonly getEvoFamily?: (this: Format, speciesid: string) => ID;
-    //declare readonly getSharedPower?: (this: Format, pokemon: Pokemon) => Set<string>;
-    //declare readonly getSharedItems?: (this: Format, pokemon: Pokemon) => Set<string>;
-    //declare readonly onChangeSet?: (
+    public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; init; }
+    public Func<Format, SpecieId, SpecieId>? GetEvoFamily { get; init; }
+    public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; init; }
+    public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; init; }
+    public Func<TeamValidator, PokemonSet, Format, object?, object?, string[]?>? OnChangeSet { get; init; }
+    public int? OnModifySpeciesPriority { get; init; }
+    public Func<IBattle, Species, Pokemon?, Pokemon?, IEffect?, Species?>? OnModifySpecies { get; init; }
+    public Action<IBattle>? OnBattleStart { get; init; }
+    public Action<IBattle>? OnTeamPreview { get; init; }
+    public Func<TeamValidator, PokemonSet, Format, object, object, string[]?>? OnValidateSet { get; init; }
+    public Func<TeamValidator, PokemonSet[], Format, object, string[]?>? OnValidateTeam { get; init; }
+    public Func<TeamValidator, PokemonSet, object, string[]?>? ValidateSet { get; init; }
+    public Func<TeamValidator, PokemonSet[], ValidateTeamOptions?, string[]?>? ValidateTeam { get; init; }
 
-    //this: TeamValidator, set: PokemonSet, format: Format, setHas?: AnyObject, teamHas?: AnyObject
-    //) => string[] | void;
-    //declare readonly onModifySpeciesPriority?: number;
-    //declare readonly onModifySpecies?: (
-
-    //this: Battle, species: Species, target?: Pokemon, source?: Pokemon, effect?: Effect
-    //) => Species | void;
-    //declare readonly onBattleStart?: (this: Battle) => void;
-    //declare readonly onTeamPreview?: (this: Battle) => void;
-    //declare readonly onValidateSet?: (
-
-    //this: TeamValidator, set: PokemonSet, format: Format, setHas: AnyObject, teamHas: AnyObject
-    //) => string[] | void;
-    //declare readonly onValidateTeam?: (
-
-    //this: TeamValidator, team: PokemonSet[], format: Format, teamHas: AnyObject
-    //) => string[] | void;
-    //declare readonly validateSet?: (this: TeamValidator, set: PokemonSet, teamHas: AnyObject) => string[] | null;
-    //declare readonly validateTeam?: (this: TeamValidator, team: PokemonSet[], options?: {
-
-    //    removeNicknames?: boolean,
-    //    skipSets?: { [name: string]: { [key: string]: boolean }
-    //    },
-    //}) => string[] | void;
-    //declare readonly section?: string;
-    //declare readonly column?: number;
+    public class ValidateTeamOptions
+    {
+        public bool RemoveNicknames { get; init; }
+        public Dictionary<string, Dictionary<string, bool>>? SkipSets { get; init; }
+    }
+    public string? Section { get; init; }
+    public int? Column { get; init; }
 
 
     #region IEventMethods Implementation
