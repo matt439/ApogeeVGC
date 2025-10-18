@@ -33,6 +33,8 @@ public enum ItemId
     IapapaBerry,
     MagoBerry,
     SitrusBerry,
+    RustedSword,
+    RustedShield,
 
     None,
 }

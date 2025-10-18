@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Xml;
-using ApogeeVGC.Sim.Actions;
+﻿using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -10,7 +8,6 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Utils;
 
@@ -1326,4 +1323,15 @@ public record OnLockMoveEffectDelegate(OnLockMove OnLockMove) : EffectDelegate
 }
 
 
-
+/// <summary>
+/// bool | 'integer' | 'positive-integer'
+/// </summary>
+public abstract record FormatHasValue
+{
+    public static implicit operator FormatHasValue(bool value) => new BoolFormatHasValue(value);
+    public static FormatHasValue FromInteger() => new IntegerFormatHasValue();
+    public static FormatHasValue FromPositiveInteger() => new PositiveIntegerFormatHasValue();
+}
+public record BoolFormatHasValue(bool Value) : FormatHasValue;
+public record IntegerFormatHasValue : FormatHasValue;
+public record PositiveIntegerFormatHasValue : FormatHasValue;

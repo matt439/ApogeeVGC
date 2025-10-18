@@ -14,7 +14,10 @@ using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 using System;
+using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using static System.Collections.Specialized.BitVector32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -2757,9 +2760,986 @@ public partial class BattleAsync : IBattle
         }
     }
 
+    //   runAction(action: Action) {
+    //	const pokemonOriginalHP = action.pokemon?.hp;
+    //	let residualPokemon: (readonly [Pokemon, number])[] = [];
+    //	// returns whether or not we ended in a callback
+    //	switch (action.choice) {
+    //	case 'start': {
+    //		for (const side of this.sides) {
+    //			if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
+    //			this.add('teamsize', side.id, side.pokemon.length);
+    //		}
+
+    //		this.add('start');
+
+    //		// Change Zacian/Zamazenta into their Crowned formes
+    //		for (const pokemon of this.getAllPokemon()) {
+    //			let rawSpecies: Species | null = null;
+    //			if (pokemon.species.id === 'zacian' && pokemon.item === 'rustedsword') {
+    //				rawSpecies = this.dex.species.get('Zacian-Crowned');
+    //			} else if (pokemon.species.id === 'zamazenta' && pokemon.item === 'rustedshield') {
+    //				rawSpecies = this.dex.species.get('Zamazenta-Crowned');
+    //			}
+    //			if (!rawSpecies) continue;
+    //			const species = pokemon.setSpecies(rawSpecies);
+    //			if (!species) continue;
+    //			pokemon.baseSpecies = rawSpecies;
+    //			pokemon.details = pokemon.getUpdatedDetails();
+    //			pokemon.setAbility(species.abilities['0'], null, null, true);
+    //			pokemon.baseAbility = pokemon.ability;
+
+    //			const behemothMove: { [k: string]: string } = {
+    //				'Zacian-Crowned': 'behemothblade', 'Zamazenta-Crowned': 'behemothbash',
+    //			};
+    //			const ironHeadIndex = pokemon.baseMoves.indexOf('ironhead');
+    //			if (ironHeadIndex >= 0) {
+    //				const move = this.dex.moves.get(behemothMove[rawSpecies.name]);
+    //				pokemon.baseMoveSlots[ironHeadIndex] = {
+    //					move: move.name,
+    //					id: move.id,
+    //					pp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
+    //					maxpp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
+    //					target: move.target,
+    //					disabled: false,
+    //					disabledSource: '',
+    //					used: false,
+    //				};
+    //				pokemon.moveSlots = pokemon.baseMoveSlots.slice();
+    //			}
+    //		}
+
+    //		this.format.onBattleStart?.call(this);
+    //		for (const rule of this.ruleTable.keys()) {
+    //			if ('+*-!'.includes(rule.charAt(0))) continue;
+    //			const subFormat = this.dex.formats.get(rule);
+    //			subFormat.onBattleStart?.call(this);
+    //		}
+
+    //		for (const side of this.sides) {
+    //			for (let i = 0; i < side.active.length; i++) {
+    //				if (!side.pokemonLeft) {
+    //					// forfeited before starting
+    //					side.active[i] = side.pokemon[i];
+    //					side.active[i].fainted = true;
+    //					side.active[i].hp = 0;
+    //				} else {
+    //					this.actions.switchIn(side.pokemon[i], i);
+    //				}
+    //			}
+    //		}
+    //		for (const pokemon of this.getAllPokemon()) {
+    //			this.singleEvent('Start', this.dex.conditions.getByID(pokemon.species.id), pokemon.speciesState, pokemon);
+    //		}
+    //		this.midTurn = true;
+    //		break;
+    //	}
+
+    //	case 'move':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.actions.runMove(action.move, action.pokemon, action.targetLoc, {
+    //			sourceEffect: action.sourceEffect, zMove: action.zmove,
+    //			maxMove: action.maxMove, originalTarget: action.originalTarget,
+    //		});
+    //		break;
+    //	case 'megaEvo':
+    //		this.actions.runMegaEvo(action.pokemon);
+    //		break;
+    //	case 'megaEvoX':
+    //		this.actions.runMegaEvoX?.(action.pokemon);
+    //		break;
+    //	case 'megaEvoY':
+    //		this.actions.runMegaEvoY?.(action.pokemon);
+    //		break;
+    //	case 'runDynamax':
+    //		action.pokemon.addVolatile('dynamax');
+    //		action.pokemon.side.dynamaxUsed = true;
+    //		if (action.pokemon.side.allySide) action.pokemon.side.allySide.dynamaxUsed = true;
+    //		break;
+    //	case 'terastallize':
+    //		this.actions.terastallize(action.pokemon);
+    //		break;
+    //	case 'beforeTurnMove':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.debug('before turn callback: ' + action.move.id);
+    //		const target = this.getTarget(action.pokemon, action.move, action.targetLoc);
+    //		if (!target) return false;
+    //		if (!action.move.beforeTurnCallback) throw new Error(`beforeTurnMove has no beforeTurnCallback`);
+    //		action.move.beforeTurnCallback.call(this, action.pokemon, target);
+    //		break;
+    //	case 'priorityChargeMove':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.debug('priority charge callback: ' + action.move.id);
+    //		if (!action.move.priorityChargeCallback) throw new Error(`priorityChargeMove has no priorityChargeCallback`);
+    //		action.move.priorityChargeCallback.call(this, action.pokemon);
+    //		break;
+
+    //	case 'event':
+    //		this.runEvent(action.event!, action.pokemon);
+    //		break;
+    //	case 'team':
+    //		if (action.index === 0) {
+    //			action.pokemon.side.pokemon = [];
+    //		}
+    //		action.pokemon.side.pokemon.push(action.pokemon);
+    //		action.pokemon.position = action.index;
+    //		// we return here because the update event would crash since there are no active pokemon yet
+    //		return;
+
+    //	case 'pass':
+    //		return;
+    //	case 'instaswitch':
+    //	case 'switch':
+    //		if (action.choice === 'switch' && action.pokemon.status) {
+    //			this.singleEvent('CheckShow', this.dex.abilities.getByID('naturalcure' as ID), null, action.pokemon);
+    //		}
+    //		if (this.actions.switchIn(action.target, action.pokemon.position, action.sourceEffect) === 'pursuitfaint') {
+    //			// a pokemon fainted from Pursuit before it could switch
+    //			if (this.gen <= 4) {
+    //				// in gen 2-4, the switch still happens
+    //				this.hint("Previously chosen switches continue in Gen 2-4 after a Pursuit target faints.");
+    //				action.priority = -101;
+    //				this.queue.unshift(action);
+    //				break;
+    //			} else {
+    //				// in gen 5+, the switch is cancelled
+    //				this.hint("A Pokemon can't switch between when it runs out of HP and when it faints");
+    //				break;
+    //			}
+    //		}
+    //		break;
+    //	case 'revivalblessing':
+    //		action.pokemon.side.pokemonLeft++;
+    //		if (action.target.position < action.pokemon.side.active.length) {
+    //			this.queue.addChoice({
+    //				choice: 'instaswitch',
+    //				pokemon: action.target,
+    //				target: action.target,
+    //			});
+    //		}
+    //		action.target.fainted = false;
+    //		action.target.faintQueued = false;
+    //		action.target.subFainted = false;
+    //		action.target.status = '';
+    //		action.target.hp = 1; // Needed so hp functions works
+    //		action.target.sethp(action.target.maxhp / 2);
+    //		this.add('-heal', action.target, action.target.getHealth, '[from] move: Revival Blessing');
+    //		action.pokemon.side.removeSlotCondition(action.pokemon, 'revivalblessing');
+    //		break;
+    //	case 'runSwitch':
+    //		this.actions.runSwitch(action.pokemon);
+    //		break;
+    //	case 'shift':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.swapPosition(action.pokemon, 1);
+    //		break;
+
+    //	case 'beforeTurn':
+    //		this.eachEvent('BeforeTurn');
+    //		break;
+    //	case 'residual':
+    //		this.add('');
+    //		this.clearActiveMove(true);
+    //		this.updateSpeed();
+    //		residualPokemon = this.getAllActive().map(pokemon => [pokemon, pokemon.getUndynamaxedHP()] as const);
+    //		this.fieldEvent('Residual');
+    //		if (!this.ended) this.add('upkeep');
+    //		break;
+    //	}
+
+    //	// phazing (Roar, etc)
+    //	for (const side of this.sides) {
+    //		for (const pokemon of side.active) {
+    //			if (pokemon.forceSwitchFlag) {
+    //				if (pokemon.hp) this.actions.dragIn(pokemon.side, pokemon.position);
+    //				pokemon.forceSwitchFlag = false;
+    //			}
+    //		}
+    //	}
+
+    //	this.clearActiveMove();
+
+    //	// fainting
+
+    //	this.faintMessages();
+    //	if (this.ended) return true;
+
+    //	// switching (fainted pokemon, U-turn, Baton Pass, etc)
+
+    //	if (!this.queue.peek() || (this.gen <= 3 && ['move', 'residual'].includes(this.queue.peek()!.choice))) {
+    //		// in gen 3 or earlier, switching in fainted pokemon is done after
+    //		// every move, rather than only at the end of the turn.
+    //		this.checkFainted();
+    //	} else if (['megaEvo', 'megaEvoX', 'megaEvoY'].includes(action.choice) && this.gen === 7) {
+    //		this.eachEvent('Update');
+    //		// In Gen 7, the action order is recalculated for a Pokémon that mega evolves.
+    //		for (const [i, queuedAction] of this.queue.list.entries()) {
+    //			if (queuedAction.pokemon === action.pokemon && queuedAction.choice === 'move') {
+    //				this.queue.list.splice(i, 1);
+    //				queuedAction.mega = 'done';
+    //				this.queue.insertChoice(queuedAction, true);
+    //				break;
+    //			}
+    //		}
+    //		return false;
+    //	} else if (this.queue.peek()?.choice === 'instaswitch') {
+    //		return false;
+    //	}
+
+    //	if (this.gen >= 5 && action.choice !== 'start') {
+    //		this.eachEvent('Update');
+    //		for (const [pokemon, originalHP] of residualPokemon) {
+    //			const maxhp = pokemon.getUndynamaxedHP(pokemon.maxhp);
+    //			if (pokemon.hp && pokemon.getUndynamaxedHP() <= maxhp / 2 && originalHP > maxhp / 2) {
+    //				this.runEvent('EmergencyExit', pokemon);
+    //			}
+    //		}
+    //	}
+
+    //	if (action.choice === 'runSwitch') {
+    //		const pokemon = action.pokemon;
+    //		if (pokemon.hp && pokemon.hp <= pokemon.maxhp / 2 && pokemonOriginalHP! > pokemon.maxhp / 2) {
+    //			this.runEvent('EmergencyExit', pokemon);
+    //		}
+    //	}
+
+    //	const switches = this.sides.map(
+    //		side => side.active.some(pokemon => pokemon && !!pokemon.switchFlag)
+    //	);
+
+    //	for (let i = 0; i < this.sides.length; i++) {
+    //		let reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+    //		if (switches[i] && !this.canSwitch(this.sides[i])) {
+    //			for (const pokemon of this.sides[i].active) {
+    //				if (this.sides[i].slotConditions[pokemon.position]['revivalblessing']) {
+    //					reviveSwitch = true;
+    //					continue;
+    //				}
+    //				pokemon.switchFlag = false;
+    //			}
+    //			if (!reviveSwitch) switches[i] = false;
+    //		} else if (switches[i]) {
+    //			for (const pokemon of this.sides[i].active) {
+    //				if (
+    //					pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== 'revivalblessing' &&
+    //					!pokemon.skipBeforeSwitchOutEventFlag
+    //				) {
+    //					this.runEvent('BeforeSwitchOut', pokemon);
+    //					pokemon.skipBeforeSwitchOutEventFlag = true;
+    //					this.faintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+    //					if (this.ended) return true;
+    //					if (pokemon.fainted) {
+    //						switches[i] = this.sides[i].active.some(sidePokemon => sidePokemon && !!sidePokemon.switchFlag);
+    //					}
+    //				}
+    //			}
+    //		}
+    //	}
+
+    //	for (const playerSwitch of switches) {
+    //		if (playerSwitch) {
+    //			this.makeRequest('switch');
+    //			return true;
+    //		}
+    //	}
+
+    //	if (this.gen < 5) this.eachEvent('Update');
+
+    //	if (this.gen >= 8 && (this.queue.peek()?.choice === 'move' || this.queue.peek()?.choice === 'runDynamax')) {
+    //		// In gen 8, speed is updated dynamically so update the queue's speed properties and sort it.
+    //		this.updateSpeed();
+    //		for (const queueAction of this.queue.list) {
+    //			if (queueAction.pokemon) this.getActionSpeed(queueAction);
+    //		}
+    //		this.queue.sort();
+    //	}
+
+    //	return false;
+    //}runAction(action: Action) {
+    //	const pokemonOriginalHP = action.pokemon?.hp;
+    //	let residualPokemon: (readonly [Pokemon, number])[] = [];
+    //	// returns whether or not we ended in a callback
+    //	switch (action.choice) {
+    //	case 'start': {
+    //		for (const side of this.sides) {
+    //			if (side.pokemonLeft) side.pokemonLeft = side.pokemon.length;
+    //			this.add('teamsize', side.id, side.pokemon.length);
+    //		}
+
+    //		this.add('start');
+
+    //		// Change Zacian/Zamazenta into their Crowned formes
+    //		for (const pokemon of this.getAllPokemon()) {
+    //			let rawSpecies: Species | null = null;
+    //			if (pokemon.species.id === 'zacian' && pokemon.item === 'rustedsword') {
+    //				rawSpecies = this.dex.species.get('Zacian-Crowned');
+    //			} else if (pokemon.species.id === 'zamazenta' && pokemon.item === 'rustedshield') {
+    //				rawSpecies = this.dex.species.get('Zamazenta-Crowned');
+    //			}
+    //			if (!rawSpecies) continue;
+    //			const species = pokemon.setSpecies(rawSpecies);
+    //			if (!species) continue;
+    //			pokemon.baseSpecies = rawSpecies;
+    //			pokemon.details = pokemon.getUpdatedDetails();
+    //			pokemon.setAbility(species.abilities['0'], null, null, true);
+    //			pokemon.baseAbility = pokemon.ability;
+
+    //			const behemothMove: { [k: string]: string } = {
+    //				'Zacian-Crowned': 'behemothblade', 'Zamazenta-Crowned': 'behemothbash',
+    //			};
+    //			const ironHeadIndex = pokemon.baseMoves.indexOf('ironhead');
+    //			if (ironHeadIndex >= 0) {
+    //				const move = this.dex.moves.get(behemothMove[rawSpecies.name]);
+    //				pokemon.baseMoveSlots[ironHeadIndex] = {
+    //					move: move.name,
+    //					id: move.id,
+    //					pp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
+    //					maxpp: move.noPPBoosts ? move.pp : move.pp * 8 / 5,
+    //					target: move.target,
+    //					disabled: false,
+    //					disabledSource: '',
+    //					used: false,
+    //				};
+    //				pokemon.moveSlots = pokemon.baseMoveSlots.slice();
+    //			}
+    //		}
+
+    //		this.format.onBattleStart?.call(this);
+    //		for (const rule of this.ruleTable.keys()) {
+    //			if ('+*-!'.includes(rule.charAt(0))) continue;
+    //			const subFormat = this.dex.formats.get(rule);
+    //			subFormat.onBattleStart?.call(this);
+    //		}
+
+    //		for (const side of this.sides) {
+    //			for (let i = 0; i < side.active.length; i++) {
+    //				if (!side.pokemonLeft) {
+    //					// forfeited before starting
+    //					side.active[i] = side.pokemon[i];
+    //					side.active[i].fainted = true;
+    //					side.active[i].hp = 0;
+    //				} else {
+    //					this.actions.switchIn(side.pokemon[i], i);
+    //				}
+    //			}
+    //		}
+    //		for (const pokemon of this.getAllPokemon()) {
+    //			this.singleEvent('Start', this.dex.conditions.getByID(pokemon.species.id), pokemon.speciesState, pokemon);
+    //		}
+    //		this.midTurn = true;
+    //		break;
+    //	}
+
+    //	case 'move':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.actions.runMove(action.move, action.pokemon, action.targetLoc, {
+    //			sourceEffect: action.sourceEffect, zMove: action.zmove,
+    //			maxMove: action.maxMove, originalTarget: action.originalTarget,
+    //		});
+    //		break;
+    //	case 'megaEvo':
+    //		this.actions.runMegaEvo(action.pokemon);
+    //		break;
+    //	case 'megaEvoX':
+    //		this.actions.runMegaEvoX?.(action.pokemon);
+    //		break;
+    //	case 'megaEvoY':
+    //		this.actions.runMegaEvoY?.(action.pokemon);
+    //		break;
+    //	case 'runDynamax':
+    //		action.pokemon.addVolatile('dynamax');
+    //		action.pokemon.side.dynamaxUsed = true;
+    //		if (action.pokemon.side.allySide) action.pokemon.side.allySide.dynamaxUsed = true;
+    //		break;
+    //	case 'terastallize':
+    //		this.actions.terastallize(action.pokemon);
+    //		break;
+    //	case 'beforeTurnMove':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.debug('before turn callback: ' + action.move.id);
+    //		const target = this.getTarget(action.pokemon, action.move, action.targetLoc);
+    //		if (!target) return false;
+    //		if (!action.move.beforeTurnCallback) throw new Error(`beforeTurnMove has no beforeTurnCallback`);
+    //		action.move.beforeTurnCallback.call(this, action.pokemon, target);
+    //		break;
+    //	case 'priorityChargeMove':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.debug('priority charge callback: ' + action.move.id);
+    //		if (!action.move.priorityChargeCallback) throw new Error(`priorityChargeMove has no priorityChargeCallback`);
+    //		action.move.priorityChargeCallback.call(this, action.pokemon);
+    //		break;
+
+    //	case 'event':
+    //		this.runEvent(action.event!, action.pokemon);
+    //		break;
+    //	case 'team':
+    //		if (action.index === 0) {
+    //			action.pokemon.side.pokemon = [];
+    //		}
+    //		action.pokemon.side.pokemon.push(action.pokemon);
+    //		action.pokemon.position = action.index;
+    //		// we return here because the update event would crash since there are no active pokemon yet
+    //		return;
+
+    //	case 'pass':
+    //		return;
+    //	case 'instaswitch':
+    //	case 'switch':
+    //		if (action.choice === 'switch' && action.pokemon.status) {
+    //			this.singleEvent('CheckShow', this.dex.abilities.getByID('naturalcure' as ID), null, action.pokemon);
+    //		}
+    //		if (this.actions.switchIn(action.target, action.pokemon.position, action.sourceEffect) === 'pursuitfaint') {
+    //			// a pokemon fainted from Pursuit before it could switch
+    //			if (this.gen <= 4) {
+    //				// in gen 2-4, the switch still happens
+    //				this.hint("Previously chosen switches continue in Gen 2-4 after a Pursuit target faints.");
+    //				action.priority = -101;
+    //				this.queue.unshift(action);
+    //				break;
+    //			} else {
+    //				// in gen 5+, the switch is cancelled
+    //				this.hint("A Pokemon can't switch between when it runs out of HP and when it faints");
+    //				break;
+    //			}
+    //		}
+    //		break;
+    //	case 'revivalblessing':
+    //		action.pokemon.side.pokemonLeft++;
+    //		if (action.target.position < action.pokemon.side.active.length) {
+    //			this.queue.addChoice({
+    //				choice: 'instaswitch',
+    //				pokemon: action.target,
+    //				target: action.target,
+    //			});
+    //		}
+    //		action.target.fainted = false;
+    //		action.target.faintQueued = false;
+    //		action.target.subFainted = false;
+    //		action.target.status = '';
+    //		action.target.hp = 1; // Needed so hp functions works
+    //		action.target.sethp(action.target.maxhp / 2);
+    //		this.add('-heal', action.target, action.target.getHealth, '[from] move: Revival Blessing');
+    //		action.pokemon.side.removeSlotCondition(action.pokemon, 'revivalblessing');
+    //		break;
+    //	case 'runSwitch':
+    //		this.actions.runSwitch(action.pokemon);
+    //		break;
+    //	case 'shift':
+    //		if (!action.pokemon.isActive) return false;
+    //		if (action.pokemon.fainted) return false;
+    //		this.swapPosition(action.pokemon, 1);
+    //		break;
+
+    //	case 'beforeTurn':
+    //		this.eachEvent('BeforeTurn');
+    //		break;
+    //	case 'residual':
+    //		this.add('');
+    //		this.clearActiveMove(true);
+    //		this.updateSpeed();
+    //		residualPokemon = this.getAllActive().map(pokemon => [pokemon, pokemon.getUndynamaxedHP()] as const);
+    //		this.fieldEvent('Residual');
+    //		if (!this.ended) this.add('upkeep');
+    //		break;
+    //	}
+
+    //	// phazing (Roar, etc)
+    //	for (const side of this.sides) {
+    //		for (const pokemon of side.active) {
+    //			if (pokemon.forceSwitchFlag) {
+    //				if (pokemon.hp) this.actions.dragIn(pokemon.side, pokemon.position);
+    //				pokemon.forceSwitchFlag = false;
+    //			}
+    //		}
+    //	}
+
+    //	this.clearActiveMove();
+
+    //	// fainting
+
+    //	this.faintMessages();
+    //	if (this.ended) return true;
+
+    //	// switching (fainted pokemon, U-turn, Baton Pass, etc)
+
+    //	if (!this.queue.peek() || (this.gen <= 3 && ['move', 'residual'].includes(this.queue.peek()!.choice))) {
+    //		// in gen 3 or earlier, switching in fainted pokemon is done after
+    //		// every move, rather than only at the end of the turn.
+    //		this.checkFainted();
+    //	} else if (['megaEvo', 'megaEvoX', 'megaEvoY'].includes(action.choice) && this.gen === 7) {
+    //		this.eachEvent('Update');
+    //		// In Gen 7, the action order is recalculated for a Pokémon that mega evolves.
+    //		for (const [i, queuedAction] of this.queue.list.entries()) {
+    //			if (queuedAction.pokemon === action.pokemon && queuedAction.choice === 'move') {
+    //				this.queue.list.splice(i, 1);
+    //				queuedAction.mega = 'done';
+    //				this.queue.insertChoice(queuedAction, true);
+    //				break;
+    //			}
+    //		}
+    //		return false;
+    //	} else if (this.queue.peek()?.choice === 'instaswitch') {
+    //		return false;
+    //	}
+
+    //	if (this.gen >= 5 && action.choice !== 'start') {
+    //		this.eachEvent('Update');
+    //		for (const [pokemon, originalHP] of residualPokemon) {
+    //			const maxhp = pokemon.getUndynamaxedHP(pokemon.maxhp);
+    //			if (pokemon.hp && pokemon.getUndynamaxedHP() <= maxhp / 2 && originalHP > maxhp / 2) {
+    //				this.runEvent('EmergencyExit', pokemon);
+    //			}
+    //		}
+    //	}
+
+    //	if (action.choice === 'runSwitch') {
+    //		const pokemon = action.pokemon;
+    //		if (pokemon.hp && pokemon.hp <= pokemon.maxhp / 2 && pokemonOriginalHP! > pokemon.maxhp / 2) {
+    //			this.runEvent('EmergencyExit', pokemon);
+    //		}
+    //	}
+
+    //	const switches = this.sides.map(
+    //		side => side.active.some(pokemon => pokemon && !!pokemon.switchFlag)
+    //	);
+
+    //	for (let i = 0; i < this.sides.length; i++) {
+    //		let reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+    //		if (switches[i] && !this.canSwitch(this.sides[i])) {
+    //			for (const pokemon of this.sides[i].active) {
+    //				if (this.sides[i].slotConditions[pokemon.position]['revivalblessing']) {
+    //					reviveSwitch = true;
+    //					continue;
+    //				}
+    //				pokemon.switchFlag = false;
+    //			}
+    //			if (!reviveSwitch) switches[i] = false;
+    //		} else if (switches[i]) {
+    //			for (const pokemon of this.sides[i].active) {
+    //				if (
+    //					pokemon.hp && pokemon.switchFlag && pokemon.switchFlag !== 'revivalblessing' &&
+    //					!pokemon.skipBeforeSwitchOutEventFlag
+    //				) {
+    //					this.runEvent('BeforeSwitchOut', pokemon);
+    //					pokemon.skipBeforeSwitchOutEventFlag = true;
+    //					this.faintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+    //					if (this.ended) return true;
+    //					if (pokemon.fainted) {
+    //						switches[i] = this.sides[i].active.some(sidePokemon => sidePokemon && !!sidePokemon.switchFlag);
+    //					}
+    //				}
+    //			}
+    //		}
+    //	}
+
+    //	for (const playerSwitch of switches) {
+    //		if (playerSwitch) {
+    //			this.makeRequest('switch');
+    //			return true;
+    //		}
+    //	}
+
+    //	if (this.gen < 5) this.eachEvent('Update');
+
+    //	if (this.gen >= 8 && (this.queue.peek()?.choice === 'move' || this.queue.peek()?.choice === 'runDynamax')) {
+    //		// In gen 8, speed is updated dynamically so update the queue's speed properties and sort it.
+    //		this.updateSpeed();
+    //		for (const queueAction of this.queue.list) {
+    //			if (queueAction.pokemon) this.getActionSpeed(queueAction);
+    //		}
+    //		this.queue.sort();
+    //	}
+
+    //	return false;
+    //}
+
     public bool RunAction(IAction action)
     {
-        throw new NotImplementedException();
+        int? pokemonOriginalHp = action switch
+        {
+            PokemonAction pa => pa.Pokemon?.Hp,
+            MoveAction ma => ma.Pokemon?.Hp,
+            SwitchAction sa => sa.Pokemon?.Hp,
+            _ => null,
+        };
+
+        List<(Pokemon pokemon, int hp)> residualPokemon = [];
+
+        // Returns whether or not we ended in a callback
+        switch (action.Choice)
+        {
+            case ActionId.Start:
+                {
+                    foreach (Side side in Sides)
+                    {
+                        if (side.PokemonLeft > 0)
+                            side.PokemonLeft = side.Pokemon.Count;
+                        UiGenerator.PrintMessage($"teamsize|{side.Id}|{side.Pokemon.Count}");
+                    }
+
+                    UiGenerator.PrintMessage("start");
+
+                    // Change Zacian/Zamazenta into their Crowned formes
+                    foreach (Pokemon pokemon in GetAllPokemon())
+                    {
+                        Species? rawSpecies = null;
+                        if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
+                        {
+                            rawSpecies = Library.Species[SpecieId.ZacianCrowned];
+                        }
+                        else if (pokemon.Species.Id == SpecieId.Zamazenta && pokemon.Item == ItemId.RustedShield)
+                        {
+                            rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
+                        }
+
+                        if (rawSpecies == null) continue;
+
+                        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
+                        if (species == null) continue;
+
+                        pokemon.BaseSpecies = rawSpecies;
+                        pokemon.Details = pokemon.GetUpdatedDetails();
+                        pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
+                            ?? throw new InvalidOperationException("Species has no ability in slot 0"),
+                            null, null, isFromFormeChange: true);
+                        pokemon.BaseAbility = pokemon.Ability;
+
+                        // Replace Iron Head with Behemoth Blade/Bash
+                        Dictionary<SpecieId, MoveId> behemothMoves = new()
+                {
+                    { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
+                    { SpecieId.ZamazentaCrowned, MoveId.BehemothBash }
+                };
+
+                        int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
+                        if (ironHeadIndex >= 0)
+                        {
+                            Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
+                            pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
+                            {
+                                Move = move.Id,
+                                Id = move.Id,
+                                Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                                MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                                Target = move.Target,
+                                Disabled = false,
+                                DisabledSource = null,
+                                Used = false,
+                            };
+                            pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
+                        }
+                    }
+
+                    // Call format's OnBattleStart handler
+                    Format.OnBattleStart
+
+                    foreach (RuleId rule in RuleTable.Keys)
+                    {
+                        string ruleString = rule.ToString();
+                        if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+                        Format subFormat = Library.Rulesets[rule];
+                        subFormat.GetDelegate(EventId.BattleStart)?.Invoke(this);
+                    }
+
+                    foreach (Side side in Sides)
+                    {
+                        for (int i = 0; i < side.Active.Count; i++)
+                        {
+                            if (side.PokemonLeft <= 0)
+                            {
+                                // Forfeited before starting
+                                side.Active[i] = side.Pokemon[i];
+                                side.Active[i].Fainted = true;
+                                side.Active[i].Hp = 0;
+                            }
+                            else
+                            {
+                                Actions.SwitchIn(side.Pokemon[i], i);
+                            }
+                        }
+                    }
+
+                    foreach (Pokemon pokemon in GetAllPokemon())
+                    {
+                        Condition speciesCondition = Library.Conditions[pokemon.Species.Id];
+                        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                    }
+
+                    MidTurn = true;
+                    break;
+                }
+
+            case ActionId.Move:
+                {
+                    var moveAction = (MoveAction)action;
+                    if (!moveAction.Pokemon.IsActive) return false;
+                    if (moveAction.Pokemon.Fainted) return false;
+                    Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
+                        sourceEffect: moveAction.SourceEffect,
+                        originalTarget: moveAction.OriginalTarget);
+                    break;
+                }
+
+            case ActionId.Terastallize:
+                {
+                    var teraAction = (PokemonAction)action;
+                    Actions.Terastallize(teraAction.Pokemon);
+                    break;
+                }
+
+            case ActionId.BeforeTurnMove:
+                {
+                    var btmAction = (MoveAction)action;
+                    if (!btmAction.Pokemon.IsActive) return false;
+                    if (btmAction.Pokemon.Fainted) return false;
+                    Debug($"before turn callback: {btmAction.Move.Id}");
+                    Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
+                    if (target == null) return false;
+                    if (btmAction.Move.BeforeTurnCallback == null)
+                        throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
+                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target);
+                    break;
+                }
+
+            case ActionId.PriorityChargeMove:
+                {
+                    var pcmAction = (MoveAction)action;
+                    if (!pcmAction.Pokemon.IsActive) return false;
+                    if (pcmAction.Pokemon.Fainted) return false;
+                    Debug($"priority charge callback: {pcmAction.Move.Id}");
+                    if (pcmAction.Move.PriorityChargeCallback == null)
+                        throw new InvalidOperationException("priorityChargeMove has no priorityChargeCallback");
+                    pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
+                    break;
+                }
+
+            case ActionId.Event:
+                {
+                    var eventAction = (PokemonAction)action;
+                    RunEvent(eventAction.EventId, eventAction.Pokemon);
+                    break;
+                }
+
+            case ActionId.Team:
+                {
+                    var teamAction = (TeamAction)action;
+                    if (teamAction.Index == 0)
+                    {
+                        teamAction.Pokemon.Side.Pokemon = [];
+                    }
+                    teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
+                    teamAction.Pokemon.Position = teamAction.Index;
+                    // We return here because the update event would crash since there are no active pokemon yet
+                    return false;
+                }
+
+            case ActionId.Pass:
+                return false;
+
+            case ActionId.InstaSwitch:
+            case ActionId.Switch:
+                {
+                    var switchAction = (SwitchAction)action;
+                    if (switchAction.Choice == ActionId.Switch && switchAction.Pokemon.Status != ConditionId.None)
+                    {
+                        Ability naturalCure = Library.Abilities[AbilityId.NaturalCure];
+                        SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
+                    }
+
+                    SwitchResult switchResult = Actions.SwitchIn(
+                        switchAction.Target,
+                        switchAction.Pokemon.Position,
+                        switchAction.SourceEffect);
+
+                    if (switchResult == SwitchResult.PursuitFaint)
+                    {
+                        // A pokemon fainted from Pursuit before it could switch
+                        // In gen 5+, the switch is cancelled
+                        Hint("A Pokemon can't switch between when it runs out of HP and when it faints");
+                        break;
+                    }
+                    break;
+                }
+
+            case ActionId.RevivalBlessing:
+                {
+                    var rbAction = (SwitchAction)action;
+                    rbAction.Pokemon.Side.PokemonLeft++;
+                    if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
+                    {
+                        Queue.InserChoice(new InstaSwitchChoice
+                        {
+                            Pokemon = rbAction.Target,
+                            Target = rbAction.Target,
+                        });
+                    }
+                    rbAction.Target.Fainted = false;
+                    rbAction.Target.FaintQueued = false;
+                    rbAction.Target.SubFainted = false;
+                    rbAction.Target.Status = ConditionId.None;
+                    rbAction.Target.Hp = 1; // Needed so HP functions work
+                    rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
+                    UiGenerator.PrintHealEvent(rbAction.Target, fromEffect: "move: Revival Blessing");
+                    rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon, ConditionId.RevivalBlessing);
+                    break;
+                }
+
+            case ActionId.RunSwitch:
+                {
+                    var rsAction = (PokemonAction)action;
+                    Actions.RunSwitch(rsAction.Pokemon);
+                    break;
+                }
+
+            case ActionId.Shift:
+                {
+                    var shiftAction = (PokemonAction)action;
+                    if (!shiftAction.Pokemon.IsActive) return false;
+                    if (shiftAction.Pokemon.Fainted) return false;
+                    SwapPosition(shiftAction.Pokemon, 1);
+                    break;
+                }
+
+            case ActionId.BeforeTurn:
+                EachEvent(EventId.BeforeTurn);
+                break;
+
+            case ActionId.Residual:
+                UiGenerator.PrintEmptyLine();
+                ClearActiveMove(failed: true);
+                UpdateSpeed();
+                residualPokemon = GetAllActive()
+                    .Select(p => (p, p.GetUndynamaxedHp()))
+                    .ToList();
+                FieldEvent(EventId.Residual);
+                if (!Ended) UiGenerator.PrintMessage("upkeep");
+                break;
+        }
+
+        // Phazing (Roar, etc)
+        foreach (Side side in Sides)
+        {
+            foreach (Pokemon pokemon in side.Active)
+            {
+                if (pokemon.ForceSwitchFlag != ForceSwitchFlag.None)
+                {
+                    if (pokemon.Hp > 0) Actions.DragIn(pokemon.Side, pokemon.Position);
+                    pokemon.ForceSwitchFlag = ForceSwitchFlag.None;
+                }
+            }
+        }
+
+        ClearActiveMove();
+
+        // Fainting
+        FaintMessages();
+        if (Ended) return true;
+
+        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
+        if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
+        {
+            return false;
+        }
+
+        // Emergency Exit / Wimp Out check (Gen 5+)
+        if (action.Choice != ActionId.Start)
+        {
+            EachEvent(EventId.Update);
+            foreach ((Pokemon pokemon, int originalHp) in residualPokemon)
+            {
+                int maxHp = pokemon.GetUndynamaxedHp(pokemon.MaxHp);
+                if (pokemon.Hp > 0 && pokemon.GetUndynamaxedHp() <= maxHp / 2 && originalHp > maxHp / 2)
+                {
+                    RunEvent(EventId.EmergencyExit, pokemon);
+                }
+            }
+        }
+
+        if (action.Choice == ActionId.RunSwitch)
+        {
+            var runSwitchAction = (PokemonAction)action;
+            Pokemon pokemon = runSwitchAction.Pokemon;
+            if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 &&
+                pokemonOriginalHp > pokemon.MaxHp / 2)
+            {
+                RunEvent(EventId.EmergencyExit, pokemon);
+            }
+        }
+
+        // Check for switches
+        List<bool> switches = Sides
+            .Select(side => side.Active.Any(p => p.SwitchFlag.IsTrue()))
+            .ToList();
+
+        for (int i = 0; i < Sides.Count; i++)
+        {
+            bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+            if (switches[i] && CanSwitch(Sides[i]) == 0)
+            {
+                foreach (Pokemon pokemon in Sides[i].Active)
+                {
+                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position, ConditionId.RevivalBlessing);
+                    if (revivalBlessing != null)
+                    {
+                        reviveSwitch = true;
+                        continue;
+                    }
+                    pokemon.SwitchFlag = MoveIdBoolUnion.FromBool(false);
+                }
+                if (!reviveSwitch) switches[i] = false;
+            }
+            else if (switches[i])
+            {
+                foreach (Pokemon pokemon in Sides[i].Active)
+                {
+                    if (pokemon.Hp > 0 &&
+                        pokemon.SwitchFlag.IsTrue() &&
+                        pokemon.SwitchFlag != MoveIdBoolUnion.FromMoveId(MoveId.RevivalBlessing) &&
+                        !pokemon.SkipBeforeSwitchOutEventFlag)
+                    {
+                        RunEvent(EventId.BeforeSwitchOut, pokemon);
+                        pokemon.SkipBeforeSwitchOutEventFlag = true;
+                        FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+                        if (Ended) return true;
+                        if (pokemon.Fainted)
+                        {
+                            switches[i] = Sides[i].Active.Any(p => p.SwitchFlag.IsTrue());
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach (bool playerSwitch in switches)
+        {
+            if (playerSwitch)
+            {
+                MakeRequest(RequestState.SwitchIn);
+                return true;
+            }
+        }
+
+        // In Gen 8+, speed is updated dynamically
+        IAction? nextAction = Queue.Peek();
+        if (nextAction?.Choice == ActionId.Move)
+        {
+            // Update the queue's speed properties and sort it
+            UpdateSpeed();
+            foreach (IAction queueAction in Queue.List)
+            {
+                GetActionSpeed(queueAction);
+            }
+            Queue.Sort();
+        }
+
+        return false;
     }
 
     public void TurnLoop()

@@ -26,7 +26,7 @@ public class Pokemon : IPriorityComparison
     public int Happiness => Set.Happiness;
     public PokeballId Pokeball => Set.Pokeball;
 
-    public IReadOnlyList<MoveSlot> BaseMoveSlots { get; }
+    public List<MoveSlot> BaseMoveSlots { get; }
     public StatsTable Evs => Set.Evs;
     public StatsTable Ivs => Set.Ivs;
     public List<MoveSlot> MoveSlots { get; set; }

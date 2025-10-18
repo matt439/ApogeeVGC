@@ -41,6 +41,9 @@ public enum MoveId
     Curse,
     PollenPuff,
     TeraStarStorm,
+    BehemothBlade,
+    BehemothBash,
+    IronHead,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

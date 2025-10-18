@@ -27,6 +27,10 @@ public enum SpecieId
     RockruffDusk,
     TerapagosTerastal,
     TerapagosStellar,
+    Zacian,
+    ZacianCrowned,
+    Zamazenta,
+    ZamazentaCrowned,
 }
 
 public enum FormeId

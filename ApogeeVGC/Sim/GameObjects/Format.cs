@@ -53,6 +53,54 @@ public record Format : IEffect, IBasicEffect, IEventMethods
     public Action<IBattle>? OnBegin { get; init; }
     public bool NoLog { get; init; }
 
+    public FormatHasValue? HasValue { get; init; }
+    // OnValidateRule TODO: Implement this event method
+    public RuleId? MutuallyExclusiveWith { get; init; }
+    // ModdedDex fields here. Possible unnecessary in this context.
+    public bool? ChallengeShow { get; init; }
+    public bool? SearchShow { get; init; }
+    public bool? BestOfDefault { get; init; }
+    public bool? TeraPreviewDefault { get; init; }
+    // Threads // TODO: Implement thread handling
+    public bool? TournamentShow { get; init; }
+
+    //declare readonly checkCanLearn?: (
+
+    //this: TeamValidator, move: Move, species: Species, setSources: PokemonSources, set: PokemonSet
+    //) => string | null;
+    //declare readonly getEvoFamily?: (this: Format, speciesid: string) => ID;
+    //declare readonly getSharedPower?: (this: Format, pokemon: Pokemon) => Set<string>;
+    //declare readonly getSharedItems?: (this: Format, pokemon: Pokemon) => Set<string>;
+    //declare readonly onChangeSet?: (
+
+    //this: TeamValidator, set: PokemonSet, format: Format, setHas?: AnyObject, teamHas?: AnyObject
+    //) => string[] | void;
+    //declare readonly onModifySpeciesPriority?: number;
+    //declare readonly onModifySpecies?: (
+
+    //this: Battle, species: Species, target?: Pokemon, source?: Pokemon, effect?: Effect
+    //) => Species | void;
+    //declare readonly onBattleStart?: (this: Battle) => void;
+    //declare readonly onTeamPreview?: (this: Battle) => void;
+    //declare readonly onValidateSet?: (
+
+    //this: TeamValidator, set: PokemonSet, format: Format, setHas: AnyObject, teamHas: AnyObject
+    //) => string[] | void;
+    //declare readonly onValidateTeam?: (
+
+    //this: TeamValidator, team: PokemonSet[], format: Format, teamHas: AnyObject
+    //) => string[] | void;
+    //declare readonly validateSet?: (this: TeamValidator, set: PokemonSet, teamHas: AnyObject) => string[] | null;
+    //declare readonly validateTeam?: (this: TeamValidator, team: PokemonSet[], options?: {
+
+    //    removeNicknames?: boolean,
+    //    skipSets?: { [name: string]: { [key: string]: boolean }
+    //    },
+    //}) => string[] | void;
+    //declare readonly section?: string;
+    //declare readonly column?: number;
+
+
     #region IEventMethods Implementation
 
     public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
