@@ -15,7 +15,7 @@ public class BattleActions(IBattle battle)
 
     #region Switch
 
-    public bool SwitchIn(Pokemon pokemon, int pos, IEffect? sourceEffect, bool isDrag = false)
+    public bool SwitchIn(Pokemon pokemon, int pos, IEffect? sourceEffect = null, bool isDrag = false)
     {
         throw new NotImplementedException();
     }

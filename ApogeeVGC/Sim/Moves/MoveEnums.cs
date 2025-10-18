@@ -44,6 +44,7 @@ public enum MoveId
     BehemothBlade,
     BehemothBash,
     IronHead,
+    RevivalBlessing,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

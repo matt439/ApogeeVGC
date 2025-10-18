@@ -46,6 +46,7 @@ public enum AbilityId
     Pickup,
     Stalwart,
     PropellerTail,
+    NaturalCure,
 
     None,
 }

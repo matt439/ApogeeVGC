@@ -68,6 +68,8 @@ public record Species : IEffect
     public MoveId? RequiredMove { get; init; }
     public AbilityId? RequiredAbility { get; init; }
 
+    public ConditionId Conditon { get; init; } = ConditionId.None;
+
     public IReadOnlyList<ItemId>? RequiredItems
     {
         get

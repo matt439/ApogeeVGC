@@ -1685,14 +1685,7 @@ public partial class BattleAsync : IBattle
         // Process each target
         for (int i = 0; i < damage.Count; i++)
         {
-            IntBoolUnion? curDamage = damage[i];
-
-            // Skip if damage is null/undefined
-            if (curDamage == null)
-            {
-                retVals.Add(null);
-                continue;
-            }
+            SpreadMoveDamage curDamage = new([damage[i]]);
 
             // Extract Pokemon from union type
             Pokemon? target = targetArray[i] switch
@@ -1701,7 +1694,7 @@ public partial class BattleAsync : IBattle
                 _ => null,
             };
 
-            int targetDamage = curDamage.ToInt();
+            int targetDamage = curDamage[0].ToInt();
 
             // Target has no HP - return 0
             if (target is not { Hp: > 0 })
@@ -3364,9 +3357,9 @@ public partial class BattleAsync : IBattle
     {
         int? pokemonOriginalHp = action switch
         {
-            PokemonAction pa => pa.Pokemon?.Hp,
-            MoveAction ma => ma.Pokemon?.Hp,
-            SwitchAction sa => sa.Pokemon?.Hp,
+            PokemonAction pa => pa.Pokemon.Hp,
+            MoveAction ma => ma.Pokemon.Hp,
+            SwitchAction sa => sa.Pokemon.Hp,
             _ => null,
         };
 
@@ -3408,7 +3401,7 @@ public partial class BattleAsync : IBattle
                         pokemon.Details = pokemon.GetUpdatedDetails();
                         pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
                             ?? throw new InvalidOperationException("Species has no ability in slot 0"),
-                            null, null, isFromFormeChange: true);
+                            isFromFormeChange: true);
                         pokemon.BaseAbility = pokemon.Ability;
 
                         // Replace Iron Head with Behemoth Blade/Bash
@@ -3468,7 +3461,7 @@ public partial class BattleAsync : IBattle
 
                     foreach (Pokemon pokemon in GetAllPokemon())
                     {
-                        Condition speciesCondition = Library.Conditions[pokemon.Species.Id];
+                        Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
                         SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
                     }
 
@@ -3482,11 +3475,13 @@ public partial class BattleAsync : IBattle
                     if (!moveAction.Pokemon.IsActive) return false;
                     if (moveAction.Pokemon.Fainted) return false;
                     Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
-                        sourceEffect: moveAction.SourceEffect,
-                        originalTarget: moveAction.OriginalTarget);
+                        new BattleActions.RunMoveOptions
+                        {
+                            SourceEffect = moveAction.SourceEffect,
+                            OriginalTarget = moveAction.OriginalTarget,
+                        });
                     break;
                 }
-
             case ActionId.Terastallize:
                 {
                     var teraAction = (PokemonAction)action;
@@ -3504,7 +3499,8 @@ public partial class BattleAsync : IBattle
                     if (target == null) return false;
                     if (btmAction.Move.BeforeTurnCallback == null)
                         throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
-                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target);
+                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target,
+                        btmAction.Move.ToActiveMove());
                     break;
                 }
 
@@ -3523,7 +3519,10 @@ public partial class BattleAsync : IBattle
             case ActionId.Event:
                 {
                     var eventAction = (PokemonAction)action;
-                    RunEvent(eventAction.EventId, eventAction.Pokemon);
+                    RunEvent(eventAction.Event ??
+                             throw new InvalidOperationException("In showdown it uses a '!' suppressor." +
+                                                                 "Not sure how to handle null"),
+                        eventAction.Pokemon);
                     break;
                 }
 
@@ -3553,18 +3552,7 @@ public partial class BattleAsync : IBattle
                         SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
                     }
 
-                    SwitchResult switchResult = Actions.SwitchIn(
-                        switchAction.Target,
-                        switchAction.Pokemon.Position,
-                        switchAction.SourceEffect);
-
-                    if (switchResult == SwitchResult.PursuitFaint)
-                    {
-                        // A pokemon fainted from Pursuit before it could switch
-                        // In gen 5+, the switch is cancelled
-                        Hint("A Pokemon can't switch between when it runs out of HP and when it faints");
-                        break;
-                    }
+                    Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position, switchAction.SourceEffect);
                     break;
                 }
 
@@ -3574,10 +3562,12 @@ public partial class BattleAsync : IBattle
                     rbAction.Pokemon.Side.PokemonLeft++;
                     if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
                     {
-                        Queue.InserChoice(new InstaSwitchChoice
+                        Queue.AddChoice(new SwitchAction
                         {
+                            Choice = ActionId.RevivalBlessing,
                             Pokemon = rbAction.Target,
                             Target = rbAction.Target,
+                            Order = 3,
                         });
                     }
                     rbAction.Target.Fainted = false;
@@ -3628,10 +3618,10 @@ public partial class BattleAsync : IBattle
         {
             foreach (Pokemon pokemon in side.Active)
             {
-                if (pokemon.ForceSwitchFlag != ForceSwitchFlag.None)
+                if (pokemon.ForceSwitchFlag)
                 {
                     if (pokemon.Hp > 0) Actions.DragIn(pokemon.Side, pokemon.Position);
-                    pokemon.ForceSwitchFlag = ForceSwitchFlag.None;
+                    pokemon.ForceSwitchFlag = false;
                 }
             }
         }
@@ -3685,13 +3675,14 @@ public partial class BattleAsync : IBattle
             {
                 foreach (Pokemon pokemon in Sides[i].Active)
                 {
-                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position, ConditionId.RevivalBlessing);
+                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
+                        ConditionId.RevivalBlessing);
                     if (revivalBlessing != null)
                     {
                         reviveSwitch = true;
                         continue;
                     }
-                    pokemon.SwitchFlag = MoveIdBoolUnion.FromBool(false);
+                    pokemon.SwitchFlag = false;
                 }
                 if (!reviveSwitch) switches[i] = false;
             }
@@ -3701,7 +3692,7 @@ public partial class BattleAsync : IBattle
                 {
                     if (pokemon.Hp > 0 &&
                         pokemon.SwitchFlag.IsTrue() &&
-                        pokemon.SwitchFlag != MoveIdBoolUnion.FromMoveId(MoveId.RevivalBlessing) &&
+                        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
                         !pokemon.SkipBeforeSwitchOutEventFlag)
                     {
                         RunEvent(EventId.BeforeSwitchOut, pokemon);

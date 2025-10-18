@@ -186,6 +186,7 @@ public abstract record BoolIntUndefinedUnion
 {
     public abstract bool IsTruthy();
     public abstract bool IsZero();
+    public abstract int ToInt();
 
     public static BoolIntUndefinedUnion FromBool(bool value) => new BoolBoolIntUndefinedUnion(value);
     public static BoolIntUndefinedUnion FromInt(int value) => new IntBoolIntUndefinedUnion(value);
@@ -201,18 +202,21 @@ public record BoolBoolIntUndefinedUnion(bool Value) : BoolIntUndefinedUnion
 {
     public override bool IsTruthy() => Value;
     public override bool IsZero() => !Value;
+    public override int ToInt() => Value ? 1 : 0;
 }
 
 public record IntBoolIntUndefinedUnion(int Value) : BoolIntUndefinedUnion
 {
     public override bool IsTruthy() => Value != 0;
     public override bool IsZero() => Value == 0;
+    public override int ToInt() => Value;
 }
 
 public record UndefinedBoolIntUndefinedUnion(Undefined Value) : BoolIntUndefinedUnion
 {
     public override bool IsTruthy() => false;
     public override bool IsZero() => false;
+    public override int ToInt() => 0;
 }
 
 
@@ -818,6 +822,25 @@ public record FalseIntUndefinedFalseUnion : IntUndefinedFalseUnion;
 /// </summary>
 public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
 {
+    public SpreadMoveDamage()
+    {
+    }
+
+    public SpreadMoveDamage(SpreadMoveDamage other)
+    {
+        foreach (BoolIntUndefinedUnion item in other)
+        {
+            Add(item);
+        }
+    }
+
+    public SpreadMoveDamage(List<BoolIntUndefinedUnion> other)
+    {
+        foreach (BoolIntUndefinedUnion item in other)
+        {
+            Add(item);
+        }
+    }
 }
 
 public class SpreadMoveTargets : List<PokemonFalseUnion>
