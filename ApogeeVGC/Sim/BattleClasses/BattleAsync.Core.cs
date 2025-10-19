@@ -3880,7 +3880,7 @@ public partial class BattleAsync : IBattle
             // Apply provided choices to each corresponding side
             for (int i = 0; i < inputs.Count; i++)
             {
-                Choice? input = inputs[i];
+                Choice input = inputs[i];
                 Sides[i].Choose(input);
             }
         }
@@ -3954,39 +3954,60 @@ public partial class BattleAsync : IBattle
         }
     }
 
-    //undoChoice(sideid: SideID)
-    //{
-    //    const side = this.getSide(sideid);
-    //    if (!side.requestState) return;
-
-    //    if (side.choice.cantUndo)
-    //    {
-    //        side.emitChoiceError(`Can't undo: A trapping/disabling effect would cause undo to leak information`);
-
-    //        return;
-    //    }
-
-    //    let updated = false;
-    //    if (side.requestState === 'move')
-    //    {
-    //        for (const action of side.choice.actions) {
-    //            const pokemon = action.pokemon;
-    //            if (action.choice !== 'move' || !pokemon) continue;
-    //            if (side.updateRequestForPokemon(pokemon, req => side.updateDisabledRequest(pokemon, req)))
-    //            {
-    //                updated = true;
-    //            }
-    //        }
-    //    }
-
-    //    side.clearChoice();
-
-    //    if (updated) side.emitRequest(side.activeRequest!, true);
-    //}
-
     public void UndoChoice(SideId sideId)
     {
-        throw new NotImplementedException();
+        Side side = GetSide(sideId);
+
+        // No active request - nothing to undo
+        if (side.ActiveRequest == null)
+            return;
+
+        // Check if undo would leak information
+        if (side.GetChoice().CantUndo)
+        {
+            side.EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to" +
+                                 "leak information");
+            return;
+        }
+
+        bool updated = false;
+
+        // If undoing a move selection, update disabled moves for each Pokémon
+        if (RequestState == RequestState.Move)
+        {
+            foreach (IActionChoice action in side.GetChoice().Actions)
+            {
+                // Extract Pokémon from the action (could be MoveAction, SwitchAction, etc.)
+                Pokemon? pokemon = action switch
+                {
+                    MoveAction ma => ma.Pokemon,
+                    SwitchAction sa => sa.Pokemon,
+                    PokemonAction pa => pa.Pokemon,
+                    TeamAction ta => ta.Pokemon,
+                    _ => null,
+                };
+
+                // Skip if not a move action or no Pokémon
+                if (action is not MoveAction || pokemon == null)
+                    continue;
+
+                // Update the request for this Pokémon, refreshing disabled moves
+                if (side.UpdateRequestForPokemon(pokemon, req =>
+                        side.UpdateDisabledRequest(pokemon, req)))
+                {
+                    updated = true;
+                }
+            }
+        }
+
+        // Clear the current choice
+        side.ClearChoice();
+
+        // If we updated any move availability, send the updated request to the client
+        if (updated && side.ActiveRequest != null)
+        {
+            side.EmitRequest(side.ActiveRequest, updatedRequest: true);
+        }
     }
 
     public bool AllChoicesDone()
