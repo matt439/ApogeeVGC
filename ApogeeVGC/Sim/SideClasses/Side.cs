@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -763,12 +764,85 @@ public class Side
 
     public bool UpdateDisabledRequest(Pokemon pokemon, PokemonMoveRequestData req)
     {
-        throw new NotImplementedException();
+        bool updated = false;
+
+        // Clear maybeLocked if it's set
+        if (pokemon.MaybeLocked ?? false)
+        {
+            pokemon.MaybeLocked = false;
+            req.MaybeLocked = null;
+            updated = true;
+        }
+
+        // Handle maybeDisabled in non-singles formats
+        if (pokemon.MaybeDisabled && Battle.GameType != GameType.Singles)
+        {
+            // Gen 4+ behavior
+            if (Battle.Gen >= 4)
+            {
+                pokemon.MaybeDisabled = false;
+                req.MaybeDisabled = null;
+                updated = true;
+            }
+
+            // Update individual move disabled states
+            foreach (PokemonMoveData m in req.Moves)
+            {
+                MoveSlot? moveData = pokemon.GetMoveData(m.Id);
+                BoolHiddenUnion? disabled = moveData?.Disabled;
+
+                // Check if move should be marked as disabled
+                if (disabled != null &&
+                    (Battle.Gen >= 4 || Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
+                {
+                    m.Disabled = true;
+                    updated = true;
+                }
+            }
+        }
+
+        // If all moves are disabled or only Struggle is available
+        bool allMovesDisabled = req.Moves.All(m =>
+            m.Disabled is BoolMoveIdBoolUnion { Value: true } ||
+            m.Id == MoveId.Struggle);
+
+        if (allMovesDisabled)
+        {
+            // Disable Terastallization (Gen 9 mechanic)
+            if (req.CanTerastallize is not null and not FalseMoveTypeFalseUnion)
+            {
+                req.CanTerastallize = null;
+                updated = true;
+            }
+        }
+
+        return updated;
     }
 
     public bool UpdateRequestForPokemon(Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)
     {
-        throw new NotImplementedException();
+        // Ensure we have an active request with Pokemon data
+        if (ActiveRequest is not MoveRequest moveRequest || moveRequest.Active == null)
+        {
+            throw new InvalidOperationException("Can't update a request without active Pokemon");
+        }
+
+        // Find the Pokemon in the request
+        PokemonMoveRequestData? req = moveRequest.Active[pokemon.Position];
+        if (req == null)
+        {
+            throw new InvalidOperationException("Pokemon not found in request's active field");
+        }
+
+        // Apply the update function
+        BoolVoidUnion result = update(req);
+
+        // Return true if the update function returned true, otherwise default to true
+        return result switch
+        {
+            BoolBoolVoidUnion { Value: var b } => b,
+            _ => true,
+        };
     }
 
     public SideBoolUnion ChooseSwitch(string? slotText = null)
