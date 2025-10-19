@@ -274,7 +274,7 @@ public class Side
         throw new NotImplementedException();
     }
 
-    public void EmitRequest(IChoiceRequest update, bool updatedRequest = false)
+    public void EmitRequest(IChoiceRequest? update = null, bool updatedRequest = false)
     {
         throw new NotImplementedException();
     }

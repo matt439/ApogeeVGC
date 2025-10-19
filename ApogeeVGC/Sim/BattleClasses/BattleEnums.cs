@@ -42,4 +42,6 @@ public enum BattleId
 public enum SendType
 {
     Message,
+    End,
+    Update,
 }

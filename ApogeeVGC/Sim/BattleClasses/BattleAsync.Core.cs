@@ -13,12 +13,10 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Diagnostics;
-using System.IO;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync : IBattle
+public partial class BattleAsync : IBattle, IDisposable
 {
     public BattleId Id { get; init; }
     public bool DebugMode { get; init; }
@@ -72,8 +70,8 @@ public partial class BattleAsync : IBattle
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
     public List<string> MessageLog { get; set; } = [];
-    public int SentLogPos { get; set; } = 0;
-    public bool SentEnd { get; set; } = false;
+    public int SentLogPos { get; set; }
+    public bool SentEnd { get; set; }
     public static bool SentRequests => true;
 
     public RequestState RequestState { get; set; } = RequestState.None;
@@ -97,7 +95,7 @@ public partial class BattleAsync : IBattle
     public ActiveMove? LastMove { get; set; }
     public MoveId? LastSuccessfulMoveThisTurn { get; set; }
     public int LastMoveLine { get; set; } = -1;
-    public int LastDamage { get; set; } = 0;
+    public int LastDamage { get; set; }
     public int EffectOrder { get; set; }
     public bool QuickClawRoll { get; set; }
     public List<int> SpeedOrder { get; set; } = [];
@@ -118,8 +116,9 @@ public partial class BattleAsync : IBattle
     public Side P2 => Sides[1];
     public static Side P3 => throw new Exception("3v3 battles are not implemented.");
     public static Side P4 => throw new Exception("4v4 battles are not implemented.");
-
     private HashSet<string> Hints { get; set; } = [];
+
+    private bool _disposed;
 
     public BattleAsync(BattleOptions options, Library library)
     {
@@ -4355,7 +4354,7 @@ public partial class BattleAsync : IBattle
     /// This is a placeholder - you'll need to implement the actual packing logic
     /// based on your client's expected format.
     /// </summary>
-    private string PackTeam(List<PokemonSet> team)
+    private static string PackTeam(List<PokemonSet> team)
     {
         // TODO: Implement team packing logic
         // This should serialize the team data into the format your client expects
@@ -4445,7 +4444,74 @@ public partial class BattleAsync : IBattle
 
     public void SendUpdates()
     {
-        throw new NotImplementedException();
+        // Don't send if there are no new log entries
+        if (SentLogPos >= Log.Count) return;
+
+        // Send new log entries to clients
+        var updates = Log.Skip(SentLogPos).ToList();
+        Send(SendType.Update, updates);
+
+        // Send requests to players if not already sent
+        if (!SentRequests)
+        {
+            foreach (Side side in Sides)
+            {
+                side.EmitRequest();
+            }
+            //SentRequests = true;
+        }
+
+        // Update the position marker
+        SentLogPos = Log.Count;
+
+        // Send end-of-battle summary if battle ended and not already sent
+        if (!SentEnd && Ended)
+        {
+            // Build the battle log object
+            var log = new Dictionary<string, object>
+            {
+                ["winner"] = Winner ?? string.Empty,
+                ["seed"] = PrngSeed,
+                ["turns"] = Turn,
+                ["p1"] = Sides[0].Name,
+                ["p2"] = Sides[1].Name,
+                ["p1team"] = Sides[0].Team,
+                ["p2team"] = Sides[1].Team,
+                ["score"] = new List<int> { Sides[0].PokemonLeft, Sides[1].PokemonLeft },
+                ["inputLog"] = InputLog,
+            };
+
+            // Add P3/P4 data only if they exist (for multi-battles)
+            if (Sides.Count > 2)
+            {
+                log["p3"] = Sides[2].Name;
+                log["p3team"] = Sides[2].Team;
+                log["score"] = new List<int>
+            {
+                Sides[0].PokemonLeft,
+                Sides[1].PokemonLeft,
+                Sides[2].PokemonLeft,
+            };
+            }
+
+            if (Sides.Count > 3)
+            {
+                log["p4"] = Sides[3].Name;
+                log["p4team"] = Sides[3].Team;
+                log["score"] = new List<int>
+            {
+                Sides[0].PokemonLeft,
+                Sides[1].PokemonLeft,
+                Sides[2].PokemonLeft,
+                Sides[3].PokemonLeft,
+            };
+            }
+
+            // Serialize and send the end message
+            string logJson = System.Text.Json.JsonSerializer.Serialize(log);
+            Send(SendType.End, new List<string> { logJson });
+            SentEnd = true;
+        }
     }
 
     private Side GetSide(SideId id)
@@ -4459,7 +4525,7 @@ public partial class BattleAsync : IBattle
     }
     public int GetOverflowedTurnCount()
     {
-        throw new NotImplementedException();
+        return Gen >= 8 ? (Turn - 1) % 256 : Turn - 1;
     }
 
     /// <summary>
@@ -4530,9 +4596,46 @@ public partial class BattleAsync : IBattle
         };
     }
 
+    /// <summary>
+    /// Disposes of battle resources and breaks circular references.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+
+        if (disposing)
+        {
+            // Dispose managed resources
+            Field.Destroy();
+
+            foreach (Side side in Sides)
+            {
+                side.Destroy();
+            }
+
+            Queue.Clear();
+            Log.Clear();
+            InputLog.Clear();
+            MessageLog.Clear();
+            FaintQueue.Clear();
+        }
+
+        // Mark as disposed
+        _disposed = true;
+    }
+
+    /// <summary>
+    /// Public method for backwards compatibility with original API
+    /// </summary>
     public void Destroy()
     {
-        throw new NotImplementedException();
+        Dispose();
     }
 
     public IBattle Copy()
