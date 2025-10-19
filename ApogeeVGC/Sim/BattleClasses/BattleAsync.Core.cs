@@ -13,15 +13,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using static System.Collections.Specialized.BitVector32;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -125,6 +118,8 @@ public partial class BattleAsync : IBattle
     public Side P2 => Sides[1];
     public static Side P3 => throw new Exception("3v3 battles are not implemented.");
     public static Side P4 => throw new Exception("4v4 battles are not implemented.");
+
+    private HashSet<string> Hints { get; set; } = [];
 
     public BattleAsync(BattleOptions options, Library library)
     {
@@ -4039,98 +4034,206 @@ public partial class BattleAsync : IBattle
         return totalActions >= Sides.Count;
     }
 
-//    hint(hint: string, once?: boolean, side?: Side)
-//    {
-//        if (this.hints.has(side ? `${ side.id}|${ hint}` : hint)) return;
-
-//        if (side)
-//        {
-//            this.addSplit(side.id, ['-hint', hint]);
-//        }
-//        else
-//        {
-//            this.add('-hint', hint);
-//        }
-
-//        if (once) this.hints.add(side ? `${ side.id}|${ hint}` : hint);
-//    }
-
-//    addSplit(side: SideID, secret: Part[], shared?: Part[])
-//    {
-//        this.log.push(`| split |${ side}`);
-//        this.add(...secret);
-//        if (shared)
-//        {
-//            this.add(...shared);
-//        }
-//        else
-//        {
-//            this.log.push('');
-//        }
-//    }
-
-//    add(...parts: (Part | (() => { side: SideID, secret: string, shared: string }))[]) {
-//		if (!parts.some(part => typeof part === 'function')) {
-//			this.log.push(`|${parts.join('|')}`);
-//			return;
-//		}
-
-//		let side: SideID | null = null;
-//const secret = [];
-//const shared = [];
-//for (const part of parts) {
-//			if (typeof part === 'function') {
-//				const split = part();
-//if (side && side !== split.side) throw new Error("Multiple sides passed to add");
-//side = split.side;
-//secret.push(split.secret);
-//shared.push(split.shared);
-//			} else
-//{
-//    secret.push(part);
-//    shared.push(part);
-//}
-//		}
-//		this.addSplit(side!, secret, shared);
-//	}
-
-//	addMove(...args: (string | number | Function | AnyObject)[]) {
-//    this.lastMoveLine = this.log.length;
-//    // eslint-disable-next-line @typescript-eslint/no-base-to-string
-//    this.log.push(`|${ args.join('|')}`);
-//}
-
-//attrLastMove(...args: (string | number | Function | AnyObject)[]) {
-//    if (this.lastMoveLine < 0) return;
-//    if (this.log[this.lastMoveLine].startsWith('|-anim|'))
-//    {
-//        if (args.includes('[still]'))
-//        {
-//            this.log.splice(this.lastMoveLine, 1);
-//            this.lastMoveLine = -1;
-//            return;
-//        }
-//    }
-//    else if (args.includes('[still]'))
-//    {
-//        // If no animation plays, the target should never be known
-//        const parts = this.log[this.lastMoveLine].split('|');
-//        parts[4] = '';
-//        this.log[this.lastMoveLine] = parts.join('|');
-//    }
-//    // eslint-disable-next-line @typescript-eslint/no-base-to-string
-//    this.log[this.lastMoveLine] += `|${ args.join('|')}`;
-//}
-
-public void Hint(string hint, bool? once = null, Side? side = null)
+    /// <summary>
+    /// Sends a hint message to be displayed in the battle log.
+    /// Hints are typically used for warnings, clarifications, or educational messages.
+    /// </summary>
+    /// <param name="hint">The hint text to display</param>
+    /// <param name="once">If true, the hint will only be shown once per battle</param>
+    /// <param name="side">If specified, the hint is only visible to that side</param>
+    public void Hint(string hint, bool once = false, Side? side = null)
     {
-        throw new NotImplementedException();
+        // Create a unique key for this hint
+        string hintKey = side != null ? $"{side.Id}|{hint}" : hint;
+
+        // If this hint has already been shown and once=true, skip it
+        if (Hints.Contains(hintKey)) return;
+
+        // Send the hint to the appropriate recipient(s)
+        if (side != null)
+        {
+            AddSplit(side.Id, ["-hint", hint]);
+        }
+        else
+        {
+            Add("-hint", hint);
+        }
+
+        // Mark this hint as shown if once=true
+        if (once) Hints.Add(hintKey);
     }
 
-    // AddSplit()
-    // Add()
-    // AddMove()
-    // AttrLastMove()
+    /// <summary>
+    /// Adds a split message to the battle log.
+    /// Split messages show different content to each player (for hidden information like damage rolls).
+    /// Format: "| split |[sideId]" followed by secret line(s), then shared line(s).
+    /// </summary>
+    /// <param name="side">The side that can see the secret information</param>
+    /// <param name="secret">Message parts visible only to the specified side</param>
+    /// <param name="shared">Message parts visible to everyone (optional)</param>
+    public void AddSplit(SideId side, List<string> secret, List<string>? shared = null)
+    {
+        // Add the split marker
+        Log.Add($"| split |{side}");
+
+        // Add the secret message (visible only to specified side)
+        Add(secret.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
+
+        // Add the shared message (visible to everyone)
+        if (shared != null)
+        {
+            Add(shared.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
+        }
+        else
+        {
+            // Empty line indicates no shared content
+            Log.Add(string.Empty);
+        }
+    }
+
+    /// <summary>
+    /// Adds a message to the battle log.
+    /// Supports both simple string parts and functions that generate split messages.
+    /// Parts are joined with '|' separators according to the Showdown protocol.
+    /// </summary>
+    /// <param name="parts">
+    /// Message parts to add. Can be strings or functions that return split message data.
+    /// Functions should return a tuple of (SideId side, string secret, string shared).
+    /// </param>
+    public void Add(params ILogPart[] parts)
+    {
+        // Check if any parts are functions (for split messages)
+        bool hasFunctions = parts.Any(part => part is FunctionLogPart);
+
+        if (!hasFunctions)
+        {
+            // Simple case: just join the parts with pipes
+            string message = $"|{string.Join("|", parts)}";
+            Log.Add(message);
+            return;
+        }
+
+        // Complex case: process functions to create split messages
+        SideId? side = null;
+        var secret = new List<string>();
+        var shared = new List<string>();
+
+        foreach (ILogPart part in parts)
+        {
+            if (part is FunctionLogPart funcPart)
+            {
+                // Execute the function to get split message data
+                var split = funcPart.Generator();
+
+                // Verify all functions target the same side
+                if (side != null && side != split.Item1)
+                {
+                    throw new InvalidOperationException("Multiple sides passed to Add");
+                }
+
+                side = split.Item1;
+                secret.Add(split.Item2);
+                shared.Add(split.Item3);
+            }
+            else
+            {
+                // Non-function parts go to both secret and shared
+                string partStr = part.ToString() ?? string.Empty;
+                secret.Add(partStr);
+                shared.Add(partStr);
+            }
+        }
+
+        // Create the split message
+        AddSplit(side!.Value, secret, shared);
+    }
+
+    /// <summary>
+    /// Convenience overload for adding simple string messages.
+    /// </summary>
+    public void Add(params string[] parts)
+    {
+        Add(parts.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
+    }
+
+    /// <summary>
+    /// Adds a move usage line to the battle log.
+    /// This is tracked separately so attributes can be added to it via AttrLastMove().
+    /// </summary>
+    /// <param name="args">Message parts describing the move usage (pokemon, move, target, etc.)</param>
+    public void AddMove(params object[] args)
+    {
+        // Track this line's position for later attribute additions
+        LastMoveLine = Log.Count;
+
+        // Add the move line to the log
+        string message = $"|{string.Join("|", args)}";
+        Log.Add(message);
+    }
+
+    /// <summary>
+    /// Adds attributes to the most recently logged move.
+    /// Used to add tags like [still] (no animation), [miss], etc.
+    /// </summary>
+    /// <param name="args">Attribute parts to append to the last move line</param>
+    public void AttrLastMove(params object[] args)
+    {
+        // No last move to attribute to
+        if (LastMoveLine < 0) return;
+
+        // Special handling for animation lines with [still]
+        if (Log[LastMoveLine].StartsWith("|-anim|"))
+        {
+            if (args.Contains("[still]"))
+            {
+                // Remove the animation line entirely
+                Log.RemoveAt(LastMoveLine);
+                LastMoveLine = -1;
+                return;
+            }
+        }
+        else if (args.Contains("[still]"))
+        {
+            // If no animation plays, hide the target (index 4) to prevent information leak
+            string[] parts = Log[LastMoveLine].Split('|');
+            if (parts.Length > 4)
+            {
+                parts[4] = string.Empty;
+                Log[LastMoveLine] = string.Join("|", parts);
+            }
+        }
+
+        // Append the attributes to the last move line
+        string attributes = $"|{string.Join("|", args)}";
+        Log[LastMoveLine] += attributes;
+    }
+
+    //retargetLastMove(newTarget: Pokemon)
+    //{
+    //    if (this.lastMoveLine < 0) return;
+    //    const parts = this.log[this.lastMoveLine].split('|');
+    //    parts[4] = newTarget.toString();
+    //    this.log[this.lastMoveLine] = parts.join('|');
+    //}
+
+    //debug(activity: string)
+    //{
+    //    if (this.debugMode)
+    //    {
+    //        this.add('debug', activity);
+    //    }
+    //}
+
+    //getDebugLog()
+    //{
+    //    const channelMessages = extractChannelMessages(this.log.join('\n'), [-1]);
+    //    return channelMessages[-1].join('\n');
+    //}
+
+    //debugError(activity: string)
+    //{
+    //    this.add('debug', activity);
+    //}
 
     public void RetargetLastMove(Pokemon newTarget)
     {
