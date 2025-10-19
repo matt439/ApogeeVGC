@@ -506,7 +506,16 @@ public class Side
 
     public bool IsChoiceDone()
     {
-        throw new NotImplementedException();
+        if (RequestState == RequestState.None) return true;
+        if (Choice.ForcedSwitchesLeft > 0) return false;
+
+        if (RequestState == RequestState.TeamPreview)
+        {
+            return Choice.Actions.Count >= PickedTeamSize();
+        }
+
+        GetChoiceIndex();
+        return Choice.Actions.Count >= Active.Count;
     }
 
     public bool ChooseMove(string? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
