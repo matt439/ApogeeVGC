@@ -1,10 +1,12 @@
-﻿using ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Choices;
 
-public record ChosenAction
+public record ChosenAction : IActionChoice
 {
     public required ChoiceType Choice { get; init; }
     public Pokemon? Pokemon { get; init; }
@@ -15,5 +17,11 @@ public record ChosenAction
     public int? Index { get; init; }
     public Side? Side { get; init; }
     public MoveType? Terastallize { get; init; }
-    public int? Priority { get; init; }
+
+
+    public IntFalseUnion Order { get; init; } = int.MaxValue;
+    public int Priority { get; init; }
+    public int Speed { get; init; }
+    public int SubOrder { get; init; }
+    public int EffectOrder { get; init; }
 }

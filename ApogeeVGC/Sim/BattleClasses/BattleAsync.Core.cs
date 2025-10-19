@@ -3899,8 +3899,90 @@ public partial class BattleAsync : IBattle
 
     public void CommitChoices()
     {
-        throw new NotImplementedException();
+        UpdateSpeed();
+
+        // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
+        // fainting). When this happens, the rest of the turn is saved (and not
+        // re-sorted), but the new switch choices are sorted and inserted before
+        // the rest of the turn.
+        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+        Queue.Clear();
+
+        if (!AllChoicesDone())
+        {
+            throw new InvalidOperationException("Not all choices done");
+        }
+
+        // Log each side's choice to the input log
+        foreach (Side side in Sides)
+        {
+            string? choice = side.GetChoice().ToString();
+            if (!string.IsNullOrEmpty(choice))
+            {
+                InputLog.Add($">{side.Id} {choice}");
+            }
+        }
+
+        // Add each side's actions to the queue
+        foreach (Side side in Sides)
+        {
+            Queue.AddChoice(side.Choice.Actions);
+        }
+
+        ClearRequest();
+
+        // Sort the new actions by priority/speed
+        Queue.Sort();
+
+        // Append the old queue actions after the new ones
+        Queue.List.AddRange(oldQueue);
+
+        // Clear request state
+        RequestState = RequestState.None;
+        foreach (Side side in Sides)
+        {
+            side.ActiveRequest = null;
+        }
+
+        // Start executing the turn
+        TurnLoop();
+
+        // Workaround for tests - send updates if log is getting large
+        if (Log.Count - SentLogPos > 500)
+        {
+            SendUpdates();
+        }
     }
+
+    //undoChoice(sideid: SideID)
+    //{
+    //    const side = this.getSide(sideid);
+    //    if (!side.requestState) return;
+
+    //    if (side.choice.cantUndo)
+    //    {
+    //        side.emitChoiceError(`Can't undo: A trapping/disabling effect would cause undo to leak information`);
+
+    //        return;
+    //    }
+
+    //    let updated = false;
+    //    if (side.requestState === 'move')
+    //    {
+    //        for (const action of side.choice.actions) {
+    //            const pokemon = action.pokemon;
+    //            if (action.choice !== 'move' || !pokemon) continue;
+    //            if (side.updateRequestForPokemon(pokemon, req => side.updateDisabledRequest(pokemon, req)))
+    //            {
+    //                updated = true;
+    //            }
+    //        }
+    //    }
+
+    //    side.clearChoice();
+
+    //    if (updated) side.emitRequest(side.activeRequest!, true);
+    //}
 
     public void UndoChoice(SideId sideId)
     {

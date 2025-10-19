@@ -279,7 +279,7 @@ public class BattleQueue(IBattle battle)
         List.AddRange(resolvedChoices);
     }
 
-    public void AddChoice(List<IActionChoice> choices)
+    public void AddChoice(IEnumerable<IActionChoice> choices)
     {
         foreach (var resolvedChoices in choices.Select(choice => ResolveAction(choice)))
         {
