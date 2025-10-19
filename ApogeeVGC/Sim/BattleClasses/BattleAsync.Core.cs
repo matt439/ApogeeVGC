@@ -1404,7 +1404,7 @@ public partial class BattleAsync : IBattle
         RunPickTeam();
 
         // Add start action to queue
-        Queue.InserChoice(new StartGameChoice());
+        Queue.InserChoice(new StartGameAction());
 
         // Set mid-turn flag
         MidTurn = true;
@@ -2117,24 +2117,71 @@ public partial class BattleAsync : IBattle
         }
     }
 
-    public int Chain(int previousMod, int nextMod)
+    /// <summary>
+    /// Chains two damage modifiers together using fixed-point arithmetic.
+    /// This is used for combining multiple modifiers (STAB, type effectiveness, abilities, etc.)
+    /// in the damage calculation formula.
+    /// </summary>
+    /// <param name="previousMod">Previous modifier (number or [numerator, denominator])</param>
+    /// <param name="nextMod">Next modifier to chain (number or [numerator, denominator])</param>
+    /// <returns>The combined modifier as a decimal value</returns>
+    public double Chain(double previousMod, double nextMod)
     {
-        throw new NotImplementedException();
+        // Convert to fixed-point (4096-based)
+        int prevFixed = Trunc((int)(previousMod * 4096));
+        int nextFixed = Trunc((int)(nextMod * 4096));
+
+        // Apply chaining formula: M'' = ((M * M') + 0x800) >> 12
+        // The 0x800 (2048) is added for proper rounding
+        return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
-    public int Chain(List<int> previousMod, int nextMod)
+    public double Chain(int[] previousMod, double nextMod)
     {
-        throw new NotImplementedException();
+        if (previousMod.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
+                nameof(previousMod));
+        }
+
+        // Convert fraction to fixed-point
+        int prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
+        int nextFixed = Trunc((int)(nextMod * 4096));
+
+        return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
-    public int Chain(int previousMod, List<int> nextMod)
+    public double Chain(double previousMod, int[] nextMod)
     {
-        throw new NotImplementedException();
+        if (nextMod.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
+                nameof(nextMod));
+        }
+
+        int prevFixed = Trunc((int)(previousMod * 4096));
+        int nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
+
+        return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
-    public int Chain(List<int> previousMod, List<int> nextMod)
+    public double Chain(int[] previousMod, int[] nextMod)
     {
-        throw new NotImplementedException();
+        if (previousMod.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
+                nameof(previousMod));
+        }
+        if (nextMod.Length != 2)
+        {
+            throw new ArgumentException("Fraction array must have exactly 2 elements [numerator, denominator]",
+                nameof(nextMod));
+        }
+
+        int prevFixed = Trunc(previousMod[0] * 4096 / previousMod[1]);
+        int nextFixed = Trunc(nextMod[0] * 4096 / nextMod[1]);
+
+        return ((prevFixed * nextFixed + 2048) >> 12) / 4096.0;
     }
 
     public double ChainModify(int numerator, int denominator = 1)
@@ -3733,10 +3780,85 @@ public partial class BattleAsync : IBattle
         return false;
     }
 
+    /// <summary>
+    /// Generally called at the beginning of a turn, to go through the
+    /// turn one action at a time.
+    /// 
+    /// If there is a mid-turn decision (like U-Turn), this will return
+    /// and be called again later to resume the turn.
+    /// </summary>
     public void TurnLoop()
     {
-        throw new NotImplementedException();
+        // Add empty line for formatting
+        UiGenerator.PrintEmptyLine();
+
+        // Add timestamp in Unix epoch seconds
+        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        UiGenerator.PrintMessage($"t:|{timestamp}");
+
+        // Clear request state if it exists
+        if (RequestState != RequestState.None)
+        {
+            RequestState = RequestState.None;
+        }
+
+        // First time through - set up turn structure
+        if (!MidTurn)
+        {
+            // Insert BeforeTurn action at the front of the queue
+            Queue.InserChoice(new BeforeTurnAction());
+
+            // Add Residual action at the end of the queue
+            Queue.AddChoice(new ResidualAction());
+
+            MidTurn = true;
+        }
+
+        // Process actions one at a time
+        while (Queue.Shift() is { } action)
+        {
+            RunAction(action);
+
+            // Exit early if we need to wait for a request or battle ended
+            if (RequestState != RequestState.None || Ended)
+            {
+                return;
+            }
+        }
+
+        // Turn is complete
+        EndTurn();
+        MidTurn = false;
+        Queue.Clear();
     }
+
+    ///**
+    // * Takes a choice string passed from the client. Starts the next
+    // * turn if all required choices have been made.
+    // */
+    //choose(sideid: SideID, input: string)
+    //{
+    //    const side = this.getSide(sideid);
+
+    //    if (!side.choose(input))
+    //    {
+    //        if (!side.choice.error)
+    //        {
+    //            side.emitChoiceError(`Unknown error for choice: ${ input}. If you're not using a custom client, please report this as a bug.`);
+
+    //        }
+    //        return false;
+    //    }
+
+    //    if (!side.isChoiceDone())
+    //    {
+    //        side.emitChoiceError(`Incomplete choice: ${ input}
+    //        -missing other pokemon`);
+    //        return false;
+    //    }
+    //    if (this.allChoicesDone()) this.commitChoices();
+    //    return true;
+    //}
 
     public bool Choose(SideId sideId, Choice input)
     {
