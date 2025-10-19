@@ -44,4 +44,5 @@ public enum SendType
     Message,
     End,
     Update,
+    SideUpdate,
 }

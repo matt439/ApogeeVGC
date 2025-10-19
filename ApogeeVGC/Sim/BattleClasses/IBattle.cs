@@ -166,4 +166,6 @@ public interface IBattle
     T Sample<T>(IReadOnlyList<T> items);
 
     Action<SendType, IEnumerable<string>> Send { get; }
+
+    bool StrictChoices { get; }
 }

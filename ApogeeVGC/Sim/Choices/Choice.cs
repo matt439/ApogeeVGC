@@ -3,7 +3,7 @@
 public class Choice
 {
     public bool CantUndo { get; set; }
-    public string Error { get; init; } = string.Empty;
+    public string Error { get; set; } = string.Empty;
     public IReadOnlyList<ChosenAction> Actions { get; init; } = [];
     public int ForcedSwitchesLeft { get; init; }
     public int ForcedPassesLeft { get; init; }

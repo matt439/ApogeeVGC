@@ -5,9 +5,8 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
+using System.Text.Json;
 using System.Text.Json.Nodes;
-using ApogeeVGC.Sim.Ui;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -449,19 +448,60 @@ public class Side
     //    return false;
     //}
 
-    public void Send(List<ILogPart> parts)
+    public void Send(params object[] parts)
     {
-        throw new NotImplementedException();
+        string sideUpdate = "|" + string.Join("|", parts.Select(part =>
+        {
+            if (part is Func<Side, object> func)
+                return func(this).ToString() ?? string.Empty;
+            return part.ToString() ?? string.Empty;
+        }));
+
+        Battle.Send(SendType.SideUpdate, [$"{Id}\n{sideUpdate}"]);
     }
 
     public void EmitRequest(IChoiceRequest? update = null, bool updatedRequest = false)
     {
-        throw new NotImplementedException();
+        update ??= ActiveRequest;
+
+        if (updatedRequest && update is MoveRequest moveRequest)
+        {
+            moveRequest.Update = true;
+        }
+        else if (updatedRequest && update is SwitchRequest switchRequest)
+        {
+            switchRequest.Update = true;
+        }
+
+        string json = JsonSerializer.Serialize(update);
+        Battle.Send(SendType.SideUpdate, [$"{Id}\n|request|{json}"]);
+        ActiveRequest = update;
     }
 
-    public void EmitChoiceError(string message)
+    public bool EmitChoiceError(
+        string message,
+        (Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)? updateInfo = null)
     {
-        throw new NotImplementedException();
+        Choice.Error = message;
+
+        bool? updated = updateInfo.HasValue
+            ? UpdateRequestForPokemon(updateInfo.Value.pokemon, updateInfo.Value.update)
+            : null;
+
+        string type = updated == true ? "[Unavailable choice]" : "[Invalid choice]";
+        Battle.Send(SendType.SideUpdate, [$"{Id}\n|error|{type} {message}"]);
+
+        if (updated == true)
+        {
+            EmitRequest(ActiveRequest, true);
+        }
+
+        if (Battle.StrictChoices)
+        {
+            throw new InvalidOperationException($"{type} {message}");
+        }
+
+        return false;
     }
 
     public bool IsChoiceDone()
