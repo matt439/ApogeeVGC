@@ -146,6 +146,9 @@ public interface IBattle
 
     EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot, int? duration);
 
+    EffectState InitEffectState(EffectStateId id, Side target, Pokemon source, PokemonSlot sourceSlot,
+        bool isSlotCondition, int? duration);
+
     MoveCategory GetCategory(ActiveMove move);
 
     void Start();

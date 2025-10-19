@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 
@@ -38,7 +39,7 @@ public class EffectState
     public bool? KnockedOff { get; set; }
     public bool? Ending { get; set; }
     public bool? Resisted { get; set; }
-    public bool? IsSlotCondition { get; init; }
+    public bool? IsSlotCondition { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {

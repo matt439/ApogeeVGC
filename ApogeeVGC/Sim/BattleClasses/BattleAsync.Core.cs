@@ -3985,6 +3985,21 @@ public partial class BattleAsync : IBattle, IDisposable
         return state;
     }
 
+    public EffectState InitEffectState(EffectStateId id, Side target, Pokemon source, PokemonSlot sourceSlot,
+        bool isSlotCondition, int? duration)
+    {
+        // Use the first overload to handle basic initialization and effect ordering
+        // Side conditions are considered inactive for effect ordering purposes
+        EffectState state = InitEffectState(id, effectOrder: null, target: null);
+        // Add the additional properties specific to this overload
+        state.Target = target;
+        state.Source = source;
+        state.SourceSlot = sourceSlot;
+        state.IsSlotCondition = isSlotCondition;
+        state.Duration = duration;
+        return state;
+    }
+
     public void ClearEffectState(ref EffectState state)
     {
         EffectStateTarget? prevTarget = state.Target;
