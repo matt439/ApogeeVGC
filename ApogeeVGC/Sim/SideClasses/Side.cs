@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -121,6 +122,11 @@ public class Side
         Initialised = false;
     }
 
+    public JsonObject ToJson()
+    {
+        throw new NotImplementedException();
+    }
+
     private Pokemon? AddPokemon(PokemonSet set)
     {
         if (Pokemon.Count >= 24) return null;
@@ -158,12 +164,13 @@ public class Side
 
     public Pokemon? RandomFoe()
     {
-        throw new NotImplementedException();
+        var actives = Foes();
+        return actives.Count == 0 ? null : Battle.Sample(actives);
     }
 
     public List<Side> FoeSidesWithConditions()
     {
-        throw new NotImplementedException();
+        return [Foe];
     }
 
     public int FoePokemonLeft()
@@ -185,13 +192,46 @@ public class Side
 
     public List<Pokemon> ActiveTeam()
     {
-        throw new NotImplementedException();
+        return Battle.Sides[N % 2].Active.Concat(Battle.Sides[N % 2 + 2].Active).ToList();
     }
 
     public bool HasAlly(Pokemon pokemon)
     {
         return pokemon.Side == this;
     }
+
+    //addSideCondition(
+    //    status: string | Condition, source: Pokemon | 'debug' | null = null, sourceEffect: Effect | null = null
+    //) : boolean {
+    //    if (!source && this.battle.event?.target) source = this.battle.event.target;
+    //    if (source === 'debug') source = this.active[0];
+    //    if (!source) throw new Error(`setting sidecond without a source`);
+    //    if (!source.getSlot) source = (source as any as Side).active[0];
+
+    //    status = this.battle.dex.conditions.get(status);
+    //    if (this.sideConditions[status.id]) {
+    //        if (!(status as any).onSideRestart) return false;
+    //        return this.battle.singleEvent('SideRestart', status, this.sideConditions[status.id], this, source, sourceEffect);
+    //    }
+    //    this.sideConditions [status.id] = this.battle.initEffectState({
+    //        id: status.id,
+    //        target: this,
+    //        source,
+    //        sourceSlot: source.getSlot(),
+    //        duration: status.duration,
+    //    });
+    //    if (status.durationCallback) {
+
+    //        this.sideConditions[status.id].duration =
+    //            status.durationCallback.call(this.battle, this.active[0], source, sourceEffect);
+    //    }
+    //    if (!this.battle.singleEvent('SideStart', status, this.sideConditions[status.id], this, source, sourceEffect)) {
+    //        delete this.sideConditions[status.id];
+    //        return false;
+    //    }
+    //    this.battle.runEvent('SideConditionStart', this, source, status);
+    //    return true;
+    //}
 
     public bool AddSideCondition(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {

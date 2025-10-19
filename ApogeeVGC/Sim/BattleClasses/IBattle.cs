@@ -159,4 +159,6 @@ public interface IBattle
     int CanSwitch(Side side);
 
     RuleTable RuleTable { get; }
+
+    T Sample<T>(IReadOnlyList<T> items);
 }
