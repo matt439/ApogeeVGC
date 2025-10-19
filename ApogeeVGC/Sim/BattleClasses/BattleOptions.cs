@@ -7,7 +7,7 @@ public record BattleOptions
 {
     public Format? Format { get; init; }
     public FormatId Id { get; init; }
-    public Action<SendType, IReadOnlyList<string>>? Send { get; init; } // Output callback
+    public Action<SendType, IEnumerable<string>>? Send { get; init; } // Output callback
     public Prng? Prng { get; init; } // PRNG override (you usually don't need this, just pass a seed)
     public PrngSeed? Seed { get; init; } // PRNG seed
     public bool? Rated { get; init; } // Rated string

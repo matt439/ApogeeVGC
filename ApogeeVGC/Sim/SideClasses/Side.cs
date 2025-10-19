@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.Ui;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.SideClasses;
@@ -356,45 +357,99 @@ public class Side
         return false;
     }
 
-    //getSlotCondition(target: Pokemon | number, status: string | Effect)
-    //{
-    //    if (target instanceof Pokemon) target = target.position;
-    //    status = this.battle.dex.conditions.get(status) as Effect;
-    //    if (!this.slotConditions[target][status.id]) return null;
-    //    return status;
-    //}
-
-    //removeSlotCondition(target: Pokemon | number, status: string | Effect)
-    //{
-    //    if (target instanceof Pokemon) target = target.position;
-    //    status = this.battle.dex.conditions.get(status) as Effect;
-    //    if (!this.slotConditions[target][status.id]) return false;
-    //    this.battle.singleEvent('End', status, this.slotConditions[target][status.id], this.active[target]);
-    //    delete this.slotConditions[target][status.id];
-    //    return true;
-    //}
-
     public IEffect? GetSlotCondition(PokemonIntUnion target, Condition status)
     {
-        throw new NotImplementedException();
+        // Convert target to position if it's a Pokemon
+        int targetSlot = target switch
+        {
+            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.Position,
+            IntPokemonIntUnion intValue => intValue.Value,
+            _ => throw new InvalidOperationException("Invalid target type"),
+        };
+
+        // Validate slot index
+        if (targetSlot < 0 || targetSlot >= SlotConditions.Count)
+        {
+            throw new InvalidOperationException($"Invalid slot index: {targetSlot}");
+        }
+
+        // Check if condition exists in the slot
+        if (!SlotConditions[targetSlot].ContainsKey(status.Id))
+            return null;
+
+        return status;
     }
 
     public IEffect? GetSlotCondition(PokemonIntUnion target, ConditionId status)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return GetSlotCondition(target, condition);
     }
 
     public bool RemoveSlotCondition(PokemonIntUnion target, Condition status)
     {
-        throw new NotImplementedException();
+        // Convert target to position if it's a Pokemon
+        int targetSlot = target switch
+        {
+            PokemonPokemonIntUnion pokemon => pokemon.Pokemon.Position,
+            IntPokemonIntUnion intValue => intValue.Value,
+            _ => throw new InvalidOperationException("Invalid target type"),
+        };
+
+        // Validate slot index
+        if (targetSlot < 0 || targetSlot >= SlotConditions.Count)
+        {
+            throw new InvalidOperationException($"Invalid slot index: {targetSlot}");
+        }
+
+        // Check if condition exists in the slot
+        if (!SlotConditions[targetSlot].TryGetValue(status.Id, out EffectState? conditionState))
+            return false;
+
+        // Trigger End event
+        Battle.SingleEvent(EventId.End, status, conditionState, Active[targetSlot]);
+
+        // Remove the condition
+        SlotConditions[targetSlot].Remove(status.Id);
+
+        return true;
     }
 
     public bool RemoveSlotCondition(PokemonIntUnion target, ConditionId status)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return RemoveSlotCondition(target, condition);
     }
 
-    public void Send(List<object> parts)
+    //send(...parts: (string | number | Function | AnyObject)[]) {
+    //    const sideUpdate = '|' + parts.map(part => {
+    //        if (typeof part !== 'function') return part;
+    //        return part(this);
+    //    }).join('|');
+    //    this.battle.send('sideupdate', `${this.id
+    //    }\n${sideUpdate}`);
+    //}
+
+    //emitRequest(update: ChoiceRequest = this.activeRequest!, updatedRequest = false) {
+    //    if (updatedRequest) (this.activeRequest as MoveRequest | SwitchRequest).update = true;
+    //    this.battle.send('sideupdate', `${ this.id}\n | request |${ JSON.stringify(update)}`);
+    //    this.activeRequest = update;
+    //}
+
+    //emitChoiceError(
+    //    message: string, update ?: { pokemon: Pokemon, update: (req: PokemonMoveRequestData) => boolean | void }
+    //) {
+    //    this.choice.error = message;
+    //    const updated = update ? this.updateRequestForPokemon(update.pokemon, update.update) : null;
+    //    const type = `[${ updated ? 'Unavailable' : 'Invalid'}
+    //    choice]`;
+    //    this.battle.send('sideupdate', `${ this.id}\n | error |${ type} ${ message}`);
+    //    if (updated) this.emitRequest(this.activeRequest!, true);
+    //    if (this.battle.strictChoices) throw new Error(`${ type } ${ message}`);
+    //    return false;
+    //}
+
+    public void Send(List<ILogPart> parts)
     {
         throw new NotImplementedException();
     }

@@ -164,4 +164,6 @@ public interface IBattle
     RuleTable RuleTable { get; }
 
     T Sample<T>(IReadOnlyList<T> items);
+
+    Action<SendType, IEnumerable<string>> Send { get; }
 }

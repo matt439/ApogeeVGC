@@ -108,7 +108,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public static bool Fail => false;
     public const object? SilentFail = null;
 
-    public Action<SendType, IReadOnlyList<string>> Send { get; init; }
+    public Action<SendType, IEnumerable<string>> Send { get; init; }
 
     public Library Library { get; init; }
     public bool PrintDebug { get; init; }
@@ -161,7 +161,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // TeamGenerator
         // Hints
 
-        Send = options.Send ?? ((_, _) => { });
+        Send = options.Send ?? ((type, messages) => { });
 
         // InputOptions
 
