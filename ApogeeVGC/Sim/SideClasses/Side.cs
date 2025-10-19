@@ -200,67 +200,80 @@ public class Side
         return pokemon.Side == this;
     }
 
-    //addSideCondition(
-    //    status: string | Condition, source: Pokemon | 'debug' | null = null, sourceEffect: Effect | null = null
-    //) : boolean {
-    //    if (!source && this.battle.event?.target) source = this.battle.event.target;
-    //    if (source === 'debug') source = this.active[0];
-    //    if (!source) throw new Error(`setting sidecond without a source`);
-    //    if (!source.getSlot) source = (source as any as Side).active[0];
-
-    //    status = this.battle.dex.conditions.get(status);
-    //    if (this.sideConditions[status.id]) {
-    //        if (!(status as any).onSideRestart) return false;
-    //        return this.battle.singleEvent('SideRestart', status, this.sideConditions[status.id], this, source, sourceEffect);
-    //    }
-    //    this.sideConditions [status.id] = this.battle.initEffectState({
-    //        id: status.id,
-    //        target: this,
-    //        source,
-    //        sourceSlot: source.getSlot(),
-    //        duration: status.duration,
-    //    });
-    //    if (status.durationCallback) {
-
-    //        this.sideConditions[status.id].duration =
-    //            status.durationCallback.call(this.battle, this.active[0], source, sourceEffect);
-    //    }
-    //    if (!this.battle.singleEvent('SideStart', status, this.sideConditions[status.id], this, source, sourceEffect)) {
-    //        delete this.sideConditions[status.id];
-    //        return false;
-    //    }
-    //    this.battle.runEvent('SideConditionStart', this, source, status);
-    //    return true;
-    //}
-
     public bool AddSideCondition(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return AddSideCondition(condition, source, sourceEffect);
     }
 
     public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        // Step 1: Source resolution
+        if (source == null && Battle is BattleAsync { Event.Target: PokemonSingleEventTarget eventTarget })
+        {
+            source = eventTarget.Pokemon;
+        }
+        if (source == null)
+            throw new InvalidOperationException("Setting side condition without a source");
+
+        // Step 3: Restart handling
+        if (SideConditions.TryGetValue(status.Id, out EffectState? condition))
+        {
+            // If no onSideRestart handler, return false
+            if (status.OnRestart == null)
+                return false;
+
+            // Call the restart handler
+            RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, this, source, sourceEffect);
+            return restartResult is BoolRelayVar { Value: true };
+        }
+
+        // Step 4: Create EffectState
+        EffectState effectState = Battle.InitEffectState(status.Id, source, source.GetSlot(), status.Duration);
+
+        // Step 5: Duration callback
+        if (status.DurationCallback != null)
+        {
+            effectState.Duration = status.DurationCallback(Battle, Active[0], source, sourceEffect);
+        }
+
+        SideConditions[status.Id] = effectState;
+
+        // Step 6: SideStart event
+        RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, this, source, sourceEffect);
+        if (sideStartResult is not BoolRelayVar { Value: true })
+        {
+            SideConditions.Remove(status.Id);
+            return false;
+        }
+
+        // Step 7: Run SideConditionStart event
+        Battle.RunEvent(EventId.SideConditionStart, this, source, status);
+
+        // Step 8: Success
+        return true;
     }
 
-    public IEffect? GetSideCondition(ConditionId status)
+    public Condition? GetSideCondition(ConditionId status)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return !SideConditions.ContainsKey(condition.Id) ? null : condition;
     }
 
-    public IEffect? GetSideCondition(IEffect status)
+    public Condition? GetSideCondition(Condition status)
     {
-        throw new NotImplementedException();
+        return !SideConditions.ContainsKey(status.Id) ? null : status;
     }
 
-    public IEffect? GetSideConditionData(ConditionId status)
+    public EffectState? GetSideConditionData(ConditionId status)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return SideConditions.GetValueOrDefault(condition.Id);
     }
 
-    public IEffect? GetSideConditionData(IEffect status)
+    public EffectState? GetSideConditionData(Condition status)
     {
-        throw new NotImplementedException();
+        return SideConditions.GetValueOrDefault(status.Id);
     }
 
     public bool RemoveSideCondition(ConditionId status)
@@ -276,6 +289,42 @@ public class Side
     {
         return RemoveSideCondition(status.Id);
     }
+
+    //addSlotCondition(
+    //    target: Pokemon | number, status: string | Condition, source: Pokemon | 'debug' | null = null,
+    //sourceEffect: Effect | null = null
+    //)
+    //{
+    //    source ??= this.battle.event?.target || null;
+    //    if (source === 'debug') source = this.active[0];
+    //    if (target instanceof Pokemon) target = target.position;
+    //    if (!source) throw new Error(`setting sidecond without a source`);
+
+    //    status = this.battle.dex.conditions.get(status);
+    //    if (this.slotConditions[target][status.id]) {
+    //        if (!status.onRestart) return false;
+    //        return this.battle.singleEvent('Restart', status, this.slotConditions[target][status.id], this, source, sourceEffect);
+    //    }
+
+    //    const conditionState = this.slotConditions[target][status.id] = this.battle.initEffectState({
+    //        id: status.id,
+    //        target: this,
+    //        source,
+    //        sourceSlot: source.getSlot(),
+    //        isSlotCondition: true,
+    //        duration: status.duration,
+
+    //    });
+    //    if (status.durationCallback) {
+    //        conditionState.duration =
+    //            status.durationCallback.call(this.battle, this.active[0], source, sourceEffect);
+    //    }
+    //    if (!this.battle.singleEvent('Start', status, conditionState, this.active[target], source, sourceEffect)) {
+    //        delete this.slotConditions[target][status.id];
+    //        return false;
+    //    }
+    //    return true;
+    //}
 
     public RelayVar AddSlotCondition(PokemonIntUnion target, ConditionId status, Pokemon? source = null,
         IEffect? sourceEffect = null)
