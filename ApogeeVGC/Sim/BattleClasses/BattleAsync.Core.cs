@@ -17,6 +17,9 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net.Sockets;
 using static System.Collections.Specialized.BitVector32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -4010,12 +4013,116 @@ public partial class BattleAsync : IBattle
         }
     }
 
+    /// <summary>
+    /// Returns true if both decisions are complete.
+    /// Checks if all sides have completed their choices for the current turn.
+    /// When supportCancel is disabled, locks completed choices to prevent information leaks.
+    /// </summary>
+    /// <returns>True if all sides have completed their choices, false otherwise</returns>
     public bool AllChoicesDone()
     {
-        throw new NotImplementedException();
+        int totalActions = 0;
+
+        foreach (Side side in Sides.Where(side => side.IsChoiceDone()))
+        {
+            // If cancellation is not supported, lock the choice to prevent undoing
+            // This prevents information leaks from trapping/disabling effects
+            if (!SupportCancel)
+            {
+                Choice choice = side.GetChoice();
+                choice.CantUndo = true;
+            }
+
+            totalActions++;
+        }
+
+        return totalActions >= Sides.Count;
     }
 
-    public void Hint(string hint, bool? once = null, Side? side = null)
+//    hint(hint: string, once?: boolean, side?: Side)
+//    {
+//        if (this.hints.has(side ? `${ side.id}|${ hint}` : hint)) return;
+
+//        if (side)
+//        {
+//            this.addSplit(side.id, ['-hint', hint]);
+//        }
+//        else
+//        {
+//            this.add('-hint', hint);
+//        }
+
+//        if (once) this.hints.add(side ? `${ side.id}|${ hint}` : hint);
+//    }
+
+//    addSplit(side: SideID, secret: Part[], shared?: Part[])
+//    {
+//        this.log.push(`| split |${ side}`);
+//        this.add(...secret);
+//        if (shared)
+//        {
+//            this.add(...shared);
+//        }
+//        else
+//        {
+//            this.log.push('');
+//        }
+//    }
+
+//    add(...parts: (Part | (() => { side: SideID, secret: string, shared: string }))[]) {
+//		if (!parts.some(part => typeof part === 'function')) {
+//			this.log.push(`|${parts.join('|')}`);
+//			return;
+//		}
+
+//		let side: SideID | null = null;
+//const secret = [];
+//const shared = [];
+//for (const part of parts) {
+//			if (typeof part === 'function') {
+//				const split = part();
+//if (side && side !== split.side) throw new Error("Multiple sides passed to add");
+//side = split.side;
+//secret.push(split.secret);
+//shared.push(split.shared);
+//			} else
+//{
+//    secret.push(part);
+//    shared.push(part);
+//}
+//		}
+//		this.addSplit(side!, secret, shared);
+//	}
+
+//	addMove(...args: (string | number | Function | AnyObject)[]) {
+//    this.lastMoveLine = this.log.length;
+//    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+//    this.log.push(`|${ args.join('|')}`);
+//}
+
+//attrLastMove(...args: (string | number | Function | AnyObject)[]) {
+//    if (this.lastMoveLine < 0) return;
+//    if (this.log[this.lastMoveLine].startsWith('|-anim|'))
+//    {
+//        if (args.includes('[still]'))
+//        {
+//            this.log.splice(this.lastMoveLine, 1);
+//            this.lastMoveLine = -1;
+//            return;
+//        }
+//    }
+//    else if (args.includes('[still]'))
+//    {
+//        // If no animation plays, the target should never be known
+//        const parts = this.log[this.lastMoveLine].split('|');
+//        parts[4] = '';
+//        this.log[this.lastMoveLine] = parts.join('|');
+//    }
+//    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+//    this.log[this.lastMoveLine] += `|${ args.join('|')}`;
+//}
+
+public void Hint(string hint, bool? once = null, Side? side = null)
     {
         throw new NotImplementedException();
     }

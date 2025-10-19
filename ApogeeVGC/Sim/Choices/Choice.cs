@@ -1,8 +1,8 @@
 ﻿namespace ApogeeVGC.Sim.Choices;
 
-public record Choice
+public class Choice
 {
-    public bool CantUndo { get; init; }
+    public bool CantUndo { get; set; }
     public string Error { get; init; } = string.Empty;
     public IReadOnlyList<ChosenAction> Actions { get; init; } = [];
     public int ForcedSwitchesLeft { get; init; }
