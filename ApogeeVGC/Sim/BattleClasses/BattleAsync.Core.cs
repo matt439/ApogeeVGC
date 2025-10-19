@@ -3832,42 +3832,69 @@ public partial class BattleAsync : IBattle
         Queue.Clear();
     }
 
-    ///**
-    // * Takes a choice string passed from the client. Starts the next
-    // * turn if all required choices have been made.
-    // */
-    //choose(sideid: SideID, input: string)
-    //{
-    //    const side = this.getSide(sideid);
-
-    //    if (!side.choose(input))
-    //    {
-    //        if (!side.choice.error)
-    //        {
-    //            side.emitChoiceError(`Unknown error for choice: ${ input}. If you're not using a custom client, please report this as a bug.`);
-
-    //        }
-    //        return false;
-    //    }
-
-    //    if (!side.isChoiceDone())
-    //    {
-    //        side.emitChoiceError(`Incomplete choice: ${ input}
-    //        -missing other pokemon`);
-    //        return false;
-    //    }
-    //    if (this.allChoicesDone()) this.commitChoices();
-    //    return true;
-    //}
-
+    /// <summary>
+    /// Takes a choice passed from the client. Starts the next
+    /// turn if all required choices have been made.
+    /// </summary>
+    /// <param name="sideId">The ID of the side making the choice</param>
+    /// <param name="input">The choice being made</param>
+    /// <returns>True if the choice was valid and processed, false otherwise</returns>
     public bool Choose(SideId sideId, Choice input)
     {
-        throw new NotImplementedException();
+        Side side = GetSide(sideId);
+
+        if (!side.Choose(input))
+        {
+            if (string.IsNullOrEmpty(side.GetChoice().Error))
+            {
+                side.EmitChoiceError(
+                    $"Unknown error for choice: {input}. If you're not using a custom client, please report this as a bug.");
+            }
+            return false;
+        }
+
+        if (!side.IsChoiceDone())
+        {
+            side.EmitChoiceError($"Incomplete choice: {input} - missing other pokemon");
+            return false;
+        }
+
+        if (AllChoicesDone())
+        {
+            CommitChoices();
+        }
+
+        return true;
     }
 
-    public void MakeChoices(List<Choice> inputs)
+    /// <summary>
+    /// Convenience method for easily making choices for multiple sides.
+    /// If inputs are provided, applies them to the corresponding sides.
+    /// If no inputs are provided, auto-chooses for all sides.
+    /// </summary>
+    /// <param name="inputs">Optional list of choices for each side. Pass null or empty list for auto-choice.</param>
+    public void MakeChoices(List<Choice>? inputs = null)
     {
-        throw new NotImplementedException();
+        if (inputs is { Count: > 0 })
+        {
+            // Apply provided choices to each corresponding side
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                Choice? input = inputs[i];
+                Sides[i].Choose(input);
+            }
+        }
+        else
+        {
+            // Auto-choose for all sides
+            foreach (Side side in Sides)
+            {
+                side.AutoChoose();
+            }
+        }
+
+        // Commit all choices
+        CommitChoices();
     }
 
     public void CommitChoices()

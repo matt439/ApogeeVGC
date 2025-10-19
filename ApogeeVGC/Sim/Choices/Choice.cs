@@ -3,7 +3,7 @@
 public record Choice
 {
     public bool CantUndo { get; init; }
-    //public required string Error { get; init; }
+    public string Error { get; init; } = string.Empty;
     public IReadOnlyList<ChosenAction> Actions { get; init; } = [];
     public int ForcedSwitchesLeft { get; init; }
     public int ForcedPassesLeft { get; init; }
