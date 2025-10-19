@@ -1419,3 +1419,17 @@ public abstract record FormatHasValue
 public record BoolFormatHasValue(bool Value) : FormatHasValue;
 public record IntegerFormatHasValue : FormatHasValue;
 public record PositiveIntegerFormatHasValue : FormatHasValue;
+
+
+
+
+/// <summary>
+/// MoveId | int
+/// </summary>
+public abstract record MoveIdIntUnion
+{
+    public static implicit operator MoveIdIntUnion(MoveId moveId) => new MoveIdMoveIdIntUnion(moveId);
+    public static implicit operator MoveIdIntUnion(int value) => new IntMoveIdIntUnion(value);
+}
+public record MoveIdMoveIdIntUnion(MoveId MoveId) : MoveIdIntUnion;
+public record IntMoveIdIntUnion(int Value) : MoveIdIntUnion;

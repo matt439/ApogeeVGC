@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Text.Json;
@@ -518,14 +519,246 @@ public class Side
         return Choice.Actions.Count >= Active.Count;
     }
 
-    public bool ChooseMove(string? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
+    public bool ChooseMove(MoveIdIntUnion? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
     {
-        throw new NotImplementedException();
+        // Step 1: Validate request state
+        if (RequestState != RequestState.Move)
+        {
+            return EmitChoiceError($"Can't move: You need a {RequestState} response");
+        }
+
+        // Step 2: Get the active pokemon index
+        int index = GetChoiceIndex();
+        if (index >= Active.Count)
+        {
+            return EmitChoiceError("Can't move: You sent more choices than unfainted Pokémon.");
+        }
+
+        // Step 3: Determine auto-choose and get pokemon
+        bool autoChoose = moveText == null;
+        Pokemon pokemon = Active[index];
+
+        // Step 4: Parse moveText (name or index)
+        PokemonMoveRequestData request = pokemon.GetMoveRequestData();
+        var moveid = MoveId.None;
+
+        if (autoChoose) moveText = 1; // Default to first move
+
+        // Handle the union type: either MoveId or int
+        switch (moveText)
+        {
+            case IntMoveIdIntUnion intUnion:
+            {
+                // Parse a one-based move index
+                int moveIndex = intUnion.Value - 1;
+                if (moveIndex < 0 || moveIndex >= request.Moves.Count)
+                {
+                    return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
+                }
+                moveid = request.Moves[moveIndex].Id;
+                break;
+            }
+            case MoveIdMoveIdIntUnion moveIdUnion:
+            {
+                // Parse a move ID directly
+                moveid = moveIdUnion.MoveId;
+            
+                // Find the move in the request
+                bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
+
+                if (!found)
+                {
+                    return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+                }
+                break;
+            }
+        }
+
+        // Step 5: Get available moves
+        var moves = pokemon.GetMoves();
+        
+        // Step 6: Auto-choose first available move if needed
+        if (autoChoose)
+        {
+            foreach (PokemonMoveData pokemonMoveData in request.Moves)
+            {
+                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion { Value: true })
+                {
+                    continue;
+                }
+
+                moveid = pokemonMoveData.Id;
+                break;
+            }
+        }
+
+        Move move = Battle.Library.Moves[moveid];
+
+        // Step 7: Validate targeting
+        if (autoChoose)
+        {
+            targetLoc = 0;
+        }
+        else if (Battle.Actions.TargetTypeChoices(move.Target))
+        {
+            if (targetLoc == 0 && Active.Count >= 2)
+            {
+                return EmitChoiceError($"Can't move: {move.Name} needs a target");
+            }
+            if (!Battle.ValidTargetLoc(targetLoc, pokemon, move.Target))
+            {
+                return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
+            }
+        }
+        else
+        {
+            if (targetLoc != 0)
+            {
+                return EmitChoiceError($"Can't move: You can't choose a target for {move.Name}");
+            }
+        }
+
+        // Step 8: Handle locked moves (multi-turn moves like Outrage)
+        var lockedMove = pokemon.GetLockedMove();
+        if (lockedMove != null)
+        {
+            int lockedMoveTargetLoc = pokemon.LastMoveTargetLoc ?? 0;
+            
+            // Note: In the original TS code, it checks pokemon.volatiles[lockedMoveID]?.targetLoc
+            // but EffectState doesn't have a targetLoc property in our C# implementation
+            // This would need to be added to EffectState if this functionality is needed
+
+            if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
+
+            Choice.Actions = [.. Choice.Actions, new ChosenAction
+            {
+                Choice = ChoiceType.Move,
+                Pokemon = pokemon,
+                TargetLoc = lockedMoveTargetLoc,
+                MoveId = lockedMove.Value,
+            }];
+
+            return true;
+        }
+
+        // Step 9: Handle Struggle when no moves have PP
+        if (moves.Count == 0)
+        {
+            // Gen 4 and earlier announce Pokemon has no moves left
+            if (Battle.Gen <= 4)
+            {
+                Send("-activate", pokemon, "move: Struggle");
+            }
+
+            if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
+
+            Choice.Actions = [.. Choice.Actions, new ChosenAction
+            {
+                Choice = ChoiceType.Move,
+                Pokemon = pokemon,
+                MoveId = MoveId.Struggle,
+            }];
+
+            return true;
+        }
+
+        // Step 10: Check for disabled moves
+        bool isEnabled = false;
+        string disabledSource = string.Empty;
+
+        foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
+        {
+            if (m.Disabled is null or BoolMoveIdBoolUnion { Value: false })
+            {
+                isEnabled = true;
+                break;
+            }
+            else if (m.DisabledSource != null)
+            {
+                disabledSource = m.DisabledSource.Name;
+            }
+        }
+
+        if (!isEnabled)
+        {
+            if (autoChoose)
+            {
+                throw new InvalidOperationException("autoChoose chose a disabled move");
+            }
+
+            return EmitChoiceError(
+                $"Can't move: {pokemon.Name}'s {move.Name} is disabled",
+                (pokemon, req =>
+                    UpdateDisabledRequestForMove(pokemon, req, moveid, disabledSource))
+            );
+        }
+
+        // Step 11: Terastallization (Gen 9 only)
+        bool terastallize = eventType == EventType.Terastallize;
+
+        if (terastallize && request.CanTerastallize is null or FalseMoveTypeFalseUnion)
+        {
+            return EmitChoiceError($"Can't move: {pokemon.Name} can't Terastallize.");
+        }
+
+        if (terastallize && Choice.Terastallize)
+        {
+            return EmitChoiceError("Can't move: You can only Terastallize once per battle.");
+        }
+
+        if (terastallize && Battle.Gen != 9)
+        {
+            return EmitChoiceError("Can't move: You can only Terastallize in Gen 9.");
+        }
+
+        // Step 12: Add action to choice
+        Choice.Actions = [.. Choice.Actions, new ChosenAction
+        {
+            Choice = ChoiceType.Move,
+            Pokemon = pokemon,
+            TargetLoc = targetLoc,
+            MoveId = moveid,
+            Terastallize = terastallize ? pokemon.TeraType : null,
+        }];
+
+        // Step 13: Handle maybeDisabled flag
+        if ((pokemon.MaybeDisabled) && 
+            (Battle.GameType == GameType.Singles || 
+             (Battle.Gen <= 3 && !Battle.Actions.TargetTypeChoices(move.Target))))
+        {
+            Choice.CantUndo = true;
+        }
+
+        // Step 14: Update choice flags
+        if (terastallize)
+        {
+            Choice.Terastallize = true;
+        }
+
+        return true;
     }
 
-    public bool ChooseMove(int? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
+    private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req, 
+        MoveId moveid, string disabledSource)
     {
-        throw new NotImplementedException();
+        bool updated = UpdateDisabledRequest(pokemon, req);
+
+        foreach (PokemonMoveData m in req.Moves)
+        {
+            if (m.Id != moveid) continue;
+
+            // Check if we need to update the disabled state
+            bool needsUpdate = m.Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
+                               m.DisabledSource?.Name != disabledSource;
+
+            if (needsUpdate)
+            {
+                updated = true;
+            }
+            break;
+        }
+
+        return BoolVoidUnion.FromBool(updated);
     }
 
     public bool UpdateDisabledRequest(Pokemon pokemon, PokemonMoveRequestData req)

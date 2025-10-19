@@ -196,7 +196,7 @@ public class BattleActions(IBattle battle)
         throw new NotImplementedException();
     }
 
-    public bool TargetTypeChoices(PokemonType type)
+    public bool TargetTypeChoices(MoveTarget type)
     {
         throw new NotImplementedException();
     }
