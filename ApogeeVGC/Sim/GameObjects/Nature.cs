@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
-public enum NatureType
+public enum NatureId
 {
     Adamant,
     Bashful,
@@ -30,11 +30,12 @@ public enum NatureType
     Sassy,
     Serious,
     Timid,
+    None, // Used to hide nature from the opponent
 }
 
 public record Nature : IBasicEffect
 {
-    public required NatureType Type { get; init; }
+    public required NatureId Id { get; init; }
     public StatIdExceptHp? Plus { get; init; }
     public StatIdExceptHp? Minus { get; init; }
 
@@ -57,7 +58,7 @@ public record Nature : IBasicEffect
     {
         return new Nature
         {
-            Type = Type,
+            Id = Id,
             Plus = Plus,
             Minus = Minus,
         };

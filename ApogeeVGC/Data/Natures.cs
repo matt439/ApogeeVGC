@@ -7,152 +7,152 @@ namespace ApogeeVGC.Data;
 
 public record Natures
 {
-    public IReadOnlyDictionary<NatureType, Nature> NatureData { get; }
+    public IReadOnlyDictionary<NatureId, Nature> NatureData { get; }
 
     public Natures()
     {
-        NatureData = new ReadOnlyDictionary<NatureType, Nature>(_natureData);
+        NatureData = new ReadOnlyDictionary<NatureId, Nature>(_natureData);
     }
 
-    private readonly Dictionary<NatureType, Nature> _natureData = new()
+    private readonly Dictionary<NatureId, Nature> _natureData = new()
     {
-        [NatureType.Adamant] = new Nature
+        [NatureId.Adamant] = new Nature
         {
-            Type = NatureType.Adamant,
+            Id = NatureId.Adamant,
             Plus = StatIdExceptHp.Atk,
             Minus = StatIdExceptHp.SpA,
         },
-        [NatureType.Bashful] = new Nature
+        [NatureId.Bashful] = new Nature
         {
-            Type = NatureType.Bashful,
+            Id = NatureId.Bashful,
         },
-        [NatureType.Bold] = new Nature
+        [NatureId.Bold] = new Nature
         {
-            Type = NatureType.Bold,
+            Id = NatureId.Bold,
             Plus = StatIdExceptHp.Def,
             Minus = StatIdExceptHp.Atk,
         },
-        [NatureType.Brave] = new Nature
+        [NatureId.Brave] = new Nature
         {
-            Type = NatureType.Brave,
+            Id = NatureId.Brave,
             Plus = StatIdExceptHp.Atk,
             Minus = StatIdExceptHp.Spe,
         },
-        [NatureType.Calm] = new Nature
+        [NatureId.Calm] = new Nature
         {
-            Type = NatureType.Calm,
+            Id = NatureId.Calm,
             Plus = StatIdExceptHp.SpD,
             Minus = StatIdExceptHp.Atk,
         },
-        [NatureType.Careful] = new Nature
+        [NatureId.Careful] = new Nature
         {
-            Type = NatureType.Careful,
+            Id = NatureId.Careful,
             Plus = StatIdExceptHp.SpD,
             Minus = StatIdExceptHp.SpA,
         },
-        [NatureType.Docile] = new Nature
+        [NatureId.Docile] = new Nature
         {
-            Type = NatureType.Docile,
+            Id = NatureId.Docile,
         },
-        [NatureType.Gentle] = new Nature
+        [NatureId.Gentle] = new Nature
         {
-            Type = NatureType.Gentle,
+            Id = NatureId.Gentle,
             Plus = StatIdExceptHp.SpD,
             Minus = StatIdExceptHp.Def,
         },
-        [NatureType.Hardy] = new Nature
+        [NatureId.Hardy] = new Nature
         {
-            Type = NatureType.Hardy,
+            Id = NatureId.Hardy,
         },
-        [NatureType.Hasty] = new Nature
+        [NatureId.Hasty] = new Nature
         {
-            Type = NatureType.Hasty,
+            Id = NatureId.Hasty,
             Plus = StatIdExceptHp.Spe,
             Minus = StatIdExceptHp.Def,
         },
-        [NatureType.Impish] = new Nature
+        [NatureId.Impish] = new Nature
         {
-            Type = NatureType.Impish,
+            Id = NatureId.Impish,
             Plus = StatIdExceptHp.Def,
             Minus = StatIdExceptHp.SpA,
         },
-        [NatureType.Jolly] = new Nature
+        [NatureId.Jolly] = new Nature
         {
-            Type = NatureType.Jolly,
+            Id = NatureId.Jolly,
             Plus = StatIdExceptHp.Spe,
             Minus = StatIdExceptHp.SpA,
         },
-        [NatureType.Lax] = new Nature
+        [NatureId.Lax] = new Nature
         {
-            Type = NatureType.Lax,
+            Id = NatureId.Lax,
             Plus = StatIdExceptHp.Def,
             Minus = StatIdExceptHp.SpD,
         },
-        [NatureType.Lonely] = new Nature
+        [NatureId.Lonely] = new Nature
         {
-            Type = NatureType.Lonely,
+            Id = NatureId.Lonely,
             Plus = StatIdExceptHp.Atk,
             Minus = StatIdExceptHp.Def,
         },
-        [NatureType.Mild] = new Nature
+        [NatureId.Mild] = new Nature
         {
-            Type = NatureType.Mild,
+            Id = NatureId.Mild,
             Plus = StatIdExceptHp.SpA,
             Minus = StatIdExceptHp.Def,
         },
-        [NatureType.Modest] = new Nature
+        [NatureId.Modest] = new Nature
         {
-            Type = NatureType.Modest,
+            Id = NatureId.Modest,
             Plus = StatIdExceptHp.SpA,
             Minus = StatIdExceptHp.Atk,
         },
-        [NatureType.Naive] = new Nature
+        [NatureId.Naive] = new Nature
         {
-            Type = NatureType.Naive,
+            Id = NatureId.Naive,
             Plus = StatIdExceptHp.Spe,
             Minus = StatIdExceptHp.SpD,
         },
-        [NatureType.Naughty] = new Nature
+        [NatureId.Naughty] = new Nature
         {
-            Type = NatureType.Naughty,
+            Id = NatureId.Naughty,
             Plus = StatIdExceptHp.Atk,
             Minus = StatIdExceptHp.SpD,
         },
-        [NatureType.Quiet] = new Nature
+        [NatureId.Quiet] = new Nature
         {
-            Type = NatureType.Quiet,
+            Id = NatureId.Quiet,
             Plus = StatIdExceptHp.SpA,
             Minus = StatIdExceptHp.Spe,
         },
-        [NatureType.Quirky] = new Nature
+        [NatureId.Quirky] = new Nature
         {
-            Type = NatureType.Quirky,
+            Id = NatureId.Quirky,
         },
-        [NatureType.Rash] = new Nature
+        [NatureId.Rash] = new Nature
         {
-            Type = NatureType.Rash,
+            Id = NatureId.Rash,
             Plus = StatIdExceptHp.SpA,
             Minus = StatIdExceptHp.SpD,
         },
-        [NatureType.Relaxed] = new Nature
+        [NatureId.Relaxed] = new Nature
         {
-            Type = NatureType.Relaxed,
+            Id = NatureId.Relaxed,
             Plus = StatIdExceptHp.Def,
             Minus = StatIdExceptHp.Spe,
         },
-        [NatureType.Sassy] = new Nature
+        [NatureId.Sassy] = new Nature
         {
-            Type = NatureType.Sassy,
+            Id = NatureId.Sassy,
             Plus = StatIdExceptHp.SpD,
             Minus = StatIdExceptHp.Spe,
         },
-        [NatureType.Serious] = new Nature
+        [NatureId.Serious] = new Nature
         {
-            Type = NatureType.Serious,
+            Id = NatureId.Serious,
         },
-        [NatureType.Timid] = new Nature
+        [NatureId.Timid] = new Nature
         {
-            Type = NatureType.Timid,
+            Id = NatureId.Timid,
             Plus = StatIdExceptHp.Spe,
             Minus = StatIdExceptHp.Atk,
         },

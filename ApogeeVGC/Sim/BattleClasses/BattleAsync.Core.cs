@@ -380,7 +380,7 @@ public partial class BattleAsync : IBattle
     /// More importantly, it makes it easiest to resolve speed ties properly through
     /// randomization via Prng.Shuffle().
     /// </summary>
-    /// <typeparam name="T">Type that implements IPriorityComparison for sorting</typeparam>
+    /// <typeparam name="T">Id that implements IPriorityComparison for sorting</typeparam>
     /// <param name="list">List to sort in-place</param>
     /// <param name="comparator">Comparison function (defaults to ComparePriority)</param>
     public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null)
@@ -4208,51 +4208,66 @@ public partial class BattleAsync : IBattle
         Log[LastMoveLine] += attributes;
     }
 
-    //retargetLastMove(newTarget: Pokemon)
-    //{
-    //    if (this.lastMoveLine < 0) return;
-    //    const parts = this.log[this.lastMoveLine].split('|');
-    //    parts[4] = newTarget.toString();
-    //    this.log[this.lastMoveLine] = parts.join('|');
-    //}
-
-    //debug(activity: string)
-    //{
-    //    if (this.debugMode)
-    //    {
-    //        this.add('debug', activity);
-    //    }
-    //}
-
-    //getDebugLog()
-    //{
-    //    const channelMessages = extractChannelMessages(this.log.join('\n'), [-1]);
-    //    return channelMessages[-1].join('\n');
-    //}
-
-    //debugError(activity: string)
-    //{
-    //    this.add('debug', activity);
-    //}
-
+    /// <summary>
+    /// Updates the target of the most recently logged move.
+    /// Used when a move's target changes after it was initially logged (e.g., through redirection).
+    /// </summary>
+    /// <param name="newTarget">The new target Pokémon to display in the move log</param>
     public void RetargetLastMove(Pokemon newTarget)
     {
-        throw new NotImplementedException();
+        // No last move to retarget
+        if (LastMoveLine < 0) return;
+
+        // Parse the log line (format: |move|attacker|moveName|target|...)
+        string[] parts = Log[LastMoveLine].Split('|');
+
+        // Index 4 is the target field in the move log format
+        if (parts.Length > 4)
+        {
+            parts[4] = newTarget.ToString();
+            Log[LastMoveLine] = string.Join("|", parts);
+        }
     }
 
-    public void Debug(string activityString)
+    /// <summary>
+    /// Logs debug information to the battle log.
+    /// Only adds the message if debug mode is enabled.
+    /// </summary>
+    /// <param name="activity">The debug message to log</param>
+    public void Debug(string activity)
     {
-        throw new NotImplementedException();
+        if (DebugMode)
+        {
+            Add("debug", activity);
+        }
     }
 
+    /// <summary>
+    /// Extracts and returns all debug messages from the battle log.
+    /// In the TypeScript version, this uses extractChannelMessages with channel -1.
+    /// </summary>
+    /// <returns>A string containing all debug messages, separated by newlines</returns>
     public string GetDebugLog()
     {
-        throw new NotImplementedException();
+        // Extract debug channel messages (channel -1 in the original)
+        // This would need the extractChannelMessages function implementation
+        // For now, we'll filter for debug messages manually
+        var debugMessages = Log
+            .Where(line => line.StartsWith("|debug|"))
+            .Select(line => line[7..]); // Remove "|debug|" prefix
+
+        return string.Join("\n", debugMessages);
     }
 
-    public void DebugError()
+    /// <summary>
+    /// Logs a debug error message to the battle log.
+    /// Unlike Debug(), this always logs regardless of debug mode setting.
+    /// Used for important errors that should always be recorded.
+    /// </summary>
+    /// <param name="activity">The error message to log</param>
+    public void DebugError(string activity)
     {
-        throw new NotImplementedException();
+        Add("debug", activity);
     }
 
     private static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
@@ -4260,9 +4275,92 @@ public partial class BattleAsync : IBattle
         return options.Team ?? throw new InvalidOperationException();
     }
 
+    /// <summary>
+    /// Generates and sends team preview information at the start of a battle.
+    /// Creates sanitized team data that can be safely shown to both players,
+    /// hiding sensitive information like exact EVs/IVs while showing species,
+    /// items, abilities, and moves.
+    /// </summary>
     public void ShowOpenTeamSheets()
     {
-        throw new NotImplementedException();
+        // Only show team sheets at the very start of the battle
+        if (Turn != 0) return;
+
+        foreach (Side side in Sides)
+        {
+            var team = new List<PokemonSet>();
+
+            foreach (Pokemon pokemon in side.Pokemon)
+            {
+                PokemonSet set = pokemon.Set;
+
+                // Create sanitized set with visible information only
+                var newSet = new PokemonSet
+                {
+                    Name = string.Empty, // Hide nicknames
+                    Species = set.Species,
+                    Item = set.Item,
+                    Ability = set.Ability,
+                    Moves = set.Moves,
+                    Nature = new Nature { Id = NatureId.None }, // Hide nature
+                    Gender = pokemon.Gender,
+                    Evs = new StatsTable(), // Hide exact EVs
+                    Ivs = new StatsTable(), // Hide exact IVs
+                    Level = set.Level,
+                    Shiny = set.Shiny,
+                    TeraType = set.TeraType, // Will be set below for Gen 9
+                };
+
+                // Special handling for Zacian/Zamazenta with their signature items
+                // This prevents the client from flagging them as illusions when they use their signature move
+                if (set is { Species: SpecieId.Zacian, Item: ItemId.RustedSword } or
+                    { Species: SpecieId.Zamazenta, Item: ItemId.RustedShield })
+                {
+                    // Convert to Crowned forme
+                    SpecieId crownedSpecies = set.Species == SpecieId.Zacian
+                        ? SpecieId.ZacianCrowned
+                        : SpecieId.ZamazentaCrowned;
+
+                    newSet = newSet with { Species = crownedSpecies };
+
+                    // Replace Iron Head with signature move
+                    var crownedMoves = new Dictionary<SpecieId, MoveId>
+                    {
+                        { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
+                        { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
+                    };
+
+                    int ironHeadIndex = newSet.Moves.ToList().IndexOf(MoveId.IronHead);
+                    if (ironHeadIndex >= 0)
+                    {
+                        var movesList = newSet.Moves.ToList();
+                        movesList[ironHeadIndex] = crownedMoves[crownedSpecies];
+                        newSet = newSet with { Moves = movesList };
+                    }
+                }
+
+                team.Add(newSet);
+            }
+
+            // Send the sanitized team data to the client
+            // Note: You'll need to implement a Teams.Pack() equivalent method
+            // that serializes the team data into the format expected by the client
+            string packedTeam = PackTeam(team);
+            Add("showteam", side.Id.ToString(), packedTeam);
+        }
+    }
+
+    /// <summary>
+    /// Packs a team into a string format for transmission to the client.
+    /// This is a placeholder - you'll need to implement the actual packing logic
+    /// based on your client's expected format.
+    /// </summary>
+    private string PackTeam(List<PokemonSet> team)
+    {
+        // TODO: Implement team packing logic
+        // This should serialize the team data into the format your client expects
+        // The original uses Teams.pack() from the @pkmn/sets library
+        throw new NotImplementedException("Team packing logic needs to be implemented");
     }
 
     private void SetPlayer(SideId slot, PlayerOptions options)

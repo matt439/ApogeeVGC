@@ -637,7 +637,7 @@ public record Moves
             //    Num = 10019,
             //    Accuracy = IntTrueUnion.FromTrue(),
             //    Name = "Confused",
-            //    Type = MoveType.Normal,
+            //    Id = MoveType.Normal,
             //},
 
 
@@ -656,7 +656,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Normal,
+            //    Id = MoveType.Normal,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -673,7 +673,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Ice,
+            //    Id = MoveType.Ice,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -690,7 +690,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Dragon,
+            //    Id = MoveType.Dragon,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -707,7 +707,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Fire,
+            //    Id = MoveType.Fire,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -724,7 +724,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Bug,
+            //    Id = MoveType.Bug,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -741,7 +741,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Fairy,
+            //    Id = MoveType.Fairy,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -758,7 +758,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Ground,
+            //    Id = MoveType.Ground,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -775,7 +775,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Fighting,
+            //    Id = MoveType.Fighting,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -792,7 +792,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Steel,
+            //    Id = MoveType.Steel,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -809,7 +809,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Dark,
+            //    Id = MoveType.Dark,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -826,7 +826,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Electric,
+            //    Id = MoveType.Electric,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -843,7 +843,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Grass,
+            //    Id = MoveType.Grass,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -860,7 +860,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Psychic,
+            //    Id = MoveType.Psychic,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -877,7 +877,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Poison,
+            //    Id = MoveType.Poison,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -894,7 +894,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Flying,
+            //    Id = MoveType.Flying,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -911,7 +911,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Rock,
+            //    Id = MoveType.Rock,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -928,7 +928,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Water,
+            //    Id = MoveType.Water,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,
@@ -945,7 +945,7 @@ public record Moves
             //    BasePp = 10,
             //    Priority = 0,
             //    Target = MoveTarget.Normal,
-            //    Type = MoveType.Ghost,
+            //    Id = MoveType.Ghost,
             //    Flags = new MoveFlags
             //    {
             //        Protect = true,

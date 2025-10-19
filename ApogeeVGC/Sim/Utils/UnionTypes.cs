@@ -568,7 +568,7 @@ public record PokemonTypeSingleEventSource(PokemonType Type) : SingleEventSource
 
 
 /// <summary>
-/// Pokemon | Pokemon? | false | Type
+/// Pokemon | Pokemon? | false | Id
 /// </summary>
 public abstract record RunEventSource
 {

@@ -2176,7 +2176,7 @@ public class Pokemon : IPriorityComparison
             return [Terastallized.Value.ConvertToPokemonType()];
         }
 
-        // Run Type event to allow abilities/items/conditions to modify types
+        // Run Id event to allow abilities/items/conditions to modify types
         RelayVar? rv = Battle.RunEvent(EventId.Type, this, null, null, Types);
 
         List<PokemonType> resultTypes;
