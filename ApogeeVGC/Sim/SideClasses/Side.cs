@@ -3,11 +3,16 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Numerics;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
@@ -1016,9 +1021,193 @@ public class Side
         return Math.Min(pokemonLength, ruleTableSize);
     }
 
-    public bool ChooseTeam(object data)
+    // chooseTeam(data = '')
+    // {
+    //     if (this.requestState !== 'teampreview')
+    //     {
+    //         return this.emitChoiceError(`Can't choose for Team Preview: You're not in a Team Preview phase`);
+    //     }
+
+    //     const ruleTable = this.battle.ruleTable;
+    //     let positions = data.split(data.includes(',') ? ',' : '')
+    //         .map(datum => parseInt(datum) - 1);
+    //     const pickedTeamSize = this.pickedTeamSize();
+
+    //     // make sure positions is exactly of length pickedTeamSize
+    //     // - If too big: the client automatically sends a full list, so we just trim it down to size
+    //     positions.splice(pickedTeamSize);
+    //     // - If too small: we intentionally support only sending leads and having the sim fill in the rest
+    //     if (positions.length === 0)
+    //     {
+    //         for (let i = 0; i < pickedTeamSize; i++) positions.push(i);
+    //     }
+    //     else if (positions.length < pickedTeamSize)
+    //     {
+    //         for (let i = 0; i < pickedTeamSize; i++)
+    //         {
+    //             if (!positions.includes(i)) positions.push(i);
+    //             // duplicate in input, let the rest of the code handle the error message
+    //             if (positions.length >= pickedTeamSize) break;
+    //         }
+    //     }
+
+    //     for (const [index, pos] of positions.entries()) {
+    //         if (isNaN(pos) || pos < 0 || pos >= this.pokemon.length)
+    //         {
+    //             return this.emitChoiceError(`Can't choose for Team Preview: You do not have a Pokémon in slot ${pos + 1}`);
+
+    //         }
+    //         if (positions.indexOf(pos) !== index)
+    //         {
+    //             return this.emitChoiceError(`Can't choose for Team Preview: The Pokémon in slot ${pos + 1} can only switch in once`);
+
+    //         }
+    //     }
+    //     if (ruleTable.maxTotalLevel)
+    //     {
+    //         let totalLevel = 0;
+    //         for (const pos of positions) totalLevel += this.pokemon[pos].level;
+
+    //         if (totalLevel > ruleTable.maxTotalLevel)
+    //         {
+    //             if (!data)
+    //             {
+    //                 // autoChoose
+    //                 positions = [...this.pokemon.keys()].sort((a, b) => (this.pokemon[a].level - this.pokemon[b].level))
+    //                     .slice(0, pickedTeamSize);
+    //             }
+    //             else
+    //             {
+    //                 return this.emitChoiceError(`Your selected team has a total level of ${ totalLevel}, but it can't be above ${ruleTable.maxTotalLevel}; please select a valid team of ${pickedTeamSize} Pokémon`);
+
+    //             }
+    //         }
+    //     }
+    //     if (ruleTable.valueRules.has('forceselect'))
+    //     {
+    //         const speciesList = ruleTable.valueRules.get('forceselect')!.split('|')
+    //             .map(entry => this.battle.dex.species.get(entry).name);
+    //         if (!data)
+    //         {
+    //             // autoChoose
+    //             positions = [...this.pokemon.keys()].filter(pos => speciesList.includes(this.pokemon[pos].species.name))
+    //                 .concat([...this.pokemon.keys()].filter(pos => !speciesList.includes(this.pokemon[pos].species.name)))
+    //                 .slice(0, pickedTeamSize);
+    //         }
+    //         else
+    //         {
+    //             let hasSelection = false;
+    //             for (const pos of positions) {
+    //                 if (speciesList.includes(this.pokemon[pos].species.name))
+    //                 {
+    //                     hasSelection = true;
+    //                     break;
+    //                 }
+    //             }
+    //             if (!hasSelection)
+    //             {
+    //                 return this.emitChoiceError(`You must bring ${ speciesList.length > 1 ? `one of ${ speciesList.join(', ')}` : speciesList[0]}
+    //                 to the battle.`);
+    //             }
+    //         }
+    //     }
+    //     for (const [index, pos] of positions.entries()) {
+    //         this.choice.switchIns.add(pos);
+    //         this.choice.actions.push({
+    //         choice: 'team',
+    //	index,
+    //	pokemon: this.pokemon[pos],
+    //	priority: -index,
+    //} as ChosenAction);
+    //     }
+
+    //     return true;
+    // }
+
+    public bool ChooseTeam(string data = "")
     {
-        throw new NotImplementedException();
+        // Step 1: Validate request state
+        if (RequestState != RequestState.TeamPreview)
+        {
+            return EmitChoiceError("Can't choose for Team Preview: You're not in a Team Preview phase");
+        }
+
+        // Step 2: Parse positions from input
+        List<int> positions;
+        if (string.IsNullOrWhiteSpace(data))
+        {
+            positions = [];
+        }
+        else
+        {
+            char separator = data.Contains(',') ? ',' : ' ';
+            positions = data.Split(separator)
+                .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1) // Convert to 0-based
+                .ToList();
+        }
+
+        int pickedTeamSize = PickedTeamSize();
+
+        // Step 3: Auto-fill positions if needed
+        if (positions.Count == 0)
+        {
+            // No input - use all Pokémon in order
+            for (int i = 0; i < pickedTeamSize; i++)
+            {
+                positions.Add(i);
+            }
+        }
+        else if (positions.Count < pickedTeamSize)
+        {
+            // Partial input - fill remaining slots with unused Pokémon
+            for (int i = 0; i < pickedTeamSize && positions.Count < pickedTeamSize; i++)
+            {
+                if (!positions.Contains(i))
+                {
+                    positions.Add(i);
+                }
+            }
+        }
+        else if (positions.Count > pickedTeamSize)
+        {
+            // Too many positions - trim to size
+            positions = positions.Take(pickedTeamSize).ToList();
+        }
+
+        // Step 4: Validate positions
+        for (int index = 0; index < positions.Count; index++)
+        {
+            int pos = positions[index];
+
+            // Check if position is valid
+            if (pos < 0 || pos >= Pokemon.Count)
+            {
+                return EmitChoiceError($"Can't choose for Team Preview: You do not have a Pokémon in slot {pos + 1}");
+            }
+
+            // Check for duplicates
+            if (positions.IndexOf(pos) != index)
+            {
+                return EmitChoiceError($"Can't choose for Team Preview: The Pokémon in slot {pos + 1} can only switch in once");
+            }
+        }
+
+        // Step 5: Create team actions
+        for (int index = 0; index < positions.Count; index++)
+        {
+            int pos = positions[index];
+            Choice.SwitchIns.Add(pos);
+            Choice.Actions = [.. Choice.Actions, new ChosenAction
+            {
+                MoveId = MoveId.None,
+                Choice = ChoiceType.Team,
+                Index = index,
+                Pokemon = Pokemon[pos],
+                Priority = -index, // Earlier picks have higher priority
+            }];
+        }
+
+        return true;
     }
 
     public bool ChooseShift()
