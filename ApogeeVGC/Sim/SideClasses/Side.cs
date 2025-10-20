@@ -3,27 +3,18 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Reflection;
-using System.Reflection.Emit;
+
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
-public class Side
+public class Side : IDisposable
 {
+    private bool _disposed;
     public IBattle Battle { get; }
     public SideId Id { get; }
     public int N { get; set; }
@@ -1150,135 +1141,145 @@ public class Side
         };
     }
 
-    //    choose(input: string)
-    //    {
-    //        if (!this.requestState)
-    //        {
-    //            return this.emitChoiceError(
-    //                this.battle.ended ? `Can't do anything: The game is over` : `Can't do anything: It's not your turn`
-    //            );
-    //        }
-
-    //        if (this.choice.cantUndo)
-    //        {
-    //            return this.emitChoiceError(`Can't undo: A trapping/disabling effect would cause undo to leak information`);
-
-    //        }
-
-    //        this.clearChoice();
-
-    //        const choiceStrings = (input.startsWith('team ') ? [input] : input.split(','));
-
-    //        if (choiceStrings.length > this.active.length)
-    //        {
-    //            return this.emitChoiceError(
-    //				`Can't make choices: You sent choices for ${choiceStrings.length} Pokémon, but this is a ${this.battle.gameType} game!`
-    //            );
-    //        }
-
-    //        for (const choiceString of choiceStrings) {
-    //            let[choiceType, data] = Utils.splitFirst(choiceString.trim(), ' ');
-    //            data = data.trim();
-    //            if (choiceType === 'testfight')
-    //            {
-    //                choiceType = 'move';
-    //                data = 'testfight';
-    //            }
-
-    //            switch (choiceType)
-    //            {
-    //                case 'move':
-    //                    const original = data;
-    //                    const error = () => this.emitChoiceError(`Conflicting arguments for "move": ${ original}`);
-    //                    let targetLoc: number | undefined;
-    //                    let event: 'mega' | 'megax' | 'megay' | 'zmove' | 'ultra' | 'dynamax' | 'terastallize' | '' = '';
-    //				while (true) {
-    //					// If data ends with a number, treat it as a target location.
-    //					// We need to special case 'Conversion 2' so it doesn't get
-    //					// confused with 'Conversion' erroneously sent with the target
-    //					// '2' (since Conversion targets 'self', targetLoc can't be 2).
-    //					if (/\s(?:-|\+)?[1 - 3]$/.test(data) && toID(data) !== 'conversion2') {
-    //						if (targetLoc !== undefined) return error();
-    //    targetLoc = parseInt(data.slice(-2));
-    //						data = data.slice(0, -2).trim();
-    //} else if (data.endsWith(' mega')) {
-    //						if (event) return error();
-    //						event = 'mega';
-    //data = data.slice(0, -5);
-    //} else if (data.endsWith(' megax')) {
-    //						if (event) return error();
-    //						event = 'megax';
-    //data = data.slice(0, -6);
-    //} else if (data.endsWith(' megay')) {
-    //						if (event) return error();
-    //						event = 'megay';
-    //data = data.slice(0, -6);
-    //} else if (data.endsWith(' zmove')) {
-    //						if (event) return error();
-    //						event = 'zmove';
-    //data = data.slice(0, -6);
-    //} else if (data.endsWith(' ultra')) {
-    //						if (event) return error();
-    //						event = 'ultra';
-    //data = data.slice(0, -6);
-    //} else if (data.endsWith(' dynamax')) {
-    //						if (event) return error();
-    //						event = 'dynamax';
-    //data = data.slice(0, -8);
-    //} else if (data.endsWith(' gigantamax')) {
-    //						if (event) return error();
-    //						event = 'dynamax';
-    //data = data.slice(0, -11);
-    //} else if (data.endsWith(' max')) {
-    //						if (event) return error();
-    //						event = 'dynamax';
-    //data = data.slice(0, -4);
-    //} else if (data.endsWith(' terastal')) {
-    //						if (event) return error();
-    //						event = 'terastallize';
-    //data = data.slice(0, -9);
-    //} else if (data.endsWith(' terastallize')) {
-    //						if (event) return error();
-    //						event = 'terastallize';
-    //data = data.slice(0, -13);
-    //} else {
-    //						break;
-    //					}
-    //				}
-    //				if (!this.chooseMove(data, targetLoc, event)) return false;
-    //break;
-
-    //            case 'switch':
-    //    this.chooseSwitch(data);
-    //    break;
-    //case 'shift':
-    //    if (data) return this.emitChoiceError(`Unrecognized data after "shift": ${ data}`);
-    //    if (!this.chooseShift()) return false;
-    //    break;
-    //case 'team':
-    //    if (!this.chooseTeam(data)) return false;
-    //    break;
-    //case 'pass':
-    //case 'skip':
-    //    if (data) return this.emitChoiceError(`Unrecognized data after "pass": ${ data}`);
-    //    if (!this.choosePass()) return false;
-    //    break;
-    //case 'auto':
-    //case 'default':
-    //    this.autoChoose();
-    //    break;
-    //default:
-    //    this.emitChoiceError(`Unrecognized choice: ${ choiceString}`);
-    //    break;
-    //}
-    //		}
-
-    //		return !this.choice.error;
-    //	}
-
-    public bool Choose(object input)
+    /// <summary>
+    /// Process a choice object containing one or more actions.
+    /// This is the main entry point for making battle choices using the Choice class.
+    /// </summary>
+    /// <param name="input">The Choice object containing the actions to execute</param>
+    /// <returns>True if all choices were valid and processed, false otherwise</returns>
+    public bool Choose(Choice input)
     {
-        throw new NotImplementedException();
+        // Step 1: Validate that it's the player's turn
+        if (RequestState == RequestState.None)
+        {
+            string message = Battle.Ended 
+                ? "Can't do anything: The game is over" 
+                : "Can't do anything: It's not your turn";
+            return EmitChoiceError(message);
+        }
+
+        // Step 2: Check if undo is allowed
+        if (Choice.CantUndo)
+        {
+            return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
+        }
+
+        // Step 3: Clear existing choice
+        ClearChoice();
+
+        // Step 4: Validate number of actions doesn't exceed active Pokemon count
+        if (input.Actions.Count > Active.Count)
+        {
+            return EmitChoiceError(
+                $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but this is a {Battle.GameType} game!"
+            );
+        }
+
+        // Step 5: Process each action in the choice
+        if (input.Actions.Select(action => action.Choice switch
+            {
+                ChoiceType.Move => ProcessChosenMoveAction(action),
+                ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
+                ChoiceType.Team => ProcessChosenTeamAction(action),
+                ChoiceType.Pass => ChoosePass().IsTrue(),
+                ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
+                _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
+            }).Any(success => !success))
+        {
+            return false;
+        }
+
+        // Step 6: Apply choice-level settings
+        if (input.Terastallize)
+        {
+            Choice.Terastallize = true;
+        }
+
+        if (input.CantUndo)
+        {
+            Choice.CantUndo = true;
+        }
+
+        return string.IsNullOrEmpty(Choice.Error);
+    }
+
+    private bool ProcessChosenMoveAction(ChosenAction action)
+    {
+        // Determine event type based on Terastallize flag
+        EventType eventType = action.Terastallize != null 
+            ? EventType.Terastallize 
+            : EventType.None;
+
+        // Use ChooseMove with the move ID and target location
+        return ChooseMove(
+            moveText: action.MoveId,
+            targetLoc: action.TargetLoc ?? 0,
+            eventType: eventType
+        );
+    }
+
+    private bool ProcessChosenSwitchAction(ChosenAction action)
+    {
+        if (action.Target == null)
+        {
+            return EmitChoiceError("Can't switch: No target Pokemon specified");
+        }
+
+        return ChooseSwitch(action.Target).IsTrue();
+    }
+
+    private bool ProcessChosenTeamAction(ChosenAction action)
+    {
+        // For team preview, the actions are already ordered by priority
+        // We just need to verify this is a valid team choice
+        if (action.Pokemon == null)
+        {
+            return EmitChoiceError("Can't choose for Team Preview: No Pokemon specified");
+        }
+
+        // The team ordering is handled by collecting all team actions
+        // and processing them in priority order, which is done by the caller
+        // Here we just validate and record the choice
+        int slot = action.Pokemon.Position;
+        
+        if (!Choice.SwitchIns.Add(slot))
+        {
+            return EmitChoiceError(
+                $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+            );
+        }
+
+        Choice.Actions = [.. Choice.Actions, action];
+
+        return true;
+    }
+
+    private bool ProcessChosenRevivalBlessingAction(ChosenAction action)
+    {
+        if (action.Pokemon == null || action.Target == null)
+        {
+            return EmitChoiceError("Can't use Revival Blessing: Missing Pokemon or target");
+        }
+
+        // Validate that the target is fainted
+        if (!action.Target.Fainted)
+        {
+            return EmitChoiceError("Can't use Revival Blessing: Target must be fainted");
+        }
+
+        // Validate that we have a Revival Blessing slot condition
+        if (!SlotConditions[action.Pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+        {
+            return EmitChoiceError("Can't use Revival Blessing: No Revival Blessing active");
+        }
+
+        // Process the Revival Blessing
+        Choice.ForcedSwitchesLeft = Math.Max(0, Choice.ForcedSwitchesLeft - 1);
+        action.Pokemon.SwitchFlag = false;
+
+        Choice.Actions = [.. Choice.Actions, action];
+
+        return true;
     }
 
     public int GetChoiceIndex(bool isPass = false)
@@ -1372,7 +1373,7 @@ public class Side
             while (!IsChoiceDone())
             {
                 SideBoolUnion result = ChooseSwitch();
-                if (result is BoolSideBoolUnion { Value: false })
+                if (!result.IsTrue())
                 {
                     throw new InvalidOperationException($"autoChoose switch crashed: {Choice.Error}");
                 }
@@ -1403,31 +1404,51 @@ public class Side
         return true;
     }
 
-    //destroy()
-    //{
-    //    // deallocate ourself
+    /// <summary>
+    /// Disposes all resources held by this Side instance.
+    /// Cleans up Pokemon references and choice actions to break circular references.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-    //    // deallocate children and get rid of references to them
-    //    for (const pokemon of this.pokemon) {
-    //        if (pokemon) pokemon.destroy();
-    //    }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
 
-    //    for (const action of this.choice.actions) {
-    //        delete action.side;
-    //        delete action.pokemon;
-    //        delete action.target;
-    //    }
-    //    this.choice.actions = [];
+        if (disposing)
+        {
+            // Dispose children and clear references to them
+            foreach (Pokemon pokemon in Pokemon)
+            {
+                if (pokemon is IDisposable disposablePokemon)
+                {
+                    disposablePokemon.Dispose();
+                }
+            }
 
-    //    // get rid of some possibly-circular references
-    //    this.pokemon = [];
-    //    this.active = [];
-    //    this.foe = null!;
-    //    (this as any).battle = null!;
-    //}
+            // Clear choice actions by replacing with an empty list
+            // Note: ChosenAction is a record with init-only properties,
+            // so we can't modify individual instances. We replace the entire list instead.
+            Choice.Actions = [];
 
+            // Clear circular/large references
+            Pokemon.Clear();
+            Active.Clear();
+            Foe = null!;
+        }
+
+        _disposed = true;
+    }
+
+    /// <summary>
+    /// Legacy method for compatibility. Calls Dispose().
+    /// </summary>
     public void Destroy()
     {
-        throw new NotImplementedException();
+        Dispose();
     }
 }

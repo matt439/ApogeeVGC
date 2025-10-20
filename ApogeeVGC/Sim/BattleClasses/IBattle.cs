@@ -173,4 +173,6 @@ public interface IBattle
     bool ValidTargetLoc(int targetLoc, Pokemon source, MoveTarget targetType);
 
     RequestState RequestState { get; }
+
+    bool Ended { get; }
 }

@@ -3245,7 +3245,8 @@ public partial class BattleAsync : IBattle, IDisposable
             if (string.IsNullOrEmpty(side.GetChoice().Error))
             {
                 side.EmitChoiceError(
-                    $"Unknown error for choice: {input}. If you're not using a custom client, please report this as a bug.");
+                    $"Unknown error for choice: {input}. If you're not using a custom client," +
+                    $"please report this as a bug.");
             }
             return false;
         }

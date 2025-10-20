@@ -13,7 +13,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
-public class Pokemon : IPriorityComparison
+public class Pokemon : IPriorityComparison, IDisposable
 {
     public Side Side { get; }
     public IBattle Battle => Side.Battle;
@@ -2590,6 +2590,16 @@ public class Pokemon : IPriorityComparison
         }
 
         return true;
+    }
+
+    public void Dispose()
+    {
+        // Clean up resources if needed
+    }
+
+    public void Destroy()
+    {
+        Dispose();
     }
 
     #region Helpers

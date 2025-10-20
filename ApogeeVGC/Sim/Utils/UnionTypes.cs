@@ -1083,11 +1083,20 @@ public record IntPokemonIntUnion(int Value) : PokemonIntUnion;
 /// </summary>
 public abstract record SideBoolUnion
 {
+    public abstract bool IsTrue();
     public static implicit operator SideBoolUnion(Side side) => new SideSideBoolUnion(side);
     public static implicit operator SideBoolUnion(bool value) => new BoolSideBoolUnion(value);
 }
-public record SideSideBoolUnion(Side Side) : SideBoolUnion;
-public record BoolSideBoolUnion(bool Value) : SideBoolUnion;
+
+public record SideSideBoolUnion(Side Side) : SideBoolUnion
+{
+    public override bool IsTrue() => true;
+}
+
+public record BoolSideBoolUnion(bool Value) : SideBoolUnion
+{
+    public override bool IsTrue() => Value;
+}
 
 
 /// <summary>

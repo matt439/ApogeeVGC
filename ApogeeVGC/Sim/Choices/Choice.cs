@@ -1,5 +1,8 @@
 ﻿namespace ApogeeVGC.Sim.Choices;
 
+/// <summary>
+/// One single turn's choice for one single player.
+/// </summary>
 public class Choice
 {
     public bool CantUndo { get; set; }

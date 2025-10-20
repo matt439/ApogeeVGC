@@ -6,6 +6,9 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Choices;
 
+/// <summary>
+/// A single action that can be chosen. Choices will have one Action for each pokemon.
+/// </summary>
 public record ChosenAction : IActionChoice
 {
     public required ChoiceType Choice { get; init; }
