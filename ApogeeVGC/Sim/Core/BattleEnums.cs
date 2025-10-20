@@ -27,6 +27,7 @@ public enum RequestState
     TeamPreview,
     Move,
     SwitchIn,
+    Switch,
     None,
 }
 

@@ -6,9 +6,12 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
+using System;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -422,34 +425,6 @@ public class Side
         return RemoveSlotCondition(target, condition);
     }
 
-    //send(...parts: (string | number | Function | AnyObject)[]) {
-    //    const sideUpdate = '|' + parts.map(part => {
-    //        if (typeof part !== 'function') return part;
-    //        return part(this);
-    //    }).join('|');
-    //    this.battle.send('sideupdate', `${this.id
-    //    }\n${sideUpdate}`);
-    //}
-
-    //emitRequest(update: ChoiceRequest = this.activeRequest!, updatedRequest = false) {
-    //    if (updatedRequest) (this.activeRequest as MoveRequest | SwitchRequest).update = true;
-    //    this.battle.send('sideupdate', `${ this.id}\n | request |${ JSON.stringify(update)}`);
-    //    this.activeRequest = update;
-    //}
-
-    //emitChoiceError(
-    //    message: string, update ?: { pokemon: Pokemon, update: (req: PokemonMoveRequestData) => boolean | void }
-    //) {
-    //    this.choice.error = message;
-    //    const updated = update ? this.updateRequestForPokemon(update.pokemon, update.update) : null;
-    //    const type = `[${ updated ? 'Unavailable' : 'Invalid'}
-    //    choice]`;
-    //    this.battle.send('sideupdate', `${ this.id}\n | error |${ type} ${ message}`);
-    //    if (updated) this.emitRequest(this.activeRequest!, true);
-    //    if (this.battle.strictChoices) throw new Error(`${ type } ${ message}`);
-    //    return false;
-    //}
-
     public void Send(params object[] parts)
     {
         string sideUpdate = "|" + string.Join("|", parts.Select(part =>
@@ -480,8 +455,7 @@ public class Side
         ActiveRequest = update;
     }
 
-    public bool EmitChoiceError(
-        string message,
+    public bool EmitChoiceError(string message,
         (Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)? updateInfo = null)
     {
         Choice.Error = message;
@@ -845,9 +819,186 @@ public class Side
         };
     }
 
-    public SideBoolUnion ChooseSwitch(string? slotText = null)
+    public SideBoolUnion ChooseSwitch(PokemonIntUnion? slotText = null)
     {
-        throw new NotImplementedException();
+        // Step 1: Validate request state
+        if (RequestState != RequestState.Move && RequestState != RequestState.Switch)
+        {
+            return EmitChoiceError($"Can't switch: You need a {RequestState} response");
+        }
+
+        // Step 2: Get the active pokemon index
+        int index = GetChoiceIndex();
+        if (index >= Active.Count)
+        {
+            if (RequestState == RequestState.Switch)
+            {
+                return EmitChoiceError("Can't switch: You sent more switches than Pokémon that need to switch");
+            }
+            return EmitChoiceError("Can't switch: You sent more choices than unfainted Pokémon");
+        }
+
+        // Step 3: Get the currently active pokemon
+        Pokemon pokemon = Active[index];
+        int slot;
+
+        // Step 4: Determine the target slot
+        if (slotText == null)
+        {
+            // Auto-select mode
+            if (RequestState != RequestState.Switch)
+            {
+                return EmitChoiceError("Can't switch: You need to select a Pokémon to switch in");
+            }
+
+            // Check for Revival Blessing slot condition
+            if (SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+            {
+                // Find first fainted Pokemon
+                slot = 0;
+                while (slot < Pokemon.Count && !Pokemon[slot].Fainted)
+                {
+                    slot++;
+                }
+            }
+            else
+            {
+                // Normal forced switch - auto-select first available
+                if (Choice.ForcedSwitchesLeft <= 0)
+                {
+                    return ChoosePass();
+                }
+
+                slot = Active.Count;
+                while (slot < Pokemon.Count &&
+                       (Choice.SwitchIns.Contains(slot) || Pokemon[slot].Fainted))
+                {
+                    slot++;
+                }
+            }
+        }
+        else
+        {
+            // Parse the slot from the union type
+            slot = slotText switch
+            {
+                IntPokemonIntUnion intUnion => intUnion.Value - 1, // Convert from 1-based to 0-based
+                PokemonPokemonIntUnion pokemonUnion => pokemonUnion.Pokemon.Position,
+                _ => -1, // Invalid - will trigger error below
+            };
+
+            // If slot is still invalid after parsing, return error
+            if (slot < 0)
+            {
+                return EmitChoiceError($"Can't switch: Invalid switch target \"{slotText}\"");
+            }
+        }
+
+        // Step 5: Validate slot index
+        if (slot >= Pokemon.Count)
+        {
+            return EmitChoiceError($"Can't switch: You do not have a Pokémon in slot {slot + 1} to switch to");
+        }
+        else if (slot < Active.Count &&
+                 !SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+        {
+            return EmitChoiceError("Can't switch: You can't switch to an active Pokémon");
+        }
+        else if (Choice.SwitchIns.Contains(slot))
+        {
+            return EmitChoiceError($"Can't switch: The Pokémon in slot {slot + 1} can only switch in once");
+        }
+
+        // Step 6: Get target Pokemon
+        Pokemon targetPokemon = Pokemon[slot];
+
+        // Step 7: Handle Revival Blessing special case
+        if (SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
+        {
+            if (!targetPokemon.Fainted)
+            {
+                return EmitChoiceError("Can't switch: You have to pass to a fainted Pokémon");
+            }
+
+            // Decrement forced switches (clamp to prevent negative)
+            Choice.ForcedSwitchesLeft = Math.Max(0, Choice.ForcedSwitchesLeft - 1);
+            pokemon.SwitchFlag = false;
+
+            Choice.Actions = [.. Choice.Actions, new ChosenAction
+            {
+                MoveId = MoveId.RevivalBlessing,
+                Choice = ChoiceType.RevivalBlessing,
+                Pokemon = pokemon,
+                Target = targetPokemon,
+            }];
+
+            return true;
+        }
+
+        // Step 8: Validate target is not fainted (for normal switches)
+        if (targetPokemon.Fainted)
+        {
+            return EmitChoiceError("Can't switch: You can't switch to a fainted Pokémon");
+        }
+
+        // Step 9: Handle move phase switching (check for trapped)
+        if (RequestState == RequestState.Move)
+        {
+            if (pokemon.Trapped == PokemonTrapped.True)
+            {
+                return EmitChoiceError(
+                    "Can't switch: The active Pokémon is trapped",
+                    (pokemon, req =>
+                    {
+                        bool updated = false;
+
+                        if (req.MaybeTrapped != null)
+                        {
+                            req.MaybeTrapped = null;
+                            updated = true;
+                        }
+
+                        if (req.Trapped != true)
+                        {
+                            req.Trapped = true;
+                            updated = true;
+                        }
+
+                        return BoolVoidUnion.FromBool(updated);
+                    })
+                );
+            }
+            if (pokemon.MaybeTrapped)
+            {
+                Choice.CantUndo = true;
+            }
+        }
+        else if (RequestState == RequestState.Switch)
+        {
+            // Step 10: Handle forced switches
+            if (Choice.ForcedSwitchesLeft <= 0)
+            {
+                throw new InvalidOperationException("Player somehow switched too many Pokemon");
+            }
+            Choice.ForcedSwitchesLeft--;
+        }
+
+        // Step 11: Record the switch
+        Choice.SwitchIns.Add(slot);
+
+        ChoiceType choiceType = RequestState == RequestState.Switch
+            ? ChoiceType.InstaSwitch
+            : ChoiceType.Switch;
+
+        Choice.Actions = [.. Choice.Actions, new ChosenAction
+        {
+            MoveId = MoveId.None,
+            Choice = choiceType,
+            Pokemon = pokemon,
+            Target = targetPokemon,
+        }];
+
+        return true;
     }
 
     /// <summary>

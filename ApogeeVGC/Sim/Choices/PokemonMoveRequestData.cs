@@ -19,7 +19,7 @@ public record PokemonMoveRequestData
     public required IReadOnlyList<PokemonMoveData> Moves { get; init; }
     public bool? MaybeDisabled { get; set; }
     public bool? MaybeLocked { get; set; }
-    public bool? Trapped { get; init; }
-    public bool? MaybeTrapped { get; init; }
+    public bool? Trapped { get; set; }
+    public bool? MaybeTrapped { get; set; }
     public MoveTypeFalseUnion? CanTerastallize { get; set; }
 }
