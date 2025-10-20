@@ -23,6 +23,7 @@ public interface IBattle
     int Gen { get; }
 
     Library Library { get; }
+
     //Random Random { get; }
     bool PrintDebug { get; }
     Field Field { get; }
@@ -170,4 +171,6 @@ public interface IBattle
     bool StrictChoices { get; }
 
     bool ValidTargetLoc(int targetLoc, Pokemon source, MoveTarget targetType);
+
+    RequestState RequestState { get; }
 }

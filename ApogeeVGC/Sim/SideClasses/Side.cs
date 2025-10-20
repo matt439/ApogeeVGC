@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Reflection;
@@ -1021,109 +1022,6 @@ public class Side
         return Math.Min(pokemonLength, ruleTableSize);
     }
 
-    // chooseTeam(data = '')
-    // {
-    //     if (this.requestState !== 'teampreview')
-    //     {
-    //         return this.emitChoiceError(`Can't choose for Team Preview: You're not in a Team Preview phase`);
-    //     }
-
-    //     const ruleTable = this.battle.ruleTable;
-    //     let positions = data.split(data.includes(',') ? ',' : '')
-    //         .map(datum => parseInt(datum) - 1);
-    //     const pickedTeamSize = this.pickedTeamSize();
-
-    //     // make sure positions is exactly of length pickedTeamSize
-    //     // - If too big: the client automatically sends a full list, so we just trim it down to size
-    //     positions.splice(pickedTeamSize);
-    //     // - If too small: we intentionally support only sending leads and having the sim fill in the rest
-    //     if (positions.length === 0)
-    //     {
-    //         for (let i = 0; i < pickedTeamSize; i++) positions.push(i);
-    //     }
-    //     else if (positions.length < pickedTeamSize)
-    //     {
-    //         for (let i = 0; i < pickedTeamSize; i++)
-    //         {
-    //             if (!positions.includes(i)) positions.push(i);
-    //             // duplicate in input, let the rest of the code handle the error message
-    //             if (positions.length >= pickedTeamSize) break;
-    //         }
-    //     }
-
-    //     for (const [index, pos] of positions.entries()) {
-    //         if (isNaN(pos) || pos < 0 || pos >= this.pokemon.length)
-    //         {
-    //             return this.emitChoiceError(`Can't choose for Team Preview: You do not have a Pokémon in slot ${pos + 1}`);
-
-    //         }
-    //         if (positions.indexOf(pos) !== index)
-    //         {
-    //             return this.emitChoiceError(`Can't choose for Team Preview: The Pokémon in slot ${pos + 1} can only switch in once`);
-
-    //         }
-    //     }
-    //     if (ruleTable.maxTotalLevel)
-    //     {
-    //         let totalLevel = 0;
-    //         for (const pos of positions) totalLevel += this.pokemon[pos].level;
-
-    //         if (totalLevel > ruleTable.maxTotalLevel)
-    //         {
-    //             if (!data)
-    //             {
-    //                 // autoChoose
-    //                 positions = [...this.pokemon.keys()].sort((a, b) => (this.pokemon[a].level - this.pokemon[b].level))
-    //                     .slice(0, pickedTeamSize);
-    //             }
-    //             else
-    //             {
-    //                 return this.emitChoiceError(`Your selected team has a total level of ${ totalLevel}, but it can't be above ${ruleTable.maxTotalLevel}; please select a valid team of ${pickedTeamSize} Pokémon`);
-
-    //             }
-    //         }
-    //     }
-    //     if (ruleTable.valueRules.has('forceselect'))
-    //     {
-    //         const speciesList = ruleTable.valueRules.get('forceselect')!.split('|')
-    //             .map(entry => this.battle.dex.species.get(entry).name);
-    //         if (!data)
-    //         {
-    //             // autoChoose
-    //             positions = [...this.pokemon.keys()].filter(pos => speciesList.includes(this.pokemon[pos].species.name))
-    //                 .concat([...this.pokemon.keys()].filter(pos => !speciesList.includes(this.pokemon[pos].species.name)))
-    //                 .slice(0, pickedTeamSize);
-    //         }
-    //         else
-    //         {
-    //             let hasSelection = false;
-    //             for (const pos of positions) {
-    //                 if (speciesList.includes(this.pokemon[pos].species.name))
-    //                 {
-    //                     hasSelection = true;
-    //                     break;
-    //                 }
-    //             }
-    //             if (!hasSelection)
-    //             {
-    //                 return this.emitChoiceError(`You must bring ${ speciesList.length > 1 ? `one of ${ speciesList.join(', ')}` : speciesList[0]}
-    //                 to the battle.`);
-    //             }
-    //         }
-    //     }
-    //     for (const [index, pos] of positions.entries()) {
-    //         this.choice.switchIns.add(pos);
-    //         this.choice.actions.push({
-    //         choice: 'team',
-    //	index,
-    //	pokemon: this.pokemon[pos],
-    //	priority: -index,
-    //} as ChosenAction);
-    //     }
-
-    //     return true;
-    // }
-
     public bool ChooseTeam(string data = "")
     {
         // Step 1: Validate request state
@@ -1212,13 +1110,170 @@ public class Side
 
     public bool ChooseShift()
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("This is only used in Triple Battles which are not yet implemented.");
     }
 
     public void ClearChoice()
     {
-        throw new NotImplementedException();
+        int forcedSwitches = 0;
+        int forcedPasses = 0;
+
+        // Calculate forced switches if we're in switch request state
+        if (Battle.RequestState == RequestState.Switch)
+        {
+            // Count active Pokemon that need to switch out
+            int canSwitchOut = Active.Count(pokemon => pokemon.SwitchFlag.IsTrue());
+
+            // Count bench Pokemon available to switch in (not active, not fainted)
+            int canSwitchIn = Pokemon
+                .Skip(Active.Count) // Skip active slots
+                .Count(pokemon => pokemon is { Fainted: false });
+
+            // Can only force as many switches as we have Pokemon to switch in
+            forcedSwitches = Math.Min(canSwitchOut, canSwitchIn);
+
+            // Any switches we can't fulfill become forced passes
+            forcedPasses = canSwitchOut - forcedSwitches;
+        }
+
+        // Reset choice to default state
+        Choice = new Choice
+        {
+            CantUndo = false,
+            Error = string.Empty,
+            Actions = [],
+            ForcedSwitchesLeft = forcedSwitches,
+            ForcedPassesLeft = forcedPasses,
+            SwitchIns = [],
+            Terastallize = false,
+        };
     }
+
+    //    choose(input: string)
+    //    {
+    //        if (!this.requestState)
+    //        {
+    //            return this.emitChoiceError(
+    //                this.battle.ended ? `Can't do anything: The game is over` : `Can't do anything: It's not your turn`
+    //            );
+    //        }
+
+    //        if (this.choice.cantUndo)
+    //        {
+    //            return this.emitChoiceError(`Can't undo: A trapping/disabling effect would cause undo to leak information`);
+
+    //        }
+
+    //        this.clearChoice();
+
+    //        const choiceStrings = (input.startsWith('team ') ? [input] : input.split(','));
+
+    //        if (choiceStrings.length > this.active.length)
+    //        {
+    //            return this.emitChoiceError(
+    //				`Can't make choices: You sent choices for ${choiceStrings.length} Pokémon, but this is a ${this.battle.gameType} game!`
+    //            );
+    //        }
+
+    //        for (const choiceString of choiceStrings) {
+    //            let[choiceType, data] = Utils.splitFirst(choiceString.trim(), ' ');
+    //            data = data.trim();
+    //            if (choiceType === 'testfight')
+    //            {
+    //                choiceType = 'move';
+    //                data = 'testfight';
+    //            }
+
+    //            switch (choiceType)
+    //            {
+    //                case 'move':
+    //                    const original = data;
+    //                    const error = () => this.emitChoiceError(`Conflicting arguments for "move": ${ original}`);
+    //                    let targetLoc: number | undefined;
+    //                    let event: 'mega' | 'megax' | 'megay' | 'zmove' | 'ultra' | 'dynamax' | 'terastallize' | '' = '';
+    //				while (true) {
+    //					// If data ends with a number, treat it as a target location.
+    //					// We need to special case 'Conversion 2' so it doesn't get
+    //					// confused with 'Conversion' erroneously sent with the target
+    //					// '2' (since Conversion targets 'self', targetLoc can't be 2).
+    //					if (/\s(?:-|\+)?[1 - 3]$/.test(data) && toID(data) !== 'conversion2') {
+    //						if (targetLoc !== undefined) return error();
+    //    targetLoc = parseInt(data.slice(-2));
+    //						data = data.slice(0, -2).trim();
+    //} else if (data.endsWith(' mega')) {
+    //						if (event) return error();
+    //						event = 'mega';
+    //data = data.slice(0, -5);
+    //} else if (data.endsWith(' megax')) {
+    //						if (event) return error();
+    //						event = 'megax';
+    //data = data.slice(0, -6);
+    //} else if (data.endsWith(' megay')) {
+    //						if (event) return error();
+    //						event = 'megay';
+    //data = data.slice(0, -6);
+    //} else if (data.endsWith(' zmove')) {
+    //						if (event) return error();
+    //						event = 'zmove';
+    //data = data.slice(0, -6);
+    //} else if (data.endsWith(' ultra')) {
+    //						if (event) return error();
+    //						event = 'ultra';
+    //data = data.slice(0, -6);
+    //} else if (data.endsWith(' dynamax')) {
+    //						if (event) return error();
+    //						event = 'dynamax';
+    //data = data.slice(0, -8);
+    //} else if (data.endsWith(' gigantamax')) {
+    //						if (event) return error();
+    //						event = 'dynamax';
+    //data = data.slice(0, -11);
+    //} else if (data.endsWith(' max')) {
+    //						if (event) return error();
+    //						event = 'dynamax';
+    //data = data.slice(0, -4);
+    //} else if (data.endsWith(' terastal')) {
+    //						if (event) return error();
+    //						event = 'terastallize';
+    //data = data.slice(0, -9);
+    //} else if (data.endsWith(' terastallize')) {
+    //						if (event) return error();
+    //						event = 'terastallize';
+    //data = data.slice(0, -13);
+    //} else {
+    //						break;
+    //					}
+    //				}
+    //				if (!this.chooseMove(data, targetLoc, event)) return false;
+    //break;
+
+    //            case 'switch':
+    //    this.chooseSwitch(data);
+    //    break;
+    //case 'shift':
+    //    if (data) return this.emitChoiceError(`Unrecognized data after "shift": ${ data}`);
+    //    if (!this.chooseShift()) return false;
+    //    break;
+    //case 'team':
+    //    if (!this.chooseTeam(data)) return false;
+    //    break;
+    //case 'pass':
+    //case 'skip':
+    //    if (data) return this.emitChoiceError(`Unrecognized data after "pass": ${ data}`);
+    //    if (!this.choosePass()) return false;
+    //    break;
+    //case 'auto':
+    //case 'default':
+    //    this.autoChoose();
+    //    break;
+    //default:
+    //    this.emitChoiceError(`Unrecognized choice: ${ choiceString}`);
+    //    break;
+    //}
+    //		}
+
+    //		return !this.choice.error;
+    //	}
 
     public bool Choose(object input)
     {

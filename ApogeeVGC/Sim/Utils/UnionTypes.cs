@@ -791,7 +791,7 @@ public abstract record MoveIdBoolUnion
 }
 public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion
 {
-    public override bool IsTrue() => true;
+    public override bool IsTrue() => MoveId != MoveId.None;
 }
 public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion
 {
