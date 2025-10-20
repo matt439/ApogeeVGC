@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Utils;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Reflection;
@@ -1282,18 +1283,148 @@ public class Side
 
     public int GetChoiceIndex(bool isPass = false)
     {
-        throw new NotImplementedException();
+        int index = Choice.Actions.Count;
+
+        if (!isPass)
+        {
+            switch (RequestState)
+            {
+                case RequestState.Move:
+                    // auto-pass
+                    while (
+                        index < Active.Count &&
+                        (Active[index].Fainted || Active[index].Volatiles.ContainsKey(ConditionId.Commanding))
+                    )
+                    {
+                        ChoosePass();
+                        index++;
+                    }
+                    break;
+                case RequestState.Switch:
+                    while (index < Active.Count && !Active[index].SwitchFlag.IsTrue())
+                    {
+                        ChoosePass();
+                        index++;
+                    }
+                    break;
+            }
+        }
+
+        return index;
     }
 
     public SideBoolUnion ChoosePass()
     {
-        throw new NotImplementedException();
+        int index = GetChoiceIndex(true);
+        if (index >= Active.Count) return false;
+        Pokemon pokemon = Active[index];
+
+        switch (RequestState)
+        {
+            case RequestState.Switch:
+                if (pokemon.SwitchFlag.IsTrue())
+                {
+                    // This condition will always happen if called by Battle#choose()
+                    if (Choice.ForcedPassesLeft <= 0)
+                    {
+                        return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
+                                               $"replace {pokemon.Name}");
+                    }
+                    Choice.ForcedPassesLeft--;
+                }
+                break;
+
+            case RequestState.Move:
+                if (!pokemon.Fainted && !pokemon.Volatiles.ContainsKey(ConditionId.Commanding))
+                {
+                    return EmitChoiceError($"Can't pass: Your {pokemon.Name} must make a move (or switch)");
+                }
+                break;
+
+            default:
+                return EmitChoiceError("Can't pass: Not a move or switch request");
+        }
+
+        Choice.Actions = [.. Choice.Actions, new ChosenAction
+        {
+            MoveId = MoveId.None,
+            Choice = ChoiceType.Pass,
+        }];
+
+        return true;
     }
 
+    /// <summary>
+    /// Automatically finish a choice if not currently complete.
+    /// </summary>
     public bool AutoChoose()
     {
-        throw new NotImplementedException();
+        if (RequestState == RequestState.TeamPreview)
+        {
+            if (!IsChoiceDone())
+            {
+                ChooseTeam();
+            }
+        }
+        else if (RequestState == RequestState.Switch)
+        {
+            int i = 0;
+            while (!IsChoiceDone())
+            {
+                SideBoolUnion result = ChooseSwitch();
+                if (result is BoolSideBoolUnion { Value: false })
+                {
+                    throw new InvalidOperationException($"autoChoose switch crashed: {Choice.Error}");
+                }
+                i++;
+                if (i > 10)
+                {
+                    throw new InvalidOperationException("autoChoose failed: infinite looping");
+                }
+            }
+        }
+        else if (RequestState == RequestState.Move)
+        {
+            int i = 0;
+            while (!IsChoiceDone())
+            {
+                if (!ChooseMove())
+                {
+                    throw new InvalidOperationException($"autoChoose crashed: {Choice.Error}");
+                }
+                i++;
+                if (i > 10)
+                {
+                    throw new InvalidOperationException("autoChoose failed: infinite looping");
+                }
+            }
+        }
+
+        return true;
     }
+
+    //destroy()
+    //{
+    //    // deallocate ourself
+
+    //    // deallocate children and get rid of references to them
+    //    for (const pokemon of this.pokemon) {
+    //        if (pokemon) pokemon.destroy();
+    //    }
+
+    //    for (const action of this.choice.actions) {
+    //        delete action.side;
+    //        delete action.pokemon;
+    //        delete action.target;
+    //    }
+    //    this.choice.actions = [];
+
+    //    // get rid of some possibly-circular references
+    //    this.pokemon = [];
+    //    this.active = [];
+    //    this.foe = null!;
+    //    (this as any).battle = null!;
+    //}
 
     public void Destroy()
     {

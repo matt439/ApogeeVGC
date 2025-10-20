@@ -6,7 +6,7 @@ public class Choice
     public string Error { get; set; } = string.Empty;
     public IReadOnlyList<ChosenAction> Actions { get; set; } = [];
     public int ForcedSwitchesLeft { get; set; }
-    public int ForcedPassesLeft { get; init; }
+    public int ForcedPassesLeft { get; set; }
     public HashSet<int> SwitchIns { get; init; } = [];
     public bool Terastallize { get; set; }
 }
