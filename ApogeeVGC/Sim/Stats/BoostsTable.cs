@@ -165,4 +165,15 @@ public class BoostsTable
             _ => throw new ArgumentOutOfRangeException(nameof(stage), "Stat stage must be between -6 and +6."),
         };
     }
+
+    public IEnumerable<(BoostId BoostId, int Value)> GetBoosts()
+    {
+        yield return (BoostId.Atk, Atk);
+        yield return (BoostId.Def, Def);
+        yield return (BoostId.SpA, SpA);
+        yield return (BoostId.SpD, SpD);
+        yield return (BoostId.Spe, Spe);
+        yield return (BoostId.Accuracy, Accuracy);
+        yield return (BoostId.Evasion, Evasion);
+    }
 }

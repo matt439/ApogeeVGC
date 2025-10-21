@@ -57,7 +57,7 @@ public class SparseBoostsTable
 
     public double? GetBoostMultiplier(BoostId stat)
     {
-        var boost = GetBoost(stat);
+        int? boost = GetBoost(stat);
         if (!boost.HasValue)
             return null;
 

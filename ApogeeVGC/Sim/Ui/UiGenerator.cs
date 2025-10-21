@@ -453,4 +453,9 @@ public static class UiGenerator
     {
         Console.WriteLine($"{pokemon.Name}'s attack missed {target.Name}!");
     }
+
+    public static void PrintClearPositiveBoostEvent(Pokemon target, Pokemon pokemon, ActiveMove move)
+    {
+        Console.WriteLine($"{pokemon.Name}'s {move.Name} cleared all positive stat boosts from {target.Name}!");
+    }
 }

@@ -1466,48 +1466,51 @@ public class BattleActions(IBattle battle)
         return null;
     }
 
-    //hitStepStealBoosts(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove)
-    //{
-    //    const target = targets[0]; // hardcoded
-    //    if (move.stealsBoosts)
-    //    {
-    //        const boosts: SparseBoostsTable = { }
-    //        ;
-    //        let stolen = false;
-    //        let statName: BoostID;
-    //        for (statName in target.boosts)
-    //        {
-    //            const stage = target.boosts[statName];
-    //            if (stage > 0)
-    //            {
-    //                boosts[statName] = stage;
-    //                stolen = true;
-    //            }
-    //        }
-    //        if (stolen)
-    //        {
-    //            this.battle.attrLastMove('[still]');
-    //            this.battle.add('-clearpositiveboost', target, pokemon, 'move: ' + move.name);
-    //            this.battle.boost(boosts, pokemon, pokemon);
-
-    //            let statName2: BoostID;
-    //            for (statName2 in boosts)
-    //            {
-    //                boosts[statName2] = 0;
-    //            }
-    //            target.setBoost(boosts);
-    //            if (move.id === "spectralthief")
-    //            {
-    //                this.battle.addMove('-anim', pokemon, "Spectral Thief", target);
-    //            }
-    //        }
-    //    }
-    //    return undefined;
-    //}
-
+    /// <summary>
+    /// Hit step 6: Steal positive boosts (Spectral Thief).
+    /// Returns null to indicate this step doesn't filter targets.
+    /// </summary>
     public List<BoolIntUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        if (move.StealsBoosts != true)
+        {
+            return null;
+        }
+
+        Pokemon target = targets[0]; // hardcoded - only first target
+        var boosts = new SparseBoostsTable();
+        bool stolen = false;
+
+        foreach ((BoostId BoostId, int Value) boost in target.Boosts.GetBoosts())
+        {
+            if (boost.Value <= 0)
+            {
+                continue;
+            }
+            boosts.SetBoost(boost.BoostId, boost.Value);
+            stolen = true;
+        }
+
+        if (!stolen) return null;
+
+        Battle.AttrLastMove("[still]");
+        UiGenerator.PrintClearPositiveBoostEvent(target, pokemon, move);
+        Battle.Boost(boosts, pokemon, pokemon);
+
+        // Reset the boosts to 0 for setting on target
+        var resetBoosts = new SparseBoostsTable
+        {
+            Atk = boosts.Atk.HasValue ? 0 : null,
+            Def = boosts.Def.HasValue ? 0 : null,
+            SpA = boosts.SpA.HasValue ? 0 : null,
+            SpD = boosts.SpD.HasValue ? 0 : null,
+            Spe = boosts.Spe.HasValue ? 0 : null,
+            Accuracy = boosts.Accuracy.HasValue ? 0 : null,
+            Evasion = boosts.Evasion.HasValue ? 0 : null,
+        };
+        target.SetBoost(resetBoosts);
+
+        return null;
     }
 
     public Undefined AfterMoveSecondaryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
