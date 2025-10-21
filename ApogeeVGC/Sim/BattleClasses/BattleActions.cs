@@ -1515,7 +1515,13 @@ public class BattleActions(IBattle battle)
 
     public Undefined AfterMoveSecondaryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        if ((move.HasSheerForce ?? false) && pokemon.HasAbility(AbilityId.SheerForce)) return new Undefined();
+
+        Battle.SingleEvent(EventId.AfterMoveSecondary, move, null, targets[0], pokemon, 
+            move);
+        Battle.RunEvent(EventId.AfterMoveSecondary, targets.ToArray(), pokemon, move);
+
+        return new Undefined();
     }
 
     public IntUndefinedFalseUnion TryMoveHit(Pokemon target, Pokemon pokemon, ActiveMove move)
