@@ -39,6 +39,7 @@ public enum ItemId
     JabocaBerry,
     RowapBerry,
     RedCard,
+    UtilityUmbrella,
 
     None,
 }

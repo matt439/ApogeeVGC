@@ -66,6 +66,14 @@ public enum ConditionId
     DragonCheer,
     FocusEnergy,
     LaserFocus,
+    Detect,
+    MaxGuard,
+    KingsShield,
+    SpikyShield,
+    BanefulBunker,
+    Obstruct,
+    SilkTrap,
+    BurningBulwark,
 
     None,
 }

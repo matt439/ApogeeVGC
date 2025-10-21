@@ -10,7 +10,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -2819,7 +2818,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public Nature GetNature()
     {
-        throw new NotImplementedException();
+        return Set.Nature;
     }
 
     public RelayVar AddVolatile(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null,
@@ -3029,18 +3028,8 @@ public class Pokemon : IPriorityComparison, IDisposable
             return new PokemonHealth
             {
                 SideId = Side.Id,
-                Secret = FaintedHealthData.Instance with
-                {
-                    StatusCondition = Status != ConditionId.None
-                        ? Status
-                        : null,
-                },
-                Shared = FaintedHealthData.Instance with
-                {
-                    StatusCondition = Status != ConditionId.None
-                        ? Status
-                        : null,
-                },
+                Secret = FaintedHealthData.Instance,
+                Shared = FaintedHealthData.Instance,
             };
         }
 
@@ -3171,7 +3160,9 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public bool AddType(PokemonType newType)
     {
-        throw new NotImplementedException();
+        if (Terastallized is not null) return false;
+        AddedType = newType;
+        return true;
     }
 
     public PokemonType[] GetTypes(bool? excludeAdded = null, bool? preterastallized = null)
@@ -3317,14 +3308,53 @@ public class Pokemon : IPriorityComparison, IDisposable
             state.Source == this);
     }
 
+    /// <summary>
+    /// Checks if the Pokemon is protected against a single-target damaging move.
+    /// Returns true if the Pokemon has any protection volatile status (Protect, Detect, King's Shield, etc.)
+    /// </summary>
+    /// <returns>True if protected, false otherwise</returns>
     public bool IsProtected()
     {
-        throw new NotImplementedException();
+        return Volatiles.ContainsKey(ConditionId.Protect) ||
+               Volatiles.ContainsKey(ConditionId.Detect) ||
+               Volatiles.ContainsKey(ConditionId.MaxGuard) ||
+               Volatiles.ContainsKey(ConditionId.KingsShield) ||
+               Volatiles.ContainsKey(ConditionId.SpikyShield) ||
+               Volatiles.ContainsKey(ConditionId.BanefulBunker) ||
+               Volatiles.ContainsKey(ConditionId.Obstruct) ||
+               Volatiles.ContainsKey(ConditionId.SilkTrap) ||
+               Volatiles.ContainsKey(ConditionId.BurningBulwark);
     }
 
+    /// <summary>
+    /// Gets the effective weather for this Pokemon.
+    /// Like Field.EffectiveWeather(), but ignores sun and rain if
+    /// the Utility Umbrella item is being held by the Pokemon.
+    /// Returns ConditionId.None if weather is negated by Utility Umbrella.
+    /// </summary>
+    /// <returns>The effective weather condition, or ConditionId.None if negated</returns>
     public ConditionId EffectiveWeather()
     {
-        throw new NotImplementedException();
+        // Get the current effective weather from the field
+        ConditionId weather = Battle.Field.EffectiveWeather();
+
+        // Check if Utility Umbrella negates sun/rain effects
+        switch (weather)
+        {
+            case ConditionId.SunnyDay:
+            case ConditionId.RainDance:
+            case ConditionId.DesolateLand:
+            case ConditionId.PrimordialSea:
+                // Utility Umbrella negates these weather conditions
+                if (HasItem(ItemId.UtilityUmbrella))
+                {
+                    return ConditionId.None;
+                }
+                break;
+        }
+
+        // Return the weather as-is (not affected by Utility Umbrella)
+        return weather;
     }
 
     /// <summary>
