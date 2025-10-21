@@ -63,6 +63,9 @@ public enum ConditionId
     RainDance,
     Substitute,
     ShedTail,
+    DragonCheer,
+    FocusEnergy,
+    LaserFocus,
 
     None,
 }

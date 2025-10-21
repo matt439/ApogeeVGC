@@ -31,6 +31,9 @@ public enum SpecieId
     ZacianCrowned,
     Zamazenta,
     ZamazentaCrowned,
+    Ogerpon,
+    Terapagos,
+    EternatusEternamax,
 }
 
 public enum FormeId

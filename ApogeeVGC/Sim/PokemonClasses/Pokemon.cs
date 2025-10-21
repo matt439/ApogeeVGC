@@ -5,14 +5,11 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -1659,7 +1656,137 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public bool TransformInto(Pokemon pokemon, IEffect? effect = null)
     {
-        throw new NotImplementedException();
+        Species species = pokemon.Species;
+
+        // Validation checks
+        if (pokemon.Fainted || Illusion != null || pokemon.Illusion != null ||
+            (pokemon.Volatiles.ContainsKey(ConditionId.Substitute)) ||
+            pokemon.Transformed || Transformed ||
+            species.Id == SpecieId.EternatusEternamax ||
+            (species.BaseSpecies is SpecieId.Ogerpon or SpecieId.Terapagos &&
+             (Terastallized != null || pokemon.Terastallized != null)) ||
+            Terastallized == MoveType.Stellar)
+        {
+            return false;
+        }
+
+        // Set species
+        if (SetSpecie(species, effect, isTransform: true) == null)
+            return false;
+
+        // Mark as transformed and copy weight
+        Transformed = true;
+        WeightHg = pokemon.WeightHg;
+
+        // Copy types
+        var types = pokemon.GetTypes(excludeAdded: true, preterastallized: true);
+        if (pokemon.Volatiles.TryGetValue(ConditionId.Roost, out EffectState? roostState))
+        {
+            // Use the type stored in Roost volatile
+            if (roostState.TypeWas is not null)
+            {
+                SetType((PokemonType)roostState.TypeWas, enforce: true);
+            }
+            else
+            {
+                SetType(types, enforce: true);
+            }
+        }
+        else
+        {
+            SetType(types, enforce: true);
+        }
+        AddedType = pokemon.AddedType;
+        KnownType = IsAlly(pokemon) && pokemon.KnownType;
+        ApparentType = pokemon.ApparentType.ToList();
+
+        // Copy stats (except HP)
+        foreach (StatIdExceptHp stat in Enum.GetValues<StatIdExceptHp>())
+        {
+            StoredStats[stat] = pokemon.StoredStats[stat];
+        }
+
+        // Copy moves
+        MoveSlots.Clear();
+        foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+        {
+            int pp = moveSlot.MaxPp == 1 ? 1 : 5;
+            int maxPp = moveSlot.MaxPp == 1 ? 1 : 5;
+
+            MoveSlots.Add(new MoveSlot
+            {
+                Id = moveSlot.Id,
+                Move = moveSlot.Move,
+                Pp = pp,
+                MaxPp = maxPp,
+                Target = moveSlot.Target,
+                Disabled = false,
+                DisabledSource = null,
+                Used = false,
+                Virtual = true,
+            });
+        }
+
+        // Copy boosts
+        foreach (BoostId boost in Enum.GetValues<BoostId>())
+        {
+            Boosts.SetBoost(boost, pokemon.Boosts.GetBoost(boost));
+        }
+
+        // Copy critical hit volatiles (Gen 6+, so applies to Gen 9)
+        ConditionId[] critVolatiles =
+        [
+            ConditionId.DragonCheer,
+            ConditionId.FocusEnergy,
+            ConditionId.LaserFocus,
+        ];
+
+        // Remove overlapping volatiles first
+        foreach (ConditionId volatileId in critVolatiles)
+        {
+            RemoveVolatile(Battle.Library.Conditions[volatileId]);
+        }
+
+        // Add them from target
+        foreach (ConditionId volatileId in critVolatiles)
+        {
+            if (!pokemon.Volatiles.TryGetValue(volatileId, out EffectState? volatileState)) continue;
+            AddVolatile(volatileId);
+
+            if (volatileId == ConditionId.DragonCheer)
+            {
+                Volatiles[volatileId].HasDragonType = volatileState.HasDragonType;
+            }
+        }
+
+        // Add battle message
+        if (effect != null)
+        {
+            UiGenerator.PrintTransformEvent(this, pokemon, effect);
+        }
+        else
+        {
+            UiGenerator.PrintTransformEvent(this, pokemon);
+        }
+
+        // Handle Terastallization display
+        if (Terastallized != null)
+        {
+            KnownType = true;
+            ApparentType = [Terastallized.Value.ConvertToPokemonType()];
+        }
+
+        // Copy ability
+        SetAbility(pokemon.Ability, this, isFromFormeChange: true, isTransform: true);
+
+        // Handle Ogerpon/Terapagos Terastallization restriction
+        if (Species.BaseSpecies is SpecieId.Ogerpon or SpecieId.Terapagos &&
+            CanTerastallize is not FalseMoveTypeFalseUnion)
+        {
+            CanTerastallize = MoveTypeFalseUnion.FromFalse();
+        }
+
+        return true;
     }
 
     /// <summary>

@@ -379,4 +379,16 @@ public static class UiGenerator
             Console.WriteLine($"-detailschange|{pokemon}|{details}");
         }
     }
+
+    public static void PrintTransformEvent(Pokemon pokemon1, Pokemon pokemon2, IEffect? effect = null)
+    {
+        if (effect is not null)
+        {
+            Console.WriteLine($"{pokemon1.Name} transformed into {pokemon2.Name} due to {effect.Name}!");
+        }
+        else
+        {
+            Console.WriteLine($"{pokemon1.Name} transformed into {pokemon2.Name}!");
+        }
+    }
 }
