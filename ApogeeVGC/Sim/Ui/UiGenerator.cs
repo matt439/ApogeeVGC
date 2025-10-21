@@ -193,6 +193,11 @@ public static class UiGenerator
         Console.WriteLine($"{pokemon.Name} is immune!");
     }
 
+    public static void PrintImmuneEvent(Pokemon pokemon, string message)
+    {
+        Console.WriteLine($"{pokemon.Name} is immune! {message}");
+    }
+
     public static void PrintDetailsChangeEvent(Pokemon pokemon, Pokemon.PokemonDetails details)
     {
         Console.WriteLine($"{pokemon.Name}'s details changed: {details}");
@@ -437,5 +442,10 @@ public static class UiGenerator
             message += $" {attrs}";
         }
         Console.WriteLine(message);
+    }
+
+    public static void PrintMissEvent(Pokemon pokemon, Pokemon target)
+    {
+        Console.WriteLine($"{pokemon.Name}'s attack missed {target.Name}!");
     }
 }

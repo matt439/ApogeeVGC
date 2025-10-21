@@ -41,6 +41,7 @@ public enum ItemId
     RedCard,
     UtilityUmbrella,
     CustapBerry,
+    BlunderPolicy,
 
     None,
 }

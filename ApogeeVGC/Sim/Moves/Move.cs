@@ -144,6 +144,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
 
 
     // Hit effect modifiers
+    public BoolUndefinedUnion? AlwaysHit { get; init; }
     public MoveType? BaseMoveType { get;init; }
     public int? BasePowerModifier { get; init; }
     public int? CritModifier { get; init; }

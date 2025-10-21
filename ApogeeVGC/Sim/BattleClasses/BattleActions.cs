@@ -1187,9 +1187,207 @@ public class BattleActions(IBattle battle)
         return hitResults;
     }
 
-    public List<BoolIntUndefinedUnion>? HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    /// <summary>
+    /// Hit step 4: Check accuracy.
+    /// Returns a list of hit results (true = hit, false = miss).
+    /// </summary>
+    public List<BoolIntUndefinedUnion> HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        var hitResults = new List<BoolIntUndefinedUnion>();
+
+        foreach (Pokemon target in targets)
+        {
+            Battle.ActiveTarget = target;
+
+            // Calculate true accuracy
+            IntTrueUnion accuracy = move.Accuracy;
+
+            // Handle OHKO moves (One-Hit Knockout moves like Fissure, Sheer Cold)
+            if (move.Ohko != null)
+            {
+                // OHKO moves bypass accuracy modifiers
+                if (!target.IsSemiInvulnerable())
+                {
+                    // Base accuracy for OHKO moves is 30%
+                    int ohkoAccuracy = 30;
+
+                    // Ice-type OHKO moves (Sheer Cold) have 20% accuracy when used by non-Ice types (Gen 7+)
+                    if (move.Ohko is IceMoveOhko && Battle.Gen >= 7 && !pokemon.HasType(PokemonType.Ice))
+                    {
+                        ohkoAccuracy = 20;
+                    }
+
+                    // OHKO moves gain accuracy based on level difference
+                    // Only works if: target level <= user level AND (move hits all types OR target doesn't have OHKO immunity type)
+                    bool hasTypeImmunity = move.Ohko is BoolMoveOhko { Value: true } ||
+                                           move.Ohko is IceMoveOhko && target.HasType(PokemonType.Ice);
+
+                    if (pokemon.Level >= target.Level && !hasTypeImmunity)
+                    {
+                        ohkoAccuracy += pokemon.Level - target.Level;
+                    }
+                    else
+                    {
+                        // OHKO failed due to level or type immunity
+                        UiGenerator.PrintImmuneEvent(target, "[ohko]");
+                        hitResults.Add(BoolIntUndefinedUnion.FromBool(false));
+                        continue;
+                    }
+
+                    accuracy = IntTrueUnion.FromInt(ohkoAccuracy);
+                }
+            }
+            else
+            {
+                // Non-OHKO moves: Run ModifyAccuracy event
+                RelayVar? accuracyEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
+                    move, RelayVar.FromIntTrueUnion(accuracy));
+
+                if (accuracyEvent is IntRelayVar irv)
+                {
+                    accuracy = IntTrueUnion.FromInt(irv.Value);
+                }
+                else if (accuracyEvent is BoolRelayVar { Value: true })
+                {
+                    accuracy = IntTrueUnion.FromTrue();
+                }
+
+                // Apply accuracy/evasion boosts if accuracy is not "always hit"
+                if (accuracy is IntIntTrueUnion intAccuracy)
+                {
+                    int boost = 0;
+
+                    // Apply user's accuracy boosts (unless move ignores accuracy)
+                    if (move.IgnoreAccuracy != true)
+                    {
+                        // Create a copy of the boosts table for the event
+                        var boostsTable = new BoostsTable
+                        {
+                            Atk = pokemon.Boosts.Atk,
+                            Def = pokemon.Boosts.Def,
+                            SpA = pokemon.Boosts.SpA,
+                            SpD = pokemon.Boosts.SpD,
+                            Spe = pokemon.Boosts.Spe,
+                            Accuracy = pokemon.Boosts.Accuracy,
+                            Evasion = pokemon.Boosts.Evasion,
+                        };
+
+                        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
+                            null, boostsTable);
+
+                        if (boostEvent is BoostsTableRelayVar brv)
+                        {
+                            boostsTable = brv.Table;
+                        }
+
+                        boost = Battle.ClampIntRange(boostsTable.Accuracy, -6, 6);
+                    }
+
+                    // Subtract target's evasion boosts (unless move ignores evasion)
+                    if (move.IgnoreEvasion != true)
+                    {
+                        // Create a copy of the target's boosts table for the event
+                        var targetBoostsTable = new BoostsTable
+                        {
+                            Atk = target.Boosts.Atk,
+                            Def = target.Boosts.Def,
+                            SpA = target.Boosts.SpA,
+                            SpD = target.Boosts.SpD,
+                            Spe = target.Boosts.Spe,
+                            Accuracy = target.Boosts.Accuracy,
+                            Evasion = target.Boosts.Evasion,
+                        };
+
+                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                            null, targetBoostsTable);
+
+                        if (targetBoostEvent is BoostsTableRelayVar tbrv)
+                        {
+                            targetBoostsTable = tbrv.Table;
+                        }
+
+                        boost = Battle.ClampIntRange(boost - targetBoostsTable.Evasion, -6, 6);
+                    }
+
+                    // Apply boost multiplier to accuracy
+                    if (boost > 0)
+                    {
+                        // Positive boosts: multiply accuracy
+                        int intAcc = Battle.Trunc(intAccuracy.Value * (3 + boost) / 3);
+                        accuracy = intAcc;
+                    }
+                    else if (boost < 0)
+                    {
+                        // Negative boosts: divide accuracy
+                        int intAcc = Battle.Trunc(intAccuracy.Value * 3 / (3 - boost));
+                        accuracy = intAcc;
+                    }
+                }
+            }
+
+            // Check for moves that always hit
+            if (move.AlwaysHit == true ||
+                (move.Id == MoveId.Toxic && Battle.Gen >= 8 && pokemon.HasType(PokemonType.Poison)) ||
+                (move is { Target: MoveTarget.Self, Category: MoveCategory.Status } &&
+                 !target.IsSemiInvulnerable()))
+            {
+                accuracy = IntTrueUnion.FromTrue(); // Bypasses OHKO accuracy modifiers
+            }
+            else
+            {
+                // Run Accuracy event for final accuracy check
+                RelayVar? finalAccuracyEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
+                    move, RelayVar.FromIntTrueUnion(accuracy));
+
+                if (finalAccuracyEvent is IntRelayVar faeIrv)
+                {
+                    accuracy = IntTrueUnion.FromInt(faeIrv.Value);
+                }
+                else if (finalAccuracyEvent is BoolRelayVar { Value: true })
+                {
+                    accuracy = IntTrueUnion.FromTrue();
+                }
+            }
+
+            // Check if move hits based on accuracy roll
+            bool hits = accuracy switch
+            {
+                TrueIntTrueUnion => true, // Always hits
+                IntIntTrueUnion intAcc => Battle.RandomChance(intAcc.Value, 100), // Roll for hit
+                _ => false,
+            };
+
+            if (!hits)
+            {
+                // Move missed
+                if (move.SmartTarget == true)
+                {
+                    move.SmartTarget = false;
+                }
+                else
+                {
+                    if (move.SpreadHit != true)
+                    {
+                        Battle.AttrLastMove("[miss]");
+                    }
+                    UiGenerator.PrintMissEvent(pokemon, target);
+                }
+
+                // Blunder Policy: Boost speed by 2 stages on miss (not for OHKO moves)
+                if (move.Ohko == null && pokemon.HasItem(ItemId.BlunderPolicy) && pokemon.UseItem())
+                {
+                    Battle.Boost(new SparseBoostsTable { Spe = 2 }, pokemon);
+                }
+
+                hitResults.Add(BoolIntUndefinedUnion.FromBool(false));
+                continue;
+            }
+
+            // Move hit successfully
+            hitResults.Add(BoolIntUndefinedUnion.FromBool(true));
+        }
+
+        return hitResults;
     }
 
     public List<BoolIntUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)

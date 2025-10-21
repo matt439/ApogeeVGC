@@ -616,7 +616,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon?
+/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon? | IntTrueUnion
 /// </summary>
 public abstract record RelayVar
 {
@@ -642,6 +642,13 @@ public abstract record RelayVar
     public static implicit operator RelayVar(Pokemon pokemon) => new PokemonRelayVar(pokemon);
     public static RelayVar? FromNullablePokemon(Pokemon? pokemon) => pokemon is null ?
         null : new PokemonRelayVar(pokemon);
+
+    public static RelayVar FromIntTrueUnion(IntTrueUnion union) => union switch
+    {
+        IntIntTrueUnion intValue => new IntRelayVar(intValue.Value),
+        TrueIntTrueUnion => new BoolRelayVar(true),
+        _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
+    };
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
