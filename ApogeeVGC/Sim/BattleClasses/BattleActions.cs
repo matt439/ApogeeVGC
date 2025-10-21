@@ -747,6 +747,12 @@ public class BattleActions(IBattle battle)
             {
                 pokemon.MoveThisTurnResult = null;
             }
+            
+            // Set moveResult based on damage (true if damage exists, is 0, or is undefined)
+            if (damage is IntIntUndefinedFalseUnion or UndefinedIntUndefinedFalseUnion)
+            {
+                moveResult = true;
+            }
         }
         else
         {
@@ -787,28 +793,31 @@ public class BattleActions(IBattle battle)
         // If move failed, trigger MoveFail event
         if (!moveResult)
         {
-            Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon, activeMove);
+            Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon,
+                activeMove);
             return false;
         }
 
         // Handle AfterMoveSecondary effects (excluding Sheer Force and future moves)
-        if (activeMove.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce) ||
-            activeMove.Flags.FutureMove == true) return false;
-
-        int originalHp = pokemon.Hp;
-
-        // Trigger AfterMoveSecondarySelf events
-        Battle.SingleEvent(EventId.AfterMoveSecondarySelf, activeMove, null, pokemon,
-            SingleEventSource.FromNullablePokemon(target), activeMove);
-        Battle.RunEvent(EventId.AfterMoveSecondarySelf, pokemon,
-            RunEventSource.FromNullablePokemon(target), activeMove);
-
-        // Check for Emergency Exit activation (if user's HP dropped below 50%)
-        if (pokemon == target || activeMove.Category == MoveCategory.Status) return false;
-
-        if (pokemon.Hp <= pokemon.MaxHp / 2 && originalHp > pokemon.MaxHp / 2)
+        if (!(activeMove.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce)) &&
+            activeMove.Flags.FutureMove != true)
         {
-            Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+            int originalHp = pokemon.Hp;
+
+            // Trigger AfterMoveSecondarySelf events
+            Battle.SingleEvent(EventId.AfterMoveSecondarySelf, activeMove, null, pokemon,
+                SingleEventSource.FromNullablePokemon(target), activeMove);
+            Battle.RunEvent(EventId.AfterMoveSecondarySelf, pokemon,
+                RunEventSource.FromNullablePokemon(target), activeMove);
+
+            // Check for Emergency Exit activation (if user's HP dropped below 50%)
+            if (pokemon != target && activeMove.Category != MoveCategory.Status)
+            {
+                if (pokemon.Hp <= pokemon.MaxHp / 2 && originalHp > pokemon.MaxHp / 2)
+                {
+                    Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+                }
+            }
         }
 
         return true;
