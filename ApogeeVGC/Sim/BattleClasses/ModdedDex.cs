@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
@@ -104,7 +105,7 @@ public class ModdedDex(Library library)
         return GetImmunity(library.Conditions[condition], targetTypes);
     }
 
-    public static bool GetImmunity(Condition condition, PokemonType targetType)
+    public bool GetImmunity(Condition condition, PokemonType targetType)
     {
         var immuneTypes = condition.ImmuneTypes;
         return !(immuneTypes?.Contains(targetType) ?? false);
@@ -113,6 +114,33 @@ public class ModdedDex(Library library)
     public static bool GetImmunity(Condition condition, IReadOnlyList<PokemonType> targetTypes)
     {
         var immuneTypes = condition.ImmuneTypes;
+        if (immuneTypes == null || immuneTypes.Count == 0)
+        {
+            return true;
+        }
+        // For multiple types, if ANY type is immune, the Pokemon is immune
+        return targetTypes.All(targetType => !immuneTypes.Contains(targetType));
+    }
+
+    public bool GetImmunity(AbilityId ability, PokemonType targetType)
+    {
+        return GetImmunity(library.Abilities[ability], targetType);
+    }
+
+    public bool GetImmunity(AbilityId ability, IReadOnlyList<PokemonType> targetTypes)
+    {
+        return GetImmunity(library.Abilities[ability], targetTypes);
+    }
+
+    public bool GetImmunity(Ability ability, PokemonType targetType)
+    {
+        var immuneTypes = ability.ImmuneTypes;
+        return !(immuneTypes?.Contains(targetType) ?? false);
+    }
+
+    public bool GetImmunity(Ability ability, IReadOnlyList<PokemonType> targetTypes)
+    {
+        var immuneTypes = ability.ImmuneTypes;
         if (immuneTypes == null || immuneTypes.Count == 0)
         {
             return true;

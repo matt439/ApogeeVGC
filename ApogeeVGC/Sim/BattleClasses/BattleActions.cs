@@ -1126,9 +1126,65 @@ public class BattleActions(IBattle battle)
             Select(BoolIntUndefinedUnion.FromBool).ToList();
     }
 
-    public List<BoolIntUndefinedUnion>? HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    /// <summary>
+    /// Hit step 3: Check for move-specific immunities (Powder moves, TryImmunity event, Prankster).
+    /// Returns a list of hit results (true = can hit, false = immune).
+    /// </summary>
+    public List<BoolIntUndefinedUnion> HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        var hitResults = new List<BoolIntUndefinedUnion>();
+
+        foreach (Pokemon target in targets)
+        {
+            bool canHit = true;
+
+            // Gen 6+: Check powder move immunity (Grass-types and Overcoat ability)
+            if (Battle.Gen >= 6 && 
+                move.Flags.Powder == true && 
+                target != pokemon && 
+                !Battle.Dex.GetImmunity(move.Condition?.Id ?? ConditionId.None, target.Types))
+            {
+                if (Battle.PrintDebug)
+                {
+                    // Battle.Debug("natural powder immunity");
+                }
+                UiGenerator.PrintImmuneEvent(target);
+                canHit = false;
+            }
+            // Run TryImmunity event (abilities like Wonder Guard, Flash Fire, Volt Absorb, etc.)
+            else if (Battle.SingleEvent(EventId.TryImmunity, move, null, target, pokemon, 
+                         move) is BoolRelayVar { Value: false })
+            {
+                UiGenerator.PrintImmuneEvent(target);
+                canHit = false;
+            }
+            // Gen 7+: Check Prankster immunity (Dark-types are immune to Prankster-boosted moves from opponents)
+            else if (Battle.Gen >= 7 && 
+                     move.PranksterBoosted == true && 
+                     pokemon.HasAbility(AbilityId.Prankster) &&
+                     !target.IsAlly(pokemon) && 
+                     !Battle.Dex.GetImmunity(AbilityId.Prankster, target.Types))
+            {
+                if (Battle.PrintDebug)
+                {
+                    // Battle.Debug("natural prankster immunity");
+                }
+
+                // Show hint message unless target has Illusion or move would fail anyway due to status immunity
+                if (target.Illusion != null || 
+                    !(move.Status != null && !Battle.Dex.GetImmunity(move.Status.Value, target.Types)))
+                {
+                    UiGenerator.PrintHint("Since gen 7, Dark is immune to Prankster moves.");
+                }
+
+                UiGenerator.PrintImmuneEvent(target);
+                canHit = false;
+            }
+
+            hitResults.Add(BoolIntUndefinedUnion.FromBool(canHit));
+        }
+
+        return hitResults;
     }
 
     public List<BoolIntUndefinedUnion>? HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)

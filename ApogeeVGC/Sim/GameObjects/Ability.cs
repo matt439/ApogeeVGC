@@ -104,6 +104,8 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
 
     public bool AffectsFainted { get; init; }
 
+    public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
+
     public Ability Copy()
     {
         return this with { };
