@@ -180,4 +180,6 @@ public interface IBattle
     bool Ended { get; }
 
     void RetargetLastMove(Pokemon newTarget);
+
+    List<FaintQueue> FaintQueue { get; }
 }
