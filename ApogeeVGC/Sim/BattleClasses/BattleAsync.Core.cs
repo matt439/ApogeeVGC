@@ -1401,7 +1401,7 @@ public partial class BattleAsync : IBattle, IDisposable
         RunPickTeam();
 
         // Add start action to queue
-        Queue.InserChoice(new StartGameAction());
+        Queue.InsertChoice(new StartGameAction());
 
         // Set mid-turn flag
         MidTurn = true;
@@ -3203,7 +3203,7 @@ public partial class BattleAsync : IBattle, IDisposable
         if (!MidTurn)
         {
             // Insert BeforeTurn action at the front of the queue
-            Queue.InserChoice(new BeforeTurnAction());
+            Queue.InsertChoice(new BeforeTurnAction());
 
             // Add Residual action at the end of the queue
             Queue.AddChoice(new ResidualAction());

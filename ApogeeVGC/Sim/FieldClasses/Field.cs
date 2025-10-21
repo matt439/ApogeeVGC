@@ -13,7 +13,7 @@ public enum FieldId
     Default,
 }
 
-public class Field
+public class Field : IDisposable
 {
     public IBattle Battle { get; init; }
     public FieldId Id { get; init; } = FieldId.Default;
@@ -420,7 +420,18 @@ public class Field
 
     public void Destroy()
     {
-        throw new NotImplementedException();
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        ClearWeather();
+        ClearTerrain();
+        foreach (ConditionId status in PseudoWeather.Keys.ToList())
+        {
+            RemovePseudoWeather(status);
+        }
+        GC.SuppressFinalize(this);
     }
     
     public Field Copy()

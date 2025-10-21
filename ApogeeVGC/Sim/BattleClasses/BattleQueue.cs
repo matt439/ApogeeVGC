@@ -382,29 +382,159 @@ public class BattleQueue(IBattle battle)
         return null;
     }
 
-    public void InserChoice(IActionChoice choice, bool midTurn = false)
+    /// <summary>
+    /// Inserts the passed action into the action queue when it normally
+    /// would have happened (sorting by priority/speed), without
+    /// re-sorting the existing actions.
+    /// </summary>
+    /// <param name="choice">The action choice to insert</param>
+    /// <param name="midTurn">Whether this is being inserted mid-turn</param>
+    public void InsertChoice(IActionChoice choice, bool midTurn = false)
     {
-        throw new NotImplementedException();
+        // Update the pokemon's speed if it has one
+        if (choice is IAction { Pokemon: not null } action)
+        {
+            action.Pokemon.UpdateSpeed();
+        }
+
+        // Resolve the choice into one or more actions
+        var actions = ResolveAction(choice, midTurn);
+
+        // If no actions were generated, nothing to insert
+        if (actions.Count == 0) return;
+
+        // Find the insertion range based on priority comparison
+        int? firstIndex = null;
+        int? lastIndex = null;
+
+        for (int i = 0; i < List.Count; i++)
+        {
+            IAction curAction = List[i];
+            int compared = BattleAsync.ComparePriority(actions[0], curAction);
+
+            // Mark the first position where our action should go
+            // (when it has equal or higher priority than the current action)
+            if (compared <= 0 && firstIndex == null)
+            {
+                firstIndex = i;
+            }
+
+            // Mark the last position in the range
+            // (when our action has strictly higher priority)
+            if (compared >= 0) continue;
+            lastIndex = i;
+            break;
+        }
+
+        // If we never found a position, append to the end
+        if (firstIndex == null)
+        {
+            List.AddRange(actions);
+        }
+        else
+        {
+            // If we didn't find a lastIndex, it means we should insert at the end of the range
+            lastIndex ??= List.Count;
+
+            // Randomly select an index within the valid range to preserve speed tie randomness
+            int index = firstIndex == lastIndex
+                ? firstIndex.Value
+                : Battle.Random(firstIndex.Value, lastIndex.Value + 1);
+
+            // Insert the actions at the selected position
+            List.InsertRange(index, actions);
+        }
     }
 
-    public void InserChoice(List<IActionChoice> choices, bool midTurn = false)
+    /// <summary>
+    /// Inserts multiple action choices into the queue.
+    /// This is a convenience overload that calls InsertChoice for each choice.
+    /// </summary>
+    /// <param name="choices">The list of action choices to insert</param>
+    /// <param name="midTurn">Whether this is being inserted mid-turn</param>
+    public void InsertChoice(List<IActionChoice> choices, bool midTurn = false)
     {
-        throw new NotImplementedException();
+        foreach (IActionChoice choice in choices)
+        {
+            InsertChoice(choice, midTurn);
+        }
     }
 
+    /// <summary>
+    /// Clears all actions from the queue.
+    /// </summary>
     public void Clear()
     {
-        throw new NotImplementedException();
+        List.Clear();
     }
 
+    /// <summary>
+    /// Returns a debug string representation of an action or the entire queue.
+    /// Useful for debugging action ordering and priority issues.
+    /// </summary>
+    /// <param name="action">The action to debug, or null to debug the entire queue</param>
+    /// <returns>A formatted debug string</returns>
     public string Debug(IAction? action = null)
     {
-        throw new NotImplementedException();
+        if (action != null)
+        {
+            // Debug a single action
+            return DebugAction(action);
+        }
+
+        // Debug the entire queue
+        if (List.Count == 0)
+        {
+            return "Queue is empty";
+        }
+
+        var debugLines = new List<string> { "Battle Queue:" };
+        for (int i = 0; i < List.Count; i++)
+        {
+            debugLines.Add($"  [{i}] {DebugAction(List[i])}");
+        }
+
+        return string.Join("\n", debugLines);
     }
 
+    /// <summary>
+    /// Helper method to format a single action for debugging.
+    /// </summary>
+    private static string DebugAction(IAction action)
+    {
+        string pokemonName = action.Pokemon?.Name ?? "None";
+        string choiceStr = action.Choice.ToString();
+
+        return action switch
+        {
+            MoveAction ma => $"{choiceStr} | {pokemonName} | {ma.Move.Name} | " +
+                            $"Order: {ma.Order} | Priority: {ma.Priority} | Speed: {ma.Speed}",
+            SwitchAction sa => $"{choiceStr} | {pokemonName} -> {sa.Target.Name} | " +
+                              $"Order: {sa.Order} | Speed: {sa.Speed}",
+            PokemonAction pa => $"{choiceStr} | {pokemonName} | " +
+                               $"Order: {pa.Order} | Speed: {pa.Speed}",
+            _ => $"{choiceStr} | {pokemonName}",
+        };
+    }
+
+    /// <summary>
+    /// Sorts the action queue by priority/speed order.
+    /// Uses the battle's SpeedSort method which properly handles speed ties.
+    /// </summary>
+    /// <returns>This queue (for method chaining)</returns>
     public BattleQueue Sort()
     {
-        throw new NotImplementedException();
+        if (Battle is BattleAsync battleAsync)
+        {
+            battleAsync.SpeedSort(List);
+        }
+        else
+        {
+            // Fallback: simple sort using ComparePriority
+            List.Sort(BattleAsync.ComparePriority);
+        }
+
+        return this;
     }
 
     #region Helpers
