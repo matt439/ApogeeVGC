@@ -257,9 +257,20 @@ public class Pokemon : IPriorityComparison, IDisposable
         return new PokemonSlot(Side.Id, poistionOffset);
     }
 
+    /// <summary>
+    /// Returns a string representation of this Pokemon.
+    /// If the Pokemon has an Illusion, shows the disguised Pokemon's name.
+    /// For active Pokemon, includes slot identifier; otherwise just shows full name.
+    /// </summary>
+    /// <returns>String representation combining slot (if active) and Pokemon name</returns>
     public override string ToString()
     {
-        throw new NotImplementedException();
+        // Determine the full name to display (real or illusion)
+        string fullname = Illusion != null ? Illusion.Fullname : Fullname;
+
+        // If active, combine slot identifier with name (skip first 2 chars of fullname)
+        // Otherwise just return the full name
+        return IsActive ? GetSlot() + fullname[2..] : fullname;
     }
 
     public class PokemonDetails
