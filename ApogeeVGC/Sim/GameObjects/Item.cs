@@ -40,6 +40,7 @@ public enum ItemId
     RowapBerry,
     RedCard,
     UtilityUmbrella,
+    CustapBerry,
 
     None,
 }

@@ -424,4 +424,18 @@ public static class UiGenerator
     {
         Console.WriteLine($"{pokemon.Name} can't use {move.Name} because {reason}!");
     }
+
+    public static void PrintMoveEvent(Pokemon pokemon, string moveName, Pokemon? target = null, string? attrs = null)
+    {
+        string message = $"{pokemon.Name} used {moveName}";
+        if (target != null)
+        {
+            message += $" on {target.Name}";
+        }
+        if (!string.IsNullOrEmpty(attrs))
+        {
+            message += $" {attrs}";
+        }
+        Console.WriteLine(message);
+    }
 }

@@ -588,7 +588,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon
+/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon?
 /// </summary>
 public abstract record RelayVar
 {
@@ -612,6 +612,8 @@ public abstract record RelayVar
     public static implicit operator RelayVar(RelayVar[] values) => new ArrayRelayVar([.. values]);
     public static implicit operator RelayVar(List<RelayVar> values) => new ArrayRelayVar(values);
     public static implicit operator RelayVar(Pokemon pokemon) => new PokemonRelayVar(pokemon);
+    public static RelayVar? FromNullablePokemon(Pokemon? pokemon) => pokemon is null ?
+        null : new PokemonRelayVar(pokemon);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;

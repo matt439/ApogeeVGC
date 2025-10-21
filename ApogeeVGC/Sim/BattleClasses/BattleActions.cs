@@ -509,185 +509,289 @@ public class BattleActions(IBattle battle)
         throw new NotImplementedException();
     }
 
-    //    useMoveInner(
-    //        moveOrMoveName: Move | string, pokemon: Pokemon, options?: {
-    //        target ?: Pokemon | null, sourceEffect ?: Effect | null,
-    //			zMove ?: string, maxMove ?: string,
-    //		},
-    //	) {
-    //		let target = options?.target;
-    //    let sourceEffect = options?.sourceEffect;
-    //    const zMove = options?.zMove;
-    //    const maxMove = options?.maxMove;
-    //		if (!sourceEffect && this.battle.effect.id) sourceEffect = this.battle.effect;
-    //		if (sourceEffect && ['instruct', 'custapberry'].includes(sourceEffect.id)) sourceEffect = null;
-
-    //		let move = this.dex.getActiveMove(moveOrMoveName);
-    //    pokemon.lastMoveUsed = move;
-    //		if (move.id === 'weatherball' && zMove) {
-    //			// Z-Weather Ball only changes types if it's used directly,
-    //			// not if it's called by Z-Sleep Talk or something.
-    //			this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-    //			if (move.type !== 'Normal') sourceEffect = move;
-    //		}
-    //		if (zMove || (move.category !== 'Status' && sourceEffect && (sourceEffect as ActiveMove).isZ)) {
-    //			move = this.getActiveZMove(move, pokemon);
-    //}
-    //		if (maxMove && move.category !== 'Status') {
-    //            // Max move outcome is dependent on the move type after type modifications from ability and the move itself
-    //            this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-    //			this.battle.runEvent('ModifyType', pokemon, target, move, move);
-    //}
-    //		if (maxMove || (move.category !== 'Status' && sourceEffect && (sourceEffect as ActiveMove).isMax)) {
-    //			move = this.getActiveMaxMove(move, pokemon);
-    //}
-
-    //		if (this.battle.activeMove) {
-    //    move.priority = this.battle.activeMove.priority;
-    //    if (!move.hasBounced) move.pranksterBoosted = this.battle.activeMove.pranksterBoosted;
-    //}
-    //		const baseTarget = move.target;
-    //let targetRelayVar = { target };
-    //targetRelayVar = this.battle.runEvent('ModifyTarget', pokemon, target, move, targetRelayVar, true);
-    //		if (targetRelayVar.target !== undefined) target = targetRelayVar.target;
-    //		if (target === undefined) target = this.battle.getRandomTarget(pokemon, move);
-    //		if (move.target === 'self' || move.target === 'allies') {
-    //    target = pokemon;
-    //}
-    //		if (sourceEffect) {
-    //    move.sourceEffect = sourceEffect.id;
-    //    move.ignoreAbility = (sourceEffect as ActiveMove).ignoreAbility;
-    //}
-    //let moveResult = false;
-
-    //		this.battle.setActiveMove(move, pokemon, target);
-
-    //		this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-    //		this.battle.singleEvent('ModifyMove', move, null, pokemon, target, move, move);
-    //		if (baseTarget !== move.target) {
-    //    // Target changed in ModifyMove, so we must adjust it here
-    //    // Adjust before the next event so the correct target is passed to the
-    //    // event
-    //    target = this.battle.getRandomTarget(pokemon, move);
-    //}
-    //move = this.battle.runEvent('ModifyType', pokemon, target, move, move);
-    //move = this.battle.runEvent('ModifyMove', pokemon, target, move, move);
-    //		if (baseTarget !== move.target) {
-    //    // Adjust again
-    //    target = this.battle.getRandomTarget(pokemon, move);
-    //}
-    //		if (!move || pokemon.fainted) {
-    //    return false;
-    //}
-
-    //let attrs = '';
-
-    //let movename = move.name;
-    //		if (move.id === 'hiddenpower') movename = 'Hidden Power';
-    //		if (sourceEffect) attrs += `|[from] ${ sourceEffect.fullname}`;
-    //		if (zMove && move.isZ === true) {
-    //    attrs = `| [anim]${ movename}${ attrs}`;
-    //    movename = `Z -${ movename}`;
-    //}
-    //		this.battle.addMove('move', pokemon, movename, `${ target}${ attrs}`);
-
-    //		if (zMove) this.runZPower(move, pokemon);
-
-    //		if (!target) {
-    //    this.battle.attrLastMove('[notarget]');
-    //    this.battle.add(this.battle.gen >= 5 ? '-fail' : '-notarget', pokemon);
-    //    return false;
-    //}
-
-    //		const { targets, pressureTargets } = pokemon.getMoveTargets(move, target);
-    //		if (targets.length) {
-    //    target = targets[targets.length - 1]; // in case of redirection
-    //}
-
-    //		const callerMoveForPressure = sourceEffect && (sourceEffect as ActiveMove).pp ? sourceEffect as ActiveMove : null;
-    //		if (!sourceEffect || callerMoveForPressure || sourceEffect.id === 'pursuit') {
-    //    let extraPP = 0;
-    //    for (const source of pressureTargets) {
-    //        const ppDrop = this.battle.runEvent('DeductPP', source, pokemon, move);
-    //        if (ppDrop !== true)
-    //        {
-    //            extraPP += ppDrop || 0;
-    //        }
-    //    }
-    //    if (extraPP > 0)
-    //    {
-    //        pokemon.deductPP(callerMoveForPressure || moveOrMoveName, extraPP);
-    //    }
-    //}
-
-    //		if (!this.battle.singleEvent('TryMove', move, null, pokemon, target, move) ||
-    //			!this.battle.runEvent('TryMove', pokemon, target, move)) {
-    //    move.mindBlownRecoil = false;
-    //    return false;
-    //}
-
-    //		this.battle.singleEvent('UseMoveMessage', move, null, pokemon, target, move);
-
-    //		if (move.ignoreImmunity === undefined) {
-    //    move.ignoreImmunity = (move.category === 'Status');
-    //}
-
-    //		if (this.battle.gen !== 4 && move.selfdestruct === 'always') {
-    //    this.battle.faint(pokemon, pokemon, move);
-    //}
-
-    //let damage: number | false | undefined | '' = false;
-    //		if (move.target === 'all' || move.target === 'foeSide' || move.target === 'allySide' || move.target === 'allyTeam') {
-    //    damage = this.tryMoveHit(targets, pokemon, move);
-    //    if (damage === this.battle.NOT_FAIL) pokemon.moveThisTurnResult = null;
-    //    if (damage || damage === 0 || damage === undefined) moveResult = true;
-    //} else {
-    //    if (!targets.length)
-    //    {
-    //        this.battle.attrLastMove('[notarget]');
-    //        this.battle.add(this.battle.gen >= 5 ? '-fail' : '-notarget', pokemon);
-    //        return false;
-    //    }
-    //    if (this.battle.gen === 4 && move.selfdestruct === 'always')
-    //    {
-    //        this.battle.faint(pokemon, pokemon, move);
-    //    }
-    //    moveResult = this.trySpreadMoveHit(targets, pokemon, move);
-    //}
-    //		if (move.selfBoost && moveResult) this.moveHit(pokemon, pokemon, move, move.selfBoost, false, true);
-    //		if (!pokemon.hp) {
-    //    this.battle.faint(pokemon, pokemon, move);
-    //}
-
-    //		if (!moveResult) {
-    //    this.battle.singleEvent('MoveFail', move, null, target, pokemon, move);
-    //    return false;
-    //}
-
-    //		if (!(move.hasSheerForce && pokemon.hasAbility('sheerforce')) && !move.flags['futuremove']) {
-    //			const originalHp = pokemon.hp;
-
-    //            this.battle.singleEvent('AfterMoveSecondarySelf', move, null, pokemon, target, move);
-    //			this.battle.runEvent('AfterMoveSecondarySelf', pokemon, target, move);
-    //			if (pokemon && pokemon !== target && move.category !== 'Status') {
-    //    if (pokemon.hp <= pokemon.maxhp / 2 && originalHp > pokemon.maxhp / 2)
-    //    {
-    //        this.battle.runEvent('EmergencyExit', pokemon, pokemon);
-    //    }
-    //}
-    //}
-
-    //		return true;
-    //	}
-
     public void UseMoveInner(MoveId moveId, Pokemon pokemon, UseMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        Move move = Library.Moves[moveId];
+        UseMoveInner(move, pokemon, options);
     }
 
     public void UseMoveInner(Move move, Pokemon pokemon, UseMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        Pokemon? target = options?.Target;
+        IEffect? sourceEffect = options?.SourceEffect;
+
+        // Default sourceEffect to battle effect if not provided and battle has an active effect
+        if (sourceEffect == null && Battle.Effect.EffectStateId != EffectStateId.FromEmpty())
+        {
+            sourceEffect = Battle.Effect;
+        }
+
+        // Clear sourceEffect for Instruct and Custap Berry
+        if (sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry })
+        {
+            sourceEffect = null;
+        }
+
+        // Get active move
+        var activeMove = move.ToActiveMove();
+        pokemon.LastMoveUsed = activeMove;
+
+        // Copy priority and prankster boost from active move if it exists
+        if (Battle.ActiveMove != null)
+        {
+            activeMove.Priority = Battle.ActiveMove.Priority;
+            if (activeMove.HasBounced != true)
+            {
+                activeMove.PranksterBoosted = Battle.ActiveMove.PranksterBoosted;
+            }
+        }
+
+        // Store base target for later comparison
+        MoveTarget baseTarget = activeMove.Target;
+
+        // Run ModifyTarget event
+        RelayVar? targetRelayVar = Battle.RunEvent(EventId.ModifyTarget, pokemon,
+            RunEventSource.FromNullablePokemon(target), activeMove, RelayVar.FromNullablePokemon(target));
+
+        if (targetRelayVar is PokemonRelayVar prv)
+        {
+            target = prv.Pokemon;
+        }
+
+        // Get random target if target is undefined
+        target ??= Battle.GetRandomTarget(pokemon, activeMove);
+
+        // Self/allies target always targets the user
+        if (activeMove.Target is MoveTarget.Self or MoveTarget.Allies)
+        {
+            target = pokemon;
+        }
+
+        // Set source effect information
+        if (sourceEffect != null)
+        {
+            activeMove.SourceEffect = sourceEffect.EffectStateId;
+            if (sourceEffect is ActiveMove sourceMove)
+            {
+                activeMove.IgnoreAbility = sourceMove.IgnoreAbility;
+            }
+        }
+
+        // Set as active move
+        Battle.SetActiveMove(activeMove, pokemon, target);
+
+        // Run ModifyType event (single)
+        Battle.SingleEvent(EventId.ModifyType, activeMove, null, pokemon,
+            SingleEventSource.FromNullablePokemon(target), activeMove, activeMove);
+
+        // Run ModifyMove event (single)
+        Battle.SingleEvent(EventId.ModifyMove, activeMove, null, pokemon,
+            SingleEventSource.FromNullablePokemon(target), activeMove, activeMove);
+
+        // Check if target changed and adjust
+        if (baseTarget != activeMove.Target)
+        {
+            target = Battle.GetRandomTarget(pokemon, activeMove);
+        }
+
+        // Run ModifyType event (global)
+        RelayVar? modifyTypeResult = Battle.RunEvent(EventId.ModifyType, pokemon,
+            RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
+
+        if (modifyTypeResult is EffectRelayVar { Effect: ActiveMove modifiedMove1 })
+        {
+            activeMove = modifiedMove1;
+        }
+
+        // Run ModifyMove event (global)
+        RelayVar? modifyMoveResult = Battle.RunEvent(EventId.ModifyMove, pokemon,
+            RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
+
+        if (modifyMoveResult is EffectRelayVar { Effect: ActiveMove modifiedMove2 })
+        {
+            activeMove = modifiedMove2;
+        }
+
+        // Check if target changed again and adjust
+        if (baseTarget != activeMove.Target)
+        {
+            target = Battle.GetRandomTarget(pokemon, activeMove);
+        }
+
+        // Early exit if move is null or pokemon fainted
+        if (pokemon.Fainted)
+        {
+            return;
+        }
+
+        // Build move message attributes
+        string moveName = activeMove.Name;
+
+        string attrs = "";
+        if (sourceEffect != null)
+        {
+            attrs += $"|[from] {sourceEffect.EffectStateId}"; // Note: Needs proper fullname formatting
+        }
+
+        // Add move message to battle log
+        UiGenerator.PrintMoveEvent(pokemon, moveName, target, attrs);
+
+        // Handle no target
+        if (target == null)
+        {
+            // Battle.AttrLastMove("[notarget]"); // Skipping attribute
+            if (Battle.PrintDebug)
+            {
+                UiGenerator.PrintFailEvent(pokemon);
+            }
+            return;
+        }
+
+        // Get move targets for Pressure PP deduction
+        Pokemon.MoveTargets moveTargets = pokemon.GetMoveTargets(activeMove, target);
+        var targets = moveTargets.Targets;
+        var pressureTargets = moveTargets.PressureTargets;
+
+        // Update target to last in list (for redirection)
+        if (targets.Count > 0)
+        {
+            target = targets[^1];
+        }
+
+        // Determine if this is a caller move for Pressure
+        ActiveMove? callerMoveForPressure = null;
+        if (sourceEffect is ActiveMove { Pp: > 0 } sm)
+        {
+            callerMoveForPressure = sm;
+        }
+
+        // Handle Pressure ability PP deduction
+        if (sourceEffect == null || callerMoveForPressure != null)
+        {
+            int extraPp = 0;
+            foreach (RelayVar? ppDropEvent in pressureTargets.Select(pressureSource =>
+                         Battle.RunEvent(EventId.DeductPp, pressureSource, pokemon, activeMove)))
+            {
+                if (ppDropEvent is IntRelayVar irv)
+                {
+                    extraPp += irv.Value;
+                }
+                else if (ppDropEvent is not BoolRelayVar { Value: true })
+                {
+                    extraPp += 0;
+                }
+            }
+
+            if (extraPp > 0)
+            {
+                pokemon.DeductPp(callerMoveForPressure ?? activeMove, extraPp);
+            }
+        }
+
+        // Run TryMove events
+        bool tryMoveResult = Battle.SingleEvent(EventId.TryMove, activeMove, null, pokemon,
+                                 SingleEventSource.FromNullablePokemon(target), activeMove)
+                                 is not BoolRelayVar { Value: false }
+                             && Battle.RunEvent(EventId.TryMove, pokemon,
+                                 RunEventSource.FromNullablePokemon(target), activeMove)
+                                 is not BoolRelayVar { Value: false };
+
+        if (!tryMoveResult)
+        {
+            activeMove.MindBlownRecoil = false;
+            return;
+        }
+
+        // Run UseMoveMessage event
+        Battle.SingleEvent(EventId.UseMoveMessage, activeMove, null, pokemon,
+            SingleEventSource.FromNullablePokemon(target), activeMove);
+
+        // Set default ignoreImmunity for Status moves
+        activeMove.IgnoreImmunity ??= activeMove.Category == MoveCategory.Status;
+
+        // Gen 5-8: Self-destruct moves always faint the user immediately
+        // Gen 9 checks selfdestruct later
+        if (Battle.Gen != 4 && activeMove.SelfDestruct is AlwaysMoveSelfDestruct)
+        {
+            Battle.Faint(pokemon, pokemon, activeMove);
+        }
+
+        bool moveResult = false;
+
+        // Execute move and track result
+
+        if (activeMove.Target is MoveTarget.All or MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam)
+        {
+            // Multi-target moves
+            IntUndefinedFalseUnion damage = TryMoveHit(targets, pokemon, activeMove);
+
+            // Check for NOT_FAIL result
+            if (damage is UndefinedIntUndefinedFalseUnion)
+            {
+                pokemon.MoveThisTurnResult = null;
+            }
+        }
+        else
+        {
+            // Single-target moves
+            if (targets.Count == 0)
+            {
+                // Battle.AttrLastMove("[notarget]"); // Skipping attribute
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintFailEvent(pokemon);
+                }
+                return;
+            }
+
+            // Gen 4: Self-destruct moves faint the user before hitting
+            if (Battle.Gen == 4 && activeMove.SelfDestruct is AlwaysMoveSelfDestruct)
+            {
+                Battle.Faint(pokemon, pokemon, activeMove);
+            }
+
+            moveResult = TrySpreadMoveHit(targets, pokemon, activeMove, notActive: false);
+        }
+
+        // Apply self-boost if move succeeded
+        if (activeMove.SelfBoost != null && moveResult)
+        {
+            MoveHit(pokemon, pokemon, activeMove, new HitEffect { Boosts = activeMove.SelfBoost },
+                false, true);
+        }
+
+        // Check if user fainted
+        if (pokemon.Hp <= 0)
+        {
+            Battle.Faint(pokemon, pokemon, activeMove);
+        }
+
+        // If move failed, trigger MoveFail event
+        if (!moveResult)
+        {
+            Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon, activeMove);
+            return;
+        }
+
+        // Handle AfterMoveSecondary effects (excluding Sheer Force and future moves)
+        if (activeMove.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce) ||
+            activeMove.Flags.FutureMove == true) return;
+
+        int originalHp = pokemon.Hp;
+
+        // Trigger AfterMoveSecondarySelf events
+        Battle.SingleEvent(EventId.AfterMoveSecondarySelf, activeMove, null, pokemon,
+            SingleEventSource.FromNullablePokemon(target), activeMove);
+        Battle.RunEvent(EventId.AfterMoveSecondarySelf, pokemon,
+            RunEventSource.FromNullablePokemon(target), activeMove);
+
+        // Check for Emergency Exit activation (if user's HP dropped below 50%)
+        if (pokemon == target || activeMove.Category == MoveCategory.Status) return;
+
+        if (pokemon.Hp <= pokemon.MaxHp / 2 && originalHp > pokemon.MaxHp / 2)
+        {
+            Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+        }
     }
 
     public bool TrySpreadMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move, bool notActive = false)

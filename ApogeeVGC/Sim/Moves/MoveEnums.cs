@@ -49,6 +49,7 @@ public enum MoveId
     SolarBlade,
     ElectroShot,
     SkyDrop,
+    Instruct,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

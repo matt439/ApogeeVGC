@@ -133,7 +133,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
 
     public (int, int)? Recoil { get; init; }
     public (int, int)? Drain { get; init; }
-    public bool? MindBlownRecoil { get; init; }
+    public bool? MindBlownRecoil { get; set; }
     public bool? StealsBoosts { get; init; }
     public bool? StruggleRecoil { get; init; }
     public SecondaryEffect? Secondary { get; init; }
@@ -152,11 +152,11 @@ public record Move : IMoveEventHandlers, IBasicEffect
     public MoveOverridePokemon? OverrideDefensivePokemon { get; init; }
     public StatIdExceptHp? OverrideDefensiveStat { get; init; }
     public bool? ForceStab { get; init; }
-    public bool? IgnoreAbility { get; init; }
+    public bool? IgnoreAbility { get; set; }
     public bool? IgnoreAccuracy { get; init; }
     public bool? IgnoreDefensive { get; init; }
     public bool? IgnoreEvasion { get; init; }
-    public MoveIgnoreImmunity? IgnoreImmunity { get; init; }
+    public MoveIgnoreImmunity? IgnoreImmunity { get; set; }
     public bool? IgnoreNegativeOffensive { get; init; }
     public bool? IgnoreOffensive { get; init; }
     public bool? IgnorePositiveDefensive { get; init; }

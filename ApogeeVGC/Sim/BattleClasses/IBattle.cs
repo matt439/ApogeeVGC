@@ -204,4 +204,8 @@ public interface IBattle
     Pokemon? GetTarget(Pokemon pokemon, MoveId moveId, int targetLoc, Pokemon? originalTarget = null);
 
     Pokemon? GetTarget(Pokemon pokemon, Move move, int targetLoc, Pokemon? originalTarget = null);
+
+    void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null);
+
+    void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null);
 }

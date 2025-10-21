@@ -48,6 +48,7 @@ public enum AbilityId
     PropellerTail,
     NaturalCure,
     Dancer,
+    SheerForce,
 
     None,
 }
