@@ -186,4 +186,12 @@ public interface IBattle
     int Turn { get; }
 
     public int EffectOrder { get; set; }
+
+    void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) where T : IPriorityComparison;
+
+    List<int> SpeedOrder { get; set; }
+
+    void FieldEvent(EventId eventId, List<Pokemon>? targets = null);
+
+    Pokemon? GetRandomSwitchable(Side side);
 }

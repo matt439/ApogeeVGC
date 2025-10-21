@@ -1,14 +1,14 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils;
-using ApogeeVGC.Sim.Actions;
-using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Ui;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -199,12 +199,55 @@ public class BattleActions(IBattle battle)
 
     public bool DragIn(Side side, int pos)
     {
-        throw new NotImplementedException();
+        Pokemon? pokemon = Battle.GetRandomSwitchable(side);
+        if (pokemon == null || pokemon.IsActive)
+        {
+            return false;
+        }
+
+        Pokemon? oldActive = side.Active[pos];
+        if (oldActive == null)
+        {
+            throw new InvalidOperationException("Nothing to drag out");
+        }
+
+        if (oldActive.Hp <= 0)
+        {
+            return false;
+        }
+
+        RelayVar? dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive);
+
+        return dragOutResult is not BoolRelayVar { Value: false } &&
+               SwitchIn(pokemon, pos, null, true);
     }
 
     public bool RunSwitch(Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        List<Pokemon> switchersIn = [pokemon];
+
+        while (Battle.Queue.Peek() is RunSwitchAction)
+        {
+            IAction? nextSwitch = Battle.Queue.Shift();
+            if (nextSwitch is RunSwitchAction runSwitchAction)
+            {
+                switchersIn.Add(runSwitchAction.Pokemon ?? throw new InvalidOperationException("Pokemon must" +
+                    "not be null here."));
+            }
+        }
+
+        var allActive = Battle.GetAllActive(true);
+        Battle.SpeedSort(allActive);
+        Battle.SpeedOrder = allActive.Select(a => a.Side.N * a.Battle.Sides.Count + a.Position).ToList();
+        Battle.FieldEvent(EventId.SwitchIn, switchersIn);
+
+        foreach (Pokemon poke in switchersIn.Where(poke => poke.Hp > 0))
+        {
+            poke.IsStarted = true;
+            poke.DraggedIn = null;
+        }
+
+        return true;
     }
 
     #endregion
