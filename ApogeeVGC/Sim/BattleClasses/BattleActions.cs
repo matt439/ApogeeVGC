@@ -1390,10 +1390,120 @@ public class BattleActions(IBattle battle)
         return hitResults;
     }
 
+    /// <summary>
+    /// Hit step 5: Break protection effects (Protect, King's Shield, etc.).
+    /// Returns null to indicate this step doesn't filter targets.
+    /// </summary>
     public List<BoolIntUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        if (move.BreaksProtect != true)
+        {
+            return null;
+        }
+
+        foreach (Pokemon target in targets)
+        {
+            bool broke = false;
+
+            // Remove individual protection volatiles
+            var protectionVolatiles = new[]
+            {
+                ConditionId.BanefulBunker,
+                ConditionId.BurningBulwark,
+                ConditionId.KingsShield,
+                ConditionId.Obstruct,
+                ConditionId.Protect,
+                ConditionId.SilkTrap,
+                ConditionId.SpikyShield,
+            };
+
+            foreach (ConditionId effectId in protectionVolatiles)
+            {
+                if (target.RemoveVolatile(Library.Conditions[effectId]))
+                {
+                    broke = true;
+                }
+            }
+
+            // Remove side-wide protection conditions (Gen 6+ or when targeting opponents)
+            if (Battle.Gen >= 6 || !target.IsAlly(pokemon))
+            {
+                var sideProtections = new[]
+                {
+                    ConditionId.QuickGuard,
+                    ConditionId.WideGuard,
+                };
+
+                foreach (ConditionId effectId in sideProtections)
+                {
+                    if (target.Side.RemoveSideCondition(effectId))
+                    {
+                        broke = true;
+                    }
+                }
+            }
+
+            // Display activation message if protection was broken
+            if (broke)
+            {
+                if (move.Id == MoveId.Feint)
+                {
+                    UiGenerator.PrintActivateEvent(target, Library.Moves[MoveId.Feint].ToActiveMove());
+                }
+                else
+                {
+                    UiGenerator.PrintActivateEvent(target, move, "[broken]");
+                }
+
+                // Gen 6+: Remove Stall volatile when protection is broken
+                if (Battle.Gen >= 6)
+                {
+                    target.RemoveVolatile(Library.Conditions[ConditionId.Stall]);
+                }
+            }
+        }
+
+        return null;
     }
+
+    //hitStepStealBoosts(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove)
+    //{
+    //    const target = targets[0]; // hardcoded
+    //    if (move.stealsBoosts)
+    //    {
+    //        const boosts: SparseBoostsTable = { }
+    //        ;
+    //        let stolen = false;
+    //        let statName: BoostID;
+    //        for (statName in target.boosts)
+    //        {
+    //            const stage = target.boosts[statName];
+    //            if (stage > 0)
+    //            {
+    //                boosts[statName] = stage;
+    //                stolen = true;
+    //            }
+    //        }
+    //        if (stolen)
+    //        {
+    //            this.battle.attrLastMove('[still]');
+    //            this.battle.add('-clearpositiveboost', target, pokemon, 'move: ' + move.name);
+    //            this.battle.boost(boosts, pokemon, pokemon);
+
+    //            let statName2: BoostID;
+    //            for (statName2 in boosts)
+    //            {
+    //                boosts[statName2] = 0;
+    //            }
+    //            target.setBoost(boosts);
+    //            if (move.id === "spectralthief")
+    //            {
+    //                this.battle.addMove('-anim', pokemon, "Spectral Thief", target);
+    //            }
+    //        }
+    //    }
+    //    return undefined;
+    //}
 
     public List<BoolIntUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {

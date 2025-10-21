@@ -106,6 +106,11 @@ public static class UiGenerator
         }
     }
 
+    public static void PrintActivateEvent(Pokemon pokemon, IEffect effect, string detail)
+    {
+        Console.WriteLine($"{pokemon.Name}'s {effect.Name} activated! {detail}");
+    }
+
     public static void PrintStartEvent(Pokemon pokemon, IEffect effect, IEffect? sourceEffect = null,
         Pokemon? source = null)
     {

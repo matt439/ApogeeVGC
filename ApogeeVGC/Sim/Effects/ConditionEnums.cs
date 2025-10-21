@@ -74,6 +74,8 @@ public enum ConditionId
     Obstruct,
     SilkTrap,
     BurningBulwark,
+    QuickGuard,
+    WideGuard,
 
     None,
 }
