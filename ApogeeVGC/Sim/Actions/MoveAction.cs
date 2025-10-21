@@ -42,7 +42,7 @@ public record MoveAction : IAction
                             "Order must be one of the predefined values.");
                     }
                     break;
-                case FalseIntFalseUnion f:
+                case FalseIntFalseUnion:
                     throw new ArgumentException("Order cannot be of type FalseIntFalseUnion.", nameof(value));
                 default:
                     throw new ArgumentException("Order must be of type FalseIntFalseUnion or IntIntFalseUnion.",

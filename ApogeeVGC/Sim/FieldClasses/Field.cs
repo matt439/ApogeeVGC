@@ -214,12 +214,12 @@ public class Field
         throw new NotImplementedException();
     }
 
-    public Condition GetPseudoWeather(ConditionId status)
+    public Condition? GetPseudoWeather(ConditionId status)
     {
         throw new NotImplementedException();
     }
 
-    public Condition GetPseudoWeather(Condition status)
+    public Condition? GetPseudoWeather(Condition status)
     {
         throw new NotImplementedException();
     }

@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Events;

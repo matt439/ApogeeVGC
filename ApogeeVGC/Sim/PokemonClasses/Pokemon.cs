@@ -153,6 +153,8 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public List<MoveId> BaseMoves => throw new NotImplementedException();
 
+    private const int TrickRoomSpeedOffset = 10000;
+
     public Pokemon(IBattle battle, PokemonSet set, Side side)
     {
         Side = side;
@@ -289,7 +291,23 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public PokemonHealth GetFullDetails()
     {
-        throw new NotImplementedException();
+        PokemonHealth health = GetHealth();
+        PokemonDetails details = Details;
+        if (Illusion is not null)
+        {
+            details = Illusion.GetUpdatedDetails(Level);
+        }
+
+        if (Terastallized is not null)
+        {
+            details.TeraType = Terastallized;
+        }
+        return new PokemonHealth
+        {
+            SideId = health.SideId,
+            Secret = health.Secret,
+            Shared = health.Shared,
+        };
     }
 
     public void UpdateSpeed()
@@ -422,7 +440,12 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public int GetActionSpeed()
     {
-        throw new NotImplementedException();
+        int speed = GetStat(StatIdExceptHp.Spe);
+        if (Battle.Field.GetPseudoWeather(ConditionId.TrickRoom) is not null)
+        {
+            speed = TrickRoomSpeedOffset - speed;
+        }
+        return Battle.Trunc(speed, 13);
     }
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
@@ -470,12 +493,12 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public MoveSlot? GetMoveData(MoveId move)
     {
-        throw new NotImplementedException();
+        return GetMoveData(Battle.Library.Moves[move]);
     }
 
     public MoveSlot? GetMoveData(Move move)
     {
-        throw new NotImplementedException();
+        return MoveSlots.FirstOrDefault(moveSlot => moveSlot.Id == move.Id);
     }
 
     /// <summary>

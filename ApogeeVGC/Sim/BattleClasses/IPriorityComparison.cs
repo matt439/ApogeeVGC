@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Sim.Actions;
-using ApogeeVGC.Sim.Utils;
+﻿using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
