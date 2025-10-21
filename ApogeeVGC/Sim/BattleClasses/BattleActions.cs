@@ -499,14 +499,30 @@ public class BattleActions(IBattle battle)
         public IEffect? SourceEffect { get; init; }
     }
 
+    /// <summary>
+    /// UseMove is the "inside" move caller. It handles effects of the
+    /// move itself, but not the idea of using the move.
+    /// Most caller effects, like Sleep Talk, Nature Power, Magic Bounce,
+    /// etc use useMove.
+    /// The only ones that use runMove are Instruct, Pursuit, and
+    /// Dancer.
+    /// </summary>
     public bool UseMove(MoveId moveId, Pokemon pokemon, UseMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        Move move = Library.Moves[moveId];
+        return UseMove(move, pokemon, options);
     }
 
     public bool UseMove(Move move, Pokemon pokemon, UseMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        pokemon.MoveThisTurnResult = new Undefined();
+        BoolUndefinedUnion? oldMoveResult = pokemon.MoveThisTurnResult;
+        bool moveResult = UseMoveInner(move, pokemon, options);
+        if (oldMoveResult == pokemon.MoveThisTurnResult)
+        {
+            pokemon.MoveThisTurnResult = moveResult;
+        }
+        return moveResult;
     }
 
     public void UseMoveInner(MoveId moveId, Pokemon pokemon, UseMoveOptions? options = null)
@@ -515,7 +531,7 @@ public class BattleActions(IBattle battle)
         UseMoveInner(move, pokemon, options);
     }
 
-    public void UseMoveInner(Move move, Pokemon pokemon, UseMoveOptions? options = null)
+    public bool UseMoveInner(Move move, Pokemon pokemon, UseMoveOptions? options = null)
     {
         Pokemon? target = options?.Target;
         IEffect? sourceEffect = options?.SourceEffect;
@@ -621,7 +637,7 @@ public class BattleActions(IBattle battle)
         // Early exit if move is null or pokemon fainted
         if (pokemon.Fainted)
         {
-            return;
+            return false;
         }
 
         // Build move message attributes
@@ -644,7 +660,8 @@ public class BattleActions(IBattle battle)
             {
                 UiGenerator.PrintFailEvent(pokemon);
             }
-            return;
+
+            return false;
         }
 
         // Get move targets for Pressure PP deduction
@@ -699,7 +716,7 @@ public class BattleActions(IBattle battle)
         if (!tryMoveResult)
         {
             activeMove.MindBlownRecoil = false;
-            return;
+            return false;
         }
 
         // Run UseMoveMessage event
@@ -741,7 +758,8 @@ public class BattleActions(IBattle battle)
                 {
                     UiGenerator.PrintFailEvent(pokemon);
                 }
-                return;
+
+                return false;
             }
 
             // Gen 4: Self-destruct moves faint the user before hitting
@@ -770,12 +788,12 @@ public class BattleActions(IBattle battle)
         if (!moveResult)
         {
             Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon, activeMove);
-            return;
+            return false;
         }
 
         // Handle AfterMoveSecondary effects (excluding Sheer Force and future moves)
         if (activeMove.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce) ||
-            activeMove.Flags.FutureMove == true) return;
+            activeMove.Flags.FutureMove == true) return false;
 
         int originalHp = pokemon.Hp;
 
@@ -786,12 +804,14 @@ public class BattleActions(IBattle battle)
             RunEventSource.FromNullablePokemon(target), activeMove);
 
         // Check for Emergency Exit activation (if user's HP dropped below 50%)
-        if (pokemon == target || activeMove.Category == MoveCategory.Status) return;
+        if (pokemon == target || activeMove.Category == MoveCategory.Status) return false;
 
         if (pokemon.Hp <= pokemon.MaxHp / 2 && originalHp > pokemon.MaxHp / 2)
         {
             Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
         }
+
+        return true;
     }
 
     public bool TrySpreadMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move, bool notActive = false)

@@ -95,7 +95,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     public bool StatsRaisedThisTurn { get; set; }
     public bool StatsLoweredThisTurn { get; set; }
     public bool? MoveLastTurnResult { get; set; }
-    public bool? MoveThisTurnResult { get; set; }
+    public BoolUndefinedUnion? MoveThisTurnResult { get; set; }
     public int? HurtThisTurn { get; set; }
     public int LastDamage { get; set; }
     public List<Attacker> AttackedBy { get; set; }
