@@ -42,6 +42,7 @@ public enum ItemId
     UtilityUmbrella,
     CustapBerry,
     BlunderPolicy,
+    LoadedDice,
 
     None,
 }

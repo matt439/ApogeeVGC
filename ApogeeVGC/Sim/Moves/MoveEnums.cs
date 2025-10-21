@@ -53,6 +53,7 @@ public enum MoveId
     Toxic,
     HelpingHand,
     Feint,
+    Chloroblast,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

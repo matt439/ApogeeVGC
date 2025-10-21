@@ -458,4 +458,19 @@ public static class UiGenerator
     {
         Console.WriteLine($"{pokemon.Name}'s {move.Name} cleared all positive stat boosts from {target.Name}!");
     }
+
+    public static void PrintOhkoEvent()
+    {
+        Console.WriteLine("One-Hit KO move succeeded!");
+    }
+
+    public static void PrintAnimationEvent(Pokemon pokemon, string moveName, Pokemon target)
+    {
+        Console.WriteLine($"Animation: {pokemon.Name} uses {moveName} on {target.Name}");
+    }
+
+    public static void PrintHitCountEvent(Pokemon pokemon, int hitCount)
+    {
+        Console.WriteLine($"{pokemon.Name} hit {hitCount} time(s)!");
+    }
 }

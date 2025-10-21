@@ -115,7 +115,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
         }
     }
     public MoveTarget Target { get; init; }
-    public MoveFlags Flags { get; init; } = new();
+    public MoveFlags Flags { get; set; } = new();
     
     public MoveDamage? Damage { get; init; }
 

@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Actions;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
@@ -11,8 +10,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1839,9 +1836,412 @@ public class BattleActions(IBattle battle)
     //return damage;
     //	}
 
+    private readonly int[] _multiHitSample = [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
+
     public List<BoolIntUndefinedUnion> HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Initialize damage array with 0s for each target
+        var damage = new List<BoolIntUndefinedUnion>();
+        for (int i = 0; i < targets.Count; i++)
+        {
+            damage.Add(BoolIntUndefinedUnion.FromInt(0));
+        }
+
+        move.TotalDamage = 0;
+        pokemon.LastDamage = 0;
+
+        // Determine number of hits
+        IntIntArrayUnion targetHits = move.MultiHit ?? 1;
+        int targetHitResult = 0;
+
+        if (targetHits is IntArrayIntIntArrayUnion range)
+        {
+            // Hardcoded for specific range (2-5 hits)
+            if (range.Values[0] == 2 && range.Values[1] == 5)
+            {
+                if (Battle.Gen >= 5)
+                {
+                    // 35-35-15-15 out of 100 for 2-3-4-5 hits
+                    targetHitResult = Battle.Sample(_multiHitSample);
+                    if (targetHitResult < 4 && pokemon.HasItem(ItemId.LoadedDice))
+                    {
+                        targetHitResult = 5 - Battle.Random(2);
+                    }
+                }
+                else
+                {
+                    targetHitResult = Battle.Sample([2, 2, 2, 3, 3, 3, 4, 5]);
+                }
+            }
+            else
+            {
+                targetHitResult = Battle.Random(range.Values[0], range.Values[1] + 1);
+            }
+        }
+
+        // Loaded Dice for 10-hit moves (Population Bomb)
+        if (targetHitResult == 10 && pokemon.HasItem(ItemId.LoadedDice))
+        {
+            targetHitResult -= targetHitResult - Battle.Random(7);
+        }
+
+        bool nullDamage = true;
+        var moveDamage = new List<BoolIntUndefinedUnion>();
+
+        // There is no need to recursively check the 'sleepUsable' flag as Sleep Talk can only be used while asleep.
+        bool isSleepUsable = move.SleepUsable == true ||
+                            (move.SourceEffect is MoveEffectStateId mesi &&
+                             Library.Moves.TryGetValue(mesi.MoveId, out Move? sourceMove) &&
+                             sourceMove.SleepUsable == true);
+
+        var targetsCopy = new List<Pokemon>(targets);
+        int hit;
+        
+        for (hit = 1; hit <= targetHitResult; hit++)
+        {
+            // Break if any target has already failed
+            if (damage.Any(d => d is BoolBoolIntUndefinedUnion { Value: false })) break;
+            
+            // Break if user fell asleep and move is not sleep-usable
+            if (hit > 1 && pokemon.Status == ConditionId.Sleep && (!isSleepUsable || Battle.Gen == 4)) break;
+            
+            // Break if all targets are fainted
+            if (targets.All(t => t.Hp <= 0)) break;
+
+            move.Hit = hit;
+
+            // Handle smart target moves (Dragon Darts)
+            if (move.SmartTarget == true && targets.Count > 1)
+            {
+                targetsCopy = [targets[hit - 1]];
+                damage = [damage[hit - 1]];
+            }
+            else
+            {
+                targetsCopy = new List<Pokemon>(targets);
+            }
+
+            // Some relevant-to-single-target-moves-only things are hardcoded
+            Pokemon target = targetsCopy[0];
+            
+            if (move.SmartTarget != null)
+            {
+                if (hit > 1)
+                {
+                    UiGenerator.PrintAnimationEvent(pokemon, move.Name, target);
+                }
+                else
+                {
+                    Battle.RetargetLastMove(target);
+                }
+            }
+
+            // Triple Kick - multiaccuracy handling
+            if (move.MultiAccuracy == true && hit > 1)
+            {
+                IntTrueUnion accuracy = move.Accuracy;
+                double[] boostTable = [1, 4.0 / 3, 5.0 / 3, 2, 7.0 / 3, 8.0 / 3, 3];
+                
+                if (accuracy is IntIntTrueUnion intAccuracy)
+                {
+                    double accValue = intAccuracy.Value;
+
+                    if (move.IgnoreAccuracy != true)
+                    {
+                        var boosts = new BoostsTable
+                        {
+                            Atk = pokemon.Boosts.Atk,
+                            Def = pokemon.Boosts.Def,
+                            SpA = pokemon.Boosts.SpA,
+                            SpD = pokemon.Boosts.SpD,
+                            Spe = pokemon.Boosts.Spe,
+                            Accuracy = pokemon.Boosts.Accuracy,
+                            Evasion = pokemon.Boosts.Evasion,
+                        };
+
+                        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
+                            null, boosts);
+
+                        if (boostEvent is BoostsTableRelayVar brv)
+                        {
+                            boosts = brv.Table;
+                        }
+
+                        int boost = Battle.ClampIntRange(boosts.Accuracy, -6, 6);
+                        if (boost > 0)
+                        {
+                            accValue *= boostTable[boost];
+                        }
+                        else if (boost < 0)
+                        {
+                            accValue /= boostTable[-boost];
+                        }
+                    }
+
+                    if (move.IgnoreEvasion != true)
+                    {
+                        var targetBoosts = new BoostsTable
+                        {
+                            Atk = target.Boosts.Atk,
+                            Def = target.Boosts.Def,
+                            SpA = target.Boosts.SpA,
+                            SpD = target.Boosts.SpD,
+                            Spe = target.Boosts.Spe,
+                            Accuracy = target.Boosts.Accuracy,
+                            Evasion = target.Boosts.Evasion,
+                        };
+
+                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                            null, targetBoosts);
+
+                        if (targetBoostEvent is BoostsTableRelayVar tbrv)
+                        {
+                            targetBoosts = tbrv.Table;
+                        }
+
+                        int boost = Battle.ClampIntRange(targetBoosts.Evasion, -6, 6);
+                        switch (boost)
+                        {
+                            case > 0:
+                                accValue /= boostTable[boost];
+                                break;
+                            case < 0:
+                                accValue *= boostTable[-boost];
+                                break;
+                        }
+                    }
+
+                    accuracy = IntTrueUnion.FromInt((int)accValue);
+                }
+
+                RelayVar? modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
+                    move, RelayVar.FromIntTrueUnion(accuracy));
+
+                if (modifyAccEvent is IntRelayVar irv)
+                {
+                    accuracy = IntTrueUnion.FromInt(irv.Value);
+                }
+                else if (modifyAccEvent is BoolRelayVar { Value: true })
+                {
+                    accuracy = IntTrueUnion.FromTrue();
+                }
+
+                if (move.AlwaysHit != true)
+                {
+                    RelayVar? accEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
+                        move, RelayVar.FromIntTrueUnion(accuracy));
+
+                    if (accEvent is IntRelayVar aerv)
+                    {
+                        accuracy = IntTrueUnion.FromInt(aerv.Value);
+                    }
+                    else if (accEvent is BoolRelayVar { Value: true })
+                    {
+                        accuracy = IntTrueUnion.FromTrue();
+                    }
+
+                    bool hits = accuracy switch
+                    {
+                        TrueIntTrueUnion => true,
+                        IntIntTrueUnion intAcc => Battle.RandomChance(intAcc.Value, 100),
+                        _ => false,
+                    };
+
+                    if (!hits) break;
+                }
+            }
+
+            // Modifies targetsCopy (which is why it's a copy)
+            (SpreadMoveDamage moveDamageThisHit, SpreadMoveTargets _) = SpreadMoveHit(
+                SpreadMoveTargets.FromPokemonList(targetsCopy),
+                pokemon,
+                move,
+                new HitEffect { OnHit = move.OnHit });
+
+            // When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
+            // so spreadMoveHit returns a length 1 damage array
+            if (move.SmartTarget == true)
+            {
+                moveDamage.AddRange(moveDamageThisHit);
+            }
+            else
+            {
+                moveDamage = moveDamageThisHit;
+            }
+
+            if (!moveDamage.Any(val => val is not BoolBoolIntUndefinedUnion { Value: false })) break;
+            nullDamage = false;
+
+            for (int i = 0; i < moveDamage.Count; i++)
+            {
+                if (move.SmartTarget == true && i != hit - 1) continue;
+
+                // Damage from each hit is individually counted for the
+                // purposes of Counter, Metal Burst, and Mirror Coat.
+                BoolIntUndefinedUnion md = moveDamage[i];
+                damage[i] = md switch
+                {
+                    BoolBoolIntUndefinedUnion { Value: true } => BoolIntUndefinedUnion.FromInt(0),
+                    IntBoolIntUndefinedUnion intDmg => BoolIntUndefinedUnion.FromInt(intDmg.Value),
+                    _ => BoolIntUndefinedUnion.FromInt(0),
+                };
+
+                // Total damage dealt is accumulated for the purposes of recoil (Parental Bond).
+                if (damage[i] is IntBoolIntUndefinedUnion dmgInt && move.TotalDamage is IntIntFalseUnion totDmg)
+                {
+                    move.TotalDamage = totDmg.Value + dmgInt.Value;
+                }
+            }
+
+            if (move.MindBlownRecoil == true)
+            {
+                int hpBeforeRecoil = pokemon.Hp;
+
+                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
+                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]), true);
+
+                move.MindBlownRecoil = false;
+                if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+                {
+                    Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+                }
+            }
+
+            Battle.EachEvent(EventId.Update);
+            
+            if (pokemon.Hp <= 0 && targets.Count == 1)
+            {
+                hit++; // report the correct number of hits for multihit moves
+                break;
+            }
+        }
+
+        // hit is 1 higher than the actual hit count
+        if (hit == 1)
+        {
+            for (int i = 0; i < damage.Count; i++)
+            {
+                damage[i] = BoolIntUndefinedUnion.FromBool(false);
+            }
+            return damage;
+        }
+
+        if (nullDamage)
+        {
+            for (int i = 0; i < damage.Count; i++)
+            {
+                damage[i] = BoolIntUndefinedUnion.FromBool(false);
+            }
+        }
+
+        Battle.FaintMessages(false, false, pokemon.Hp <= 0);
+
+        if (move is { MultiHit: not null, SmartTarget: null })
+        {
+            UiGenerator.PrintHitCountEvent(targets[0], hit - 1);
+        }
+
+        // Recoil damage
+        if ((move.Recoil != null || move.Id == MoveId.Chloroblast) && move.TotalDamage.ToInt() > 0)
+        {
+            int hpBeforeRecoil = pokemon.Hp;
+
+            Battle.Damage(CalcRecoilDamage(move.TotalDamage.ToInt(), move, pokemon), pokemon, pokemon,
+                BattleDamageEffect.FromIEffect(Library.Conditions[ConditionId.Recoil]));
+
+            if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+            {
+                Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+            }
+        }
+
+        // Struggle recoil
+        if (move.StruggleRecoil == true)
+        {
+            int hpBeforeRecoil = pokemon.Hp;
+            int recoilDamage;
+            
+            if (Battle.Gen >= 5)
+            {
+                recoilDamage = Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
+            }
+            else
+            {
+                recoilDamage = Battle.ClampIntRange(Battle.Trunc(pokemon.MaxHp / 4), 1, null);
+            }
+            
+            Battle.DirectDamage(recoilDamage, pokemon, pokemon,
+                Library.Conditions[ConditionId.StruggleRecoil]);
+            
+            if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+            {
+                Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+            }
+        }
+
+        // smartTarget messes up targetsCopy, but smartTarget should in theory ensure that targets will never fail, anyway
+        if (move.SmartTarget == true)
+        {
+            targetsCopy = new List<Pokemon>(targets);
+        }
+
+        for (int i = 0; i < targetsCopy.Count; i++)
+        {
+            Pokemon target = targetsCopy[i];
+            if (pokemon != target)
+            {
+                IntFalseUnion? dmg = moveDamage[i] switch
+                {
+                    IntBoolIntUndefinedUnion intDmg => IntFalseUnion.FromInt(intDmg.Value),
+                    BoolBoolIntUndefinedUnion { Value: false } => IntFalseUnion.FromFalse(),
+                    _ => null,
+                };
+
+                target.GotAttacked(move, dmg, pokemon);
+                
+                if (moveDamage[i] is IntBoolIntUndefinedUnion)
+                {
+                    target.TimesAttacked += move.SmartTarget == true ? 1 : hit - 1;
+                }
+            }
+        }
+
+        if (move.Ohko != null && targets[0].Hp <= 0)
+        {
+            UiGenerator.PrintOhkoEvent();
+        }
+
+        if (!damage.Any(val => (val is IntBoolIntUndefinedUnion intVal && intVal.Value != 0) ||
+                               val is IntBoolIntUndefinedUnion { Value: 0 }))
+        {
+            return damage;
+        }
+
+        Battle.EachEvent(EventId.Update);
+
+        AfterMoveSecondaryEvent(targetsCopy.Where(_ => true).ToList(), pokemon, move);
+
+        if (!(move.HasSheerForce == true && pokemon.HasAbility(AbilityId.SheerForce)))
+        {
+            for (int i = 0; i < damage.Count; i++)
+            {
+                // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
+                // The previous check was for `move.multihit`, but that fails for Dragon Darts
+                int curDamage = targets.Count == 1 ? move.TotalDamage.ToInt() :
+                    damage[i] is IntBoolIntUndefinedUnion dmgInt ? dmgInt.Value : 0;
+
+                if (curDamage > 0 && targets[i].Hp > 0)
+                {
+                    int targetHpBeforeDamage = (targets[i].HurtThisTurn ?? 0) + curDamage;
+                    if (targets[i].Hp <= targets[i].MaxHp / 2 && targetHpBeforeDamage > targets[i].MaxHp / 2)
+                    {
+                        Battle.RunEvent(EventId.EmergencyExit, targets[i], pokemon);
+                    }
+                }
+            }
+        }
+
+        return damage;
     }
 
     public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets, Pokemon pokemon,
