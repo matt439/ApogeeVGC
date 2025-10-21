@@ -38,6 +38,7 @@ public enum ItemId
     PowerHerb,
     JabocaBerry,
     RowapBerry,
+    RedCard,
 
     None,
 }

@@ -392,8 +392,9 @@ public static class UiGenerator
         }
     }
 
-    public static void PrintEndItemEvent(Pokemon pokemon, Item item)
+    public static void PrintEndItemEvent(Pokemon pokemon, Item item, string? extraDetail = null)
     {
-        Console.WriteLine($"{pokemon.Name}'s {item.Name} ended!");
+        Console.WriteLine(
+            $"{pokemon.Name}'s {item.Name} was consumed!{(extraDetail is not null ? " " + extraDetail : "")}");
     }
 }

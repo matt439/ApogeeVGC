@@ -145,6 +145,7 @@ public enum EventId
     TryTerrain,
     Type,
     Update,
+    Use,
     UseItem,
     UseMoveMessage,
     Weather,

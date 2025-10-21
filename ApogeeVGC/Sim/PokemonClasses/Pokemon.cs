@@ -2441,7 +2441,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         if (!canUseItem || !canEatItem) return false;
 
         // Display item consumption message
-        UiGenerator.PrintEndItemEvent(this, item);
+        UiGenerator.PrintEndItemEvent(this, item, "[eat]");
 
         // Trigger the Eat event on the item
         Battle.SingleEvent(EventId.Eat, item, ItemState, this,
@@ -2488,7 +2488,91 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public bool UseItem(Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        // Get item to check if it's a gem
+        Item item = GetItem();
+
+        // Early validation checks
+        // Allow gems to be used when fainted, but not other items
+        if ((Hp <= 0 && !item.IsGem) || !IsActive)
+            return false;
+
+        // Check that item exists and hasn't been knocked off
+        if (Item == ItemId.None || ItemState.KnockedOff == true)
+            return false;
+
+        // Resolve source and sourceEffect from battle event if not provided
+        if (sourceEffect == null && Battle.Event is not null)
+        {
+            sourceEffect = Battle.Event.Effect;
+        }
+
+        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        {
+            source = pset.Pokemon;
+        }
+
+        // Prevent using wrong item when triggered by another item
+        if (sourceEffect?.EffectType == EffectType.Item &&
+            Item != ((Item)sourceEffect).Id &&
+            source == this)
+        {
+            // If an item is telling us to use it but we aren't holding it, 
+            // we probably shouldn't use what we are holding
+            return false;
+        }
+
+        // Run UseItem event to check if usage should proceed
+        RelayVar? useItemEvent = Battle.RunEvent(EventId.UseItem, this, null,
+            null, item);
+        if (useItemEvent is BoolRelayVar { Value: false })
+        {
+            return false;
+        }
+
+        // Display appropriate end item message based on item type
+        switch (item.Id)
+        {
+            case ItemId.RedCard:
+                // Red Card shows the source that triggered it
+                UiGenerator.PrintEndItemEvent(this, item, $"[of] {source}");
+                break;
+
+            default:
+                if (item.IsGem)
+                {
+                    // Gems show "[from] gem" tag
+                    UiGenerator.PrintEndItemEvent(this, item, "[from] gem");
+                }
+                else
+                {
+                    // Standard item consumption message
+                    UiGenerator.PrintEndItemEvent(this, item);
+                }
+                break;
+        }
+
+        // Apply stat boosts if the item provides them
+        if (item.Boosts is SparseBoostsTableItemBoosts boosts)
+        {
+            Battle.Boost(boosts.Table, this, source, item);
+        }
+
+        // Trigger the Use event on the item
+        Battle.SingleEvent(EventId.Use, item, ItemState, this,
+            SingleEventSource.FromNullablePokemon(source), sourceEffect);
+
+        // Clean up: move item to lastItem and clear current item
+        LastItem = Item;
+        Item = ItemId.None;
+        ItemState = Battle.InitEffectState();
+
+        // Set usage flag
+        UsedItemThisTurn = true;
+
+        // Trigger AfterUseItem event
+        Battle.RunEvent(EventId.AfterUseItem, this, null, null, item);
+
+        return true;
     }
 
     public ItemFalseUnion TakeItem(Pokemon? source = null)
