@@ -36,6 +36,8 @@ public enum ItemId
     RustedSword,
     RustedShield,
     PowerHerb,
+    JabocaBerry,
+    RowapBerry,
 
     None,
 }

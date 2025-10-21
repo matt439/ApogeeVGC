@@ -2393,7 +2393,97 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public bool EatItem(bool force = false, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        // Early validation checks
+        if (Item == ItemId.None || ItemState.KnockedOff == true)
+            return false;
+
+        // Check HP unless it's a retaliatory berry
+        if ((Hp <= 0 && Item != ItemId.JabocaBerry && Item != ItemId.RowapBerry) || !IsActive)
+            return false;
+
+        // Resolve source and sourceEffect from battle event if not provided
+        if (sourceEffect == null && Battle.Event is not null)
+        {
+            sourceEffect = Battle.Event.Effect;
+        }
+
+        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        {
+            source = pset.Pokemon;
+        }
+
+        // Get the actual item object
+        Item item = GetItem();
+
+        // Prevent eating wrong item when triggered by another item
+        if (sourceEffect?.EffectType == EffectType.Item &&
+            Item != ((Item)sourceEffect).Id &&
+            source == this)
+        {
+            // If an item is telling us to eat it but we aren't holding it, 
+            // we probably shouldn't eat what we are holding
+            return false;
+        }
+
+        // Run UseItem and TryEatItem events to check if eating should proceed
+        RelayVar? useItemEvent = Battle.RunEvent(EventId.UseItem, this, null,
+            null, item);
+        bool canUseItem = useItemEvent is not BoolRelayVar { Value: false };
+
+        bool canEatItem = force;
+        if (!force)
+        {
+            RelayVar? tryEatEvent = Battle.RunEvent(EventId.TryEatItem, this, null,
+                null, item);
+            canEatItem = tryEatEvent is not BoolRelayVar { Value: false };
+        }
+
+        if (!canUseItem || !canEatItem) return false;
+
+        // Display item consumption message
+        UiGenerator.PrintEndItemEvent(this, item);
+
+        // Trigger the Eat event on the item
+        Battle.SingleEvent(EventId.Eat, item, ItemState, this,
+            SingleEventSource.FromNullablePokemon(source), sourceEffect);
+
+        // Run EatItem event for other effects to respond
+        Battle.RunEvent(EventId.EatItem, this,
+            RunEventSource.FromNullablePokemon(source), sourceEffect, item);
+
+        // Handle staleness tracking for restorative berries
+        if (RestorativeBerries.Contains(item.Id))
+        {
+            switch (PendingStaleness)
+            {
+                case StalenessId.Internal:
+                    // Only set to internal if not already external
+                    if (Staleness != StalenessId.External)
+                    {
+                        Staleness = StalenessId.Internal;
+                    }
+                    break;
+
+                case StalenessId.External:
+                    Staleness = StalenessId.External;
+                    break;
+            }
+            PendingStaleness = null;
+        }
+
+        // Clean up: move item to lastItem and clear current item
+        LastItem = Item;
+        Item = ItemId.None;
+        ItemState = Battle.InitEffectState();
+
+        // Set consumption flags
+        UsedItemThisTurn = true;
+        AteBerry = true;
+
+        // Trigger AfterUseItem event
+        Battle.RunEvent(EventId.AfterUseItem, this, null, null, item);
+
+        return true;
     }
 
     public bool UseItem(Pokemon? source = null, IEffect? sourceEffect = null)

@@ -391,4 +391,9 @@ public static class UiGenerator
             Console.WriteLine($"{pokemon1.Name} transformed into {pokemon2.Name}!");
         }
     }
+
+    public static void PrintEndItemEvent(Pokemon pokemon, Item item)
+    {
+        Console.WriteLine($"{pokemon.Name}'s {item.Name} ended!");
+    }
 }

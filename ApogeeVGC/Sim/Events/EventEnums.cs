@@ -51,6 +51,7 @@ public enum EventId
     DeductPp,
     DisableMove,
     DragOut,
+    Eat,
     EatItem,
     Effectiveness,
     EmergencyExit,
