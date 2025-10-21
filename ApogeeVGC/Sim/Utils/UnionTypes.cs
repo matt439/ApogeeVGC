@@ -532,7 +532,7 @@ public record VoidTypesVoidUnion(VoidReturn Value) : TypesVoidUnion;
 
 
 /// <summary>
-/// Pokemon | Side | Field | Battle
+/// Pokemon | Side | Field | Battle | Pokemon?
 /// </summary>
 public abstract record SingleEventTarget
 {
@@ -543,6 +543,10 @@ public abstract record SingleEventTarget
     public static implicit operator SingleEventTarget(Field field) => new FieldSingleEventTarget(field);
 
     public static SingleEventTarget FromIBattle(IBattle battle) => new BattleSingleEventTarget(battle);
+    public static SingleEventTarget? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonSingleEventTarget(pokemon);
+    }
 }
 public record PokemonSingleEventTarget(Pokemon Pokemon) : SingleEventTarget;
 public record SideSingleEventTarget(Side Side) : SingleEventTarget;

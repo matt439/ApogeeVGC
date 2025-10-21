@@ -208,4 +208,6 @@ public interface IBattle
     void SetActiveMove(ActiveMove? move = null, Pokemon? pokemon = null, Pokemon? target = null);
 
     void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null);
+
+    void AttrLastMove(params string[] args);
 }

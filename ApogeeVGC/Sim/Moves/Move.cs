@@ -126,6 +126,7 @@ public record Move : IMoveEventHandlers, IBasicEffect
     public int[]? Heal { get; init; }
     public bool? ForceSwitch { get; init; }
     public MoveSelfSwitch? SelfSwitch { get; init; }
+    public BoolUndefinedUnion? SpreadHit { get; set; }
     public SparseBoostsTable? SelfBoost { get; init; }
     public MoveSelfDestruct? SelfDestruct { get; init; }
     public bool? BreaksProtect { get; init; }

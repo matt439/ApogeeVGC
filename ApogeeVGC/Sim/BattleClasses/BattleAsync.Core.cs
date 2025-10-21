@@ -3576,7 +3576,7 @@ public partial class BattleAsync : IBattle, IDisposable
     /// Used to add tags like [still] (no animation), [miss], etc.
     /// </summary>
     /// <param name="args">Attribute parts to append to the last move line</param>
-    public void AttrLastMove(params object[] args)
+    public void AttrLastMove(params string[] args)
     {
         // No last move to attribute to
         if (LastMoveLine < 0) return;
