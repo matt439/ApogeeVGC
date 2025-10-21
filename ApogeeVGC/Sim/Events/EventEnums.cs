@@ -43,6 +43,7 @@ public enum EventId
     ChangeBoost,
     ChargeMove,
     CheckShow,
+    Copy,
     CriticalHit,
     Damage,
     DamageCallback,

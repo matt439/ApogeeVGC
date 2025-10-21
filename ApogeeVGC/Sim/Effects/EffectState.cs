@@ -48,4 +48,22 @@ public class EffectState
             _ => throw new ArgumentOutOfRangeException(nameof(key), key, null),
         };
     }
+
+    public EffectState ShallowClone()
+    {
+        return new EffectState
+        {
+            Id = Id,
+            Target = Target,
+            Source = Source,
+            SourceSlot = SourceSlot,
+            SourceEffect = SourceEffect,
+            Duration = Duration,
+            Started = Started,
+            Ending = Ending,
+            LinkedPokemon = LinkedPokemon?.ToList(), // Create new list reference
+            LinkedStatus = LinkedStatus,
+            // TODO: Copy any other properties
+        };
+    }
 }

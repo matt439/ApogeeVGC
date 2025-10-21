@@ -61,6 +61,8 @@ public enum ConditionId
     DesolateLand,
     PrimordialSea,
     RainDance,
+    Substitute,
+    ShedTail,
 
     None,
 }
