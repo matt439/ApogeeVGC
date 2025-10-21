@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
@@ -412,5 +413,15 @@ public static class UiGenerator
                 ? $"{pokemon.Name} switched in due to {effect.Name}!"
                 : $"{pokemon.Name} switched in!");
         }
+    }
+
+    public static void PrintHint(string hint)
+    {
+        Console.WriteLine($"[hint] {hint}");
+    }
+
+    public static void PrintCantEvent(Pokemon pokemon, string reason, ActiveMove move)
+    {
+        Console.WriteLine($"{pokemon.Name} can't use {move.Name} because {reason}!");
     }
 }

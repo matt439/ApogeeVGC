@@ -185,7 +185,7 @@ public interface IBattle
 
     int Turn { get; }
 
-    public int EffectOrder { get; set; }
+    int EffectOrder { get; set; }
 
     void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null) where T : IPriorityComparison;
 
@@ -194,4 +194,10 @@ public interface IBattle
     void FieldEvent(EventId eventId, List<Pokemon>? targets = null);
 
     Pokemon? GetRandomSwitchable(Side side);
+
+    bool? FaintMessages(bool lastFirst = false, bool forceCheck = false, bool checkWin = true);
+
+    bool? CheckWin(FaintQueue? faintData = null);
+
+    MoveId? LastSuccessfulMoveThisTurn { get; set; }
 }

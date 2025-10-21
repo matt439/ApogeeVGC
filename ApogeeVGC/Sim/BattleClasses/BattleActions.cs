@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -261,14 +262,262 @@ public class BattleActions(IBattle battle)
         public Pokemon? OriginalTarget { get; init; }
     }
 
+    /// <summary>
+    /// RunMove is the "outside" move caller. It handles deducting PP,
+    /// flinching, full paralysis, etc. All the stuff up to and including
+    /// the "POKEMON used MOVE" message.
+    /// 
+    /// For details of the difference between RunMove and UseMove, see UseMove's info.
+    /// 
+    /// ExternalMove skips LockMove and PP deduction, mostly for use by Dancer.
+    /// </summary>
     public void RunMove(MoveId moveId, Pokemon pokemon, int targetLoc, RunMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        Move baseMove = Library.Moves[moveId];
+        RunMove(baseMove, pokemon, targetLoc, options);
     }
 
+    /// <summary>
+    /// RunMove is the "outside" move caller. It handles deducting PP,
+    /// flinching, full paralysis, etc. All the stuff up to and including
+    /// the "POKEMON used MOVE" message.
+    /// 
+    /// For details of the difference between RunMove and UseMove, see UseMove's info.
+    /// 
+    /// ExternalMove skips LockMove and PP deduction, mostly for use by Dancer.
+    /// </summary>
     public void RunMove(Move move, Pokemon pokemon, int targetLoc, RunMoveOptions? options = null)
     {
-        throw new NotImplementedException();
+        pokemon.ActiveMoveActions++;
+        
+        bool externalMove = options?.ExternalMove ?? false;
+        Pokemon? originalTarget = options?.OriginalTarget;
+        IEffect? sourceEffect = options?.SourceEffect;
+
+        // Get the target for this move
+        Pokemon? target = GetTarget(pokemon, move, targetLoc, originalTarget);
+        var baseMove = move.ToActiveMove();
+        int priority = baseMove.Priority;
+        bool pranksterBoosted = baseMove.PranksterBoosted ?? false;
+
+        // Allow move override via OverrideAction event (e.g., Assault Vest, Choice items)
+        if (baseMove.Id != MoveId.Struggle && !externalMove)
+        {
+            RelayVar? changedMoveResult = Battle.RunEvent(EventId.OverrideAction, pokemon,
+                RunEventSource.FromNullablePokemon(target), baseMove);
+            if (changedMoveResult is MoveIdRelayVar moveIdRv && moveIdRv.MoveId != baseMove.Id)
+            {
+                baseMove = Library.Moves[moveIdRv.MoveId].ToActiveMove();
+                baseMove.Priority = priority;
+                if (pranksterBoosted)
+                {
+                    baseMove.PranksterBoosted = pranksterBoosted;
+                }
+                target = Battle.GetRandomTarget(pokemon, baseMove);
+            }
+        }
+
+        ActiveMove activeMove = baseMove;
+        activeMove.IsExternal = externalMove;
+
+        SetActiveMove(activeMove, pokemon, target);
+
+        // Run BeforeMove event - can prevent the move from happening
+        RelayVar? willTryMove = Battle.RunEvent(EventId.BeforeMove, pokemon,
+            RunEventSource.FromNullablePokemon(target), activeMove);
+
+        if (willTryMove is BoolRelayVar { Value: false } or null)
+        {
+            Battle.RunEvent(EventId.MoveAborted, pokemon, RunEventSource.FromNullablePokemon(target), activeMove);
+            ClearActiveMove(true);
+            
+            // The event 'BeforeMove' could have returned false or null
+            // false indicates that this counts as a move failing for the purpose of calculating Stomping Tantrum's base power
+            // null indicates the opposite, as the Pokemon didn't have an option to choose anything
+            pokemon.MoveThisTurnResult = willTryMove is BoolRelayVar brv ? brv.Value : null;
+            return;
+        }
+
+        // Used exclusively for a hint later (moves that can't be used twice in a row)
+        if (activeMove.Flags.CantUseTwice ?? false)
+        {
+            if (pokemon.LastMove?.Id == activeMove.Id)
+            {
+                pokemon.AddVolatile(Library.Conditions[activeMove.Id.ToConditionId()].Id, pokemon, activeMove);
+            }
+        }
+
+        // Execute beforeMoveCallback if present
+        if (activeMove.BeforeMoveCallback is not null)
+        {
+            BoolVoidUnion callbackResult = activeMove.BeforeMoveCallback(Battle, pokemon, target, activeMove);
+            if (callbackResult is BoolBoolVoidUnion { Value: true })
+            {
+                ClearActiveMove(true);
+                pokemon.MoveThisTurnResult = false;
+                return;
+            }
+        }
+
+        pokemon.LastDamage = 0;
+        MoveId? lockedMove = null;
+        
+        if (!externalMove)
+        {
+            // Check if Pokemon is locked into a move (e.g., Outrage, Rollout)
+            RelayVar? lockedMoveResult = Battle.RunEvent(EventId.LockMove, pokemon);
+            lockedMove = lockedMoveResult switch
+            {
+                MoveIdRelayVar lockedMoveRv => lockedMoveRv.MoveId,
+                BoolRelayVar { Value: true } => null,
+                _ => lockedMove,
+            };
+
+            if (lockedMove == null)
+            {
+                // Deduct PP
+                int ppDeducted = pokemon.DeductPp(baseMove, null,
+                    PokemonFalseUnion.FromNullablePokemon(target));
+
+                if (ppDeducted == 0 && activeMove.Id != MoveId.Struggle)
+                {
+                    if (Battle.PrintDebug)
+                    {
+                        UiGenerator.PrintCantEvent(pokemon, "nopp", activeMove);
+                    }
+                    ClearActiveMove(true);
+                    pokemon.MoveThisTurnResult = false;
+                    return;
+                }
+            }
+            else
+            {
+                sourceEffect = Library.Conditions[ConditionId.LockedMove];
+            }
+            
+            pokemon.MoveUsed(activeMove, targetLoc);
+        }
+
+        // Dancer Petal Dance hack - track if we need to preserve lock state
+        bool noLock = externalMove && !pokemon.Volatiles.ContainsKey(ConditionId.LockedMove);
+
+        // Actually use the move
+        bool moveDidSomething = UseMove(baseMove, pokemon, new UseMoveOptions 
+        { 
+            Target = target, 
+            SourceEffect = sourceEffect,
+        });
+
+        Battle.LastSuccessfulMoveThisTurn = moveDidSomething && Battle.ActiveMove != null 
+            ? Battle.ActiveMove.Id 
+            : null;
+
+        if (Battle.ActiveMove != null)
+        {
+            activeMove = Battle.ActiveMove;
+        }
+
+        Battle.SingleEvent(EventId.AfterMove, activeMove, null, pokemon,
+            SingleEventSource.FromNullablePokemon(target), activeMove);
+
+        Battle.RunEvent(EventId.AfterMove, pokemon, RunEventSource.FromNullablePokemon(target), activeMove);
+
+        if (activeMove.Flags.CantUseTwice ?? false)
+        {
+            if (pokemon.RemoveVolatile(Library.Conditions[activeMove.Id.ToConditionId()]))
+            {
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintHint($"Some effects can force a Pokemon to use {activeMove.Name} again in a row.");
+                }
+            }
+        }
+
+        // Handle Dancer ability - activates in order of lowest speed stat to highest
+        if ((activeMove.Flags.Dance ?? false) && moveDidSomething && !(activeMove.IsExternal ?? false))
+        {
+            List<Pokemon> dancers = [];
+            foreach (Pokemon currentPoke in Battle.GetAllActive())
+            {
+                if (pokemon == currentPoke) continue;
+                if (currentPoke.HasAbility(AbilityId.Dancer) && !currentPoke.IsSemiInvulnerable())
+                {
+                    dancers.Add(currentPoke);
+                }
+            }
+
+            // Dancer activates in order of lowest speed stat to highest
+            // Note that the speed stat used is after any volatile replacements like Speed Swap,
+            // but before any multipliers like Agility or Choice Scarf
+            // Ties go to whichever Pokemon has had the ability for the least amount of time
+            dancers.Sort((a, b) =>
+            {
+                int speedDiff = a.StoredStats[StatIdExceptHp.Spe] - b.StoredStats[StatIdExceptHp.Spe];
+                if (speedDiff != 0) return speedDiff;
+                return a.AbilityState.EffectOrder - b.AbilityState.EffectOrder;
+            });
+
+            Pokemon? targetOf1StDance = Battle.ActiveTarget;
+            foreach (Pokemon dancer in dancers)
+            {
+                if (Battle.FaintMessages() ?? false) break;
+                if (dancer.Fainted) continue;
+
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintActivateEvent(dancer, Library.Abilities[AbilityId.Dancer]);
+                }
+
+                Pokemon dancersTarget = targetOf1StDance != null && 
+                                       !targetOf1StDance.IsAlly(dancer) && 
+                                       pokemon.IsAlly(dancer)
+                    ? targetOf1StDance
+                    : pokemon;
+
+                int dancersTargetLoc = dancer.GetLocOf(dancersTarget);
+                RunMove(activeMove.Id, dancer, dancersTargetLoc, new RunMoveOptions
+                {
+                    SourceEffect = Library.Abilities[AbilityId.Dancer],
+                    ExternalMove = true,
+                });
+            }
+        }
+
+        // Clear locked move volatile if this was an external move and the Pokemon has the volatile
+        if (noLock && pokemon.Volatiles.ContainsKey(ConditionId.LockedMove))
+        {
+            pokemon.DeleteVolatile(ConditionId.LockedMove);
+        }
+
+        Battle.FaintMessages();
+        Battle.CheckWin();
+    }
+
+    private Pokemon? GetTarget(Pokemon pokemon, Move move, int targetLoc, Pokemon? originalTarget)
+    {
+        // This method needs to be implemented based on your battle system
+        // For now, returning the original target or getting the Pokemon at the target location
+        if (originalTarget != null)
+        {
+            return originalTarget;
+        }
+
+        return pokemon.GetAtLoc(targetLoc);
+    }
+
+    private void SetActiveMove(ActiveMove move, Pokemon pokemon, Pokemon? target)
+    {
+        Battle.ActiveMove = move;
+        Battle.ActiveTarget = target;
+    }
+
+    private void ClearActiveMove(bool failed)
+    {
+        Battle.ActiveMove = null;
+        if (failed)
+        {
+            Battle.ActiveTarget = null;
+        }
     }
 
     public record UseMoveOptions
@@ -277,12 +526,12 @@ public class BattleActions(IBattle battle)
         public IEffect? SourceEffect { get; init; }
     }
 
-    public void UseMove(MoveId moveId, Pokemon pokemon, UseMoveOptions? options = null)
+    public bool UseMove(MoveId moveId, Pokemon pokemon, UseMoveOptions? options = null)
     {
         throw new NotImplementedException();
     }
 
-    public void UseMove(Move move, Pokemon pokemon, UseMoveOptions? options = null)
+    public bool UseMove(Move move, Pokemon pokemon, UseMoveOptions? options = null)
     {
         throw new NotImplementedException();
     }

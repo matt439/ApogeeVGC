@@ -47,6 +47,7 @@ public enum AbilityId
     Stalwart,
     PropellerTail,
     NaturalCure,
+    Dancer,
 
     None,
 }
