@@ -242,8 +242,7 @@ public partial class BattleAsync
             }
 
             // Process any faint messages and check if battle has ended
-            // TODO: Implement FaintMessages method
-            // FaintMessages();
+            FaintMessages();
             if (Ended) return;
         }
     }
@@ -665,10 +664,18 @@ public partial class BattleAsync
         // Return appropriate result
         return target is PokemonArrayRunEventTarget ? new ArrayRelayVar([.. targetRelayVars ?? []]) : relayVar;
     }
+    public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target, Pokemon? source = null,
+        IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
+    {
+        return RunEvent(eventId, RunEventTarget.FromPokemonSideBattleUnion(target),
+            RunEventSource.FromNullablePokemon(source), effect, relayVar, onEffect, true);
+    }
 
-
-    // TODO: PriorityEvent()
-    // TODO: OnEvent()
+    public void OnEvent(EventId eventId, Format target, object[] rest)
+    {
+        throw new NotImplementedException("This method is for attaching custom event handlers to a Battle." +
+                                          "It shouldn't be used in this implementation.");
+    }
 
     #region Helpers
 

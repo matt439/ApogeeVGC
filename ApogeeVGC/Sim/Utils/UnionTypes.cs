@@ -588,7 +588,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable | decimal | MoveId | string | RelayVar[]
+/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon
 /// </summary>
 public abstract record RelayVar
 {
@@ -611,6 +611,7 @@ public abstract record RelayVar
     public static implicit operator RelayVar(string value) => new StringRelayVar(value);
     public static implicit operator RelayVar(RelayVar[] values) => new ArrayRelayVar([.. values]);
     public static implicit operator RelayVar(List<RelayVar> values) => new ArrayRelayVar(values);
+    public static implicit operator RelayVar(Pokemon pokemon) => new PokemonRelayVar(pokemon);
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -626,6 +627,7 @@ public record DecimalRelayVar(decimal Value) : RelayVar;
 public record MoveIdRelayVar(MoveId MoveId) : RelayVar;
 public record StringRelayVar(string Value) : RelayVar;
 public record ArrayRelayVar(List<RelayVar> Values) : RelayVar;
+public record PokemonRelayVar(Pokemon Pokemon) : RelayVar;
 
 
 
@@ -708,7 +710,7 @@ public static class EffectUnionFactory
 
 
 /// <summary>
-/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | Field | Pokemon?
+/// Pokemon | Pokemon[] | Side | Battle | PokemonSideBattleUnion? | PokemonSideBattleUnion|  Field | Pokemon?
 /// </summary>
 public abstract record RunEventTarget
 {
@@ -729,6 +731,16 @@ public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
         return target switch
         {
             null => null,
+            PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
+            PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
+            PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),
+            _ => throw new InvalidOperationException("Cannot convert to RunEventTarget"),
+        };
+    }
+    public static RunEventTarget FromPokemonSideBattleUnion(PokemonSideBattleUnion target)
+    {
+        return target switch
+        {
             PokemonSideBattlePokemon pokemon => new PokemonRunEventTarget(pokemon.Pokemon),
             PokemonSideBattleSide side => new SideRunEventTarget(side.Side),
             PokemonSideBattleBattle battle => new BattleRunEventTarget(battle.Battle),

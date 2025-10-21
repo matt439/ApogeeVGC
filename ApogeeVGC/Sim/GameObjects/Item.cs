@@ -35,6 +35,7 @@ public enum ItemId
     SitrusBerry,
     RustedSword,
     RustedShield,
+    PowerHerb,
 
     None,
 }

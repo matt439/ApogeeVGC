@@ -647,89 +647,155 @@ public class Pokemon : IPriorityComparison, IDisposable
         public required List<Pokemon> PressureTargets { get; init; }
     }
 
-    //    getMoveTargets(move: ActiveMove, target: Pokemon) : { targets: Pokemon[], pressureTargets: Pokemon[] } {
-    //		let targets: Pokemon[] = [];
-
-    //		switch (move.target) {
-    //		case 'all':
-    //		case 'foeSide':
-    //		case 'allySide':
-    //		case 'allyTeam':
-    //			if (!move.target.startsWith('foe')) {
-    //				targets.push(...this.alliesAndSelf());
-    //			}
-    //			if (!move.target.startsWith('ally')) {
-    //				targets.push(...this.foes(true));
-    //}
-    //			if (targets.length && !targets.includes(target)) {
-
-    //                this.battle.retargetLastMove(targets[targets.length - 1]);
-    //}
-    //			break;
-    //		case 'allAdjacent':
-    //			targets.push(...this.adjacentAllies());
-    //			// falls through
-    //		case 'allAdjacentFoes':
-    //			targets.push(...this.adjacentFoes());
-    //			if (targets.length && !targets.includes(target)) {
-    //    this.battle.retargetLastMove(targets[targets.length - 1]);
-    //}
-    //			break;
-    //		case 'allies':
-    //			targets = this.alliesAndSelf();
-    //			break;
-    //		default:
-    //			const selectedTarget = target;
-    //			if (!target || (target.fainted && !target.isAlly(this)) && this.battle.gameType !== 'freeforall') {
-    //    // If a targeted foe faints, the move is retargeted
-    //    const possibleTarget = this.battle.getRandomTarget(this, move);
-    //    if (!possibleTarget) return { targets: [], pressureTargets: [] }
-    //    ;
-    //    target = possibleTarget;
-    //}
-    //			if (this.battle.activePerHalf > 1 && !move.tracksTarget) {
-    //    const isCharging = move.flags['charge'] && !this.volatiles['twoturnmove'] &&
-    //        !(move.id.startsWith('solarb') && ['sunnyday', 'desolateland'].includes(this.effectiveWeather())) &&
-    //        !(move.id === 'electroshot' && ['raindance', 'primordialsea'].includes(this.effectiveWeather())) &&
-    //        !(this.hasItem('powerherb') && move.id !== 'skydrop');
-    //    if (!isCharging && !(move.id === 'pursuit' && (target.beingCalledBack || target.switchFlag)))
-    //    {
-    //        target = this.battle.priorityEvent('RedirectTarget', this, this, move, target);
-    //    }
-    //}
-    //			if (move.smartTarget) {
-    //    targets = this.getSmartTargets(target, move);
-    //    target = targets[0];
-    //} else {
-    //    targets.push(target);
-    //}
-    //			if (target.fainted && !move.flags['futuremove']) {
-    //				return { targets: [], pressureTargets: [] };
-    //			}
-    //			if (selectedTarget !== target)
-    //{
-    //    this.battle.retargetLastMove(target);
-    //}
-    //		}
-
-    //		// Resolve apparent targets for Pressure.
-    //		let pressureTargets = targets;
-    //if (move.target === 'foeSide')
-    //{
-    //    pressureTargets = [];
-    //}
-    //if (move.flags['mustpressure'])
-    //{
-    //    pressureTargets = this.foes();
-    //}
-
-    //return { targets, pressureTargets }
-    //;
-    //	}
-
     public MoveTargets GetMoveTargets(ActiveMove move, Pokemon target)
     {
-        throw new NotImplementedException();
+        List<Pokemon> targets = [];
+
+        switch (move.Target)
+        {
+            case MoveTarget.All:
+            case MoveTarget.FoeSide:
+            case MoveTarget.AllySide:
+            case MoveTarget.AllyTeam:
+                {
+                    // Add allies if not a foe-only move
+                    if (move.Target != MoveTarget.FoeSide)
+                    {
+                        targets.AddRange(AlliesAndSelf());
+                    }
+
+                    // Add foes if not an ally-only move
+                    if (move.Target != MoveTarget.AllySide && move.Target != MoveTarget.AllyTeam)
+                    {
+                        targets.AddRange(Foes(all: true));
+                    }
+
+                    // Retarget if the original target isn't in the list
+                    if (targets.Count > 0 && !targets.Contains(target))
+                    {
+                        Battle.RetargetLastMove(targets[^1]);
+                    }
+                    break;
+                }
+
+            case MoveTarget.AllAdjacent:
+                targets.AddRange(AdjacentAllies());
+                goto case MoveTarget.AllAdjacentFoes; // Fall through
+
+            case MoveTarget.AllAdjacentFoes:
+                targets.AddRange(AdjacentFoes());
+                if (targets.Count > 0 && !targets.Contains(target))
+                {
+                    Battle.RetargetLastMove(targets[^1]);
+                }
+                break;
+
+            case MoveTarget.Allies:
+                targets = AlliesAndSelf();
+                break;
+
+            default:
+                {
+                    Pokemon selectedTarget = target;
+
+                    // If targeted foe faints, retarget (except in free-for-all)
+                    if ((target.Fainted && !target.IsAlly(this)))
+                    {
+                        Pokemon? possibleTarget = Battle.GetRandomTarget(this, move);
+                        if (possibleTarget == null)
+                        {
+                            return new MoveTargets
+                            {
+                                Targets = [],
+                                PressureTargets = [],
+                            };
+                        }
+                        target = possibleTarget;
+                    }
+
+                    // Handle redirection for multi-Pokémon battles
+                    if (Battle.ActivePerHalf > 1 && move.TracksTarget != true)
+                    {
+                        // Check if this is a charging turn (first turn of two-turn moves)
+                        bool isCharging = move.Flags.Charge == true &&
+                                          !Volatiles.ContainsKey(ConditionId.TwoTurnMove) &&
+                                          // Solar Beam/Blade skip charging in sun
+                                          !(move.Id is MoveId.SolarBeam or MoveId.SolarBlade &&
+                                            EffectiveWeather() is ConditionId.SunnyDay or ConditionId.DesolateLand)
+                                          // Electro Shot skips charging in rain
+                                          && !(move.Id == MoveId.ElectroShot &&
+                                               EffectiveWeather() is ConditionId.RainDance or ConditionId.PrimordialSea) &&
+                                          // Power Herb allows skipping charge (except Sky Drop)
+                                          !(HasItem(ItemId.PowerHerb) && move.Id != MoveId.SkyDrop);
+
+                        // Apply redirection (Follow Me, Rage Powder, etc.)
+                        if (!isCharging && !(target.BeingCalledBack || target.SwitchFlag.IsTrue()))
+                        {
+                            RelayVar? redirectResult = Battle.PriorityEvent(
+                                EventId.RedirectTarget,
+                                this,
+                                this,
+                                move,
+                                target
+                            );
+
+                            if (redirectResult is PokemonRelayVar prv)
+                            {
+                                target = prv.Pokemon;
+                            }
+                        }
+                    }
+
+                    // Handle smart targeting (Dragon Darts)
+                    if (move.SmartTarget == true)
+                    {
+                        targets = GetSmartTargets(target, move);
+                        target = targets[0];
+                    }
+                    else
+                    {
+                        targets.Add(target);
+                    }
+
+                    // Fail if target fainted (unless it's a future move like Future Sight)
+                    if (target.Fainted && move.Flags.FutureMove != true)
+                    {
+                        return new MoveTargets
+                        {
+                            Targets = [],
+                            PressureTargets = [],
+                        };
+                    }
+
+                    // Update battle log if target changed
+                    if (selectedTarget != target)
+                    {
+                        Battle.RetargetLastMove(target);
+                    }
+                    break;
+                }
+        }
+
+        // Resolve apparent targets for Pressure ability
+        var pressureTargets = targets;
+
+        if (move.Target == MoveTarget.FoeSide)
+        {
+            // FoeSide moves don't trigger Pressure
+            pressureTargets = [];
+        }
+
+        if (move.Flags.MustPressure == true)
+        {
+            // Some moves always trigger Pressure on all foes
+            pressureTargets = Foes();
+        }
+
+        return new MoveTargets
+        {
+            Targets = targets,
+            PressureTargets = pressureTargets,
+        };
     }
 
     /// <summary>

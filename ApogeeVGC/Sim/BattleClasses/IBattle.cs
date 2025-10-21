@@ -63,6 +63,9 @@ public interface IBattle
     RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null);
 
+    RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target, Pokemon? source = null,
+        IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false);
+
     void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null);
 
     BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
@@ -175,4 +178,6 @@ public interface IBattle
     RequestState RequestState { get; }
 
     bool Ended { get; }
+
+    void RetargetLastMove(Pokemon newTarget);
 }

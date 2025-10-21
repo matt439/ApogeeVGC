@@ -57,6 +57,10 @@ public enum ConditionId
     IceBall,
     Rollout,
     Fainted,
+    SunnyDay,
+    DesolateLand,
+    PrimordialSea,
+    RainDance,
 
     None,
 }
