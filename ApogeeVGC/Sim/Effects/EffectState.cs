@@ -14,7 +14,7 @@ public enum EffectStateKey
 public class EffectState
 {
     public required EffectStateId Id { get; set; }
-    public int EffectOrder { get; init; }
+    public int EffectOrder { get; set; }
     public int? Duration { get; set; }
 
     // other properties that might be relevant to effect state

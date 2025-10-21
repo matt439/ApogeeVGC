@@ -182,4 +182,8 @@ public interface IBattle
     void RetargetLastMove(Pokemon newTarget);
 
     List<FaintQueue> FaintQueue { get; }
+
+    int Turn { get; }
+
+    public int EffectOrder { get; set; }
 }

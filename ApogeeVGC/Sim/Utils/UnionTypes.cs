@@ -1348,7 +1348,7 @@ public abstract record EffectDelegate
 
 public record DelegateEffectDelegate(Delegate Del) : EffectDelegate
 {
-    public override Delegate? GetDelegate(int index = 0) => Del;
+    public override Delegate GetDelegate(int index = 0) => Del;
 }
 
 public record OnFlinchEffectDelegate(OnFlinch OnFlinch) : EffectDelegate

@@ -397,4 +397,20 @@ public static class UiGenerator
         Console.WriteLine(
             $"{pokemon.Name}'s {item.Name} was consumed!{(extraDetail is not null ? " " + extraDetail : "")}");
     }
+
+    public static void PrintSwitchEvent(Pokemon pokemon, bool isDrag, IEffect? effect = null)
+    {
+        if (isDrag)
+        {
+            Console.WriteLine(effect is not null
+                ? $"{pokemon.Name} was dragged out by {effect.Name}!"
+                : $"{pokemon.Name} was dragged out!");
+        }
+        else
+        {
+            Console.WriteLine(effect is not null
+                ? $"{pokemon.Name} switched in due to {effect.Name}!"
+                : $"{pokemon.Name} switched in!");
+        }
+    }
 }
