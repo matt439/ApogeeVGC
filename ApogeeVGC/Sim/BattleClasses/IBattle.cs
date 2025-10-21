@@ -200,4 +200,8 @@ public interface IBattle
     bool? CheckWin(FaintQueue? faintData = null);
 
     MoveId? LastSuccessfulMoveThisTurn { get; set; }
+
+    Pokemon? GetTarget(Pokemon pokemon, MoveId moveId, int targetLoc, Pokemon? originalTarget = null);
+
+    Pokemon? GetTarget(Pokemon pokemon, Move move, int targetLoc, Pokemon? originalTarget = null);
 }
