@@ -50,6 +50,8 @@ public enum MoveId
     ElectroShot,
     SkyDrop,
     Instruct,
+    Toxic,
+    HelpingHand,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

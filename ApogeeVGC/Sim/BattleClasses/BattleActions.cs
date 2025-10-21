@@ -973,20 +973,157 @@ public class BattleActions(IBattle battle)
         return moveResult;
     }
 
-    public List<BoolIntUndefinedUnion>? HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon,
+    /// <summary>
+    /// Hit step 0: Check for semi-invulnerability (Fly, Dig, Dive, etc.).
+    /// Returns a list of hit results (true = can hit, false = miss due to invulnerability).
+    /// </summary>
+    public List<BoolIntUndefinedUnion> HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon,
         ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Helping Hand always hits all targets
+        if (move.Id == MoveId.HelpingHand)
+        {
+            return Enumerable.Repeat(BoolIntUndefinedUnion.FromBool(true), targets.Count).ToList();
+        }
+
+        var hitResults = new List<BoolIntUndefinedUnion>();
+
+        foreach (Pokemon target in targets)
+        {
+            bool canHit;
+
+            // Commanding Pokemon cannot be targeted
+            if (target.Volatiles.ContainsKey(ConditionId.Commanding))
+            {
+                canHit = false;
+            }
+            // Gen 8+: Toxic used by Poison-types always hits (even through semi-invulnerability)
+            else if (Battle.Gen >= 8 && move.Id == MoveId.Toxic && pokemon.HasType(PokemonType.Poison))
+            {
+                canHit = true;
+            }
+            else
+            {
+                // Run Invulnerability event to check if target can be hit
+                RelayVar? invulnResult = Battle.RunEvent(EventId.Invulnerability, target, pokemon, move);
+                
+                // Convert RelayVar to boolean (false means invulnerable/miss, true/null means can hit)
+                canHit = invulnResult is not BoolRelayVar { Value: false };
+            }
+
+            hitResults.Add(BoolIntUndefinedUnion.FromBool(canHit));
+
+            // Handle miss messaging
+            if (!canHit)
+            {
+                if (move.SmartTarget == true)
+                {
+                    // Smart target moves (Dragon Darts) disable smart targeting on miss
+                    move.SmartTarget = false;
+                }
+                else
+                {
+                    // Add miss attribute for non-spread moves
+                    if (move.SpreadHit != true)
+                    {
+                        Battle.AttrLastMove("[miss]");
+                    }
+
+                    // Display miss message
+                    UiGenerator.PrintMessage($"{pokemon.Name} missed {target.Name}!");
+                }
+            }
+        }
+
+        return hitResults;
     }
 
-    public List<BoolIntUndefinedUnion>? HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    /// <summary>
+    /// Hit step 1: Run TryHit event (handles Protect, Magic Bounce, Volt Absorb, etc.).
+    /// Returns a list of hit results (true = can hit, false = blocked, undefined = NOT_FAIL).
+    /// </summary>
+    public List<BoolIntUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Run TryHit event for all targets
+        RelayVar? hitResult = Battle.RunEvent(EventId.TryHit, targets.ToArray(), pokemon, move);
+
+        List<RelayVar?> hitResults;
+        if (hitResult is ArrayRelayVar arv)
+        {
+            hitResults = [];
+            hitResults.AddRange(arv.Values);
+        }
+        else
+        {
+            // If single result, apply to all targets
+            hitResults = Enumerable.Repeat(hitResult, targets.Count).ToList();
+        }
+
+        // Check if move completely failed (no successes but at least one explicit failure)
+        bool hasTrue = false;
+        bool hasFalse = false;
+
+        foreach (RelayVar? result in hitResults)
+        {
+            if (result is BoolRelayVar brv)
+            {
+                if (brv.Value)
+                {
+                    hasTrue = true;
+                }
+                else
+                {
+                    hasFalse = true;
+                }
+            }
+        }
+
+        if (!hasTrue && hasFalse)
+        {
+            if (Battle.PrintDebug)
+            {
+                UiGenerator.PrintFailEvent(pokemon);
+            }
+            Battle.AttrLastMove("[still]");
+        }
+
+        // Convert results to BoolIntUndefinedUnion
+        var convertedResults = new List<BoolIntUndefinedUnion>();
+        foreach (RelayVar? result in hitResults)
+        {
+            // If result is NOT_FAIL (null), keep it as undefined
+            // Otherwise convert to boolean (default false if not a boolean)
+            if (result is null)
+            {
+                convertedResults.Add(BoolIntUndefinedUnion.FromUndefined());
+            }
+            else if (result is BoolRelayVar brv)
+            {
+                convertedResults.Add(BoolIntUndefinedUnion.FromBool(brv.Value));
+            }
+            else
+            {
+                // Any other RelayVar type defaults to false
+                convertedResults.Add(BoolIntUndefinedUnion.FromBool(false));
+            }
+        }
+
+        return convertedResults;
     }
 
-    public List<BoolIntUndefinedUnion>? HitStepTypeImmunity(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    /// <summary>
+    /// Hit step 2: Check for type immunity (e.g., Ground-type moves against Flying-types).
+    /// Returns a list of hit results (true = not immune, false = immune).
+    /// </summary>
+    public static List<BoolIntUndefinedUnion> HitStepTypeImmunity(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Default ignoreImmunity for Status moves if not already set
+        move.IgnoreImmunity ??= move.Category == MoveCategory.Status;
+
+        return targets.Select(target =>
+            target.RunImmunity(move, !(move.SmartTarget ?? false))).
+            Select(BoolIntUndefinedUnion.FromBool).ToList();
     }
 
     public List<BoolIntUndefinedUnion>? HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
