@@ -9,7 +9,7 @@ public record Attacker
     public required Pokemon Source { get; init; }
     public int Damage { get; init; }
     public bool ThisTurn { get; init; }
-    public Move? Move { get; init; }
+    public MoveId? Move { get; init; }
     public PokemonSlot PokemonSlot { get; init; } = new(SideId.P1, 0);
-    public IntBoolUnion? DamageValue { get; init; }
+    public IntFalseUnion? DamageValue { get; init; }
 }

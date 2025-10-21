@@ -10,6 +10,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -149,9 +151,15 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public PokemonDetails Details { get; set; }
 
-    public List<MoveId> Moves => throw new NotImplementedException();
+    /// <summary>
+    /// Gets the list of move IDs for the Pokemon's current move slots.
+    /// </summary>
+    public List<MoveId> Moves => MoveSlots.Select(moveSlot => moveSlot.Id).ToList();
 
-    public List<MoveId> BaseMoves => throw new NotImplementedException();
+    /// <summary>
+    /// Gets the list of move IDs for the Pokemon's base move slots (original moves before transformations).
+    /// </summary>
+    public List<MoveId> BaseMoves => BaseMoveSlots.Select(moveSlot => moveSlot.Id).ToList();
 
     private const int TrickRoomSpeedOffset = 10000;
 
@@ -868,39 +876,136 @@ public class Pokemon : IPriorityComparison, IDisposable
         return false;
     }
 
-    public int DeductPp(MoveId move, int? amount = null, PokemonFalseUnion? target = null)
+    /// <summary>
+    /// Deducts PP (Power Points) from a move when it is used.
+    /// In Gen 1, PP can go negative. In Gen 2+, PP is clamped to 0.
+    /// </summary>
+    /// <param name="moveId">The move to deduct PP from</param>
+    /// <param name="amount">Amount of PP to deduct (defaults to 1)</param>
+    /// <param name="target">The target Pokemon (unused but kept for API compatibility)</param>
+    /// <returns>The actual amount of PP deducted</returns>
+    public int DeductPp(MoveId moveId, int? amount = null, PokemonFalseUnion? target = null)
     {
-        throw new NotImplementedException();
+        Move move = Battle.Library.Moves[moveId];
+        return DeductPp(move, amount, target);
     }
 
+    /// <summary>
+    /// Deducts PP (Power Points) from a move when it is used.
+    /// In Gen 1, PP can go negative. In Gen 2+, PP is clamped to 0.
+    /// </summary>
+    /// <param name="move">The move to deduct PP from</param>
+    /// <param name="amount">Amount of PP to deduct (defaults to 1)</param>
+    /// <param name="target">The target Pokemon (unused but kept for API compatibility)</param>
+    /// <returns>The actual amount of PP deducted</returns>
     public int DeductPp(Move move, int? amount = null, PokemonFalseUnion? target = null)
     {
-        throw new NotImplementedException();
+        int gen = Battle.Gen;
+
+        // Get the move data for this Pokemon
+        MoveSlot? ppData = GetMoveData(move);
+        if (ppData == null) return 0;
+
+        // Mark move as used
+        ppData.Used = true;
+
+        // Gen 2+: If move has no PP left, can't deduct anything
+        if (ppData.Pp <= 0 && gen > 1) return 0;
+
+        // Default to deducting 1 PP
+        int deductAmount = amount ?? 1;
+
+        // Deduct the PP
+        ppData.Pp -= deductAmount;
+
+        // Gen 2+: Clamp PP to 0 and adjust return value if we went negative
+        if (ppData.Pp < 0 && gen > 1)
+        {
+            deductAmount += ppData.Pp; // ppData.pp is negative, so this reduces deductAmount
+            ppData.Pp = 0;
+        }
+
+        return deductAmount;
     }
 
     public void MoveUsed(ActiveMove move, int? targetLoc = null)
     {
-        throw new NotImplementedException();
+        LastMove = move;
+        if (Battle.Gen == 2) LastMoveEncore = move;
+        LastMoveTargetLoc = targetLoc;
+        MoveThisTurn = move.Id;
     }
 
-    public void GotAttacked(MoveId move, IntFalseUnion? damage, Pokemon source)
+    /// <summary>
+    /// Records that this Pokemon was attacked by another Pokemon's move.
+    /// Used for moves like Counter, Mirror Coat, Revenge, Bide, etc.
+    /// </summary>
+    /// <param name="moveId">The move that hit this Pokemon</param>
+    /// <param name="damage">The damage dealt (can be false/null if no damage)</param>
+    /// <param name="source">The Pokemon that attacked</param>
+    public void GotAttacked(MoveId moveId, IntFalseUnion? damage, Pokemon source)
     {
-        throw new NotImplementedException();
+        Move move = Battle.Library.Moves[moveId];
+        GotAttacked(move, damage, source);
     }
 
+    /// <summary>
+    /// Records that this Pokemon was attacked by another Pokemon's move.
+    /// Used for moves like Counter, Mirror Coat, Revenge, Bide, etc.
+    /// </summary>
+    /// <param name="move">The move that hit this Pokemon</param>
+    /// <param name="damage">The damage dealt (can be false/null if no damage)</param>
+    /// <param name="source">The Pokemon that attacked</param>
     public void GotAttacked(Move move, IntFalseUnion? damage, Pokemon source)
     {
-        throw new NotImplementedException();
+        // Convert damage to numeric value (0 if false/null)
+        int damageNumber = damage switch
+        {
+            IntIntFalseUnion intDamage => intDamage.Value,
+            _ => 0,
+        };
+
+        // Add attack record to the list
+        AttackedBy.Add(new Attacker
+        {
+            Source = source,
+            Damage = damageNumber,
+            Move = move.Id,
+            ThisTurn = true,
+            PokemonSlot = source.GetSlot(),
+            DamageValue = damage,
+        });
     }
 
     public Attacker? GetLastAttackedBy()
     {
-        throw new NotImplementedException();
+        return AttackedBy.Count == 0 ? null : AttackedBy[^1];
     }
 
-    public Attacker? GetLastDamagedBy()
+    /// <summary>
+    /// Gets the most recent attacker that actually dealt numeric damage to this Pokemon.
+    /// Used for moves like Metal Burst, Revenge, and Avalanche.
+    /// </summary>
+    /// <param name="filterOutSameSide">If true, exclude attacks from allies</param>
+    /// <returns>The last damaging attacker, or null if none found</returns>
+    public Attacker? GetLastDamagedBy(bool filterOutSameSide = false)
     {
-        throw new NotImplementedException();
+        // Filter attackers that dealt actual numeric damage
+        var damagedBy = AttackedBy.Where(attacker =>
+        {
+            // Check if damageValue is a numeric value (not false/null)
+            bool hasNumericDamage = attacker.DamageValue is IntIntFalseUnion;
+
+            // If no same-side filtering, just check damage
+            if (!filterOutSameSide)
+                return hasNumericDamage;
+
+            // With same-side filtering, also check if attacker is not an ally
+            return hasNumericDamage && !IsAlly(attacker.Source);
+        }).ToList();
+
+        // Return the last (most recent) damaging attacker, or null if list is empty
+        return damagedBy.Count == 0 ? null : damagedBy[^1];
     }
 
     /// <summary>
@@ -996,14 +1101,6 @@ public class Pokemon : IPriorityComparison, IDisposable
             // Special move target modifications
             switch (moveSlot.Id)
             {
-                case MoveId.Curse:
-                    // Curse has different targeting if user is not Ghost-type
-                    if (!HasType(PokemonType.Ghost))
-                    {
-                        Move curseMove = Battle.Library.Moves[MoveId.Curse];
-                    }
-                    break;
-
                 case MoveId.PollenPuff:
                     // Heal Block prevents Pollen Puff from targeting allies
                     if (Volatiles.ContainsKey(ConditionId.HealBlock))
@@ -1271,9 +1368,16 @@ public class Pokemon : IPriorityComparison, IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Calculates the sum of all positive stat boosts on this Pokemon.
+    /// Used for moves like Punishment, Stored Power, and Power Trip.
+    /// </summary>
+    /// <returns>The total of all positive boost stages</returns>
     public int PositiveBoosts()
     {
-        throw new NotImplementedException();
+        // Iterate through all boost types
+        return Enum.GetValues<BoostId>().Select(boostId => Boosts.GetBoost(boostId)).
+            Where(boostValue => boostValue > 0).Sum();
     }
 
     public SparseBoostsTable GetCappedBoost(SparseBoostsTable boosts)
