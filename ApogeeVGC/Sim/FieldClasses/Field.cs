@@ -309,57 +309,99 @@ public class Field
         return Battle.Library.Conditions[Terrain];
     }
 
-    //addPseudoWeather(
-    //    status: string | Condition,
-    //source: Pokemon | 'debug' | null = null,
-    //sourceEffect: Effect | null = null
-    //) : boolean {
-    //    if (!source && this.battle.event?.target) source = this.battle.event.target;
-    //    if (source === 'debug') source = this.battle.sides[0].active[0];
-    //    status = this.battle.dex.conditions.get(status);
-
-    //    let state = this.pseudoWeather[status.id];
-    //    if (state) {
-    //        if (!(status as any).onFieldRestart) return false;
-    //        return this.battle.singleEvent('FieldRestart', status, state, this, source, sourceEffect);
-    //    }
-    //    state = this.pseudoWeather[status.id] = this.battle.initEffectState({
-    //        id: status.id,
-    //        source,
-    //        sourceSlot: source?.getSlot(),
-    //        duration: status.duration,
-
-    //    });
-    //    if (status.durationCallback) {
-    //        if (!source) throw new Error(`setting fieldcond without a source`);
-    //        state.duration = status.durationCallback.call(this.battle, source, source, sourceEffect);
-    //    }
-    //    if (!this.battle.singleEvent('FieldStart', status, state, this, source, sourceEffect)) {
-    //        delete this.pseudoWeather[status.id];
-    //        return false;
-    //    }
-    //    this.battle.runEvent('PseudoWeatherChange', source, source, status);
-    //    return true;
-    //}
-
     public bool AddPseudoWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        Condition condition = Battle.Library.Conditions[status];
+        return AddPseudoWeather(condition, source, sourceEffect);
     }
 
     public bool AddPseudoWeather(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        throw new NotImplementedException();
+        // Fall back to battle effect if sourceEffect not provided
+        sourceEffect ??= Battle.Effect;
+        
+        // Fall back to event target if source not provided
+        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        {
+            source = pset.Pokemon;
+        }
+
+        // Check if pseudo-weather already exists
+        if (PseudoWeather.TryGetValue(status.Id, out EffectState? existingState))
+        {
+            // If the condition doesn't have a restart handler, return false
+            if (status.OnFieldRestart == null)
+            {
+                return false;
+            }
+
+            // Try to restart the pseudo-weather
+            Battle.SingleEvent(
+                EventId.FieldRestart,
+                status,
+                existingState,
+                this,
+                SingleEventSource.FromNullablePokemon(source),
+                sourceEffect
+            );
+            return true;
+        }
+
+        // Initialize new pseudo-weather state
+        EffectState state = Battle.InitEffectState(
+            status.EffectStateId,
+            source,
+            source?.GetSlot(),
+            status.Duration ?? 0
+        );
+
+        // If the condition has a custom duration callback, use it
+        if (status.DurationCallback != null)
+        {
+            if (source == null)
+            {
+                throw new InvalidOperationException("Setting pseudo-weather without a source");
+            }
+            state.Duration = status.DurationCallback(Battle, source, source, sourceEffect);
+        }
+
+        // Try to start the pseudo-weather
+        RelayVar? startResult = Battle.SingleEvent(
+            EventId.FieldStart,
+            status,
+            state,
+            this,
+            SingleEventSource.FromNullablePokemon(source),
+            sourceEffect
+        );
+
+        // If the start event failed, don't add the pseudo-weather
+        if (startResult is BoolRelayVar { Value: false })
+        {
+            return false;
+        }
+
+        // Add the pseudo-weather to the dictionary
+        PseudoWeather[status.Id] = state;
+
+        // Trigger pseudo-weather change event for all handlers
+        Battle.RunEvent(
+            EventId.PseudoWeatherChange, 
+            RunEventTarget.FromNullablePokemon(source),
+            RunEventSource.FromNullablePokemon(source),
+            status);
+
+        return true;
     }
 
     public Condition? GetPseudoWeather(ConditionId status)
     {
-        throw new NotImplementedException();
+        return PseudoWeather.ContainsKey(status) ? Battle.Library.Conditions[status] : null;
     }
 
     public Condition? GetPseudoWeather(Condition status)
     {
-        throw new NotImplementedException();
+        return GetPseudoWeather(status.Id);
     }
 
     public bool RemovePseudoWeather(Condition status)
