@@ -2577,7 +2577,57 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public ItemFalseUnion TakeItem(Pokemon? source = null)
     {
-        throw new NotImplementedException();
+        // Check if item exists and hasn't been knocked off
+        if (Item == ItemId.None || ItemState.KnockedOff == true)
+            return ItemFalseUnion.FromFalse();
+
+        // Default source to this Pokemon if not provided
+        source ??= this;
+
+        // Generation 4 special rule: Multitype ability (Arceus) protection
+        if (Battle.Gen == 4)
+        {
+            // Arceus (Multitype) cannot have items taken
+            if (Ability == AbilityId.Multitype)
+                return ItemFalseUnion.FromFalse();
+
+            // Cannot take items from Arceus (Multitype)
+            if (source.Ability == AbilityId.Multitype)
+                return ItemFalseUnion.FromFalse();
+        }
+
+        // Get the actual item object
+        Item item = GetItem();
+
+        // Run TakeItem event to check if taking should proceed
+        RelayVar? takeItemEvent = Battle.RunEvent(EventId.TakeItem, this, source,
+            null, item);
+
+        if (takeItemEvent is BoolRelayVar { Value: false })
+        {
+            return ItemFalseUnion.FromFalse();
+        }
+
+        // Store old item state for End event
+        EffectState oldItemState = ItemState;
+
+        // Clear the item
+        Item = ItemId.None;
+
+        // Clear the item state
+        ItemState = Battle.InitEffectState();
+
+        // Clear pending staleness
+        PendingStaleness = null;
+
+        // Trigger End event on the old item
+        Battle.SingleEvent(EventId.End, item, oldItemState, this);
+
+        // Trigger AfterTakeItem event
+        Battle.RunEvent(EventId.AfterTakeItem, this, null, null, item);
+
+        // Return the taken item
+        return item;
     }
 
     public bool SetItem(ItemId item, Pokemon? source = null, IEffect? effect = null)
