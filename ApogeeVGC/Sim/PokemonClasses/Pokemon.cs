@@ -543,7 +543,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public List<Pokemon> AdjacentAllies()
     {
-        throw new NotImplementedException();
+        return Side.Allies().Where(IsAdjacent).ToList();
     }
 
     public List<Pokemon> Foes(bool all = false)
@@ -553,7 +553,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public List<Pokemon> AdjacentFoes()
     {
-        throw new NotImplementedException();
+        return Battle.ActivePerHalf <= 2 ? Side.Foes() : Side.Foes().Where(IsAdjacent).ToList();
     }
 
     public bool IsAlly(Pokemon? pokemon = null)
@@ -563,17 +563,42 @@ public class Pokemon : IPriorityComparison, IDisposable
 
     public bool IsAdjacent(Pokemon pokemon2)
     {
-        throw new NotImplementedException();
+        if (Fainted || pokemon2.Fainted) return false;
+        if (Battle.ActivePerHalf <= 2) return this != pokemon2;
+        if (Side == pokemon2.Side) return Math.Abs(Position - pokemon2.Position) == 1;
+        return Math.Abs(Position + pokemon2.Position + 1 - Side.Active.Count) <= 1;
     }
 
     public int GetUndynamaxedHp(int? amount = null)
     {
-        throw new NotImplementedException();
+        int hp = amount ?? Hp;
+        return hp;
     }
 
+    /// <summary>
+    /// Get targets for Dragon Darts - determines if the move should hit a target and its adjacent ally.
+    /// </summary>
     public List<Pokemon> GetSmartTargets(Pokemon target, ActiveMove move)
     {
-        throw new NotImplementedException();
+        // Get the first adjacent ally of the target
+        Pokemon? target2 = target.AdjacentAllies().FirstOrDefault();
+
+        // If the adjacent ally doesn't exist, is the user, or is fainted
+        if (target2 == null || target2 == this || target2.Hp <= 0)
+        {
+            move.SmartTarget = false;
+            return [target];
+        }
+
+        // If the primary target is fainted
+        if (target.Hp <= 0)
+        {
+            move.SmartTarget = false;
+            return [target2];
+        }
+
+        // Return both targets (primary target and its adjacent ally)
+        return [target, target2];
     }
 
     public Pokemon GetAtLoc(int targetLoc)
@@ -621,6 +646,86 @@ public class Pokemon : IPriorityComparison, IDisposable
         public required List<Pokemon> Targets { get; init; }
         public required List<Pokemon> PressureTargets { get; init; }
     }
+
+    //    getMoveTargets(move: ActiveMove, target: Pokemon) : { targets: Pokemon[], pressureTargets: Pokemon[] } {
+    //		let targets: Pokemon[] = [];
+
+    //		switch (move.target) {
+    //		case 'all':
+    //		case 'foeSide':
+    //		case 'allySide':
+    //		case 'allyTeam':
+    //			if (!move.target.startsWith('foe')) {
+    //				targets.push(...this.alliesAndSelf());
+    //			}
+    //			if (!move.target.startsWith('ally')) {
+    //				targets.push(...this.foes(true));
+    //}
+    //			if (targets.length && !targets.includes(target)) {
+
+    //                this.battle.retargetLastMove(targets[targets.length - 1]);
+    //}
+    //			break;
+    //		case 'allAdjacent':
+    //			targets.push(...this.adjacentAllies());
+    //			// falls through
+    //		case 'allAdjacentFoes':
+    //			targets.push(...this.adjacentFoes());
+    //			if (targets.length && !targets.includes(target)) {
+    //    this.battle.retargetLastMove(targets[targets.length - 1]);
+    //}
+    //			break;
+    //		case 'allies':
+    //			targets = this.alliesAndSelf();
+    //			break;
+    //		default:
+    //			const selectedTarget = target;
+    //			if (!target || (target.fainted && !target.isAlly(this)) && this.battle.gameType !== 'freeforall') {
+    //    // If a targeted foe faints, the move is retargeted
+    //    const possibleTarget = this.battle.getRandomTarget(this, move);
+    //    if (!possibleTarget) return { targets: [], pressureTargets: [] }
+    //    ;
+    //    target = possibleTarget;
+    //}
+    //			if (this.battle.activePerHalf > 1 && !move.tracksTarget) {
+    //    const isCharging = move.flags['charge'] && !this.volatiles['twoturnmove'] &&
+    //        !(move.id.startsWith('solarb') && ['sunnyday', 'desolateland'].includes(this.effectiveWeather())) &&
+    //        !(move.id === 'electroshot' && ['raindance', 'primordialsea'].includes(this.effectiveWeather())) &&
+    //        !(this.hasItem('powerherb') && move.id !== 'skydrop');
+    //    if (!isCharging && !(move.id === 'pursuit' && (target.beingCalledBack || target.switchFlag)))
+    //    {
+    //        target = this.battle.priorityEvent('RedirectTarget', this, this, move, target);
+    //    }
+    //}
+    //			if (move.smartTarget) {
+    //    targets = this.getSmartTargets(target, move);
+    //    target = targets[0];
+    //} else {
+    //    targets.push(target);
+    //}
+    //			if (target.fainted && !move.flags['futuremove']) {
+    //				return { targets: [], pressureTargets: [] };
+    //			}
+    //			if (selectedTarget !== target)
+    //{
+    //    this.battle.retargetLastMove(target);
+    //}
+    //		}
+
+    //		// Resolve apparent targets for Pressure.
+    //		let pressureTargets = targets;
+    //if (move.target === 'foeSide')
+    //{
+    //    pressureTargets = [];
+    //}
+    //if (move.flags['mustpressure'])
+    //{
+    //    pressureTargets = this.foes();
+    //}
+
+    //return { targets, pressureTargets }
+    //;
+    //	}
 
     public MoveTargets GetMoveTargets(ActiveMove move, Pokemon target)
     {
