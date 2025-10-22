@@ -95,6 +95,24 @@ public record FalseIntFalseUnion : IntFalseUnion
 
 
 /// <summary>
+/// int | false | undefined
+/// </summary>
+public abstract record IntFalseUndefinedUnion
+{
+    public static IntFalseUndefinedUnion FromInt(int value) => new IntIntFalseUndefined(value);
+    public static IntFalseUndefinedUnion FromFalse() => new FalseIntFalseUndefined();
+    public static IntFalseUndefinedUnion FromUndefined() => new UndefinedIntFalseUndefined(new Undefined());
+    public static implicit operator IntFalseUndefinedUnion(int value) => new IntIntFalseUndefined(value);
+    public static implicit operator IntFalseUndefinedUnion(Undefined value) =>
+        new UndefinedIntFalseUndefined(value);
+}
+public record IntIntFalseUndefined(int Value) : IntFalseUndefinedUnion;
+public record FalseIntFalseUndefined : IntFalseUndefinedUnion;
+public record UndefinedIntFalseUndefined(Undefined Value) : IntFalseUndefinedUnion;
+
+
+
+/// <summary>
 /// int | true
 /// </summary>
 public abstract record IntTrueUnion
@@ -220,6 +238,19 @@ public abstract record BoolIntUndefinedUnion
     public static implicit operator BoolIntUndefinedUnion(int value) => new IntBoolIntUndefinedUnion(value);
     public static implicit operator BoolIntUndefinedUnion(Undefined value) =>
         new UndefinedBoolIntUndefinedUnion(value);
+
+    public IntFalseUndefinedUnion ToIntFalseUndefinedUnion()
+    {
+        return this switch
+        {
+            BoolBoolIntUndefinedUnion boolCase => boolCase.Value
+                ? throw new InvalidOperationException("Cannot convert true to IntFalseUndefinedUnion")
+                : new FalseIntFalseUndefined(),
+            IntBoolIntUndefinedUnion intCase => new IntIntFalseUndefined(intCase.Value),
+            UndefinedBoolIntUndefinedUnion => new UndefinedIntFalseUndefined(new Undefined()),
+            _ => throw new InvalidOperationException("Unknown BoolIntUndefinedUnion type"),
+        };
+    }
 }
 
 public record BoolBoolIntUndefinedUnion(bool Value) : BoolIntUndefinedUnion
@@ -883,13 +914,13 @@ public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
         }
     }
 
-    public SpreadMoveDamage(List<BoolIntUndefinedUnion> other)
-    {
-        foreach (BoolIntUndefinedUnion item in other)
-        {
-            Add(item);
-        }
-    }
+    //public SpreadMoveDamage(List<BoolIntUndefinedUnion> other)
+    //{
+    //    foreach (BoolIntUndefinedUnion item in other)
+    //    {
+    //        Add(item);
+    //    }
+    //}
 }
 
 public class SpreadMoveTargets : List<PokemonFalseUnion>

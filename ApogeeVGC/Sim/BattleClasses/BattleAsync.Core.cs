@@ -104,7 +104,7 @@ public partial class BattleAsync : IBattle, IDisposable
     // Hints
 
     public static Undefined NotFail => new();
-    public static int HitSubstiture => 0;
+    public int HitSubstitute => 0;
     public static bool Fail => false;
     public const object? SilentFail = null;
 
@@ -1643,14 +1643,13 @@ public partial class BattleAsync : IBattle, IDisposable
         return success.HasValue ? new BoolBoolZeroUnion(success.Value) : null;
     }
 
-    public List<IntFalseUnion?> SpreadDamage(SpreadMoveDamage damage, List<PokemonFalseUnion?>? targetArray,
-    Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
+    public SpreadMoveDamage SpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets? targetArray = null,
+        Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
     {
         // Return early if no targets
-        if (targetArray == null)
-            return [new IntIntFalseUnion(0)];
+        if (targetArray == null) return [0];
 
-        var retVals = new List<IntFalseUnion?>();
+        var retVals = new SpreadMoveDamage();
 
         // Convert effect to Condition
         Condition? effectCondition;
@@ -1696,14 +1695,14 @@ public partial class BattleAsync : IBattle, IDisposable
             // Target has no HP - return 0
             if (target is not { Hp: > 0 })
             {
-                retVals.Add(new IntIntFalseUnion(0));
+                retVals.Add(0);
                 continue;
             }
 
             // Target is not active - return false
             if (!target.IsActive)
             {
-                retVals.Add(new FalseIntFalseUnion());
+                retVals.Add(false);
                 continue;
             }
 
@@ -1719,7 +1718,7 @@ public partial class BattleAsync : IBattle, IDisposable
                     !target.RunStatusImmunity(effectCondition.Id))
                 {
                     Debug("weather immunity");
-                    retVals.Add(new IntIntFalseUnion(0));
+                    retVals.Add(0);
                     continue;
                 }
 
@@ -1735,7 +1734,7 @@ public partial class BattleAsync : IBattle, IDisposable
                 if (damageResult is not IntRelayVar damageInt)
                 {
                     Debug("damage event failed");
-                    retVals.Add(null);
+                    retVals.Add(new Undefined());
                     continue;
                 }
 
@@ -1748,7 +1747,7 @@ public partial class BattleAsync : IBattle, IDisposable
 
             // Apply damage to target
             targetDamage = target.Damage(targetDamage, source, effectCondition);
-            retVals.Add(new IntIntFalseUnion(targetDamage));
+            retVals.Add(targetDamage);
 
             // Track that the Pokemon was hurt this turn
             if (targetDamage != 0)
@@ -1767,20 +1766,19 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             for (int i = 0; i < targetArray.Count; i++)
             {
-                if (retVals[i] == null || retVals[i] is FalseIntFalseUnion)
+                if (retVals[i] is UndefinedBoolIntUndefinedUnion || retVals[i] == false)
                     continue;
 
                 Pokemon? target = targetArray[i] switch
                 {
                     PokemonPokemonUnion p => p.Pokemon,
-                    _ => null
+                    _ => null,
                 };
 
-                if (target?.Hp <= 0)
-                {
-                    Debug($"instafaint: {string.Join(", ", FaintQueue.Select(entry => entry.Target.Name))}");
-                    FaintMessages(lastFirst: true);
-                }
+                if (!(target?.Hp <= 0)) continue;
+
+                Debug($"instafaint: {string.Join(", ", FaintQueue.Select(entry => entry.Target.Name))}");
+                FaintMessages(lastFirst: true);
             }
         }
 
@@ -1860,7 +1858,7 @@ public partial class BattleAsync : IBattle, IDisposable
     /// - false if target is not active
     /// - null if damage was prevented by an event
     /// </returns>
-    public IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
+    public IntFalseUndefinedUnion Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false)
     {
         // Default target to event target if available
@@ -1880,14 +1878,14 @@ public partial class BattleAsync : IBattle, IDisposable
 
         // Create single-element arrays for SpreadDamage
         var damageArray = new SpreadMoveDamage { damage };
-        var targetArray = new List<PokemonFalseUnion?>
+        var targetArray = new SpreadMoveTargets
         {
-            PokemonFalseUnion.FromNullablePokemon(target),
+            target ?? throw new InvalidOperationException(),
         };
 
         // Call SpreadDamage and return the first (only) result
-        var results = SpreadDamage(damageArray, targetArray, source, effect, instafaint);
-        return results[0];
+        SpreadMoveDamage results = SpreadDamage(damageArray, targetArray, source, effect, instafaint);
+        return results[0].ToIntFalseUndefinedUnion();
     }
 
     /// <summary>

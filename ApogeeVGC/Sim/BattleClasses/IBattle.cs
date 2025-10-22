@@ -71,7 +71,7 @@ public interface IBattle
     BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false);
 
-    IntFalseUnion? Damage(int damage, Pokemon? target = null, Pokemon? source = null,
+    IntFalseUndefinedUnion Damage(int damage, Pokemon? target = null, Pokemon? source = null,
         BattleDamageEffect? effect = null, bool instafaint = false);
 
     IntFalseUnion? Heal(int damage, Pokemon? target = null, Pokemon? source = null, BattleHealEffect? effect = null);
@@ -212,4 +212,9 @@ public interface IBattle
     void AttrLastMove(params string[] args);
 
     int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null, IEffect? effect = null);
+
+    public SpreadMoveDamage SpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets? targetArray = null,
+        Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false);
+
+    int HitSubstitute { get; }
 }

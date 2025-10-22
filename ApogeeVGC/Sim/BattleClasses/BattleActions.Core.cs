@@ -1060,14 +1060,214 @@ public partial class BattleActions(IBattle battle)
         return MoveHit(target, pokemon, move);
     }
 
-    
-
     public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets, Pokemon pokemon,
         ActiveMove move, HitEffect? hitEffect = null, bool isSecondary = false, bool isSelf = false)
     {
-        throw new NotImplementedException();
+        // Hardcoded for single-target purposes
+        // (no spread moves have any kind of onTryHit handler)
+        Pokemon target = SpreadMoveTargets.ToPokemonList(targets)[0];
+        var damage = new SpreadMoveDamage();
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            damage.Add(BoolIntUndefinedUnion.FromBool(true));
+        }
+
+        // Run TryHit events for field/side moves
+        if (move.Target == MoveTarget.All && !isSelf)
+        {
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
+                SingleEventTarget.FromNullablePokemon(target), pokemon, move);
+            
+            if (hitResult is BoolRelayVar { Value: false })
+            {
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintFailEvent(pokemon);
+                }
+                Battle.AttrLastMove("[still]");
+                
+                damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                return (damage, targets);
+            }
+        }
+        else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam && !isSelf)
+        {
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
+                SingleEventTarget.FromNullablePokemon(target), pokemon, move);
+            
+            if (hitResult is BoolRelayVar { Value: false })
+            {
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintFailEvent(pokemon);
+                }
+                Battle.AttrLastMove("[still]");
+                
+                damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                return (damage, targets);
+            }
+        }
+        else
+        {
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
+                target, pokemon, move);
+            
+            if (hitResult is BoolRelayVar { Value: false })
+            {
+                if (Battle.PrintDebug)
+                {
+                    UiGenerator.PrintFailEvent(pokemon);
+                }
+                Battle.AttrLastMove("[still]");
+                
+                damage[0] = BoolIntUndefinedUnion.FromBool(false);
+                return (damage, targets);
+            }
+        }
+
+        // 0. check for substitute
+        if (!isSecondary && !isSelf)
+        {
+            if (move.Target != MoveTarget.All && move.Target != MoveTarget.AllyTeam && 
+                move.Target != MoveTarget.AllySide && move.Target != MoveTarget.FoeSide)
+            {
+                damage = TryPrimaryHitEvent(damage, targets, pokemon, move, move, isSecondary);
+            }
+        }
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (damage[i] == Battle.HitSubstitute)
+            {
+                damage[i] = BoolIntUndefinedUnion.FromBool(true);
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+
+            if (targets[i] is PokemonPokemonUnion && isSecondary && move.Self == null)
+            {
+                damage[i] = BoolIntUndefinedUnion.FromBool(true);
+            }
+            
+            if (damage[i] is BoolBoolIntUndefinedUnion { Value: false })
+            {
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+        }
+
+        // 1. call to Battle.GetDamage
+        damage = GetSpreadDamage(damage, targets, pokemon, move, move, isSecondary, isSelf);
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (damage[i] is BoolBoolIntUndefinedUnion { Value: false })
+            {
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+        }
+
+        // 2. call to Battle.SpreadDamage
+        damage = Battle.SpreadDamage(damage, targets, pokemon, BattleDamageEffect.FromIEffect(move));
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (damage[i] is BoolBoolIntUndefinedUnion { Value: false })
+            {
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+        }
+
+        // 3. onHit event happens here
+        damage = RunMoveEffects(damage, targets, pokemon, move, move, isSecondary, isSelf);
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            {
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+        }
+
+        // steps 4 and 5 can mess with Battle.ActiveTarget, which needs to be preserved for Dancer
+        Pokemon? activeTarget = Battle.ActiveTarget;
+
+        // 4. self drops (start checking for targets[i] === false here)
+        if (move.Self != null && move.SelfDropped != true)
+        {
+            SelfDrops(targets, pokemon, move, move, isSecondary);
+        }
+
+        // 5. secondary effects
+        if (move.Secondaries != null)
+        {
+            Secondaries(targets, pokemon, move, move, isSelf);
+        }
+
+        Battle.ActiveTarget = activeTarget;
+
+        // 6. force switch
+        if (move.ForceSwitch != null)
+        {
+            damage = ForceSwitch(damage, targets, pokemon, move);
+        }
+
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            {
+                targets[i] = PokemonFalseUnion.FromFalse();
+            }
+        }
+
+        var damagedTargets = new List<Pokemon>();
+        var damagedDamage = new List<int>();
+        
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (damage[i] is IntBoolIntUndefinedUnion intDmg && 
+                targets[i] is PokemonPokemonUnion pokemonUnion)
+            {
+                damagedTargets.Add(pokemonUnion.Pokemon);
+                damagedDamage.Add(intDmg.Value);
+            }
+        }
+
+        int pokemonOriginalHp = pokemon.Hp;
+        
+        if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
+        {
+            Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move, 
+                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d)).ToList()));
+            
+            if (move.OnAfterHit != null)
+            {
+                foreach (Pokemon t in damagedTargets)
+                {
+                    Battle.SingleEvent(EventId.AfterHit, move, null, t, pokemon, move);
+                }
+            }
+            
+            if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 && pokemonOriginalHp > pokemon.MaxHp / 2)
+            {
+                Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+            }
+        }
+
+        return (damage, targets);
     }
 
+    //tryPrimaryHitEvent(
+    //    damage: SpreadMoveDamage, targets: SpreadMoveTargets, pokemon: Pokemon,
+    //move: ActiveMove, moveData: ActiveMove, isSecondary?: boolean
+
+    //) : SpreadMoveDamage {
+    //    for (const [i, target] of targets.entries()) {
+    //        if (!target) continue;
+    //        damage[i] = this.battle.runEvent('TryPrimaryHit', target, pokemon, moveData);
+    //    }
+    //    return damage;
+    //}
+    
     public SpreadMoveDamage TryPrimaryHitEvent(SpreadMoveDamage damage, SpreadMoveTargets targets,
         Pokemon pokemon, ActiveMove move, ActiveMove moveData, bool isSecondary = false)
     {

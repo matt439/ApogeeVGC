@@ -512,8 +512,8 @@ public record Conditions
                         return;
                     }
 
-                    IntFalseUnion? damage = battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
-                    if (damage is IntIntFalseUnion d)
+                    IntFalseUndefinedUnion damage = battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
+                    if (damage is IntIntFalseUndefined d)
                     {
                         battle.Heal(d.Value, target, pokemon);
                     }
