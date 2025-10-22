@@ -12,10 +12,10 @@ public delegate DoubleVoidUnion ModifierEffectHandler(IBattle battle, int relayV
 public delegate DoubleVoidUnion ModifierMoveHandler(IBattle battle, int relayVar, Pokemon target,
     Pokemon source, ActiveMove move);
 
-public delegate BoolUndefinedVoidUnion? ResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
+public delegate BoolEmptyVoidUnion? ResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
     ActiveMove move);
 
-public delegate BoolIntUndefinedVoidUnion? ExtResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
+public delegate BoolIntEmptyVoidUnion? ExtResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
     ActiveMove move);
 
 public delegate void VoidEffectHandler(IBattle battle, Pokemon target, Pokemon source, IEffect effect);
@@ -28,10 +28,10 @@ public delegate DoubleVoidUnion ModifierSourceEffectHandler(IBattle battle, int 
 public delegate DoubleVoidUnion ModifierSourceMoveHandler(IBattle battle, int relayVar, Pokemon source,
     Pokemon target, ActiveMove move);
 
-public delegate BoolUndefinedVoidUnion? ResultSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target,
+public delegate BoolEmptyVoidUnion? ResultSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target,
     ActiveMove move);
 
-public delegate BoolIntUndefinedVoidUnion? ExtResultSourceMoveHandler(IBattle battle, Pokemon source,
+public delegate BoolIntEmptyVoidUnion? ExtResultSourceMoveHandler(IBattle battle, Pokemon source,
     Pokemon target, ActiveMove move);
 
 public delegate void VoidSourceEffectHandler(IBattle battle, Pokemon source, Pokemon target, IEffect effect);

@@ -617,7 +617,7 @@ public record Conditions
                     {
                         source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
                     }
-                    return new Undefined();
+                    return new Empty(); // in place of Battle.NOT_FAIL ("")
                 },
             },
             [ConditionId.Tailwind] = new()

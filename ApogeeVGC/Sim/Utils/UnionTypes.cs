@@ -16,7 +16,16 @@ namespace ApogeeVGC.Sim.Utils;
 /// </summary>
 public record VoidReturn;
 
+/// <summary>
+/// Represents the 'undefined' type, indicating an uninitialized or absent value.
+/// </summary>
 public record Undefined;
+
+/// <summary>
+/// Represents an empty type with no data. In TypeScript this is "" (empty string).
+/// Empty should be used where Battle.NOT_FAIL ("") is used in the original code.
+/// </summary>
+public record Empty;
 
 /// <summary>
 /// int | bool
@@ -171,6 +180,46 @@ public abstract record BoolUndefinedVoidUnion
 public record BoolBoolUndefinedVoidUnion(bool Value) : BoolUndefinedVoidUnion;
 public record UndefinedBoolUndefinedVoidUnion(Undefined Value) : BoolUndefinedVoidUnion;
 public record VoidUnionBoolUndefinedVoidUnion(VoidReturn Value) : BoolUndefinedVoidUnion;
+
+
+/// <summary>
+/// bool | empty | void
+/// </summary>
+public abstract record BoolEmptyVoidUnion
+{
+    public static BoolEmptyVoidUnion FromBool(bool value) => new BoolBoolEmptyVoidUnion(value);
+    public static BoolEmptyVoidUnion FromEmpty() => new EmptyBoolEmptyVoidUnion(new Empty());
+    public static BoolEmptyVoidUnion FromVoid() => new VoidUnionBoolEmptyVoidUnion(new VoidReturn());
+    public static implicit operator BoolEmptyVoidUnion(bool value) => new BoolBoolEmptyVoidUnion(value);
+    public static implicit operator BoolEmptyVoidUnion(VoidReturn value) => new VoidUnionBoolEmptyVoidUnion(value);
+    public static implicit operator BoolEmptyVoidUnion(Empty value) => new EmptyBoolEmptyVoidUnion(value);
+}
+public record BoolBoolEmptyVoidUnion(bool Value) : BoolEmptyVoidUnion;
+public record EmptyBoolEmptyVoidUnion(Empty Value) : BoolEmptyVoidUnion;
+public record VoidUnionBoolEmptyVoidUnion(VoidReturn Value) : BoolEmptyVoidUnion;
+
+
+/// <summary>
+/// bool | int | empty | void
+/// </summary>
+public abstract record BoolIntEmptyVoidUnion
+{
+    public static BoolIntEmptyVoidUnion FromBool(bool value) => new BoolBoolIntEmptyVoidUnion(value);
+    public static BoolIntEmptyVoidUnion FromInt(int value) => new IntBoolIntEmptyVoidUnion(value);
+    public static BoolIntEmptyVoidUnion FromEmpty() => new EmptyBoolIntEmptyVoidUnion(new Empty());
+    public static BoolIntEmptyVoidUnion FromVoid() => new VoidUnionBoolIntEmptyVoidUnion(new VoidReturn());
+    public static implicit operator BoolIntEmptyVoidUnion(bool value) => new BoolBoolIntEmptyVoidUnion(value);
+    public static implicit operator BoolIntEmptyVoidUnion(int value) => new IntBoolIntEmptyVoidUnion(value);
+    public static implicit operator BoolIntEmptyVoidUnion(VoidReturn value) =>
+        new VoidUnionBoolIntEmptyVoidUnion(value);
+    public static implicit operator BoolIntEmptyVoidUnion(Empty value) =>
+        new EmptyBoolIntEmptyVoidUnion(value);
+}
+public record BoolBoolIntEmptyVoidUnion(bool Value) : BoolIntEmptyVoidUnion;
+public record IntBoolIntEmptyVoidUnion(int Value) : BoolIntEmptyVoidUnion;
+public record EmptyBoolIntEmptyVoidUnion(Empty Value) : BoolIntEmptyVoidUnion;
+public record VoidUnionBoolIntEmptyVoidUnion(VoidReturn Value) : BoolIntEmptyVoidUnion;
+
 
 
 /// <summary>

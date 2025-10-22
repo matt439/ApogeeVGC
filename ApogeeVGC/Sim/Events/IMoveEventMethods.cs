@@ -26,17 +26,17 @@ public delegate IntBoolVoidUnion? OnDamageHandler(IBattle battle, int damage, Po
 
 public delegate IntVoidUnion OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, PokemonType type,
     ActiveMove move);
-public delegate BoolUndefinedVoidUnion? OnHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
+public delegate BoolEmptyVoidUnion? OnHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
 public delegate void OnModifyMoveHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
 public delegate void OnModifyTypeHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
 
 public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target,
     ActiveMove move);
 
-public delegate BoolUndefinedVoidUnion? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source,
+public delegate BoolEmptyVoidUnion? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source,
     ActiveMove move);
 
-public interface IMoveEventHandlers
+public interface IMoveEventMethods
 {
     BasePowerCallbackHandler? BasePowerCallback { get; }
     BeforeMoveCallbackHandler? BeforeMoveCallback { get; }
