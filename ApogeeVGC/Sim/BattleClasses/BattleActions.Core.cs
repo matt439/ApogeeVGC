@@ -1256,22 +1256,27 @@ public partial class BattleActions(IBattle battle)
         return (damage, targets);
     }
 
-    //tryPrimaryHitEvent(
-    //    damage: SpreadMoveDamage, targets: SpreadMoveTargets, pokemon: Pokemon,
-    //move: ActiveMove, moveData: ActiveMove, isSecondary?: boolean
-
-    //) : SpreadMoveDamage {
-    //    for (const [i, target] of targets.entries()) {
-    //        if (!target) continue;
-    //        damage[i] = this.battle.runEvent('TryPrimaryHit', target, pokemon, moveData);
-    //    }
-    //    return damage;
-    //}
-    
     public SpreadMoveDamage TryPrimaryHitEvent(SpreadMoveDamage damage, SpreadMoveTargets targets,
         Pokemon pokemon, ActiveMove move, ActiveMove moveData, bool isSecondary = false)
     {
-        throw new NotImplementedException();
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (targets[i] is not PokemonPokemonUnion pokemonUnion)
+            {
+                continue;
+            }
+
+            Pokemon target = pokemonUnion.Pokemon;
+            RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
+
+            if (result is not BoolIntUndefinedUnionRelayVar biuu)
+            {
+                throw new InvalidOperationException("RelayVar must be type BoolIntUndefinedUnionRelayVar here.");
+            }
+            damage[i] = biuu.Value;
+        }
+
+        return damage;
     }
 
     public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,

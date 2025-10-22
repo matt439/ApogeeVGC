@@ -647,7 +647,8 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
-/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon? | IntTrueUnion
+/// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon? | IntTrueUnion |
+/// BoolIntUndefinedUnion
 /// </summary>
 public abstract record RelayVar
 {
@@ -680,6 +681,8 @@ public abstract record RelayVar
         TrueIntTrueUnion => new BoolRelayVar(true),
         _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
     };
+
+
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -696,6 +699,7 @@ public record MoveIdRelayVar(MoveId MoveId) : RelayVar;
 public record StringRelayVar(string Value) : RelayVar;
 public record ArrayRelayVar(List<RelayVar> Values) : RelayVar;
 public record PokemonRelayVar(Pokemon Pokemon) : RelayVar;
+public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : RelayVar;
 
 
 
