@@ -2941,7 +2941,7 @@ public partial class BattleAsync : IBattle, IDisposable
                     if (target == null) return false;
                     if (btmAction.Move.BeforeTurnCallback == null)
                         throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
-                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target,
+                    btmAction.Move.BeforeTurnCallback.GetValueOrThrow()(this, btmAction.Pokemon, target,
                         btmAction.Move.ToActiveMove());
                     break;
                 }
@@ -2954,7 +2954,7 @@ public partial class BattleAsync : IBattle, IDisposable
                     Debug($"priority charge callback: {pcmAction.Move.Id}");
                     if (pcmAction.Move.PriorityChargeCallback == null)
                         throw new InvalidOperationException("priorityChargeMove has no priorityChargeCallback");
-                    pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
+                    pcmAction.Move.PriorityChargeCallback.GetValueOrThrow()(this, pcmAction.Pokemon);
                     break;
                 }
 

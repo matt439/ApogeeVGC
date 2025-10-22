@@ -1019,7 +1019,7 @@ public partial class BattleActions
                 SpreadMoveTargets.FromPokemonList(targetsCopy),
                 pokemon,
                 move,
-                new HitEffect { OnHit = move.OnHit });
+                new HitEffect { OnHit = move.OnHit?.GetValueOrDefault() });
 
             // When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
             // so spreadMoveHit returns a length 1 damage array

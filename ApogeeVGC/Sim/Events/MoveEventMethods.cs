@@ -14,7 +14,7 @@ public delegate BoolVoidUnion BeforeMoveCallbackHandler(IBattle battle, Pokemon 
     ActiveMove move);
 
 public delegate void BeforeTurnCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
-public delegate IntFalseUnion DamageCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate IntFalseUnion DamageCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target);
 public delegate void PriorityChargeCallbackHandler(IBattle battle, Pokemon pokemon);
 
 public delegate void OnDisableMoveHandler(IBattle battle, Pokemon pokemon);
@@ -38,35 +38,35 @@ public delegate BoolUndefinedVoidUnion? OnTryHitSideHandler(IBattle battle, Side
 
 public interface IMoveEventHandlers
 {
-    BasePowerCallbackHandler? BasePowerCallback { get; }
-    BeforeMoveCallbackHandler? BeforeMoveCallback { get; }
-    BeforeTurnCallbackHandler? BeforeTurnCallback { get; }
-    DamageCallbackHandler? DamageCallback { get; }
-    PriorityChargeCallbackHandler? PriorityChargeCallback { get; }
+    TypeUndefinedUnion<BasePowerCallbackHandler>? BasePowerCallback { get; }
+    TypeUndefinedUnion<BeforeMoveCallbackHandler>? BeforeMoveCallback { get; }
+    TypeUndefinedUnion<BeforeTurnCallbackHandler>? BeforeTurnCallback { get; }
+    TypeUndefinedUnion<DamageCallbackHandler>? DamageCallback { get; }
+    TypeUndefinedUnion<PriorityChargeCallbackHandler>? PriorityChargeCallback { get; }
 
-    OnDisableMoveHandler? OnDisableMove { get; }
-    VoidSourceMoveHandler? OnAfterHit { get; }
-    OnAfterSubDamageHandler? OnAfterSubDamage { get; }
-    VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; }
-    VoidMoveHandler? OnAfterMoveSecondary { get; }
-    VoidSourceMoveHandler? OnAfterMove { get; }
-    OnDamageHandler? OnDamage { get; }
-    ModifierSourceMoveHandler? OnBasePower { get; }
-    OnEffectivenessHandler? OnEffectiveness { get; }
-    ResultMoveHandler? OnHit { get; }
-    ResultMoveHandler? OnHitField { get; }
-    OnHitSideHandler? OnHitSide { get; }
-    OnModifyMoveHandler? OnModifyMove { get; }
-    ModifierSourceMoveHandler? OnModifyPriority { get; }
-    VoidMoveHandler? OnMoveFail { get; }
-    OnModifyTypeHandler? OnModifyType { get; }
-    OnModifyTargetHandler? OnModifyTarget { get; }
-    ResultMoveHandler? OnPrepareHit { get; }
-    ResultSourceMoveHandler? OnTry { get; }
-    ExtResultSourceMoveHandler? OnTryHit { get; }
-    ResultMoveHandler? OnTryHitField { get; }
-    OnTryHitSideHandler? OnTryHitSide { get; }
-    ResultMoveHandler? OnTryImmunity { get; }
-    ResultSourceMoveHandler? OnTryMove { get; }
-    VoidSourceMoveHandler? OnUseMoveMessage { get; }
+    TypeUndefinedUnion<OnDisableMoveHandler>? OnDisableMove { get; }
+    TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterHit { get; }
+    TypeUndefinedUnion<OnAfterSubDamageHandler>? OnAfterSubDamage { get; }
+    TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterMoveSecondarySelf { get; }
+    TypeUndefinedUnion<VoidMoveHandler>? OnAfterMoveSecondary { get; }
+    TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterMove { get; }
+    TypeUndefinedUnion<OnDamageHandler>? OnDamage { get; }
+    TypeUndefinedUnion<ModifierSourceMoveHandler>? OnBasePower { get; }
+    TypeUndefinedUnion<OnEffectivenessHandler>? OnEffectiveness { get; }
+    TypeUndefinedUnion<ResultMoveHandler>? OnHit { get; }
+    TypeUndefinedUnion<ResultMoveHandler>? OnHitField { get; }
+    TypeUndefinedUnion<OnHitSideHandler>? OnHitSide { get; }
+    TypeUndefinedUnion<OnModifyMoveHandler>? OnModifyMove { get; }
+    TypeUndefinedUnion<ModifierSourceMoveHandler>? OnModifyPriority { get; }
+    TypeUndefinedUnion<VoidMoveHandler>? OnMoveFail { get; }
+    TypeUndefinedUnion<OnModifyTypeHandler>? OnModifyType { get; }
+    TypeUndefinedUnion<OnModifyTargetHandler>? OnModifyTarget { get; }
+    TypeUndefinedUnion<ResultMoveHandler>? OnPrepareHit { get; }
+    TypeUndefinedUnion<ResultSourceMoveHandler>? OnTry { get; }
+    TypeUndefinedUnion<ExtResultSourceMoveHandler>? OnTryHit { get; }
+    TypeUndefinedUnion<ResultMoveHandler>? OnTryHitField { get; }
+    TypeUndefinedUnion<OnTryHitSideHandler>? OnTryHitSide { get; }
+    TypeUndefinedUnion<ResultMoveHandler>? OnTryImmunity { get; }
+    TypeUndefinedUnion<ResultSourceMoveHandler>? OnTryMove { get; }
+    TypeUndefinedUnion<VoidSourceMoveHandler>? OnUseMoveMessage { get; }
 }

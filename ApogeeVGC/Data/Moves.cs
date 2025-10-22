@@ -60,7 +60,8 @@ public record Moves
                     Metronome = true,
                 },
                 Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = (_, target, _, _) => !target.HasType(PokemonType.Grass),
+                OnTryImmunity = (ResultMoveHandler)((_, target, _, _) =>
+                    !target.HasType(PokemonType.Grass)),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -103,13 +104,13 @@ public record Moves
                 },
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
-                OnPrepareHit = (battle, pokemon, _, _) => battle.Queue.WillAct() is null &&
-                                                          battle.RunEvent(EventId.StallMove, pokemon) is not null,
-                OnHit = (_, pokemon, _, _) =>
+                OnPrepareHit = (ResultMoveHandler)((battle, pokemon, _, _) => battle.Queue.WillAct() is null &&
+                                                          battle.RunEvent(EventId.StallMove, pokemon) is not null),
+                OnHit = (ResultMoveHandler)((_, pokemon, _, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
-                },
+                }),
                 Condition = _library.Conditions[ConditionId.Protect],
                 Secondary = null,
                 Target = MoveTarget.Self,
@@ -171,14 +172,14 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnBasePower = (battle, _, _, target, move) =>
+                OnBasePower = (ModifierSourceMoveHandler)((battle, _, _, target, move) =>
                 {
                     if (target.RunEffectiveness(move) > 0.0)
                     {
                         return battle.ChainModify([5461, 4096]);
                     }
                     return new VoidReturn();
-                },
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
@@ -221,14 +222,14 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = (battle, _, pokemon, _, _) =>
+                OnBasePower = (ModifierSourceMoveHandler)((battle, _, pokemon, _, _) =>
                 {
                     if (pokemon.Status is not ConditionId.None && pokemon.Status != ConditionId.Sleep)
                     {
                         return battle.ChainModify(2);
                     }
                     return new VoidReturn();
-                },
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -465,14 +466,14 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = (_, source, _, _) =>
+                OnTry = (ResultSourceMoveHandler)((_, source, _, _) =>
                 {
                     if (source.ActiveMoveActions > 1)
                     {
                         return false;
                     }
                     return new VoidReturn();
-                },
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -487,7 +488,7 @@ public record Moves
                 Num = 484,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (_, pokemon, target, _) =>
+                BasePowerCallback = (BasePowerCallbackHandler)((_, pokemon, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int pokemonWeight = pokemon.GetWeight();
@@ -513,7 +514,7 @@ public record Moves
                         bp = 40;
                     }
                     return bp;
-                },
+                }),
                 Category = MoveCategory.Physical,
                 Name = "Heavy Slam",
                 BasePp = 10,
@@ -537,7 +538,7 @@ public record Moves
                 Num = 67,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (_, _, target, _) =>
+                BasePowerCallback = (BasePowerCallbackHandler)((_, _, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int bp = targetWeight switch
@@ -550,7 +551,7 @@ public record Moves
                         _ => 20,
                     };
                     return bp;
-                },
+                }),
                 Category = MoveCategory.Physical,
                 Name = "Low Kick",
                 BasePp = 20,
@@ -617,7 +618,7 @@ public record Moves
                     FailInstruct = true,
                     NoSketch = true,
                 },
-                OnModifyMove = (battle, move, pokemon, _) =>
+                OnModifyMove = (OnModifyMoveHandler)((battle, move, pokemon, _) =>
                 {
                     move.Type = MoveType.Fighting;
                     if (battle.PrintDebug)
@@ -625,7 +626,7 @@ public record Moves
                         UiGenerator.PrintActivateEvent(pokemon,
                             _library.Moves[MoveId.Struggle].ToActiveMove());
                     }
-                },
+                }),
                 StruggleRecoil = true,
                 Secondary = null,
                 Target = MoveTarget.RandomNormal,

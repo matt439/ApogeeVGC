@@ -9,36 +9,36 @@ public record Move : IMoveEventHandlers, IBasicEffect
 {
     #region IMoveEventHandlers Implementation
 
-    public BasePowerCallbackHandler? BasePowerCallback { get; init; }
-    public BeforeMoveCallbackHandler? BeforeMoveCallback { get; init; }
-    public BeforeTurnCallbackHandler? BeforeTurnCallback { get; init; }
-    public DamageCallbackHandler? DamageCallback { get; init; }
-    public PriorityChargeCallbackHandler? PriorityChargeCallback { get; init; }
-    public OnDisableMoveHandler? OnDisableMove { get; init; }
-    public VoidSourceMoveHandler? OnAfterHit { get; init; }
-    public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
-    public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
-    public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
-    public VoidSourceMoveHandler? OnAfterMove { get; init; }
-    public OnDamageHandler? OnDamage { get; init; }
-    public ModifierSourceMoveHandler? OnBasePower { get; init; }
-    public OnEffectivenessHandler? OnEffectiveness { get; init; }
-    public ResultMoveHandler? OnHit { get; init; }
-    public ResultMoveHandler? OnHitField { get; init; }
-    public OnHitSideHandler? OnHitSide { get; init; }
-    public OnModifyMoveHandler? OnModifyMove { get; init; }
-    public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
-    public VoidMoveHandler? OnMoveFail { get; init; }
-    public OnModifyTypeHandler? OnModifyType { get; init; }
-    public OnModifyTargetHandler? OnModifyTarget { get; init; }
-    public ResultMoveHandler? OnPrepareHit { get; init; }
-    public ResultSourceMoveHandler? OnTry { get; init; }
-    public ExtResultSourceMoveHandler? OnTryHit { get; init; }
-    public ResultMoveHandler? OnTryHitField { get; init; }
-    public OnTryHitSideHandler? OnTryHitSide { get; init; }
-    public ResultMoveHandler? OnTryImmunity { get; init; }
-    public ResultSourceMoveHandler? OnTryMove { get; init; }
-    public VoidSourceMoveHandler? OnUseMoveMessage { get; init; }
+    public TypeUndefinedUnion<BasePowerCallbackHandler>? BasePowerCallback { get; init; }
+    public TypeUndefinedUnion<BeforeMoveCallbackHandler>? BeforeMoveCallback { get; init; }
+    public TypeUndefinedUnion<BeforeTurnCallbackHandler>? BeforeTurnCallback { get; init; }
+    public TypeUndefinedUnion<DamageCallbackHandler>? DamageCallback { get; init; }
+    public TypeUndefinedUnion<PriorityChargeCallbackHandler>? PriorityChargeCallback { get; init; }
+    public TypeUndefinedUnion<OnDisableMoveHandler>? OnDisableMove { get; init; }
+    public TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterHit { get; init; }
+    public TypeUndefinedUnion<OnAfterSubDamageHandler>? OnAfterSubDamage { get; init; }
+    public TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterMoveSecondarySelf { get; init; }
+    public TypeUndefinedUnion<VoidMoveHandler>? OnAfterMoveSecondary { get; init; }
+    public TypeUndefinedUnion<VoidSourceMoveHandler>? OnAfterMove { get; init; }
+    public TypeUndefinedUnion<OnDamageHandler>? OnDamage { get; init; }
+    public TypeUndefinedUnion<ModifierSourceMoveHandler>? OnBasePower { get; init; }
+    public TypeUndefinedUnion<OnEffectivenessHandler>? OnEffectiveness { get; init; }
+    public TypeUndefinedUnion<ResultMoveHandler>? OnHit { get; init; }
+    public TypeUndefinedUnion<ResultMoveHandler>? OnHitField { get; init; }
+    public TypeUndefinedUnion<OnHitSideHandler>? OnHitSide { get; init; }
+    public TypeUndefinedUnion<OnModifyMoveHandler>? OnModifyMove { get; init; }
+    public TypeUndefinedUnion<ModifierSourceMoveHandler>? OnModifyPriority { get; init; }
+    public TypeUndefinedUnion<VoidMoveHandler>? OnMoveFail { get; init; }
+    public TypeUndefinedUnion<OnModifyTypeHandler>? OnModifyType { get; init; }
+    public TypeUndefinedUnion<OnModifyTargetHandler>? OnModifyTarget { get; init; }
+    public TypeUndefinedUnion<ResultMoveHandler>? OnPrepareHit { get; init; }
+    public TypeUndefinedUnion<ResultSourceMoveHandler>? OnTry { get; init; }
+    public TypeUndefinedUnion<ExtResultSourceMoveHandler>? OnTryHit { get; init; }
+    public TypeUndefinedUnion<ResultMoveHandler>? OnTryHitField { get; init; }
+    public TypeUndefinedUnion<OnTryHitSideHandler>? OnTryHitSide { get; init; }
+    public TypeUndefinedUnion<ResultMoveHandler>? OnTryImmunity { get; init; }
+    public TypeUndefinedUnion<ResultSourceMoveHandler>? OnTryMove { get; init; }
+    public TypeUndefinedUnion<VoidSourceMoveHandler>? OnUseMoveMessage { get; init; }
 
     #endregion
 
@@ -194,36 +194,36 @@ public record Move : IMoveEventHandlers, IBasicEffect
     {
         return id switch
         {
-            EventId.BasePowerCallback => EffectDelegate.FromNullableDelegate(BasePowerCallback),
-            EventId.BeforeMoveCallback => EffectDelegate.FromNullableDelegate(BeforeMoveCallback),
-            EventId.BeforeTurnCallback => EffectDelegate.FromNullableDelegate(BeforeTurnCallback),
-            EventId.DamageCallback => EffectDelegate.FromNullableDelegate(DamageCallback),
-            EventId.PriorityChargeCallback => EffectDelegate.FromNullableDelegate(PriorityChargeCallback),
-            EventId.DisableMove => EffectDelegate.FromNullableDelegate(OnDisableMove),
-            EventId.AfterHit => EffectDelegate.FromNullableDelegate(OnAfterHit),
-            EventId.AfterSubDamage => EffectDelegate.FromNullableDelegate(OnAfterSubDamage),
-            EventId.AfterMoveSecondarySelf => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondarySelf),
-            EventId.AfterMoveSecondary => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondary),
-            EventId.AfterMove => EffectDelegate.FromNullableDelegate(OnAfterMove),
-            EventId.Damage => EffectDelegate.FromNullableDelegate(OnDamage),
-            EventId.BasePower => EffectDelegate.FromNullableDelegate(OnBasePower),
-            EventId.Effectiveness => EffectDelegate.FromNullableDelegate(OnEffectiveness),
-            EventId.Hit => EffectDelegate.FromNullableDelegate(OnHit),
-            EventId.HitField => EffectDelegate.FromNullableDelegate(OnHitField),
-            EventId.HitSide => EffectDelegate.FromNullableDelegate(OnHitSide),
-            EventId.ModifyMove => EffectDelegate.FromNullableDelegate(OnModifyMove),
-            EventId.ModifyPriority => EffectDelegate.FromNullableDelegate(OnModifyPriority),
-            EventId.MoveFail => EffectDelegate.FromNullableDelegate(OnMoveFail),
-            EventId.ModifyType => EffectDelegate.FromNullableDelegate(OnModifyType),
-            EventId.ModifyTarget => EffectDelegate.FromNullableDelegate(OnModifyTarget),
-            EventId.PrepareHit => EffectDelegate.FromNullableDelegate(OnPrepareHit),
-            EventId.Try => EffectDelegate.FromNullableDelegate(OnTry),
-            EventId.TryHit => EffectDelegate.FromNullableDelegate(OnTryHit),
-            EventId.TryHitField => EffectDelegate.FromNullableDelegate(OnTryHitField),
-            EventId.TryHitSide => EffectDelegate.FromNullableDelegate(OnTryHitSide),
-            EventId.TryImmunity => EffectDelegate.FromNullableDelegate(OnTryImmunity),
-            EventId.TryMove => EffectDelegate.FromNullableDelegate(OnTryMove),
-            EventId.UseMoveMessage => EffectDelegate.FromNullableDelegate(OnUseMoveMessage),
+            EventId.BasePowerCallback => EffectDelegate.FromNullableDelegate(BasePowerCallback?.GetValueOrDefault()),
+            EventId.BeforeMoveCallback => EffectDelegate.FromNullableDelegate(BeforeMoveCallback?.GetValueOrDefault()),
+            EventId.BeforeTurnCallback => EffectDelegate.FromNullableDelegate(BeforeTurnCallback?.GetValueOrDefault()),
+            EventId.DamageCallback => EffectDelegate.FromNullableDelegate(DamageCallback?.GetValueOrDefault()),
+            EventId.PriorityChargeCallback => EffectDelegate.FromNullableDelegate(PriorityChargeCallback?.GetValueOrDefault()),
+            EventId.DisableMove => EffectDelegate.FromNullableDelegate(OnDisableMove?.GetValueOrDefault()),
+            EventId.AfterHit => EffectDelegate.FromNullableDelegate(OnAfterHit?.GetValueOrDefault()),
+            EventId.AfterSubDamage => EffectDelegate.FromNullableDelegate(OnAfterSubDamage?.GetValueOrDefault()),
+            EventId.AfterMoveSecondarySelf => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondarySelf?.GetValueOrDefault()),
+            EventId.AfterMoveSecondary => EffectDelegate.FromNullableDelegate(OnAfterMoveSecondary?.GetValueOrDefault()),
+            EventId.AfterMove => EffectDelegate.FromNullableDelegate(OnAfterMove?.GetValueOrDefault()),
+            EventId.Damage => EffectDelegate.FromNullableDelegate(OnDamage?.GetValueOrDefault()),
+            EventId.BasePower => EffectDelegate.FromNullableDelegate(OnBasePower?.GetValueOrDefault()),
+            EventId.Effectiveness => EffectDelegate.FromNullableDelegate(OnEffectiveness?.GetValueOrDefault()),
+            EventId.Hit => EffectDelegate.FromNullableDelegate(OnHit?.GetValueOrDefault()),
+            EventId.HitField => EffectDelegate.FromNullableDelegate(OnHitField?.GetValueOrDefault()),
+            EventId.HitSide => EffectDelegate.FromNullableDelegate(OnHitSide?.GetValueOrDefault()),
+            EventId.ModifyMove => EffectDelegate.FromNullableDelegate(OnModifyMove?.GetValueOrDefault()),
+            EventId.ModifyPriority => EffectDelegate.FromNullableDelegate(OnModifyPriority?.GetValueOrDefault()),
+            EventId.MoveFail => EffectDelegate.FromNullableDelegate(OnMoveFail?.GetValueOrDefault()),
+            EventId.ModifyType => EffectDelegate.FromNullableDelegate(OnModifyType?.GetValueOrDefault()),
+            EventId.ModifyTarget => EffectDelegate.FromNullableDelegate(OnModifyTarget?.GetValueOrDefault()),
+            EventId.PrepareHit => EffectDelegate.FromNullableDelegate(OnPrepareHit?.GetValueOrDefault()),
+            EventId.Try => EffectDelegate.FromNullableDelegate(OnTry?.GetValueOrDefault()),
+            EventId.TryHit => EffectDelegate.FromNullableDelegate(OnTryHit?.GetValueOrDefault()),
+            EventId.TryHitField => EffectDelegate.FromNullableDelegate(OnTryHitField?.GetValueOrDefault()),
+            EventId.TryHitSide => EffectDelegate.FromNullableDelegate(OnTryHitSide?.GetValueOrDefault()),
+            EventId.TryImmunity => EffectDelegate.FromNullableDelegate(OnTryImmunity?.GetValueOrDefault()),
+            EventId.TryMove => EffectDelegate.FromNullableDelegate(OnTryMove?.GetValueOrDefault()),
+            EventId.UseMoveMessage => EffectDelegate.FromNullableDelegate(OnUseMoveMessage?.GetValueOrDefault()),
             _ => null,
         };
     }

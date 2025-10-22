@@ -359,7 +359,7 @@ public partial class BattleActions(IBattle battle)
         // Execute beforeMoveCallback if present
         if (activeMove.BeforeMoveCallback is not null)
         {
-            BoolVoidUnion callbackResult = activeMove.BeforeMoveCallback(Battle, pokemon, target, activeMove);
+            BoolVoidUnion callbackResult = activeMove.BeforeMoveCallback.GetValueOrThrow()(Battle, pokemon, target, activeMove);
             if (callbackResult is BoolBoolVoidUnion { Value: true })
             {
                 ClearActiveMove(true);

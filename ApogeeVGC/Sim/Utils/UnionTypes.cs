@@ -1541,3 +1541,35 @@ public abstract record MoveIdIntUnion
 }
 public record MoveIdMoveIdIntUnion(MoveId MoveId) : MoveIdIntUnion;
 public record IntMoveIdIntUnion(int Value) : MoveIdIntUnion;
+
+/// <summary>
+/// T | undefined - Generic union for any type with undefined
+/// Useful for wrapping delegates and other types that need optional undefined semantics
+/// </summary>
+public abstract record TypeUndefinedUnion<T>
+{
+    public static TypeUndefinedUnion<T> FromValue(T value) => new ValueTypeUndefinedUnion<T>(value);
+    public static TypeUndefinedUnion<T> FromUndefined() => new UndefinedTypeUndefinedUnion<T>(new Undefined());
+    public static implicit operator TypeUndefinedUnion<T>(T value) => new ValueTypeUndefinedUnion<T>(value);
+
+    public static implicit operator TypeUndefinedUnion<T>(Undefined value) =>
+        new UndefinedTypeUndefinedUnion<T>(value);
+
+    public bool IsUndefined => this is UndefinedTypeUndefinedUnion<T>;
+    public bool HasValue => this is ValueTypeUndefinedUnion<T>;
+
+    public T? GetValueOrDefault() => this switch
+    {
+        ValueTypeUndefinedUnion<T> v => v.Value,
+        _ => default,
+    };
+
+    public T GetValueOrThrow() => this switch
+    {
+        ValueTypeUndefinedUnion<T> v => v.Value,
+        _ => throw new InvalidOperationException("Value is undefined"),
+    };
+}
+
+public record ValueTypeUndefinedUnion<T>(T Value) : TypeUndefinedUnion<T>;
+public record UndefinedTypeUndefinedUnion<T>(Undefined Undefined) : TypeUndefinedUnion<T>;
