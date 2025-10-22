@@ -1846,7 +1846,34 @@ public partial class BattleActions(IBattle battle)
     public SpreadMoveDamage ForceSwitch(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
         ActiveMove move)
     {
-        throw new NotImplementedException();
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (targets[i] is not PokemonPokemonUnion pokemonUnion)
+            {
+                continue;
+            }
+
+            Pokemon target = pokemonUnion.Pokemon;
+
+            if (target.Hp > 0 && source.Hp > 0 && Battle.CanSwitch(target.Side) != 0)
+            {
+                RelayVar? hitResult = Battle.RunEvent(EventId.DragOut, target, source, move);
+
+                switch (hitResult)
+                {
+                    case BoolRelayVar { Value: true } or null:
+                        target.ForceSwitchFlag = true;
+                        break;
+                    case BoolRelayVar { Value: false } when move.Category == MoveCategory.Status:
+                        UiGenerator.PrintFailEvent(source);
+                        Battle.AttrLastMove("[still]");
+                        damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                        break;
+                }
+            }
+        }
+
+        return damage;
     }
 
     public IntUndefinedFalseUnion MoveHit(Pokemon? target, Pokemon pokemon, ActiveMove move,
