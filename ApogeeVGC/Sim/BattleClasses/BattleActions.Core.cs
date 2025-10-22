@@ -1879,14 +1879,21 @@ public partial class BattleActions(IBattle battle)
     public IntUndefinedFalseUnion MoveHit(Pokemon? target, Pokemon pokemon, ActiveMove move,
         HitEffect? moveData = null, bool isSecondary = false, bool isSelf = false)
     {
-        throw new NotImplementedException();
+        List<Pokemon> targets = target != null ? [target] : [];
+        return ExecuteMoveHit(targets, pokemon, move, moveData, isSecondary, isSelf);
     }
 
     public IntUndefinedFalseUnion MoveHit(List<Pokemon?> targets, Pokemon pokemon, ActiveMove move,
         HitEffect? moveData = null, bool isSecondary = false, bool isSelf = false)
     {
-        throw new NotImplementedException();
+        var validTargets = targets.Where(t => t != null).Cast<Pokemon>().ToList();
+        return ExecuteMoveHit(validTargets, pokemon, move, moveData, isSecondary, isSelf);
     }
+
+    //calcRecoilDamage(damageDealt: number, move: Move, pokemon: Pokemon) : number {
+    //    if (move.id === 'chloroblast') return Math.round(pokemon.maxhp / 2);
+    //    return this.battle.clampIntRange(Math.round(damageDealt* move.recoil![0] / move.recoil![1]), 1);
+    //}
 
     public int CalcRecoilDamage(int damageDealt, Move move, Pokemon pokemon)
     {
@@ -2042,6 +2049,29 @@ public partial class BattleActions(IBattle battle)
     #endregion
 
     #region Helpers
+
+    private IntUndefinedFalseUnion ExecuteMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move,
+        HitEffect? moveData = null, bool isSecondary = false, bool isSelf = false)
+    {
+        (SpreadMoveDamage damage, _) = SpreadMoveHit(
+            SpreadMoveTargets.FromPokemonList(targets),
+            pokemon, move, moveData, isSecondary, isSelf);
+
+        if (damage.Count == 0)
+        {
+            return IntUndefinedFalseUnion.FromFalse();
+        }
+
+        BoolIntUndefinedUnion retVal = damage[0];
+
+        return retVal switch
+        {
+            BoolBoolIntUndefinedUnion { Value: true } => new Undefined(),
+            IntBoolIntUndefinedUnion intVal => intVal.Value,
+            UndefinedBoolIntUndefinedUnion => new Undefined(),
+            _ => IntUndefinedFalseUnion.FromFalse()
+        };
+    }
 
     private void ClearActiveMove(bool failed)
     {
