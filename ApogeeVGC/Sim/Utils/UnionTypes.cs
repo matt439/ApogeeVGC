@@ -563,7 +563,7 @@ public record VoidTypesVoidUnion(VoidReturn Value) : TypesVoidUnion;
 
 
 /// <summary>
-/// Pokemon | Side | Field | Battle | Pokemon?
+/// Pokemon | Side | Field | Battle
 /// </summary>
 public abstract record SingleEventTarget
 {
@@ -1365,7 +1365,7 @@ public record BattleEffectHolder(IBattle Battle) : EffectHolder;
 
 /// <summary>
 /// Delegate? | OnFlinch | OnCriticalHit | OnFractionalPriority | OnTakeItem | OnTryHeal | OnTryEatItem |
-/// OnNegateImmunity | OnLockMove
+/// OnNegateImmunity | OnLockMove | Undefined | TypeUndefinedUnion(Delegate)
 /// </summary>
 public abstract record EffectDelegate
 {
@@ -1431,11 +1431,42 @@ public abstract record EffectDelegate
     {
         return del is null ? null : new OnLockMoveEffectDelegate(del);
     }
+
+    public static implicit operator EffectDelegate(Undefined value) => new UndefinedEffectDelegate(value);
+
+    public static implicit operator EffectDelegate(TypeUndefinedUnion<Delegate> union)
+    {
+        return union switch
+        {
+            ValueTypeUndefinedUnion<Delegate> v => new DelegateEffectDelegate(v.Value),
+            UndefinedTypeUndefinedUnion<Delegate> _ => new UndefinedEffectDelegate(new Undefined()),
+            _ => throw new InvalidOperationException("Unknown TypeUndefinedUnion<Delegate> type"),
+        };
+    }
+
+    /// <summary>
+    /// Converts a TypeUndefinedUnion of any delegate type to an EffectDelegate
+    /// </summary>
+    public static EffectDelegate? FromNullableTypeUndefinedUnion<T>(TypeUndefinedUnion<T>? union) where T : Delegate
+    {
+        if (union is null) return null;
+        return union switch
+        {
+            ValueTypeUndefinedUnion<T> v => new DelegateEffectDelegate(v.Value),
+            UndefinedTypeUndefinedUnion<T> _ => new UndefinedEffectDelegate(new Undefined()),
+            _ => throw new InvalidOperationException($"Unknown TypeUndefinedUnion<{typeof(T).Name}> type"),
+        };
+    }
 }
 
 public record DelegateEffectDelegate(Delegate Del) : EffectDelegate
 {
     public override Delegate GetDelegate(int index = 0) => Del;
+}
+
+public record UndefinedEffectDelegate(Undefined Value) : EffectDelegate
+{
+    public override Delegate? GetDelegate(int index = 0) => null;
 }
 
 public record OnFlinchEffectDelegate(OnFlinch OnFlinch) : EffectDelegate

@@ -112,9 +112,9 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
     }
 
     #region IAbilityEventMethods Implementation
-    public Action<IBattle, Pokemon>? OnCheckShow { get; init; }
-    public Action<IBattle, PokemonSideFieldUnion>? OnEnd { get; init; }
-    public Action<IBattle, Pokemon>? OnStart { get; init; }
+    public TypeUndefinedUnion<Action<IBattle, Pokemon>>? OnCheckShow { get; init; }
+    public TypeUndefinedUnion<Action<IBattle, PokemonSideFieldUnion>>? OnEnd { get; init; }
+    public TypeUndefinedUnion<Action<IBattle, Pokemon>>? OnStart { get; init; }
     #endregion
 
     #region IPokemonEventMethods Implementation
@@ -602,9 +602,9 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
     {
         return id switch
         {
-            EventId.CheckShow => EffectDelegate.FromNullableDelegate(OnCheckShow),
-            EventId.End => EffectDelegate.FromNullableDelegate(OnEnd),
-            EventId.Start => EffectDelegate.FromNullableDelegate(OnStart),
+            EventId.CheckShow => EffectDelegate.FromNullableTypeUndefinedUnion(OnCheckShow),
+            EventId.End => EffectDelegate.FromNullableTypeUndefinedUnion(OnEnd),
+            EventId.Start => EffectDelegate.FromNullableTypeUndefinedUnion(OnStart),
             EventId.DamagingHit => EffectDelegate.FromNullableDelegate(OnDamagingHit),
             EventId.EmergencyExit => EffectDelegate.FromNullableDelegate(OnEmergencyExit),
             EventId.AfterEachBoost => EffectDelegate.FromNullableDelegate(OnAfterEachBoost),

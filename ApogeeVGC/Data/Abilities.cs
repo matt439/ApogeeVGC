@@ -33,7 +33,7 @@ public record Abilities
                 Num = 266,
                 Rating = 3.5,
                 OnSwitchInPriority = 1,
-                OnStart = (battle, pokemon) =>
+                OnStart = (Action<IBattle, Pokemon>)((battle, pokemon) =>
                 {
                     if (battle.EffectState.Unnerved is true) return;
                     if (battle.PrintDebug)
@@ -42,11 +42,11 @@ public record Abilities
                         UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
                     }
                     battle.EffectState.Unnerved = true;
-                },
-                OnEnd = (battle, _) =>
+                }),
+                OnEnd = (Action<IBattle, PokemonSideFieldUnion>)((battle, _) =>
                 {
                     battle.EffectState.Unnerved = false;
-                },
+                }),
                 OnFoeTryEatItem = (Func<IBattle, Item, Pokemon, BoolVoidUnion>)((battle, _, _) =>
                     BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
                 OnSourceAfterFaint = (battle, length, _, source, effect) =>
@@ -72,7 +72,7 @@ public record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = (battle, pokemon) =>
+                OnStart = (Action<IBattle, Pokemon>)((battle, pokemon) =>
                 {
                     if (!battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
@@ -82,7 +82,7 @@ public record Abilities
                             UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
                         }
                     }
-                },
+                }),
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, _, _, _) =>
                 {
@@ -147,10 +147,10 @@ public record Abilities
                 Rating = 3.0,
                 Condition = ConditionId.QuarkDrive,
                 OnSwitchInPriority = -2,
-                OnStart = (battle, pokemon) =>
+                OnStart = (Action<IBattle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState, pokemon);
-                },
+                }),
                 OnTerrainChange = (battle, pokemon, _, _) =>
                 {
                     Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
@@ -164,7 +164,7 @@ public record Abilities
                         pokemon.RemoveVolatile(quarkDrive);
                     }
                 },
-                OnEnd = (_, pokemon) =>
+                OnEnd = (Action<IBattle, PokemonSideFieldUnion>)((_, pokemon) =>
                 {
                     if (pokemon is not PokemonSideFieldPokemon pok)
                     {
@@ -172,7 +172,7 @@ public record Abilities
                     }
                     pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
                     UiGenerator.PrintEndEvent(pok.Pokemon, _library.Abilities[pok.Pokemon.Ability]);
-                },
+                }),
                 Flags = new AbilityFlags
                 {
                     FailRolePlay = true,
