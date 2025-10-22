@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record SecondaryEffect
+public record SecondaryEffect : HitEffect
 {
     //public Func<Battle, Pokemon, Pokemon, ActiveMove, bool?>? OnHit { get; init; }
     //public SparseBoostsTable? Boosts { get; init; }

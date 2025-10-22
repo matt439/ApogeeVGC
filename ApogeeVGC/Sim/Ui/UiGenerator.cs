@@ -157,6 +157,11 @@ public static class UiGenerator
         }
     }
 
+    public static void PrintFailEvent(Pokemon pokemon, string message)
+    {
+        Console.WriteLine($"{pokemon.Name} failed! {message}");
+    }
+
     public static void PrintFieldStartEvent(Condition fieldCondition, IEffect? sourceEffect = null,
         Pokemon? sourcePokemon = null)
     {

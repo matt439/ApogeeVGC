@@ -76,6 +76,7 @@ public enum ConditionId
     BurningBulwark,
     QuickGuard,
     WideGuard,
+    Commanded,
 
     None,
 }

@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
@@ -93,6 +92,12 @@ public record ActiveMove : Move, IEffect
             return pp > 0 ? pp : 0;
         }
     }
+
+    /// <summary>
+    /// This is used to handle the casting of a HitEffect to an ActiveMove in RunMoveEffects() and SpreadMoveHit().
+    /// Store the HitEffect in this property so it can be accessed later.
+    /// </summary>
+    public HitEffect? HitEffect { get; set; }
 }
 
 
