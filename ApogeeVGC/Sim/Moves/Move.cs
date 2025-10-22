@@ -5,9 +5,9 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record Move : IMoveEventHandlers, IBasicEffect
+public record Move : IMoveEventMethods, IBasicEffect
 {
-    #region IMoveEventHandlers Implementation
+    #region IMoveEventMethods Implementation
 
     public TypeUndefinedUnion<BasePowerCallbackHandler>? BasePowerCallback { get; init; }
     public TypeUndefinedUnion<BeforeMoveCallbackHandler>? BeforeMoveCallback { get; init; }

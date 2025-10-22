@@ -36,7 +36,7 @@ public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, 
 public delegate BoolUndefinedVoidUnion? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source,
     ActiveMove move);
 
-public interface IMoveEventHandlers
+public interface IMoveEventMethods
 {
     TypeUndefinedUnion<BasePowerCallbackHandler>? BasePowerCallback { get; }
     TypeUndefinedUnion<BeforeMoveCallbackHandler>? BeforeMoveCallback { get; }
