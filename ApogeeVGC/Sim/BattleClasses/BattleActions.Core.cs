@@ -10,8 +10,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -19,6 +17,15 @@ public partial class BattleActions(IBattle battle)
 {
     public IBattle Battle { get; init; } = battle;
     public Library Library => Battle.Library;
+
+    private readonly HashSet<MoveTarget> _choosableTargets =
+    [
+        MoveTarget.Normal,
+        MoveTarget.Any,
+        MoveTarget.AdjacentAlly,
+        MoveTarget.AdjacentAllyOrSelf,
+        MoveTarget.AdjacentFoe,
+    ];
 
     #region Switch
 
@@ -1890,11 +1897,6 @@ public partial class BattleActions(IBattle battle)
         return ExecuteMoveHit(validTargets, pokemon, move, moveData, isSecondary, isSelf);
     }
 
-    //calcRecoilDamage(damageDealt: number, move: Move, pokemon: Pokemon) : number {
-    //    if (move.id === 'chloroblast') return Math.round(pokemon.maxhp / 2);
-    //    return this.battle.clampIntRange(Math.round(damageDealt* move.recoil![0] / move.recoil![1]), 1);
-    //}
-
     public int CalcRecoilDamage(int damageDealt, Move move, Pokemon pokemon)
     {
         // Chloroblast is a special case - returns 50% of max HP as recoil
@@ -1915,7 +1917,7 @@ public partial class BattleActions(IBattle battle)
 
     public bool TargetTypeChoices(MoveTarget type)
     {
-        throw new NotImplementedException();
+        return _choosableTargets.Contains(type);
     }
 
     /// <summary>
