@@ -1897,7 +1897,20 @@ public partial class BattleActions(IBattle battle)
 
     public int CalcRecoilDamage(int damageDealt, Move move, Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        // Chloroblast is a special case - returns 50% of max HP as recoil
+        if (move.Id == MoveId.Chloroblast)
+        {
+            return (int)Math.Round(pokemon.MaxHp / 2.0);
+        }
+
+        // Standard recoil calculation: damageDealt * recoil[0] / recoil[1]
+        // Clamped to minimum of 1
+        if (move.Recoil == null) return 0;
+
+        int recoilDamage = (int)Math.Round(damageDealt * move.Recoil.Value.Item1 /
+                                           (double)move.Recoil.Value.Item2);
+        return Battle.ClampIntRange(recoilDamage, 1, null);
+
     }
 
     public bool TargetTypeChoices(MoveTarget type)
