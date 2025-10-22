@@ -1803,7 +1803,44 @@ public partial class BattleActions(IBattle battle)
     public void Secondaries(SpreadMoveTargets targets, Pokemon source, ActiveMove move, ActiveMove moveData,
         bool isSelf = false)
     {
-        throw new NotImplementedException();
+        if (moveData.Secondaries == null) return;
+
+        foreach (PokemonFalseUnion targetUnion in targets)
+        {
+            if (targetUnion is not PokemonPokemonUnion pokemonUnion)
+            {
+                continue;
+            }
+
+            Pokemon target = pokemonUnion.Pokemon;
+
+            // Run ModifySecondaries event to get the list of secondary effects
+            RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
+                moveData.Secondaries);
+
+            var secondaries = modifyResult is SecondaryEffectArrayRelayVar secListRv
+                ? secListRv.Effects
+                : moveData.Secondaries;
+
+            foreach (SecondaryEffect secondary in secondaries)
+            {
+                int secondaryRoll = Battle.Random(100);
+
+                // User stat boosts or target stat drops can possibly overflow if it goes beyond 256 in Gen 8 or prior
+                bool secondaryOverflow = (secondary.Boosts != null || secondary.Self != null) && Battle.Gen <= 8;
+
+                int effectiveChance = secondary.Chance ?? 100;
+                if (secondaryOverflow)
+                {
+                    effectiveChance %= 256;
+                }
+
+                if (secondary.Chance == null || secondaryRoll < effectiveChance)
+                {
+                    MoveHit(target, source, move, secondary, true, isSelf);
+                }
+            }
+        }
     }
 
     public SpreadMoveDamage ForceSwitch(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
