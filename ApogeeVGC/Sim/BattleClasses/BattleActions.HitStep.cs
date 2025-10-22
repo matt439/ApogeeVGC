@@ -801,12 +801,12 @@ public partial class BattleActions
             damage.Add(BoolIntUndefinedUnion.FromInt(0));
         }
 
-        move.TotalDamage = 0;
+        move.TotalDamage = IntFalseUnion.FromInt(0);
         pokemon.LastDamage = 0;
 
         // Determine number of hits
         IntIntArrayUnion targetHits = move.MultiHit ?? 1;
-        int targetHitResult = 0;
+        int targetHitResult;
 
         if (targetHits is IntArrayIntIntArrayUnion range)
         {
@@ -832,11 +832,20 @@ public partial class BattleActions
                 targetHitResult = Battle.Random(range.Values[0], range.Values[1] + 1);
             }
         }
+        else if (targetHits is IntIntIntArrayUnion singleHit)
+        {
+            targetHitResult = singleHit.Value;
+        }
+        else
+        {
+            // Fallback (shouldn't happen given the null coalescing above)
+            targetHitResult = 1;
+        }
 
         // Loaded Dice for 10-hit moves (Population Bomb)
         if (targetHitResult == 10 && pokemon.HasItem(ItemId.LoadedDice))
         {
-            targetHitResult -= targetHitResult - Battle.Random(7);
+            targetHitResult -= Battle.Random(7);
         }
 
         bool nullDamage = true;
@@ -1041,9 +1050,14 @@ public partial class BattleActions
                 };
 
                 // Total damage dealt is accumulated for the purposes of recoil (Parental Bond).
-                if (damage[i] is IntBoolIntUndefinedUnion dmgInt && move.TotalDamage is IntIntFalseUnion totDmg)
+                if (damage[i] is IntBoolIntUndefinedUnion dmgInt)
                 {
-                    move.TotalDamage = totDmg.Value + dmgInt.Value;
+                    int currentTotal = move.TotalDamage switch
+                    {
+                        IntIntFalseUnion intVal => intVal.Value,
+                        _ => 0
+                    };
+                    move.TotalDamage = IntFalseUnion.FromInt(currentTotal + dmgInt.Value);
                 }
             }
 
