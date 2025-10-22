@@ -1280,9 +1280,61 @@ public partial class BattleActions(IBattle battle)
     }
 
     public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
-        ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
+    ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
     {
-        throw new NotImplementedException();
+        for (int i = 0; i < targets.Count; i++)
+        {
+            if (targets[i] is not PokemonPokemonUnion pokemonUnion)
+            {
+                continue;
+            }
+
+            Pokemon target = pokemonUnion.Pokemon;
+            Battle.ActiveTarget = target;
+            damage[i] = BoolIntUndefinedUnion.FromUndefined();
+
+            IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
+
+            // getDamage has several possible return values:
+            //
+            //   a number:
+            //     means that much damage is dealt (0 damage still counts as dealing
+            //     damage for the purposes of things like Static)
+            //   false:
+            //     gives error message: "But it failed!" and move ends
+            //   null:
+            //     the move ends, with no message (usually, a custom fail message
+            //     was already output by an event handler)
+            //   undefined:
+            //     means no damage is dealt and the move continues
+            //
+            // basically, these values have the same meanings as they do for event
+            // handlers.
+
+            switch (curDamage)
+            {
+                case FalseIntUndefinedFalseUnion or null:
+                {
+                    if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
+                    {
+                        if (Battle.PrintDebug)
+                        {
+                            UiGenerator.PrintFailEvent(source);
+                        }
+                        Battle.AttrLastMove("[still]");
+                    }
+
+                    Battle.Debug("damage calculation interrupted");
+                    damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                    continue;
+                }
+                case IntIntUndefinedFalseUnion intDamage:
+                    damage[i] = BoolIntUndefinedUnion.FromInt(intDamage.Value);
+                    break;
+            }
+        }
+
+        return damage;
     }
 
     public SpreadMoveDamage RunMoveEffects(SpreadMoveDamage damage, SpreadMoveTargets targets,

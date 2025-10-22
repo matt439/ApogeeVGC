@@ -217,4 +217,6 @@ public interface IBattle
         Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false);
 
     int HitSubstitute { get; }
+
+    void Debug(string activity);
 }

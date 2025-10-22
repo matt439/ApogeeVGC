@@ -473,4 +473,6 @@ public static class UiGenerator
     {
         Console.WriteLine($"{pokemon.Name} hit {hitCount} time(s)!");
     }
+
+
 }
