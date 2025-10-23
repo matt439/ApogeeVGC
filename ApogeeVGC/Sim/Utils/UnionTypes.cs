@@ -11,6 +11,8 @@ using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.Utils;
 
+#region Types
+
 /// <summary>
 /// The 'void' type, representing the absence of a value.
 /// </summary>
@@ -27,13 +29,55 @@ public record Undefined;
 /// </summary>
 public record Empty;
 
+
+
+/// <summary>
+/// (int | bool | undefined)[]
+/// </summary>
+public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
+{
+    public SpreadMoveDamage()
+    {
+    }
+
+    public SpreadMoveDamage(SpreadMoveDamage other)
+    {
+        foreach (BoolIntUndefinedUnion item in other)
+        {
+            Add(item);
+        }
+    }
+}
+
+public class SpreadMoveTargets : List<PokemonFalseUnion>
+{
+    public static SpreadMoveTargets FromPokemonList(List<Pokemon> pokemons)
+    {
+        var spreadTargets = new SpreadMoveTargets();
+        spreadTargets.AddRange(pokemons.Select(pokemon => new PokemonPokemonUnion(pokemon)));
+        return spreadTargets;
+    }
+
+    public static List<Pokemon> ToPokemonList(SpreadMoveTargets targets)
+    {
+        return targets
+            .OfType<PokemonPokemonUnion>()
+            .Select(union => union.Pokemon)
+            .ToList();
+    }
+}
+
+#endregion
+
+#region GenericUnions
+
 /// <summary>
 /// int | bool
 /// </summary>
 public abstract record IntBoolUnion
 {
     public abstract int ToInt();
-    
+
     public static IntBoolUnion FromInt(int value) => new IntIntBoolUnion(value);
     public static IntBoolUnion FromBool(bool value) => new BoolIntBoolUnion(value);
 
@@ -58,7 +102,7 @@ public record BoolIntBoolUnion(bool Value) : IntBoolUnion
 public abstract record IntFalseUnion
 {
     public abstract int ToInt();
-    
+
     public static IntFalseUnion FromInt(int value) => new IntIntFalseUnion(value);
     public static IntFalseUnion FromFalse() => new FalseIntFalseUnion();
 
@@ -403,41 +447,6 @@ public record IntIntBoolVoidUnion(int Value) : IntBoolVoidUnion;
 public record BoolIntBoolVoidUnion(bool Value) : IntBoolVoidUnion;
 public record VoidIntBoolVoidUnion(VoidReturn Value) : IntBoolVoidUnion;
 
-
-
-
-/// <summary>
-/// CommonHandlers['ModifierSourceMove'] | -0.1
-/// </summary>
-public abstract record OnFractionalPriority
-{
-    public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
-        new OnFractionalPriorityFunc(function);
-
-    private static readonly decimal PriorityValue = new(-0.1);
-
-    public static implicit operator OnFractionalPriority(decimal value) =>
-        value == PriorityValue
-            ? new OnFrationalPriorityNeg(value)
-            : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
-}
-public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
-public record OnFrationalPriorityNeg(decimal Value) : OnFractionalPriority;
-
-
-/// <summary>
-/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) =&gt; boolean | void) | boolean
-/// </summary>
-public abstract record OnCriticalHit
-{
-    public static implicit operator OnCriticalHit(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> function) =>
-        new OnCriticalHitFunc(function);
-    public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
-}
-public record OnCriticalHitFunc(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> Function) : OnCriticalHit;
-public record OnCriticalHitBool(bool Value) : OnCriticalHit;
-
-
 /// <summary>
 /// Pokemon | Side
 /// </summary>
@@ -515,6 +524,372 @@ public record PokemonSideBattleBattle(IBattle Battle) : PokemonSideBattleUnion;
 public record PokemonSideBattleNullablePokemon(Pokemon? Pokemon) : PokemonSideBattleUnion;
 
 
+
+
+
+
+/// <summary>
+/// MoveId | void
+/// </summary>
+public abstract record MoveIdVoidUnion
+{
+    public static implicit operator MoveIdVoidUnion(MoveId moveId) => new MoveIdMoveIdVoidUnion(moveId);
+    public static implicit operator MoveIdVoidUnion(VoidReturn value) => new VoidMoveIdVoidUnion(value);
+    public static MoveIdVoidUnion FromVoid() => new VoidMoveIdVoidUnion(new VoidReturn());
+}
+public record MoveIdMoveIdVoidUnion(MoveId MoveId) : MoveIdVoidUnion;
+public record VoidMoveIdVoidUnion(VoidReturn Value) : MoveIdVoidUnion;
+
+
+
+
+
+/// <summary>
+/// Delegate | void
+/// </summary>
+public abstract record DelegateVoidUnion
+{
+    public static implicit operator DelegateVoidUnion(Delegate del) => new DelegateDelegateVoidUnion(del);
+    public static implicit operator DelegateVoidUnion(VoidReturn value) => new VoidDelegateVoidUnion(value);
+    public static DelegateVoidUnion FromVoid() => new VoidDelegateVoidUnion(new VoidReturn());
+}
+public record DelegateDelegateVoidUnion(Delegate Del) : DelegateVoidUnion;
+public record VoidDelegateVoidUnion(VoidReturn Value) : DelegateVoidUnion;
+
+
+/// <summary>
+/// Pokemon | void
+/// </summary>
+public abstract record PokemonVoidUnion
+{
+    public static implicit operator PokemonVoidUnion(Pokemon pokemon) => new PokemonPokemonVoidUnion(pokemon);
+    public static implicit operator PokemonVoidUnion(VoidReturn value) => new VoidPokemonVoidUnion(value);
+    public static PokemonVoidUnion FromVoid() => new VoidPokemonVoidUnion(new VoidReturn());
+}
+public record PokemonPokemonVoidUnion(Pokemon Pokemon) : PokemonVoidUnion;
+public record VoidPokemonVoidUnion(VoidReturn Value) : PokemonVoidUnion;
+
+
+
+
+/// <summary>
+/// PokemonType[] | void
+/// </summary>
+public abstract record TypesVoidUnion
+{
+    public static implicit operator TypesVoidUnion(PokemonType[] types) => new TypesTypesVoidUnion(types);
+    public static implicit operator TypesVoidUnion(VoidReturn value) => new VoidTypesVoidUnion(value);
+    public static TypesVoidUnion FromVoid() => new VoidTypesVoidUnion(new VoidReturn());
+}
+public record TypesTypesVoidUnion(PokemonType[] Types) : TypesVoidUnion;
+public record VoidTypesVoidUnion(VoidReturn Value) : TypesVoidUnion;
+
+
+
+
+
+
+
+/// <summary>
+/// AbilityId | false
+/// </summary>
+public abstract record AbilityIdFalseUnion
+{
+    public static implicit operator AbilityIdFalseUnion(AbilityId abilityId) =>
+        new AbilityIdAbilityIdFalseUnion(abilityId);
+    public static AbilityIdFalseUnion FromFalse() => new FalseAbilityIdFalseUnion();
+}
+public record AbilityIdAbilityIdFalseUnion(AbilityId AbilityId) : AbilityIdFalseUnion;
+public record FalseAbilityIdFalseUnion : AbilityIdFalseUnion;
+
+
+/// <summary>
+/// MoveAction | SwitchAction
+/// </summary>
+public abstract record MoveSwitchActionUnion
+{
+    public static implicit operator MoveSwitchActionUnion(MoveAction moveAction) =>
+        new MoveActionMoveSwitchActionUnion(moveAction);
+    public static implicit operator MoveSwitchActionUnion(SwitchAction switchAction) =>
+        new SwitchActionMoveSwitchActionUnion(switchAction);
+}
+public record MoveActionMoveSwitchActionUnion(MoveAction MoveAction) : MoveSwitchActionUnion;
+public record SwitchActionMoveSwitchActionUnion(SwitchAction SwitchAction) : MoveSwitchActionUnion;
+
+
+/// <summary>
+/// MoveAction | SwitchAction | TeamAction | PokemonAction
+/// </summary>
+public abstract record MoveSwitchTeamPokemonActionUnion
+{
+    public static implicit operator MoveSwitchTeamPokemonActionUnion(MoveAction moveAction) =>
+        new MoveActionMoveSwitchTeamPokemonActionUnion(moveAction);
+    public static implicit operator MoveSwitchTeamPokemonActionUnion(SwitchAction switchAction) =>
+        new SwitchActionMoveSwitchTeamPokemonActionUnion(switchAction);
+    public static implicit operator MoveSwitchTeamPokemonActionUnion(TeamAction teamAction) =>
+        new TeamActionMoveSwitchTeamPokemonActionUnion(teamAction);
+    public static implicit operator MoveSwitchTeamPokemonActionUnion(PokemonAction pokemonAction) =>
+        new PokemonActionMoveSwitchTeamPokemonActionUnion(pokemonAction);
+}
+public record MoveActionMoveSwitchTeamPokemonActionUnion(MoveAction MoveAction) :
+    MoveSwitchTeamPokemonActionUnion;
+public record SwitchActionMoveSwitchTeamPokemonActionUnion(SwitchAction SwitchAction) :
+    MoveSwitchTeamPokemonActionUnion;
+public record TeamActionMoveSwitchTeamPokemonActionUnion(TeamAction TeamAction) :
+    MoveSwitchTeamPokemonActionUnion;
+public record PokemonActionMoveSwitchTeamPokemonActionUnion(PokemonAction PokemonAction) :
+    MoveSwitchTeamPokemonActionUnion;
+
+
+
+
+
+
+/// <summary>
+/// pokemon | false
+/// </summary>
+public abstract record PokemonFalseUnion
+{
+    public static implicit operator PokemonFalseUnion(Pokemon pokemon) => new PokemonPokemonUnion(pokemon);
+    public static PokemonFalseUnion FromFalse() => new FalsePokemonUnion();
+
+    public static PokemonFalseUnion? FromNullablePokemon(Pokemon? pokemon)
+    {
+        return pokemon is null ? null : new PokemonPokemonUnion(pokemon);
+    }
+}
+public record PokemonPokemonUnion(Pokemon Pokemon) : PokemonFalseUnion;
+public record FalsePokemonUnion : PokemonFalseUnion;
+
+
+
+/// <summary>
+/// bool| 0
+/// </summary>
+public abstract record BoolZeroUnion
+{
+    public static implicit operator BoolZeroUnion(bool value) => new BoolBoolZeroUnion(value);
+    public static BoolZeroUnion FromZero() => new ZeroBoolZeroUnion();
+}
+public record BoolBoolZeroUnion(bool Value) : BoolZeroUnion;
+public record ZeroBoolZeroUnion : BoolZeroUnion;
+
+
+/// <summary>
+/// MoveId | bool
+/// </summary>
+public abstract record MoveIdBoolUnion
+{
+    public abstract bool IsTrue();
+    public static implicit operator MoveIdBoolUnion(MoveId moveId) => new MoveIdMoveIdBoolUnion(moveId);
+    public static implicit operator MoveIdBoolUnion(bool value) => new BoolMoveIdBoolUnion(value);
+}
+public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion
+{
+    public override bool IsTrue() => MoveId != MoveId.None;
+}
+public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion
+{
+    public override bool IsTrue() => Value;
+}
+
+
+/// <summary>
+/// int | Undefined | false
+/// </summary>
+public abstract record IntUndefinedFalseUnion
+{
+    public static implicit operator IntUndefinedFalseUnion(int value) =>
+        new IntIntUndefinedFalseUnion(value);
+    public static implicit operator IntUndefinedFalseUnion(Undefined value) =>
+        new UndefinedIntUndefinedFalseUnion(value);
+    public static IntUndefinedFalseUnion FromFalse() => new FalseIntUndefinedFalseUnion();
+}
+public record IntIntUndefinedFalseUnion(int Value) : IntUndefinedFalseUnion;
+public record UndefinedIntUndefinedFalseUnion(Undefined Value) : IntUndefinedFalseUnion;
+public record FalseIntUndefinedFalseUnion : IntUndefinedFalseUnion;
+
+
+
+
+/// <summary>
+/// MoveType | false
+/// </summary>
+public abstract record MoveTypeFalseUnion
+{
+    public static implicit operator MoveTypeFalseUnion(MoveType moveType) =>
+        new MoveTypeMoveTypeFalseUnion(moveType);
+    public static MoveTypeFalseUnion FromFalse() => new FalseMoveTypeFalseUnion();
+}
+public record MoveTypeMoveTypeFalseUnion(MoveType MoveType) : MoveTypeFalseUnion;
+public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
+
+
+
+
+
+/// <summary>
+/// ConditionId | bool
+/// </summary>
+public abstract record ConditionIdBoolUnion
+{
+    public static implicit operator ConditionIdBoolUnion(ConditionId conditionId) =>
+        new ConditionIdConditionIdBoolUnion(conditionId);
+    public static implicit operator ConditionIdBoolUnion(bool value) => new BoolConditionIdBoolUnion(value);
+}
+public record ConditionIdConditionIdBoolUnion(ConditionId ConditionId) : ConditionIdBoolUnion;
+public record BoolConditionIdBoolUnion(bool Value) : ConditionIdBoolUnion;
+
+
+/// <summary>
+/// Item | false
+/// </summary>
+public abstract record ItemFalseUnion
+{
+    public static implicit operator ItemFalseUnion(Item item) => new ItemItemFalseUnion(item);
+    public static ItemFalseUnion FromFalse() => new FalseItemFalseUnion();
+}
+public record ItemItemFalseUnion(Item Item) : ItemFalseUnion;
+public record FalseItemFalseUnion : ItemFalseUnion;
+
+
+
+/// <summary>
+/// Pokemon | int
+/// </summary>
+public abstract record PokemonIntUnion
+{
+    public static implicit operator PokemonIntUnion(Pokemon pokemon) => new PokemonPokemonIntUnion(pokemon);
+    public static implicit operator PokemonIntUnion(int value) => new IntPokemonIntUnion(value);
+}
+public record PokemonPokemonIntUnion(Pokemon Pokemon) : PokemonIntUnion;
+public record IntPokemonIntUnion(int Value) : PokemonIntUnion;
+
+
+
+/// <summary>
+/// Side | bool
+/// </summary>
+public abstract record SideBoolUnion
+{
+    public abstract bool IsTrue();
+    public static implicit operator SideBoolUnion(Side side) => new SideSideBoolUnion(side);
+    public static implicit operator SideBoolUnion(bool value) => new BoolSideBoolUnion(value);
+}
+
+public record SideSideBoolUnion(Side Side) : SideBoolUnion
+{
+    public override bool IsTrue() => true;
+}
+
+public record BoolSideBoolUnion(bool Value) : SideBoolUnion
+{
+    public override bool IsTrue() => Value;
+}
+
+
+
+
+/// <summary>
+/// int | int[]
+/// </summary>
+public abstract record IntIntArrayUnion
+{
+    public static implicit operator IntIntArrayUnion(int value) => new IntIntIntArrayUnion(value);
+    public static implicit operator IntIntArrayUnion(int[] values) => new IntArrayIntIntArrayUnion(values);
+}
+public record IntIntIntArrayUnion(int Value) : IntIntArrayUnion;
+public record IntArrayIntIntArrayUnion(int[] Values) : IntIntArrayUnion;
+
+
+
+/// <summary>
+/// bool | 'hidden'
+/// </summary>
+public abstract record BoolHiddenUnion
+{
+    public static implicit operator BoolHiddenUnion(bool value) => new BoolBoolHiddenUnion(value);
+    public static BoolHiddenUnion FromHidden() => new HiddenBoolHiddenUnion();
+
+    /// <summary>
+    /// Returns true if this union represents a truthy value (true or 'hidden').
+    /// Used to check if a move is effectively disabled.
+    /// </summary>
+    public bool IsTruthy() => this switch
+    {
+        BoolBoolHiddenUnion { Value: true } => true,
+        HiddenBoolHiddenUnion => true,
+        _ => false,
+    };
+
+    /// <summary>
+    /// Returns true if this union is explicitly the boolean value true.
+    /// </summary>
+    public bool IsTrue() => this is BoolBoolHiddenUnion { Value: true };
+}
+public record BoolBoolHiddenUnion(bool Value) : BoolHiddenUnion;
+public record HiddenBoolHiddenUnion : BoolHiddenUnion;
+
+
+
+/// <summary>
+/// MoveId | int
+/// </summary>
+public abstract record MoveIdIntUnion
+{
+    public static implicit operator MoveIdIntUnion(MoveId moveId) => new MoveIdMoveIdIntUnion(moveId);
+    public static implicit operator MoveIdIntUnion(int value) => new IntMoveIdIntUnion(value);
+}
+public record MoveIdMoveIdIntUnion(MoveId MoveId) : MoveIdIntUnion;
+public record IntMoveIdIntUnion(int Value) : MoveIdIntUnion;
+
+#endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+#region SpecificUnions
+
+/// <summary>
+/// CommonHandlers['ModifierSourceMove'] | -0.1
+/// </summary>
+public abstract record OnFractionalPriority
+{
+    public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
+        new OnFractionalPriorityFunc(function);
+
+    private static readonly decimal PriorityValue = new(-0.1);
+
+    public static implicit operator OnFractionalPriority(decimal value) =>
+        value == PriorityValue
+            ? new OnFrationalPriorityNeg(value)
+            : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
+}
+public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
+public record OnFrationalPriorityNeg(decimal Value) : OnFractionalPriority;
+
+
+/// <summary>
+/// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) =&gt; boolean | void) | boolean
+/// </summary>
+public abstract record OnCriticalHit
+{
+    public static implicit operator OnCriticalHit(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> function) =>
+        new OnCriticalHitFunc(function);
+    public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
+}
+public record OnCriticalHitFunc(Func<IBattle, Pokemon, object?, Move, BoolVoidUnion> Function) : OnCriticalHit;
+public record OnCriticalHitBool(bool Value) : OnCriticalHit;
+
 /// <summary>
 /// ((this: Battle, relayVar: number, target: Pokemon, source: Pokemon, effect: Effect) => number | boolean | void)
 /// | ((this: Battle, pokemon: Pokemon) => boolean | void)
@@ -578,20 +953,6 @@ public record SparseBoostsTableSparseBoostsTableVoidUnion(SparseBoostsTable Tabl
 public record VoidSparseBoostsTableVoidUnion(VoidReturn Value) : SparseBoostsTableVoidUnion;
 
 
-
-/// <summary>
-/// MoveId | void
-/// </summary>
-public abstract record MoveIdVoidUnion
-{
-    public static implicit operator MoveIdVoidUnion(MoveId moveId) => new MoveIdMoveIdVoidUnion(moveId);
-    public static implicit operator MoveIdVoidUnion(VoidReturn value) => new VoidMoveIdVoidUnion(value);
-    public static MoveIdVoidUnion FromVoid() => new VoidMoveIdVoidUnion(new VoidReturn());
-}
-public record MoveIdMoveIdVoidUnion(MoveId MoveId) : MoveIdVoidUnion;
-public record VoidMoveIdVoidUnion(VoidReturn Value) : MoveIdVoidUnion;
-
-
 /// <summary>
 /// ((this: Battle, pokemon: Pokemon, type: string) => boolean | void) | boolean
 /// </summary>
@@ -605,30 +966,6 @@ public record OnNegateImmunityFunc(Func<IBattle, Pokemon, PokemonType, BoolVoidU
 public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
 
 
-/// <summary>
-/// Delegate | void
-/// </summary>
-public abstract record DelegateVoidUnion
-{
-    public static implicit operator DelegateVoidUnion(Delegate del) => new DelegateDelegateVoidUnion(del);
-    public static implicit operator DelegateVoidUnion(VoidReturn value) => new VoidDelegateVoidUnion(value);
-    public static DelegateVoidUnion FromVoid() => new VoidDelegateVoidUnion(new VoidReturn());
-}
-public record DelegateDelegateVoidUnion(Delegate Del) : DelegateVoidUnion;
-public record VoidDelegateVoidUnion(VoidReturn Value) : DelegateVoidUnion;
-
-
-/// <summary>
-/// Pokemon | void
-/// </summary>
-public abstract record PokemonVoidUnion
-{
-    public static implicit operator PokemonVoidUnion(Pokemon pokemon) => new PokemonPokemonVoidUnion(pokemon);
-    public static implicit operator PokemonVoidUnion(VoidReturn value) => new VoidPokemonVoidUnion(value);
-    public static PokemonVoidUnion FromVoid() => new VoidPokemonVoidUnion(new VoidReturn());
-}
-public record PokemonPokemonVoidUnion(Pokemon Pokemon) : PokemonVoidUnion;
-public record VoidPokemonVoidUnion(VoidReturn Value) : PokemonVoidUnion;
 
 
 /// <summary>
@@ -642,19 +979,6 @@ public abstract record OnTakeItem
 }
 public record OnTakeItemFunc(Func<IBattle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> Func) : OnTakeItem;
 public record OnTakeItemBool(bool Value) : OnTakeItem;
-
-
-/// <summary>
-/// PokemonType[] | void
-/// </summary>
-public abstract record TypesVoidUnion
-{
-    public static implicit operator TypesVoidUnion(PokemonType[] types) => new TypesTypesVoidUnion(types);
-    public static implicit operator TypesVoidUnion(VoidReturn value) => new VoidTypesVoidUnion(value);
-    public static TypesVoidUnion FromVoid() => new VoidTypesVoidUnion(new VoidReturn());
-}
-public record TypesTypesVoidUnion(PokemonType[] Types) : TypesVoidUnion;
-public record VoidTypesVoidUnion(VoidReturn Value) : TypesVoidUnion;
 
 
 
@@ -800,82 +1124,6 @@ public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar
 
 
 
-/// <summary>
-/// AbilityId | false
-/// </summary>
-public abstract record AbilityIdFalseUnion
-{
-    public static implicit operator AbilityIdFalseUnion(AbilityId abilityId) =>
-        new AbilityIdAbilityIdFalseUnion(abilityId);
-    public static AbilityIdFalseUnion FromFalse() => new FalseAbilityIdFalseUnion();
-}
-public record AbilityIdAbilityIdFalseUnion(AbilityId AbilityId) : AbilityIdFalseUnion;
-public record FalseAbilityIdFalseUnion : AbilityIdFalseUnion;
-
-
-/// <summary>
-/// MoveAction | SwitchAction
-/// </summary>
-public abstract record MoveSwitchActionUnion
-{
-    public static implicit operator MoveSwitchActionUnion(MoveAction moveAction) =>
-        new MoveActionMoveSwitchActionUnion(moveAction);
-    public static implicit operator MoveSwitchActionUnion(SwitchAction switchAction) =>
-        new SwitchActionMoveSwitchActionUnion(switchAction);
-}
-public record MoveActionMoveSwitchActionUnion(MoveAction MoveAction) : MoveSwitchActionUnion;
-public record SwitchActionMoveSwitchActionUnion(SwitchAction SwitchAction) : MoveSwitchActionUnion;
-
-
-/// <summary>
-/// MoveAction | SwitchAction | TeamAction | PokemonAction
-/// </summary>
-public abstract record MoveSwitchTeamPokemonActionUnion
-{
-    public static implicit operator MoveSwitchTeamPokemonActionUnion(MoveAction moveAction) =>
-        new MoveActionMoveSwitchTeamPokemonActionUnion(moveAction);
-    public static implicit operator MoveSwitchTeamPokemonActionUnion(SwitchAction switchAction) =>
-        new SwitchActionMoveSwitchTeamPokemonActionUnion(switchAction);
-    public static implicit operator MoveSwitchTeamPokemonActionUnion(TeamAction teamAction) =>
-        new TeamActionMoveSwitchTeamPokemonActionUnion(teamAction);
-    public static implicit operator MoveSwitchTeamPokemonActionUnion(PokemonAction pokemonAction) =>
-        new PokemonActionMoveSwitchTeamPokemonActionUnion(pokemonAction);
-}
-public record MoveActionMoveSwitchTeamPokemonActionUnion(MoveAction MoveAction) :
-    MoveSwitchTeamPokemonActionUnion;
-public record SwitchActionMoveSwitchTeamPokemonActionUnion(SwitchAction SwitchAction) :
-    MoveSwitchTeamPokemonActionUnion;
-public record TeamActionMoveSwitchTeamPokemonActionUnion(TeamAction TeamAction) :
-    MoveSwitchTeamPokemonActionUnion;
-public record PokemonActionMoveSwitchTeamPokemonActionUnion(PokemonAction PokemonAction) :
-    MoveSwitchTeamPokemonActionUnion;
-
-
-public static class EffectUnionFactory
-{
-    public static SingleEventSource ToSingleEventSource(IEffect effect) => effect switch
-    {
-        Ability ability => new EffectSingleEventSource(ability),
-        Item item => new EffectSingleEventSource(item),
-        ActiveMove activeMove => new EffectSingleEventSource(activeMove),
-        Species specie => new EffectSingleEventSource(specie),
-        Condition condition => new EffectSingleEventSource(condition),
-        Format format => new EffectSingleEventSource(format),
-        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
-    };
-
-    public static RelayVar ToRelayVar(IEffect effect) => effect switch
-    {
-        Ability ability => new EffectRelayVar(ability),
-        Item item => new EffectRelayVar(item),
-        ActiveMove activeMove => new EffectRelayVar(activeMove),
-        Species specie => new SpecieRelayVar(specie),
-        Condition condition => new EffectRelayVar(condition),
-        Format format => new EffectRelayVar(format),
-        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to RelayVar"),
-    };
-}
-
 
 
 /// <summary>
@@ -890,8 +1138,8 @@ public abstract record RunEventTarget
         return pokemon is null ? null : new PokemonRunEventTarget(pokemon);
     }
 
-public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
-        new PokemonArrayRunEventTarget(pokemonList);
+    public static implicit operator RunEventTarget(Pokemon[] pokemonList) =>
+            new PokemonArrayRunEventTarget(pokemonList);
 
     public static implicit operator RunEventTarget(Side side) => new SideRunEventTarget(side);
     public static RunEventTarget FromIBattle(IBattle battle) => new BattleRunEventTarget(battle);
@@ -926,134 +1174,6 @@ public record BattleRunEventTarget(IBattle Battle) : RunEventTarget;
 public record FieldRunEventTarget(Field Field) : RunEventTarget;
 
 
-
-
-
-
-
-/// <summary>
-/// pokemon | false
-/// </summary>
-public abstract record PokemonFalseUnion
-{
-    public static implicit operator PokemonFalseUnion(Pokemon pokemon) => new PokemonPokemonUnion(pokemon);
-    public static PokemonFalseUnion FromFalse() => new FalsePokemonUnion();
-
-    public static PokemonFalseUnion? FromNullablePokemon(Pokemon? pokemon)
-    {
-        return pokemon is null ? null : new PokemonPokemonUnion(pokemon);
-    }
-}
-public record PokemonPokemonUnion(Pokemon Pokemon) : PokemonFalseUnion;
-public record FalsePokemonUnion : PokemonFalseUnion;
-
-
-
-/// <summary>
-/// bool| 0
-/// </summary>
-public abstract record BoolZeroUnion
-{
-    public static implicit operator BoolZeroUnion(bool value) => new BoolBoolZeroUnion(value);
-    public static BoolZeroUnion FromZero() => new ZeroBoolZeroUnion();
-}
-public record BoolBoolZeroUnion(bool Value) : BoolZeroUnion;
-public record ZeroBoolZeroUnion : BoolZeroUnion;
-
-
-/// <summary>
-/// MoveId | bool
-/// </summary>
-public abstract record MoveIdBoolUnion
-{
-    public abstract bool IsTrue();
-    public static implicit operator MoveIdBoolUnion(MoveId moveId) => new MoveIdMoveIdBoolUnion(moveId);
-    public static implicit operator MoveIdBoolUnion(bool value) => new BoolMoveIdBoolUnion(value);
-}
-public record MoveIdMoveIdBoolUnion(MoveId MoveId) : MoveIdBoolUnion
-{
-    public override bool IsTrue() => MoveId != MoveId.None;
-}
-public record BoolMoveIdBoolUnion(bool Value) : MoveIdBoolUnion
-{
-    public override bool IsTrue() => Value;
-}
-
-
-/// <summary>
-/// int | Undefined | false
-/// </summary>
-public abstract record IntUndefinedFalseUnion
-{
-    public static implicit operator IntUndefinedFalseUnion(int value) =>
-        new IntIntUndefinedFalseUnion(value);
-    public static implicit operator IntUndefinedFalseUnion(Undefined value) =>
-        new UndefinedIntUndefinedFalseUnion(value);
-    public static IntUndefinedFalseUnion FromFalse() => new FalseIntUndefinedFalseUnion();
-}
-public record IntIntUndefinedFalseUnion(int Value) : IntUndefinedFalseUnion;
-public record UndefinedIntUndefinedFalseUnion(Undefined Value) : IntUndefinedFalseUnion;
-public record FalseIntUndefinedFalseUnion : IntUndefinedFalseUnion;
-
-
-
-
-/// <summary>
-/// (int | bool | undefined)[]
-/// </summary>
-public class SpreadMoveDamage : List<BoolIntUndefinedUnion>
-{
-    public SpreadMoveDamage()
-    {
-    }
-
-    public SpreadMoveDamage(SpreadMoveDamage other)
-    {
-        foreach (BoolIntUndefinedUnion item in other)
-        {
-            Add(item);
-        }
-    }
-
-    //public SpreadMoveDamage(List<BoolIntUndefinedUnion> other)
-    //{
-    //    foreach (BoolIntUndefinedUnion item in other)
-    //    {
-    //        Add(item);
-    //    }
-    //}
-}
-
-public class SpreadMoveTargets : List<PokemonFalseUnion>
-{
-    public static SpreadMoveTargets FromPokemonList(List<Pokemon> pokemons)
-    {
-        var spreadTargets = new SpreadMoveTargets();
-        spreadTargets.AddRange(pokemons.Select(pokemon => new PokemonPokemonUnion(pokemon)));
-        return spreadTargets;
-    }
-
-    public static List<Pokemon> ToPokemonList(SpreadMoveTargets targets)
-    {
-        return targets
-            .OfType<PokemonPokemonUnion>()
-            .Select(union => union.Pokemon)
-            .ToList();
-    }
-}
-
-
-/// <summary>
-/// MoveType | false
-/// </summary>
-public abstract record MoveTypeFalseUnion
-{
-    public static implicit operator MoveTypeFalseUnion(MoveType moveType) =>
-        new MoveTypeMoveTypeFalseUnion(moveType);
-    public static MoveTypeFalseUnion FromFalse() => new FalseMoveTypeFalseUnion();
-}
-public record MoveTypeMoveTypeFalseUnion(MoveType MoveType) : MoveTypeFalseUnion;
-public record FalseMoveTypeFalseUnion : MoveTypeFalseUnion;
 
 
 /// <summary>
@@ -1091,13 +1211,13 @@ public abstract record EventTargetParameter
 
         return target switch
         {
-            PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) => 
+            PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
                 new PokemonEventTargetParameter(p.Pokemon),
-            SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) => 
+            SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) =>
                 new SideEventTargetParameter(s.Side),
-            FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) => 
+            FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) =>
                 new FieldEventTargetParameter(f.Field),
-            BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) => 
+            BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) =>
                 new BattleEventTargetParameter(b.Battle),
             _ => null,
         };
@@ -1134,13 +1254,13 @@ public abstract record EventSourceParameter
 
         return source switch
         {
-            PokemonSingleEventSource p when expectedType.IsAssignableFrom(typeof(Pokemon)) => 
+            PokemonSingleEventSource p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
                 new PokemonEventSourceParameter(p.Pokemon),
-            EffectSingleEventSource e when expectedType.IsAssignableFrom(typeof(IEffect)) => 
+            EffectSingleEventSource e when expectedType.IsAssignableFrom(typeof(IEffect)) =>
                 new EffectEventSourceParameter(e.Effect),
-            PokemonTypeSingleEventSource t when expectedType.IsAssignableFrom(typeof(PokemonType)) => 
+            PokemonTypeSingleEventSource t when expectedType.IsAssignableFrom(typeof(PokemonType)) =>
                 new PokemonTypeEventSourceParameter(t.Type),
-            FalseSingleEventSource when expectedType == typeof(bool) => 
+            FalseSingleEventSource when expectedType == typeof(bool) =>
                 new BoolEventSourceParameter(false),
             _ => null,
         };
@@ -1234,64 +1354,6 @@ public record BoolMoveOhko(bool Value) : MoveOhko;
 public record IceMoveOhko : MoveOhko;
 
 
-/// <summary>
-/// ConditionId | bool
-/// </summary>
-public abstract record ConditionIdBoolUnion
-{
-    public static implicit operator ConditionIdBoolUnion(ConditionId conditionId) =>
-        new ConditionIdConditionIdBoolUnion(conditionId);
-    public static implicit operator ConditionIdBoolUnion(bool value) => new BoolConditionIdBoolUnion(value);
-}
-public record ConditionIdConditionIdBoolUnion(ConditionId ConditionId) : ConditionIdBoolUnion;
-public record BoolConditionIdBoolUnion(bool Value) : ConditionIdBoolUnion;
-
-
-/// <summary>
-/// Item | false
-/// </summary>
-public abstract record ItemFalseUnion
-{
-    public static implicit operator ItemFalseUnion(Item item) => new ItemItemFalseUnion(item);
-    public static ItemFalseUnion FromFalse() => new FalseItemFalseUnion();
-}
-public record ItemItemFalseUnion(Item Item) : ItemFalseUnion;
-public record FalseItemFalseUnion : ItemFalseUnion;
-
-
-
-/// <summary>
-/// Pokemon | int
-/// </summary>
-public abstract record PokemonIntUnion
-{
-    public static implicit operator PokemonIntUnion(Pokemon pokemon) => new PokemonPokemonIntUnion(pokemon);
-    public static implicit operator PokemonIntUnion(int value) => new IntPokemonIntUnion(value);
-}
-public record PokemonPokemonIntUnion(Pokemon Pokemon) : PokemonIntUnion;
-public record IntPokemonIntUnion(int Value) : PokemonIntUnion;
-
-
-
-/// <summary>
-/// Side | bool
-/// </summary>
-public abstract record SideBoolUnion
-{
-    public abstract bool IsTrue();
-    public static implicit operator SideBoolUnion(Side side) => new SideSideBoolUnion(side);
-    public static implicit operator SideBoolUnion(bool value) => new BoolSideBoolUnion(value);
-}
-
-public record SideSideBoolUnion(Side Side) : SideBoolUnion
-{
-    public override bool IsTrue() => true;
-}
-
-public record BoolSideBoolUnion(bool Value) : SideBoolUnion
-{
-    public override bool IsTrue() => Value;
-}
 
 
 /// <summary>
@@ -1343,18 +1405,6 @@ public record TypeMoveDataIgnoreImmunity(Dictionary<PokemonType, bool> TypeImmun
 
 
 
-/// <summary>
-/// int | int[]
-/// </summary>
-public abstract record IntIntArrayUnion
-{
-    public static implicit operator IntIntArrayUnion(int value) => new IntIntIntArrayUnion(value);
-    public static implicit operator IntIntArrayUnion(int[] values) => new IntArrayIntIntArrayUnion(values);
-}
-public record IntIntIntArrayUnion(int Value) : IntIntArrayUnion;
-public record IntArrayIntIntArrayUnion(int[] Values) : IntIntArrayUnion;
-
-
 
 /// <summary>
 /// bool | 'past'
@@ -1397,32 +1447,6 @@ public record DrainBattleHealEffect : BattleHealEffect;
 
 
 
-/// <summary>
-/// bool | 'hidden'
-/// </summary>
-public abstract record BoolHiddenUnion
-{
-    public static implicit operator BoolHiddenUnion(bool value) => new BoolBoolHiddenUnion(value);
-    public static BoolHiddenUnion FromHidden() => new HiddenBoolHiddenUnion();
-    
-    /// <summary>
-    /// Returns true if this union represents a truthy value (true or 'hidden').
-    /// Used to check if a move is effectively disabled.
-    /// </summary>
-    public bool IsTruthy() => this switch
-    {
-        BoolBoolHiddenUnion { Value: true } => true,
-        HiddenBoolHiddenUnion => true,
-        _ => false,
-    };
-    
-    /// <summary>
-    /// Returns true if this union is explicitly the boolean value true.
-    /// </summary>
-    public bool IsTrue() => this is BoolBoolHiddenUnion { Value: true };
-}
-public record BoolBoolHiddenUnion(bool Value) : BoolHiddenUnion;
-public record HiddenBoolHiddenUnion : BoolHiddenUnion;
 
 
 /// <summary>
@@ -1493,7 +1517,7 @@ public abstract record EffectDelegate
     {
         return del is null ? null : new OnFractionalPriorityEffectDelegate(del);
     }
-    
+
     public static implicit operator EffectDelegate(OnTakeItem onTakeItem) =>
         new OnTakeItemEffectDelegate(onTakeItem);
     public static EffectDelegate? FromNullableOnTakeItem(OnTakeItem? del)
@@ -1624,16 +1648,62 @@ public record BoolFormatHasValue(bool Value) : FormatHasValue;
 public record IntegerFormatHasValue : FormatHasValue;
 public record PositiveIntegerFormatHasValue : FormatHasValue;
 
+#endregion
 
 
 
-/// <summary>
-/// MoveId | int
-/// </summary>
-public abstract record MoveIdIntUnion
+
+
+
+#region Factories
+
+public static class EffectUnionFactory
 {
-    public static implicit operator MoveIdIntUnion(MoveId moveId) => new MoveIdMoveIdIntUnion(moveId);
-    public static implicit operator MoveIdIntUnion(int value) => new IntMoveIdIntUnion(value);
+    public static SingleEventSource ToSingleEventSource(IEffect effect) => effect switch
+    {
+        Ability ability => new EffectSingleEventSource(ability),
+        Item item => new EffectSingleEventSource(item),
+        ActiveMove activeMove => new EffectSingleEventSource(activeMove),
+        Species specie => new EffectSingleEventSource(specie),
+        Condition condition => new EffectSingleEventSource(condition),
+        Format format => new EffectSingleEventSource(format),
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to SingleEventSource"),
+    };
+
+    public static RelayVar ToRelayVar(IEffect effect) => effect switch
+    {
+        Ability ability => new EffectRelayVar(ability),
+        Item item => new EffectRelayVar(item),
+        ActiveMove activeMove => new EffectRelayVar(activeMove),
+        Species specie => new SpecieRelayVar(specie),
+        Condition condition => new EffectRelayVar(condition),
+        Format format => new EffectRelayVar(format),
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to RelayVar"),
+    };
 }
-public record MoveIdMoveIdIntUnion(MoveId MoveId) : MoveIdIntUnion;
-public record IntMoveIdIntUnion(int Value) : MoveIdIntUnion;
+
+#endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

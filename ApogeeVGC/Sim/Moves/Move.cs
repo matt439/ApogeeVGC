@@ -126,7 +126,7 @@ public record Move : IMoveEventMethods, IBasicEffect
     public int[]? Heal { get; init; }
     public bool? ForceSwitch { get; init; }
     public MoveSelfSwitch? SelfSwitch { get; init; }
-    public BoolUndefinedUnion? SpreadHit { get; set; }
+    public bool? SpreadHit { get; set; }
     public SparseBoostsTable? SelfBoost { get; init; }
     public MoveSelfDestruct? SelfDestruct { get; init; }
     public bool? BreaksProtect { get; init; }
@@ -144,7 +144,7 @@ public record Move : IMoveEventMethods, IBasicEffect
 
 
     // Hit effect modifiers
-    public BoolUndefinedUnion? AlwaysHit { get; init; }
+    public bool? AlwaysHit { get; init; }
     public MoveType? BaseMoveType { get;init; }
     public int? BasePowerModifier { get; init; }
     public int? CritModifier { get; init; }
