@@ -4,8 +4,6 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
-//using ApogeeVGC.Sim.Ui;
-
 namespace ApogeeVGC.Data;
 
 public record Items
@@ -44,9 +42,16 @@ public record Items
                 Name = "Choice Specs",
                 SpriteNum = 70,
                 Fling = new FlingData { BasePower = 10 },
-                OnStart = (_, pokemon) =>
+                OnStart = (battle, pokemon) =>
                 {
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock)) return;
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("removing choicelock");
+                        }
+                        return;
+                    }
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 },
                 OnModifyMove = (_, _, pokemon, _) =>
@@ -114,13 +119,12 @@ public record Items
                 OnModifySpD = (battle, _, _, _, _) => battle.ChainModify(1.5),
                 OnDisableMove = (_, pokemon) =>
                 {
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
+                             let move = _library.Moves[moveSlot.Move]
+                             where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
+                             select moveSlot)
                     {
-                        Move move = _library.Moves[moveSlot.Move];
-                        if (move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst)
-                        {
-                            pokemon.DisableMove(moveSlot.Id);
-                        }
+                        pokemon.DisableMove(moveSlot.Id);
                     }
                 },
                 Num = 640,
