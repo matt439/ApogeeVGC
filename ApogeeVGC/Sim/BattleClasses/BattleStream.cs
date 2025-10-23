@@ -1,8 +1,10 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -22,10 +24,12 @@ public class BattleStream : IDisposable
     public bool NoCatch { get; }
     public bool KeepAlive { get; }
     public BattleReplayMode Replay { get; }
-    public BattleAsync? Battle { get; set; }
+    private BattleAsync? Battle { get; set; }
+    private Library Library { get; set; }
 
-    public BattleStream(BattleStreamOptions? options = null)
+    public BattleStream(Library lib, BattleStreamOptions? options = null)
     {
+        Library = lib;
         BattleStreamOptions options1 = options ?? new BattleStreamOptions();
         Debug = options1.Debug;
         NoCatch = options1.NoCatch;
@@ -193,9 +197,8 @@ public class BattleStream : IDisposable
                         options.Debug = true;
                     }
 
-                    // TODO: You'll need to inject the Library dependency
-                    // _battle = new BattleAsync(options, library);
-                    throw new NotImplementedException("Battle creation requires Library injection");
+                    Battle = new BattleAsync(options, Library);
+                    break;
                 }
 
             case "player":
@@ -205,8 +208,11 @@ public class BattleStream : IDisposable
                     PlayerOptions playerOptions = JsonSerializer.Deserialize<PlayerOptions>(optionsText)
                                                   ?? throw new InvalidOperationException("Invalid player options");
 
-                    // TODO: Implement SetPlayer equivalent
-                    // _battle?.SetPlayer(slot, playerOptions);
+                    if (Battle is null)
+                    {
+                        throw new InvalidOperationException("Battle not started");
+                    }
+                    Battle.SetPlayer(slot, playerOptions);
                     break;
                 }
 
@@ -263,14 +269,25 @@ public class BattleStream : IDisposable
                 }
 
             case "reseed":
+            {
+                if (Battle == null) break;
+
+                // Validate that message contains only digits
+                if (!string.IsNullOrEmpty(message) && !ulong.TryParse(message, out _))
                 {
-                    if (Battle == null) break;
-                    // TODO: Implement resetRNG equivalent
-                    // var seed = message;
-                    // _battle.ResetRNG(seed);
-                    // _battle.InputLog.Add($">reseed {_battle.Prng.GetSeed()}");
-                    break;
+                    throw new InvalidOperationException($"Invalid seed for reseed: \"{message}\"");
                 }
+
+                // Convert seed string to int (or null if empty)
+                int? seed = string.IsNullOrEmpty(message)
+                    ? null
+                    : int.Parse(message);
+
+                PrngSeed? prngSeed = seed.HasValue ? new PrngSeed(seed.Value) : null;
+                    Battle.ResetRng(prngSeed);
+                Battle.InputLog.Add($">reseed {Battle.Prng.GetSeed()}");
+                break;
+            }
 
             case "tiebreak":
                 {
@@ -563,9 +580,9 @@ public class BattleTextStream : IDisposable
     private readonly Channel<string> _outputChannel;
     private bool _disposed;
 
-    public BattleTextStream(BattleStreamOptions? options = null)
+    public BattleTextStream(Library library, BattleStreamOptions? options = null)
     {
-        _battleStream = new BattleStream(options);
+        _battleStream = new BattleStream(library, options);
         _currentMessage = new StringBuilder();
         _cancellationTokenSource = new CancellationTokenSource();
 

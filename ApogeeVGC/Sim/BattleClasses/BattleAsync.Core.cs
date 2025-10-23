@@ -199,6 +199,11 @@ public partial class BattleAsync : IBattle, IDisposable
         return Prng.Sample(items);
     }
 
+    public void ResetRng(PrngSeed? seed = null)
+    {
+        Prng = new Prng(seed);
+    }
+
     /// <summary>
     /// Determines if the current active move is suppressing abilities.
     /// Returns true if:
@@ -592,7 +597,7 @@ public partial class BattleAsync : IBattle, IDisposable
         }
 
         // Generate appropriate requests for the current state
-        List<IChoiceRequest> requests = GetRequests(type.Value);
+        var requests = GetRequests(type.Value);
 
         // Assign requests to each side
         for (int i = 0; i < Sides.Count; i++)
@@ -3761,7 +3766,7 @@ public partial class BattleAsync : IBattle, IDisposable
         throw new NotImplementedException("Team packing logic needs to be implemented");
     }
 
-    private void SetPlayer(SideId slot, PlayerOptions options)
+    public void SetPlayer(SideId slot, PlayerOptions options)
     {
         Side? side;
         bool didSomething = true;

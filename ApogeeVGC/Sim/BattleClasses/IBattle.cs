@@ -221,4 +221,8 @@ public interface IBattle
     int HitSubstitute { get; }
 
     void Debug(string activity);
+
+    void SetPlayer(SideId slot, PlayerOptions options);
+
+    void ResetRng(PrngSeed? seed = null);
 }

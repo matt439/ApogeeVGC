@@ -15,6 +15,11 @@ public class Prng
         Rng = new Rng(StartingSeed.Seed);
     }
 
+    public PrngSeed GetSeed()
+    {
+        return new PrngSeed(StartingSeed.Seed);
+    }
+
     /// <summary>
     /// Retrieves the next random number in the sequence.
     /// This function has three different results, depending on arguments:
