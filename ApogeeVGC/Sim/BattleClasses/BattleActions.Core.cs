@@ -1920,26 +1920,14 @@ public partial class BattleActions(IBattle battle)
         return _choosableTargets.Contains(type);
     }
 
-    //combineResults<T extends number | boolean | null | '' | undefined,
-    //U extends number | boolean | null | '' | undefined>(
-    //left: T, right: U
-    //): T | U {
-    //    const NOT_FAILURE = 'string';
-    //    const NULL = 'object';
-    //    const resultsPriorities = ['undefined', NOT_FAILURE, NULL, 'boolean', 'number'];
-    //    if (resultsPriorities.indexOf(typeof left) > resultsPriorities.indexOf(typeof right)) {
-    //        return left;
-    //    } else if (left && !right && right !== 0) {
-    //        return left;
-    //    } else if (typeof left === 'number' && typeof right === 'number')
-    //    {
-    //        return (left + right) as T;
-    //    }
-    //    else
-    //    {
-    //        return right;
-    //    }
-    //}
+    public static BoolIntUndefinedUnion CombineResults(BoolIntUndefinedUnion? left,
+        BoolIntUndefinedUnion? right)
+    {
+        return CombineResults(
+            BoolIntEmptyUndefinedUnion.FromNullableBoolIntUndefinedUnion(left),
+            BoolIntEmptyUndefinedUnion.FromNullableBoolIntUndefinedUnion(right)).
+            ToBoolIntUndefinedUnion();
+    }
 
     /// <summary>
     /// Combines two move result values based on priority.
@@ -1950,17 +1938,22 @@ public partial class BattleActions(IBattle battle)
     /// <param name="left">First result value</param>
     /// <param name="right">Second result value</param>
     /// <returns>Combined result with the higher priority, or sum if both are numbers</returns>
-    public static BoolIntEmptyUndefinedUnion CombineResults(
-        BoolIntEmptyUndefinedUnion? left,
+    public static BoolIntEmptyUndefinedUnion CombineResults(BoolIntEmptyUndefinedUnion? left,
         BoolIntEmptyUndefinedUnion? right)
     {
-        // Handle null inputs
-        if (left == null && right == null) return BoolIntEmptyUndefinedUnion.FromUndefined();
-        if (left == null) return right!;
+        switch (left)
+        {
+            // Handle null inputs
+            case null when right == null:
+                return BoolIntEmptyUndefinedUnion.FromUndefined();
+            case null:
+                return right;
+        }
+
         if (right == null) return left;
 
-        int leftPriority = GetPriority(left);
-        int rightPriority = GetPriority(right);
+        int leftPriority = GetBattleActionsPriority(left);
+        int rightPriority = GetBattleActionsPriority(right);
 
         // If left has higher priority, return it
         if (leftPriority < rightPriority)
@@ -1969,34 +1962,20 @@ public partial class BattleActions(IBattle battle)
         }
 
         // If left is truthy and right is falsy (but not 0)
-        if (left.IsTruthy() && !right.IsTruthy() && !right.IsTruthy())
+        // In TS: left && !right && right !== 0
+        if (left.IsTruthy() && !right.IsTruthy() && !right.IsZero())
         {
             return left;
         }
 
         // If both are numbers, sum them
-        if (left is IntBoolIntEmptyUndefinedUnion leftInt &&
-            right is IntBoolIntEmptyUndefinedUnion rightInt)
+        if (left is IntBoolIntEmptyUndefinedUnion leftInt && right is IntBoolIntEmptyUndefinedUnion rightInt)
         {
             return BoolIntEmptyUndefinedUnion.FromInt(leftInt.Value + rightInt.Value);
         }
 
         // Otherwise return right
         return right;
-
-        // Priority mapping (lower number = higher priority)
-        int GetPriority(BoolIntEmptyUndefinedUnion? value)
-        {
-            return value switch
-            {
-                UndefinedBoolIntEmptyUndefinedUnion => 0,        // undefined (highest)
-                EmptyBoolIntEmptyUndefinedUnion => 1,                    // string (success)
-                null => 2,                                      // null
-                BoolBoolIntEmptyUndefinedUnion => 3,              // boolean
-                IntBoolIntEmptyUndefinedUnion => 4,               // number (lowest)
-                _ => 5,
-            };
-        }
     }
 
     public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, ActiveMove move,
@@ -2085,6 +2064,20 @@ public partial class BattleActions(IBattle battle)
     #endregion
 
     #region Helpers
+
+    // Priority mapping (lower number = higher priority)
+    private static int GetBattleActionsPriority(BoolIntEmptyUndefinedUnion? value)
+    {
+        return value switch
+        {
+            UndefinedBoolIntEmptyUndefinedUnion => 0,        // undefined (highest)
+            EmptyBoolIntEmptyUndefinedUnion => 1,            // empty string (NOT_FAILURE)
+            null => 2,                                       // null
+            BoolBoolIntEmptyUndefinedUnion => 3,             // boolean
+            IntBoolIntEmptyUndefinedUnion => 4,              // number (lowest)
+            _ => 5,
+        };
+    }
 
     private IntUndefinedFalseUnion ExecuteMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move,
         HitEffect? moveData = null, bool isSecondary = false, bool isSelf = false)
