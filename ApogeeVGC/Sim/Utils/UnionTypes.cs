@@ -221,6 +221,53 @@ public record EmptyBoolIntEmptyVoidUnion(Empty Value) : BoolIntEmptyVoidUnion;
 public record VoidUnionBoolIntEmptyVoidUnion(VoidReturn Value) : BoolIntEmptyVoidUnion;
 
 
+/// <summary>
+/// bool | int | empty | undefined
+/// </summary>
+public abstract record BoolIntEmptyUndefinedUnion
+{
+    public abstract bool IsTruthy();
+    public abstract bool IsZero();
+
+    public static BoolIntEmptyUndefinedUnion FromBool(bool value) => new BoolBoolIntEmptyUndefinedUnion(value);
+    public static BoolIntEmptyUndefinedUnion FromInt(int value) => new IntBoolIntEmptyUndefinedUnion(value);
+    public static BoolIntEmptyUndefinedUnion FromEmpty() => new EmptyBoolIntEmptyUndefinedUnion(new Empty());
+    public static BoolIntEmptyUndefinedUnion FromUndefined() =>
+        new UndefinedBoolIntEmptyUndefinedUnion(new Undefined());
+    public static implicit operator BoolIntEmptyUndefinedUnion(bool value) =>
+        new BoolBoolIntEmptyUndefinedUnion(value);
+    public static implicit operator BoolIntEmptyUndefinedUnion(int value) =>
+        new IntBoolIntEmptyUndefinedUnion(value);
+    public static implicit operator BoolIntEmptyUndefinedUnion(Empty value) =>
+        new EmptyBoolIntEmptyUndefinedUnion(value);
+    public static implicit operator BoolIntEmptyUndefinedUnion(Undefined value) =>
+        new UndefinedBoolIntEmptyUndefinedUnion(value);
+}
+
+public record BoolBoolIntEmptyUndefinedUnion(bool Value) : BoolIntEmptyUndefinedUnion
+{
+    public override bool IsTruthy() => Value;
+    public override bool IsZero() => !Value;
+}
+
+public record IntBoolIntEmptyUndefinedUnion(int Value) : BoolIntEmptyUndefinedUnion
+{
+    public override bool IsTruthy() => Value != 0;
+    public override bool IsZero() => Value == 0;
+}
+
+public record EmptyBoolIntEmptyUndefinedUnion(Empty Value) : BoolIntEmptyUndefinedUnion
+{
+    public override bool IsTruthy() => false;
+    public override bool IsZero() => true;
+}
+public record UndefinedBoolIntEmptyUndefinedUnion(Undefined Value) : BoolIntEmptyUndefinedUnion
+{
+    public override bool IsTruthy() => false;
+    public override bool IsZero() => false;
+}
+
+
 
 /// <summary>
 /// bool | undefined

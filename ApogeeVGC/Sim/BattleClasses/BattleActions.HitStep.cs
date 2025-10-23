@@ -16,16 +16,16 @@ public partial class BattleActions
     /// Hit step 0: Check for semi-invulnerability (Fly, Dig, Dive, etc.).
     /// Returns a list of hit results (true = can hit, false = miss due to invulnerability).
     /// </summary>
-    public List<BoolIntUndefinedUnion> HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon,
+    public List<BoolIntEmptyUndefinedUnion> HitStepInvulnerabilityEvent(List<Pokemon> targets, Pokemon pokemon,
         ActiveMove move)
     {
         // Helping Hand always hits all targets
         if (move.Id == MoveId.HelpingHand)
         {
-            return Enumerable.Repeat(BoolIntUndefinedUnion.FromBool(true), targets.Count).ToList();
+            return Enumerable.Repeat(BoolIntEmptyUndefinedUnion.FromBool(true), targets.Count).ToList();
         }
 
-        var hitResults = new List<BoolIntUndefinedUnion>();
+        var hitResults = new List<BoolIntEmptyUndefinedUnion>();
 
         foreach (Pokemon target in targets)
         {
@@ -50,7 +50,7 @@ public partial class BattleActions
                 canHit = invulnResult is not BoolRelayVar { Value: false };
             }
 
-            hitResults.Add(BoolIntUndefinedUnion.FromBool(canHit));
+            hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(canHit));
 
             // Handle miss messaging
             if (!canHit)
@@ -81,7 +81,7 @@ public partial class BattleActions
     /// Hit step 1: Run TryHit event (handles Protect, Magic Bounce, Volt Absorb, etc.).
     /// Returns a list of hit results (true = can hit, false = blocked, undefined = NOT_FAIL).
     /// </summary>
-    public List<BoolIntUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         // Run TryHit event for all targets
         RelayVar? hitResult = Battle.RunEvent(EventId.TryHit, targets.ToArray(), pokemon, move);
@@ -127,23 +127,23 @@ public partial class BattleActions
         }
 
         // Convert results to BoolIntUndefinedUnion
-        var convertedResults = new List<BoolIntUndefinedUnion>();
+        var convertedResults = new List<BoolIntEmptyUndefinedUnion>();
         foreach (RelayVar? result in hitResults)
         {
             // If result is NOT_FAIL (null), keep it as undefined
             // Otherwise convert to boolean (default false if not a boolean)
             if (result is null)
             {
-                convertedResults.Add(BoolIntUndefinedUnion.FromUndefined());
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }
             else if (result is BoolRelayVar brv)
             {
-                convertedResults.Add(BoolIntUndefinedUnion.FromBool(brv.Value));
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(brv.Value));
             }
             else
             {
                 // Any other RelayVar type defaults to false
-                convertedResults.Add(BoolIntUndefinedUnion.FromBool(false));
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
             }
         }
 
@@ -154,7 +154,7 @@ public partial class BattleActions
     /// Hit step 2: Check for type immunity (e.g., Ground-type moves against Flying-types).
     /// Returns a list of hit results (true = not immune, false = immune).
     /// </summary>
-    public static List<BoolIntUndefinedUnion> HitStepTypeImmunity(List<Pokemon> targets, Pokemon pokemon,
+    public static List<BoolIntEmptyUndefinedUnion> HitStepTypeImmunity(List<Pokemon> targets, Pokemon pokemon,
         ActiveMove move)
     {
         // Default ignoreImmunity for Status moves if not already set
@@ -162,16 +162,17 @@ public partial class BattleActions
 
         return targets.Select(target =>
             target.RunImmunity(move, !(move.SmartTarget ?? false))).
-            Select(BoolIntUndefinedUnion.FromBool).ToList();
+            Select(BoolIntEmptyUndefinedUnion.FromBool).ToList();
     }
 
     /// <summary>
     /// Hit step 3: Check for move-specific immunities (Powder moves, TryImmunity event, Prankster).
     /// Returns a list of hit results (true = can hit, false = immune).
     /// </summary>
-    public List<BoolIntUndefinedUnion> HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepTryImmunity(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
-        var hitResults = new List<BoolIntUndefinedUnion>();
+        var hitResults = new List<BoolIntEmptyUndefinedUnion>();
 
         foreach (Pokemon target in targets)
         {
@@ -220,7 +221,7 @@ public partial class BattleActions
                 canHit = false;
             }
 
-            hitResults.Add(BoolIntUndefinedUnion.FromBool(canHit));
+            hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(canHit));
         }
 
         return hitResults;
@@ -230,9 +231,9 @@ public partial class BattleActions
     /// Hit step 4: Check accuracy.
     /// Returns a list of hit results (true = hit, false = miss).
     /// </summary>
-    public List<BoolIntUndefinedUnion> HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepAccuracy(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
-        var hitResults = new List<BoolIntUndefinedUnion>();
+        var hitResults = new List<BoolIntEmptyUndefinedUnion>();
 
         foreach (Pokemon target in targets)
         {
@@ -269,7 +270,7 @@ public partial class BattleActions
                     {
                         // OHKO failed due to level or type immunity
                         UiGenerator.PrintImmuneEvent(target, "[ohko]");
-                        hitResults.Add(BoolIntUndefinedUnion.FromBool(false));
+                        hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
                         continue;
                     }
 
@@ -418,12 +419,12 @@ public partial class BattleActions
                     Battle.Boost(new SparseBoostsTable { Spe = 2 }, pokemon);
                 }
 
-                hitResults.Add(BoolIntUndefinedUnion.FromBool(false));
+                hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
                 continue;
             }
 
             // Move hit successfully
-            hitResults.Add(BoolIntUndefinedUnion.FromBool(true));
+            hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(true));
         }
 
         return hitResults;
@@ -433,7 +434,7 @@ public partial class BattleActions
     /// Hit step 5: Break protection effects (Protect, King's Shield, etc.).
     /// Returns null to indicate this step doesn't filter targets.
     /// </summary>
-    public List<BoolIntUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion>? HitStepBreakProtect(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         if (move.BreaksProtect != true)
         {
@@ -509,7 +510,7 @@ public partial class BattleActions
     /// Hit step 6: Steal positive boosts (Spectral Thief).
     /// Returns null to indicate this step doesn't filter targets.
     /// </summary>
-    public List<BoolIntUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion>? HitStepStealBoosts(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         if (move.StealsBoosts != true)
         {
@@ -552,253 +553,15 @@ public partial class BattleActions
         return null;
     }
 
-    //    hitStepMoveHitLoop(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove)
-    //    { // Temporary name
-    //        let damage: (number | boolean | undefined)[] = [];
-    //        for (const i of targets.keys()) {
-    //            damage[i] = 0;
-    //        }
-    //        move.totalDamage = 0;
-    //        pokemon.lastDamage = 0;
-    //        let targetHits = move.multihit || 1;
-    //        if (Array.isArray(targetHits))
-    //        {
-    //            // yes, it's hardcoded... meh
-    //            if (targetHits[0] === 2 && targetHits[1] === 5)
-    //            {
-    //                if (this.battle.gen >= 5)
-    //                {
-    //                    // 35-35-15-15 out of 100 for 2-3-4-5 hits
-    //                    targetHits = this.battle.sample([2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5]);
-    //                    if (targetHits < 4 && pokemon.hasItem('loadeddice'))
-    //                    {
-    //                        targetHits = 5 - this.battle.random(2);
-    //                    }
-    //                }
-    //                else
-    //                {
-    //                    targetHits = this.battle.sample([2, 2, 2, 3, 3, 3, 4, 5]);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                targetHits = this.battle.random(targetHits[0], targetHits[1] + 1);
-    //            }
-    //        }
-    //        if (targetHits === 10 && pokemon.hasItem('loadeddice')) targetHits -= this.battle.random(7);
-    //        targetHits = Math.floor(targetHits);
-    //        let nullDamage = true;
-    //        let moveDamage: (number | boolean | undefined)[] = [];
-    //        // There is no need to recursively check the ´sleepUsable´ flag as Sleep Talk can only be used while asleep.
-    //        const isSleepUsable = move.sleepUsable || this.dex.moves.get(move.sourceEffect).sleepUsable;
-
-    //        let targetsCopy: (Pokemon | false | null)[] = targets.slice(0);
-    //        let hit: number;
-    //        for (hit = 1; hit <= targetHits; hit++)
-    //        {
-    //            if (damage.includes(false)) break;
-    //            if (hit > 1 && pokemon.status === 'slp' && (!isSleepUsable || this.battle.gen === 4)) break;
-    //            if (targets.every(target => !target?.hp)) break;
-    //            move.hit = hit;
-    //            if (move.smartTarget && targets.length > 1)
-    //            {
-    //                targetsCopy = [targets[hit - 1]];
-    //                damage = [damage[hit - 1]];
-    //            }
-    //            else
-    //            {
-    //                targetsCopy = targets.slice(0);
-    //            }
-    //            const target = targetsCopy[0]; // some relevant-to-single-target-moves-only things are hardcoded
-    //            if (target && typeof move.smartTarget === 'boolean')
-    //            {
-    //                if (hit > 1)
-    //                {
-    //                    this.battle.addMove('-anim', pokemon, move.name, target);
-    //                }
-    //                else
-    //                {
-    //                    this.battle.retargetLastMove(target);
-    //                }
-    //            }
-
-    //            // like this (Triple Kick)
-    //            if (target && move.multiaccuracy && hit > 1)
-    //            {
-    //                let accuracy = move.accuracy;
-    //                const boostTable = [1, 4 / 3, 5 / 3, 2, 7 / 3, 8 / 3, 3];
-    //                if (accuracy !== true)
-    //                {
-    //                    if (!move.ignoreAccuracy)
-    //                    {
-    //                        const boosts = this.battle.runEvent('ModifyBoost', pokemon, null, null, { ...pokemon.boosts });
-    //        const boost = this.battle.clampIntRange(boosts['accuracy'], -6, 6);
-    //        if (boost > 0)
-    //        {
-    //            accuracy *= boostTable[boost];
-    //        }
-    //        else
-    //        {
-    //            accuracy /= boostTable[-boost];
-    //        }
-    //    }
-    //					if (!move.ignoreEvasion) {
-    //						const boosts = this.battle.runEvent('ModifyBoost', target, null, null, { ...target.boosts });
-    //						const boost = this.battle.clampIntRange(boosts['evasion'], -6, 6);
-    //						if (boost > 0) {
-    //							accuracy /= boostTable[boost];
-    //						} else if (boost < 0)
-    //{
-    //    accuracy *= boostTable[-boost];
-    //}
-    //					}
-    //				}
-    //				accuracy = this.battle.runEvent('ModifyAccuracy', target, pokemon, move, accuracy);
-    //if (!move.alwaysHit)
-    //{
-    //    accuracy = this.battle.runEvent('Accuracy', target, pokemon, move, accuracy);
-    //    if (accuracy !== true && !this.battle.randomChance(accuracy, 100)) break;
-    //}
-    //			}
-
-    //			const moveData = move;
-    //if (!moveData.flags) moveData.flags = { }
-    //;
-
-    //let moveDamageThisHit;
-    //// Modifies targetsCopy (which is why it's a copy)
-    //[moveDamageThisHit, targetsCopy] = this.spreadMoveHit(targetsCopy, pokemon, move, moveData);
-    //// When Dragon Darts targets two different pokemon, targetsCopy is a length 1 array each hit
-    //// so spreadMoveHit returns a length 1 damage array
-    //if (move.smartTarget)
-    //{
-    //    moveDamage.push(...moveDamageThisHit);
-    //}
-    //else
-    //{
-    //    moveDamage = moveDamageThisHit;
-    //}
-
-    //if (!moveDamage.some(val => val !== false)) break;
-    //nullDamage = false;
-
-    //for (const [i, md] of moveDamage.entries()) {
-    //    if (move.smartTarget && i !== hit - 1) continue;
-    //    // Damage from each hit is individually counted for the
-    //    // purposes of Counter, Metal Burst, and Mirror Coat.
-    //    damage[i] = md === true || !md ? 0 : md;
-    //    // Total damage dealt is accumulated for the purposes of recoil (Parental Bond).
-    //    move.totalDamage += damage[i];
-    //}
-    //if (move.mindBlownRecoil)
-    //{
-    //    const hpBeforeRecoil = pokemon.hp;
-    //    this.battle.damage(Math.round(pokemon.maxhp / 2), pokemon, pokemon, this.dex.conditions.get(move.id), true);
-    //    move.mindBlownRecoil = false;
-    //    if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2)
-    //    {
-    //        this.battle.runEvent('EmergencyExit', pokemon, pokemon);
-    //    }
-    //}
-    //this.battle.eachEvent('Update');
-    //if (!pokemon.hp && targets.length === 1)
-    //{
-    //    hit++; // report the correct number of hits for multihit moves
-    //    break;
-    //}
-    //		}
-    //		// hit is 1 higher than the actual hit count
-    //		if (hit === 1) return damage.fill(false);
-    //if (nullDamage) damage.fill(false);
-    //this.battle.faintMessages(false, false, !pokemon.hp);
-    //if (move.multihit && typeof move.smartTarget !== 'boolean')
-    //{
-    //    this.battle.add('-hitcount', targets[0], hit - 1);
-    //}
-
-    //if ((move.recoil || move.id === 'chloroblast') && move.totalDamage)
-    //{
-    //    const hpBeforeRecoil = pokemon.hp;
-    //    this.battle.damage(this.calcRecoilDamage(move.totalDamage, move, pokemon), pokemon, pokemon, 'recoil');
-    //    if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2)
-    //    {
-    //        this.battle.runEvent('EmergencyExit', pokemon, pokemon);
-    //    }
-    //}
-
-    //if (move.struggleRecoil)
-    //{
-    //    const hpBeforeRecoil = pokemon.hp;
-    //    let recoilDamage;
-    //    if (this.dex.gen >= 5)
-    //    {
-    //        recoilDamage = this.battle.clampIntRange(Math.round(pokemon.baseMaxhp / 4), 1);
-    //    }
-    //    else
-    //    {
-    //        recoilDamage = this.battle.clampIntRange(this.battle.trunc(pokemon.maxhp / 4), 1);
-    //    }
-    //    this.battle.directDamage(recoilDamage, pokemon, pokemon, { id: 'strugglerecoil' } as Condition);
-    //    if (pokemon.hp <= pokemon.maxhp / 2 && hpBeforeRecoil > pokemon.maxhp / 2)
-    //    {
-    //        this.battle.runEvent('EmergencyExit', pokemon, pokemon);
-    //    }
-    //}
-
-    //// smartTarget messes up targetsCopy, but smartTarget should in theory ensure that targets will never fail, anyway
-    //if (move.smartTarget)
-    //{
-    //    targetsCopy = targets.slice(0);
-    //}
-
-    //for (const [i, target] of targetsCopy.entries()) {
-    //    if (target && pokemon !== target)
-    //    {
-    //        target.gotAttacked(move, moveDamage[i] as number | false | undefined, pokemon);
-    //        if (typeof moveDamage[i] === 'number')
-    //        {
-    //            target.timesAttacked += move.smartTarget ? 1 : hit - 1;
-    //        }
-    //    }
-    //}
-
-    //if (move.ohko && !targets[0].hp) this.battle.add('-ohko');
-
-    //if (!damage.some(val => !!val || val === 0)) return damage;
-
-    //this.battle.eachEvent('Update');
-
-    //this.afterMoveSecondaryEvent(targetsCopy.filter(val => !!val), pokemon, move);
-
-    //if (!(move.hasSheerForce && pokemon.hasAbility('sheerforce')))
-    //{
-    //    for (const [i, d] of damage.entries()) {
-    //        // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
-    //        // The previous check was for `move.multihit`, but that fails for Dragon Darts
-    //        const curDamage = targets.length === 1 ? move.totalDamage : d;
-    //        if (typeof curDamage === 'number' && targets[i].hp)
-    //        {
-    //            const targetHPBeforeDamage = (targets[i].hurtThisTurn || 0) + curDamage;
-    //            if (targets[i].hp <= targets[i].maxhp / 2 && targetHPBeforeDamage > targets[i].maxhp / 2)
-    //            {
-    //                this.battle.runEvent('EmergencyExit', targets[i], pokemon);
-    //            }
-    //        }
-    //    }
-    //}
-
-    //return damage;
-    //	}
-
     private readonly int[] _multiHitSample = [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5];
 
-    public List<BoolIntUndefinedUnion> HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public List<BoolIntEmptyUndefinedUnion> HitStepMoveHitLoop(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         // Initialize damage array with 0s for each target
-        var damage = new List<BoolIntUndefinedUnion>();
+        var damage = new List<BoolIntEmptyUndefinedUnion>();
         for (int i = 0; i < targets.Count; i++)
         {
-            damage.Add(BoolIntUndefinedUnion.FromInt(0));
+            damage.Add(BoolIntEmptyUndefinedUnion.FromInt(0));
         }
 
         move.TotalDamage = IntFalseUnion.FromInt(0);
@@ -863,7 +626,7 @@ public partial class BattleActions
         for (hit = 1; hit <= targetHitResult; hit++)
         {
             // Break if any target has already failed
-            if (damage.Any(d => d is BoolBoolIntUndefinedUnion { Value: false })) break;
+            if (damage.Any(d => d is BoolBoolIntEmptyUndefinedUnion { Value: false })) break;
 
             // Break if user fell asleep and move is not sleep-usable
             if (hit > 1 && pokemon.Status == ConditionId.Sleep && (!isSleepUsable || Battle.Gen == 4)) break;
@@ -1044,18 +807,18 @@ public partial class BattleActions
                 BoolIntUndefinedUnion md = moveDamage[i];
                 damage[i] = md switch
                 {
-                    BoolBoolIntUndefinedUnion { Value: true } => BoolIntUndefinedUnion.FromInt(0),
-                    IntBoolIntUndefinedUnion intDmg => BoolIntUndefinedUnion.FromInt(intDmg.Value),
-                    _ => BoolIntUndefinedUnion.FromInt(0),
+                    BoolBoolIntUndefinedUnion { Value: true } => BoolIntEmptyUndefinedUnion.FromInt(0),
+                    IntBoolIntUndefinedUnion intDmg => BoolIntEmptyUndefinedUnion.FromInt(intDmg.Value),
+                    _ => BoolIntEmptyUndefinedUnion.FromInt(0),
                 };
 
                 // Total damage dealt is accumulated for the purposes of recoil (Parental Bond).
-                if (damage[i] is IntBoolIntUndefinedUnion dmgInt)
+                if (damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt)
                 {
                     int currentTotal = move.TotalDamage switch
                     {
                         IntIntFalseUnion intVal => intVal.Value,
-                        _ => 0
+                        _ => 0,
                     };
                     move.TotalDamage = IntFalseUnion.FromInt(currentTotal + dmgInt.Value);
                 }
@@ -1089,7 +852,7 @@ public partial class BattleActions
         {
             for (int i = 0; i < damage.Count; i++)
             {
-                damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                damage[i] = BoolIntEmptyUndefinedUnion.FromBool(false);
             }
             return damage;
         }
@@ -1098,7 +861,7 @@ public partial class BattleActions
         {
             for (int i = 0; i < damage.Count; i++)
             {
-                damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                damage[i] = BoolIntEmptyUndefinedUnion.FromBool(false);
             }
         }
 
@@ -1179,8 +942,8 @@ public partial class BattleActions
             UiGenerator.PrintOhkoEvent();
         }
 
-        if (!damage.Any(val => (val is IntBoolIntUndefinedUnion intVal && intVal.Value != 0) ||
-                               val is IntBoolIntUndefinedUnion { Value: 0 }))
+        if (!damage.Any(val => (val is IntBoolIntEmptyUndefinedUnion intVal &&
+                                intVal.Value != 0) || val is IntBoolIntEmptyUndefinedUnion { Value: 0 }))
         {
             return damage;
         }
@@ -1196,7 +959,7 @@ public partial class BattleActions
                 // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
                 // The previous check was for `move.multihit`, but that fails for Dragon Darts
                 int curDamage = targets.Count == 1 ? move.TotalDamage.ToInt() :
-                    damage[i] is IntBoolIntUndefinedUnion dmgInt ? dmgInt.Value : 0;
+                    damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt ? dmgInt.Value : 0;
 
                 if (curDamage > 0 && targets[i].Hp > 0)
                 {

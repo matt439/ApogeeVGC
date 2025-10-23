@@ -852,7 +852,7 @@ public partial class BattleActions(IBattle battle)
 
         // Define the sequence of hit validation steps
         // Each step filters out targets that fail its check
-        var moveSteps = new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntUndefinedUnion>?>>
+        var moveSteps = new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>>
         {
             // 0. check for semi invulnerability
             HitStepInvulnerabilityEvent,
@@ -946,7 +946,7 @@ public partial class BattleActions(IBattle battle)
 
             // Track if any target failed this step
             atLeastOneFailure = atLeastOneFailure || 
-                hitResults.Any(result => result is BoolBoolIntUndefinedUnion { Value: false });
+                hitResults.Any(result => result is BoolBoolIntEmptyUndefinedUnion { Value: false });
 
             // Disable smart targeting if there was a failure
             if (move.SmartTarget == true && atLeastOneFailure)
