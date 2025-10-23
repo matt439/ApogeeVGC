@@ -4,7 +4,7 @@ namespace ApogeeVGC.Sim.Actions;
 
 public record StartGameAction : IActionChoice
 {
-    public ActionId Choice => ActionId.Start;
+    public static ActionId Choice => ActionId.Start;
     public IntFalseUnion Order => int.MaxValue;
     public int Priority => 0;
     public int Speed => 0;

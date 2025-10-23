@@ -4,7 +4,7 @@ namespace ApogeeVGC.Sim.Actions;
 
 public record ResidualAction : IActionChoice
 {
-    public ActionId Choice => ActionId.Residual;
+    public static ActionId Choice => ActionId.Residual;
     public IntFalseUnion Order => int.MaxValue;
     public int Priority => 0;
     public int Speed => 0;

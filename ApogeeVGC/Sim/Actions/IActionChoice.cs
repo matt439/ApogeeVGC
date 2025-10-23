@@ -2,6 +2,4 @@
 
 namespace ApogeeVGC.Sim.Actions;
 
-public interface IActionChoice : IPriorityComparison
-{
-}
+public interface IActionChoice : IPriorityComparison;

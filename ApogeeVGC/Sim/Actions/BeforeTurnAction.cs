@@ -4,7 +4,7 @@ namespace ApogeeVGC.Sim.Actions;
 
 public record BeforeTurnAction : IActionChoice
 {
-    public ActionId Choice => ActionId.BeforeTurn;
+    public static ActionId Choice => ActionId.BeforeTurn;
     public IntFalseUnion Order => int.MaxValue;
     public int Priority => 0;
     public int Speed => 0;
