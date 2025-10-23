@@ -248,4 +248,6 @@ public interface IBattle
     void AddMove(params StringNumberDelegateObjectUnion[] args);
 
     void ShowOpenTeamSheets();
+
+    void Hint(string hint, bool once = false, Side? side = null);
 }
