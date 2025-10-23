@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -156,8 +157,6 @@ public interface IBattle
 
     MoveCategory GetCategory(ActiveMove move);
 
-    void Start();
-
     List<Pokemon> GetAllActive(bool includeFainted = false);
 
     int StatModify(StatsTable baseStats, PokemonSet set, StatId statName);
@@ -220,4 +219,32 @@ public interface IBattle
     int HitSubstitute { get; }
 
     void Debug(string activity);
+
+    void Dispose();
+
+    void SendUpdates();
+
+    void SetPlayer(SideId slot, PlayerOptions options);
+
+    void UndoChoice(SideId sideId);
+
+    bool Choose(SideId sideId, Choice input);
+
+    bool ForceWin(SideId? side = null);
+
+    List<string> InputLog { get; }
+
+    bool Tie();
+
+    bool Lose(SideId sideId);
+
+    void ResetRng(PrngSeed? seed = null);
+
+    Prng Prng { get; }
+
+    bool Tiebreak();
+
+    void Add(params PartFuncUnion[] parts);
+
+    void ShowOpenTeamSheets();
 }
