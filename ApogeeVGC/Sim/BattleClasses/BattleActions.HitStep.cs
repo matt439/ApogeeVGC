@@ -119,7 +119,7 @@ public partial class BattleActions
 
         if (!hasTrue && hasFalse)
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 UiGenerator.PrintFailEvent(pokemon);
             }
@@ -184,7 +184,7 @@ public partial class BattleActions
                 target != pokemon &&
                 !Battle.Dex.GetImmunity(move.Condition?.Id ?? ConditionId.None, target.Types))
             {
-                if (Battle.PrintDebug)
+                if (Battle.DisplayUi)
                 {
                     // Battle.Debug("natural powder immunity");
                 }
@@ -205,7 +205,7 @@ public partial class BattleActions
                      !target.IsAlly(pokemon) &&
                      !Battle.Dex.GetImmunity(AbilityId.Prankster, target.Types))
             {
-                if (Battle.PrintDebug)
+                if (Battle.DisplayUi)
                 {
                     // Battle.Debug("natural prankster immunity");
                 }

@@ -528,7 +528,7 @@ public partial class BattleAsync
                 var ability = (Ability)effect;
                 if ((ability.Flags.Breakable ?? false) && SuppressingAbility(pokemonHolder2.Pokemon))
                 {
-                    if (PrintDebug)
+                    if (DisplayUi)
                     {
                         UiGenerator.PrintMessage($"{eventId} handler suppressed by Mold Breaker");
                     }
@@ -538,7 +538,7 @@ public partial class BattleAsync
                 // For custom abilities (no num), check if this is an attacking event
                 if (ability.Num == 0 && IsAttackingEvent(eventId, sourceEffect))
                 {
-                    if (PrintDebug)
+                    if (DisplayUi)
                     {
                         UiGenerator.PrintMessage($"{eventId} handler suppressed by Mold Breaker");
                     }
@@ -552,7 +552,7 @@ public partial class BattleAsync
                 effectHolder is PokemonEffectHolder pokemonHolder3 &&
                 pokemonHolder3.Pokemon.IgnoringItem())
             {
-                if (eventId != EventId.Update && PrintDebug)
+                if (eventId != EventId.Update && DisplayUi)
                 {
                     UiGenerator.PrintMessage($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
                 }
@@ -565,7 +565,7 @@ public partial class BattleAsync
                 effectHolder is PokemonEffectHolder pokemonHolder4 &&
                 pokemonHolder4.Pokemon.IgnoringAbility())
             {
-                if (eventId != EventId.Update && PrintDebug)
+                if (eventId != EventId.Update && DisplayUi)
                 {
                     UiGenerator.PrintMessage($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
                 }
@@ -577,7 +577,7 @@ public partial class BattleAsync
                 eventId is not (EventId.Residual or EventId.End) &&
                 Field.SuppressingWeather())
             {
-                if (PrintDebug)
+                if (DisplayUi)
                 {
                     UiGenerator.PrintMessage($"{eventId} handler suppressed by Air Lock");
                 }

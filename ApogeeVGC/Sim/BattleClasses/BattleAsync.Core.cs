@@ -111,7 +111,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public Action<SendType, IEnumerable<string>> Send { get; init; }
 
     public Library Library { get; init; }
-    public bool PrintDebug { get; init; }
+    public bool DisplayUi { get; init; }
     public Side P1 => Sides[0];
     public Side P2 => Sides[1];
     public static Side P3 => throw new Exception("3v3 battles are not implemented.");

@@ -22,7 +22,7 @@ public static class BattleGenerator
     //            printDebug),
     //        Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2, SideId.Side2, format,
     //            printDebug),
-    //        PrintDebug = printDebug,
+    //        DisplayUi = printDebug,
     //        BattleSeed = seed,
     //        Format = format,
     //        Player1 = player1,

@@ -17,7 +17,7 @@
 //        {
 //            PlayerId = playerId,
 //            Team = TeamGenerator.GenerateTestTeam(library, trainerName, sideId, printDebug),
-//            PrintDebug = printDebug,
+//            DisplayUi = printDebug,
 //            SideId = sideId,
 //            Slot1 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),
 //            Slot2 = PokemonBuilder.BuildDefaultPokemon(library, defaulTrainer, sideId),

@@ -36,7 +36,7 @@ public record Abilities
                 OnStart = (battle, pokemon) =>
                 {
                     if (battle.EffectState.Unnerved is true) return;
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintAbilityEvent(pokemon, "As One");
                         UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
@@ -77,7 +77,7 @@ public record Abilities
                     if (!battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
-                        if (battle.PrintDebug)
+                        if (battle.DisplayUi)
                         {
                             UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
                         }

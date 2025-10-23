@@ -620,7 +620,7 @@ public record Moves
                 OnModifyMove = (battle, move, pokemon, _) =>
                 {
                     move.Type = MoveType.Fighting;
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintActivateEvent(pokemon,
                             _library.Moves[MoveId.Struggle].ToActiveMove());

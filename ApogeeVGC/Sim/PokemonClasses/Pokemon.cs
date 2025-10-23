@@ -2151,7 +2151,7 @@ public class Pokemon : IPriorityComparison, IDisposable
                 // Check condition-specific immunity using the new overload
                 if (!RunStatusImmunity(status.Id))
                 {
-                    if (Battle.PrintDebug)
+                    if (Battle.DisplayUi)
                     {
                         // Battle.Debug("immune to status");
                     }
@@ -2175,7 +2175,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             RelayVar? result = Battle.RunEvent(EventId.SetStatus, this, source, sourceEffect, status);
             if (result is BoolRelayVar { Value: false })
             {
-                if (Battle.PrintDebug)
+                if (Battle.DisplayUi)
                 {
                     // Battle.Debug($"set status [{status.Choice}] interrupted");
                 }
@@ -2216,7 +2216,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
             if (!startSucceeded)
             {
-                if (Battle.PrintDebug)
+                if (Battle.DisplayUi)
                 {
                     // Battle.Debug($"status start [{status.Choice}] interrupted");
                 }
@@ -2744,7 +2744,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Check status immunity
         if (!RunStatusImmunity(status))
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug("immune to volatile status");
             }
@@ -2763,7 +2763,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
         if (tryResult is BoolRelayVar { Value: false } or null)
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug($"add volatile [{status}] interrupted");
             }
@@ -3424,7 +3424,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Check natural type immunity using battle's dex
         if (!Battle.Dex.GetImmunity(moveType, this))
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug("natural status immunity");
             }
@@ -3442,7 +3442,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // TypeScript logic: if (!immunity) - means if immunity is falsy/false
         if (immunity is BoolRelayVar { Value: false } or null)
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug("artificial status immunity");
             }
@@ -3475,7 +3475,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Check natural condition immunity using ModdedDex static method
         if (!ModdedDex.GetImmunity(condition, Types))
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug("natural condition immunity");
             }
@@ -3494,7 +3494,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // TypeScript logic: if (!immunity) - means if immunity is falsy/false
         if (immunity is BoolRelayVar { Value: false } or null)
         {
-            if (Battle.PrintDebug)
+            if (Battle.DisplayUi)
             {
                 // Battle.Debug("artificial condition immunity");
             }

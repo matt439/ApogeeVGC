@@ -15,7 +15,7 @@
 //        {
 //            Trainer = trainer,
 //            PokemonSet = PokemonBuilder.BuildTestSet(library, trainer, sideId, printDebug),
-//            PrintDebug = printDebug,
+//            DisplayUi = printDebug,
 //            SideId = sideId,
 //        };
 //    }

@@ -53,7 +53,7 @@ public record Conditions
                                                         $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
                     }
 
-                    bool debug = battle.PrintDebug;
+                    bool debug = battle.DisplayUi;
                     if (!debug) return new VoidReturn();
 
                     Condition burn = _library.Conditions[ConditionId.Burn];
@@ -102,7 +102,7 @@ public record Conditions
                 ImmuneTypes = [PokemonType.Electric],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
-                    if (!battle.PrintDebug) return new VoidReturn();
+                    if (!battle.DisplayUi) return new VoidReturn();
 
                     Condition paralysis = _library.Conditions[ConditionId.Paralysis];
 
@@ -130,7 +130,7 @@ public record Conditions
                 OnBeforeMove = (battle, pokemon, _, _) =>
                 {
                     if (!battle.RandomChance(1, 4)) return new VoidReturn();
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Paralysis]);
                     }
@@ -144,7 +144,7 @@ public record Conditions
                 EffectType = EffectType.Status,
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         Condition sleep = _library.Conditions[ConditionId.Sleep];
                         switch (sourceEffect)
@@ -168,7 +168,7 @@ public record Conditions
 
                     if (!target.RemoveVolatile(nightmare)) return new VoidReturn();
 
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintEndEvent(target, nightmare);
                     }
@@ -189,7 +189,7 @@ public record Conditions
                         pokemon.CureStatus();
                         return new VoidReturn();
                     }
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Sleep]);
                     }
@@ -208,7 +208,7 @@ public record Conditions
                 ImmuneTypes = [PokemonType.Ice],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         Condition freeze = _library.Conditions[ConditionId.Freeze];
                         switch (sourceEffect)
@@ -242,7 +242,7 @@ public record Conditions
                         pokemon.CureStatus();
                         return new VoidReturn();
                     }
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Freeze]);
                     }
@@ -251,7 +251,7 @@ public record Conditions
                 OnModifyMove = (battle, move, pokemon, _) =>
                 {
                     if (!(move.Flags.Defrost ?? false)) return;
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintCureStatusEvent(pokemon, _library.Conditions[ConditionId.Freeze], move);
                     }
@@ -281,7 +281,7 @@ public record Conditions
                 ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
-                    if (!battle.PrintDebug) return new VoidReturn();
+                    if (!battle.DisplayUi) return new VoidReturn();
 
                     Condition poison = _library.Conditions[ConditionId.Poison];
 
@@ -305,7 +305,7 @@ public record Conditions
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
                     battle.EffectState.Stage = 0;
-                    if (!battle.PrintDebug) return new VoidReturn();
+                    if (!battle.DisplayUi) return new VoidReturn();
 
                     Condition toxic = _library.Conditions[ConditionId.Toxic];
                     switch (sourceEffect)
@@ -344,7 +344,7 @@ public record Conditions
                 EffectType = EffectType.Condition,
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         Condition confusion = _library.Conditions[ConditionId.Confusion];
                         switch (sourceEffect)
@@ -372,7 +372,7 @@ public record Conditions
                 },
                 OnEnd = (battle, target) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintEndEvent(target, _library.Conditions[ConditionId.Confusion]);
                     }
@@ -386,7 +386,7 @@ public record Conditions
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Confusion]);
                         return new VoidReturn();
                     }
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintActivateEvent(pokemon, _library.Conditions[ConditionId.Confusion]);
                     }
@@ -419,7 +419,7 @@ public record Conditions
                 OnBeforeMovePriority = 8,
                 OnBeforeMove = (battle, pokemon, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Flinch]);
                     }
@@ -462,7 +462,7 @@ public record Conditions
                         move.Id == battle.EffectState.Move ||
                         move.Id == MoveId.Struggle) return new VoidReturn();
 
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintFailEvent(pokemon);
                     }
@@ -497,7 +497,7 @@ public record Conditions
                 AssociatedMove = MoveId.LeechSeed,
                 OnStart = (battle, target, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintStartEvent(target, _library.Moves[MoveId.LeechSeed].ToActiveMove());
                     }
@@ -528,7 +528,7 @@ public record Conditions
                 DurationCallback = (_, _, _, _) => 5,
                 OnFieldStart = (battle, _, source, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintFieldStartEvent(_library.Conditions[ConditionId.TrickRoom], 
                             null, source);
@@ -542,7 +542,7 @@ public record Conditions
                 OnFieldResidualSubOrder = 1,
                 OnFieldEnd = (battle, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.TrickRoom]);
                     }
@@ -590,7 +590,7 @@ public record Conditions
                 AssociatedMove = MoveId.Protect,
                 OnStart = (battle, target, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSingleTurnEvent(target, _library.Conditions[ConditionId.Protect]);
                     }
@@ -607,7 +607,7 @@ public record Conditions
                     {
                         move.SmartTarget = false;
                     }
-                    else if (battle.PrintDebug)
+                    else if (battle.DisplayUi)
                     {
                         UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.Protect]);
                     }
@@ -630,7 +630,7 @@ public record Conditions
                 DurationCallback = (_, _, _, _) => 4,
                 OnSideStart = (battle, side, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Tailwind]);
                     }
@@ -644,7 +644,7 @@ public record Conditions
                 OnSideResidualSubOrder = 5,
                 OnSideEnd = (battle, side) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Tailwind]);
                     }
@@ -675,7 +675,7 @@ public record Conditions
                 },
                 OnSideStart = (battle, side, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Reflect]);
                     }
@@ -684,7 +684,7 @@ public record Conditions
                 OnSideResidualSubOrder = 1,
                 OnSideEnd = (battle, side) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Reflect]);
                     }
@@ -715,7 +715,7 @@ public record Conditions
                 },
                 OnSideStart = (battle, side, _, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.LightScreen]);
                     }
@@ -724,7 +724,7 @@ public record Conditions
                 OnSideResidualSubOrder = 2,
                 OnSideEnd = (battle, side) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.LightScreen]);
                     }
@@ -743,7 +743,7 @@ public record Conditions
                         (target.IsGrounded() ?? false) &&
                         !target.IsSemiInvulnerable())
                     {
-                        if (battle.PrintDebug && effect is Condition { Id: ConditionId.Yawn } or
+                        if (battle.DisplayUi && effect is Condition { Id: ConditionId.Yawn } or
                                 Move { Id: MoveId.Yawn } or
                                     ActiveMove { Secondaries: not null })
                         {
@@ -759,7 +759,7 @@ public record Conditions
                     if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable()) return new VoidReturn();
                     if (status.Id == ConditionId.Yawn)
                     {
-                        if (battle.PrintDebug)
+                        if (battle.DisplayUi)
                         {
                             UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.ElectricTerrain]);
                         }
@@ -780,7 +780,7 @@ public record Conditions
                 },
                 OnFieldStart = (battle, _, source, effect) =>
                 {
-                    if (!battle.PrintDebug) return;
+                    if (!battle.DisplayUi) return;
 
                     Condition et = _library.Conditions[ConditionId.ElectricTerrain];
 
@@ -797,7 +797,7 @@ public record Conditions
                 OnFieldResidualSubOrder = 7,
                 OnFieldEnd = (battle, _) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.ElectricTerrain]);
                     }
@@ -817,7 +817,7 @@ public record Conditions
                         if (item.Id == ItemId.BoosterEnergy)
                         {
                             battle.EffectState.FromBooster = true;
-                            if (battle.PrintDebug)
+                            if (battle.DisplayUi)
                             {
                                 UiGenerator.PrintActivateEvent(pokemon,
                                     _library.Conditions[ConditionId.QuarkDrive],
@@ -825,12 +825,12 @@ public record Conditions
                             }
                         }
                     }
-                    else if (battle.PrintDebug)
+                    else if (battle.DisplayUi)
                     {
                         UiGenerator.PrintActivateEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
                     }
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintStartEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
                     }
@@ -882,7 +882,7 @@ public record Conditions
                 },
                 OnEnd = (battle, pokemon) =>
                 {
-                    if (battle.PrintDebug)
+                    if (battle.DisplayUi)
                     {
                         UiGenerator.PrintEndEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
                     }

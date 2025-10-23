@@ -78,7 +78,7 @@
 //            Evs = evs,
 //            Name = nickname ?? library.SpeciesData[species].Name,
 //            Shiny = shiny,
-//            PrintDebug = pringDebug,
+//            DisplayUi = pringDebug,
 //            TeraType = terraType,
 //        };
 
