@@ -102,6 +102,7 @@ public record BoolIntBoolUnion(bool Value) : IntBoolUnion
 public abstract record IntFalseUnion
 {
     public abstract int ToInt();
+    public abstract IntUndefinedFalseUnion ToIntUndefinedFalseUnion();
 
     public static IntFalseUnion FromInt(int value) => new IntIntFalseUnion(value);
     public static IntFalseUnion FromFalse() => new FalseIntFalseUnion();
@@ -138,11 +139,13 @@ public abstract record IntFalseUnion
 public record IntIntFalseUnion(int Value) : IntFalseUnion
 {
     public override int ToInt() => Value;
+    public override IntUndefinedFalseUnion ToIntUndefinedFalseUnion() => new IntIntUndefinedFalseUnion(Value);
 }
 
 public record FalseIntFalseUnion : IntFalseUnion
 {
     public override int ToInt() => 0;
+    public override IntUndefinedFalseUnion ToIntUndefinedFalseUnion() => new FalseIntUndefinedFalseUnion();
 }
 
 

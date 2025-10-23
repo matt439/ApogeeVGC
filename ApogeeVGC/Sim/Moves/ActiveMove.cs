@@ -105,7 +105,7 @@ public record ActiveMove : Move, IEffect
 // Element of MoveHitData
 public record MoveHitResult
 {
-    public bool Crit { get; init; }
+    public bool Crit { get; set; }
     public int TypeMod { get; set; }
     public bool ZBrokeProtect { get; set; }
 }

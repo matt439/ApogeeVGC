@@ -10,7 +10,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1810,22 +1809,403 @@ public partial class BattleActions(IBattle battle)
         return right;
     }
 
+    //    /**
+    //	 * 0 is a success dealing 0 damage, such as from False Swipe at 1 HP.
+    //	 *
+    //	 * Normal PS return value rules apply:
+    //	 * undefined = success, null = silent failure, false = loud failure
+    //	 */
+    //    getDamage(
+    //        source: Pokemon, target: Pokemon, move: string | number | ActiveMove,
+    //        suppressMessages = false
+    //    ) : number | undefined | null | false {
+    //		if (typeof move === 'string') move = this.dex.getActiveMove(move);
+
+    //		if (typeof move === 'number') {
+    //			const basePower = move;
+    //    move = new Dex.Move({
+    //				basePower,
+    //				type: '???',
+    //				category: 'Physical',
+    //				willCrit: false,
+    //			}) as ActiveMove;
+    //			move.hit = 0;
+    //		}
+
+    //		if (!target.runImmunity(move, !suppressMessages))
+    //{
+    //    return false;
+    //}
+
+    //if (move.ohko) return this.battle.gen === 3 ? target.hp : target.maxhp;
+    //if (move.damageCallback) return move.damageCallback.call(this.battle, source, target);
+    //if (move.damage === 'level')
+    //{
+    //    return source.level;
+    //}
+    //else if (move.damage)
+    //{
+    //    return move.damage;
+    //}
+
+    //const category = this.battle.getCategory(move);
+
+    //let basePower: number | false | null = move.basePower;
+    //if (move.basePowerCallback)
+    //{
+    //    basePower = move.basePowerCallback.call(this.battle, source, target, move);
+    //}
+    //if (!basePower) return basePower === 0 ? undefined : basePower;
+    //basePower = this.battle.clampIntRange(basePower, 1);
+
+    //let critMult;
+    //let critRatio = this.battle.runEvent('ModifyCritRatio', source, target, move, move.critRatio || 0);
+    //if (this.battle.gen <= 5)
+    //{
+    //    critRatio = this.battle.clampIntRange(critRatio, 0, 5);
+    //    critMult = [0, 16, 8, 4, 3, 2];
+    //}
+    //else
+    //{
+    //    critRatio = this.battle.clampIntRange(critRatio, 0, 4);
+    //    if (this.battle.gen === 6)
+    //    {
+    //        critMult = [0, 16, 8, 2, 1];
+    //    }
+    //    else
+    //    {
+    //        critMult = [0, 24, 8, 2, 1];
+    //    }
+    //}
+
+    //const moveHit = target.getMoveHitData(move);
+    //moveHit.crit = move.willCrit || false;
+    //if (move.willCrit === undefined)
+    //{
+    //    if (critRatio)
+    //    {
+    //        moveHit.crit = this.battle.randomChance(1, critMult[critRatio]);
+    //    }
+    //}
+
+    //if (moveHit.crit)
+    //{
+    //    moveHit.crit = this.battle.runEvent('CriticalHit', target, null, move);
+    //}
+
+    //// happens after crit calculation
+    //basePower = this.battle.runEvent('BasePower', source, target, move, basePower, true);
+
+    //if (!basePower) return 0;
+    //basePower = this.battle.clampIntRange(basePower, 1);
+    //// Hacked Max Moves have 0 base power, even if you Dynamax
+    //if ((!source.volatiles['dynamax'] && move.isMax) || (move.isMax && this.dex.moves.get(move.baseMove).isMax))
+    //{
+    //    basePower = 0;
+    //}
+
+    //const dexMove = this.dex.moves.get(move.id);
+    //if (source.terastallized && (source.terastallized === 'Stellar' ?
+    //    !source.stellarBoostedTypes.includes(move.type) : source.hasType(move.type)) &&
+    //    basePower < 60 && dexMove.priority <= 0 && !dexMove.multihit &&
+    //    // Hard move.basePower check for moves like Dragon Energy that have variable BP
+    //    !((move.basePower === 0 || move.basePower === 150) && move.basePowerCallback)
+    //)
+    //{
+    //    basePower = 60;
+    //}
+
+    //const level = source.level;
+
+    //const attacker = move.overrideOffensivePokemon === 'target' ? target : source;
+    //const defender = move.overrideDefensivePokemon === 'source' ? source : target;
+
+    //const isPhysical = move.category === 'Physical';
+    //let attackStat: StatIDExceptHP = move.overrideOffensiveStat || (isPhysical ? 'atk' : 'spa');
+    //const defenseStat: StatIDExceptHP = move.overrideDefensiveStat || (isPhysical ? 'def' : 'spd');
+
+    //const statTable = { atk: 'Atk', def: 'Def', spa: 'SpA', spd: 'SpD', spe: 'Spe' };
+
+    //let atkBoosts = attacker.boosts[attackStat];
+    //let defBoosts = defender.boosts[defenseStat];
+
+    //let ignoreNegativeOffensive = !!move.ignoreNegativeOffensive;
+    //let ignorePositiveDefensive = !!move.ignorePositiveDefensive;
+
+    //if (moveHit.crit)
+    //{
+    //    ignoreNegativeOffensive = true;
+    //    ignorePositiveDefensive = true;
+    //}
+    //const ignoreOffensive = !!(move.ignoreOffensive || (ignoreNegativeOffensive && atkBoosts < 0));
+    //const ignoreDefensive = !!(move.ignoreDefensive || (ignorePositiveDefensive && defBoosts > 0));
+
+    //if (ignoreOffensive)
+    //{
+    //    this.battle.debug('Negating (sp)atk boost/penalty.');
+    //    atkBoosts = 0;
+    //}
+    //if (ignoreDefensive)
+    //{
+    //    this.battle.debug('Negating (sp)def boost/penalty.');
+    //    defBoosts = 0;
+    //}
+
+    //let attack = attacker.calculateStat(attackStat, atkBoosts, 1, source);
+    //let defense = defender.calculateStat(defenseStat, defBoosts, 1, target);
+
+    //attackStat = (category === 'Physical' ? 'atk' : 'spa');
+
+    //// Apply Stat Modifiers
+    //attack = this.battle.runEvent('Modify' + statTable[attackStat], source, target, move, attack);
+    //defense = this.battle.runEvent('Modify' + statTable[defenseStat], target, source, move, defense);
+
+    //if (this.battle.gen <= 4 && ['explosion', 'selfdestruct'].includes(move.id) && defenseStat === 'def')
+    //{
+    //    defense = this.battle.clampIntRange(Math.floor(defense / 2), 1);
+    //}
+
+    //const tr = this.battle.trunc;
+
+    //// int(int(int(2 * L / 5 + 2) * A * P / D) / 50);
+    //const baseDamage = tr(tr(tr(tr(2 * level / 5 + 2) * basePower * attack) / defense) / 50);
+
+    //// Calculate damage modifiers separately (order differs between generations)
+    //return this.modifyDamage(baseDamage, source, target, move, suppressMessages);
+    //	}
+
+    /// <summary>
+    /// Calculates damage for a move.
+    /// 0 is a success dealing 0 damage, such as from False Swipe at 1 HP.
+    /// 
+    /// Normal PS return value rules apply:
+    /// undefined = success, null = silent failure, false = loud failure
+    /// </summary>
     public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, ActiveMove move,
         bool suppressMessages = false)
     {
-        throw new NotImplementedException();
+        // Check immunity
+        if (!target.RunImmunity(move, !suppressMessages))
+        {
+            return IntUndefinedFalseUnion.FromFalse();
+        }
+
+        // OHKO moves deal max HP damage (Gen 9)
+        if (move.Ohko != null)
+        {
+            return target.MaxHp;
+        }
+
+        // Damage callback (e.g., Seismic Toss, Night Shade)
+        if (move.DamageCallback != null)
+        {
+            return move.DamageCallback(Battle, source, target, move).ToIntUndefinedFalseUnion();
+        }
+
+        // Fixed damage moves
+        if (move.Damage is LevelMoveDamage)
+        {
+            return source.Level;
+        }
+        else if (move.Damage is IntMoveDamage intDmg)
+        {
+            return intDmg.Value;
+        }
+
+        // Get move category (Physical/Special)
+        MoveCategory category = Battle.GetCategory(move);
+
+        // Calculate base power
+        IntFalseUnion? basePower = move.BasePower;
+        if (move.BasePowerCallback != null)
+        {
+            basePower = move.BasePowerCallback(Battle, source, target, move);
+        }
+
+        // Base power checks
+        if (basePower == null || basePower == 0)
+        {
+            return basePower == 0 ? new Undefined() : IntUndefinedFalseUnion.FromFalse();
+        }
+        basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
+
+        // Calculate critical hit ratio (Gen 7+ logic, used in Gen 9)
+        int critRatio = move.CritRatio ?? 0;
+        RelayVar? critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
+            RunEventSource.FromNullablePokemon(target), move, critRatio);
+
+        if (critRatioEvent is IntRelayVar irv)
+        {
+            critRatio = irv.Value;
+        }
+
+        critRatio = Battle.ClampIntRange(critRatio, 0, 4);
+
+        // Gen 7+ critical hit multipliers (used in Gen 9)
+        int[] critMult = [0, 24, 8, 2, 1];
+
+        // Determine if move will critically hit
+        MoveHitResult moveHit = target.GetMoveHitData(move);
+        moveHit.Crit = move.WillCrit ?? false;
+
+        if (move.WillCrit == null)
+        {
+            if (critRatio > 0)
+            {
+                moveHit.Crit = Battle.RandomChance(1, critMult[critRatio]);
+            }
+        }
+
+        // Run CriticalHit event (can be cancelled)
+        if (moveHit.Crit)
+        {
+            RelayVar? critEvent = Battle.RunEvent(EventId.CriticalHit, target,
+                RunEventSource.FromNullablePokemon(null), move);
+            moveHit.Crit = critEvent is not BoolRelayVar { Value: false };
+        }
+
+        // Run BasePower event after crit calculation
+        RelayVar? basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
+            RunEventSource.FromNullablePokemon(target), move, basePower.ToInt(), true);
+
+        if (basePowerEvent is IntRelayVar bpIrv)
+        {
+            basePower = bpIrv.Value;
+        }
+
+        if (basePower == 0)
+        {
+            return 0;
+        }
+        basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
+
+        // Terastallization 60 BP boost for low base power moves (Gen 9)
+        Move dexMove = Library.Moves[move.Id];
+        if (source.Terastallized != null &&
+            (source.Terastallized == MoveType.Stellar
+                ? !source.StellarBoostedTypes.Contains(move.Type)
+                : source.HasType((PokemonType)move.Type)) &&
+            basePower.ToInt() < 60 &&
+            dexMove is { Priority: <= 0, MultiHit: null } &&
+            // Exclude moves like Dragon Energy with variable BP
+            !(move.BasePower is 0 or 150 && move.BasePowerCallback != null))
+        {
+            basePower = 60;
+        }
+
+        int level = source.Level;
+
+        // Determine attacker and defender (some moves swap offensive/defensive Pokemon)
+        Pokemon attacker = move.OverrideOffensivePokemon == MoveOverridePokemon.Target ? target : source;
+        Pokemon defender = move.OverrideDefensivePokemon == MoveOverridePokemon.Source ? source : target;
+
+        // Determine stats to use
+        bool isPhysical = category == MoveCategory.Physical;
+        StatIdExceptHp attackStat = move.OverrideOffensiveStat ?? (isPhysical ? StatIdExceptHp.Atk : StatIdExceptHp.SpA);
+        StatIdExceptHp defenseStat = move.OverrideDefensiveStat ?? (isPhysical ? StatIdExceptHp.Def : StatIdExceptHp.SpD);
+
+        // Get boost values
+        int atkBoosts = attacker.Boosts.GetBoost(attackStat.ConvertToBoostId());
+        int defBoosts = defender.Boosts.GetBoost(defenseStat.ConvertToBoostId());
+
+        // Determine which boosts to ignore
+        bool ignoreNegativeOffensive = move.IgnoreNegativeOffensive ?? false;
+        bool ignorePositiveDefensive = move.IgnorePositiveDefensive ?? false;
+
+        // Critical hits ignore negative offensive and positive defensive boosts
+        if (moveHit.Crit)
+        {
+            ignoreNegativeOffensive = true;
+            ignorePositiveDefensive = true;
+        }
+
+        bool ignoreOffensive = move.IgnoreOffensive == true || (ignoreNegativeOffensive && atkBoosts < 0);
+        bool ignoreDefensive = move.IgnoreDefensive == true || (ignorePositiveDefensive && defBoosts > 0);
+
+        if (ignoreOffensive)
+        {
+            Battle.Debug("Negating (sp)atk boost/penalty.");
+            atkBoosts = 0;
+        }
+
+        if (ignoreDefensive)
+        {
+            Battle.Debug("Negating (sp)def boost/penalty.");
+            defBoosts = 0;
+        }
+
+        // Calculate actual stat values with boosts
+        int attack = attacker.CalculateStat(attackStat, atkBoosts, 1, source);
+        int defense = defender.CalculateStat(defenseStat, defBoosts, 1, target);
+
+        // Adjust attackStat for Modify event naming
+        attackStat = category == MoveCategory.Physical ? StatIdExceptHp.Atk : StatIdExceptHp.SpA;
+
+        // Run Modify stat events
+        EventId modifyAtkEvent = attackStat switch
+        {
+            StatIdExceptHp.Atk => EventId.ModifyAtk,
+            StatIdExceptHp.SpA => EventId.ModifySpA,
+            _ => throw new InvalidOperationException("Invalid attack stat"),
+        };
+
+        EventId modifyDefEvent = defenseStat switch
+        {
+            StatIdExceptHp.Def => EventId.ModifyDef,
+            StatIdExceptHp.SpD => EventId.ModifySpD,
+            _ => throw new InvalidOperationException("Invalid defense stat"),
+        };
+
+        RelayVar? modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
+            RunEventSource.FromNullablePokemon(target), move, attack);
+        attack = modifyAtkResult is IntRelayVar atkIrv ? atkIrv.Value : attack;
+
+        RelayVar? modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
+            RunEventSource.FromNullablePokemon(source), move, defense);
+        defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
+
+        // Calculate base damage using the standard Pokémon damage formula
+        // int(int(int(2 * L / 5 + 2) * A * P / D) / 50)
+        int baseDamage = Battle.Trunc(
+            Battle.Trunc(
+                Battle.Trunc(
+                    Battle.Trunc(2 * level / 5 + 2) * basePower.ToInt() * attack
+                ) / defense
+            ) / 50
+        );
+
+        // Apply damage modifiers
+        return ModifyDamage(baseDamage, source, target, move, suppressMessages);
     }
 
-    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, MoveId move,
+    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, MoveId moveId,
         bool suppressMessages = false)
     {
-        throw new NotImplementedException();
+        Move move = Library.Moves[moveId];
+        return GetDamage(source, target, move.ToActiveMove(), suppressMessages);
     }
 
-    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, int move,
+    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, int basePower,
         bool suppressMessages = false)
     {
-        throw new NotImplementedException();
+        // Create a temporary move with the specified base power
+        var tempMove = new Move
+        {
+            Id = MoveId.None,
+            Name = "Custom Move",
+            Num = 0,
+            BasePower = basePower,
+            Type = MoveType.Unknown,
+            Category = MoveCategory.Physical,
+            Accuracy = new TrueIntTrueUnion(),
+            BasePp = 1,
+            Target = MoveTarget.Normal,
+            WillCrit = false,
+        }.ToActiveMove();
+
+        tempMove.Hit = 0;
+
+        return GetDamage(source, target, tempMove, suppressMessages);
     }
 
     public int ModifyDamage(int baseDamage, Pokemon pokemon, Pokemon target, ActiveMove move,
@@ -1917,7 +2297,7 @@ public partial class BattleActions(IBattle battle)
         }
 
         // Type effectiveness
-        int typeMod = (int)target.RunEffectiveness(move);
+        int typeMod = target.RunEffectiveness(move).ToModifier();
         typeMod = Battle.ClampIntRange(typeMod, -6, 6);
         hitData.TypeMod = typeMod;
         
