@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1346,175 +1347,6 @@ public partial class BattleActions(IBattle battle)
         return damage;
     }
 
-    //runMoveEffects(
-    //    damage: SpreadMoveDamage, targets: SpreadMoveTargets, source: Pokemon,
-    //    move: ActiveMove, moveData: ActiveMove, isSecondary?: boolean, isSelf?: boolean
-
-    //)
-    //{
-    //    let didAnything: number | boolean | null | undefined = damage.reduce(this.combineResults);
-    //    for (const [i, target] of targets.entries()) {
-    //        if (target === false) continue;
-    //        let hitResult;
-    //        let didSomething: number | boolean | null | undefined = undefined;
-
-    //        if (target)
-    //        {
-    //            if (moveData.boosts && !target.fainted)
-    //            {
-    //                hitResult = this.battle.boost(moveData.boosts, target, source, move, isSecondary, isSelf);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.heal && !target.fainted)
-    //            {
-    //                if (target.hp >= target.maxhp)
-    //                {
-    //                    this.battle.add('-fail', target, 'heal');
-    //                    this.battle.attrLastMove('[still]');
-    //                    damage[i] = this.combineResults(damage[i], false);
-    //                    didAnything = this.combineResults(didAnything, null);
-    //                    continue;
-    //                }
-    //                const amount = target.baseMaxhp * moveData.heal[0] / moveData.heal[1];
-    //                const d = this.battle.heal((this.battle.gen < 5 ? Math.floor : Math.round)(amount), target, source, move);
-    //                if (!d && d !== 0)
-    //                {
-    //                    if (d !== null)
-    //                    {
-    //                        this.battle.add('-fail', source);
-    //                        this.battle.attrLastMove('[still]');
-    //                    }
-    //                    this.battle.debug('heal interrupted');
-    //                    damage[i] = this.combineResults(damage[i], false);
-    //                    didAnything = this.combineResults(didAnything, null);
-    //                    continue;
-    //                }
-    //                didSomething = true;
-    //            }
-    //            if (moveData.status)
-    //            {
-    //                hitResult = target.trySetStatus(moveData.status, source, moveData.ability ? moveData.ability : move);
-    //                if (!hitResult && move.status)
-    //                {
-    //                    damage[i] = this.combineResults(damage[i], false);
-    //                    didAnything = this.combineResults(didAnything, null);
-    //                    continue;
-    //                }
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.forceStatus)
-    //            {
-    //                hitResult = target.setStatus(moveData.forceStatus, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.volatileStatus)
-    //            {
-    //                hitResult = target.addVolatile(moveData.volatileStatus, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.sideCondition)
-    //            {
-    //                hitResult = target.side.addSideCondition(moveData.sideCondition, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.slotCondition)
-    //            {
-    //                hitResult = target.side.addSlotCondition(target, moveData.slotCondition, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.weather)
-    //            {
-    //                hitResult = this.battle.field.setWeather(moveData.weather, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.terrain)
-    //            {
-    //                hitResult = this.battle.field.setTerrain(moveData.terrain, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.pseudoWeather)
-    //            {
-    //                hitResult = this.battle.field.addPseudoWeather(moveData.pseudoWeather, source, move);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            if (moveData.forceSwitch)
-    //            {
-    //                hitResult = !!this.battle.canSwitch(target.side);
-    //                didSomething = this.combineResults(didSomething, hitResult);
-    //            }
-    //            // Hit events
-    //            //   These are like the TryHit events, except we don't need a FieldHit event.
-    //            //   Scroll up for the TryHit event documentation, and just ignore the "Try" part. ;)
-    //            if (move.target === 'all' && !isSelf)
-    //            {
-    //                if (moveData.onHitField)
-    //                {
-    //                    hitResult = this.battle.singleEvent('HitField', moveData, { }, target, source, move);
-    //                    didSomething = this.combineResults(didSomething, hitResult);
-    //                }
-    //            }
-    //            else if ((move.target === 'foeSide' || move.target === 'allySide') && !isSelf)
-    //            {
-    //                if (moveData.onHitSide)
-    //                {
-    //                    hitResult = this.battle.singleEvent('HitSide', moveData, { }, target.side, source, move);
-    //                    didSomething = this.combineResults(didSomething, hitResult);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                if (moveData.onHit)
-    //                {
-    //                    hitResult = this.battle.singleEvent('Hit', moveData, { }, target, source, move);
-    //                    didSomething = this.combineResults(didSomething, hitResult);
-    //                }
-    //                if (!isSelf && !isSecondary)
-    //                {
-    //                    this.battle.runEvent('Hit', target, source, move);
-    //                }
-    //            }
-    //        }
-    //        if (moveData.selfdestruct === 'ifHit' && damage[i] !== false)
-    //        {
-    //            this.battle.faint(source, source, move);
-    //        }
-    //        if (moveData.selfSwitch)
-    //        {
-    //            if (this.battle.canSwitch(source.side) && !source.volatiles['commanded'])
-    //            {
-    //                didSomething = true;
-    //            }
-    //            else
-    //            {
-    //                didSomething = this.combineResults(didSomething, false);
-    //            }
-    //        }
-    //        // Move didn't fail because it didn't try to do anything
-    //        if (didSomething === undefined) didSomething = true;
-    //        damage[i] = this.combineResults(damage[i], didSomething === null ? false : didSomething);
-    //        didAnything = this.combineResults(didAnything, didSomething);
-    //    }
-
-    //    if (!didAnything && didAnything !== 0 && !moveData.self && !moveData.selfdestruct)
-    //    {
-    //        if (!isSelf && !isSecondary)
-    //        {
-    //            if (didAnything === false)
-    //            {
-    //                this.battle.add('-fail', source);
-    //                this.battle.attrLastMove('[still]');
-    //            }
-    //        }
-    //        this.battle.debug('move failed because it did nothing');
-    //    }
-    //    else if (move.selfSwitch && source.hp && !source.volatiles['commanded'])
-    //    {
-    //        source.switchFlag = move.id;
-    //    }
-
-    //    return damage;
-    //}
-
     public SpreadMoveDamage RunMoveEffects(SpreadMoveDamage damage, SpreadMoveTargets targets,
     Pokemon source, ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
     {
@@ -1999,9 +1831,157 @@ public partial class BattleActions(IBattle battle)
     public int ModifyDamage(int baseDamage, Pokemon pokemon, Pokemon target, ActiveMove move,
         bool suppressMessages = false)
     {
-        throw new NotImplementedException();
-    }
+        MoveType type = move.Type;
+        
+        baseDamage += 2;
 
+        // Spread move modifier (multi-target moves do 75% damage in doubles)
+        if (move.SpreadHit == true)
+        {
+            Battle.Debug("Spread modifier: 0.75");
+            baseDamage = Battle.Modify(baseDamage, 0.75);
+        }
+
+        // Weather modifier
+        RelayVar? weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
+            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
+        
+        if (weatherModResult is IntRelayVar weatherMod)
+        {
+            baseDamage = weatherMod.Value;
+        }
+
+        // Critical hit - not a modifier, direct multiplication
+        MoveHitResult hitData = target.GetMoveHitData(move);
+        bool isCrit = hitData.Crit;
+        
+        if (isCrit)
+        {
+            double critModifier = move.CritModifier ?? 1.5;
+            baseDamage = Battle.Trunc((int)(baseDamage * critModifier));
+        }
+
+        // Random factor - also not a modifier
+        baseDamage = Battle.Randomizer(baseDamage);
+
+        // STAB (Same Type Attack Bonus)
+        // The Typeless type never gets STAB
+        if (type != MoveType.Unknown)
+        {
+            double stab = 1.0;
+            
+            bool isStab = move.ForceStab == true || 
+                         pokemon.HasType((PokemonType)type) || 
+                         pokemon.GetTypes(false, true).Contains((PokemonType)type);
+            
+            if (isStab)
+            {
+                stab = 1.5;
+            }
+
+            // Stellar tera type handling
+            if (pokemon.Terastallized == MoveType.Stellar)
+            {
+                if (!pokemon.StellarBoostedTypes.Contains(type) || move.StellarBoosted == true)
+                {
+                    stab = isStab ? 2.0 : 4915.0 / 4096.0;
+                    move.StellarBoosted = true;
+                    
+                    // Terapagos-Stellar doesn't consume stellar boosts
+                    if (pokemon.Species.Id != SpecieId.TerapagosStellar)
+                    {
+                        pokemon.StellarBoostedTypes.Add(type);
+                    }
+                }
+            }
+            else
+            {
+                // Regular tera type handling
+                if (pokemon.Terastallized == type && 
+                    pokemon.GetTypes(false, true).Contains((PokemonType)type))
+                {
+                    stab = 2.0;
+                }
+                
+                // Run ModifySTAB event
+                RelayVar? modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
+                    RunEventSource.FromNullablePokemon(target), move, new DecimalRelayVar((decimal)stab));
+                
+                if (modifyStabResult is DecimalRelayVar stabMod)
+                {
+                    stab = (double)stabMod.Value;
+                }
+            }
+
+            baseDamage = Battle.Modify(baseDamage, stab);
+        }
+
+        // Type effectiveness
+        int typeMod = (int)target.RunEffectiveness(move);
+        typeMod = Battle.ClampIntRange(typeMod, -6, 6);
+        hitData.TypeMod = typeMod;
+        
+        if (typeMod > 0)
+        {
+            if (!suppressMessages)
+            {
+                UiGenerator.PrintSuperEffectiveEvent(target);
+            }
+
+            for (int i = 0; i < typeMod; i++)
+            {
+                baseDamage *= 2;
+            }
+        }
+        
+        if (typeMod < 0)
+        {
+            if (!suppressMessages)
+            {
+                UiGenerator.PrintResistedEvent(target);
+            }
+
+            for (int i = 0; i > typeMod; i--)
+            {
+                baseDamage = Battle.Trunc((int)(baseDamage / 2.0));
+            }
+        }
+
+        if (isCrit && !suppressMessages)
+        {
+            UiGenerator.PrintCritEvent(target);
+        }
+
+        // Burn modifier for physical moves (except Facade and Guts users)
+        if (pokemon.Status == ConditionId.Burn && 
+            move.Category == MoveCategory.Physical && 
+            !pokemon.HasAbility(AbilityId.Guts))
+        {
+            // In Gen 6+, Facade ignores the burn modifier
+            if (move.Id != MoveId.Facade)
+            {
+                baseDamage = Battle.Modify(baseDamage, 0.5);
+            }
+        }
+
+        // Final modifier - Life Orb, etc.
+        RelayVar? finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
+            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
+        
+        if (finalModResult is IntRelayVar finalMod)
+        {
+            baseDamage = finalMod.Value;
+        }
+
+        // Minimum 1 damage check (Gen 6+)
+        if (baseDamage == 0)
+        {
+            return 1;
+        }
+
+        // 16-bit truncation (can truncate to 0)
+        return Battle.Trunc(baseDamage, 16);
+    }
 
     /// <summary>
     /// Calculates confusion self-hit damage.

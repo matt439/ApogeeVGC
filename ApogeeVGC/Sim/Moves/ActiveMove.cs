@@ -106,7 +106,7 @@ public record ActiveMove : Move, IEffect
 public record MoveHitResult
 {
     public bool Crit { get; init; }
-    public int TypeMod { get; init; }
+    public int TypeMod { get; set; }
     public bool ZBrokeProtect { get; set; }
 }
 

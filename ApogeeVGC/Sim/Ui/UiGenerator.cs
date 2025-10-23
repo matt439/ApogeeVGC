@@ -479,5 +479,18 @@ public static class UiGenerator
         Console.WriteLine($"{pokemon.Name} hit {hitCount} time(s)!");
     }
 
+    public static void PrintSuperEffectiveEvent(Pokemon pokemon)
+    {
+        Console.WriteLine("It's super effective!");
+    }
 
+    public static void PrintResistedEvent(Pokemon pokemon)
+    {
+        Console.WriteLine("It's not very effective...");
+    }
+
+    public static void PrintCritEvent(Pokemon pokemon)
+    {
+        Console.WriteLine("A critical hit!");
+    }
 }
