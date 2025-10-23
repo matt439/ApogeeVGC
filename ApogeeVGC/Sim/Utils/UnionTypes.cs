@@ -207,26 +207,6 @@ public record VoidIntVoidUnion(VoidReturn Value) : IntVoidUnion;
 
 
 /// <summary>
-/// bool | undefined | void
-/// </summary>
-public abstract record BoolUndefinedVoidUnion
-{
-    public static BoolUndefinedVoidUnion FromBool(bool value) => new BoolBoolUndefinedVoidUnion(value);
-    public static BoolUndefinedVoidUnion FromUndefined() => new UndefinedBoolUndefinedVoidUnion(new Undefined());
-    public static BoolUndefinedVoidUnion FromVoid() => new VoidUnionBoolUndefinedVoidUnion(new VoidReturn());
-    public static implicit operator BoolUndefinedVoidUnion(bool value) => new BoolBoolUndefinedVoidUnion(value);
-    public static implicit operator BoolUndefinedVoidUnion(VoidReturn value) =>
-        new VoidUnionBoolUndefinedVoidUnion(value);
-
-    public static implicit operator BoolUndefinedVoidUnion(Undefined value) =>
-        new UndefinedBoolUndefinedVoidUnion(value);
-}
-public record BoolBoolUndefinedVoidUnion(bool Value) : BoolUndefinedVoidUnion;
-public record UndefinedBoolUndefinedVoidUnion(Undefined Value) : BoolUndefinedVoidUnion;
-public record VoidUnionBoolUndefinedVoidUnion(VoidReturn Value) : BoolUndefinedVoidUnion;
-
-
-/// <summary>
 /// bool | empty | void
 /// </summary>
 public abstract record BoolEmptyVoidUnion
@@ -335,32 +315,6 @@ public record UndefinedBoolUndefinedUnion(Undefined Value) : BoolUndefinedUnion
 }
 
 
-
-
-/// <summary>
-/// bool | int | undefined | void
-/// </summary>
-public abstract record BoolIntUndefinedVoidUnion
-{
-    public static BoolIntUndefinedVoidUnion FromBool(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
-    public static BoolIntUndefinedVoidUnion FromInt(int value) => new IntBoolIntUndefinedVoidUnion(value);
-    public static BoolIntUndefinedVoidUnion FromUndefined() =>
-        new UndefinedBoolIntUndefinedVoidUnion(new Undefined());
-    public static BoolIntUndefinedVoidUnion FromVoid() => new VoidUnionBoolIntUndefinedVoidUnion(new VoidReturn());
-    public static implicit operator BoolIntUndefinedVoidUnion(bool value) => new BoolBoolIntUndefinedVoidUnion(value);
-    public static implicit operator BoolIntUndefinedVoidUnion(int value) => new IntBoolIntUndefinedVoidUnion(value);
-    public static implicit operator BoolIntUndefinedVoidUnion(VoidReturn value) =>
-        new VoidUnionBoolIntUndefinedVoidUnion(value);
-    public static implicit operator BoolIntUndefinedVoidUnion(Undefined value) =>
-        new UndefinedBoolIntUndefinedVoidUnion(value);
-}
-public record BoolBoolIntUndefinedVoidUnion(bool Value) : BoolIntUndefinedVoidUnion;
-public record IntBoolIntUndefinedVoidUnion(int Value) : BoolIntUndefinedVoidUnion;
-public record UndefinedBoolIntUndefinedVoidUnion(Undefined Value) : BoolIntUndefinedVoidUnion;
-public record VoidUnionBoolIntUndefinedVoidUnion(VoidReturn Value) : BoolIntUndefinedVoidUnion;
-
-
-
 /// <summary>
 /// bool | int | undefined
 /// </summary>
@@ -447,6 +401,10 @@ public record IntIntBoolVoidUnion(int Value) : IntBoolVoidUnion;
 public record BoolIntBoolVoidUnion(bool Value) : IntBoolVoidUnion;
 public record VoidIntBoolVoidUnion(VoidReturn Value) : IntBoolVoidUnion;
 
+
+
+
+
 /// <summary>
 /// Pokemon | Side
 /// </summary>
@@ -457,6 +415,9 @@ public abstract record PokemonSideUnion
 }
 public record PokemonSidePokemon(Pokemon Pokemon) : PokemonSideUnion;
 public record PokemonSideSide(Side Side) : PokemonSideUnion;
+
+
+
 
 /// <summary>
 /// Pokemon | Side | Field
@@ -522,8 +483,6 @@ public record PokemonSideBattlePokemon(Pokemon Pokemon) : PokemonSideBattleUnion
 public record PokemonSideBattleSide(Side Side) : PokemonSideBattleUnion;
 public record PokemonSideBattleBattle(IBattle Battle) : PokemonSideBattleUnion;
 public record PokemonSideBattleNullablePokemon(Pokemon? Pokemon) : PokemonSideBattleUnion;
-
-
 
 
 
@@ -708,6 +667,37 @@ public abstract record IntUndefinedFalseUnion
 public record IntIntUndefinedFalseUnion(int Value) : IntUndefinedFalseUnion;
 public record UndefinedIntUndefinedFalseUnion(Undefined Value) : IntUndefinedFalseUnion;
 public record FalseIntUndefinedFalseUnion : IntUndefinedFalseUnion;
+
+
+/// <summary>
+/// int | undefined | false | empty
+/// </summary>
+public abstract record IntUndefinedFalseEmptyUnion
+{
+    public static implicit operator IntUndefinedFalseEmptyUnion(int value) =>
+        new IntIntUndefinedFalseEmptyUnion(value);
+    public static implicit operator IntUndefinedFalseEmptyUnion(Undefined value) =>
+        new UndefinedIntUndefinedFalseEmptyUnion(value);
+    public static IntUndefinedFalseEmptyUnion FromFalse() => new FalseIntUndefinedFalseEmptyUnion();
+    public static IntUndefinedFalseEmptyUnion FromEmpty() => new EmptyIntUndefinedFalseEmptyUnion(new Empty());
+
+    public static IntUndefinedFalseEmptyUnion FromIntUndefinedFalseUnion(IntUndefinedFalseUnion value)
+    {
+        return value switch
+        {
+            IntIntUndefinedFalseUnion intCase => new IntIntUndefinedFalseEmptyUnion(intCase.Value),
+            UndefinedIntUndefinedFalseUnion undefinedCase =>
+                new UndefinedIntUndefinedFalseEmptyUnion(undefinedCase.Value),
+            FalseIntUndefinedFalseUnion => new FalseIntUndefinedFalseEmptyUnion(),
+            _ => throw new InvalidOperationException("Unknown IntUndefinedFalseUnion type"),
+        };
+    }
+}
+public record IntIntUndefinedFalseEmptyUnion(int Value) : IntUndefinedFalseEmptyUnion;
+public record UndefinedIntUndefinedFalseEmptyUnion(Undefined Value) : IntUndefinedFalseEmptyUnion;
+public record FalseIntUndefinedFalseEmptyUnion : IntUndefinedFalseEmptyUnion;
+public record EmptyIntUndefinedFalseEmptyUnion(Empty Value) : IntUndefinedFalseEmptyUnion;
+
 
 
 
@@ -1683,27 +1673,3 @@ public static class EffectUnionFactory
 }
 
 #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -749,16 +749,16 @@ public partial class BattleActions(IBattle battle)
         if (activeMove.Target is MoveTarget.All or MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam)
         {
             // Multi-target moves
-            IntUndefinedFalseUnion damage = TryMoveHit(targets, pokemon, activeMove);
+            IntUndefinedFalseEmptyUnion damage = TryMoveHit(targets, pokemon, activeMove);
 
             // Check for NOT_FAIL result
-            if (damage is UndefinedIntUndefinedFalseUnion)
+            if (damage is UndefinedIntUndefinedFalseEmptyUnion)
             {
                 pokemon.MoveThisTurnResult = null;
             }
             
             // Set moveResult based on damage (true if damage exists, is 0, or is undefined)
-            if (damage is IntIntUndefinedFalseUnion or UndefinedIntUndefinedFalseUnion)
+            if (damage is IntIntUndefinedFalseEmptyUnion or UndefinedIntUndefinedFalseEmptyUnion)
             {
                 moveResult = true;
             }
@@ -998,7 +998,7 @@ public partial class BattleActions(IBattle battle)
     /// <summary>
     /// NOTE: used only for moves that target sides/fields rather than pokemon
     /// </summary>
-    public IntUndefinedFalseUnion TryMoveHit(Pokemon target, Pokemon pokemon, ActiveMove move)
+    public IntUndefinedFalseEmptyUnion TryMoveHit(Pokemon target, Pokemon pokemon, ActiveMove move)
     {
         List<Pokemon> targets = [target];
         return TryMoveHit(targets, pokemon, move);
@@ -1007,7 +1007,7 @@ public partial class BattleActions(IBattle battle)
     /// <summary>
     /// NOTE: used only for moves that target sides/fields rather than pokemon
     /// </summary>
-    public IntUndefinedFalseUnion TryMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public IntUndefinedFalseEmptyUnion TryMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         Pokemon target = targets[0];
 
@@ -1042,7 +1042,7 @@ public partial class BattleActions(IBattle battle)
             {
                 return new Undefined();
             }
-            return IntUndefinedFalseUnion.FromFalse();
+            return IntUndefinedFalseEmptyUnion.FromFalse();
         }
         
         if (move.Target == MoveTarget.All)
@@ -1063,10 +1063,10 @@ public partial class BattleActions(IBattle battle)
                 UiGenerator.PrintFailEvent(pokemon);
             }
             Battle.AttrLastMove("[still]");
-            return IntUndefinedFalseUnion.FromFalse();
+            return IntUndefinedFalseEmptyUnion.FromFalse();
         }
 
-        return MoveHit(target, pokemon, move);
+        return IntUndefinedFalseEmptyUnion.FromIntUndefinedFalseUnion(MoveHit(target, pokemon, move));
     }
 
     public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets, Pokemon pokemon,
@@ -1920,6 +1920,27 @@ public partial class BattleActions(IBattle battle)
         return _choosableTargets.Contains(type);
     }
 
+    //combineResults<T extends number | boolean | null | '' | undefined,
+    //U extends number | boolean | null | '' | undefined>(
+    //left: T, right: U
+    //): T | U {
+    //    const NOT_FAILURE = 'string';
+    //    const NULL = 'object';
+    //    const resultsPriorities = ['undefined', NOT_FAILURE, NULL, 'boolean', 'number'];
+    //    if (resultsPriorities.indexOf(typeof left) > resultsPriorities.indexOf(typeof right)) {
+    //        return left;
+    //    } else if (left && !right && right !== 0) {
+    //        return left;
+    //    } else if (typeof left === 'number' && typeof right === 'number')
+    //    {
+    //        return (left + right) as T;
+    //    }
+    //    else
+    //    {
+    //        return right;
+    //    }
+    //}
+
     /// <summary>
     /// Combines two move result values based on priority.
     /// Used to aggregate results across multiple targets.
@@ -1929,12 +1950,12 @@ public partial class BattleActions(IBattle battle)
     /// <param name="left">First result value</param>
     /// <param name="right">Second result value</param>
     /// <returns>Combined result with the higher priority, or sum if both are numbers</returns>
-    public static BoolIntUndefinedUnion CombineResults(
-        BoolIntUndefinedUnion? left,
-        BoolIntUndefinedUnion? right)
+    public static BoolIntEmptyUndefinedUnion CombineResults(
+        BoolIntEmptyUndefinedUnion? left,
+        BoolIntEmptyUndefinedUnion? right)
     {
         // Handle null inputs
-        if (left == null && right == null) return BoolIntUndefinedUnion.FromUndefined();
+        if (left == null && right == null) return BoolIntEmptyUndefinedUnion.FromUndefined();
         if (left == null) return right!;
         if (right == null) return left;
 
@@ -1954,25 +1975,25 @@ public partial class BattleActions(IBattle battle)
         }
 
         // If both are numbers, sum them
-        if (left is IntBoolIntUndefinedUnion leftInt &&
-            right is IntBoolIntUndefinedUnion rightInt)
+        if (left is IntBoolIntEmptyUndefinedUnion leftInt &&
+            right is IntBoolIntEmptyUndefinedUnion rightInt)
         {
-            return BoolIntUndefinedUnion.FromInt(leftInt.Value + rightInt.Value);
+            return BoolIntEmptyUndefinedUnion.FromInt(leftInt.Value + rightInt.Value);
         }
 
         // Otherwise return right
         return right;
 
         // Priority mapping (lower number = higher priority)
-        int GetPriority(BoolIntUndefinedUnion value)
+        int GetPriority(BoolIntEmptyUndefinedUnion? value)
         {
             return value switch
             {
-                UndefinedBoolIntUndefinedUnion => 0,        // undefined (highest)
-                // string/"NOT_FAILURE" case not in our union, would be priority 1
-                // null case not in our union, would be priority 2
-                BoolBoolIntUndefinedUnion => 3,              // boolean
-                IntBoolIntUndefinedUnion => 4,               // number (lowest)
+                UndefinedBoolIntEmptyUndefinedUnion => 0,        // undefined (highest)
+                EmptyBoolIntEmptyUndefinedUnion => 1,                    // string (success)
+                null => 2,                                      // null
+                BoolBoolIntEmptyUndefinedUnion => 3,              // boolean
+                IntBoolIntEmptyUndefinedUnion => 4,               // number (lowest)
                 _ => 5,
             };
         }
