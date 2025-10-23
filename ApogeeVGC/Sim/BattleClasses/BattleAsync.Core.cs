@@ -4084,6 +4084,11 @@ public partial class BattleAsync : IBattle, IDisposable
         return (num / divisor) * divisor;
     }
 
+    public int Trunc(double num, int bits = 0)
+    {
+        return Trunc((int)Math.Floor(num), bits);
+    }
+
     public int ClampIntRange(int num, int? min, int? max)
     {
         if (num < min)

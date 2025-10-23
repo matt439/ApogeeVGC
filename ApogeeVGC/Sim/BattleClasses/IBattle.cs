@@ -108,6 +108,8 @@ public interface IBattle
 
     int Trunc(int num, int bits = 0);
 
+    int Trunc(double num, int bits = 0);
+
     bool RandomChance(int numerator, int denominator);
 
     /// <summary>
