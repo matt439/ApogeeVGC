@@ -38,8 +38,11 @@ public record Abilities
                     if (battle.EffectState.Unnerved is true) return;
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintAbilityEvent(pokemon, "As One");
-                        UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
+                        //UiGenerator.PrintAbilityEvent(pokemon, "As One");
+                        //UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
+
+                        battle.Add("-ability", pokemon, "As One");
+                        battle.Add("-ability", pokemon, "Unnerve");
                     }
                     battle.EffectState.Unnerved = true;
                 },
@@ -79,18 +82,18 @@ public record Abilities
                     {
                         if (battle.DisplayUi)
                         {
-                            UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
+                            //UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
+
+                            battle.Add("-activate", pokemon, "ability: Hadron Engine");
                         }
                     }
                 },
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, _, _, _) =>
                 {
-                    if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
-                    {
-                        return battle.ChainModify([5461, 4096]);
-                    }
-                    return new VoidReturn();
+                    if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null)) return new VoidReturn();
+                    battle.Debug("Hadron Engine boost");
+                    return battle.ChainModify([5461, 4096]);
                 },
             },
             [AbilityId.Guts] = new()
@@ -164,14 +167,20 @@ public record Abilities
                         pokemon.RemoveVolatile(quarkDrive);
                     }
                 },
-                OnEnd = (_, pokemon) =>
+                OnEnd = (battle, pokemon) =>
                 {
                     if (pokemon is not PokemonSideFieldPokemon pok)
                     {
                         throw new ArgumentException("Expecting a Pokemon here.");
                     }
                     pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
-                    UiGenerator.PrintEndEvent(pok.Pokemon, _library.Abilities[pok.Pokemon.Ability]);
+
+                    if (battle.DisplayUi)
+                    {
+                        //UiGenerator.PrintEndEvent(pok.Pokemon, _library.Abilities[pok.Pokemon.Ability]);
+
+                        battle.Add("-end", pok.Pokemon, "Quark Drive", "[silent]");
+                    }
                 },
                 Flags = new AbilityFlags
                 {

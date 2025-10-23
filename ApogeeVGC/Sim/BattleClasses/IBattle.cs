@@ -24,7 +24,6 @@ public interface IBattle
 
     Library Library { get; }
 
-    //Random Random { get; }
     bool DisplayUi { get; }
     Field Field { get; }
 
