@@ -18,8 +18,8 @@ public static class SideIdTools
     {
         return sideId switch
         {
-            SideId.P1 => "P1",
-            SideId.P2 => "P2",
+            SideId.P1 => "p1",
+            SideId.P2 => "p2",
             _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid SideId."),
         };
     }

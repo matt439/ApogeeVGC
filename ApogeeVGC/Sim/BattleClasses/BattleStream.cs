@@ -25,7 +25,7 @@ public class BattleStream : IDisposable
     public bool KeepAlive { get; }
     public BattleReplayMode Replay { get; }
     private BattleAsync? Battle { get; set; }
-    private Library Library { get; set; }
+    private Library Library { get; }
 
     public BattleStream(Library lib, BattleStreamOptions? options = null)
     {

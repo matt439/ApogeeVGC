@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -858,6 +859,36 @@ public abstract record MoveIdIntUnion
 public record MoveIdMoveIdIntUnion(MoveId MoveId) : MoveIdIntUnion;
 public record IntMoveIdIntUnion(int Value) : MoveIdIntUnion;
 
+
+
+
+/// <summary>
+/// string | number | Delegate | object
+/// Represents arguments for the addMove method that can be strings, numbers, functions, or arbitrary objects.
+/// Maps to TypeScript: (string | number | Function | AnyObject)
+/// </summary>
+public abstract record StringNumberDelegateObjectUnion
+{
+    public static implicit operator StringNumberDelegateObjectUnion(string value) =>
+        new StringStringNumberDelegateObjectUnion(value);
+    public static implicit operator StringNumberDelegateObjectUnion(int value) =>
+        new IntStringNumberDelegateObjectUnion(value);
+    public static implicit operator StringNumberDelegateObjectUnion(double value) =>
+        new DoubleStringNumberDelegateObjectUnion(value);
+    public static implicit operator StringNumberDelegateObjectUnion(Delegate del) =>
+        new DelegateStringNumberDelegateObjectUnion(del);
+
+    // Factory method for explicit object creation
+    public static StringNumberDelegateObjectUnion FromObject(object obj) =>
+        new ObjectStringNumberDelegateObjectUnion(obj);
+}
+
+public record StringStringNumberDelegateObjectUnion(string Value) : StringNumberDelegateObjectUnion;
+public record IntStringNumberDelegateObjectUnion(int Value) : StringNumberDelegateObjectUnion;
+public record DoubleStringNumberDelegateObjectUnion(double Value) : StringNumberDelegateObjectUnion;
+public record DelegateStringNumberDelegateObjectUnion(Delegate Delegate) : StringNumberDelegateObjectUnion;
+public record ObjectStringNumberDelegateObjectUnion(object Object) : StringNumberDelegateObjectUnion;
+
 #endregion
 
 
@@ -1663,6 +1694,94 @@ public record BoolFormatHasValue(bool Value) : FormatHasValue;
 public record IntegerFormatHasValue : FormatHasValue;
 public record PositiveIntegerFormatHasValue : FormatHasValue;
 
+
+
+/// <summary>
+/// string | number | boolean | Pokemon | Side | Effect | Move | undefined
+/// </summary>
+public abstract record Part
+{
+    public static implicit operator Part(string value) => new StringPart(value);
+    public static implicit operator Part(int value) => new IntPart(value);
+    public static implicit operator Part(double value) => new DoublePart(value);
+    public static implicit operator Part(bool value) => new BoolPart(value);
+    public static implicit operator Part(Pokemon pokemon) => new PokemonPart(pokemon);
+    public static implicit operator Part(Side side) => new SidePart(side);
+    public static implicit operator Part(ActiveMove move) => new MovePart(move);
+
+    public static implicit operator Part(Item item) => EffectUnionFactory.ToPart(item);
+    public static implicit operator Part(Ability ability) => EffectUnionFactory.ToPart(ability);
+    public static implicit operator Part(Species species) => EffectUnionFactory.ToPart(species);
+    public static implicit operator Part(Condition condition) => EffectUnionFactory.ToPart(condition);
+    public static implicit operator Part(Format format) => EffectUnionFactory.ToPart(format);
+
+    public static Part FromUndefined() => new UndefinedPart(new Undefined());
+
+    public static implicit operator Part(Undefined value) => new UndefinedPart(value);
+
+    public static Part? FromNullable<T>(T? value) where T : class
+    {
+        return value switch
+        {
+            null => null,
+            string s => new StringPart(s),
+            Pokemon p => new PokemonPart(p),
+            Side s => new SidePart(s),
+            ActiveMove m => new MovePart(m),
+            IEffect e => new EffectPart(e),
+            _ => throw new InvalidOperationException($"Unsupported type: {typeof(T)}"),
+        };
+    }
+}
+public record StringPart(string Value) : Part;
+public record IntPart(int Value) : Part;
+public record DoublePart(double Value) : Part;
+public record BoolPart(bool Value) : Part;
+public record PokemonPart(Pokemon Pokemon) : Part;
+public record SidePart(Side Side) : Part;
+public record MovePart(ActiveMove Move) : Part;
+public record EffectPart(IEffect Effect) : Part;
+public record UndefinedPart(Undefined Value) : Part;
+
+
+
+
+/// <summary>
+/// Part | (() => { side: SideID, secret: string, shared: string })
+/// Represents a battle log part that can be either a direct value or a function that generates side-specific content.
+/// </summary>
+public abstract record PartFuncUnion
+{
+    public static implicit operator PartFuncUnion(Part part) => new PartPartFuncUnion(part);
+    public static implicit operator PartFuncUnion(Func<SideSecretSharedResult> func) =>
+        new FuncPartFuncUnion(func);
+
+    // Convenience implicit conversions for Part types
+    public static implicit operator PartFuncUnion(string value) => new PartPartFuncUnion(value);
+    public static implicit operator PartFuncUnion(int value) => new PartPartFuncUnion(value);
+    public static implicit operator PartFuncUnion(double value) => new PartPartFuncUnion(value);
+    public static implicit operator PartFuncUnion(bool value) => new PartPartFuncUnion(value);
+    public static implicit operator PartFuncUnion(Pokemon pokemon) => new PartPartFuncUnion(pokemon);
+    public static implicit operator PartFuncUnion(Side side) => new PartPartFuncUnion(side);
+    public static implicit operator PartFuncUnion(ActiveMove move) => new PartPartFuncUnion(move);
+    public static implicit operator PartFuncUnion(Undefined value) => new PartPartFuncUnion(value);
+
+    public static implicit operator PartFuncUnion(Item item) => EffectUnionFactory.ToPart(item);
+    public static implicit operator PartFuncUnion(Ability ability) => EffectUnionFactory.ToPart(ability);
+    public static implicit operator PartFuncUnion(Species species) => EffectUnionFactory.ToPart(species);
+    public static implicit operator PartFuncUnion(Condition condition) => EffectUnionFactory.ToPart(condition);
+    public static implicit operator PartFuncUnion(Format format) => EffectUnionFactory.ToPart(format);
+}
+
+public record PartPartFuncUnion(Part Part) : PartFuncUnion;
+public record FuncPartFuncUnion(Func<SideSecretSharedResult> Func) : PartFuncUnion;
+
+/// <summary>
+/// Represents the result of a side-specific content generation function.
+/// Maps to TypeScript: { side: SideID, secret: string, shared: string }
+/// </summary>
+public record SideSecretSharedResult(SideId Side, string Secret, string Shared);
+
 #endregion
 
 
@@ -1694,6 +1813,17 @@ public static class EffectUnionFactory
         Condition condition => new EffectRelayVar(condition),
         Format format => new EffectRelayVar(format),
         _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to RelayVar"),
+    };
+
+    public static Part ToPart(IEffect effect) => effect switch
+    {
+        Ability ability => new EffectPart(ability),
+        Item item => new EffectPart(item),
+        ActiveMove activeMove => new EffectPart(activeMove),
+        Species specie => new EffectPart(specie),
+        Condition condition => new EffectPart(condition),
+        Format format => new EffectPart(format),
+        _ => throw new InvalidOperationException($"Cannot convert {effect.GetType()} to Part"),
     };
 }
 

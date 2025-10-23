@@ -13,6 +13,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System;
+using System.Drawing;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -3355,6 +3357,36 @@ public partial class BattleAsync : IBattle, IDisposable
         }
     }
 
+    //undoChoice(sideid: SideID)
+    //{
+    //    const side = this.getSide(sideid);
+    //    if (!side.requestState) return;
+
+    //    if (side.choice.cantUndo)
+    //    {
+    //        side.emitChoiceError(`Can't undo: A trapping/disabling effect would cause undo to leak information`);
+
+    //        return;
+    //    }
+
+    //    let updated = false;
+    //    if (side.requestState === 'move')
+    //    {
+    //        for (const action of side.choice.actions) {
+    //            const pokemon = action.pokemon;
+    //            if (action.choice !== 'move' || !pokemon) continue;
+    //            if (side.updateRequestForPokemon(pokemon, req => side.updateDisabledRequest(pokemon, req)))
+    //            {
+    //                updated = true;
+    //            }
+    //        }
+    //    }
+
+    //    side.clearChoice();
+
+    //    if (updated) side.emitRequest(side.activeRequest!, true);
+    //}
+
     public void UndoChoice(SideId sideId)
     {
         Side side = GetSide(sideId);
@@ -3376,7 +3408,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // If undoing a move selection, update disabled moves for each Pokémon
         if (RequestState == RequestState.Move)
         {
-            foreach (IActionChoice action in side.GetChoice().Actions)
+            foreach (ChosenAction action in side.GetChoice().Actions)
             {
                 // Extract Pokémon from the action (could be MoveAction, SwitchAction, etc.)
                 Pokemon? pokemon = action switch
@@ -3437,13 +3469,6 @@ public partial class BattleAsync : IBattle, IDisposable
         return totalActions >= Sides.Count;
     }
 
-    /// <summary>
-    /// Sends a hint message to be displayed in the battle log.
-    /// Hints are typically used for warnings, clarifications, or educational messages.
-    /// </summary>
-    /// <param name="hint">The hint text to display</param>
-    /// <param name="once">If true, the hint will only be shown once per battle</param>
-    /// <param name="side">If specified, the hint is only visible to that side</param>
     public void Hint(string hint, bool once = false, Side? side = null)
     {
         // Create a unique key for this hint
@@ -3466,120 +3491,90 @@ public partial class BattleAsync : IBattle, IDisposable
         if (once) Hints.Add(hintKey);
     }
 
-    /// <summary>
-    /// Adds a split message to the battle log.
-    /// Split messages show different content to each player (for hidden information like damage rolls).
-    /// Format: "| split |[sideId]" followed by secret line(s), then shared line(s).
-    /// </summary>
-    /// <param name="side">The side that can see the secret information</param>
-    /// <param name="secret">Message parts visible only to the specified side</param>
-    /// <param name="shared">Message parts visible to everyone (optional)</param>
-    public void AddSplit(SideId side, List<string> secret, List<string>? shared = null)
+    public void AddSplit(SideId side, Part[] secret, Part[]? shared = null)
     {
-        // Add the split marker
+        // Add the split marker with the side ID
         Log.Add($"| split |{side}");
 
-        // Add the secret message (visible only to specified side)
-        Add(secret.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
+        // Add the secret parts (visible only to the specified side)
+        Add(secret.Select(p => (PartFuncUnion)p).ToArray());
 
-        // Add the shared message (visible to everyone)
-        if (shared != null)
+        // Add the shared parts (visible to all sides) or empty line
+        if (shared is { Length: > 0 })
         {
-            Add(shared.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
+            Add(shared.Select(p => (PartFuncUnion)p).ToArray());
         }
         else
         {
-            // Empty line indicates no shared content
             Log.Add(string.Empty);
         }
     }
 
-    /// <summary>
-    /// Adds a message to the battle log.
-    /// Supports both simple string parts and functions that generate split messages.
-    /// Parts are joined with '|' separators according to the Showdown protocol.
-    /// </summary>
-    /// <param name="parts">
-    /// Message parts to add. Can be strings or functions that return split message data.
-    /// Functions should return a tuple of (SideId side, string secret, string shared).
-    /// </param>
-    public void Add(params ILogPart[] parts)
+    public void Add(params PartFuncUnion[] parts)
     {
-        // Check if any parts are functions (for split messages)
-        bool hasFunctions = parts.Any(part => part is FunctionLogPart);
+        // Check if any part is a function that generates side-specific content
+        bool hasFunction = parts.Any(part => part is FuncPartFuncUnion);
 
-        if (!hasFunctions)
+        if (!hasFunction)
         {
-            // Simple case: just join the parts with pipes
-            string message = $"|{string.Join("|", parts)}";
+            // Simple case: all parts are direct values
+            // Extract Part from PartPartFuncUnion before formatting
+            string message = $"|{string.Join("|", parts.Select(FormatPartFuncUnion))}";
             Log.Add(message);
             return;
         }
 
-        // Complex case: process functions to create split messages
+        // Complex case: some parts are functions
         SideId? side = null;
         var secret = new List<string>();
         var shared = new List<string>();
 
-        foreach (ILogPart part in parts)
+        foreach (PartFuncUnion part in parts)
         {
-            if (part is FunctionLogPart funcPart)
+            if (part is FuncPartFuncUnion funcPart)
             {
-                // Execute the function to get split message data
-                var split = funcPart.Generator();
+                // Execute the function to get side-specific content
+                SideSecretSharedResult result = funcPart.Func();
 
-                // Verify all functions target the same side
-                if (side != null && side != split.Item1)
+                // Validate that all functions use the same side
+                if (side.HasValue && side.Value != result.Side)
                 {
-                    throw new InvalidOperationException("Multiple sides passed to Add");
+                    throw new InvalidOperationException("Multiple sides passed to add");
                 }
 
-                side = split.Item1;
-                secret.Add(split.Item2);
-                shared.Add(split.Item3);
+                side = result.Side;
+                secret.Add(result.Secret);
+                shared.Add(result.Shared);
             }
-            else
+            else if (part is PartPartFuncUnion directPart)
             {
-                // Non-function parts go to both secret and shared
-                string partStr = part.ToString() ?? string.Empty;
-                secret.Add(partStr);
-                shared.Add(partStr);
+                // Direct value: add to both secret and shared
+                string formatted = FormatPart(directPart.Part);
+                secret.Add(formatted);
+                shared.Add(formatted);
             }
         }
 
-        // Create the split message
-        AddSplit(side!.Value, secret, shared);
+        // Add the split message
+        if (side.HasValue)
+        {
+            AddSplit(side.Value,
+                secret.Select(Part (s) => new StringPart(s)).ToArray(),
+                shared.Select(Part (s) => new StringPart(s)).ToArray());
+        }
     }
 
-    /// <summary>
-    /// Convenience overload for adding simple string messages.
-    /// </summary>
-    public void Add(params string[] parts)
-    {
-        Add(parts.Select(s => new StringLogPart(s)).Cast<ILogPart>().ToArray());
-    }
-
-    /// <summary>
-    /// Adds a move usage line to the battle log.
-    /// This is tracked separately so attributes can be added to it via AttrLastMove().
-    /// </summary>
-    /// <param name="args">Message parts describing the move usage (pokemon, move, target, etc.)</param>
-    public void AddMove(params object[] args)
+    public void AddMove(params StringNumberDelegateObjectUnion[] args)
     {
         // Track this line's position for later attribute additions
         LastMoveLine = Log.Count;
 
-        // Add the move line to the log
-        string message = $"|{string.Join("|", args)}";
+        // Format and add the move line to the log
+        string message = $"|{string.Join("|", args.Select(FormatArg))}";
         Log.Add(message);
     }
 
-    /// <summary>
-    /// Adds attributes to the most recently logged move.
-    /// Used to add tags like [still] (no animation), [miss], etc.
-    /// </summary>
-    /// <param name="args">Attribute parts to append to the last move line</param>
-    public void AttrLastMove(params string[] args)
+    public void AttrLastMove(params StringNumberDelegateObjectUnion[] args)
     {
         // No last move to attribute to
         if (LastMoveLine < 0) return;
@@ -3587,7 +3582,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // Special handling for animation lines with [still]
         if (Log[LastMoveLine].StartsWith("|-anim|"))
         {
-            if (args.Contains("[still]"))
+            if (args.Any(arg => FormatArg(arg) == "[still]"))
             {
                 // Remove the animation line entirely
                 Log.RemoveAt(LastMoveLine);
@@ -3595,7 +3590,7 @@ public partial class BattleAsync : IBattle, IDisposable
                 return;
             }
         }
-        else if (args.Contains("[still]"))
+        else if (args.Any(arg => FormatArg(arg) == "[still]"))
         {
             // If no animation plays, hide the target (index 4) to prevent information leak
             string[] parts = Log[LastMoveLine].Split('|');
@@ -3607,8 +3602,46 @@ public partial class BattleAsync : IBattle, IDisposable
         }
 
         // Append the attributes to the last move line
-        string attributes = $"|{string.Join("|", args)}";
+        string attributes = $"|{string.Join("|", args.Select(FormatArg))}";
         Log[LastMoveLine] += attributes;
+    }
+
+    /// <summary>
+    /// Formats a Part for output to the battle log.
+    /// Converts various Part types to their string representations.
+    /// </summary>
+    private static string FormatPart(Part part)
+    {
+        return part switch
+        {
+            StringPart s => s.Value,
+            IntPart i => i.Value.ToString(),
+            DoublePart d => d.Value.ToString("F"),
+            BoolPart b => b.Value.ToString().ToLowerInvariant(),
+            PokemonPart p => p.Pokemon.ToString(),
+            SidePart s => s.Side.Id.ToString(),
+            MovePart m => m.Move.Name,
+            EffectPart e => e.Effect.Name,
+            UndefinedPart => "undefined",
+            _ => string.Empty,
+        };
+    }
+
+    /// <summary>
+    /// Formats a StringNumberDelegateObjectUnion argument for output.
+    /// Converts various union types to their string representations.
+    /// </summary>
+    private static string FormatArg(StringNumberDelegateObjectUnion arg)
+    {
+        return arg switch
+        {
+            StringStringNumberDelegateObjectUnion s => s.Value,
+            IntStringNumberDelegateObjectUnion i => i.Value.ToString(),
+            DoubleStringNumberDelegateObjectUnion d => d.Value.ToString("F"),
+            DelegateStringNumberDelegateObjectUnion del => del.Delegate.Method.Name,
+            ObjectStringNumberDelegateObjectUnion obj => obj.Object.ToString() ?? string.Empty,
+            _ => string.Empty,
+        };
     }
 
     /// <summary>
@@ -4104,6 +4137,22 @@ public partial class BattleAsync : IBattle, IDisposable
     }
 
     #region Helpers
+
+    /// <summary>
+    /// Formats a PartFuncUnion for output to the battle log.
+    /// Extracts the Part from PartPartFuncUnion and formats it.
+    /// </summary>
+    private static string FormatPartFuncUnion(PartFuncUnion partFuncUnion)
+    {
+        return partFuncUnion switch
+        {
+            PartPartFuncUnion p => FormatPart(p.Part),
+            FuncPartFuncUnion => throw new InvalidOperationException(
+                "Cannot format a function PartFuncUnion directly. This should be handled in the Add method."),
+            _ => string.Empty,
+        };
+    }
+
 
     /// <summary>
     /// Invokes a DelegateEffectDelegate by attempting common delegate signatures.

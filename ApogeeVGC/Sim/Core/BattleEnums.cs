@@ -31,25 +31,3 @@ public enum RequestState
     None,
 }
 
-public enum PlayerState
-{
-    TeamPreviewSelect,
-    TeamPreviewLocked,
-    MoveSwitchSelect,
-    MoveSwitchLocked,
-    FaintedSelect,
-    FaintedLocked,
-    ForceSwitchSelect,
-    ForceSwitchLocked,
-    //TagetSelect,
-    //TargetLocked,
-    // TODO: Implement these above states
-    Idle,
-}
-
-//public enum MoveAction
-//{
-//    None,
-//    SwitchAttackerOut,
-//}
-

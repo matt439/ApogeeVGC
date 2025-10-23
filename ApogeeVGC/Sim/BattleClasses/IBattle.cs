@@ -9,7 +9,6 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -211,7 +210,7 @@ public interface IBattle
 
     void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null);
 
-    void AttrLastMove(params string[] args);
+    void AttrLastMove(params StringNumberDelegateObjectUnion[] args);
 
     int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null, IEffect? effect = null);
 
@@ -221,8 +220,4 @@ public interface IBattle
     int HitSubstitute { get; }
 
     void Debug(string activity);
-
-    void SetPlayer(SideId slot, PlayerOptions options);
-
-    void ResetRng(PrngSeed? seed = null);
 }
