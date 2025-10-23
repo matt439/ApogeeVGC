@@ -245,5 +245,7 @@ public interface IBattle
 
     void Add(params PartFuncUnion[] parts);
 
+    void AddMove(params StringNumberDelegateObjectUnion[] args);
+
     void ShowOpenTeamSheets();
 }

@@ -5,7 +5,6 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Data;
@@ -53,38 +52,26 @@ public record Conditions
                                                         $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
                     }
 
-                    bool debug = battle.DisplayUi;
-                    if (!debug) return new VoidReturn();
-
-                    Condition burn = _library.Conditions[ConditionId.Burn];
+                    if (!battle.DisplayUi) return new VoidReturn();
 
                     switch (sourceEffect.EffectType)
                     {
                         case EffectType.Item:
                             if (sourceEffect is Item { Id: ItemId.FlameOrb })
                             {
-                                UiGenerator.PrintStatusEvent(target, burn, sourceEffect);
+                                battle.Add("-status", target, "brn", "[from] item: Flame Orb");
                             }
                             break;
                         case EffectType.Ability:
-                            if (sourceEffect is Ability ability)
+                            if (sourceEffect is Ability)
                             {
-                                UiGenerator.PrintStatusEvent(target, burn, ability, source);
+                                battle.Add("-status", target, "brn", "[from] ability: " +
+                                    sourceEffect.Name, $"[of] {source}");
                             }
                             break;
                         case EffectType.Move:
-                            UiGenerator.PrintStatusEvent(target, burn);
+                            battle.Add("-status", target, "brn");
                             break;
-                        case EffectType.Specie:
-                        case EffectType.Condition:
-                        case EffectType.Format:
-                            throw new InvalidOperationException($"Effect type {sourceEffect.EffectType} cannot" +
-                                                                $"apply {ConditionId.Burn} to" +
-                                                                $"pokemon {target.Name}.");
-                        default:
-                            throw new InvalidOperationException($"Unknown effect type {sourceEffect.EffectType}" +
-                                                                $"when trying to apply {ConditionId.Burn} to" +
-                                                                $"pokemon {target.Name}.");
                     }
                     return new VoidReturn();
                 },
@@ -104,15 +91,14 @@ public record Conditions
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    Condition paralysis = _library.Conditions[ConditionId.Paralysis];
-
-                    if (sourceEffect is Ability ability)
+                    if (sourceEffect is Ability)
                     {
-                        UiGenerator.PrintStatusEvent(target, paralysis, ability, source);
+                        battle.Add("-status", target, "par", "[from] ability: " + sourceEffect.Name,
+                            $"[of] {source}");
                     }
                     else
                     {
-                        UiGenerator.PrintStatusEvent(target, paralysis);
+                        battle.Add("-status", target, "par");
                     }
                     return new VoidReturn();
                 },
@@ -132,7 +118,7 @@ public record Conditions
                     if (!battle.RandomChance(1, 4)) return new VoidReturn();
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Paralysis]);
+                        battle.Add("cant", pokemon, "par");
                     }
                     return false;
                 },
@@ -146,17 +132,17 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        Condition sleep = _library.Conditions[ConditionId.Sleep];
                         switch (sourceEffect)
                         {
-                            case Ability ability:
-                                UiGenerator.PrintStatusEvent(target, sleep, ability, source);
+                            case Ability:
+                                battle.Add("-status", target, "slp", "[from] ability: " +
+                                    sourceEffect.Name, $"[of] {source}");
                                 break;
-                            case ActiveMove move:
-                                UiGenerator.PrintStatusEvent(target, sleep, move);
+                            case ActiveMove:
+                                battle.Add("-status", target, "slp", $"[from] move: {sourceEffect.Name}");
                                 break;
                             default:
-                                UiGenerator.PrintStatusEvent(target, sleep);
+                                battle.Add("-status", target, "slp");
                                 break;
                         }
                     }
@@ -170,7 +156,7 @@ public record Conditions
 
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintEndEvent(target, nightmare);
+                        battle.Add("-end", target, "Nightmare", "[silent]");
                     }
                     return new VoidReturn();
                 },
@@ -191,7 +177,7 @@ public record Conditions
                     }
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Sleep]);
+                        battle.Add("cant", pokemon, "slp");
                     }
                     if (move.SleepUsable ?? false)
                     {
@@ -210,14 +196,14 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        Condition freeze = _library.Conditions[ConditionId.Freeze];
                         switch (sourceEffect)
                         {
-                            case Ability ability:
-                                UiGenerator.PrintStatusEvent(target, freeze, ability, source);
+                            case Ability:
+                                battle.Add("-status", target, "frz", "[from] ability: " +
+                                    sourceEffect.Name, $"[of] {source}");
                                 break;
                             default:
-                                UiGenerator.PrintStatusEvent(target, freeze);
+                                battle.Add("-status", target, "frz");
                                 break;
                         }
                     }
@@ -244,7 +230,7 @@ public record Conditions
                     }
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Freeze]);
+                        battle.Add("cant", pokemon, "frz");
                     }
                     return false;
                 },
@@ -253,7 +239,7 @@ public record Conditions
                     if (!(move.Flags.Defrost ?? false)) return;
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintCureStatusEvent(pokemon, _library.Conditions[ConditionId.Freeze], move);
+                        battle.Add("-curestatus", pokemon, "frz", $"[from] move: {move}");
                     }
                     pokemon.ClearStatus();
                 },
@@ -283,15 +269,14 @@ public record Conditions
                 {
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    Condition poison = _library.Conditions[ConditionId.Poison];
-
                     if (sourceEffect.EffectType == EffectType.Ability)
                     {
-                        UiGenerator.PrintStatusEvent(target, poison, sourceEffect, source);
+                        battle.Add("-status", target, "psn", "[from] ability: " +
+                            sourceEffect.Name, $"[of] {source}");
                     }
                     else
                     {
-                        UiGenerator.PrintStatusEvent(target, poison);
+                        battle.Add("-status", target, "psn");
                     }
                     return new VoidReturn();
                 },
@@ -307,17 +292,17 @@ public record Conditions
                     battle.EffectState.Stage = 0;
                     if (!battle.DisplayUi) return new VoidReturn();
 
-                    Condition toxic = _library.Conditions[ConditionId.Toxic];
                     switch (sourceEffect)
                     {
                         case Item { Id: ItemId.ToxicOrb }:
-                            UiGenerator.PrintStatusEvent(target, toxic, sourceEffect);
+                            battle.Add("-status", target, "tox", "[from] item: Toxic Orb");
                             break;
-                        case Ability ability:
-                            UiGenerator.PrintStatusEvent(target, toxic, ability, source);
+                        case Ability:
+                            battle.Add("-status", target, "tox", "[from] ability: " +
+                                                                 sourceEffect.Name, $"[of] {source}");
                             break;
                         default:
-                            UiGenerator.PrintStatusEvent(target, toxic);
+                            battle.Add("-status", target, "tox");
                             break;
                     }
                     return new VoidReturn();
@@ -346,19 +331,17 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        Condition confusion = _library.Conditions[ConditionId.Confusion];
                         switch (sourceEffect)
                         {
                             case Condition { Id: ConditionId.LockedMove }:
-                                UiGenerator.PrintStartEvent(target, confusion,
-                                    _library.Conditions[ConditionId.LockedMove]);
+                                battle.Add("-start", target, "confusion", "[fatigue]");
                                 break;
-                            case Ability ability:
-                                UiGenerator.PrintStartEvent(target, confusion, ability,
-                                    source);
+                            case Ability:
+                                battle.Add("-start", target, "confusion", "[from] ability: " +
+                                    sourceEffect.Name, $"[of] {source}");
                                 break;
                             default:
-                                UiGenerator.PrintStartEvent(target, confusion);
+                                battle.Add("-start", target, "confusion");
                                 break;
                         }
                     }
@@ -374,7 +357,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintEndEvent(target, _library.Conditions[ConditionId.Confusion]);
+                        battle.Add("-end", target, "confusion");
                     }
                 },
                 OnBeforeMovePriority = 3,
@@ -388,7 +371,7 @@ public record Conditions
                     }
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintActivateEvent(pokemon, _library.Conditions[ConditionId.Confusion]);
+                        battle.Add("-activate", pokemon, "confusion");
                     }
                     if (!battle.RandomChance(33, 100))
                     {
@@ -421,7 +404,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintCantEvent(pokemon, _library.Conditions[ConditionId.Flinch]);
+                        battle.Add("cant", pokemon, "flinch");
                     }
                     battle.RunEvent(EventId.Flinch, pokemon);
                     return false;
@@ -462,10 +445,12 @@ public record Conditions
                         move.Id == battle.EffectState.Move ||
                         move.Id == MoveId.Struggle) return new VoidReturn();
 
-                    if (battle.DisplayUi)
-                    {
-                        UiGenerator.PrintFailEvent(pokemon);
-                    }
+                    if (!battle.DisplayUi) return false;
+
+                    battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), move.Name);
+                    battle.AttrLastMove("[still]");
+                    battle.Debug("Disabled by Choice item lock");
+                    battle.Add("-fail", pokemon);
                     return false;
                 },
                 OnDisableMove = (battle, pokemon) =>
@@ -476,10 +461,7 @@ public record Conditions
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return;
                     }
-                    if (pokemon.IgnoringItem())
-                    {
-                        return;
-                    }
+                    if (pokemon.IgnoringItem()) return;
 
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
                                  moveSlot.Move != battle.EffectState.Move))
@@ -499,7 +481,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintStartEvent(target, _library.Moves[MoveId.LeechSeed].ToActiveMove());
+                        battle.Add("-start", target, "move: Leech Seed");
                     }
                     return new VoidReturn();
                 },
@@ -509,10 +491,15 @@ public record Conditions
                     Pokemon? target = battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
                     if (target is null || target.Fainted || target.Hp <= 0)
                     {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Nothing to leech into");
+                        }
                         return;
                     }
+                    IntFalseUndefinedUnion damage =
+                        battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
 
-                    IntFalseUndefinedUnion damage = battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
                     if (damage is IntIntFalseUndefined d)
                     {
                         battle.Heal(d.Value, target, pokemon);
@@ -530,8 +517,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintFieldStartEvent(_library.Conditions[ConditionId.TrickRoom], 
-                            null, source);
+                        battle.Add("-fieldstart", "move: Trick Room", $"[of] {source}");
                     }
                 },
                 OnFieldRestart = (battle, _, _, _) =>
@@ -544,7 +530,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.TrickRoom]);
+                        battle.Add("-fieldend", "move: Trick Room");
                     }
                 },
             },
@@ -564,6 +550,10 @@ public record Conditions
                 OnStallMove = (battle, pokemon) =>
                 {
                     int counter = battle.EffectState.Counter ?? 1;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"Success change: {Math.Round(100.0 / counter)}%");
+                    }
                     bool success = battle.RandomChance(1, counter);
                     if (!success)
                     {
@@ -592,7 +582,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSingleTurnEvent(target, _library.Conditions[ConditionId.Protect]);
+                        battle.Add("-singleturn", target, "Protect");
                     }
                     return new VoidReturn();
                 },
@@ -609,7 +599,7 @@ public record Conditions
                     }
                     else if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.Protect]);
+                        battle.Add("-activate", target, "move: Protect");
                     }
 
                     EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
@@ -632,7 +622,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Tailwind]);
+                        battle.Add("-sidestart", side, "move: Tailwind");
                     }
                 },
                 OnModifySpe = (battle, _, _) =>
@@ -646,7 +636,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Tailwind]);
+                        battle.Add("-sideend", side, "move: Tailwind");
                     }
                 },
             },
@@ -667,6 +657,10 @@ public record Conditions
                     {
                         if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
                         {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Debug("Reflect weaken");
+                            }
                             return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
                                 battle.ChainModify(0.5);
                         }
@@ -677,7 +671,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.Reflect]);
+                        battle.Add("-sidestart", side, "Reflect");
                     }
                 },
                 OnSideResidualOrder = 26,
@@ -686,7 +680,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.Reflect]);
+                        battle.Add("-sideend", side, "Reflect");
                     }
                 },
             },
@@ -707,6 +701,10 @@ public record Conditions
                     {
                         if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
                         {
+                            if (battle.DisplayUi)
+                            {
+                                battle.Debug("Light Screen weaken");
+                            }
                             return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
                                 battle.ChainModify(0.5);
                         }
@@ -717,7 +715,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideStartEvent(side, _library.Conditions[ConditionId.LightScreen]);
+                        battle.Add("-sidestart", side, "move: Light Screen");
                     }
                 },
                 OnSideResidualOrder = 26,
@@ -726,7 +724,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintSideEndEvent(side, _library.Conditions[ConditionId.LightScreen]);
+                        battle.Add("-sideend", side, "move: Light Screen");
                     }
                 },
             },
@@ -747,11 +745,10 @@ public record Conditions
                                 Move { Id: MoveId.Yawn } or
                                     ActiveMove { Secondaries: not null })
                         {
-                            UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.ElectricTerrain]);
+                            battle.Add("-activate", target, "move: Electric Terrain");
                         }
                         return false;
                     }
-                    
                     return new VoidReturn();
                 },
                 OnTryAddVolatile = (battle, status, target, _, _) =>
@@ -761,7 +758,7 @@ public record Conditions
                     {
                         if (battle.DisplayUi)
                         {
-                            UiGenerator.PrintActivateEvent(target, _library.Conditions[ConditionId.ElectricTerrain]);
+                            battle.Add("-activate", target, "move: Electric Terrain");
                         }
                         return null;
                     }
@@ -774,6 +771,10 @@ public record Conditions
                         (attacker.IsGrounded() ?? false) &&
                         !attacker.IsSemiInvulnerable())
                     {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("electric terrain boost");
+                        }
                         return battle.ChainModify([5325, 4096]);
                     }
                     return new VoidReturn();
@@ -782,15 +783,14 @@ public record Conditions
                 {
                     if (!battle.DisplayUi) return;
 
-                    Condition et = _library.Conditions[ConditionId.ElectricTerrain];
-
-                    if (effect is Ability ability)
+                    if (effect is Ability)
                     {
-                        UiGenerator.PrintFieldStartEvent(et, ability, source);
+                        battle.Add("-fieldstart", "move: Electric Terrain", "[from] ability: " +
+                            effect.Name, $"[of] {source}");
                     }
                     else
                     {
-                        UiGenerator.PrintFieldStartEvent(et);
+                        battle.Add("-fieldstart", "move: Electric Terrain");
                     }
                 },
                 OnFieldResidualOrder = 27,
@@ -799,7 +799,7 @@ public record Conditions
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintFieldEndEvent(_library.Conditions[ConditionId.ElectricTerrain]);
+                        battle.Add("-fieldend", "move: Electric Terrain");
                     }
                 },
             },
@@ -819,20 +819,18 @@ public record Conditions
                             battle.EffectState.FromBooster = true;
                             if (battle.DisplayUi)
                             {
-                                UiGenerator.PrintActivateEvent(pokemon,
-                                    _library.Conditions[ConditionId.QuarkDrive],
-                                    _library.Items[pokemon.Item]);
+                                battle.Add("-activate", pokemon, "ability: Quark Drive", "[fromitem]");
                             }
                         }
                     }
                     else if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintActivateEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
+                        battle.Add("-activate", pokemon, "ability: Quark Drive");
                     }
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintStartEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
+                        battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat);
                     }
                     return new VoidReturn();
                 },
@@ -843,6 +841,10 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Quark Drive atk boost");
+                    }
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifyDefPriority = 6,
@@ -851,6 +853,10 @@ public record Conditions
                     if (battle.EffectState.BestStat != StatIdExceptHp.Def || pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
+                    }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Quark Drive def boost");
                     }
                     return battle.ChainModify([5325, 4096]);
                 },
@@ -861,6 +867,10 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Quark Drive spa boost");
+                    }
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifySpDPriority = 6,
@@ -870,6 +880,10 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Quark Drive spd boost");
+                    }
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifySpe = (battle, _, pokemon) =>
@@ -878,13 +892,17 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("Quark Drive spe boost");
+                    }
                     return (int)battle.ChainModify(1.5);
                 },
                 OnEnd = (battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
                     {
-                        UiGenerator.PrintEndEvent(pokemon, _library.Conditions[ConditionId.QuarkDrive]);
+                        battle.Add("-end", pokemon, "Quark Drive");
                     }
                 },
             },
