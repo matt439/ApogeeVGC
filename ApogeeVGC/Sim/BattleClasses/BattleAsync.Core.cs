@@ -882,7 +882,7 @@ public partial class BattleAsync : IBattle, IDisposable
         if (DisplayUi)
         {
             // Print empty line for formatting
-            Add("");
+            Add(string.Empty);
 
             // Print the appropriate win/tie message
             // Note: AllySide is not implemented in this codebase (see Side class)
@@ -1037,7 +1037,7 @@ public partial class BattleAsync : IBattle, IDisposable
             }
             else
             {
-                Add("swap", pokemon, newPosition, "");
+                Add("swap", pokemon, newPosition, string.Empty);
             }
         }
 
@@ -1448,7 +1448,7 @@ public partial class BattleAsync : IBattle, IDisposable
             // Log rated status
             if (Rated)
             {
-                string ratedMessage = Rated ? "" : Rated.ToString();
+                string ratedMessage = Rated ? string.Empty : Rated.ToString();
                 Add("rated", ratedMessage);
             }
         }
@@ -1553,7 +1553,7 @@ public partial class BattleAsync : IBattle, IDisposable
                         new StringPart("poke"),
                     new StringPart(pokemon.Side.Id.ToString()),
                     new StringPart(detailsString),
-                    new StringPart(""),
+                    new StringPart(string.Empty),
                     ]);
             }
 
@@ -3105,7 +3105,7 @@ public partial class BattleAsync : IBattle, IDisposable
             case ActionId.Residual:
                 if (DisplayUi)
                 {
-                    Add("");
+                    Add(string.Empty);
                 }
 
                 ClearActiveMove(failed: true);
@@ -3254,7 +3254,7 @@ public partial class BattleAsync : IBattle, IDisposable
         if (DisplayUi)
         {
             // Add empty line for formatting
-            Add("");
+            Add(string.Empty);
 
             // Add timestamp in Unix epoch seconds
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -3769,7 +3769,7 @@ public partial class BattleAsync : IBattle, IDisposable
             // Send the sanitized team data to the client
             // Note: You'll need to implement a Teams.Pack() equivalent method
             // that serializes the team data into the format expected by the client
-            string packedTeam = PackTeam(team);
+            string packedTeam = Teams.Pack(team);
             Add("showteam", side.Id.ToString(), packedTeam);
         }
     }
@@ -4128,19 +4128,6 @@ public partial class BattleAsync : IBattle, IDisposable
     }
 
     #region Helpers
-
-    /// <summary>
-    /// Packs a team into a string format for transmission to the client.
-    /// This is a placeholder - you'll need to implement the actual packing logic
-    /// based on your client's expected format.
-    /// </summary>
-    private static string PackTeam(List<PokemonSet> team)
-    {
-        // TODO: Implement team packing logic
-        // This should serialize the team data into the format your client expects
-        // The original uses Teams.pack() from the @pkmn/sets library
-        throw new NotImplementedException("Team packing logic needs to be implemented");
-    }
 
     /// <summary>
     /// Formats a Part for output to the battle log.

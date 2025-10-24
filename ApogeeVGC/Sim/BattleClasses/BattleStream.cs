@@ -1,10 +1,12 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Threading.Channels;
-using ApogeeVGC.Data;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -269,25 +271,25 @@ public class BattleStream : IDisposable
                 }
 
             case "reseed":
-            {
-                if (Battle == null) break;
-
-                // Validate that message contains only digits
-                if (!string.IsNullOrEmpty(message) && !ulong.TryParse(message, out _))
                 {
-                    throw new InvalidOperationException($"Invalid seed for reseed: \"{message}\"");
-                }
+                    if (Battle == null) break;
 
-                // Convert seed string to int (or null if empty)
-                int? seed = string.IsNullOrEmpty(message)
-                    ? null
-                    : int.Parse(message);
+                    // Validate that message contains only digits
+                    if (!string.IsNullOrEmpty(message) && !ulong.TryParse(message, out _))
+                    {
+                        throw new InvalidOperationException($"Invalid seed for reseed: \"{message}\"");
+                    }
 
-                PrngSeed? prngSeed = seed.HasValue ? new PrngSeed(seed.Value) : null;
+                    // Convert seed string to int (or null if empty)
+                    int? seed = string.IsNullOrEmpty(message)
+                        ? null
+                        : int.Parse(message);
+
+                    PrngSeed? prngSeed = seed.HasValue ? new PrngSeed(seed.Value) : null;
                     Battle.ResetRng(prngSeed);
-                Battle.InputLog.Add($">reseed {Battle.Prng.GetSeed()}");
-                break;
-            }
+                    Battle.InputLog.Add($">reseed {Battle.Prng.GetSeed()}");
+                    break;
+                }
 
             case "tiebreak":
                 {
@@ -304,7 +306,87 @@ public class BattleStream : IDisposable
             case "chat":
                 {
                     Battle?.InputLog.Add($">chat {message}");
-                    Battle?.Add("chat", message);
+                    if (Battle?.DisplayUi == true)
+                    {
+                        Battle.Add("chat", message);
+                    }
+                    break;
+                }
+
+            case "eval":
+                {
+                    if (Battle == null) break;
+
+                    // Add to input log
+                    Battle.InputLog.Add($">{type} {message}");
+
+                    // Format message for display
+                    message = message.Replace("\f", "\n");
+
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("", ">>> " + message.Replace("\n", "\n||"));
+                    }
+
+                    try
+                    {
+                        // Note: Actual eval functionality would need to be implemented
+                        // This is a placeholder for the eval logic
+                        string result = "eval not implemented in C#";
+
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.Add("", "<<< " + result);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.Add("", "<<< error: " + e.Message);
+                        }
+                    }
+                    break;
+                }
+
+            case "requestlog":
+                {
+                    if (Battle != null)
+                    {
+                        _ = PushMessageAsync("requesteddata", string.Join("\n", Battle.InputLog));
+                    }
+                    break;
+                }
+
+            case "requestexport":
+                {
+                    if (Battle != null)
+                    {
+                        string export = $"{Battle.Prng.GetSeed()}\n{string.Join("\n", Battle.InputLog)}";
+                        _ = PushMessageAsync("requesteddata", export);
+                    }
+                    break;
+                }
+
+            case "requestteam":
+                {
+                    if (Battle == null) break;
+
+                    message = message.Trim();
+                    if (!int.TryParse(message.AsSpan(1), out int slotNum) || slotNum < 1)
+                    {
+                        throw new InvalidOperationException($"Team requested for slot {message}, but that slot does not exist.");
+                    }
+
+                    int slotIndex = slotNum - 1;
+                    if (slotIndex >= Battle.Sides.Count)
+                    {
+                        throw new InvalidOperationException($"Team requested for slot {message}, but that slot does not exist.");
+                    }
+
+                    Side side = Battle.Sides[slotIndex];
+                    string team = Teams.Pack(side.Team);
+                    _ = PushMessageAsync("requesteddata", team);
                     break;
                 }
 
