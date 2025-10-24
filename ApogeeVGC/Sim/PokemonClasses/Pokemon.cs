@@ -1816,7 +1816,14 @@ public class Pokemon : IPriorityComparison, IDisposable
                 // Status-based forme change (e.g., Shaymin-Sky -> Shaymin)
                 if (Battle.DisplayUi)
                 {
-                    Battle.Add("-formechange", this, species.Name, message);
+                    if (message is null)
+                    {
+                        Battle.Add("-formechange", this, species.Name);
+                    }
+                    else
+                    {
+                        Battle.Add("-formechange", this, species.Name, message);
+                    }
                 }
             }
         }
@@ -1825,13 +1832,27 @@ public class Pokemon : IPriorityComparison, IDisposable
             // Handle temporary forme changes
             if (Battle.DisplayUi)
             {
-                if (source?.EffectType == EffectType.Ability)
+                if (source.EffectType == EffectType.Ability)
                 {
-                    Battle.Add("-formechange", this, species.Name, message, $"[from] ability: {source.Name}");
+                    if (message is null)
+                    {
+                        Battle.Add("-formechange", this, species.Name, $"[from] ability: {source.Name}");
+                    }
+                    else
+                    {
+                        Battle.Add("-formechange", this, species.Name, message, $"[from] ability: {source.Name}");
+                    }
                 }
                 else
                 {
-                    Battle.Add("-formechange", this, Illusion?.Species.Name ?? species.Name, message);
+                    if (message is null)
+                    {
+                        Battle.Add("-formechange", this, Illusion?.Species.Name ?? species.Name);
+                    }
+                    else
+                    {
+                        Battle.Add("-formechange", this, Illusion?.Species.Name ?? species.Name, message);
+                    }
                 }
             }
         }
@@ -1841,7 +1862,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             source is Ability ability && ability.Id != AbilityId.Disguise && ability.Id != AbilityId.IceFace)
         {
             // Break Illusion for certain Tera forme changes
-            if (Illusion != null && source != null)
+            if (Illusion != null)
             {
                 // Tera forme by Ogerpon or Terapagos breaks the Illusion
                 Ability = AbilityId.None; // Don't allow Illusion to wear off
