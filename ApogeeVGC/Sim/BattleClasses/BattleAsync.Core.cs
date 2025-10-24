@@ -2981,7 +2981,12 @@ public partial class BattleAsync : IBattle, IDisposable
                     var btmAction = (MoveAction)action;
                     if (!btmAction.Pokemon.IsActive) return false;
                     if (btmAction.Pokemon.Fainted) return false;
-                    Debug($"before turn callback: {btmAction.Move.Id}");
+
+                    if (DisplayUi)
+                    {
+                        Debug($"before turn callback: {btmAction.Move.Id}");
+                    }
+
                     Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
                     if (target == null) return false;
                     if (btmAction.Move.BeforeTurnCallback == null)
@@ -2996,7 +3001,12 @@ public partial class BattleAsync : IBattle, IDisposable
                     var pcmAction = (MoveAction)action;
                     if (!pcmAction.Pokemon.IsActive) return false;
                     if (pcmAction.Pokemon.Fainted) return false;
-                    Debug($"priority charge callback: {pcmAction.Move.Id}");
+
+                    if (DisplayUi)
+                    {
+                        Debug($"priority charge callback: {pcmAction.Move.Id}");
+                    }
+
                     if (pcmAction.Move.PriorityChargeCallback == null)
                         throw new InvalidOperationException("priorityChargeMove has no priorityChargeCallback");
                     pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
