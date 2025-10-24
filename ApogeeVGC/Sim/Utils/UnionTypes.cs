@@ -1717,6 +1717,20 @@ public abstract record Part
     public static implicit operator Part(Condition condition) => EffectUnionFactory.ToPart(condition);
     public static implicit operator Part(Format format) => EffectUnionFactory.ToPart(format);
 
+    public static Part FromIEffect(IEffect effect)
+    {
+        return effect switch
+        {
+            Item item => EffectUnionFactory.ToPart(item),
+            Ability ability => EffectUnionFactory.ToPart(ability),
+            Species species => EffectUnionFactory.ToPart(species),
+            Condition condition => EffectUnionFactory.ToPart(condition),
+            Format format => EffectUnionFactory.ToPart(format),
+            ActiveMove activeMove => EffectUnionFactory.ToPart(activeMove),
+            _ => throw new InvalidOperationException("Invalid IEffect type."),
+        };
+    }
+
     public static Part FromUndefined() => new UndefinedPart(new Undefined());
 
     public static implicit operator Part(Undefined value) => new UndefinedPart(value);
@@ -1772,6 +1786,8 @@ public abstract record PartFuncUnion
     public static implicit operator PartFuncUnion(Species species) => EffectUnionFactory.ToPart(species);
     public static implicit operator PartFuncUnion(Condition condition) => EffectUnionFactory.ToPart(condition);
     public static implicit operator PartFuncUnion(Format format) => EffectUnionFactory.ToPart(format);
+
+    public static PartFuncUnion FromIEffect(IEffect effect) => Part.FromIEffect(effect);
 }
 
 public record PartPartFuncUnion(Part Part) : PartFuncUnion;

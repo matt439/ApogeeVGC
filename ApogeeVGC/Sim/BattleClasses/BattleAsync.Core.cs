@@ -519,9 +519,15 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             return move.Flags.Contact is true;
         }
+
         if (!announcePads) return false;
-        UiGenerator.PrintActivateEvent(defender, Effect);
-        UiGenerator.PrintActivateEvent(attacker, Library.Items[ItemId.ProtectivePads]);
+
+        if (DisplayUi)
+        {
+            Add("-activate", defender, PartFuncUnion.FromIEffect(Effect));
+            Add("-activate", attacker, "item: Protective Pads");
+        }
+
         return false;
     }
 
