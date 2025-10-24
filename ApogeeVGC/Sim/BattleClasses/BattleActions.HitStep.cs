@@ -37,7 +37,7 @@ public partial class BattleActions
                 canHit = false;
             }
             // Gen 8+: Toxic used by Poison-types always hits (even through semi-invulnerability)
-            else if (Battle.Gen >= 8 && move.Id == MoveId.Toxic && pokemon.HasType(PokemonType.Poison))
+            else if (move.Id == MoveId.Toxic && pokemon.HasType(PokemonType.Poison))
             {
                 canHit = true;
             }
@@ -69,7 +69,10 @@ public partial class BattleActions
                     }
 
                     // Display miss message
-                    UiGenerator.PrintMessage($"{pokemon.Name} missed {target.Name}!");
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("-miss", pokemon, target);
+                    }
                 }
             }
         }
