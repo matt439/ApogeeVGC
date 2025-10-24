@@ -1079,7 +1079,7 @@ public partial class BattleActions(IBattle battle)
     }
 
     public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets, Pokemon pokemon,
-        ActiveMove move, HitEffect? hitEffect = null, bool isSecondary = false, bool isSelf = false)
+    ActiveMove move, HitEffect? hitEffect = null, bool isSecondary = false, bool isSelf = false)
     {
         // Hardcoded for single-target purposes
         // (no spread moves have any kind of onTryHit handler)
@@ -1096,15 +1096,15 @@ public partial class BattleActions(IBattle battle)
         {
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
-            
+
             if (hitResult is BoolRelayVar { Value: false })
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.Add("-fail", pokemon);
+                    Battle.AttrLastMove("[still]");
                 }
-                Battle.AttrLastMove("[still]");
-                
+
                 damage[0] = BoolIntUndefinedUnion.FromBool(false);
                 return (damage, targets);
             }
@@ -1113,15 +1113,15 @@ public partial class BattleActions(IBattle battle)
         {
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
-            
+
             if (hitResult is BoolRelayVar { Value: false })
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.Add("-fail", pokemon);
+                    Battle.AttrLastMove("[still]");
                 }
-                Battle.AttrLastMove("[still]");
-                
+
                 damage[0] = BoolIntUndefinedUnion.FromBool(false);
                 return (damage, targets);
             }
@@ -1130,15 +1130,15 @@ public partial class BattleActions(IBattle battle)
         {
             RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
                 target, pokemon, move);
-            
+
             if (hitResult is BoolRelayVar { Value: false })
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.Add("-fail", pokemon);
+                    Battle.AttrLastMove("[still]");
                 }
-                Battle.AttrLastMove("[still]");
-                
+
                 damage[0] = BoolIntUndefinedUnion.FromBool(false);
                 return (damage, targets);
             }
@@ -1147,7 +1147,7 @@ public partial class BattleActions(IBattle battle)
         // 0. check for substitute
         if (!isSecondary && !isSelf)
         {
-            if (move.Target != MoveTarget.All && move.Target != MoveTarget.AllyTeam && 
+            if (move.Target != MoveTarget.All && move.Target != MoveTarget.AllyTeam &&
                 move.Target != MoveTarget.AllySide && move.Target != MoveTarget.FoeSide)
             {
                 damage = TryPrimaryHitEvent(damage, targets, pokemon, move, move, isSecondary);
@@ -1166,7 +1166,7 @@ public partial class BattleActions(IBattle battle)
             {
                 damage[i] = BoolIntUndefinedUnion.FromBool(true);
             }
-            
+
             if (damage[i] is BoolBoolIntUndefinedUnion { Value: false })
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
@@ -1239,10 +1239,10 @@ public partial class BattleActions(IBattle battle)
 
         var damagedTargets = new List<Pokemon>();
         var damagedDamage = new List<int>();
-        
+
         for (int i = 0; i < targets.Count; i++)
         {
-            if (damage[i] is IntBoolIntUndefinedUnion intDmg && 
+            if (damage[i] is IntBoolIntUndefinedUnion intDmg &&
                 targets[i] is PokemonPokemonUnion pokemonUnion)
             {
                 damagedTargets.Add(pokemonUnion.Pokemon);
@@ -1251,12 +1251,12 @@ public partial class BattleActions(IBattle battle)
         }
 
         int pokemonOriginalHp = pokemon.Hp;
-        
+
         if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
         {
-            Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move, 
+            Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
                 new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d)).ToList()));
-            
+
             if (move.OnAfterHit != null)
             {
                 foreach (Pokemon t in damagedTargets)
@@ -1264,7 +1264,7 @@ public partial class BattleActions(IBattle battle)
                     Battle.SingleEvent(EventId.AfterHit, move, null, t, pokemon, move);
                 }
             }
-            
+
             if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 && pokemonOriginalHp > pokemon.MaxHp / 2)
             {
                 Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
