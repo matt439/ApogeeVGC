@@ -3,7 +3,6 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.FieldClasses;
@@ -41,7 +40,7 @@ public class Field : IDisposable
     {
         // Fall back to battle effect if sourceEffect not provided
         sourceEffect ??= Battle.Effect;
-        
+
         // Fall back to event target if source not provided
         if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
         {
@@ -51,18 +50,16 @@ public class Field : IDisposable
         // Check if weather is already set to this weather
         if (Weather == status.Id)
         {
-            // Special case for abilities in Gen 6+ or if weather has no duration
+            // Special case for abilities if weather has no duration
             if (sourceEffect.EffectType == EffectType.Ability)
             {
-                if (Battle.Gen > 5 || WeatherState.Duration == 0)
+                if (WeatherState.Duration == 0)
                 {
                     return false;
                 }
             }
-            // For other effects in Gen 3+
-            // Note: Original TS code also checks for Sandstorm in Gen 1-2, but that condition
-            // doesn't exist in the codebase yet, so we skip that check
-            else if (Battle.Gen > 2)
+            // For other effects (gen 9 always satisfies gen > 2)
+            else
             {
                 return false;
             }
@@ -72,23 +69,25 @@ public class Field : IDisposable
         if (source != null)
         {
             RelayVar? result = Battle.RunEvent(EventId.SetWeather, source, source, status);
-            
+
             // If the event blocked the weather change
             if (result is null or BoolRelayVar { Value: false })
             {
                 if (result is not BoolRelayVar { Value: false }) return false;
 
-                // Check if source effect is a move with weather-setting capability
-                // (In the original TS, this checks if the move has a weather property)
-                // Since we don't have that property, we can check if it's a move with a condition
-                if (sourceEffect is Move { Condition.EffectType: EffectType.Weather })
+                if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(source, sourceEffect);
-                }
-                else if (sourceEffect.EffectType == EffectType.Ability)
-                {
-                    UiGenerator.PrintAbilityEvent(source, sourceEffect.Name);
-                    UiGenerator.PrintFailEvent(source);
+                    // Check if source effect is a move with weather-setting capability
+                    if (sourceEffect is Move { Condition.EffectType: EffectType.Weather })
+                    {
+                        Battle.Add("-fail", source, PartFuncUnion.FromIEffect(sourceEffect),
+                            $"[from] {Weather}");
+                    }
+                    else if (sourceEffect.EffectType == EffectType.Ability)
+                    {
+                        Battle.Add("-ability", source, PartFuncUnion.FromIEffect(sourceEffect),
+                            $"[from] {Weather}", "[fail]");
+                    }
                 }
                 return false;
             }
@@ -97,7 +96,7 @@ public class Field : IDisposable
         // Save previous weather state in case we need to rollback
         ConditionId prevWeather = Weather;
         EffectState prevWeatherState = WeatherState;
-        
+
         // Set the new weather
         Weather = status.Id;
         WeatherState = Battle.InitEffectState(status.EffectStateId, source, source?.GetSlot(), 0);
@@ -127,7 +126,7 @@ public class Field : IDisposable
             SingleEventSource.FromNullablePokemon(source),
             sourceEffect
         );
-        
+
         if (startResult is BoolRelayVar { Value: false })
         {
             // Rollback to previous state
@@ -138,7 +137,7 @@ public class Field : IDisposable
 
         // Trigger weather change event for all handlers
         Battle.EachEvent(EventId.WeatherChange, sourceEffect);
-        
+
         return true;
     }
 

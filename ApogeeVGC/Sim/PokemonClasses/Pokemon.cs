@@ -7,7 +7,6 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
@@ -1660,9 +1659,9 @@ public class Pokemon : IPriorityComparison, IDisposable
         ConditionId[] critVolatiles =
         [
             ConditionId.DragonCheer,
-            ConditionId.FocusEnergy,
-            ConditionId.LaserFocus,
-        ];
+        ConditionId.FocusEnergy,
+        ConditionId.LaserFocus,
+    ];
 
         // Remove overlapping volatiles first
         foreach (ConditionId volatileId in critVolatiles)
@@ -1683,13 +1682,16 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
 
         // Add battle message
-        if (effect != null)
+        if (Battle.DisplayUi)
         {
-            UiGenerator.PrintTransformEvent(this, pokemon, effect);
-        }
-        else
-        {
-            UiGenerator.PrintTransformEvent(this, pokemon);
+            if (effect != null)
+            {
+                Battle.Add("-transform", this, pokemon, "[from]", PartFuncUnion.FromIEffect(effect));
+            }
+            else
+            {
+                Battle.Add("-transform", this, pokemon);
+            }
         }
 
         // Handle Terastallization display
@@ -1777,11 +1779,8 @@ public class Pokemon : IPriorityComparison, IDisposable
         Species? species = SetSpecie(rawSpecies, source);
         if (species == null) return false;
 
-        // Early return for Gen 1-2 battles
-        if (Battle.Gen <= 2) return true;
-
         // Determine the species the opponent sees (accounting for Illusion)
-        //SpecieId apparentSpecies = Illusion?.Species.BaseSpecies ?? species.BaseSpecies;
+        string apparentSpecies = Illusion?.Species.Name ?? species.BaseSpecies.ToString();
 
         if (isPermanent == true)
         {
@@ -1790,36 +1789,50 @@ public class Pokemon : IPriorityComparison, IDisposable
 
             // Update details and send to client
             Details = GetUpdatedDetails();
-            PokemonDetails details = (Illusion ?? this).GetUpdatedDetails();
+            string details = (Illusion ?? this).GetUpdatedDetails().ToString();
 
             // Add Tera type to details if Terastallized
             if (Terastallized != null)
             {
-                details.TeraType = Terastallized.Value;
+                details += $", tera:{Terastallized.Value}";
             }
-            UiGenerator.PrintDetailsChangeEvent(this, details);
+
+            if (Battle.DisplayUi)
+            {
+                Battle.Add("detailschange", this, details);
+            }
 
             // Update max HP based on new species
             UpdateMaxHp();
 
             // Handle different source types for permanent changes
-            if (source.EffectType == EffectType.Condition)
+            if (source == null)
+            {
+                // Tera forme (Ogerpon/Terapagos text would go here if needed)
+                FormeRegression = true;
+            }
+            else if (source.EffectType == EffectType.Condition)
             {
                 // Status-based forme change (e.g., Shaymin-Sky -> Shaymin)
-                UiGenerator.PrintFormeChangeEvent(this, species.Id, message);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-formechange", this, species.Name, message);
+                }
             }
         }
         else
         {
             // Handle temporary forme changes
-            if (source.EffectType == EffectType.Ability)
+            if (Battle.DisplayUi)
             {
-                UiGenerator.PrintFormeChangeEvent(this, species.Id, message, source);
-            }
-            else
-            {
-                UiGenerator.PrintFormeChangeEvent(this, Illusion is not null ? Illusion.Species.Id :
-                    species.Id, message);
+                if (source?.EffectType == EffectType.Ability)
+                {
+                    Battle.Add("-formechange", this, species.Name, message, $"[from] ability: {source.Name}");
+                }
+                else
+                {
+                    Battle.Add("-formechange", this, Illusion?.Species.Name ?? species.Name, message);
+                }
             }
         }
 
@@ -1828,7 +1841,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             source is Ability ability && ability.Id != AbilityId.Disguise && ability.Id != AbilityId.IceFace)
         {
             // Break Illusion for certain Tera forme changes
-            if (Illusion != null)
+            if (Illusion != null && source != null)
             {
                 // Tera forme by Ogerpon or Terapagos breaks the Illusion
                 Ability = AbilityId.None; // Don't allow Illusion to wear off
@@ -1837,7 +1850,11 @@ public class Pokemon : IPriorityComparison, IDisposable
             // Get the new ability from the species
             AbilityId newAbility = species.Abilities.GetAbility(abilitySlot) ?? species.Abilities.Slot0;
 
-            SetAbility(newAbility, isFromFormeChange: true);
+            // Ogerpon's forme change doesn't override permanent abilities
+            if (source != null || !(GetAbility().Flags.CantSuppress ?? false))
+            {
+                SetAbility(newAbility, isFromFormeChange: true);
+            }
 
             // Reset base ability (ability resets upon switching out)
             BaseAbility = newAbility;
@@ -2124,19 +2141,23 @@ public class Pokemon : IPriorityComparison, IDisposable
     public bool CureStatus(bool silent = false)
     {
         // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0) return false;
+        if (Hp <= 0 || Status == ConditionId.None) return false;
 
         // Add cure status message to battle log
-        UiGenerator.PrintCureStatusEvent(this, Battle.Library.Conditions[Status]);
+        if (Battle.DisplayUi)
+        {
+            Battle.Add("-curestatus", this, Battle.Library.Conditions[Status], silent ? "[silent]" : "[msg]");
+        }
 
         // Special case: If curing sleep, also remove Nightmare volatile
-        if (Status == ConditionId.Sleep)
+        if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
         {
-            // Check if Pokemon has Nightmare volatile and remove it
-            if (Volatiles.ContainsKey(ConditionId.Nightmare))
+            if (RemoveVolatile( Battle.Library.Conditions[ConditionId.Nightmare]))
             {
-                DeleteVolatile(ConditionId.Nightmare); // Use DeleteVolatile to avoid extra logic
-                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-end", this, Battle.Library.Conditions[ConditionId.Nightmare], "[silent]");
+                }
             }
         }
 
@@ -2147,7 +2168,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     }
 
     public bool SetStatus(ConditionId statusId, Pokemon? source = null, IEffect? sourceEffect = null,
-        bool ignoreImmunities = false)
+    bool ignoreImmunities = false)
     {
         // Initial HP check
         if (Hp <= 0) return false;
@@ -2170,12 +2191,18 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (sourceEffect is ActiveMove move && move.Status == Status)
             {
-                UiGenerator.PrintFailEvent(this, Battle.Library.Conditions[Status]);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-fail", this, Battle.Library.Conditions[Status]);
+                }
             }
             else if (sourceEffect is ActiveMove { Status: not null })
             {
-                UiGenerator.PrintFailEvent(source);
-                // Battle.AttrLastMove("[still]"); // Skipping visual effect
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-fail", source);
+                    Battle.AttrLastMove("[still]");
+                }
             }
             return false;
         }
@@ -2194,12 +2221,12 @@ public class Pokemon : IPriorityComparison, IDisposable
                 {
                     if (Battle.DisplayUi)
                     {
-                        // Battle.Debug("immune to status");
-                    }
+                        Battle.Debug("immune to status");
 
-                    if (sourceEffect is ActiveMove { Status: not null })
-                    {
-                        UiGenerator.PrintImmuneEvent(this);
+                        if (sourceEffect is ActiveMove { Status: not null })
+                        {
+                            Battle.Add("-immune", this);
+                        }
                     }
                     return false;
                 }
@@ -2218,7 +2245,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             {
                 if (Battle.DisplayUi)
                 {
-                    // Battle.Debug($"set status [{status.Choice}] interrupted");
+                    Battle.Debug($"set status [{status.Id}] interrupted");
                 }
                 return false;
             }
@@ -2243,7 +2270,6 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Run Start event (with rollback on failure)
         if (status.Id != ConditionId.None)
         {
-            // FIXED: Proper boolean handling for SingleEvent
             RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, StatusState, this,
                 source, sourceEffect);
 
@@ -2259,7 +2285,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             {
                 if (Battle.DisplayUi)
                 {
-                    // Battle.Debug($"status start [{status.Choice}] interrupted");
+                    Battle.Debug($"status start [{status.Id}] interrupted");
                 }
 
                 // Rollback the status change
@@ -2289,7 +2315,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     public bool ClearStatus()
     {
         // Early exit if Pokemon is fainted or has no status
-        if (Hp <= 0) return false;
+        if (Hp <= 0 || Status == ConditionId.None) return false;
 
         // Special case: If clearing sleep, also remove Nightmare volatile (silent)
         if (Status == ConditionId.Sleep && Volatiles.ContainsKey(ConditionId.Nightmare))
@@ -2297,7 +2323,10 @@ public class Pokemon : IPriorityComparison, IDisposable
             // Remove Nightmare volatile and add silent end message
             if (RemoveVolatile(Battle.Library.Conditions[ConditionId.Nightmare]))
             {
-                UiGenerator.PrintEndEvent(this, Battle.Library.Conditions[ConditionId.Nightmare]);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-end", this, Battle.Library.Conditions[ConditionId.Nightmare], "[silent]");
+                }
             }
         }
 
@@ -2312,6 +2341,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     {
         return Battle.Library.Conditions[Status];
     }
+
 
     public bool EatItem(bool force = false, Pokemon? source = null, IEffect? sourceEffect = null)
     {
@@ -2363,7 +2393,10 @@ public class Pokemon : IPriorityComparison, IDisposable
         if (!canUseItem || !canEatItem) return false;
 
         // Display item consumption message
-        UiGenerator.PrintEndItemEvent(this, item, "[eat]");
+        if (Battle.DisplayUi)
+        {
+            Battle.Add("-enditem", this, item, "[eat]");
+        }
 
         // Trigger the Eat event on the item
         Battle.SingleEvent(EventId.Eat, item, ItemState, this,
@@ -2452,25 +2485,28 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
 
         // Display appropriate end item message based on item type
-        switch (item.Id)
+        if (Battle.DisplayUi)
         {
-            case ItemId.RedCard:
-                // Red Card shows the source that triggered it
-                UiGenerator.PrintEndItemEvent(this, item, $"[of] {source}");
-                break;
+            switch (item.Id)
+            {
+                case ItemId.RedCard:
+                    // Red Card shows the source that triggered it
+                    Battle.Add("-enditem", this, item, $"[of] {source}");
+                    break;
 
-            default:
-                if (item.IsGem)
-                {
-                    // Gems show "[from] gem" tag
-                    UiGenerator.PrintEndItemEvent(this, item, "[from] gem");
-                }
-                else
-                {
-                    // Standard item consumption message
-                    UiGenerator.PrintEndItemEvent(this, item);
-                }
-                break;
+                default:
+                    if (item.IsGem)
+                    {
+                        // Gems show "[from] gem" tag
+                        Battle.Add("-enditem", this, item, "[from] gem");
+                    }
+                    else
+                    {
+                        // Standard item consumption message
+                        Battle.Add("-enditem", this, item);
+                    }
+                    break;
+            }
         }
 
         // Apply stat boosts if the item provides them
@@ -2694,22 +2730,24 @@ public class Pokemon : IPriorityComparison, IDisposable
         Ability = ability;
         AbilityState = Battle.InitEffectState(ability, null, this);
 
-        // Send battle message ONLY if sourceEffect exists (matching TypeScript)
-        if (!isFromFormeChange && !isTransform)
+        // Send battle message ONLY if sourceEffect exists and DisplayUi is enabled (matching TypeScript)
+        if (Battle.DisplayUi && !isFromFormeChange && !isTransform)
         {
             if (source != null)
             {
-                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect, source);
+                Battle.Add("-ability", this, newAbility.Name, oldAbility.Name,
+                    $"[from] {sourceEffect.FullName}", $"[of] {source}");
             }
             else
             {
-                UiGenerator.PrintAbilityChangeEvent(this, newAbility, oldAbility, sourceEffect);
+                Battle.Add("-ability", this, newAbility.Name, oldAbility.Name,
+                    $"[from] {sourceEffect.FullName}");
             }
         }
 
-        // Start the new ability's effects (Gen 4+ only)
-        if (ability != AbilityId.None && Battle.Gen > 3 &&
-            (!isTransform || oldAbility.Id != newAbility.Id || Battle.Gen <= 4))
+        // Start the new ability's effects (Gen 4+ only, but since gen is always 9, we skip the gen check)
+        if (ability != AbilityId.None &&
+            (!isTransform || oldAbility.Id != newAbility.Id))
         {
             Battle.SingleEvent(EventId.Start, newAbility, AbilityState, this,
                 SingleEventSource.FromNullablePokemon(source));
@@ -2745,7 +2783,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     }
 
     public RelayVar AddVolatile(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null,
-        ConditionId? linkedStatus = null)
+    ConditionId? linkedStatus = null)
     {
         // Get the condition from the battle library
         Condition condition = Battle.Library.Conditions[status];
@@ -2761,12 +2799,11 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
         {
-            //source ??= Battle.Event.Source;
-            sourceEffect ??= Battle.Event.Effect;
             if (source == null && Battle.Event.Source is PokemonSingleEventSource pses)
             {
                 source = pses.Pokemon;
             }
+            sourceEffect ??= Battle.Event.Effect;
         }
         source ??= this; // Default source to this Pokemon
 
@@ -2787,13 +2824,16 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug("immune to volatile status");
+                Battle.Debug("immune to volatile status");
             }
 
             // Show immunity message if source effect is a move with status
             if (sourceEffect is ActiveMove { Status: not null })
             {
-                UiGenerator.PrintImmuneEvent(this);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-immune", this);
+                }
             }
             return new BoolRelayVar(false);
         }
@@ -2806,7 +2846,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug($"add volatile [{status}] interrupted");
+                Battle.Debug($"add volatile [{status}] interrupted");
             }
             return tryResult ?? new BoolRelayVar(false);
         }
@@ -3318,7 +3358,6 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
 
         // Special handling for Terapagos-Terastal with Tera Shell ability
-        // ✅ FIXED: Changed != false to !
         if (Species.Id == SpecieId.TerapagosTerastal && HasAbility(AbilityId.TeraShell) &&
             !Battle.SuppressingAbility(this))
         {
@@ -3345,7 +3384,10 @@ public class Pokemon : IPriorityComparison, IDisposable
             }
 
             // Activate Tera Shell - make move not very effective
-            UiGenerator.PrintActivateEvent(this, Battle.Library.Abilities[AbilityId.TeraShell]);
+            if (Battle.DisplayUi)
+            {
+                Battle.Add("-activate", this, PartFuncUnion.FromIEffect(Battle.Library.Abilities[AbilityId.TeraShell]));
+            }
             AbilityState.Resisted = true;
             return MoveEffectiveness.NotVeryEffective05X;
         }
@@ -3408,16 +3450,19 @@ public class Pokemon : IPriorityComparison, IDisposable
             return false;
         }
 
-        // Display appropriate immunity message
-        if (notImmune == null)
+        // Display appropriate immunity message only if DisplayUi is true
+        if (Battle.DisplayUi)
         {
-            // Levitate ability immunity
-            UiGenerator.PrintImmuneEvent(this, Battle.Library.Abilities[AbilityId.Levitate]);
-        }
-        else
-        {
-            // General immunity
-            UiGenerator.PrintImmuneEvent(this);
+            if (notImmune == null)
+            {
+                // Levitate ability immunity
+                Battle.Add("-immune", this, "[from] ability: Levitate");
+            }
+            else
+            {
+                // General immunity
+                Battle.Add("-immune", this);
+            }
         }
 
         return false;
@@ -3442,12 +3487,11 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug("natural status immunity");
-            }
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                UiGenerator.PrintImmuneEvent(this);
+                Battle.Debug("natural status immunity");
+                if (!string.IsNullOrEmpty(message))
+                {
+                    Battle.Add("-immune", this);
+                }
             }
             return false;
         }
@@ -3460,13 +3504,12 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug("artificial status immunity");
-            }
-
-            // TypeScript: if (message && immunity !== null)
-            if (!string.IsNullOrEmpty(message) && immunity is not null)
-            {
-                UiGenerator.PrintImmuneEvent(this);
+                Battle.Debug("artificial status immunity");
+                // TypeScript: if (message && immunity !== null)
+                if (!string.IsNullOrEmpty(message) && immunity is not null)
+                {
+                    Battle.Add("-immune", this);
+                }
             }
             return false;
         }
@@ -3493,12 +3536,11 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug("natural condition immunity");
-            }
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                UiGenerator.PrintImmuneEvent(this);
+                Battle.Debug("natural condition immunity");
+                if (!string.IsNullOrEmpty(message))
+                {
+                    Battle.Add("-immune", this);
+                }
             }
             return false;
         }
@@ -3512,13 +3554,12 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             if (Battle.DisplayUi)
             {
-                // Battle.Debug("artificial condition immunity");
-            }
-
-            // TypeScript: if (message && immunity !== null)
-            if (!string.IsNullOrEmpty(message) && immunity is not null)
-            {
-                UiGenerator.PrintImmuneEvent(this);
+                Battle.Debug("artificial condition immunity");
+                // TypeScript: if (message && immunity !== null)
+                if (!string.IsNullOrEmpty(message) && immunity is not null)
+                {
+                    Battle.Add("-immune", this);
+                }
             }
             return false;
         }

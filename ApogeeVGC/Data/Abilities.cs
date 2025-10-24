@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.PokemonClasses;
