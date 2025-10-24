@@ -1022,25 +1022,35 @@ public partial class BattleAsync : IBattle, IDisposable
 
         // Special check: position 1 can be swapped even if empty/fainted
         // Other positions require a valid, non-fainted target
-        if (newPosition != 1 && (target.Fainted))
+        if (newPosition != 1 && target.Fainted)
         {
             return false;
         }
 
         // Log the swap event
-        UiGenerator.PrintSwapEvent(pokemon, newPosition, attributes);
+        if (DisplayUi)
+        {
+            if (!string.IsNullOrEmpty(attributes))
+            {
+                Add("swap", pokemon, newPosition, attributes);
+            }
+            else
+            {
+                Add("swap", pokemon, newPosition, "");
+            }
+        }
 
         // Perform the swap
         Side side = pokemon.Side;
-        
+
         // Swap in the Pokemon array (full team roster)
         side.Pokemon[pokemon.Position] = target;
         side.Pokemon[newPosition] = pokemon;
-        
+
         // Swap in the Active array (currently active Pokemon)
         side.Active[pokemon.Position] = side.Pokemon[pokemon.Position];
         side.Active[newPosition] = side.Pokemon[newPosition];
-        
+
         // Update position properties
         target.Position = pokemon.Position;
         pokemon.Position = newPosition;
@@ -1095,6 +1105,8 @@ public partial class BattleAsync : IBattle, IDisposable
                     pokemon.UsedItemThisTurn = false;
                     pokemon.StatsRaisedThisTurn = false;
                     pokemon.StatsLoweredThisTurn = false;
+                    // It shouldn't be possible in a normal battle for a Pokemon to be damaged before turn 1's move selection
+                    // However, this could be potentially relevant in certain OMs
                     pokemon.HurtThisTurn = null;
                 }
 
@@ -1128,9 +1140,8 @@ public partial class BattleAsync : IBattle, IDisposable
                     }
                 }
 
-                // Update type visibility (Gen 7+)
-                // If Pokemon was attacked and illusion wasn't broken, reveal its type
-                if (pokemon.GetLastAttackedBy() != null && Gen >= 7)
+                // If it was an illusion, it's not any more (Gen 7+)
+                if (pokemon.GetLastAttackedBy() != null)
                 {
                     pokemon.KnownType = true;
                 }
@@ -1151,9 +1162,10 @@ public partial class BattleAsync : IBattle, IDisposable
                     }
                 }
 
-                // Update apparent type display (Gen 7+ and not Terastallized)
-                if (Gen >= 7 && pokemon.Terastallized == null)
+                // Update apparent type display (not Terastallized)
+                if (pokemon.Terastallized == null)
                 {
+                    // In Gen 7+, the real type of every Pokemon is visible to all players via the bottom screen while making choices
                     // Get the visible Pokemon (accounting for Illusion)
                     Pokemon seenPokemon = pokemon.Illusion ?? pokemon;
 
@@ -1161,12 +1173,26 @@ public partial class BattleAsync : IBattle, IDisposable
                     string realTypeString = string.Join("/",
                         seenPokemon.GetTypes(excludeAdded: true).Select(t => t.ToString()));
 
-                    // Update apparent type if it changed
                     string currentApparentType = string.Join("/", seenPokemon.ApparentType);
                     if (realTypeString != currentApparentType)
                     {
                         // Update apparent type (this is for display purposes)
+                        if (DisplayUi)
+                        {
+                            Add("-start", pokemon, "typechange", realTypeString, "[silent]");
+                        }
                         seenPokemon.ApparentType = seenPokemon.GetTypes(excludeAdded: true).ToList();
+
+                        if (pokemon.AddedType != null)
+                        {
+                            // The typechange message removes the added type, so put it back
+                            if (DisplayUi)
+                            {
+                                Add("-start", pokemon, "typeadd", pokemon.AddedType?.ToString() ??
+                                    throw new InvalidOperationException("Added type should not be null"),
+                                    "[silent]");
+                            }
+                        }
                     }
                 }
 
@@ -1177,42 +1203,39 @@ public partial class BattleAsync : IBattle, IDisposable
                 // Run trap events
                 RunEvent(EventId.TrapPokemon, pokemon);
 
-                // Check if Pokemon can potentially be trapped
-                if (!pokemon.KnownType || Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                // Canceling switches would leak information if a foe might have a trapping ability
+                if (pokemon.KnownType || Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
                 {
                     RunEvent(EventId.MaybeTrapPokemon, pokemon);
                 }
 
-                // Check foe abilities for potential trapping (Gen 3+)
-                if (Gen > 2)
+                // Check foe abilities for potential trapping
+                foreach (Pokemon source in pokemon.Foes())
                 {
-                    foreach (Pokemon source in pokemon.Foes())
+                    // Get the species to check (accounting for Illusion)
+                    Species species = (source.Illusion ?? source).Species;
+
+                    // Check each ability slot the species could have
+                    foreach (SpeciesAbilityType abilitySlot in Enum.GetValues<SpeciesAbilityType>())
                     {
-                        // Get the species to check (accounting for Illusion)
-                        Species species = (source.Illusion ?? source).Species;
+                        var abilityId = species.Abilities.GetAbility(abilitySlot);
+                        if (abilityId == null) continue;
 
-                        // Check each ability slot the species could have
-                        foreach (SpeciesAbilityType abilitySlot in Enum.GetValues<SpeciesAbilityType>())
-                        {
-                            var abilityId = species.Abilities.GetAbility(abilitySlot);
-                            if (abilityId == null) continue;
+                        // Skip if this is the source's current ability (already checked above)
+                        if (abilityId == source.Ability) continue;
 
-                            // Skip if this is the source's current ability (already checked above)
-                            if (abilityId == source.Ability) continue;
+                        // Get the ability
+                        Ability ability = Library.Abilities[abilityId.Value];
 
-                            // Get the ability
-                            Ability ability = Library.Abilities[abilityId.Value];
+                        // Check if ability is banned
+                        if (RuleTable.Has(ability.Id)) continue;
 
-                            // Check if ability is banned
-                            if (RuleTable.Has(ability.Id)) continue;
+                        // Skip immunity check if type is known and already not immune
+                        if (pokemon.KnownType && !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                            continue;
 
-                            // Skip immunity check if type is known and already immune
-                            if (pokemon.KnownType && !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
-                                continue;
-
-                            // Run the FoeMaybeTrapPokemon event for this potential ability
-                            SingleEvent(EventId.FoeMaybeTrapPokemon, ability, null, pokemon, source);
-                        }
+                        // Run the FoeMaybeTrapPokemon event for this potential ability
+                        SingleEvent(EventId.FoeMaybeTrapPokemon, ability, null, pokemon, source);
                     }
                 }
 
@@ -1250,17 +1273,13 @@ public partial class BattleAsync : IBattle, IDisposable
         }
 
         // Display turn number
-        UiGenerator.PrintTurnEvent(Turn);
+        if (DisplayUi)
+        {
+            Add("turn", Turn);
+        }
 
-        // Pre-calculate Quick Claw roll for Gen 2-3
-        if (Gen == 2)
-        {
-            QuickClawRoll = RandomChance(60, 256);
-        }
-        if (Gen == 3)
-        {
-            QuickClawRoll = RandomChance(1, 5);
-        }
+        // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
+        // Gen 9 doesn't use Quick Claw rolls the same way
 
         // Request move choices for the new turn
         MakeRequest(RequestState.Move);
