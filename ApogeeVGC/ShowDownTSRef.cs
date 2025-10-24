@@ -1,193 +1,83 @@
-﻿//useMoveInner(
-//        moveOrMoveName: Move | string, pokemon: Pokemon, options ?: {
-//    target ?: Pokemon | null, sourceEffect ?: Effect | null,
-//			zMove ?: string, maxMove ?: string,
-//		},
-//	) {
-//    let target = options?.target;
-//    let sourceEffect = options?.sourceEffect;
-//    const zMove = options?.zMove;
-//    const maxMove = options?.maxMove;
-//    if (!sourceEffect && this.battle.effect.id) sourceEffect = this.battle.effect;
-//    if (sourceEffect && ['instruct', 'custapberry'].includes(sourceEffect.id)) sourceEffect = null;
+﻿
+//using ApogeeVGC.Sim.Moves;
+//using ApogeeVGC.Sim.PokemonClasses;
+//using ApogeeVGC.Sim.Utils;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
 
-//    let move = this.dex.getActiveMove(moveOrMoveName);
-//    pokemon.lastMoveUsed = move;
-//    if (move.id === 'weatherball' && zMove)
-//    {
-//        // Z-Weather Ball only changes types if it's used directly,
-//        // not if it's called by Z-Sleep Talk or something.
-//        this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-//        if (move.type !== 'Normal') sourceEffect = move;
-//    }
-//    if (zMove || (move.category !== 'Status' && sourceEffect && (sourceEffect as ActiveMove).isZ))
-//    {
-//        move = this.getActiveZMove(move, pokemon);
-//    }
-//    if (maxMove && move.category !== 'Status')
-//    {
-//        // Max move outcome is dependent on the move type after type modifications from ability and the move itself
-//        this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-//        this.battle.runEvent('ModifyType', pokemon, target, move, move);
-//    }
-//    if (maxMove || (move.category !== 'Status' && sourceEffect && (sourceEffect as ActiveMove).isMax))
-//    {
-//        move = this.getActiveMaxMove(move, pokemon);
-//    }
+///** NOTE: includes single-target moves */
+//trySpreadMoveHit(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove, notActive ?: boolean) {
+//    if (targets.length > 1 && !move.smartTarget) move.spreadHit = true;
 
-//    if (this.battle.activeMove)
-//    {
-//        move.priority = this.battle.activeMove.priority;
-//        if (!move.hasBounced) move.pranksterBoosted = this.battle.activeMove.pranksterBoosted;
-//    }
-//    const baseTarget = move.target;
-//    let targetRelayVar = { target };
-//    targetRelayVar = this.battle.runEvent('ModifyTarget', pokemon, target, move, targetRelayVar, true);
-//    if (targetRelayVar.target !== undefined) target = targetRelayVar.target;
-//    if (target === undefined) target = this.battle.getRandomTarget(pokemon, move);
-//    if (move.target === 'self' || move.target === 'allies')
-//    {
-//        target = pokemon;
-//    }
-//    if (sourceEffect)
-//    {
-//        move.sourceEffect = sourceEffect.id;
-//        move.ignoreAbility = (sourceEffect as ActiveMove).ignoreAbility;
-//    }
-//    let moveResult = false;
+//    const moveSteps: ((targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) =>
+//		(number | boolean | "" | undefined)[] | undefined)[] = [
+//			// 0. check for semi invulnerability
+//			this.hitStepInvulnerabilityEvent,
 
-//    this.battle.setActiveMove(move, pokemon, target);
+//			// 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) (this is step 2 in gens 5 & 6, and step 4 in gen 4)
+//			this.hitStepTryHitEvent,
 
-//    this.battle.singleEvent('ModifyType', move, null, pokemon, target, move, move);
-//    this.battle.singleEvent('ModifyMove', move, null, pokemon, target, move, move);
-//    if (baseTarget !== move.target)
+//			// 2. check for type immunity (this is step 1 in gens 4-6)
+//			this.hitStepTypeImmunity,
+
+//			// 3. check for various move-specific immunities
+//			this.hitStepTryImmunity,
+
+//			// 4. check accuracy
+//			this.hitStepAccuracy,
+
+//			// 5. break protection effects
+//			this.hitStepBreakProtect,
+
+//			// 6. steal positive boosts (Spectral Thief)
+//			this.hitStepStealBoosts,
+
+//			// 7. loop that processes each hit of the move (has its own steps per iteration)
+//			this.hitStepMoveHitLoop,
+//        ];
+//    if (this.battle.gen <= 6)
 //    {
-//        // Target changed in ModifyMove, so we must adjust it here
-//        // Adjust before the next event so the correct target is passed to the
-//        // event
-//        target = this.battle.getRandomTarget(pokemon, move);
+//    // Swap step 1 with step 2
+//    [moveSteps[1], moveSteps[2]] = [moveSteps[2], moveSteps[1]];
 //    }
-//    move = this.battle.runEvent('ModifyType', pokemon, target, move, move);
-//    move = this.battle.runEvent('ModifyMove', pokemon, target, move, move);
-//    if (baseTarget !== move.target)
+//    if (this.battle.gen === 4)
 //    {
-//        // Adjust again
-//        target = this.battle.getRandomTarget(pokemon, move);
-//    }
-//    if (!move || pokemon.fainted)
-//    {
-//        return false;
+//    // Swap step 4 with new step 2 (old step 1)
+//    [moveSteps[2], moveSteps[4]] = [moveSteps[4], moveSteps[2]];
 //    }
 
-//    let attrs = '';
+//    if (notActive) this.battle.setActiveMove(move, pokemon, targets[0]);
 
-//    let movename = move.name;
-//    if (move.id === 'hiddenpower') movename = 'Hidden Power';
-//    if (sourceEffect) attrs += `| [from] ${ sourceEffect.fullname}`;
-//    if (zMove && move.isZ === true)
+//    const hitResult = this.battle.singleEvent('Try', move, null, pokemon, targets[0], move) &&
+//        this.battle.singleEvent('PrepareHit', move, { }, targets[0], pokemon, move) &&
+//        this.battle.runEvent('PrepareHit', pokemon, targets[0], move);
+//    if (!hitResult)
 //    {
-//        attrs = `| [anim]${ movename}${ attrs}`;
-//        movename = `Z -${ movename}`;
-//    }
-//    this.battle.addMove('move', pokemon, movename, `${ target}${ attrs}`);
-
-//    if (zMove) this.runZPower(move, pokemon);
-
-//    if (!target)
-//    {
-//        this.battle.attrLastMove('[notarget]');
-//        this.battle.add(this.battle.gen >= 5 ? '-fail' : '-notarget', pokemon);
-//        return false;
-//    }
-
-//    const { targets, pressureTargets } = pokemon.getMoveTargets(move, target);
-//    if (targets.length)
-//    {
-//        target = targets[targets.length - 1]; // in case of redirection
-//    }
-
-//    const callerMoveForPressure = sourceEffect && (sourceEffect as ActiveMove).pp ? sourceEffect as ActiveMove : null;
-//    if (!sourceEffect || callerMoveForPressure || sourceEffect.id === 'pursuit')
-//    {
-//        let extraPP = 0;
-//        for (const source of pressureTargets) {
-//            const ppDrop = this.battle.runEvent('DeductPP', source, pokemon, move);
-//            if (ppDrop !== true)
-//            {
-//                extraPP += ppDrop || 0;
-//            }
-//        }
-//        if (extraPP > 0)
+//        if (hitResult === false)
 //        {
-//            pokemon.deductPP(callerMoveForPressure || moveOrMoveName, extraPP);
+//            this.battle.add('-fail', pokemon);
+//            this.battle.attrLastMove('[still]');
 //        }
+//        return hitResult === this.battle.NOT_FAIL;
 //    }
 
-//    if (!this.battle.singleEvent('TryMove', move, null, pokemon, target, move) ||
-//        !this.battle.runEvent('TryMove', pokemon, target, move))
-//    {
-//        move.mindBlownRecoil = false;
-//        return false;
-//    }
-
-//    this.battle.singleEvent('UseMoveMessage', move, null, pokemon, target, move);
-
-//    if (move.ignoreImmunity === undefined)
-//    {
-//        move.ignoreImmunity = (move.category === 'Status');
-//    }
-
-//    if (this.battle.gen !== 4 && move.selfdestruct === 'always')
-//    {
-//        this.battle.faint(pokemon, pokemon, move);
-//    }
-
-//    let damage: number | false | undefined | '' = false;
-//    if (move.target === 'all' || move.target === 'foeSide' || move.target === 'allySide' || move.target === 'allyTeam')
-//    {
-//        damage = this.tryMoveHit(targets, pokemon, move);
-//        if (damage === this.battle.NOT_FAIL) pokemon.moveThisTurnResult = null;
-//        if (damage || damage === 0 || damage === undefined) moveResult = true;
-//    }
-//    else
-//    {
+//    let atLeastOneFailure = false;
+//    for (const step of moveSteps) {
+//        const hitResults: (number | boolean | "" | undefined)[] | undefined = step.call(this, targets, pokemon, move);
+//        if (!hitResults) continue;
+//        targets = targets.filter((val, i) => hitResults[i] || hitResults[i] === 0);
+//        atLeastOneFailure = atLeastOneFailure || hitResults.some(val => val === false);
+//        if (move.smartTarget && atLeastOneFailure) move.smartTarget = false;
 //        if (!targets.length)
 //        {
-//            this.battle.attrLastMove('[notarget]');
-//            this.battle.add(this.battle.gen >= 5 ? '-fail' : '-notarget', pokemon);
-//            return false;
-//        }
-//        if (this.battle.gen === 4 && move.selfdestruct === 'always')
-//        {
-//            this.battle.faint(pokemon, pokemon, move);
-//        }
-//        moveResult = this.trySpreadMoveHit(targets, pokemon, move);
-//    }
-//    if (move.selfBoost && moveResult) this.moveHit(pokemon, pokemon, move, move.selfBoost, false, true);
-//    if (!pokemon.hp)
-//    {
-//        this.battle.faint(pokemon, pokemon, move);
-//    }
-
-//    if (!moveResult)
-//    {
-//        this.battle.singleEvent('MoveFail', move, null, target, pokemon, move);
-//        return false;
-//    }
-
-//    if (!(move.hasSheerForce && pokemon.hasAbility('sheerforce')) && !move.flags['futuremove'])
-//    {
-//        const originalHp = pokemon.hp;
-//        this.battle.singleEvent('AfterMoveSecondarySelf', move, null, pokemon, target, move);
-//        this.battle.runEvent('AfterMoveSecondarySelf', pokemon, target, move);
-//        if (pokemon && pokemon !== target && move.category !== 'Status')
-//        {
-//            if (pokemon.hp <= pokemon.maxhp / 2 && originalHp > pokemon.maxhp / 2)
-//            {
-//                this.battle.runEvent('EmergencyExit', pokemon, pokemon);
-//            }
+//            // console.log(step.name);
+//            break;
 //        }
 //    }
 
-//    return true;
+//    move.hitTargets = targets;
+//    const moveResult = !!targets.length;
+//    if (!moveResult && !atLeastOneFailure) pokemon.moveThisTurnResult = null;
+//    const hitSlot = targets.map(p => p.getSlot());
+//    if (move.spreadHit) this.battle.attrLastMove('[spread] ' + hitSlot.join(','));
+//    return moveResult;
 //}

@@ -862,32 +862,32 @@ public partial class BattleActions(IBattle battle)
         // Define the sequence of hit validation steps
         // Each step filters out targets that fail its check
         var moveSteps = new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>>
-        {
-            // 0. check for semi invulnerability
-            HitStepInvulnerabilityEvent,
+    {
+        // 0. check for semi invulnerability
+        HitStepInvulnerabilityEvent,
 
-            // 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) 
-            // (this is step 2 in gens 5 & 6, and step 4 in gen 4)
-            HitStepTryEvent,
+        // 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) 
+        // (this is step 2 in gens 5 & 6, and step 4 in gen 4)
+        HitStepTryEvent,
 
-            // 2. check for type immunity (this is step 1 in gens 4-6)
-            HitStepTypeImmunity,
+        // 2. check for type immunity (this is step 1 in gens 4-6)
+        HitStepTypeImmunity,
 
-            // 3. check for various move-specific immunities
-            HitStepTryImmunity,
+        // 3. check for various move-specific immunities
+        HitStepTryImmunity,
 
-            // 4. check accuracy
-            HitStepAccuracy,
+        // 4. check accuracy
+        HitStepAccuracy,
 
-            // 5. break protection effects
-            HitStepBreakProtect,
+        // 5. break protection effects
+        HitStepBreakProtect,
 
-            // 6. steal positive boosts (Spectral Thief)
-            HitStepStealBoosts,
+        // 6. steal positive boosts (Spectral Thief)
+        HitStepStealBoosts,
 
-            // 7. loop that processes each hit of the move (has its own steps per iteration)
-            HitStepMoveHitLoop,
-        };
+        // 7. loop that processes each hit of the move (has its own steps per iteration)
+        HitStepMoveHitLoop,
+    };
 
         // Set as active move if needed
         if (notActive)
@@ -896,15 +896,15 @@ public partial class BattleActions(IBattle battle)
         }
 
         // Run preliminary events to check if the move can be used at all
-        RelayVar? tryResult = Battle.SingleEvent(EventId.Try, move, null, pokemon, 
+        RelayVar? tryResult = Battle.SingleEvent(EventId.Try, move, null, pokemon,
             targets.Count > 0 ? SingleEventSource.FromNullablePokemon(targets[0]) : null, move);
-        
-        RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move, 
+
+        RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move,
             Battle.InitEffectState(),
             targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
             pokemon, move);
-        
-        RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon, 
+
+        RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
             targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
 
         bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
@@ -920,9 +920,9 @@ public partial class BattleActions(IBattle battle)
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.Add("-fail", pokemon);
+                    Battle.AttrLastMove("[still]");
                 }
-                Battle.AttrLastMove("[still]");
             }
 
             // Return true only if this is a "not a failure" case (null result means NOT_FAIL)
@@ -931,11 +931,11 @@ public partial class BattleActions(IBattle battle)
 
         // Process each hit validation step
         bool atLeastOneFailure = false;
-        
+
         foreach (var step in moveSteps)
         {
             var hitResults = step(targets, pokemon, move);
-            
+
             if (hitResults == null)
             {
                 continue;
@@ -954,7 +954,7 @@ public partial class BattleActions(IBattle battle)
             targets = newTargets;
 
             // Track if any target failed this step
-            atLeastOneFailure = atLeastOneFailure || 
+            atLeastOneFailure = atLeastOneFailure ||
                 hitResults.Any(result => result is BoolBoolIntEmptyUndefinedUnion { Value: false });
 
             // Disable smart targeting if there was a failure
@@ -972,9 +972,9 @@ public partial class BattleActions(IBattle battle)
 
         // Store final hit targets in the move
         move.HitTargets = targets;
-        
+
         bool moveResult = targets.Count > 0;
-        
+
         // If move completely failed with no specific failures, set moveThisTurnResult to null (NOT_FAIL)
         if (!moveResult && !atLeastOneFailure)
         {
@@ -982,7 +982,7 @@ public partial class BattleActions(IBattle battle)
         }
 
         // Add spread move attribute to battle log if applicable
-        if (move.SpreadHit == true)
+        if (Battle.DisplayUi && move.SpreadHit == true)
         {
             var hitSlots = targets.Select(p => p.Position).ToList();
             Battle.AttrLastMove($"[spread] {string.Join(",", hitSlots)}");
@@ -991,7 +991,7 @@ public partial class BattleActions(IBattle battle)
         return moveResult;
     }
 
-   
+
 
     public Undefined AfterMoveSecondaryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
