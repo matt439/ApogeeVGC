@@ -762,7 +762,11 @@ public partial class BattleAsync : IBattle, IDisposable
         if (Ended) return false;
 
         InputLog.Add("> tiebreak");
-        UiGenerator.PrintMessage("Time's up! Going to tiebreaker...");
+
+        if (DisplayUi)
+        {
+            Add("message", "Time's up! Going to tiebreaker...");
+        }
 
         // Count non-fainted Pokemon for each side
         var notFainted = Sides.Select(side =>
@@ -770,10 +774,13 @@ public partial class BattleAsync : IBattle, IDisposable
         ).ToList();
 
         // Display Pokemon count per side
-        string pokemonCountMessage = string.Join("; ",
-            Sides.Select((side, i) => $"{side.Name}: {notFainted[i]} Pokemon left")
-        );
-        UiGenerator.PrintMessage(pokemonCountMessage);
+        if (DisplayUi)
+        {
+            string pokemonCountMessage = string.Join("; ",
+                Sides.Select((side, i) => $"{side.Name}: {notFainted[i]} Pokemon left")
+            );
+            Add("-message", pokemonCountMessage);
+        }
 
         // Filter sides with maximum Pokemon count
         int maxNotFainted = notFainted.Max();
@@ -790,15 +797,17 @@ public partial class BattleAsync : IBattle, IDisposable
         ).ToList();
 
         // Display HP percentage per side
-        string hpPercentageMessage = string.Join("; ",
-            tiedSides.Select((side, i) => $"{side.Name}: {Math.Round(hpPercentage[i])}% total HP left")
-        );
-        UiGenerator.PrintMessage(hpPercentageMessage);
+        if (DisplayUi)
+        {
+            string hpPercentageMessage = string.Join("; ",
+                tiedSides.Select((side, i) => $"{side.Name}: {Math.Round(hpPercentage[i])}% total HP left")
+            );
+            Add("-message", hpPercentageMessage);
+        }
 
         // Filter sides with maximum HP percentage
         double maxPercentage = hpPercentage.Max();
-        tiedSides = tiedSides.Where((_, i) => Math.Abs(hpPercentage[i] - maxPercentage) < double.Epsilon).
-            ToList();
+        tiedSides = tiedSides.Where((_, i) => Math.Abs(hpPercentage[i] - maxPercentage) < double.Epsilon).ToList();
 
         if (tiedSides.Count <= 1)
         {
@@ -811,10 +820,13 @@ public partial class BattleAsync : IBattle, IDisposable
         ).ToList();
 
         // Display total HP per side
-        string hpTotalMessage = string.Join("; ",
-            tiedSides.Select((side, i) => $"{side.Name}: {hpTotal[i]} total HP left")
-        );
-        UiGenerator.PrintMessage(hpTotalMessage);
+        if (DisplayUi)
+        {
+            string hpTotalMessage = string.Join("; ",
+                tiedSides.Select((side, i) => $"{side.Name}: {hpTotal[i]} total HP left")
+            );
+            Add("-message", hpTotalMessage);
+        }
 
         // Filter sides with maximum total HP
         int maxTotal = hpTotal.Max();
@@ -866,21 +878,24 @@ public partial class BattleAsync : IBattle, IDisposable
 
         Winner = side?.Name ?? string.Empty;
 
-        // Print empty line for formatting
-        UiGenerator.PrintEmptyLine();
+        if (DisplayUi)
+        {
+            // Print empty line for formatting
+            Add("");
 
-        // Print the appropriate win/tie message
-        // Note: AllySide is not implemented in this codebase (see Side class)
-        // The original TypeScript code checks for side?.allySide here
-        if (side != null)
-        {
-            // Single side wins
-            UiGenerator.PrintWinEvent(side);
-        }
-        else
-        {
-            // Tie
-            UiGenerator.PrintTieEvent();
+            // Print the appropriate win/tie message
+            // Note: AllySide is not implemented in this codebase (see Side class)
+            // The original TypeScript code checks for side?.allySide here
+            if (side != null)
+            {
+                // Single side wins
+                Add("win", side.Name);
+            }
+            else
+            {
+                // Tie
+                Add("tie");
+            }
         }
 
         // End the battle
