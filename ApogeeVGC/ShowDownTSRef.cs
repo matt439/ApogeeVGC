@@ -1,30 +1,39 @@
-﻿///**
-//     * Generally called at the beginning of a turn, to go through the
-//     * turn one action at a time.
-//     *
-//     * If there is a mid-turn decision (like U-Turn), this will return
-//     * and be called again later to resume the turn.
-//     */
-//turnLoop() {
-//    this.add('');
-//    this.add('t:', Math.floor(Date.now() / 1000));
-//    if (this.requestState) this.requestState = '';
-
-//    if (!this.midTurn)
+﻿//setPlayer(slot: SideID, options: PlayerOptions) {
+//    let side;
+//    let didSomething = true;
+//    const slotNum = parseInt(slot[1]) - 1;
+//    if (!this.sides[slotNum])
 //    {
-//        this.queue.insertChoice({ choice: 'beforeTurn' });
-//        this.queue.addChoice({ choice: 'residual' });
-//        this.midTurn = true;
+//        // create player
+//        const team = this.getTeam(options);
+//        side = new Side(options.name || `Player ${ slotNum + 1 }`, this, slotNum, team);
+//        if (options.avatar) side.avatar = `${ options.avatar}`;
+//        this.sides[slotNum] = side;
 //    }
-
-//    let action;
-//    while ((action = this.queue.shift()))
+//    else
 //    {
-//        this.runAction(action);
-//        if (this.requestState || this.ended) return;
+//        // edit player
+//        side = this.sides[slotNum];
+//        didSomething = false;
+//        if (options.name && side.name !== options.name)
+//        {
+//            side.name = options.name;
+//            didSomething = true;
+//        }
+//        if (options.avatar && side.avatar !== `${ options.avatar}`) {
+//            side.avatar = `${ options.avatar}`;
+//            didSomething = true;
+//        }
+//        if (options.team) throw new Error(`Player ${ slot } already has a team!`);
 //    }
+//    if (options.team && typeof options.team !== 'string')
+//    {
+//        options.team = Teams.pack(options.team);
+//    }
+//    if (!didSomething) return;
+//    this.inputLog.push(`> player ${ slot} ` +JSON.stringify(options));
+//    this.add('player', side.id, side.name, side.avatar, options.rating || '');
 
-//    this.endTurn();
-//    this.midTurn = false;
-//    this.queue.clear();
+//    // Start the battle if it's ready to start
+//    if (this.sides.every(playerSide => !!playerSide) && !this.started) this.start();
 //}

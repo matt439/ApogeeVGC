@@ -3808,6 +3808,11 @@ public partial class BattleAsync : IBattle, IDisposable
             };
 
             Sides[slotNum] = side;
+
+            if (DisplayUi)
+            {
+                Debug($"Created new player for {slot}: {playerName}");
+            }
         }
         else
         {
@@ -3818,6 +3823,10 @@ public partial class BattleAsync : IBattle, IDisposable
             // Update name if different
             if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
             {
+                if (DisplayUi)
+                {
+                    Debug($"Updating player name for {slot}: {side.Name} -> {options.Name}");
+                }
                 side.Name = options.Name;
                 didSomething = true;
             }
@@ -3825,6 +3834,10 @@ public partial class BattleAsync : IBattle, IDisposable
             // Update avatar if different
             if (!string.IsNullOrEmpty(options.Avatar) && side.Avatar != options.Avatar)
             {
+                if (DisplayUi)
+                {
+                    Debug($"Updating player avatar for {slot}: {side.Avatar} -> {options.Avatar}");
+                }
                 side.Avatar = options.Avatar;
                 didSomething = true;
             }
@@ -3844,11 +3857,14 @@ public partial class BattleAsync : IBattle, IDisposable
         InputLog.Add($"> player {slot} {optionsJson}");
 
         // Add player info to battle log
-        string rating = options.Rating?.ToString() ?? string.Empty;
-        Log.Add($"|player|{side.Id}|{side.Name}|{side.Avatar}|{rating}");
+        if (DisplayUi)
+        {
+            string rating = options.Rating?.ToString() ?? string.Empty;
+            Add("player", side.Id.ToString(), side.Name, side.Avatar, rating);
+        }
 
         // Start battle if all sides are ready and battle hasn't started
-        if (Sides.All(playerSide => !playerSide.Initialised) && !Started)
+        if (Sides.All(playerSide => playerSide.Initialised) && !Started)
         {
             Start();
         }
