@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -135,6 +134,308 @@ public partial class BattleAsync
         }
 
         return returnVal ?? relayVar;
+    }
+
+    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
+        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
+    {
+        // Check for stack overflow
+        if (EventDepth >= 8)
+        {
+            if (DisplayUi)
+            {
+                Add("message", "STACK LIMIT EXCEEDED");
+                Add("message", "PLEASE REPORT IN BUG THREAD");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {Event.Id}");
+            }
+            throw new InvalidOperationException("Stack overflow");
+        }
+
+        // Default target to Battle if not provided
+        target ??= RunEventTarget.FromIBattle(this);
+
+        // Extract the source Pokemon for handler lookup
+        Pokemon? effectSource = source switch
+        {
+            PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
+            _ => null,
+        };
+
+        // Find all handlers for this event
+        var handlers = FindEventHandlers(target, eventId, effectSource);
+
+        // If onEffect is true, add the sourceEffect's handler at the front
+        if (onEffect == true)
+        {
+            if (sourceEffect == null)
+            {
+                throw new ArgumentNullException(nameof(sourceEffect), "onEffect passed without an effect");
+            }
+
+            EffectDelegate? callback = sourceEffect.GetDelegate(eventId);
+            if (callback != null)
+            {
+                if (target is PokemonArrayRunEventTarget)
+                {
+                    throw new InvalidOperationException("Cannot use onEffect with array target");
+                }
+
+                // Add the effect's callback as the first handler
+                handlers.Insert(0, ResolvePriority(new EventListenerWithoutPriority
+                {
+                    Effect = sourceEffect,
+                    Callback = callback,
+                    State = InitEffectState(),
+                    End = null,
+                    EffectHolder = target switch
+                    {
+                        PokemonRunEventTarget pokemonTarget => pokemonTarget.Pokemon,
+                        SideRunEventTarget sideTarget => sideTarget.Side,
+                        FieldRunEventTarget fieldTarget => fieldTarget.Field,
+                        BattleRunEventTarget => EffectHolder.FromIBattle(this),
+                        _ => throw new InvalidOperationException($"Unknown target type: {target.GetType().Name}"),
+                    },
+                }, eventId));
+            }
+        }
+
+        // Sort handlers based on event type
+        if (eventId is EventId.Invulnerability or EventId.TryHit or EventId.DamagingHit or EventId.EntryHazard)
+        {
+            handlers.Sort(CompareLeftToRightOrder);
+        }
+        else if (fastExit == true)
+        {
+            handlers.Sort(CompareRedirectOrder);
+        }
+        else
+        {
+            SpeedSort(handlers);
+        }
+
+        // Track if relayVar was explicitly provided
+        bool hasRelayVar = relayVar != null;
+        relayVar ??= new BoolRelayVar(true);
+
+        // Save parent context
+        Event parentEvent = Event;
+        Event = new Event
+        {
+            Id = eventId,
+            Target = target switch
+            {
+                PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget.Pokemon),
+                _ => null,
+            },
+            Source = source switch
+            {
+                PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource.Pokemon),
+                _ => null,
+            },
+            Effect = sourceEffect,
+            Modifier = 1.0,
+        };
+        EventDepth++;
+
+        // Handle array targets
+        List<RelayVar>? targetRelayVars = null;
+        if (target is PokemonArrayRunEventTarget arrayTarget)
+        {
+            if (relayVar is ArrayRelayVar arrayRelayVar)
+            {
+                targetRelayVars = arrayRelayVar.Values.ToList();
+            }
+            else
+            {
+                // Initialize all to true
+                targetRelayVars = new List<RelayVar>(arrayTarget.PokemonList.Length);
+                for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
+                {
+                    targetRelayVars.Add(new BoolRelayVar(true));
+                }
+            }
+        }
+
+        // Execute each handler
+        foreach (EventListener handler in handlers)
+        {
+            // For array targets, check if this specific target's relay var is falsy
+            if (handler.Index.HasValue && targetRelayVars != null)
+            {
+                RelayVar currentRelayVar = targetRelayVars[handler.Index.Value];
+
+                // Skip if falsy (except for DamagingHit with 0 damage)
+                if (!IsRelayVarTruthy(currentRelayVar) &&
+                    !(eventId == EventId.DamagingHit && currentRelayVar is IntRelayVar { Value: 0 }))
+                {
+                    continue;
+                }
+
+                // Update event target for this handler
+                if (handler.Target != null)
+                {
+                    Event.Target = new PokemonSingleEventTarget(handler.Target);
+                }
+
+                // Use this target's relay var
+                relayVar = currentRelayVar;
+            }
+
+            IEffect effect = handler.Effect;
+            EffectHolder effectHolder = handler.EffectHolder;
+
+            // Check if status has changed
+            if (effect.EffectType == EffectType.Status &&
+                effectHolder is PokemonEffectHolder pokemonHolder)
+            {
+                var condition = (Condition)effect;
+                if (pokemonHolder.Pokemon.Status != condition.Id)
+                {
+                    // Status changed, skip this handler
+                    continue;
+                }
+            }
+
+            // Check for Mold Breaker suppression
+            if (effect.EffectType == EffectType.Ability &&
+                effectHolder is PokemonEffectHolder pokemonHolder2)
+            {
+                var ability = (Ability)effect;
+                if ((ability.Flags.Breakable ?? false) && SuppressingAbility(pokemonHolder2.Pokemon))
+                {
+                    if (DisplayUi)
+                    {
+                        Debug($"{eventId} handler suppressed by Mold Breaker");
+                    }
+                    continue;
+                }
+
+                // For custom abilities (no num), check if this is an attacking event
+                if (ability.Num == 0 && IsAttackingEvent(eventId, sourceEffect))
+                {
+                    if (DisplayUi)
+                    {
+                        Debug($"{eventId} handler suppressed by Mold Breaker");
+                    }
+                    continue;
+                }
+            }
+
+            // Check for item suppression
+            if (eventId is not (EventId.Start or EventId.SwitchIn or EventId.TakeItem) &&
+                effect.EffectType == EffectType.Item &&
+                effectHolder is PokemonEffectHolder pokemonHolder3 &&
+                pokemonHolder3.Pokemon.IgnoringItem())
+            {
+                if (eventId != EventId.Update && DisplayUi)
+                {
+                    Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
+                }
+                continue;
+            }
+
+            // Check for ability suppression
+            if (eventId != EventId.End &&
+                effect.EffectType == EffectType.Ability &&
+                effectHolder is PokemonEffectHolder pokemonHolder4 &&
+                pokemonHolder4.Pokemon.IgnoringAbility())
+            {
+                if (eventId != EventId.Update && DisplayUi)
+                {
+                    Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
+                }
+                continue;
+            }
+
+            // Check for weather suppression
+            if ((effect.EffectType == EffectType.Weather || eventId == EventId.Weather) &&
+                eventId is not (EventId.Residual or EventId.End) &&
+                Field.SuppressingWeather())
+            {
+                if (DisplayUi)
+                {
+                    Debug($"{eventId} handler suppressed by Air Lock");
+                }
+                continue;
+            }
+
+            // Execute the handler
+            RelayVar? returnVal = null;
+
+            // Save parent effect context
+            IEffect parentEffect = Effect;
+            EffectState parentEffectState = EffectState;
+
+            // Set up handler's effect context
+            Effect = handler.Effect;
+            EffectState = handler.State ?? InitEffectState();
+            EffectState.Target = effectHolder switch
+            {
+                PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
+                SideEffectHolder sideEh => new SideEffectStateTarget(sideEh.Side),
+                FieldEffectHolder fieldEh => new FieldEffectStateTarget(fieldEh.Field),
+                BattleEffectHolder battleEh => EffectStateTarget.FromIBattle(battleEh.Battle),
+                _ => null,
+            };
+
+            // Invoke the callback if present
+            if (handler.Callback != null)
+            {
+                returnVal = InvokeEventCallback(
+                    handler.Callback,
+                    hasRelayVar,
+                    relayVar,
+                    Event.Target,
+                    Event.Source,
+                    sourceEffect
+                );
+            }
+
+            // Restore parent effect context
+            Effect = parentEffect;
+            EffectState = parentEffectState;
+
+            // Process return value
+            if (returnVal != null)
+            {
+                relayVar = returnVal;
+
+                // Check for early exit
+                if (!IsRelayVarTruthy(relayVar) || fastExit == true)
+                {
+                    if (handler.Index.HasValue && targetRelayVars != null)
+                    {
+                        // Update this target's relay var
+                        targetRelayVars[handler.Index.Value] = relayVar;
+
+                        // Check if all targets are falsy
+                        if (targetRelayVars.All(rv => !IsRelayVarTruthy(rv)))
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Restore event depth and parent event
+        EventDepth--;
+
+        // Apply event modifier to numeric relay vars
+        if (relayVar is IntRelayVar intRelay && intRelay.Value == Math.Abs(intRelay.Value))
+        {
+            relayVar = new IntRelayVar(FinalModify(intRelay.Value));
+        }
+
+        Event = parentEvent;
+
+        // Return appropriate result
+        return target is PokemonArrayRunEventTarget ? new ArrayRelayVar([.. targetRelayVars ?? []]) : relayVar;
     }
 
     /// <summary>
@@ -373,307 +674,6 @@ public partial class BattleAsync
         }
     }
 
-    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
-        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
-    {
-        // Check for stack overflow
-        if (EventDepth >= 8)
-        {
-            UiGenerator.PrintMessage("STACK LIMIT EXCEEDED");
-            UiGenerator.PrintMessage("PLEASE REPORT IN BUG THREAD");
-            UiGenerator.PrintMessage($"Event: {eventId}");
-            UiGenerator.PrintMessage($"Parent event: {Event.Id}");
-            throw new InvalidOperationException("Stack overflow");
-        }
-
-        // Default target to Battle if not provided
-        target ??= RunEventTarget.FromIBattle(this);
-
-        // Extract the source Pokemon for handler lookup
-        Pokemon? effectSource = source switch
-        {
-            PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
-            _ => null,
-        };
-
-        // Find all handlers for this event
-        var handlers = FindEventHandlers(target, eventId, effectSource);
-
-        // If onEffect is true, add the sourceEffect's handler at the front
-        if (onEffect == true)
-        {
-            if (sourceEffect == null)
-            {
-                throw new ArgumentNullException(nameof(sourceEffect), "onEffect passed without an effect");
-            }
-
-            EffectDelegate? callback = sourceEffect.GetDelegate(eventId);
-            if (callback != null)
-            {
-                if (target is PokemonArrayRunEventTarget)
-                {
-                    throw new InvalidOperationException("Cannot use onEffect with array target");
-                }
-
-                // Add the effect's callback as the first handler
-                handlers.Insert(0, ResolvePriority(new EventListenerWithoutPriority
-                {
-                    Effect = sourceEffect,
-                    Callback = callback,
-                    State = InitEffectState(),
-                    End = null,
-                    EffectHolder = target switch
-                    {
-                        PokemonRunEventTarget pokemonTarget => pokemonTarget.Pokemon,
-                        SideRunEventTarget sideTarget => sideTarget.Side,
-                        FieldRunEventTarget fieldTarget => fieldTarget.Field,
-                        BattleRunEventTarget => EffectHolder.FromIBattle(this),
-                        _ => throw new InvalidOperationException($"Unknown target type: {target.GetType().Name}"),
-                    },
-                }, eventId));
-            }
-        }
-
-        // Sort handlers based on event type
-        if (eventId is EventId.Invulnerability or EventId.TryHit or EventId.DamagingHit or EventId.EntryHazard)
-        {
-            handlers.Sort(CompareLeftToRightOrder);
-        }
-        else if (fastExit == true)
-        {
-            handlers.Sort(CompareRedirectOrder);
-        }
-        else
-        {
-            SpeedSort(handlers);
-        }
-
-        // Track if relayVar was explicitly provided
-        bool hasRelayVar = relayVar != null;
-        relayVar ??= new BoolRelayVar(true);
-
-        // Save parent context
-        Event parentEvent = Event;
-        Event = new Event
-        {
-            Id = eventId,
-            Target = target switch
-            {
-                PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget.Pokemon),
-                _ => null,
-            },
-            Source = source switch
-            {
-                PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource.Pokemon),
-                _ => null,
-            },
-            Effect = sourceEffect,
-            Modifier = 1.0,
-        };
-        EventDepth++;
-
-        // Handle array targets
-        List<RelayVar>? targetRelayVars = null;
-        if (target is PokemonArrayRunEventTarget arrayTarget)
-        {
-            if (relayVar is ArrayRelayVar arrayRelayVar)
-            {
-                targetRelayVars = arrayRelayVar.Values.ToList();
-            }
-            else
-            {
-                // Initialize all to true
-                targetRelayVars = new List<RelayVar>(arrayTarget.PokemonList.Length);
-                for (int i = 0; i < arrayTarget.PokemonList.Length; i++)
-                {
-                    targetRelayVars.Add(new BoolRelayVar(true));
-                }
-            }
-        }
-
-        // Execute each handler
-        foreach (EventListener handler in handlers)
-        {
-            // For array targets, check if this specific target's relay var is falsy
-            if (handler.Index.HasValue && targetRelayVars != null)
-            {
-                RelayVar currentRelayVar = targetRelayVars[handler.Index.Value];
-
-                // Skip if falsy (except for DamagingHit with 0 damage)
-                if (!IsRelayVarTruthy(currentRelayVar) &&
-                    !(eventId == EventId.DamagingHit && currentRelayVar is IntRelayVar { Value: 0 }))
-                {
-                    continue;
-                }
-
-                // Update event target for this handler
-                if (handler.Target != null)
-                {
-                    Event.Target = new PokemonSingleEventTarget(handler.Target);
-                }
-
-                // Use this target's relay var
-                relayVar = currentRelayVar;
-            }
-
-            IEffect effect = handler.Effect;
-            EffectHolder effectHolder = handler.EffectHolder;
-
-            // Check if status has changed
-            if (effect.EffectType == EffectType.Status &&
-                effectHolder is PokemonEffectHolder pokemonHolder)
-            {
-                var condition = (Condition)effect;
-                if (pokemonHolder.Pokemon.Status != condition.Id)
-                {
-                    // Status changed, skip this handler
-                    continue;
-                }
-            }
-
-            // Check for Mold Breaker suppression
-            if (effect.EffectType == EffectType.Ability &&
-                effectHolder is PokemonEffectHolder pokemonHolder2)
-            {
-                var ability = (Ability)effect;
-                if ((ability.Flags.Breakable ?? false) && SuppressingAbility(pokemonHolder2.Pokemon))
-                {
-                    if (DisplayUi)
-                    {
-                        UiGenerator.PrintMessage($"{eventId} handler suppressed by Mold Breaker");
-                    }
-                    continue;
-                }
-
-                // For custom abilities (no num), check if this is an attacking event
-                if (ability.Num == 0 && IsAttackingEvent(eventId, sourceEffect))
-                {
-                    if (DisplayUi)
-                    {
-                        UiGenerator.PrintMessage($"{eventId} handler suppressed by Mold Breaker");
-                    }
-                    continue;
-                }
-            }
-
-            // Check for item suppression
-            if (eventId is not (EventId.Start or EventId.SwitchIn or EventId.TakeItem) &&
-                effect.EffectType == EffectType.Item &&
-                effectHolder is PokemonEffectHolder pokemonHolder3 &&
-                pokemonHolder3.Pokemon.IgnoringItem())
-            {
-                if (eventId != EventId.Update && DisplayUi)
-                {
-                    UiGenerator.PrintMessage($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
-                }
-                continue;
-            }
-
-            // Check for ability suppression
-            if (eventId != EventId.End &&
-                effect.EffectType == EffectType.Ability &&
-                effectHolder is PokemonEffectHolder pokemonHolder4 &&
-                pokemonHolder4.Pokemon.IgnoringAbility())
-            {
-                if (eventId != EventId.Update && DisplayUi)
-                {
-                    UiGenerator.PrintMessage($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
-                }
-                continue;
-            }
-
-            // Check for weather suppression
-            if ((effect.EffectType == EffectType.Weather || eventId == EventId.Weather) &&
-                eventId is not (EventId.Residual or EventId.End) &&
-                Field.SuppressingWeather())
-            {
-                if (DisplayUi)
-                {
-                    UiGenerator.PrintMessage($"{eventId} handler suppressed by Air Lock");
-                }
-                continue;
-            }
-
-            // Execute the handler
-            RelayVar? returnVal = null;
-
-            // Save parent effect context
-            IEffect parentEffect = Effect;
-            EffectState parentEffectState = EffectState;
-
-            // Set up handler's effect context
-            Effect = handler.Effect;
-            EffectState = handler.State ?? InitEffectState();
-            EffectState.Target = effectHolder switch
-            {
-                PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
-                SideEffectHolder sideEh => new SideEffectStateTarget(sideEh.Side),
-                FieldEffectHolder fieldEh => new FieldEffectStateTarget(fieldEh.Field),
-                BattleEffectHolder battleEh => EffectStateTarget.FromIBattle(battleEh.Battle),
-                _ => null,
-            };
-
-            // Invoke the callback if present
-            // In TypeScript, if callback is not a function, it's returned as-is (constant value)
-            // In C#, constants are handled inside InvokeEventCallback (e.g., OnFlinchBool)
-            // If Callback is null, this handler shouldn't have been added (design invariant)
-            if (handler.Callback != null)
-            {
-                returnVal = InvokeEventCallback(
-                    handler.Callback,
-                    hasRelayVar,
-                    relayVar,
-                    Event.Target,
-                    Event.Source,
-                    sourceEffect
-                );
-            }
-
-            // Restore parent effect context
-            Effect = parentEffect;
-            EffectState = parentEffectState;
-
-            // Process return value
-            if (returnVal != null)
-            {
-                relayVar = returnVal;
-
-                // Check for early exit
-                if (!IsRelayVarTruthy(relayVar) || fastExit == true)
-                {
-                    if (handler.Index.HasValue && targetRelayVars != null)
-                    {
-                        // Update this target's relay var
-                        targetRelayVars[handler.Index.Value] = relayVar;
-
-                        // Check if all targets are falsy
-                        if (targetRelayVars.All(rv => !IsRelayVarTruthy(rv)))
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Restore event depth and parent event
-        EventDepth--;
-
-        // Apply event modifier to numeric relay vars
-        if (relayVar is IntRelayVar intRelay && intRelay.Value == Math.Abs(intRelay.Value))
-        {
-            relayVar = new IntRelayVar(FinalModify(intRelay.Value));
-        }
-
-        Event = parentEvent;
-
-        // Return appropriate result
-        return target is PokemonArrayRunEventTarget ? new ArrayRelayVar([.. targetRelayVars ?? []]) : relayVar;
-    }
     public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target, Pokemon? source = null,
         IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
     {
