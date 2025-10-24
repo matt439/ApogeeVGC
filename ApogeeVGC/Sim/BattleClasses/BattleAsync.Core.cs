@@ -602,6 +602,27 @@ public partial class BattleAsync : IBattle, IDisposable
             side.ActiveRequest = null;
         }
 
+        // Add team preview message if applicable
+        if (type.Value == RequestState.TeamPreview)
+        {
+            // `pickedTeamSize = 6` means the format wants the user to select
+            // the entire team order, unlike `pickedTeamSize = null` which
+            // will only ask the user to select their lead(s).
+            int? pickedTeamSize = RuleTable.PickedTeamSize;
+
+            if (DisplayUi)
+            {
+                if (pickedTeamSize.HasValue)
+                {
+                    Add("teampreview", pickedTeamSize.Value);
+                }
+                else
+                {
+                    Add("teampreview");
+                }
+            }
+        }
+
         // Generate appropriate requests for the current state
         var requests = GetRequests(type.Value);
 
@@ -610,10 +631,6 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             Sides[i].ActiveRequest = requests[i];
         }
-
-        // Note: In the TypeScript version, sentRequests is set to false
-        // The C# version has SentRequests as a static property that always returns true
-        // This may need to be changed to an instance property if the behavior is needed
 
         // Verify that choices aren't already done (would indicate a bug)
         if (Sides.All(side => side.IsChoiceDone()))
