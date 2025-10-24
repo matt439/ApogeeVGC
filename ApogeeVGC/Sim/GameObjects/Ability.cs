@@ -49,6 +49,7 @@ public enum AbilityId
     NaturalCure,
     Dancer,
     SheerForce,
+    Illusion,
 
     None,
 }
