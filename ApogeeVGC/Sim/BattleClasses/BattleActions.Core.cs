@@ -1721,8 +1721,11 @@ public partial class BattleActions(IBattle battle)
                         target.ForceSwitchFlag = true;
                         break;
                     case BoolRelayVar { Value: false } when move.Category == MoveCategory.Status:
-                        UiGenerator.PrintFailEvent(source);
-                        Battle.AttrLastMove("[still]");
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.Add("-fail", source);
+                            Battle.AttrLastMove("[still]");
+                        }
                         damage[i] = BoolIntUndefinedUnion.FromBool(false);
                         break;
                 }
