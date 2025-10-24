@@ -13,8 +13,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1663,14 +1661,7 @@ public partial class BattleAsync : IBattle, IDisposable
         switch (effect)
         {
             case EffectBattleDamageEffect ebde:
-                if (ebde.Effect is Condition cond)
-                {
-                    effectCondition = cond;
-                }
-                else
-                {
-                    effectCondition = null;
-                }
+                effectCondition = ebde.Effect as Condition;
                 break;
             case DrainBattleDamageEffect:
                 effectCondition = Library.Conditions[ConditionId.Drain];
@@ -1698,6 +1689,13 @@ public partial class BattleAsync : IBattle, IDisposable
             };
 
             int targetDamage = curDamage[0].ToInt();
+
+            // Handle undefined damage values
+            if (curDamage[0] is UndefinedBoolIntUndefinedUnion)
+            {
+                retVals.Add(curDamage[0]);
+                continue;
+            }
 
             // Target has no HP - return 0
             if (target is not { Hp: > 0 })
@@ -1766,6 +1764,18 @@ public partial class BattleAsync : IBattle, IDisposable
 
             // Log damage messages
             PrintDamageMessage(target, source, effectCondition);
+
+            if (effect is not EffectBattleDamageEffect { Effect: ActiveMove move }) continue;
+
+            // Handle recoil and drain for moves (Gen-specific logic)
+            if (targetDamage <= 0 || effectCondition?.EffectType != EffectType.Move) continue;
+
+            // Gen 5+ drain healing (uses rounding instead of flooring)
+            if (Gen <= 4 || move.Drain == null || source == null) continue;
+
+            int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
+                                               (double)move.Drain.Value.Item2));
+            Heal(drainAmount, source, target, new DrainBattleHealEffect());
         }
 
         // Handle instafaint if requested
@@ -1792,61 +1802,95 @@ public partial class BattleAsync : IBattle, IDisposable
         return retVals;
     }
 
+
     /// <summary>
-    /// Helper method to print damage messages based on the effect type.
-    /// Handles special cases like PartiallyTrapped, Powder, and Confusion.
+    /// Logs a damage message to the battle log based on the effect causing the damage.
+    /// Handles special cases like partially trapped, powder, and confusion.
     /// </summary>
-    private void PrintDamageMessage(Pokemon target, Pokemon? source = null, IEffect? effect = null)
+    private void PrintDamageMessage(Pokemon target, Pokemon? source, Condition? effect)
     {
-        // Get effect name (convert 'tox' to 'psn' for display)
-        string effectName = effect?.Name == "Toxic" ? "Poison" : effect?.Name ?? "";
+        if (!DisplayUi) return;
 
-        // Handle special condition-specific messages
-        if (effect is Condition condition)
+        // Get the health status for the log message
+        var healthFunc = target.GetHealth;
+
+        // Get the effect name, converting "tox" to "psn" for display
+        string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
+
+        switch (effect?.Id)
         {
-            switch (condition.Id)
+            case ConditionId.PartiallyTrapped:
+                // Get the source effect from the volatile condition
+                if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped, out EffectState? ptState) &&
+                    ptState.SourceEffect != null)
+                {
+                    Add("-damage", target, healthFunc, "[from]", ptState.SourceEffect.FullName, "[partiallytrapped]");
+                }
+                break;
+
+            case ConditionId.Powder:
+                Add("-damage", target, healthFunc, "[silent]");
+                break;
+
+            case ConditionId.Confusion:
+                Add("-damage", target, healthFunc, "[from] confusion");
+                break;
+
+            default:
+                if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
+                {
+                    // Simple damage from a move or no effect
+                    Add("-damage", target, healthFunc);
+                }
+                else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
+                {
+                    // Damage from effect with source
+                    Add("-damage", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
+                }
+                else
+                {
+                    // Damage from effect without source
+                    Add("-damage", target, healthFunc, $"[from] {effectName}");
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Logs a heal message to the battle log based on the effect causing the healing.
+    /// </summary>
+    private void PrintHealMessage(Pokemon target, Pokemon? source, Condition? effect)
+    {
+        if (!DisplayUi) return;
+
+        // Get the health status for the log message
+        var healthFunc = target.GetHealth;
+
+        // Determine if this is a drain effect
+        bool isDrain = effect?.Id == ConditionId.Drain;
+
+        if (isDrain && source != null)
+        {
+            // Drain healing shows the source
+            Add("-heal", target, healthFunc, "[from] drain", $"[of] {source}");
+        }
+        else if (effect != null && effect.Id != ConditionId.None)
+        {
+            // Healing from a specific effect
+            string effectName = effect.FullName == "tox" ? "psn" : effect.FullName;
+            if (source != null && source != target)
             {
-                case ConditionId.PartiallyTrapped:
-                    // Get the source effect from the volatile condition
-                    EffectState? partiallyTrappedState =
-                        target.Volatiles.GetValueOrDefault(ConditionId.PartiallyTrapped);
-                    if (partiallyTrappedState?.SourceEffect != null)
-                    {
-                        UiGenerator.PrintDamageEvent(target,
-                            fromEffect: partiallyTrappedState.SourceEffect.Name,
-                            isPartiallyTrapped: true);
-                    }
-                    else
-                    {
-                        UiGenerator.PrintDamageEvent(target);
-                    }
-                    return;
-
-                case ConditionId.Powder:
-                    UiGenerator.PrintDamageEvent(target, silent: true);
-                    return;
-
-                case ConditionId.Confusion:
-                    UiGenerator.PrintDamageEvent(target, fromEffect: "confusion");
-                    return;
+                Add("-heal", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
             }
-        }
-
-        // Default damage message formatting
-        if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
-        {
-            // Simple damage message (from move or no effect)
-            UiGenerator.PrintDamageEvent(target);
-        }
-        else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
-        {
-            // Damage from effect with source attribution
-            UiGenerator.PrintDamageEvent(target, fromEffect: effectName, ofPokemon: source);
+            else
+            {
+                Add("-heal", target, healthFunc, $"[from] {effectName}");
+            }
         }
         else
         {
-            // Damage from effect without source
-            UiGenerator.PrintDamageEvent(target, fromEffect: effectName);
+            // Simple heal with no effect
+            Add("-heal", target, healthFunc);
         }
     }
 
@@ -2069,57 +2113,6 @@ public partial class BattleAsync : IBattle, IDisposable
         );
 
         return new IntIntFalseUnion(finalDamage);
-    }
-
-    /// <summary>
-    /// Helper method to print heal messages based on the effect type.
-    /// Handles special cases like Leech Seed, Rest, Drain, and Wish.
-    /// </summary>
-    private void PrintHealMessage(Pokemon target, Pokemon? source = null, IEffect? effect = null)
-    {
-        // Handle special condition-specific messages
-        if (effect is Condition condition)
-        {
-            switch (condition.Id)
-            {
-                case ConditionId.LeechSeed:
-                case ConditionId.Rest:
-                    // Silent heal message
-                    UiGenerator.PrintHealEvent(target, silent: true);
-                    return;
-
-                case ConditionId.Drain:
-                    // Drain shows the source
-                    UiGenerator.PrintHealEvent(target, fromEffect: "drain", ofPokemon: source);
-                    return;
-
-                case ConditionId.Wish:
-                    // Wish has no heal message (handled by Wish's end effect)
-                    return;
-            }
-        }
-
-        // Default heal message formatting
-        if (effect == null)
-        {
-            return;
-        }
-
-        if (effect.EffectType == EffectType.Move)
-        {
-            // Simple heal message (from move)
-            UiGenerator.PrintHealEvent(target);
-        }
-        else if (source != null && source != target)
-        {
-            // Heal from effect with source attribution
-            UiGenerator.PrintHealEvent(target, fromEffect: effect.Name, ofPokemon: source);
-        }
-        else
-        {
-            // Heal from effect without source
-            UiGenerator.PrintHealEvent(target, fromEffect: effect.Name);
-        }
     }
 
     /// <summary>
@@ -3500,7 +3493,7 @@ public partial class BattleAsync : IBattle, IDisposable
             if (part is FuncPartFuncUnion funcPart)
             {
                 // Execute the function to get side-specific content
-                PokemonHealth result = funcPart.Func();
+                SideSecretSharedResult result = funcPart.Func();
 
                 // Validate that all functions use the same side
                 if (side.HasValue && side.Value != result.Side)

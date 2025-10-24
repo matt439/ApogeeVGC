@@ -7,6 +7,7 @@ public interface IEffect
 {
     EffectType EffectType { get; }
     string Name { get; }
+    string FullName { get; }
     EffectStateId EffectStateId { get; }
     EffectDelegate? GetDelegate(EventId id);
 

@@ -29,6 +29,8 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
         }
     }
     public string Name { get; init; } = string.Empty;
+    public string FullName => Name;
+
     //public ConditionEffectType ConditionEffectType { get; init; }
 
     ///// <summary>
