@@ -1319,7 +1319,7 @@ public partial class BattleAsync : IBattle, IDisposable
 
         // Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
         if (!stalenessBySide.All(s => s.HasValue) ||
-            !stalenessBySide.Any(s => s == StalenessId.External))
+            stalenessBySide.All(s => s != StalenessId.External))
         {
             return false;
         }
@@ -1436,25 +1436,30 @@ public partial class BattleAsync : IBattle, IDisposable
             Sides[3].Foe = Sides[2];
         }
 
-        // Log generation
-        UiGenerator.PrintMessage($"gen|{Gen}");
-
-        // Log tier
-        UiGenerator.PrintMessage($"tier|{Format.Name}");
-
-        // Log rated status
-        if (Rated)
+        if (DisplayUi)
         {
-            string ratedMessage = Rated ? "" : Rated.ToString();
-            UiGenerator.PrintMessage($"rated|{ratedMessage}");
+            // Log generation
+            Add("gen", Gen);
+
+            // Log tier
+            Add("tier", Format.Name);
+
+            // Log rated status
+            if (Rated)
+            {
+                string ratedMessage = Rated ? "" : Rated.ToString();
+                Add("rated", ratedMessage);
+            }
         }
 
         // Call format's OnBegin handler
         Format.OnBegin?.Invoke(this);
 
         // Call OnBegin for each rule in the rule table
-        foreach (Format subFormat in from rule in RuleTable.Keys let ruleString = rule.ToString()
-                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0]) select Library.Rulesets[rule])
+        foreach (Format subFormat in from rule in RuleTable.Keys
+                 let ruleString = rule.ToString()
+                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
+                 select Library.Rulesets[rule])
         {
             subFormat.OnBegin?.Invoke(this);
         }

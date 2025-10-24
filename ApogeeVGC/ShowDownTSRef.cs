@@ -1,111 +1,78 @@
-﻿//maybeTriggerEndlessBattleClause(
-//		trappedBySide: boolean[], stalenessBySide: ('internal' | 'external' | undefined)[]
-//	) {
-//	// Gen 1 Endless Battle Clause triggers
-//	// These are checked before the 100 turn minimum as the battle cannot progress if they are true
-//	if (this.gen <= 1)
+﻿using ApogeeVGC.Sim.GameObjects;
+using System.Reflection;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+//start() {
+//	// Deserialized games should use restart()
+//	if (this.deserialized) return;
+//	// need all players to start
+//	if (!this.sides.every(side => !!side)) throw new Error(`Missing sides: ${ this.sides }`);
+
+//	if (this.started) throw new Error(`Battle already started`);
+
+//	const format = this.format;
+//	this.started = true;
+//	if (this.gameType === 'multi')
 //	{
-//		const noProgressPossible = this.sides.every(side => {
-//			const foeAllGhosts = side.foe.pokemon.every(pokemon => pokemon.fainted || pokemon.hasType('Ghost'));
-//			const foeAllTransform = side.foe.pokemon.every(pokemon => (
-//				pokemon.fainted ||
-//				// true if transforming into this pokemon would lead to an endless battle
-//				// Transform will fail (depleting PP) if used against Ditto in Stadium 1
-//				(this.dex.currentMod !== 'gen1stadium' || pokemon.species.id !== 'ditto') &&
-//				// there are some subtleties such as a Mew with only Transform and auto-fail moves,
-//				// but it's unlikely to come up in a real game so there's no need to handle it
-//				pokemon.moves.every(moveid => moveid === 'transform')
-//			));
-//			return side.pokemon.every(pokemon => (
-//				pokemon.fainted ||
-//				// frozen pokemon can't thaw in gen 1 without outside help
-//				pokemon.status === 'frz' ||
-//				// a pokemon can't lose PP if it Transforms into a pokemon with only Transform
-//				(pokemon.moves.every(moveid => moveid === 'transform') && foeAllTransform) ||
-//				// Struggle can't damage yourself if every foe is a Ghost
-//				(pokemon.moveSlots.every(slot => slot.pp === 0) && foeAllGhosts)
-//			));
-//		});
-//		if (noProgressPossible)
-//		{
-//			this.add('-message', `This battle cannot progress.Endless Battle Clause activated!`);
-//			return this.tie();
+//		this.sides[1].foe = this.sides[2]!;
+//		this.sides[0].foe = this.sides[3]!;
+//		this.sides[2]!.foe = this.sides[1];
+//		this.sides[3]!.foe = this.sides[0];
+//		this.sides[1].allySide = this.sides[3]!;
+//		this.sides[0].allySide = this.sides[2]!;
+//		this.sides[2]!.allySide = this.sides[0];
+//		this.sides[3]!.allySide = this.sides[1];
+//		// sync side conditions
+//		this.sides[2]!.sideConditions = this.sides[0].sideConditions;
+//		this.sides[3]!.sideConditions = this.sides[1].sideConditions;
+//	}
+//	else
+//	{
+//		this.sides[1].foe = this.sides[0];
+//		this.sides[0].foe = this.sides[1];
+//		if (this.sides.length > 2)
+//		{ // ffa
+//			this.sides[2]!.foe = this.sides[3]!;
+//			this.sides[3]!.foe = this.sides[2]!;
 //		}
 //	}
 
-//	if (this.turn <= 100) return;
+//	this.add('gen', this.gen);
 
-//	// the turn limit is not a part of Endless Battle Clause
-//	if (this.turn >= 1000)
+//	this.add('tier', format.name);
+//	if (this.rated)
 //	{
-//		this.add('message', `It is turn 1000.You have hit the turn limit!`);
-//		this.tie();
-//		return true;
-//	}
-//	if (
-//		(this.turn >= 500 && this.turn % 100 === 0) || // every 100 turns past turn 500,
-//		(this.turn >= 900 && this.turn % 10 === 0) || // every 10 turns past turn 900,
-//		this.turn >= 990 // every turn past turn 990
-//	)
-//	{
-//		const turnsLeft = 1000 - this.turn;
-//		const turnsLeftText = (turnsLeft === 1 ? `1 turn` : `${ turnsLeft}
-//		turns`);
-//		this.add('bigerror', `You will auto - tie if the battle doesn't end in ${turnsLeftText} (on turn 1000).`);
-//		}
-
-//	if (!this.ruleTable.has('endlessbattleclause')) return;
-//	// for now, FFA doesn't support Endless Battle Clause
-//	if (this.format.gameType === 'freeforall') return;
-
-//	// Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
-//	if (!stalenessBySide.every(s => !!s) || !stalenessBySide.some(s => s === 'external')) return;
-
-//	// Can both sides switch to a non-stale Pokemon?
-//	const canSwitch = [];
-//	for (const [i, trapped] of trappedBySide.entries()) {
-//		canSwitch[i] = false;
-//		if (trapped) break;
-//		const side = this.sides[i];
-
-//		for (const pokemon of side.pokemon) {
-//			if (!pokemon.fainted && !(pokemon.volatileStaleness || pokemon.staleness))
-//			{
-//				canSwitch[i] = true;
-//				break;
-//			}
-//		}
-//	}
-//	if (canSwitch.every(s => s)) return;
-
-//	// Endless Battle Clause activates - we determine the winner by looking at each side's sets.
-//	const losers: Side[] = [];
-//	for (const side of this.sides) {
-//		let berry = false; // Restorative Berry
-//		let cycle = false; // Harvest or Recycle
-//		for (const pokemon of side.pokemon) {
-//			berry = RESTORATIVE_BERRIES.has(toID(pokemon.set.item));
-//			if (['harvest', 'pickup'].includes(toID(pokemon.set.ability)) ||
-//				pokemon.set.moves.map(toID).includes('recycle' as ID))
-//			{
-//				cycle = true;
-//			}
-//			if (berry && cycle) break;
-//		}
-//		if (berry && cycle) losers.push(side);
+//		if (this.rated === 'Rated battle') this.rated = true;
+//		this.add('rated', typeof this.rated === 'string' ? this.rated : '');
 //	}
 
-//	if (losers.length === 1)
-//	{
-//		const loser = losers[0];
-//		this.add('-message', `${ loser.name}
-//		's team started with the rudimentary means to perform restorative berry-cycling and thus loses.`);
-//			return this.win(loser.foe);
+//	format.onBegin?.call(this);
+//	for (const rule of this.ruleTable.keys()) {
+//		if ('+*-!'.includes(rule.charAt(0))) continue;
+//		const subFormat = this.dex.formats.get(rule);
+//		subFormat.onBegin?.call(this);
 //	}
-//	if (losers.length === this.sides.length)
+
+//	if (this.sides.some(side => !side.pokemon[0]))
 //	{
-//		this.add('-message', `Each side's team started with the rudimentary means to perform restorative berry-cycling.`);
+//		throw new Error('Battle not started: A player has an empty team.');
+//	}
+
+//	if (this.debugMode)
+//	{
+//		this.checkEVBalance();
+//	}
+
+//	if (format.customRules)
+//	{
+//		const plural = format.customRules.length === 1 ? '' : 's';
+//		const open = format.customRules.length <= 5 ? ' open' : '';
+//		this.add(`raw |< div class= "infobox" >< details class= "readmore"${ open}>< summary >< strong >${ format.customRules.length}
+//custom rule${plural}:</ strong ></ summary > ${ format.customRules.join(', ')}</ details ></ div >`);
 //		}
 
-//	return this.tie();
-//}
+//		this.runPickTeam();
+//this.queue.addChoice({ choice: 'start' });
+//this.midTurn = true;
+//if (!this.requestState) this.turnLoop();
+//	}
