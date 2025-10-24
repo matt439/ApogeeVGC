@@ -1597,14 +1597,14 @@ public partial class BattleAsync : IBattle, IDisposable
     /// 1. Validates the target has HP and is active
     /// 2. Runs ChangeBoost and TryBoost events for modification
     /// 3. Applies boosts via target.BoostBy() for each stat
-    /// 4. Logs boost messages using UiGenerator methods
+    /// 4. Logs boost messages to battle log
     /// 5. Triggers AfterEachBoost and AfterBoost events
     /// 6. Updates statsRaisedThisTurn/statsLoweredThisTurn flags
     /// 
     /// Returns:
     /// - null if boost succeeded
     /// - 0 if target has no HP
-    /// - false if target is inactive or no foes remain (Gen 6+)
+    /// - false if target is inactive or no foes remain (Gen 9)
     /// </summary>
     public BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
@@ -1625,8 +1625,8 @@ public partial class BattleAsync : IBattle, IDisposable
         // Validate target is active
         if (!(target?.IsActive ?? false)) return new BoolBoolZeroUnion(false);
 
-        // Gen 6+: Check if any foes remain
-        if (Gen > 5 && target.Side.FoePokemonLeft() <= 0) return new BoolBoolZeroUnion(false);
+        // Gen 9: Check if any foes remain
+        if (target.Side.FoePokemonLeft() <= 0) return new BoolBoolZeroUnion(false);
 
         // Run ChangeBoost event to allow modifications
         RelayVar modifiedBoost = RunEvent(EventId.ChangeBoost, target,
@@ -1646,10 +1646,11 @@ public partial class BattleAsync : IBattle, IDisposable
 
         if (finalBoost is not SparseBoostsTableRelayVar finalBoostTable)
         {
-            throw new InvalidOperationException("ChangeBoost event did not return a valid SparseBoostsTable.");
+            throw new InvalidOperationException("TryBoost event did not return a valid SparseBoostsTable.");
         }
 
         bool? success = null;
+        bool boosted = isSecondary;
 
         // Apply each boost
         foreach (BoostId boostId in Enum.GetValues<BoostId>())
@@ -1664,8 +1665,13 @@ public partial class BattleAsync : IBattle, IDisposable
             // Apply the boost and get the actual change
             int boostBy = target.BoostBy(currentBoost);
 
-            // Determine if this is a boost or unboost for messaging
-            bool isUnboost = boostValue.Value < 0 || target.Boosts.GetBoost(boostId) == -6;
+            // Determine message type
+            string msg = "-boost";
+            if (boostValue.Value < 0 || target.Boosts.GetBoost(boostId) == -6)
+            {
+                msg = "-unboost";
+                boostBy = -boostBy;
+            }
 
             if (boostBy != 0)
             {
@@ -1673,77 +1679,58 @@ public partial class BattleAsync : IBattle, IDisposable
 
                 // Handle special cases
                 EffectStateId effectId = effect?.EffectStateId ?? EffectStateId.FromEmpty();
-                if (effectId is MoveEffectStateId { MoveId: MoveId.BellyDrum } or
-                    AbilityEffectStateId { AbilityId: AbilityId.AngerPoint })
+
+                if (DisplayUi)
                 {
-                    // Use PrintSetBoostEvent for moves that set boosts to maximum
-                    UiGenerator.PrintSetBoostEvent(target, boostId, boostBy, effect ??
-                        throw new ArgumentNullException(nameof(effect)));
-                }
-                else if (effect is not null)
-                {
-                    switch (effect.EffectType)
+                    if (effectId is MoveEffectStateId { MoveId: MoveId.BellyDrum } or
+                        AbilityEffectStateId { AbilityId: AbilityId.AngerPoint })
                     {
-                        case EffectType.Move:
-                            // Regular move boost/unboost
-                            break;
+                        // Use -setboost for moves that set boosts to maximum
+                        Add("-setboost", target, boostId.ConvertToString(),
+                            target.Boosts.GetBoost(boostId),
+                            "[from]", PartFuncUnion.FromIEffect(effect!));
+                    }
+                    else if (effect is not null)
+                    {
+                        switch (effect.EffectType)
+                        {
+                            case EffectType.Move:
+                                Add(msg, target, boostId.ConvertToString(), boostBy);
+                                break;
 
-                        case EffectType.Item:
-                            // Item-triggered boost/unboost (messages handled by UI)
-                            break;
+                            case EffectType.Item:
+                                Add(msg, target, boostId.ConvertToString(), boostBy,
+                                    "[from]", $"item: {effect.Name}");
+                                break;
 
-                        default:
-                            // Ability or other effect type
-                            if (effect.EffectType == EffectType.Ability && !isSecondary)
-                            {
-                                if (effect is not Ability ability)
+                            default:
+                                if (effect.EffectType == EffectType.Ability && !boosted)
                                 {
-                                    throw new InvalidOperationException("Effect is not an Ability.");
+                                    Add("-ability", target, PartFuncUnion.FromIEffect(effect), "boost");
+                                    boosted = true;
                                 }
-                                UiGenerator.PrintAbilityEvent(target, ability);
-                                //boosted = true;
-                            }
-                            break;
+                                Add(msg, target, boostId.ConvertToString(), boostBy);
+                                break;
+                        }
                     }
-
-                    if (isUnboost)
-                    {
-                        UiGenerator.PrintUnboostEvent(target, boostId, -boostBy, effect);
-                    }
-                    else
-                    {
-                        UiGenerator.PrintBoostEvent(target, boostId, boostBy, effect);
-                    }
-
-                    break;
                 }
+
                 // Trigger AfterEachBoost event
                 RunEvent(EventId.AfterEachBoost, target, RunEventSource.FromNullablePokemon(source), effect,
                     currentBoost);
             }
             else if (effect?.EffectType == EffectType.Ability)
             {
-                // Ability boost that failed
-                if (!isSecondary && !isSelf) continue;
-                if (isUnboost)
+                if (DisplayUi && (isSecondary || isSelf))
                 {
-                    UiGenerator.PrintUnboostEvent(target, boostId, 0, effect);
-                }
-                else
-                {
-                    UiGenerator.PrintBoostEvent(target, boostId, 0, effect);
+                    Add(msg, target, boostId.ConvertToString(), boostBy);
                 }
             }
             else if (!isSecondary && !isSelf)
             {
-                // Failed boost that should be announced
-                if (isUnboost)
+                if (DisplayUi)
                 {
-                    UiGenerator.PrintUnboostEvent(target, boostId, 0, effect ?? throw new ArgumentNullException(nameof(effect)));
-                }
-                else
-                {
-                    UiGenerator.PrintBoostEvent(target, boostId, 0, effect ?? throw new ArgumentNullException(nameof(effect)));
+                    Add(msg, target, boostId.ConvertToString(), boostBy);
                 }
             }
         }
@@ -1754,7 +1741,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // Update turn flags
         if (success == true)
         {
-            // Check if any boosts were positive
+            // Check if any boosts were positive or negative
             bool hasPositiveBoost = false;
             bool hasNegativeBoost = false;
 
