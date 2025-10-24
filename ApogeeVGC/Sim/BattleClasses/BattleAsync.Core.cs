@@ -2612,7 +2612,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // Reorder queue if requested (move last to first)
         if (lastFirst && FaintQueue.Count > 0)
         {
-            FaintQueue lastFaintData = FaintQueue[^1]; // Get last element with different name
+            FaintQueue lastFaintData = FaintQueue[^1];
             FaintQueue.RemoveAt(FaintQueue.Count - 1);
             FaintQueue.Insert(0, lastFaintData);
         }
@@ -2640,7 +2640,10 @@ public partial class BattleAsync : IBattle, IDisposable
             if (!pokemon.Fainted && (beforeFaintResult == null || IsRelayVarTruthy(beforeFaintResult)))
             {
                 // Print faint message
-                UiGenerator.PrintFaintEvent(pokemon);
+                if (DisplayUi)
+                {
+                    Add("faint", pokemon);
+                }
 
                 // Update side's Pokemon count
                 if (pokemon.Side.PokemonLeft > 0)
@@ -2693,7 +2696,10 @@ public partial class BattleAsync : IBattle, IDisposable
                 {
                     // AFTER clearing volatiles: update details and stats
                     pokemon.Details = pokemon.GetUpdatedDetails();
-                    UiGenerator.PrintDetailsChangeEvent(pokemon, pokemon.Details, silent: true);
+                    if (DisplayUi)
+                    {
+                        Add("detailschange", pokemon, pokemon.Details.ToString(), "[silent]");
+                    }
                     pokemon.UpdateMaxHp();
                     pokemon.FormeRegression = false;
                 }
