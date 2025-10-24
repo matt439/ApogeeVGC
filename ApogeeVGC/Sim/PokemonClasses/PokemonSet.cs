@@ -98,7 +98,7 @@ public record PokemonSet
 //    //public int FaintedCount => PokemonCount - AlivePokemonCount;
 //    //public bool AllFainted => AlivePokemonCount == 0;
 //    //public bool AnyTeraUsed => Pokemons.Any(pokemon => pokemon.IsTeraUsed);
-//    public required SideId SideId { get; init; }
+//    public required Side Side { get; init; }
 
 //    /// /// <summary>
 //    /// Creates a deep copy of this PokemonSet for MCTS simulation purposes.
@@ -109,7 +109,7 @@ public record PokemonSet
 //        return new PokemonSet
 //        {
 //            Pokemons = Pokemons.Select(pokemon => pokemon.Copy()).ToArray(),
-//            SideId = SideId,
+//            Side = Side,
 //        };
 //    }
 //}

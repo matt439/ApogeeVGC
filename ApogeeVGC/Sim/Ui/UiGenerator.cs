@@ -219,43 +219,43 @@ public static class UiGenerator
         Console.WriteLine($"{pokemon.Name} changed forme to {newForme}!");
     }
 
-    /// <summary>
-    /// Prints a heal event message.
-    /// Handles various healing scenarios including healing from effects, abilities, and conditions.
-    /// </summary>
-    /// <param name="target">The Pokemon being healed</param>
-    /// <param name="fromEffect">Optional effect name causing the healing (e.g., "drain", "wish")</param>
-    /// <param name="ofPokemon">Optional source Pokemon for the healing</param>
-    /// <param name="silent">If true, prints a silent heal message</param>
-    public static void PrintHealEvent(Pokemon target, string? fromEffect = null,
-        Pokemon? ofPokemon = null, bool silent = false)
-    {
-        PokemonHealth health = target.GetHealth();
-        string healthStatus = FormatHealthStatus(health);
+    ///// <summary>
+    ///// Prints a heal event message.
+    ///// Handles various healing scenarios including healing from effects, abilities, and conditions.
+    ///// </summary>
+    ///// <param name="target">The Pokemon being healed</param>
+    ///// <param name="fromEffect">Optional effect name causing the healing (e.g., "drain", "wish")</param>
+    ///// <param name="ofPokemon">Optional source Pokemon for the healing</param>
+    ///// <param name="silent">If true, prints a silent heal message</param>
+    //public static void PrintHealEvent(Pokemon target, string? fromEffect = null,
+    //    Pokemon? ofPokemon = null, bool silent = false)
+    //{
+    //    PokemonHealth health = target.GetHealth();
+    //    string healthStatus = FormatHealthStatus(health);
 
-        if (silent)
-        {
-            // Silent heal (e.g., from Leech Seed, Rest)
-            Console.WriteLine($"-heal|{target}|{healthStatus}|[silent]");
-            return;
-        }
+    //    if (silent)
+    //    {
+    //        // Silent heal (e.g., from Leech Seed, Rest)
+    //        Console.WriteLine($"-heal|{target}|{healthStatus}|[silent]");
+    //        return;
+    //    }
 
-        if (string.IsNullOrEmpty(fromEffect))
-        {
-            // Simple heal (from move or no effect)
-            Console.WriteLine($"-heal|{target}|{healthStatus}");
-        }
-        else if (ofPokemon != null)
-        {
-            // Heal from effect with source Pokemon
-            Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
-        }
-        else
-        {
-            // Heal from effect without source
-            Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}");
-        }
-    }
+    //    if (string.IsNullOrEmpty(fromEffect))
+    //    {
+    //        // Simple heal (from move or no effect)
+    //        Console.WriteLine($"-heal|{target}|{healthStatus}");
+    //    }
+    //    else if (ofPokemon != null)
+    //    {
+    //        // Heal from effect with source Pokemon
+    //        Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
+    //    }
+    //    else
+    //    {
+    //        // Heal from effect without source
+    //        Console.WriteLine($"-heal|{target}|{healthStatus}|[from] {fromEffect}");
+    //    }
+    //}
 
     public static void PrintSetBoostEvent(Pokemon target, BoostId boostId, int boost, IEffect sourceEffect)
     {
@@ -324,60 +324,60 @@ public static class UiGenerator
         Console.WriteLine(error);
     }
 
-    /// <summary>
-    /// Prints a damage event message.
-    /// Handles various damage scenarios including damage from effects, abilities, and conditions.
-    /// </summary>
-    /// <param name="target">The Pokemon taking damage</param>
-    /// <param name="fromEffect">Optional effect name causing the damage (e.g., "burn", "confusion")</param>
-    /// <param name="ofPokemon">Optional source Pokemon for the damage</param>
-    /// <param name="silent">If true, prints a silent damage message (no console output)</param>
-    /// <param name="isPartiallyTrapped">If true, includes the [partiallytrapped] tag</param>
-    public static void PrintDamageEvent(Pokemon target, string? fromEffect = null,
-        Pokemon? ofPokemon = null, bool silent = false, bool isPartiallyTrapped = false)
-    {
-        PokemonHealth health = target.GetHealth();
-        string healthStatus = FormatHealthStatus(health);
+    ///// <summary>
+    ///// Prints a damage event message.
+    ///// Handles various damage scenarios including damage from effects, abilities, and conditions.
+    ///// </summary>
+    ///// <param name="target">The Pokemon taking damage</param>
+    ///// <param name="fromEffect">Optional effect name causing the damage (e.g., "burn", "confusion")</param>
+    ///// <param name="ofPokemon">Optional source Pokemon for the damage</param>
+    ///// <param name="silent">If true, prints a silent damage message (no console output)</param>
+    ///// <param name="isPartiallyTrapped">If true, includes the [partiallytrapped] tag</param>
+    //public static void PrintDamageEvent(Pokemon target, string? fromEffect = null,
+    //    Pokemon? ofPokemon = null, bool silent = false, bool isPartiallyTrapped = false)
+    //{
+    //    PokemonHealth health = target.GetHealth();
+    //    string healthStatus = FormatHealthStatus(health);
 
-        if (silent)
-        {
-            // Silent damage (e.g., from Powder)
-            Console.WriteLine($"-damage|{target}|{healthStatus}|[silent]");
-            return;
-        }
+    //    if (silent)
+    //    {
+    //        // Silent damage (e.g., from Powder)
+    //        Console.WriteLine($"-damage|{target}|{healthStatus}|[silent]");
+    //        return;
+    //    }
 
-        if (isPartiallyTrapped && !string.IsNullOrEmpty(fromEffect))
-        {
-            // Partially trapped damage (e.g., from Bind, Wrap)
-            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[partiallytrapped]");
-            return;
-        }
+    //    if (isPartiallyTrapped && !string.IsNullOrEmpty(fromEffect))
+    //    {
+    //        // Partially trapped damage (e.g., from Bind, Wrap)
+    //        Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[partiallytrapped]");
+    //        return;
+    //    }
 
-        if (string.IsNullOrEmpty(fromEffect))
-        {
-            // Simple damage (from move or no effect)
-            Console.WriteLine($"-damage|{target}|{healthStatus}");
-        }
-        else if (ofPokemon != null)
-        {
-            // Damage from effect with source Pokemon
-            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
-        }
-        else
-        {
-            // Damage from effect without source
-            Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}");
-        }
-    }
+    //    if (string.IsNullOrEmpty(fromEffect))
+    //    {
+    //        // Simple damage (from move or no effect)
+    //        Console.WriteLine($"-damage|{target}|{healthStatus}");
+    //    }
+    //    else if (ofPokemon != null)
+    //    {
+    //        // Damage from effect with source Pokemon
+    //        Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}|[of] {ofPokemon}");
+    //    }
+    //    else
+    //    {
+    //        // Damage from effect without source
+    //        Console.WriteLine($"-damage|{target}|{healthStatus}|[from] {fromEffect}");
+    //    }
+    //}
 
-    /// <summary>
-    /// Formats a Pokemon's health status for display in messages.
-    /// Returns format like "100/100" or "50/100 slp" depending on status.
-    /// </summary>
-    private static string FormatHealthStatus(PokemonHealth health)
-    {
-        throw new NotImplementedException();
-    }
+    ///// <summary>
+    ///// Formats a Pokemon's health status for display in messages.
+    ///// Returns format like "100/100" or "50/100 slp" depending on status.
+    ///// </summary>
+    //private static string FormatHealthStatus(PokemonHealth health)
+    //{
+    //    throw new NotImplementedException();
+    //}
 
     public static void PrintFaintEvent(Pokemon pokemon)
     {

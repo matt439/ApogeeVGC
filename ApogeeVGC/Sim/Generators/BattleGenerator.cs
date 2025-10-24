@@ -18,9 +18,9 @@ public static class BattleGenerator
     //    {
     //        Library = library,
     //        Field = new Field(),
-    //        Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1, SideId.Side1, format,
+    //        Side1 = SideGenerator.GenerateTestSide(library, trainerName1, PlayerId.Player1, Side.Side1, format,
     //            printDebug),
-    //        Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2, SideId.Side2, format,
+    //        Side2 = SideGenerator.GenerateTestSide(library, trainerName2, PlayerId.Player2, Side.Side2, format,
     //            printDebug),
     //        DisplayUi = printDebug,
     //        BattleSeed = seed,

@@ -306,9 +306,9 @@ public class Pokemon : IPriorityComparison, IDisposable
         return details;
     }
 
-    public PokemonHealth GetFullDetails()
+    public SideSecretSharedResult GetFullDetails()
     {
-        PokemonHealth health = GetHealth();
+        SideSecretSharedResult health = GetHealth();
         PokemonDetails details = Details;
         if (Illusion is not null)
         {
@@ -319,12 +319,8 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             details.TeraType = Terastallized;
         }
-        return new PokemonHealth
-        {
-            SideId = health.SideId,
-            Secret = health.Secret,
-            Shared = health.Shared,
-        };
+
+        return new SideSecretSharedResult(health.Side, health.Secret, health.Shared);
     }
 
     public void UpdateSpeed()
@@ -1300,10 +1296,15 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Convert move slots to Move objects
         var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
 
+        if (GetHealth().Secret is not SecretConditionId secretCondition)
+        {
+            secretCondition = new SecretConditionId(ConditionId.None);
+        }
+
         // Create the base entry
         var entry = new PokemonSwitchRequestData
         {
-            Condition = GetHealth().Secret.StatusCondition ?? ConditionId.None,
+            Condition = secretCondition.Value,
             Active = Position < Side.Active.Count,
             Stats = stats,
             Moves = moves,
@@ -1822,7 +1823,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         MaxHp = newMaxHp;
         if (Hp > 0)
         {
-            UiGenerator.PrintHealEvent(this, Hp.ToString());
+            //UiGenerator.PrintHealEvent(this, Hp.ToString());
         }
     }
 
@@ -2894,100 +2895,73 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
     }
 
-    /// <summary>
-    /// Gets the current health status of this Pokemon.
-    /// Returns both secret (exact) and shared (observable) health data.
-    /// The shared data varies based on battle settings and generation:
-    /// - Exact HP if battle.ReportExactHp is true
-    /// - Percentage if battle.ReportPercentages is true or Gen 7+
-    /// - Pixel-based display (48 pixels) for Gen 3-6 with color indicators in Gen 5+
-    /// </summary>
-    public PokemonHealth GetHealth()
+    public SideSecretSharedResult GetHealth()
     {
-        // Fainted Pokemon
+        // If Pokemon is fainted, return fainted status
         if (Hp <= 0)
         {
-            return new PokemonHealth
-            {
-                SideId = Side.Id,
-                Secret = FaintedHealthData.Instance,
-                Shared = FaintedHealthData.Instance,
-            };
+            return new SideSecretSharedResult(
+                Side: Side.Id,
+                Secret: "0 fnt",
+                Shared: "0 fnt"
+            );
         }
 
-        // Secret data is always exact HP
-        var secret = new ExactHealthData
-        {
-            CurrentHp = Hp,
-            MaxHp = MaxHp,
-            StatusCondition = Status != ConditionId.None ? Status : null,
-        };
-
-        // Determine shared health data format based on battle settings
-        HealthData shared;
+        // Build secret HP string (always exact)
+        string secret = $"{Hp}/{MaxHp}";
+        string shared;
 
         if (Battle.ReportExactHp)
         {
-            // Exact HP reporting (same as secret)
+            // Report exact HP
             shared = secret;
         }
         else if (Battle.ReportPercentages || Battle.Gen >= 7)
         {
             // HP Percentage Mod mechanics
             int percentage = (int)Math.Ceiling(100.0 * Hp / MaxHp);
-
-            // Cap at 99% if not at full HP
             if (percentage == 100 && Hp < MaxHp)
             {
                 percentage = 99;
             }
-
-            shared = new PercentageHealthData
-            {
-                Percentage = percentage,
-                StatusCondition = Status != ConditionId.None ? Status : null,
-            };
+            shared = $"{percentage}/100";
         }
         else
         {
-            // In-game accurate pixel health mechanics (Gen 3-6)
+            // In-game accurate pixel health mechanics
             // PS doesn't use pixels after Gen 6, but for reference:
             // - [Gen 7] SM uses 99 pixels
             // - [Gen 7] USUM uses 86 pixels
             int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
-            if (pixels == 0) pixels = 1; // Minimum 1 pixel if alive
+            if (pixels == 0) pixels = 1; // Equivalent to: || 1
 
-            PixelColorIndicator? colorIndicator = null;
+            shared = $"{pixels}/48";
 
-            // Gen 5+ adds color indicators at specific thresholds
             if (Battle.Gen >= 5)
             {
                 if (pixels == 9)
                 {
-                    // 9 pixels: yellow if HP > 20%, red if HP <= 20%
-                    colorIndicator = Hp * 5 > MaxHp ? PixelColorIndicator.Yellow : PixelColorIndicator.Red;
+                    shared += Hp * 5 > MaxHp ? "y" : "r";
                 }
                 else if (pixels == 24)
                 {
-                    // 24 pixels: green if HP > 50%, yellow if HP <= 50%
-                    colorIndicator = Hp * 2 > MaxHp ? PixelColorIndicator.Green : PixelColorIndicator.Yellow;
+                    shared += Hp * 2 > MaxHp ? "g" : "y";
                 }
             }
-
-            shared = new PixelHealthData
-            {
-                Pixels = pixels,
-                ColorIndicator = colorIndicator,
-                StatusCondition = Status != ConditionId.None ? Status : null,
-            };
         }
 
-        return new PokemonHealth
+        // Append status condition if present
+        if (Status != ConditionId.None)
         {
-            SideId = Side.Id,
-            Secret = secret,
-            Shared = shared,
-        };
+            secret += $" {Status}";
+            shared += $" {Status}";
+        }
+
+        return new SideSecretSharedResult(
+            Side: Side.Id,
+            Secret: secret,
+            Shared: shared
+        );
     }
 
     /// <summary>
@@ -3055,7 +3029,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             return [Terastallized.Value.ConvertToPokemonType()];
         }
 
-        // Run Id event to allow abilities/items/conditions to modify types
+        // Run Value event to allow abilities/items/conditions to modify types
         RelayVar? rv = Battle.RunEvent(EventId.Type, this, null, null, Types);
 
         List<PokemonType> resultTypes;

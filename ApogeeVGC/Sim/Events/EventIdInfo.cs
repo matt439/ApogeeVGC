@@ -10,7 +10,7 @@ public record EventIdInfo
     /// <summary>
     /// The base EventId without any prefix.
     /// For example, AllyBasePower has BasePower as its base, SourceModifyAtk has ModifyAtk.
-    /// If not explicitly set, defaults to Id (for events without a prefix).
+    /// If not explicitly set, defaults to Value (for events without a prefix).
     /// </summary>
     public EventId BaseEventId { get; init; }
 
@@ -58,7 +58,7 @@ public record EventIdInfo
     /// </summary>
     public EventId GetBaseEventId()
     {
-        // If BaseEventId was explicitly set, use it; otherwise fall back to Id
+        // If BaseEventId was explicitly set, use it; otherwise fall back to Value
         return BaseEventId != default ? BaseEventId : Id;
     }
 

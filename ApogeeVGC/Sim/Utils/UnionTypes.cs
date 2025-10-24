@@ -1093,7 +1093,7 @@ public record PokemonTypeSingleEventSource(PokemonType Type) : SingleEventSource
 
 
 /// <summary>
-/// Pokemon | Pokemon? | false | Id
+/// Pokemon | Pokemon? | false | Value
 /// </summary>
 public abstract record RunEventSource
 {
@@ -1753,8 +1753,7 @@ public record UndefinedPart(Undefined Value) : Part;
 public abstract record PartFuncUnion
 {
     public static implicit operator PartFuncUnion(Part part) => new PartPartFuncUnion(part);
-    public static implicit operator PartFuncUnion(Func<SideSecretSharedResult> func) =>
-        new FuncPartFuncUnion(func);
+    public static implicit operator PartFuncUnion(Func<SideSecretSharedResult> func) => new FuncPartFuncUnion(func);
 
     // Convenience implicit conversions for Part types
     public static implicit operator PartFuncUnion(string value) => new PartPartFuncUnion(value);
@@ -1780,7 +1779,30 @@ public record FuncPartFuncUnion(Func<SideSecretSharedResult> Func) : PartFuncUni
 /// Represents the result of a side-specific content generation function.
 /// Maps to TypeScript: { side: SideID, secret: string, shared: string }
 /// </summary>
-public record SideSecretSharedResult(SideId Side, string Secret, string Shared);
+public record SideSecretSharedResult(SideId Side, Secret Secret, Shared Shared);
+
+
+/// <summary>
+/// string | ConditionId
+/// </summary>
+public abstract record Secret
+{
+    public static implicit operator Secret(string value) => new SecretString(value);
+    public static implicit operator Secret(ConditionId id) => new SecretConditionId(id);
+}
+public record SecretString(string Value) : Secret;
+public record SecretConditionId(ConditionId Value) : Secret;
+
+
+/// <summary>
+/// string
+/// </summary>
+public abstract record Shared
+{
+    public static implicit operator Shared(string value) => new SharedString(value);
+}
+public record SharedString(string Value) : Shared;
+
 
 #endregion
 

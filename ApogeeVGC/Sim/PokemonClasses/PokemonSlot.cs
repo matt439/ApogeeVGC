@@ -7,11 +7,11 @@ public class PokemonSlot(SideId sideId, int positionOffset)
     public SideId SideId { get; init; } = sideId;
     public PositionLetter PositionLetter { get; init; } = FromIntPosition(positionOffset);
 
-    //private static SideId FromInt(int sideId) => sideId switch
+    //private static Side FromInt(int sideId) => sideId switch
     //{
-    //    0 => SideId.P1,
-    //    1 => SideId.P2,
-    //    _ => throw new ArgumentOutOfRangeException(nameof(sideId), "SideId must be 0 or 1"),
+    //    0 => Side.P1,
+    //    1 => Side.P2,
+    //    _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Side must be 0 or 1"),
     //};
 
     private static PositionLetter FromIntPosition(int positionOffset) => positionOffset switch

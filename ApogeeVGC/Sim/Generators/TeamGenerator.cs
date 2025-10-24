@@ -7,7 +7,7 @@
 
 //public static class TeamGenerator
 //{
-//    public static Team GenerateTestTeam(Library library, string trainerName, SideId sideId, bool printDebug = false)
+//    public static Team GenerateTestTeam(Library library, string trainerName, Side sideId, bool printDebug = false)
 //    {
 //        Trainer trainer = TrainerGenerator.GenerateTestTrainer(trainerName, printDebug);
 
@@ -16,7 +16,7 @@
 //            Trainer = trainer,
 //            PokemonSet = PokemonBuilder.BuildTestSet(library, trainer, sideId, printDebug),
 //            DisplayUi = printDebug,
-//            SideId = sideId,
+//            Side = sideId,
 //        };
 //    }
 //}

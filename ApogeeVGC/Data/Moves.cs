@@ -647,7 +647,7 @@ public record Moves
             //    Num = 10019,
             //    Accuracy = IntTrueUnion.FromTrue(),
             //    Name = "Confused",
-            //    Id = MoveType.Normal,
+            //    Value = MoveType.Normal,
             //},
         };
     }

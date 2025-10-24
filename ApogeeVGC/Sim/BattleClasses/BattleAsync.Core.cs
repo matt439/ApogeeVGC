@@ -384,7 +384,7 @@ public partial class BattleAsync : IBattle, IDisposable
     /// More importantly, it makes it easiest to resolve speed ties properly through
     /// randomization via Prng.Shuffle().
     /// </summary>
-    /// <typeparam name="T">Id that implements IPriorityComparison for sorting</typeparam>
+    /// <typeparam name="T">Value that implements IPriorityComparison for sorting</typeparam>
     /// <param name="list">List to sort in-place</param>
     /// <param name="comparator">Comparison function (defaults to ComparePriority)</param>
     public void SpeedSort<T>(List<T> list, Func<T, T, int>? comparator = null)
@@ -825,7 +825,7 @@ public partial class BattleAsync : IBattle, IDisposable
 
     public bool Win(SideId? side = null)
     {
-        // Convert SideId to Side if provided
+        // Convert Side to Side if provided
         Side? winningSide = side.HasValue ? GetSide(side.Value) : null;
         return Win(winningSide);
     }
@@ -3495,7 +3495,7 @@ public partial class BattleAsync : IBattle, IDisposable
             if (part is FuncPartFuncUnion funcPart)
             {
                 // Execute the function to get side-specific content
-                SideSecretSharedResult result = funcPart.Func();
+                PokemonHealth result = funcPart.Func();
 
                 // Validate that all functions use the same side
                 if (side.HasValue && side.Value != result.Side)
@@ -3504,8 +3504,8 @@ public partial class BattleAsync : IBattle, IDisposable
                 }
 
                 side = result.Side;
-                secret.Add(result.Secret);
-                shared.Add(result.Shared);
+                secret.Add(result.Secret.ToString());
+                shared.Add(result.Shared.ToString());
             }
             else if (part is PartPartFuncUnion directPart)
             {
@@ -3765,7 +3765,7 @@ public partial class BattleAsync : IBattle, IDisposable
         Side? side;
         bool didSomething = true;
 
-        // Convert SideId enum to array index (P1=0, P2=1)
+        // Convert Side enum to array index (P1=0, P2=1)
         int slotNum = slot == SideId.P1 ? 0 : 1;
 
         if (!Sides[slotNum].Initialised)
@@ -3918,7 +3918,7 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             SideId.P1 => Sides[0],
             SideId.P2 => Sides[1],
-            _ => throw new ArgumentOutOfRangeException(nameof(id), $"Invalid SideId: {id}"),
+            _ => throw new ArgumentOutOfRangeException(nameof(id), $"Invalid Side: {id}"),
         };
     }
     public int GetOverflowedTurnCount()

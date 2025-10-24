@@ -59,7 +59,7 @@ internal class ReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionary<TKey,
         }
 
         // If no Copy method exists, throw an exception with helpful information
-        throw new InvalidOperationException($"Id {typeof(TValue).Name} does not have a Copy() method. " +
+        throw new InvalidOperationException($"Value {typeof(TValue).Name} does not have a Copy() method. " +
                                           "All types used in Library must implement a Copy() method for" +
                                           "proper isolation.");
     }

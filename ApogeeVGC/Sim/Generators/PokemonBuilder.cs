@@ -42,7 +42,7 @@
 //        NatureId nature,
 //        MoveType terraType,
 //        Trainer trainer,
-//        SideId sideId,
+//        Side sideId,
 //        bool pringDebug = false,
 //        StatsTable? ivs = null,
 //        string? nickname = null,
@@ -86,7 +86,7 @@
 //            : throw new ArgumentException("Invalid Pokemon configuration.");
 //    }
 
-//    public static PokemonSet BuildTestSet(Library library, Trainer trainer, SideId sideId, bool printDebug = false)
+//    public static PokemonSet BuildTestSet(Library library, Trainer trainer, Side sideId, bool printDebug = false)
 //    {
 //        return new PokemonSet()
 //        {
@@ -189,11 +189,11 @@
 //                    printDebug
 //                ),
 //            ],
-//            SideId = sideId,
+//            Side = sideId,
 //        };
 //    }
 
-//    public static Pokemon BuildDefaultPokemon(Library library, Trainer trainer, SideId sideId)
+//    public static Pokemon BuildDefaultPokemon(Library library, Trainer trainer, Side sideId)
 //    {
 //        return Build(
 //            library,

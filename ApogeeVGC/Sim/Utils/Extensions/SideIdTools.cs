@@ -10,7 +10,7 @@ public static class SideIdTools
         {
             SideId.P1 => SideId.P2,
             SideId.P2 => SideId.P1,
-            _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid SideId."),
+            _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid Side."),
         };
     }
 
@@ -20,7 +20,7 @@ public static class SideIdTools
         {
             SideId.P1 => "p1",
             SideId.P2 => "p2",
-            _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid SideId."),
+            _ => throw new ArgumentOutOfRangeException(nameof(sideId), "Invalid Side."),
         };
     }
 }
