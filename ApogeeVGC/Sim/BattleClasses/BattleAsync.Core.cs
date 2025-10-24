@@ -1563,6 +1563,8 @@ public partial class BattleAsync : IBattle, IDisposable
 
     public void CheckEvBalance()
     {
+        if (!DisplayUi) return;
+
         bool? limitedEVs = null;
 
         foreach (Side side in Sides)
@@ -1583,8 +1585,7 @@ public partial class BattleAsync : IBattle, IDisposable
             else if (limitedEVs != sideLimitedEVs)
             {
                 // Sides have different EV limit adherence - show warning
-                UiGenerator.PrintBigError(
-                    "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
+                Add("bigerror", "Warning: One player isn't adhering to a 510 EV limit, and the other player is.");
             }
         }
     }
