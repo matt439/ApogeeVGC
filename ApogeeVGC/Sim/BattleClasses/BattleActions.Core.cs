@@ -1391,8 +1391,11 @@ public partial class BattleActions(IBattle battle)
             {
                 if (target.Hp >= target.MaxHp)
                 {
-                    UiGenerator.PrintFailEvent(target, "heal");
-                    Battle.AttrLastMove("[still]");
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", target, "heal");
+                        Battle.AttrLastMove("[still]");
+                    }
                     damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
                     didAnything = CombineResults(didAnything, null);
                     continue;
@@ -1400,7 +1403,7 @@ public partial class BattleActions(IBattle battle)
 
                 int amount = target.BaseMaxHp * moveData.Heal[0] / moveData.Heal[1];
                 int roundedAmount = Battle.Gen < 5 ? (int)Math.Floor((double)amount) : (int)Math.Round((double)amount);
-                
+
                 IntFalseUnion? healResult = Battle.Heal(roundedAmount, target, source,
                     BattleHealEffect.FromIEffect(move));
 
@@ -1408,8 +1411,11 @@ public partial class BattleActions(IBattle battle)
                 {
                     if (healResult is not null)
                     {
-                        UiGenerator.PrintFailEvent(source);
-                        Battle.AttrLastMove("[still]");
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.Add("-fail", source);
+                            Battle.AttrLastMove("[still]");
+                        }
                     }
                     Battle.Debug("heal interrupted");
                     damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
@@ -1601,8 +1607,11 @@ public partial class BattleActions(IBattle battle)
             {
                 if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
                 {
-                    UiGenerator.PrintFailEvent(source);
-                    Battle.AttrLastMove("[still]");
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("-fail", source);
+                        Battle.AttrLastMove("[still]");
+                    }
                 }
             }
             Battle.Debug("move failed because it did nothing");
