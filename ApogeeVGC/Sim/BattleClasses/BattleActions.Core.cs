@@ -1041,11 +1041,11 @@ public partial class BattleActions(IBattle battle)
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.Add("-fail", pokemon);
+                    Battle.AttrLastMove("[still]");
                 }
-                Battle.AttrLastMove("[still]");
             }
-            
+
             // Return undefined (NOT_FAIL) if any result was null, otherwise return false
             if (tryResult is null || prepareHitResult1 is null || prepareHitResult2 is null)
             {
@@ -1053,7 +1053,7 @@ public partial class BattleActions(IBattle battle)
             }
             return IntUndefinedFalseEmptyUnion.FromFalse();
         }
-        
+
         if (move.Target == MoveTarget.All)
         {
             RelayVar? fieldHitResult = Battle.RunEvent(EventId.TryHitField, target, pokemon, move);
@@ -1069,9 +1069,9 @@ public partial class BattleActions(IBattle battle)
         {
             if (Battle.DisplayUi)
             {
-                UiGenerator.PrintFailEvent(pokemon);
+                Battle.Add("-fail", pokemon);
+                Battle.AttrLastMove("[still]");
             }
-            Battle.AttrLastMove("[still]");
             return IntUndefinedFalseEmptyUnion.FromFalse();
         }
 
