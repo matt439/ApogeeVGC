@@ -296,7 +296,7 @@ public partial class BattleActions(IBattle battle)
     public void RunMove(Move move, Pokemon pokemon, int targetLoc, RunMoveOptions? options = null)
     {
         pokemon.ActiveMoveActions++;
-        
+
         bool externalMove = options?.ExternalMove ?? false;
         Pokemon? originalTarget = options?.OriginalTarget;
         IEffect? sourceEffect = options?.SourceEffect;
@@ -337,7 +337,7 @@ public partial class BattleActions(IBattle battle)
         {
             Battle.RunEvent(EventId.MoveAborted, pokemon, RunEventSource.FromNullablePokemon(target), activeMove);
             ClearActiveMove(true);
-            
+
             // The event 'BeforeMove' could have returned false or null
             // false indicates that this counts as a move failing for the purpose of calculating Stomping Tantrum's base power
             // null indicates the opposite, as the Pokemon didn't have an option to choose anything
@@ -368,7 +368,7 @@ public partial class BattleActions(IBattle battle)
 
         pokemon.LastDamage = 0;
         MoveId? lockedMove = null;
-        
+
         if (!externalMove)
         {
             // Check if Pokemon is locked into a move (e.g., Outrage, Rollout)
@@ -390,7 +390,7 @@ public partial class BattleActions(IBattle battle)
                 {
                     if (Battle.DisplayUi)
                     {
-                        UiGenerator.PrintCantEvent(pokemon, "nopp", activeMove);
+                        Battle.Add("cant", pokemon, "nopp", activeMove);
                     }
                     ClearActiveMove(true);
                     pokemon.MoveThisTurnResult = false;
@@ -401,7 +401,7 @@ public partial class BattleActions(IBattle battle)
             {
                 sourceEffect = Library.Conditions[ConditionId.LockedMove];
             }
-            
+
             pokemon.MoveUsed(activeMove, targetLoc);
         }
 
@@ -409,14 +409,14 @@ public partial class BattleActions(IBattle battle)
         bool noLock = externalMove && !pokemon.Volatiles.ContainsKey(ConditionId.LockedMove);
 
         // Actually use the move
-        bool moveDidSomething = UseMove(baseMove, pokemon, new UseMoveOptions 
-        { 
-            Target = target, 
+        bool moveDidSomething = UseMove(baseMove, pokemon, new UseMoveOptions
+        {
+            Target = target,
             SourceEffect = sourceEffect,
         });
 
-        Battle.LastSuccessfulMoveThisTurn = moveDidSomething && Battle.ActiveMove != null 
-            ? Battle.ActiveMove.Id 
+        Battle.LastSuccessfulMoveThisTurn = moveDidSomething && Battle.ActiveMove != null
+            ? Battle.ActiveMove.Id
             : null;
 
         if (Battle.ActiveMove != null)
@@ -435,7 +435,7 @@ public partial class BattleActions(IBattle battle)
             {
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintHint($"Some effects can force a Pokemon to use {activeMove.Name} again in a row.");
+                    Battle.Hint($"Some effects can force a Pokemon to use {activeMove.Name} again in a row.");
                 }
             }
         }
@@ -472,11 +472,11 @@ public partial class BattleActions(IBattle battle)
 
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintActivateEvent(dancer, Library.Abilities[AbilityId.Dancer]);
+                    Battle.Add("-activate", dancer, "ability: Dancer");
                 }
 
-                Pokemon dancersTarget = targetOf1StDance != null && 
-                                       !targetOf1StDance.IsAlly(dancer) && 
+                Pokemon dancersTarget = targetOf1StDance != null &&
+                                       !targetOf1StDance.IsAlly(dancer) &&
                                        pokemon.IsAlly(dancer)
                     ? targetOf1StDance
                     : pokemon;
