@@ -1,31 +1,25 @@
-﻿//hitStepInvulnerabilityEvent(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
-//    if (move.id === 'helpinghand') return new Array(targets.length).fill(true);
-//    const hitResults: boolean[] = [];
-//    for (const [i, target] of targets.entries()) {
-//        if (target.volatiles['commanding'])
-//        {
-//            hitResults[i] = false;
-//        }
-//        else if (this.battle.gen >= 8 && move.id === 'toxic' && pokemon.hasType('Poison'))
-//        {
-//            hitResults[i] = true;
-//        }
-//        else
-//        {
-//            hitResults[i] = this.battle.runEvent('Invulnerability', target, pokemon, move);
-//        }
-//        if (hitResults[i] === false)
-//        {
-//            if (move.smartTarget)
-//            {
-//                move.smartTarget = false;
-//            }
-//            else
-//            {
-//                if (!move.spreadHit) this.battle.attrLastMove('[miss]');
-//                this.battle.add('-miss', pokemon, target);
-//            }
-//        }
+﻿//hitStepTryHitEvent(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
+//    const hitResults = this.battle.runEvent('TryHit', targets, pokemon, move);
+//    if (!hitResults.includes(true) && hitResults.includes(false))
+//    {
+//        this.battle.add('-fail', pokemon);
+//        this.battle.attrLastMove('[still]');
 //    }
+//    for (const i of targets.keys()) {
+//        if (hitResults[i] !== this.battle.NOT_FAIL) hitResults[i] = hitResults[i] || false;
+//    }
+//    return hitResults;
+//}
+//hitStepTypeImmunity(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
+//    if (move.ignoreImmunity === undefined)
+//    {
+//        move.ignoreImmunity = (move.category === 'Status');
+//    }
+
+//    const hitResults = [];
+//    for (const i of targets.keys()) {
+//        hitResults[i] = targets[i].runImmunity(move, !move.smartTarget);
+//    }
+
 //    return hitResults;
 //}

@@ -1114,7 +1114,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
 /// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon? | IntTrueUnion |
-/// BoolIntUndefinedUnion | SecondaryEffect[]
+/// BoolIntUndefinedUnion | SecondaryEffect[] | Undefined
 /// </summary>
 public abstract record RelayVar
 {
@@ -1149,6 +1149,7 @@ public abstract record RelayVar
     };
     public static implicit operator RelayVar(BoolIntUndefinedUnion union) => new BoolIntUndefinedUnionRelayVar(union);
     public static implicit operator RelayVar(SecondaryEffect[] effects) => new SecondaryEffectArrayRelayVar(effects);
+    public static RelayVar FromUndefined() => new UndefinedRelayVar();
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -1167,6 +1168,7 @@ public record ArrayRelayVar(List<RelayVar> Values) : RelayVar;
 public record PokemonRelayVar(Pokemon Pokemon) : RelayVar;
 public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : RelayVar;
 public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar;
+public record UndefinedRelayVar : RelayVar;
 
 
 

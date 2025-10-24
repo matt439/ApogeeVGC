@@ -124,18 +124,18 @@ public partial class BattleActions
         {
             if (Battle.DisplayUi)
             {
-                UiGenerator.PrintFailEvent(pokemon);
+                Battle.Add("-fail", pokemon);
             }
             Battle.AttrLastMove("[still]");
         }
 
-        // Convert results to BoolIntUndefinedUnion
+        // Convert results to BoolIntEmptyUndefinedUnion
         var convertedResults = new List<BoolIntEmptyUndefinedUnion>();
         foreach (RelayVar? result in hitResults)
         {
             // If result is NOT_FAIL (null), keep it as undefined
             // Otherwise convert to boolean (default false if not a boolean)
-            if (result is null)
+            if (result is UndefinedRelayVar or null)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }
@@ -164,8 +164,8 @@ public partial class BattleActions
         move.IgnoreImmunity ??= move.Category == MoveCategory.Status;
 
         return targets.Select(target =>
-            target.RunImmunity(move, !(move.SmartTarget ?? false))).
-            Select(BoolIntEmptyUndefinedUnion.FromBool).ToList();
+            target.RunImmunity(move, !(move.SmartTarget ?? false)))
+            .Select(BoolIntEmptyUndefinedUnion.FromBool).ToList();
     }
 
     /// <summary>
