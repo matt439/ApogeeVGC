@@ -11,6 +11,132 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
+    public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
+        SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
+        RelayVar? relayVar = null, EffectDelegate? customCallback = null)
+    {
+        // Check for stack overflow
+        if (EventDepth >= 8)
+        {
+            if (DisplayUi)
+            {
+                Add("message", "STACK LIMIT EXCEEDED");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {Event.Id}");
+            }
+            throw new InvalidOperationException("Stack overflow");
+        }
+
+        // Check for infinite loop
+        if (Log.Count - SentLogPos > 1000)
+        {
+            if (DisplayUi)
+            {
+                Add("message", "LINE LIMIT EXCEEDED");
+                Add("message", $"Event: {eventId}");
+                Add("message", $"Parent event: {Event.Id}");
+            }
+            throw new InvalidOperationException("Infinite loop");
+        }
+
+        // Track if relayVar was explicitly provided
+        bool hasRelayVar = relayVar != null;
+        relayVar ??= new BoolRelayVar(true);
+
+        // Check if status effect has changed
+        if (effect.EffectType == EffectType.Status &&
+            target is PokemonSingleEventTarget pokemonTarget)
+        {
+            Pokemon targetPokemon = pokemonTarget.Pokemon;
+            if (effect is Condition condition && targetPokemon.Status != condition.Id)
+            {
+                // Status has changed; abort the event
+                return relayVar;
+            }
+        }
+
+        // Check if ability is suppressed by Mold Breaker
+        if (eventId == EventId.SwitchIn &&
+            effect.EffectType == EffectType.Ability &&
+            effect is Ability { Flags.Breakable: true } &&
+            target is PokemonSingleEventTarget moldbreakerTarget &&
+            SuppressingAbility(moldbreakerTarget.Pokemon))
+        {
+            Debug($"{eventId} handler suppressed by Mold Breaker");
+            return relayVar;
+        }
+
+        // Check if item is suppressed
+        if (eventId != EventId.Start &&
+            eventId != EventId.TakeItem &&
+            effect.EffectType == EffectType.Item &&
+            target is PokemonSingleEventTarget itemTarget &&
+            itemTarget.Pokemon.IgnoringItem())
+        {
+            Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
+            return relayVar;
+        }
+
+        // Check if ability is suppressed by Gastro Acid/Neutralizing Gas
+        if (eventId != EventId.End &&
+            effect.EffectType == EffectType.Ability &&
+            target is PokemonSingleEventTarget abilityTarget &&
+            abilityTarget.Pokemon.IgnoringAbility())
+        {
+            Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
+            return relayVar;
+        }
+
+        // Check if weather is suppressed
+        if (effect.EffectType == EffectType.Weather &&
+            eventId != EventId.FieldStart &&
+            eventId != EventId.FieldResidual &&
+            eventId != EventId.FieldEnd &&
+            Field.SuppressingWeather())
+        {
+            Debug($"{eventId} handler suppressed by Air Lock");
+            return relayVar;
+        }
+
+        // Get the callback - either custom or from the effect
+        EffectDelegate? callback = customCallback ?? effect.GetDelegate(eventId);
+        if (callback == null) return relayVar;
+
+        // Save parent context
+        IEffect parentEffect = Effect;
+        EffectState parentEffectState = EffectState;
+        Event parentEvent = Event;
+
+        // Set up new event context
+        Effect = effect;
+        EffectState = state ?? InitEffectState();
+        Event = new Event
+        {
+            Id = eventId,
+            Target = target,
+            Source = source,
+            Effect = sourceEffect,
+        };
+        EventDepth++;
+
+        // Invoke the callback with appropriate parameters
+        RelayVar? returnVal;
+        try
+        {
+            returnVal = InvokeEventCallback(callback, hasRelayVar, relayVar, target, source, sourceEffect);
+        }
+        finally
+        {
+            // Restore parent context
+            EventDepth--;
+            Effect = parentEffect;
+            EffectState = parentEffectState;
+            Event = parentEvent;
+        }
+
+        return returnVal ?? relayVar;
+    }
+
     /// <summary>
     /// Runs an event with no source on each Pokémon on the field, in Speed order.
     /// Speed ties are resolved randomly using the battle's PRNG.
@@ -245,122 +371,6 @@ public partial class BattleAsync
             FaintMessages();
             if (Ended) return;
         }
-    }
-
-    public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
-        SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
-        RelayVar? relayVar = null, EffectDelegate? customCallback = null)
-    {
-        // Check for stack overflow
-        if (EventDepth >= 8)
-        {
-            UiGenerator.PrintMessage("STACK LIMIT EXCEEDED");
-            UiGenerator.PrintMessage($"Event: {eventId}");
-            UiGenerator.PrintMessage($"Parent event: {Event.Id}");
-            throw new InvalidOperationException("Stack overflow");
-        }
-
-        // Check for infinite loop
-        if (Log.Count - SentLogPos > 1000)
-        {
-            UiGenerator.PrintMessage("STACK LIMIT EXCEEDED");
-            UiGenerator.PrintMessage($"Event: {eventId}");
-            UiGenerator.PrintMessage($"Parent event: {Event.Id}");
-            throw new InvalidOperationException("Infinite loop");
-        }
-
-        // Track if relayVar was explicitly provided
-        bool hasRelayVar = relayVar != null;
-        relayVar ??= new BoolRelayVar(true);
-
-        // Check if status effect has changed
-        if (effect.EffectType == EffectType.Status &&
-            target is PokemonSingleEventTarget pokemonTarget)
-        {
-            Pokemon targetPokemon = pokemonTarget.Pokemon;
-            if (effect is Condition condition && targetPokemon.Status != condition.Id)
-            {
-                // Status has changed; abort the event
-                return relayVar;
-            }
-        }
-
-        // Check if ability is suppressed by Mold Breaker
-        if (eventId == EventId.SwitchIn &&
-            effect.EffectType == EffectType.Ability &&
-            effect is Ability { Flags.Breakable: true } &&
-            target is PokemonSingleEventTarget moldbreakerTarget &&
-            SuppressingAbility(moldbreakerTarget.Pokemon))
-        {
-            return relayVar;
-        }
-
-        // Check if item is suppressed
-        if (eventId != EventId.Start &&
-            eventId != EventId.TakeItem &&
-            effect.EffectType == EffectType.Item &&
-            target is PokemonSingleEventTarget itemTarget &&
-            itemTarget.Pokemon.IgnoringItem())
-        {
-            return relayVar;
-        }
-
-        // Check if ability is suppressed by Gastro Acid/Neutralizing Gas
-        if (eventId != EventId.End &&
-            effect.EffectType == EffectType.Ability &&
-            target is PokemonSingleEventTarget abilityTarget &&
-            abilityTarget.Pokemon.IgnoringAbility())
-        {
-            return relayVar;
-        }
-
-        // Check if weather is suppressed
-        if (effect.EffectType == EffectType.Weather &&
-            eventId != EventId.FieldStart &&
-            eventId != EventId.FieldResidual &&
-            eventId != EventId.FieldEnd &&
-            Field.SuppressingWeather())
-        {
-            return relayVar;
-        }
-
-        // Get the callback - either custom or from the effect
-        EffectDelegate? callback = customCallback ?? effect.GetDelegate(eventId);
-        if (callback == null) return relayVar;
-
-        // Save parent context
-        IEffect parentEffect = Effect;
-        EffectState parentEffectState = EffectState;
-        Event parentEvent = Event;
-
-        // Set up new event context
-        Effect = effect;
-        EffectState = state ?? InitEffectState();
-        Event = new Event
-        {
-            Id = eventId,
-            Target = target,
-            Source = source,
-            Effect = sourceEffect,
-        };
-        EventDepth++;
-
-        // Invoke the callback with appropriate parameters
-        RelayVar? returnVal;
-        try
-        {
-            returnVal = InvokeEventCallback(callback, hasRelayVar, relayVar, target, source, sourceEffect);
-        }
-        finally
-        {
-            // Restore parent context
-            EventDepth--;
-            Effect = parentEffect;
-            EffectState = parentEffectState;
-            Event = parentEvent;
-        }
-
-        return returnVal ?? relayVar;
     }
 
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
