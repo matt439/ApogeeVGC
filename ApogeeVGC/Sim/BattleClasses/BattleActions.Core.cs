@@ -1298,7 +1298,7 @@ public partial class BattleActions(IBattle battle)
     }
 
     public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
-    ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
+        ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
     {
         for (int i = 0; i < targets.Count; i++)
         {
@@ -1332,20 +1332,20 @@ public partial class BattleActions(IBattle battle)
             switch (curDamage)
             {
                 case FalseIntUndefinedFalseUnion or null:
-                {
-                    if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
                     {
-                        if (Battle.DisplayUi)
+                        if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
                         {
-                            UiGenerator.PrintFailEvent(source);
+                            if (Battle.DisplayUi)
+                            {
+                                Battle.Add("-fail", source);
+                                Battle.AttrLastMove("[still]");
+                            }
                         }
-                        Battle.AttrLastMove("[still]");
-                    }
 
-                    Battle.Debug("damage calculation interrupted");
-                    damage[i] = BoolIntUndefinedUnion.FromBool(false);
-                    continue;
-                }
+                        Battle.Debug("damage calculation interrupted");
+                        damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                        continue;
+                    }
                 case IntIntUndefinedFalseUnion intDamage:
                     damage[i] = BoolIntUndefinedUnion.FromInt(intDamage.Value);
                     break;
