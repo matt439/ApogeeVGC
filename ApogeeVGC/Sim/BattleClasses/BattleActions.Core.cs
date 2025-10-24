@@ -650,22 +650,33 @@ public partial class BattleActions(IBattle battle)
         // Build move message attributes
         string moveName = activeMove.Name;
 
-        string attrs = "";
-        if (sourceEffect != null)
-        {
-            attrs += $"|[from] {sourceEffect.EffectStateId}"; // Note: Needs proper fullname formatting
-        }
-
         // Add move message to battle log
-        UiGenerator.PrintMoveEvent(pokemon, moveName, target, attrs);
+        if (Battle.DisplayUi)
+        {
+            if (target is null)
+            {
+                throw new InvalidOperationException("Target cannot be null when displaying move message." );
+            }
+            
+            if (sourceEffect != null)
+            {
+                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName, 
+                    StringNumberDelegateObjectUnion.FromObject(target), $"[from] {sourceEffect.EffectStateId}");
+            }
+            else
+            {
+                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+                    StringNumberDelegateObjectUnion.FromObject(target));
+            }
+        }
 
         // Handle no target
         if (target == null)
         {
-            // Battle.AttrLastMove("[notarget]"); // Skipping attribute
             if (Battle.DisplayUi)
             {
-                UiGenerator.PrintFailEvent(pokemon);
+                Battle.AttrLastMove("[notarget]");
+                Battle.Add(Battle.Gen >= 5 ? "-fail" : "-notarget", pokemon);
             }
 
             return false;
@@ -754,7 +765,7 @@ public partial class BattleActions(IBattle battle)
             {
                 pokemon.MoveThisTurnResult = null;
             }
-            
+
             // Set moveResult based on damage (true if damage exists, is 0, or is undefined)
             if (damage is IntIntUndefinedFalseEmptyUnion or UndefinedIntUndefinedFalseEmptyUnion)
             {
@@ -766,10 +777,10 @@ public partial class BattleActions(IBattle battle)
             // Single-target moves
             if (targets.Count == 0)
             {
-                // Battle.AttrLastMove("[notarget]"); // Skipping attribute
                 if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintFailEvent(pokemon);
+                    Battle.AttrLastMove("[notarget]");
+                    Battle.Add(Battle.Gen >= 5 ? "-fail" : "-notarget", pokemon);
                 }
 
                 return false;
