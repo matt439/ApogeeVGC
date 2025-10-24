@@ -1,210 +1,111 @@
-﻿//endTurn() {
-//	this.turn++;
-//	this.lastSuccessfulMoveThisTurn = null;
-
-//	const dynamaxEnding: Pokemon[] = [];
-//	for (const pokemon of this.getAllActive()) {
-//		if (pokemon.volatiles['dynamax']?.turns === 3)
+﻿//maybeTriggerEndlessBattleClause(
+//		trappedBySide: boolean[], stalenessBySide: ('internal' | 'external' | undefined)[]
+//	) {
+//	// Gen 1 Endless Battle Clause triggers
+//	// These are checked before the 100 turn minimum as the battle cannot progress if they are true
+//	if (this.gen <= 1)
+//	{
+//		const noProgressPossible = this.sides.every(side => {
+//			const foeAllGhosts = side.foe.pokemon.every(pokemon => pokemon.fainted || pokemon.hasType('Ghost'));
+//			const foeAllTransform = side.foe.pokemon.every(pokemon => (
+//				pokemon.fainted ||
+//				// true if transforming into this pokemon would lead to an endless battle
+//				// Transform will fail (depleting PP) if used against Ditto in Stadium 1
+//				(this.dex.currentMod !== 'gen1stadium' || pokemon.species.id !== 'ditto') &&
+//				// there are some subtleties such as a Mew with only Transform and auto-fail moves,
+//				// but it's unlikely to come up in a real game so there's no need to handle it
+//				pokemon.moves.every(moveid => moveid === 'transform')
+//			));
+//			return side.pokemon.every(pokemon => (
+//				pokemon.fainted ||
+//				// frozen pokemon can't thaw in gen 1 without outside help
+//				pokemon.status === 'frz' ||
+//				// a pokemon can't lose PP if it Transforms into a pokemon with only Transform
+//				(pokemon.moves.every(moveid => moveid === 'transform') && foeAllTransform) ||
+//				// Struggle can't damage yourself if every foe is a Ghost
+//				(pokemon.moveSlots.every(slot => slot.pp === 0) && foeAllGhosts)
+//			));
+//		});
+//		if (noProgressPossible)
 //		{
-//			dynamaxEnding.push(pokemon);
-//		}
-//	}
-//	if (dynamaxEnding.length > 1)
-//	{
-//		this.updateSpeed();
-//		this.speedSort(dynamaxEnding);
-//	}
-//	for (const pokemon of dynamaxEnding) {
-//		pokemon.removeVolatile('dynamax');
-//	}
-
-//	// Gen 1 partial trapping ends when either Pokemon or a switch in faints to residual damage
-//	if (this.gen === 1)
-//	{
-//		for (const pokemon of this.getAllActive()) {
-//			if (pokemon.volatiles['partialtrappinglock'])
-//			{
-//				const target = pokemon.volatiles['partialtrappinglock'].locked;
-//				if (target.hp <= 0 || !target.volatiles['partiallytrapped'])
-//				{
-//					delete pokemon.volatiles['partialtrappinglock'];
-//				}
-//			}
-//			if (pokemon.volatiles['partiallytrapped'])
-//			{
-//				const source = pokemon.volatiles['partiallytrapped'].source;
-//				if (source.hp <= 0 || !source.volatiles['partialtrappinglock'])
-//				{
-//					delete pokemon.volatiles['partiallytrapped'];
-//				}
-//			}
-//			if (pokemon.volatiles['fakepartiallytrapped'])
-//			{
-//				const counterpart = pokemon.volatiles['fakepartiallytrapped'].counterpart;
-//				if (counterpart.hp <= 0 || !counterpart.volatiles['fakepartiallytrapped'])
-//				{
-//					delete pokemon.volatiles['fakepartiallytrapped'];
-//				}
-//			}
+//			this.add('-message', `This battle cannot progress.Endless Battle Clause activated!`);
+//			return this.tie();
 //		}
 //	}
 
-//	const trappedBySide: boolean[] = [];
-//	const stalenessBySide: ('internal' | 'external' | undefined)[] = [];
+//	if (this.turn <= 100) return;
+
+//	// the turn limit is not a part of Endless Battle Clause
+//	if (this.turn >= 1000)
+//	{
+//		this.add('message', `It is turn 1000.You have hit the turn limit!`);
+//		this.tie();
+//		return true;
+//	}
+//	if (
+//		(this.turn >= 500 && this.turn % 100 === 0) || // every 100 turns past turn 500,
+//		(this.turn >= 900 && this.turn % 10 === 0) || // every 10 turns past turn 900,
+//		this.turn >= 990 // every turn past turn 990
+//	)
+//	{
+//		const turnsLeft = 1000 - this.turn;
+//		const turnsLeftText = (turnsLeft === 1 ? `1 turn` : `${ turnsLeft}
+//		turns`);
+//		this.add('bigerror', `You will auto - tie if the battle doesn't end in ${turnsLeftText} (on turn 1000).`);
+//		}
+
+//	if (!this.ruleTable.has('endlessbattleclause')) return;
+//	// for now, FFA doesn't support Endless Battle Clause
+//	if (this.format.gameType === 'freeforall') return;
+
+//	// Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
+//	if (!stalenessBySide.every(s => !!s) || !stalenessBySide.some(s => s === 'external')) return;
+
+//	// Can both sides switch to a non-stale Pokemon?
+//	const canSwitch = [];
+//	for (const [i, trapped] of trappedBySide.entries()) {
+//		canSwitch[i] = false;
+//		if (trapped) break;
+//		const side = this.sides[i];
+
+//		for (const pokemon of side.pokemon) {
+//			if (!pokemon.fainted && !(pokemon.volatileStaleness || pokemon.staleness))
+//			{
+//				canSwitch[i] = true;
+//				break;
+//			}
+//		}
+//	}
+//	if (canSwitch.every(s => s)) return;
+
+//	// Endless Battle Clause activates - we determine the winner by looking at each side's sets.
+//	const losers: Side[] = [];
 //	for (const side of this.sides) {
-//		let sideTrapped = true;
-//		let sideStaleness: 'internal' | 'external' | undefined;
-//		for (const pokemon of side.active) {
-//			if (!pokemon) continue;
-//			pokemon.moveThisTurn = '';
-//			pokemon.newlySwitched = false;
-//			pokemon.moveLastTurnResult = pokemon.moveThisTurnResult;
-//			pokemon.moveThisTurnResult = undefined;
-//			if (this.turn !== 1)
+//		let berry = false; // Restorative Berry
+//		let cycle = false; // Harvest or Recycle
+//		for (const pokemon of side.pokemon) {
+//			berry = RESTORATIVE_BERRIES.has(toID(pokemon.set.item));
+//			if (['harvest', 'pickup'].includes(toID(pokemon.set.ability)) ||
+//				pokemon.set.moves.map(toID).includes('recycle' as ID))
 //			{
-//				pokemon.usedItemThisTurn = false;
-//				pokemon.statsRaisedThisTurn = false;
-//				pokemon.statsLoweredThisTurn = false;
-//				// It shouldn't be possible in a normal battle for a Pokemon to be damaged before turn 1's move selection
-//				// However, this could be potentially relevant in certain OMs
-//				pokemon.hurtThisTurn = null;
+//				cycle = true;
 //			}
-
-//			pokemon.maybeDisabled = false;
-//			pokemon.maybeLocked = false;
-//			for (const moveSlot of pokemon.moveSlots) {
-//				moveSlot.disabled = false;
-//				moveSlot.disabledSource = '';
-//			}
-//			this.runEvent('DisableMove', pokemon);
-//			for (const moveSlot of pokemon.moveSlots) {
-//				const activeMove = this.dex.getActiveMove(moveSlot.id);
-//				this.singleEvent('DisableMove', activeMove, null, pokemon);
-//				if (activeMove.flags['cantusetwice'] && pokemon.lastMove?.id === moveSlot.id)
-//				{
-//					pokemon.disableMove(pokemon.lastMove.id);
-//				}
-//			}
-
-//			// If it was an illusion, it's not any more
-//			if (pokemon.getLastAttackedBy() && this.gen >= 7) pokemon.knownType = true;
-
-//			for (let i = pokemon.attackedBy.length - 1; i >= 0; i--)
-//			{
-//				const attack = pokemon.attackedBy[i];
-//				if (attack.source.isActive)
-//				{
-//					attack.thisTurn = false;
-//				}
-//				else
-//				{
-//					pokemon.attackedBy.splice(pokemon.attackedBy.indexOf(attack), 1);
-//				}
-//			}
-
-//			if (this.gen >= 7 && !pokemon.terastallized)
-//			{
-//				// In Gen 7, the real type of every Pokemon is visible to all players via the bottom screen while making choices
-//				const seenPokemon = pokemon.illusion || pokemon;
-//				const realTypeString = seenPokemon.getTypes(true).join('/');
-//				if (realTypeString !== seenPokemon.apparentType)
-//				{
-//					this.add('-start', pokemon, 'typechange', realTypeString, '[silent]');
-//					seenPokemon.apparentType = realTypeString;
-//					if (pokemon.addedType)
-//					{
-//						// The typechange message removes the added type, so put it back
-//						this.add('-start', pokemon, 'typeadd', pokemon.addedType, '[silent]');
-//					}
-//				}
-//			}
-
-//			pokemon.trapped = pokemon.maybeTrapped = false;
-//			this.runEvent('TrapPokemon', pokemon);
-//			if (!pokemon.knownType || this.dex.getImmunity('trapped', pokemon))
-//			{
-//				this.runEvent('MaybeTrapPokemon', pokemon);
-//			}
-//			// canceling switches would leak information
-//			// if a foe might have a trapping ability
-//			if (this.gen > 2)
-//			{
-//				for (const source of pokemon.foes()) {
-//					const species = (source.illusion || source).species;
-//					if (!species.abilities) continue;
-//					for (const abilitySlot in species.abilities) {
-//						const abilityName = species.abilities[abilitySlot as keyof Species['abilities']];
-//						if (abilityName === source.ability)
-//						{
-//							// pokemon event was already run above so we don't need
-//							// to run it again.
-//							continue;
-//						}
-//						const ruleTable = this.ruleTable;
-//						if ((ruleTable.has('+hackmons') || !ruleTable.has('obtainableabilities')) && !this.format.team)
-//						{
-//							// hackmons format
-//							continue;
-//						}
-//						else if (abilitySlot === 'H' && species.unreleasedHidden)
-//						{
-//							// unreleased hidden ability
-//							continue;
-//						}
-//						const ability = this.dex.abilities.get(abilityName);
-//						if (ruleTable.has('-ability:' + ability.id)) continue;
-//						if (pokemon.knownType && !this.dex.getImmunity('trapped', pokemon)) continue;
-//						this.singleEvent('FoeMaybeTrapPokemon', ability, { }, pokemon, source);
-//					}
-//				}
-//			}
-
-//			if (pokemon.fainted) continue;
-
-//			sideTrapped = sideTrapped && pokemon.trapped;
-//			const staleness = pokemon.volatileStaleness || pokemon.staleness;
-//			if (staleness) sideStaleness = sideStaleness === 'external' ? sideStaleness : staleness;
-//			pokemon.activeTurns++;
+//			if (berry && cycle) break;
 //		}
-//		trappedBySide.push(sideTrapped);
-//		stalenessBySide.push(sideStaleness);
-//		side.faintedLastTurn = side.faintedThisTurn;
-//		side.faintedThisTurn = null;
+//		if (berry && cycle) losers.push(side);
 //	}
 
-//	if (this.maybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide)) return;
-
-//	if (this.gameType === 'triples' && this.sides.every(side => side.pokemonLeft === 1))
+//	if (losers.length === 1)
 //	{
-//		// If both sides have one Pokemon left in triples and they are not adjacent, they are both moved to the center.
-//		const actives = this.getAllActive();
-//		if (actives.length > 1 && !actives[0].isAdjacent(actives[1]))
-//		{
-//			this.swapPosition(actives[0], 1, '[silent]');
-//			this.swapPosition(actives[1], 1, '[silent]');
-//			this.add('-center');
-//		}
+//		const loser = losers[0];
+//		this.add('-message', `${ loser.name}
+//		's team started with the rudimentary means to perform restorative berry-cycling and thus loses.`);
+//			return this.win(loser.foe);
 //	}
-
-//	this.add('turn', this.turn);
-//	if (this.gameType === 'multi')
+//	if (losers.length === this.sides.length)
 //	{
-//		for (const side of this.sides) {
-//			if (side.canDynamaxNow())
-//			{
-//				if (this.turn === 1)
-//				{
-//					this.addSplit(side.id, ['-candynamax', side.id]);
-//				}
-//				else
-//				{
-//					this.add('-candynamax', side.id);
-//				}
-//			}
+//		this.add('-message', `Each side's team started with the rudimentary means to perform restorative berry-cycling.`);
 //		}
-//	}
-//	if (this.gen === 2) this.quickClawRoll = this.randomChance(60, 256);
-//	if (this.gen === 3) this.quickClawRoll = this.randomChance(1, 5);
 
-//	this.makeRequest('move');
+//	return this.tie();
 //}

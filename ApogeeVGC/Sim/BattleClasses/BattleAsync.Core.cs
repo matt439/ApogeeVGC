@@ -1293,7 +1293,10 @@ public partial class BattleAsync : IBattle, IDisposable
         // Turn limit check (not part of Endless Battle Clause, but hard limit)
         if (Turn >= 1000)
         {
-            UiGenerator.PrintMessage("It is turn 1000. You have hit the turn limit!");
+            if (DisplayUi)
+            {
+                Add("-message", "It is turn 1000. You have hit the turn limit!");
+            }
             Tie();
             return true;
         }
@@ -1303,9 +1306,12 @@ public partial class BattleAsync : IBattle, IDisposable
             (Turn >= 900 && Turn % 10 == 0) ||  // Every 10 turns past turn 900
             Turn >= 990)                         // Every turn past turn 990
         {
-            int turnsLeft = 1000 - Turn;
-            string turnsLeftText = turnsLeft == 1 ? "1 turn" : $"{turnsLeft} turns";
-            UiGenerator.PrintBigError($"You will auto-tie if the battle doesn't end in {turnsLeftText} (on turn 1000).");
+            if (DisplayUi)
+            {
+                int turnsLeft = 1000 - Turn;
+                string turnsLeftText = turnsLeft == 1 ? "1 turn" : $"{turnsLeft} turns";
+                Add("bigerror", $"You will auto-tie if the battle doesn't end in {turnsLeftText} (on turn 1000).");
+            }
         }
 
         // Check if Endless Battle Clause rule is enabled
@@ -1313,7 +1319,7 @@ public partial class BattleAsync : IBattle, IDisposable
 
         // Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
         if (!stalenessBySide.All(s => s.HasValue) ||
-            stalenessBySide.All(s => s != StalenessId.External))
+            !stalenessBySide.Any(s => s == StalenessId.External))
         {
             return false;
         }
@@ -1325,7 +1331,7 @@ public partial class BattleAsync : IBattle, IDisposable
             bool trapped = trappedBySide[i];
             canSwitch.Add(false);
 
-            if (trapped) continue; // Changed from 'break' - should only skip this side
+            if (trapped) continue;
 
             Side side = Sides[i];
 
@@ -1379,17 +1385,23 @@ public partial class BattleAsync : IBattle, IDisposable
         if (losers.Count == 1)
         {
             Side loser = losers[0];
-            UiGenerator.PrintMessage(
-                $"{loser.Name}'s team started with the rudimentary means to perform " +
-                "restorative berry-cycling and thus loses.");
+            if (DisplayUi)
+            {
+                Add("-message",
+                    $"{loser.Name}'s team started with the rudimentary means to perform " +
+                    "restorative berry-cycling and thus loses.");
+            }
             return Win(loser.Foe);
         }
 
         if (losers.Count == Sides.Count)
         {
-            UiGenerator.PrintMessage(
-                "Each side's team started with the rudimentary means to perform " +
-                "restorative berry-cycling.");
+            if (DisplayUi)
+            {
+                Add("-message",
+                    "Each side's team started with the rudimentary means to perform " +
+                    "restorative berry-cycling.");
+            }
         }
 
         return Tie();
