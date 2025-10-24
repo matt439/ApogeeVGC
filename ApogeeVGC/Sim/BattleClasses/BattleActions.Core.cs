@@ -186,12 +186,6 @@ public partial class BattleActions(IBattle battle)
             }
         }
 
-        // Gen 2 special case: track drag turn
-        if (isDrag && Battle.Gen == 2)
-        {
-            pokemon.DraggedIn = Battle.Turn;
-        }
-
         pokemon.PreviouslySwitchedIn++;
 
         // Schedule RunSwitch action

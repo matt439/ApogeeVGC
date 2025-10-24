@@ -13,6 +13,11 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -450,7 +455,7 @@ public partial class BattleAsync : IBattle, IDisposable
         }
     }
 
-    private EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
+    public EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
     {
         // Get event metadata from Library
         EventIdInfo eventInfo = Library.Events[callbackName];
@@ -1802,98 +1807,6 @@ public partial class BattleAsync : IBattle, IDisposable
         return retVals;
     }
 
-
-    /// <summary>
-    /// Logs a damage message to the battle log based on the effect causing the damage.
-    /// Handles special cases like partially trapped, powder, and confusion.
-    /// </summary>
-    private void PrintDamageMessage(Pokemon target, Pokemon? source, Condition? effect)
-    {
-        if (!DisplayUi) return;
-
-        // Get the health status for the log message
-        var healthFunc = target.GetHealth;
-
-        // Get the effect name, converting "tox" to "psn" for display
-        string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
-
-        switch (effect?.Id)
-        {
-            case ConditionId.PartiallyTrapped:
-                // Get the source effect from the volatile condition
-                if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped, out EffectState? ptState) &&
-                    ptState.SourceEffect != null)
-                {
-                    Add("-damage", target, healthFunc, "[from]", ptState.SourceEffect.FullName, "[partiallytrapped]");
-                }
-                break;
-
-            case ConditionId.Powder:
-                Add("-damage", target, healthFunc, "[silent]");
-                break;
-
-            case ConditionId.Confusion:
-                Add("-damage", target, healthFunc, "[from] confusion");
-                break;
-
-            default:
-                if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
-                {
-                    // Simple damage from a move or no effect
-                    Add("-damage", target, healthFunc);
-                }
-                else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
-                {
-                    // Damage from effect with source
-                    Add("-damage", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
-                }
-                else
-                {
-                    // Damage from effect without source
-                    Add("-damage", target, healthFunc, $"[from] {effectName}");
-                }
-                break;
-        }
-    }
-
-    /// <summary>
-    /// Logs a heal message to the battle log based on the effect causing the healing.
-    /// </summary>
-    private void PrintHealMessage(Pokemon target, Pokemon? source, Condition? effect)
-    {
-        if (!DisplayUi) return;
-
-        // Get the health status for the log message
-        var healthFunc = target.GetHealth;
-
-        // Determine if this is a drain effect
-        bool isDrain = effect?.Id == ConditionId.Drain;
-
-        if (isDrain && source != null)
-        {
-            // Drain healing shows the source
-            Add("-heal", target, healthFunc, "[from] drain", $"[of] {source}");
-        }
-        else if (effect != null && effect.Id != ConditionId.None)
-        {
-            // Healing from a specific effect
-            string effectName = effect.FullName == "tox" ? "psn" : effect.FullName;
-            if (source != null && source != target)
-            {
-                Add("-heal", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
-            }
-            else
-            {
-                Add("-heal", target, healthFunc, $"[from] {effectName}");
-            }
-        }
-        else
-        {
-            // Simple heal with no effect
-            Add("-heal", target, healthFunc);
-        }
-    }
-
     /// <summary>
     /// Applies damage to a single Pokémon.
     /// This is a convenience wrapper around SpreadDamage for single-target damage.
@@ -2819,10 +2732,17 @@ public partial class BattleAsync : IBattle, IDisposable
                     {
                         if (side.PokemonLeft > 0)
                             side.PokemonLeft = side.Pokemon.Count;
-                        UiGenerator.PrintMessage($"teamsize|{side.Id}|{side.Pokemon.Count}");
+
+                        if (DisplayUi)
+                        {
+                            Add("teamsize", side.Id.ToString(), side.Pokemon.Count.ToString());
+                        }
                     }
 
-                    UiGenerator.PrintMessage("start");
+                    if (DisplayUi)
+                    {
+                        Add("start");
+                    }
 
                     // Change Zacian/Zamazenta into their Crowned formes
                     foreach (Pokemon pokemon in GetAllPokemon())
@@ -2851,10 +2771,10 @@ public partial class BattleAsync : IBattle, IDisposable
 
                         // Replace Iron Head with Behemoth Blade/Bash
                         Dictionary<SpecieId, MoveId> behemothMoves = new()
-                {
-                    { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
-                    { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
-                };
+                    {
+                        { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
+                        { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
+                    };
 
                         int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
                         if (ironHeadIndex >= 0)
@@ -2927,6 +2847,7 @@ public partial class BattleAsync : IBattle, IDisposable
                         });
                     break;
                 }
+
             case ActionId.Terastallize:
                 {
                     var teraAction = (PokemonAction)action;
@@ -2965,8 +2886,7 @@ public partial class BattleAsync : IBattle, IDisposable
                 {
                     var eventAction = (PokemonAction)action;
                     RunEvent(eventAction.Event ??
-                             throw new InvalidOperationException("In showdown it uses a '!' suppressor." +
-                                                                 "Not sure how to handle null"),
+                             throw new InvalidOperationException("Event action must have an event"),
                         eventAction.Pokemon);
                     break;
                 }
@@ -3009,7 +2929,7 @@ public partial class BattleAsync : IBattle, IDisposable
                     {
                         Queue.AddChoice(new SwitchAction
                         {
-                            Choice = ActionId.RevivalBlessing,
+                            Choice = ActionId.InstaSwitch,
                             Pokemon = rbAction.Target,
                             Target = rbAction.Target,
                             Order = 3,
@@ -3021,7 +2941,12 @@ public partial class BattleAsync : IBattle, IDisposable
                     rbAction.Target.Status = ConditionId.None;
                     rbAction.Target.Hp = 1; // Needed so HP functions work
                     rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
-                    UiGenerator.PrintHealEvent(rbAction.Target, fromEffect: "move: Revival Blessing");
+
+                    if (DisplayUi)
+                    {
+                        Add("-heal", rbAction.Target, rbAction.Target.GetHealth, "[from] move: Revival Blessing");
+                    }
+
                     rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon, ConditionId.RevivalBlessing);
                     break;
                 }
@@ -3047,14 +2972,22 @@ public partial class BattleAsync : IBattle, IDisposable
                 break;
 
             case ActionId.Residual:
-                UiGenerator.PrintEmptyLine();
+                if (DisplayUi)
+                {
+                    Add("");
+                }
+
                 ClearActiveMove(failed: true);
                 UpdateSpeed();
                 residualPokemon = GetAllActive()
                     .Select(p => (p, p.GetUndynamaxedHp()))
                     .ToList();
                 FieldEvent(EventId.Residual);
-                if (!Ended) UiGenerator.PrintMessage("upkeep");
+
+                if (!Ended && DisplayUi)
+                {
+                    Add("upkeep");
+                }
                 break;
         }
 
@@ -3566,44 +3499,6 @@ public partial class BattleAsync : IBattle, IDisposable
     }
 
     /// <summary>
-    /// Formats a Part for output to the battle log.
-    /// Converts various Part types to their string representations.
-    /// </summary>
-    private static string FormatPart(Part part)
-    {
-        return part switch
-        {
-            StringPart s => s.Value,
-            IntPart i => i.Value.ToString(),
-            DoublePart d => d.Value.ToString("F"),
-            BoolPart b => b.Value.ToString().ToLowerInvariant(),
-            PokemonPart p => p.Pokemon.ToString(),
-            SidePart s => s.Side.Id.ToString(),
-            MovePart m => m.Move.Name,
-            EffectPart e => e.Effect.Name,
-            UndefinedPart => "undefined",
-            _ => string.Empty,
-        };
-    }
-
-    /// <summary>
-    /// Formats a StringNumberDelegateObjectUnion argument for output.
-    /// Converts various union types to their string representations.
-    /// </summary>
-    private static string FormatArg(StringNumberDelegateObjectUnion arg)
-    {
-        return arg switch
-        {
-            StringStringNumberDelegateObjectUnion s => s.Value,
-            IntStringNumberDelegateObjectUnion i => i.Value.ToString(),
-            DoubleStringNumberDelegateObjectUnion d => d.Value.ToString("F"),
-            DelegateStringNumberDelegateObjectUnion del => del.Delegate.Method.Name,
-            ObjectStringNumberDelegateObjectUnion obj => obj.Object.ToString() ?? string.Empty,
-            _ => string.Empty,
-        };
-    }
-
-    /// <summary>
     /// Updates the target of the most recently logged move.
     /// Used when a move's target changes after it was initially logged (e.g., through redirection).
     /// </summary>
@@ -3665,7 +3560,7 @@ public partial class BattleAsync : IBattle, IDisposable
         Add("debug", activity);
     }
 
-    private static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
+    public static IReadOnlyList<PokemonSet> GetTeam(PlayerOptions options)
     {
         return options.Team ?? throw new InvalidOperationException();
     }
@@ -3743,19 +3638,6 @@ public partial class BattleAsync : IBattle, IDisposable
             string packedTeam = PackTeam(team);
             Add("showteam", side.Id.ToString(), packedTeam);
         }
-    }
-
-    /// <summary>
-    /// Packs a team into a string format for transmission to the client.
-    /// This is a placeholder - you'll need to implement the actual packing logic
-    /// based on your client's expected format.
-    /// </summary>
-    private static string PackTeam(List<PokemonSet> team)
-    {
-        // TODO: Implement team packing logic
-        // This should serialize the team data into the format your client expects
-        // The original uses Teams.pack() from the @pkmn/sets library
-        throw new NotImplementedException("Team packing logic needs to be implemented");
     }
 
     public void SetPlayer(SideId slot, PlayerOptions options)
@@ -4096,6 +3978,148 @@ public partial class BattleAsync : IBattle, IDisposable
     }
 
     #region Helpers
+
+    /// <summary>
+    /// Packs a team into a string format for transmission to the client.
+    /// This is a placeholder - you'll need to implement the actual packing logic
+    /// based on your client's expected format.
+    /// </summary>
+    private static string PackTeam(List<PokemonSet> team)
+    {
+        // TODO: Implement team packing logic
+        // This should serialize the team data into the format your client expects
+        // The original uses Teams.pack() from the @pkmn/sets library
+        throw new NotImplementedException("Team packing logic needs to be implemented");
+    }
+
+    /// <summary>
+    /// Formats a Part for output to the battle log.
+    /// Converts various Part types to their string representations.
+    /// </summary>
+    private static string FormatPart(Part part)
+    {
+        return part switch
+        {
+            StringPart s => s.Value,
+            IntPart i => i.Value.ToString(),
+            DoublePart d => d.Value.ToString("F"),
+            BoolPart b => b.Value.ToString().ToLowerInvariant(),
+            PokemonPart p => p.Pokemon.ToString(),
+            SidePart s => s.Side.Id.ToString(),
+            MovePart m => m.Move.Name,
+            EffectPart e => e.Effect.Name,
+            UndefinedPart => "undefined",
+            _ => string.Empty,
+        };
+    }
+
+    /// <summary>
+    /// Formats a StringNumberDelegateObjectUnion argument for output.
+    /// Converts various union types to their string representations.
+    /// </summary>
+    private static string FormatArg(StringNumberDelegateObjectUnion arg)
+    {
+        return arg switch
+        {
+            StringStringNumberDelegateObjectUnion s => s.Value,
+            IntStringNumberDelegateObjectUnion i => i.Value.ToString(),
+            DoubleStringNumberDelegateObjectUnion d => d.Value.ToString("F"),
+            DelegateStringNumberDelegateObjectUnion del => del.Delegate.Method.Name,
+            ObjectStringNumberDelegateObjectUnion obj => obj.Object.ToString() ?? string.Empty,
+            _ => string.Empty,
+        };
+    }
+
+    /// <summary>
+    /// Logs a damage message to the battle log based on the effect causing the damage.
+    /// Handles special cases like partially trapped, powder, and confusion.
+    /// </summary>
+    private void PrintDamageMessage(Pokemon target, Pokemon? source, Condition? effect)
+    {
+        if (!DisplayUi) return;
+
+        // Get the health status for the log message
+        var healthFunc = target.GetHealth;
+
+        // Get the effect name, converting "tox" to "psn" for display
+        string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
+
+        switch (effect?.Id)
+        {
+            case ConditionId.PartiallyTrapped:
+                // Get the source effect from the volatile condition
+                if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped, out EffectState? ptState) &&
+                    ptState.SourceEffect != null)
+                {
+                    Add("-damage", target, healthFunc, "[from]", ptState.SourceEffect.FullName, "[partiallytrapped]");
+                }
+                break;
+
+            case ConditionId.Powder:
+                Add("-damage", target, healthFunc, "[silent]");
+                break;
+
+            case ConditionId.Confusion:
+                Add("-damage", target, healthFunc, "[from] confusion");
+                break;
+
+            default:
+                if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
+                {
+                    // Simple damage from a move or no effect
+                    Add("-damage", target, healthFunc);
+                }
+                else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
+                {
+                    // Damage from effect with source
+                    Add("-damage", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
+                }
+                else
+                {
+                    // Damage from effect without source
+                    Add("-damage", target, healthFunc, $"[from] {effectName}");
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Logs a heal message to the battle log based on the effect causing the healing.
+    /// </summary>
+    private void PrintHealMessage(Pokemon target, Pokemon? source, Condition? effect)
+    {
+        if (!DisplayUi) return;
+
+        // Get the health status for the log message
+        var healthFunc = target.GetHealth;
+
+        // Determine if this is a drain effect
+        bool isDrain = effect?.Id == ConditionId.Drain;
+
+        if (isDrain && source != null)
+        {
+            // Drain healing shows the source
+            Add("-heal", target, healthFunc, "[from] drain", $"[of] {source}");
+        }
+        else if (effect != null && effect.Id != ConditionId.None)
+        {
+            // Healing from a specific effect
+            string effectName = effect.FullName == "tox" ? "psn" : effect.FullName;
+            if (source != null && source != target)
+            {
+                Add("-heal", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
+            }
+            else
+            {
+                Add("-heal", target, healthFunc, $"[from] {effectName}");
+            }
+        }
+        else
+        {
+            // Simple heal with no effect
+            Add("-heal", target, healthFunc);
+        }
+    }
 
     /// <summary>
     /// Formats a PartFuncUnion for output to the battle log.
