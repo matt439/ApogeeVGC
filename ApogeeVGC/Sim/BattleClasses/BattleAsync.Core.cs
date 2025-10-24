@@ -1885,17 +1885,17 @@ public partial class BattleAsync : IBattle, IDisposable
             // Log damage messages
             PrintDamageMessage(target, source, effectCondition);
 
-            if (effect is not EffectBattleDamageEffect { Effect: ActiveMove move }) continue;
-
-            // Handle recoil and drain for moves (Gen-specific logic)
-            if (targetDamage <= 0 || effectCondition?.EffectType != EffectType.Move) continue;
-
-            // Gen 5+ drain healing (uses rounding instead of flooring)
-            if (Gen <= 4 || move.Drain == null || source == null) continue;
-
-            int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
-                                               (double)move.Drain.Value.Item2));
-            Heal(drainAmount, source, target, new DrainBattleHealEffect());
+            // Handle drain for moves (Gen 9 uses rounding)
+            if (effect is EffectBattleDamageEffect { Effect: ActiveMove move })
+            {
+                if (targetDamage > 0 && effectCondition?.EffectType == EffectType.Move &&
+                    move.Drain != null && source != null)
+                {
+                    int drainAmount = Trunc(Math.Round(targetDamage * move.Drain.Value.Item1 /
+                                                       (double)move.Drain.Value.Item2));
+                    Heal(drainAmount, source, target, new DrainBattleHealEffect());
+                }
+            }
         }
 
         // Handle instafaint if requested
@@ -4153,9 +4153,6 @@ public partial class BattleAsync : IBattle, IDisposable
     {
         if (!DisplayUi) return;
 
-        // Get the health status for the log message
-        var healthFunc = target.GetHealth;
-
         // Get the effect name, converting "tox" to "psn" for display
         string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
 
@@ -4166,33 +4163,33 @@ public partial class BattleAsync : IBattle, IDisposable
                 if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped, out EffectState? ptState) &&
                     ptState.SourceEffect != null)
                 {
-                    Add("-damage", target, healthFunc, "[from]", ptState.SourceEffect.FullName, "[partiallytrapped]");
+                    Add("-damage", target, target.GetHealth, $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
                 break;
 
             case ConditionId.Powder:
-                Add("-damage", target, healthFunc, "[silent]");
+                Add("-damage", target, target.GetHealth, "[silent]");
                 break;
 
             case ConditionId.Confusion:
-                Add("-damage", target, healthFunc, "[from] confusion");
+                Add("-damage", target, target.GetHealth, "[from] confusion");
                 break;
 
             default:
                 if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
-                    Add("-damage", target, healthFunc);
+                    Add("-damage", target, target.GetHealth);
                 }
                 else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
                 {
                     // Damage from effect with source
-                    Add("-damage", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
+                    Add("-damage", target, target.GetHealth, $"[from] {effectName}", $"[of] {source}");
                 }
                 else
                 {
                     // Damage from effect without source
-                    Add("-damage", target, healthFunc, $"[from] {effectName}");
+                    Add("-damage", target, target.GetHealth, $"[from] {effectName}");
                 }
                 break;
         }
