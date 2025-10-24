@@ -264,8 +264,8 @@ public partial class BattleActions
                     // Base accuracy for OHKO moves is 30%
                     int ohkoAccuracy = 30;
 
-                    // Ice-type OHKO moves (Sheer Cold) have 20% accuracy when used by non-Ice types (Gen 7+)
-                    if (move.Ohko is IceMoveOhko && Battle.Gen >= 7 && !pokemon.HasType(PokemonType.Ice))
+                    // Ice-type OHKO moves (Sheer Cold) have 20% accuracy when used by non-Ice types
+                    if (move.Ohko is IceMoveOhko && !pokemon.HasType(PokemonType.Ice))
                     {
                         ohkoAccuracy = 20;
                     }
@@ -282,7 +282,10 @@ public partial class BattleActions
                     else
                     {
                         // OHKO failed due to level or type immunity
-                        UiGenerator.PrintImmuneEvent(target, "[ohko]");
+                        if (Battle.DisplayUi)
+                        {
+                            Battle.Add("-immune", target, "[ohko]");
+                        }
                         hitResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
                         continue;
                     }
@@ -380,7 +383,7 @@ public partial class BattleActions
 
             // Check for moves that always hit
             if (move.AlwaysHit == true ||
-                (move.Id == MoveId.Toxic && Battle.Gen >= 8 && pokemon.HasType(PokemonType.Poison)) ||
+                (move.Id == MoveId.Toxic && pokemon.HasType(PokemonType.Poison)) ||
                 (move is { Target: MoveTarget.Self, Category: MoveCategory.Status } &&
                  !target.IsSemiInvulnerable()))
             {
@@ -423,7 +426,11 @@ public partial class BattleActions
                     {
                         Battle.AttrLastMove("[miss]");
                     }
-                    UiGenerator.PrintMissEvent(pokemon, target);
+
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("-miss", pokemon, target);
+                    }
                 }
 
                 // Blunder Policy: Boost speed by 2 stages on miss (not for OHKO moves)
