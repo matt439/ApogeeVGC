@@ -306,7 +306,9 @@ public class Pokemon : IPriorityComparison, IDisposable
         return details;
     }
 
-    public SideSecretSharedResult GetFullDetails()
+    public Func<SideSecretSharedResult> GetFullDetails => GetFullDetailsData;
+
+    private SideSecretSharedResult GetFullDetailsData()
     {
         SideSecretSharedResult health = GetHealth();
         PokemonDetails details = Details;
@@ -2895,7 +2897,9 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
     }
 
-    public SideSecretSharedResult GetHealth()
+    public Func<SideSecretSharedResult> GetHealth => GetHealthData;
+
+    private SideSecretSharedResult GetHealthData()
     {
         // If Pokemon is fainted, return fainted status
         if (Hp <= 0)

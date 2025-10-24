@@ -13,6 +13,8 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1935,30 +1937,33 @@ public partial class BattleAsync : IBattle, IDisposable
         damage = target.Damage(damage, source, effect);
 
         // Log the damage with special cases for certain effects
-        if (effect is Condition condition)
+        if (DisplayUi)
         {
-            switch (condition.Id)
+            if (effect is Condition condition)
             {
-                case ConditionId.StruggleRecoil:
-                    // Struggle recoil has special messaging
-                    UiGenerator.PrintDamageEvent(target, fromEffect: "recoil");
-                    break;
+                switch (condition.Id)
+                {
+                    case ConditionId.StruggleRecoil:
+                        // Struggle recoil has special messaging
+                        Add("-damage", target, target.GetHealth, "[from] recoil");
+                        break;
 
-                case ConditionId.Confusion:
-                    // Confusion damage has special messaging
-                    UiGenerator.PrintDamageEvent(target, fromEffect: "confusion");
-                    break;
+                    case ConditionId.Confusion:
+                        // Confusion damage has special messaging
+                        Add("-damage", target, target.GetHealth, "[from] confusion");
+                        break;
 
-                default:
-                    // Regular direct damage message
-                    UiGenerator.PrintDamageEvent(target);
-                    break;
+                    default:
+                        // Regular direct damage message
+                        Add("-damage", target, target.GetHealth);
+                        break;
+                }
             }
-        }
-        else
-        {
-            // No effect or non-condition effect - simple damage message
-            UiGenerator.PrintDamageEvent(target);
+            else
+            {
+                // No effect or non-condition effect - simple damage message
+                Add("-damage", target, target.GetHealth);
+            }
         }
 
         // If target fainted from the damage, trigger faint immediately
