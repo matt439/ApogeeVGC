@@ -1,25 +1,30 @@
-﻿//hitStepTryHitEvent(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
-//    const hitResults = this.battle.runEvent('TryHit', targets, pokemon, move);
-//    if (!hitResults.includes(true) && hitResults.includes(false))
-//    {
-//        this.battle.add('-fail', pokemon);
-//        this.battle.attrLastMove('[still]');
-//    }
-//    for (const i of targets.keys()) {
-//        if (hitResults[i] !== this.battle.NOT_FAIL) hitResults[i] = hitResults[i] || false;
-//    }
-//    return hitResults;
-//}
-//hitStepTypeImmunity(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
-//    if (move.ignoreImmunity === undefined)
-//    {
-//        move.ignoreImmunity = (move.category === 'Status');
-//    }
-
+﻿//hitStepTryImmunity(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
 //    const hitResults = [];
-//    for (const i of targets.keys()) {
-//        hitResults[i] = targets[i].runImmunity(move, !move.smartTarget);
+//    for (const [i, target] of targets.entries()) {
+//        if (this.battle.gen >= 6 && move.flags['powder'] && target !== pokemon && !this.dex.getImmunity('powder', target))
+//        {
+//            this.battle.debug('natural powder immunity');
+//            this.battle.add('-immune', target);
+//            hitResults[i] = false;
+//        }
+//        else if (!this.battle.singleEvent('TryImmunity', move, { }, target, pokemon, move)) {
+//            this.battle.add('-immune', target);
+//            hitResults[i] = false;
+//        } else if (this.battle.gen >= 7 && move.pranksterBoosted && pokemon.hasAbility('prankster') &&
+//                   !targets[i].isAlly(pokemon) && !this.dex.getImmunity('prankster', target))
+//        {
+//            this.battle.debug('natural prankster immunity');
+//            if (target.illusion || !(move.status && !this.dex.getImmunity(move.status, target)))
+//            {
+//                this.battle.hint("Since gen 7, Dark is immune to Prankster moves.");
+//            }
+//            this.battle.add('-immune', target);
+//            hitResults[i] = false;
+//        }
+//        else
+//        {
+//            hitResults[i] = true;
+//        }
 //    }
-
 //    return hitResults;
 //}

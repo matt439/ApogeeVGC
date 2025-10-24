@@ -187,18 +187,24 @@ public partial class BattleActions
                 target != pokemon &&
                 !Battle.Dex.GetImmunity(move.Condition?.Id ?? ConditionId.None, target.Types))
             {
+                Battle.Debug("natural powder immunity");
+
                 if (Battle.DisplayUi)
                 {
-                    // Battle.Debug("natural powder immunity");
+                    Battle.Add("-immune", target);
                 }
-                UiGenerator.PrintImmuneEvent(target);
+
                 canHit = false;
             }
             // Run TryImmunity event (abilities like Wonder Guard, Flash Fire, Volt Absorb, etc.)
             else if (Battle.SingleEvent(EventId.TryImmunity, move, null, target, pokemon,
                          move) is BoolRelayVar { Value: false })
             {
-                UiGenerator.PrintImmuneEvent(target);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-immune", target);
+                }
+
                 canHit = false;
             }
             // Gen 7+: Check Prankster immunity (Dark-types are immune to Prankster-boosted moves from opponents)
@@ -208,19 +214,23 @@ public partial class BattleActions
                      !target.IsAlly(pokemon) &&
                      !Battle.Dex.GetImmunity(AbilityId.Prankster, target.Types))
             {
-                if (Battle.DisplayUi)
-                {
-                    // Battle.Debug("natural prankster immunity");
-                }
+                Battle.Debug("natural prankster immunity");
 
                 // Show hint message unless target has Illusion or move would fail anyway due to status immunity
                 if (target.Illusion != null ||
                     !(move.Status != null && !Battle.Dex.GetImmunity(move.Status.Value, target.Types)))
                 {
-                    UiGenerator.PrintHint("Since gen 7, Dark is immune to Prankster moves.");
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Hint("Since gen 7, Dark is immune to Prankster moves.");
+                    }
                 }
 
-                UiGenerator.PrintImmuneEvent(target);
+                if (Battle.DisplayUi)
+                {
+                    Battle.Add("-immune", target);
+                }
+
                 canHit = false;
             }
 
