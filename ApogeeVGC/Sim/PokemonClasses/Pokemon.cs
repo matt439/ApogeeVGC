@@ -281,6 +281,43 @@ public class Pokemon : IPriorityComparison, IDisposable
         public GenderId Gender { get; init; }
         public bool Shiny { get; init; }
         public MoveType? TeraType { get; set; }
+
+        /// <summary>
+        /// Converts PokemonDetails to the string format used by battle protocol.
+        /// Format: "SpeciesName, L##, Gender, shiny, tera:Type"
+        /// </summary>
+        public override string ToString()
+        {
+            var parts = new List<string> {
+                // Add species name
+                Id.ToString() };
+
+            // Add level (omit L100 as it's the default)
+            if (Level != 100)
+            {
+                parts.Add($"L{Level}");
+            }
+
+            // Add gender (omit if genderless/unknown)
+            if (Gender != GenderId.N)
+            {
+                parts.Add(Gender.ToString());
+            }
+
+            // Add shiny indicator
+            if (Shiny)
+            {
+                parts.Add("shiny");
+            }
+
+            // Add Tera type if present
+            if (TeraType != null)
+            {
+                parts.Add($"tera:{TeraType}");
+            }
+
+            return string.Join(", ", parts);
+        }
     }
 
     public PokemonDetails GetUpdatedDetails(int? level = null)

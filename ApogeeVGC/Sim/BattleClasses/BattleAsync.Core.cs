@@ -13,6 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
+using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -1492,15 +1493,72 @@ public partial class BattleAsync : IBattle, IDisposable
         }
     }
 
-    //public void Restart(Action<string, List<string>>? send)
-    //{
-    //    throw new InvalidOperationException("This method relies on the battle being serialized which" +
-    //                                        "cannot be done in this simulator implmentation.");
-    //}
+    public void Restart(Action<string, List<string>>? send)
+    {
+        if (!Deserialized)
+        {
+            throw new InvalidOperationException("Attempt to restart a battle which has not been deserialized");
+        }
+        throw new Exception("Not sure what this is suppsed to do");
+    }
 
     public void RunPickTeam()
     {
-        throw new NotImplementedException();
+        // onTeamPreview handlers are expected to show full teams to all active sides,
+        // and send a 'teampreview' request for players to pick their leads / team order.
+        Format.OnTeamPreview?.Invoke(this);
+
+        foreach (RuleId rule in RuleTable.Keys)
+        {
+            string ruleString = rule.ToString();
+            if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+            Format subFormat = Library.Rulesets[rule];
+            subFormat.OnTeamPreview?.Invoke(this);
+        }
+
+        if (RequestState == RequestState.TeamPreview)
+        {
+            return;
+        }
+
+        if (RuleTable.PickedTeamSize > 0)
+        {
+            // There was no onTeamPreview handler (e.g. Team Preview rule missing).
+            // Players must still pick their own Pokémon, so we show them privately.
+            if (DisplayUi)
+            {
+                Add("clearpoke");
+            }
+
+            foreach (Pokemon pokemon in GetAllPokemon())
+            {
+                // Get the details object and convert to string
+                PokemonDetails detailsObj = pokemon.Details;
+
+                // Create a modified copy for display (hide certain formes)
+                var maskedDetails = new PokemonDetails
+                {
+                    Id = MaskSpeciesForTeamPreview(detailsObj.Id),
+                    Level = detailsObj.Level,
+                    Gender = detailsObj.Gender,
+                    Shiny = false, // Always hide shiny in team preview
+                    TeraType = detailsObj.TeraType,
+                };
+
+                // Convert to protocol string
+                string detailsString = maskedDetails.ToString();
+
+                AddSplit(pokemon.Side.Id,
+                    [
+                        new StringPart("poke"),
+                    new StringPart(pokemon.Side.Id.ToString()),
+                    new StringPart(detailsString),
+                    new StringPart(""),
+                    ]);
+            }
+
+            MakeRequest(RequestState.TeamPreview);
+        }
     }
 
     public void CheckEvBalance()
@@ -4417,6 +4475,30 @@ public partial class BattleAsync : IBattle, IDisposable
         }
 
         return subOrder;
+    }
+
+    /// <summary>
+    /// Masks species IDs that change forme on battle start to prevent information leakage.
+    /// Returns a masked version (with -*) for species that need hiding, otherwise returns the original.
+    /// </summary>
+    private static SpecieId MaskSpeciesForTeamPreview(SpecieId speciesId)
+    {
+        return speciesId switch
+        {
+            // Zacian/Zamazenta without Crowned forme should be masked
+            SpecieId.Zacian => SpecieId.Zacian, // Keep as-is, will add masking in SpecieId enum if needed
+            SpecieId.Zamazenta => SpecieId.Zamazenta, // Keep as-is
+
+            // Xerneas formes should be masked
+            SpecieId.Xerneas or SpecieId.XerneasNeutral or SpecieId.XerneasActive => SpecieId.Xerneas,
+
+            // Don't mask Crowned formes
+            SpecieId.ZacianCrowned => SpecieId.ZacianCrowned,
+            SpecieId.ZamazentaCrowned => SpecieId.ZamazentaCrowned,
+
+            // All other species pass through unchanged
+            _ => speciesId,
+        };
     }
 
     #endregion

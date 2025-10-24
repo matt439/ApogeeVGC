@@ -36,6 +36,9 @@ public enum SpecieId
     Terapagos,
     EternatusEternamax,
     Morpeko,
+    Xerneas,
+    XerneasNeutral,
+    XerneasActive,
 }
 
 public enum FormeId
