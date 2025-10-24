@@ -46,6 +46,7 @@ public record Move : IMoveEventMethods, IBasicEffect
     public MoveId Id { get; init; }
     public EffectStateId EffectStateId => Id;
     public required string Name { get; init; }
+    public string FullName => $"move: {Name}";
     public int Num
     {
         get;

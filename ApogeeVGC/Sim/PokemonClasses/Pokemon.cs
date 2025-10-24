@@ -19,6 +19,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     public IBattle Battle => Side.Battle;
     public PokemonSet Set { get; }
     public string Name => Set.Name[..20];
+    public string FullName => $"{Side.Id.ToString()}: {Name}";
 
     public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
     public int Level => Set.Level;

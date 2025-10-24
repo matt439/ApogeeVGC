@@ -75,7 +75,7 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
     }
     public bool SuppressWeather { get; init; }
 
-    public string Fullname => $"ability: {Name}";
+    public string FullName => $"ability: {Name}";
 
     public int Gen
     {
