@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Ui;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
@@ -608,18 +607,11 @@ public partial class BattleActions
             // Hardcoded for specific range (2-5 hits)
             if (range.Values[0] == 2 && range.Values[1] == 5)
             {
-                if (Battle.Gen >= 5)
+                // 35-35-15-15 out of 100 for 2-3-4-5 hits
+                targetHitResult = Battle.Sample(_multiHitSample);
+                if (targetHitResult < 4 && pokemon.HasItem(ItemId.LoadedDice))
                 {
-                    // 35-35-15-15 out of 100 for 2-3-4-5 hits
-                    targetHitResult = Battle.Sample(_multiHitSample);
-                    if (targetHitResult < 4 && pokemon.HasItem(ItemId.LoadedDice))
-                    {
-                        targetHitResult = 5 - Battle.Random(2);
-                    }
-                }
-                else
-                {
-                    targetHitResult = Battle.Sample([2, 2, 2, 3, 3, 3, 4, 5]);
+                    targetHitResult = 5 - Battle.Random(2);
                 }
             }
             else
@@ -661,7 +653,7 @@ public partial class BattleActions
             if (damage.Any(d => d is BoolBoolIntEmptyUndefinedUnion { Value: false })) break;
 
             // Break if user fell asleep and move is not sleep-usable
-            if (hit > 1 && pokemon.Status == ConditionId.Sleep && (!isSleepUsable || Battle.Gen == 4)) break;
+            if (hit > 1 && pokemon.Status == ConditionId.Sleep && !isSleepUsable) break;
 
             // Break if all targets are fainted
             if (targets.All(t => t.Hp <= 0)) break;
@@ -686,7 +678,13 @@ public partial class BattleActions
             {
                 if (hit > 1)
                 {
-                    UiGenerator.PrintAnimationEvent(pokemon, move.Name, target);
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.AddMove("-anim",
+                            StringNumberDelegateObjectUnion.FromObject(pokemon),
+                            move.Name,
+                            StringNumberDelegateObjectUnion.FromObject(target));
+                    }
                 }
                 else
                 {
@@ -901,7 +899,10 @@ public partial class BattleActions
 
         if (move is { MultiHit: not null, SmartTarget: null })
         {
-            UiGenerator.PrintHitCountEvent(targets[0], hit - 1);
+            if (Battle.DisplayUi)
+            {
+                Battle.Add("-hitcount", targets[0], hit - 1);
+            }
         }
 
         // Recoil damage
@@ -922,16 +923,7 @@ public partial class BattleActions
         if (move.StruggleRecoil == true)
         {
             int hpBeforeRecoil = pokemon.Hp;
-            int recoilDamage;
-
-            if (Battle.Gen >= 5)
-            {
-                recoilDamage = Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
-            }
-            else
-            {
-                recoilDamage = Battle.ClampIntRange(Battle.Trunc(pokemon.MaxHp / 4), 1, null);
-            }
+            int recoilDamage = Battle.ClampIntRange((int)Math.Round(pokemon.BaseMaxHp / 4.0), 1, null);
 
             Battle.DirectDamage(recoilDamage, pokemon, pokemon,
                 Library.Conditions[ConditionId.StruggleRecoil]);
@@ -971,7 +963,10 @@ public partial class BattleActions
 
         if (move.Ohko != null && targets[0].Hp <= 0)
         {
-            UiGenerator.PrintOhkoEvent();
+            if (Battle.DisplayUi)
+            {
+                Battle.Add("-ohko");
+            }
         }
 
         if (!damage.Any(val => (val is IntBoolIntEmptyUndefinedUnion intVal &&
