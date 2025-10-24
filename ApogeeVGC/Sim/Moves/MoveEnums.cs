@@ -54,6 +54,7 @@ public enum MoveId
     HelpingHand,
     Feint,
     Chloroblast,
+    SpectralThief,
 
     Struggle,
     Confused, // The move pokemon use to hit themselves in confusion

@@ -1,31 +1,35 @@
-﻿//hitStepBreakProtect(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
-//    if (move.breaksProtect)
+﻿//hitStepStealBoosts(targets: Pokemon[], pokemon: Pokemon, move: ActiveMove) {
+//    const target = targets[0]; // hardcoded
+//    if (move.stealsBoosts)
 //    {
-//        for (const target of targets) {
-//            let broke = false;
-//            for (const effectid of[
-//            'banefulbunker', 'burningbulwark', 'kingsshield', 'obstruct', 'protect', 'silktrap', 'spikyshield',
+//        const boosts: SparseBoostsTable = { }
+//        ;
+//        let stolen = false;
+//        let statName: BoostID;
+//        for (statName in target.boosts)
+//        {
+//            const stage = target.boosts[statName];
+//            if (stage > 0)
+//            {
+//                boosts[statName] = stage;
+//                stolen = true;
+//            }
+//        }
+//        if (stolen)
+//        {
+//            this.battle.attrLastMove('[still]');
+//            this.battle.add('-clearpositiveboost', target, pokemon, 'move: ' + move.name);
+//            this.battle.boost(boosts, pokemon, pokemon);
 
-//                ]) {
-//                if (target.removeVolatile(effectid)) broke = true;
-//            }
-//            if (this.battle.gen >= 6 || !target.isAlly(pokemon))
+//            let statName2: BoostID;
+//            for (statName2 in boosts)
 //            {
-//                for (const effectid of['craftyshield', 'matblock', 'quickguard', 'wideguard']) {
-//                    if (target.side.removeSideCondition(effectid)) broke = true;
-//                }
+//                boosts[statName2] = 0;
 //            }
-//            if (broke)
+//            target.setBoost(boosts);
+//            if (move.id === "spectralthief")
 //            {
-//                if (move.id === 'feint')
-//                {
-//                    this.battle.add('-activate', target, 'move: Feint');
-//                }
-//                else
-//                {
-//                    this.battle.add('-activate', target, `move: ${ move.name}`, '[broken]');
-//                }
-//                if (this.battle.gen >= 6) delete target.volatiles['stall'];
+//                this.battle.addMove('-anim', pokemon, "Spectral Thief", target);
 //            }
 //        }
 //    }

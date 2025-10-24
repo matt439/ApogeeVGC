@@ -554,7 +554,12 @@ public partial class BattleActions
         if (!stolen) return null;
 
         Battle.AttrLastMove("[still]");
-        UiGenerator.PrintClearPositiveBoostEvent(target, pokemon, move);
+
+        if (Battle.DisplayUi)
+        {
+            Battle.Add("-clearpositiveboost", target, pokemon, $"move: {move.Name}");
+        }
+
         Battle.Boost(boosts, pokemon, pokemon);
 
         // Reset the boosts to 0 for setting on target
@@ -569,6 +574,13 @@ public partial class BattleActions
             Evasion = boosts.Evasion.HasValue ? 0 : null,
         };
         target.SetBoost(resetBoosts);
+
+        // Add animation for Spectral Thief specifically
+        if (move.Id == MoveId.SpectralThief && Battle.DisplayUi)
+        {
+            Battle.AddMove("-anim", StringNumberDelegateObjectUnion.FromObject(pokemon), "Spectral Thief", 
+                StringNumberDelegateObjectUnion.FromObject(target));
+        }
 
         return null;
     }
