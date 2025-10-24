@@ -468,14 +468,14 @@ public partial class BattleActions
             // Remove individual protection volatiles
             var protectionVolatiles = new[]
             {
-                ConditionId.BanefulBunker,
-                ConditionId.BurningBulwark,
-                ConditionId.KingsShield,
-                ConditionId.Obstruct,
-                ConditionId.Protect,
-                ConditionId.SilkTrap,
-                ConditionId.SpikyShield,
-            };
+            ConditionId.BanefulBunker,
+            ConditionId.BurningBulwark,
+            ConditionId.KingsShield,
+            ConditionId.Obstruct,
+            ConditionId.Protect,
+            ConditionId.SilkTrap,
+            ConditionId.SpikyShield,
+        };
 
             foreach (ConditionId effectId in protectionVolatiles)
             {
@@ -485,14 +485,14 @@ public partial class BattleActions
                 }
             }
 
-            // Remove side-wide protection conditions (Gen 6+ or when targeting opponents)
-            if (Battle.Gen >= 6 || !target.IsAlly(pokemon))
+            // Remove side-wide protection conditions (when targeting opponents in Gen 9)
+            if (!target.IsAlly(pokemon))
             {
                 var sideProtections = new[]
                 {
-                    ConditionId.QuickGuard,
-                    ConditionId.WideGuard,
-                };
+                ConditionId.QuickGuard,
+                ConditionId.WideGuard,
+            };
 
                 foreach (ConditionId effectId in sideProtections)
                 {
@@ -506,20 +506,20 @@ public partial class BattleActions
             // Display activation message if protection was broken
             if (broke)
             {
-                if (move.Id == MoveId.Feint)
+                if (Battle.DisplayUi)
                 {
-                    UiGenerator.PrintActivateEvent(target, Library.Moves[MoveId.Feint].ToActiveMove());
-                }
-                else
-                {
-                    UiGenerator.PrintActivateEvent(target, move, "[broken]");
+                    if (move.Id == MoveId.Feint)
+                    {
+                        Battle.Add("-activate", target, "move: Feint");
+                    }
+                    else
+                    {
+                        Battle.Add("-activate", target, $"move: {move.Name}", "[broken]");
+                    }
                 }
 
-                // Gen 6+: Remove Stall volatile when protection is broken
-                if (Battle.Gen >= 6)
-                {
-                    target.RemoveVolatile(Library.Conditions[ConditionId.Stall]);
-                }
+                // Gen 9: Remove Stall volatile when protection is broken
+                target.RemoveVolatile(Library.Conditions[ConditionId.Stall]);
             }
         }
 
