@@ -3251,12 +3251,15 @@ public partial class BattleAsync : IBattle, IDisposable
     /// </summary>
     public void TurnLoop()
     {
-        // Add empty line for formatting
-        UiGenerator.PrintEmptyLine();
+        if (DisplayUi)
+        {
+            // Add empty line for formatting
+            Add("");
 
-        // Add timestamp in Unix epoch seconds
-        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        UiGenerator.PrintMessage($"t:|{timestamp}");
+            // Add timestamp in Unix epoch seconds
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            Add("t:", timestamp);
+        }
 
         // Clear request state if it exists
         if (RequestState != RequestState.None)
