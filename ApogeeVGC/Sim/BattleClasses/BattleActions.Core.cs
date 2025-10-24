@@ -2065,23 +2065,26 @@ public partial class BattleActions(IBattle battle)
     }
 
     public int ModifyDamage(int baseDamage, Pokemon pokemon, Pokemon target, ActiveMove move,
-        bool suppressMessages = false)
+    bool suppressMessages = false)
     {
         MoveType type = move.Type;
-        
+
         baseDamage += 2;
 
         // Spread move modifier (multi-target moves do 75% damage in doubles)
         if (move.SpreadHit == true)
         {
-            Battle.Debug("Spread modifier: 0.75");
+            if (Battle.DisplayUi)
+            {
+                Battle.Debug("Spread modifier: 0.75");
+            }
             baseDamage = Battle.Modify(baseDamage, 0.75);
         }
 
         // Weather modifier
         RelayVar? weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
-        
+
         if (weatherModResult is IntRelayVar weatherMod)
         {
             baseDamage = weatherMod.Value;
@@ -2090,7 +2093,7 @@ public partial class BattleActions(IBattle battle)
         // Critical hit - not a modifier, direct multiplication
         MoveHitResult hitData = target.GetMoveHitData(move);
         bool isCrit = hitData.Crit;
-        
+
         if (isCrit)
         {
             double critModifier = move.CritModifier ?? 1.5;
@@ -2105,11 +2108,11 @@ public partial class BattleActions(IBattle battle)
         if (type != MoveType.Unknown)
         {
             double stab = 1.0;
-            
-            bool isStab = move.ForceStab == true || 
-                         pokemon.HasType((PokemonType)type) || 
+
+            bool isStab = move.ForceStab == true ||
+                         pokemon.HasType((PokemonType)type) ||
                          pokemon.GetTypes(false, true).Contains((PokemonType)type);
-            
+
             if (isStab)
             {
                 stab = 1.5;
@@ -2122,7 +2125,7 @@ public partial class BattleActions(IBattle battle)
                 {
                     stab = isStab ? 2.0 : 4915.0 / 4096.0;
                     move.StellarBoosted = true;
-                    
+
                     // Terapagos-Stellar doesn't consume stellar boosts
                     if (pokemon.Species.Id != SpecieId.TerapagosStellar)
                     {
@@ -2133,16 +2136,16 @@ public partial class BattleActions(IBattle battle)
             else
             {
                 // Regular tera type handling
-                if (pokemon.Terastallized == type && 
+                if (pokemon.Terastallized == type &&
                     pokemon.GetTypes(false, true).Contains((PokemonType)type))
                 {
                     stab = 2.0;
                 }
-                
+
                 // Run ModifySTAB event
                 RelayVar? modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
                     RunEventSource.FromNullablePokemon(target), move, new DecimalRelayVar((decimal)stab));
-                
+
                 if (modifyStabResult is DecimalRelayVar stabMod)
                 {
                     stab = (double)stabMod.Value;
@@ -2156,12 +2159,12 @@ public partial class BattleActions(IBattle battle)
         int typeMod = target.RunEffectiveness(move).ToModifier();
         typeMod = Battle.ClampIntRange(typeMod, -6, 6);
         hitData.TypeMod = typeMod;
-        
+
         if (typeMod > 0)
         {
-            if (!suppressMessages)
+            if (!suppressMessages && Battle.DisplayUi)
             {
-                UiGenerator.PrintSuperEffectiveEvent(target);
+                Battle.Add("-supereffective", target);
             }
 
             for (int i = 0; i < typeMod; i++)
@@ -2169,12 +2172,12 @@ public partial class BattleActions(IBattle battle)
                 baseDamage *= 2;
             }
         }
-        
+
         if (typeMod < 0)
         {
-            if (!suppressMessages)
+            if (!suppressMessages && Battle.DisplayUi)
             {
-                UiGenerator.PrintResistedEvent(target);
+                Battle.Add("-resisted", target);
             }
 
             for (int i = 0; i > typeMod; i--)
@@ -2183,14 +2186,14 @@ public partial class BattleActions(IBattle battle)
             }
         }
 
-        if (isCrit && !suppressMessages)
+        if (isCrit && !suppressMessages && Battle.DisplayUi)
         {
-            UiGenerator.PrintCritEvent(target);
+            Battle.Add("-crit", target);
         }
 
         // Burn modifier for physical moves (except Facade and Guts users)
-        if (pokemon.Status == ConditionId.Burn && 
-            move.Category == MoveCategory.Physical && 
+        if (pokemon.Status == ConditionId.Burn &&
+            move.Category == MoveCategory.Physical &&
             !pokemon.HasAbility(AbilityId.Guts))
         {
             // In Gen 6+, Facade ignores the burn modifier
@@ -2203,7 +2206,7 @@ public partial class BattleActions(IBattle battle)
         // Final modifier - Life Orb, etc.
         RelayVar? finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
-        
+
         if (finalModResult is IntRelayVar finalMod)
         {
             baseDamage = finalMod.Value;
