@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Sim.GameObjects;
+﻿namespace ApogeeVGC.Sim.Abilities;
 
 public record AbilityFlags
 {

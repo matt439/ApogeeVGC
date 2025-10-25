@@ -1,7 +1,7 @@
-﻿using ApogeeVGC.Sim.Actions;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;

@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Actions;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.FieldClasses;

@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.Abilities;
 
 namespace ApogeeVGC.Sim.Moves;
 

@@ -1,6 +1,6 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
