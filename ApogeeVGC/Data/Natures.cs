@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 
 namespace ApogeeVGC.Data;
 
-
 public record Natures
 {
     public IReadOnlyDictionary<NatureId, Nature> NatureData { get; }

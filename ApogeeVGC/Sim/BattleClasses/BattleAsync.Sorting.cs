@@ -4,7 +4,6 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;

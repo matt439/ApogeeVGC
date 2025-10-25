@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FormatClasses;
 
 namespace ApogeeVGC.Data;
-
 
 public record Rulesets
 {

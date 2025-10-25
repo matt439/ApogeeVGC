@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 
 namespace ApogeeVGC.Sim.Player;

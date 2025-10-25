@@ -82,6 +82,43 @@ public enum MoveId
     //FairyBasic,
 }
 
+public enum MoveType
+{
+    Normal,
+    Fire,
+    Water,
+    Electric,
+    Grass,
+    Ice,
+    Fighting,
+    Poison,
+    Ground,
+    Flying,
+    Psychic,
+    Bug,
+    Rock,
+    Ghost,
+    Dragon,
+    Dark,
+    Steel,
+    Fairy,
+    Stellar,
+    Unknown,
+}
+
+public enum MoveSourceType
+{
+    Tm,
+    Tutor,
+    LevelUp,
+    Restricted,
+    Egg,
+    DreamWorld,
+    Event,
+    Virtual,
+    Chain,
+}
+
 public enum MoveCategory
 {
     Physical,

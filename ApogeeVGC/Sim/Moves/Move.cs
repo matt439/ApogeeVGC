@@ -103,7 +103,7 @@ public record Move : IMoveEventMethods, IBasicEffect, ICopyable<Move>
             field = value;
         }
     }
-    public bool NoPpBoosts { get; init; } = false;
+    public bool NoPpBoosts { get; init; }
     public MoveCategory Category { get; init; }
     public MoveType Type { get; set; }
     public int Priority

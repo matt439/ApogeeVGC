@@ -1,10 +1,7 @@
-﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.Abilities;
+﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;

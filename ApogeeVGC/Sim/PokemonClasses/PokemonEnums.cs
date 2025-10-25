@@ -1,5 +1,31 @@
 ﻿namespace ApogeeVGC.Sim.PokemonClasses;
 
+public enum PokemonType
+{
+    Normal,
+    Fire,
+    Water,
+    Electric,
+    Grass,
+    Ice,
+    Fighting,
+    Poison,
+    Ground,
+    Flying,
+    Psychic,
+    Bug,
+    Rock,
+    Ghost,
+    Dragon,
+    Dark,
+    Steel,
+    Fairy,
+    /// <summary>
+    /// Represents the "???" type
+    /// </summary>
+    Unknown,
+}
+
 public enum PokeballId
 {
     Pokeball,

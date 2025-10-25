@@ -1,18 +1,5 @@
 ﻿namespace ApogeeVGC.Sim.Moves;
 
-public enum MoveSourceType
-{
-    Tm,
-    Tutor,
-    LevelUp,
-    Restricted,
-    Egg,
-    DreamWorld,
-    Event,
-    Virtual,
-    Chain,
-}
-
 public class MoveSource
 {
     public int Generation

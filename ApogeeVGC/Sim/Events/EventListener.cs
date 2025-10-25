@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Sim.Actions;
-using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;

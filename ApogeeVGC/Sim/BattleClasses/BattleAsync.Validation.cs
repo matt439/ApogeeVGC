@@ -5,9 +5,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
-using static ApogeeVGC.Sim.PokemonClasses.Pokemon;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -44,10 +42,10 @@ public partial class BattleAsync
             foreach (Pokemon pokemon in GetAllPokemon())
             {
                 // Get the details object and convert to string
-                PokemonDetails detailsObj = pokemon.Details;
+                Pokemon.PokemonDetails detailsObj = pokemon.Details;
 
                 // Create a modified copy for display (hide certain formes)
-                var maskedDetails = new PokemonDetails
+                var maskedDetails = new Pokemon.PokemonDetails
                 {
                     Id = MaskSpeciesForTeamPreview(detailsObj.Id),
                     Level = detailsObj.Level,
