@@ -46,3 +46,19 @@ public enum SendType
     Update,
     SideUpdate,
 }
+
+public enum GameType
+{
+    Singles,
+    Doubles,
+}
+
+public enum RequestState
+{
+    TeamPreview,
+    Move,
+    SwitchIn,
+    Switch,
+    None,
+}
+

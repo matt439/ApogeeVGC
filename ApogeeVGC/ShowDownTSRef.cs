@@ -1,258 +1,446 @@
-﻿///**
-// * Example random player AI.
-// *
+﻿
+
+//using ApogeeVGC.Sim.Choices;
+//using System;
+//using System.Diagnostics;
+//using System.IO;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
+
+///**
+// * Battle Stream
 // * Pokemon Showdown - http://pokemonshowdown.com/
+// *
+// * Supports interacting with a PS battle in Stream format.
+// *
+// * This format is VERY NOT FINALIZED, please do not use it directly yet.
 // *
 // * @license MIT
 // */
 
-//import type { ObjectReadWriteStream }
-//from '../../lib/streams';
-//import { BattlePlayer } from '../battle-stream';
-//import { PRNG, type PRNGSeed } from '../prng';
+//import { Streams, Utils } from '../lib';
+//import { Teams } from './teams';
+//import { Battle, extractChannelMessages } from './battle';
 //import type { ChoiceRequest }
-//from '../side';
+//from './side';
 
-//export class RandomPlayerAI extends BattlePlayer
+///**
+// * Like string.split(delimiter), but only recognizes the first `limit`
+// * delimiters (default 1).
+// *
+// * `"1 2 3 4".split(" ", 2) => ["1", "2"]`
+// *
+// * `Utils.splitFirst("1 2 3 4", " ", 1) => ["1", "2 3 4"]`
+// *
+// * Returns an array of length exactly limit + 1.
+// */
+//function splitFirst(str: string, delimiter: string, limit = 1) {
+//	const splitStr: string[] = [];
+//while (splitStr.length < limit)
 //{
-
-//    protected readonly move: number;
-//protected readonly mega: number;
-//protected readonly prng: PRNG;
-
-//constructor(
-//    playerStream: ObjectReadWriteStream<string>,
-//    options: { move ?: number, mega ?: number, seed ?: PRNG | PRNGSeed | null } = { },
-//		debug = false
-//	) {
-//    super(playerStream, debug);
-//    this.move = options.move || 1.0;
-//    this.mega = options.mega || 0;
-//    this.prng = PRNG.get(options.seed);
-//}
-
-//override receiveError(error: Error) {
-//    // If we made an unavailable choice we will receive a followup request to
-//    // allow us the opportunity to correct our decision.
-//    if (error.message.startsWith('[Unavailable choice]')) return;
-//    throw error;
-//}
-
-//override receiveRequest(request: ChoiceRequest) {
-//    if (request.wait)
+//    const delimiterIndex = str.indexOf(delimiter);
+//    if (delimiterIndex >= 0)
 //    {
-//        // wait request
-//        // do nothing
-//    }
-//    else if (request.forceSwitch)
-//    {
-//        // switch request
-//        const pokemon = request.side.pokemon;
-//        const chosen: number[] = [];
-//        const choices = request.forceSwitch.map((mustSwitch, i) => {
-//        if (!mustSwitch) return `pass`;
-
-//        const canSwitch = range(1, 6).filter(j => (
-//            pokemon[j - 1] &&
-//            // not active
-//            j > request.forceSwitch.length &&
-//            // not chosen for a simultaneous switch
-//            !chosen.includes(j) &&
-//            // not fainted or fainted and using Revival Blessing
-//            !pokemon[j - 1].condition.endsWith(` fnt`) === !pokemon[i].reviving
-//        ));
-
-//        if (!canSwitch.length) return `pass`;
-//        const target = this.chooseSwitch(
-//            undefined,
-//            canSwitch.map(slot => ({ slot, pokemon: pokemon[slot - 1] }))
-//				);
-//        chosen.push(target);
-//        return `switch ${ target}`;
-//    });
-
-//    this.choose(choices.join(`, `));
-//} else if (request.teamPreview)
-//{
-//    this.choose(this.chooseTeamPreview(request.side.pokemon));
-//}
-//else if (request.active)
-//{
-//    // move request
-//    let[canMegaEvo, canUltraBurst, canZMove, canDynamax, canTerastallize] = [true, true, true, true, true];
-//    const pokemon = request.side.pokemon;
-//    const chosen: number[] = [];
-//    const choices = request.active.map((active: AnyObject, i: number) => {
-//        if (pokemon[i].condition.endsWith(` fnt`) || pokemon[i].commanding) return `pass`;
-
-//        canMegaEvo = canMegaEvo && active.canMegaEvo;
-//        canUltraBurst = canUltraBurst && active.canUltraBurst;
-//        canZMove = canZMove && !!active.canZMove;
-//        canDynamax = canDynamax && !!active.canDynamax;
-//        canTerastallize = canTerastallize && !!active.canTerastallize;
-
-//        // Determine whether we should change form if we do end up switching
-//        const change = (canMegaEvo || canUltraBurst || canDynamax) && this.prng.random() < this.mega;
-//        // If we've already dynamaxed or if we're planning on potentially dynamaxing
-//        // we need to use the maxMoves instead of our regular moves
-
-//        const useMaxMoves = (!active.canDynamax && active.maxMoves) || (change && canDynamax);
-//        const possibleMoves = useMaxMoves ? active.maxMoves.maxMoves : active.moves;
-
-//        let canMove = range(1, possibleMoves.length).filter(j => (
-//            // not disabled
-//            !possibleMoves[j - 1].disabled
-//        // NOTE: we don't actually check for whether we have PP or not because the
-//        // simulator will mark the move as disabled if there is zero PP and there are
-//        // situations where we actually need to use a move with 0 PP (Gen 1 Wrap).
-//        )).map(j => ({
-//        slot: j,
-//					move: possibleMoves[j - 1].move,
-//					target: possibleMoves[j - 1].target,
-//					zMove: false,
-//				}));
-//        if (canZMove)
-//        {
-//            canMove.push(...range(1, active.canZMove.length)
-//                .filter(j => active.canZMove[j - 1])
-//                .map(j => ({
-//            slot: j,
-//							move: active.canZMove[j - 1].move,
-//							target: active.canZMove[j - 1].target,
-//							zMove: true,
-//						})));
-//        }
-
-//        // Filter out adjacentAlly moves if we have no allies left, unless they're our
-//        // only possible move options.
-//        const hasAlly = pokemon.length > 1 && !pokemon[i ^ 1].condition.endsWith(` fnt`);
-//        const filtered = canMove.filter(m => m.target !== `adjacentAlly` || hasAlly);
-//        canMove = filtered.length ? filtered : canMove;
-
-//        const moves = canMove.map(m => {
-//        let move = `move ${ m.slot}`;
-//        // NOTE: We don't generate all possible targeting combinations.
-//        if (request.active.length > 1)
-//        {
-//            if ([`normal`, `any`, `adjacentFoe`].includes(m.target))
-//            {
-//                move += ` ${ 1 + this.prng.random(2)}`;
-//            }
-//            if (m.target === `adjacentAlly`) {
-//            move += ` -${ (i ^ 1) + 1}`;
-//        }
-//        if (m.target === `adjacentAllyOrSelf`) {
-//            if (hasAlly)
-//            {
-//                move += ` -${ 1 + this.prng.random(2)}`;
-//            }
-//            else
-//            {
-//                move += ` -${ i + 1}`;
-//            }
-//        }
-//    }
-//    if (m.zMove) move += ` zmove`;
-//    return { choice: move, move: m }
-//    ;
-//});
-
-//const canSwitch = range(1, 6).filter(j => (
-//    pokemon[j - 1] &&
-//    // not active
-//    !pokemon[j - 1].active &&
-//    // not chosen for a simultaneous switch
-//    !chosen.includes(j) &&
-//    // not fainted
-//    !pokemon[j - 1].condition.endsWith(` fnt`)
-//));
-//const switches = active.trapped ? [] : canSwitch;
-
-//if (switches.length && (!moves.length || this.prng.random() > this.move))
-//{
-//    const target = this.chooseSwitch(
-//        active,
-//        canSwitch.map(slot => ({ slot, pokemon: pokemon[slot - 1] }))
-//					);
-//    chosen.push(target);
-//    return `switch ${ target}`;
-//}
-//else if (moves.length)
-//{
-//    const move = this.chooseMove(active, moves);
-//    if (move.endsWith(` zmove`))
-//    {
-//        canZMove = false;
-//        return move;
-//    }
-//    else if (change)
-//    {
-//        if (canTerastallize)
-//        {
-//            canTerastallize = false;
-//            return `${ move}
-//            terastallize`;
-//        }
-//        else if (canDynamax)
-//        {
-//            canDynamax = false;
-//            return `${ move}
-//            dynamax`;
-//        }
-//        else if (canMegaEvo)
-//        {
-//            canMegaEvo = false;
-//            return `${ move}
-//            mega`;
-//        }
-//        else
-//        {
-//            canUltraBurst = false;
-//            return `${ move}
-//            ultra`;
-//        }
+//        splitStr.push(str.slice(0, delimiterIndex));
+//        str = str.slice(delimiterIndex + delimiter.length);
 //    }
 //    else
 //    {
-//        return move;
+//        splitStr.push(str);
+//        str = '';
 //    }
 //}
-//else
+//splitStr.push(str);
+//return splitStr;
+//}
+
+//export class BattleStream extends Streams.ObjectReadWriteStream<string> {
+//    debug: boolean;
+//    noCatch: boolean;
+//    replay: boolean | 'spectator';
+//    keepAlive: boolean;
+//    battle: Battle | null;
+
+//    constructor(options: {
+//        debug ?: boolean, noCatch ?: boolean, keepAlive ?: boolean, replay ?: boolean | 'spectator',
+//	} = { }) {
+//        super();
+//        this.debug = !!options.debug;
+//        this.noCatch = !!options.noCatch;
+//        this.replay = options.replay || false;
+//        this.keepAlive = !!options.keepAlive;
+//        this.battle = null;
+//    }
+
+//	override _write(chunk: string) {
+//        if (this.noCatch)
+//        {
+//            this._writeLines(chunk);
+//        }
+//        else
+//        {
+//            try
+//            {
+//                this._writeLines(chunk);
+//            }
+//            catch (err: any) {
+//                this.pushError(err, true);
+//                return;
+//            }
+//            }
+//            if (this.battle) this.battle.sendUpdates();
+//        }
+
+//        _writeLines(chunk: string) {
+//            for (const line of chunk.split('\n')) {
+//                if (line.startsWith('>'))
+//                {
+//                    const [type, message] = splitFirst(line.slice(1), ' ');
+//                    this._writeLine(type, message);
+//                }
+//            }
+//        }
+
+//        pushMessage(type: string, data: string) {
+//            if (this.replay)
+//            {
+//                if (type === 'update')
+//                {
+//                    if (this.replay === 'spectator')
+//                    {
+//                        const channelMessages = extractChannelMessages(data, [0]);
+//                        this.push(channelMessages[0].join('\n'));
+//                    }
+//                    else
+//                    {
+//                        const channelMessages = extractChannelMessages(data, [-1]);
+//                        this.push(channelMessages[-1].join('\n'));
+//                    }
+//                }
+//                return;
+//            }
+//            this.push(`${ type}\n${ data}`);
+//        }
+
+//        _writeLine(type: string, message: string) {
+//            switch (type)
+//            {
+//                case 'start':
+//                    const options = JSON.parse(message);
+//                    options.send = (t: string, data: any) => {
+//                        if (Array.isArray(data)) data = data.join("\n");
+//                        this.pushMessage(t, data);
+//                        if (t === 'end' && !this.keepAlive) this.pushEnd();
+//                    }
+//                    ;
+//                    if (this.debug) options.debug = true;
+//                    this.battle = new Battle(options);
+//                    break;
+//                case 'player':
+//                    const [slot, optionsText] = splitFirst(message, ' ');
+//                    this.battle!.setPlayer(slot as SideID, JSON.parse(optionsText));
+//                    break;
+//                case 'p1':
+//                case 'p2':
+//                case 'p3':
+//                case 'p4':
+//                    if (message === 'undo')
+//                    {
+//                        this.battle!.undoChoice(type);
+//                    }
+//                    else
+//                    {
+//                        this.battle!.choose(type, message);
+//                    }
+//                    break;
+//                case 'forcewin':
+//                case 'forcetie':
+//                    this.battle!.win(type === 'forcewin' ? message as SideID : null);
+//                    if (message)
+//                    {
+//                        this.battle!.inputLog.push(`> forcewin ${ message}`);
+//                    }
+//                    else
+//                    {
+//                        this.battle!.inputLog.push(`> forcetie`);
+//                    }
+//                    break;
+//                case 'forcelose':
+//                    this.battle!.lose(message as SideID);
+//                    this.battle!.inputLog.push(`> forcelose ${ message}`);
+//                    break;
+//                case 'reseed':
+//                    this.battle!.resetRNG(message as PRNGSeed);
+//                    // could go inside resetRNG, but this makes using it in `eval` slightly less buggy
+//                    this.battle!.inputLog.push(`> reseed ${ this.battle!.prng.getSeed()}`);
+//                    break;
+//                case 'tiebreak':
+//                    this.battle!.tiebreak();
+//                    break;
+//                case 'chat-inputlogonly':
+//                    this.battle!.inputLog.push(`> chat ${ message}`);
+//                    break;
+//                case 'chat':
+//                    this.battle!.inputLog.push(`> chat ${ message}`);
+//                    this.battle!.add('chat', `${ message}`);
+//                    break;
+//                case 'eval':
+//                    const battle = this.battle!;
+
+//                    // n.b. this will usually but not always work - if you eval code that also affects the inputLog,
+//                    // replaying the inputlog would double-play the change.
+//                    battle.inputLog.push(`>${ type} ${ message}`);
+
+//                    message = message.replace(/\f / g, '\n');
+//                    battle.add('', '>>> ' + message.replace(/\n / g, '\n||'));
+//                    try
+//                    {
+//                        /* eslint-disable no-eval, @typescript-eslint/no-unused-vars */
+//                        const p1 = battle.sides[0];
+//                        const p2 = battle.sides[1];
+//                        const p3 = battle.sides[2];
+//                        const p4 = battle.sides[3];
+//                        const p1active = p1?.active[0];
+//                        const p2active = p2?.active[0];
+//                        const p3active = p3?.active[0];
+//                        const p4active = p4?.active[0];
+//                        const toID = battle.toID;
+//                        const player = (input: string) => {
+//                            input = toID(input);
+//                            if (/ ^p[1 - 9]$/.test(input)) return battle.sides[parseInt(input.slice(1)) - 1];
+//                            if (/ ^ [1 - 9]$/.test(input)) return battle.sides[parseInt(input) - 1];
+//                            for (const side of battle.sides) {
+//                                if (toID(side.name) === input) return side;
+//                            }
+//                            return null;
+//                        }
+//                        ;
+//                        const pokemon = (side: string | Side, input: string) => {
+//                            if (typeof side === 'string') side = player(side)!;
+
+//                            input = toID(input);
+//                            if (/ ^ [1 - 9]$/.test(input)) return side.pokemon[parseInt(input) - 1];
+//                            return side.pokemon.find(p => p.baseSpecies.id === input || p.species.id === input);
+//                        }
+//                        ;
+//                        let result = eval(message);
+//                        /* eslint-enable no-eval, @typescript-eslint/no-unused-vars */
+
+//                        if (result?.then)
+//                        {
+//                            result.then((unwrappedResult: any) => {
+//                                unwrappedResult = Utils.visualize(unwrappedResult);
+//                                battle.add('', 'Promise -> ' + unwrappedResult);
+//                                battle.sendUpdates();
+//                            }, (error: Error) => {
+//                                battle.add('', '<<< error: ' + error.message);
+//                                battle.sendUpdates();
+//                            });
+//                        }
+//                        else
+//                        {
+//                            result = Utils.visualize(result);
+//                            result = result.replace(/\n / g, '\n||');
+//                            battle.add('', '<<< ' + result);
+//                        }
+//                    }
+//                    catch (e: any) {
+//                        battle.add('', '<<< error: ' + e.message);
+//                    }
+//                    break;
+
+//        case 'requestlog':
+//                        this.push(`requesteddata\n${ this.battle!.inputLog.join('\n')}`);
+//                        break;
+//                    case 'requestexport':
+//                        this.push(`requesteddata\n${ this.battle!.prngSeed}\n${ this.battle!.inputLog.join('\n')}`);
+//                        break;
+//                    case 'requestteam':
+//                        message = message.trim();
+//                        const slotNum = parseInt(message.slice(1)) - 1;
+//                        if (isNaN(slotNum) || slotNum < 0)
+//                        {
+//                            throw new Error(`Team requested for slot ${ message}, but that slot does not exist.`);
+//                        }
+//                        const side = this.battle!.sides[slotNum];
+//                        const team = Teams.pack(side.team);
+//                        this.push(`requesteddata\n${ team}`);
+//                        break;
+//                    case 'show-openteamsheets':
+//                        this.battle!.showOpenTeamSheets();
+//                        break;
+//                    case 'version':
+//                    case 'version-origin':
+//                        break;
+//                    default:
+//                        throw new Error(`Unrecognized command ">${type} ${message}"`);
+//                    }
+//                    }
+
+//	override _writeEnd() {
+//                        // if battle already ended, we don't need to pushEnd.
+//                        if (!this.atEOF) this.pushEnd();
+//                        this._destroy();
+//                    }
+
+//	override _destroy() {
+//                        if (this.battle) this.battle.destroy();
+//                    }
+//            }
+
+//            /**
+//             * Splits a BattleStream into omniscient, spectator, p1, p2, p3 and p4
+//             * streams, for ease of consumption.
+//             */
+//            export function getPlayerStreams(stream: BattleStream) {
+//                const streams = {
+//        omniscient: new Streams.ObjectReadWriteStream({
+//            write(data: string) {
+//                void stream.write(data);
+//            },
+//			writeEnd() {
+//                    return stream.writeEnd();
+//                },
+//		}),
+//		spectator: new Streams.ObjectReadStream<string>({
+//            read() {},
+//        }),
+//		p1: new Streams.ObjectReadWriteStream({
+//            write(data: string) {
+//                void stream.write(data.replace(/(^|\n)/g, `$1>p1 `));
+//            },
+//		}),
+//		p2: new Streams.ObjectReadWriteStream({
+//            write(data: string) {
+//                void stream.write(data.replace(/(^|\n)/g, `$1>p2 `));
+//            },
+//		}),
+//		p3: new Streams.ObjectReadWriteStream({
+//			write(data: string) {
+
+//                void stream.write(data.replace(/ (^|\n) / g, `$1 > p3 `));
+//			},
+//		}),
+//		p4: new Streams.ObjectReadWriteStream({
+//            write(data: string) {
+//                void stream.write(data.replace(/(^|\n)/g, `$1>p4 `));
+//            },
+//		}),
+//	};
+//(async () => {
+//    for await (const chunk of stream) {
+//        const [type, data] = splitFirst(chunk, `\n`);
+//        switch (type)
+//        {
+//            case 'update':
+//                const channelMessages = extractChannelMessages(data, [-1, 0, 1, 2, 3, 4]);
+//                streams.omniscient.push(channelMessages[-1].join('\n'));
+//                streams.spectator.push(channelMessages[0].join('\n'));
+//                streams.p1.push(channelMessages[1].join('\n'));
+//                streams.p2.push(channelMessages[2].join('\n'));
+//                streams.p3.push(channelMessages[3].join('\n'));
+//                streams.p4.push(channelMessages[4].join('\n'));
+//                break;
+//            case 'sideupdate':
+//                const [side, sideData] = splitFirst(data, `\n`);
+//                streams[side as SideID].push(sideData);
+//                break;
+//            case 'end':
+//                // ignore
+//                break;
+//        }
+//    }
+//    for (const s of Object.values(streams)) {
+//        s.pushEnd();
+//    }
+//})().catch(err => {
+//    for (const s of Object.values(streams)) {
+//        s.pushError(err, true);
+//    }
+//});
+//return streams;
+//}
+
+//export abstract class BattlePlayer
 //{
-//    throw new Error(`${ this.constructor.name } unable to make choice ${ i}. request = '${typeof request}',` +
-//						` chosen = '${chosen}', (mega =${ canMegaEvo}, ultra =${ canUltraBurst}, zmove =${ canZMove},` +
-//						` dynamax = '${canDynamax}', terastallize =${ canTerastallize})`);
+//    readonly stream: Streams.ObjectReadWriteStream<string>;
+//	readonly log: string[];
+//	readonly debug: boolean;
+
+//	constructor(playerStream: Streams.ObjectReadWriteStream<string>, debug = false)
+//    {
+//        this.stream = playerStream;
+//        this.log = [];
+//        this.debug = debug;
+//    }
+
+//    async start()
+//    {
+//        for await(const chunk of this.stream) {
+//            this.receive(chunk);
+//        }
+//    }
+
+//    receive(chunk: string)
+//    {
+//        for (const line of chunk.split('\n')) {
+//            this.receiveLine(line);
+//        }
+//    }
+
+//    receiveLine(line: string)
+//    {
+//        if (this.debug) console.log(line);
+//        if (!line.startsWith('|')) return;
+//        const [cmd, rest] = splitFirst(line.slice(1), '|');
+//        if (cmd === 'request') return this.receiveRequest(JSON.parse(rest));
+//        if (cmd === 'error') return this.receiveError(new Error(rest));
+//        this.log.push(line);
+//    }
+
+//    abstract receiveRequest(request: ChoiceRequest) : void;
+
+//	receiveError(error: Error)
+//    {
+//        throw error;
+//    }
+
+//    choose(choice: string)
+//    {
+//        void this.stream.write(choice);
+//    }
 //}
-//			});
-//this.choose(choices.join(`, `));
-//		}
-//	}
 
-//	protected chooseTeamPreview(team: AnyObject[]): string {
-//		return `default`;
-//	}
-
-//	protected chooseMove(active: AnyObject, moves: { choice: string, move: AnyObject }
-//[]): string {
-//		return this.prng.sample(moves).choice;
-//	}
-
-//	protected chooseSwitch(active: AnyObject | undefined, switches: { slot: number, pokemon: AnyObject }
-//[]): number {
-//		return this.prng.sample(switches).slot;
-//	}
-//}
-
-//// Creates an array of numbers progressing from start up to and including end
-//function range(start: number, end?: number, step = 1) {
-//	if (end === undefined) {
-//		end = start;
-//start = 0;
-//	}
-//	const result = [];
-//for (; start <= end; start += step)
+//export class BattleTextStream extends Streams.ReadWriteStream
 //{
-//    result.push(start);
-//}
-//return result;
+//	readonly battleStream: BattleStream;
+//    currentMessage: string;
+
+//    constructor(options: { debug ?: boolean }) {
+//        super();
+//        this.battleStream = new BattleStream(options);
+//        this.currentMessage = '';
+//        void this._listen();
+//    }
+
+//    async _listen() {
+//        for await(let message of this.battleStream) {
+//            if (!message.endsWith('\n')) message += '\n';
+//            this.push(message + '\n');
+//        }
+//        this.pushEnd();
+//    }
+
+//	override _write(message: string | Buffer) {
+//        this.currentMessage += `${ message}`;
+//        const index = this.currentMessage.lastIndexOf('\n');
+//        if (index >= 0)
+//        {
+//            void this.battleStream.write(this.currentMessage.slice(0, index));
+//            this.currentMessage = this.currentMessage.slice(index + 1);
+//        }
+//    }
+
+//	override _writeEnd() {
+//        return this.battleStream.writeEnd();
+//    }
 //}
