@@ -110,10 +110,20 @@ public class Side : IDisposable
         Avatar = string.Empty;
         Team = [];
         Pokemon = [];
-        Active = [];
+        // Initialize Active list with proper size based on game type
+        Active = battle.GameType switch
+        {
+            GameType.Doubles => [null!, null!],
+            _ => [null!],
+        };
         PokemonLeft = 0;
         SideConditions = [];
         SlotConditions = [];
+        // Initialize slot conditions for each active slot
+        for (int i = 0; i < Active.Count; i++)
+        {
+            SlotConditions.Add(new Dictionary<ConditionId, EffectState>());
+        }
         Choice = new Choice
         {
             CantUndo = false,
