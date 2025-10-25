@@ -1,5 +1,5 @@
-﻿using ApogeeVGC.Player;
-using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Player;
 
 namespace ApogeeVGC.Sim.Utils.Extensions;
 

@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 /// <summary>
 /// Example random player AI that makes random choices in battle.

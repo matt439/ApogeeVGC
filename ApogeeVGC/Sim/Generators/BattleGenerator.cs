@@ -1,6 +1,5 @@
 ﻿using System.Net.Sockets;
 using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.FieldClasses;

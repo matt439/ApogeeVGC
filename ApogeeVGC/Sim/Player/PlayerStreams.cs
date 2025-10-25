@@ -1,7 +1,7 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using System.Threading.Channels;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 /// <summary>
 /// Container for player-specific battle streams.

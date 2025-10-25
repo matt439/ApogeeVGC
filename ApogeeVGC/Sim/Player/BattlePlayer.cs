@@ -2,7 +2,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 /// <summary>
 /// Abstract base class for battle players that interact with a BattleStream.
