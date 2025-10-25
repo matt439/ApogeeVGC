@@ -61,8 +61,7 @@ public record PokemonSet
             field = value;
         }
     }
-    public PokeballId Pokeball { get; init; }
-    public PokemonType HiddenPowerType { get; init; }
+    public PokeballId Pokeball { get; init; } = PokeballId.Pokeball;
     public MoveType TeraType { get; init; }
 }
 
