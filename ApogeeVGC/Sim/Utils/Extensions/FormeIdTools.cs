@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Sim.Utils.Extensions;
 

@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Data;
 

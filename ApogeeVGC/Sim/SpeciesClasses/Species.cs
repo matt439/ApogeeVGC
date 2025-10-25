@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -10,7 +11,7 @@ using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.SpeciesClasses;
 
 public record Species : IEffect, ICopyable<Species>
 {
@@ -291,7 +292,7 @@ public record GenderRatio
     public GenderRatio(double m, double f)
     {
         if (m < 0.0 || m > 1.0 || f < 0.0 || f > 1.0 ||
-            (Math.Abs(m + f - 1.0) > Species.Epsilon && m != 0.0 && f != 0.0))
+            Math.Abs(m + f - 1.0) > Species.Epsilon && m != 0.0 && f != 0.0)
         {
             throw new ArgumentException();
         }

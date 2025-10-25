@@ -1,8 +1,8 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;

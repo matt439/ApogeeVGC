@@ -1,7 +1,8 @@
 ﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.Events;
 
 public record EventInfo
 {

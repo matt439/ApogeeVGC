@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 

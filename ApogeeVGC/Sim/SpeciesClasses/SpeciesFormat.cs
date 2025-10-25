@@ -1,8 +1,9 @@
-﻿using ApogeeVGC.Sim.Types;
+﻿using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.SpeciesClasses;
 
 public record SpeciesFormat : ICopyable<SpeciesFormat>
 {
