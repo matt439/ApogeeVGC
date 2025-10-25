@@ -34,26 +34,6 @@ public class Side : IDisposable
 
     public int PokemonLeft { get; set; }
 
-    /// <summary>
-    /// Gets a Pokemon from the Active list at the specified index.
-    /// Throws an exception if the slot is null, as this indicates an invalid battle state.
-    /// </summary>
-    /// <param name="index">The active slot index (0-based)</param>
-    /// <returns>The Pokemon in the specified slot</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the slot is empty (null)</exception>
-    public Pokemon GetActiveAt(int index)
-    {
-        if (index < 0 || index >= Active.Count)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), 
-                $"Active slot index {index} is out of range. Valid range: 0-{Active.Count - 1}");
-        }
-
-        return Active[index] ?? throw new InvalidOperationException(
-            $"Active slot {index} for {Name} (Side {Id}) is empty. " +
-            "This indicates an invalid battle state where a Pokemon should be present.");
-    }
-
     public Pokemon? FaintedLastTurn { get; set; }
     public Pokemon? FaintedThisTurn { get; set; }
     public int TotalFainted { get; set; }
@@ -1466,5 +1446,25 @@ public class Side : IDisposable
     public void Destroy()
     {
         Dispose();
+    }
+
+    /// <summary>
+    /// Gets a Pokemon from the Active list at the specified index.
+    /// Throws an exception if the slot is null, as this indicates an invalid battle state.
+    /// </summary>
+    /// <param name="index">The active slot index (0-based)</param>
+    /// <returns>The Pokemon in the specified slot</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the slot is empty (null)</exception>
+    public Pokemon GetActiveAt(int index)
+    {
+        if (index < 0 || index >= Active.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index),
+                $"Active slot index {index} is out of range. Valid range: 0-{Active.Count - 1}");
+        }
+
+        return Active[index] ?? throw new InvalidOperationException(
+            $"Active slot {index} for {Name} (Side {Id}) is empty. " +
+            "This indicates an invalid battle state where a Pokemon should be present.");
     }
 }
