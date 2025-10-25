@@ -3,6 +3,7 @@ using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Generators;
 using System.Text.Json;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.Core;
 
