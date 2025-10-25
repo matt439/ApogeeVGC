@@ -2,6 +2,7 @@
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Generators;
+using System.Text.Json;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -12,6 +13,12 @@ public class Driver
     public async Task StartTest()
     {
         PlayerStreams streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(Library));
+
+        // Battle specification
+        var spec = new
+        {
+            formatid = "gen9customgame",
+        };
 
         PlayerOptions p1Spec = new()
         {
@@ -28,7 +35,29 @@ public class Driver
         var p1 = new RandomPlayerAi(streams.P1);
         var p2 = new RandomPlayerAi(streams.P2);
 
-        await p1.StartAsync();
-        await p1.StartAsync();
+        Console.WriteLine($"p1 is {p1.GetType().Name}");
+        Console.WriteLine($"p2 is {p2.GetType().Name}");
+
+        // Start the AI players
+        _ = p1.StartAsync();
+        _ = p2.StartAsync();
+
+        // Start consuming the omniscient stream to see battle output
+        _ = Task.Run(async () =>
+        {
+            await foreach (string chunk in streams.Omniscient.ReadAllAsync())
+            {
+                Console.WriteLine(chunk);
+            }
+        });
+
+        // Initialize the battle by writing commands to the omniscient stream
+        string startCommand = $"""
+                               >start {JsonSerializer.Serialize(spec)}
+                                           >player p1 {JsonSerializer.Serialize(p1Spec)}
+                                           >player p2 {JsonSerializer.Serialize(p2Spec)}
+                               """;
+
+        await streams.Omniscient.WriteAsync(startCommand);
     }
 }
