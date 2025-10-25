@@ -182,6 +182,12 @@ public record Species : IEffect
                 Hidden = Abilities.Hidden,
                 Special = Abilities.Special,
             },
+            CosmeticFormes = CosmeticFormes != null ? [..CosmeticFormes] : null,
+            OtherFormes = OtherFormes != null ? [..OtherFormes] : null,
+            FormeOrder = FormeOrder != null ? [..FormeOrder] : null,
+            Evos = [..Evos],
+            EggGroups = [..EggGroups],
+            Tags = [..Tags],
         };
     }
 
