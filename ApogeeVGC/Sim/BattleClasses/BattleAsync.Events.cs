@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;

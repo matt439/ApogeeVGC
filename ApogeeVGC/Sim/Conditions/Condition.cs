@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
@@ -9,7 +10,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Sim.Effects;
+namespace ApogeeVGC.Sim.Conditions;
 
 public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect,
     ICopyable<Condition>

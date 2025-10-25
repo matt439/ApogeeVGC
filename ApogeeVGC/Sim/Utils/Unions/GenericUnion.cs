@@ -1,6 +1,6 @@
 ﻿using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;

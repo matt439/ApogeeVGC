@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Sim.Effects;
+﻿namespace ApogeeVGC.Sim.Conditions;
 
 public enum ConditionId
 {

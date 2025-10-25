@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Stats;
 

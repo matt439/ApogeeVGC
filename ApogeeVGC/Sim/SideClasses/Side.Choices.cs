@@ -1,6 +1,6 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;

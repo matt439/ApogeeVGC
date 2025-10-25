@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;

@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Utils;
 using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Conditions;
 
 namespace ApogeeVGC.Data;
 

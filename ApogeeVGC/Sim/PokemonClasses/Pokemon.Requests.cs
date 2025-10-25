@@ -1,5 +1,5 @@
 ﻿using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;

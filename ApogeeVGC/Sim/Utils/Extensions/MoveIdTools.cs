@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Sim.Utils.Extensions;
