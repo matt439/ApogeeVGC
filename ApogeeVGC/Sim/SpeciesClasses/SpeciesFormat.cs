@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;

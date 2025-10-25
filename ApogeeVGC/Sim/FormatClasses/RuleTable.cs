@@ -1,7 +1,7 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using System.Data;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.FormatClasses;
 
 public class RuleTable : Dictionary<RuleId, Rule>
 {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Data;

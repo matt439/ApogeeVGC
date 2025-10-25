@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.GameObjects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -8,6 +7,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.FormatClasses;
 
 namespace ApogeeVGC.Data;
 

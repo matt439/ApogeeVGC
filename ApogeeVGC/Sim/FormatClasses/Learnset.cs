@@ -2,7 +2,7 @@
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.FormatClasses;
 
 public record Learnset : ICopyable<Learnset>
 {

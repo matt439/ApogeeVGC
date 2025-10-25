@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.GameObjects;
+﻿using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;

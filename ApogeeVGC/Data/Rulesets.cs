@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.FormatClasses;
 
 namespace ApogeeVGC.Data;
 

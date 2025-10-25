@@ -13,7 +13,7 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.FormatClasses;
 
 
 public enum FormatId

@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Sim.GameObjects;
+﻿namespace ApogeeVGC.Sim.FormatClasses;
 
 public enum Tier
 {

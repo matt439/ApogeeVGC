@@ -12,52 +12,6 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Abilities;
 
-public enum AbilityId
-{
-    AsOneGlastrier,
-    HadronEngine,
-    Guts,
-    FlameBody,
-    Prankster,
-    QuarkDrive,
-
-    ChillingNeigh,
-    Unnerve,
-    QuickFeet,
-
-    Overgrow,
-    Chlorophyll,
-    EarlyBird,
-    BulletProof,
-    Swarm,
-    Frisk,
-    Pickpocket,
-    Corrosion,
-    NeutralizingGas,
-    Klutz,
-    IceFace,
-    Disguise,
-    Multitype,
-    Levitate,
-    TeraShell,
-    AngerPoint,
-    PoisonTouch,
-    PerishBody,
-    Stall,
-    MagicBounce,
-    Harvest,
-    Pickup,
-    Stalwart,
-    PropellerTail,
-    NaturalCure,
-    Dancer,
-    SheerForce,
-    Illusion,
-
-    None,
-}
-
-
 public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect, ICopyable<Ability>
 {
     public EffectType EffectType => EffectType.Ability;
