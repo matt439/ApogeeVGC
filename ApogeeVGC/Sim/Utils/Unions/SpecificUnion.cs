@@ -918,8 +918,14 @@ public abstract record Secret
     public static implicit operator Secret(string value) => new SecretString(value);
     public static implicit operator Secret(ConditionId id) => new SecretConditionId(id);
 }
-public record SecretString(string Value) : Secret;
-public record SecretConditionId(ConditionId Value) : Secret;
+public record SecretString(string Value) : Secret
+{
+    public override string ToString() => Value;
+}
+public record SecretConditionId(ConditionId Value) : Secret
+{
+    public override string ToString() => Value.ToString();
+}
 
 
 /// <summary>
@@ -929,4 +935,7 @@ public abstract record Shared
 {
     public static implicit operator Shared(string value) => new SharedString(value);
 }
-public record SharedString(string Value) : Shared;
+public record SharedString(string Value) : Shared
+{
+    public override string ToString() => Value;
+}

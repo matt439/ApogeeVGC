@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -56,6 +57,6 @@ public class PokemonSlot(SideId sideId, int positionOffset)
 
     public override string ToString()
     {
-        return $"{SideId}{PositionLetter.ToString().ToLowerInvariant()}";
+        return $"{SideId.GetSideIdName()}{PositionLetter.ToString().ToLowerInvariant()}";
     }
 }

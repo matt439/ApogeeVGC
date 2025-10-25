@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Sim\Utils\x.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="ShowDownTSRef.cs" />
   </ItemGroup>
 

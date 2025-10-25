@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -172,8 +173,8 @@ public partial class BattleAsync
 
     public void AddSplit(SideId side, Part[] secret, Part[]? shared = null)
     {
-        // Add the split marker with the side ID
-        Log.Add($"| split |{side}");
+        // Add the split marker with the side ID (lowercase)
+        Log.Add($"| split |{side.GetSideIdName()}");
 
         // Add the secret parts (visible only to the specified side)
         Add(secret.Select(p => (PartFuncUnion)p).ToArray());
@@ -277,7 +278,7 @@ public partial class BattleAsync
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
             PokemonPart p => p.Pokemon?.ToString() ?? string.Empty,
-            SidePart s => s.Side.Id.ToString(),
+            SidePart s => s.Side.Id.GetSideIdName(),
             MovePart m => m.Move.Name,
             EffectPart e => e.Effect.Name,
             UndefinedPart => "undefined",

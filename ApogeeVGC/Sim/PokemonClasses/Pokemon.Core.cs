@@ -313,7 +313,12 @@ public partial class Pokemon : IPriorityComparison, IDisposable
             details.TeraType = Terastallized;
         }
 
-        return new SideSecretSharedResult(health.Side, health.Secret, health.Shared);
+        // Combine details string with health string
+        string detailsStr = details.ToString();
+        string secretFullDetails = $"{detailsStr}|{health.Secret}";
+        string sharedFullDetails = $"{detailsStr}|{health.Shared}";
+
+        return new SideSecretSharedResult(health.Side, secretFullDetails, sharedFullDetails);
     }
 
     public int GetUndynamaxedHp(int? amount = null)
