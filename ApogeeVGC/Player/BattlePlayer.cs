@@ -7,9 +7,9 @@ namespace ApogeeVGC.Player;
 /// <summary>
 /// Abstract base class for battle players that interact with a BattleStream.
 /// </summary>
-public abstract class BattlePlayer(BattleStream stream, bool debug = false)
+public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = false)
 {
-    protected readonly BattleStream Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+    protected readonly PlayerReadWriteStream Stream = stream ?? throw new ArgumentNullException(nameof(stream));
     protected readonly List<string> Log = [];
     protected readonly bool Debug = debug;
 

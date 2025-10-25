@@ -8,7 +8,7 @@ namespace ApogeeVGC.Player;
 /// <summary>
 /// Example random player AI that makes random choices in battle.
 /// </summary>
-public class RandomPlayerAi(BattleStream stream, double move = 1.0, Prng? prng = null,
+public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prng? prng = null,
     PrngSeed? seed = null, bool debug = false) : BattlePlayer(stream, debug)
 {
     protected readonly double MoveWeight = move;
