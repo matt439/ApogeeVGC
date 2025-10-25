@@ -503,7 +503,7 @@ public partial class BattleAsync
             }
 
             // Process each active Pokemon on this side
-            foreach (Pokemon active in side.Active)
+            foreach (Pokemon active in side.Active.OfType<Pokemon>())
             {
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)

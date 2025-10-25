@@ -119,8 +119,10 @@ public partial class BattleAsync
             bool sideTrapped = true;
             StalenessId? sideStaleness = null;
 
-            foreach (Pokemon pokemon in side.Active)
+            foreach (Pokemon? pokemon in side.Active)
             {
+                if (pokemon == null) continue;
+
                 // Reset move tracking
                 pokemon.MoveThisTurn = false;
                 pokemon.NewlySwitched = false;
@@ -470,10 +472,13 @@ public partial class BattleAsync
                         {
                             if (side.PokemonLeft <= 0)
                             {
-                                // Forfeited before starting
+                                // Forfeited before starting - assign the pokemon but mark as fainted
                                 side.Active[i] = side.Pokemon[i];
-                                side.Active[i].Fainted = true;
-                                side.Active[i].Hp = 0;
+                                Pokemon assignedPokemon = side.Active[i]
+                                    ?? throw new InvalidOperationException(
+                                        $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
+                                assignedPokemon.Fainted = true;
+                                assignedPokemon.Hp = 0;
                             }
                             else
                             {
@@ -662,8 +667,10 @@ public partial class BattleAsync
         // Phazing (Roar, etc)
         foreach (Side side in Sides)
         {
-            foreach (Pokemon pokemon in side.Active)
+            foreach (Pokemon? pokemon in side.Active)
             {
+                if (pokemon == null) continue;
+                
                 if (pokemon.ForceSwitchFlag)
                 {
                     if (pokemon.Hp > 0) Actions.DragIn(pokemon.Side, pokemon.Position);
@@ -711,7 +718,7 @@ public partial class BattleAsync
 
         // Check for switches
         var switches = Sides
-            .Select(side => side.Active.Any(p => p.SwitchFlag.IsTrue()))
+            .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
             .ToList();
 
         for (int i = 0; i < Sides.Count; i++)
@@ -719,8 +726,10 @@ public partial class BattleAsync
             bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
             if (switches[i] && CanSwitch(Sides[i]) == 0)
             {
-                foreach (Pokemon pokemon in Sides[i].Active)
+                foreach (Pokemon? pokemon in Sides[i].Active)
                 {
+                    if (pokemon == null) continue;
+
                     IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
                         ConditionId.RevivalBlessing);
                     if (revivalBlessing != null)
@@ -734,8 +743,10 @@ public partial class BattleAsync
             }
             else if (switches[i])
             {
-                foreach (Pokemon pokemon in Sides[i].Active)
+                foreach (Pokemon? pokemon in Sides[i].Active)
                 {
+                    if (pokemon == null) continue;
+
                     if (pokemon.Hp > 0 &&
                         pokemon.SwitchFlag.IsTrue() &&
                         pokemon.SwitchFlag != MoveId.RevivalBlessing &&
@@ -747,7 +758,7 @@ public partial class BattleAsync
                         if (Ended) return true;
                         if (pokemon.Fainted)
                         {
-                            switches[i] = Sides[i].Active.Any(p => p.SwitchFlag.IsTrue());
+                            switches[i] = Sides[i].Active.Any(p => p != null && p.SwitchFlag.IsTrue());
                         }
                     }
                 }

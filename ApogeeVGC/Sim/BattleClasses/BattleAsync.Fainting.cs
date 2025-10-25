@@ -19,13 +19,19 @@ public partial class BattleAsync
     public void CheckFainted()
     {
         // Iterate through all sides in the battle
-        foreach (Pokemon pokemon in Sides.SelectMany(side => side.Active.Where(pokemon => pokemon.Fainted)))
+        foreach (Side side in Sides)
         {
-            // Set the status to fainted
-            pokemon.Status = ConditionId.Fainted;
+            foreach (Pokemon? pokemon in side.Active)
+            {
+                if (pokemon == null) continue;
+                if (!pokemon.Fainted) continue;
 
-            // Mark that this Pokémon needs to be switched out
-            pokemon.SwitchFlag = true;
+                // Set the status to fainted
+                pokemon.Status = ConditionId.Fainted;
+
+                // Mark that this Pokémon needs to be switched out
+                pokemon.SwitchFlag = true;
+            }
         }
     }
 
@@ -371,7 +377,8 @@ public partial class BattleAsync
         side.PokemonLeft = 0;
 
         // Faint the first active Pokémon if present
-        side.Active.FirstOrDefault()?.Faint();
+        Pokemon? firstActive = side.Active.FirstOrDefault(p => p != null);
+        firstActive?.Faint();
 
         // Show faint messages (lastFirst: false, forceCheck: true)
         FaintMessages(lastFirst: false, forceCheck: true);

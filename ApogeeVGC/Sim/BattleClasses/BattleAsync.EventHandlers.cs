@@ -146,7 +146,7 @@ public partial class BattleAsync
                 // Handle bubble down from Side to active Pokemon
                 if (shouldBubbleDown)
                 {
-                    foreach (Pokemon active in side.Active)
+                    foreach (Pokemon active in side.Active.OfType<Pokemon>())
                     {
                         if (side == targetSide)
                         {

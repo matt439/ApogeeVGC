@@ -76,7 +76,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public bool Ended { get; set; }
     public string? Winner { get; set; }
 
-    public IEffect Effect { get; set; }
+    public IEffect Effect { get; set; } = null!;
     public EffectState EffectState { get; set; }
 
     public Event Event { get; set; } = new();
@@ -131,11 +131,17 @@ public partial class BattleAsync : IBattle, IDisposable
         StrictChoices = options.StrictChoices;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
-        Sides =
-        [
-            new Side(this),
-            new Side(this),
-        ];
+        
+        // Create sides with temporary Foe references (will be set properly below)
+        var side1 = new Side(this);
+        var side2 = new Side(this);
+        
+        // Set up bidirectional Foe relationships
+        side1.Foe = side2;
+        side2.Foe = side1;
+        
+        Sides = [side1, side2];
+        
         ActivePerHalf = 1;
         Prng = options.Prng ?? new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
@@ -145,7 +151,6 @@ public partial class BattleAsync : IBattle, IDisposable
         Queue = new BattleQueue(this);
         Actions = new BattleActions(this);
 
-        Effect = null!; // TODO: Fix nullability
         EffectState = InitEffectState();
 
         for (int i = 0; i < ActivePerHalf * 2; i++)

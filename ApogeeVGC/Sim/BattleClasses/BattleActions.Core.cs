@@ -46,7 +46,7 @@ public partial class BattleActions(IBattle battle)
             throw new ArgumentException($"Invalid switch position {pos} / {side.Active.Count}");
         }
 
-        Pokemon oldActive = side.Active[pos];
+        Pokemon oldActive = side.GetActiveAt(pos);
         Pokemon? unfaintedActive = oldActive.Hp > 0 ? oldActive : null;
 
         if (unfaintedActive != null)

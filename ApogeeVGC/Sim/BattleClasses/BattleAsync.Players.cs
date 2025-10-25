@@ -133,7 +133,9 @@ public partial class BattleAsync
         List<Pokemon> pokemnoList = [];
         foreach (Side side in Sides)
         {
-            pokemnoList.AddRange(side.Active.Where(pokemon => includeFainted || !pokemon.Fainted));
+            pokemnoList.AddRange(side.Active
+                .Where(pokemon => pokemon != null && (includeFainted || !pokemon.Fainted))
+                .Select(pokemon => pokemon!));
         }
         return pokemnoList;
     }

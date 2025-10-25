@@ -26,21 +26,33 @@ public class Side : IDisposable
     // public Side? AllySide { get; init; } = null;
     public List<PokemonSet> Team { get; set; }
     public List<Pokemon> Pokemon { get; set; }
-    public List<Pokemon> Active { get; set; }
-    public Side Foe
-    {
-        get
-        {
-            if (field is null)
-            {
-                throw new InvalidOperationException("Foe side not set yet");
-            }
-            return field;
-        }
-        set;
-    } = null!; // set in battle.start()
+    public List<Pokemon?> Active { get; set; }
+    
+    // Foe is set during Battle.Start(), not during construction
+    // This is nullable until Start() is called, but should never be accessed before then
+    public Side Foe { get; set; } = null!;
 
     public int PokemonLeft { get; set; }
+
+    /// <summary>
+    /// Gets a Pokemon from the Active list at the specified index.
+    /// Throws an exception if the slot is null, as this indicates an invalid battle state.
+    /// </summary>
+    /// <param name="index">The active slot index (0-based)</param>
+    /// <returns>The Pokemon in the specified slot</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the slot is empty (null)</exception>
+    public Pokemon GetActiveAt(int index)
+    {
+        if (index < 0 || index >= Active.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), 
+                $"Active slot index {index} is out of range. Valid range: 0-{Active.Count - 1}");
+        }
+
+        return Active[index] ?? throw new InvalidOperationException(
+            $"Active slot {index} for {Name} (Side {Id}) is empty. " +
+            "This indicates an invalid battle state where a Pokemon should be present.");
+    }
 
     public Pokemon? FaintedLastTurn { get; set; }
     public Pokemon? FaintedThisTurn { get; set; }
@@ -65,10 +77,11 @@ public class Side : IDisposable
         Pokemon = [];
 
         // Initialize Active list with proper size based on game type
+        // Start with null entries that will be filled when Pokemon are switched in
         Active = battle.GameType switch
         {
-            GameType.Doubles => [null!, null!],
-            _ => [null!],
+            GameType.Doubles => [null, null],
+            _ => [null],
         };
 
         PokemonLeft = 0;
@@ -174,7 +187,7 @@ public class Side : IDisposable
 
     public List<Pokemon> Allies(bool all = false)
     {
-        var allies = Active.Where(_ => true).ToList();
+        var allies = Active.Where(p => p != null).Select(p => p!).ToList();
         if (!all) allies = allies.Where(ally => ally.Hp > 0).ToList();
         return allies;
     }
@@ -186,7 +199,10 @@ public class Side : IDisposable
 
     public List<Pokemon> ActiveTeam()
     {
-        return Battle.Sides[N % 2].Active.Concat(Battle.Sides[N % 2 + 2].Active).ToList();
+        return Battle.Sides[N % 2].Active.Concat(Battle.Sides[N % 2 + 2].Active)
+            .Where(p => p != null)
+            .Select(p => p!)
+            .ToList();
     }
 
     public bool HasAlly(Pokemon pokemon)
@@ -228,7 +244,12 @@ public class Side : IDisposable
         // Step 5: Duration callback
         if (status.DurationCallback != null)
         {
-            effectState.Duration = status.DurationCallback(Battle, Active[0], source, sourceEffect);
+            Pokemon? firstActive = Active.FirstOrDefault(p => p != null);
+            if (firstActive is null)
+            {
+                throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
+            }
+            effectState.Duration = status.DurationCallback(Battle, firstActive, source, sourceEffect);
         }
 
         SideConditions[status.Id] = effectState;
@@ -335,14 +356,19 @@ public class Side : IDisposable
         // Step 6: Duration callback
         if (status.DurationCallback != null)
         {
-            conditionState.Duration = status.DurationCallback(Battle, Active[0], source, sourceEffect);
+            Pokemon? firstActive = Active.FirstOrDefault(p => p != null);
+            if (firstActive is null)
+            {
+                throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
+            }
+            conditionState.Duration = status.DurationCallback(Battle, firstActive, source, sourceEffect);
         }
 
         SlotConditions[targetSlot][status.Id] = conditionState;
 
         // Step 7: Start event
-        RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState,
-            Active[targetSlot], source, sourceEffect);
+        RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState, 
+            GetActiveAt(targetSlot), source, sourceEffect);
 
         if (startResult is BoolRelayVar { Value: true }) return true;
         SlotConditions[targetSlot].Remove(status.Id);
@@ -399,7 +425,7 @@ public class Side : IDisposable
             return false;
 
         // Trigger End event
-        Battle.SingleEvent(EventId.End, status, conditionState, Active[targetSlot]);
+        Battle.SingleEvent(EventId.End, status, conditionState, GetActiveAt(targetSlot));
 
         // Remove the condition
         SlotConditions[targetSlot].Remove(status.Id);
@@ -499,7 +525,7 @@ public class Side : IDisposable
 
         // Step 3: Determine auto-choose and get pokemon
         bool autoChoose = moveText == null;
-        Pokemon pokemon = Active[index];
+        Pokemon pokemon = GetActiveAt(index);
 
         // Step 4: Parse moveText (name or index)
         PokemonMoveRequestData request = pokemon.GetMoveRequestData();
@@ -827,7 +853,7 @@ public class Side : IDisposable
         }
 
         // Step 3: Get the currently active pokemon
-        Pokemon pokemon = Active[index];
+        Pokemon pokemon = GetActiveAt(index);
         int slot;
 
         // Step 4: Determine the target slot
@@ -1104,7 +1130,7 @@ public class Side : IDisposable
         if (Battle.RequestState == RequestState.Switch)
         {
             // Count active Pokemon that need to switch out
-            int canSwitchOut = Active.Count(pokemon => pokemon.SwitchFlag.IsTrue());
+            int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
 
             // Count bench Pokemon available to switch in (not active, not fainted)
             int canSwitchIn = Pokemon
@@ -1284,7 +1310,8 @@ public class Side : IDisposable
                     // auto-pass
                     while (
                         index < Active.Count &&
-                        (Active[index].Fainted || Active[index].Volatiles.ContainsKey(ConditionId.Commanding))
+                        Active[index] != null &&
+                        (Active[index]!.Fainted || Active[index]!.Volatiles.ContainsKey(ConditionId.Commanding))
                     )
                     {
                         ChoosePass();
@@ -1292,7 +1319,7 @@ public class Side : IDisposable
                     }
                     break;
                 case RequestState.Switch:
-                    while (index < Active.Count && !Active[index].SwitchFlag.IsTrue())
+                    while (index < Active.Count && Active[index] != null && !Active[index]!.SwitchFlag.IsTrue())
                     {
                         ChoosePass();
                         index++;
@@ -1308,7 +1335,7 @@ public class Side : IDisposable
     {
         int index = GetChoiceIndex(true);
         if (index >= Active.Count) return false;
-        Pokemon pokemon = Active[index];
+        Pokemon pokemon = GetActiveAt(index);
 
         switch (RequestState)
         {

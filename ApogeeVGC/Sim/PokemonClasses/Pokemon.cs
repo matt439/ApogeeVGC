@@ -669,7 +669,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         }
 
         // Return the Pokemon at the calculated position (adjust for 0-based indexing)
-        return side.Active[targetLoc - 1];
+        return side.GetActiveAt(targetLoc - 1);
     }
 
     /// <summary>
@@ -1406,8 +1406,11 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Check all positions after this Pokémon
         for (int i = Position + 1; i < allyActive.Count; i++)
         {
+            Pokemon? pokemon = allyActive[i];
+            if (pokemon is null) continue;
+            
             // If there's a living Pokémon at a later position, this isn't the last
-            if (!allyActive[i].Fainted)
+            if (!pokemon.Fainted)
             {
                 return false;
             }
@@ -3263,7 +3266,7 @@ public class Pokemon : IPriorityComparison, IDisposable
 
         // Check if this Pokemon is the source of Sky Drop on any opponent
         return Side.Foe.Active.Any(foeActive =>
-            foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
+            foeActive != null && foeActive.Volatiles.TryGetValue(ConditionId.SkyDrop, out EffectState? state) &&
             state.Source == this);
     }
 

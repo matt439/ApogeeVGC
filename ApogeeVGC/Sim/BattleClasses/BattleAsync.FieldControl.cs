@@ -26,7 +26,7 @@ public partial class BattleAsync
         }
 
         // Get the Pokémon at the target position
-        Pokemon target = pokemon.Side.Active[newPosition];
+        Pokemon target = pokemon.Side.GetActiveAt(newPosition);
 
         // Special check: position 1 can be swapped even if empty/fainted
         // Other positions require a valid, non-fainted target

@@ -98,7 +98,7 @@ public partial class BattleAsync
                     // Create a table of which active Pokemon need to switch
                     // Convert MoveIdBoolUnion to bool using IsTrue() method
                     var switchTable = side.Active
-                        .Select(pokemon => pokemon.SwitchFlag.IsTrue())
+                        .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
                         .ToList();
 
                     // Only create a switch request if at least one Pokemon needs to switch
@@ -138,8 +138,8 @@ public partial class BattleAsync
 
                     // Get move request data for each active Pokemon
                     var activeData = side.Active
-                        .Select(pokemon => pokemon.GetMoveRequestData())
-                        .Where(_ => true)
+                        .Where(pokemon => pokemon != null)
+                        .Select(pokemon => pokemon!.GetMoveRequestData())
                         .ToList();
 
                     var moveRequest = new MoveRequest
