@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Text;
@@ -99,8 +100,10 @@ public class BattleStream : IDisposable
     {
         try
         {
+            Console.WriteLine("[BattleStream] Starting ProcessInputAsync");
             await foreach (string chunk in _inputChannel.Reader.ReadAllAsync(cancellationToken))
             {
+                Console.WriteLine($"[BattleStream] Processing chunk: {chunk.Substring(0, Math.Min(100, chunk.Length))}...");
                 if (NoCatch)
                 {
                     ProcessLines(chunk);
@@ -119,9 +122,11 @@ public class BattleStream : IDisposable
                 }
 
                 // Send battle updates after processing
+                Console.WriteLine($"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
                 Battle?.SendUpdates();
             }
 
+            Console.WriteLine("[BattleStream] Input completed");
             // Input completed, signal end if needed
             if (!KeepAlive)
             {
@@ -130,14 +135,17 @@ public class BattleStream : IDisposable
         }
         catch (OperationCanceledException)
         {
+            Console.WriteLine("[BattleStream] ProcessInputAsync cancelled");
             // Expected when cancellation is requested
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[BattleStream] ProcessInputAsync error: {ex.Message}");
             await PushErrorAsync(ex);
         }
         finally
         {
+            Console.WriteLine("[BattleStream] ProcessInputAsync completing output channel");
             _outputChannel.Writer.Complete();
         }
     }
@@ -155,6 +163,7 @@ public class BattleStream : IDisposable
 
     private async Task PushMessageAsync(string type, string data)
     {
+        Console.WriteLine($"[BattleStream] PushMessage: type={type}, data length={data.Length}");
         if (Replay != BattleReplayMode.None)
         {
             if (type != "update") return;
@@ -169,6 +178,7 @@ public class BattleStream : IDisposable
 
         // Normal mode: send type\ndata format
         string message = $"{type}\n{data}";
+        Console.WriteLine($"[BattleStream] Writing to output channel: {message.Substring(0, Math.Min(100, message.Length))}...");
         await _outputChannel.Writer.WriteAsync(message);
     }
 
@@ -469,10 +479,144 @@ public class BattleStream : IDisposable
     /// </summary>
     private static Choice ParseChoice(string message)
     {
-        // TODO: Implement full choice parsing
-        // This is a placeholder - you'll need to parse the choice format
-        // Examples: "move 1", "switch 2", "team 1234"
-        throw new NotImplementedException("Choice parsing not yet implemented");
+        // Parse choice format: "move 1" or "switch 2" or "move 1, switch 2" (for doubles)
+        // Can also have "default" for team preview
+        
+        var choice = new Choice();
+        var actions = new List<ChosenAction>();
+
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            choice.Error = "Empty choice";
+            return choice;
+        }
+
+        // Split by comma for multiple Pokemon actions (doubles/triples)
+        string[] individualChoices = message.Split(',', StringSplitOptions.TrimEntries);
+
+        foreach (string individualChoice in individualChoices)
+        {
+            // Skip "default" or "pass" choices
+            if (individualChoice.Equals("default", StringComparison.OrdinalIgnoreCase) ||
+                individualChoice.Equals("pass", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            // Parse individual choice
+            string[] parts = individualChoice.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                continue;
+            }
+
+            string choiceType = parts[0].ToLowerInvariant();
+
+            switch (choiceType)
+            {
+                case "move":
+                    {
+                        if (parts.Length < 2 || !int.TryParse(parts[1], out int moveSlot))
+                        {
+                            choice.Error = $"Invalid move choice: {individualChoice}";
+                            return choice;
+                        }
+
+                        // Parse optional target (e.g., "move 1 2" for move slot 1 targeting position 2)
+                        int? targetLoc = null;
+                        if (parts.Length >= 3 && int.TryParse(parts[2], out int target))
+                        {
+                            targetLoc = target;
+                        }
+
+                        // Check for mega evolution, z-move, dynamax, or terastallize
+                        bool hasMega = individualChoice.Contains("mega", StringComparison.OrdinalIgnoreCase);
+                        bool hasZmove = individualChoice.Contains("zmove", StringComparison.OrdinalIgnoreCase);
+                        bool hasDynamax = individualChoice.Contains("dynamax", StringComparison.OrdinalIgnoreCase) ||
+                                        individualChoice.Contains("max", StringComparison.OrdinalIgnoreCase);
+                        bool hasTerastallize = individualChoice.Contains("terastallize", StringComparison.OrdinalIgnoreCase) ||
+                                              individualChoice.Contains("tera", StringComparison.OrdinalIgnoreCase);
+
+                        if (hasTerastallize)
+                        {
+                            choice.Terastallize = true;
+                        }
+
+                        actions.Add(new ChosenAction
+                        {
+                            Choice = ChoiceType.Move,
+                            MoveId = MoveId.None, // Will be resolved later by the battle engine
+                            Index = moveSlot - 1, // Convert to 0-based index
+                            TargetLoc = targetLoc,
+                        });
+                        break;
+                    }
+
+                case "switch":
+                    {
+                        if (parts.Length < 2 || !int.TryParse(parts[1], out int switchSlot))
+                        {
+                            choice.Error = $"Invalid switch choice: {individualChoice}";
+                            return choice;
+                        }
+
+                        actions.Add(new ChosenAction
+                        {
+                            Choice = ChoiceType.Switch,
+                            MoveId = MoveId.None,
+                            Index = switchSlot - 1, // Convert to 0-based index
+                        });
+                        
+                        choice.SwitchIns.Add(switchSlot);
+                        break;
+                    }
+
+                case "team":
+                    {
+                        // Team order for team preview (e.g., "team 123456")
+                        if (parts.Length < 2)
+                        {
+                            choice.Error = $"Invalid team choice: {individualChoice}";
+                            return choice;
+                        }
+
+                        // Parse team order - each digit is a pokemon position
+                        string teamOrder = parts[1];
+                        for (int i = 0; i < teamOrder.Length; i++)
+                        {
+                            if (char.IsDigit(teamOrder[i]))
+                            {
+                                int position = teamOrder[i] - '0';
+                                actions.Add(new ChosenAction
+                                {
+                                    Choice = ChoiceType.Team,
+                                    MoveId = MoveId.None,
+                                    Index = position - 1, // Convert to 0-based index
+                                });
+                            }
+                        }
+                        break;
+                    }
+
+                case "shift":
+                    {
+                        actions.Add(new ChosenAction
+                        {
+                            Choice = ChoiceType.Shift,
+                            MoveId = MoveId.None,
+                        });
+                        break;
+                    }
+
+                default:
+                    choice.Error = $"Unknown choice type: {choiceType}";
+                    return choice;
+            }
+        }
+
+        choice.Actions = actions;
+        return choice;
     }
 
     public void Dispose()

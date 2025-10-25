@@ -126,6 +126,7 @@ public partial class BattleAsync : IBattle, IDisposable
         // RuleTable
         Id = BattleId.Default;
         DebugMode = options.Debug;
+        DisplayUi = true; // Always display UI for battle streams
         ForceRandomChange = options.ForceRandomChance;
         Deserialized = options.Deserialized;
         StrictChoices = options.StrictChoices;
