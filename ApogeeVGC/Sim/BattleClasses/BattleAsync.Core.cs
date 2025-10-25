@@ -131,11 +131,11 @@ public partial class BattleAsync : IBattle, IDisposable
         StrictChoices = options.StrictChoices;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
-        Sides = new List<Side>(2)
-        {
+        Sides =
+        [
             new Side(this),
             new Side(this),
-        };
+        ];
         ActivePerHalf = 1;
         Prng = options.Prng ?? new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
