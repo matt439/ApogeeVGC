@@ -38,26 +38,50 @@ public class Driver
         Console.WriteLine($"p1 is {p1.GetType().Name}");
         Console.WriteLine($"p2 is {p2.GetType().Name}");
 
-        // Start the AI players
-        _ = p1.StartAsync();
-        _ = p2.StartAsync();
+        // Start the AI players (don't await - they run in background)
+        var p1Task = p1.StartAsync();
+        var p2Task = p2.StartAsync();
 
         // Start consuming the omniscient stream to see battle output
-        _ = Task.Run(async () =>
+        var streamConsumerTask = Task.Run(async () =>
         {
-            await foreach (string chunk in streams.Omniscient.ReadAllAsync())
+            try
             {
-                Console.WriteLine(chunk);
+                await foreach (string chunk in streams.Omniscient.ReadAllAsync())
+                {
+                    Console.WriteLine(chunk);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Stream consumer error: {ex.Message}");
             }
         });
 
         // Initialize the battle by writing commands to the omniscient stream
-        string startCommand = $"""
-                               >start {JsonSerializer.Serialize(spec)}
-                                           >player p1 {JsonSerializer.Serialize(p1Spec)}
-                                           >player p2 {JsonSerializer.Serialize(p2Spec)}
-                               """;
+        string startCommand = $@">start {JsonSerializer.Serialize(spec)}
+>player p1 {JsonSerializer.Serialize(p1Spec)}
+>player p2 {JsonSerializer.Serialize(p2Spec)}";
 
         await streams.Omniscient.WriteAsync(startCommand);
+
+        // Wait for all tasks to complete (or any to fault)
+        try
+        {
+            await Task.WhenAny(
+                Task.WhenAll(p1Task, p2Task, streamConsumerTask),
+                Task.Delay(TimeSpan.FromMinutes(5)) // Timeout after 5 minutes
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Battle error: {ex.Message}");
+        }
+        finally
+        {
+            // Cleanup
+            streams.Dispose();
+            Console.WriteLine("Battle completed or timed out.");
+        }
     }
 }

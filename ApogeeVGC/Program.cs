@@ -4,9 +4,9 @@ namespace ApogeeVGC;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        //var driver = new Driver();
-        //driver.Start(DriverMode.ConsoleVsRandom);
+        var driver = new Driver();
+        await driver.StartTest();
     }
 }
