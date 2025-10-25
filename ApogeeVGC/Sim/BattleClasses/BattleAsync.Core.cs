@@ -168,6 +168,8 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             SetPlayer(SideId.P2, options.P2);
         }
+
+        Console.WriteLine("Battle constructor complete.");
     }
     public int Random(int m, int n)
     {

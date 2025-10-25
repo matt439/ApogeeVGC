@@ -76,10 +76,10 @@ public class Driver
         // Wait for all tasks to complete (or timeout)
         try
         {
-            var allTasks = Task.WhenAll(p1Task, p2Task, streamConsumerTask);
-            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(5));
+            Task allTasks = Task.WhenAll(p1Task, p2Task, streamConsumerTask);
+            Task timeoutTask = Task.Delay(TimeSpan.FromMinutes(5));
 
-            var completedTask = await Task.WhenAny(allTasks, timeoutTask);
+            Task completedTask = await Task.WhenAny(allTasks, timeoutTask);
 
             if (completedTask == timeoutTask)
             {

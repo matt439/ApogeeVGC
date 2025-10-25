@@ -1,26 +1,11 @@
-﻿using ApogeeVGC.Sim.Effects;
+﻿using System.Reflection;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Utils;
-using System.Reflection;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /// <summary>
-    /// Invokes a DelegateEffectDelegate by attempting common delegate signatures.
-    /// Falls back to reflection only when necessary.
-    /// Optimized to minimize allocations by reusing a fixed-size array.
-    /// </summary>
     private RelayVar? InvokeDelegateEffectDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
@@ -128,7 +113,7 @@ public partial class BattleAsync
     /// Builds a single argument for delegate invocation.
     /// Used by the optimized fast-path for common parameter counts.
     /// </summary>
-    private object? BuildSingleArg(System.Reflection.ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
+    private object? BuildSingleArg(ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect, int position = 0)
     {
         Type paramType = param.ParameterType;

@@ -1448,7 +1448,6 @@ public class Side : IDisposable
             // Clear circular/large references
             Pokemon.Clear();
             Active.Clear();
-            Foe = null!;
         }
 
         _disposed = true;
