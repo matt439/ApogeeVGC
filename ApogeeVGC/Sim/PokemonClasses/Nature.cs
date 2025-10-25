@@ -2,7 +2,7 @@
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 
-namespace ApogeeVGC.Sim.GameObjects;
+namespace ApogeeVGC.Sim.PokemonClasses;
 
 public enum NatureId
 {
