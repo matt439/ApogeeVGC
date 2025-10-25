@@ -28,12 +28,13 @@ public partial class BattleActions
             throw new ArgumentException($"Invalid switch position {pos} / {side.Active.Count}");
         }
 
-        Pokemon oldActive = side.GetActiveAt(pos);
-        Pokemon? unfaintedActive = oldActive.Hp > 0 ? oldActive : null;
+        // Handle initial switch-in where Active[pos] is null
+        Pokemon? oldActive = side.Active[pos];
+        Pokemon? unfaintedActive = oldActive?.Hp > 0 ? oldActive : null;
 
         if (unfaintedActive != null)
         {
-            oldActive.BeingCalledBack = true;
+            oldActive!.BeingCalledBack = true;
 
             // Determine if we need to copy volatiles (for moves like U-turn, Shed Tail, etc.)
             MoveSelfSwitch? switchCopyFlag = null;
@@ -110,30 +111,35 @@ public partial class BattleActions
         }
 
         // Update Pokemon states and positions
-        oldActive.IsActive = false;
-        oldActive.IsStarted = false;
-        oldActive.UsedItemThisTurn = false;
-        oldActive.StatsRaisedThisTurn = false;
-        oldActive.StatsLoweredThisTurn = false;
-        oldActive.Position = pokemon.Position;
-
-        // Clear status if fainted
-        if (oldActive.Fainted)
+        if (oldActive != null)
         {
-            oldActive.Status = ConditionId.None;
-        }
+            oldActive.IsActive = false;
+            oldActive.IsStarted = false;
+            oldActive.UsedItemThisTurn = false;
+            oldActive.StatsRaisedThisTurn = false;
+            oldActive.StatsLoweredThisTurn = false;
+            oldActive.Position = pokemon.Position;
 
-        // Gen 4 and earlier: transfer last item
-        if (Battle.Gen <= 4)
-        {
-            pokemon.LastItem = oldActive.LastItem;
-            oldActive.LastItem = ItemId.None;
+            // Clear status if fainted
+            if (oldActive.Fainted)
+            {
+                oldActive.Status = ConditionId.None;
+            }
+
+            // Gen 4 and earlier: transfer last item
+            if (Battle.Gen <= 4)
+            {
+                pokemon.LastItem = oldActive.LastItem;
+                oldActive.LastItem = ItemId.None;
+            }
+
+            // Swap positions in the side's Pokemon list
+            side.Pokemon[oldActive.Position] = oldActive;
         }
 
         // Swap positions in the side's Pokemon list
         pokemon.Position = pos;
         side.Pokemon[pokemon.Position] = pokemon;
-        side.Pokemon[oldActive.Position] = oldActive;
 
         // Activate the new Pokemon
         pokemon.IsActive = true;

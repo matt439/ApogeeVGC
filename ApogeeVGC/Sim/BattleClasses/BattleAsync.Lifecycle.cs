@@ -489,8 +489,12 @@ public partial class BattleAsync
 
                     foreach (Pokemon pokemon in GetAllPokemon())
                     {
-                        Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
-                        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                        // Only apply species condition if it's not None
+                        if (pokemon.Species.Conditon != ConditionId.None)
+                        {
+                            Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
+                            SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                        }
                     }
 
                     MidTurn = true;
@@ -626,8 +630,8 @@ public partial class BattleAsync
 
             case ActionId.RunSwitch:
                 {
-                    var rsAction = (PokemonAction)action;
-                    Actions.RunSwitch(rsAction.Pokemon);
+                    var rsAction = (RunSwitchAction)action;
+                    Actions.RunSwitch(rsAction.Pokemon!);
                     break;
                 }
 
@@ -707,8 +711,8 @@ public partial class BattleAsync
 
         if (action.Choice == ActionId.RunSwitch)
         {
-            var runSwitchAction = (PokemonAction)action;
-            Pokemon pokemon = runSwitchAction.Pokemon;
+            var runSwitchAction = (RunSwitchAction)action;
+            Pokemon pokemon = runSwitchAction.Pokemon!;
             if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 &&
                 pokemonOriginalHp > pokemon.MaxHp / 2)
             {
