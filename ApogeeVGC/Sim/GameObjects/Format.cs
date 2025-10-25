@@ -684,4 +684,16 @@ public record Format : IEffect, IBasicEffect, IEventMethods
             _ => null,
         };
     }
+
+    /// <summary>
+    /// Creates a copy of this Format for simulation purposes.
+    /// This method creates an independent copy with the same state while sharing immutable references.
+    /// </summary>
+    /// <returns>A new Format instance with copied state</returns>
+    public Format Copy()
+    {
+        // Since Format is a record, we can use the with expression to create a shallow copy
+        // All delegate properties (event handlers) are immutable references and safe to share
+        return this with { };
+    }
 }

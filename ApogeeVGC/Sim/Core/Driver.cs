@@ -39,11 +39,11 @@ public class Driver
         Console.WriteLine($"p2 is {p2.GetType().Name}");
 
         // Start the AI players (don't await - they run in background)
-        var p1Task = p1.StartAsync();
-        var p2Task = p2.StartAsync();
+        Task p1Task = p1.StartAsync();
+        Task p2Task = p2.StartAsync();
 
         // Start consuming the omniscient stream to see battle output
-        var streamConsumerTask = Task.Run(async () =>
+        Task streamConsumerTask = Task.Run(async () =>
         {
             try
             {
@@ -59,19 +59,31 @@ public class Driver
         });
 
         // Initialize the battle by writing commands to the omniscient stream
-        string startCommand = $@">start {JsonSerializer.Serialize(spec)}
->player p1 {JsonSerializer.Serialize(p1Spec)}
->player p2 {JsonSerializer.Serialize(p2Spec)}";
+        string startCommand = $"""
+                               >start {JsonSerializer.Serialize(spec)}
+                               >player p1 {JsonSerializer.Serialize(p1Spec)}
+                               >player p2 {JsonSerializer.Serialize(p2Spec)}
+                               """;
 
         await streams.Omniscient.WriteAsync(startCommand);
 
-        // Wait for all tasks to complete (or any to fault)
+        // Wait for all tasks to complete (or timeout)
         try
         {
-            await Task.WhenAny(
-                Task.WhenAll(p1Task, p2Task, streamConsumerTask),
-                Task.Delay(TimeSpan.FromMinutes(5)) // Timeout after 5 minutes
-            );
+            var allTasks = Task.WhenAll(p1Task, p2Task, streamConsumerTask);
+            var timeoutTask = Task.Delay(TimeSpan.FromMinutes(5));
+
+            var completedTask = await Task.WhenAny(allTasks, timeoutTask);
+
+            if (completedTask == timeoutTask)
+            {
+                Console.WriteLine("Battle timed out after 5 minutes.");
+            }
+            else
+            {
+                // Wait for the allTasks to ensure we capture any exceptions
+                await allTasks;
+            }
         }
         catch (Exception ex)
         {
@@ -79,6 +91,21 @@ public class Driver
         }
         finally
         {
+            // Ensure all tasks are completed before disposing streams
+            // Give tasks a short grace period to finish after stream closure
+            try
+            {
+                await Task.WhenAll(p1Task, p2Task, streamConsumerTask).WaitAsync(TimeSpan.FromSeconds(5));
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine("Warning: Some tasks did not complete within grace period.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Task completion error: {ex.Message}");
+            }
+
             // Cleanup
             streams.Dispose();
             Console.WriteLine("Battle completed or timed out.");

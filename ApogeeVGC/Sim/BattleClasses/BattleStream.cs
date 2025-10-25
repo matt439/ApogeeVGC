@@ -788,7 +788,14 @@ public class PlayerReadStream : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
-        _outputChannel.Writer.Complete();
+        try
+        {
+            _outputChannel.Writer.Complete();
+        }
+        catch (ChannelClosedException)
+        {
+            // Channel already completed by background task - safe to ignore
+        }
         _disposed = true;
     }
 }
