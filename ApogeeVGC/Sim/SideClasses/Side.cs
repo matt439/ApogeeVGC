@@ -55,53 +55,6 @@ public class Side : IDisposable
 
     public RequestState RequestState { get; set; }
 
-    public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
-    {
-        // Copy side scripts from battle if needed
-
-        Battle = battle;
-        Id = sideNum;
-        //N = sideNum;
-
-        Name = name;
-        Avatar = string.Empty;
-
-        Team = team.ToList();
-        Pokemon = [];
-        foreach (PokemonSet set in Team)
-        {
-            AddPokemon(set);
-        }
-
-        Active = battle.GameType switch
-        {
-            GameType.Doubles => [null!, null!],
-            _ => [null!],
-        };
-
-        PokemonLeft = Pokemon.Count;
-
-        SideConditions = [];
-        SlotConditions = [];
-
-        // Initialize slot conditions for each active slot
-        for (int i = 0; i < Active.Count; i++)
-        {
-            SlotConditions.Add(new Dictionary<ConditionId, EffectState>());
-        }
-
-        Choice = new Choice
-        {
-            CantUndo = false,
-            Actions = [],
-            ForcedSwitchesLeft = 0,
-            ForcedPassesLeft = 0,
-            SwitchIns = [],
-            Terastallize = false,
-        };
-        Initialised = true;
-    }
-
     public Side(IBattle battle)
     {
         Battle = battle;
@@ -110,21 +63,49 @@ public class Side : IDisposable
         Avatar = string.Empty;
         Team = [];
         Pokemon = [];
+
         // Initialize Active list with proper size based on game type
         Active = battle.GameType switch
         {
             GameType.Doubles => [null!, null!],
             _ => [null!],
         };
+
         PokemonLeft = 0;
         SideConditions = [];
         SlotConditions = [];
+
         // Initialize slot conditions for each active slot
         for (int i = 0; i < Active.Count; i++)
         {
             SlotConditions.Add(new Dictionary<ConditionId, EffectState>());
         }
-        Choice = new Choice
+
+        Choice = CreateDefaultChoice();
+        Initialised = false;
+    }
+
+    public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
+        : this(battle)
+    {
+        // Override values set by base constructor
+        Id = sideNum;
+        Name = name;
+
+        // Add team-specific initialization
+        Team = team.ToList();
+        foreach (PokemonSet set in Team)
+        {
+            AddPokemon(set);
+        }
+
+        PokemonLeft = Pokemon.Count;
+        Initialised = true;
+    }
+
+    private Choice CreateDefaultChoice()
+    {
+        return new Choice
         {
             CantUndo = false,
             Actions = [],
@@ -133,7 +114,6 @@ public class Side : IDisposable
             SwitchIns = [],
             Terastallize = false,
         };
-        Initialised = false;
     }
 
     public JsonObject ToJson()
