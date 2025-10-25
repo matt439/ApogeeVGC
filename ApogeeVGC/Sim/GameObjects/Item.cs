@@ -136,17 +136,7 @@ public record Item : IPokemonEventMethods, IEffect, IBasicEffect
 
     public Item Copy()
     {
-        throw new NotImplementedException();
-        //return new Item
-        //{
-        //    Choice = Choice,
-        //    Name = Name,
-        //    SpriteNum = SpriteNum,
-        //    Fling = Fling with { },
-        //    Num = Num,
-        //    Gen = Gen,
-        //    Condition = Condition?.Copy(),
-        //};
+        return this with { };
     }
 
     #region PokemonMoveEventMethods Implementation
@@ -469,7 +459,7 @@ public record Item : IPokemonEventMethods, IEffect, IBasicEffect
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; init; }
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; init; }
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; init; }
+    public Func<IBattle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAnySetWeather { get; init; }
     public Func<IBattle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; init; }
     public Action<IBattle, Pokemon>? OnAnySwitchIn { get; init; }
     public Action<IBattle, Pokemon>? OnAnySwitchOut { get; init; }
