@@ -220,8 +220,6 @@ public class BattleStream : IDisposable
 
             case "p1":
             case "p2":
-            case "p3":
-            case "p4":
                 {
                     if (Battle == null)
                         throw new InvalidOperationException("Battle not started");
@@ -711,40 +709,24 @@ public class PlayerStreams : IDisposable
     /// </summary>
     public PlayerReadWriteStream P2 { get; }
 
-    /// <summary>
-    /// Stream for player 3.
-    /// </summary>
-    public PlayerReadWriteStream P3 { get; }
-
-    /// <summary>
-    /// Stream for player 4.
-    /// </summary>
-    public PlayerReadWriteStream P4 { get; }
-
     internal PlayerStreams(
         PlayerReadWriteStream omniscient,
         PlayerReadStream spectator,
         PlayerReadWriteStream p1,
-        PlayerReadWriteStream p2,
-        PlayerReadWriteStream p3,
-        PlayerReadWriteStream p4)
+        PlayerReadWriteStream p2)
     {
         Omniscient = omniscient;
         Spectator = spectator;
         P1 = p1;
         P2 = p2;
-        P3 = p3;
-        P4 = p4;
     }
 
     public void Dispose()
     {
-        Omniscient?.Dispose();
-        Spectator?.Dispose();
-        P1?.Dispose();
-        P2?.Dispose();
-        P3?.Dispose();
-        P4?.Dispose();
+        Omniscient.Dispose();
+        Spectator.Dispose();
+        P1.Dispose();
+        P2.Dispose();
     }
 }
 
@@ -753,19 +735,14 @@ public class PlayerStreams : IDisposable
 /// </summary>
 public class PlayerReadStream : IDisposable
 {
-    private readonly Channel<string> _outputChannel;
+    private readonly Channel<string> _outputChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
+    {
+        SingleReader = false,
+        SingleWriter = true,
+    });
     private bool _disposed;
 
     internal Channel<string> OutputChannel => _outputChannel;
-
-    public PlayerReadStream()
-    {
-        _outputChannel = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
-        {
-            SingleReader = false,
-            SingleWriter = true,
-        });
-    }
 
     /// <summary>
     /// Reads the next message from the stream.
@@ -858,7 +835,7 @@ public class PlayerReadWriteStream : PlayerReadStream
 }
 
 /// <summary>
-/// Splits a BattleStream into omniscient, spectator, p1, p2, p3 and p4 streams,
+/// Splits a BattleStream into omniscient, spectator, p1 and p2 streams,
 /// for ease of consumption.
 /// </summary>
 public static class BattleStreamExtensions
@@ -872,10 +849,8 @@ public static class BattleStreamExtensions
         var spectator = new PlayerReadStream();
         var p1 = new PlayerReadWriteStream(stream, "p1");
         var p2 = new PlayerReadWriteStream(stream, "p2");
-        var p3 = new PlayerReadWriteStream(stream, "p3");
-        var p4 = new PlayerReadWriteStream(stream, "p4");
 
-        var streams = new PlayerStreams(omniscient, spectator, p1, p2, p3, p4);
+        var streams = new PlayerStreams(omniscient, spectator, p1, p2);
 
         // Start background task to distribute messages
         _ = Task.Run(async () =>
@@ -891,14 +866,12 @@ public static class BattleStreamExtensions
                         case "update":
                             {
                                 // Extract channel messages for different perspectives
-                                var channelMessages = ExtractChannelMessages(data, [-1, 0, 1, 2, 3, 4]);
+                                var channelMessages = ExtractChannelMessages(data, [-1, 0, 1, 2]);
 
                                 await omniscient.PushAsync(string.Join('\n', channelMessages[-1]));
                                 await spectator.PushAsync(string.Join('\n', channelMessages[0]));
                                 await p1.PushAsync(string.Join('\n', channelMessages[1]));
                                 await p2.PushAsync(string.Join('\n', channelMessages[2]));
-                                await p3.PushAsync(string.Join('\n', channelMessages[3]));
-                                await p4.PushAsync(string.Join('\n', channelMessages[4]));
                                 break;
                             }
                         case "sideupdate":
@@ -908,8 +881,6 @@ public static class BattleStreamExtensions
                                 {
                                     "p1" => p1,
                                     "p2" => p2,
-                                    "p3" => p3,
-                                    "p4" => p4,
                                     _ => null
                                 };
 
@@ -930,8 +901,6 @@ public static class BattleStreamExtensions
                 spectator.PushEnd();
                 p1.PushEnd();
                 p2.PushEnd();
-                p3.PushEnd();
-                p4.PushEnd();
             }
             catch (Exception err)
             {
@@ -939,8 +908,6 @@ public static class BattleStreamExtensions
                 spectator.PushError(err, true);
                 p1.PushError(err, true);
                 p2.PushError(err, true);
-                p3.PushError(err, true);
-                p4.PushError(err, true);
             }
         });
 
