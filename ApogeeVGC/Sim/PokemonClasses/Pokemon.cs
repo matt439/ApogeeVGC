@@ -17,7 +17,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     public Side Side { get; }
     public IBattle Battle => Side.Battle;
     public PokemonSet Set { get; }
-    public string Name => Set.Name[..20];
+    public string Name => Set.Name[..Math.Min(20, Set.Name.Length)];
     public string FullName => $"{Side.Id.ToString()}: {Name}";
 
     public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
@@ -266,7 +266,7 @@ public class Pokemon : IPriorityComparison, IDisposable
     public override string ToString()
     {
         // Determine the full name to display (real or illusion)
-        string fullname = Illusion != null ? Illusion.Fullname : Fullname;
+        string fullname = Illusion != null ? Illusion.Fullname : FullName;
 
         // If active, combine slot identifier with name (skip first 2 chars of fullname)
         // Otherwise just return the full name
@@ -2500,7 +2500,7 @@ public class Pokemon : IPriorityComparison, IDisposable
             return false;
         }
 
-        // Run UseItem event to check if usage should proceed
+        // Run UseItem event for validation
         RelayVar? useItemEvent = Battle.RunEvent(EventId.UseItem, this, null,
             null, item);
         if (useItemEvent is BoolRelayVar { Value: false })
@@ -2602,7 +2602,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         // Clear pending staleness
         PendingStaleness = null;
 
-        // Trigger End event on the old item
+        // Trigger End event on the item
         Battle.SingleEvent(EventId.End, item, oldItemState, this);
 
         // Trigger AfterTakeItem event
@@ -2910,7 +2910,7 @@ public class Pokemon : IPriorityComparison, IDisposable
         {
             BoolRelayVar brv => brv.Value,
             null => false,
-            _ => true, // Non-boolean RelayVar types treated as success
+            _ => true, // Non-boolean RelayVar types are treated as success
         };
 
         if (!startSucceeded)

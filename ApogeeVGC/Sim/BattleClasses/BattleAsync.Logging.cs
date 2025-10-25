@@ -275,7 +275,7 @@ public partial class BattleAsync
             IntPart i => i.Value.ToString(),
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
-            PokemonPart p => p.Pokemon.ToString(),
+            PokemonPart p => p.Pokemon?.ToString() ?? string.Empty,
             SidePart s => s.Side.Id.ToString(),
             MovePart m => m.Move.Name,
             EffectPart e => e.Effect.Name,

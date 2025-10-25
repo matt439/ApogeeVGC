@@ -53,4 +53,9 @@ public class PokemonSlot(SideId sideId, int positionOffset)
             return targetPos;
         }
     }
+
+    public override string ToString()
+    {
+        return $"{SideId}{PositionLetter.ToString().ToLowerInvariant()}";
+    }
 }
