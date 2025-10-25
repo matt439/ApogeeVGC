@@ -138,8 +138,8 @@ public partial class BattleAsync : IBattle, IDisposable
         GameType = Format.GameType;
         Sides = new List<Side>(2)
         {
-            [0] = new Side(this),
-            [1] = new Side(this),
+            new Side(this),
+            new Side(this),
         };
         ActivePerHalf = 1;
         Prng = options.Prng ?? new Prng(options.Seed);
@@ -3384,7 +3384,7 @@ public partial class BattleAsync : IBattle, IDisposable
             string? choice = side.GetChoice().ToString();
             if (!string.IsNullOrEmpty(choice))
             {
-                InputLog.Add($">{side.Id} {choice}");
+                InputLog.Add($"> {side.Id} {choice}");
             }
         }
 

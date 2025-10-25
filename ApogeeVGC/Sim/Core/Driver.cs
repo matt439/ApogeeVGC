@@ -55,6 +55,12 @@ public class Driver
             catch (Exception ex)
             {
                 Console.WriteLine($"Stream consumer error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
+                }
             }
         });
 
@@ -88,6 +94,12 @@ public class Driver
         catch (Exception ex)
         {
             Console.WriteLine($"Battle error: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
+            }
         }
         finally
         {
@@ -104,6 +116,12 @@ public class Driver
             catch (Exception ex)
             {
                 Console.WriteLine($"Task completion error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
+                }
             }
 
             // Cleanup
