@@ -1,9 +1,10 @@
 ﻿using ApogeeVGC.Sim.Types;
+using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
-public record SpeciesFormat
+public record SpeciesFormat : ICopyable<SpeciesFormat>
 {
     public required SpecieId Id { get; init; }
     public Tier? DoublesTier
@@ -41,5 +42,18 @@ public record SpeciesFormat
                 field = value;
             }
         }
+    }
+
+    public SpeciesFormat Copy()
+    {
+        return new SpeciesFormat
+        {
+            Id = Id,
+            DoublesTier = DoublesTier,
+            GmaxUnreleased = GmaxUnreleased,
+            IsNonstandard = IsNonstandard,
+            NatDexTier = NatDexTier,
+            Tier = Tier,
+        };
     }
 }

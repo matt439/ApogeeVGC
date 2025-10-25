@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record Move : IMoveEventMethods, IBasicEffect
+public record Move : IMoveEventMethods, IBasicEffect, ICopyable<Move>
 {
     #region IMoveEventMethods Implementation
 

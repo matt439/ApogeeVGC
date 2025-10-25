@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
@@ -33,7 +34,7 @@ public enum NatureId
     None, // Used to hide nature from the opponent
 }
 
-public record Nature : IBasicEffect
+public record Nature : IBasicEffect, ICopyable<Nature>
 {
     public required NatureId Id { get; init; }
     public StatIdExceptHp? Plus { get; init; }

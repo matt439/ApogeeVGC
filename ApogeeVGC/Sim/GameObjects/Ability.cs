@@ -55,7 +55,7 @@ public enum AbilityId
 }
 
 
-public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect
+public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect, ICopyable<Ability>
 {
     public EffectType EffectType => EffectType.Ability;
     public required AbilityId Id { get; init; }

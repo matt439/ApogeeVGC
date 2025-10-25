@@ -53,7 +53,7 @@ public record FlingData
     public ConditionId? Status { get; init; }
 }
 
-public record Item : IPokemonEventMethods, IEffect, IBasicEffect
+public record Item : IPokemonEventMethods, IEffect, IBasicEffect, ICopyable<Item>
 {
     public ItemId Id { get; init; }
     public EffectStateId EffectStateId => Id;

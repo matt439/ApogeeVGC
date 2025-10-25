@@ -8,7 +8,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.GameObjects;
 
-public record Species : IEffect
+public record Species : IEffect, ICopyable<Species>
 {
     public const double Epsilon = 0.0001;
 

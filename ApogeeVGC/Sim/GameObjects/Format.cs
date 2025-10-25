@@ -31,7 +31,7 @@ public enum RuleId
     EndlessBattleClause,
 }
 
-public record Format : IEffect, IBasicEffect, IEventMethods
+public record Format : IEffect, IBasicEffect, IEventMethods, ICopyable<Format>
 {
     public FormatId FormatId { get; init; }
     public EffectStateId EffectStateId => FormatId;

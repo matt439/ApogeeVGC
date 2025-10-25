@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Reflection;
 
 namespace ApogeeVGC.Sim.Utils;
 
@@ -8,10 +7,10 @@ namespace ApogeeVGC.Sim.Utils;
 /// This ensures that mutable fields in the objects cannot be accidentally shared between different users of the Library.
 /// </summary>
 /// <typeparam name="TKey">The type of the dictionary keys</typeparam>
-/// <typeparam name="TValue">The type of the dictionary values, must have a Copy() method</typeparam>
+/// <typeparam name="TValue">The type of the dictionary values, must implement ICopyable</typeparam>
 internal class ReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> innerDictionary)
     : IReadOnlyDictionary<TKey, TValue>
-    where TValue : class
+    where TValue : ICopyable<TValue>
 {
     public TValue this[TKey key]
     {
@@ -43,24 +42,11 @@ internal class ReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionary<TKey,
             value = CopyValue(originalValue);
             return true;
         }
-        value = null!;
+        value = default!;
         return false;
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static TValue CopyValue(TValue value)
-    {
-        // Use reflection to call the Copy method dynamically
-        MethodInfo? copyMethod = typeof(TValue).GetMethod("Copy");
-        if (copyMethod != null)
-        {
-            return (TValue)copyMethod.Invoke(value, null)!;
-        }
-
-        // If no Copy method exists, throw an exception with helpful information
-        throw new InvalidOperationException($"Value {typeof(TValue).Name} does not have a Copy() method. " +
-                                          "All types used in Library must implement a Copy() method for" +
-                                          "proper isolation.");
-    }
+    private static TValue CopyValue(TValue value) => value.Copy();
 }

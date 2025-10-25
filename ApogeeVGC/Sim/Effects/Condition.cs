@@ -10,7 +10,8 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Effects;
 
-public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect
+public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect,
+    ICopyable<Condition>
 {
     public required ConditionId Id { get; init; }
     public EffectStateId EffectStateId => Id;

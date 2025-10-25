@@ -1,6 +1,8 @@
-﻿namespace ApogeeVGC.Sim.Events;
+﻿using ApogeeVGC.Sim.Utils;
 
-public record EventIdInfo
+namespace ApogeeVGC.Sim.Events;
+
+public record EventIdInfo : ICopyable<EventIdInfo>
 {
     public EventId Id { get; init; }
     public EventPrefix Prefix { get; init; } = EventPrefix.None;
@@ -144,5 +146,23 @@ public record EventIdInfo
 
         // For prefixed events, return the base without the prefix
         return GetBaseEventId();
+    }
+
+    public EventIdInfo Copy()
+    {
+        return new EventIdInfo
+        {
+            Id = Id,
+            Prefix = Prefix,
+            Suffix = Suffix,
+            Type = Type,
+            BaseEventId = BaseEventId,
+            FieldEventId = FieldEventId,
+            SideEventId = SideEventId,
+            UsesEffectOrder = UsesEffectOrder,
+            UsesSpeed = UsesSpeed,
+            UsesFractionalSpeed = UsesFractionalSpeed,
+            UsesLeftToRightOrder = UsesLeftToRightOrder,
+        };
     }
 }
