@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Utils;
+﻿using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 

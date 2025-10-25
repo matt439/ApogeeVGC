@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Unions;
 using System.Text.Json;
 
 namespace ApogeeVGC.Sim.SideClasses;

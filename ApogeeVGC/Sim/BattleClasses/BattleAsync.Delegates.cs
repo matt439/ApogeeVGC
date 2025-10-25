@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
