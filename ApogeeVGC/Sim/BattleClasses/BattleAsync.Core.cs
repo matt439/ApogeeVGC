@@ -2344,15 +2344,7 @@ public partial class BattleAsync : IBattle, IDisposable
         return relayVar;
     }
 
-    public MoveCategory GetCategory(ActiveMove move)
-    {
-        return move.Category;
-    }
-
-    public int Randomizer(int baseDamage)
-    {
-        return Trunc(Trunc(baseDamage * (100 - Random(16))) / 100);
-    }
+    
 
     /// <summary>
     /// Returns whether a proposed target location for a move is valid.
@@ -3950,10 +3942,7 @@ public partial class BattleAsync : IBattle, IDisposable
             _ => throw new ArgumentOutOfRangeException(nameof(id), $"Invalid Side: {id}"),
         };
     }
-    public int GetOverflowedTurnCount()
-    {
-        return Gen >= 8 ? (Turn - 1) % 256 : Turn - 1;
-    }
+    
 
     /// <summary>
     /// Initializes an EffectState object with proper effect ordering.
