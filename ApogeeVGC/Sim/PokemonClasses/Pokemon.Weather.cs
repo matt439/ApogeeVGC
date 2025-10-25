@@ -1,5 +1,5 @@
 ﻿using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Items;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 

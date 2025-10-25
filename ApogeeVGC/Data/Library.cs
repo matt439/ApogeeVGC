@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Items;
 
 namespace ApogeeVGC.Data;
 

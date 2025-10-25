@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.GameObjects;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
