@@ -250,7 +250,7 @@ public partial class Pokemon : IPriorityComparison, IDisposable
         MaxHp = 1;
         
         // Initialize species and stats - this sets MaxHp, StoredStats, etc.
-        SetSpecie(BaseSpecies, null);
+        SetSpecie(BaseSpecies, Battle.Effect);
         
         Hp = MaxHp;
         Details = GetUpdatedDetails();
