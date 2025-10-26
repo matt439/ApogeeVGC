@@ -561,6 +561,6 @@ public partial class Pokemon
         AbilityState.Started = null;
         ItemState.Started = null;
 
-        SetSpecie(BaseSpecies, Battle.Effect);
+        SetSpecies(BaseSpecies, Battle.Effect);
     }
 }

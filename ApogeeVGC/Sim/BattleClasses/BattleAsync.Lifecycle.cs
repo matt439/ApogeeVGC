@@ -424,7 +424,7 @@ public partial class BattleAsync
 
                         if (rawSpecies == null) continue;
 
-                        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
+                        Species? species = pokemon.SetSpecies(rawSpecies, Effect);
                         if (species == null) continue;
 
                         pokemon.BaseSpecies = rawSpecies;

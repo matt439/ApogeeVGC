@@ -29,7 +29,7 @@ public partial class Pokemon
         }
 
         // Set species
-        if (SetSpecie(species, effect, isTransform: true) == null)
+        if (SetSpecies(species, effect, isTransform: true) == null)
             return false;
 
         // Mark as transformed and copy weight
@@ -153,7 +153,7 @@ public partial class Pokemon
     /// <summary>
     /// Default is Battle.Effect for source.
     /// </summary>
-    public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
+    public Species? SetSpecies(Species rawSpecies, IEffect? source, bool isTransform = false)
     {
         RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
         if (rv is null) return null;
@@ -212,7 +212,7 @@ public partial class Pokemon
         Species rawSpecies = Battle.Library.Species[specieId];
 
         // Attempt to set the species
-        Species? species = SetSpecie(rawSpecies, source);
+        Species? species = SetSpecies(rawSpecies, source);
         if (species == null) return false;
 
         // Determine the species the opponent sees (accounting for Illusion)

@@ -246,11 +246,11 @@ public partial class Pokemon : IPriorityComparison, IDisposable
 
         ClearVolatile();
         
-        // Initialize MaxHp to a non-zero value so SetSpecie will set it properly
+        // Initialize MaxHp to a non-zero value so SetSpecies will set it properly
         MaxHp = 1;
         
         // Initialize species and stats - this sets MaxHp, StoredStats, etc.
-        SetSpecie(BaseSpecies, Battle.Effect);
+        SetSpecies(BaseSpecies, Battle.Effect);
         
         Hp = MaxHp;
         Details = GetUpdatedDetails();
