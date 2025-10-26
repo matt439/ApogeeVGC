@@ -19,56 +19,56 @@ public static class State
 {
     private const string Positions = "abcdefghijklmnopqrstuvwx";
 
-    private static readonly IReadOnlyList<string> Battle = new List<string>
-    {
-        "dex",
-        "gen",
-        "ruleTable",
-        "id",
-        "log",
-        "inherit",
-        "format",
-        "teamGenerator",
-        "HIT_SUBSTITUTE",
-        "NOT_FAIL",
-        "FAIL",
-        "SILENT_FAIL",
-        "field",
-        "sides",
-        "prng",
-        "hints",
-        "deserialized",
-        "queue",
-        "actions",
-    };
+    //private static readonly IReadOnlyList<string> Battle = new List<string>
+    //{
+    //    "dex",
+    //    "gen",
+    //    "ruleTable",
+    //    "id",
+    //    "log",
+    //    "inherit",
+    //    "format",
+    //    "teamGenerator",
+    //    "HIT_SUBSTITUTE",
+    //    "NOT_FAIL",
+    //    "FAIL",
+    //    "SILENT_FAIL",
+    //    "field",
+    //    "sides",
+    //    "prng",
+    //    "hints",
+    //    "deserialized",
+    //    "queue",
+    //    "actions",
+    //};
 
-    private static readonly IReadOnlyList<string> Side = new List<string>
-    {
-        "battle",
-        "team",
-        "pokemon",
-        "choice",
-        "activeRequest",
-    };
+    //private static readonly IReadOnlyList<string> Side = new List<string>
+    //{
+    //    "battle",
+    //    "team",
+    //    "pokemon",
+    //    "choice",
+    //    "activeRequest",
+    //};
 
-    private static readonly IReadOnlyList<string> Pokemon = new List<string>
-    {
-        "side",
-        "battle",
-        "set",
-        "name",
-        "fullname",
-        "id",
-        "happiness",
-        "level",
-        "pokeball",
-        "baseMoveSlots",
-    };
+    //private static readonly IReadOnlyList<string> Pokemon = new List<string>
+    //{
+    //    "side",
+    //    "battle",
+    //    "set",
+    //    "name",
+    //    "fullname",
+    //    "id",
+    //    "happiness",
+    //    "level",
+    //    "pokeball",
+    //    "baseMoveSlots",
+    //};
 
-    private static readonly IReadOnlyList<string> Choice = new List<string>
-    {
-        "switchIns",
-    };
+    //private static readonly IReadOnlyList<string> Choice = new List<string>
+    //{
+    //    "switchIns",
+    //};
 
     private static readonly IReadOnlyList<string> ActiveMove = new List<string>
     {
@@ -77,32 +77,180 @@ public static class State
 
     public static JsonObject SerializeBattle(IBattle battle)
     {
-        throw new NotImplementedException();
+        // Battle skip list from TypeScript
+        var skip = new List<string> 
+        { 
+            "Dex", "Gen", "RuleTable", "Id", "Log", "Inherit", "Format", "TeamGenerator",
+            "HIT_SUBSTITUTE", "NOT_FAIL", "FAIL", "SILENT_FAIL", "Field", "Sides", "Prng", 
+            "Hints", "Deserialized", "Queue", "Actions", "Library"
+        };
+        
+        JsonObject state = Serialize(battle, skip, battle);
+        
+        // Serialize Field
+        state["field"] = SerializeField(battle.Field);
+        
+        // Serialize Sides array
+        state["sides"] = new JsonArray(
+            battle.Sides.Select(SerializeSide).ToArray()
+        );
+        
+        // Serialize PRNG seed
+        state["prng"] = battle.Prng.GetSeed().Seed;
+        
+        // Serialize hints as array (if battle has hints)
+        // Note: hints might not be accessible on IBattle interface
+        // We'll handle this via reflection if needed
+        try
+        {
+            PropertyInfo? hintsProperty = battle.GetType().GetProperty("Hints");
+            if (hintsProperty != null)
+            {
+                object? hints = hintsProperty.GetValue(battle);
+                if (hints is System.Collections.IEnumerable hintsEnum)
+                {
+                    var hintsList = (from object? hint in hintsEnum select hint?.ToString() ??
+                        string.Empty).ToList();
+                    state["hints"] = new JsonArray(hintsList.Select(h => JsonValue.Create(h)).ToArray());
+                }
+            }
+        }
+        catch
+        {
+            // If hints aren't available, just skip them
+            state["hints"] = new JsonArray();
+        }
+        
+        // Serialize log - we treat log specially to avoid mutations
+        // Note: log might not be accessible on IBattle interface
+        try
+        {
+            PropertyInfo? logProperty = battle.GetType().GetProperty("Log");
+            if (logProperty != null)
+            {
+                object? log = logProperty.GetValue(battle);
+                if (log is List<string> logList)
+                {
+                    state["log"] = new JsonArray(logList.Select(l => JsonValue.Create(l)).ToArray());
+                }
+            }
+        }
+        catch
+        {
+            // If log isn't available, use empty array
+            state["log"] = new JsonArray();
+        }
+        
+        // Serialize queue list
+        state["queue"] = SerializeWithRefs(battle.Queue.List, battle) as JsonNode;
+        
+        // Get format ID if available
+        try
+        {
+            PropertyInfo? formatProperty = battle.GetType().GetProperty("Format");
+            if (formatProperty != null)
+            {
+                object? format = formatProperty.GetValue(battle);
+                if (format != null)
+                {
+                    PropertyInfo? idProperty = format.GetType().GetProperty("Id");
+                    if (idProperty != null)
+                    {
+                        object? formatId = idProperty.GetValue(format);
+                        state["formatid"] = formatId?.ToString() ?? "gen9customgame";
+                    }
+                }
+            }
+            else
+            {
+                state["formatid"] = "gen9customgame";
+            }
+        }
+        catch
+        {
+            state["formatid"] = "gen9customgame";
+        }
+        
+        return state;
     }
 
     public static IBattle DeserializeBattle(JsonObject serialized)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException(
+            "DeserializeBattle from JsonObject requires battle reconstruction logic. " +
+            "This would need to:\n" +
+            "1. Extract team data from sides\n" +
+            "2. Create a new Battle instance with the teams\n" +
+            "3. Reorder Pokemon arrays to match serialized state\n" +
+            "4. Deserialize all battle state\n" +
+            "5. Restore queue and other runtime state\n\n" +
+            "This is complex and requires knowledge of Battle constructor and initialization. " +
+            "For now, use the string overload with JSON, or implement battle-specific reconstruction logic.");
     }
 
     public static IBattle DeserializeBattle(string serialized)
     {
-        throw new NotImplementedException();
+        JsonObject? state = JsonNode.Parse(serialized)?.AsObject();
+        if (state == null)
+        {
+            throw new InvalidOperationException("Failed to parse serialized battle state");
+        }
+        
+        return DeserializeBattle(state);
     }
 
     public static JsonObject Normalize(JsonObject state)
     {
-        throw new NotImplementedException();
+        // Normalize the log to remove timestamp variations
+        if (state.ContainsKey("log"))
+        {
+            if (state["log"] is JsonArray logArray)
+            {
+                var normalizedLog = NormalizeLog(
+                    logArray.Select(l => l?.GetValue<string>() ?? string.Empty).ToList()
+                );
+                state["log"] = new JsonArray(normalizedLog.Select(l => JsonValue.Create(l)).ToArray());
+            }
+            else if (state["log"]?.GetValue<string>() is { } logString)
+            {
+                var normalizedLog = NormalizeLog(logString);
+                state["log"] = new JsonArray(normalizedLog.Select(l => JsonValue.Create(l)).ToArray());
+            }
+        }
+        
+        return state;
     }
 
     public static List<string> NormalizeLog(List<string>? log = null)
     {
-        throw new NotImplementedException();
+        if (log == null || log.Count == 0)
+        {
+            return new List<string>();
+        }
+        
+        // Normalize each line by removing timestamp variations
+        // Lines starting with "|t:|" are normalized to just "|t:|"
+        return log.Select(line =>
+            line.StartsWith("|t:|") ? "|t:|" : line
+        ).ToList();
     }
 
     public static List<string> NormalizeLog(string log)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(log))
+        {
+            return new List<string>();
+        }
+        
+        // Split the log string into lines
+        string[] lines = log.Split('\n');
+        
+        // Normalize each line
+        var normalized = lines.Select(line =>
+            line.StartsWith("|t:|") ? "|t:|" : line
+        ).ToList();
+        
+        return normalized;
     }
 
     public static JsonObject SerializeField(Field field)
@@ -148,8 +296,7 @@ public static class State
             foreach (var kvp in pseudoWeatherJson)
             {
                 var conditionId = Enum.Parse<ConditionId>(kvp.Key);
-                var effectState = DeserializeWithRefs(kvp.Value, battle) as EffectState;
-                if (effectState != null)
+                if (DeserializeWithRefs(kvp.Value, battle) is EffectState effectState)
                 {
                     field.PseudoWeather[conditionId] = effectState;
                 }
@@ -165,24 +312,19 @@ public static class State
         
         // Manually serialize pokemon array
         state["pokemon"] = new JsonArray(
-            side.Pokemon.Select(p => SerializePokemon(p)).ToArray()
+            side.Pokemon.Select(SerializePokemon).ToArray()
         );
         
         // Encode team as position string (e.g., "1,2,3" or "123")
         // This represents the original team order mapping to current pokemon array positions
-        var team = new List<int>();
-        for (int i = 0; i < side.Pokemon.Count; i++)
-        {
-            // Find where this pokemon's set appears in the original team
-            int teamIndex = side.Team.IndexOf(side.Pokemon[i].Set);
-            team.Add(teamIndex + 1); // 1-indexed
-        }
+        var team = side.Pokemon.Select(t =>
+            side.Team.IndexOf(t.Set)).Select(teamIndex => teamIndex + 1).ToList();
         state["team"] = team.Count > 9 
             ? string.Join(",", team) 
             : string.Join("", team);
         
         // Serialize choice (special handling for SwitchIns set)
-        JsonObject choiceState = Serialize(side.Choice, new List<string> { "SwitchIns" }, side.Battle);
+        JsonObject choiceState = Serialize(side.Choice, ["SwitchIns"], side.Battle);
         choiceState["switchIns"] = new JsonArray(
             side.Choice.SwitchIns.Select(i => JsonValue.Create(i)).ToArray()
         );
@@ -252,7 +394,7 @@ public static class State
         var skip = new List<string> 
         { 
             "Side", "Battle", "Set", "Name", "FullName", "Fullname", "Id",
-            "Happiness", "Level", "Pokeball", "BaseMoveSlots"
+            "Happiness", "Level", "Pokeball", "BaseMoveSlots",
         };
         JsonObject state = Serialize(pokemon, skip, pokemon.Battle);
         
@@ -289,14 +431,12 @@ public static class State
         // baseMoveSlots and moveSlots need to point to the same objects (identity, not equality)
         if (state.ContainsKey("baseMoveSlots"))
         {
-            var baseMoveSlots = DeserializeWithRefs(state["baseMoveSlots"], battle) as List<object?>;
-            if (baseMoveSlots != null)
+            if (DeserializeWithRefs(state["baseMoveSlots"], battle) is List<object?> baseMoveSlots)
             {
                 var typedBaseMoveSlots = new List<MoveSlot>();
                 for (int i = 0; i < baseMoveSlots.Count; i++)
                 {
-                    var moveSlot = baseMoveSlots[i] as MoveSlot;
-                    if (moveSlot != null)
+                    if (baseMoveSlots[i] is MoveSlot moveSlot)
                     {
                         // If this matches a moveSlot, use the moveSlot reference instead
                         if (i < pokemon.MoveSlots.Count)
@@ -369,8 +509,8 @@ public static class State
         // We use reflection to compare properties
         Type activeMoveType = typeof(ActiveMove);
         Type baseMoveType = typeof(Move);
-        var baseProperties = baseMoveType.GetProperties(System.Reflection.BindingFlags.Public | 
-                                                        System.Reflection.BindingFlags.Instance);
+        var baseProperties = baseMoveType.GetProperties(BindingFlags.Public | 
+                                                        BindingFlags.Instance);
         
         foreach (PropertyInfo prop in baseProperties)
         {
@@ -428,12 +568,12 @@ public static class State
         ReferableUndefinedUnion referableUnion = FromRef(moveRef, battle);
         Move baseMove = referableUnion switch
         {
-            ReferableReferableUndefinedUnion r when r.Referable is MoveReferable m => m.Move,
-            _ => throw new InvalidOperationException($"Invalid move reference: {moveRef}")
+            ReferableReferableUndefinedUnion { Referable: MoveReferable m } => m.Move,
+            _ => throw new InvalidOperationException($"Invalid move reference: {moveRef}"),
         };
         
         // Use the Move's ToActiveMove method to create a(n) ActiveMove with all properties copied
-        ActiveMove activeMove = baseMove.ToActiveMove();
+        var activeMove = baseMove.ToActiveMove();
         
         // Now deserialize the changed properties onto the active move
         Deserialize(state, activeMove, ActiveMove.ToList(), battle);
@@ -652,7 +792,7 @@ public static class State
         if (string.IsNullOrEmpty(str) || char.IsLower(str[0]))
             return str;
             
-        return char.ToLowerInvariant(str[0]) + str.Substring(1);
+        return char.ToLowerInvariant(str[0]) + str[1..];
     }
 
     public static bool IsReferable(object obj)
@@ -661,15 +801,15 @@ public static class State
         {
             IBattle => true,
             Field => true,
-            SideClasses.Side => true,
-            PokemonClasses.Pokemon => true,
+            Side => true,
+            Pokemon => true,
             Condition => true,
             Ability => true,
             Item => true,
             Moves.ActiveMove => true,  // Check ActiveMove before Move since it inherits from Move
             Move => true,
             Species => true,
-            _ => false
+            _ => false,
         };
     }
 
@@ -733,8 +873,8 @@ public static class State
             return ReferableUndefinedUnion.FromUndefined();
         }
 
-        string type = content.Substring(0, colonIndex);
-        string id = content.Substring(colonIndex + 1);
+        string type = content[..colonIndex];
+        string id = content[(colonIndex + 1)..];
 
         return type switch
         {
@@ -760,7 +900,7 @@ public static class State
             throw new ArgumentException($"Invalid side reference format: {id}", nameof(id));
         }
 
-        int sideIndex = int.Parse(id.Substring(1)) - 1;
+        int sideIndex = int.Parse(id[1..]) - 1;
         
         if (sideIndex < 0 || sideIndex >= battle.Sides.Count)
         {
@@ -782,13 +922,13 @@ public static class State
         }
 
         // Extract side ID (e.g., "p1")
-        string sideId = id.Substring(0, 2);
+        string sideId = id[..2];
         
         // Extract position letter (e.g., "a")
         char positionLetter = id[2];
         
         // Parse the side
-        int sideIndex = int.Parse(sideId.Substring(1)) - 1;
+        int sideIndex = int.Parse(sideId[1..]) - 1;
         
         if (sideIndex < 0 || sideIndex >= battle.Sides.Count)
         {
