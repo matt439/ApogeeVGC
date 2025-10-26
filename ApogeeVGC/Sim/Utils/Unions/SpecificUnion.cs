@@ -939,3 +939,46 @@ public record SharedString(string Value) : Shared
 {
     public override string ToString() => Value;
 }
+
+
+
+/// <summary>
+/// Battle | Field | Side | Pokemon | Condition | Ability | Item | Move | Species
+/// </summary>
+public abstract record Referable
+{
+    public static Referable FromIBattle(IBattle battle) => new BattleReferable(battle);
+    public static implicit operator Referable(Field field) => new FieldReferable(field);
+    public static implicit operator Referable(Side side) => new SideReferable(side);
+    public static implicit operator Referable(Pokemon pokemon) => new PokemonReferable(pokemon);
+    public static implicit operator Referable(Condition condition) => new ConditionReferable(condition);
+    public static implicit operator Referable(Ability ability) => new AbilityReferable(ability);
+    public static implicit operator Referable(Item item) => new ItemReferable(item);
+    public static implicit operator Referable(ActiveMove move) => new MoveReferable(move);
+    public static implicit operator Referable(Species species) => new SpeciesReferable(species);
+}
+public record BattleReferable(IBattle Battle) : Referable;
+public record FieldReferable(Field Field) : Referable;
+public record SideReferable(Side Side) : Referable;
+public record PokemonReferable(Pokemon Pokemon) : Referable;
+public record ConditionReferable(Condition Condition) : Referable;
+public record AbilityReferable(Ability Ability) : Referable;
+public record ItemReferable(Item Item) : Referable;
+public record MoveReferable(ActiveMove Move) : Referable;
+public record SpeciesReferable(Species Species) : Referable;
+
+
+
+/// <summary>
+/// Referable | undefined
+/// </summary>
+public abstract record ReferableUndefinedUnion
+{
+    public static implicit operator ReferableUndefinedUnion(Referable referable) =>
+        new ReferableReferableUndefinedUnion(referable);
+    public static ReferableUndefinedUnion FromUndefined() => new UndefinedReferableUndefinedUnion();
+    public static implicit operator ReferableUndefinedUnion(Undefined value) =>
+        new UndefinedReferableUndefinedUnion();
+}
+public record ReferableReferableUndefinedUnion(Referable Referable) : ReferableUndefinedUnion;
+public record UndefinedReferableUndefinedUnion : ReferableUndefinedUnion;

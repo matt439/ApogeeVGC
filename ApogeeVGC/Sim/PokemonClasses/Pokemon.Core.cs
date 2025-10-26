@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Abilities;
+﻿using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
@@ -7,6 +8,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -271,6 +273,11 @@ public partial class Pokemon : IPriorityComparison, IDisposable
         // If active, combine slot identifier with name (skip first 2 chars of fullname)
         // Otherwise just return the full name
         return IsActive ? GetSlot() + fullname[2..] : fullname;
+    }
+
+    public JsonObject ToJson()
+    {
+        return State.SerializePokemon(this);
     }
 
     public PokemonDetails GetUpdatedDetails(int? level = null)
