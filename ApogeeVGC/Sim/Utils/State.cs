@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Reflection;
+using System.Text.Json.Nodes;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -18,7 +19,7 @@ public static class State
 {
     private const string Positions = "abcdefghijklmnopqrstuvwx";
 
-    private static IReadOnlyList<string> _battle = new List<string>
+    private static readonly IReadOnlyList<string> Battle = new List<string>
     {
         "dex",
         "gen",
@@ -41,7 +42,7 @@ public static class State
         "actions",
     };
 
-    private static IReadOnlyList<string> _side = new List<string>
+    private static readonly IReadOnlyList<string> Side = new List<string>
     {
         "battle",
         "team",
@@ -50,7 +51,7 @@ public static class State
         "activeRequest",
     };
 
-    private static IReadOnlyList<string> _pokemon = new List<string>
+    private static readonly IReadOnlyList<string> Pokemon = new List<string>
     {
         "side",
         "battle",
@@ -64,12 +65,12 @@ public static class State
         "baseMoveSlots",
     };
 
-    private static IReadOnlyList<string> _choice = new List<string>
+    private static readonly IReadOnlyList<string> Choice = new List<string>
     {
         "switchIns",
     };
 
-    private static IReadOnlyList<string> _activeMove = new List<string>
+    private static readonly IReadOnlyList<string> ActiveMove = new List<string>
     {
         "move",
     };
@@ -106,32 +107,239 @@ public static class State
 
     public static JsonObject SerializeField(Field field)
     {
-        throw new NotImplementedException();
+        // Field has special skip list - we skip 'id' and 'battle'
+        var skip = new List<string> { "Id", "Battle" };
+        JsonObject state = Serialize(field, skip, field.Battle);
+        
+        // Weather and Terrain are just IDs (enums), they serialize fine
+        // WeatherState and TerrainState are EffectState objects that need to be serialized
+        // PseudoWeather is a Dictionary<ConditionId, EffectState> that needs special handling
+        
+        // The generic Serialize should handle most of this, but we need to ensure
+        // PseudoWeather dictionary is properly converted
+        if (field.PseudoWeather.Count > 0)
+        {
+            var pseudoWeatherJson = new JsonObject();
+            foreach (var kvp in field.PseudoWeather)
+            {
+                pseudoWeatherJson[kvp.Key.ToString()] = SerializeWithRefs(kvp.Value, field.Battle) as JsonNode;
+            }
+            state["pseudoWeather"] = pseudoWeatherJson;
+        }
+        
+        return state;
     }
 
     public static void DeserializeField(JsonObject state, out Field field)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("DeserializeField requires a battle context - use the IBattle parameter version");
+    }
+    
+    public static void DeserializeField(JsonObject state, Field field, IBattle battle)
+    {
+        // Field deserialization is simpler - we just update the existing field
+        var skip = new List<string> { "Id", "Battle", "PseudoWeather" };
+        Deserialize(state, field, skip, battle);
+        
+        // Handle PseudoWeather dictionary specially
+        if (state.ContainsKey("pseudoWeather") && state["pseudoWeather"] is JsonObject pseudoWeatherJson)
+        {
+            field.PseudoWeather.Clear();
+            foreach (var kvp in pseudoWeatherJson)
+            {
+                var conditionId = Enum.Parse<ConditionId>(kvp.Key);
+                var effectState = DeserializeWithRefs(kvp.Value, battle) as EffectState;
+                if (effectState != null)
+                {
+                    field.PseudoWeather[conditionId] = effectState;
+                }
+            }
+        }
     }
 
     public static JsonObject SerializeSide(Side side)
     {
-        throw new NotImplementedException();
+        // Side skip list from TypeScript: battle, team, pokemon, choice, activeRequest
+        var skip = new List<string> { "Battle", "Team", "Pokemon", "Choice", "ActiveRequest" };
+        JsonObject state = Serialize(side, skip, side.Battle);
+        
+        // Manually serialize pokemon array
+        state["pokemon"] = new JsonArray(
+            side.Pokemon.Select(p => SerializePokemon(p)).ToArray()
+        );
+        
+        // Encode team as position string (e.g., "1,2,3" or "123")
+        // This represents the original team order mapping to current pokemon array positions
+        var team = new List<int>();
+        for (int i = 0; i < side.Pokemon.Count; i++)
+        {
+            // Find where this pokemon's set appears in the original team
+            int teamIndex = side.Team.IndexOf(side.Pokemon[i].Set);
+            team.Add(teamIndex + 1); // 1-indexed
+        }
+        state["team"] = team.Count > 9 
+            ? string.Join(",", team) 
+            : string.Join("", team);
+        
+        // Serialize choice (special handling for SwitchIns set)
+        JsonObject choiceState = Serialize(side.Choice, new List<string> { "SwitchIns" }, side.Battle);
+        choiceState["switchIns"] = new JsonArray(
+            side.Choice.SwitchIns.Select(i => JsonValue.Create(i)).ToArray()
+        );
+        state["choice"] = choiceState;
+        
+        // ActiveRequest: If null, encode as tombstone to prevent recomputation
+        if (side.ActiveRequest == null)
+        {
+            state["activeRequest"] = JsonValue.Create((string?)null);
+        }
+        // Otherwise, skip it (will be recomputed during deserialization)
+        
+        return state;
     }
 
     public static void DeserializeSide(JsonObject state, out Side side)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("DeserializeSide requires a battle context - use the IBattle parameter version");
+    }
+    
+    public static void DeserializeSide(JsonObject state, Side side, IBattle battle)
+    {
+        // Side skip list (same as serialization)
+        var skip = new List<string> { "Battle", "Team", "Pokemon", "Choice", "ActiveRequest" };
+        Deserialize(state, side, skip, battle);
+        
+        // Deserialize pokemon array
+        if (state.ContainsKey("pokemon") && state["pokemon"] is JsonArray pokemonArray)
+        {
+            for (int i = 0; i < pokemonArray.Count && i < side.Pokemon.Count; i++)
+            {
+                if (pokemonArray[i] is JsonObject pokemonState)
+                {
+                    DeserializePokemon(pokemonState, side.Pokemon[i], battle);
+                }
+            }
+        }
+        
+        // Deserialize choice
+        if (state.ContainsKey("choice") && state["choice"] is JsonObject choiceState)
+        {
+            var choiceSkip = new List<string> { "SwitchIns" };
+            Deserialize(choiceState, side.Choice, choiceSkip, battle);
+            
+            // Deserialize SwitchIns set
+            if (choiceState.ContainsKey("switchIns") && choiceState["switchIns"] is JsonArray switchInsArray)
+            {
+                side.Choice.SwitchIns.Clear();
+                foreach (JsonNode? item in switchInsArray)
+                {
+                    if (item != null)
+                    {
+                        side.Choice.SwitchIns.Add(item.GetValue<int>());
+                    }
+                }
+            }
+        }
+        
+        // Note: team string is not deserialized back - it's only used during
+        // battle reconstruction to reorder pokemon correctly
     }
 
     public static JsonObject SerializePokemon(Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        // Pokemon skip list from TypeScript: side, battle, set, name, fullname, id, 
+        // happiness, level, pokeball, baseMoveSlots
+        var skip = new List<string> 
+        { 
+            "Side", "Battle", "Set", "Name", "FullName", "Fullname", "Id",
+            "Happiness", "Level", "Pokeball", "BaseMoveSlots"
+        };
+        JsonObject state = Serialize(pokemon, skip, pokemon.Battle);
+        
+        // Manually add the set
+        state["set"] = SerializeWithRefs(pokemon.Set, pokemon.Battle) as JsonNode;
+        
+        // Only serialize baseMoveSlots if they differ from moveSlots
+        if (pokemon.BaseMoveSlots.Count != pokemon.MoveSlots.Count ||
+            !pokemon.BaseMoveSlots.Select((ms, i) => (ms, i))
+                .All(pair => ReferenceEquals(pair.ms, pokemon.MoveSlots[pair.i])))
+        {
+            state["baseMoveSlots"] = SerializeWithRefs(pokemon.BaseMoveSlots, pokemon.Battle) as JsonNode;
+        }
+        
+        return state;
     }
 
     public static void DeserializePokemon(JsonObject state, out Pokemon pokemon)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException("DeserializePokemon requires a battle context - use the IBattle parameter version");
+    }
+    
+    public static void DeserializePokemon(JsonObject state, Pokemon pokemon, IBattle battle)
+    {
+        // Pokemon skip list (same as serialization plus baseMoveSlots which needs special handling)
+        var skip = new List<string> 
+        { 
+            "Side", "Battle", "Set", "Name", "FullName", "Fullname", "Id",
+            "Happiness", "Level", "Pokeball", "BaseMoveSlots"
+        };
+        Deserialize(state, pokemon, skip, battle);
+        
+        // Set is readonly, so we skip it during deserialization
+        // baseMoveSlots and moveSlots need to point to the same objects (identity, not equality)
+        if (state.ContainsKey("baseMoveSlots"))
+        {
+            var baseMoveSlots = DeserializeWithRefs(state["baseMoveSlots"], battle) as List<object?>;
+            if (baseMoveSlots != null)
+            {
+                var typedBaseMoveSlots = new List<MoveSlot>();
+                for (int i = 0; i < baseMoveSlots.Count; i++)
+                {
+                    var moveSlot = baseMoveSlots[i] as MoveSlot;
+                    if (moveSlot != null)
+                    {
+                        // If this matches a moveSlot, use the moveSlot reference instead
+                        if (i < pokemon.MoveSlots.Count)
+                        {
+                            MoveSlot currentMoveSlot = pokemon.MoveSlots[i];
+                            // Check if IDs match and it's not virtual
+                            if (currentMoveSlot.Id == moveSlot.Id && (currentMoveSlot.Virtual != true))
+                            {
+                                typedBaseMoveSlots.Add(currentMoveSlot);
+                                continue;
+                            }
+                        }
+                        typedBaseMoveSlots.Add(moveSlot);
+                    }
+                }
+                
+                // Update BaseMoveSlots using reflection since it might be readonly
+                PropertyInfo? baseMoveSlotsProp = typeof(Pokemon).GetProperty("BaseMoveSlots");
+                if (baseMoveSlotsProp?.CanWrite == true)
+                {
+                    baseMoveSlotsProp.SetValue(pokemon, typedBaseMoveSlots);
+                }
+            }
+        }
+        else
+        {
+            // baseMoveSlots = moveSlots.slice()
+            PropertyInfo? baseMoveSlotsProp = typeof(Pokemon).GetProperty("BaseMoveSlots");
+            if (baseMoveSlotsProp?.CanWrite == true)
+            {
+                baseMoveSlotsProp.SetValue(pokemon, pokemon.MoveSlots.ToList());
+            }
+        }
+        
+        // Handle showCure special case - if undefined in state, set to undefined
+        if (!state.ContainsKey("showCure"))
+        {
+            PropertyInfo? showCureProp = typeof(Pokemon).GetProperty("ShowCure");
+            if (showCureProp?.CanWrite == true)
+            {
+                showCureProp.SetValue(pokemon, null);
+            }
+        }
     }
 
     public static bool IsActiveMove(JsonObject obj)
@@ -155,21 +363,21 @@ public static class State
         // a bug in the simulator if it ever happened.
         
         Move baseMove = battle.Library.Moves[activeMove.Id];
-        var skip = new HashSet<string>(_activeMove);
+        var skip = new HashSet<string>(ActiveMove);
         
         // Skip fields that haven't changed from the base Move
         // We use reflection to compare properties
-        var activeMoveType = typeof(ActiveMove);
-        var baseMoveType = typeof(Move);
+        Type activeMoveType = typeof(ActiveMove);
+        Type baseMoveType = typeof(Move);
         var baseProperties = baseMoveType.GetProperties(System.Reflection.BindingFlags.Public | 
                                                         System.Reflection.BindingFlags.Instance);
         
-        foreach (var prop in baseProperties)
+        foreach (PropertyInfo prop in baseProperties)
         {
             if (!prop.CanRead) continue;
             
-            var baseValue = prop.GetValue(baseMove);
-            var activeValue = prop.GetValue(activeMove);
+            object? baseValue = prop.GetValue(baseMove);
+            object? activeValue = prop.GetValue(activeMove);
             
             // This should really be a deepEquals check to see if anything on ActiveMove was
             // modified from the base Move, but that ends up being expensive and mostly unnecessary
@@ -200,7 +408,7 @@ public static class State
             }
         }
         
-        var state = Serialize(activeMove, skip.ToList(), battle);
+        JsonObject state = Serialize(activeMove, skip.ToList(), battle);
         state["move"] = ToRef((Referable)baseMove);
         
         return state;
@@ -217,18 +425,18 @@ public static class State
         string moveRef = state["move"]?.GetValue<string>() ?? 
             throw new InvalidOperationException("ActiveMove 'move' reference is null");
         
-        var referableUnion = FromRef(moveRef, battle);
+        ReferableUndefinedUnion referableUnion = FromRef(moveRef, battle);
         Move baseMove = referableUnion switch
         {
             ReferableReferableUndefinedUnion r when r.Referable is MoveReferable m => m.Move,
             _ => throw new InvalidOperationException($"Invalid move reference: {moveRef}")
         };
         
-        // Use the Move's ToActiveMove method to create an ActiveMove with all properties copied
+        // Use the Move's ToActiveMove method to create a(n) ActiveMove with all properties copied
         ActiveMove activeMove = baseMove.ToActiveMove();
         
         // Now deserialize the changed properties onto the active move
-        Deserialize(state, activeMove, _activeMove.ToList(), battle);
+        Deserialize(state, activeMove, ActiveMove.ToList(), battle);
         
         return activeMove;
     }
@@ -272,14 +480,14 @@ public static class State
                 Referable referable = obj switch
                 {
                     IBattle b => Referable.FromIBattle(b),
-                    Field f => (Referable)f,
-                    Side s => (Referable)s,
-                    Pokemon p => (Referable)p,
-                    Condition c => (Referable)c,
-                    Ability a => (Referable)a,
-                    Item i => (Referable)i,
+                    Field f => f,
+                    Side s => s,
+                    Pokemon p => p,
+                    Condition c => c,
+                    Ability a => a,
+                    Item i => i,
                     Move m => (Referable)m,
-                    Species s => (Referable)s,
+                    Species s => s,
                     _ => throw new InvalidOperationException($"Unhandled referable type: {obj.GetType()}")
                 };
                 return ToRef(referable);
@@ -289,7 +497,7 @@ public static class State
                                                                  obj.GetType().IsGenericType && 
                                                                  obj.GetType().GetGenericTypeDefinition() == typeof(List<>):
                 var list = new List<object?>();
-                foreach (var item in enumerable)
+                foreach (object? item in enumerable)
                 {
                     list.Add(SerializeWithRefs(item, battle));
                 }
@@ -300,7 +508,7 @@ public static class State
                 var dict = new Dictionary<string, object?>();
                 foreach (System.Collections.DictionaryEntry entry in dictionary)
                 {
-                    string key = entry.Key?.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
+                    string key = entry.Key.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
                     dict[key] = SerializeWithRefs(entry.Value, battle);
                 }
                 return dict;
@@ -328,14 +536,14 @@ public static class State
                     
                     // For external types, try to serialize properties
                     var result = new Dictionary<string, object?>();
-                    var properties = obj.GetType().GetProperties(System.Reflection.BindingFlags.Public | 
-                                                                  System.Reflection.BindingFlags.Instance);
-                    foreach (var prop in properties)
+                    var properties = obj.GetType().GetProperties(BindingFlags.Public | 
+                                                                  BindingFlags.Instance);
+                    foreach (PropertyInfo prop in properties)
                     {
                         if (prop.CanRead)
                         {
-                            var value = prop.GetValue(obj);
-                            var serialized = SerializeWithRefs(value, battle);
+                            object? value = prop.GetValue(obj);
+                            object? serialized = SerializeWithRefs(value, battle);
                             if (serialized != null)
                             {
                                 result[ToCamelCase(prop.Name)] = serialized;
@@ -370,7 +578,7 @@ public static class State
                 
             // Check if this is a reference string
             case string s:
-                var refResult = FromRef(s, battle);
+                ReferableUndefinedUnion refResult = FromRef(s, battle);
                 return refResult switch
                 {
                     ReferableReferableUndefinedUnion r => r.Referable switch
@@ -393,7 +601,7 @@ public static class State
             // Handle arrays/lists stored as JsonArray or List
             case JsonArray jsonArray:
                 var list = new List<object?>();
-                foreach (var item in jsonArray)
+                foreach (JsonNode? item in jsonArray)
                 {
                     list.Add(DeserializeWithRefs(item?.AsValue().GetValue<object>(), battle));
                 }
@@ -401,7 +609,7 @@ public static class State
                 
             case System.Collections.IList listObj:
                 var resultList = new List<object?>();
-                foreach (var item in listObj)
+                foreach (object? item in listObj)
                 {
                     resultList.Add(DeserializeWithRefs(item, battle));
                 }
@@ -426,7 +634,7 @@ public static class State
                 var dict = new Dictionary<string, object?>();
                 foreach (System.Collections.DictionaryEntry entry in dictionary)
                 {
-                    string key = entry.Key?.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
+                    string key = entry.Key.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
                     dict[key] = DeserializeWithRefs(entry.Value, battle);
                 }
                 return dict;
@@ -453,12 +661,12 @@ public static class State
         {
             IBattle => true,
             Field => true,
-            Side => true,
-            Pokemon => true,
+            SideClasses.Side => true,
+            PokemonClasses.Pokemon => true,
             Condition => true,
             Ability => true,
             Item => true,
-            ActiveMove => true,  // Check ActiveMove before Move since it inherits from Move
+            Moves.ActiveMove => true,  // Check ActiveMove before Move since it inherits from Move
             Move => true,
             Species => true,
             _ => false
@@ -560,7 +768,7 @@ public static class State
                 $"Side index {sideIndex} is out of range (0-{battle.Sides.Count - 1})");
         }
 
-        return (Referable)battle.Sides[sideIndex];
+        return battle.Sides[sideIndex];
     }
 
     private static Referable ParsePokemonRef(string id, IBattle battle)
@@ -604,7 +812,7 @@ public static class State
                 $"Position {position} is out of range (0-{side.Pokemon.Count - 1})");
         }
 
-        return (Referable)side.Pokemon[position];
+        return side.Pokemon[position];
     }
 
     private static Referable ParseMoveRef(string id, IBattle battle)
@@ -618,11 +826,11 @@ public static class State
     public static JsonObject Serialize(object obj, List<string> skip, IBattle battle)
     {
         var state = new JsonObject();
-        var type = obj.GetType();
-        var properties = type.GetProperties(System.Reflection.BindingFlags.Public | 
-                                           System.Reflection.BindingFlags.Instance);
+        Type type = obj.GetType();
+        var properties = type.GetProperties(BindingFlags.Public | 
+                                           BindingFlags.Instance);
         
-        foreach (var prop in properties)
+        foreach (PropertyInfo prop in properties)
         {
             // Skip properties in the skip list (case-insensitive comparison for flexibility)
             if (skip.Any(s => s.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)))
@@ -638,8 +846,8 @@ public static class State
             
             try
             {
-                var value = prop.GetValue(obj);
-                var serialized = SerializeWithRefs(value, battle);
+                object? value = prop.GetValue(obj);
+                object? serialized = SerializeWithRefs(value, battle);
                 
                 // JSON.stringify will get rid of keys with undefined values anyway, but
                 // we also do it here so that comparisons work correctly.
@@ -706,16 +914,14 @@ public static class State
 
     public static void Deserialize(JsonObject state, object obj, List<string> skip, IBattle battle)
     {
-        var type = obj.GetType();
-        var properties = type.GetProperties(System.Reflection.BindingFlags.Public | 
-                                           System.Reflection.BindingFlags.Instance)
+        Type type = obj.GetType();
+        var properties = type.GetProperties(BindingFlags.Public | 
+                                           BindingFlags.Instance)
                              .ToDictionary(p => ToCamelCase(p.Name), p => p, 
                                          StringComparer.OrdinalIgnoreCase);
         
-        foreach (var kvp in state)
+        foreach ((string key, JsonNode? jsonValue) in state)
         {
-            string key = kvp.Key;
-            
             // Skip properties in the skip list (already camelCased)
             if (skip.Any(s => ToCamelCase(s).Equals(key, StringComparison.OrdinalIgnoreCase)))
             {
@@ -723,7 +929,7 @@ public static class State
             }
             
             // Find the property (case-insensitive)
-            if (!properties.TryGetValue(key, out var prop))
+            if (!properties.TryGetValue(key, out PropertyInfo? prop))
             {
                 // Property doesn't exist on the object, skip it
                 continue;
@@ -737,7 +943,6 @@ public static class State
             
             try
             {
-                var jsonValue = kvp.Value;
                 if (jsonValue == null)
                 {
                     prop.SetValue(obj, null);
@@ -745,7 +950,7 @@ public static class State
                 }
                 
                 // Deserialize the value with reference resolution
-                var deserializedValue = DeserializeWithRefs(jsonValue, battle);
+                object? deserializedValue = DeserializeWithRefs(jsonValue, battle);
                 
                 // Try to convert the deserialized value to the property type
                 object? convertedValue = ConvertToPropertyType(deserializedValue, prop.PropertyType);
@@ -779,7 +984,7 @@ public static class State
         }
         
         // Handle nullable types
-        var underlyingType = Nullable.GetUnderlyingType(targetType);
+        Type? underlyingType = Nullable.GetUnderlyingType(targetType);
         if (underlyingType != null)
         {
             return ConvertToPropertyType(value, underlyingType);
@@ -806,7 +1011,7 @@ public static class State
         {
             if (targetType.IsArray)
             {
-                var elementType = targetType.GetElementType()!;
+                Type elementType = targetType.GetElementType()!;
                 var array = Array.CreateInstance(elementType, list.Count);
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -817,9 +1022,9 @@ public static class State
             
             if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(List<>))
             {
-                var elementType = targetType.GetGenericArguments()[0];
+                Type elementType = targetType.GetGenericArguments()[0];
                 var listInstance = (System.Collections.IList)Activator.CreateInstance(targetType)!;
-                foreach (var item in list)
+                foreach (object? item in list)
                 {
                     listInstance.Add(ConvertToPropertyType(item, elementType));
                 }
@@ -832,14 +1037,14 @@ public static class State
         {
             if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Dictionary<,>))
             {
-                var keyType = targetType.GetGenericArguments()[0];
-                var valueType = targetType.GetGenericArguments()[1];
+                Type keyType = targetType.GetGenericArguments()[0];
+                Type valueType = targetType.GetGenericArguments()[1];
                 var dictInstance = (System.Collections.IDictionary)Activator.CreateInstance(targetType)!;
                 
                 foreach (var kvp in dict)
                 {
-                    var key = ConvertToPropertyType(kvp.Key, keyType);
-                    var val = ConvertToPropertyType(kvp.Value, valueType);
+                    object? key = ConvertToPropertyType(kvp.Key, keyType);
+                    object? val = ConvertToPropertyType(kvp.Value, valueType);
                     dictInstance.Add(key!, val);
                 }
                 return dictInstance;
