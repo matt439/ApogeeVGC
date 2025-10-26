@@ -12,63 +12,17 @@ using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Data;
+using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Actions;
 
 namespace ApogeeVGC.Sim.Utils;
 
 public static class State
 {
     private const string Positions = "abcdefghijklmnopqrstuvwx";
-
-    //private static readonly IReadOnlyList<string> Battle = new List<string>
-    //{
-    //    "dex",
-    //    "gen",
-    //    "ruleTable",
-    //    "id",
-    //    "log",
-    //    "inherit",
-    //    "format",
-    //    "teamGenerator",
-    //    "HIT_SUBSTITUTE",
-    //    "NOT_FAIL",
-    //    "FAIL",
-    //    "SILENT_FAIL",
-    //    "field",
-    //    "sides",
-    //    "prng",
-    //    "hints",
-    //    "deserialized",
-    //    "queue",
-    //    "actions",
-    //};
-
-    //private static readonly IReadOnlyList<string> Side = new List<string>
-    //{
-    //    "battle",
-    //    "team",
-    //    "pokemon",
-    //    "choice",
-    //    "activeRequest",
-    //};
-
-    //private static readonly IReadOnlyList<string> Pokemon = new List<string>
-    //{
-    //    "side",
-    //    "battle",
-    //    "set",
-    //    "name",
-    //    "fullname",
-    //    "id",
-    //    "happiness",
-    //    "level",
-    //    "pokeball",
-    //    "baseMoveSlots",
-    //};
-
-    //private static readonly IReadOnlyList<string> Choice = new List<string>
-    //{
-    //    "switchIns",
-    //};
 
     private static readonly IReadOnlyList<string> ActiveMove = new List<string>
     {
@@ -82,7 +36,7 @@ public static class State
         { 
             "Dex", "Gen", "RuleTable", "Id", "Log", "Inherit", "Format", "TeamGenerator",
             "HIT_SUBSTITUTE", "NOT_FAIL", "FAIL", "SILENT_FAIL", "Field", "Sides", "Prng", 
-            "Hints", "Deserialized", "Queue", "Actions", "Library"
+            "Hints", "Deserialized", "Queue", "Actions", "Library",
         };
         
         JsonObject state = Serialize(battle, skip, battle);
@@ -174,21 +128,333 @@ public static class State
         return state;
     }
 
+    public static IBattle DeserializeBattle(JsonObject serialized, Library library)
+    {
+        // Extract battle configuration from serialized state
+        string formatId = serialized["formatid"]?.GetValue<string>() ?? "gen9ou";
+        
+        // Extract PRNG seed
+        PrngSeed? prngSeed = null;
+        if (serialized.ContainsKey("prng") && serialized["prng"] is JsonValue prngValue)
+        {
+            // The PRNG seed is stored as a string  representation
+            if (prngValue.TryGetValue(out string? seedStr) && !string.IsNullOrEmpty(seedStr))
+            {
+                // Parse the seed string to an integer
+                if (int.TryParse(seedStr, out int seedInt))
+                {
+                    prngSeed = new PrngSeed(seedInt);
+                }
+            }
+        }
+        
+        // Extract other battle options
+        bool? rated = null;
+        if (serialized.ContainsKey("rated") && serialized["rated"] is JsonValue ratedValue)
+        {
+            rated = ratedValue.GetValue<bool>();
+        }
+        
+        bool debugMode = false;
+        if (serialized.ContainsKey("debugMode") && serialized["debugMode"] is JsonValue debugValue)
+        {
+            debugMode = debugValue.GetValue<bool>();
+        }
+        
+        bool strictChoices = false;
+        if (serialized.ContainsKey("strictChoices") && serialized["strictChoices"] is JsonValue strictValue)
+        {
+            strictChoices = strictValue.GetValue<bool>();
+        }
+        
+        // Extract side data to build player options
+        if (serialized["sides"] is not JsonArray sidesArray || sidesArray.Count != 2)
+        {
+            throw new InvalidOperationException("Serialized battle must have exactly 2 sides");
+        }
+        
+        var playerOptions = new PlayerOptions[2];
+        
+        for (int i = 0; i < 2; i++)
+        {
+            if (sidesArray[i] is not JsonObject sideState)
+            {
+                throw new InvalidOperationException($"Side {i} is not a valid JsonObject");
+            }
+            
+            // Extract team ordering
+            string teamStr = sideState["team"]?.GetValue<string>() ?? throw new InvalidOperationException($"Side {i} missing team data");
+            string[] teamPositions = teamStr.Length > 9 ? teamStr.Split(',') : teamStr.Select(c => c.ToString()).ToArray();
+            
+            // Extract pokemon array
+            if (sideState["pokemon"] is not JsonArray pokemonArray)
+            {
+                throw new InvalidOperationException($"Side {i} missing pokemon array");
+            }
+            
+            // Build team in original order
+            var team = new List<PokemonSet>();
+            foreach (string posStr in teamPositions)
+            {
+                int position = int.Parse(posStr) - 1;
+                if (position < 0 || position >= pokemonArray.Count)
+                {
+                    throw new InvalidOperationException($"Invalid team position: {posStr}");
+                }
+                
+                if (pokemonArray[position] is not JsonObject pokemonState)
+                {
+                    throw new InvalidOperationException($"Pokemon at position {position} is not a valid JsonObject");
+                }
+                
+                // Extract the PokemonSet
+                if (pokemonState["set"] is not JsonObject setObj)
+                {
+                    throw new InvalidOperationException($"Pokemon at position {position} missing set data");
+                }
+                
+                // Deserialize the set
+                PokemonSet pokemonSet = DeserializePokemonSet(setObj);
+                team.Add(pokemonSet);
+            }
+            
+            // Extract player info
+            string? name = sideState["name"]?.GetValue<string>();
+            string? avatar = sideState["avatar"]?.GetValue<string>();
+            
+            // Get side ID (p1 or p2)
+            SideId sideId = i == 0 ? SideId.P1 : SideId.P2;
+            
+            playerOptions[i] = new PlayerOptions
+            {
+                Name = name ?? sideId.GetSideIdName(),
+                Avatar = avatar,
+                Team = team,
+            };
+        }
+        
+        // Create battle options
+        var options = new BattleOptions
+        {
+            Id = Enum.TryParse(formatId, true, out FormatId parsedFormatId) 
+                ? parsedFormatId 
+                : FormatId.Gen9Ou,
+            Seed = prngSeed,
+            Rated = rated,
+            Debug = debugMode,
+            Deserialized = true, // Mark as deserialized to prevent auto-start
+            StrictChoices = strictChoices,
+            P1 = playerOptions[0],
+            P2 = playerOptions[1],
+        };
+        
+        // Create the Battle instance
+        var battle = new BattleAsync(options, library);
+        
+        // Reorder Pokemon arrays to match serialization state
+        // The Battle constructor orders pokemon by original team order,
+        // but we need to reorder them to match the serialized state
+        for (int i = 0; i < sidesArray.Count; i++)
+        {
+            if (sidesArray[i] is not JsonObject sideState)
+            {
+                continue;
+            }
+            
+            string teamStr = sideState["team"]?.GetValue<string>() ?? string.Empty;
+            string[] teamPositions = teamStr.Length > 9 ? teamStr.Split(',') : teamStr.Select(c => c.ToString()).ToArray();
+            
+            Side side = battle.Sides[i];
+            var ordered = new Pokemon[side.Pokemon.Count];
+            
+            for (int j = 0; j < teamPositions.Length; j++)
+            {
+                int position = int.Parse(teamPositions[j]) - 1;
+                ordered[position] = side.Pokemon[j];
+            }
+            
+            // Update the side's pokemon array
+            PropertyInfo? pokemonProp = typeof(Side).GetProperty("Pokemon");
+            if (pokemonProp?.CanWrite == true)
+            {
+                pokemonProp.SetValue(side, ordered.ToList());
+            }
+            else
+            {
+                // If Pokemon property is readonly, use reflection to set the backing field
+                FieldInfo? pokemonField = typeof(Side).GetField("<Pokemon>k__BackingField", 
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                if (pokemonField != null)
+                {
+                    pokemonField.SetValue(side, ordered.ToList());
+                }
+            }
+        }
+        
+        // Deserialize battle state (excluding special fields handled separately)
+        var battleSkip = new List<string> 
+        { 
+            "Dex", "Gen", "RuleTable", "Id", "Log", "Inherit", "Format", "TeamGenerator",
+            "HIT_SUBSTITUTE", "NOT_FAIL", "FAIL", "SILENT_FAIL", "Field", "Sides", "Prng", 
+            "Hints", "Deserialized", "Queue", "Actions", "Library", "formatid"
+        };
+        Deserialize(serialized, battle, battleSkip, battle);
+        
+        // Deserialize Field
+        if (serialized["field"] is JsonObject fieldState)
+        {
+            DeserializeField(fieldState, battle.Field, battle);
+        }
+        
+        // Deserialize Sides
+        bool activeRequests = false;
+        for (int i = 0; i < sidesArray.Count; i++)
+        {
+            if (sidesArray[i] is JsonObject sideState)
+            {
+                DeserializeSide(sideState, battle.Sides[i], battle);
+                
+                // Check if this side has an undefined activeRequest (needs recomputation)
+                if (!sideState.ContainsKey("activeRequest"))
+                {
+                    activeRequests = true;
+                }
+            }
+        }
+        
+        // Recompute active requests if any were undefined
+        if (activeRequests)
+        {
+            // Get fresh requests from current battle state
+            // Note: This requires a GetRequests method on Battle that we may need to call differently
+            try
+            {
+                // Try to get requests using reflection if not directly accessible
+                MethodInfo? getRequestsMethod = typeof(BattleAsync).GetMethod("GetRequests", 
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                
+                if (getRequestsMethod != null)
+                {
+                    if (getRequestsMethod.Invoke(battle, [battle.RequestState]) is object?[] requests)
+                    {
+                        for (int i = 0; i < sidesArray.Count; i++)
+                        {
+                            if (sidesArray[i] is JsonObject sideState)
+                            {
+                                // If activeRequest was null (tombstone), keep it null
+                                if (sideState.ContainsKey("activeRequest") && 
+                                    sideState["activeRequest"]?.GetValue<string>() == null)
+                                {
+                                    PropertyInfo? activeRequestProp = typeof(Side).GetProperty("ActiveRequest");
+                                    if (activeRequestProp?.CanWrite == true)
+                                    {
+                                        activeRequestProp.SetValue(battle.Sides[i], null);
+                                    }
+                                }
+                                // If activeRequest was undefined, use the recomputed one
+                                else if (!sideState.ContainsKey("activeRequest"))
+                                {
+                                    PropertyInfo? activeRequestProp = typeof(Side).GetProperty("ActiveRequest");
+                                    if (activeRequestProp?.CanWrite == true && i < requests.Length)
+                                    {
+                                        activeRequestProp.SetValue(battle.Sides[i], requests[i]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If we can't get requests, just skip this step
+                // The battle should still be functional without active requests
+            }
+        }
+        
+        // Restore PRNG state
+        if (serialized.ContainsKey("prng") && serialized["prng"] is JsonValue prngJsonValue)
+        {
+            if (prngJsonValue.TryGetValue(out string? prngSeedStr) && !string.IsNullOrEmpty(prngSeedStr))
+            {
+                if (int.TryParse(prngSeedStr, out int seedInt))
+                {
+                    battle.Prng = new Prng(new PrngSeed(seedInt));
+                }
+            }
+        }
+        
+        // Deserialize queue
+        if (serialized.ContainsKey("queue"))
+        {
+            object? queueData = DeserializeWithRefs(serialized["queue"], battle);
+            if (queueData is List<object?> queueList)
+            {
+                // Clear existing queue and populate with deserialized actions
+                battle.Queue.Clear();
+                
+                // Convert objects to IAction if possible
+                foreach (object? item in queueList)
+                {
+                    if (item is IAction action)
+                    {
+                        battle.Queue.List.Add(action);
+                    }
+                }
+            }
+        }
+        
+        // Restore hints
+        if (serialized.ContainsKey("hints") && serialized["hints"] is JsonArray hintsArray)
+        {
+            var hintsSet = new HashSet<string>();
+            foreach (JsonNode? hint in hintsArray)
+            {
+                if (hint != null)
+                {
+                    hintsSet.Add(hint.GetValue<string>());
+                }
+            }
+            
+            // Set hints using reflection
+            PropertyInfo? hintsProp = typeof(BattleAsync).GetProperty("Hints", 
+                BindingFlags.NonPublic | BindingFlags.Instance);
+            if (hintsProp?.CanWrite == true)
+            {
+                hintsProp.SetValue(battle, hintsSet);
+            }
+        }
+        
+        // Restore log
+        if (serialized.ContainsKey("log") && serialized["log"] is JsonArray logArray)
+        {
+            var log = new List<string>();
+            foreach (JsonNode? logLine in logArray)
+            {
+                if (logLine != null)
+                {
+                    log.Add(logLine.GetValue<string>());
+                }
+            }
+            
+            PropertyInfo? logProp = typeof(BattleAsync).GetProperty("Log");
+            if (logProp?.CanWrite == true)
+            {
+                logProp.SetValue(battle, log);
+            }
+        }
+        
+        return battle;
+    }
+
     public static IBattle DeserializeBattle(JsonObject serialized)
     {
         throw new NotImplementedException(
-            "DeserializeBattle from JsonObject requires battle reconstruction logic. " +
-            "This would need to:\n" +
-            "1. Extract team data from sides\n" +
-            "2. Create a new Battle instance with the teams\n" +
-            "3. Reorder Pokemon arrays to match serialized state\n" +
-            "4. Deserialize all battle state\n" +
-            "5. Restore queue and other runtime state\n\n" +
-            "This is complex and requires knowledge of Battle constructor and initialization. " +
-            "For now, use the string overload with JSON, or implement battle-specific reconstruction logic.");
+            "DeserializeBattle from JsonObject requires a Library parameter. " +
+            "Use DeserializeBattle(JsonObject serialized, Library library) instead.");
     }
 
-    public static IBattle DeserializeBattle(string serialized)
+    public static IBattle DeserializeBattle(string serialized, Library library)
     {
         JsonObject? state = JsonNode.Parse(serialized)?.AsObject();
         if (state == null)
@@ -196,29 +462,183 @@ public static class State
             throw new InvalidOperationException("Failed to parse serialized battle state");
         }
         
-        return DeserializeBattle(state);
+        return DeserializeBattle(state, library);
     }
 
-    public static JsonObject Normalize(JsonObject state)
+    public static IBattle DeserializeBattle(string serialized)
     {
-        // Normalize the log to remove timestamp variations
-        if (state.ContainsKey("log"))
+        throw new NotImplementedException(
+            "DeserializeBattle from string requires a Library parameter. " +
+            "Use DeserializeBattle(string serialized, Library library) instead.");
+    }
+    
+    /// <summary>
+    /// Deserializes a PokemonSet from a JsonObject.
+    /// </summary>
+    private static PokemonSet DeserializePokemonSet(JsonObject setObj)
+    {
+        // Extract required fields
+        string name = setObj["name"]?.GetValue<string>() ?? throw new InvalidOperationException("PokemonSet missing name");
+        string speciesStr = setObj["species"]?.GetValue<string>() ?? throw new InvalidOperationException("PokemonSet missing species");
+        
+        // Parse species
+        SpecieId species = Enum.TryParse(speciesStr, true, out SpecieId parsedSpecies) 
+            ? parsedSpecies 
+            : throw new InvalidOperationException($"Invalid species: {speciesStr}");
+        
+        // Extract optional fields
+        ItemId item = ItemId.None;
+        if (setObj.ContainsKey("item") && setObj["item"] is JsonValue itemValue)
         {
-            if (state["log"] is JsonArray logArray)
+            string itemStr = itemValue.GetValue<string>();
+            if (!string.IsNullOrEmpty(itemStr) && Enum.TryParse(itemStr, true, out ItemId parsedItem))
             {
-                var normalizedLog = NormalizeLog(
-                    logArray.Select(l => l?.GetValue<string>() ?? string.Empty).ToList()
-                );
-                state["log"] = new JsonArray(normalizedLog.Select(l => JsonValue.Create(l)).ToArray());
-            }
-            else if (state["log"]?.GetValue<string>() is { } logString)
-            {
-                var normalizedLog = NormalizeLog(logString);
-                state["log"] = new JsonArray(normalizedLog.Select(l => JsonValue.Create(l)).ToArray());
+                item = parsedItem;
             }
         }
         
-        return state;
+        AbilityId ability = AbilityId.None;
+        if (setObj.ContainsKey("ability") && setObj["ability"] is JsonValue abilityValue)
+        {
+            string abilityStr = abilityValue.GetValue<string>();
+            if (!string.IsNullOrEmpty(abilityStr) && Enum.TryParse(abilityStr, true, out AbilityId parsedAbility))
+            {
+                ability = parsedAbility;
+            }
+        }
+        
+        // Extract moves
+        var moves = new List<MoveId>();
+        if (setObj.ContainsKey("moves") && setObj["moves"] is JsonArray movesArray)
+        {
+            foreach (JsonNode? moveNode in movesArray)
+            {
+                if (moveNode != null)
+                {
+                    string moveStr = moveNode.GetValue<string>();
+                    if (Enum.TryParse(moveStr, true, out MoveId moveId))
+                    {
+                        moves.Add(moveId);
+                    }
+                }
+            }
+        }
+        
+        // Extract nature
+        Nature? nature = null;
+        if (setObj.ContainsKey("nature") && setObj["nature"] is JsonValue natureValue)
+        {
+            string natureStr = natureValue.GetValue<string>();
+            if (!string.IsNullOrEmpty(natureStr) && Enum.TryParse(natureStr, true, out NatureId natureId))
+            {
+                nature = new Nature { Id = natureId };
+            }
+        }
+        
+        // Extract gender
+        GenderId gender = GenderId.N;
+        if (setObj.ContainsKey("gender") && setObj["gender"] is JsonValue genderValue)
+        {
+            string genderStr = genderValue.GetValue<string>();
+            if (!string.IsNullOrEmpty(genderStr) && Enum.TryParse(genderStr, true, out GenderId parsedGender))
+            {
+                gender = parsedGender;
+            }
+        }
+        
+        // Extract EVs and IVs
+        var evs = new StatsTable();
+        if (setObj.ContainsKey("evs") && setObj["evs"] is JsonObject evsObj)
+        {
+            DeserializeStatsTable(evsObj, evs);
+        }
+        
+        var ivs = new StatsTable();
+        if (setObj.ContainsKey("ivs") && setObj["ivs"] is JsonObject ivsObj)
+        {
+            DeserializeStatsTable(ivsObj, ivs);
+        }
+        
+        // Extract level
+        int level = 100;
+        if (setObj.ContainsKey("level") && setObj["level"] is JsonValue levelValue)
+        {
+            level = levelValue.GetValue<int>();
+        }
+        
+        // Extract shiny
+        bool shiny = false;
+        if (setObj.ContainsKey("shiny") && setObj["shiny"] is JsonValue shinyValue)
+        {
+            shiny = shinyValue.GetValue<bool>();
+        }
+        
+        // Extract happiness
+        int happiness = 255;
+        if (setObj.ContainsKey("happiness") && setObj["happiness"] is JsonValue happinessValue)
+        {
+            happiness = happinessValue.GetValue<int>();
+        }
+        
+        // Extract pokeball
+        PokeballId pokeball = PokeballId.Pokeball;
+        if (setObj.ContainsKey("pokeball") && setObj["pokeball"] is JsonValue pokeballValue)
+        {
+            string pokeballStr = pokeballValue.GetValue<string>();
+            if (!string.IsNullOrEmpty(pokeballStr) && Enum.TryParse(pokeballStr, true, out PokeballId parsedPokeball))
+            {
+                pokeball = parsedPokeball;
+            }
+        }
+        
+        // Create and return the PokemonSet
+        return new PokemonSet
+        {
+            Name = name,
+            Species = species,
+            Item = item,
+            Ability = ability,
+            Moves = moves,
+            Nature = nature ?? new Nature { Id = NatureId.Serious }, // Default to Serious if not specified
+            Gender = gender,
+            Evs = evs,
+            Ivs = ivs,
+            Level = level,
+            Shiny = shiny,
+            Happiness = happiness,
+            Pokeball = pokeball
+        };
+    }
+    
+    /// <summary>
+    /// Deserializes stats from a JsonObject into a StatsTable.
+    /// </summary>
+    private static void DeserializeStatsTable(JsonObject statsObj, StatsTable stats)
+    {
+        if (statsObj.ContainsKey("hp") && statsObj["hp"] is JsonValue hpValue)
+        {
+            stats.Hp = hpValue.GetValue<int>();
+        }
+        if (statsObj.ContainsKey("atk") && statsObj["atk"] is JsonValue atkValue)
+        {
+            stats.Atk = atkValue.GetValue<int>();
+        }
+        if (statsObj.ContainsKey("def") && statsObj["def"] is JsonValue defValue)
+        {
+            stats.Def = defValue.GetValue<int>();
+        }
+        if (statsObj.ContainsKey("spa") && statsObj["spa"] is JsonValue spaValue)
+        {
+            stats.SpA = spaValue.GetValue<int>();
+        }
+        if (statsObj.ContainsKey("spd") && statsObj["spd"] is JsonValue spdValue)
+        {
+            stats.SpD = spdValue.GetValue<int>();
+        }
+        if (statsObj.ContainsKey("spe") && statsObj["spe"] is JsonValue speValue)
+        {
+            stats.Spe = speValue.GetValue<int>();
+        }
     }
 
     public static List<string> NormalizeLog(List<string>? log = null)
@@ -607,27 +1027,27 @@ public static class State
                 return SerializeActiveMove(activeMove, battle);
                 
             // Check if this is a referable type (circular reference handling)
-            case IBattle _:
-            case Field _:
-            case Side _:
-            case Pokemon _:
-            case Condition _:
-            case Ability _:
-            case Item _:
-            case Move _:
-            case Species _:
+            case IBattle:
+            case Field:
+            case Side:
+            case Pokemon:
+            case Condition:
+            case Ability:
+            case Item:
+            case Move:
+            case Species:
                 // Convert to Referable union type and then to reference string
                 Referable referable = obj switch
                 {
                     IBattle b => Referable.FromIBattle(b),
                     Field f => f,
-                    Side s => s,
+                    Side side => side,
                     Pokemon p => p,
                     Condition c => c,
                     Ability a => a,
                     Item i => i,
                     Move m => (Referable)m,
-                    Species s => s,
+                    Species sp => sp,
                     _ => throw new InvalidOperationException($"Unhandled referable type: {obj.GetType()}")
                 };
                 return ToRef(referable);
@@ -731,28 +1151,22 @@ public static class State
                         AbilityReferable a => a.Ability,
                         ItemReferable i => i.Item,
                         MoveReferable m => m.Move,
-                        SpeciesReferable sp => sp.Species,
+                        SpeciesReferable ss => ss.Species,
                         _ => s // Not a reference, return original string
                     },
                     UndefinedReferableUndefinedUnion => s, // Not a reference, return original string
-                    _ => s
+                    _ => s,
                 };
                 
             // Handle arrays/lists stored as JsonArray or List
             case JsonArray jsonArray:
-                var list = new List<object?>();
-                foreach (JsonNode? item in jsonArray)
-                {
-                    list.Add(DeserializeWithRefs(item?.AsValue().GetValue<object>(), battle));
-                }
+                var list = jsonArray.Select(item =>
+                    DeserializeWithRefs(item?.AsValue().GetValue<object>(), battle)).ToList();
                 return list;
                 
             case System.Collections.IList listObj:
-                var resultList = new List<object?>();
-                foreach (object? item in listObj)
-                {
-                    resultList.Add(DeserializeWithRefs(item, battle));
-                }
+                var resultList = (from object? item in listObj
+                    select DeserializeWithRefs(item, battle)).ToList();
                 return resultList;
                 
             // Handle objects stored as JsonObject or Dictionary
@@ -825,8 +1239,8 @@ public static class State
             SideReferable s => $"[Side:{s.Side.Id.GetSideIdName()}]",
             
             // Battle and Field don't need IDs as there's only one instance of each
-            BattleReferable _ => "[Battle]",
-            FieldReferable _ => "[Field]",
+            BattleReferable => "[Battle]",
+            FieldReferable => "[Field]",
             
             // For immutable data types (Dex types), use their ID
             ConditionReferable c => $"[Condition:{c.Condition.Id}]",
