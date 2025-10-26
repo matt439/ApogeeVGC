@@ -70,11 +70,7 @@ public static partial class State
             case System.Collections.IEnumerable enumerable when obj.GetType().IsArray || 
                                                                  obj.GetType().IsGenericType && 
                                                                  obj.GetType().GetGenericTypeDefinition() == typeof(List<>):
-                var list = new List<object?>();
-                foreach (object? item in enumerable)
-                {
-                    list.Add(SerializeWithRefs(item, battle));
-                }
+                var list = (from object? item in enumerable select SerializeWithRefs(item, battle)).ToList();
                 return list;
                 
             // Handle dictionaries

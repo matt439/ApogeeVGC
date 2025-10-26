@@ -152,12 +152,12 @@ public partial class Pokemon : IPriorityComparison, IDisposable
     public PokemonDetails Details { get; set; }
 
     /// <summary>
-    /// Gets the list of move IDs for the Pokemon's current move slots.
+    /// Gets the list of move ID's for the Pokemon's current move slots.
     /// </summary>
     public List<MoveId> Moves => MoveSlots.Select(moveSlot => moveSlot.Id).ToList();
 
     /// <summary>
-    /// Gets the list of move IDs for the Pokemon's base move slots (original moves before transformations).
+    /// Gets the list of move ID's for the Pokemon's base move slots (original moves before transformations).
     /// </summary>
     public List<MoveId> BaseMoves => BaseMoveSlots.Select(moveSlot => moveSlot.Id).ToList();
 
@@ -245,6 +245,13 @@ public partial class Pokemon : IPriorityComparison, IDisposable
         CanTerastallize = canTerastallize ?? null;
 
         ClearVolatile();
+        
+        // Initialize MaxHp to a non-zero value so SetSpecie will set it properly
+        MaxHp = 1;
+        
+        // Initialize species and stats - this sets MaxHp, StoredStats, etc.
+        SetSpecie(BaseSpecies, null);
+        
         Hp = MaxHp;
         Details = GetUpdatedDetails();
     }
