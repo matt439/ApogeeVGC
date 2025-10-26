@@ -9,6 +9,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -399,7 +400,7 @@ public partial class BattleAsync
 
                         if (DisplayUi)
                         {
-                            Add("teamsize", side.Id.ToString(), side.Pokemon.Count.ToString());
+                            Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
                         }
                     }
 

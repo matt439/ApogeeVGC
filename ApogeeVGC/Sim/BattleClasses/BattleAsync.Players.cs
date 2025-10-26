@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -79,7 +80,7 @@ public partial class BattleAsync
         if (DisplayUi)
         {
             string rating = options.Rating?.ToString() ?? string.Empty;
-            Add("player", side.Id.ToString(), side.Name, side.Avatar, rating);
+            Add("player", side.Id.GetSideIdName(), side.Name, side.Avatar, rating);
         }
 
         // Start battle if all sides are ready and battle hasn't started

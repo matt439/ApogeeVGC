@@ -174,7 +174,7 @@ public partial class BattleAsync
     public void AddSplit(SideId side, Part[] secret, Part[]? shared = null)
     {
         // Add the split marker with the side ID (lowercase)
-        Log.Add($"| split |{side.GetSideIdName()}");
+        Log.Add($"|split|{side.GetSideIdName()}");
 
         // Add the secret parts (visible only to the specified side)
         Add(secret.Select(p => (PartFuncUnion)p).ToArray());
