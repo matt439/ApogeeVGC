@@ -2,6 +2,7 @@
 
 public enum ConditionId
 {
+    None,
     Burn,
     Paralysis,
     Sleep,
@@ -77,14 +78,4 @@ public enum ConditionId
     QuickGuard,
     WideGuard,
     Commanded,
-
-    None,
 }
-
-//public enum ConditionEffectType
-//{
-//    Condition,
-//    Weather,
-//    Status,
-//    Terrain,
-//}

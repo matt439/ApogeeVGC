@@ -41,6 +41,12 @@ public record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.None] = new()
+            {
+                Id = ConditionId.None,
+                Name = "None",
+                EffectType = EffectType.Condition,
+            },
             [ConditionId.Burn] = new()
             {
                 Id = ConditionId.Burn,
