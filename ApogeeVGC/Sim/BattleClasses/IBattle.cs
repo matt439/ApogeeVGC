@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Data;
+﻿using System.Text.Json.Nodes;
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -251,4 +252,10 @@ public interface IBattle
     void ShowOpenTeamSheets();
 
     void Hint(string hint, bool once = false, Side? side = null);
+
+    JsonObject ToJson();
+
+    IBattle FromJson(JsonObject serialized);
+
+    IBattle FromJson(string serialized);
 }

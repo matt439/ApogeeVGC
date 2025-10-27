@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -107,7 +108,7 @@ public partial class Side : IDisposable
 
     public JsonObject ToJson()
     {
-        throw new NotImplementedException();
+        return State.SerializeSide(this);
     }
 
     private Pokemon? AddPokemon(PokemonSet set)

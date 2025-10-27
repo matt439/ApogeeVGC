@@ -1,9 +1,11 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FieldClasses;
@@ -29,6 +31,11 @@ public class Field : IDisposable
         Battle = battle;
         WeatherState = Battle.InitEffectState();
         TerrainState = Battle.InitEffectState();
+    }
+
+    public JsonObject ToJson()
+    {
+        return State.SerializeField(this);
     }
 
     public bool SetWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)

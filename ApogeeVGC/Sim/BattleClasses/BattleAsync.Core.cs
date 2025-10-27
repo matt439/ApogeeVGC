@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Data;
+﻿using System.Text.Json.Nodes;
+using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -178,6 +179,22 @@ public partial class BattleAsync : IBattle, IDisposable
 
         Console.WriteLine("Battle constructor complete.");
     }
+
+    public JsonObject ToJson()
+    {
+        return State.SerializeBattle(this);
+    }
+
+    public IBattle FromJson(JsonObject serialized)
+    {
+        return State.DeserializeBattle(serialized);
+    }
+
+    public IBattle FromJson(string serialized)
+    {
+        return State.DeserializeBattle(serialized);
+    }
+
     public int Random(int m, int n)
     {
         return Prng.Random(m, n);
