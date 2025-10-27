@@ -195,6 +195,11 @@ public partial class BattleAsync : IBattle, IDisposable
         return State.DeserializeBattle(serialized);
     }
 
+    public override string ToString()
+    {
+        return $"Battle: {Format}";
+    }
+
     public int Random(int m, int n)
     {
         return Prng.Random(m, n);

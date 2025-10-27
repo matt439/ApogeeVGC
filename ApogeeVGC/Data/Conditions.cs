@@ -50,7 +50,7 @@ public record Conditions
             [ConditionId.Burn] = new()
             {
                 Id = ConditionId.Burn,
-                Name = "Burn",
+                Name = "brn",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Fire],
                 OnStart = (battle, target, source, sourceEffect) =>
@@ -93,7 +93,7 @@ public record Conditions
             [ConditionId.Paralysis] = new()
             {
                 Id = ConditionId.Paralysis,
-                Name = "Paralysis",
+                Name = "par",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Electric],
                 OnStart = (battle, target, source, sourceEffect) =>
@@ -135,7 +135,7 @@ public record Conditions
             [ConditionId.Sleep] = new()
             {
                 Id = ConditionId.Sleep,
-                Name = "Sleep",
+                Name = "slp",
                 EffectType = EffectType.Status,
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
@@ -198,7 +198,7 @@ public record Conditions
             [ConditionId.Freeze] = new()
             {
                 Id = ConditionId.Freeze,
-                Name = "Freeze",
+                Name = "frz",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Ice],
                 OnStart = (battle, target, source, sourceEffect) =>
@@ -271,7 +271,7 @@ public record Conditions
             [ConditionId.Poison] = new()
             {
                 Id = ConditionId.Poison,
-                Name = "Poison",
+                Name = "psn",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
                 OnStart = (battle, target, source, sourceEffect) =>
@@ -293,7 +293,7 @@ public record Conditions
             [ConditionId.Toxic] = new()
             {
                 Id = ConditionId.Toxic,
-                Name = "Toxic",
+                Name = "tox",
                 EffectType = EffectType.Status,
                 ImmuneTypes = [PokemonType.Poison, PokemonType.Steel],
                 OnStart = (battle, target, source, sourceEffect) =>
@@ -334,7 +334,7 @@ public record Conditions
             [ConditionId.Confusion] = new()
             {
                 Id = ConditionId.Confusion,
-                Name = "Confusion",
+                Name = "confusion",
                 EffectType = EffectType.Condition,
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
@@ -405,7 +405,7 @@ public record Conditions
             [ConditionId.Flinch] = new()
             {
                 Id = ConditionId.Flinch,
-                Name = "Flinch",
+                Name = "flinch",
                 EffectType = EffectType.Condition,
                 Duration = 1,
                 OnBeforeMovePriority = 8,
@@ -422,6 +422,7 @@ public record Conditions
             [ConditionId.ChoiceLock] = new()
             {
                 Id = ConditionId.ChoiceLock,
+                Name = "choicelock",
                 NoCopy = true,
                 EffectType = EffectType.Condition,
                 OnStart = (battle, _, _, _) =>
@@ -482,7 +483,7 @@ public record Conditions
             [ConditionId.LeechSeed] = new()
             {
                 Id = ConditionId.LeechSeed,
-                Name = "Leech Seed",
+                Name = "leechseed",
                 EffectType = EffectType.Condition,
                 ImmuneTypes = [PokemonType.Grass],
                 AssociatedMove = MoveId.LeechSeed,
@@ -518,7 +519,7 @@ public record Conditions
             [ConditionId.TrickRoom] = new()
             {
                 Id = ConditionId.TrickRoom,
-                Name = "Trick Room",
+                Name = "trickroom",
                 EffectType = EffectType.Condition,
                 Duration = 5,
                 DurationCallback = (_, _, _, _) => 5,
@@ -547,7 +548,7 @@ public record Conditions
             {
                 // Protect, Detect, Endure counter
                 Id = ConditionId.Stall,
-                Name = "Stall",
+                Name = "stall",
                 Duration = 2,
                 CounterMax = 729,
                 EffectType = EffectType.Condition,
@@ -583,7 +584,7 @@ public record Conditions
             [ConditionId.Protect] = new()
             {
                 Id = ConditionId.Protect,
-                Name = "Protect",
+                Name = "protect",
                 Duration = 1,
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Protect,
@@ -622,7 +623,7 @@ public record Conditions
             [ConditionId.Tailwind] = new()
             {
                 Id = ConditionId.Tailwind,
-                Name = "Tailwind",
+                Name = "tailwind",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Tailwind,
                 Duration = 4,
@@ -652,7 +653,7 @@ public record Conditions
             [ConditionId.Reflect] = new()
             {
                 Id = ConditionId.Reflect,
-                Name = "Reflect",
+                Name = "reflect",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.Reflect,
                 Duration = 5,
@@ -696,7 +697,7 @@ public record Conditions
             [ConditionId.LightScreen] = new()
             {
                 Id = ConditionId.LightScreen,
-                Name = "Light Screen",
+                Name = "lightscreen",
                 EffectType = EffectType.Condition,
                 AssociatedMove = MoveId.LightScreen,
                 Duration = 5,
@@ -740,7 +741,7 @@ public record Conditions
             [ConditionId.ElectricTerrain] = new()
             {
                 Id = ConditionId.ElectricTerrain,
-                Name = "Electric Terrain",
+                Name = "electricterrain",
                 EffectType = EffectType.Terrain,
                 Duration = 5,
                 DurationCallback = (_, source, _, _) => source.HasItem(ItemId.TerrainExtender) ? 8 : 5,
@@ -815,7 +816,7 @@ public record Conditions
             [ConditionId.QuarkDrive] = new()
             {
                 Id = ConditionId.QuarkDrive,
-                Name = "Quark Drive",
+                Name = "quarkdrive",
                 EffectType = EffectType.Condition,
                 NoCopy = true,
                 AssociatedAbility = AbilityId.QuarkDrive,

@@ -33,6 +33,7 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     }
     public string Name { get; init; } = string.Empty;
     public string FullName => Name;
+    public string ShowdownId => Name;
 
     //public ConditionEffectType ConditionEffectType { get; init; }
 
@@ -56,17 +57,6 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
 
     public bool AffectsFainted { get; init; }
-
-    public Condition Copy()
-    {
-        return this with
-        {
-            // Records have built-in copy semantics with 'with' expression
-            // This creates a shallow copy which is appropriate since most properties
-            // are either value types, immutable references (strings), or function delegates
-            // The only mutable properties (Duration, Counter) are copied correctly
-        };
-    }
 
     /// <summary>
     /// battle, target, source, effect -> number
@@ -798,5 +788,21 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
             EventId.FieldResidual => OnFieldResidualSubOrder,
             _ => null,
         };
+    }
+
+    public Condition Copy()
+    {
+        return this with
+        {
+            // Records have built-in copy semantics with 'with' expression
+            // This creates a shallow copy which is appropriate since most properties
+            // are either value types, immutable references (strings), or function delegates
+            // The only mutable properties (Duration, Counter) are copied correctly
+        };
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Abilities;
@@ -34,7 +35,7 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
     public bool SuppressWeather { get; init; }
 
     public string FullName => $"ability: {Name}";
-
+    public string ShowdownId => Id.ToShowdownId();
     public int Gen
     {
         get
@@ -63,6 +64,11 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
     public bool AffectsFainted { get; init; }
 
     public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 
     public Ability Copy()
     {
