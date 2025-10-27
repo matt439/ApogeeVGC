@@ -209,7 +209,7 @@ public partial class BattleAsync
             {
                 side.EmitRequest();
             }
-            //SentRequests = true;
+            SentRequests = true;
         }
 
         // Update the position marker
