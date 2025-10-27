@@ -2,6 +2,12 @@
 
 Thank you for contributing to ApogeeVGC! This guide will help you understand the project architecture and coding conventions.
 
+## Pokemon Showdown Reference
+The project references Pokémon Showdown's TypeScript code for mechanics and data structures.
+The `Reference/pokemon-showdown` project contains all source code (it is a git submodule).
+Key folders are `Reference/pokemon-showdown/sim` and `Reference/pokemon-showdown/lib`.
+`Reference/pokemon-showdown/sim/SIM-PROTOCOL.md` and `Reference/pokemon-showdown/sim/SIMULATOR.md` explains the correcnt input/output syntax of the program.
+
 ## Architecture Overview
 
 ### Battle Simulation Flow
@@ -184,13 +190,6 @@ When implementing new features:
 - **Null checks**: Use nullable types and check for null appropriately
 - **Type effectiveness**: Remember VGC uses Gen 9 type chart
 - **Doubles targeting**: Always consider multi-target scenarios
-
-## Pokemon Showdown Reference
-The project references Pokémon Showdown's TypeScript code for mechanics and data structures. Key files include:
-- `RUNEVENT-TS.md` - Event system documentation
-- `SINGLEEVENT-TS.md` - Single event handling documentation
-- `SIM-PROTOCOL.md` - Simulation protocol overview
-- `SIMULATOR.md` - Core simulator mechanics
 
 ## Questions?
 For complex battle mechanics, refer to:
