@@ -4,6 +4,13 @@
 
 ApogeeVGC is a **Pokémon Video Game Championship (VGC) battle simulator** built in C# (.NET 9). This project simulates Pokémon battles following official VGC Double Battle mechanics, including moves, abilities, status conditions, weather, terrain, and complex battle interactions. It is are conversion from Pokemon Showdown (written in TypeScript) and uses OOP.
 
+## Pokemon Showdown Reference
+The project references Pokémon Showdown's TypeScript code for mechanics and data structures.
+The `Reference/pokemon-showdown` project contains all source code (it is a git submodule).
+Key folders are `Reference/pokemon-showdown/sim` and `Reference/pokemon-showdown/lib`.
+`Reference/pokemon-showdown/sim/SIM-PROTOCOL.md` and `Reference/pokemon-showdown/sim/SIMULATOR.md` explains the correcnt input/output syntax of the program.
+Before making changes, compare with the source code to make sure the logic matches.
+
 ## Technology Stack
 
 - **Framework**: .NET 9.0
@@ -27,7 +34,6 @@ ApogeeVGC/
 │       ├── Unions/       # Discriminated unions for type safety
 │       └── State.*.cs     # State management utilities
 ├── Data/          # Static game data (abilities, moves, species)
-├── ShowDownTSRef.cs             # Reference TypeScript from Pokémon Showdown
 └── Program.cs # Entry point
 ```
 

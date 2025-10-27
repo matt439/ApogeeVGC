@@ -7,6 +7,7 @@ The project references Pokémon Showdown's TypeScript code for mechanics and dat
 The `Reference/pokemon-showdown` project contains all source code (it is a git submodule).
 Key folders are `Reference/pokemon-showdown/sim` and `Reference/pokemon-showdown/lib`.
 `Reference/pokemon-showdown/sim/SIM-PROTOCOL.md` and `Reference/pokemon-showdown/sim/SIMULATOR.md` explains the correcnt input/output syntax of the program.
+Before making changes, compare with the source code to make sure the logic matches.
 
 ## Architecture Overview
 
