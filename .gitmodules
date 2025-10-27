@@ -1,0 +1,3 @@
+[submodule "Reference/pokemon-showdown"]
+	path = Reference/pokemon-showdown
+	url = https://github.com/smogon/pokemon-showdown.git
