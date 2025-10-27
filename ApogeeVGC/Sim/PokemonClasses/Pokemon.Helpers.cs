@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -9,6 +10,7 @@ public partial class Pokemon
     public class PokemonDetails
     {
         public SpecieId Id { get; init; }
+        public string Name { get; init; } = string.Empty;
         public int Level { get; init; }
         public GenderId Gender { get; init; }
         public bool Shiny { get; init; }
@@ -21,8 +23,8 @@ public partial class Pokemon
         public override string ToString()
         {
             var parts = new List<string> {
-                // Add species name
-                Id.ToString() };
+                // Add species name - use the Name property which has proper formatting with hyphens
+                Name };
 
             // Add level (omit L100 as it's the default)
             if (Level != 100)
@@ -45,7 +47,7 @@ public partial class Pokemon
             // Add Tera type if present
             if (TeraType != null)
             {
-                parts.Add($"tera:{TeraType}");
+                parts.Add($"tera:{TeraType.Value.ToString()}");
             }
 
             return string.Join(", ", parts);

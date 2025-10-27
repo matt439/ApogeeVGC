@@ -303,6 +303,7 @@ public partial class Pokemon : IPriorityComparison, IDisposable
         var details = new PokemonDetails
         {
             Id = id,
+            Name = Species.Name,  // Use the properly formatted name from Species
             Level = displayLevel,
             Gender = Gender,
             Shiny = Set.Shiny,

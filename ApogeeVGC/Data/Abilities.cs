@@ -39,9 +39,6 @@ public record Abilities
                     if (battle.EffectState.Unnerved is true) return;
                     if (battle.DisplayUi)
                     {
-                        //UiGenerator.PrintAbilityEvent(pokemon, "As One");
-                        //UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
-
                         battle.Add("-ability", pokemon, "As One");
                         battle.Add("-ability", pokemon, "Unnerve");
                     }

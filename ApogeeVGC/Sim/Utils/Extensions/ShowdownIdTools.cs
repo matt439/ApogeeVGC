@@ -50,4 +50,9 @@ public static class ShowdownIdTools
     {
         return natureId.ToString().ToShowdownId();
     }
+
+    public static string ToShowdownId(this MoveType moveType)
+    {
+        return moveType.ToString().ToShowdownId();
+    }
 }
