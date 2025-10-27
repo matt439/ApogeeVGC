@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -15,11 +15,11 @@ namespace ApogeeVGC.Data;
 public record Abilities
 {
     public IReadOnlyDictionary<AbilityId, Ability> AbilitiesData { get; }
-    private readonly Library _library;
+    private readonly Library library;
 
     public Abilities(Library library)
     {
-        _library = library;
+        this.library = library;
         AbilitiesData = new ReadOnlyDictionary<AbilityId, Ability>(CreateAbilities());
     }
 
@@ -55,7 +55,7 @@ public record Abilities
                     if (effect.EffectType != EffectType.Move) return;
 
                     battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
-                        _library.Abilities[AbilityId.ChillingNeigh]);
+                        library.Abilities[AbilityId.ChillingNeigh]);
                 },
                 Flags = new AbilityFlags
                 {
@@ -75,7 +75,7 @@ public record Abilities
                 Rating = 4.5,
                 OnStart = (battle, pokemon) =>
                 {
-                    if (!battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]) &&
+                    if (!battle.Field.SetTerrain(library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         if (battle.DisplayUi)
@@ -154,7 +154,7 @@ public record Abilities
                 },
                 OnTerrainChange = (battle, pokemon, _, _) =>
                 {
-                    Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
+                    Condition quarkDrive = library.Conditions[ConditionId.QuarkDrive];
 
                     if (battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {

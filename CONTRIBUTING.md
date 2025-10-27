@@ -185,9 +185,14 @@ When implementing new features:
 - **Type effectiveness**: Remember VGC uses Gen 9 type chart
 - **Doubles targeting**: Always consider multi-target scenarios
 
+## Pokemon Showdown Reference
+The project references Pokémon Showdown's TypeScript code for mechanics and data structures. Key files include:
+- `RUNEVENT-TS.md` - Event system documentation
+- `SINGLEEVENT-TS.md` - Single event handling documentation
+- `SIM-PROTOCOL.md` - Simulation protocol overview
+- `SIMULATOR.md` - Core simulator mechanics
+
 ## Questions?
 For complex battle mechanics, refer to:
-- `RunEventTS.md` - Event system documentation
-- `SingleEvent.md` - Single event handling documentation
 - Official VGC rules and mechanics documentation
 - Smogon University doubles resources

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-ApogeeVGC is a **Pokémon Video Game Championship (VGC) battle simulator** built in C# (.NET 9). This project simulates Pokémon battles following official VGC Double Battle mechanics, including moves, abilities, status conditions, weather, terrain, and complex battle interactions.
+ApogeeVGC is a **Pokémon Video Game Championship (VGC) battle simulator** built in C# (.NET 9). This project simulates Pokémon battles following official VGC Double Battle mechanics, including moves, abilities, status conditions, weather, terrain, and complex battle interactions. It is are conversion from Pokemon Showdown (written in TypeScript) and uses OOP.
 
 ## Technology Stack
 
