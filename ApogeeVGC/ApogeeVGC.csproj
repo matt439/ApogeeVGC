@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ShowDownTSRef.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Sim\Ui\" />
   </ItemGroup>
 
