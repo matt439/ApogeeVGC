@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -177,7 +177,7 @@ public partial class BattleAsync : IBattle, IDisposable
             SetPlayer(SideId.P2, options.P2);
         }
 
-        Console.WriteLine("Battle constructor complete.");
+        Console.Error.WriteLine("Battle constructor complete.");
     }
 
     public JsonObject ToJson()

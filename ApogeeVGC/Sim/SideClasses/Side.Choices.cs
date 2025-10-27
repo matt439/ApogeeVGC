@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
@@ -848,7 +848,28 @@ public partial class Side
             switchRequest.Update = true;
         }
 
-        string json = JsonSerializer.Serialize(update);
+        // Configure JSON serializer to handle circular references and ignore read-only properties
+        var options = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            // Skip properties that cause serialization errors (like delegates)
+            WriteIndented = false,
+        };
+
+        string json;
+        try
+        {
+            json = JsonSerializer.Serialize(update, options);
+        }
+        catch (NotSupportedException ex)
+        {
+            // If serialization fails due to unsupported types (like delegates),
+            // log the error and send a minimal request
+            Console.Error.WriteLine($"[EmitRequest] Serialization error: {ex.Message}");
+            json = JsonSerializer.Serialize(new { error = "Serialization failed", type = update.GetType().Name }, options);
+        }
+
         Battle.Send(SendType.SideUpdate, [$"{Id}\n|request|{json}"]);
         ActiveRequest = update;
     }

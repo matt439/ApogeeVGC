@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -192,19 +192,19 @@ public partial class BattleAsync
 
     public void SendUpdates()
     {
-        Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
+        Console.Error.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
         // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count) return;
 
         // Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();
-        Console.WriteLine($"[SendUpdates] Sending {updates.Count} updates");
+        Console.Error.WriteLine($"[SendUpdates] Sending {updates.Count} updates");
         Send(SendType.Update, updates);
 
         // Send requests to players if not already sent
         if (!SentRequests)
         {
-            Console.WriteLine("[SendUpdates] Sending requests to players");
+            Console.Error.WriteLine("[SendUpdates] Sending requests to players");
             foreach (Side side in Sides)
             {
                 side.EmitRequest();
