@@ -2,6 +2,13 @@
 
 This directory contains the official Pokemon Showdown repository as a git submodule for reference purposes.
 
+## Visual Studio Integration
+
+The `ShowdownReference.csproj` project is included in the solution to make the TypeScript files visible in Solution Explorer. This project:
+- Does not build or compile any code
+- Simply includes the TypeScript files for easy navigation and reference
+- Allows Copilot to see and reference the Showdown implementation naturally
+
 ## Current Version
 
 Currently tracking: **commit 7b0158b4ab6c6d3fda3137ecf4d44756151f2428**

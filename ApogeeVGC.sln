@@ -5,6 +5,10 @@ VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.csproj", "{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{BDE35A5A-67E2-89B5-F696-3D963A037A75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShowdownReference", "Reference\ShowdownReference.csproj", "{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,24 @@ Global
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x64.Build.0 = Release|Any CPU
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x86.ActiveCfg = Release|Any CPU
 		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x86.Build.0 = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|x64.Build.0 = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4AE6CA65-F2FA-4667-9441-CAC65C35EA6A} = {BDE35A5A-67E2-89B5-F696-3D963A037A75}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}

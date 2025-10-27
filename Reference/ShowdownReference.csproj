@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+<TargetFramework>net9.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>false</IsPublishable>
+    <!-- Disable all compilation and building -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <!-- Include TypeScript and JavaScript files for viewing only -->
+  <ItemGroup>
+    <None Include="pokemon-showdown\**\*.ts" />
+    <None Include="pokemon-showdown\**\*.js" />
+    <None Include="pokemon-showdown\**\*.json" />
+    <None Include="pokemon-showdown\**\*.md" />
+    <None Include="README.md" />
+  </ItemGroup>
+
+  <!-- Exclude node_modules and other unnecessary directories -->
+  <ItemGroup>
+    <None Remove="pokemon-showdown\node_modules\**" />
+    <None Remove="pokemon-showdown\.git\**" />
+    <None Remove="pokemon-showdown\logs\**" />
+    <None Remove="pokemon-showdown\databases\**" />
+  </ItemGroup>
+</Project>
