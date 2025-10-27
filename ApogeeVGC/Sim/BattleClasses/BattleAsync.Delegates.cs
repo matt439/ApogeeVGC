@@ -19,33 +19,36 @@ public partial class BattleAsync
             return (RelayVar?)del.DynamicInvoke(null);
         }
 
+        // Check if first parameter is IBattle (used for proper position tracking)
+        bool firstParamIsBattle = paramCount > 0 && parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle));
+
         // Optimize for the most common cases (1-5 parameters)
         // This avoids array allocation for the majority of callbacks
         object? result;
         switch (paramCount)
         {
             case 1:
-                result = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect));
+                result = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle));
                 return (RelayVar?)result;
             case 2:
                 result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1)
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle)
                 );
                 return (RelayVar?)result;
             case 3:
                 result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1),
-                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2)
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2, firstParamIsBattle)
                 );
                 return (RelayVar?)result;
             case 4:
                 result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1),
-                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2),
-                    BuildSingleArg(parameters[3], hasRelayVar, relayVar, target, source, sourceEffect, 3)
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2, firstParamIsBattle),
+                    BuildSingleArg(parameters[3], hasRelayVar, relayVar, target, source, sourceEffect, 3, firstParamIsBattle)
                 );
                 return (RelayVar?)result;
         }
@@ -56,7 +59,7 @@ public partial class BattleAsync
         int argIndex = 0;
 
         // First parameter is typically IBattle (this)
-        if (parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle)))
+        if (firstParamIsBattle)
         {
             args[argIndex++] = this;
         }
@@ -114,7 +117,8 @@ public partial class BattleAsync
     /// Used by the optimized fast-path for common parameter counts.
     /// </summary>
     private object? BuildSingleArg(ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
-        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect, int position = 0)
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect, int position = 0,
+        bool firstParamIsBattle = false)
     {
         Type paramType = param.ParameterType;
 
@@ -125,20 +129,29 @@ public partial class BattleAsync
         }
 
         // Second parameter might be relayVar if explicitly provided
-        if (position == 1 && hasRelayVar)
+        if (hasRelayVar && ((firstParamIsBattle && position == 1) || (!firstParamIsBattle && position == 0)))
         {
             return relayVar;
         }
 
-        // Adjust position if IBattle was first
+        // Calculate adjusted position for matching to target/source/sourceEffect
+        // We need to account for parameters consumed by IBattle and relayVar
         int adjustedPos = position;
-        if (position > 0 && paramType.IsAssignableFrom(typeof(IBattle)))
+
+        // If first param was IBattle and we're past it, adjust down
+        if (firstParamIsBattle && position > 0)
         {
             adjustedPos--;
         }
-        if (hasRelayVar && adjustedPos > 0)
+
+        // If relayVar was provided and we're past where it would be, adjust down
+        if (hasRelayVar)
         {
-            adjustedPos--;
+            int relayVarPos = firstParamIsBattle ? 1 : 0;
+            if (position > relayVarPos)
+            {
+                adjustedPos--;
+            }
         }
 
         // Try to match standard parameters in order: target, source, sourceEffect
