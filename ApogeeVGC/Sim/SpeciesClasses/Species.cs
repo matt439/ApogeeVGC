@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FormatClasses;
@@ -13,7 +14,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.SpeciesClasses;
 
-public record Species : IEffect, ICopyable<Species>
+public record Species : IEffect, ICopyable<Species>, IIdentifiable
 {
     public const double Epsilon = 0.0001;
 
@@ -22,7 +23,8 @@ public record Species : IEffect, ICopyable<Species>
     public EffectType EffectType => EffectType.Specie;
     public int Num { get; init; }
     public required string Name { get; init; }
-    public string FullName => $"{Name}{(Forme != BaseForme ? $"-{Forme}" : string.Empty)}";
+    public string FullName => $"pokemon: {Name}";
+    public string ShowdownId => Id.ToShowdownId();
     public SpecieId BaseSpecies { get; init; }
     public FormeId Forme { get; init; } = FormeId.None;
     public FormeId BaseForme { get; init; } = FormeId.None;

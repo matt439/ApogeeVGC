@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
@@ -35,13 +36,14 @@ public enum RuleId
     EndlessBattleClause,
 }
 
-public record Format : IEffect, IBasicEffect, IEventMethods, ICopyable<Format>
+public record Format : IEffect, IBasicEffect, IEventMethods, ICopyable<Format>, IIdentifiable
 {
     public FormatId FormatId { get; init; }
     public EffectStateId EffectStateId => FormatId;
     public EffectType EffectType => EffectType.Format;
     public required string Name { get; init; }
     public string FullName => $"format: {Name}";
+    public string ShowdownId => Name;
     public string? Desc { get; init; }
     public bool AffectsFainted { get; init; }
     public FormatEffectType FormatEffectType { get; init; }

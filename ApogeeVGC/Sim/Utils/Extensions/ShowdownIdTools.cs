@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 
 namespace ApogeeVGC.Sim.Utils.Extensions;
@@ -43,5 +44,10 @@ public static class ShowdownIdTools
     public static string ToShowdownId(this ItemId itemId)
     {
         return itemId.ToString().ToShowdownId();
+    }
+
+    public static string ToShowdownId(this NatureId natureId)
+    {
+        return natureId.ToString().ToShowdownId();
     }
 }

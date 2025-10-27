@@ -13,7 +13,8 @@ public interface IEffect
     /// This is the ID used in Pokémon Showdown's codebase to identify this effect.
     /// It is typically a lowercase version of the effect's name with spaces and special characters removed.
     /// </summary>
-    string ShowdownId { get; }
+    /// 
+    //string ShowdownId { get; }
     EffectStateId EffectStateId { get; }
     EffectDelegate? GetDelegate(EventId id);
 

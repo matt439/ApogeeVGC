@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -8,6 +9,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Items;
@@ -18,13 +20,14 @@ public record FlingData
     public ConditionId? Status { get; init; }
 }
 
-public record Item : IPokemonEventMethods, IEffect, IBasicEffect, ICopyable<Item>
+public record Item : IPokemonEventMethods, IEffect, IBasicEffect, ICopyable<Item>, IIdentifiable
 {
     public ItemId Id { get; init; }
     public EffectStateId EffectStateId => Id;
     public EffectType EffectType => EffectType.Item;
     public required string Name { get; init; }
     public string FullName => $"Item: {Name}";
+    public string ShowdownId => Id.ToShowdownId();
     public int SpriteNum { get; init; }
 
     public FlingData? Fling
@@ -787,5 +790,10 @@ public record Item : IPokemonEventMethods, IEffect, IBasicEffect, ICopyable<Item
             EventId.SwitchIn => OnSwitchInSubOrder,
             _ => null,
         };
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

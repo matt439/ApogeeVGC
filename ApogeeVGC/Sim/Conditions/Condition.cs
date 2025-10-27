@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
@@ -15,7 +16,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 namespace ApogeeVGC.Sim.Conditions;
 
 public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMethods, IEffect, IBasicEffect,
-    ICopyable<Condition>
+    ICopyable<Condition>, IIdentifiable
 {
     public required ConditionId Id { get; init; }
     public EffectStateId EffectStateId => Id;

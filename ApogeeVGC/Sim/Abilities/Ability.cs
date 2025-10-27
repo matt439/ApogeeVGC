@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
@@ -13,7 +14,8 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Abilities;
 
-public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect, ICopyable<Ability>
+public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBasicEffect, ICopyable<Ability>,
+    IIdentifiable
 {
     public EffectType EffectType => EffectType.Ability;
     public required AbilityId Id { get; init; }

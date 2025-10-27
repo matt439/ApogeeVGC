@@ -1,13 +1,15 @@
-﻿using ApogeeVGC.Sim.FormatClasses;
+﻿using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.SpeciesClasses;
 
-public record SpeciesFormat : ICopyable<SpeciesFormat>
+public record SpeciesFormat : ICopyable<SpeciesFormat>, IIdentifiable
 {
     public required SpecieId Id { get; init; }
+    public string ShowdownId => Id.ToShowdownId();
     public Tier? DoublesTier
     {
         get;

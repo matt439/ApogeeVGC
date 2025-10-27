@@ -16,7 +16,7 @@ public record SpeciesFormats
 
     private readonly Dictionary<SpecieId, SpeciesFormat> _speciesFormatsData = new()
     {
-        [SpecieId.CalyrexIce] = new SpeciesFormat()
+        [SpecieId.CalyrexIce] = new SpeciesFormat
         {
             Id = SpecieId.CalyrexIce,
             Tier = Tier.Uber,

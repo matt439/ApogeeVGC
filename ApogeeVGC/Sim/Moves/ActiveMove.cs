@@ -1,12 +1,14 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record ActiveMove : Move, IEffect
+public record ActiveMove : Move, IEffect, IIdentifiable
 {
     /// <summary>The MoveSlot this move occupies in a Pokemon's moveset.</summary>
     public required MoveSlot MoveSlot { get; init; }
@@ -99,6 +101,13 @@ public record ActiveMove : Move, IEffect
     /// Store the HitEffect in this property so it can be accessed later.
     /// </summary>
     public HitEffect? HitEffect { get; set; }
+
+    public string ShowdownId => Id.ToShowdownId();
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }
 
 
