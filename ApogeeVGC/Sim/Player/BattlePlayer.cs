@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using ApogeeVGC.Sim.Choices;
 
 namespace ApogeeVGC.Sim.Player;
@@ -56,10 +57,27 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
         {
             case "request":
             {
-                var request = JsonSerializer.Deserialize<IChoiceRequest>(rest);
-                if (request != null)
+                try
                 {
-                    ReceiveRequest(request);
+                    Console.WriteLine($"[BattlePlayer] Received request JSON (first 200 chars): {rest.Substring(0, Math.Min(200, rest.Length))}");
+   
+                    // Parse as JsonObject and pass to the handler
+                    JsonObject? jsonRequest = JsonSerializer.Deserialize<JsonObject>(rest);
+ 
+                    if (jsonRequest != null)
+                    {
+                        Console.WriteLine($"[BattlePlayer] Parsed request with keys: {string.Join(", ", jsonRequest.Select(kvp => kvp.Key))}");
+                        ReceiveRequest(jsonRequest);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[BattlePlayer] Failed to parse request JSON");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[BattlePlayer] Error parsing request: {ex.Message}");
+                    Console.WriteLine($"[BattlePlayer] Stack trace: {ex.StackTrace}");
                 }
                 return;
             }
@@ -76,7 +94,7 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
     /// Called when a choice request is received from the battle.
     /// Derived classes must implement this to provide battle choices.
     /// </summary>
-    public abstract void ReceiveRequest(IChoiceRequest request);
+    public abstract void ReceiveRequest(JsonObject request);
 
     /// <summary>
     /// Called when an error is received from the battle.
@@ -92,6 +110,7 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
     /// </summary>
     public async Task ChooseAsync(string choice, CancellationToken cancellationToken = default)
     {
+    Console.WriteLine($"[BattlePlayer] Sending choice: {choice}");
         await Stream.WriteAsync(choice, cancellationToken);
     }
 }

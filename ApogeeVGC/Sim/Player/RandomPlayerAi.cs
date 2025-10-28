@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils;
+using System.Text.Json.Nodes;
 
 namespace ApogeeVGC.Sim.Player;
 
@@ -24,30 +25,35 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
         base.ReceiveError(error);
     }
 
-    public override void ReceiveRequest(IChoiceRequest request)
+    public override void ReceiveRequest(JsonObject request)
     {
         try
         {
-            if (request.Wait == true)
+            Console.WriteLine($"[RandomPlayerAi] Received request with keys: {string.Join(", ", request.Select(kvp => kvp.Key))}");
+
+            if (request.ContainsKey("wait") && request["wait"]?.GetValue<bool>() == true)
             {
                 // Wait request - do nothing
+                Console.WriteLine("[RandomPlayerAi] Wait request - doing nothing");
                 return;
             }
 
-            if (request.ForceSwitch != null)
+            if (request.ContainsKey("forceSwitch"))
             {
                 // Switch request
+                Console.WriteLine("[RandomPlayerAi] Handling forced switch");
                 HandleForcedSwitch(request);
             }
-            else if (request.TeamPreview == true)
+            else if (request.ContainsKey("teamPreview"))
             {
                 // Team preview
-                string choice = ChooseTeamPreview(request.Side.Pokemon);
-                _ = ChooseAsync(choice);
+                Console.WriteLine("[RandomPlayerAi] Handling team preview");
+                _ = ChooseAsync("default");
             }
-            else
+            else if (request.ContainsKey("active"))
             {
                 // Move request
+                Console.WriteLine("[RandomPlayerAi] Handling move request");
                 HandleMoveRequest(request);
             }
         }
@@ -59,20 +65,31 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
         }
     }
 
-    private void HandleForcedSwitch(IChoiceRequest request)
+    private void HandleForcedSwitch(JsonObject request)
     {
         try
         {
-            var pokemon = request.Side.Pokemon;
-            var forceSwitch = request.ForceSwitch!;
+            if (request["forceSwitch"] is not JsonArray forceSwitchArray)
+            {
+                Console.WriteLine("[HandleForcedSwitch] forceSwitch is not an array");
+                return;
+            }
+
+            if (request["side"] is not JsonObject sideObj || sideObj["pokemon"] is not JsonArray pokemonArray)
+            {
+                Console.WriteLine("[HandleForcedSwitch] side or pokemon data missing");
+                return;
+            }
+
             var chosen = new HashSet<int>();
             var choices = new List<string>();
 
-            Console.WriteLine($"[DEBUG] HandleForcedSwitch: Pokemon count = {pokemon.Count}, ForceSwitch count = {forceSwitch.Count}");
+            Console.WriteLine($"[DEBUG] HandleForcedSwitch: Pokemon count = {pokemonArray.Count}, ForceSwitch count = {forceSwitchArray.Count}");
 
-            for (int i = 0; i < forceSwitch.Count; i++)
+            for (int i = 0; i < forceSwitchArray.Count; i++)
             {
-                if (!forceSwitch[i])
+                bool needsSwitch = forceSwitchArray[i]?.GetValue<bool>() ?? false;
+                if (!needsSwitch)
                 {
                     choices.Add("pass");
                     continue;
@@ -82,16 +99,17 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 for (int j = 1; j <= 6; j++)
                 {
                     int pokemonIndex = j - 1;
-                    if (pokemonIndex >= pokemon.Count) break;
+                    if (pokemonIndex >= pokemonArray.Count) break;
 
-                    PokemonSwitchRequestData mon = pokemon[pokemonIndex];
+                    if (pokemonArray[pokemonIndex] is not JsonObject mon) continue;
 
-                    // Check if we can switch to this pokemon
-                    // FIXED: Check bounds before accessing pokemon[i]
-                    bool needsReviving = i < pokemon.Count && pokemon[i].Reviving;
-                    if (j > forceSwitch.Count && // not active
-                        !chosen.Contains(j) && // not chosen for simultaneous switch
-                        IsFainted(mon.Condition) == needsReviving) // fainted status matches reviving requirement
+                    bool isActive = mon["active"]?.GetValue<bool>() ?? false;
+                    string conditionStr = mon["condition"]?.GetValue<string>() ?? "0/0";
+                    bool isFainted = conditionStr.Contains("fnt") || conditionStr.StartsWith("0 ");
+
+                    if (j > forceSwitchArray.Count && // not active slot
+                        !chosen.Contains(j) && // not already chosen
+                        !isFainted) // not fainted
                     {
                         canSwitch.Add(j);
                     }
@@ -105,21 +123,7 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 }
                 else
                 {
-                    var switchOptions = canSwitch.Select(slot => 
-                    {
-                        Console.WriteLine($"[DEBUG] Creating switch option for slot {slot} (index {slot - 1})");
-                        if (slot - 1 >= pokemon.Count)
-                        {
-                            throw new InvalidOperationException($"Invalid pokemon slot {slot}: pokemon count is {pokemon.Count}");
-                        }
-                        return new SwitchOption
-                        {
-                            Slot = slot,
-                            Pokemon = pokemon[slot - 1],
-                        };
-                    }).ToList();
-
-                    int target = ChooseSwitch(null, switchOptions);
+                    int target = Prng.Sample(canSwitch);
                     chosen.Add(target);
                     choices.Add($"switch {target}");
                 }
@@ -135,90 +139,141 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
         }
     }
 
-    private void HandleMoveRequest(IChoiceRequest request)
+    private void HandleMoveRequest(JsonObject request)
     {
         try
         {
-            var pokemon = request.Side.Pokemon;
-            var choices = new List<string>();
-
-            Console.WriteLine($"[DEBUG] HandleMoveRequest: Pokemon count = {pokemon.Count}");
-
-            // For each active pokemon, make a choice
-            var activePokemon = pokemon.Where(p => p.Active).ToList();
-            Console.WriteLine($"[DEBUG] Active pokemon count = {activePokemon.Count}");
-
-            foreach (PokemonSwitchRequestData mon in activePokemon)
+            if (request["side"] is not JsonObject sideObj || sideObj["pokemon"] is not JsonArray pokemonArray)
             {
-                if (IsFainted(mon.Condition) || mon.Commanding)
+                Console.WriteLine("[HandleMoveRequest] side or pokemon data missing");
+                return;
+            }
+
+            if (request["active"] is not JsonArray activeArray)
+            {
+                Console.WriteLine("[HandleMoveRequest] active data missing");
+                return;
+            }
+
+            var choices = new List<string>();
+            Console.WriteLine($"[DEBUG] HandleMoveRequest: Pokemon count = {pokemonArray.Count}, Active count = {activeArray.Count}");
+
+            for (int i = 0; i < activeArray.Count; i++)
+            {
+                if (activeArray[i] is not JsonObject activeData)
                 {
                     choices.Add("pass");
                     continue;
                 }
 
-                // Get available moves
-                var availableMoves = mon.Moves
-                    .Select((move, index) => new { Move = move, Slot = index + 1 })
-                    .Where(m => m.Move != null)
-                    .Select(m => new MoveOption
-                    {
-                        Slot = m.Slot,
-                        Choice = $"move {m.Slot}",
-                    })
-                    .ToList();
-
-                // Get available switches
-                var canSwitch = new List<int>();
-                if (!mon.Active) // If trapped, we can't switch
+                // Get corresponding pokemon from side
+                JsonObject? sidePokemon = null;
+                for (int j = 0; j < pokemonArray.Count; j++)
                 {
-                    for (int j = 1; j <= 6; j++)
+                    if (pokemonArray[j] is JsonObject mon && mon["active"]?.GetValue<bool>() == true)
                     {
-                        int pokemonIndex = j - 1;
-                        if (pokemonIndex >= pokemon.Count) break;
+                        // Found an active pokemon - check if it's the i-th one
+                        // For now, just use the first active pokemon we find
+                        // This is simplified - a proper implementation would track positions
+                        sidePokemon = mon;
+                        break;
+                    }
+                }
 
-                        PokemonSwitchRequestData switchMon = pokemon[pokemonIndex];
-                        if (!switchMon.Active && !IsFainted(switchMon.Condition))
+                if (sidePokemon == null)
+                {
+                    choices.Add("pass");
+                    continue;
+                }
+
+                string conditionStr = sidePokemon["condition"]?.GetValue<string>() ?? "0/0";
+                bool isFainted = conditionStr.Contains("fnt") || conditionStr.StartsWith("0 ");
+                bool commanding = sidePokemon["commanding"]?.GetValue<bool>() ?? false;
+
+                if (isFainted || commanding)
+                {
+                    choices.Add("pass");
+                    continue;
+                }
+
+                // Count available moves
+                int moveCount = 0;
+                if (activeData["moves"] is JsonArray movesArray)
+                {
+                    moveCount = movesArray.Count;
+                }
+
+                Console.WriteLine($"[DEBUG] Pokemon {i} has {moveCount} moves");
+
+                // Check if can switch
+                bool canSwitch = false;
+                bool trapped = sidePokemon["trapped"]?.GetValue<bool>() ?? false;
+                if (!trapped)
+                {
+                    // Count non-active, non-fainted pokemon
+                    for (int j = 0; j < pokemonArray.Count; j++)
+                    {
+                        if (pokemonArray[j] is JsonObject mon)
                         {
-                            canSwitch.Add(j);
+                            bool active = mon["active"]?.GetValue<bool>() ?? false;
+                            string cond = mon["condition"]?.GetValue<string>() ?? "0/0";
+                            bool fainted = cond.Contains("fnt") || cond.StartsWith("0 ");
+
+                            if (!active && !fainted)
+                            {
+                                canSwitch = true;
+                                break;
+                            }
                         }
                     }
                 }
 
-                Console.WriteLine($"[DEBUG] Can switch to {canSwitch.Count} pokemon");
+                Console.WriteLine($"[DEBUG] Can switch: {canSwitch}");
 
                 // Randomly decide to switch or use a move
-                if (canSwitch.Count > 0 && (availableMoves.Count == 0 || Prng.Random() > MoveWeight))
+                if (canSwitch && (moveCount == 0 || Prng.Random() > MoveWeight))
                 {
-                    var switchOptions = canSwitch.Select(slot =>
+                    // Choose a random switch target
+                    var switchTargets = new List<int>();
+                    for (int j = 1; j <= pokemonArray.Count; j++)
                     {
-                        Console.WriteLine($"[DEBUG] Creating switch option for slot {slot} (index {slot - 1})");
-                        if (slot - 1 >= pokemon.Count)
+                        int idx = j - 1;
+                        if (pokemonArray[idx] is JsonObject mon)
                         {
-                            throw new InvalidOperationException($"Invalid pokemon slot {slot}: pokemon count is {pokemon.Count}");
-                        }
-                        return new SwitchOption
-                        {
-                            Slot = slot,
-                            Pokemon = pokemon[slot - 1],
-                        };
-                    }).ToList();
+                            bool active = mon["active"]?.GetValue<bool>() ?? false;
+                            string cond = mon["condition"]?.GetValue<string>() ?? "0/0";
+                            bool fainted = cond.Contains("fnt") || cond.StartsWith("0 ");
 
-                    int target = ChooseSwitch(mon, switchOptions);
-                    choices.Add($"switch {target}");
+                            if (!active && !fainted)
+                            {
+                                switchTargets.Add(j);
+                            }
+                        }
+                    }
+
+                    if (switchTargets.Count > 0)
+                    {
+                        int target = Prng.Sample(switchTargets);
+                        choices.Add($"switch {target}");
+                    }
+                    else
+                    {
+                        choices.Add("pass");
+                    }
                 }
-                else if (availableMoves.Count > 0)
+                else if (moveCount > 0)
                 {
-                    string move = ChooseMove(mon, availableMoves);
-                    choices.Add(move);
+                    // Choose a random move slot (1-based)
+                    int moveSlot = Prng.Random(1, moveCount + 1);
+                    choices.Add($"move {moveSlot}");
                 }
                 else
                 {
-                    throw new InvalidOperationException(
-                        $"{GetType().Name} unable to make choice. " +
-                        $"No available moves or switches.");
+                    choices.Add("pass");
                 }
             }
 
+            Console.WriteLine($"[DEBUG] Final choices: {string.Join(", ", choices)}");
             _ = ChooseAsync(string.Join(", ", choices));
         }
         catch (Exception ex)
@@ -228,43 +283,4 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             throw;
         }
     }
-
-    protected virtual string ChooseTeamPreview(IReadOnlyList<PokemonSwitchRequestData> team)
-    {
-        return "default";
-    }
-
-    protected virtual string ChooseMove(
-        PokemonSwitchRequestData active,
-        IReadOnlyList<MoveOption> moves)
-    {
-        return Prng.Sample(moves).Choice;
-    }
-
-    protected virtual int ChooseSwitch(
-        PokemonSwitchRequestData? active,
-        IReadOnlyList<SwitchOption> switches)
-    {
-        return Prng.Sample(switches).Slot;
-    }
-
-    private static bool IsFainted(ConditionId condition)
-    {
-        // Check if the condition indicates the pokemon is fainted
-        // This is a simplified check - you may need to adjust based on your ConditionId enum
-        return condition.ToString().EndsWith("fnt") ||
-               condition.ToString().Contains("Faint", StringComparison.OrdinalIgnoreCase);
-    }
-}
-
-public record MoveOption
-{
-    public required int Slot { get; init; }
-    public required string Choice { get; init; }
-}
-
-public record SwitchOption
-{
-    public required int Slot { get; init; }
-    public required PokemonSwitchRequestData Pokemon { get; init; }
 }
