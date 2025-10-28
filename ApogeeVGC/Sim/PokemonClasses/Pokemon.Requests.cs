@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
@@ -54,64 +54,67 @@ public partial class Pokemon
         // Get move list - either base moves (for allies) or current moves
         var moveSource = forAlly ? BaseMoveSlots : MoveSlots;
 
-        // Convert move slots to Move objects
-        var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
+        // Convert move slots to MoveDto objects (only serializable data)
+        var moves = moveSource
+      .Select(moveSlot => Battle.Library.Moves[moveSlot.Id])
+    .Select(MoveDto.FromMove)
+       .ToList();
 
         if (GetHealth().Secret is not SecretConditionId secretCondition)
-        {
-            secretCondition = new SecretConditionId(ConditionId.None);
-        }
+      {
+  secretCondition = new SecretConditionId(ConditionId.None);
+     }
 
         // Create the base entry
         var entry = new PokemonSwitchRequestData
         {
-            Condition = secretCondition.Value,
-            Active = Position < Side.Active.Count,
-            Stats = stats,
-            Moves = moves,
-            BaseAbility = Battle.Library.Abilities[BaseAbility],
-            Item = Battle.Library.Items[Item],
+    Condition = secretCondition.Value,
+      Active = Position < Side.Active.Count,
+       Stats = stats,
+       Moves = moves,
+     BaseAbility = AbilityDto.FromAbility(Battle.Library.Abilities[BaseAbility]),
+            Item = ItemDto.FromItem(Battle.Library.Items[Item]),
             Pokeball = Pokeball,
-            // Default values for Gen 9+ fields
-            Ability = Battle.Library.Abilities[Ability],
-            Commanding = false,
-            Reviving = false,
-            TeraType = TeraType,
+        // Default values for Gen 9+ fields
+            Ability = AbilityDto.FromAbility(Battle.Library.Abilities[Ability]),
+       Commanding = false,
+     Reviving = false,
+ TeraType = TeraType,
             Terastallized = false,
-        };
+   };
 
         // Gen 7+ includes current ability
-        if (Battle.Gen > 6)
-        {
-            entry = entry with { Ability = Battle.Library.Abilities[Ability] };
+   if (Battle.Gen > 6)
+    {
+            entry = entry with { Ability = AbilityDto.FromAbility(Battle.Library.Abilities[Ability]) };
         }
 
-        // Gen 9+ includes commanding and reviving status
+      // Gen 9+ includes commanding and reviving status
         if (Battle.Gen >= 9)
         {
             // Commanding: Pokemon has the Commanding volatile and is not fainted
-            bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
+    bool commanding = Volatiles.ContainsKey(ConditionId.Commanding) && !Fainted;
 
-            // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
-            bool reviving = IsActive &&
-                            Position < Side.SlotConditions.Count &&
-                            Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
+      // Reviving: Pokemon is active and has Revival Blessing slot condition at its position
+     bool reviving = IsActive &&
+     Position < Side.SlotConditions.Count &&
+             Side.SlotConditions[Position].ContainsKey(ConditionId.RevivalBlessing);
 
-            entry = entry with
-            {
-                Commanding = commanding,
-                Reviving = reviving,
-            };
-        }
+   entry = entry with
+  {
+          Commanding = commanding,
+  Reviving = reviving,
+  };
+  }
 
-        // Gen 9 includes Tera type and Terastallized status
+    // Gen 9 includes Tera type and Terastallized status
         if (Battle.Gen == 9)
-        {
+  {
             entry = entry with
-            {
-                TeraType = TeraType,
-                Terastallized = Terastallized != null,
-            };
+        {
+        TeraType = TeraType,
+     Terastallized = Terastallized != null,
+   };
         }
 
         return entry;

@@ -5,7 +5,6 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
-using System.Text.Json.Serialization;
 
 namespace ApogeeVGC.Sim.Moves;
 
@@ -13,65 +12,65 @@ public record Move : IMoveEventMethods, IBasicEffect, ICopyable<Move>
 {
     #region IMoveEventMethods Implementation
 
-    [JsonIgnore]
+    
     public BasePowerCallbackHandler? BasePowerCallback { get; init; }
-    [JsonIgnore]
+    
     public BeforeMoveCallbackHandler? BeforeMoveCallback { get; init; }
-    [JsonIgnore]
+    
     public BeforeTurnCallbackHandler? BeforeTurnCallback { get; init; }
-    [JsonIgnore]
+    
     public DamageCallbackHandler? DamageCallback { get; init; }
-    [JsonIgnore]
+    
   public PriorityChargeCallbackHandler? PriorityChargeCallback { get; init; }
-    [JsonIgnore]
+    
     public OnDisableMoveHandler? OnDisableMove { get; init; }
-    [JsonIgnore]
+    
     public VoidSourceMoveHandler? OnAfterHit { get; init; }
-    [JsonIgnore]
+    
     public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
-  [JsonIgnore]
+  
  public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
-  [JsonIgnore]
+  
   public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
-    [JsonIgnore]
+    
     public VoidSourceMoveHandler? OnAfterMove { get; init; }
-    [JsonIgnore]
+    
     public OnDamageHandler? OnDamage { get; init; }
-    [JsonIgnore]
+    
     public ModifierSourceMoveHandler? OnBasePower { get; init; }
-    [JsonIgnore]
+    
     public OnEffectivenessHandler? OnEffectiveness { get; init; }
-    [JsonIgnore]
+    
     public ResultMoveHandler? OnHit { get; init; }
-    [JsonIgnore]
+    
   public ResultMoveHandler? OnHitField { get; init; }
-    [JsonIgnore]
+    
     public OnHitSideHandler? OnHitSide { get; init; }
-    [JsonIgnore]
+    
  public OnModifyMoveHandler? OnModifyMove { get; init; }
- [JsonIgnore]
+ 
     public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
-    [JsonIgnore]
+    
     public VoidMoveHandler? OnMoveFail { get; init; }
-    [JsonIgnore]
+    
     public OnModifyTypeHandler? OnModifyType { get; init; }
-    [JsonIgnore]
+    
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
-    [JsonIgnore]
+    
     public ResultMoveHandler? OnPrepareHit { get; init; }
-    [JsonIgnore]
+    
     public ResultSourceMoveHandler? OnTry { get; init; }
-    [JsonIgnore]
+    
     public ExtResultSourceMoveHandler? OnTryHit { get; init; }
-    [JsonIgnore]
+    
     public ResultMoveHandler? OnTryHitField { get; init; }
-    [JsonIgnore]
+    
     public OnTryHitSideHandler? OnTryHitSide { get; init; }
-    [JsonIgnore]
+    
     public ResultMoveHandler? OnTryImmunity { get; init; }
-    [JsonIgnore]
+    
     public ResultSourceMoveHandler? OnTryMove { get; init; }
-    [JsonIgnore]
+    
     public VoidSourceMoveHandler? OnUseMoveMessage { get; init; }
 
     #endregion
