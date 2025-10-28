@@ -1,6 +1,7 @@
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Items;
@@ -12,7 +13,6 @@ using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace ApogeeVGC.Sim.Utils;
@@ -24,151 +24,216 @@ public static partial class State
         switch (obj)
         {
             case null:
-            return null;
+                return null;
 
-          // Delegates (functions) should be elided (return undefined, which we represent as null)
-          case Delegate:
-     return null;
+            // Delegates (functions) should be elided (return undefined, which we represent as null)
+            case Delegate:
+                return null;
 
-      // Primitive types - serialize as-is
-  case bool b:
- return b;
+            // Primitive types - serialize as-is
+            case bool b:
+                return b;
             case int i:
-      return i;
-   case long l:
-       return l;
-        case double d:
-         return d;
-     case decimal dec:
-return dec;
+                return i;
+            case long l:
+                return l;
+            case double d:
+                return d;
+            case decimal dec:
+                return dec;
             case string s:
-          return s;
+                return s;
 
- // Special handling for Pokemon Showdown protocol types
+            // Special handling for Pokemon Showdown protocol types
             case Nature nature:
-     return nature.ShowdownId;
+                return nature.ShowdownId;
 
-      case StatsTable stats:
-       return SerializeStatsTable(stats);
+            case StatsTable stats:
+                return SerializeStatsTable(stats);
 
-         case PokemonSet pokemonSet:
-          return SerializePokemonSet(pokemonSet);
+            case PokemonSet pokemonSet:
+                return SerializePokemonSet(pokemonSet);
 
-     case PlayerOptions playerOptions:
-      return SerializePlayerOptions(playerOptions);
+            case PlayerOptions playerOptions:
+                return SerializePlayerOptions(playerOptions);
 
             // Special handling for ActiveMove - serialize with only changed fields
-      case ActiveMove activeMove:
-       return SerializeActiveMove(activeMove, battle);
+            case ActiveMove activeMove:
+                return SerializeActiveMove(activeMove, battle);
 
-        // Check if this is a referable type (circular reference handling)
-       // Item, Ability, Condition, Move, and Species are referable (immutable from library)
-       case IBattle:
+            // Special handling for request data classes - serialize only relevant fields
+            case PokemonMoveData moveData:
+                return new Dictionary<string, object?>
+                {
+                    ["move"] = moveData.Move.Name,
+                    ["id"] = moveData.Id.ToString().ToLower(),
+                    ["pp"] = moveData.Pp,
+                    ["maxpp"] = moveData.MaxPp,
+                    ["target"] = moveData.Target?.ToString().ToLower(),
+                    ["disabled"] = SerializeWithRefs(moveData.Disabled, battle)
+                };
+
+            case PokemonSwitchRequestData switchData:
+                return new Dictionary<string, object?>
+                {
+                    ["condition"] = switchData.Condition.ToString(),
+                    ["active"] = switchData.Active,
+                    ["stats"] = SerializeStatsTable(switchData.Stats),
+                    ["moves"] = switchData.MoveNames.ToList(),
+                    ["baseAbility"] = switchData.BaseAbilityName.ToLower(),
+                    ["item"] = switchData.ItemName.ToLower(),
+                    ["pokeball"] = switchData.Pokeball.ToString().ToLower(),
+                    ["ability"] = switchData.AbilityName.ToLower(),
+                    ["commanding"] = switchData.Commanding,
+                    ["reviving"] = switchData.Reviving,
+                    ["teraType"] = switchData.TeraType.ToString().ToLower(),
+                    ["terastallized"] = switchData.Terastallized
+                };
+
+            case PokemonMoveRequestData moveReqData:
+                return SerializeChoiceRequest(moveReqData, battle);
+
+            case SideRequestData sideReqData:
+                return SerializeChoiceRequest(sideReqData, battle);
+
+            // Handle choice request types - serialize using reflection to get all properties
+            case MoveRequest moveRequest:
+                return SerializeChoiceRequest(moveRequest, battle);
+
+            case SwitchRequest switchRequest:
+                return SerializeChoiceRequest(switchRequest, battle);
+
+            case TeamPreviewRequest teamRequest:
+                return SerializeChoiceRequest(teamRequest, battle);
+
+            case WaitRequest waitRequest:
+                return SerializeChoiceRequest(waitRequest, battle);
+
+            // Check if this is a referable type (circular reference handling)
+            // Item, Ability, Condition, Move, and Species are referable (immutable from library)
+            case IBattle:
             case Field:
             case Side:
             case Pokemon:
             case Condition:
             case Ability:
             case Item:
-        case Move:
-     case Species:
-        // Convert to Referable union type and then to reference string
-    Referable referable = obj switch
+            case Move:
+            case Species:
+                // Convert to Referable union type and then to reference string
+                Referable referable = obj switch
                 {
-     IBattle b => Referable.FromIBattle(b),
-Field f => f,
-           Side side => side,
-Pokemon p => p,
-       Condition c => c,
-        Ability a => a,
-          Item i => i,
-       Move m => (Referable)m,
-           Species sp => sp,
-   _ => throw new InvalidOperationException(
-            $"Unhandled referable type: {obj.GetType()}")
-     };
-      return ToRef(referable);
+                    IBattle b => Referable.FromIBattle(b),
+                    Field f => f,
+                    Side side => side,
+                    Pokemon p => p,
+                    Condition c => c,
+                    Ability a => a,
+                    Item i => i,
+                    Move m => (Referable)m,
+                    Species sp => sp,
+                    _ => throw new InvalidOperationException(
+                        $"Unhandled referable type: {obj.GetType()}")
+                };
+                return ToRef(referable);
 
             // Handle collections
             case System.Collections.IEnumerable enumerable when obj.GetType().IsArray ||
-          obj.GetType().IsGenericType &&
-        obj.GetType()
-          .GetGenericTypeDefinition() ==
-         typeof(List<>):
-     var list = new List<object?>();
-       foreach (object? item in enumerable)
-   {
-    object? serialized = SerializeWithRefs(item, battle);
-      // Only add if not null/undefined (elide null delegate results)
-       if (serialized != null)
-         {
-             list.Add(serialized);
-           }
-       }
+                                                                obj.GetType().IsGenericType &&
+                                                                obj.GetType()
+                                                                    .GetGenericTypeDefinition() ==
+                                                                typeof(List<>):
+                var list = new List<object?>();
+                foreach (object? item in enumerable)
+                {
+                    object? serialized = SerializeWithRefs(item, battle);
+                    // Only add if not null/undefined (elide null delegate results)
+                    if (serialized != null)
+                    {
+                        list.Add(serialized);
+                    }
+                }
 
-              return list;
+                return list;
 
             // Handle dictionaries
- case System.Collections.IDictionary dictionary:
+            case System.Collections.IDictionary dictionary:
                 var dict = new Dictionary<string, object?>();
                 foreach (System.Collections.DictionaryEntry entry in dictionary)
-         {
-      string key = entry.Key.ToString() ??
-           throw new InvalidOperationException(
-    "Dictionary key cannot be null");
-          object? serialized = SerializeWithRefs(entry.Value, battle);
+                {
+                    string key = entry.Key.ToString() ??
+                                 throw new InvalidOperationException(
+                                     "Dictionary key cannot be null");
+                    object? serialized = SerializeWithRefs(entry.Value, battle);
                     // Only add if not null/undefined (elide null delegate results)
-         if (serialized != null)
-          {
-            dict[key] = serialized;
-  }
-   }
+                    if (serialized != null)
+                    {
+                        dict[key] = serialized;
+                    }
+                }
 
-         return dict;
+                return dict;
 
             // Handle enums - serialize as string
-          case Enum enumValue:
-             return enumValue.ToString();
+            case Enum enumValue:
+                return enumValue.ToString();
 
-  default:
-      // For plain objects (POCOs), serialize all public properties
-           if (obj.GetType().IsClass && obj.GetType() != typeof(string))
-     {
-               // If we're getting this error, some 'special' field has been added to
-          // an object and we need to update the logic in this file to handle it.
-    // The most common case is that someone added a Set/Map which probably
-   // needs to be serialized as an Array/Object respectively.
+            // Handle union types - extract the actual value
+            case MoveTypeFalseUnion union:
+                return union switch
+                {
+                    MoveTypeMoveTypeFalseUnion m => m.MoveType.ToString().ToLower(),
+                    FalseMoveTypeFalseUnion => false,
+                    _ => null
+                };
 
-      // Only serialize simple DTOs/POCOs, not complex types we haven't explicitly handled
-         if (obj.GetType().Namespace?.StartsWith("ApogeeVGC") == true)
-     {
-        throw new NotSupportedException(
-           $"Unsupported type {obj.GetType().Name}: {obj}. " +
-          "This type needs explicit handling in SerializeWithRefs.");
-             }
+            case MoveIdBoolUnion moveIdBoolUnion:
+                return moveIdBoolUnion switch
+                {
+                    MoveIdMoveIdBoolUnion m => m.MoveId.ToString().ToLower(),
+                    BoolMoveIdBoolUnion b => b.Value,
+                    _ => null
+                };
 
-          // For external types, try to serialize properties
-    var result = new Dictionary<string, object?>();
-        var properties = obj.GetType().GetProperties(BindingFlags.Public |
-         BindingFlags.Instance);
-     foreach (PropertyInfo prop in properties)
-         {
-   if (prop.CanRead)
-           {
-object? value = prop.GetValue(obj);
-         object? serialized = SerializeWithRefs(value, battle);
-          // Only add if not null/undefined
-        if (serialized != null)
-     {
-         result[ToCamelCase(prop.Name)] = serialized;
-  }
-       }
-   }
+            default:
+                // For plain objects (POCOs), serialize all public properties
+                if (obj.GetType().IsClass && obj.GetType() != typeof(string))
+                {
+                    // If we're getting this error, some 'special' field has been added to
+                    // an object and we need to update the logic in this file to handle it.
+                    // The most common case is that someone added a Set/Map which probably
+                    // needs to be serialized as an Array/Object respectively.
 
-        return result;
-    }
+                    // Only serialize simple DTOs/POCOs, not complex types we haven't explicitly handled
+                    if (obj.GetType().Namespace?.StartsWith("ApogeeVGC") == true)
+                    {
+                        throw new NotSupportedException(
+                            $"Unsupported type {obj.GetType().Name}: {obj}. " +
+                            "This type needs explicit handling in SerializeWithRefs.");
+                    }
 
-    throw new NotSupportedException($"Cannot serialize type {obj.GetType()}: {obj}");
+                    // For external types, try to serialize properties
+                    var result = new Dictionary<string, object?>();
+                    var properties = obj.GetType().GetProperties(BindingFlags.Public |
+                                                                 BindingFlags.Instance);
+                    foreach (PropertyInfo prop in properties)
+                    {
+                        if (prop.CanRead)
+                        {
+                            object? value = prop.GetValue(obj);
+                            object? serialized = SerializeWithRefs(value, battle);
+                            // Only add if not null/undefined
+                            if (serialized != null)
+                            {
+                                result[ToCamelCase(prop.Name)] = serialized;
+                            }
+                        }
+                    }
+
+                    return result;
+                }
+
+                throw new NotSupportedException($"Cannot serialize type {obj.GetType()}: {obj}");
         }
     }
 
@@ -177,15 +242,41 @@ object? value = prop.GetValue(obj);
     /// </summary>
     private static Dictionary<string, int> SerializeStatsTable(StatsTable stats)
     {
-return new Dictionary<string, int>
+        return new Dictionary<string, int>
         {
-     ["hp"] = stats.Hp,
+            ["hp"] = stats.Hp,
             ["atk"] = stats.Atk,
-  ["def"] = stats.Def,
+            ["def"] = stats.Def,
             ["spa"] = stats.SpA,
             ["spd"] = stats.SpD,
             ["spe"] = stats.Spe
- };
+        };
+    }
+
+    /// <summary>
+    /// Serializes a choice request object by recursively serializing its properties.
+    /// </summary>
+    private static Dictionary<string, object?> SerializeChoiceRequest(object request,
+        IBattle battle)
+    {
+        var result = new Dictionary<string, object?>();
+        var properties =
+            request.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (PropertyInfo prop in properties)
+        {
+            if (!prop.CanRead) continue;
+
+            object? value = prop.GetValue(request);
+            object? serialized = SerializeWithRefs(value, battle);
+
+            if (serialized != null)
+            {
+                result[ToCamelCase(prop.Name)] = serialized;
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -195,27 +286,29 @@ return new Dictionary<string, int>
     {
         var result = new Dictionary<string, object?>
         {
-       ["name"] = set.Name,
+            ["name"] = set.Name,
             ["species"] = set.Species.ToShowdownId(),
             ["item"] = set.Item.ToShowdownId(),
-    ["ability"] = set.Ability.ToShowdownId(),
-   ["moves"] = set.Moves.Select(m => m.ToShowdownId()).ToList(),
-         ["nature"] = set.Nature.ShowdownId,
-   ["evs"] = SerializeStatsTable(set.Evs),
+            ["ability"] = set.Ability.ToShowdownId(),
+            ["moves"] =
+                set.Moves.Select(m => m.ToShowdownId())
+                    .ToArray(), // Convert to array for proper JSON serialization
+            ["nature"] = set.Nature.ShowdownId,
+            ["evs"] = SerializeStatsTable(set.Evs),
             ["ivs"] = SerializeStatsTable(set.Ivs),
-  ["level"] = set.Level,
-   ["gender"] = set.Gender.GenderIdString(),
+            ["level"] = set.Level,
+            ["gender"] = set.Gender.GenderIdString(),
         };
 
-      // Only include optional fields if they differ from defaults
+        // Only include optional fields if they differ from defaults
         if (set.Shiny)
         {
             result["shiny"] = true;
         }
 
         if (set.Happiness != 0)
-  {
-  result["happiness"] = set.Happiness;
+        {
+            result["happiness"] = set.Happiness;
         }
 
         if (set.Pokeball != PokeballId.Pokeball)
@@ -223,7 +316,7 @@ return new Dictionary<string, int>
             result["pokeball"] = set.Pokeball.ToShowdownId();
         }
 
-  // Always include teraType for Gen 9
+        // Always include teraType for Gen 9
         result["teraType"] = set.TeraType.ToShowdownId();
 
         return result;
@@ -234,31 +327,32 @@ return new Dictionary<string, int>
     /// </summary>
     private static Dictionary<string, object?> SerializePlayerOptions(PlayerOptions options)
     {
-      var result = new Dictionary<string, object?>();
+        var result = new Dictionary<string, object?>();
 
-     if (options.Name != null)
-      {
-    result["name"] = options.Name;
-  }
+        if (options.Name != null)
+        {
+            result["name"] = options.Name;
+        }
 
         if (options.Avatar != null)
-  {
-      result["avatar"] = options.Avatar;
+        {
+            result["avatar"] = options.Avatar;
         }
 
-   if (options.Rating != null)
+        if (options.Rating != null)
         {
-   result["rating"] = options.Rating;
- }
-
-      if (options.Team != null)
-  {
-  result["team"] = options.Team.Select(SerializePokemonSet).ToList();
+            result["rating"] = options.Rating;
         }
 
-    if (options.Seed != null)
+        if (options.Team != null)
         {
-   result["seed"] = options.Seed;
+            // Serialize team as array of dictionaries with primitive types only
+            result["team"] = options.Team.Select(SerializePokemonSet).ToArray();
+        }
+
+        if (options.Seed != null)
+        {
+            result["seed"] = options.Seed;
         }
 
         return result;
@@ -267,15 +361,17 @@ return new Dictionary<string, int>
     /// <summary>
     /// Public method to serialize PlayerOptions for Pokemon Showdown protocol without requiring a battle instance.
     /// </summary>
-    public static Dictionary<string, object?> SerializePlayerOptionsForShowdown(PlayerOptions options)
-  {
+    public static Dictionary<string, object?> SerializePlayerOptionsForShowdown(
+        PlayerOptions options)
+    {
         return SerializePlayerOptions(options);
     }
 
     /// <summary>
     /// Deserializes PlayerOptions from Pokemon Showdown JSON format back to C# objects.
     /// </summary>
-    public static PlayerOptions DeserializePlayerOptionsFromShowdown(JsonObject json, Library library)
+    public static PlayerOptions DeserializePlayerOptionsFromShowdown(JsonObject json,
+        Library library)
     {
         string? name = json.ContainsKey("name") ? json["name"]?.GetValue<string>() : null;
         string? avatar = json.ContainsKey("avatar") ? json["avatar"]?.GetValue<string>() : null;
@@ -284,24 +380,26 @@ return new Dictionary<string, int>
         List<PokemonSet>? team = null;
         if (json.ContainsKey("team") && json["team"] is JsonArray teamArray)
         {
-            team = teamArray.Select(item => DeserializePokemonSetFromShowdown((JsonObject)item!, library)).ToList();
+            team = teamArray
+                .Select(item => DeserializePokemonSetFromShowdown((JsonObject)item!, library))
+                .ToList();
         }
 
-    PrngSeed? seed = null;
+        PrngSeed? seed = null;
         if (json.ContainsKey("seed"))
         {
-        // Handle seed deserialization if needed
-  // seed = ...;
+            // Handle seed deserialization if needed
+            // seed = ...;
         }
 
         return new PlayerOptions
         {
-          Name = name,
-  Avatar = avatar,
+            Name = name,
+            Avatar = avatar,
             Rating = rating,
-  Team = team,
+            Team = team,
             Seed = seed
-    };
+        };
     }
 
     /// <summary>
@@ -311,122 +409,129 @@ return new Dictionary<string, int>
     {
         try
         {
-     string name = json["name"]?.GetValue<string>() ?? throw new InvalidOperationException("Pokemon name is required");
-          string speciesStr = json["species"]?.GetValue<string>() ?? throw new InvalidOperationException("Pokemon species is required");
- string itemStr = json["item"]?.GetValue<string>() ?? throw new InvalidOperationException("Pokemon item is required");
-string abilityStr = json["ability"]?.GetValue<string>() ?? throw new InvalidOperationException("Pokemon ability is required");
-        string natureStr = json["nature"]?.GetValue<string>() ?? throw new InvalidOperationException("Pokemon nature is required");
-        string genderStr = json["gender"]?.GetValue<string>() ?? "";
-   int level = json["level"]?.GetValue<int>() ?? 50;
+            string name = json["name"]?.GetValue<string>() ??
+                          throw new InvalidOperationException("Pokemon name is required");
+            string speciesStr = json["species"]?.GetValue<string>() ??
+                                throw new InvalidOperationException("Pokemon species is required");
+            string itemStr = json["item"]?.GetValue<string>() ??
+                             throw new InvalidOperationException("Pokemon item is required");
+            string abilityStr = json["ability"]?.GetValue<string>() ??
+                                throw new InvalidOperationException("Pokemon ability is required");
+            string natureStr = json["nature"]?.GetValue<string>() ??
+                               throw new InvalidOperationException("Pokemon nature is required");
+            string genderStr = json["gender"]?.GetValue<string>() ?? "";
+            int level = json["level"]?.GetValue<int>() ?? 50;
 
-    // Parse moves
-        List<MoveId> moves = new();
-        if (json["moves"] is JsonArray movesArray)
-    {
-   foreach (var moveNode in movesArray)
-             {
-          string moveStr = moveNode?.GetValue<string>() ?? throw new InvalidOperationException("Move cannot be null");
-         moves.Add(ParseShowdownId<MoveId>(moveStr));
-      }
-        }
-     else
-        {
-     throw new InvalidOperationException("Moves must be an array");
-        }
+            // Parse moves
+            List<MoveId> moves = new();
+            if (json["moves"] is JsonArray movesArray)
+            {
+                foreach (var moveNode in movesArray)
+                {
+                    string moveStr = moveNode?.GetValue<string>() ??
+                                     throw new InvalidOperationException("Move cannot be null");
+                    moves.Add(ParseShowdownId<MoveId>(moveStr));
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Moves must be an array");
+            }
 
-     // Parse EVs
-        StatsTable evs = new();
-        if (json["evs"] is JsonObject evsObj)
-      {
-        evs.Hp = evsObj["hp"]?.GetValue<int>() ?? 0;
-        evs.Atk = evsObj["atk"]?.GetValue<int>() ?? 0;
-   evs.Def = evsObj["def"]?.GetValue<int>() ?? 0;
- evs.SpA = evsObj["spa"]?.GetValue<int>() ?? 0;
- evs.SpD = evsObj["spd"]?.GetValue<int>() ?? 0;
-        evs.Spe = evsObj["spe"]?.GetValue<int>() ?? 0;
-        }
+            // Parse EVs
+            StatsTable evs = new();
+            if (json["evs"] is JsonObject evsObj)
+            {
+                evs.Hp = evsObj["hp"]?.GetValue<int>() ?? 0;
+                evs.Atk = evsObj["atk"]?.GetValue<int>() ?? 0;
+                evs.Def = evsObj["def"]?.GetValue<int>() ?? 0;
+                evs.SpA = evsObj["spa"]?.GetValue<int>() ?? 0;
+                evs.SpD = evsObj["spd"]?.GetValue<int>() ?? 0;
+                evs.Spe = evsObj["spe"]?.GetValue<int>() ?? 0;
+            }
 
-        // Parse IVs
-   StatsTable ivs = new();
-    if (json["ivs"] is JsonObject ivsObj)
-        {
+            // Parse IVs
+            StatsTable ivs = new();
+            if (json["ivs"] is JsonObject ivsObj)
+            {
                 ivs.Hp = ivsObj["hp"]?.GetValue<int>() ?? 31;
-     ivs.Atk = ivsObj["atk"]?.GetValue<int>() ?? 31;
-    ivs.Def = ivsObj["def"]?.GetValue<int>() ?? 31;
-        ivs.SpA = ivsObj["spa"]?.GetValue<int>() ?? 31;
-             ivs.SpD = ivsObj["spd"]?.GetValue<int>() ?? 31;
-          ivs.Spe = ivsObj["spe"]?.GetValue<int>() ?? 31;
+                ivs.Atk = ivsObj["atk"]?.GetValue<int>() ?? 31;
+                ivs.Def = ivsObj["def"]?.GetValue<int>() ?? 31;
+                ivs.SpA = ivsObj["spa"]?.GetValue<int>() ?? 31;
+                ivs.SpD = ivsObj["spd"]?.GetValue<int>() ?? 31;
+                ivs.Spe = ivsObj["spe"]?.GetValue<int>() ?? 31;
+            }
+
+            // Parse optional fields
+            bool shiny = json.ContainsKey("shiny") && json["shiny"]!.GetValue<bool>();
+            int happiness = json.ContainsKey("happiness") ? json["happiness"]!.GetValue<int>() : 0;
+            PokeballId pokeball = json.ContainsKey("pokeball")
+                ? ParseShowdownId<PokeballId>(json["pokeball"]!.GetValue<string>())
+                : PokeballId.Pokeball;
+            MoveType teraType = json.ContainsKey("teraType")
+                ? ParseShowdownId<MoveType>(json["teraType"]!.GetValue<string>())
+                : MoveType.Normal;
+
+            // Parse enums from showdown IDs
+            SpecieId species = ParseShowdownId<SpecieId>(speciesStr);
+            ItemId item = ParseShowdownId<ItemId>(itemStr);
+            AbilityId ability = ParseShowdownId<AbilityId>(abilityStr);
+            NatureId natureId = ParseShowdownId<NatureId>(natureStr);
+            GenderId gender = ParseGenderId(genderStr);
+
+            return new PokemonSet
+            {
+                Name = name,
+                Species = species,
+                Item = item,
+                Ability = ability,
+                Moves = moves,
+                Nature = library.Natures[natureId],
+                Gender = gender,
+                Evs = evs,
+                Ivs = ivs,
+                Level = level,
+                Shiny = shiny,
+                Happiness = happiness,
+                Pokeball = pokeball,
+                TeraType = teraType
+            };
         }
-
-     // Parse optional fields
-        bool shiny = json.ContainsKey("shiny") && json["shiny"]!.GetValue<bool>();
-        int happiness = json.ContainsKey("happiness") ? json["happiness"]!.GetValue<int>() : 0;
-        PokeballId pokeball = json.ContainsKey("pokeball")
-    ? ParseShowdownId<PokeballId>(json["pokeball"]!.GetValue<string>())
-    : PokeballId.Pokeball;
-        MoveType teraType = json.ContainsKey("teraType")
-     ? ParseShowdownId<MoveType>(json["teraType"]!.GetValue<string>())
-   : MoveType.Normal;
-
-        // Parse enums from showdown IDs
-     SpecieId species = ParseShowdownId<SpecieId>(speciesStr);
-        ItemId item = ParseShowdownId<ItemId>(itemStr);
-      AbilityId ability = ParseShowdownId<AbilityId>(abilityStr);
-      NatureId natureId = ParseShowdownId<NatureId>(natureStr);
-        GenderId gender = ParseGenderId(genderStr);
-
-        return new PokemonSet
-  {
-   Name = name,
-       Species = species,
-  Item = item,
-    Ability = ability,
-  Moves = moves,
-   Nature = library.Natures[natureId],
-      Gender = gender,
-       Evs = evs,
-   Ivs = ivs,
-   Level = level,
-      Shiny = shiny,
-  Happiness = happiness,
-    Pokeball = pokeball,
-  TeraType = teraType
-};
- }
-    catch (Exception ex)
-  {
-      Console.WriteLine($"Error deserializing PokemonSet: {ex.Message}");
-Console.WriteLine($"JSON: {json.ToJsonString()}");
-    throw;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing PokemonSet: {ex.Message}");
+            Console.WriteLine($"JSON: {json.ToJsonString()}");
+            throw;
         }
     }
 
     /// <summary>
     /// Parses a Showdown ID string (lowercase, no spaces) back to an enum value.
- /// </summary>
+    /// </summary>
     private static T ParseShowdownId<T>(string showdownId) where T : struct, Enum
     {
 // Try to parse directly with case-insensitive matching
-   // This should handle most cases like "calyrexice" -> "CalyrexIce"
-        if (Enum.TryParse<T>(showdownId, ignoreCase: true, out T result))
+        // This should handle most cases like "calyrexice" -> "CalyrexIce"
+        if (Enum.TryParse(showdownId, ignoreCase: true, out T result))
         {
-       return result;
+            return result;
         }
 
-     throw new ArgumentException($"Could not parse showdown ID '{showdownId}' as {typeof(T).Name}");
+        throw new ArgumentException(
+            $"Could not parse showdown ID '{showdownId}' as {typeof(T).Name}");
     }
 
     /// <summary>
     /// Parses gender string from Showdown format.
     /// </summary>
     private static GenderId ParseGenderId(string genderStr)
-  {
+    {
         return genderStr.ToUpperInvariant() switch
         {
-    "M" => GenderId.M,
-      "F" => GenderId.F,
-    "" => GenderId.Empty,
- _ => GenderId.N
+            "M" => GenderId.M,
+            "F" => GenderId.F,
+            "" => GenderId.Empty,
+            _ => GenderId.N
         };
     }
 
@@ -809,5 +914,24 @@ Console.WriteLine($"JSON: {json.ToJsonString()}");
             // If we can't convert, return the value as-is and hope for the best
             return value;
         }
+    }
+
+    /// <summary>
+    /// Serializes a choice request to a JSON string, properly handling delegates and complex objects.
+    /// This should be used instead of System.Text.Json.JsonSerializer for battle-related objects.
+    /// </summary>
+    public static string SerializeRequest(object request, IBattle battle)
+    {
+        // Use our custom serialization that handles delegates
+        object? serialized = SerializeWithRefs(request, battle);
+
+        // Convert to JSON string
+        return System.Text.Json.JsonSerializer.Serialize(serialized,
+            new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = false,
+                DefaultIgnoreCondition =
+                    System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            });
     }
 }

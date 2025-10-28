@@ -8,6 +8,8 @@ public record PokemonMoveData
 {
     public required Move Move { get; init; }
     public MoveId Id => Move.Id;
+    public int Pp => Move.BasePp;
+    public int MaxPp => Move.NoPpBoosts ? Move.BasePp : Move.BasePp * 8 / 5;
     public MoveTarget? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; set; }
     public IEffect? DisabledSource { get; init; }

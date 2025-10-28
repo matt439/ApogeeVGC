@@ -71,18 +71,33 @@ public class Driver
         // Convert PlayerOptions to Showdown format dictionaries
         Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
         Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
-   
+
+        // Debug: Check if team exists in dictionary
+        Console.WriteLine($"p1Dict contains team: {p1Dict.ContainsKey("team")}");
+        if (p1Dict.ContainsKey("team"))
+        {
+            var team = p1Dict["team"];
+            Console.WriteLine($"p1 team type: {team?.GetType().Name}");
+            if (team is object[] teamArray)
+            {
+                Console.WriteLine($"p1 team count: {teamArray.Length}");
+            }
+        }
+
         // Convert dictionaries to JsonObject for serialization
         JsonObject p1JsonObj = DictionaryToJsonObject(p1Dict);
         JsonObject p2JsonObj = DictionaryToJsonObject(p2Dict);
-        
+
         string p1Json = p1JsonObj.ToJsonString();
         string p2Json = p2JsonObj.ToJsonString();
-        
+
+        Console.WriteLine($"p1Json length: {p1Json.Length}");
+        Console.WriteLine($"p1Json preview: {p1Json.Substring(0, Math.Min(500, p1Json.Length))}");
+
         // Write to file for debugging
         await File.WriteAllTextAsync("p1.json", p1Json);
         await File.WriteAllTextAsync("p2.json", p2Json);
-        
+
         string startCommand = $"""
                                >start {JsonSerializer.Serialize(spec)}
                                >player p1 {p1Json}
@@ -90,7 +105,7 @@ public class Driver
                                """;
 
         await File.WriteAllTextAsync("command.txt", startCommand);
-        
+
         await streams.Omniscient.WriteAsync(startCommand);
 
         // Wait for all tasks to complete (or timeout)
@@ -127,7 +142,8 @@ public class Driver
             // Give tasks a short grace period to finish after stream closure
             try
             {
-                await Task.WhenAll(p1Task, p2Task, streamConsumerTask).WaitAsync(TimeSpan.FromSeconds(5));
+                await Task.WhenAll(p1Task, p2Task, streamConsumerTask)
+                    .WaitAsync(TimeSpan.FromSeconds(5));
             }
             catch (TimeoutException)
             {
@@ -179,12 +195,21 @@ public class Driver
             double d => JsonValue.Create(d),
             bool b => JsonValue.Create(b),
             Dictionary<string, object?> dict => DictionaryToJsonObject(dict),
-            Dictionary<string, int> intDict => new JsonObject(intDict.Select(kvp => 
-              new KeyValuePair<string, JsonNode?>(kvp.Key, JsonValue.Create(kvp.Value)))),
-            List<Dictionary<string, object?>> dictList => new JsonArray(dictList.Select(DictionaryToJsonObject).ToArray<JsonNode?>()),
+            Dictionary<string, int> intDict => new JsonObject(intDict.Select(kvp =>
+                new KeyValuePair<string, JsonNode?>(kvp.Key, JsonValue.Create(kvp.Value)))),
+            // Handle arrays before lists (more specific patterns first)
+            Dictionary<string, object?>[] dictArray => new JsonArray(dictArray
+                .Select(DictionaryToJsonObject).ToArray<JsonNode?>()),
+            string[] stringArray => new JsonArray(stringArray
+                .Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
+            object[] objArray => new JsonArray(objArray.Select(ConvertToJsonNode).ToArray()),
+            // Handle lists
+            List<Dictionary<string, object?>> dictList => new JsonArray(dictList
+                .Select(DictionaryToJsonObject).ToArray<JsonNode?>()),
             List<object?> list => new JsonArray(list.Select(ConvertToJsonNode).ToArray()),
-            List<string> stringList => new JsonArray(stringList.Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
-            _ => JsonValue.Create(value?.ToString() ?? "")
+            List<string> stringList => new JsonArray(stringList
+                .Select(s => (JsonNode?)JsonValue.Create(s)).ToArray()),
+            _ => JsonValue.Create(value.ToString() ?? "")
         };
     }
 }

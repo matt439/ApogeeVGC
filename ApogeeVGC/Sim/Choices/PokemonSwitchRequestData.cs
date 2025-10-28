@@ -14,11 +14,15 @@ public record PokemonSwitchRequestData
     public ConditionId Condition { get; init; }
     public bool Active { get; init; }
     public required StatsTable Stats { get; init; }
-    public required IReadOnlyList<Move> Moves { get; init; }
+  public required IReadOnlyList<Move> Moves { get; init; }
+    public IReadOnlyList<string> MoveNames => Moves.Select(m => m.Name).ToList();
     public required Ability BaseAbility { get; init; }
+    public string BaseAbilityName => BaseAbility.Name;
     public required Item Item { get; init; }
+    public string ItemName => Item.Name;
     public PokeballId Pokeball { get; init; }
     public required Ability Ability { get; init; }
+    public string AbilityName => Ability.Name;
     public bool Commanding { get; init; }
     public bool Reviving { get; init; }
     public MoveType TeraType { get; init; }

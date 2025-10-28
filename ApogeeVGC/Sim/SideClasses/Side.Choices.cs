@@ -841,16 +841,17 @@ public partial class Side
 
         if (updatedRequest && update is MoveRequest moveRequest)
         {
-            moveRequest.Update = true;
+         moveRequest.Update = true;
         }
         else if (updatedRequest && update is SwitchRequest switchRequest)
         {
-            switchRequest.Update = true;
+   switchRequest.Update = true;
         }
 
-        string json = JsonSerializer.Serialize(update);
+   // Use State.SerializeRequest instead of JsonSerializer.Serialize to properly handle delegates
+        string json = ApogeeVGC.Sim.Utils.State.SerializeRequest(update, Battle);
         Battle.Send(SendType.SideUpdate, [$"{Id}\n|request|{json}"]);
-        ActiveRequest = update;
+  ActiveRequest = update;
     }
 
     public bool EmitChoiceError(string message,
