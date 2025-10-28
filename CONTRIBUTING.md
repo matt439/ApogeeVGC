@@ -186,11 +186,7 @@ When implementing new features:
 - **Doubles targeting**: Always consider multi-target scenarios
 
 ## Pokemon Showdown Reference
-The project references Pokémon Showdown's TypeScript code for mechanics and data structures. Key files include:
-- `RUNEVENT-TS.md` - Event system documentation
-- `SINGLEEVENT-TS.md` - Single event handling documentation
-- `SIM-PROTOCOL.md` - Simulation protocol overview
-- `SIMULATOR.md` - Core simulator mechanics
+The project references Pokémon Showdown's TypeScript code for mechanics and data structures. All relevant Showdown files are present in the solution in the 'pokemon-showdown' solution folder.
 
 ## Questions?
 For complex battle mechanics, refer to:

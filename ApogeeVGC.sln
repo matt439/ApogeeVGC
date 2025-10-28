@@ -5,6 +5,79 @@ VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.csproj", "{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pokemon-showdown", "pokemon-showdown", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\ARCHITECTURE.md = pokemon-showdown\ARCHITECTURE.md
+		pokemon-showdown\COMMANDLINE.md = pokemon-showdown\COMMANDLINE.md
+		pokemon-showdown\CONTRIBUTING.md = pokemon-showdown\CONTRIBUTING.md
+		pokemon-showdown\PROTOCOL.md = pokemon-showdown\PROTOCOL.md
+		pokemon-showdown\README.md = pokemon-showdown\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{C0A9A346-036F-484E-8129-6B553F2987A0}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\data\abilities.ts = pokemon-showdown\data\abilities.ts
+		pokemon-showdown\data\aliases.ts = pokemon-showdown\data\aliases.ts
+		pokemon-showdown\data\conditions.ts = pokemon-showdown\data\conditions.ts
+		pokemon-showdown\data\formats-data.ts = pokemon-showdown\data\formats-data.ts
+		pokemon-showdown\data\FORMES.md = pokemon-showdown\data\FORMES.md
+		pokemon-showdown\data\items.ts = pokemon-showdown\data\items.ts
+		pokemon-showdown\data\learnsets.ts = pokemon-showdown\data\learnsets.ts
+		pokemon-showdown\data\moves.ts = pokemon-showdown\data\moves.ts
+		pokemon-showdown\data\natures.ts = pokemon-showdown\data\natures.ts
+		pokemon-showdown\data\pokedex.ts = pokemon-showdown\data\pokedex.ts
+		pokemon-showdown\data\pokemongo.ts = pokemon-showdown\data\pokemongo.ts
+		pokemon-showdown\data\rulesets.ts = pokemon-showdown\data\rulesets.ts
+		pokemon-showdown\data\scripts.ts = pokemon-showdown\data\scripts.ts
+		pokemon-showdown\data\tags.ts = pokemon-showdown\data\tags.ts
+		pokemon-showdown\data\typechart.ts = pokemon-showdown\data\typechart.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sim", "sim", "{FAB885D4-E08F-4809-9763-9B97788E28E5}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\sim\battle-actions.ts = pokemon-showdown\sim\battle-actions.ts
+		pokemon-showdown\sim\battle-queue.ts = pokemon-showdown\sim\battle-queue.ts
+		pokemon-showdown\sim\battle-stream.ts = pokemon-showdown\sim\battle-stream.ts
+		pokemon-showdown\sim\battle.ts = pokemon-showdown\sim\battle.ts
+		pokemon-showdown\sim\dex-abilities.ts = pokemon-showdown\sim\dex-abilities.ts
+		pokemon-showdown\sim\dex-conditions.ts = pokemon-showdown\sim\dex-conditions.ts
+		pokemon-showdown\sim\dex-data.ts = pokemon-showdown\sim\dex-data.ts
+		pokemon-showdown\sim\dex-formats.ts = pokemon-showdown\sim\dex-formats.ts
+		pokemon-showdown\sim\dex-items.ts = pokemon-showdown\sim\dex-items.ts
+		pokemon-showdown\sim\dex-moves.ts = pokemon-showdown\sim\dex-moves.ts
+		pokemon-showdown\sim\dex-species.ts = pokemon-showdown\sim\dex-species.ts
+		pokemon-showdown\sim\DEX.md = pokemon-showdown\sim\DEX.md
+		pokemon-showdown\sim\dex.ts = pokemon-showdown\sim\dex.ts
+		pokemon-showdown\sim\field.ts = pokemon-showdown\sim\field.ts
+		pokemon-showdown\sim\global-types.ts = pokemon-showdown\sim\global-types.ts
+		pokemon-showdown\sim\index.ts = pokemon-showdown\sim\index.ts
+		pokemon-showdown\sim\NONSTANDARD.md = pokemon-showdown\sim\NONSTANDARD.md
+		pokemon-showdown\sim\pokemon.ts = pokemon-showdown\sim\pokemon.ts
+		pokemon-showdown\sim\prng.ts = pokemon-showdown\sim\prng.ts
+		pokemon-showdown\sim\README.md = pokemon-showdown\sim\README.md
+		pokemon-showdown\sim\side.ts = pokemon-showdown\sim\side.ts
+		pokemon-showdown\sim\SIM-PROTOCOL.md = pokemon-showdown\sim\SIM-PROTOCOL.md
+		pokemon-showdown\sim\SIMULATOR.md = pokemon-showdown\sim\SIMULATOR.md
+		pokemon-showdown\sim\state.ts = pokemon-showdown\sim\state.ts
+		pokemon-showdown\sim\team-validator.ts = pokemon-showdown\sim\team-validator.ts
+		pokemon-showdown\sim\TEAMS.md = pokemon-showdown\sim\TEAMS.md
+		pokemon-showdown\sim\teams.ts = pokemon-showdown\sim\teams.ts
+		pokemon-showdown\sim\tsconfig.json = pokemon-showdown\sim\tsconfig.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{9C8132A1-EAD1-423E-B5C8-4CF741A8CAA3}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\sim\examples\battle-stream-example.ts = pokemon-showdown\sim\examples\battle-stream-example.ts
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{711F7807-C3DF-4241-A073-EB51552D8865}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\sim\tools\exhaustive-runner.ts = pokemon-showdown\sim\tools\exhaustive-runner.ts
+		pokemon-showdown\sim\tools\multi-random-runner.ts = pokemon-showdown\sim\tools\multi-random-runner.ts
+		pokemon-showdown\sim\tools\random-player-ai.ts = pokemon-showdown\sim\tools\random-player-ai.ts
+		pokemon-showdown\sim\tools\runner.ts = pokemon-showdown\sim\tools\runner.ts
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +103,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C0A9A346-036F-484E-8129-6B553F2987A0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FAB885D4-E08F-4809-9763-9B97788E28E5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9C8132A1-EAD1-423E-B5C8-4CF741A8CAA3} = {FAB885D4-E08F-4809-9763-9B97788E28E5}
+		{711F7807-C3DF-4241-A073-EB51552D8865} = {FAB885D4-E08F-4809-9763-9B97788E28E5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}
