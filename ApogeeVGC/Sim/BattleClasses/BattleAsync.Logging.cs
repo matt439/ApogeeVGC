@@ -5,6 +5,8 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
+using System.Text.Json.Nodes;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -193,13 +195,13 @@ public partial class BattleAsync
     public void SendUpdates()
     {
         Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
-        // Don't send if there are no new log entries
+     // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count)
-        {
+      {
             return;
         }
 
-        // Send new log entries to clients
+// Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();
         Console.WriteLine($"[SendUpdates] Sending {updates.Count} updates");
         Send(SendType.Update, updates);
@@ -207,65 +209,168 @@ public partial class BattleAsync
         // Send requests to players if not already sent
         if (!SentRequests)
         {
-            Console.WriteLine("[SendUpdates] Sending requests to players");
-            foreach (Side side in Sides)
-            {
-                side.EmitRequest();
-            }
-            SentRequests = true;
-        }
+          Console.WriteLine("[SendUpdates] Sending requests to players");
+         foreach (Side side in Sides)
+        {
+     side.EmitRequest();
+ }
+    SentRequests = true;
+  }
 
-        // Update the position marker
+     // Update the position marker
         SentLogPos = Log.Count;
 
         // Send end-of-battle summary if battle ended and not already sent
         if (!SentEnd && Ended)
         {
+            // Serialize team data using SerializeWithRefs to avoid event handler issues
+          var p1TeamJson = new JsonArray();
+    foreach (PokemonSet set in Sides[0].Team)
+            {
+         // Use SerializeWithRefs which handles PokemonSet correctly
+ object? serialized = State.SerializeWithRefs(set, this);
+     if (serialized is Dictionary<string, object?> dict)
+  {
+          // Convert dictionary to JsonObject
+       var jsonObj = new JsonObject();
+         foreach (var kvp in dict)
+           {
+   jsonObj[kvp.Key] = kvp.Value switch
+     {
+       string s => JsonValue.Create(s),
+          int i => JsonValue.Create(i),
+ bool b => JsonValue.Create(b),
+         Dictionary<string, int> statsDict => new JsonObject(
+       statsDict.Select(stat => 
+      new KeyValuePair<string, JsonNode?>(stat.Key, JsonValue.Create(stat.Value)))),
+             List<string> strList => new JsonArray(strList.Select(s => JsonValue.Create(s)).ToArray()),
+         _ => JsonValue.Create(kvp.Value?.ToString())
+       };
+            }
+p1TeamJson.Add(jsonObj);
+      }
+            }
+
+         var p2TeamJson = new JsonArray();
+       foreach (PokemonSet set in Sides[1].Team)
+            {
+          object? serialized = State.SerializeWithRefs(set, this);
+      if (serialized is Dictionary<string, object?> dict)
+   {
+  var jsonObj = new JsonObject();
+        foreach (var kvp in dict)
+  {
+      jsonObj[kvp.Key] = kvp.Value switch
+       {
+           string s => JsonValue.Create(s),
+         int i => JsonValue.Create(i),
+    bool b => JsonValue.Create(b),
+         Dictionary<string, int> statsDict => new JsonObject(
+       statsDict.Select(stat => 
+     new KeyValuePair<string, JsonNode?>(stat.Key, JsonValue.Create(stat.Value)))),
+         List<string> strList => new JsonArray(strList.Select(s => JsonValue.Create(s)).ToArray()),
+     _ => JsonValue.Create(kvp.Value?.ToString())
+ };
+        }
+        p2TeamJson.Add(jsonObj);
+           }
+}
+
             // Build the battle log object
             var log = new Dictionary<string, object>
             {
                 ["winner"] = Winner ?? string.Empty,
-                ["seed"] = PrngSeed,
+ ["seed"] = PrngSeed.Seed.ToString(),
                 ["turns"] = Turn,
-                ["p1"] = Sides[0].Name,
-                ["p2"] = Sides[1].Name,
-                ["p1team"] = Sides[0].Team,
-                ["p2team"] = Sides[1].Team,
-                ["score"] = new List<int> { Sides[0].PokemonLeft, Sides[1].PokemonLeft },
-                ["inputLog"] = InputLog,
+ ["p1"] = Sides[0].Name,
+  ["p2"] = Sides[1].Name,
+["p1team"] = p1TeamJson,
+     ["p2team"] = p2TeamJson,
+["score"] = new List<int> { Sides[0].PokemonLeft, Sides[1].PokemonLeft },
+    ["inputLog"] = InputLog,
             };
 
             // Add P3/P4 data only if they exist (for multi-battles)
-            if (Sides.Count > 2)
+     if (Sides.Count > 2)
             {
-                log["p3"] = Sides[2].Name;
-                log["p3team"] = Sides[2].Team;
-                log["score"] = new List<int>
-            {
-                Sides[0].PokemonLeft,
-                Sides[1].PokemonLeft,
-                Sides[2].PokemonLeft,
+          var p3TeamJson = new JsonArray();
+ foreach (PokemonSet set in Sides[2].Team)
+           {
+       object? serialized = State.SerializeWithRefs(set, this);
+         if (serialized is Dictionary<string, object?> dict)
+       {
+               var jsonObj = new JsonObject();
+             foreach (var kvp in dict)
+         {
+        jsonObj[kvp.Key] = kvp.Value switch
+  {
+      string s => JsonValue.Create(s),
+             int i => JsonValue.Create(i),
+    bool b => JsonValue.Create(b),
+         Dictionary<string, int> statsDict => new JsonObject(
+        statsDict.Select(stat => 
+       new KeyValuePair<string, JsonNode?>(stat.Key, JsonValue.Create(stat.Value)))),
+                 List<string> strList => new JsonArray(strList.Select(s => JsonValue.Create(s)).ToArray()),
+_ => JsonValue.Create(kvp.Value?.ToString())
             };
-            }
-
-            if (Sides.Count > 3)
-            {
-                log["p4"] = Sides[3].Name;
-                log["p4team"] = Sides[3].Team;
-                log["score"] = new List<int>
-            {
-                Sides[0].PokemonLeft,
-                Sides[1].PokemonLeft,
-                Sides[2].PokemonLeft,
-                Sides[3].PokemonLeft,
+             }
+         p3TeamJson.Add(jsonObj);
+        }
+   }
+         
+     log["p3"] = Sides[2].Name;
+   log["p3team"] = p3TeamJson;
+       log["score"] = new List<int>
+       {
+   Sides[0].PokemonLeft,
+        Sides[1].PokemonLeft,
+ Sides[2].PokemonLeft,
             };
-            }
+  }
 
-            // Serialize and send the end message
-            string logJson = System.Text.Json.JsonSerializer.Serialize(log);
+      if (Sides.Count > 3)
+      {
+      var p4TeamJson = new JsonArray();
+  foreach (PokemonSet set in Sides[3].Team)
+         {
+         object? serialized = State.SerializeWithRefs(set, this);
+      if (serialized is Dictionary<string, object?> dict)
+              {
+  var jsonObj = new JsonObject();
+        foreach (var kvp in dict)
+     {
+      jsonObj[kvp.Key] = kvp.Value switch
+             {
+             string s => JsonValue.Create(s),
+        int i => JsonValue.Create(i),
+        bool b => JsonValue.Create(b),
+     Dictionary<string, int> statsDict => new JsonObject(
+           statsDict.Select(stat => 
+ new KeyValuePair<string, JsonNode?>(stat.Key, JsonValue.Create(stat.Value)))),
+          List<string> strList => new JsonArray(strList.Select(s => JsonValue.Create(s)).ToArray()),
+         _ => JsonValue.Create(kvp.Value?.ToString())
+      };
+   }
+       p4TeamJson.Add(jsonObj);
+   }
+          }
+    
+    log["p4"] = Sides[3].Name;
+       log["p4team"] = p4TeamJson;
+     log["score"] = new List<int>
+  {
+              Sides[0].PokemonLeft,
+      Sides[1].PokemonLeft,
+       Sides[2].PokemonLeft,
+  Sides[3].PokemonLeft,
+         };
+  }
+
+   // Serialize and send the end message
+    string logJson = System.Text.Json.JsonSerializer.Serialize(log);
             Send(SendType.End, new List<string> { logJson });
             SentEnd = true;
-        }
+     }
     }
 
     /// <summary>
