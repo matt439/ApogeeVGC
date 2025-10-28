@@ -1,9 +1,26 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.csproj", "{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{B5A1F9C0-1234-4567-89AB-CDEF01234567}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pokemon-showdown", "pokemon-showdown", "{C6A2F9D1-2345-5678-9ABC-DEF012345678}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\README.md = pokemon-showdown\README.md
+		pokemon-showdown\package.json = pokemon-showdown\package.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sim", "sim", "{D7A3F9E2-3456-6789-ABCD-EF0123456789}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown\sim\battle.ts = pokemon-showdown\sim\battle.ts
+		pokemon-showdown\sim\side.ts = pokemon-showdown\sim\side.ts
+		pokemon-showdown\sim\pokemon.ts = pokemon-showdown\sim\pokemon.ts
+		pokemon-showdown\sim\field.ts = pokemon-showdown\sim\field.ts
+		pokemon-showdown\sim\state.ts = pokemon-showdown\sim\state.ts
+		pokemon-showdown\sim\battle-stream.ts = pokemon-showdown\sim\battle-stream.ts
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +47,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C6A2F9D1-2345-5678-9ABC-DEF012345678} = {B5A1F9C0-1234-4567-89AB-CDEF01234567}
+		{D7A3F9E2-3456-6789-ABCD-EF0123456789} = {C6A2F9D1-2345-5678-9ABC-DEF012345678}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}
