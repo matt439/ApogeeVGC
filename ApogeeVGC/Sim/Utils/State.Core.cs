@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json.Nodes;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
@@ -17,113 +17,133 @@ public static partial class State
 {
     public static object? SerializeWithRefs(object? obj, IBattle battle)
     {
-        switch (obj)
+  switch (obj)
         {
             case null:
-                return null;
+      return null;
+    
+            // Delegates (functions) should be elided (return undefined, which we represent as null)
+        case Delegate:
+    return null;
                 
-            // Primitive types - serialize as-is
-            case bool b:
-                return b;
-            case int i:
-                return i;
-            case long l:
+   // Primitive types - serialize as-is
+    case bool b:
+         return b;
+ case int i:
+       return i;
+    case long l:
                 return l;
-            case double d:
+   case double d:
                 return d;
             case decimal dec:
-                return dec;
+  return dec;
             case string s:
-                return s;
-                
-            // Special handling for ActiveMove - serialize with only changed fields
-            case ActiveMove activeMove:
-                return SerializeActiveMove(activeMove, battle);
-                
+    return s;
+       
+       // Special handling for ActiveMove - serialize with only changed fields
+  case ActiveMove activeMove:
+         return SerializeActiveMove(activeMove, battle);
+      
             // Check if this is a referable type (circular reference handling)
+            // Item, Ability, Condition, Move, and Species are referable (immutable from library)
             case IBattle:
             case Field:
-            case Side:
-            case Pokemon:
+      case Side:
+     case Pokemon:
             case Condition:
             case Ability:
             case Item:
-            case Move:
-            case Species:
-                // Convert to Referable union type and then to reference string
-                Referable referable = obj switch
-                {
-                    IBattle b => Referable.FromIBattle(b),
-                    Field f => f,
-                    Side side => side,
-                    Pokemon p => p,
-                    Condition c => c,
-                    Ability a => a,
-                    Item i => i,
-                    Move m => (Referable)m,
-                    Species sp => sp,
-                    _ => throw new InvalidOperationException($"Unhandled referable type: {obj.GetType()}")
-                };
-                return ToRef(referable);
-                
-            // Handle collections
-            case System.Collections.IEnumerable enumerable when obj.GetType().IsArray || 
-                                                                 obj.GetType().IsGenericType && 
-                                                                 obj.GetType().GetGenericTypeDefinition() == typeof(List<>):
-                var list = (from object? item in enumerable select SerializeWithRefs(item, battle)).ToList();
-                return list;
-                
+    case Move:
+    case Species:
+      // Convert to Referable union type and then to reference string
+  Referable referable = obj switch
+  {
+      IBattle b => Referable.FromIBattle(b),
+  Field f => f,
+      Side side => side,
+      Pokemon p => p,
+   Condition c => c,
+   Ability a => a,
+           Item i => i,
+  Move m => (Referable)m,
+ Species sp => sp,
+          _ => throw new InvalidOperationException($"Unhandled referable type: {obj.GetType()}")
+      };
+    return ToRef(referable);
+    
+ // Handle collections
+         case System.Collections.IEnumerable enumerable when obj.GetType().IsArray || 
+            obj.GetType().IsGenericType && 
+  obj.GetType().GetGenericTypeDefinition() == typeof(List<>):
+    var list = new List<object?>();
+       foreach (object? item in enumerable)
+         {
+          object? serialized = SerializeWithRefs(item, battle);
+   // Only add if not null/undefined (elide null delegate results)
+           if (serialized != null)
+        {
+      list.Add(serialized);
+ }
+      }
+              return list;
+        
             // Handle dictionaries
-            case System.Collections.IDictionary dictionary:
-                var dict = new Dictionary<string, object?>();
-                foreach (System.Collections.DictionaryEntry entry in dictionary)
-                {
-                    string key = entry.Key.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
-                    dict[key] = SerializeWithRefs(entry.Value, battle);
-                }
-                return dict;
-                
-            // Handle enums - serialize as string
-            case Enum enumValue:
-                return enumValue.ToString();
-                
-            default:
-                // For plain objects (POCOs), serialize all public properties
-                if (obj.GetType().IsClass && obj.GetType() != typeof(string))
-                {
-                    // If we're getting this error, some 'special' field has been added to
-                    // an object and we need to update the logic in this file to handle it.
-                    // The most common case is that someone added a Set/Map which probably
-                    // needs to be serialized as an Array/Object respectively.
-                    
-                    // Only serialize simple DTOs/POCOs, not complex types we haven't explicitly handled
-                    if (obj.GetType().Namespace?.StartsWith("ApogeeVGC") == true)
-                    {
-                        throw new NotSupportedException(
-                            $"Unsupported type {obj.GetType().Name}: {obj}. " +
-                            "This type needs explicit handling in SerializeWithRefs.");
-                    }
-                    
-                    // For external types, try to serialize properties
-                    var result = new Dictionary<string, object?>();
-                    var properties = obj.GetType().GetProperties(BindingFlags.Public | 
-                                                                  BindingFlags.Instance);
-                    foreach (PropertyInfo prop in properties)
-                    {
-                        if (prop.CanRead)
-                        {
-                            object? value = prop.GetValue(obj);
-                            object? serialized = SerializeWithRefs(value, battle);
-                            if (serialized != null)
-                            {
-                                result[ToCamelCase(prop.Name)] = serialized;
-                            }
-                        }
-                    }
-                    return result;
-                }
-                
-                throw new NotSupportedException($"Cannot serialize type {obj.GetType()}: {obj}");
+      case System.Collections.IDictionary dictionary:
+        var dict = new Dictionary<string, object?>();
+    foreach (System.Collections.DictionaryEntry entry in dictionary)
+    {
+       string key = entry.Key.ToString() ?? throw new InvalidOperationException("Dictionary key cannot be null");
+        object? serialized = SerializeWithRefs(entry.Value, battle);
+        // Only add if not null/undefined (elide null delegate results)
+           if (serialized != null)
+        {
+   dict[key] = serialized;
+    }
+ }
+          return dict;
+        
+    // Handle enums - serialize as string
+        case Enum enumValue:
+          return enumValue.ToString();
+    
+         default:
+           // For plain objects (POCOs), serialize all public properties
+          if (obj.GetType().IsClass && obj.GetType() != typeof(string))
+  {
+                 // If we're getting this error, some 'special' field has been added to
+  // an object and we need to update the logic in this file to handle it.
+            // The most common case is that someone added a Set/Map which probably
+   // needs to be serialized as an Array/Object respectively.
+            
+     // Only serialize simple DTOs/POCOs, not complex types we haven't explicitly handled
+     if (obj.GetType().Namespace?.StartsWith("ApogeeVGC") == true)
+    {
+                throw new NotSupportedException(
+   $"Unsupported type {obj.GetType().Name}: {obj}. " +
+         "This type needs explicit handling in SerializeWithRefs.");
+   }
+     
+    // For external types, try to serialize properties
+var result = new Dictionary<string, object?>();
+           var properties = obj.GetType().GetProperties(BindingFlags.Public | 
+    BindingFlags.Instance);
+      foreach (PropertyInfo prop in properties)
+            {
+    if (prop.CanRead)
+     {
+          object? value = prop.GetValue(obj);
+   object? serialized = SerializeWithRefs(value, battle);
+         // Only add if not null/undefined
+ if (serialized != null)
+       {
+ result[ToCamelCase(prop.Name)] = serialized;
+              }
+             }
+        }
+     return result;
+    }
+       
+      throw new NotSupportedException($"Cannot serialize type {obj.GetType()}: {obj}");
         }
     }
 
@@ -187,6 +207,38 @@ public static partial class State
                     return DeserializeActiveMove(jsonObject, battle);
                 }
                 
+                // Check if this is an Item, Ability, or Condition serialized object
+                // These will be reconstructed from the battle's Library based on their ID
+                if (jsonObject.ContainsKey("id"))
+                {
+                    string? idStr = jsonObject["id"]?.GetValue<string>();
+                    if (!string.IsNullOrEmpty(idStr))
+                    {
+                        // Check effectType to determine which type this is
+                        if (jsonObject.ContainsKey("effectType"))
+                        {
+                            string effectType = jsonObject["effectType"]?.GetValue<string>() ?? "";
+                            
+                            if (effectType == "Item")
+                            {
+                                // Return reference to the item from Library
+                                return ToRef(battle.Library.Items.GetValueOrDefault(Enum.Parse<ItemId>(idStr)));
+                            }
+                            else if (effectType == "Ability")
+                            {
+                                // Return reference to the ability from Library
+                                return ToRef(battle.Library.Abilities.GetValueOrDefault(Enum.Parse<AbilityId>(idStr)));
+                            }
+                            else if (effectType == "Condition" || effectType == "Weather" || 
+                                     effectType == "Status" || effectType == "Terrain")
+                            {
+                                // Return reference to the condition from Library
+                                return ToRef(battle.Library.Conditions.GetValueOrDefault(Enum.Parse<ConditionId>(idStr)));
+                            }
+                        }
+                    }
+                }
+                
                 var resultDict = new Dictionary<string, object?>();
                 foreach (var kvp in jsonObject)
                 {
@@ -228,82 +280,83 @@ public static partial class State
         
         foreach (PropertyInfo prop in properties)
         {
-            // Skip properties in the skip list (case-insensitive comparison for flexibility)
+    // Skip properties in the skip list (case-insensitive comparison for flexibility)
             if (skip.Any(s => s.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)))
-            {
-                continue;
-            }
+   {
+    continue;
+         }
             
-            // Skip properties that can't be read
-            if (!prop.CanRead)
-            {
-                continue;
+   // Skip properties that can't be read
+     if (!prop.CanRead)
+   {
+         continue;
+    }
+      
+   try
+      {
+       object? value = prop.GetValue(obj);
+        object? serialized = SerializeWithRefs(value, battle);
+        
+          // JSON.stringify will get rid of keys with undefined values anyway, but
+    // we also do it here so that comparisons work correctly.
+              // In C#, we represent "undefined" as null for delegates that were never set.
+      if (serialized != null)
+          {
+    // Convert property name to camelCase for JSON
+     string jsonKey = ToCamelCase(prop.Name);
+ 
+        // Handle different serialized types
+         state[jsonKey] = serialized switch
+        {
+            JsonObject jo => jo,
+      JsonArray ja => ja,
+          bool b => JsonValue.Create(b),
+        int i => JsonValue.Create(i),
+   long l => JsonValue.Create(l),
+       double d => JsonValue.Create(d),
+ decimal dec => JsonValue.Create(dec),
+        string s => JsonValue.Create(s),
+ List<object?> list => new JsonArray(list.Select(item => item switch
+      {
+        JsonNode node => node,
+       null => null,
+    bool b => JsonValue.Create(b),
+           int i => JsonValue.Create(i),
+          long l => JsonValue.Create(l),
+      double d => JsonValue.Create(d),
+   decimal dec => JsonValue.Create(dec),
+       string s => JsonValue.Create(s),
+    _ => JsonValue.Create(item.ToString())
+  }).ToArray()),
+    Dictionary<string, object?> dict => new JsonObject(
+    dict.Select(kvp => new KeyValuePair<string, JsonNode?>(
+ kvp.Key,
+     kvp.Value switch
+      {
+          JsonNode node => node,
+  null => null,
+       bool b => JsonValue.Create(b),
+        int i => JsonValue.Create(i),
+      long l => JsonValue.Create(l),
+   double d => JsonValue.Create(d),
+    decimal dec => JsonValue.Create(dec),
+ string s => JsonValue.Create(s),
+       _ => JsonValue.Create(kvp.Value.ToString()),
+       }
+))
+  ),
+        _ => JsonValue.Create(serialized.ToString()),
+        };
             }
-            
-            try
-            {
-                object? value = prop.GetValue(obj);
-                object? serialized = SerializeWithRefs(value, battle);
-                
-                // JSON.stringify will get rid of keys with undefined values anyway, but
-                // we also do it here so that comparisons work correctly.
-                if (serialized != null)
-                {
-                    // Convert property name to camelCase for JSON
-                    string jsonKey = ToCamelCase(prop.Name);
-                    
-                    // Handle different serialized types
-                    state[jsonKey] = serialized switch
-                    {
-                        JsonObject jo => jo,
-                        JsonArray ja => ja,
-                        bool b => JsonValue.Create(b),
-                        int i => JsonValue.Create(i),
-                        long l => JsonValue.Create(l),
-                        double d => JsonValue.Create(d),
-                        decimal dec => JsonValue.Create(dec),
-                        string s => JsonValue.Create(s),
-                        List<object?> list => new JsonArray(list.Select(item => item switch
-                        {
-                            JsonNode node => node,
-                            null => null,
-                            bool b => JsonValue.Create(b),
-                            int i => JsonValue.Create(i),
-                            long l => JsonValue.Create(l),
-                            double d => JsonValue.Create(d),
-                            decimal dec => JsonValue.Create(dec),
-                            string s => JsonValue.Create(s),
-                            _ => JsonValue.Create(item.ToString())
-                        }).ToArray()),
-                        Dictionary<string, object?> dict => new JsonObject(
-                            dict.Select(kvp => new KeyValuePair<string, JsonNode?>(
-                                kvp.Key,
-                                kvp.Value switch
-                                {
-                                    JsonNode node => node,
-                                    null => null,
-                                    bool b => JsonValue.Create(b),
-                                    int i => JsonValue.Create(i),
-                                    long l => JsonValue.Create(l),
-                                    double d => JsonValue.Create(d),
-                                    decimal dec => JsonValue.Create(dec),
-                                    string s => JsonValue.Create(s),
-                                    _ => JsonValue.Create(kvp.Value.ToString()),
-                                }
-                            ))
-                        ),
-                        _ => JsonValue.Create(serialized.ToString()),
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle serialization errors for specific properties
-                throw new InvalidOperationException(
-                    $"Failed to serialize property '{prop.Name}' of type '{type.Name}': {ex.Message}", 
-                    ex);
-            }
-        }
+  }
+  catch (Exception ex)
+     {
+           // Log or handle serialization errors for specific properties
+     throw new InvalidOperationException(
+            $"Failed to serialize property '{prop.Name}' of type '{type.Name}': {ex.Message}", 
+              ex);
+    }
+     }
         
         return state;
     }
