@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -194,7 +194,10 @@ public partial class BattleAsync
     {
         Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
         // Don't send if there are no new log entries
-        if (SentLogPos >= Log.Count) return;
+        if (SentLogPos >= Log.Count)
+        {
+            return;
+        }
 
         // Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();
@@ -209,7 +212,7 @@ public partial class BattleAsync
             {
                 side.EmitRequest();
             }
-            //SentRequests = true;
+            SentRequests = true;
         }
 
         // Update the position marker
@@ -277,7 +280,7 @@ public partial class BattleAsync
             IntPart i => i.Value.ToString(),
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
-            PokemonPart p => p.Pokemon?.ToString() ?? string.Empty,
+            PokemonPart p => p.Pokemon.ToString(),
             SidePart s => s.Side.Id.GetSideIdName(),
             MovePart m => m.Move.Name,
             EffectPart e => e.Effect.Name,

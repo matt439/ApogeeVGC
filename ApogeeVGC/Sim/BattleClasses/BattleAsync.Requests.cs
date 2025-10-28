@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
@@ -60,6 +60,7 @@ public partial class BattleAsync
         {
             Sides[i].ActiveRequest = requests[i];
         }
+        SentRequests = false;
 
         // Verify that choices aren't already done (would indicate a bug)
         if (Sides.All(side => side.IsChoiceDone()))

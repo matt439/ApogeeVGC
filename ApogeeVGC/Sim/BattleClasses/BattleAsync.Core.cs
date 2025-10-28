@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using ApogeeVGC.Data;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -69,7 +69,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public List<string> MessageLog { get; set; } = [];
     public int SentLogPos { get; set; }
     public bool SentEnd { get; set; }
-    public static bool SentRequests => true;
+    public bool SentRequests { get; set; } = true;
 
     public RequestState RequestState { get; set; } = RequestState.None;
     public int Turn { get; set; }
