@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -71,7 +71,7 @@ public partial class Pokemon
                 [
                     new PokemonMoveData
                     {
-                        Move = Battle.Library.Moves[MoveId.Recharge],
+                        Move = MoveDto.FromMove(Battle.Library.Moves[MoveId.Recharge]),
                         Target = null,
                         Disabled = null,
                         DisabledSource = null,
@@ -86,7 +86,7 @@ public partial class Pokemon
                 [
                     new PokemonMoveData
                     {
-                        Move = Battle.Library.Moves[moveSlot.Move],
+                        Move = MoveDto.FromMove(Battle.Library.Moves[moveSlot.Move]),
                         Target = null,
                         Disabled = null,
                         DisabledSource = null,
@@ -99,7 +99,7 @@ public partial class Pokemon
             [
                 new PokemonMoveData
                 {
-                    Move = Battle.Library.Moves[lockedMove.Value],
+                    Move = MoveDto.FromMove(Battle.Library.Moves[lockedMove.Value]),
                     Target = null,
                     Disabled = null,
                     DisabledSource = null,
@@ -156,11 +156,11 @@ public partial class Pokemon
                 hasValidMove = true;
             }
 
-            // Convert disabled state to MoveIdBoolUnion
-            MoveIdBoolUnion? disabledUnion = null;
+            // Convert disabled state to bool for JSON serialization
+            bool? disabledBool = null;
             if (disabled.IsTruthy())
             {
-                disabledUnion = disabled.IsTrue() ? true : null;
+                disabledBool = true;
             }
 
             // Get the Move object from the library
@@ -169,9 +169,9 @@ public partial class Pokemon
             // Add move to list
             moves.Add(new PokemonMoveData
             {
-                Move = moveObject,
+                Move = MoveDto.FromMove(moveObject),
                 Target = null, // Target is not set in this context
-                Disabled = disabledUnion,
+                Disabled = disabledBool,
                 DisabledSource = moveSlot.DisabledSource,
             });
         }

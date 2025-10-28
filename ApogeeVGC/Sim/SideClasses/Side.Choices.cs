@@ -78,7 +78,7 @@ public partial class Side
         {
             foreach (PokemonMoveData pokemonMoveData in request.Moves)
             {
-                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion { Value: true })
+                if (pokemonMoveData.Disabled == true)
                 {
                     continue;
                 }
@@ -164,7 +164,7 @@ public partial class Side
 
         foreach (PokemonMoveData m in moves.Where(m => m.Id == moveid))
         {
-            if (m.Disabled is null or BoolMoveIdBoolUnion { Value: false })
+            if (m.Disabled != true)
             {
                 isEnabled = true;
                 break;
@@ -190,11 +190,11 @@ public partial class Side
         }
 
         // Step 11: Terastallization (Gen 9 only)
-        bool terastallize = eventType == EventType.Terastallize;
+      bool terastallize = eventType == EventType.Terastallize;
 
-        if (terastallize && request.CanTerastallize is null or FalseMoveTypeFalseUnion)
-        {
-            return EmitChoiceError($"Can't move: {pokemon.Name} can't Terastallize.");
+if (terastallize && request.CanTerastallize == null)
+      {
+    return EmitChoiceError($"Can't move: {pokemon.Name} can't Terastallize.");
         }
 
         if (terastallize && Choice.Terastallize)
@@ -848,6 +848,34 @@ public partial class Side
             switchRequest.Update = true;
         }
 
+        // Debug: Log request type and key properties
+        Console.Error.WriteLine($"[EmitRequest] Request type: {update?.GetType().Name}");
+        if (update is MoveRequest mr)
+        {
+            Console.Error.WriteLine($"[EmitRequest] MoveRequest.Active count: {mr.Active?.Count ?? 0}");
+            Console.Error.WriteLine($"[EmitRequest] MoveRequest.Side: {mr.Side != null}");
+            Console.Error.WriteLine($"[EmitRequest] MoveRequest.Wait: {mr.Wait}");
+            Console.Error.WriteLine($"[EmitRequest] MoveRequest.TeamPreview: {mr.TeamPreview}");
+            Console.Error.WriteLine($"[EmitRequest] MoveRequest.ForceSwitch: {mr.ForceSwitch}");
+
+            // Try to serialize just Active to see if it works
+            try
+            {
+                var options2 = new JsonSerializerOptions
+                {
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+                    WriteIndented = false,
+                };
+                string activeJson = JsonSerializer.Serialize(mr.Active, options2);
+                Console.Error.WriteLine($"[EmitRequest] Active JSON (first 200 chars): {(activeJson.Length > 200 ? activeJson.Substring(0, 200) : activeJson)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[EmitRequest] Failed to serialize Active: {ex.Message}");
+            }
+        }
+
         // Configure JSON serializer to handle circular references and ignore read-only properties
         var options = new JsonSerializerOptions
         {
@@ -859,23 +887,32 @@ public partial class Side
 
         string json;
         try
-     {
-      json = JsonSerializer.Serialize(update, options);
-    if (json.Length < 500)
-       {
-    Console.Error.WriteLine($"[EmitRequest] Full JSON: {json}");
-    }
-            else
+        {
+// Explicitly serialize as the concrete type
+       json = update switch
+            {
+MoveRequest mr2 => JsonSerializer.Serialize(mr2, options),
+       SwitchRequest sr => JsonSerializer.Serialize(sr, options),
+       TeamPreviewRequest tpr => JsonSerializer.Serialize(tpr, options),
+                WaitRequest wr => JsonSerializer.Serialize(wr, options),
+         _ => JsonSerializer.Serialize(update, options)
+            };
+    
+        if (json.Length < 500)
    {
-                Console.Error.WriteLine($"[EmitRequest] JSON (first 500 chars): {json.Substring(0, 500)}");
-        }
+             Console.Error.WriteLine($"[EmitRequest] Full JSON: {json}");
+            }
+          else
+          {
+    Console.Error.WriteLine($"[EmitRequest] JSON (first 500 chars): {json.Substring(0, 500)}");
+          }
         }
         catch (NotSupportedException ex)
-        {
-            // If serialization fails due to unsupported types (like delegates),
-            // log the error and send a minimal request
+ {
+  // If serialization fails due to unsupported types (like delegates),
+        // log the error and send a minimal request
             Console.Error.WriteLine($"[EmitRequest] Serialization error: {ex.Message}");
-            json = JsonSerializer.Serialize(new { error = "Serialization failed", type = update.GetType().Name }, options);
+ json = JsonSerializer.Serialize(new { error = "Serialization failed", type = update.GetType().Name }, options);
         }
 
         Battle.Send(SendType.SideUpdate, [$"{Id}\n|request|{json}"]);
@@ -924,7 +961,7 @@ public partial class Side
 
 
     private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req,
-        MoveId moveid, string disabledSource)
+   MoveId moveid, string disabledSource)
     {
         bool updated = UpdateDisabledRequest(pokemon, req);
 
@@ -932,14 +969,14 @@ public partial class Side
         {
             if (m.Id != moveid) continue;
 
-            // Check if we need to update the disabled state
-            bool needsUpdate = m.Disabled is null or BoolMoveIdBoolUnion { Value: false } ||
-                               m.DisabledSource?.Name != disabledSource;
+ // Check if we need to update the disabled state
+  bool needsUpdate = m.Disabled != true ||
+           m.DisabledSource?.Name != disabledSource;
 
-            if (needsUpdate)
+       if (needsUpdate)
             {
-                updated = true;
-            }
+     updated = true;
+  }
             break;
         }
 
@@ -953,54 +990,54 @@ public partial class Side
         // Clear maybeLocked if it's set
         if (pokemon.MaybeLocked ?? false)
         {
-            pokemon.MaybeLocked = false;
-            req.MaybeLocked = null;
+  pokemon.MaybeLocked = false;
+     req.MaybeLocked = null;
             updated = true;
-        }
+      }
 
-        // Handle maybeDisabled in non-singles formats
+      // Handle maybeDisabled in non-singles formats
         if (pokemon.MaybeDisabled && Battle.GameType != GameType.Singles)
         {
-            // Gen 4+ behavior
+  // Gen 4+ behavior
             if (Battle.Gen >= 4)
-            {
-                pokemon.MaybeDisabled = false;
-                req.MaybeDisabled = null;
-                updated = true;
+      {
+     pokemon.MaybeDisabled = false;
+             req.MaybeDisabled = null;
+      updated = true;
             }
 
-            // Update individual move disabled states
+   // Update individual move disabled states
             foreach (PokemonMoveData m in req.Moves)
-            {
-                MoveSlot? moveData = pokemon.GetMoveData(m.Id);
-                BoolHiddenUnion? disabled = moveData?.Disabled;
+          {
+   MoveSlot? moveData = pokemon.GetMoveData(m.Id);
+        BoolHiddenUnion? disabled = moveData?.Disabled;
 
-                // Check if move should be marked as disabled
-                if (disabled != null &&
-                    (Battle.Gen >= 4 || Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
-                {
-                    m.Disabled = true;
-                    updated = true;
-                }
+       // Check if move should be marked as disabled
+     if (disabled != null &&
+     (Battle.Gen >= 4 || Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
+ {
+      m.Disabled = true;
+          updated = true;
+    }
             }
         }
 
         // If all moves are disabled or only Struggle is available
-        bool allMovesDisabled = req.Moves.All(m =>
-            m.Disabled is BoolMoveIdBoolUnion { Value: true } ||
-            m.Id == MoveId.Struggle);
+      bool allMovesDisabled = req.Moves.All(m =>
+            m.Disabled == true ||
+   m.Id == MoveId.Struggle);
 
         if (allMovesDisabled)
-        {
+     {
             // Disable Terastallization (Gen 9 mechanic)
-            if (req.CanTerastallize is not null and not FalseMoveTypeFalseUnion)
-            {
-                req.CanTerastallize = null;
-                updated = true;
-            }
+      if (req.CanTerastallize != null)
+    {
+    req.CanTerastallize = null;
+         updated = true;
+  }
         }
 
-        return updated;
+     return updated;
     }
 
     public bool UpdateRequestForPokemon(Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)
@@ -1008,24 +1045,24 @@ public partial class Side
         // Ensure we have an active request with Pokemon data
         if (ActiveRequest is not MoveRequest moveRequest || moveRequest.Active == null)
         {
-            throw new InvalidOperationException("Can't update a request without active Pokemon");
+       throw new InvalidOperationException("Can't update a request without active Pokemon");
         }
 
         // Find the Pokemon in the request
-        PokemonMoveRequestData? req = moveRequest.Active[pokemon.Position];
-        if (req == null)
+      PokemonMoveRequestData? req = moveRequest.Active[pokemon.Position];
+  if (req == null)
         {
-            throw new InvalidOperationException("Pokemon not found in request's active field");
+    throw new InvalidOperationException("Pokemon not found in request's active field");
         }
 
-        // Apply the update function
+ // Apply the update function
         BoolVoidUnion result = update(req);
 
         // Return true if the update function returned true, otherwise default to true
         return result switch
-        {
-            BoolBoolVoidUnion { Value: var b } => b,
-            _ => true,
+      {
+      BoolBoolVoidUnion { Value: var b } => b,
+ _ => true,
         };
     }
 }

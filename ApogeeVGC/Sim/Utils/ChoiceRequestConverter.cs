@@ -16,6 +16,14 @@ public class ChoiceRequestConverter : JsonConverter<IChoiceRequest>
 
         // Debug: print the JSON (first 200 chars)
   string json = root.GetRawText();
+  if (json.Length < 500)
+     {
+      Console.WriteLine($"[ChoiceRequestConverter] Full JSON: {json}");
+        }
+else
+  {
+    Console.WriteLine($"[ChoiceRequestConverter] JSON (first 500 chars): {json.Substring(0, 500)}");
+        }
 Console.WriteLine($"[ChoiceRequestConverter] JSON properties: {string.Join(", ", root.EnumerateObject().Select(p => p.Name))}");
 
         // Determine the type based on which properties are present
@@ -27,18 +35,20 @@ Console.WriteLine($"[ChoiceRequestConverter] JSON properties: {string.Join(", ",
 
         Console.WriteLine($"[ChoiceRequestConverter] hasActive={hasActive}, hasForceSwitch={hasForceSwitch}, hasTeamPreview={hasTeamPreview}, hasWait={hasWait}");
 
-        if (hasActive)
+  try
         {
+  if (hasActive)
+ {
     Console.WriteLine($"[ChoiceRequestConverter] Deserializing as MoveRequest");
 return JsonSerializer.Deserialize<MoveRequest>(json, options);
-      }
+  }
         else if (hasForceSwitch)
         {
  Console.WriteLine($"[ChoiceRequestConverter] Deserializing as SwitchRequest");
      return JsonSerializer.Deserialize<SwitchRequest>(json, options);
-      }
+ }
  else if (hasTeamPreview)
-     {
+  {
  Console.WriteLine($"[ChoiceRequestConverter] Deserializing as TeamPreviewRequest");
       return JsonSerializer.Deserialize<TeamPreviewRequest>(json, options);
  }
@@ -51,6 +61,13 @@ return JsonSerializer.Deserialize<MoveRequest>(json, options);
         // Default to WaitRequest if we can't determine the type
   Console.WriteLine($"[ChoiceRequestConverter] Defaulting to WaitRequest");
         return JsonSerializer.Deserialize<WaitRequest>(json, options);
+        }
+        catch (Exception ex)
+   {
+      Console.Error.WriteLine($"[ChoiceRequestConverter] Deserialization error: {ex.Message}");
+       Console.Error.WriteLine($"[ChoiceRequestConverter] Stack trace: {ex.StackTrace}");
+         throw;
+        }
     }
 
     public override void Write(Utf8JsonWriter writer, IChoiceRequest value, JsonSerializerOptions options)

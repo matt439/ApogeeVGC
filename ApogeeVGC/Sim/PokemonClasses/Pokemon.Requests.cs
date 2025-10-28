@@ -137,17 +137,17 @@ public partial class Pokemon
         // If no moves available, default to Struggle
         if (moves.Count == 0)
         {
-            moves =
-            [
-                new PokemonMoveData
-                {
-                    Move = Battle.Library.Moves[MoveId.Struggle],
-                    Target = null,
-                    Disabled = null,
-                    DisabledSource = null,
-                }
-            ];
-            lockedMove = MoveId.Struggle;
+      moves =
+         [
+          new PokemonMoveData
+        {
+   Move = MoveDto.FromMove(Battle.Library.Moves[MoveId.Struggle]),
+       Target = null,
+   Disabled = null,
+        DisabledSource = null,
+        }
+    ];
+  lockedMove = MoveId.Struggle;
         }
 
         // Create base request data
@@ -207,7 +207,17 @@ public partial class Pokemon
         {
             if (CanTerastallize is not null and not FalseMoveTypeFalseUnion)
             {
-                data = data with { CanTerastallize = CanTerastallize };
+                // Convert MoveTypeFalseUnion to MoveType? for JSON serialization
+                MoveType? teraType = CanTerastallize switch
+                {
+                    MoveTypeMoveTypeFalseUnion { MoveType: var type } => type,
+                    _ => null
+                };
+
+                if (teraType.HasValue)
+                {
+                    data = data with { CanTerastallize = teraType.Value };
+                }
             }
         }
 
