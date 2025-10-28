@@ -1,30 +1,42 @@
 ﻿=== ApogeeVGC Battle Output ===
-Generated: 2025-10-28 10:45:47
-Duration: 30 seconds (timeout) or until completion
+Generated: 2025-10-28 11:08:29
+Duration: 10 seconds (timeout) or until completion
 
 === STANDARD OUTPUT ===
 p1 is RandomPlayerAi
 p2 is RandomPlayerAi
 |player|p1|Bot 1||
-|player|p2|Bot 2||
 |gen|9
+|
+|player|p2|Bot 2||
+|t:|1761613700.00
 |tier|[Gen 9] OU
 |teamsize|p1|6
 |teamsize|p2|6
-|start
 |split|p1
+|split|p2
 |switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|205/205
 |switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|100/100
-|split|p2
-|t:|1761612318.00
-|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|start
 |switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
 |-ability|p1a: calyrex-ice|As One
 |-ability|p1a: calyrex-ice|Unnerve
 |-ability|p2a: calyrex-ice|As One
-|-ability|p2a: calyrex-ice|Unnerve
 |turn|1
-|
+|-ability|p2a: calyrex-ice|Unnerve
+[ChoiceRequestConverter] JSON properties: Side, NoCancel
+[ChoiceRequestConverter] hasActive=False, hasForceSwitch=False, hasTeamPreview=False, hasWait=False
+[ChoiceRequestConverter] hasActive=False, hasForceSwitch=False, hasTeamPreview=False, hasWait=False
+[ChoiceRequestConverter] Defaulting to WaitRequest
+[ChoiceRequestConverter] JSON properties: Side, NoCancel
+[ChoiceRequestConverter] Defaulting to WaitRequest
+[RandomPlayerAi] Received request type: WaitRequest
+[RandomPlayerAi] Received request type: WaitRequest
+[RandomPlayerAi] Wait: True, TeamPreview: , ForceSwitch: False
+[RandomPlayerAi] Wait: True, TeamPreview: , ForceSwitch: False
+[RandomPlayerAi] Wait request - doing nothing
+[RandomPlayerAi] Wait request - doing nothing
 
 
 === STANDARD ERROR ===
@@ -36,23 +48,25 @@ STDERR: [BattleStream] Calling SendUpdates, Battle is not null
 STDERR: [SendUpdates] SentLogPos=0, Log.Count=20
 STDERR: [SendUpdates] Sending 20 updates
 STDERR: [BattleStream] PushMessage: type=update, data length=496
+STDERR: |player|p2|Bot 2||
 STDERR: [BattleStream] Writing to output channel: update
 STDERR: |player|p1|Bot 1||
 STDERR: |gen|9
-STDERR: |player|p2|Bot 2||
 STDERR: |
 STDERR: |tier|[Gen 9] OU
-STDERR: |t:|1761612318.00
+STDERR: |t:|1761613700.00
 STDERR: |teamsize|p...
 STDERR: [SendUpdates] Sending requests to players
+STDERR: [EmitRequest] JSON (first 500 chars): {"Side":{"Name":"Bot 1","Id":0,"Pokemon":[{"Condition":0,"Active":true,"Stats":{"Hp":0,"Atk":209,"Def":170,"SpA":94,"SpD":180,"Spe":70},"Moves":[{"Id":0,"Name":"Glacial Lance","Num":824,"BasePower":120,"Category":0,"Type":5,"Priority":0,"Target":5,"BasePp":5},{"Id":1,"Name":"Leech Seed","Num":73,"BasePower":0,"Category":2,"Type":4,"Priority":0,"Target":11,"BasePp":10},{"Id":2,"Name":"Trick Room","Num":433,"BasePower":0,"Category":2,"Type":10,"Priority":-7,"Target":3,"BasePp":5},{"Id":3,"Name":"P
 STDERR: [BattleStream] PushMessage: type=sideupdate, data length=4915
 STDERR: [BattleStream] Writing to output channel: sideupdate
-STDERR: |request|{"Side":{"Name":"Bot 1","Id":0,"Pokemon":[{"Condition":0,"Active":true,"Stats...
 STDERR: P1
+STDERR: |request|{"Side":{"Name":"Bot 1","Id":0,"Pokemon":[{"Condition":0,"Active":true,"Stats...
+STDERR: [EmitRequest] JSON (first 500 chars): {"Side":{"Name":"Bot 2","Id":1,"Pokemon":[{"Condition":0,"Active":true,"Stats":{"Hp":0,"Atk":209,"Def":170,"SpA":94,"SpD":180,"Spe":70},"Moves":[{"Id":0,"Name":"Glacial Lance","Num":824,"BasePower":120,"Category":0,"Type":5,"Priority":0,"Target":5,"BasePp":5},{"Id":1,"Name":"Leech Seed","Num":73,"BasePower":0,"Category":2,"Type":4,"Priority":0,"Target":11,"BasePp":10},{"Id":2,"Name":"Trick Room","Num":433,"BasePower":0,"Category":2,"Type":10,"Priority":-7,"Target":3,"BasePp":5},{"Id":3,"Name":"P
 STDERR: [BattleStream] PushMessage: type=sideupdate, data length=4915
 STDERR: [BattleStream] Writing to output channel: sideupdate
-STDERR: P2
 STDERR: |request|{"Side":{"Name":"Bot 2","Id":1,"Pokemon":[{"Condition":0,"Active":true,"Stats...
+STDERR: P2
 
 
 === END OF OUTPUT ===

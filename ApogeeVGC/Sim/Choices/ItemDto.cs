@@ -13,7 +13,7 @@ public record ItemDto
 
     public static ItemDto FromItem(Item item)
     {
-   return new ItemDto
+        return new ItemDto
         {
             Id = item.Id,
             Name = item.Name,

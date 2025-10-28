@@ -15,9 +15,9 @@ public record AbilityDto
     {
         return new AbilityDto
         {
-          Id = ability.Id,
-Name = ability.Name,
-    Num = ability.Num,
+            Id = ability.Id,
+            Name = ability.Name,
+            Num = ability.Num,
       };
     }
 }

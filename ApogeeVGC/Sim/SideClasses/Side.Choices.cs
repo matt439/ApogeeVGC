@@ -859,8 +859,16 @@ public partial class Side
 
         string json;
         try
-        {
-            json = JsonSerializer.Serialize(update, options);
+     {
+      json = JsonSerializer.Serialize(update, options);
+    if (json.Length < 500)
+       {
+    Console.Error.WriteLine($"[EmitRequest] Full JSON: {json}");
+    }
+            else
+   {
+                Console.Error.WriteLine($"[EmitRequest] JSON (first 500 chars): {json.Substring(0, 500)}");
+        }
         }
         catch (NotSupportedException ex)
         {

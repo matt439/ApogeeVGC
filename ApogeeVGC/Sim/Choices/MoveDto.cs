@@ -21,15 +21,15 @@ public record MoveDto
     {
         return new MoveDto
         {
-       Id = move.Id,
-     Name = move.Name,
+            Id = move.Id,
+            Name = move.Name,
             Num = move.Num,
-   BasePower = move.BasePower,
+            BasePower = move.BasePower,
             Category = move.Category,
-         Type = move.Type,
+            Type = move.Type,
             Priority = move.Priority,
-   Target = move.Target,
-      BasePp = move.BasePp,
+            Target = move.Target,
+            BasePp = move.BasePp,
         };
     }
 }

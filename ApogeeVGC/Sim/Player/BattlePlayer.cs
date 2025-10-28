@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Player;
 
@@ -11,6 +13,12 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
     protected readonly PlayerReadWriteStream Stream = stream ?? throw new ArgumentNullException(nameof(stream));
     protected readonly List<string> Log = [];
     protected readonly bool Debug = debug;
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        Converters = { new ChoiceRequestConverter() },
+        PropertyNameCaseInsensitive = true,
+    };
 
     /// <summary>
     /// Starts reading from the stream and processing messages.
@@ -56,10 +64,19 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
         {
             case "request":
             {
-                var request = JsonSerializer.Deserialize<IChoiceRequest>(rest);
-                if (request != null)
+                try
                 {
-                    ReceiveRequest(request);
+                    var request = JsonSerializer.Deserialize<IChoiceRequest>(rest, JsonOptions);
+                    if (request != null)
+                    {
+                        ReceiveRequest(request);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deserializing request: {ex.Message}");
+                    Console.WriteLine($"Request JSON: {rest}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 }
                 return;
             }
