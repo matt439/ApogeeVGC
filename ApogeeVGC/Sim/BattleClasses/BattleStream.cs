@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Channels;
 using ApogeeVGC.Sim.PokemonClasses;
 
@@ -216,15 +217,30 @@ public class BattleStream : IDisposable
                 {
                     (string slotStr, string optionsText) = SplitFirst(message, ' ');
                     var slot = Enum.Parse<SideId>(slotStr, ignoreCase: true);
-                    PlayerOptions playerOptions = JsonSerializer.Deserialize<PlayerOptions>(optionsText)
-                                                  ?? throw new InvalidOperationException("Invalid player options");
+                    
+                    Console.WriteLine($"[BattleStream] Received player command for {slot}");
+                    Console.WriteLine($"[BattleStream] Options text: {optionsText.Substring(0, Math.Min(200, optionsText.Length))}...");
+      
+                    // Deserialize to JsonObject first to handle Showdown format
+                  JsonObject? playerOptionsJson = JsonSerializer.Deserialize<JsonObject>(optionsText);
+                 if (playerOptionsJson == null)
+                {
+             throw new InvalidOperationException("Invalid player options");
+            }
 
-                    if (Battle is null)
-                    {
-                        throw new InvalidOperationException("Battle not started");
-                    }
-                    Battle.SetPlayer(slot, playerOptions);
-                    break;
+            Console.WriteLine($"[BattleStream] Deserialized to JsonObject, keys: {string.Join(", ", playerOptionsJson.Select(kvp => kvp.Key))}");
+              
+   // Convert from Showdown format to PlayerOptions using State helper
+    PlayerOptions playerOptions = State.DeserializePlayerOptionsFromShowdown(playerOptionsJson, Library);
+
+               Console.WriteLine($"[BattleStream] Converted to PlayerOptions, Team is {(playerOptions.Team == null ? "null" : $"count={playerOptions.Team.Count}")}");
+
+            if (Battle is null)
+                 {
+            throw new InvalidOperationException("Battle not started");
+               }
+     Battle.SetPlayer(slot, playerOptions);
+        break;
                 }
 
             case "p1":

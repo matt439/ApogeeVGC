@@ -55,4 +55,9 @@ public static class ShowdownIdTools
     {
         return moveType.ToString().ToShowdownId();
     }
+
+    public static string ToShowdownId(this PokeballId pokeballId)
+    {
+        return pokeballId.ToString().ToShowdownId();
+    }
 }
