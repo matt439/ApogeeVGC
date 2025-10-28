@@ -17,6 +17,7 @@ public partial class BattleAsync
             // Clear all sides' choices when starting a new request
             foreach (Side side in Sides)
             {
+                side.RequestState = type.Value;
                 side.ClearChoice();
             }
         }
@@ -78,6 +79,7 @@ public partial class BattleAsync
         RequestState = RequestState.None;
         foreach (Side side in Sides)
         {
+            side.RequestState = RequestState.None;
             side.ActiveRequest = null;
             side.ClearChoice();
         }

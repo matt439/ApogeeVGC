@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -54,21 +55,71 @@ public class BattleQueue(IBattle battle)
     /// </summary>
     public List<IAction> ResolveAction(IActionChoice action, bool midTurn = false)
     {
-        switch (action)
-        {
-            case null:
-                throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
-            // Pass actions return empty list
-            case IAction { Choice: ActionId.Pass }:
-                return [];
+      switch (action)
+  {
+    case null:
+      throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
+    // Pass actions return empty list
+   case IAction { Choice: ActionId.Pass }:
+       return [];
         }
 
         // Start with the action itself
-        List<IAction> actions = [];
+    List<IAction> actions = [];
 
-        // Cast to IAction - all ActionChoices should be IActions in practice
-        IAction currentAction = action as IAction ??
-                                throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+    // Convert ChosenAction to proper IAction type
+    IAction currentAction;
+    if (action is ChosenAction chosenAction)
+    {
+        // Map ChoiceType to ActionId (they should have matching values)
+        ActionId actionId = (ActionId)chosenAction.Choice;
+        
+        currentAction = actionId switch
+        {
+   ActionId.Move => new MoveAction
+  {
+ Choice = actionId,
+Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
+       Move = chosenAction.Move ?? Battle.Library.Moves[chosenAction.MoveId],
+    TargetLoc = chosenAction.TargetLoc ?? 0,
+     Order = 200, // Default order for moves
+    // OriginalTarget will be set below after we have the full action context
+       OriginalTarget = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
+ },
+ActionId.Switch or ActionId.InstaSwitch => new SwitchAction
+  {
+  Choice = actionId,
+  Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Switch action requires Pokemon"),
+  Target = chosenAction.Target ?? throw new InvalidOperationException("Switch action requires Target"),
+  Order = 103, // Default order for switches (from _orders dictionary in BattleQueue)
+        },
+   ActionId.Team => new TeamAction
+     {
+   Choice = actionId,
+      Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Team action requires Pokemon"),
+ Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires Index"),
+  },
+ActionId.Pass or ActionId.Shift => new PokemonAction
+ {
+Choice = actionId,
+       Pokemon = chosenAction.Pokemon,
+  },
+   ActionId.RevivalBlessing => new SwitchAction
+   {
+     Choice = actionId,
+  Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Revival Blessing requires Pokemon"),
+        Target = chosenAction.Target ?? throw new InvalidOperationException("Revival Blessing requires Target"),
+       Order = 6, // Order for RevivalBlessing (from _orders dictionary in BattleQueue)
+     },
+  _ => throw new InvalidOperationException($"Unknown ChosenAction type: {actionId}"),
+   };
+    }
+  else
+{
+// Cast to IAction - all other ActionChoices should be IActions in practice
+  currentAction = action as IAction ??
+      throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+        }
 
         // Populate move if missing (from moveId)
         if (currentAction is MoveAction moveAction)

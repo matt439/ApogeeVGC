@@ -610,12 +610,27 @@ public partial class Side
     {
         // Determine event type based on Terastallize flag
         EventType eventType = action.Terastallize != null
-            ? EventType.Terastallize
+          ? EventType.Terastallize
             : EventType.None;
 
-        // Use ChooseMove with the move ID and target location
+      // Convert MoveId to MoveIdIntUnion
+        // If the MoveId enum value is a small number (1-24), treat it as a move slot index
+        MoveIdIntUnion moveText;
+   int moveIdValue = (int)action.MoveId;
+        if (moveIdValue >= 1 && moveIdValue <= 24)
+   {
+   // Likely a move slot (1-based index), not an actual MoveId enum value
+  moveText = new IntMoveIdIntUnion(moveIdValue);
+        }
+    else
+        {
+     // Actual MoveId enum value
+            moveText = new MoveIdMoveIdIntUnion(action.MoveId);
+   }
+
+  // Use ChooseMove with the move ID and target location
         return ChooseMove(
-            moveText: action.MoveId,
+    moveText: moveText,
             targetLoc: action.TargetLoc ?? 0,
             eventType: eventType
         );

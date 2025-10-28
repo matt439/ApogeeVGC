@@ -542,22 +542,23 @@ public class BattleStream : IDisposable
                         int? targetLoc = null;
                         if (parts.Length >= 3 && int.TryParse(parts[2], out int target))
                         {
-                            targetLoc = target;
+                          targetLoc = target;
                         }
                         bool hasTerastallize = individualChoice.Contains("terastallize", StringComparison.OrdinalIgnoreCase) ||
                                               individualChoice.Contains("tera", StringComparison.OrdinalIgnoreCase);
 
                         if (hasTerastallize)
                         {
-                            choice.Terastallize = true;
+                          choice.Terastallize = true;
                         }
 
+                        // Cast the move slot to MoveId to store in ChosenAction
+                        // This will be interpreted as an integer by the union when passed to ChooseMove
                         actions.Add(new ChosenAction
                         {
-                            Choice = ChoiceType.Move,
-                            MoveId = MoveId.None, // Will be resolved later by the battle engine
-                            Index = moveSlot - 1, // Convert to 0-based index
-                            TargetLoc = targetLoc,
+                          Choice = ChoiceType.Move,
+                          MoveId = (MoveId)moveSlot,
+                          TargetLoc = targetLoc,
                         });
                         break;
                     }
