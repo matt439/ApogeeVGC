@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -12,6 +12,7 @@ using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
+using System.Text.Json.Serialization;
 
 namespace ApogeeVGC.Sim.Conditions;
 
@@ -62,361 +63,699 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     /// <summary>
     /// battle, target, source, effect -> number
     /// </summary>
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnCopy { get; init; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnEnd { get; init; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnRestart { get; init; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnStart { get; init; }
 
 
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
+    [JsonIgnore]
+ public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnEmergencyExit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; init; }
-    public VoidSourceMoveHandler? OnAfterHit { get; init; }
+    [JsonIgnore]
+public VoidSourceMoveHandler? OnAfterHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAfterMega { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAfterSetStatus { get; init; }
+    [JsonIgnore]
     public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAfterTerastallization { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAfterUseItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAfterTakeItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAfterFaint { get; init; }
-    public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
+  public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAfterMove { get; init; }
-    public VoidSourceMoveHandler? OnAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnAttract { get; init; }
+    [JsonIgnore]
+ public VoidSourceMoveHandler? OnAfterMoveSelf { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon, Pokemon>? OnAttract { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnBasePower { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnBeforeMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnBeforeSwitchIn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnBeforeSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnBeforeTurn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnChargeMove { get; init; }
+    [JsonIgnore]
     public OnCriticalHit? OnCriticalHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; init; }
+  [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnDisableMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnEatItem { get; init; }
+    [JsonIgnore]
     public OnEffectivenessHandler? OnEffectiveness { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnEntryHazard { get; init; }
+    [JsonIgnore]
     public VoidEffectHandler? OnFaint { get; init; }
+    [JsonIgnore]
     public OnFlinch? OnFlinch { get; init; }
+    [JsonIgnore]
     public OnFractionalPriority? OnFractionalPriority { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnImmunity { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, PokemonType, Pokemon>? OnImmunity { get; init; }
+    [JsonIgnore]
     public OnLockMove? OnLockMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnMaybeTrapPokemon { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnModifyAccuracy { get; init; }
-    public ModifierSourceMoveHandler? OnModifyAtk { get; init; }
+    [JsonIgnore]
+  public ModifierSourceMoveHandler? OnModifyAtk { get; init; }
+    [JsonIgnore]
     public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifyCritRatio { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnModifyDef { get; init; }
+    [JsonIgnore]
     public OnModifyMoveHandler? OnModifyMove { get; init; }
-    public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
+    [JsonIgnore]
+public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
+    [JsonIgnore]
     public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
+    [JsonIgnore]
     public OnModifyTypeHandler? OnModifyType { get; init; }
+    [JsonIgnore]
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifySpA { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnModifySpD { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifyStab { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnMoveAborted { get; init; }
+ [JsonIgnore]
     public OnNegateImmunity? OnNegateImmunity { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnPrepareHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, IEffect>? OnResidual { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Side, Pokemon, Condition>? OnSideConditionStart { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, BoolVoidUnion>? OnStallMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSwitchIn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon>? OnSwap { get; init; }
+    [JsonIgnore]
     public OnTakeItem? OnTakeItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; init; }
+    [JsonIgnore]
+  public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; init; }
+  [JsonIgnore]
     public OnTryEatItem? OnTryEatItem { get; init; }
+    [JsonIgnore]
     public OnTryHeal? OnTryHeal { get; init; }
-    public ExtResultSourceMoveHandler? OnTryHit { get; init; }
-    public ResultMoveHandler? OnTryHitField { get; init; }
+    [JsonIgnore]
+  public ExtResultSourceMoveHandler? OnTryHit { get; init; }
+    [JsonIgnore]
+ public ResultMoveHandler? OnTryHitField { get; init; }
+ [JsonIgnore]
     public ResultMoveHandler? OnTryHitSide { get; init; }
+    [JsonIgnore]
     public ExtResultMoveHandler? OnInvulnerability { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnTryMove { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnUseItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnUpdate { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, object?, Condition>? OnWeather { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnWeatherModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifyDamagePhase1 { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnModifyDamagePhase2 { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeAfterHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; init; }
-    public OnAfterSubDamageHandler? OnFoeAfterSubDamage { get; init; }
+[JsonIgnore]
+  public OnAfterSubDamageHandler? OnFoeAfterSubDamage { get; init; }
+ [JsonIgnore]
     public Action<IBattle, Pokemon>? OnFoeAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnFoeAfterUseItem { get; init; }
+ [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeAfterBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnFoeAfterFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnFoeAfterMoveSecondary { get; init; }
+ [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeAfterMove { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeAfterMoveSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon>? OnFoeAttract { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeBasePower { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, IEffect>? OnFoeBeforeFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeBeforeMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnFoeBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeBeforeSwitchOut { get; init; }
+    [JsonIgnore]
+ public Action<IBattle, Pokemon>? OnFoeBeforeSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnFoeChargeMove { get; init; }
+    [JsonIgnore]
     public OnCriticalHit? OnFoeCriticalHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnFoeDisableMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnFoeEatItem { get; init; }
+    [JsonIgnore]
+ public Action<IBattle, Item, Pokemon>? OnFoeEatItem { get; init; }
+    [JsonIgnore]
     public OnEffectivenessHandler? OnFoeEffectiveness { get; init; }
+    [JsonIgnore]
     public VoidEffectHandler? OnFoeFaint { get; init; }
+    [JsonIgnore]
     public OnFlinch? OnFoeFlinch { get; init; }
+ [JsonIgnore]
     public ResultMoveHandler? OnFoeHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnFoeImmunity { get; init; }
-    public OnLockMove? OnFoeLockMove { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, PokemonType, Pokemon>? OnFoeImmunity { get; init; }
+    [JsonIgnore]
+public OnLockMove? OnFoeLockMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnFoeModifyAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyAtk { get; init; }
+    [JsonIgnore]
     public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyCritRatio { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyDamage { get; init; }
+ [JsonIgnore]
     public ModifierMoveHandler? OnFoeModifyDef { get; init; }
+    [JsonIgnore]
     public OnModifyMoveHandler? OnFoeModifyMove { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyPriority { get; init; }
+    [JsonIgnore]
     public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifySpA { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnFoeModifySpD { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyStab { get; init; }
+    [JsonIgnore]
     public OnModifyTypeHandler? OnFoeModifyType { get; init; }
+    [JsonIgnore]
     public OnModifyTargetHandler? OnFoeModifyTarget { get; init; }
+ [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnFoeMoveAborted { get; init; }
+    [JsonIgnore]
     public OnNegateImmunity? OnFoeNegateImmunity { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnFoePrepareHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; init; }
+    [JsonIgnore]
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnFoeSwitchOut { get; init; }
+    [JsonIgnore]
     public OnTakeItem? OnFoeTakeItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnFoeTerrain { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeTrapPokemon { get; init; }
+    [JsonIgnore]
+ public Action<IBattle, Pokemon>? OnFoeTrapPokemon { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; init; }
+    [JsonIgnore]
     public OnTryEatItem? OnFoeTryEatItem { get; init; }
+    [JsonIgnore]
     public OnTryHeal? OnFoeTryHeal { get; init; }
+    [JsonIgnore]
     public ExtResultSourceMoveHandler? OnFoeTryHit { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnFoeTryHitField { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnFoeTryHitSide { get; init; }
-    public ExtResultMoveHandler? OnFoeInvulnerability { get; init; }
+    [JsonIgnore]
+  public ExtResultMoveHandler? OnFoeInvulnerability { get; init; }
+ [JsonIgnore]
     public ResultSourceMoveHandler? OnFoeTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; init; }
+    [JsonIgnore]
+ public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase2 { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceAfterHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; init; }
+    [JsonIgnore]
     public OnAfterSubDamageHandler? OnSourceAfterSubDamage { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnSourceAfterUseItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceAfterBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnSourceAfterFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnSourceAfterMoveSecondary { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceAfterMove { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceBeforeMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceBeforeSwitchIn { get; init; }
+ [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceBeforeSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnSourceChargeMove { get; init; }
+    [JsonIgnore]
     public OnCriticalHit? OnSourceCriticalHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceDisableMove { get; init; }
+    [JsonIgnore]
+  public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon>? OnSourceDisableMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnSourceEatItem { get; init; }
+    [JsonIgnore]
     public OnEffectivenessHandler? OnSourceEffectiveness { get; init; }
+ [JsonIgnore]
     public VoidEffectHandler? OnSourceFaint { get; init; }
+    [JsonIgnore]
     public OnFlinch? OnSourceFlinch { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnSourceHit { get; init; }
+ [JsonIgnore]
     public Action<IBattle, PokemonType, Pokemon>? OnSourceImmunity { get; init; }
+    [JsonIgnore]
     public OnLockMove? OnSourceLockMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnSourceModifyAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyAtk { get; init; }
+    [JsonIgnore]
     public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyCritRatio { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnSourceModifyDef { get; init; }
+    [JsonIgnore]
     public OnModifyMoveHandler? OnSourceModifyMove { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyPriority { get; init; }
+    [JsonIgnore]
     public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifySpA { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnSourceModifySpD { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyStab { get; init; }
+    [JsonIgnore]
     public OnModifyTypeHandler? OnSourceModifyType { get; init; }
+    [JsonIgnore]
     public OnModifyTargetHandler? OnSourceModifyTarget { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; init; }
+    [JsonIgnore]
+  public Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnSourceMoveAborted { get; init; }
+    [JsonIgnore]
     public OnNegateImmunity? OnSourceNegateImmunity { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnSourcePrepareHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; init; }
+    [JsonIgnore]
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; init; }
-    public Func<IBattle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; init; }
+    [JsonIgnore]
+ public Func<IBattle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceSwitchOut { get; init; }
+    [JsonIgnore]
     public OnTakeItem? OnSourceTakeItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceTerrain { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnSourceTrapPokemon { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; init; }
-    public OnTryEatItem? OnSourceTryEatItem { get; init; }
+    [JsonIgnore]
+public OnTryEatItem? OnSourceTryEatItem { get; init; }
+    [JsonIgnore]
     public OnTryHeal? OnSourceTryHeal { get; init; }
+    [JsonIgnore]
     public ExtResultSourceMoveHandler? OnSourceTryHit { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnSourceTryHitField { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnSourceTryHitSide { get; init; }
+    [JsonIgnore]
     public ExtResultMoveHandler? OnSourceInvulnerability { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnSourceTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; init; }
+    [JsonIgnore]
+ public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; init; }
+[JsonIgnore]
     public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase2 { get; init; }
+  [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyAfterHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; init; }
+    [JsonIgnore]
     public OnAfterSubDamageHandler? OnAnyAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon>? OnAnyAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAnyAfterUseItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyAfterBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAnyAfterFaint { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyAfterMega { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnAnyAfterMoveSecondary { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyAfterMove { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyAfterMoveSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyAfterTerastallization { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon>? OnAnyAttract { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyBasePower { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, IEffect>? OnAnyBeforeFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyBeforeMove { get; init; }
+  [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyBeforeSwitchIn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyBeforeSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAnyChargeMove { get; init; }
+    [JsonIgnore]
     public OnCriticalHit? OnAnyCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; init; }
+    [JsonIgnore]
+ public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyDisableMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAnyEatItem { get; init; }
+    [JsonIgnore]
     public OnEffectivenessHandler? OnAnyEffectiveness { get; init; }
+    [JsonIgnore]
     public VoidEffectHandler? OnAnyFaint { get; init; }
+    [JsonIgnore]
     public OnFlinch? OnAnyFlinch { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnAnyHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnAnyImmunity { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, PokemonType, Pokemon>? OnAnyImmunity { get; init; }
+    [JsonIgnore]
     public OnLockMove? OnAnyLockMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnAnyModifyAccuracy { get; init; }
+ [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyAtk { get; init; }
+    [JsonIgnore]
     public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyCritRatio { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnAnyModifyDef { get; init; }
+    [JsonIgnore]
     public OnModifyMoveHandler? OnAnyModifyMove { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyPriority { get; init; }
+[JsonIgnore]
     public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
+  [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifySpA { get; init; }
-    public ModifierMoveHandler? OnAnyModifySpD { get; init; }
+    [JsonIgnore]
+ public ModifierMoveHandler? OnAnyModifySpD { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; init; }
-    public ModifierSourceMoveHandler? OnAnyModifyStab { get; init; }
+    [JsonIgnore]
+  public ModifierSourceMoveHandler? OnAnyModifyStab { get; init; }
+    [JsonIgnore]
     public OnModifyTypeHandler? OnAnyModifyType { get; init; }
+    [JsonIgnore]
     public OnModifyTargetHandler? OnAnyModifyTarget { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; init; }
+ [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; init; }
+    [JsonIgnore]
     public OnNegateImmunity? OnAnyNegateImmunity { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnAnyPrepareHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; init; }
+    [JsonIgnore]
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; init; }
+ [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnySwitchIn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnySwitchOut { get; init; }
-    public OnTakeItem? OnAnyTakeItem { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyTerrain { get; init; }
+    [JsonIgnore]
+  public OnTakeItem? OnAnyTakeItem { get; init; }
+    [JsonIgnore]
+  public Action<IBattle, Pokemon>? OnAnyTerrain { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAnyTrapPokemon { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; init; }
+    [JsonIgnore]
     public OnTryEatItem? OnAnyTryEatItem { get; init; }
+    [JsonIgnore]
     public OnTryHeal? OnAnyTryHeal { get; init; }
+  [JsonIgnore]
     public ExtResultSourceMoveHandler? OnAnyTryHit { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnAnyTryHitField { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnAnyTryHitSide { get; init; }
+    [JsonIgnore]
     public ExtResultMoveHandler? OnAnyInvulnerability { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnAnyTryMove { get; init; }
+[JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAnyModifyDamagePhase2 { get; init; }
+    [JsonIgnore]
     public int? OnAccuracyPriority { get; init; }
     public int? OnDamagingHitOrder { get; init; }
     public int? OnAfterMoveSecondaryPriority { get; init; }
@@ -483,97 +822,183 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public int? OnTryMovePriority { get; init; }
     public int? OnTryPrimaryHitPriority { get; init; }
     public int? OnTypePriority { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Side, Pokemon, IEffect>? OnSideStart { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Side, Pokemon, IEffect>? OnSideRestart { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Side, Pokemon, IEffect>? OnSideResidual { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Side>? OnSideEnd { get; init; }
     public int? OnSideResidualOrder { get; init; }
     public int? OnSideResidualPriority { get; init; }
     public int? OnSideResidualSubOrder { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Field, Pokemon, IEffect>? OnFieldStart { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Field, Pokemon, IEffect>? OnFieldRestart { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Field, Pokemon, IEffect>? OnFieldResidual { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Field>? OnFieldEnd { get; init; }
     public int? OnFieldResidualOrder { get; init; }
     public int? OnFieldResidualPriority { get; init; }
     public int? OnFieldResidualSubOrder { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyAfterHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; init; }
+    [JsonIgnore]
     public OnAfterSubDamageHandler? OnAllyAfterSubDamage { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyAfterSwitchInSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAllyAfterUseItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyAfterBoost { get; init; }
+    [JsonIgnore]
     public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAllyAfterFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyAfterMoveSecondarySelf { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnAllyAfterMoveSecondary { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyAfterMove { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyAfterMoveSelf { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon>? OnAllyAttract { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyBasePower { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, IEffect>? OnAllyBeforeFaint { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyBeforeMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyBeforeSwitchIn { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyBeforeSwitchOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyTryBoost { get; init; }
+    [JsonIgnore]
     public VoidSourceMoveHandler? OnAllyChargeMove { get; init; }
+    [JsonIgnore]
     public OnCriticalHit? OnAllyCriticalHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAllyDamage { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAllyDeductPp { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyDisableMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Item, Pokemon>? OnAllyEatItem { get; init; }
+    [JsonIgnore]
     public OnEffectivenessHandler? OnAllyEffectiveness { get; init; }
+    [JsonIgnore]
     public VoidEffectHandler? OnAllyFaint { get; init; }
+    [JsonIgnore]
     public OnFlinch? OnAllyFlinch { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnAllyHit { get; init; }
+    [JsonIgnore]
     public Action<IBattle, PokemonType, Pokemon>? OnAllyImmunity { get; init; }
+    [JsonIgnore]
     public OnLockMove? OnAllyLockMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnAllyModifyAccuracy { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyAtk { get; init; }
+    [JsonIgnore]
     public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAllyModifyBoost { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyCritRatio { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnAllyModifyDef { get; init; }
+    [JsonIgnore]
     public OnModifyMoveHandler? OnAllyModifyMove { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyPriority { get; init; }
+    [JsonIgnore]
     public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifySpA { get; init; }
+    [JsonIgnore]
     public ModifierMoveHandler? OnAllyModifySpD { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAllyModifySpe { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyStab { get; init; }
+    [JsonIgnore]
     public OnModifyTypeHandler? OnAllyModifyType { get; init; }
+    [JsonIgnore]
     public OnModifyTargetHandler? OnAllyModifyTarget { get; init; }
+    [JsonIgnore]
     public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAllyModifyWeight { get; init; }
+    [JsonIgnore]
     public VoidMoveHandler? OnAllyMoveAborted { get; init; }
+    [JsonIgnore]
     public OnNegateImmunity? OnAllyNegateImmunity { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAllyOverrideAction { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnAllyPrepareHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAllyRedirectTarget { get; init; }
+    [JsonIgnore]
     public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAllySetAbility { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, PokemonVoidUnion?>? OnAllySetStatus { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAllySetWeather { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, PokemonVoidUnion>? OnAllyStallMove { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllySwitchOut { get; init; }
+    [JsonIgnore]
     public OnTakeItem? OnAllyTakeItem { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyTerrain { get; init; }
+    [JsonIgnore]
     public Action<IBattle, Pokemon>? OnAllyTrapPokemon { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAllyTryAddVolatile { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Item, Pokemon, BoolVoidUnion>? OnAllyTryEatItem { get; init; }
+    [JsonIgnore]
     public OnTryHeal? OnAllyTryHeal { get; init; }
+    [JsonIgnore]
     public ExtResultSourceMoveHandler? OnAllyTryHit { get; init; }
+    [JsonIgnore]
     public ExtResultSourceMoveHandler? OnAllyTryHitField { get; init; }
+    [JsonIgnore]
     public ResultMoveHandler? OnAllyTryHitSide { get; init; }
+    [JsonIgnore]
     public ExtResultMoveHandler? OnAllyInvulnerability { get; init; }
+    [JsonIgnore]
     public ResultSourceMoveHandler? OnAllyTryMove { get; init; }
+    [JsonIgnore]
     public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyTryPrimaryHit { get; init; }
+    [JsonIgnore]
     public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAllyType { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; init; }
+    [JsonIgnore]
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase2 { get; init; }
 
     public EffectDelegate? GetDelegate(EventId id)
@@ -758,7 +1183,7 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
             EventId.SideResidual => OnSideResidualPriority,
             EventId.FieldResidual => OnFieldResidualPriority,
             _ => null,
-        };
+     };
     }
 
     public IntFalseUnion? GetOrder(EventId id)

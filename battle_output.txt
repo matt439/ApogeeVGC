@@ -1,0 +1,60 @@
+﻿=== ApogeeVGC Battle Output ===
+Generated: 2025-10-28 10:08:15
+Duration: 30 seconds (timeout) or until completion
+
+=== STANDARD OUTPUT ===
+p1 is RandomPlayerAi
+p2 is RandomPlayerAi
+|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gen|9
+|tier|[Gen 9] OU
+|
+|t:|1761610065.00
+|teamsize|p1|6
+|teamsize|p2|6
+|split|p1
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|start
+|split|p2
+|-ability|p1a: calyrex-ice|Unnerve
+|-ability|p1a: calyrex-ice|As One
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|-ability|p2a: calyrex-ice|As One
+|-ability|p2a: calyrex-ice|Unnerve
+|turn|1
+
+
+=== STANDARD ERROR ===
+STDERR: [BattleStream] Starting ProcessInputAsync
+STDERR: [BattleStream] Processing chunk: >start {"formatid":"gen9customgame"}
+STDERR: >player p1 {"Name":"Bot 1","Avatar":null,"Rating":null,"Team":...
+STDERR: Battle constructor complete.
+STDERR: [BattleStream] Calling SendUpdates, Battle is not null
+STDERR: [SendUpdates] SentLogPos=0, Log.Count=20
+STDERR: [SendUpdates] Sending 20 updates
+STDERR: [BattleStream] PushMessage: type=update, data length=496
+STDERR: [BattleStream] Writing to output channel: update
+STDERR: |player|p2|Bot 2||
+STDERR: |player|p1|Bot 1||
+STDERR: |tier|[Gen 9] OU
+STDERR: |gen|9
+STDERR: |t:|1761610065.00
+STDERR: |
+STDERR: |teamsize|p...
+STDERR: [SendUpdates] Sending requests to players
+STDERR: [EmitRequest] Serialization error: Serialization and deserialization of 'System.Action`4[[ApogeeVGC.Sim.BattleClasses.IBattle, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.FieldClasses.Field, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.PokemonClasses.Pokemon, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.Effects.IEffect, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]' instances is not supported. The unsupported member type is located on type 'System.Action`4[ApogeeVGC.Sim.BattleClasses.IBattle,ApogeeVGC.Sim.FieldClasses.Field,ApogeeVGC.Sim.PokemonClasses.Pokemon,ApogeeVGC.Sim.Effects.IEffect]'. Path: $.Side.Pokemon.Moves.Condition.OnFieldStart.
+STDERR: [BattleStream] PushMessage: type=sideupdate, data length=65
+STDERR: [BattleStream] Writing to output channel: sideupdate
+STDERR: P1
+STDERR: |request|{"error":"Serialization failed","type":"MoveRequest"}...
+STDERR: [EmitRequest] Serialization error: Serialization and deserialization of 'System.Action`4[[ApogeeVGC.Sim.BattleClasses.IBattle, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.FieldClasses.Field, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.PokemonClasses.Pokemon, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null],[ApogeeVGC.Sim.Effects.IEffect, ApogeeVGC, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]' instances is not supported. The unsupported member type is located on type 'System.Action`4[ApogeeVGC.Sim.BattleClasses.IBattle,ApogeeVGC.Sim.FieldClasses.Field,ApogeeVGC.Sim.PokemonClasses.Pokemon,ApogeeVGC.Sim.Effects.IEffect]'. Path: $.Side.Pokemon.Moves.Condition.OnFieldStart.
+STDERR: [BattleStream] PushMessage: type=sideupdate, data length=65
+STDERR: [BattleStream] Writing to output channel: sideupdate
+STDERR: |request|{"error":"Serialization failed","type":"MoveRequest"}...
+STDERR: P2
+
+
+=== END OF OUTPUT ===
