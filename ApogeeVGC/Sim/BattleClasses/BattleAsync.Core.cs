@@ -78,7 +78,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public bool Ended { get; set; }
     public string? Winner { get; set; }
 
-    public IEffect Effect { get; set; } = null!;
+    public IEffect Effect { get; set; }
     public EffectState EffectState { get; set; }
 
     public Event Event { get; set; } = new();
@@ -176,6 +176,13 @@ public partial class BattleAsync : IBattle, IDisposable
         {
             SetPlayer(SideId.P2, options.P2);
         }
+
+        // Initialize a default empty effect. Choose Format as it not used much so it's a good placeholder.
+        Effect = new Format
+        {
+            Name = "Empty Effect",
+            FormatId = FormatId.EmptyEffect,
+        };
 
         Console.WriteLine("Battle constructor complete.");
     }

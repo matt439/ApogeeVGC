@@ -19,6 +19,7 @@ namespace ApogeeVGC.Sim.FormatClasses;
 public enum FormatId
 {
     Gen9Ou,
+    EmptyEffect,
 }
 
 public enum FormatEffectType
