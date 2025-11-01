@@ -548,16 +548,35 @@ public partial class BattleAsync
                 if (handler.State.Duration <= 0)
                 {
                     // Effect has expired, trigger its end callback
-                    List<object?> endCallArgsList = [.. handler.EndCallArgs ?? []];
-                    if (endCallArgsList.Count == 0)
+                    // The End callback is already bound and knows what to do
+                    try
                     {
-                        endCallArgsList.Add(handler.EffectHolder);
-                        endCallArgsList.Add(effect.EffectStateId);
+                        Delegate? endDelegate = handler.End.GetDelegate();
+                        if (endDelegate != null)
+                        {
+                            // Check the number of parameters expected
+                            var parameters = endDelegate.Method.GetParameters();
+                            if (parameters.Length == 0)
+                            {
+                                endDelegate.DynamicInvoke();
+                            }
+                            else
+                            {
+                                // Skip if we don't know how to invoke it
+                                if (DisplayUi)
+                                {
+                                    Debug($"Skipping End callback for {effect.Name} - requires {parameters.Length} parameters");
+                                }
+                            }
+                        }
                     }
-
-                    // Invoke the end callback
-                    Delegate? endDelegate = handler.End.GetDelegate();
-                    endDelegate?.DynamicInvoke([.. endCallArgsList]);
+                    catch (Exception ex)
+                    {
+                        if (DisplayUi)
+                        {
+                            Debug($"Error invoking End callback for {effect.Name}: {ex.Message}");
+                        }
+                    }
 
                     if (Ended) return;
                     continue;
