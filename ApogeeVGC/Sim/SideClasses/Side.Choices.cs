@@ -645,12 +645,19 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
 
     private bool ProcessChosenSwitchAction(ChosenAction action)
     {
-        if (action.Target == null)
+        // Handle switch specified by slot number in TargetLoc
+        if (action.Target == null && action.TargetLoc.HasValue)
+  {
+      // Convert TargetLoc (slot number) to Pokemon using IntPokemonIntUnion
+            return ChooseSwitch(new IntPokemonIntUnion(action.TargetLoc.Value)).IsTrue();
+      }
+  
+     if (action.Target == null)
         {
             return EmitChoiceError("Can't switch: No target Pokemon specified");
         }
 
-        return ChooseSwitch(action.Target).IsTrue();
+ return ChooseSwitch(action.Target).IsTrue();
     }
 
     private bool ProcessChosenTeamAction(ChosenAction action)
@@ -903,20 +910,54 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
 
     public bool IsChoiceDone()
     {
-        if (RequestState == RequestState.None) return true;
+     if (RequestState == RequestState.None) return true;
       
-        // If this side has a WaitRequest, the choice is done (no action needed)
-  if (ActiveRequest?.Wait == true) return true;
+      // If this side has a WaitRequest, the choice is done (no action needed)
+        if (ActiveRequest?.Wait == true)
+    {
+   return true;
+ }
     
-      if (Choice.ForcedSwitchesLeft > 0) return false;
+        if (Choice.ForcedSwitchesLeft > 0)
+        {
+            return false;
+   }
 
         if (RequestState == RequestState.TeamPreview)
-     {
-         return Choice.Actions.Count >= PickedTeamSize();
- }
+ {
+        return Choice.Actions.Count >= PickedTeamSize();
+        }
 
-      GetChoiceIndex();
- return Choice.Actions.Count >= Active.Count;
+        // Calculate the effective action count needed WITHOUT modifying state
+        // Count actions plus any auto-pass slots (fainted/commanding Pokemon)
+   int actionsNeeded = 0;
+        int currentActionIndex = Choice.Actions.Count;
+        
+        for (int i = currentActionIndex; i < Active.Count; i++)
+        {
+          if (Active[i] == null) continue;
+       
+            // Check if this slot needs an action or auto-passes
+          bool needsAutoPass = false;
+
+            switch (RequestState)
+   {
+    case RequestState.Move:
+     needsAutoPass = Active[i]!.Fainted || Active[i]!.Volatiles.ContainsKey(ConditionId.Commanding);
+       break;
+   case RequestState.Switch:
+        needsAutoPass = !Active[i]!.SwitchFlag.IsTrue();
+        break;
+            }
+  
+          if (!needsAutoPass)
+   {
+      // This slot needs an actual action
+  actionsNeeded++;
+            }
+   }
+        
+        return actionsNeeded == 0; // Done if no more actions needed
     }
 
 

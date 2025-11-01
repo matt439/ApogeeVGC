@@ -575,12 +575,14 @@ public class BattleStream : IDisposable
                         {
                             Choice = ChoiceType.Switch,
                             MoveId = MoveId.None,
-                            Index = switchSlot - 1, // Convert to 0-based index
-                        });
-                        
-                        choice.SwitchIns.Add(switchSlot);
-                        break;
-                    }
+                            // Store the switch slot as an integer for later processing
+         // Side.Choose will handle converting this to the actual target Pokemon
+         TargetLoc = switchSlot, // Store as TargetLoc for now, will be converted by Side.ProcessChosenSwitchAction
+    });
+        
+    choice.SwitchIns.Add(switchSlot);
+    break;
+   }
 
                 case "team":
                     {

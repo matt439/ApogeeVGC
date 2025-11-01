@@ -693,11 +693,14 @@ public partial class BattleAsync
         // Fainting
         FaintMessages();
         if (Ended) return true;
+    
+        // Check for fainted Pokemon and set switch flags
+        CheckFainted();
 
         // Switching (fainted pokemon, U-turn, Baton Pass, etc)
-        if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
+      if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
         {
-            return false;
+    return false;
         }
 
         // Emergency Exit / Wimp Out check (Gen 5+)
