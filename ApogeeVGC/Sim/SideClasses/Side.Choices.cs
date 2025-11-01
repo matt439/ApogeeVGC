@@ -904,15 +904,19 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
     public bool IsChoiceDone()
     {
         if (RequestState == RequestState.None) return true;
-        if (Choice.ForcedSwitchesLeft > 0) return false;
+      
+        // If this side has a WaitRequest, the choice is done (no action needed)
+  if (ActiveRequest?.Wait == true) return true;
+    
+      if (Choice.ForcedSwitchesLeft > 0) return false;
 
         if (RequestState == RequestState.TeamPreview)
-  {
-  return Choice.Actions.Count >= PickedTeamSize();
-        }
+     {
+         return Choice.Actions.Count >= PickedTeamSize();
+ }
 
       GetChoiceIndex();
-        return Choice.Actions.Count >= Active.Count;
+ return Choice.Actions.Count >= Active.Count;
     }
 
 

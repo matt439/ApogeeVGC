@@ -158,6 +158,22 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             var choices = new List<string>();
             Console.WriteLine($"[DEBUG] HandleMoveRequest: Pokemon count = {pokemonArray.Count}, Active count = {activeArray.Count}");
 
+            // Build a list of active pokemon in order
+            var activePokemon = new List<JsonObject?>();
+            for (int i = 0; i < pokemonArray.Count && activePokemon.Count < activeArray.Count; i++)
+            {
+                if (pokemonArray[i] is JsonObject mon && mon["active"]?.GetValue<bool>() == true)
+                {
+                    activePokemon.Add(mon);
+                }
+            }
+
+            // Pad with nulls if needed
+            while (activePokemon.Count < activeArray.Count)
+            {
+                activePokemon.Add(null);
+            }
+
             for (int i = 0; i < activeArray.Count; i++)
             {
                 if (activeArray[i] is not JsonObject activeData)
@@ -167,18 +183,7 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 }
 
                 // Get corresponding pokemon from side
-                JsonObject? sidePokemon = null;
-                for (int j = 0; j < pokemonArray.Count; j++)
-                {
-                    if (pokemonArray[j] is JsonObject mon && mon["active"]?.GetValue<bool>() == true)
-                    {
-                        // Found an active pokemon - check if it's the i-th one
-                        // For now, just use the first active pokemon we find
-                        // This is simplified - a proper implementation would track positions
-                        sidePokemon = mon;
-                        break;
-                    }
-                }
+                JsonObject? sidePokemon = i < activePokemon.Count ? activePokemon[i] : null;
 
                 if (sidePokemon == null)
                 {
