@@ -18,7 +18,8 @@ public partial class BattleActions
     /// <param name="move">The move being used</param>
     /// <param name="notActive">If true, sets this as the active move before processing</param>
     /// <returns>True if at least one target was hit, false otherwise</returns>
-    public bool TrySpreadMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move, bool notActive = false)
+    public bool TrySpreadMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move,
+        bool notActive = false)
     {
         // Mark as spread move if targeting multiple Pokemon
         if (targets.Count > 1 && move.SmartTarget != true)
@@ -28,33 +29,34 @@ public partial class BattleActions
 
         // Define the sequence of hit validation steps
         // Each step filters out targets that fail its check
-        var moveSteps = new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>>
-    {
-        // 0. check for semi invulnerability
-        HitStepInvulnerabilityEvent,
+        var moveSteps =
+            new List<Func<List<Pokemon>, Pokemon, ActiveMove, List<BoolIntEmptyUndefinedUnion>?>>
+            {
+                // 0. check for semi invulnerability
+                HitStepInvulnerabilityEvent,
 
-        // 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) 
-        // (this is step 2 in gens 5 & 6, and step 4 in gen 4)
-        HitStepTryEvent,
+                // 1. run the 'TryHit' event (Protect, Magic Bounce, Volt Absorb, etc.) 
+                // (this is step 2 in gens 5 & 6, and step 4 in gen 4)
+                HitStepTryEvent,
 
-        // 2. check for type immunity (this is step 1 in gens 4-6)
-        HitStepTypeImmunity,
+                // 2. check for type immunity (this is step 1 in gens 4-6)
+                HitStepTypeImmunity,
 
-        // 3. check for various move-specific immunities
-        HitStepTryImmunity,
+                // 3. check for various move-specific immunities
+                HitStepTryImmunity,
 
-        // 4. check accuracy
-        HitStepAccuracy,
+                // 4. check accuracy
+                HitStepAccuracy,
 
-        // 5. break protection effects
-        HitStepBreakProtect,
+                // 5. break protection effects
+                HitStepBreakProtect,
 
-        // 6. steal positive boosts (Spectral Thief)
-        HitStepStealBoosts,
+                // 6. steal positive boosts (Spectral Thief)
+                HitStepStealBoosts,
 
-        // 7. loop that processes each hit of the move (has its own steps per iteration)
-        HitStepMoveHitLoop,
-    };
+                // 7. loop that processes each hit of the move (has its own steps per iteration)
+                HitStepMoveHitLoop,
+            };
 
         // Set as active move if needed
         if (notActive)
@@ -75,8 +77,8 @@ public partial class BattleActions
             targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
 
         bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
-                        prepareHitResult1 is not BoolRelayVar { Value: false } &&
-                        prepareHitResult2 is not BoolRelayVar { Value: false };
+                         prepareHitResult1 is not BoolRelayVar { Value: false } &&
+                         prepareHitResult2 is not BoolRelayVar { Value: false };
 
         if (!hitResult)
         {
@@ -118,11 +120,15 @@ public partial class BattleActions
                     newTargets.Add(targets[i]);
                 }
             }
+
             targets = newTargets;
 
             // Track if any target failed this step
             atLeastOneFailure = atLeastOneFailure ||
-                hitResults.Any(result => result is BoolBoolIntEmptyUndefinedUnion { Value: false });
+                                hitResults.Any(result => result is BoolBoolIntEmptyUndefinedUnion
+                                {
+                                    Value: false
+                                });
 
             // Disable smart targeting if there was a failure
             if (move.SmartTarget == true && atLeastOneFailure)
@@ -159,10 +165,11 @@ public partial class BattleActions
     }
 
 
-
-    public Undefined AfterMoveSecondaryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public Undefined AfterMoveSecondaryEvent(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
-        if ((move.HasSheerForce ?? false) && pokemon.HasAbility(AbilityId.SheerForce)) return new Undefined();
+        if ((move.HasSheerForce ?? false) && pokemon.HasAbility(AbilityId.SheerForce))
+            return new Undefined();
 
         Battle.SingleEvent(EventId.AfterMoveSecondary, move, null, targets[0], pokemon,
             move);
@@ -183,7 +190,8 @@ public partial class BattleActions
     /// <summary>
     /// NOTE: used only for moves that target sides/fields rather than pokemon
     /// </summary>
-    public IntUndefinedFalseEmptyUnion TryMoveHit(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
+    public IntUndefinedFalseEmptyUnion TryMoveHit(List<Pokemon> targets, Pokemon pokemon,
+        ActiveMove move)
     {
         Pokemon target = targets[0];
 
@@ -197,8 +205,8 @@ public partial class BattleActions
             RunEventSource.FromNullablePokemon(target), move);
 
         bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
-                        prepareHitResult1 is not BoolRelayVar { Value: false } &&
-                        prepareHitResult2 is not BoolRelayVar { Value: false };
+                         prepareHitResult1 is not BoolRelayVar { Value: false } &&
+                         prepareHitResult2 is not BoolRelayVar { Value: false };
 
         if (!hitResult)
         {
@@ -218,6 +226,7 @@ public partial class BattleActions
             {
                 return new Undefined();
             }
+
             return IntUndefinedFalseEmptyUnion.FromFalse();
         }
 
@@ -239,14 +248,17 @@ public partial class BattleActions
                 Battle.Add("-fail", pokemon);
                 Battle.AttrLastMove("[still]");
             }
+
             return IntUndefinedFalseEmptyUnion.FromFalse();
         }
 
-        return IntUndefinedFalseEmptyUnion.FromIntUndefinedFalseUnion(MoveHit(target, pokemon, move));
+        return IntUndefinedFalseEmptyUnion.FromIntUndefinedFalseUnion(
+            MoveHit(target, pokemon, move));
     }
 
-    public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets, Pokemon pokemon,
-    ActiveMove move, HitEffect? hitEffect = null, bool isSecondary = false, bool isSelf = false)
+    public (SpreadMoveDamage, SpreadMoveTargets) SpreadMoveHit(SpreadMoveTargets targets,
+        Pokemon pokemon,
+        ActiveMove move, HitEffect? hitEffect = null, bool isSecondary = false, bool isSelf = false)
     {
         // Hardcoded for single-target purposes
         // (no spread moves have any kind of onTryHit handler)
@@ -261,7 +273,8 @@ public partial class BattleActions
         // Run TryHit events for field/side moves
         if (move.Target == MoveTarget.All && !isSelf)
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move,
+                Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (hitResult is BoolRelayVar { Value: false })
@@ -276,9 +289,11 @@ public partial class BattleActions
                 return (damage, targets);
             }
         }
-        else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam && !isSelf)
+        else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam &&
+                 !isSelf)
         {
-            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move,
+                Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (hitResult is BoolRelayVar { Value: false })
@@ -352,7 +367,8 @@ public partial class BattleActions
         }
 
         // 2. call to Battle.SpreadDamage
-        damage = Battle.SpreadDamage(damage, targets, pokemon, BattleDamageEffect.FromIEffect(move));
+        damage = Battle.SpreadDamage(damage, targets, pokemon,
+            BattleDamageEffect.FromIEffect(move));
 
         for (int i = 0; i < targets.Count; i++)
         {
@@ -367,7 +383,8 @@ public partial class BattleActions
 
         for (int i = 0; i < targets.Count; i++)
         {
-            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            if (!(damage[i] is IntBoolIntUndefinedUnion ||
+                  damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
             }
@@ -398,7 +415,8 @@ public partial class BattleActions
 
         for (int i = 0; i < targets.Count; i++)
         {
-            if (!(damage[i] is IntBoolIntUndefinedUnion || damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
+            if (!(damage[i] is IntBoolIntUndefinedUnion ||
+                  damage[i] is IntBoolIntUndefinedUnion { Value: 0 }))
             {
                 targets[i] = PokemonFalseUnion.FromFalse();
             }
@@ -422,7 +440,8 @@ public partial class BattleActions
         if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
         {
             Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
-                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d)).ToList()));
+                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d))
+                    .ToList()));
 
             if (move.OnAfterHit != null)
             {
@@ -432,7 +451,8 @@ public partial class BattleActions
                 }
             }
 
-            if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 && pokemonOriginalHp > pokemon.MaxHp / 2)
+            if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 &&
+                pokemonOriginalHp > pokemon.MaxHp / 2)
             {
                 Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
             }
@@ -454,17 +474,38 @@ public partial class BattleActions
             Pokemon target = pokemonUnion.Pokemon;
             RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
 
-            if (result is not BoolIntUndefinedUnionRelayVar biuu)
+            // Handle different result types
+            if (result is null or UndefinedRelayVar)
             {
-                throw new InvalidOperationException("RelayVar must be type BoolIntUndefinedUnionRelayVar here.");
+                // Undefined means continue without modification
+                damage[i] = BoolIntUndefinedUnion.FromUndefined();
             }
-            damage[i] = biuu.Value;
+            else if (result is BoolIntUndefinedUnionRelayVar biuu)
+            {
+                damage[i] = biuu.Value;
+            }
+            else if (result is BoolRelayVar boolRelay)
+            {
+                // Convert BoolRelayVar to BoolIntUndefinedUnion
+                damage[i] = BoolIntUndefinedUnion.FromBool(boolRelay.Value);
+            }
+            else if (result is IntRelayVar intRelay)
+            {
+                // Convert IntRelayVar to BoolIntUndefinedUnion
+                damage[i] = BoolIntUndefinedUnion.FromInt(intRelay.Value);
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Unexpected RelayVar type in TryPrimaryHit: {result.GetType().Name}");
+            }
         }
 
         return damage;
     }
 
-    public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
+    public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets,
+        Pokemon source,
         ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
     {
         for (int i = 0; i < targets.Count; i++)
@@ -499,20 +540,21 @@ public partial class BattleActions
             switch (curDamage)
             {
                 case FalseIntUndefinedFalseUnion or null:
+                {
+                    if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary &&
+                        !isSelf)
                     {
-                        if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
+                        if (Battle.DisplayUi)
                         {
-                            if (Battle.DisplayUi)
-                            {
-                                Battle.Add("-fail", source);
-                                Battle.AttrLastMove("[still]");
-                            }
+                            Battle.Add("-fail", source);
+                            Battle.AttrLastMove("[still]");
                         }
-
-                        Battle.Debug("damage calculation interrupted");
-                        damage[i] = BoolIntUndefinedUnion.FromBool(false);
-                        continue;
                     }
+
+                    Battle.Debug("damage calculation interrupted");
+                    damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                    continue;
+                }
                 case IntIntUndefinedFalseUnion intDamage:
                     damage[i] = BoolIntUndefinedUnion.FromInt(intDamage.Value);
                     break;

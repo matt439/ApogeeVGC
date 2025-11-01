@@ -260,6 +260,8 @@ public abstract record RelayVar
     public static implicit operator RelayVar(BoolIntUndefinedUnion union) => new BoolIntUndefinedUnionRelayVar(union);
     public static implicit operator RelayVar(SecondaryEffect[] effects) => new SecondaryEffectArrayRelayVar(effects);
     public static RelayVar FromUndefined() => new UndefinedRelayVar();
+
+    public static RelayVar FromVoid() => new VoidRelayVar();
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -279,6 +281,7 @@ public record PokemonRelayVar(Pokemon Pokemon) : RelayVar;
 public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : RelayVar;
 public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar;
 public record UndefinedRelayVar : RelayVar;
+public record VoidRelayVar : RelayVar;
 
 
 

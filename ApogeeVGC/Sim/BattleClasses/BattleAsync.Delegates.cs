@@ -6,7 +6,8 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
-    private RelayVar? InvokeDelegateEffectDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
+    private RelayVar? InvokeDelegateEffectDelegate(Delegate del, bool hasRelayVar,
+        RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         // Cache parameter info to avoid repeated reflection calls
@@ -16,41 +17,53 @@ public partial class BattleAsync
         // Most common signature: (IBattle battle, ...)
         if (paramCount == 0)
         {
-            return (RelayVar?)del.DynamicInvoke(null);
+            object? invokeResult = del.DynamicInvoke(null);
+            return ConvertToRelayVar(invokeResult);
         }
 
         // Check if first parameter is IBattle (used for proper position tracking)
-        bool firstParamIsBattle = paramCount > 0 && parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle));
+        bool firstParamIsBattle = paramCount > 0 &&
+                                  parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle));
 
         // Optimize for the most common cases (1-5 parameters)
         // This avoids array allocation for the majority of callbacks
-        object? result;
+        object? invokeResult2;
         switch (paramCount)
         {
             case 1:
-                result = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle));
-                return (RelayVar?)result;
+                invokeResult2 = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar,
+                    relayVar, target, source, sourceEffect, 0, firstParamIsBattle));
+                return ConvertToRelayVar(invokeResult2);
             case 2:
-                result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle)
+                invokeResult2 = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 1, firstParamIsBattle)
                 );
-                return (RelayVar?)result;
+                return ConvertToRelayVar(invokeResult2);
             case 3:
-                result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle),
-                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2, firstParamIsBattle)
+                invokeResult2 = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 1, firstParamIsBattle),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 2, firstParamIsBattle)
                 );
-                return (RelayVar?)result;
+                return ConvertToRelayVar(invokeResult2);
             case 4:
-                result = del.DynamicInvoke(
-                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source, sourceEffect, 0, firstParamIsBattle),
-                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source, sourceEffect, 1, firstParamIsBattle),
-                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source, sourceEffect, 2, firstParamIsBattle),
-                    BuildSingleArg(parameters[3], hasRelayVar, relayVar, target, source, sourceEffect, 3, firstParamIsBattle)
+                invokeResult2 = del.DynamicInvoke(
+                    BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 0, firstParamIsBattle),
+                    BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 1, firstParamIsBattle),
+                    BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 2, firstParamIsBattle),
+                    BuildSingleArg(parameters[3], hasRelayVar, relayVar, target, source,
+                        sourceEffect, 3, firstParamIsBattle)
                 );
-                return (RelayVar?)result;
+                return ConvertToRelayVar(invokeResult2);
         }
 
         // Fallback for 5+ parameters (rare)
@@ -78,7 +91,8 @@ public partial class BattleAsync
             // Try to match target parameter
             if (target != null)
             {
-                EventTargetParameter? targetParam = EventTargetParameter.FromSingleEventTarget(target, paramType);
+                EventTargetParameter? targetParam =
+                    EventTargetParameter.FromSingleEventTarget(target, paramType);
                 if (targetParam != null)
                 {
                     args[argIndex++] = targetParam.ToObject();
@@ -89,7 +103,8 @@ public partial class BattleAsync
             // Try to match source parameter
             if (source != null)
             {
-                EventSourceParameter? sourceParam = EventSourceParameter.FromSingleEventSource(source, paramType);
+                EventSourceParameter? sourceParam =
+                    EventSourceParameter.FromSingleEventSource(source, paramType);
                 if (sourceParam != null)
                 {
                     args[argIndex++] = sourceParam.ToObject();
@@ -108,8 +123,58 @@ public partial class BattleAsync
             args[argIndex++] = null;
         }
 
-        result = del.DynamicInvoke(args);
-        return (RelayVar?)result;
+        object? finalResult = del.DynamicInvoke(args);
+        return ConvertToRelayVar(finalResult);
+    }
+
+    /// <summary>
+    /// Converts common return types from event handlers to RelayVar.
+    /// Handles BoolEmptyVoidUnion and other union types that may be returned.
+    /// </summary>
+    private RelayVar? ConvertToRelayVar(object? result)
+    {
+        if (result == null) return null;
+
+        // If it's already a RelayVar, return it
+        if (result is RelayVar relay) return relay;
+
+        // Handle BoolIntUndefinedUnion (from TryPrimaryHit and similar events)
+        if (result is BoolIntUndefinedUnion boolIntUndef)
+        {
+            return new BoolIntUndefinedUnionRelayVar(boolIntUndef);
+        }
+
+        // Handle BoolEmptyVoidUnion (from ResultMove handlers)
+        if (result is BoolEmptyVoidUnion boolEmptyVoid)
+        {
+            return boolEmptyVoid switch
+            {
+                BoolBoolEmptyVoidUnion b => new BoolRelayVar(b.Value),
+                EmptyBoolEmptyVoidUnion => RelayVar.FromUndefined(), // Empty maps to undefined
+                VoidUnionBoolEmptyVoidUnion => RelayVar.FromVoid(), // Void means no return value
+                _ => null,
+            };
+        }
+
+        // Handle BoolIntEmptyVoidUnion
+        if (result is BoolIntEmptyVoidUnion boolIntEmptyVoid)
+        {
+            return boolIntEmptyVoid switch
+            {
+                BoolBoolIntEmptyVoidUnion b => new BoolRelayVar(b.Value),
+                IntBoolIntEmptyVoidUnion i => new IntRelayVar(i.Value),
+                EmptyBoolIntEmptyVoidUnion => RelayVar.FromUndefined(),
+                VoidUnionBoolIntEmptyVoidUnion => RelayVar.FromVoid(),
+                _ => null
+            };
+        }
+
+        // Handle primitive types
+        if (result is bool boolVal) return new BoolRelayVar(boolVal);
+        if (result is int intVal) return new IntRelayVar(intVal);
+
+        // If we don't know how to convert, return null
+        return null;
     }
 
     /// <summary>
@@ -117,7 +182,8 @@ public partial class BattleAsync
     /// Used by the optimized fast-path for common parameter counts.
     /// </summary>
     private object? BuildSingleArg(ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
-        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect, int position = 0,
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect,
+        int position = 0,
         bool firstParamIsBattle = false)
     {
         Type paramType = param.ParameterType;
@@ -129,7 +195,8 @@ public partial class BattleAsync
         }
 
         // Second parameter might be relayVar if explicitly provided
-        if (hasRelayVar && ((firstParamIsBattle && position == 1) || (!firstParamIsBattle && position == 0)))
+        if (hasRelayVar && ((firstParamIsBattle && position == 1) ||
+                            (!firstParamIsBattle && position == 0)))
         {
             return relayVar;
         }
@@ -161,17 +228,21 @@ public partial class BattleAsync
                 // Try target first
                 if (target != null)
                 {
-                    EventTargetParameter? targetParam = EventTargetParameter.FromSingleEventTarget(target, paramType);
+                    EventTargetParameter? targetParam =
+                        EventTargetParameter.FromSingleEventTarget(target, paramType);
                     if (targetParam != null) return targetParam.ToObject();
                 }
+
                 break;
             case 1:
                 // Try source second
                 if (source != null)
                 {
-                    EventSourceParameter? sourceParam = EventSourceParameter.FromSingleEventSource(source, paramType);
+                    EventSourceParameter? sourceParam =
+                        EventSourceParameter.FromSingleEventSource(source, paramType);
                     if (sourceParam != null) return sourceParam.ToObject();
                 }
+
                 break;
             case 2:
                 // Try sourceEffect third
@@ -179,6 +250,7 @@ public partial class BattleAsync
                 {
                     return sourceEffect;
                 }
+
                 break;
         }
 

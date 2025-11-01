@@ -8,6 +8,6 @@ public class Program
     {
         var driver = new Driver();
         await driver.StartTest();
-        Console.ReadLine();
+        // Console.ReadLine();
     }
 }
