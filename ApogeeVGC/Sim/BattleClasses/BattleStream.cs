@@ -585,30 +585,17 @@ public class BattleStream : IDisposable
                 case "team":
                     {
                         // Team order for team preview (e.g., "team 123456")
-                        if (parts.Length < 2)
-                        {
-                            choice.Error = $"Invalid team choice: {individualChoice}";
-                            return choice;
-                        }
+                        // Return a choice with TeamData set, which will be processed by Side.Choose -> Side.ChooseTeam
+      if (parts.Length < 2)
+        {
+          choice.Error = $"Invalid team choice: {individualChoice}";
+           return choice;
+             }
 
-                        // Parse team order - each digit is a pokemon position
-                        string teamOrder = parts[1];
-                        for (int i = 0; i < teamOrder.Length; i++)
-                        {
-                            if (char.IsDigit(teamOrder[i]))
-                            {
-                                int position = teamOrder[i] - '0';
-                                actions.Add(new ChosenAction
-                                {
-                                    Choice = ChoiceType.Team,
-                                    MoveId = MoveId.None,
-                                    Index = position - 1, // Convert to 0-based index
-                                });
-                            }
-                        }
-                        break;
-                    }
-
+      // Store the team order string to be processed by ChooseTeam
+        choice.TeamData = parts[1];
+         break;
+ }
                 case "shift":
                     {
                         actions.Add(new ChosenAction

@@ -96,9 +96,9 @@ ActionId.Switch or ActionId.InstaSwitch => new SwitchAction
    ActionId.Team => new TeamAction
      {
    Choice = actionId,
-      Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Team action requires Pokemon"),
- Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires Index"),
-  },
+   Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Team action requires Pokemon"),
+    Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires Index"),
+     },
 ActionId.Pass or ActionId.Shift => new PokemonAction
  {
 Choice = actionId,
@@ -334,7 +334,7 @@ Choice = actionId,
     {
         foreach (var resolvedChoices in choices.Select(choice => ResolveAction(choice)))
         {
-            List.AddRange(resolvedChoices);
+List.AddRange(resolvedChoices);
         }
     }
 

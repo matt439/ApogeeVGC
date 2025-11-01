@@ -12,4 +12,9 @@ public class Choice
     public int ForcedPassesLeft { get; set; }
     public HashSet<int> SwitchIns { get; init; } = [];
     public bool Terastallize { get; set; }
+    
+    /// <summary>
+    /// Raw team preview data string (e.g., "123456") to be processed by Side.ChooseTeam
+    /// </summary>
+    public string? TeamData { get; set; }
 }

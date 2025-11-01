@@ -490,6 +490,7 @@ public partial class Side
         {
             int pos = positions[index];
             Choice.SwitchIns.Add(pos);
+
             Choice.Actions = [.. Choice.Actions, new ChosenAction
             {
                 MoveId = MoveId.None,
@@ -557,53 +558,59 @@ public partial class Side
         {
             string message = Battle.Ended
                 ? "Can't do anything: The game is over"
-                : "Can't do anything: It's not your turn";
+  : "Can't do anything: It's not your turn";
             return EmitChoiceError(message);
         }
 
-        // Step 2: Check if undo is allowed
-        if (Choice.CantUndo)
-        {
-            return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
-        }
+ // Step 2: Check if undo is allowed
+   if (Choice.CantUndo)
+   {
+ return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
+    }
 
         // Step 3: Clear existing choice
-        ClearChoice();
+      ClearChoice();
 
-        // Step 4: Validate number of actions doesn't exceed active Pokemon count
-        if (input.Actions.Count > Active.Count)
+      // Step 3.5: Handle team preview if TeamData is set
+        if (!string.IsNullOrEmpty(input.TeamData))
         {
-            return EmitChoiceError(
-                $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but this is a {Battle.GameType} game!"
-            );
+            return ChooseTeam(input.TeamData);
         }
 
-        // Step 5: Process each action in the choice
-        if (input.Actions.Select(action => action.Choice switch
+    // Step 4: Validate number of actions doesn't exceed active Pokemon count
+  if (input.Actions.Count > Active.Count)
         {
+            return EmitChoiceError(
+     $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but this is a {Battle.GameType} game!"
+    );
+        }
+
+     // Step 5: Process each action in the choice
+        if (input.Actions.Select(action => action.Choice switch
+     {
             ChoiceType.Move => ProcessChosenMoveAction(action),
-            ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
-            ChoiceType.Team => ProcessChosenTeamAction(action),
-            ChoiceType.Pass => ChoosePass().IsTrue(),
-            ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
+     ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
+    ChoiceType.Team => ProcessChosenTeamAction(action),
+ChoiceType.Pass => ChoosePass().IsTrue(),
+       ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
             _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
         }).Any(success => !success))
         {
-            return false;
+  return false;
         }
 
         // Step 6: Apply choice-level settings
-        if (input.Terastallize)
+      if (input.Terastallize)
         {
-            Choice.Terastallize = true;
+  Choice.Terastallize = true;
         }
 
-        if (input.CantUndo)
+      if (input.CantUndo)
         {
-            Choice.CantUndo = true;
+   Choice.CantUndo = true;
         }
 
-        return string.IsNullOrEmpty(Choice.Error);
+     return string.IsNullOrEmpty(Choice.Error);
     }
 
     private bool ProcessChosenMoveAction(ChosenAction action)
@@ -900,11 +907,11 @@ public partial class Side
         if (Choice.ForcedSwitchesLeft > 0) return false;
 
         if (RequestState == RequestState.TeamPreview)
-        {
-            return Choice.Actions.Count >= PickedTeamSize();
+  {
+  return Choice.Actions.Count >= PickedTeamSize();
         }
 
-        GetChoiceIndex();
+      GetChoiceIndex();
         return Choice.Actions.Count >= Active.Count;
     }
 
