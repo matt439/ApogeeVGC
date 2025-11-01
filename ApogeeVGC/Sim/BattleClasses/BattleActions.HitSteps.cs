@@ -859,13 +859,19 @@ public partial class BattleActions
             {
                 int hpBeforeRecoil = pokemon.Hp;
 
-                Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
-                    BattleDamageEffect.FromIEffect(Library.Conditions[move.Id.ToConditionId()]), true);
+                // Try to get the condition for the move, if it doesn't exist use a generic recoil condition
+                ConditionId conditionId = move.Id.ToConditionId();
+            Condition damageEffect = Library.Conditions.TryGetValue(conditionId, out Condition? condition)
+        ? condition
+ : Library.Conditions[ConditionId.Recoil];
 
-                move.MindBlownRecoil = false;
-                if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
-                {
-                    Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+      Battle.Damage((int)Math.Round(pokemon.MaxHp / 2.0), pokemon, pokemon,
+      BattleDamageEffect.FromIEffect(damageEffect), true);
+
+         move.MindBlownRecoil = false;
+    if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+           {
+Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
                 }
             }
 

@@ -57,8 +57,9 @@ public record Conditions
                 {
                     if (sourceEffect is null)
                     {
-                        throw new ArgumentNullException($"Source effect is null when trying to apply" +
-                                                        $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
+                        throw new ArgumentNullException(
+                            $"Source effect is null when trying to apply" +
+                            $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
                     }
 
                     if (!battle.DisplayUi) return new VoidReturn();
@@ -70,6 +71,7 @@ public record Conditions
                             {
                                 battle.Add("-status", target, "brn", "[from] item: Flame Orb");
                             }
+
                             break;
                         case EffectType.Ability:
                             if (sourceEffect is Ability)
@@ -77,11 +79,13 @@ public record Conditions
                                 battle.Add("-status", target, "brn", "[from] ability: " +
                                     sourceEffect.Name, $"[of] {source}");
                             }
+
                             break;
                         case EffectType.Move:
                             battle.Add("-status", target, "brn");
                             break;
                     }
+
                     return new VoidReturn();
                 },
                 OnResidualOrder = 10,
@@ -109,6 +113,7 @@ public record Conditions
                     {
                         battle.Add("-status", target, "par");
                     }
+
                     return new VoidReturn();
                 },
                 OnModifySpePriority = -101,
@@ -119,6 +124,7 @@ public record Conditions
                     {
                         spe = (int)Math.Floor(spe * 50.0 / 100);
                     }
+
                     return spe;
                 },
                 OnBeforeMovePriority = 1,
@@ -129,6 +135,7 @@ public record Conditions
                     {
                         battle.Add("cant", pokemon, "par");
                     }
+
                     return false;
                 },
             },
@@ -148,7 +155,8 @@ public record Conditions
                                     sourceEffect.Name, $"[of] {source}");
                                 break;
                             case ActiveMove:
-                                battle.Add("-status", target, "slp", $"[from] move: {sourceEffect.Name}");
+                                battle.Add("-status", target, "slp",
+                                    $"[from] move: {sourceEffect.Name}");
                                 break;
                             default:
                                 battle.Add("-status", target, "slp");
@@ -167,6 +175,7 @@ public record Conditions
                     {
                         battle.Add("-end", target, "Nightmare", "[silent]");
                     }
+
                     return new VoidReturn();
                 },
                 OnBeforeMovePriority = 10,
@@ -184,14 +193,17 @@ public record Conditions
                         pokemon.CureStatus();
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("cant", pokemon, "slp");
                     }
+
                     if (move.SleepUsable ?? false)
                     {
                         return new VoidReturn();
                     }
+
                     return false;
                 },
             },
@@ -222,6 +234,7 @@ public record Conditions
                     {
                         target.FormeChange(SpecieId.Shaymin, battle.Effect, true);
                     }
+
                     return new VoidReturn();
                 },
                 OnBeforeMovePriority = 10,
@@ -232,15 +245,18 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.RandomChance(1, 5))
                     {
                         pokemon.CureStatus();
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("cant", pokemon, "frz");
                     }
+
                     return false;
                 },
                 OnModifyMove = (battle, move, pokemon, _) =>
@@ -250,6 +266,7 @@ public record Conditions
                     {
                         battle.Add("-curestatus", pokemon, "frz", $"[from] move: {move}");
                     }
+
                     pokemon.ClearStatus();
                 },
                 OnAfterMoveSecondary = (_, target, _, move) =>
@@ -281,12 +298,13 @@ public record Conditions
                     if (sourceEffect.EffectType == EffectType.Ability)
                     {
                         battle.Add("-status", target, "psn", "[from] ability: " +
-                            sourceEffect.Name, $"[of] {source}");
+                                                             sourceEffect.Name, $"[of] {source}");
                     }
                     else
                     {
                         battle.Add("-status", target, "psn");
                     }
+
                     return new VoidReturn();
                 },
             },
@@ -308,12 +326,14 @@ public record Conditions
                             break;
                         case Ability:
                             battle.Add("-status", target, "tox", "[from] ability: " +
-                                                                 sourceEffect.Name, $"[of] {source}");
+                                                                 sourceEffect.Name,
+                                $"[of] {source}");
                             break;
                         default:
                             battle.Add("-status", target, "tox");
                             break;
                     }
+
                     return new VoidReturn();
                 },
                 OnSwitchIn = (battle, _) =>
@@ -327,6 +347,7 @@ public record Conditions
                     {
                         battle.EffectState.Stage++;
                     }
+
                     battle.Damage(battle.ClampIntRange(pokemon.BaseMaxHp / 16, 1, null) *
                                   (battle.EffectState.Stage ?? 0));
                 },
@@ -354,11 +375,13 @@ public record Conditions
                                 break;
                         }
                     }
+
                     int min = 2;
                     if (sourceEffect is ActiveMove { Id: MoveId.AxeKick })
                     {
                         min = 3;
                     }
+
                     battle.EffectState.Time = battle.Random(min, 6);
                     return new VoidReturn();
                 },
@@ -378,14 +401,17 @@ public record Conditions
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Confusion]);
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", pokemon, "confusion");
                     }
+
                     if (!battle.RandomChance(33, 100))
                     {
                         return new VoidReturn();
                     }
+
                     battle.ActiveTarget = pokemon;
                     int damage = battle.Actions.GetConfusionDamage(pokemon, 40);
 
@@ -398,7 +424,8 @@ public record Conditions
                         Type = MoveType.Normal,
                         MoveSlot = new MoveSlot(),
                     };
-                    battle.Damage(damage, pokemon, pokemon, BattleDamageEffect.FromIEffect(activeMove));
+                    battle.Damage(damage, pokemon, pokemon,
+                        BattleDamageEffect.FromIEffect(activeMove));
                     return false;
                 },
             },
@@ -415,6 +442,7 @@ public record Conditions
                     {
                         battle.Add("cant", pokemon, "flinch");
                     }
+
                     battle.RunEvent(EventId.Flinch, pokemon);
                     return false;
                 },
@@ -429,17 +457,24 @@ public record Conditions
                 {
                     if (battle.ActiveMove is null)
                     {
-                        throw new InvalidOperationException("Active move is null when trying to apply" +
-                                                            $"{ConditionId.ChoiceLock}.");
+                        throw new InvalidOperationException(
+                            "Active move is null when trying to apply" +
+                            $"{ConditionId.ChoiceLock}.");
                     }
+
                     if (battle.ActiveMove.HasBounced ?? false)
                     {
                         return false;
                     }
-                    if (battle.ActiveMove.SourceEffect is MoveEffectStateId { MoveId: MoveId.Snatch })
+
+                    if (battle.ActiveMove.SourceEffect is MoveEffectStateId
+                        {
+                            MoveId: MoveId.Snatch
+                        })
                     {
                         return false;
                     }
+
                     battle.EffectState.Move = battle.ActiveMove.Id;
                     return new VoidReturn();
                 },
@@ -457,7 +492,8 @@ public record Conditions
 
                     if (!battle.DisplayUi) return false;
 
-                    battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), move.Name);
+                    battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
+                        move.Name);
                     battle.AttrLastMove("[still]");
                     battle.Debug("Disabled by Choice item lock");
                     battle.Add("-fail", pokemon);
@@ -466,11 +502,13 @@ public record Conditions
                 OnDisableMove = (battle, pokemon) =>
                 {
                     if (!pokemon.GetItem().IsChoice == true ||
-                        battle.EffectState.Move != null && !pokemon.HasMove((MoveId)battle.EffectState.Move))
+                        battle.EffectState.Move != null &&
+                        !pokemon.HasMove((MoveId)battle.EffectState.Move))
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return;
                     }
+
                     if (pokemon.IgnoringItem()) return;
 
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
@@ -493,20 +531,24 @@ public record Conditions
                     {
                         battle.Add("-start", target, "move: Leech Seed");
                     }
+
                     return new VoidReturn();
                 },
                 OnResidualOrder = 8,
                 OnResidual = (battle, pokemon, _, _) =>
                 {
-                    Pokemon? target = battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
+                    Pokemon? target =
+                        battle.GetAtSlot(pokemon.Volatiles[ConditionId.LeechSeed].SourceSlot);
                     if (target is null || target.Fainted || target.Hp <= 0)
                     {
                         if (battle.DisplayUi)
                         {
                             battle.Debug("Nothing to leech into");
                         }
+
                         return;
                     }
+
                     IntFalseUndefinedUnion damage =
                         battle.Damage(pokemon.BaseMaxHp / 8, pokemon, target);
 
@@ -564,19 +606,23 @@ public record Conditions
                     {
                         battle.Debug($"Success change: {Math.Round(100.0 / counter)}%");
                     }
+
                     bool success = battle.RandomChance(1, counter);
                     if (!success)
                     {
                         pokemon.DeleteVolatile(ConditionId.Stall);
                     }
+
                     return success;
                 },
                 OnRestart = (battle, _, _, _) =>
                 {
-                    if (battle.Effect is Condition condition && battle.EffectState.Counter < condition.CounterMax)
+                    if (battle.Effect is Condition condition &&
+                        battle.EffectState.Counter < condition.CounterMax)
                     {
                         battle.EffectState.Counter *= 3;
                     }
+
                     battle.EffectState.Duration = 2;
                     return new VoidReturn();
                 },
@@ -594,6 +640,7 @@ public record Conditions
                     {
                         battle.Add("-singleturn", target, "Protect");
                     }
+
                     return new VoidReturn();
                 },
                 OnTryHitPriority = 3,
@@ -603,6 +650,7 @@ public record Conditions
                     {
                         return new VoidReturn();
                     }
+
                     if (move.SmartTarget ?? false)
                     {
                         move.SmartTarget = false;
@@ -613,10 +661,12 @@ public record Conditions
                     }
 
                     EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
-                    if (lockedMove is not null && source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                    if (lockedMove is not null &&
+                        source.Volatiles[ConditionId.LockedMove].Duration == 2)
                     {
                         source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
                     }
+
                     return new Empty(); // in place of Battle.NOT_FAIL ("")
                 },
             },
@@ -671,10 +721,13 @@ public record Conditions
                             {
                                 battle.Debug("Reflect weaken");
                             }
-                            return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
-                                battle.ChainModify(0.5);
+
+                            return battle.ActivePerHalf > 1
+                                ? battle.ChainModify([2732, 4096])
+                                : battle.ChainModify(0.5);
                         }
                     }
+
                     return new VoidReturn();
                 },
                 OnSideStart = (battle, side, _, _) =>
@@ -715,10 +768,13 @@ public record Conditions
                             {
                                 battle.Debug("Light Screen weaken");
                             }
-                            return battle.ActivePerHalf > 1 ? battle.ChainModify([2732, 4096]) :
-                                battle.ChainModify(0.5);
+
+                            return battle.ActivePerHalf > 1
+                                ? battle.ChainModify([2732, 4096])
+                                : battle.ChainModify(0.5);
                         }
                     }
+
                     return new VoidReturn();
                 },
                 OnSideStart = (battle, side, _, _) =>
@@ -744,7 +800,8 @@ public record Conditions
                 Name = "electricterrain",
                 EffectType = EffectType.Terrain,
                 Duration = 5,
-                DurationCallback = (_, source, _, _) => source.HasItem(ItemId.TerrainExtender) ? 8 : 5,
+                DurationCallback = (_, source, _, _) =>
+                    source.HasItem(ItemId.TerrainExtender) ? 8 : 5,
                 OnSetStatus = (battle, status, target, _, effect) =>
                 {
                     if (status.Id == ConditionId.Sleep &&
@@ -753,25 +810,30 @@ public record Conditions
                     {
                         if (battle.DisplayUi && effect is Condition { Id: ConditionId.Yawn } or
                                 Move { Id: MoveId.Yawn } or
-                                    ActiveMove { Secondaries: not null })
+                                ActiveMove { Secondaries: not null })
                         {
                             battle.Add("-activate", target, "move: Electric Terrain");
                         }
+
                         return false;
                     }
+
                     return new VoidReturn();
                 },
                 OnTryAddVolatile = (battle, status, target, _, _) =>
                 {
-                    if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable()) return new VoidReturn();
+                    if (!(target.IsGrounded() ?? false) || target.IsSemiInvulnerable())
+                        return new VoidReturn();
                     if (status.Id == ConditionId.Yawn)
                     {
                         if (battle.DisplayUi)
                         {
                             battle.Add("-activate", target, "move: Electric Terrain");
                         }
+
                         return null;
                     }
+
                     return new VoidReturn();
                 },
                 OnBasePowerPriority = 6,
@@ -785,8 +847,10 @@ public record Conditions
                         {
                             battle.Debug("electric terrain boost");
                         }
+
                         return battle.ChainModify([5325, 4096]);
                     }
+
                     return new VoidReturn();
                 },
                 OnFieldStart = (battle, _, source, effect) =>
@@ -829,7 +893,8 @@ public record Conditions
                             battle.EffectState.FromBooster = true;
                             if (battle.DisplayUi)
                             {
-                                battle.Add("-activate", pokemon, "ability: Quark Drive", "[fromitem]");
+                                battle.Add("-activate", pokemon, "ability: Quark Drive",
+                                    "[fromitem]");
                             }
                         }
                     }
@@ -837,75 +902,92 @@ public record Conditions
                     {
                         battle.Add("-activate", pokemon, "ability: Quark Drive");
                     }
+
                     battle.EffectState.BestStat = pokemon.GetBestStat(false, true);
                     if (battle.DisplayUi)
                     {
                         battle.Add("-start", pokemon, "quarkdrive" + battle.EffectState.BestStat);
                     }
+
                     return new VoidReturn();
                 },
                 OnModifyAtkPriority = 5,
                 OnModifyAtk = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Atk || pokemon.IgnoringAbility())
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Atk ||
+                        pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug("Quark Drive atk boost");
                     }
+
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifyDefPriority = 6,
                 OnModifyDef = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Def || pokemon.IgnoringAbility())
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
+                        pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug("Quark Drive def boost");
                     }
+
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifySpAPriority = 5,
                 OnModifySpA = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.SpA || pokemon.IgnoringAbility())
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
+                        pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug("Quark Drive spa boost");
                     }
+
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifySpDPriority = 6,
                 OnModifySpD = (battle, _, pokemon, _, _) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.SpD || pokemon.IgnoringAbility())
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
+                        pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug("Quark Drive spd boost");
                     }
+
                     return battle.ChainModify([5325, 4096]);
                 },
                 OnModifySpe = (battle, _, pokemon) =>
                 {
-                    if (battle.EffectState.BestStat != StatIdExceptHp.Spe || pokemon.IgnoringAbility())
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
+                        pokemon.IgnoringAbility())
                     {
                         return new VoidReturn();
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug("Quark Drive spe boost");
                     }
+
                     return (int)battle.ChainModify(1.5);
                 },
                 OnEnd = (battle, pokemon) =>
@@ -915,6 +997,18 @@ public record Conditions
                         battle.Add("-end", pokemon, "Quark Drive");
                     }
                 },
+            },
+            [ConditionId.Recoil] = new()
+            {
+                Id = ConditionId.Recoil,
+                Name = "recoil",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.StruggleRecoil] = new()
+            {
+                Id = ConditionId.StruggleRecoil,
+                Name = "strugglerecoil",
+                EffectType = EffectType.Condition,
             },
         };
     }
