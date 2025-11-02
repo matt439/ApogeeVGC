@@ -76,23 +76,23 @@ public class BattleQueue(IBattle battle)
         
         currentAction = actionId switch
         {
-   ActionId.Move => new MoveAction
-  {
- Choice = actionId,
-Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
-       Move = chosenAction.Move ?? Battle.Library.Moves[chosenAction.MoveId],
-    TargetLoc = chosenAction.TargetLoc ?? 0,
-     Order = 200, // Default order for moves
-    // OriginalTarget will be set below after we have the full action context
-       OriginalTarget = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
- },
-ActionId.Switch or ActionId.InstaSwitch => new SwitchAction
-  {
-  Choice = actionId,
-  Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Switch action requires Pokemon"),
-  Target = chosenAction.Target ?? throw new InvalidOperationException("Switch action requires Target"),
-  Order = 103, // Default order for switches (from _orders dictionary in BattleQueue)
-        },
+          ActionId.Move or ActionId.BeforeTurnMove or ActionId.PriorityChargeMove => new MoveAction
+        {
+   Choice = actionId,
+     Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
+ Move = chosenAction.Move ?? Battle.Library.Moves[chosenAction.MoveId],
+       TargetLoc = chosenAction.TargetLoc ?? 0,
+      Order = 200, // Default order for moves
+                // OriginalTarget will be set below after we have the full action context
+    OriginalTarget = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
+            },
+     ActionId.Switch or ActionId.InstaSwitch => new SwitchAction
+            {
+    Choice = actionId,
+     Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Switch action requires Pokemon"),
+    Target = chosenAction.Target ?? throw new InvalidOperationException("Switch action requires Target"),
+        Order = 103, // Default order for switches (from _orders dictionary in BattleQueue)
+      },
    ActionId.Team => new TeamAction
      {
    Choice = actionId,
@@ -341,10 +341,10 @@ List.AddRange(resolvedChoices);
     public IAction? WillAct()
     {
         foreach (IAction action in List)
-        {
-            if (action.Choice is ActionId.Move or ActionId.Switch or ActionId.InstaSwitch or ActionId.Shift)
-            {
-                return action;
+      {
+   if (action.Choice is ActionId.Move or ActionId.BeforeTurnMove or ActionId.PriorityChargeMove or ActionId.Switch or ActionId.InstaSwitch or ActionId.Shift)
+          {
+    return action;
             }
         }
         return null;
@@ -362,10 +362,10 @@ List.AddRange(resolvedChoices);
         
         foreach (IAction action in List)
         {
-            if (action.Choice is ActionId.Move && action is MoveAction moveAction && action.Pokemon == pokemon)
-            {
-                return moveAction;
-            }
+      if (action.Choice is ActionId.Move or ActionId.BeforeTurnMove or ActionId.PriorityChargeMove && action is MoveAction moveAction && action.Pokemon == pokemon)
+       {
+          return moveAction;
+       }
         }
         return null;
     }
@@ -397,12 +397,12 @@ List.AddRange(resolvedChoices);
     public bool CancelMove(Pokemon pokemon)
     {
         for (int i = 0; i < List.Count; i++)
-        {
-            if (List[i].Choice is not ActionId.Move || List[i].Pokemon != pokemon) continue;
-            List.RemoveAt(i);
-            return true;
+  {
+     if (List[i].Choice is not (ActionId.Move or ActionId.BeforeTurnMove or ActionId.PriorityChargeMove) || List[i].Pokemon != pokemon) continue;
+        List.RemoveAt(i);
+   return true;
         }
-        return false;
+ return false;
     }
 
     /// <summary>

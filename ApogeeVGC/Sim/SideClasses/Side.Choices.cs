@@ -237,7 +237,7 @@ public partial class Side
     public SideBoolUnion ChooseSwitch(PokemonIntUnion? slotText = null)
     {
         // Step 1: Validate request state
-        if (RequestState != RequestState.Move && RequestState != RequestState.Switch)
+        if (RequestState != RequestState.Move && RequestState != RequestState.Switch && RequestState != RequestState.SwitchIn)
         {
             return EmitChoiceError($"Can't switch: You need a {RequestState} response");
         }
@@ -246,7 +246,7 @@ public partial class Side
         int index = GetChoiceIndex();
         if (index >= Active.Count)
         {
-            if (RequestState == RequestState.Switch)
+            if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
             {
                 return EmitChoiceError("Can't switch: You sent more switches than Pokémon that need to switch");
             }
@@ -261,7 +261,7 @@ public partial class Side
         if (slotText == null)
         {
             // Auto-select mode
-            if (RequestState != RequestState.Switch)
+            if (RequestState != RequestState.Switch && RequestState != RequestState.SwitchIn)
             {
                 return EmitChoiceError("Can't switch: You need to select a Pokémon to switch in");
             }
@@ -389,7 +389,7 @@ public partial class Side
                 Choice.CantUndo = true;
             }
         }
-        else if (RequestState == RequestState.Switch)
+        else if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
         {
             // Step 10: Handle forced switches
             if (Choice.ForcedSwitchesLeft <= 0)
@@ -402,16 +402,16 @@ public partial class Side
         // Step 11: Record the switch
         Choice.SwitchIns.Add(slot);
 
-        ChoiceType choiceType = RequestState == RequestState.Switch
-            ? ChoiceType.InstaSwitch
+        ChoiceType choiceType = RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn
+         ? ChoiceType.InstaSwitch
             : ChoiceType.Switch;
 
-        Choice.Actions = [.. Choice.Actions, new ChosenAction
+ Choice.Actions = [.. Choice.Actions, new ChosenAction
         {
-            MoveId = MoveId.None,
-            Choice = choiceType,
-            Pokemon = pokemon,
-            Target = targetPokemon,
+   MoveId = MoveId.None,
+  Choice = choiceType,
+      Pokemon = pokemon,
+  Target = targetPokemon,
         }];
 
         return true;
@@ -515,7 +515,7 @@ public partial class Side
         int forcedPasses = 0;
 
         // Calculate forced switches if we're in switch request state
-        if (Battle.RequestState == RequestState.Switch)
+        if (Battle.RequestState == RequestState.Switch || Battle.RequestState == RequestState.SwitchIn)
         {
             // Count active Pokemon that need to switch out
             int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
@@ -735,13 +735,14 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
                     }
                     break;
                 case RequestState.Switch:
-                    while (index < Active.Count && Active[index] != null && !Active[index]!.SwitchFlag.IsTrue())
-                    {
-                        ChoosePass();
-                        index++;
-                    }
-                    break;
-            }
+                   case RequestState.SwitchIn:
+                  while (index < Active.Count && Active[index] != null && !Active[index]!.SwitchFlag.IsTrue())
+    {
+       ChoosePass();
+        index++;
+         }
+break;
+     }
         }
 
         return index;
@@ -755,37 +756,38 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
 
         switch (RequestState)
         {
-            case RequestState.Switch:
-                if (pokemon.SwitchFlag.IsTrue())
-                {
-                    // This condition will always happen if called by Battle#choose()
-                    if (Choice.ForcedPassesLeft <= 0)
-                    {
-                        return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
-                                               $"replace {pokemon.Name}");
-                    }
-                    Choice.ForcedPassesLeft--;
-                }
+       case RequestState.Switch:
+  case RequestState.SwitchIn:
+      if (pokemon.SwitchFlag.IsTrue())
+     {
+      // This condition will always happen if called by Battle#choose()
+          if (Choice.ForcedPassesLeft <= 0)
+ {
+            return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
+ $"replace {pokemon.Name}");
+          }
+      Choice.ForcedPassesLeft--;
+     }
+            break;
+
+        case RequestState.Move:
+           if (!pokemon.Fainted && !pokemon.Volatiles.ContainsKey(ConditionId.Commanding))
+          {
+           return EmitChoiceError($"Can't pass: Your {pokemon.Name} must make a move (or switch)");
+          }
                 break;
 
-            case RequestState.Move:
-                if (!pokemon.Fainted && !pokemon.Volatiles.ContainsKey(ConditionId.Commanding))
-                {
-                    return EmitChoiceError($"Can't pass: Your {pokemon.Name} must make a move (or switch)");
-                }
-                break;
-
-            default:
-                return EmitChoiceError("Can't pass: Not a move or switch request");
+       default:
+       return EmitChoiceError("Can't pass: Not a move or switch request");
         }
 
         Choice.Actions = [.. Choice.Actions, new ChosenAction
         {
-            MoveId = MoveId.None,
-            Choice = ChoiceType.Pass,
+  MoveId = MoveId.None,
+       Choice = ChoiceType.Pass,
         }];
 
-        return true;
+      return true;
     }
 
     /// <summary>
@@ -800,37 +802,37 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
                 ChooseTeam();
             }
         }
-        else if (RequestState == RequestState.Switch)
+        else if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
         {
             int i = 0;
             while (!IsChoiceDone())
-            {
-                SideBoolUnion result = ChooseSwitch();
-                if (!result.IsTrue())
-                {
-                    throw new InvalidOperationException($"autoChoose switch crashed: {Choice.Error}");
-                }
-                i++;
-                if (i > 10)
-                {
-                    throw new InvalidOperationException("autoChoose failed: infinite looping");
-                }
-            }
+   {
+           SideBoolUnion result = ChooseSwitch();
+     if (!result.IsTrue())
+         {
+       throw new InvalidOperationException($"autoChoose switch crashed: {Choice.Error}");
+         }
+       i++;
+     if (i > 10)
+       {
+         throw new InvalidOperationException("autoChoose failed: infinite looping");
+         }
+  }
         }
-        else if (RequestState == RequestState.Move)
-        {
-            int i = 0;
+else if (RequestState == RequestState.Move)
+   {
+       int i = 0;
             while (!IsChoiceDone())
             {
-                if (!ChooseMove())
-                {
-                    throw new InvalidOperationException($"autoChoose crashed: {Choice.Error}");
-                }
-                i++;
-                if (i > 10)
-                {
-                    throw new InvalidOperationException("autoChoose failed: infinite looping");
-                }
+       if (!ChooseMove())
+     {
+        throw new InvalidOperationException($"autoChoose crashed: {Choice.Error}");
+}
+    i++;
+             if (i > 10)
+     {
+    throw new InvalidOperationException("autoChoose failed: infinite looping");
+ }
             }
         }
 
@@ -913,45 +915,46 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
      if (RequestState == RequestState.None) return true;
       
       // If this side has a WaitRequest, the choice is done (no action needed)
-        if (ActiveRequest?.Wait == true)
+      if (ActiveRequest?.Wait == true)
     {
    return true;
  }
     
-        if (Choice.ForcedSwitchesLeft > 0)
-        {
-            return false;
+     if (Choice.ForcedSwitchesLeft > 0)
+   {
+     return false;
    }
 
-        if (RequestState == RequestState.TeamPreview)
+ if (RequestState == RequestState.TeamPreview)
  {
-        return Choice.Actions.Count >= PickedTeamSize();
-        }
+   return Choice.Actions.Count >= PickedTeamSize();
+    }
 
         // Calculate the effective action count needed WITHOUT modifying state
         // Count actions plus any auto-pass slots (fainted/commanding Pokemon)
    int actionsNeeded = 0;
         int currentActionIndex = Choice.Actions.Count;
-        
+     
         for (int i = currentActionIndex; i < Active.Count; i++)
-        {
+  {
           if (Active[i] == null) continue;
-       
+     
             // Check if this slot needs an action or auto-passes
           bool needsAutoPass = false;
 
-            switch (RequestState)
+     switch (RequestState)
    {
     case RequestState.Move:
      needsAutoPass = Active[i]!.Fainted || Active[i]!.Volatiles.ContainsKey(ConditionId.Commanding);
        break;
    case RequestState.Switch:
-        needsAutoPass = !Active[i]!.SwitchFlag.IsTrue();
+     case RequestState.SwitchIn:
+ needsAutoPass = !Active[i]!.SwitchFlag.IsTrue();
         break;
             }
   
           if (!needsAutoPass)
-   {
+ {
       // This slot needs an actual action
   actionsNeeded++;
             }
@@ -1050,21 +1053,21 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
             throw new InvalidOperationException("Can't update a request without active Pokemon");
         }
 
-        // Find the Pokemon in the request
+    // Find the Pokemon in the request
         PokemonMoveRequestData? req = moveRequest.Active[pokemon.Position];
-        if (req == null)
+      if (req == null)
         {
-            throw new InvalidOperationException("Pokemon not found in request's active field");
+    throw new InvalidOperationException("Pokemon not found in request's active field");
         }
 
         // Apply the update function
-        BoolVoidUnion result = update(req);
+   BoolVoidUnion result = update(req);
 
-        // Return true if the update function returned true, otherwise default to true
-        return result switch
-        {
+  // Return true if the update function returned true, otherwise default to true
+      return result switch
+  {
             BoolBoolVoidUnion { Value: var b } => b,
-            _ => true,
+        _ => true,
         };
     }
 }
