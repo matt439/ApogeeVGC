@@ -304,30 +304,38 @@ public partial class BattleAsync
         }
 
         // Check slot conditions (Stealth Rock trap, etc.)
+        // Only check if Pokemon has a valid active position
         Side side = pokemon.Side;
-        if (pokemon.Position < side.SlotConditions.Count)
+        if (pokemon.Position >= 0 && 
+                pokemon.Position < side.SlotConditions.Count &&
+                side.SlotConditions[pokemon.Position] != null)
         {
-            Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
-            foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions)
-            {
-                Condition slotCondition = Library.Conditions[conditionId];
+          Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
+        if (slotConditions != null)
+          {
+ foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions)
+       {
+     if (slotConditionState == null) continue;
+        
+        Condition slotCondition = Library.Conditions[conditionId];
                 callback = GetCallback(pokemon, slotCondition, callbackName);
-                if (callback != null || (getKey != null && slotConditionState.GetProperty(getKey) != null))
-                {
-                    yield return ResolvePriority(new EventListenerWithoutPriority
-                    {
-                        Effect = slotCondition,
-                        Callback = callback,
-                        State = slotConditionState,
-                        End = customHolder == null
-                            ? EffectDelegate.FromNullableDelegate(new Action<ConditionId>(id =>
-                                side.RemoveSideCondition(id)))
-                            : null,
-                        EndCallArgs = [side, pokemon, conditionId],
-                        EffectHolder = customHolder ?? pokemon,
-                    }, callbackName);
-                }
-            }
+      if (callback != null || (getKey != null && slotConditionState.GetProperty(getKey) != null))
+       {
+       yield return ResolvePriority(new EventListenerWithoutPriority
+            {
+      Effect = slotCondition,
+   Callback = callback,
+          State = slotConditionState,
+           End = customHolder == null
+            ? EffectDelegate.FromNullableDelegate(new Action<ConditionId>(id =>
+            side.RemoveSideCondition(id)))
+         : null,
+          EndCallArgs = [side, pokemon, conditionId],
+    EffectHolder = customHolder ?? pokemon,
+   }, callbackName);
+     }
+  }
+   }
         }
     }
 

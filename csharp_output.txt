@@ -1,0 +1,1257 @@
+﻿|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gen|9
+|tier|[Gen 9] OU
+|
+|t:|1762079808.00
+|teamsize|p...
+|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gen|9
+|tier|[Gen 9] OU
+|
+|t:|1762079808.00
+|teamsize|p1|6
+|teamsize|p2|6
+|start
+|split|p1
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|split|p2
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|-ability|p1a: calyrex-ice|As One
+|-ability|p1a: calyrex-ice|Unnerve
+|-ability|p2a: calyrex-ice|As One
+|-ability|p2a: calyrex-ice|Unnerve
+|turn|1
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: cal...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|157/205
+|-damage|p2a: calyrex-ice|77/100
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|158/205
+|-damage|p1a: calyrex-ice|78/100
+|-terastallize|p2a: calyrex-ice|Water
+|
+|split|p2
+|-heal|p2a: calyrex-ice|169/205
+|-heal|p2a: calyrex-ice|83/100
+|split|p1
+|-heal|p1a: calyrex-ice|170/205
+|-heal|p1a: calyrex-ice|83/100
+|upkeep
+|-terastallize|p1a: calyrex-ice|Water
+|turn|2
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|181/205
+|-heal|p2a: calyrex-ice|89/100
+|split|p1
+|-heal|p1a: calyrex-ice|182/205
+|-heal|p1a: calyrex-ice|89/100
+|upkeep
+|turn|3
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|-singleturn|p1a: calyrex-ice|Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|194/205
+|-heal|p1a: calyrex-ice|95/100
+|split|p2
+|-heal|p2a: calyrex-ice|193/205
+|-heal|p2a: calyrex-ice|95/100
+|upkeep
+|turn|4
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|split|p1
+|-heal|p1a: calyrex-ice|205/205
+|-heal|p1a: calyrex-ice|100/100
+|upkeep
+|turn|5
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|6
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|7
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|8
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: cal...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|163/205
+|-damage|p1a: calyrex-ice|80/100
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|163/205
+|-damage|p2a: calyrex-ice|80/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|175/205
+|-heal|p2a: calyrex-ice|86/100
+|split|p1
+|-heal|p1a: calyrex-ice|175/205
+|-heal|p1a: calyrex-ice|86/100
+|upkeep
+|turn|9
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|187/205
+|-heal|p1a: calyrex-ice|92/100
+|split|p2
+|-heal|p2a: calyrex-ice|187/205
+|-heal|p2a: calyrex-ice|92/100
+|upkeep
+|turn|10
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: cal...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|139/205
+|-damage|p1a: calyrex-ice|68/100
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|142/205
+|-damage|p2a: calyrex-ice|70/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|154/205
+|-heal|p2a: calyrex-ice|76/100
+|split|p1
+|-heal|p1a: calyrex-ice|151/205
+|-heal|p1a: calyrex-ice|74/100
+|upkeep
+|turn|11
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a:...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-miss|p2a: calyrex-ice|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|163/205
+|-heal|p1a: calyrex-ice|80/100
+|split|p2
+|-heal|p2a: calyrex-ice|166/205
+|-heal|p2a: calyrex-ice|81/100
+|upkeep
+|turn|12
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|-singleturn|p2a: calyrex-ice|Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|175/205
+|-heal|p1a: calyrex-ice|86/100
+|split|p2
+|-heal|p2a: calyrex-ice|178/205
+|-heal|p2a: calyrex-ice|87/100
+|upkeep
+|turn|13
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|187/205
+|-heal|p1a: calyrex-ice|92/100
+|split|p2
+|-heal|p2a: calyrex-ice|190/205
+|-heal|p2a: calyrex-ice|93/100
+|upkeep
+|turn|14
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|202/205
+|-heal|p2a: calyrex-ice|99/100
+|split|p1
+|-heal|p1a: calyrex-ice|199/205
+|-heal|p1a: calyrex-ice|98/100
+|upkeep
+|turn|15
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: cal...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|156/205
+|-damage|p1a: calyrex-ice|77/100
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|156/205
+|-damage|p2a: calyrex-ice|77/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|168/205
+|-heal|p2a: calyrex-ice|82/100
+|split|p1
+|-heal|p1a: calyrex-ice|168/205
+|-heal|p1a: calyrex-ice|82/100
+|upkeep
+|turn|16
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|180/205
+|-heal|p1a: calyrex-ice|88/100
+|split|p2
+|-heal|p2a: calyrex-ice|180/205
+|-heal|p2a: calyrex-ice|88/100
+|upkeep
+|turn|17
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|192/205
+|-heal|p1a: calyrex-ice|94/100
+|split|p2
+|-heal|p2a: calyrex-ice|192/205
+|-heal|p2a: calyrex-ice|94/100
+|upkeep
+|turn|18
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|204/205
+|-heal|p1a: calyrex-ice|99/100
+|split|p2
+|-heal|p2a: calyrex-ice|204/205
+|-heal|p2a: calyrex-ice|99/100
+|upkeep
+|turn|19
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|205/205
+|-heal|p1a: calyrex-ice|100/100
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|upkeep
+|turn|20
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|21
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|upkeep
+|turn|22
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|23
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|upkeep
+|turn|24
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|upkeep
+|turn|25
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|upkeep
+|turn|26
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Tri...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|upkeep
+|turn|27
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|28
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: cal...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|163/205
+|-damage|p1a: calyrex-ice|80/100
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|162/205
+|-damage|p2a: calyrex-ice|80/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|174/205
+|-heal|p2a: calyrex-ice|85/100
+|split|p1
+|-heal|p1a: calyrex-ice|175/205
+|-heal|p1a: calyrex-ice|86/100
+|upkeep
+|turn|29
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|187/205
+|-heal|p1a: calyrex-ice|92/100
+|split|p2
+|-heal|p2a: calyrex-ice|186/205
+|-heal|p2a: calyrex-ice|91/100
+|upkeep
+|turn|30
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|199/205
+|-heal|p1a: calyrex-ice|98/100
+|split|p2
+|-heal|p2a: calyrex-ice|198/205
+|-heal|p2a: calyrex-ice|97/100
+|upkeep
+|turn|31
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: cal...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|157/205
+|-damage|p1a: calyrex-ice|77/100
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|152/205
+|-damage|p2a: calyrex-ice|75/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|169/205
+|-heal|p1a: calyrex-ice|83/100
+|split|p2
+|-heal|p2a: calyrex-ice|164/205
+|-heal|p2a: calyrex-ice|80/100
+|upkeep
+|turn|32
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|176/205
+|-heal|p2a: calyrex-ice|86/100
+|split|p1
+|-heal|p1a: calyrex-ice|181/205
+|-heal|p1a: calyrex-ice|89/100
+|upkeep
+|turn|33
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: cal...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|132/205
+|-damage|p2a: calyrex-ice|65/100
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|136/205
+|-damage|p1a: calyrex-ice|67/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|148/205
+|-heal|p1a: calyrex-ice|73/100
+|split|p2
+|-heal|p2a: calyrex-ice|144/205
+|-heal|p2a: calyrex-ice|71/100
+|upkeep
+|turn|34
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: cal...
+|
+|t:|1762079808.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|99/205
+|-damage|p2a: calyrex-ice|49/100
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|103/205
+|-damage|p1a: calyrex-ice|51/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|111/205
+|-heal|p2a: calyrex-ice|55/100
+|split|p1
+|-heal|p1a: calyrex-ice|115/205
+|-heal|p1a: calyrex-ice|57/100
+|upkeep
+|turn|35
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079808.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|123/205
+|-heal|p2a: calyrex-ice|60/100
+|split|p1
+|-heal|p1a: calyrex-ice|127/205
+|-heal|p1a: calyrex-ice|62/100
+|upkeep
+|turn|36
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|135/205
+|-heal|p2a: calyrex-ice|66/100
+|split|p1
+|-heal|p1a: calyrex-ice|139/205
+|-heal|p1a: calyrex-ice|68/100
+|upkeep
+|turn|37
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|151/205
+|-heal|p1a: calyrex-ice|74/100
+|split|p2
+|-heal|p2a: calyrex-ice|147/205
+|-heal|p2a: calyrex-ice|72/100
+|upkeep
+|turn|38
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|159/205
+|-heal|p2a: calyrex-ice|78/100
+|split|p1
+|-heal|p1a: calyrex-ice|163/205
+|-heal|p1a: calyrex-ice|80/100
+|upkeep
+|turn|39
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|171/205
+|-heal|p2a: calyrex-ice|84/100
+|split|p1
+|-heal|p1a: calyrex-ice|175/205
+|-heal|p1a: calyrex-ice|86/100
+|upkeep
+|turn|40
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|187/205
+|-heal|p1a: calyrex-ice|92/100
+|split|p2
+|-heal|p2a: calyrex-ice|183/205
+|-heal|p2a: calyrex-ice|90/100
+|upkeep
+|turn|41
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|195/205
+|-heal|p2a: calyrex-ice|96/100
+|split|p1
+|-heal|p1a: calyrex-ice|199/205
+|-heal|p1a: calyrex-ice|98/100
+|upkeep
+|turn|42
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|split|p1
+|-heal|p1a: calyrex-ice|205/205
+|-heal|p1a: calyrex-ice|100/100
+|upkeep
+|turn|43
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|44
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|45
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|46
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|47
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|48
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyre...
+|
+|t:|1762079809.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|49
+|
+|t:|1762079809.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggl...
+|
+|t:|1762079809.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|181/205
+|-damage|p2a: calyrex-ice|89/100
+|split|p1
+|-damage|p1a: calyrex-ice|154/205|[from] recoil
+|-damage|p1a: calyrex-ice|76/100|[from] recoil
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|126/205
+|-damage|p1a: calyrex-ice|62/100
+|split|p2
+|-damage|p2a: calyrex-ice|130/205|[from] recoil
+|-damage|p2a: calyrex-ice|64/100|[from] recoil
+|
+|split|p2
+|-heal|p2a: calyrex-ice|142/205
+|-heal|p2a: calyrex-ice|70/100
+|split|p1
+|-heal|p1a: calyrex-ice|138/205
+|-heal|p1a: calyrex-ice|68/100
+|upkeep
+|turn|50
+|
+|t:|1762079809.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggl...
+|
+|t:|1762079809.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|112/205
+|-damage|p1a: calyrex-ice|55/100
+|split|p2
+|-damage|p2a: calyrex-ice|91/205|[from] recoil
+|-damage|p2a: calyrex-ice|45/100|[from] recoil
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|63/205
+|-damage|p2a: calyrex-ice|31/100
+|split|p1
+|-damage|p1a: calyrex-ice|61/205|[from] recoil
+|-damage|p1a: calyrex-ice|30/100|[from] recoil
+|
+|split|p2
+|-heal|p2a: calyrex-ice|75/205
+|-heal|p2a: calyrex-ice|37/100
+|split|p1
+|-heal|p1a: calyrex-ice|73/205
+|-heal|p1a: calyrex-ice|36/100
+|upkeep
+|turn|51
+|
+|t:|1762079809.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggl...
+|
+|t:|1762079809.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|46/205
+|-damage|p1a: calyrex-ice|23/100
+|split|p2
+|-damage|p2a: calyrex-ice|24/205|[from] recoil
+|-damage|p2a: calyrex-ice|12/100|[from] recoil
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|0 fnt
+|-damage|p2a: calyrex-ice|0 fnt
+|faint|p2a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|0 fnt|[from] recoil
+|-damage|p1a: calyrex-ice|0 fnt|[from] recoil
+|faint|p1a: calyrex-ice
