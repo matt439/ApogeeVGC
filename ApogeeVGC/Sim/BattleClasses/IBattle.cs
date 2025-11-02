@@ -231,6 +231,8 @@ public interface IBattle
 
     bool Choose(SideId sideId, Choice input);
 
+    bool Choose(SideId sideId, string input);
+
     bool ForceWin(SideId? side = null);
 
     List<string> InputLog { get; }

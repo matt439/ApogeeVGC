@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Utils.Extensions;
 using System.Text.Json;
 
 namespace ApogeeVGC.Sim.SideClasses;
@@ -554,8 +555,8 @@ public partial class Side
     public bool Choose(Choice input)
     {
         // Step 1: Validate that it's the player's turn
-        if (RequestState == RequestState.None)
-        {
+  if (RequestState == RequestState.None)
+     {
             string message = Battle.Ended
                 ? "Can't do anything: The game is over"
   : "Can't do anything: It's not your turn";
@@ -572,23 +573,23 @@ public partial class Side
       ClearChoice();
 
       // Step 3.5: Handle team preview if TeamData is set
-        if (!string.IsNullOrEmpty(input.TeamData))
+     if (!string.IsNullOrEmpty(input.TeamData))
         {
-            return ChooseTeam(input.TeamData);
-        }
+       return ChooseTeam(input.TeamData);
+      }
 
     // Step 4: Validate number of actions doesn't exceed active Pokemon count
   if (input.Actions.Count > Active.Count)
         {
-            return EmitChoiceError(
+return EmitChoiceError(
      $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but this is a {Battle.GameType} game!"
     );
-        }
+     }
 
      // Step 5: Process each action in the choice
         if (input.Actions.Select(action => action.Choice switch
      {
-            ChoiceType.Move => ProcessChosenMoveAction(action),
+  ChoiceType.Move => ProcessChosenMoveAction(action),
      ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
     ChoiceType.Team => ProcessChosenTeamAction(action),
 ChoiceType.Pass => ChoosePass().IsTrue(),
@@ -599,7 +600,7 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
   return false;
         }
 
-        // Step 6: Apply choice-level settings
+     // Step 6: Apply choice-level settings
       if (input.Terastallize)
         {
   Choice.Terastallize = true;
@@ -611,6 +612,216 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
         }
 
      return string.IsNullOrEmpty(Choice.Error);
+  }
+
+    /// <summary>
+    /// Process a choice string passed from the client.
+    /// Parses and executes the choice (e.g., "move 1", "switch 2", "move 1, switch 2")
+    /// </summary>
+    /// <param name="input">The choice string to parse and execute</param>
+ /// <returns>True if all choices were valid and processed, false otherwise</returns>
+    public bool Choose(string input)
+ {
+ // Step 1: Validate that it's the player's turn
+        if (RequestState == RequestState.None)
+        {
+       string message = Battle.Ended
+   ? "Can't do anything: The game is over"
+                : "Can't do anything: It's not your turn";
+            return EmitChoiceError(message);
+        }
+
+   // Step 2: Check if undo is allowed
+        if (Choice.CantUndo)
+    {
+        return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
+        }
+
+ // Step 3: Clear existing choice
+        ClearChoice();
+
+   // Step 4: Split by comma for multiple Pokemon (unless it starts with "team ")
+        string[] choiceStrings = input.StartsWith("team ")
+        ? [input]
+       : input.Split(',', StringSplitOptions.TrimEntries);
+
+        // Step 5: Validate number of choices doesn't exceed active Pokemon count
+        if (choiceStrings.Length > Active.Count)
+        {
+        return EmitChoiceError(
+     $"Can't make choices: You sent choices for {choiceStrings.Length} Pokémon, but this is a {Battle.GameType} game!"
+            );
+        }
+
+        // Step 6: Process each choice string
+        foreach (string choiceString in choiceStrings)
+        {
+    // Split choice type and data
+ string[] parts = choiceString.Trim().Split(' ', 2, StringSplitOptions.TrimEntries);
+  string choiceType = parts[0];
+       string data = parts.Length > 1 ? parts[1].Trim() : string.Empty;
+
+            // Handle special "testfight" alias
+   if (choiceType == "testfight")
+            {
+                choiceType = "move";
+    data = "testfight";
+            }
+
+      switch (choiceType)
+     {
+      case "move":
+            {
+        string original = data;
+      int? targetLoc = null;
+          EventType eventType = EventType.None;
+
+             // Parse modifiers from the end of the string
+   while (true)
+    {
+   // Check for target location (ends with a number like " 1", " -1", " +1")
+      if (System.Text.RegularExpressions.Regex.IsMatch(data, @"\s(?:-|\+)?[1-3]$"))
+        {
+              // Special case: "Conversion 2" should not be confused with targeting
+     if (data.ToShowdownId() != "conversion2")
+     {
+       if (targetLoc != null)
+ {
+  return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
+   }
+          targetLoc = int.Parse(data[^2..]);
+    data = data[..^2].Trim();
+      continue;
+     }
+    }
+
+          // Check for event type modifiers
+  if (data.EndsWith(" terastallize") || data.EndsWith(" terastal"))
+        {
+     if (eventType != EventType.None)
+ {
+    return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
+      }
+  eventType = EventType.Terastallize;
+    data = data.EndsWith(" terastallize") ? data[..^13] : data[..^9];
+ }
+      // Note: Mega, Dynamax, Z-Move are not yet implemented
+      // Ignore them for now to match current implementation
+      else if (data.EndsWith(" mega") || data.EndsWith(" megax") || data.EndsWith(" megay"))
+      {
+  // Mega evolution not implemented - ignore modifier but warn
+         Console.WriteLine($"Warning: Mega evolution not implemented, ignoring modifier");
+     int trimLength = data.EndsWith(" megax") || data.EndsWith(" megay") ? 6 : 5;
+      data = data[..^trimLength];
+      }
+    else if (data.EndsWith(" zmove") || data.EndsWith(" ultra"))
+{
+     // Z-Move not implemented - ignore modifier but warn
+     Console.WriteLine($"Warning: Z-Move not implemented, ignoring modifier");
+     int trimLength = data.EndsWith(" zmove") ? 6 : 6;
+        data = data[..^trimLength];
+       }
+else if (data.EndsWith(" dynamax") || data.EndsWith(" gigantamax") || data.EndsWith(" max"))
+       {
+           // Dynamax not implemented - ignore modifier but warn
+          Console.WriteLine($"Warning: Dynamax not implemented, ignoring modifier");
+  int trimLength = data.EndsWith(" gigantamax") ? 11 : (data.EndsWith(" dynamax") ? 8 : 4);
+   data = data[..^trimLength];
+  }
+        else
+      {
+ break;
+     }
+        }
+
+    // Convert move identifier (number or name) to MoveIdIntUnion
+      MoveIdIntUnion? moveText = null;
+ if (int.TryParse(data, out int moveSlot))
+   {
+     // It's a move slot number (1-based)
+       moveText = new IntMoveIdIntUnion(moveSlot);
+}
+      else if (!string.IsNullOrEmpty(data))
+    {
+          // It's a move name/ID - convert to MoveId
+     string moveIdStr = data.ToShowdownId();
+   if (Enum.TryParse<MoveId>(moveIdStr, true, out MoveId moveId))
+         {
+  moveText = new MoveIdMoveIdIntUnion(moveId);
+   }
+else
+  {
+ return EmitChoiceError($"Can't move: Invalid move \"{data}\"");
+    }
+      }
+
+  if (!ChooseMove(moveText, targetLoc ?? 0, eventType))
+        {
+       return false;
+         }
+             break;
+       }
+
+  case "switch":
+      {
+       if (!ChooseSwitch(string.IsNullOrEmpty(data) ? null : new IntPokemonIntUnion(int.Parse(data))).IsTrue())
+           {
+        return false;
+    }
+           break;
+       }
+
+            case "shift":
+     {
+             if (!string.IsNullOrEmpty(data))
+     {
+   return EmitChoiceError($"Unrecognized data after \"shift\": {data}");
+         }
+     if (!ChooseShift())
+              {
+          return false;
+               }
+  break;
+  }
+
+   case "team":
+        {
+           if (!ChooseTeam(data))
+  {
+            return false;
+   }
+          break;
+    }
+
+             case "pass":
+                case "skip":
+  {
+            if (!string.IsNullOrEmpty(data))
+   {
+    return EmitChoiceError($"Unrecognized data after \"pass\": {data}");
+       }
+     if (!ChoosePass().IsTrue())
+   {
+     return false;
+      }
+      break;
+ }
+
+      case "auto":
+    case "default":
+       {
+  AutoChoose();
+     break;
+      }
+
+      default:
+            {
+     return EmitChoiceError($"Unrecognized choice: {choiceString}");
+  }
+            }
+        }
+
+        return string.IsNullOrEmpty(Choice.Error);
     }
 
     private bool ProcessChosenMoveAction(ChosenAction action)

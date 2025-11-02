@@ -226,6 +226,42 @@ public partial class BattleAsync
     }
 
     /// <summary>
+    /// Takes a choice string passed from the client. Starts the next
+    /// turn if all required choices have been made.
+    /// </summary>
+    /// <param name="sideId">The ID of the side making the choice</param>
+    /// <param name="input">The choice string being made (e.g., "move 1", "switch 2")</param>
+    /// <returns>True if the choice was valid and processed, false otherwise</returns>
+    public bool Choose(SideId sideId, string input)
+    {
+        Side side = GetSide(sideId);
+
+        if (!side.Choose(input))
+        {
+            if (string.IsNullOrEmpty(side.GetChoice().Error))
+            {
+                side.EmitChoiceError(
+                    $"Unknown error for choice: {input}. If you're not using a custom client," +
+                    $"please report this as a bug.");
+            }
+            return false;
+        }
+
+        if (!side.IsChoiceDone())
+        {
+            side.EmitChoiceError($"Incomplete choice: {input} - missing other pokemon");
+            return false;
+        }
+
+        if (AllChoicesDone())
+        {
+            CommitChoices();
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Convenience method for easily making choices for multiple sides.
     /// If inputs are provided, applies them to the corresponding sides.
     /// If no inputs are provided, auto-chooses for all sides.

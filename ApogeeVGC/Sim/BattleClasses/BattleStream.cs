@@ -246,7 +246,7 @@ public class BattleStream : IDisposable
             case "p1":
             case "p2":
                 {
-                    if (Battle == null)
+                     if (Battle == null)
                         throw new InvalidOperationException("Battle not started");
 
                     var sideId = Enum.Parse<SideId>(type, ignoreCase: true);
@@ -257,11 +257,10 @@ public class BattleStream : IDisposable
                     }
                     else
                     {
-                        // Parse choice from message
-                        Choice choice = ParseChoice(message);
-                        Battle.Choose(sideId, choice);
-                    }
-                    break;
+                        // Pass the choice string directly to Battle.Choose
+    Battle.Choose(sideId, message);
+      }
+          break;
                 }
 
             case "forcewin":
@@ -473,7 +472,7 @@ public class BattleStream : IDisposable
     /// <summary>
     /// Extracts channel-specific messages from battle update data.
     /// </summary>
-    private static string ExtractChannelMessages(string data, BattleReplayMode replayMode)
+  private static string ExtractChannelMessages(string data, BattleReplayMode replayMode)
     {
         // This is a simplified implementation
         // TODO: Implement full channel extraction logic based on your needs
@@ -487,135 +486,6 @@ public class BattleStream : IDisposable
         // For now, just return the data as-is
         // In the full implementation, you'd parse the log lines and filter by channel
         return data;
-    }
-
-    /// <summary>
-    /// Parses a choice string into a Choice object.
-    /// </summary>
-    private static Choice ParseChoice(string message)
-    {
-        // Parse choice format: "move 1" or "switch 2" or "move 1, switch 2" (for doubles)
-        // Can also have "default" for team preview
-        
-        var choice = new Choice();
-        var actions = new List<ChosenAction>();
-
-        if (string.IsNullOrWhiteSpace(message))
-        {
-            choice.Error = "Empty choice";
-            return choice;
-        }
-
-        // Split by comma for multiple Pokemon actions (doubles/triples)
-        string[] individualChoices = message.Split(',', StringSplitOptions.TrimEntries);
-
-        foreach (string individualChoice in individualChoices)
-        {
-            // Skip "default" or "pass" choices
-            if (individualChoice.Equals("default", StringComparison.OrdinalIgnoreCase) ||
-                individualChoice.Equals("pass", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            // Parse individual choice
-            string[] parts = individualChoice.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            
-            if (parts.Length == 0)
-            {
-                continue;
-            }
-
-            string choiceType = parts[0].ToLowerInvariant();
-
-            switch (choiceType)
-            {
-                case "move":
-                    {
-                        if (parts.Length < 2 || !int.TryParse(parts[1], out int moveSlot))
-                        {
-                            choice.Error = $"Invalid move choice: {individualChoice}";
-                            return choice;
-                        }
-
-                        // Parse optional target (e.g., "move 1 2" for move slot 1 targeting position 2)
-                        int? targetLoc = null;
-                        if (parts.Length >= 3 && int.TryParse(parts[2], out int target))
-                        {
-                          targetLoc = target;
-                        }
-                        bool hasTerastallize = individualChoice.Contains("terastallize", StringComparison.OrdinalIgnoreCase) ||
-                                              individualChoice.Contains("tera", StringComparison.OrdinalIgnoreCase);
-
-                        if (hasTerastallize)
-                        {
-                          choice.Terastallize = true;
-                        }
-
-                        // Cast the move slot to MoveId to store in ChosenAction
-                        // This will be interpreted as an integer by the union when passed to ChooseMove
-                        actions.Add(new ChosenAction
-                        {
-                          Choice = ChoiceType.Move,
-                          MoveId = (MoveId)moveSlot,
-                          TargetLoc = targetLoc,
-                        });
-                        break;
-                    }
-
-                case "switch":
-                    {
-                        if (parts.Length < 2 || !int.TryParse(parts[1], out int switchSlot))
-                        {
-                            choice.Error = $"Invalid switch choice: {individualChoice}";
-                            return choice;
-                        }
-
-                        actions.Add(new ChosenAction
-                        {
-                            Choice = ChoiceType.Switch,
-                            MoveId = MoveId.None,
-                            // Store the switch slot as an integer for later processing
-         // Side.Choose will handle converting this to the actual target Pokemon
-         TargetLoc = switchSlot, // Store as TargetLoc for now, will be converted by Side.ProcessChosenSwitchAction
-    });
-        
-    choice.SwitchIns.Add(switchSlot);
-    break;
-   }
-
-                case "team":
-                    {
-                        // Team order for team preview (e.g., "team 123456")
-                        // Return a choice with TeamData set, which will be processed by Side.Choose -> Side.ChooseTeam
-      if (parts.Length < 2)
-        {
-          choice.Error = $"Invalid team choice: {individualChoice}";
-           return choice;
-             }
-
-      // Store the team order string to be processed by ChooseTeam
-        choice.TeamData = parts[1];
-         break;
- }
-                case "shift":
-                    {
-                        actions.Add(new ChosenAction
-                        {
-                            Choice = ChoiceType.Shift,
-                            MoveId = MoveId.None,
-                        });
-                        break;
-                    }
-
-                default:
-                    choice.Error = $"Unknown choice type: {choiceType}";
-                    return choice;
-            }
-        }
-
-        choice.Actions = actions;
-        return choice;
     }
 
     public void Dispose()
