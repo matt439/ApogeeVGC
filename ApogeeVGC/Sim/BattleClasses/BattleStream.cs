@@ -77,7 +77,6 @@ public class BattleStream : IDisposable
         if (_disposed) throw new ObjectDisposedException(nameof(BattleStream));
         if (!await _outputChannel.Reader.WaitToReadAsync(cancellationToken)) return null;
         return _outputChannel.Reader.TryRead(out string? message) ? message : null;
-
     }
 
     /// <summary>
@@ -103,7 +102,8 @@ public class BattleStream : IDisposable
             Console.WriteLine("[BattleStream] Starting ProcessInputAsync");
             await foreach (string chunk in _inputChannel.Reader.ReadAllAsync(cancellationToken))
             {
-                Console.WriteLine($"[BattleStream] Processing chunk: {chunk.Substring(0, Math.Min(100, chunk.Length))}...");
+                Console.WriteLine(
+                    $"[BattleStream] Processing chunk: {chunk.Substring(0, Math.Min(100, chunk.Length))}...");
                 if (NoCatch)
                 {
                     ProcessLines(chunk);
@@ -122,7 +122,8 @@ public class BattleStream : IDisposable
                 }
 
                 // Send battle updates after processing
-                Console.WriteLine($"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
+                Console.WriteLine(
+                    $"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
                 Battle?.SendUpdates();
             }
 
@@ -173,12 +174,14 @@ public class BattleStream : IDisposable
             {
                 await _outputChannel.Writer.WriteAsync(channelMessages);
             }
+
             return;
         }
 
         // Normal mode: send type\ndata format
         string message = $"{type}\n{data}";
-        Console.WriteLine($"[BattleStream] Writing to output channel: {message.Substring(0, Math.Min(100, message.Length))}...");
+        Console.WriteLine(
+            $"[BattleStream] Writing to output channel: {message.Substring(0, Math.Min(100, message.Length))}...");
         await _outputChannel.Writer.WriteAsync(message);
     }
 
@@ -187,236 +190,253 @@ public class BattleStream : IDisposable
         switch (type)
         {
             case "start":
+            {
+                BattleOptions options = JsonSerializer.Deserialize<BattleOptions>(message)
+                                        ?? throw new InvalidOperationException(
+                                            "Invalid battle options");
+
+                // Set up the send callback to push messages to output
+                options.Send = (sendType, data) =>
                 {
-                    BattleOptions options = JsonSerializer.Deserialize<BattleOptions>(message)
-                                            ?? throw new InvalidOperationException("Invalid battle options");
+                    string dataStr = string.Join("\n", data);
 
-                    // Set up the send callback to push messages to output
-                    options.Send = (sendType, data) =>
+                    _ = PushMessageAsync(sendType.ToString().ToLowerInvariant(), dataStr);
+
+                    if (sendType == SendType.End && !KeepAlive)
                     {
-                        string dataStr = string.Join("\n", data);
-
-                        _ = PushMessageAsync(sendType.ToString().ToLowerInvariant(), dataStr);
-
-                        if (sendType == SendType.End && !KeepAlive)
-                        {
-                            _ = PushEndAsync();
-                        }
-                    };
-
-                    if (Debug)
-                    {
-                        options.Debug = true;
+                        _ = PushEndAsync();
                     }
+                };
 
-                    Battle = new BattleAsync(options, Library);
-                    break;
+                if (Debug)
+                {
+                    options.Debug = true;
                 }
 
-            case "player":
-                {
-                    (string slotStr, string optionsText) = SplitFirst(message, ' ');
-                    var slot = Enum.Parse<SideId>(slotStr, ignoreCase: true);
-                    
-                    Console.WriteLine($"[BattleStream] Received player command for {slot}");
-                    Console.WriteLine($"[BattleStream] Options text: {optionsText.Substring(0, Math.Min(200, optionsText.Length))}...");
-      
-                    // Deserialize to JsonObject first to handle Showdown format
-                  JsonObject? playerOptionsJson = JsonSerializer.Deserialize<JsonObject>(optionsText);
-                 if (playerOptionsJson == null)
-                {
-             throw new InvalidOperationException("Invalid player options");
+                // Use a fixed seed for deterministic behavior in this example
+                options = options with { Seed = new PrngSeed(439) };
+
+                Battle = new BattleAsync(options, Library);
+                break;
             }
 
-            Console.WriteLine($"[BattleStream] Deserialized to JsonObject, keys: {string.Join(", ", playerOptionsJson.Select(kvp => kvp.Key))}");
-              
-   // Convert from Showdown format to PlayerOptions using State helper
-    PlayerOptions playerOptions = State.DeserializePlayerOptionsFromShowdown(playerOptionsJson, Library);
+            case "player":
+            {
+                (string slotStr, string optionsText) = SplitFirst(message, ' ');
+                var slot = Enum.Parse<SideId>(slotStr, ignoreCase: true);
 
-               Console.WriteLine($"[BattleStream] Converted to PlayerOptions, Team is {(playerOptions.Team == null ? "null" : $"count={playerOptions.Team.Count}")}");
+                Console.WriteLine($"[BattleStream] Received player command for {slot}");
+                Console.WriteLine(
+                    $"[BattleStream] Options text: {optionsText.Substring(0, Math.Min(200, optionsText.Length))}...");
 
-            if (Battle is null)
-                 {
-            throw new InvalidOperationException("Battle not started");
-               }
-     Battle.SetPlayer(slot, playerOptions);
-        break;
+                // Deserialize to JsonObject first to handle Showdown format
+                JsonObject? playerOptionsJson = JsonSerializer.Deserialize<JsonObject>(optionsText);
+                if (playerOptionsJson == null)
+                {
+                    throw new InvalidOperationException("Invalid player options");
                 }
+
+                Console.WriteLine(
+                    $"[BattleStream] Deserialized to JsonObject, keys: {string.Join(", ", playerOptionsJson.Select(kvp => kvp.Key))}");
+
+                // Convert from Showdown format to PlayerOptions using State helper
+                PlayerOptions playerOptions =
+                    State.DeserializePlayerOptionsFromShowdown(playerOptionsJson, Library);
+
+                Console.WriteLine(
+                    $"[BattleStream] Converted to PlayerOptions, Team is {(playerOptions.Team == null ? "null" : $"count={playerOptions.Team.Count}")}");
+
+                if (Battle is null)
+                {
+                    throw new InvalidOperationException("Battle not started");
+                }
+
+                Battle.SetPlayer(slot, playerOptions);
+                break;
+            }
 
             case "p1":
             case "p2":
+            {
+                if (Battle == null)
+                    throw new InvalidOperationException("Battle not started");
+
+                var sideId = Enum.Parse<SideId>(type, ignoreCase: true);
+
+                if (message == "undo")
                 {
-                     if (Battle == null)
-                        throw new InvalidOperationException("Battle not started");
-
-                    var sideId = Enum.Parse<SideId>(type, ignoreCase: true);
-
-                    if (message == "undo")
-                    {
-                        Battle.UndoChoice(sideId);
-                    }
-                    else
-                    {
-                        // Pass the choice string directly to Battle.Choose
-    Battle.Choose(sideId, message);
-      }
-          break;
+                    Battle.UndoChoice(sideId);
                 }
+                else
+                {
+                    // Pass the choice string directly to Battle.Choose
+                    Battle.Choose(sideId, message);
+                }
+
+                break;
+            }
 
             case "forcewin":
-                {
-                    if (Battle == null) break;
-                    SideId? winnerId = string.IsNullOrEmpty(message)
-                        ? null
-                        : Enum.Parse<SideId>(message, ignoreCase: true);
-                    Battle.ForceWin(winnerId);
-                    Battle.InputLog.Add(string.IsNullOrEmpty(message)
-                        ? ">forcetie"
-                        : $">forcewin {message}");
-                    break;
-                }
+            {
+                if (Battle == null) break;
+                SideId? winnerId = string.IsNullOrEmpty(message)
+                    ? null
+                    : Enum.Parse<SideId>(message, ignoreCase: true);
+                Battle.ForceWin(winnerId);
+                Battle.InputLog.Add(string.IsNullOrEmpty(message)
+                    ? ">forcetie"
+                    : $">forcewin {message}");
+                break;
+            }
 
             case "forcetie":
-                {
-                    Battle?.Tie();
-                    Battle?.InputLog.Add(">forcetie");
-                    break;
-                }
+            {
+                Battle?.Tie();
+                Battle?.InputLog.Add(">forcetie");
+                break;
+            }
 
             case "forcelose":
-                {
-                    if (Battle == null || string.IsNullOrEmpty(message)) break;
-                    var loserId = Enum.Parse<SideId>(message, ignoreCase: true);
-                    Battle.Lose(loserId);
-                    Battle.InputLog.Add($">forcelose {message}");
-                    break;
-                }
+            {
+                if (Battle == null || string.IsNullOrEmpty(message)) break;
+                var loserId = Enum.Parse<SideId>(message, ignoreCase: true);
+                Battle.Lose(loserId);
+                Battle.InputLog.Add($">forcelose {message}");
+                break;
+            }
 
             case "reseed":
+            {
+                if (Battle == null) break;
+
+                // Validate that message contains only digits
+                if (!string.IsNullOrEmpty(message) && !ulong.TryParse(message, out _))
                 {
-                    if (Battle == null) break;
-
-                    // Validate that message contains only digits
-                    if (!string.IsNullOrEmpty(message) && !ulong.TryParse(message, out _))
-                    {
-                        throw new InvalidOperationException($"Invalid seed for reseed: \"{message}\"");
-                    }
-
-                    // Convert seed string to int (or null if empty)
-                    int? seed = string.IsNullOrEmpty(message)
-                        ? null
-                        : int.Parse(message);
-
-                    PrngSeed? prngSeed = seed.HasValue ? new PrngSeed(seed.Value) : null;
-                    Battle.ResetRng(prngSeed);
-                    Battle.InputLog.Add($">reseed {Battle.Prng.GetSeed()}");
-                    break;
+                    throw new InvalidOperationException($"Invalid seed for reseed: \"{message}\"");
                 }
+
+                // Convert seed string to int (or null if empty)
+                int? seed = string.IsNullOrEmpty(message)
+                    ? null
+                    : int.Parse(message);
+
+                PrngSeed? prngSeed = seed.HasValue ? new PrngSeed(seed.Value) : null;
+                Battle.ResetRng(prngSeed);
+                Battle.InputLog.Add($">reseed {Battle.Prng.GetSeed()}");
+                break;
+            }
 
             case "tiebreak":
-                {
-                    Battle?.Tiebreak();
-                    break;
-                }
+            {
+                Battle?.Tiebreak();
+                break;
+            }
 
             case "chat-inputlogonly":
-                {
-                    Battle?.InputLog.Add($">chat {message}");
-                    break;
-                }
+            {
+                Battle?.InputLog.Add($">chat {message}");
+                break;
+            }
 
             case "chat":
+            {
+                Battle?.InputLog.Add($">chat {message}");
+                if (Battle?.DisplayUi == true)
                 {
-                    Battle?.InputLog.Add($">chat {message}");
-                    if (Battle?.DisplayUi == true)
-                    {
-                        Battle.Add("chat", message);
-                    }
-                    break;
+                    Battle.Add("chat", message);
                 }
 
+                break;
+            }
+
             case "eval":
+            {
+                if (Battle == null) break;
+
+                // Add to input log
+                Battle.InputLog.Add($">{type} {message}");
+
+                // Format message for display
+                message = message.Replace("\f", "\n");
+
+                if (Battle.DisplayUi)
                 {
-                    if (Battle == null) break;
+                    Battle.Add("", ">>> " + message.Replace("\n", "\n||"));
+                }
 
-                    // Add to input log
-                    Battle.InputLog.Add($">{type} {message}");
-
-                    // Format message for display
-                    message = message.Replace("\f", "\n");
+                try
+                {
+                    // Note: Actual eval functionality would need to be implemented
+                    // This is a placeholder for the eval logic
+                    string result = "eval not implemented in C#";
 
                     if (Battle.DisplayUi)
                     {
-                        Battle.Add("", ">>> " + message.Replace("\n", "\n||"));
+                        Battle.Add("", "<<< " + result);
                     }
-
-                    try
-                    {
-                        // Note: Actual eval functionality would need to be implemented
-                        // This is a placeholder for the eval logic
-                        string result = "eval not implemented in C#";
-
-                        if (Battle.DisplayUi)
-                        {
-                            Battle.Add("", "<<< " + result);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        if (Battle.DisplayUi)
-                        {
-                            Battle.Add("", "<<< error: " + e.Message);
-                        }
-                    }
-                    break;
                 }
+                catch (Exception e)
+                {
+                    if (Battle.DisplayUi)
+                    {
+                        Battle.Add("", "<<< error: " + e.Message);
+                    }
+                }
+
+                break;
+            }
 
             case "requestlog":
+            {
+                if (Battle != null)
                 {
-                    if (Battle != null)
-                    {
-                        _ = PushMessageAsync("requesteddata", string.Join("\n", Battle.InputLog));
-                    }
-                    break;
+                    _ = PushMessageAsync("requesteddata", string.Join("\n", Battle.InputLog));
                 }
+
+                break;
+            }
 
             case "requestexport":
+            {
+                if (Battle != null)
                 {
-                    if (Battle != null)
-                    {
-                        string export = $"{Battle.Prng.GetSeed()}\n{string.Join("\n", Battle.InputLog)}";
-                        _ = PushMessageAsync("requesteddata", export);
-                    }
-                    break;
+                    string export =
+                        $"{Battle.Prng.GetSeed()}\n{string.Join("\n", Battle.InputLog)}";
+                    _ = PushMessageAsync("requesteddata", export);
                 }
+
+                break;
+            }
 
             case "requestteam":
+            {
+                if (Battle == null) break;
+
+                message = message.Trim();
+                if (!int.TryParse(message.AsSpan(1), out int slotNum) || slotNum < 1)
                 {
-                    if (Battle == null) break;
-
-                    message = message.Trim();
-                    if (!int.TryParse(message.AsSpan(1), out int slotNum) || slotNum < 1)
-                    {
-                        throw new InvalidOperationException($"Team requested for slot {message}, but that slot does not exist.");
-                    }
-
-                    int slotIndex = slotNum - 1;
-                    if (slotIndex >= Battle.Sides.Count)
-                    {
-                        throw new InvalidOperationException($"Team requested for slot {message}, but that slot does not exist.");
-                    }
-
-                    Side side = Battle.Sides[slotIndex];
-                    string team = Teams.Pack(side.Team);
-                    _ = PushMessageAsync("requesteddata", team);
-                    break;
+                    throw new InvalidOperationException(
+                        $"Team requested for slot {message}, but that slot does not exist.");
                 }
+
+                int slotIndex = slotNum - 1;
+                if (slotIndex >= Battle.Sides.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"Team requested for slot {message}, but that slot does not exist.");
+                }
+
+                Side side = Battle.Sides[slotIndex];
+                string team = Teams.Pack(side.Team);
+                _ = PushMessageAsync("requesteddata", team);
+                break;
+            }
 
             case "show-openteamsheets":
-                {
-                    Battle?.ShowOpenTeamSheets();
-                    break;
-                }
+            {
+                Battle?.ShowOpenTeamSheets();
+                break;
+            }
 
             case "version":
             case "version-origin":
@@ -472,7 +492,7 @@ public class BattleStream : IDisposable
     /// <summary>
     /// Extracts channel-specific messages from battle update data.
     /// </summary>
-  private static string ExtractChannelMessages(string data, BattleReplayMode replayMode)
+    private static string ExtractChannelMessages(string data, BattleReplayMode replayMode)
     {
         // This is a simplified implementation
         // TODO: Implement full channel extraction logic based on your needs

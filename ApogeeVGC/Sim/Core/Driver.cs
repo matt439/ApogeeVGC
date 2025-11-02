@@ -35,8 +35,12 @@ public class Driver
             Team = TeamGenerator.GenerateTestTeam(Library),
         };
 
-        var p1 = new RandomPlayerAi(streams.P1);
-        var p2 = new RandomPlayerAi(streams.P2);
+        // Fixed seeds for reproducible results
+        var p1Seed = new PrngSeed(1818);
+        var p2Seed = new PrngSeed(1122);
+
+        var p1 = new RandomPlayerAi(streams.P1, seed: p1Seed);
+        var p2 = new RandomPlayerAi(streams.P2, seed: p2Seed);
 
         Console.WriteLine($"p1 is {p1.GetType().Name}");
         Console.WriteLine($"p2 is {p2.GetType().Name}");
