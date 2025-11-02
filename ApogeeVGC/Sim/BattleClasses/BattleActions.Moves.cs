@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -409,17 +410,23 @@ public partial class BattleActions
                 throw new InvalidOperationException("Target cannot be null when displaying move message.");
             }
 
-            if (sourceEffect != null)
-            {
-                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
-                    StringNumberDelegateObjectUnion.FromObject(target), $"[from] {sourceEffect.EffectStateId}");
-            }
-            else
-            {
-                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
-                    StringNumberDelegateObjectUnion.FromObject(target));
-            }
-        }
+            // Check if sourceEffect should be logged
+            bool shouldLogSourceEffect = sourceEffect != null &&
+ !(sourceEffect.EffectStateId is EmptyEffectStateId) &&
+     !(sourceEffect.EffectStateId is FormatEffectStateId { FormatId: FormatId.EmptyEffect });
+
+  if (shouldLogSourceEffect)
+  {
+ Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+      StringNumberDelegateObjectUnion.FromObject(target), "[from]",
+StringNumberDelegateObjectUnion.FromObject(sourceEffect!.EffectStateId));
+    }
+      else
+    {
+     Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+        StringNumberDelegateObjectUnion.FromObject(target));
+      }
+ }
 
         // Handle no target
         if (target == null)
