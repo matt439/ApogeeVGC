@@ -1,0 +1,1349 @@
+﻿|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gen|9
+|tier|[Gen 9] OU
+|
+|t:|439.00
+|teamsize|p1|6
+|te...
+|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gen|9
+|tier|[Gen 9] OU
+|
+|t:|439.00
+|teamsize|p1|6
+|teamsize|p2|6
+|start
+|split|p1
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|split|p2
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|-ability|p1a: calyrex-ice|As One
+|-ability|p1a: calyrex-ice|Unnerve
+|-ability|p2a: calyrex-ice|As One
+|-ability|p2a: calyrex-ice|Unnerve
+|turn|1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Glacia...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|158/205
+|-damage|p1a: calyrex-ice|78/100
+|-terastallize|p1a: calyrex-ice|Water
+|-terastallize|p2a: calyrex-ice|Water
+|
+|split|p1
+|-heal|p1a: calyrex-ice|170/205
+|-heal|p1a: calyrex-ice|83/100
+|upkeep
+|turn|2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ic...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|128/205
+|-damage|p1a: calyrex-ice|63/100
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|140/205
+|-heal|p1a: calyrex-ice|69/100
+|upkeep
+|turn|3
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ic...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|95/205
+|-damage|p1a: calyrex-ice|47/100
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|107/205
+|-heal|p1a: calyrex-ice|53/100
+|upkeep
+|turn|4
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick ...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|119/205
+|-heal|p1a: calyrex-ice|59/100
+|upkeep
+|turn|5
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ic...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|77/205
+|-damage|p1a: calyrex-ice|38/100
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|89/205
+|-heal|p1a: calyrex-ice|44/100
+|upkeep
+|turn|6
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|101/205
+|-heal|p1a: calyrex-ice|50/100
+|upkeep
+|turn|7
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Glacia...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|59/205
+|-damage|p1a: calyrex-ice|29/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|71/205
+|-heal|p1a: calyrex-ice|35/100
+|upkeep
+|turn|8
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Trick ...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|83/205
+|-heal|p1a: calyrex-ice|41/100
+|upkeep
+|turn|9
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ic...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|159/205
+|-damage|p2a: calyrex-ice|78/100
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|171/205
+|-heal|p2a: calyrex-ice|84/100
+|split|p1
+|-heal|p1a: calyrex-ice|95/205
+|-heal|p1a: calyrex-ice|47/100
+|upkeep
+|turn|10
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|107/205
+|-heal|p1a: calyrex-ice|53/100
+|split|p2
+|-heal|p2a: calyrex-ice|183/205
+|-heal|p2a: calyrex-ice|90/100
+|upkeep
+|turn|11
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|63/205
+|-damage|p1a: calyrex-ice|31/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|75/205
+|-heal|p1a: calyrex-ice|37/100
+|split|p2
+|-heal|p2a: calyrex-ice|195/205
+|-heal|p2a: calyrex-ice|96/100
+|upkeep
+|turn|12
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|147/205
+|-damage|p2a: calyrex-ice|72/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|87/205
+|-heal|p1a: calyrex-ice|43/100
+|split|p2
+|-heal|p2a: calyrex-ice|159/205
+|-heal|p2a: calyrex-ice|78/100
+|upkeep
+|turn|13
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|39/205
+|-damage|p1a: calyrex-ice|20/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|51/205
+|-heal|p1a: calyrex-ice|25/100
+|split|p2
+|-heal|p2a: calyrex-ice|171/205
+|-heal|p2a: calyrex-ice|84/100
+|upkeep
+|turn|14
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|129/205
+|-damage|p2a: calyrex-ice|63/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|63/205
+|-heal|p1a: calyrex-ice|31/100
+|split|p2
+|-heal|p2a: calyrex-ice|141/205
+|-heal|p2a: calyrex-ice|69/100
+|upkeep
+|turn|15
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ic...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|96/205
+|-damage|p2a: calyrex-ice|47/100
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|75/205
+|-heal|p1a: calyrex-ice|37/100
+|split|p2
+|-heal|p2a: calyrex-ice|108/205
+|-heal|p2a: calyrex-ice|53/100
+|upkeep
+|turn|16
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|87/205
+|-heal|p1a: calyrex-ice|43/100
+|split|p2
+|-heal|p2a: calyrex-ice|120/205
+|-heal|p2a: calyrex-ice|59/100
+|upkeep
+|turn|17
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ic...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|39/205
+|-damage|p1a: calyrex-ice|20/100
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|132/205
+|-heal|p2a: calyrex-ice|65/100
+|split|p1
+|-heal|p1a: calyrex-ice|51/205
+|-heal|p1a: calyrex-ice|25/100
+|upkeep
+|turn|18
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick ...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p1
+|-heal|p1a: calyrex-ice|63/205
+|-heal|p1a: calyrex-ice|31/100
+|split|p2
+|-heal|p2a: calyrex-ice|144/205
+|-heal|p2a: calyrex-ice|71/100
+|upkeep
+|turn|19
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Leech ...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|75/205
+|-heal|p1a: calyrex-ice|37/100
+|split|p2
+|-heal|p2a: calyrex-ice|156/205
+|-heal|p2a: calyrex-ice|77/100
+|upkeep
+|turn|20
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|110/205
+|-damage|p2a: calyrex-ice|54/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|122/205
+|-heal|p2a: calyrex-ice|60/100
+|split|p1
+|-heal|p1a: calyrex-ice|87/205
+|-heal|p1a: calyrex-ice|43/100
+|upkeep
+|turn|21
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|99/205
+|-heal|p1a: calyrex-ice|49/100
+|split|p2
+|-heal|p2a: calyrex-ice|134/205
+|-heal|p2a: calyrex-ice|66/100
+|upkeep
+|turn|22
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacia...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|89/205
+|-damage|p2a: calyrex-ice|44/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|111/205
+|-heal|p1a: calyrex-ice|55/100
+|split|p2
+|-heal|p2a: calyrex-ice|101/205
+|-heal|p2a: calyrex-ice|50/100
+|upkeep
+|turn|23
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|-singleturn|p1a: calyrex-ice|Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|113/205
+|-heal|p2a: calyrex-ice|56/100
+|split|p1
+|-heal|p1a: calyrex-ice|123/205
+|-heal|p1a: calyrex-ice|60/100
+|upkeep
+|turn|24
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|125/205
+|-heal|p2a: calyrex-ice|61/100
+|split|p1
+|-heal|p1a: calyrex-ice|135/205
+|-heal|p1a: calyrex-ice|66/100
+|upkeep
+|turn|25
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|137/205
+|-heal|p2a: calyrex-ice|67/100
+|split|p1
+|-heal|p1a: calyrex-ice|147/205
+|-heal|p1a: calyrex-ice|72/100
+|upkeep
+|turn|26
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|91/205
+|-damage|p2a: calyrex-ice|45/100
+|
+|split|p2
+|-heal|p2a: calyrex-ice|103/205
+|-heal|p2a: calyrex-ice|51/100
+|split|p1
+|-heal|p1a: calyrex-ice|159/205
+|-heal|p1a: calyrex-ice|78/100
+|upkeep
+|turn|27
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|-singleturn|p2a: calyrex-ice|Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|171/205
+|-heal|p1a: calyrex-ice|84/100
+|split|p2
+|-heal|p2a: calyrex-ice|115/205
+|-heal|p2a: calyrex-ice|57/100
+|upkeep
+|turn|28
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|
+|split|p1
+|-heal|p1a: calyrex-ice|183/205
+|-heal|p1a: calyrex-ice|90/100
+|split|p2
+|-heal|p2a: calyrex-ice|127/205
+|-heal|p2a: calyrex-ice|62/100
+|upkeep
+|turn|29
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|195/205
+|-heal|p1a: calyrex-ice|96/100
+|split|p2
+|-heal|p2a: calyrex-ice|139/205
+|-heal|p2a: calyrex-ice|68/100
+|upkeep
+|turn|30
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ic...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|97/205
+|-damage|p2a: calyrex-ice|48/100
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p1
+|-heal|p1a: calyrex-ice|205/205
+|-heal|p1a: calyrex-ice|100/100
+|split|p2
+|-heal|p2a: calyrex-ice|109/205
+|-heal|p2a: calyrex-ice|54/100
+|upkeep
+|turn|31
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|121/205
+|-heal|p2a: calyrex-ice|60/100
+|upkeep
+|turn|32
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|133/205
+|-heal|p2a: calyrex-ice|65/100
+|upkeep
+|turn|33
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p2a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|145/205
+|-heal|p2a: calyrex-ice|71/100
+|upkeep
+|turn|34
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|157/205
+|-heal|p2a: calyrex-ice|77/100
+|upkeep
+|turn|35
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|169/205
+|-heal|p2a: calyrex-ice|83/100
+|upkeep
+|turn|36
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|181/205
+|-heal|p2a: calyrex-ice|89/100
+|upkeep
+|turn|37
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Trick Room|p2a: calyrex-ice
+|-fieldend|move: Trick Room
+|
+|split|p2
+|-heal|p2a: calyrex-ice|193/205
+|-heal|p2a: calyrex-ice|95/100
+|upkeep
+|turn|38
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|upkeep
+|turn|39
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|upkeep
+|turn|40
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Protect|p2a: calyrex-ice
+|
+|upkeep
+|turn|41
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|42
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|43
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a: calyre...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-miss|p2a: calyrex-ice|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|44
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Protect|p1a: calyrex-ice
+|
+|upkeep
+|turn|45
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyr...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|46
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|47
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Protect is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|m...
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|48
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Trick Room is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|error|[Unavailable choice] Can't move: calyrex-ice's Glacial Lance is disabled...
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a: calyre...
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Leech Seed|p2a: calyrex-ice|[miss]
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-miss|p2a: calyrex-ice|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|
+|upkeep
+|turn|49
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|
+|t:|439.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: ...
+|
+|t:|439.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|178/205
+|-damage|p2a: calyrex-ice|87/100
+|split|p1
+|-damage|p1a: calyrex-ice|154/205|[from] recoil
+|-damage|p1a: calyrex-ice|76/100|[from] recoil
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|126/205
+|-damage|p1a: calyrex-ice|62/100
+|split|p2
+|-damage|p2a: calyrex-ice|127/205|[from] recoil
+|-damage|p2a: calyrex-ice|62/100|[from] recoil
+|
+|split|p1
+|-heal|p1a: calyrex-ice|138/205
+|-heal|p1a: calyrex-ice|68/100
+|split|p2
+|-heal|p2a: calyrex-ice|139/205
+|-heal|p2a: calyrex-ice|68/100
+|upkeep
+|turn|50
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|
+|t:|439.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: ...
+|
+|t:|439.00
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|113/205
+|-damage|p2a: calyrex-ice|56/100
+|split|p1
+|-damage|p1a: calyrex-ice|87/205|[from] recoil
+|-damage|p1a: calyrex-ice|43/100|[from] recoil
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|62/205
+|-damage|p1a: calyrex-ice|31/100
+|split|p2
+|-damage|p2a: calyrex-ice|62/205|[from] recoil
+|-damage|p2a: calyrex-ice|31/100|[from] recoil
+|
+|split|p1
+|-heal|p1a: calyrex-ice|74/205
+|-heal|p1a: calyrex-ice|37/100
+|split|p2
+|-heal|p2a: calyrex-ice|74/205
+|-heal|p2a: calyrex-ice|37/100
+|upkeep
+|turn|51
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|request|{"active":[{"moves":[{"move":"Struggle","id":"struggle","pp":1,"maxpp":1,"tar...
+|
+|t:|439.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: ...
+|
+|t:|439.00
+|-activate|p2a: calyrex-ice|move: Struggle
+|move|p2a: calyrex-ice|Struggle|p1a: calyrex-ice
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|-activate|p1a: calyrex-ice|move: Protect
+|split|p1
+|-damage|p1a: calyrex-ice|49/205
+|-damage|p1a: calyrex-ice|24/100
+|split|p2
+|-damage|p2a: calyrex-ice|23/205|[from] recoil
+|-damage|p2a: calyrex-ice|12/100|[from] recoil
+|-activate|p1a: calyrex-ice|move: Struggle
+|move|p1a: calyrex-ice|Struggle|p2a: calyrex-ice
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|-activate|p2a: calyrex-ice|move: Protect
+|split|p2
+|-damage|p2a: calyrex-ice|0 fnt
+|-damage|p2a: calyrex-ice|0 fnt
+|faint|p2a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|0 fnt|[from] recoil
+|-damage|p1a: calyrex-ice|0 fnt|[from] recoil
+|faint|p1a: calyrex-ice
+|request|{"forceSwitch":[true],"side":{"name":"Bot 1","id":"P1","pokemon":[{"condition...
+|request|{"forceSwitch":[true],"side":{"name":"Bot 2","id":"P2","pokemon":[{"condition...

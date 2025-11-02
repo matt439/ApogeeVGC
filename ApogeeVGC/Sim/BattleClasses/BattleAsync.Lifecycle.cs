@@ -334,9 +334,10 @@ public partial class BattleAsync
             // Add empty line for formatting
             Add(string.Empty);
 
-            // Add timestamp in Unix epoch seconds
-            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            Add("t:", timestamp);
+            // Use a fixed timestamp for reproducible results
+            // Using the PRNG seed as the base timestamp
+            long timestamp = PrngSeed.Seed;
+          Add("t:", timestamp);
         }
 
         // Clear request state if it exists
