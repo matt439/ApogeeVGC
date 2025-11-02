@@ -403,13 +403,45 @@ _ => JsonValue.Create(kvp.Value?.ToString())
         return arg switch
         {
             StringStringNumberDelegateObjectUnion s => s.Value,
-            IntStringNumberDelegateObjectUnion i => i.Value.ToString(),
-            DoubleStringNumberDelegateObjectUnion d => d.Value.ToString("F"),
+ IntStringNumberDelegateObjectUnion i => i.Value.ToString(),
+      DoubleStringNumberDelegateObjectUnion d => d.Value.ToString("F"),
             DelegateStringNumberDelegateObjectUnion del => del.Delegate.Method.Name,
-            ObjectStringNumberDelegateObjectUnion obj => obj.Object.ToString() ?? string.Empty,
+    ObjectStringNumberDelegateObjectUnion obj => FormatObjectArg(obj.Object),
             _ => string.Empty,
+     };
+    }
+
+    /// <summary>
+  /// Formats an object argument for protocol output.
+  /// Handles special cases like IEffect objects to use their FullName.
+  /// </summary>
+    private static string FormatObjectArg(object obj)
+    {
+        return obj switch
+  {
+            IEffect effect => effect.FullName,
+          EffectStateId effectStateId => FormatEffectStateId(effectStateId),
+          _ => obj.ToString() ?? string.Empty,
         };
     }
+
+    /// <summary>
+    /// Formats an EffectStateId to its protocol string representation.
+    /// </summary>
+    private static string FormatEffectStateId(EffectStateId effectStateId)
+    {
+ return effectStateId switch
+        {
+        SpecieEffectStateId s => s.SpecieId.ToShowdownId(),
+       AbilityEffectStateId a => a.AbilityId.ToShowdownId(),
+       ItemEffectStateId i => i.ItemId.ToShowdownId(),
+  ConditionEffectStateId c => c.ConditionId.ToShowdownId(),
+     MoveEffectStateId m => m.MoveId.ToShowdownId(),
+            FormatEffectStateId f => f.FormatId.ToShowdownId(),
+     EmptyEffectStateId => string.Empty,
+            _ => effectStateId.ToString() ?? string.Empty,
+   };
+  }
 
     /// <summary>
     /// Logs a damage message to the battle log based on the effect causing the damage.
