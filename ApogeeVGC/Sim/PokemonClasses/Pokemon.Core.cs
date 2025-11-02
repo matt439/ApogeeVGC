@@ -200,6 +200,7 @@ public partial class Pokemon : IPriorityComparison, IDisposable
         BaseMoveSlots = baseMoveSlots;
 
         // Position = 0;
+        Status = ConditionId.None;
         StatusState = battle.InitEffectState();
         Volatiles = [];
 
