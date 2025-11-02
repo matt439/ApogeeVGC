@@ -210,18 +210,14 @@ public partial class BattleAsync
     private List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        return FindPokemonEventHandlersInternal(pokemon, callbackName, getKey, customHolder).ToList();
-    }
+        List<EventListenerWithoutPriority> handlersWithoutPriority = [];
 
-    private IEnumerable<EventListener> FindPokemonEventHandlersInternal(Pokemon pokemon, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
-    {
         // Check status condition (paralysis, burn, etc.)
         Condition status = pokemon.GetStatus();
         EffectDelegate? callback = GetCallback(pokemon, status, callbackName);
         if (callback != null || (getKey != null && pokemon.StatusState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = status,
                 Callback = callback,
@@ -230,18 +226,24 @@ public partial class BattleAsync
                     ? EffectDelegate.FromNullableDelegate(new Action<bool>(_ => pokemon.ClearStatus()))
                     : null,
                 EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
+            });
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
-        foreach (ConditionId id in pokemon.Volatiles.Keys)
+        // Create a snapshot of keys to avoid modification during enumeration
+        foreach (ConditionId id in pokemon.Volatiles.Keys.ToArray())
         {
-            EffectState volatileState = pokemon.Volatiles[id];
+            // Check if the volatile still exists (it might have been removed by a previous handler)
+            if (!pokemon.Volatiles.TryGetValue(id, out EffectState? volatileState))
+            {
+                continue;
+            }
+
             Condition volatileCondition = Library.Conditions[id];
             callback = GetCallback(pokemon, volatileCondition, callbackName);
             if (callback != null || (getKey != null && volatileState.GetProperty(getKey) != null))
             {
-                yield return ResolvePriority(new EventListenerWithoutPriority
+                handlersWithoutPriority.Add(new EventListenerWithoutPriority
                 {
                     Effect = volatileCondition,
                     Callback = callback,
@@ -250,7 +252,7 @@ public partial class BattleAsync
                         ? EffectDelegate.FromNullableDelegate((Func<Condition, bool>)pokemon.RemoveVolatile)
                         : null,
                     EffectHolder = customHolder ?? pokemon,
-                }, callbackName);
+                });
             }
         }
 
@@ -259,7 +261,7 @@ public partial class BattleAsync
         callback = GetCallback(pokemon, ability, callbackName);
         if (callback != null || (getKey != null && pokemon.AbilityState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = ability,
                 Callback = callback,
@@ -268,7 +270,7 @@ public partial class BattleAsync
                     ? EffectDelegate.FromNullableDelegate(pokemon.ClearAbility)
                     : null,
                 EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
+            });
         }
 
         // Check held item
@@ -276,7 +278,7 @@ public partial class BattleAsync
         callback = GetCallback(pokemon, item, callbackName);
         if (callback != null || (getKey != null && pokemon.ItemState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = item,
                 Callback = callback,
@@ -285,7 +287,7 @@ public partial class BattleAsync
                     ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
                     : null,
                 EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
+            });
         }
 
         // Check species (for species-specific events)
@@ -293,14 +295,14 @@ public partial class BattleAsync
         callback = GetCallback(pokemon, species, callbackName);
         if (callback != null)
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = species,
                 Callback = callback,
                 State = pokemon.SpeciesState,
                 End = null, // Species can't be removed
                 EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
+            });
         }
 
         // Check slot conditions (Stealth Rock trap, etc.)
@@ -311,7 +313,8 @@ public partial class BattleAsync
             Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
             if (slotConditions != null)
             {
-                foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions)
+                // Create a snapshot of keys to avoid modification during enumeration
+                foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions.ToArray())
                 {
                     if (slotConditionState == null) continue;
 
@@ -319,7 +322,7 @@ public partial class BattleAsync
                     callback = GetCallback(pokemon, slotCondition, callbackName);
                     if (callback != null || (getKey != null && slotConditionState.GetProperty(getKey) != null))
                     {
-                        yield return ResolvePriority(new EventListenerWithoutPriority
+                        handlersWithoutPriority.Add(new EventListenerWithoutPriority
                         {
                             Effect = slotCondition,
                             Callback = callback,
@@ -330,11 +333,20 @@ public partial class BattleAsync
                                 : null,
                             EndCallArgs = [side, pokemon, conditionId],
                             EffectHolder = customHolder ?? pokemon,
-                        }, callbackName);
+                        });
                     }
                 }
             }
         }
+
+        // Now resolve priorities for all handlers (after dictionary enumeration is complete)
+        List<EventListener> handlers = new List<EventListener>(handlersWithoutPriority.Count);
+        foreach (var handler in handlersWithoutPriority)
+        {
+            handlers.Add(ResolvePriority(handler, callbackName));
+        }
+
+        return handlers;
     }
 
     private List<EventListener> FindBattleEventHandlers(EventId callbackName, EffectStateKey? getKey = null,
@@ -402,22 +414,24 @@ public partial class BattleAsync
     private List<EventListener> FindFieldEventHandlers(Field field, EventId callbackName,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        return FindFieldEventHandlersInternal(field, callbackName, getKey, customHolder).ToList();
-    }
+        List<EventListenerWithoutPriority> handlersWithoutPriority = [];
 
-    private IEnumerable<EventListener> FindFieldEventHandlersInternal(Field field, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
-    {
         // Check pseudo-weather effects (Trick Room, Gravity, etc.)
-        foreach (ConditionId id in field.PseudoWeather.Keys)
+        // Create a snapshot of keys to avoid modification during enumeration
+        foreach (ConditionId id in field.PseudoWeather.Keys.ToArray())
         {
-            EffectState pseudoWeatherState = field.PseudoWeather[id];
+            // Check if the pseudo-weather still exists
+            if (!field.PseudoWeather.TryGetValue(id, out EffectState? pseudoWeatherState))
+            {
+                continue;
+            }
+
             Condition pseudoWeather = Library.Conditions[id];
             EffectDelegate? callback = GetCallback(field, pseudoWeather, callbackName);
 
             if (callback != null || (getKey != null && pseudoWeatherState.GetProperty(getKey) != null))
             {
-                yield return ResolvePriority(new EventListenerWithoutPriority
+                handlersWithoutPriority.Add(new EventListenerWithoutPriority
                 {
                     Effect = pseudoWeather,
                     Callback = callback,
@@ -426,7 +440,7 @@ public partial class BattleAsync
                         ? EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)field.RemovePseudoWeather)
                         : null,
                     EffectHolder = customHolder is null ? field : customHolder,
-                }, callbackName);
+                });
             }
         }
 
@@ -435,7 +449,7 @@ public partial class BattleAsync
         EffectDelegate? weatherCallback = GetCallback(field, weather, callbackName);
         if (weatherCallback != null || (getKey != null && Field.WeatherState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = weather,
                 Callback = weatherCallback,
@@ -444,7 +458,7 @@ public partial class BattleAsync
                     ? EffectDelegate.FromNullableDelegate(field.ClearWeather)
                     : null,
                 EffectHolder = customHolder is null ? field : customHolder,
-            }, callbackName);
+            });
         }
 
         // Check terrain effect
@@ -452,7 +466,7 @@ public partial class BattleAsync
         EffectDelegate? terrainCallback = GetCallback(field, terrain, callbackName);
         if (terrainCallback != null || (getKey != null && field.TerrainState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
+            handlersWithoutPriority.Add(new EventListenerWithoutPriority
             {
                 Effect = terrain,
                 Callback = terrainCallback,
@@ -461,27 +475,38 @@ public partial class BattleAsync
                     ? EffectDelegate.FromNullableDelegate(field.ClearTerrain)
                     : null,
                 EffectHolder = customHolder is null ? field : customHolder,
-            }, callbackName);
+            });
         }
+
+        // Resolve priorities after all dictionary enumerations
+        List<EventListener> handlers = new List<EventListener>(handlersWithoutPriority.Count);
+        foreach (var handler in handlersWithoutPriority)
+        {
+            handlers.Add(ResolvePriority(handler, callbackName));
+        }
+
+        return handlers;
     }
 
     private List<EventListener> FindSideEventHandlers(Side side, EventId callbackName,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
-        return FindSideEventHandlersInternal(side, callbackName, getKey, customHolder).ToList();
-    }
+        List<EventListenerWithoutPriority> handlersWithoutPriority = [];
 
-    private IEnumerable<EventListener> FindSideEventHandlersInternal(Side side, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
-    {
-        foreach (ConditionId id in side.SideConditions.Keys)
+        // Create a snapshot of keys to avoid modification during enumeration
+        foreach (ConditionId id in side.SideConditions.Keys.ToArray())
         {
-            EffectState sideConditionData = side.SideConditions[id];
+            // Check if the side condition still exists
+            if (!side.SideConditions.TryGetValue(id, out EffectState? sideConditionData))
+            {
+                continue;
+            }
+
             Condition sideCondition = Library.Conditions[id];
             EffectDelegate? callback = GetCallback(side, sideCondition, callbackName);
             if (callback != null || (getKey != null && sideConditionData.GetProperty(getKey) != null))
             {
-                yield return ResolvePriority(new EventListenerWithoutPriority
+                handlersWithoutPriority.Add(new EventListenerWithoutPriority
                 {
                     Effect = sideCondition,
                     Callback = callback,
@@ -490,9 +515,18 @@ public partial class BattleAsync
                         ? EffectDelegate.FromNullableDelegate((Func<ConditionId, bool>)side.RemoveSideCondition)
                         : null,
                     EffectHolder = customHolder is null ? side : customHolder,
-                }, callbackName);
+                });
             }
         }
+
+        // Resolve priorities after all dictionary enumerations
+        List<EventListener> handlers = new List<EventListener>(handlersWithoutPriority.Count);
+        foreach (var handler in handlersWithoutPriority)
+        {
+            handlers.Add(ResolvePriority(handler, callbackName));
+        }
+
+        return handlers;
     }
 
     #region Helpers
