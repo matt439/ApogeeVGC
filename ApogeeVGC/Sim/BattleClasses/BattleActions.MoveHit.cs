@@ -333,6 +333,10 @@ public partial class BattleActions
                 move.Target != MoveTarget.AllySide && move.Target != MoveTarget.FoeSide)
             {
                 damage = TryPrimaryHitEvent(damage, targets, pokemon, move, move, isSecondary);
+                if (damage == null)
+                {
+                    throw new InvalidOperationException("TryPrimaryHitEvent returned null");
+                }
             }
         }
 
@@ -356,6 +360,10 @@ public partial class BattleActions
         }
 
         // 1. call to Battle.GetDamage
+     if (damage == null)
+ {
+   throw new InvalidOperationException("damage is null before GetSpreadDamage");
+        }
         damage = GetSpreadDamage(damage, targets, pokemon, move, move, isSecondary, isSelf);
 
         for (int i = 0; i < targets.Count; i++)
@@ -508,6 +516,11 @@ public partial class BattleActions
         Pokemon source,
         ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)
     {
+        if (damage == null)
+        {
+            throw new ArgumentNullException(nameof(damage), "damage parameter is null in GetSpreadDamage");
+        }
+        
         for (int i = 0; i < targets.Count; i++)
         {
             if (targets[i] is not PokemonPokemonUnion pokemonUnion)
@@ -519,25 +532,25 @@ public partial class BattleActions
             Battle.ActiveTarget = target;
             damage[i] = BoolIntUndefinedUnion.FromUndefined();
 
-            IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
+    IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
 
-            // getDamage has several possible return values:
-            //
+     // getDamage has several possible return values:
+       //
             //   a number:
-            //     means that much damage is dealt (0 damage still counts as dealing
+            //  means that much damage is dealt (0 damage still counts as dealing
             //     damage for the purposes of things like Static)
-            //   false:
-            //     gives error message: "But it failed!" and move ends
+    //   false:
+//     gives error message: "But it failed!" and move ends
             //   null:
-            //     the move ends, with no message (usually, a custom fail message
+      //     the move ends, with no message (usually, a custom fail message
             //     was already output by an event handler)
-            //   undefined:
-            //     means no damage is dealt and the move continues
-            //
-            // basically, these values have the same meanings as they do for event
-            // handlers.
+  //   undefined:
+     //     means no damage is dealt and the move continues
+       //
+     // basically, these values have the same meanings as they do for event
+        // handlers.
 
-            switch (curDamage)
+       switch (curDamage)
             {
                 case FalseIntUndefinedFalseUnion or null:
                 {

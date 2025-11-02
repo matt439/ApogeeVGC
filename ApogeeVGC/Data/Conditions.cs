@@ -1010,6 +1010,330 @@ public record Conditions
                 Name = "strugglerecoil",
                 EffectType = EffectType.Condition,
             },
+            [ConditionId.Nightmare] = new()
+            {
+                Id = ConditionId.Nightmare,
+                Name = "nightmare",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.LockedMove] = new()
+            {
+                Id = ConditionId.LockedMove,
+                Name = "lockedmove",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.PartialTrappingLock] = new()
+            {
+                Id = ConditionId.PartialTrappingLock,
+                Name = "partialtrappinglock",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Yawn] = new()
+            {
+                Id = ConditionId.Yawn,
+                Name = "yawn",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.GastroAcid] = new()
+            {
+                Id = ConditionId.GastroAcid,
+                Name = "gastroacid",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Commanding] = new()
+            {
+                Id = ConditionId.Commanding,
+                Name = "commanding",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Embargo] = new()
+            {
+                Id = ConditionId.Embargo,
+                Name = "embargo",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.MagicRoom] = new()
+            {
+                Id = ConditionId.MagicRoom,
+                Name = "magicroom",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.WonderRoom] = new()
+            {
+                Id = ConditionId.WonderRoom,
+                Name = "wonderroom",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Gravity] = new()
+            {
+                Id = ConditionId.Gravity,
+                Name = "gravity",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Ingrain] = new()
+            {
+                Id = ConditionId.Ingrain,
+                Name = "ingrain",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.SmackDown] = new()
+            {
+                Id = ConditionId.SmackDown,
+                Name = "smackdown",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Roost] = new()
+            {
+                Id = ConditionId.Roost,
+                Name = "roost",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.MagnetRise] = new()
+            {
+                Id = ConditionId.MagnetRise,
+                Name = "magnetrise",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Telekinesis] = new()
+            {
+                Id = ConditionId.Telekinesis,
+                Name = "telekinesis",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.SkyDrop] = new()
+            {
+                Id = ConditionId.SkyDrop,
+                Name = "skydrop",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Fly] = new()
+            {
+                Id = ConditionId.Fly,
+                Name = "fly",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Bounce] = new()
+            {
+                Id = ConditionId.Bounce,
+                Name = "bounce",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Dive] = new()
+            {
+                Id = ConditionId.Dive,
+                Name = "dive",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Dig] = new()
+            {
+                Id = ConditionId.Dig,
+                Name = "dig",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.PhantomForce] = new()
+            {
+                Id = ConditionId.PhantomForce,
+                Name = "phantomforce",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.ShadowForce] = new()
+            {
+                Id = ConditionId.ShadowForce,
+                Name = "shadowforce",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.RevivalBlessing] = new()
+            {
+                Id = ConditionId.RevivalBlessing,
+                Name = "revivalblessing",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.HealBlock] = new()
+            {
+                Id = ConditionId.HealBlock,
+                Name = "healblock",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Trapped] = new()
+            {
+                Id = ConditionId.Trapped,
+                Name = "trapped",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Drain] = new()
+            {
+                Id = ConditionId.Drain,
+                Name = "drain",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.PartiallyTrapped] = new()
+            {
+                Id = ConditionId.PartiallyTrapped,
+                Name = "partiallytrapped",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Powder] = new()
+            {
+                Id = ConditionId.Powder,
+                Name = "powder",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Rest] = new()
+            {
+                Id = ConditionId.Rest,
+                Name = "rest",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Wish] = new()
+            {
+                Id = ConditionId.Wish,
+                Name = "wish",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.TwoTurnMove] = new()
+            {
+                Id = ConditionId.TwoTurnMove,
+                Name = "twoturnmove",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.IceBall] = new()
+            {
+                Id = ConditionId.IceBall,
+                Name = "iceball",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Rollout] = new()
+            {
+                Id = ConditionId.Rollout,
+                Name = "rollout",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Fainted] = new()
+            {
+                Id = ConditionId.Fainted,
+                Name = "fainted",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.SunnyDay] = new()
+            {
+                Id = ConditionId.SunnyDay,
+                Name = "sunnyday",
+                EffectType = EffectType.Weather,
+            },
+            [ConditionId.DesolateLand] = new()
+            {
+                Id = ConditionId.DesolateLand,
+                Name = "desolateland",
+                EffectType = EffectType.Weather,
+            },
+            [ConditionId.PrimordialSea] = new()
+            {
+                Id = ConditionId.PrimordialSea,
+                Name = "primordialsea",
+                EffectType = EffectType.Weather,
+            },
+            [ConditionId.RainDance] = new()
+            {
+                Id = ConditionId.RainDance,
+                Name = "raindance",
+                EffectType = EffectType.Weather,
+            },
+            [ConditionId.Substitute] = new()
+            {
+                Id = ConditionId.Substitute,
+                Name = "substitute",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.ShedTail] = new()
+            {
+                Id = ConditionId.ShedTail,
+                Name = "shedtail",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.DragonCheer] = new()
+            {
+                Id = ConditionId.DragonCheer,
+                Name = "dragoncheer",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.FocusEnergy] = new()
+            {
+                Id = ConditionId.FocusEnergy,
+                Name = "focusenergy",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.LaserFocus] = new()
+            {
+                Id = ConditionId.LaserFocus,
+                Name = "laserfocus",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Detect] = new()
+            {
+                Id = ConditionId.Detect,
+                Name = "detect",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.MaxGuard] = new()
+            {
+                Id = ConditionId.MaxGuard,
+                Name = "maxguard",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.KingsShield] = new()
+            {
+                Id = ConditionId.KingsShield,
+                Name = "kingsshield",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.SpikyShield] = new()
+            {
+                Id = ConditionId.SpikyShield,
+                Name = "spikyshield",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.BanefulBunker] = new()
+            {
+                Id = ConditionId.BanefulBunker,
+                Name = "banefulbunker",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Obstruct] = new()
+            {
+                Id = ConditionId.Obstruct,
+                Name = "obstruct",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.SilkTrap] = new()
+            {
+                Id = ConditionId.SilkTrap,
+                Name = "silktrap",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.BurningBulwark] = new()
+            {
+                Id = ConditionId.BurningBulwark,
+                Name = "burningbulwark",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.QuickGuard] = new()
+            {
+                Id = ConditionId.QuickGuard,
+                Name = "quickguard",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.WideGuard] = new()
+            {
+                Id = ConditionId.WideGuard,
+                Name = "wideguard",
+                EffectType = EffectType.Condition,
+            },
+            [ConditionId.Commanded] = new()
+            {
+                Id = ConditionId.Commanded,
+                Name = "commanded",
+                EffectType = EffectType.Condition,
+            },
         };
     }
 }

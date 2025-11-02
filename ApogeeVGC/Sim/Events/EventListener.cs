@@ -17,7 +17,7 @@ public record EventListener : EventListenerWithoutPriority, IPriorityComparison
                     break;
                 case IntIntFalseUnion iifu:
                     int i = iifu.Value;
-                    if (i is 3 or 6 or 5 or 200 or 201 or 199 or 106 or 103 or int.MaxValue)
+                    if (i is 1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9 or 10 or 26 or 27 or 28 or 103 or 106 or 199 or 200 or 201 or int.MaxValue)
                     {
                         field = i;
                     }
