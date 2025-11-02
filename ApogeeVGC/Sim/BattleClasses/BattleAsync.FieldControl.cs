@@ -139,6 +139,11 @@ public partial class BattleAsync
     {
         foreach (Pokemon pokemon in GetAllActive())
         {
+            // Skip if pokemon or its Side are not properly initialized
+            if (pokemon?.Side == null || pokemon.Side.Foe == null)
+            {
+                continue;
+            }
             pokemon.UpdateSpeed();
         }
     }

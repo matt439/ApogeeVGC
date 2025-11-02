@@ -80,8 +80,10 @@ public class BattleQueue(IBattle battle)
         {
    Choice = actionId,
      Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
- Move = chosenAction.Move ?? Battle.Library.Moves[chosenAction.MoveId],
-       TargetLoc = chosenAction.TargetLoc ?? 0,
+ Move = chosenAction.Move ?? (chosenAction.MoveId != MoveId.None 
+      ? Battle.Library.Moves[chosenAction.MoveId]
+      : throw new InvalidOperationException("Move action requires Move or valid MoveId")),
+    TargetLoc = chosenAction.TargetLoc ?? 0,
       Order = 200, // Default order for moves
                 // OriginalTarget will be set below after we have the full action context
     OriginalTarget = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
