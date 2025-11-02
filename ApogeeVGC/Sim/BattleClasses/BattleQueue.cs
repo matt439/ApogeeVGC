@@ -58,24 +58,34 @@ public class BattleQueue(IBattle battle)
       switch (action)
   {
     case null:
-      throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
+   throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
     // Pass actions return empty list
    case IAction { Choice: ActionId.Pass }:
        return [];
         }
 
-        // Start with the action itself
+    // Start with the action itself
     List<IAction> actions = [];
 
     // Convert ChosenAction to proper IAction type
     IAction currentAction;
     if (action is ChosenAction chosenAction)
     {
-        // Map ChoiceType to ActionId (they should have matching values)
-        ActionId actionId = (ActionId)chosenAction.Choice;
-        
-        currentAction = actionId switch
-        {
+        // Map ChoiceType to ActionId correctly
+        ActionId actionId = chosenAction.Choice switch
+  {
+  ChoiceType.Move => ActionId.Move,
+ ChoiceType.Switch => ActionId.Switch,
+            ChoiceType.InstaSwitch => ActionId.InstaSwitch,
+       ChoiceType.RevivalBlessing => ActionId.RevivalBlessing,
+     ChoiceType.Team => ActionId.Team,
+      ChoiceType.Shift => ActionId.Shift,
+     ChoiceType.Pass => ActionId.Pass,
+            _ => throw new InvalidOperationException($"Unknown ChoiceType: {chosenAction.Choice}"),
+ };
+  
+ currentAction = actionId switch
+   {
           ActionId.Move or ActionId.BeforeTurnMove or ActionId.PriorityChargeMove => new MoveAction
         {
    Choice = actionId,
@@ -87,7 +97,7 @@ public class BattleQueue(IBattle battle)
       Order = 200, // Default order for moves
                 // OriginalTarget will be set below after we have the full action context
     OriginalTarget = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires Pokemon"),
-            },
+ },
      ActionId.Switch or ActionId.InstaSwitch => new SwitchAction
             {
     Choice = actionId,
@@ -336,8 +346,8 @@ Choice = actionId,
     {
         foreach (var resolvedChoices in choices.Select(choice => ResolveAction(choice)))
         {
-List.AddRange(resolvedChoices);
-        }
+       List.AddRange(resolvedChoices);
+     }
     }
 
     public IAction? WillAct()

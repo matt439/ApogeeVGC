@@ -156,7 +156,6 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             }
 
             var choices = new List<string>();
-            Console.WriteLine($"[DEBUG] HandleMoveRequest: Pokemon count = {pokemonArray.Count}, Active count = {activeArray.Count}");
 
             // Build a list of active pokemon in order
             var activePokemon = new List<JsonObject?>();
@@ -208,8 +207,6 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                     moveCount = movesArray.Count;
                 }
 
-                Console.WriteLine($"[DEBUG] Pokemon {i} has {moveCount} moves");
-
                 // Check if can switch
                 bool canSwitch = false;
                 bool trapped = sidePokemon["trapped"]?.GetValue<bool>() ?? false;
@@ -232,8 +229,6 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                         }
                     }
                 }
-
-                Console.WriteLine($"[DEBUG] Can switch: {canSwitch}");
 
                 // Randomly decide to switch or use a move
                 if (canSwitch && (moveCount == 0 || Prng.Random() > MoveWeight))
@@ -278,7 +273,6 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 }
             }
 
-            Console.WriteLine($"[DEBUG] Final choices: {string.Join(", ", choices)}");
             _ = ChooseAsync(string.Join(", ", choices));
         }
         catch (Exception ex)

@@ -26,50 +26,50 @@ public partial class Side
 
         // Step 2: Get the active pokemon index
         int index = GetChoiceIndex();
-        if (index >= Active.Count)
-        {
-            return EmitChoiceError("Can't move: You sent more choices than unfainted Pokémon.");
+    if (index >= Active.Count)
+   {
+       return EmitChoiceError("Can't move: You sent more choices than unfainted Pokémon.");
         }
 
         // Step 3: Determine auto-choose and get pokemon
-        bool autoChoose = moveText == null;
+    bool autoChoose = moveText == null;
         Pokemon pokemon = GetActiveAt(index);
 
-        // Step 4: Parse moveText (name or index)
-        PokemonMoveRequestData request = pokemon.GetMoveRequestData();
+    // Step 4: Parse moveText (name or index)
+      PokemonMoveRequestData request = pokemon.GetMoveRequestData();
         var moveid = MoveId.None;
 
         if (autoChoose) moveText = 1; // Default to first move
 
         // Handle the union type: either MoveId or int
         switch (moveText)
-        {
+      {
             case IntMoveIdIntUnion intUnion:
-                {
-                    // Parse a one-based move index
-                    int moveIndex = intUnion.Value - 1;
-                    if (moveIndex < 0 || moveIndex >= request.Moves.Count)
-                    {
-                        return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
-                    }
-                    moveid = request.Moves[moveIndex].Id;
-                    break;
-                }
+       {
+    // Parse a one-based move index
+        int moveIndex = intUnion.Value - 1;
+          if (moveIndex < 0 || moveIndex >= request.Moves.Count)
+         {
+         return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
+   }
+        moveid = request.Moves[moveIndex].Id;
+        break;
+    }
             case MoveIdMoveIdIntUnion moveIdUnion:
-                {
-                    // Parse a move ID directly
-                    moveid = moveIdUnion.MoveId;
+      {
+      // Parse a move ID directly
+            moveid = moveIdUnion.MoveId;
 
-                    // Find the move in the request
-                    bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
+            // Find the move in the request
+   bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
 
-                    if (!found)
-                    {
-                        return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
-                    }
-                    break;
-                }
-        }
+  if (!found)
+         {
+   return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
+  }
+           break;
+            }
+    }
 
         // Step 5: Get available moves
         var moves = pokemon.GetMoves();
@@ -671,96 +671,96 @@ ChoiceType.Pass => ChoosePass().IsTrue(),
       switch (choiceType)
      {
       case "move":
-            {
-        string original = data;
-      int? targetLoc = null;
-          EventType eventType = EventType.None;
-
-             // Parse modifiers from the end of the string
-   while (true)
-    {
-   // Check for target location (ends with a number like " 1", " -1", " +1")
-      if (System.Text.RegularExpressions.Regex.IsMatch(data, @"\s(?:-|\+)?[1-3]$"))
-        {
-              // Special case: "Conversion 2" should not be confused with targeting
-     if (data.ToShowdownId() != "conversion2")
-     {
-       if (targetLoc != null)
- {
-  return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
-   }
-          targetLoc = int.Parse(data[^2..]);
-    data = data[..^2].Trim();
-      continue;
-     }
-    }
-
-          // Check for event type modifiers
-  if (data.EndsWith(" terastallize") || data.EndsWith(" terastal"))
-        {
-     if (eventType != EventType.None)
- {
-    return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
-      }
-  eventType = EventType.Terastallize;
-    data = data.EndsWith(" terastallize") ? data[..^13] : data[..^9];
- }
-      // Note: Mega, Dynamax, Z-Move are not yet implemented
-      // Ignore them for now to match current implementation
-      else if (data.EndsWith(" mega") || data.EndsWith(" megax") || data.EndsWith(" megay"))
       {
-  // Mega evolution not implemented - ignore modifier but warn
-         Console.WriteLine($"Warning: Mega evolution not implemented, ignoring modifier");
-     int trimLength = data.EndsWith(" megax") || data.EndsWith(" megay") ? 6 : 5;
-      data = data[..^trimLength];
-      }
-    else if (data.EndsWith(" zmove") || data.EndsWith(" ultra"))
+  string original = data;
+                int? targetLoc = null;
+         EventType eventType = EventType.None;
+
+    // Parse modifiers from the end of the string
+     while (true)
+  {
+             // Check for target location (ends with a number like " 1", " -1", " +1")
+   if (System.Text.RegularExpressions.Regex.IsMatch(data, @"\s(?:-|\+)?[1-3]$"))
 {
-     // Z-Move not implemented - ignore modifier but warn
-     Console.WriteLine($"Warning: Z-Move not implemented, ignoring modifier");
-     int trimLength = data.EndsWith(" zmove") ? 6 : 6;
-        data = data[..^trimLength];
-       }
-else if (data.EndsWith(" dynamax") || data.EndsWith(" gigantamax") || data.EndsWith(" max"))
-       {
-           // Dynamax not implemented - ignore modifier but warn
-          Console.WriteLine($"Warning: Dynamax not implemented, ignoring modifier");
-  int trimLength = data.EndsWith(" gigantamax") ? 11 : (data.EndsWith(" dynamax") ? 8 : 4);
-   data = data[..^trimLength];
+             // Special case: "Conversion 2" should not be confused with targeting
+ if (data.ToShowdownId() != "conversion2")
+         {
+   if (targetLoc != null)
+         {
+         return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
   }
-        else
-      {
- break;
-     }
+        targetLoc = int.Parse(data[^2..]);
+            data = data[..^2].Trim();
+            continue;
+  }
         }
 
-    // Convert move identifier (number or name) to MoveIdIntUnion
-      MoveIdIntUnion? moveText = null;
- if (int.TryParse(data, out int moveSlot))
+             // Check for event type modifiers
+       if (data.EndsWith(" terastallize") || data.EndsWith(" terastal"))
    {
-     // It's a move slot number (1-based)
-       moveText = new IntMoveIdIntUnion(moveSlot);
-}
-      else if (!string.IsNullOrEmpty(data))
-    {
-          // It's a move name/ID - convert to MoveId
-     string moveIdStr = data.ToShowdownId();
-   if (Enum.TryParse<MoveId>(moveIdStr, true, out MoveId moveId))
-         {
-  moveText = new MoveIdMoveIdIntUnion(moveId);
-   }
-else
-  {
- return EmitChoiceError($"Can't move: Invalid move \"{data}\"");
-    }
-      }
-
-  if (!ChooseMove(moveText, targetLoc ?? 0, eventType))
+         if (eventType != EventType.None)
         {
-       return false;
-         }
-             break;
-       }
+         return EmitChoiceError($"Conflicting arguments for \"move\": {original}");
+          }
+ eventType = EventType.Terastallize;
+          data = data.EndsWith(" terastallize") ? data[..^13] : data[..^9];
+      }
+        // Note: Mega, Dynamax, Z-Move are not yet implemented
+          // Ignore them for now to match current implementation
+    else if (data.EndsWith(" mega") || data.EndsWith(" megax") || data.EndsWith(" megay"))
+        {
+      // Mega evolution not implemented - ignore modifier but warn
+        Console.WriteLine($"Warning: Mega evolution not implemented, ignoring modifier");
+       int trimLength = data.EndsWith(" megax") || data.EndsWith(" megay") ? 6 : 5;
+        data = data[..^trimLength];
+            }
+      else if (data.EndsWith(" zmove") || data.EndsWith(" ultra"))
+    {
+      // Z-Move not implemented - ignore modifier but warn
+        Console.WriteLine($"Warning: Z-Move not implemented, ignoring modifier");
+      int trimLength = data.EndsWith(" zmove") ? 6 : 6;
+           data = data[..^trimLength];
+  }
+    else if (data.EndsWith(" dynamax") || data.EndsWith(" gigantamax") || data.EndsWith(" max"))
+     {
+           // Dynamax not implemented - ignore modifier but warn
+   Console.WriteLine($"Warning: Dynamax not implemented, ignoring modifier");
+           int trimLength = data.EndsWith(" gigantamax") ? 11 : (data.EndsWith(" dynamax") ? 8 : 4);
+        data = data[..^trimLength];
+      }
+      else
+        {
+      break;
+           }
+        }
+
+         // Convert move identifier (number or name) to MoveIdIntUnion
+                MoveIdIntUnion? moveText = null;
+        if (int.TryParse(data, out int moveSlot))
+  {
+        // It's a move slot number (1-based)
+  moveText = new IntMoveIdIntUnion(moveSlot);
+     }
+                else if (!string.IsNullOrEmpty(data))
+                {
+           // It's a move name/ID - convert to MoveId
+                string moveIdStr = data.ToShowdownId();
+                if (Enum.TryParse<MoveId>(moveIdStr, true, out MoveId moveId))
+   {
+  moveText = new MoveIdMoveIdIntUnion(moveId);
+          }
+ else
+     {
+        return EmitChoiceError($"Can't move: Invalid move \"{data}\"");
+      }
+    }
+
+         if (!ChooseMove(moveText, targetLoc ?? 0, eventType))
+      {
+          return false;
+          }
+   break;
+  }
 
   case "switch":
       {
