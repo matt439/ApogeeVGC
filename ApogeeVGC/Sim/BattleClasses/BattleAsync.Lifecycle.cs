@@ -262,8 +262,12 @@ public partial class BattleAsync
                         // Skip if this is the source's current ability (already checked above)
                         if (abilityId == source.Ability) continue;
 
-                        // Get the ability
-                        Ability ability = Library.Abilities[abilityId.Value];
+                        // Try to get the ability - skip if not implemented
+                        if (!Library.Abilities.TryGetValue(abilityId.Value, out Ability? ability))
+                        {
+                            // Ability not yet implemented, skip it
+                            continue;
+                        }
 
                         // Check if ability is banned
                         if (RuleTable.Has(ability.Id)) continue;

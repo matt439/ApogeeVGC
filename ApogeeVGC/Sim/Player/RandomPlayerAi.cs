@@ -107,9 +107,12 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                     string conditionStr = mon["condition"]?.GetValue<string>() ?? "0/0";
                     bool isFainted = conditionStr.Contains("fnt") || conditionStr.StartsWith("0 ");
 
-                    if (j > forceSwitchArray.Count && // not active slot
-                        !chosen.Contains(j) && // not already chosen
-                        !isFainted) // not fainted
+                    Console.WriteLine($"[DEBUG] Pokemon {j}: active={isActive}, condition='{conditionStr}', isFainted={isFainted}");
+
+                    // Can switch if: not active, not already chosen, and not fainted
+                    if (!isActive && 
+                        !chosen.Contains(j) && 
+                          !isFainted)
                     {
                         canSwitch.Add(j);
                     }
