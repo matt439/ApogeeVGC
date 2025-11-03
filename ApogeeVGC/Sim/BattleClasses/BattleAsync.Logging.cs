@@ -195,11 +195,12 @@ public partial class BattleAsync
     public void SendUpdates()
     {
         Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
-     // Don't send if there are no new log entries
+        Console.WriteLine($"[SendUpdates] Stack trace: {Environment.StackTrace}");
+        // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count)
-      {
-            return;
-        }
+        {
+          return;
+     }
 
 // Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();

@@ -187,7 +187,7 @@ public partial class Pokemon
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        return SetStatus(Status == ConditionId.None ? status : ConditionId.None, source, sourceEffect);
+        return SetStatus(Status != ConditionId.None ? Status : status, source, sourceEffect);
     }
 
     public bool CureStatus(bool silent = false)

@@ -122,9 +122,14 @@ public class BattleStream : IDisposable
                 }
 
                 // Send battle updates after processing
-                Console.WriteLine(
-                    $"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
-                Battle?.SendUpdates();
+                 Console.WriteLine(
+  $"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
+ // Only send updates if the battle has started
+            // This prevents duplicate initialization messages
+           if (Battle is BattleAsync battleAsync && battleAsync.Started)
+       {
+    battleAsync.SendUpdates();
+  }
             }
 
             Console.WriteLine("[BattleStream] Input completed");
@@ -252,6 +257,9 @@ public class BattleStream : IDisposable
                 }
 
                 Battle.SetPlayer(slot, playerOptions);
+                
+                // Don't send updates here - let the Start() method handle it
+                  // after all players are set
                 break;
             }
 
