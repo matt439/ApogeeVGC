@@ -205,10 +205,12 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
 
                 // Count available moves
                 int moveCount = 0;
-                if (activeData["moves"] is JsonArray movesArray)
-                {
-                    moveCount = movesArray.Count;
-                }
+       JsonArray? movesArrayForCount = null;
+          if (activeData["moves"] is JsonArray ma)
+          {
+    movesArrayForCount = ma;
+         moveCount = ma.Count;
+             }
 
                 // Check if can switch
                 bool canSwitch = false;
@@ -266,15 +268,80 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 }
                 else if (moveCount > 0)
                 {
-                    // Choose a random move slot (1-based)
-                    int moveSlot = Prng.Random(1, moveCount + 1);
-                    choices.Add($"move {moveSlot}");
+                    // Get moves array to check targets - reuse the one from counting
+      // Choose a random move slot (1-based)
+      int moveSlot = Prng.Random(1, moveCount + 1);
+      string moveChoice = $"move {moveSlot}";
+        
+          Console.WriteLine($"[RandomPlayerAi] DEBUG: activeArray.Count={activeArray.Count}, movesArrayForCount null? {movesArrayForCount == null}");
+      
+          // Add target specifier for doubles battles
+          if (activeArray.Count > 1 && movesArrayForCount != null)
+     {
+  Console.WriteLine($"[RandomPlayerAi] DEBUG: In doubles targeting block");
+    int moveIndex = moveSlot - 1;
+        if (moveIndex < movesArrayForCount.Count && movesArrayForCount[moveIndex] is JsonObject moveData)
+   {
+     string? target = moveData["target"]?.GetValue<string>();
+Console.WriteLine($"[RandomPlayerAi] DEBUG: Move {moveSlot} has target={target}");
+     
+        // Check if ally is available
+     bool hasAlly = false;
+if (i == 0 && activePokemon.Count > 1 && activePokemon[1] != null)
+ {
+      string allyCond = activePokemon[1]!["condition"]?.GetValue<string>() ?? "0/0";
+    hasAlly = !allyCond.Contains("fnt") && !allyCond.StartsWith("0 ");
+            }
+      else if (i == 1 && activePokemon.Count > 0 && activePokemon[0] != null)
+   {
+       string allyCond = activePokemon[0]!["condition"]?.GetValue<string>() ?? "0/0";
+      hasAlly = !allyCond.Contains("fnt") && !allyCond.StartsWith("0 ");
+       }
+  
+          Console.WriteLine($"[RandomPlayerAi] DEBUG: hasAlly={hasAlly}");
+      
+ // Add target based on move target type
+       if (target == "normal" || target == "any" || target == "adjacentFoe" || target == "allAdjacentFoes")
+      {
+         // Target a random foe (1 or 2)
+    int foeTarget = Prng.Random(1, 3);
+   moveChoice += $" {foeTarget}";
+            Console.WriteLine($"[RandomPlayerAi] DEBUG: Added foe target {foeTarget}");
+}
+     else if (target == "adjacentAlly")
+     {
+    // Target ally
+  int allySlot = (i ^ 1) + 1; // XOR to get other slot
+      moveChoice += $" -{allySlot}";
+    Console.WriteLine($"[RandomPlayerAi] DEBUG: Added ally target -{allySlot}");
+        }
+  else if (target == "adjacentAllyOrSelf")
+   {
+ if (hasAlly)
+     {
+          // Randomly choose self or ally
+            int allyTarget = Prng.Random(1, 3);
+   moveChoice += $" -{allyTarget}";
+      Console.WriteLine($"[RandomPlayerAi] DEBUG: Added allyOrSelf target -{allyTarget}");
+    }
+   else
+   {
+// Target self
+ moveChoice += $" -{i + 1}";
+       Console.WriteLine($"[RandomPlayerAi] DEBUG: Added self target -{i + 1}");
+         }
+  }
+   }
+    }
+    
+ Console.WriteLine($"[RandomPlayerAi] Final move choice: {moveChoice}");
+   choices.Add(moveChoice);
                 }
                 else
-                {
-                    choices.Add("pass");
-                }
-            }
+ {
+         choices.Add("pass");
+       }
+   }
 
             _ = ChooseAsync(string.Join(", ", choices));
         }

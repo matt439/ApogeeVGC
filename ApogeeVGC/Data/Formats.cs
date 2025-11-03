@@ -29,6 +29,7 @@ public record Formats
         {
             Name = "[Gen 9] Custom Game",
             FormatId = FormatId.Gen9CustomGame,
+            GameType = GameType.Doubles,
             Ruleset = [RuleId.TeamPreview, RuleId.StandardOts],
             Banlist = [],
             OnTeamPreview = battle =>

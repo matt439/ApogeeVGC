@@ -170,7 +170,7 @@ public partial class Pokemon
             moves.Add(new PokemonMoveData
             {
                 Move = moveObject,
-                Target = null, // Target is not set in this context
+                Target = moveObject.Target,
                 Disabled = disabledUnion,
                 DisabledSource = moveSlot.DisabledSource,
             });
