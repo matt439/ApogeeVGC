@@ -57,15 +57,29 @@ public partial class Pokemon
         // Convert move slots to Move objects
         var moves = moveSource.Select(moveSlot => Battle.Library.Moves[moveSlot.Id]).ToList();
 
-        if (GetHealth().Secret is not SecretConditionId secretCondition)
+        // Format the condition string according to Pokemon Showdown format
+        string condition;
+        if (Fainted || Hp <= 0)
         {
-            secretCondition = new SecretConditionId(ConditionId.None);
+            condition = "0 fnt";
+        }
+        else
+        {
+            // Format: "HP/MaxHP" or "HP/MaxHP status"
+            condition = $"{Hp}/{BaseMaxHp}";
+
+            // Add status condition if present
+            if (Status != ConditionId.None)
+            {
+                Condition statusCondition = Battle.Library.Conditions[Status];
+                condition += $" {statusCondition.Name}";
+            }
         }
 
         // Create the base entry
         var entry = new PokemonSwitchRequestData
         {
-            Condition = secretCondition.Value,
+            Condition = condition,
             Active = Position < Side.Active.Count,
             Stats = stats,
             Moves = moves,

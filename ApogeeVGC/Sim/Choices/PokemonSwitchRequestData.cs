@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -11,10 +10,10 @@ public record PokemonSwitchRequestData
 {
     //public required string Ident { get; init; }
     //public required string Details { get; init; }
-    public ConditionId Condition { get; init; }
+    public required string Condition { get; init; }
     public bool Active { get; init; }
     public required StatsTable Stats { get; init; }
-  public required IReadOnlyList<Move> Moves { get; init; }
+    public required IReadOnlyList<Move> Moves { get; init; }
     public IReadOnlyList<string> MoveNames => Moves.Select(m => m.Name).ToList();
     public required Ability BaseAbility { get; init; }
     public string BaseAbilityName => BaseAbility.Name;
