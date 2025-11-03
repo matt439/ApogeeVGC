@@ -60,4 +60,18 @@ public static class ShowdownIdTools
     {
         return pokeballId.ToString().ToShowdownId();
     }
+
+    /// <summary>
+    /// Converts MoveTarget enum to Pokemon Showdown format (camelCase).
+    /// Examples: Normal -> "normal", AllAdjacentFoes -> "allAdjacentFoes"
+    /// </summary>
+    public static string ToShowdownId(this MoveTarget moveTarget)
+    {
+        string str = moveTarget.ToString();
+        if (string.IsNullOrEmpty(str))
+            return str;
+
+        // Convert PascalCase to camelCase (first letter lowercase)
+        return char.ToLowerInvariant(str[0]) + str[1..];
+    }
 }

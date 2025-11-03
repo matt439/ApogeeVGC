@@ -69,7 +69,7 @@ public static partial class State
                     ["id"] = moveData.Id.ToString().ToLower(),
                     ["pp"] = moveData.Pp,
                     ["maxpp"] = moveData.MaxPp,
-                    ["target"] = moveData.Target?.ToString().ToLower(),
+                    ["target"] = moveData.Target?.ToShowdownId(),
                     ["disabled"] = SerializeWithRefs(moveData.Disabled, battle)
                 };
 

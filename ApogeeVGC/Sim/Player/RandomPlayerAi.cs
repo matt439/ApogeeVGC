@@ -205,12 +205,18 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
 
                 // Count available moves
                 int moveCount = 0;
-       JsonArray? movesArrayForCount = null;
-          if (activeData["moves"] is JsonArray ma)
-          {
-    movesArrayForCount = ma;
-         moveCount = ma.Count;
-             }
+                JsonArray? movesArrayForCount = null;
+                if (activeData["moves"] is JsonArray ma)
+                {
+                    movesArrayForCount = ma;
+                    moveCount = ma.Count;
+                }
+
+                // DEBUG: Print the first move's data
+                if (movesArrayForCount != null && movesArrayForCount.Count > 0 && movesArrayForCount[0] is JsonObject firstMove)
+                {
+                    Console.WriteLine($"[RandomPlayerAi] DEBUG: First move JSON: {firstMove.ToJsonString()}");
+                }
 
                 // Check if can switch
                 bool canSwitch = false;
