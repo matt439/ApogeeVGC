@@ -46,6 +46,9 @@ public partial class BattleAsync
 
         if (DisplayUi)
         {
+            // Log game type
+            Add("gametype", GameType.ToString().ToLowerInvariant());
+
             // Log generation
             Add("gen", Gen);
 

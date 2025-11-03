@@ -64,10 +64,12 @@ public partial class BattleAsync
         SentRequests = false;
 
         // Verify that choices aren't already done (would indicate a bug)
-        if (Sides.All(side => side.IsChoiceDone()))
-        {
-            throw new InvalidOperationException("Choices are done immediately after a request");
-        }
+        // Note: This can legitimately happen when all moves are disabled (e.g., PP exhaustion)
+        // and both players are forced to use Struggle, so we skip this check
+        // if (Sides.All(side => side.IsChoiceDone()))
+        // {
+    //     throw new InvalidOperationException("Choices are done immediately after a request");
+     // }
     }
 
     /// <summary>

@@ -19,6 +19,7 @@ namespace ApogeeVGC.Sim.FormatClasses;
 public enum FormatId
 {
     Gen9Ou,
+    Gen9CustomGame,
     EmptyEffect,
 }
 
@@ -33,6 +34,8 @@ public enum FormatEffectType
 public enum RuleId
 {
     Standard,
+    TeamPreview,
+    StandardOts,
     OverflowStatMod,
     EndlessBattleClause,
 }

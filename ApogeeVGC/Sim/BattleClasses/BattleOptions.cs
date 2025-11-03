@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.FormatClasses;
+﻿using System.Text.Json.Serialization;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -6,7 +7,11 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public record BattleOptions
 {
     public Format? Format { get; init; }
+
+    [JsonConverter(typeof(FormatIdJsonConverter))]
+    [JsonPropertyName("formatid")]
     public FormatId Id { get; init; }
+    
     public Action<SendType, IEnumerable<string>>? Send { get; set; } // Output callback
     public Prng? Prng { get; init; } // PRNG override (you usually don't need this, just pass a seed)
     public PrngSeed? Seed { get; init; } // PRNG seed
