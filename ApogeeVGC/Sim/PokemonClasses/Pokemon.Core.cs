@@ -199,6 +199,20 @@ public partial class Pokemon : IPriorityComparison, IDisposable
             );
         BaseMoveSlots = baseMoveSlots;
 
+        // Initialize MoveSlots from BaseMoveSlots (deep copy to allow independent modification)
+      MoveSlots = baseMoveSlots.Select(moveSlot => new MoveSlot
+        {
+   Id = moveSlot.Id,
+      Move = moveSlot.Move,
+  Pp = moveSlot.Pp,
+            MaxPp = moveSlot.MaxPp,
+        Target = moveSlot.Target,
+   Disabled = false, // Always start with moves enabled
+      DisabledSource = moveSlot.DisabledSource,
+  Used = moveSlot.Used,
+        Virtual = moveSlot.Virtual,
+        }).ToList();
+
         // Position = 0;
         Status = ConditionId.None;
         StatusState = battle.InitEffectState();

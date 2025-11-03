@@ -517,9 +517,25 @@ public partial class Pokemon
             Evasion = 0,
         };
 
-        MoveSlots = BaseMoveSlots.ToList();
+        Console.WriteLine($"[ClearVolatile] {Name}: BaseMoveSlots count = {BaseMoveSlots.Count}, first move = {(BaseMoveSlots.Count > 0 ? BaseMoveSlots[0].Move.ToString() : "none")}");
+        Console.WriteLine($"[ClearVolatile] {Name}: BaseMoveSlots[0].Disabled = {BaseMoveSlots[0].Disabled}");
+   
+        MoveSlots = BaseMoveSlots.Select(moveSlot => new MoveSlot
+  {
+       Id = moveSlot.Id,
+ Move = moveSlot.Move,
+    Pp = moveSlot.Pp,
+      MaxPp = moveSlot.MaxPp,
+   Target = moveSlot.Target,
+       Disabled = false, // Always start with moves enabled
+ DisabledSource = null, // Clear disabled source on reset
+          Used = false, // Reset used flag
+  Virtual = moveSlot.Virtual,
+}).ToList();
 
-        Transformed = false;
+   Console.WriteLine($"[ClearVolatile] {Name}: After copy, MoveSlots count = {MoveSlots.Count}, MoveSlots[0].Disabled = {MoveSlots[0].Disabled}");
+
+Transformed = false;
         Ability = BaseAbility;
         if (CanTerastallize is FalseMoveTypeFalseUnion)
         {
