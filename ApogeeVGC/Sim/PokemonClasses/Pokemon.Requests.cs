@@ -137,8 +137,6 @@ public partial class Pokemon
     /// </summary>
     public PokemonMoveRequestData GetMoveRequestData()
     {
-        Console.WriteLine($"[GetMoveRequestData] {Name}: MoveSlots[0].Disabled = {MoveSlots[0].Disabled}");
-
         // Get locked move if Pokemon is not maybe-locked
         var lockedMove = MaybeLocked == true ? null : GetLockedMove();
 

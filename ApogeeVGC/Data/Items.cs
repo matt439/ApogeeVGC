@@ -117,12 +117,18 @@ public record Items
                 Fling = new FlingData { BasePower = 80 },
                 OnModifySpDPriority = 1,
                 OnModifySpD = (battle, _, _, _, _) => battle.ChainModify(1.5),
-                OnDisableMove = (_, pokemon) =>
+                OnDisableMove = (battle, pokemon) =>
                 {
+                    // Only disable moves if this Pokemon actually has Assault Vest
+                    if (pokemon.Item != ItemId.AssaultVest)
+                    {
+                        return;
+                    }
+                     
                     foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
-                             let move = _library.Moves[moveSlot.Move]
-                             where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
-                             select moveSlot)
+                              let move = _library.Moves[moveSlot.Move]
+                              where move.Category == MoveCategory.Status && move.Id != MoveId.MeFirst
+                              select moveSlot)
                     {
                         pokemon.DisableMove(moveSlot.Id);
                     }

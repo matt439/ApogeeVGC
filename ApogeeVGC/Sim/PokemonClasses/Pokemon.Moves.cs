@@ -59,8 +59,6 @@ public partial class Pokemon
     /// <returns>List of available moves with their current state</returns>
     public List<PokemonMoveData> GetMoves(MoveId? lockedMove = null, bool restrictData = false)
     {
-        Console.WriteLine($"[GetMoves] {Name}: MoveSlots count = {MoveSlots.Count}, lockedMove = {lockedMove}");
-
         // Handle locked move cases
         if (lockedMove is not null)
         {
@@ -138,14 +136,11 @@ public partial class Pokemon
             // Determine if move is disabled
             BoolHiddenUnion disabled = moveSlot.Disabled;
 
-            Console.WriteLine($"[GetMoves] {Name}: Move {moveSlot.Move}, disabled initial value = {disabled}, PP = {moveSlot.Pp}");
-
             // Skip Dynamax handling as requested
 
             // Check if move is out of PP (unless locked into partial trapping move)
             if (moveSlot.Pp <= 0 && !Volatiles.ContainsKey(ConditionId.PartialTrappingLock))
             {
-                Console.WriteLine($"[GetMoves] {Name}: Move {moveSlot.Move} has PP={moveSlot.Pp}, marking as disabled");
                 disabled = true;
             }
 
@@ -181,7 +176,6 @@ public partial class Pokemon
             });
         }
 
-        Console.WriteLine($"[GetMoves] {Name}: Returning {moves.Count} moves, hasValidMove = {hasValidMove}");
         return hasValidMove ? moves : [];
     }
 
@@ -283,8 +277,8 @@ public partial class Pokemon
         }
 
         foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
-                     moveSlot.Id != moveId && moveSlot.Disabled != true))
-        {
+             moveSlot.Id == moveId && moveSlot.Disabled != true))
+     {
             moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
             moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
         }
