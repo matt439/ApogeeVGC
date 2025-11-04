@@ -236,18 +236,19 @@ if (hyphenIndex > 0)
         Volatiles = [];
 
         BaseStoredStats = new StatsTable(); // Will be initialized in SetSpecies
-        StoredStats = new StatsExceptHpTable { Atk = 0, Def = 0, SpA = 0, SpD = 0, Spe = 0 };
-        Boosts = new BoostsTable
+     StoredStats = new StatsExceptHpTable { Atk = 0, Def = 0, SpA = 0, SpD = 0, Spe = 0 };
+     Boosts = new BoostsTable
         {
-            Atk = 0,
-            Def = 0,
-            SpA = 0,
-            SpD = 0,
-            Spe = 0,
+     Atk = 0,
+        Def = 0,
+          SpA = 0,
+ SpD = 0,
+    Spe = 0,
             Accuracy = 0,
-            Evasion = 0,
+   Evasion = 0,
         };
 
+        BaseAbility = set.Ability;
         Ability = BaseAbility;
         AbilityState = battle.InitEffectState(Ability, null, this);
 
