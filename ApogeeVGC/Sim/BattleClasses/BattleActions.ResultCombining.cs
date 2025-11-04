@@ -18,6 +18,7 @@ public partial class BattleActions
     /// Used to aggregate results across multiple targets.
     /// Priority order (highest to lowest): undefined, string (success), null, boolean, number.
     /// When both values are numbers, they are summed.
+    /// Special case: If left is truthy and right is falsy (but not 0), return left.
     /// </summary>
     /// <param name="left">First result value</param>
     /// <param name="right">Second result value</param>
@@ -36,18 +37,19 @@ public partial class BattleActions
 
         if (right == null) return left;
 
+        // Special case: If left is truthy and right is falsy (but not 0), return left
+        // This ensures that successful damage (integer) is preserved even if a secondary effect fails
+        // For example: Volt Switch deals damage (int), but can't switch (false) → keep the damage
+        if (left.IsTruthy() && !right.IsTruthy() && !right.IsZero())
+        {
+            return left;
+        }
+
         int leftPriority = GetBattleActionsPriority(left);
         int rightPriority = GetBattleActionsPriority(right);
 
         // If left has higher priority, return it
         if (leftPriority < rightPriority)
-        {
-            return left;
-        }
-
-        // If left is truthy and right is falsy (but not 0)
-        // In TS: left && !right && right !== 0
-        if (left.IsTruthy() && !right.IsTruthy() && !right.IsZero())
         {
             return left;
         }
