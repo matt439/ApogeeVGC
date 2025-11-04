@@ -388,8 +388,8 @@ public partial class BattleAsync
     {
         int? pokemonOriginalHp = action switch
         {
-            PokemonAction pa => pa.Pokemon.Hp,
-            MoveAction ma => ma.Pokemon.Hp,
+            PokemonAction pa when pa.Pokemon != null => pa.Pokemon.Hp,
+        MoveAction ma => ma.Pokemon.Hp,
             SwitchAction sa => sa.Pokemon.Hp,
             _ => null,
         };

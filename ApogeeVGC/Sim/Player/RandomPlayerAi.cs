@@ -275,13 +275,58 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
                 else if (moveCount > 0)
                 {
                     // Get moves array to check targets - reuse the one from counting
-      // Choose a random move slot (1-based)
-      int moveSlot = Prng.Random(1, moveCount + 1);
-      string moveChoice = $"move {moveSlot}";
-        
-          Console.WriteLine($"[RandomPlayerAi] DEBUG: activeArray.Count={activeArray.Count}, movesArrayForCount null? {movesArrayForCount == null}");
-      
-          // Add target specifier for doubles battles
+          // Get list of available (non-disabled) moves
+         var availableMoves = new List<int>();
+        for (int m = 0; m < moveCount; m++)
+        {
+          if (movesArrayForCount![m] is JsonObject moveData)
+          {
+  bool isDisabled = moveData["disabled"]?.GetValue<bool>() ?? false;
+      if (!isDisabled)
+            {
+            availableMoves.Add(m + 1); // 1-based move slot
+                   }
+}
+   }
+
+                if (availableMoves.Count == 0)
+ {
+         // No available moves - try to switch or pass
+       if (canSwitch)
+                 {
+       var switchTargets = new List<int>();
+         for (int j = 1; j <= pokemonArray.Count; j++)
+         {
+       int idx = j - 1;
+         if (pokemonArray[idx] is JsonObject mon)
+         {
+        bool active = mon["active"]?.GetValue<bool>() ?? false;
+     string cond = mon["condition"]?.GetValue<string>() ?? "0/0";
+      bool fainted = cond.Contains("fnt") || cond.StartsWith("0 ");
+
+  if (!active && !fainted)
+    {
+      switchTargets.Add(j);
+  }
+               }
+         }
+
+     if (switchTargets.Count > 0)
+     {
+              int target = Prng.Sample(switchTargets);
+            choices.Add($"switch {target}");
+  continue;
+       }
+             }
+       choices.Add("pass");
+            continue;
+  }
+
+     // Choose a random available move slot
+          int moveSlot = Prng.Sample(availableMoves);
+         string moveChoice = $"move {moveSlot}";
+  
+         // Add target specifier for doubles battles
           if (activeArray.Count > 1 && movesArrayForCount != null)
      {
   Console.WriteLine($"[RandomPlayerAi] DEBUG: In doubles targeting block");

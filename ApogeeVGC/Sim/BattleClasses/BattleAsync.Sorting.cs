@@ -204,10 +204,10 @@ public partial class BattleAsync
         // The other Action types have constant speed values so do not need to be set.
         switch (action)
         {
-            case SwitchAction switchAction:
+            case SwitchAction switchAction when switchAction.Pokemon != null:
                 switchAction.Speed = switchAction.Pokemon.GetActionSpeed();
                 break;
-            case PokemonAction pokemonAction:
+            case PokemonAction pokemonAction when pokemonAction.Pokemon != null:
                 pokemonAction.Speed = pokemonAction.Pokemon.GetActionSpeed();
                 break;
         }
