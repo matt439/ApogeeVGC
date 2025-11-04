@@ -19,25 +19,26 @@ public class Driver
 
         // Battle specification
         var spec = new
-        {
-            formatid = "gen9customgame",
-        };
+     {
+   formatid = "gen9customgame",
+        seed = new[] { 0x71A, 0x462, 0, 0 } // 1818, 1122
+     };
 
         PlayerOptions p1Spec = new()
         {
-            Name = "Bot 1",
-            Team = TeamGenerator.GenerateTestTeam(Library),
-        };
+ Name = "Bot 1",
+   Team = TeamGenerator.GenerateTestTeam(Library),
+     };
 
-        PlayerOptions p2Spec = new()
-        {
+   PlayerOptions p2Spec = new()
+     {
             Name = "Bot 2",
-            Team = TeamGenerator.GenerateTestTeam(Library),
+       Team = TeamGenerator.GenerateTestTeam(Library),
         };
 
-        // Fixed seeds for reproducible results
+ // Fixed seeds for reproducible results
         var p1Seed = new PrngSeed(1818);
-        var p2Seed = new PrngSeed(1122);
+    var p2Seed = new PrngSeed(1122);
 
         var p1 = new RandomPlayerAi(streams.P1, seed: p1Seed);
         var p2 = new RandomPlayerAi(streams.P2, seed: p2Seed);

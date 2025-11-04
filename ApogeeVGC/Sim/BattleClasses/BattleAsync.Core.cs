@@ -23,18 +23,7 @@ public partial class BattleAsync : IBattle, IDisposable
     public Format Format { get; init; }
     public EffectState FormatData { get; init; }
     public GameType GameType { get; init; }
-    public int ActivePerHalf
-    {
-        get;
-        init
-        {
-            if (value is not 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(ActivePerHalf), "ActivePerHalf must be 1.");
-            }
-            field = value;
-        }
-    }
+    public int ActivePerHalf { get; init; }
     public Field Field { get; init; }
 
     public List<Side> Sides
@@ -144,8 +133,16 @@ public partial class BattleAsync : IBattle, IDisposable
         side2.Foe = side1;
         
         Sides = [side1, side2];
+ 
+        // Set ActivePerHalf based on game type
+        ActivePerHalf = GameType switch
+        {
+            GameType.Singles => 1,
+      GameType.Doubles => 2,
+            // GameType.Triples => 3, // Not yet implemented
+    _ => 1
+        };
         
-        ActivePerHalf = 1;
         Prng = options.Prng ?? new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
 

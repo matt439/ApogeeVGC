@@ -307,38 +307,41 @@ if (i == 0 && activePokemon.Count > 1 && activePokemon[1] != null)
           Console.WriteLine($"[RandomPlayerAi] DEBUG: hasAlly={hasAlly}");
       
  // Add target based on move target type
-       if (target == "normal" || target == "any" || target == "adjacentFoe" || target == "allAdjacentFoes")
- {
-         // Target a random foe (1 or 2)
-    int foeTarget = Prng.Random(1, 3);
-   moveChoice += $" {foeTarget}";
-     Console.WriteLine($"[RandomPlayerAi] DEBUG: Added foe target {foeTarget}");
-}
-     else if (target == "adjacentAlly")
-  {
-    // Target ally
-  int allySlot = (i ^ 1) + 1; // XOR to get other slot
-      moveChoice += $" -{allySlot}";
-    Console.WriteLine($"[RandomPlayerAi] DEBUG: Added ally target -{allySlot}");
- }
-  else if (target == "adjacentAllyOrSelf")
-   {
- if (hasAlly)
-     {
-          // Randomly choose self or ally
-      int allyTarget = Prng.Random(1, 3);
-   moveChoice += $" -{allyTarget}";
-      Console.WriteLine($"[RandomPlayerAi] DEBUG: Added allyOrSelf target -{allyTarget}");
-    }
-   else
-   {
-// Target self
- moveChoice += $" -{i + 1}";
-       Console.WriteLine($"[RandomPlayerAi] DEBUG: Added self target -{i + 1}");
-    }
-  }
+    // Only add targets for moves that require explicit targeting in doubles
+        if (target == "normal" || target == "any")
+      {
+              // Target a random foe (1 or 2)
+             int foeTarget = Prng.Random(1, 3);
+       moveChoice += $" {foeTarget}";
+    Console.WriteLine($"[RandomPlayerAi] DEBUG: Added foe target {foeTarget}");
    }
-    }
+    else if (target == "adjacentAlly")
+      {
+     // Target ally
+    int allySlot = (i ^ 1) + 1; // XOR to get other slot
+       moveChoice += $" -{allySlot}";
+       Console.WriteLine($"[RandomPlayerAi] DEBUG: Added ally target -{allySlot}");
+        }
+     else if (target == "adjacentAllyOrSelf")
+ {
+           if (hasAlly)
+    {
+   // Randomly choose self or ally
+            int allyTarget = Prng.Random(1, 3);
+       moveChoice += $" -{allyTarget}";
+        Console.WriteLine($"[RandomPlayerAi] DEBUG: Added allyOrSelf target -{allyTarget}");
+ }
+    else
+        {
+                // Target self
+          moveChoice += $" -{i + 1}";
+       Console.WriteLine($"[RandomPlayerAi] DEBUG: Added self target -{i + 1}");
+         }
+          }
+    // Note: Moves like "allAdjacentFoes", "allAdjacent", "all", "allySide", "foeSide", "self", etc.
+     // do NOT require explicit targeting - they automatically hit all valid targets
+  }
+     }
     
  Console.WriteLine($"[RandomPlayerAi] Final move choice: {moveChoice}");
    choices.Add(moveChoice);
