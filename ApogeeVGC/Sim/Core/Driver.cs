@@ -19,10 +19,10 @@ public class Driver
 
         // Battle specification
         var spec = new
-     {
-   formatid = "gen9customgame",
-        seed = new[] { 0x71A, 0x462, 0, 0 } // 1818, 1122
-     };
+        {
+            formatid = "gen9vgc2024regfmasterball",
+            seed = new[] { 0x71A, 0x462, 0, 0 } // 1818, 1122
+      };
 
         PlayerOptions p1Spec = new()
         {
@@ -103,17 +103,16 @@ public class Driver
         await File.WriteAllTextAsync("p1.json", p1Json);
         await File.WriteAllTextAsync("p2.json", p2Json);
 
-        string startCommand = $"""
-                               >start {JsonSerializer.Serialize(spec)}
-                               >player p1 {p1Json}
-                               >player p2 {p2Json}
-                               """;
+        string startCommand = $">start {JsonSerializer.Serialize(spec)}\n" +
+         $">player p1 {p1Json}\n" +
+           $">player p2 {p2Json}";
 
         await File.WriteAllTextAsync("command.txt", startCommand);
 
         await streams.Omniscient.WriteAsync(startCommand);
 
-        // Wait for all tasks to complete (or timeout)
+
+// Wait for all tasks to complete (or timeout)
         try
         {
             Task allTasks = Task.WhenAll(p1Task, p2Task, streamConsumerTask);

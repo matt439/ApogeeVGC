@@ -447,23 +447,22 @@ public partial class BattleActions
 
         if (damagedDamage.Count > 0 && !isSecondary && !isSelf)
         {
-            Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
-                new ArrayRelayVar(damagedDamage.Select(RelayVar (d) => new IntRelayVar(d))
-                    .ToList()));
+   Battle.RunEvent(EventId.DamagingHit, damagedTargets.ToArray(), pokemon, move,
+  new ArrayRelayVar(damagedDamage.Select(d => (RelayVar)new IntRelayVar(d)).ToList()));
 
-            if (move.OnAfterHit != null)
-            {
-                foreach (Pokemon t in damagedTargets)
-                {
-                    Battle.SingleEvent(EventId.AfterHit, move, null, t, pokemon, move);
-                }
-            }
+        if (move.OnAfterHit != null)
+        {
+  foreach (Pokemon t in damagedTargets)
+    {
+       Battle.SingleEvent(EventId.AfterHit, move, null, t, pokemon, move);
+    }
+          }
 
             if (pokemon.Hp > 0 && pokemon.Hp <= pokemon.MaxHp / 2 &&
-                pokemonOriginalHp > pokemon.MaxHp / 2)
-            {
+          pokemonOriginalHp > pokemon.MaxHp / 2)
+       {
                 Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
-            }
+   }
         }
 
         return (damage, targets);

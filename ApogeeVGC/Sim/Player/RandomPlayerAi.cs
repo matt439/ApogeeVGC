@@ -48,7 +48,7 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             {
                 // Team preview
                 Console.WriteLine("[RandomPlayerAi] Handling team preview");
-                _ = ChooseAsync("default");
+                _ = ChooseAsync("team 1234");
             }
             else if (request.ContainsKey("active"))
             {
