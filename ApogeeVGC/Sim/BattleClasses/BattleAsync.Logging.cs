@@ -14,6 +14,43 @@ public partial class BattleAsync
 {
     public void Add(params PartFuncUnion[] parts)
     {
+        // Check for duplicate fail messages
+        if (parts.Length >= 2)
+        {
+            // Try to check if first part is "-fail"
+            string firstPart = parts[0] switch
+            {
+                PartPartFuncUnion p when p.Part is StringPart sp => sp.Value,
+                _ => string.Empty,
+            };
+
+            if (firstPart == "-fail")
+            {
+                // Extract pokemon identifier (second part)
+                string secondPart = parts.Length > 1 ? (parts[1] switch
+                {
+                    PartPartFuncUnion p when p.Part is PokemonPart pp => pp.Pokemon.ToString(),
+                    _ => string.Empty,
+                }) : string.Empty;
+
+                string failKey = $"{Turn}_{firstPart}_{secondPart}";
+
+                // Check if this exact fail message was already logged recently
+                if (this is BattleAsync battleAsync)
+                {
+                    battleAsync._loggedMoveMessages ??= new HashSet<string>();
+
+                    if (battleAsync._loggedMoveMessages.Contains(failKey))
+                    {
+                        // Duplicate fail message, skip
+                        return;
+                    }
+
+                    battleAsync._loggedMoveMessages.Add(failKey);
+                }
+            }
+        }
+
         // Check if any part is a function that generates side-specific content
         bool hasFunction = parts.Any(part => part is FuncPartFuncUnion);
 
@@ -48,26 +85,48 @@ public partial class BattleAsync
                 secret.Add(result.Secret.ToString());
                 shared.Add(result.Shared.ToString());
             }
-            else if (part is PartPartFuncUnion directPart)
+            else if (part is PartPartFuncUnion partPart)
             {
-                // Direct value: add to both secret and shared
-                string formatted = FormatPart(directPart.Part);
+                // Regular part - same for both secret and shared
+                string formatted = FormatPart(partPart.Part);
                 secret.Add(formatted);
                 shared.Add(formatted);
             }
         }
 
-        // Add the split message
+        // Add the split message with side-specific content
         if (side.HasValue)
         {
-            AddSplit(side.Value,
-                secret.Select(Part (s) => new StringPart(s)).ToArray(),
-                shared.Select(Part (s) => new StringPart(s)).ToArray());
+            AddSplit(side.Value, [.. secret.Select(s => new StringPart(s))],
+                 [.. shared.Select(s => new StringPart(s))]);
         }
     }
 
     public void AddMove(params StringNumberDelegateObjectUnion[] args)
     {
+        // Prevent duplicate move messages for the same Pokemon/Move/Turn
+        if (args.Length >= 3 && args[0] is StringStringNumberDelegateObjectUnion { Value: "move" })
+        {
+            // Extract pokemon and move name
+            string pokemonName = FormatArg(args[1]);
+            string moveName = FormatArg(args[2]);
+            string moveKey = $"{pokemonName}_{moveName}_{Turn}";
+
+            // Check if this exact move has already been logged this turn
+            if (this is BattleAsync battleAsync)
+            {
+                battleAsync._loggedMoveMessages ??= new HashSet<string>();
+
+                if (battleAsync._loggedMoveMessages.Contains(moveKey))
+                {
+                    // Already logged this move, skip
+                    return;
+                }
+
+                battleAsync._loggedMoveMessages.Add(moveKey);
+            }
+        }
+
         // Track this line's position for later attribute additions
         LastMoveLine = Log.Count;
 
@@ -80,6 +139,14 @@ public partial class BattleAsync
     {
         // No last move to attribute to
         if (LastMoveLine < 0) return;
+
+        // Check if this attribute is already present to prevent duplicates
+        string attributesToAdd = $"|{string.Join("|", args.Select(FormatArg))}";
+        if (Log[LastMoveLine].Contains(attributesToAdd))
+        {
+            // Already added this attribute, skip
+            return;
+        }
 
         // Special handling for animation lines with [still]
         if (Log[LastMoveLine].StartsWith("|-anim|"))
@@ -104,8 +171,7 @@ public partial class BattleAsync
         }
 
         // Append the attributes to the last move line
-        string attributes = $"|{string.Join("|", args.Select(FormatArg))}";
-        Log[LastMoveLine] += attributes;
+        Log[LastMoveLine] += attributesToAdd;
     }
 
 

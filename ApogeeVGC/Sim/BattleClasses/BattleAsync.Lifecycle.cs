@@ -353,43 +353,36 @@ public partial class BattleAsync
         // Clear request state if it exists
         if (RequestState != RequestState.None)
         {
-            RequestState = RequestState.None;
+         RequestState = RequestState.None;
         }
 
-        // First time through - set up turn structure
-        if (!MidTurn)
-        {
-            // Insert BeforeTurn action at the front of the queue
-            Queue.InsertChoice(new BeforeTurnAction());
+     // First time through - set up turn structure
+   if (!MidTurn)
+{
+      // Insert BeforeTurn action at the front of the queue
+          Queue.InsertChoice(new BeforeTurnAction());
 
-            // Add Residual action at the end of the queue
-            Queue.AddChoice(new ResidualAction());
+       // Add Residual action at the end of the queue
+        Queue.AddChoice(new ResidualAction());
 
-            MidTurn = true;
+          MidTurn = true;
         }
 
         // Process actions one at a time
         while (Queue.Shift() is { } action)
         {
-            // Debug: Log the action being processed
-   Console.WriteLine($"[TurnLoop] Processing action: {action.Choice} for {action.Pokemon?.Name ?? "N/A"}");
-       if (action is MoveAction ma)
-    {
-            Console.WriteLine($"[TurnLoop] Move action: {ma.Move.Name}");
-            }
-            
-  RunAction(action);
+   RunAction(action);
 
             // Exit early if we need to wait for a request or battle ended
             if (RequestState != RequestState.None || Ended)
-            {
-                return;
-            }
+      {
+     return;
+       }
         }
 
-        // Turn is complete
+   // Turn is complete
         EndTurn();
-        MidTurn = false;
+MidTurn = false;
         Queue.Clear();
     }
 

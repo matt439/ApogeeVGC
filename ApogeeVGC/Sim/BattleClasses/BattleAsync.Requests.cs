@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Actions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 

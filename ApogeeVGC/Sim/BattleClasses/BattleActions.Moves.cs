@@ -295,10 +295,6 @@ public partial class BattleActions
         Pokemon? target = options?.Target;
         IEffect? sourceEffect = options?.SourceEffect;
 
-        // Debug: Log entry to UseMoveInner
-        Console.WriteLine($"[UseMoveInner] Called for {pokemon.Name} using {move.Name}");
-        Console.WriteLine($"[UseMoveInner] Stack trace: {Environment.StackTrace}");
-
         // Default sourceEffect to battle effect if not provided and battle has an active effect
         if (sourceEffect == null && Battle.Effect.EffectStateId != EffectStateId.FromEmpty())
         {
@@ -406,46 +402,31 @@ public partial class BattleActions
         // Build move message attributes
         string moveName = activeMove.Name;
 
- // Add move message to battle log
-  // Use the Pokemon to track if we've already logged a move message for this exact move this turn
-   string moveKey = $"{pokemon.Fullname}_{activeMove.Id}_{Battle.Turn}";
-  var battleAsync = Battle as BattleAsync;
-   bool messageAlreadyLogged = battleAsync?._loggedMoveMessages?.Contains(moveKey) ?? false;
+        // Add move message to battle log
+     if (Battle.DisplayUi)
+     {
+ if (target is null)
+       {
+      throw new InvalidOperationException("Target cannot be null when displaying move message.");
+      }
 
-      Console.WriteLine($"[UseMoveInner] moveKey={moveKey}, messageAlreadyLogged={messageAlreadyLogged}");
-      
-  if (Battle.DisplayUi && !messageAlreadyLogged)
-   {
-  if (target is null)
-   {
-          throw new InvalidOperationException("Target cannot be null when displaying move message.");
-  }
+   // Check if sourceEffect should be logged
+ bool shouldLogSourceEffect = sourceEffect != null &&
+      !(sourceEffect.EffectStateId is EmptyEffectStateId) &&
+  !(sourceEffect.EffectStateId is FormatEffectStateId { FormatId: FormatId.EmptyEffect });
 
-     // Check if sourceEffect should be logged
-    bool shouldLogSourceEffect = sourceEffect != null &&
- !(sourceEffect.EffectStateId is EmptyEffectStateId) &&
-   !(sourceEffect.EffectStateId is FormatEffectStateId { FormatId: FormatId.EmptyEffect });
-
-  if (shouldLogSourceEffect)
+     if (shouldLogSourceEffect)
   {
- Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
- StringNumberDelegateObjectUnion.FromObject(target), "[from]",
-StringNumberDelegateObjectUnion.FromObject(sourceEffect!.EffectStateId));
-    }
-      else
-    {
-  Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
-    StringNumberDelegateObjectUnion.FromObject(target));
+       Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+  StringNumberDelegateObjectUnion.FromObject(target), "[from]",
+    StringNumberDelegateObjectUnion.FromObject(sourceEffect!.EffectStateId));
+   }
+       else
+       {
+     Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+        StringNumberDelegateObjectUnion.FromObject(target));
+   }
   }
-
-   // Track that we've logged this move message
-  if (battleAsync != null)
-   {
-   battleAsync._loggedMoveMessages ??= new HashSet<string>();
-   battleAsync._loggedMoveMessages.Add(moveKey);
-Console.WriteLine($"[UseMoveInner] Added moveKey to _loggedMoveMessages, count={battleAsync._loggedMoveMessages.Count}");
-}
- }
         // Handle no target
         if (target == null)
         {
