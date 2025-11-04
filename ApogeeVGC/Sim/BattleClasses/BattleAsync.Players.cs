@@ -19,10 +19,13 @@ public partial class BattleAsync
         {
             // Create new player
             var team = GetTeam(options);
+            Console.WriteLine($"[SetPlayer] {slot} team count: {team.Count}");
             string playerName = options.Name ?? $"Player {slotNum + 1}";
             
             // The Side constructor already initializes Team, Pokemon, Active, SideConditions, SlotConditions, and Choice
             side = new Side(playerName, this, slot, [.. team]);
+            
+            Console.WriteLine($"[SetPlayer] {slot} after Side constructor, Pokemon count: {side.Pokemon.Count}");
             
             // Only override properties not handled by constructor
             side.Avatar = options.Avatar ?? string.Empty;

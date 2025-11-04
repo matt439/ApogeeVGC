@@ -403,14 +403,16 @@ public partial class BattleAsync
                 {
                     foreach (Side side in Sides)
                     {
-                        if (side.PokemonLeft > 0)
-                            side.PokemonLeft = side.Pokemon.Count;
+ Console.WriteLine($"[Start Action] {side.Id} Pokemon count: {side.Pokemon.Count}, PokemonLeft: {side.PokemonLeft}");
+  
+         if (side.PokemonLeft > 0)
+        side.PokemonLeft = side.Pokemon.Count;
 
-                        if (DisplayUi)
-                        {
-                            Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
-                        }
-                    }
+           if (DisplayUi)
+        {
+                 Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+       }
+     }
 
                     if (DisplayUi)
                     {
@@ -584,16 +586,14 @@ public partial class BattleAsync
             case ActionId.Team:
                 {
                     var teamAction = (TeamAction)action;
-                    if (teamAction.Index == 0)
-                    {
-                        teamAction.Pokemon.Side.Pokemon = [];
-                    }
-                    teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
-                    teamAction.Pokemon.Position = teamAction.Index;
-                    // We return here because the update event would crash since there are no active pokemon yet
-                    return false;
-                }
-
+      
+// Team actions reorder the Pokemon by setting their Position
+ // The Pokemon list itself should not be modified - it's already populated
+     teamAction.Pokemon.Position = teamAction.Index;
+  
+     // We return here because the update event would crash since there are no active pokemon yet
+  return false;
+      }
             case ActionId.Pass:
                 return false;
 

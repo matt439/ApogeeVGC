@@ -1,0 +1,767 @@
+﻿C:\VSProjects\ApogeeVGC\ApogeeVGC\Data\Formats.cs(72,41): warning CS0472: The result of the expression is always 'true' since a value of type 'ItemId' is never equal to 'null' of type 'ItemId?' [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs(117,18): warning CS8601: Possible null reference assignment. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Delegates.cs(75,46): warning CS0168: The variable 'ex' is declared but never used [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.ActiveMove.cs(78,31): warning CS8619: Nullability of reference types in value of type 'Move' doesn't match target type 'ActiveMove'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\SideClasses\Side.Choices.cs(1094,66): warning CS8604: Possible null reference argument for parameter 'request' in 'string State.SerializeRequest(object request, IBattle battle)'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.Core.cs(133,31): warning CS8619: Nullability of reference types in value of type 'Move' doesn't match target type 'ActiveMove'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.Core.cs(615,37): warning CS8604: Possible null reference argument for parameter 'item' in 'Referable.implicit operator Referable(Item item)'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.Core.cs(622,37): warning CS8604: Possible null reference argument for parameter 'ability' in 'Referable.implicit operator Referable(Ability ability)'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.Core.cs(630,37): warning CS8604: Possible null reference argument for parameter 'condition' in 'Referable.implicit operator Referable(Condition condition)'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\State.Reference.cs(182,16): warning CS8619: Nullability of reference types in value of type 'Move' doesn't match target type 'ActiveMove'. [C:\VSProjects\ApogeeVGC\ApogeeVGC\ApogeeVGC.csproj]
+Starting doubles battle...
+
+[BattleStream] Starting ProcessInputAsync
+p1 is RandomPlayerAi
+p2 is RandomPlayerAi
+p1Dict contains team: True
+p1 team type: Dictionary`2[]
+p1 team count: 6
+p1Json length: 1991
+p1Json preview: {"name":"Bot 1","team":[{"name":"calyrex-ice","species":"calyrexice","item":"leftovers","ability":"asoneglastrier","moves":["glaciallance","leechseed","trickroom","protect"],"nature":"adamant","evs":{"hp":236,"atk":36,"def":0,"spa":0,"spd":236,"spe":0},"ivs":{"hp":31,"atk":31,"def":31,"spa":31,"spd":31,"spe":31},"level":50,"gender":"M","teraType":"water"},{"name":"miraidon","species":"miraidon","item":"choicespecs","ability":"hadronengine","moves":["voltswitch","dazzlinggleam","electrodrift","dr
+[BattleStream] Processing chunk: >start {"formatid":"gen9doublescustomgame","seed":[1818,1122,0,0]}
+>player p1 {"name":"Bot 1","team"...
+Battle constructor complete.
+[BattleStream] Received player command for P1
+[BattleStream] Options text: {"name":"Bot 1","team":[{"name":"calyrex-ice","species":"calyrexice","item":"leftovers","ability":"asoneglastrier","moves":["glaciallance","leechseed","trickroom","protect"],"nature":"adamant","evs":{...
+[BattleStream] Deserialized to JsonObject, keys: name, team
+[BattleStream] Converted to PlayerOptions, Team is count=6
+[BattleStream] Received player command for P2
+[BattleStream] Options text: {"name":"Bot 2","team":[{"name":"calyrex-ice","species":"calyrexice","item":"leftovers","ability":"asoneglastrier","moves":["glaciallance","leechseed","trickroom","protect"],"nature":"adamant","evs":{...
+[BattleStream] Deserialized to JsonObject, keys: name, team
+[BattleStream] Converted to PlayerOptions, Team is count=6
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=0, Log.Count=19
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 19 updates
+[BattleStream] PushMessage: type=update, data length=500
+[BattleStream] Writing to output channel: update
+|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gametype|doubles
+|gen|9
+|tier|[Gen 9] Custom Game
+|cle...
+[SendUpdates] Sending requests to players
+|player|p1|Bot 1||
+|player|p2|Bot 2||
+|gametype|doubles
+|gen|9
+|tier|[Gen 9] Custom Game
+|clearpoke
+|poke|p1|Calyrex-Ice, L50, M|item
+|poke|p1|Miraidon, L50, M|item
+|poke|p1|Ursaluna, L50, M|item
+|poke|p1|Volcarona, L50, M|item
+|poke|p1|Grimmsnarl, L50, M|item
+|poke|p1|Iron Hands, L50, M|item
+|poke|p2|Calyrex-Ice, L50, M|item
+|poke|p2|Miraidon, L50, M|item
+|poke|p2|Ursaluna, L50, M|item
+|poke|p2|Volcarona, L50, M|item
+|poke|p2|Grimmsnarl, L50, M|item
+|poke|p2|Iron Hands, L50, M|item
+|teampreview
+[BattleStream] PushMessage: type=sideupdate, data length=2200
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"teamPreview":true,"side":{"name":"Bot 1","id":"P1","pokemon":[{"condition":...
+[BattlePlayer] Received request JSON (first 200 chars): {"teamPreview":true,"side":{"name":"Bot 1","id":"P1","pokemon":[{"condition":"205/205","active":true,"stats":{"hp":0,"atk":209,"def":170,"spa":94,"spd":180,"spe":70},"moves":["Glacial Lance","Leech Se
+[BattlePlayer] Parsed request with keys: teamPreview, side, noCancel
+[BattleStream] PushMessage: type=sideupdate, data length=2200
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"teamPreview":true,"side":{"name":"Bot 2","id":"P2","pokemon":[{"condition":...
+[BattlePlayer] Received request JSON (first 200 chars): {"teamPreview":true,"side":{"name":"Bot 2","id":"P2","pokemon":[{"condition":"205/205","active":true,"stats":{"hp":0,"atk":209,"def":170,"spa":94,"spd":180,"spe":70},"moves":["Glacial Lance","Leech Se
+[BattlePlayer] Parsed request with keys: teamPreview, side, noCancel
+[RandomPlayerAi] Received request with keys: teamPreview, side, noCancel
+[RandomPlayerAi] Received request with keys: teamPreview, side, noCancel
+[RandomPlayerAi] Handling team preview
+[RandomPlayerAi] Handling team preview
+[BattlePlayer] Sending choice: default
+[BattlePlayer] Sending choice: default
+[BattleStream] Processing chunk: >p1 default...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=19, Log.Count=19
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p2 default...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=19, Log.Count=45
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 26 updates
+[BattleStream] PushMessage: type=update, data length=775
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|teamsize|p1|6
+|teamsize|p2|4
+|start
+|split|p1
+|switch|p1a: calyrex-ice|Calyrex-...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|teamsize|p1|6
+|teamsize|p2|4
+|start
+|split|p1
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p1a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|split|p1
+|switch|p1a: ironhands|Iron Hands, L50, M|259/259
+|switch|p1a: ironhands|Iron Hands, L50, M|100/100
+|split|p2
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|205/205
+|switch|p2a: calyrex-ice|Calyrex-Ice, L50, M|100/100
+|split|p2
+|switch|p2a: volcarona|Volcarona, L50, M|192/192
+|switch|p2a: volcarona|Volcarona, L50, M|100/100
+|-ability|p1a: calyrex-ice|As One
+|-ability|p1a: calyrex-ice|Unnerve
+|-ability|p1a: ironhands|As One
+|-ability|p1a: ironhands|Unnerve
+|-ability|p2a: calyrex-ice|As One
+|-ability|p2a: calyrex-ice|Unnerve
+|-ability|p2a: volcarona|As One
+|-ability|p2a: volcarona|Unnerve
+|turn|1
+[BattleStream] PushMessage: type=sideupdate, data length=2996
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[BattleStream] PushMessage: type=sideupdate, data length=2299
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 1 has target=allAdjacentFoes
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 1
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 2 2
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Fake Out","id":"fakeout","pp":10,"maxpp":16,"target":"normal","disabled":null}
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Struggle Bug","id":"strugglebug","pp":20,"maxpp":32,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 1 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Move 1 has target=allAdjacentFoes
+[RandomPlayerAi] DEBUG: Added foe target 1
+[RandomPlayerAi] Final move choice: move 1 1
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 1
+[BattlePlayer] Sending choice: move 2 2, move 1 1
+[BattlePlayer] Sending choice: move 1, move 1
+[BattleStream] Processing chunk: >p1 move 2 2, move 1 1...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=45, Log.Count=45
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p2 move 1, move 1...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=45, Log.Count=82
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 37 updates
+[BattleStream] PushMessage: type=update, data length=1014
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|move|p1a: ironhands|Fake Out|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-i...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|move|p1a: ironhands|Fake Out|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|188/205
+|-damage|p2a: calyrex-ice|92/100
+|move|p1a: calyrex-ice|Leech Seed|p2a: volcarona
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice|[spread] 0,1
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|172/205
+|-damage|p1a: calyrex-ice|84/100
+|split|p1
+|-damage|p1a: ironhands|174/259
+|-damage|p1a: ironhands|68/100
+|move|p2a: volcarona|Struggle Bug|p1a: calyrex-ice|[spread] 0,1
+|-supereffective|p1a: calyrex-ice
+|-resisted|p1a: ironhands
+|split|p1
+|-damage|p1a: calyrex-ice|146/205
+|-damage|p1a: calyrex-ice|72/100
+|split|p1
+|-damage|p1a: ironhands|168/259
+|-damage|p1a: ironhands|65/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|158/205
+|-heal|p1a: calyrex-ice|78/100
+|split|p2
+|-heal|p2a: calyrex-ice|200/205
+|-heal|p2a: calyrex-ice|98/100
+|upkeep
+|-terastallize|p1a: calyrex-ice|Water
+|-terastallize|p2a: volcarona|Water
+|-terastallize|p2a: calyrex-ice|Water
+|-terastallize|p1a: ironhands|Bug
+|turn|2
+[BattleStream] PushMessage: type=sideupdate, data length=2944
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[BattleStream] PushMessage: type=sideupdate, data length=2245
+[RandomPlayerAi] DEBUG: Move 3 has target=all
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 3
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Fake Out","id":"fakeout","pp":10,"maxpp":16,"target":"normal","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[RandomPlayerAi] DEBUG: Move 3 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 3 2
+[BattlePlayer] Sending choice: move 3, move 3 2
+[BattleStream] Processing chunk: >p1 move 3, move 3 2...
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 1 has target=allAdjacentFoes
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 1
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Struggle Bug","id":"strugglebug","pp":20,"maxpp":32,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 2 2
+[BattlePlayer] Sending choice: move 1, move 2 2
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=82, Log.Count=82
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p2 move 1, move 2 2...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=82, Log.Count=112
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 30 updates
+[BattleStream] PushMessage: type=update, data length=786
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|move|p1a: ironhands|Low Kick|p2a: volcarona
+|split|p2
+|-damage|p2a: volcarona|1...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|move|p1a: ironhands|Low Kick|p2a: volcarona
+|split|p2
+|-damage|p2a: volcarona|134/192
+|-damage|p2a: volcarona|70/100
+|move|p2a: calyrex-ice|Glacial Lance|p1a: calyrex-ice|[spread] 0,1
+|-resisted|p1a: calyrex-ice
+|split|p1
+|-damage|p1a: calyrex-ice|127/205
+|-damage|p1a: calyrex-ice|62/100
+|split|p1
+|-damage|p1a: ironhands|80/259
+|-damage|p1a: ironhands|31/100
+|move|p2a: volcarona|Overheat|p2a: volcarona
+|-resisted|p2a: volcarona
+|split|p2
+|-damage|p2a: volcarona|104/192
+|-damage|p2a: volcarona|55/100
+|move|p1a: calyrex-ice|Trick Room|p1a: calyrex-ice
+|-fieldstart|move: Trick Room|[of] p1a: calyrex-ice
+|
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|split|p1
+|-heal|p1a: calyrex-ice|139/205
+|-heal|p1a: calyrex-ice|68/100
+|upkeep
+|turn|3
+[BattleStream] PushMessage: type=sideupdate, data length=2943
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattleStream] PushMessage: type=sideupdate, data length=2245
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 4 has target=self
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 4
+[RandomPlayerAi] DEBUG: Added foe target 1
+[RandomPlayerAi] Final move choice: move 2 1
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Struggle Bug","id":"strugglebug","pp":20,"maxpp":32,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Fake Out","id":"fakeout","pp":10,"maxpp":16,"target":"normal","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Move 4 has target=allySide
+[RandomPlayerAi] DEBUG: Added foe target 1
+[RandomPlayerAi] Final move choice: move 2 1
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 4
+[BattlePlayer] Sending choice: move 4, move 4
+[BattlePlayer] Sending choice: move 2 1, move 2 1
+[BattleStream] Processing chunk: >p2 move 4, move 4...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=112, Log.Count=112
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p1 move 2 1, move 2 1...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=112, Log.Count=133
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 21 updates
+[BattleStream] PushMessage: type=update, data length=521
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: ironh...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: ironhands|Heavy Slam|p2a: calyrex-ice
+|-resisted|p2a: calyrex-ice
+|split|p2
+|-damage|p2a: calyrex-ice|196/205
+|-damage|p2a: calyrex-ice|96/100
+|move|p1a: calyrex-ice|Leech Seed|p2a: calyrex-ice
+|move|p2a: volcarona|Tailwind|p2a: volcarona
+|-sidestart|p2|move: Tailwind
+|
+|split|p2
+|-heal|p2a: calyrex-ice|205/205
+|-heal|p2a: calyrex-ice|100/100
+|split|p1
+|-heal|p1a: calyrex-ice|151/205
+|-heal|p1a: calyrex-ice|74/100
+|upkeep
+|turn|4
+[BattleStream] PushMessage: type=sideupdate, data length=2943
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattleStream] PushMessage: type=sideupdate, data length=2245
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: Move 4 has target=self
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 4
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Fake Out","id":"fakeout","pp":10,"maxpp":16,"target":"normal","disabled":null}
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 2 2
+[RandomPlayerAi] DEBUG: Move 2 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 2 2
+[BattlePlayer] Sending choice: move 4, move 2 2
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Struggle Bug","id":"strugglebug","pp":20,"maxpp":32,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 3 has target=self
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 3
+[BattlePlayer] Sending choice: move 2 2, move 3
+[BattleStream] Processing chunk: >p1 move 4, move 2 2...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=133, Log.Count=133
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p2 move 2 2, move 3...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=133, Log.Count=151
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 18 updates
+[BattleStream] PushMessage: type=update, data length=421
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: volca...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|move|p1a: calyrex-ice|Protect||[still]
+|-fail|p1a: calyrex-ice
+|move|p2a: volcarona|Protect||[still]
+|-fail|p2a: volcarona
+|move|p2a: calyrex-ice|Leech Seed|p2a: volcarona
+|move|p1a: ironhands|Heavy Slam|p2a: volcarona
+|-resisted|p2a: volcarona
+|split|p2
+|-damage|p2a: volcarona|70/192
+|-damage|p2a: volcarona|37/100
+|
+|split|p1
+|-heal|p1a: calyrex-ice|163/205
+|-heal|p1a: calyrex-ice|80/100
+|upkeep
+|turn|5
+[BattleStream] PushMessage: type=sideupdate, data length=2943
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattleStream] PushMessage: type=sideupdate, data length=2244
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxp...
+[BattlePlayer] Received request JSON (first 200 chars): {"active":[{"moves":[{"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null},{"move":"Leech Seed","id":"leechseed","pp":10,"maxpp":16,"target":"normal"
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[BattlePlayer] Parsed request with keys: active, side, noCancel
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] Received request with keys: active, side, noCancel
+[RandomPlayerAi] Handling move request
+[RandomPlayerAi] DEBUG: Move 1 has target=allAdjacentFoes
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 1
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Fake Out","id":"fakeout","pp":10,"maxpp":16,"target":"normal","disabled":null}
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Glacial Lance","id":"glaciallance","pp":5,"maxpp":8,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 4 has target=normal
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] DEBUG: Added foe target 2
+[RandomPlayerAi] Final move choice: move 4 2
+[RandomPlayerAi] DEBUG: Move 4 has target=self
+[BattlePlayer] Sending choice: move 1, move 4 2
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 4
+[RandomPlayerAi] DEBUG: First move JSON: {"move":"Struggle Bug","id":"strugglebug","pp":20,"maxpp":32,"target":"allAdjacentFoes","disabled":null}
+[RandomPlayerAi] DEBUG: activeArray.Count=2, movesArrayForCount null? False
+[RandomPlayerAi] DEBUG: In doubles targeting block
+[RandomPlayerAi] DEBUG: Move 1 has target=allAdjacentFoes
+[RandomPlayerAi] DEBUG: hasAlly=True
+[RandomPlayerAi] Final move choice: move 1
+[BattleStream] Processing chunk: >p1 move 1, move 4 2...
+[BattlePlayer] Sending choice: move 4, move 1
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=151, Log.Count=151
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[BattleStream] Processing chunk: >p2 move 4, move 1...
+[BattleStream] Calling SendUpdates, Battle is not null
+[SendUpdates] SentLogPos=151, Log.Count=170
+[SendUpdates] Stack trace:    at System.Environment.get_StackTrace()
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.SendUpdates() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Logging.cs:line 198
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 131
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+[SendUpdates] Sending 19 updates
+[BattleStream] PushMessage: type=update, data length=518
+[BattleStream] Writing to output channel: update
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyr...
+[SendUpdates] Sending requests to players
+|
+|t:|439.00
+|move|p2a: calyrex-ice|Protect||[still]
+|-fail|p2a: calyrex-ice
+|move|p1a: calyrex-ice|Glacial Lance|p2a: calyrex-ice|[spread] 0,1
+|-resisted|p2a: calyrex-ice
+|-resisted|p2a: volcarona
+|split|p2
+|-damage|p2a: calyrex-ice|172/205
+|-damage|p2a: calyrex-ice|84/100
+|split|p2
+|-damage|p2a: volcarona|22/192
+|-damage|p2a: volcarona|12/100
+|move|p1a: ironhands|Wild Charge|p2a: volcarona
+|-supereffective|p2a: volcarona
+|split|p2
+|-damage|p2a: volcarona|0 fnt
+|-damage|p2a: volcarona|0 fnt
+|faint|p2a: volcarona
+[BattleStream] PushMessage: type=sideupdate, data length=2173
+[BattleStream] Writing to output channel: sideupdate
+P1
+|request|{"wait":true,"side":{"name":"Bot 1","id":"P1","pokemon":[{"condition":"163/20...
+[BattlePlayer] Received request JSON (first 200 chars): {"wait":true,"side":{"name":"Bot 1","id":"P1","pokemon":[{"condition":"163/205","active":true,"stats":{"hp":0,"atk":209,"def":170,"spa":94,"spd":180,"spe":70},"moves":["Glacial Lance","Leech Seed","Tr
+[BattlePlayer] Parsed request with keys: wait, side
+[RandomPlayerAi] Received request with keys: wait, side
+[RandomPlayerAi] Wait request - doing nothing
+[BattleStream] PushMessage: type=sideupdate, data length=1499
+[BattleStream] Writing to output channel: sideupdate
+P2
+|request|{"forceSwitch":[false,true],"side":{"name":"Bot 2","id":"P2","pokemon":[{"con...
+[BattlePlayer] Received request JSON (first 200 chars): {"forceSwitch":[false,true],"side":{"name":"Bot 2","id":"P2","pokemon":[{"condition":"172/205","active":true,"stats":{"hp":0,"atk":209,"def":170,"spa":94,"spd":180,"spe":70},"moves":["Glacial Lance","
+[BattlePlayer] Parsed request with keys: forceSwitch, side, noCancel
+[RandomPlayerAi] Received request with keys: forceSwitch, side, noCancel
+[RandomPlayerAi] Handling forced switch
+[DEBUG] HandleForcedSwitch: Pokemon count = 4, ForceSwitch count = 2
+[DEBUG] Pokemon 1: active=True, condition='172/205', isFainted=False
+[DEBUG] Pokemon 2: active=True, condition='0 fnt', isFainted=True
+[DEBUG] Pokemon 3: active=False, condition='200/200', isFainted=False
+[DEBUG] Pokemon 4: active=False, condition='259/259', isFainted=False
+[DEBUG] Position 1: Can switch to 2 pokemon
+[BattlePlayer] Sending choice: pass, switch 4
+[BattleStream] Processing chunk: >p2 pass, switch 4...
+[BattleStream] ProcessInputAsync completing output channel
+Stream consumer error: Invalid ActionId for PokemonAction. (Parameter 'Choice')
+Stack trace:    at ApogeeVGC.Sim.Actions.PokemonAction.set_Choice(ActionId value) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Actions\PokemonAction.cs:line 20
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.ResolveAction(IActionChoice action, Boolean midTurn) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 114
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.<AddChoice>b__19_0(IActionChoice choice) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at System.Linq.Enumerable.IEnumerableSelectIterator`2.MoveNext()
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.AddChoice(IEnumerable`1 choices) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.CommitChoices() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 325
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.Choose(SideId sideId, String input) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 260
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLine(String type, String message) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 281
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLines(String chunk) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 166
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 115
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+--- End of stack trace from previous location ---
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+--- End of stack trace from previous location ---
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+Battle error: Invalid ActionId for PokemonAction. (Parameter 'Choice')
+Stack trace:    at ApogeeVGC.Sim.Actions.PokemonAction.set_Choice(ActionId value) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Actions\PokemonAction.cs:line 20
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.ResolveAction(IActionChoice action, Boolean midTurn) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 114
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.<AddChoice>b__19_0(IActionChoice choice) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at System.Linq.Enumerable.IEnumerableSelectIterator`2.MoveNext()
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.AddChoice(IEnumerable`1 choices) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.CommitChoices() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 325
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.Choose(SideId sideId, String input) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 260
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLine(String type, String message) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 281
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLines(String chunk) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 166
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 115
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+--- End of stack trace from previous location ---
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+--- End of stack trace from previous location ---
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Core.Driver.StartTest(String format) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Core\Driver.cs:line 137
+Task completion error: Invalid ActionId for PokemonAction. (Parameter 'Choice')
+Stack trace:    at ApogeeVGC.Sim.Actions.PokemonAction.set_Choice(ActionId value) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Actions\PokemonAction.cs:line 20
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.ResolveAction(IActionChoice action, Boolean midTurn) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 114
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.<AddChoice>b__19_0(IActionChoice choice) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at System.Linq.Enumerable.IEnumerableSelectIterator`2.MoveNext()
+   at ApogeeVGC.Sim.BattleClasses.BattleQueue.AddChoice(IEnumerable`1 choices) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleQueue.cs:line 347
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.CommitChoices() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 325
+   at ApogeeVGC.Sim.BattleClasses.BattleAsync.Choose(SideId sideId, String input) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleAsync.Requests.cs:line 260
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLine(String type, String message) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 281
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessLines(String chunk) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 166
+   at ApogeeVGC.Sim.BattleClasses.BattleStream.ProcessInputAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\BattleClasses\BattleStream.cs:line 115
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+--- End of stack trace from previous location ---
+   at ApogeeVGC.Sim.Utils.Extensions.BattleStreamExtensions.<>c__DisplayClass0_0.<<GetPlayerStreams>b__0>d.MoveNext() in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Utils\Extensions\BattleStreamExtensions.cs:line 29
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at System.Threading.Channels.AsyncOperation`1.GetResult(Int16 token)
+--- End of stack trace from previous location ---
+   at System.Threading.Channels.ChannelReader`1.ReadAllAsync(CancellationToken cancellationToken)+MoveNext()
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Player.BattlePlayer.StartAsync(CancellationToken cancellationToken) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Player\BattlePlayer.cs:line 21
+   at ApogeeVGC.Sim.Core.Driver.StartTest(String format) in C:\VSProjects\ApogeeVGC\ApogeeVGC\Sim\Core\Driver.cs:line 156
+Battle completed or timed out.

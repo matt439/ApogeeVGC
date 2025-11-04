@@ -23,6 +23,7 @@ public class FormatIdJsonConverter : JsonConverter<FormatId>
         {
             "gen9ou" => FormatId.Gen9Ou,
         "gen9customgame" => FormatId.Gen9CustomGame,
+     "gen9doublescustomgame" => FormatId.Gen9CustomGame, // Doubles format maps to Gen9CustomGame
             "emptyeffect" => FormatId.EmptyEffect,
             _ => FormatId.Gen9Ou, // Default fallback
         };
