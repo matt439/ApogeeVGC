@@ -1,3 +1,6 @@
 [submodule "References/pokemon-showdown"]
 	path = References/pokemon-showdown
 	url = https://github.com/matt439/pokemon-showdown.git
+[submodule "pokemon-showdown-client"]
+	path = pokemon-showdown-client
+	url = https://github.com/matt439/pokemon-showdown-client
