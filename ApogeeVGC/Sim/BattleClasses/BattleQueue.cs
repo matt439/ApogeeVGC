@@ -339,7 +339,28 @@ Choice = actionId,
     public void AddChoice(IActionChoice choice)
     {
         var resolvedChoices = ResolveAction(choice);
-        List.AddRange(resolvedChoices);
+       
+  // Filter out duplicate move actions for the same Pokemon
+        foreach (var resolvedChoice in resolvedChoices)
+        {
+ // Check if this is a duplicate move action
+     if (resolvedChoice is MoveAction moveAction)
+       {
+       // Check if there's already a move action for this Pokemon with the same move
+  bool isDuplicate = List.Any(existingAction =>
+   existingAction is MoveAction existingMove &&
+       existingMove.Pokemon == moveAction.Pokemon &&
+     existingMove.Move.Id == moveAction.Move.Id);
+
+       if (isDuplicate)
+      {
+         Console.WriteLine($"[AddChoice] Skipping duplicate move action for {moveAction.Pokemon.Name} using {moveAction.Move.Name}");
+    continue;
+            }
+   }
+            
+            List.Add(resolvedChoice);
+    }
     }
 
     public void AddChoice(IEnumerable<IActionChoice> choices)

@@ -104,6 +104,12 @@ public partial class BattleAsync : IBattle, IDisposable
     public static Side P4 => throw new Exception("4v4 battles are not implemented.");
     private HashSet<string> Hints { get; set; } = [];
 
+    /// <summary>
+ /// Tracks which move messages have been logged this turn to prevent duplicates.
+  /// Key format: "{PokemonFullname}_{MoveId}_{Turn}"
+    /// </summary>
+    public HashSet<string>? _loggedMoveMessages { get; set; }
+
     private bool _disposed;
 
     public BattleAsync(BattleOptions options, Library library)

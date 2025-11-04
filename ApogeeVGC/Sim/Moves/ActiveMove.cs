@@ -102,6 +102,11 @@ public record ActiveMove : Move, IEffect, IIdentifiable
     /// </summary>
     public HitEffect? HitEffect { get; set; }
 
+    /// <summary>
+    /// Tracks whether the move message has been logged to prevent duplicate messages.
+    /// </summary>
+    public bool MoveMessageLogged { get; set; }
+
     public string ShowdownId => Id.ToShowdownId();
 
     public override string ToString()

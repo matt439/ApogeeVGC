@@ -118,6 +118,9 @@ public partial class BattleAsync
         Turn++;
         LastSuccessfulMoveThisTurn = null;
 
+        // Clear the logged move messages for the new turn
+        _loggedMoveMessages?.Clear();
+
         // Process each side
         var trappedBySide = new List<bool>();
         var stalenessBySide = new List<StalenessId?>();
@@ -368,7 +371,14 @@ public partial class BattleAsync
         // Process actions one at a time
         while (Queue.Shift() is { } action)
         {
-            RunAction(action);
+            // Debug: Log the action being processed
+   Console.WriteLine($"[TurnLoop] Processing action: {action.Choice} for {action.Pokemon?.Name ?? "N/A"}");
+       if (action is MoveAction ma)
+    {
+            Console.WriteLine($"[TurnLoop] Move action: {ma.Move.Name}");
+            }
+            
+  RunAction(action);
 
             // Exit early if we need to wait for a request or battle ended
             if (RequestState != RequestState.None || Ended)
