@@ -260,29 +260,25 @@ public partial class BattleAsync
 
     public void SendUpdates()
     {
-        Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
-        Console.WriteLine($"[SendUpdates] Stack trace: {Environment.StackTrace}");
         // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count)
-        {
-          return;
-     }
+  {
+       return;
+        }
 
-// Send new log entries to clients
-        var updates = Log.Skip(SentLogPos).ToList();
-        Console.WriteLine($"[SendUpdates] Sending {updates.Count} updates");
+   // Send new log entries to clients
+     var updates = Log.Skip(SentLogPos).ToList();
         Send(SendType.Update, updates);
 
-        // Send requests to players if not already sent
-        if (!SentRequests)
-        {
-          Console.WriteLine("[SendUpdates] Sending requests to players");
-         foreach (Side side in Sides)
-        {
-     side.EmitRequest();
- }
-    SentRequests = true;
+  // Send requests to players if not already sent
+    if (!SentRequests)
+    {
+      foreach (Side side in Sides)
+            {
+      side.EmitRequest();
   }
+            SentRequests = true;
+        }
 
      // Update the position marker
         SentLogPos = Log.Count;

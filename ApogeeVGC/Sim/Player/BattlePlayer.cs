@@ -59,19 +59,12 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
             {
                 try
                 {
-                    Console.WriteLine($"[BattlePlayer] Received request JSON (first 200 chars): {rest.Substring(0, Math.Min(200, rest.Length))}");
-   
                     // Parse as JsonObject and pass to the handler
                     JsonObject? jsonRequest = JsonSerializer.Deserialize<JsonObject>(rest);
  
                     if (jsonRequest != null)
                     {
-                        Console.WriteLine($"[BattlePlayer] Parsed request with keys: {string.Join(", ", jsonRequest.Select(kvp => kvp.Key))}");
                         ReceiveRequest(jsonRequest);
-                    }
-                    else
-                    {
-                        Console.WriteLine("[BattlePlayer] Failed to parse request JSON");
                     }
                 }
                 catch (Exception ex)
@@ -110,7 +103,7 @@ public abstract class BattlePlayer(PlayerReadWriteStream stream, bool debug = fa
     /// </summary>
     public async Task ChooseAsync(string choice, CancellationToken cancellationToken = default)
     {
-    Console.WriteLine($"[BattlePlayer] Sending choice: {choice}");
+        Console.WriteLine($"[CHOICE] {choice}");
         await Stream.WriteAsync(choice, cancellationToken);
     }
 }

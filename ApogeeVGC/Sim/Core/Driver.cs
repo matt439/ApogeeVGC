@@ -50,9 +50,6 @@ public class Driver
         var p1 = new RandomPlayerAi(streams.P1, seed: p1Seed);
         var p2 = new RandomPlayerAi(streams.P2, seed: p2Seed);
 
-        Console.WriteLine($"p1 is {p1.GetType().Name}");
-        Console.WriteLine($"p2 is {p2.GetType().Name}");
-
         // Start the AI players (don't await - they run in background)
         Task p1Task = p1.StartAsync();
         Task p2Task = p2.StartAsync();
@@ -70,12 +67,6 @@ public class Driver
             catch (Exception ex)
             {
                 Console.WriteLine($"Stream consumer error: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                    Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
-                }
             }
         });
 
@@ -84,18 +75,6 @@ public class Driver
         Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
         Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
 
-        // Debug: Check if team exists in dictionary
-        Console.WriteLine($"p1Dict contains team: {p1Dict.ContainsKey("team")}");
-        if (p1Dict.ContainsKey("team"))
-        {
-            var team = p1Dict["team"];
-            Console.WriteLine($"p1 team type: {team?.GetType().Name}");
-            if (team is object[] teamArray)
-            {
-                Console.WriteLine($"p1 team count: {teamArray.Length}");
-            }
-        }
-
         // Convert dictionaries to JsonObject for serialization
         JsonObject p1JsonObj = DictionaryToJsonObject(p1Dict);
         JsonObject p2JsonObj = DictionaryToJsonObject(p2Dict);
@@ -103,18 +82,9 @@ public class Driver
         string p1Json = p1JsonObj.ToJsonString();
         string p2Json = p2JsonObj.ToJsonString();
 
-        Console.WriteLine($"p1Json length: {p1Json.Length}");
-        Console.WriteLine($"p1Json preview: {p1Json.Substring(0, Math.Min(500, p1Json.Length))}");
-
-        // Write to file for debugging
-        await File.WriteAllTextAsync("p1.json", p1Json);
-        await File.WriteAllTextAsync("p2.json", p2Json);
-
         string startCommand = $">start {JsonSerializer.Serialize(spec)}\n" +
          $">player p1 {p1Json}\n" +
            $">player p2 {p2Json}";
-
-        await File.WriteAllTextAsync("command.txt", startCommand);
 
         await streams.Omniscient.WriteAsync(startCommand);
 

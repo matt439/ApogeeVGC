@@ -99,11 +99,8 @@ public class BattleStream : IDisposable
     {
         try
         {
-            Console.WriteLine("[BattleStream] Starting ProcessInputAsync");
             await foreach (string chunk in _inputChannel.Reader.ReadAllAsync(cancellationToken))
             {
-                Console.WriteLine(
-                    $"[BattleStream] Processing chunk: {chunk.Substring(0, Math.Min(100, chunk.Length))}...");
                 if (NoCatch)
                 {
                     ProcessLines(chunk);
@@ -122,17 +119,14 @@ public class BattleStream : IDisposable
                 }
 
                 // Send battle updates after processing
-                 Console.WriteLine(
-  $"[BattleStream] Calling SendUpdates, Battle is {(Battle == null ? "null" : "not null")}");
- // Only send updates if the battle has started
-            // This prevents duplicate initialization messages
-           if (Battle is BattleAsync battleAsync && battleAsync.Started)
-       {
-    battleAsync.SendUpdates();
-  }
+                // Only send updates if the battle has started
+                // This prevents duplicate initialization messages
+                if (Battle is BattleAsync battleAsync && battleAsync.Started)
+                {
+                    battleAsync.SendUpdates();
+                }
             }
 
-            Console.WriteLine("[BattleStream] Input completed");
             // Input completed, signal end if needed
             if (!KeepAlive)
             {
@@ -141,17 +135,14 @@ public class BattleStream : IDisposable
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("[BattleStream] ProcessInputAsync cancelled");
             // Expected when cancellation is requested
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BattleStream] ProcessInputAsync error: {ex.Message}");
             await PushErrorAsync(ex);
         }
         finally
         {
-            Console.WriteLine("[BattleStream] ProcessInputAsync completing output channel");
             _outputChannel.Writer.Complete();
         }
     }
@@ -169,7 +160,6 @@ public class BattleStream : IDisposable
 
     private async Task PushMessageAsync(string type, string data)
     {
-        Console.WriteLine($"[BattleStream] PushMessage: type={type}, data length={data.Length}");
         if (Replay != BattleReplayMode.None)
         {
             if (type != "update") return;
@@ -185,8 +175,6 @@ public class BattleStream : IDisposable
 
         // Normal mode: send type\ndata format
         string message = $"{type}\n{data}";
-        Console.WriteLine(
-            $"[BattleStream] Writing to output channel: {message.Substring(0, Math.Min(100, message.Length))}...");
         await _outputChannel.Writer.WriteAsync(message);
     }
 
@@ -230,10 +218,6 @@ public class BattleStream : IDisposable
                 (string slotStr, string optionsText) = SplitFirst(message, ' ');
                 var slot = Enum.Parse<SideId>(slotStr, ignoreCase: true);
 
-                Console.WriteLine($"[BattleStream] Received player command for {slot}");
-                Console.WriteLine(
-                    $"[BattleStream] Options text: {optionsText.Substring(0, Math.Min(200, optionsText.Length))}...");
-
                 // Deserialize to JsonObject first to handle Showdown format
                 JsonObject? playerOptionsJson = JsonSerializer.Deserialize<JsonObject>(optionsText);
                 if (playerOptionsJson == null)
@@ -241,15 +225,9 @@ public class BattleStream : IDisposable
                     throw new InvalidOperationException("Invalid player options");
                 }
 
-                Console.WriteLine(
-                    $"[BattleStream] Deserialized to JsonObject, keys: {string.Join(", ", playerOptionsJson.Select(kvp => kvp.Key))}");
-
                 // Convert from Showdown format to PlayerOptions using State helper
                 PlayerOptions playerOptions =
                     State.DeserializePlayerOptionsFromShowdown(playerOptionsJson, Library);
-
-                Console.WriteLine(
-                    $"[BattleStream] Converted to PlayerOptions, Team is {(playerOptions.Team == null ? "null" : $"count={playerOptions.Team.Count}")}");
 
                 if (Battle is null)
                 {
