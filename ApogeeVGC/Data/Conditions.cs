@@ -55,14 +55,14 @@ public record Conditions
                 ImmuneTypes = [PokemonType.Fire],
                 OnStart = (battle, target, source, sourceEffect) =>
                 {
+                    if (!battle.DisplayUi) return new VoidReturn();
+
+                    // Handle null sourceEffect gracefully
                     if (sourceEffect is null)
                     {
-                        throw new ArgumentNullException(
-                            $"Source effect is null when trying to apply" +
-                            $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
+                        battle.Add("-status", target, "brn");
+                        return new VoidReturn();
                     }
-
-                    if (!battle.DisplayUi) return new VoidReturn();
 
                     switch (sourceEffect.EffectType)
                     {

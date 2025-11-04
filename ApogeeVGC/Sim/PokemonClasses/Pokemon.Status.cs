@@ -187,6 +187,8 @@ public partial class Pokemon
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
+        // Logic: if we already have a status, try to set that same status (which will fail duplicate check)
+    // Otherwise, set the new status
         return SetStatus(Status != ConditionId.None ? Status : status, source, sourceEffect);
     }
 

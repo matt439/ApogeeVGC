@@ -100,7 +100,24 @@ public partial class BattleAsync
         // Add relayVar if it was explicitly provided and if the delegate expects it
         if (hasRelayVar)
         {
-            args[argIndex++] = relayVar;
+            // Unwrap the relayVar to match the expected parameter type
+            Type expectedType = parameters[argIndex].ParameterType;
+            object? unwrapped = UnwrapRelayVar(relayVar, expectedType);
+            if (unwrapped != null)
+            {
+                args[argIndex++] = unwrapped;
+            }
+            else if (expectedType.IsAssignableFrom(relayVar.GetType()))
+            {
+                // If unwrapping failed but the type matches, use the RelayVar itself
+                args[argIndex++] = relayVar;
+            }
+            else
+            {
+                // Skip this parameter if we can't match it
+                // This shouldn't happen in normal operation
+                argIndex++;
+            }
         }
 
         // Add remaining standard parameters: target, source, sourceEffect
