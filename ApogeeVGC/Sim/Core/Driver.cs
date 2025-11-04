@@ -13,32 +13,39 @@ public class Driver
 {
     private Library Library { get; } = new();
 
-    public async Task StartTest()
+    public async Task StartTest(string format = "doubles")
     {
         PlayerStreams streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(Library));
 
-        // Battle specification
+        // Battle specification - select format based on parameter
+        string formatid = format.ToLower() switch
+        {
+            "singles" => "gen9customgame",
+            "doubles" => "gen9doublescustomgame",
+            _ => throw new ArgumentException($"Invalid format: {format}. Use 'singles' or 'doubles'.")
+        };
+
         var spec = new
         {
-            formatid = "gen9vgc2024regfmasterball",
+            formatid = formatid,
             seed = new[] { 0x71A, 0x462, 0, 0 } // 1818, 1122
-      };
+        };
 
         PlayerOptions p1Spec = new()
         {
- Name = "Bot 1",
-   Team = TeamGenerator.GenerateTestTeam(Library),
-     };
-
-   PlayerOptions p2Spec = new()
-     {
-            Name = "Bot 2",
-       Team = TeamGenerator.GenerateTestTeam(Library),
+            Name = "Bot 1",
+            Team = TeamGenerator.GenerateTestTeam(Library),
         };
 
- // Fixed seeds for reproducible results
+        PlayerOptions p2Spec = new()
+        {
+            Name = "Bot 2",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+        };
+
+        // Fixed seeds for reproducible results
         var p1Seed = new PrngSeed(1818);
-    var p2Seed = new PrngSeed(1122);
+        var p2Seed = new PrngSeed(1122);
 
         var p1 = new RandomPlayerAi(streams.P1, seed: p1Seed);
         var p2 = new RandomPlayerAi(streams.P2, seed: p2Seed);

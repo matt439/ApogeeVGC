@@ -48,7 +48,7 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             {
                 // Team preview
                 Console.WriteLine("[RandomPlayerAi] Handling team preview");
-                _ = ChooseAsync("team 1234");
+                _ = ChooseAsync("default");
             }
             else if (request.ContainsKey("active"))
             {
@@ -87,15 +87,15 @@ public class RandomPlayerAi(PlayerReadWriteStream stream, double move = 1.0, Prn
             Console.WriteLine($"[DEBUG] HandleForcedSwitch: Pokemon count = {pokemonArray.Count}, ForceSwitch count = {forceSwitchArray.Count}");
 
             for (int i = 0; i < forceSwitchArray.Count; i++)
-            {
-                bool needsSwitch = forceSwitchArray[i]?.GetValue<bool>() ?? false;
-                if (!needsSwitch)
-                {
-                    choices.Add("pass");
-                    continue;
-                }
+   {
+      bool needsSwitch = forceSwitchArray[i]?.GetValue<bool>() ?? false;
+     if (!needsSwitch)
+     {
+   choices.Add("pass");
+       continue;
+     }
 
-                var canSwitch = new List<int>();
+      var canSwitch = new List<int>();
                 for (int j = 1; j <= 6; j++)
                 {
                     int pokemonIndex = j - 1;
