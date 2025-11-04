@@ -5,6 +5,9 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.FieldClasses;
+using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
@@ -132,7 +135,8 @@ public partial class BattleAsync
                     EventTargetParameter.FromSingleEventTarget(target, paramType);
                 if (targetParam != null)
                 {
-                    args[argIndex++] = targetParam.ToObject();
+                    object? targetObj = targetParam.ToObject();
+                    args[argIndex++] = WrapInUnionIfNeeded(targetObj, paramType);
                     continue;
                 }
             }
@@ -269,22 +273,27 @@ public partial class BattleAsync
         // Try to match standard parameters in order: target, source, sourceEffect
       switch (adjustedPos)
    {
-            case 0:
+        case 0:
     // Try target first
        if (target != null)
     {
       EventTargetParameter? targetParam =
-              EventTargetParameter.FromSingleEventTarget(target, paramType);
-      if (targetParam != null) return targetParam.ToObject();
-          }
+       EventTargetParameter.FromSingleEventTarget(target, paramType);
+       if (targetParam != null)
+              {
+    object? targetObj = targetParam.ToObject();
+         // Check if we need to wrap in a union type
+ return WrapInUnionIfNeeded(targetObj, paramType);
+                }
+    }
 
   break;
       case 1:
           // Try source second
        if (source != null)
-          {
+       {
         EventSourceParameter? sourceParam =
-        EventSourceParameter.FromSingleEventSource(source, paramType);
+   EventSourceParameter.FromSingleEventSource(source, paramType);
             if (sourceParam != null) return sourceParam.ToObject();
    }
 
@@ -294,13 +303,58 @@ public partial class BattleAsync
     if (sourceEffect != null && paramType.IsInstanceOfType(sourceEffect))
         {
        return sourceEffect;
-        }
+    }
 
        break;
   }
 
         return null;
     }
+
+    /// <summary>
+    /// Wraps a value in a union type if the parameter type requires it.
+    /// Handles implicit conversions that DynamicInvoke doesn't perform.
+    /// </summary>
+ private object? WrapInUnionIfNeeded(object? value, Type paramType)
+    {
+        if (value == null) return null;
+
+  // Check if parameter type is a union type that needs wrapping
+      if (paramType == typeof(PokemonSideFieldUnion))
+        {
+       return value switch
+  {
+     Pokemon p => new PokemonSideFieldPokemon(p),
+         Side s => new PokemonSideFieldSide(s),
+Field f => new PokemonSideFieldField(f),
+  _ => value,
+ };
+        }
+
+        if (paramType == typeof(PokemonSideBattleUnion))
+        {
+    return value switch
+            {
+  Pokemon p => new PokemonSideBattlePokemon(p),
+          Side s => new PokemonSideBattleSide(s),
+ IBattle b => new PokemonSideBattleBattle(b),
+ _ => value,
+ };
+        }
+
+     if (paramType == typeof(PokemonSideUnion))
+   {
+      return value switch
+      {
+     Pokemon p => new PokemonSidePokemon(p),
+         Side s => new PokemonSideSide(s),
+     _ => value,
+ };
+        }
+
+  // No wrapping needed
+   return value;
+ }
 
     /// <summary>
     /// Unwraps a RelayVar to extract the underlying value that matches the expected parameter type.

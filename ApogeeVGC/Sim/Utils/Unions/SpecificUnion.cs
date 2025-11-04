@@ -370,16 +370,50 @@ public abstract record EventTargetParameter
     {
         if (target == null) return null;
 
-        return target switch
+        // Handle union types first - these can accept multiple concrete types
+        if (expectedType == typeof(PokemonSideFieldUnion))
         {
-            PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
-                new PokemonEventTargetParameter(p.Pokemon),
-            SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) =>
-                new SideEventTargetParameter(s.Side),
-            FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) =>
-                new FieldEventTargetParameter(f.Field),
-            BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) =>
-                new BattleEventTargetParameter(b.Battle),
+   return target switch
+            {
+     PokemonSingleEventTarget p => new PokemonEventTargetParameter(p.Pokemon),
+         SideSingleEventTarget s => new SideEventTargetParameter(s.Side),
+           FieldSingleEventTarget f => new FieldEventTargetParameter(f.Field),
+  _ => null,
+        };
+   }
+
+        if (expectedType == typeof(PokemonSideBattleUnion))
+        {
+     return target switch
+         {
+      PokemonSingleEventTarget p => new PokemonEventTargetParameter(p.Pokemon),
+                SideSingleEventTarget s => new SideEventTargetParameter(s.Side),
+           BattleSingleEventTarget b => new BattleEventTargetParameter(b.Battle),
+     _ => null,
+ };
+        }
+
+      if (expectedType == typeof(PokemonSideUnion))
+        {
+          return target switch
+            {
+  PokemonSingleEventTarget p => new PokemonEventTargetParameter(p.Pokemon),
+              SideSingleEventTarget s => new SideEventTargetParameter(s.Side),
+     _ => null,
+         };
+        }
+
+        // Handle concrete types
+   return target switch
+        {
+  PokemonSingleEventTarget p when expectedType.IsAssignableFrom(typeof(Pokemon)) =>
+           new PokemonEventTargetParameter(p.Pokemon),
+SideSingleEventTarget s when expectedType.IsAssignableFrom(typeof(Side)) =>
+   new SideEventTargetParameter(s.Side),
+     FieldSingleEventTarget f when expectedType.IsAssignableFrom(typeof(Field)) =>
+        new FieldEventTargetParameter(f.Field),
+        BattleSingleEventTarget b when expectedType.IsAssignableFrom(typeof(IBattle)) =>
+           new BattleEventTargetParameter(b.Battle),
             _ => null,
         };
     }
