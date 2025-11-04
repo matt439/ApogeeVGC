@@ -402,30 +402,30 @@ public partial class BattleActions
         // Build move message attributes
         string moveName = activeMove.Name;
 
-        // Add move message to battle log
+     // Add move message to battle log
      if (Battle.DisplayUi)
      {
  if (target is null)
-       {
+ {
       throw new InvalidOperationException("Target cannot be null when displaying move message.");
       }
 
    // Check if sourceEffect should be logged
  bool shouldLogSourceEffect = sourceEffect != null &&
-      !(sourceEffect.EffectStateId is EmptyEffectStateId) &&
+  !(sourceEffect.EffectStateId is EmptyEffectStateId) &&
   !(sourceEffect.EffectStateId is FormatEffectStateId { FormatId: FormatId.EmptyEffect });
 
      if (shouldLogSourceEffect)
   {
-       Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+     Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
   StringNumberDelegateObjectUnion.FromObject(target), "[from]",
     StringNumberDelegateObjectUnion.FromObject(sourceEffect!.EffectStateId));
    }
-       else
+    else
        {
-     Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
+   Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
         StringNumberDelegateObjectUnion.FromObject(target));
-   }
+}
   }
         // Handle no target
         if (target == null)

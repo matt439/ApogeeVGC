@@ -80,6 +80,7 @@ public partial class Side : IDisposable
     {
         // Override values set by base constructor
         Id = sideNum;
+        N = sideNum == SideId.P1 ? 0 : 1;  // Set N based on sideNum
         Name = name;
 
         // Add team-specific initialization
