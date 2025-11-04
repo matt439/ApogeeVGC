@@ -45,18 +45,15 @@ public record Formats
 
                 foreach (Pokemon pokemon in battleAsync.GetAllPokemon())
                 {
-                    // Format the Pokemon details string manually for team preview
-                    // In team preview, we show: Species, Level (if not 100), Gender, but NOT shiny
+                    // Format the Pokemon details string for team preview
+                    // In team preview, we only show: Species and Gender
+                    // Level and item status are HIDDEN in team preview
                     string speciesName = pokemon.Species.Name;
 
-                    // Build details string
+                    // Build details string - only species and gender
                     List<string> detailsParts = [speciesName];
 
-                    if (pokemon.Level != 100)
-                    {
-                        detailsParts.Add($"L{pokemon.Level}");
-                    }
-
+                    // Add gender if not genderless
                     if (pokemon.Gender == GenderId.M)
                     {
                         detailsParts.Add("M");
@@ -68,12 +65,10 @@ public record Formats
 
                     string detailsString = string.Join(", ", detailsParts);
 
-                    // Determine if Pokemon has item (show as "item" without revealing which)
-                    string itemStatus = pokemon.Item != null && pokemon.Item != ItemId.None ? "item" : "";
-
+                    // Item status is always hidden in team preview (empty string)
                     if (battleAsync.DisplayUi)
                     {
-                        battleAsync.Add("poke", pokemon.Side.Id.ToString().ToLowerInvariant(), detailsString, itemStatus);
+                        battleAsync.Add("poke", pokemon.Side.Id.ToString().ToLowerInvariant(), detailsString, string.Empty);
                     }
                 }
 

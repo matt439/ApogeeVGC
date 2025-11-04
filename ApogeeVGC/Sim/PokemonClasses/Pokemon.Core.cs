@@ -19,10 +19,27 @@ public partial class Pokemon : IPriorityComparison, IDisposable
     public Side Side { get; }
     public IBattle Battle => Side.Battle;
     public PokemonSet Set { get; }
-    public string Name => Set.Name[..Math.Min(20, Set.Name.Length)];
+  public string Name => Set.Name[..Math.Min(20, Set.Name.Length)];
     public string FullName => $"{Side.Id.ToString()}: {Name}";
 
-    public string Fullname => $"{Side.Id.GetSideIdName()}: {Name}";
+    // Use base species name for display in slot identifier (matches TypeScript behavior)
+    // Get the base species (without forme) for display
+    public string Fullname
+    {
+        get
+        {
+      // Extract the base name (before any hyphen) from the current species name
+            // E.g., "Calyrex-Ice" becomes "Calyrex", "Miraidon" stays "Miraidon"
+      string baseName = BaseSpecies.Name;
+    int hyphenIndex = baseName.IndexOf('-');
+if (hyphenIndex > 0)
+     {
+           baseName = baseName[..hyphenIndex];
+        }
+
+         return $"{Side.Id.GetSideIdName()}: {baseName}";
+        }
+    }
     public int Level => Set.Level;
     public GenderId Gender => Set.Gender;
     public int Happiness => Set.Happiness;
@@ -277,8 +294,20 @@ public partial class Pokemon : IPriorityComparison, IDisposable
     /// </summary>
     public PokemonSlot GetSlot()
     {
-        int poistionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        return new PokemonSlot(Side.Id, poistionOffset);
+        // For multi-battles, this would use: Math.Floor(Side.N / 2.0) * Side.Active.Count
+        // But for standard battles (singles/doubles), this is always 0
+        int positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
+        
+        // Get this Pokemon's position in the active slots
+        // Position is in the full Pokemon list, but we need the active slot index
+   int activePosition = Side.Active.IndexOf(this);
+        if (activePosition < 0)
+        {
+// Pokemon is not active, use position 0 as fallback
+     activePosition = 0;
+        }
+      
+        return new PokemonSlot(Side.Id, activePosition + positionOffset);
     }
 
     /// <summary>
@@ -290,7 +319,7 @@ public partial class Pokemon : IPriorityComparison, IDisposable
     public override string ToString()
     {
         // Determine the full name to display (real or illusion)
-        string fullname = Illusion != null ? Illusion.Fullname : FullName;
+      string fullname = Illusion != null ? Illusion.Fullname : Fullname;
 
         // If active, combine slot identifier with name (skip first 2 chars of fullname)
         // Otherwise just return the full name

@@ -41,29 +41,33 @@ public partial class BattleAsync
 
             foreach (Pokemon pokemon in GetAllPokemon())
             {
-                // Get the details object and convert to string
+                // Get the details object
                 Pokemon.PokemonDetails detailsObj = pokemon.Details;
 
-                // Create a modified copy for display (hide certain formes)
+                // Create a modified copy for team preview display:
+                // - Hide shiny status
+                // - Mask certain species formes
+                // - Hide level (team preview always shows level 100 so level text doesn't appear)
+                // - Keep gender
                 var maskedDetails = new Pokemon.PokemonDetails
                 {
                     Id = MaskSpeciesForTeamPreview(detailsObj.Id),
-                    Level = detailsObj.Level,
+                    Name = Library.Species[MaskSpeciesForTeamPreview(detailsObj.Id)].Name,
+                    Level = 100, // Always use 100 so level doesn't appear in the string
                     Gender = detailsObj.Gender,
                     Shiny = false, // Always hide shiny in team preview
-                    TeraType = detailsObj.TeraType,
+                    TeraType = null, // Hide Tera type in team preview
                 };
 
-                // Convert to protocol string
+                // Convert to protocol string (will not include L100, shiny, or tera type)
                 string detailsString = maskedDetails.ToString();
 
-                AddSplit(pokemon.Side.Id,
-                    [
-                        new StringPart("poke"),
-                    new StringPart(pokemon.Side.Id.ToString()),
-                    new StringPart(detailsString),
-                    new StringPart(string.Empty),
-                    ]);
+                // Add the poke message with empty string for item parameter (4th parameter)
+                // The empty string indicates item status is hidden in team preview
+                if (DisplayUi)
+                {
+                    Add("poke", pokemon.Side.Id.ToString(), detailsString, string.Empty);
+                }
             }
 
             MakeRequest(RequestState.TeamPreview);
@@ -189,7 +193,7 @@ public partial class BattleAsync
             // Xerneas formes should be masked
             SpecieId.Xerneas or SpecieId.XerneasNeutral or SpecieId.XerneasActive => SpecieId.Xerneas,
 
-            // Don't mask Crowned formes
+            // Don't mask Crownedformes
             SpecieId.ZacianCrowned => SpecieId.ZacianCrowned,
             SpecieId.ZamazentaCrowned => SpecieId.ZamazentaCrowned,
 

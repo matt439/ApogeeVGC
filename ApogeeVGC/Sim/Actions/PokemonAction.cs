@@ -11,7 +11,7 @@ public record PokemonAction : IAction
         get;
         init
         {
-            if (value is ActionId.Shift or ActionId.RunSwitch or ActionId.Event or ActionId.Terastallize)
+            if (value is ActionId.Shift or ActionId.RunSwitch or ActionId.Event or ActionId.Terastallize or ActionId.Pass)
             {
                 field = value;
             }
