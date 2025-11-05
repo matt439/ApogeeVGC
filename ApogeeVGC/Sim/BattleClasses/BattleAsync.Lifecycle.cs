@@ -416,16 +416,17 @@ MidTurn = false;
   
          if (side.PokemonLeft > 0)
         side.PokemonLeft = side.Pokemon.Count;
+  }
 
-           if (DisplayUi)
+          // Add start message once, not per side
+            if (DisplayUi)
         {
-                 Add("start");
-}
-     }
+     Add("start");
+    }
 
-                    // Change Zacian/Zamazenta into their Crowned formes
-                    foreach (Pokemon pokemon in GetAllPokemon())
-                    {
+   // Change Zacian/Zamazenta into their Crowned formes
+          foreach (Pokemon pokemon in GetAllPokemon())
+               {
                         Species? rawSpecies = null;
                         if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
                         {

@@ -44,132 +44,179 @@ public class BattleRoom : IDisposable
     {
         if (_started)
         {
-    throw new InvalidOperationException("Battle already started");
-   }
+            throw new InvalidOperationException("Battle already started");
+        }
 
-        _started = true;
+      _started = true;
 
         Console.WriteLine($"[BattleRoom] Starting battle {BattleId}");
-
-      // Buffer to collect all initialization messages
-        var initMessages = new List<string>();
- 
-        // Room init
-   initMessages.Add($">{BattleId}");
-    initMessages.Add("|init|battle");
-  initMessages.Add($"|title|{player1Username} vs {Player2Username}");
-    initMessages.Add($">{BattleId}");
-   initMessages.Add($"|j|{player1Username}");
 
         // Create battle streams  
         _streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(_library));
 
-  // Parse team (or use test team)
-  var p1Team = string.IsNullOrEmpty(teamData) 
-    ? TeamGenerator.GenerateTestTeam(_library)
-      : TeamGenerator.ParseShowdownTeam(teamData, _library);
+        // Parse team (or use test team)
+ var p1Team = string.IsNullOrEmpty(teamData) 
+            ? TeamGenerator.GenerateTestTeam(_library)
+            : TeamGenerator.ParseShowdownTeam(teamData, _library);
 
         var p2Team = TeamGenerator.GenerateTestTeam(_library);
 
         // Set up player options
-        PlayerOptions p1Spec = new()
-   {
-  Name = player1Username,
-     Team = p1Team,
+    PlayerOptions p1Spec = new()
+        {
+     Name = player1Username,
+   Team = p1Team,
         };
 
         PlayerOptions p2Spec = new()
-   {
-Name = Player2Username,
-      Team = p2Team,
+        {
+      Name = Player2Username,
+            Team = p2Team,
         };
 
- // Create AI opponent for player 2
-        var p2Seed = new PrngSeed(1122);
-  _aiPlayer = new RandomPlayerAi(_streams.P2, seed: p2Seed, debug: true);
+        // Create AI opponent for player 2
+  var p2Seed = new PrngSeed(1122);
+    _aiPlayer = new RandomPlayerAi(_streams.P2, seed: p2Seed, debug: true);
         _aiTask = _aiPlayer.StartAsync(cancellationToken);
 
- // Initialize the battle
+        // Start the stream consumer task to capture all messages
+        _streamConsumerTask = Task.Run(async () =>
+        {
+          try
+        {
+       // Send initial room setup messages that don't come from the battle stream
+                await sendToClientAsync($">{BattleId}");
+      await sendToClientAsync("|init|battle");
+         await sendToClientAsync($"|title|{player1Username} vs {Player2Username}");
+      await sendToClientAsync($"|j|{player1Username}");
+
+            // Now consume all messages from P1 stream and forward them immediately
+    await foreach (string chunk in _streams.P1.ReadAllAsync(cancellationToken))
+            {
+  Console.WriteLine($"[BattleRoom] Received P1 chunk ({chunk.Length} bytes)");
+    Console.WriteLine($"[BattleRoom] First 200 chars: {chunk.Substring(0, Math.Min(200, chunk.Length))}");
+     
+     // Skip empty or whitespace-only chunks
+              if (string.IsNullOrWhiteSpace(chunk))
+          {
+          Console.WriteLine($"[BattleRoom] Skipping empty chunk");
+        continue;
+        }
+       
+     // Process chunk to handle |split| messages correctly
+        var lines = chunk.Split('\n');
+      var processedLines = new List<string>();
+ bool inSplitBlock = false;
+                bool skipNextLine = false;
+            
+     for (int i = 0; i < lines.Length; i++)
+                {
+var line = lines[i];
+       var trimmedLine = line.Trim();
+             
+           // Skip leading empty lines, separators, and timestamps at the start only
+         if (processedLines.Count == 0 && 
+          (string.IsNullOrWhiteSpace(trimmedLine) || 
+       trimmedLine == "|" || 
+    trimmedLine.StartsWith("|t:|")))
+   {
+     continue;
+         }
+        
+           // Handle |split| directive
+      if (trimmedLine.StartsWith("|split|"))
+ {
+          inSplitBlock = true;
+     skipNextLine = false;
+       // Don't include the |split| line itself
+              continue;
+      }
+      
+           // If we're in a split block, keep first message and skip the second
+                 if (inSplitBlock)
+               {
+  if (!skipNextLine)
+  {
+          // Keep the first message (P1-specific version with actual HP)
+      processedLines.Add(line);
+               skipNextLine = true;
+             }
+    else
+           {
+      // Skip the second message (percentage version)
+                 inSplitBlock = false;
+   skipNextLine = false;
+             }
+       continue;
+     }
+          
+       // Normal line, just add it
+       processedLines.Add(line);
+      }
+                
+       // If no lines left after processing, skip this chunk
+     if (processedLines.Count == 0)
+                {
+           Console.WriteLine($"[BattleRoom] Skipping chunk with no content after processing");
+ continue;
+       }
+         
+                // Rebuild chunk from processed lines
+     var cleanedChunk = string.Join("\n", processedLines);
+       
+        Console.WriteLine($"[BattleRoom] Sending processed chunk ({cleanedChunk.Length} bytes, {lines.Length - processedLines.Count} lines removed)");
+       // Send room context once before the chunk
+  await sendToClientAsync($">{BattleId}");
+           // Send the cleaned chunk
+  await sendToClientAsync(cleanedChunk);
+            }
+
+      Console.WriteLine($"[BattleRoom] Battle {BattleId} ended");
+      }
+   catch (OperationCanceledException)
+            {
+                Console.WriteLine($"[BattleRoom] Battle {BattleId} cancelled");
+            }
+   catch (Exception ex)
+{
+       Console.WriteLine($"[BattleRoom] Stream consumer error: {ex.Message}");
+         Console.WriteLine($"Stack trace: {ex.StackTrace}");
+     }
+        }, cancellationToken);
+
+        // Give the stream consumer a moment to start and send init messages
+   await Task.Delay(50, cancellationToken);
+
+  // Initialize the battle
       string formatid = Format.ToLower() switch
-        {
+    {
             "gen9customgame" => "gen9customgame",
-     "gen9doublescustomgame" => "gen9doublescustomgame",
-     _ => "gen9doublescustomgame"
+          "gen9doublescustomgame" => "gen9doublescustomgame",
+            _ => "gen9doublescustomgame"
         };
 
-  var spec = new
+    var spec = new
         {
-      formatid = formatid,
-      seed = new[] { 0x71A, 0x762, 0, 0 } // 1818, 1122
+    formatid = formatid,
+            seed = new[] { 0x71A, 0x762, 0, 0 } // 1818, 1122
         };
 
-        // Convert PlayerOptions to Showdown format
- Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
-Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
+     // Convert PlayerOptions to Showdown format
+  Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
+   Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
 
-        JsonObject p1JsonObj = DictionaryToJsonObject(p1Dict);
+    JsonObject p1JsonObj = DictionaryToJsonObject(p1Dict);
         JsonObject p2JsonObj = DictionaryToJsonObject(p2Dict);
 
      string p1Json = p1JsonObj.ToJsonString();
-        string p2Json = p2JsonObj.ToJsonString();
+  string p2Json = p2JsonObj.ToJsonString();
 
         string startCommand = $">start {System.Text.Json.JsonSerializer.Serialize(spec)}\n" +
-            $">player p1 {p1Json}\n" +
-            $">player p2 {p2Json}";
+      $">player p1 {p1Json}\n" +
+        $">player p2 {p2Json}";
 
-        await _streams.Omniscient.WriteAsync(startCommand, cancellationToken);
-
-        // Give battle time to process and generate initialization messages
-        await Task.Delay(300, cancellationToken);
-  
-     // Collect all initialization messages from P1 stream
-   var reader = _streams.P1.OutputChannel.Reader;
-        while (reader.TryRead(out string? chunk))
-     {
-        var lines = chunk.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-       foreach (var line in lines)
-     {
-       if (string.IsNullOrWhiteSpace(line)) continue;
-initMessages.Add($">{BattleId}");
-       initMessages.Add(line);
-       }
-     }
-        
-   // Send ALL initialization messages at once
-   foreach (var msg in initMessages)
-        {
-      await sendToClientAsync(msg);
-   }
-
-     // NOW start the stream consumer task for ongoing messages
-_streamConsumerTask = Task.Run(async () =>
-{
-   try
-      {
-         await foreach (string chunk in _streams.P1.ReadAllAsync(cancellationToken))
-       {
-       var lines = chunk.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-     foreach (var line in lines)
-         {
-        if (string.IsNullOrWhiteSpace(line)) continue;
-   
-       string formattedMessage = $">{BattleId}\n{line}";
-              await sendToClientAsync(formattedMessage);
-       }
-      }
-  
-     Console.WriteLine($"[BattleRoom] Battle {BattleId} ended");
-          }
-catch (OperationCanceledException)
-   {
-   Console.WriteLine($"[BattleRoom] Battle {BattleId} cancelled");
-        }
-       catch (Exception ex)
-            {
-              Console.WriteLine($"[BattleRoom] Stream consumer error: {ex.Message}");
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    }
-     }, cancellationToken);
+        // Now write the start command - stream consumer will capture all resulting messages
+      await _streams.Omniscient.WriteAsync(startCommand, cancellationToken);
     }
 
     /// <summary>

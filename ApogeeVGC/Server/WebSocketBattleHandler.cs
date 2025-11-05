@@ -214,7 +214,15 @@ await Task.Delay(100);
          await HandleBattleChoiceAsync(roomMessage);
      return;
         }
- }
+   
+            // Handle move/switch choices sent to lobby (client bug workaround)
+     if (roomId == "lobby" && roomMessage.StartsWith("/choose") && _currentBattle != null)
+    {
+   Console.WriteLine($"[Move Choice] Redirecting lobby move choice to battle: {roomMessage}");
+     await HandleBattleChoiceAsync(roomMessage);
+         return;
+    }
+        }
 
         // Pokemon Showdown protocol: messages start with |/ for commands
         if (message.StartsWith("|/cmd rooms"))
