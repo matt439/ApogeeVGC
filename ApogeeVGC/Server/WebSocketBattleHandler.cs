@@ -12,15 +12,20 @@ public class WebSocketBattleHandler
     private readonly WebSocket _webSocket;
     private readonly PlayerStreams _streams;
     private readonly CancellationToken _cancellationToken;
+    private readonly BattleManager _battleManager;
     private string _username = "Guest";
+    private string? _currentTeam;
+    private BattleRoom? _currentBattle;
     
     public WebSocketBattleHandler(
         WebSocket webSocket,
         PlayerStreams streams,
+        BattleManager battleManager,
         CancellationToken cancellationToken)
     {
         _webSocket = webSocket;
         _streams = streams;
+        _battleManager = battleManager;
         _cancellationToken = cancellationToken;
     }
 
@@ -30,19 +35,33 @@ public class WebSocketBattleHandler
     public async Task RunAsync()
     {
         // Send initial connection messages
-        await SendInitializationMessagesAsync();
+      await SendInitializationMessagesAsync();
   
-        // Start task to send battle output to client
-        Task sendTask = SendBattleOutputToClientAsync();
+   // Start task to send battle output to client
+   Task sendTask = SendBattleOutputToClientAsync();
         
      // Start task to receive client input
-        Task receiveTask = ReceiveClientInputAsync();
-        
+  Task receiveTask = ReceiveClientInputAsync();
+    
     // Wait for either task to complete
         await Task.WhenAny(sendTask, receiveTask);
         
     // Clean up
+        CleanupBattle();
         _streams.Dispose();
+}
+
+    /// <summary>
+ /// Cleans up the current battle if one is active.
+ /// </summary>
+    private void CleanupBattle()
+    {
+        if (_currentBattle != null)
+      {
+            Console.WriteLine($"[Cleanup] Removing battle {_currentBattle.BattleId}");
+            _battleManager.RemoveBattle(_currentBattle.BattleId);
+   _currentBattle = null;
+     }
     }
 
     /// <summary>
@@ -164,6 +183,22 @@ await Task.Delay(100);
     /// </summary>
     private async Task HandleClientCommandAsync(string message)
     {
+      // Check if this is a battle room command (format: roomid|command)
+      if (message.Contains('|') && !message.StartsWith("|/"))
+      {
+            // Extract room ID and actual message
+            int firstPipe = message.IndexOf('|');
+            string roomId = message.Substring(0, firstPipe);
+string roomMessage = message.Substring(firstPipe + 1);
+
+   // Check if this is a choice for the current battle
+            if (_currentBattle != null && roomId == _currentBattle.BattleId)
+    {
+      await HandleBattleChoiceAsync(roomMessage);
+ return;
+     }
+    }
+
         // Pokemon Showdown protocol: messages start with |/ for commands
         if (message.StartsWith("|/cmd rooms"))
         {
@@ -198,49 +233,128 @@ await Task.Delay(100);
     else if (message.StartsWith("|/trn "))
         {
      // Client wants to set username
-         // Format: |/trn username,challengekeyid,challenge
-            var parts = message.Split(' ', 2);
+   // Format: |/trn username,challengekeyid,challenge
+       var parts = message.Split(' ', 2);
          if (parts.Length > 1)
-{
+        {
        // Extract just the username (before the first comma)
     var fullData = parts[1].Trim();
        var dataParts = fullData.Split(',');
-                _username = dataParts[0]; // Just the username
-           
-           Console.WriteLine($"Username changed to: {_username}");
-       // Send updateuser with named=1 (like real Pokemon Showdown)
-                await SendToClientAsync($"|updateuser| {_username}|1|101|{{}}");
- }
+         _username = dataParts[0]; // Just the username
+  
+       Console.WriteLine($"Username changed to: {_username}");
+ // Send updateuser with named=1 (like real Pokemon Showdown)
+       await SendToClientAsync($"|updateuser| {_username}|1|101|{{}}");
+         }
         }
         else if (message.StartsWith("|/utm "))
  {
-            // Client sent team - acknowledge
-            Console.WriteLine("Team data received");
+       // Client sent team - store it
+   _currentTeam = message.Substring(6).Trim(); // Remove "|/utm "
+  Console.WriteLine($"Team data received (length: {_currentTeam.Length})");
         }
-        else if (message.StartsWith("|/challenge") || message.StartsWith("|/search"))
-        {
+     else if (message.StartsWith("|/challenge") || message.StartsWith("|/search"))
+ {
    // Client wants to start a battle
-Console.WriteLine("Battle request received");
-            await SendToClientAsync(">popup|Battle system not yet implemented!\\n\\nYour C# simulator is working, but battle initiation from the client needs to be connected.\\n\\nTo test battles, use CLI mode:\\ndotnet run doubles");
+        await HandleBattleRequestAsync(message);
         }
   else if (message.StartsWith("|/avatar"))
       {
-     // Client changing avatar - acknowledge
-      var parts = message.Split(' ', 2);
-      if (parts.Length > 1)
+  // Client changing avatar - acknowledge
+      var messageParts = message.Split(' ', 2);
+   if (messageParts.Length > 1)
    {
-    Console.WriteLine($"Avatar changed to: {parts[1]}");
+    Console.WriteLine($"Avatar changed to: {messageParts[1]}");
      }
-        }
+   }
         else if (message.StartsWith("|/cmd "))
-        {
+    {
    // Generic command - log it
-            Console.WriteLine($"Command: {message}");
+     Console.WriteLine($"Command: {message}");
         }
   else
       {
-            // For other messages, log them
-            Console.WriteLine($"Unhandled: {message}");
-        }
+         // For other messages, log them
+Console.WriteLine($"Unhandled: {message}");
+ }
     }
+    /// <summary>
+    /// Handles battle request from client (/search or /challenge).
+    /// </summary>
+    private async Task HandleBattleRequestAsync(string message)
+    {
+    try
+        {
+Console.WriteLine($"[Battle Request] {message}");
+            
+    // Create new battle
+   _currentBattle = _battleManager.CreateBattle(_username, "gen9doublescustomgame");
+            
+     // Send battle init message
+   await SendBattleInitAsync(_currentBattle.BattleId);
+  
+       // Start the battle
+     await _currentBattle.StartBattleAsync(_currentTeam, SendToClientAsync, _cancellationToken);
+}
+        catch (Exception ex)
+  {
+      Console.WriteLine($"[Battle Request Error] {ex.Message}");
+    await SendToClientAsync($">popup|Battle error: {ex.Message}");
+    }
+    }
+
+    /// <summary>
+    /// Sends battle initialization messages to the client.
+    /// </summary>
+    private async Task SendBattleInitAsync(string battleId)
+    {
+  // Initialize battle room
+   await SendToClientAsync($">{battleId}");
+  await SendToClientAsync($"|init|battle");
+   await SendToClientAsync($"|title|{_username} vs AI Opponent");
+await SendToClientAsync($"|player|p1|{_username}|");
+   await SendToClientAsync($"|player|p2|AI Opponent|");
+  await SendToClientAsync($"|teamsize|p1|6");
+   await SendToClientAsync($"|teamsize|p2|6");
+ await SendToClientAsync($"|gametype|doubles");
+   await SendToClientAsync($"|gen|9");
+  await SendToClientAsync($"|tier|[Gen 9] Doubles Custom Game");
+        await SendToClientAsync($"|rated|");
+  await SendToClientAsync($"|rule|Team Preview");
+        await Task.Delay(100);
+    }
+
+    /// <summary>
+    /// Handles a battle choice from the player.
+    /// </summary>
+  private async Task HandleBattleChoiceAsync(string choice)
+    {
+        try
+    {
+      if (_currentBattle == null)
+  {
+      Console.WriteLine("[Battle Choice] No active battle");
+ return;
+          }
+
+            // Strip /choose prefix if present (client sends "/choose move 1, move 1")
+            string cleanedChoice = choice;
+            if (cleanedChoice.StartsWith("/choose "))
+         {
+  cleanedChoice = cleanedChoice.Substring(8); // Remove "/choose "
+        }
+        else if (cleanedChoice.StartsWith("/"))
+    {
+     // Handle other slash commands like /forfeit, /undo
+            cleanedChoice = cleanedChoice.Substring(1);
+        }
+
+     // Forward the choice to the battle
+   await _currentBattle.SendPlayerChoiceAsync(cleanedChoice, _cancellationToken);
+        }
+  catch (Exception ex)
+      {
+   Console.WriteLine($"[Battle Choice Error] {ex.Message}");
+        }
+  }
 }

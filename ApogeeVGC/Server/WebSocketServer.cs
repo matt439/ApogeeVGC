@@ -13,10 +13,12 @@ namespace ApogeeVGC.Server;
 public class WebSocketServer
 {
     private readonly Library _library;
-    
+    private readonly BattleManager _battleManager;
+  
     public WebSocketServer(Library library)
     {
         _library = library;
+        _battleManager = new BattleManager(library);
     }
 
     /// <summary>
@@ -28,24 +30,24 @@ public class WebSocketServer
         
         try
         {
-        // Create battle streams for this connection
-       PlayerStreams streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(_library));
+            // Create battle streams for this connection
+            PlayerStreams streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(_library));
        
             // Create handler for this connection
-          var handler = new WebSocketBattleHandler(webSocket, streams, cancellationToken);
+            var handler = new WebSocketBattleHandler(webSocket, streams, _battleManager, cancellationToken);
        
-         // Start handling the connection
+            // Start handling the connection
             await handler.RunAsync();
 }
         catch (WebSocketException ex)
         {
-      Console.WriteLine($"WebSocket error: {ex.Message}");
+            Console.WriteLine($"WebSocket error: {ex.Message}");
       }
     catch (Exception ex)
         {
             Console.WriteLine($"Connection error: {ex.Message}");
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
-        }
+ }
   finally
         {
             if (webSocket.State == WebSocketState.Open)
@@ -53,9 +55,9 @@ public class WebSocketServer
       await webSocket.CloseAsync(
            WebSocketCloseStatus.NormalClosure,
  "Connection closed",
-              cancellationToken);
+          cancellationToken);
      }
-            Console.WriteLine("WebSocket connection closed");
+     Console.WriteLine("WebSocket connection closed");
         }
     }
 }

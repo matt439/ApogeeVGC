@@ -144,7 +144,8 @@ var builder = WebApplication.CreateBuilder(args);
         app.MapGet("/~~{server}/action.php", (string server) =>
         {
     Console.WriteLine($"GET Action endpoint for server: {server}");
-          return Results.Json(new { });
+// Return empty JSON array (matches Pokemon Showdown behavior)
+  return Results.Json(new object[] { });
         });
         
         // POST version for name changes and other actions
@@ -205,7 +206,7 @@ var builder = WebApplication.CreateBuilder(args);
       app.MapGet("/action.php", () => 
         {
    Console.WriteLine("Action endpoint hit");
-        return Results.Json(new { });
+      return Results.Json(new object[] { });
         });
    
         app.MapPost("/action.php", async (HttpContext context) =>
@@ -233,7 +234,7 @@ var builder = WebApplication.CreateBuilder(args);
       app.MapGet("/config/{file}", (string file) =>
         {
             Console.WriteLine($"Config requested: {file}");
- return Results.Json(new { });
+ return Results.Json(new object[] { });
         });
 
         // Server info endpoint (for client compatibility)

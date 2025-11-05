@@ -80,7 +80,7 @@ public partial class Pokemon
         var entry = new PokemonSwitchRequestData
         {
             Condition = condition,
-            Active = Position < Side.Active.Count,
+            Active = IsActive, // Use IsActive property instead of Position < Side.Active.Count
             Stats = stats,
             Moves = moves,
             BaseAbility = Battle.Library.Abilities[BaseAbility],
