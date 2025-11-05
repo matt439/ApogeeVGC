@@ -77,6 +77,8 @@ public static partial class State
             case PokemonSwitchRequestData switchData:
                 return new Dictionary<string, object?>
                 {
+                    ["ident"] = switchData.Ident,
+                    ["details"] = switchData.Details,
                     ["condition"] = switchData.Condition.ToString(),
                     ["active"] = switchData.Active,
                     ["stats"] = switchData.Stats, // Already a Dictionary<string, int> without HP

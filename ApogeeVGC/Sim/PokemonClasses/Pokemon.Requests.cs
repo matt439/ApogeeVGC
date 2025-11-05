@@ -77,9 +77,28 @@ public partial class Pokemon
             }
         }
 
+        // Generate ident (e.g., "p1: Calyrex-Ice" or "p1a: Calyrex-Ice" for active)
+        string ident;
+        if (IsActive)
+        {
+            // Active Pokemon include position letter (a, b, c, d)
+            char positionLetter = (char)('a' + Position);
+            ident = $"{Side.Id.ToString().ToLower()}{positionLetter}: {Name}";
+        }
+        else
+        {
+            // Inactive Pokemon don't include position
+            ident = $"{Side.Id.ToString().ToLower()}: {Name}";
+        }
+
+        // Generate details string (e.g., "Calyrex-Ice, L50, M")
+        string details = Details.ToString();
+
         // Create the base entry - NOTE: Stats will need to be handled specially in serialization
         var entry = new PokemonSwitchRequestData
         {
+            Ident = ident,
+            Details = details,
             Condition = condition,
             Active = IsActive,
             Stats = stats, // Dictionary without HP

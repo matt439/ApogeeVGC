@@ -7,8 +7,8 @@ namespace ApogeeVGC.Sim.Choices;
 
 public record PokemonSwitchRequestData
 {
-    //public required string Ident { get; init; }
-    //public required string Details { get; init; }
+    public required string Ident { get; init; }
+    public required string Details { get; init; }
     public required string Condition { get; init; }
     public bool Active { get; init; }
     // Changed from StatsTable to Dictionary<string, int> to exclude HP (HP is in Condition field)

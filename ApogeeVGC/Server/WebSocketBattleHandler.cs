@@ -192,21 +192,29 @@ await Task.Delay(100);
     /// </summary>
     private async Task HandleClientCommandAsync(string message)
     {
-      // Check if this is a battle room command (format: roomid|command)
-      if (message.Contains('|') && !message.StartsWith("|/"))
-      {
+        // Check if this is a battle room command (format: roomid|command)
+     if (message.Contains('|') && !message.StartsWith("|/"))
+     {
             // Extract room ID and actual message
             int firstPipe = message.IndexOf('|');
-            string roomId = message.Substring(0, firstPipe);
-string roomMessage = message.Substring(firstPipe + 1);
+   string roomId = message.Substring(0, firstPipe);
+    string roomMessage = message.Substring(firstPipe + 1);
 
-   // Check if this is a choice for the current battle
-            if (_currentBattle != null && roomId == _currentBattle.BattleId)
+      // Check if this is a choice for the current battle
+      if (_currentBattle != null && roomId == _currentBattle.BattleId)
     {
       await HandleBattleChoiceAsync(roomMessage);
- return;
-     }
-    }
+      return;
+            }
+            
+            // Handle team preview choice sent to lobby (client bug workaround)
+            if (roomId == "lobby" && roomMessage.StartsWith("/team") && _currentBattle != null)
+  {
+              Console.WriteLine($"[Team Preview] Redirecting lobby team choice to battle: {roomMessage}");
+         await HandleBattleChoiceAsync(roomMessage);
+     return;
+        }
+ }
 
         // Pokemon Showdown protocol: messages start with |/ for commands
         if (message.StartsWith("|/cmd rooms"))
@@ -325,24 +333,36 @@ Console.WriteLine($"Unhandled: {message}");
  return;
           }
 
-            // Strip /choose prefix if present (client sends "/choose move 1, move 1")
+    // Strip /choose prefix if present (client sends "/choose move 1, move 1")
             string cleanedChoice = choice;
-            if (cleanedChoice.StartsWith("/choose "))
-         {
-  cleanedChoice = cleanedChoice.Substring(8); // Remove "/choose "
-        }
-        else if (cleanedChoice.StartsWith("/"))
-    {
-     // Handle other slash commands like /forfeit, /undo
-            cleanedChoice = cleanedChoice.Substring(1);
-        }
-
-     // Forward the choice to the battle
-   await _currentBattle.SendPlayerChoiceAsync(cleanedChoice, _cancellationToken);
-        }
-  catch (Exception ex)
+        
+      // Remove trailing |undefined that some clients append
+     if (cleanedChoice.EndsWith("|undefined"))
+ {
+           cleanedChoice = cleanedChoice.Substring(0, cleanedChoice.Length - 10); // Remove "|undefined"
+            }
+            
+        if (cleanedChoice.StartsWith("/choose "))
+        {
+     cleanedChoice = cleanedChoice.Substring(8); // Remove "/choose "
+            }
+            else if (cleanedChoice.StartsWith("/team "))
       {
-   Console.WriteLine($"[Battle Choice Error] {ex.Message}");
+   cleanedChoice = cleanedChoice.Substring(6); // Remove "/team "
+       cleanedChoice = "team " + cleanedChoice; // Format as "team 231456"
+            }
+            else if (cleanedChoice.StartsWith("/"))
+{
+        // Handle other slash commands like /forfeit, /undo
+   cleanedChoice = cleanedChoice.Substring(1);
+      }
+
+            // Forward the choice to the battle
+            await _currentBattle.SendPlayerChoiceAsync(cleanedChoice, _cancellationToken);
         }
-  }
+        catch (Exception ex)
+{
+        Console.WriteLine($"[Battle Choice Error] {ex.Message}");
+        }
+    }
 }

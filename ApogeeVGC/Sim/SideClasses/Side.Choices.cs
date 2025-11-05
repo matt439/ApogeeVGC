@@ -428,16 +428,33 @@ public partial class Side
 
         // Step 2: Parse positions from input
         List<int> positions;
-        if (string.IsNullOrWhiteSpace(data))
+if (string.IsNullOrWhiteSpace(data))
         {
-            positions = [];
+ positions = [];
         }
-        else
+  else
         {
-            char separator = data.Contains(',') ? ',' : ' ';
-            positions = data.Split(separator)
-                .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1) // Convert to 0-based
-                .ToList();
+      // Check for separators (comma or space)
+      if (data.Contains(','))
+     {
+    // Comma-separated format: "2, 1, 3, 4, 5, 6"
+      positions = data.Split(',')
+     .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1)
+    .ToList();
+         }
+    else if (data.Contains(' '))
+      {
+    // Space-separated format: "2 1 3 4 5 6"
+ positions = data.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+   .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1)
+     .ToList();
+       }
+ else
+     {
+   // No separators - treat each character as a digit: "231456"
+    positions = data.Select(c => char.IsDigit(c) ? int.Parse(c.ToString()) - 1 : -1)
+     .ToList();
+     }
         }
 
         int pickedTeamSize = PickedTeamSize();
