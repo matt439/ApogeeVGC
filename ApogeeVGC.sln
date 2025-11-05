@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35913.81
@@ -77,6 +77,44 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{711F7807
 		pokemon-showdown\sim\tools\random-player-ai.ts = pokemon-showdown\sim\tools\random-player-ai.ts
 		pokemon-showdown\sim\tools\runner.ts = pokemon-showdown\sim\tools\runner.ts
 	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pokemon-showdown-client", "pokemon-showdown-client", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown-client\.gitignore = pokemon-showdown-client\.gitignore
+		pokemon-showdown-client\package.json = pokemon-showdown-client\package.json
+		pokemon-showdown-client\README.md = pokemon-showdown-client\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "js", "js", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown-client\play.pokemonshowdown.com\js\client-battle.js = pokemon-showdown-client\play.pokemonshowdown.com\js\client-battle.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-animations.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-animations.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-animations-moves.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-animations-moves.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-choices.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-choices.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-dex.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-dex.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-dex-data.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-dex-data.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-log.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-log.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-scene-stub.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-scene-stub.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-sound.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-sound.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-text-parser.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-text-parser.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battle-tooltips.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battle-tooltips.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\battledata.js = pokemon-showdown-client\play.pokemonshowdown.com\js\battledata.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\client.js = pokemon-showdown-client\play.pokemonshowdown.com\js\client.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\client-connection.js = pokemon-showdown-client\play.pokemonshowdown.com\js\client-connection.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\client-core.js = pokemon-showdown-client\play.pokemonshowdown.com\js\client-core.js
+		pokemon-showdown-client\play.pokemonshowdown.com\js\client-main.js = pokemon-showdown-client\play.pokemonshowdown.com\js\client-main.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client-data", "client-data", "{C3D4E5F6-A7B8-9012-CDEF-123456789012}"
+	ProjectSection(SolutionItems) = preProject
+		pokemon-showdown-client\play.pokemonshowdown.com\data\abilities.js = pokemon-showdown-client\play.pokemonshowdown.com\data\abilities.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\aliases.js = pokemon-showdown-client\play.pokemonshowdown.com\data\aliases.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\formats-data.js = pokemon-showdown-client\play.pokemonshowdown.com\data\formats-data.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\items.js = pokemon-showdown-client\play.pokemonshowdown.com\data\items.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\moves.js = pokemon-showdown-client\play.pokemonshowdown.com\data\moves.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\pokedex.js = pokemon-showdown-client\play.pokemonshowdown.com\data\pokedex.js
+		pokemon-showdown-client\play.pokemonshowdown.com\data\typechart.js = pokemon-showdown-client\play.pokemonshowdown.com\data\typechart.js
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,6 +147,8 @@ Global
 		{FAB885D4-E08F-4809-9763-9B97788E28E5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9C8132A1-EAD1-423E-B5C8-4CF741A8CAA3} = {FAB885D4-E08F-4809-9763-9B97788E28E5}
 		{711F7807-C3DF-4241-A073-EB51552D8865} = {FAB885D4-E08F-4809-9763-9B97788E28E5}
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}
