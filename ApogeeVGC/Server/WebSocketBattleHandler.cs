@@ -16,7 +16,8 @@ public class WebSocketBattleHandler
     private string _username = "Guest";
     private string? _currentTeam;
     private BattleRoom? _currentBattle;
-    
+    private readonly SemaphoreSlim _sendLock = new(1, 1); // Ensure messages sent in order
+
     public WebSocketBattleHandler(
         WebSocket webSocket,
         PlayerStreams streams,
@@ -103,16 +104,24 @@ await Task.Delay(100);
     /// </summary>
     private async Task SendToClientAsync(string message)
     {
-        // Log the message (truncate if too long)
-        var preview = message.Length > 200 ? message.Substring(0, 200) + "..." : message;
-        Console.WriteLine($"SEND ({message.Length} bytes):\n{preview}\n");
+      await _sendLock.WaitAsync(_cancellationToken);
+        try
+        {
+            // Log the message (truncate if too long)
+     var preview = message.Length > 200 ? message.Substring(0, 200) + "..." : message;
+     Console.WriteLine($"SEND ({message.Length} bytes):\n{preview}\n");
  
         byte[] buffer = Encoding.UTF8.GetBytes(message);
-        await _webSocket.SendAsync(
-            new ArraySegment<byte>(buffer),
-            WebSocketMessageType.Text,
-        endOfMessage: true,
-            _cancellationToken);
+      await _webSocket.SendAsync(
+        new ArraySegment<byte>(buffer),
+     WebSocketMessageType.Text,
+       endOfMessage: true,
+    _cancellationToken);
+    }
+        finally
+  {
+   _sendLock.Release();
+        }
     }
 
     /// <summary>
@@ -282,46 +291,25 @@ Console.WriteLine($"Unhandled: {message}");
     /// Handles battle request from client (/search or /challenge).
     /// </summary>
     private async Task HandleBattleRequestAsync(string message)
-    {
-    try
+ {
+        try
         {
-Console.WriteLine($"[Battle Request] {message}");
+            Console.WriteLine($"[Battle Request] {message}");
             
-    // Create new battle
-   _currentBattle = _battleManager.CreateBattle(_username, "gen9doublescustomgame");
+            // Create new battle
+    _currentBattle = _battleManager.CreateBattle(_username, "gen9doublescustomgame");
             
-     // Send battle init message
-   await SendBattleInitAsync(_currentBattle.BattleId);
-  
-       // Start the battle
-     await _currentBattle.StartBattleAsync(_currentTeam, SendToClientAsync, _cancellationToken);
-}
+            // DON'T send ANY messages here - let BattleRoom handle ALL initialization
+            // This prevents message interleaving issues
+            
+            // Start the battle - it will send ALL messages including room init
+            await _currentBattle.StartBattleAsync(_username, _currentTeam, SendToClientAsync, _cancellationToken);
+     }
         catch (Exception ex)
-  {
-      Console.WriteLine($"[Battle Request Error] {ex.Message}");
-    await SendToClientAsync($">popup|Battle error: {ex.Message}");
-    }
-    }
-
-    /// <summary>
-    /// Sends battle initialization messages to the client.
-    /// </summary>
-    private async Task SendBattleInitAsync(string battleId)
-    {
-  // Initialize battle room
-   await SendToClientAsync($">{battleId}");
-  await SendToClientAsync($"|init|battle");
-   await SendToClientAsync($"|title|{_username} vs AI Opponent");
-await SendToClientAsync($"|player|p1|{_username}|");
-   await SendToClientAsync($"|player|p2|AI Opponent|");
-  await SendToClientAsync($"|teamsize|p1|6");
-   await SendToClientAsync($"|teamsize|p2|6");
- await SendToClientAsync($"|gametype|doubles");
-   await SendToClientAsync($"|gen|9");
-  await SendToClientAsync($"|tier|[Gen 9] Doubles Custom Game");
-        await SendToClientAsync($"|rated|");
-  await SendToClientAsync($"|rule|Team Preview");
-        await Task.Delay(100);
+        {
+        Console.WriteLine($"[Battle Request Error] {ex.Message}");
+            await SendToClientAsync($">popup|Battle error: {ex.Message}");
+      }
     }
 
     /// <summary>

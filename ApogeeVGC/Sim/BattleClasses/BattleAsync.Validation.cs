@@ -13,9 +13,15 @@ public partial class BattleAsync
 {
     public void RunPickTeam()
     {
+        Console.WriteLine($"[RunPickTeam] Starting, DisplayUi={DisplayUi}");
+
+        Console.WriteLine($"[RunPickTeam] Calling Format.OnTeamPreview");
+  
         // onTeamPreview handlers are expected to show full teams to all active sides,
         // and send a 'teampreview' request for players to pick their leads / team order.
         Format.OnTeamPreview?.Invoke(this);
+ 
+        Console.WriteLine($"[RunPickTeam] Format.OnTeamPreview completed");
 
         foreach (RuleId rule in RuleTable.Keys)
         {
@@ -27,12 +33,14 @@ public partial class BattleAsync
 
         if (RequestState == RequestState.TeamPreview)
         {
+            Console.WriteLine("[RunPickTeam] RequestState already TeamPreview, returning early");
             return;
         }
 
         if (RuleTable.PickedTeamSize.HasValue && RuleTable.PickedTeamSize.Value > 0)
         {
-            // There was no onTeamPreview handler (e.g. Team Preview rule missing).
+   Console.WriteLine($"[RunPickTeam] PickedTeamSize={RuleTable.PickedTeamSize.Value}, sending poke messages");
+      // There was no onTeamPreview handler (e.g. Team Preview rule missing).
             // Players must still pick their own Pokémon, so we show them privately.
             if (DisplayUi)
             {
@@ -62,11 +70,22 @@ public partial class BattleAsync
                 // Convert to protocol string (will not include L100, shiny, or tera type)
                 string detailsString = maskedDetails.ToString();
 
-                // Add the poke message with empty string for item parameter (4th parameter)
-                // The empty string indicates item status is hidden in team preview
+                // Add the poke message
+                // Item parameter: "item" if holding item, omit parameter entirely if not
                 if (DisplayUi)
                 {
-                    Add("poke", pokemon.Side.Id.ToString(), detailsString, string.Empty);
+                    Console.WriteLine($"[RunPickTeam] Pokemon {pokemon.Name} has item: {pokemon.Item}");
+
+                    if (pokemon.Item != ItemId.None)
+                    {
+                        // Has item - send "item" as 4th parameter
+                        Add("poke", pokemon.Side.Id.ToString(), detailsString, "item");
+                    }
+                    else
+                    {
+                        // No item - only send 3 parameters (no trailing |)
+                        Add("poke", pokemon.Side.Id.ToString(), detailsString);
+                    }
                 }
             }
 

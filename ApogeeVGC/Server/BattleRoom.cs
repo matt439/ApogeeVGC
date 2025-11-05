@@ -38,113 +38,138 @@ public class BattleRoom : IDisposable
     /// <summary>
     /// Starts the battle with the given team for player 1.
     /// </summary>
-    public async Task StartBattleAsync(string? teamData, 
+    public async Task StartBattleAsync(string player1Username, string? teamData, 
         Func<string, Task> sendToClientAsync, 
         CancellationToken cancellationToken)
     {
-      if (_started)
-   {
-            throw new InvalidOperationException("Battle already started");
-        }
+        if (_started)
+        {
+    throw new InvalidOperationException("Battle already started");
+   }
 
         _started = true;
 
         Console.WriteLine($"[BattleRoom] Starting battle {BattleId}");
 
-        // Create battle streams
-      _streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(_library));
+      // Buffer to collect all initialization messages
+        var initMessages = new List<string>();
+ 
+        // Room init
+   initMessages.Add($">{BattleId}");
+    initMessages.Add("|init|battle");
+  initMessages.Add($"|title|{player1Username} vs {Player2Username}");
+    initMessages.Add($">{BattleId}");
+   initMessages.Add($"|j|{player1Username}");
+
+        // Create battle streams  
+        _streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(_library));
 
   // Parse team (or use test team)
-        var p1Team = string.IsNullOrEmpty(teamData) 
-          ? TeamGenerator.GenerateTestTeam(_library)
-            : TeamGenerator.ParseShowdownTeam(teamData, _library);
+  var p1Team = string.IsNullOrEmpty(teamData) 
+    ? TeamGenerator.GenerateTestTeam(_library)
+      : TeamGenerator.ParseShowdownTeam(teamData, _library);
 
-    var p2Team = TeamGenerator.GenerateTestTeam(_library);
+        var p2Team = TeamGenerator.GenerateTestTeam(_library);
 
- // Set up player options
+        // Set up player options
         PlayerOptions p1Spec = new()
-        {
-        Name = Player1Username,
- Team = p1Team,
+   {
+  Name = player1Username,
+     Team = p1Team,
         };
 
         PlayerOptions p2Spec = new()
    {
-            Name = Player2Username,
-     Team = p2Team,
-      };
+Name = Player2Username,
+      Team = p2Team,
+        };
 
-        // Create AI opponent for player 2
+ // Create AI opponent for player 2
         var p2Seed = new PrngSeed(1122);
-        _aiPlayer = new RandomPlayerAi(_streams.P2, seed: p2Seed);
+  _aiPlayer = new RandomPlayerAi(_streams.P2, seed: p2Seed, debug: true);
         _aiTask = _aiPlayer.StartAsync(cancellationToken);
 
-  // Start stream consumer to send battle output to client
-        _streamConsumerTask = Task.Run(async () =>
-        {
-      try
-            {
-           await foreach (string chunk in _streams.P1.ReadAllAsync(cancellationToken))
-    {
- // Split the chunk into individual lines and send each with room prefix
-        var lines = chunk.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-       foreach (var line in lines)
-        {
-    if (string.IsNullOrWhiteSpace(line)) continue;
-     
-         // Send each line with the room prefix
-      string formattedMessage = $">{BattleId}\n{line}";
-      await sendToClientAsync(formattedMessage);
-      }
-        }
-    
-    Console.WriteLine($"[BattleRoom] Battle {BattleId} ended");
-  }
-        catch (OperationCanceledException)
-        {
-        Console.WriteLine($"[BattleRoom] Battle {BattleId} cancelled");
-         }
-catch (Exception ex)
-      {
- Console.WriteLine($"[BattleRoom] Stream consumer error: {ex.Message}");
-           Console.WriteLine($"Stack trace: {ex.StackTrace}");
-  }
-        }, cancellationToken);
-
  // Initialize the battle
-   string formatid = Format.ToLower() switch
-     {
+      string formatid = Format.ToLower() switch
+        {
             "gen9customgame" => "gen9customgame",
-        "gen9doublescustomgame" => "gen9doublescustomgame",
-       _ => "gen9doublescustomgame"
+     "gen9doublescustomgame" => "gen9doublescustomgame",
+     _ => "gen9doublescustomgame"
         };
 
   var spec = new
         {
-formatid = formatid,
-  seed = new[] { 0x71A, 0x462, 0, 0 } // 1818, 1122
- };
+      formatid = formatid,
+      seed = new[] { 0x71A, 0x762, 0, 0 } // 1818, 1122
+        };
 
-  // Convert PlayerOptions to Showdown format
-   Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
-        Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
+        // Convert PlayerOptions to Showdown format
+ Dictionary<string, object?> p1Dict = State.SerializePlayerOptionsForShowdown(p1Spec);
+Dictionary<string, object?> p2Dict = State.SerializePlayerOptionsForShowdown(p2Spec);
 
         JsonObject p1JsonObj = DictionaryToJsonObject(p1Dict);
         JsonObject p2JsonObj = DictionaryToJsonObject(p2Dict);
 
-        string p1Json = p1JsonObj.ToJsonString();
-    string p2Json = p2JsonObj.ToJsonString();
+     string p1Json = p1JsonObj.ToJsonString();
+        string p2Json = p2JsonObj.ToJsonString();
 
         string startCommand = $">start {System.Text.Json.JsonSerializer.Serialize(spec)}\n" +
-       $">player p1 {p1Json}\n" +
-    $">player p2 {p2Json}";
+            $">player p1 {p1Json}\n" +
+            $">player p2 {p2Json}";
 
-   await _streams.Omniscient.WriteAsync(startCommand, cancellationToken);
+        await _streams.Omniscient.WriteAsync(startCommand, cancellationToken);
+
+        // Give battle time to process and generate initialization messages
+        await Task.Delay(300, cancellationToken);
+  
+     // Collect all initialization messages from P1 stream
+   var reader = _streams.P1.OutputChannel.Reader;
+        while (reader.TryRead(out string? chunk))
+     {
+        var lines = chunk.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+       foreach (var line in lines)
+     {
+       if (string.IsNullOrWhiteSpace(line)) continue;
+initMessages.Add($">{BattleId}");
+       initMessages.Add(line);
+       }
+     }
         
-        // Auto-send team preview choice for P1 (since we're using auto-team)
-        // Give the battle a moment to process the start command
-   await Task.Delay(100, cancellationToken);
-        await _streams.P1.WriteAsync("default", cancellationToken);
+   // Send ALL initialization messages at once
+   foreach (var msg in initMessages)
+        {
+      await sendToClientAsync(msg);
+   }
+
+     // NOW start the stream consumer task for ongoing messages
+_streamConsumerTask = Task.Run(async () =>
+{
+   try
+      {
+         await foreach (string chunk in _streams.P1.ReadAllAsync(cancellationToken))
+       {
+       var lines = chunk.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+     foreach (var line in lines)
+         {
+        if (string.IsNullOrWhiteSpace(line)) continue;
+   
+       string formattedMessage = $">{BattleId}\n{line}";
+              await sendToClientAsync(formattedMessage);
+       }
+      }
+  
+     Console.WriteLine($"[BattleRoom] Battle {BattleId} ended");
+          }
+catch (OperationCanceledException)
+   {
+   Console.WriteLine($"[BattleRoom] Battle {BattleId} cancelled");
+        }
+       catch (Exception ex)
+            {
+              Console.WriteLine($"[BattleRoom] Stream consumer error: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    }
+     }, cancellationToken);
     }
 
     /// <summary>
@@ -178,7 +203,7 @@ formatid = formatid,
 
     /// <summary>
   /// Converts an object to a JsonNode.
-    /// </summary>
+  /// </summary>
     private static JsonNode? ConvertToJsonNode(object? value)
     {
      return value switch

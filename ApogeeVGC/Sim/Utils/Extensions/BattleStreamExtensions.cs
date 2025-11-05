@@ -46,6 +46,8 @@ public static class BattleStreamExtensions
                         case "sideupdate":
                             {
                                 (string side, string sideData) = SplitFirst(data, '\n');
+                                Console.WriteLine($"[BattleStreamExtensions] sideupdate for {side}: {sideData.Substring(0, Math.Min(100, sideData.Length))}...");
+
                                 PlayerReadStream? targetStream = side.ToLowerInvariant() switch
                                 {
                                     "p1" => p1,
@@ -56,6 +58,11 @@ public static class BattleStreamExtensions
                                 if (targetStream != null)
                                 {
                                     await targetStream.PushAsync(sideData);
+                                    Console.WriteLine($"[BattleStreamExtensions] Pushed sideupdate to {side} stream");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"[BattleStreamExtensions] Unknown side: {side}");
                                 }
                                 break;
                             }

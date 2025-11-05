@@ -46,20 +46,26 @@ public partial class BattleAsync
 
         if (DisplayUi)
         {
-            // Log game type
+          // Send teamsize FIRST (before gametype, gen, tier)
+            foreach (Side side in Sides)
+            {
+  Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+        }
+     
+        // Log game type
             Add("gametype", GameType.ToString().ToLowerInvariant());
 
-            // Log generation
-            Add("gen", Gen);
+     // Log generation
+         Add("gen", Gen);
 
             // Log tier
-            Add("tier", Format.Name);
+   Add("tier", Format.Name);
 
-            // Log rated status
+  // Log rated status
             if (Rated)
-            {
-                string ratedMessage = Rated ? string.Empty : Rated.ToString();
-                Add("rated", ratedMessage);
+         {
+        string ratedMessage = Rated ? string.Empty : Rated.ToString();
+      Add("rated", ratedMessage);
             }
         }
 
@@ -68,39 +74,39 @@ public partial class BattleAsync
 
         // Call OnBegin for each rule in the rule table
         foreach (Format subFormat in from rule in RuleTable.Keys
-                                     let ruleString = rule.ToString()
-                                     where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
-                                     select Library.Rulesets[rule])
+   let ruleString = rule.ToString()
+        where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
+ select Library.Rulesets[rule])
         {
-            subFormat.OnBegin?.Invoke(this);
+   subFormat.OnBegin?.Invoke(this);
         }
 
         // Validate that all sides have at least one Pokemon
-        if (Sides.Any(side => side.Pokemon.Count == 0))
+      if (Sides.Any(side => side.Pokemon.Count == 0))
         {
-            throw new InvalidOperationException("Battle not started: A player has an empty team.");
-        }
+     throw new InvalidOperationException("Battle not started: A player has an empty team.");
+ }
 
         // Check EV balance in debug mode
-        if (DebugMode)
+if (DebugMode)
         {
-            CheckEvBalance();
+      CheckEvBalance();
         }
 
         // Run team preview/selection phase
-        RunPickTeam();
+  RunPickTeam();
 
         // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
-        // Set mid-turn flag
+  // Set mid-turn flag
         MidTurn = true;
 
         // Start turn loop if no request is pending
         if (RequestState == RequestState.None)
-        {
+    {
             TurnLoop();
-        }
+ }
     }
 
     public void Restart(Action<string, List<string>>? send)
@@ -413,14 +419,9 @@ MidTurn = false;
 
            if (DisplayUi)
         {
-                 Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
-       }
+                 Add("start");
+}
      }
-
-                    if (DisplayUi)
-                    {
-                        Add("start");
-                    }
 
                     // Change Zacian/Zamazenta into their Crowned formes
                     foreach (Pokemon pokemon in GetAllPokemon())

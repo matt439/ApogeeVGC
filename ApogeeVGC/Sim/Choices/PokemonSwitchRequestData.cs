@@ -2,7 +2,6 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Sim.Choices;
 
@@ -12,7 +11,8 @@ public record PokemonSwitchRequestData
     //public required string Details { get; init; }
     public required string Condition { get; init; }
     public bool Active { get; init; }
-    public required StatsTable Stats { get; init; }
+    // Changed from StatsTable to Dictionary<string, int> to exclude HP (HP is in Condition field)
+    public required Dictionary<string, int> Stats { get; init; }
     public required IReadOnlyList<Move> Moves { get; init; }
     public IReadOnlyList<string> MoveNames => Moves.Select(m => m.Name).ToList();
     public required Ability BaseAbility { get; init; }

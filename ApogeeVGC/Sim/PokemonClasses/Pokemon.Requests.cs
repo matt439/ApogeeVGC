@@ -41,14 +41,15 @@ public partial class Pokemon
     /// <returns>Pokemon switch request data object</returns>
     public PokemonSwitchRequestData GetSwitchRequestData(bool forAlly = false)
     {
-        // Build stats dictionary from base stored stats
-        var stats = new StatsTable
+        // Build stats dictionary WITHOUT HP (as per Showdown protocol)
+        // HP is tracked in the "condition" field, not in stats
+        var stats = new Dictionary<string, int>
         {
-            [StatId.Atk] = BaseStoredStats[StatId.Atk],
-            [StatId.Def] = BaseStoredStats[StatId.Def],
-            [StatId.SpA] = BaseStoredStats[StatId.SpA],
-            [StatId.SpD] = BaseStoredStats[StatId.SpD],
-            [StatId.Spe] = BaseStoredStats[StatId.Spe],
+            ["atk"] = BaseStoredStats[StatId.Atk],
+            ["def"] = BaseStoredStats[StatId.Def],
+            ["spa"] = BaseStoredStats[StatId.SpA],
+            ["spd"] = BaseStoredStats[StatId.SpD],
+            ["spe"] = BaseStoredStats[StatId.Spe],
         };
 
         // Get move list - either base moves (for allies) or current moves
@@ -76,17 +77,16 @@ public partial class Pokemon
             }
         }
 
-        // Create the base entry
+        // Create the base entry - NOTE: Stats will need to be handled specially in serialization
         var entry = new PokemonSwitchRequestData
         {
             Condition = condition,
-            Active = IsActive, // Use IsActive property instead of Position < Side.Active.Count
-            Stats = stats,
+            Active = IsActive,
+            Stats = stats, // Dictionary without HP
             Moves = moves,
             BaseAbility = Battle.Library.Abilities[BaseAbility],
             Item = Battle.Library.Items[Item],
             Pokeball = Pokeball,
-            // Default values for Gen 9+ fields
             Ability = Battle.Library.Abilities[Ability],
             Commanding = false,
             Reviving = false,

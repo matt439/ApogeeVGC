@@ -180,6 +180,8 @@ public class BattleStream : IDisposable
 
     private void ProcessLine(string type, string message)
     {
+        Console.WriteLine($"[BattleStream.ProcessLine] type='{type}', message='{message.Substring(0, Math.Min(50, message.Length))}'");
+        
         switch (type)
         {
             case "start":
@@ -244,6 +246,8 @@ public class BattleStream : IDisposable
             case "p1":
             case "p2":
             {
+                Console.WriteLine($"[BattleStream.ProcessLine] Received choice from {type}: {message}");
+    
                 if (Battle == null)
                     throw new InvalidOperationException("Battle not started");
 
@@ -256,7 +260,8 @@ public class BattleStream : IDisposable
                 else
                 {
                     // Pass the choice string directly to Battle.Choose
-                    Battle.Choose(sideId, message);
+                    bool success = Battle.Choose(sideId, message);
+                    Console.WriteLine($"[BattleStream.ProcessLine] Choice result for {type}: {success}");
                 }
 
                 break;

@@ -239,6 +239,8 @@ public partial class BattleAsync
     {
         Side side = GetSide(sideId);
 
+        Console.WriteLine($"[BattleAsync.Choose] {sideId} choosing: {input}");
+
         if (!side.Choose(input))
         {
             if (string.IsNullOrEmpty(side.GetChoice().Error))
@@ -256,7 +258,10 @@ public partial class BattleAsync
             return false;
         }
 
-        if (AllChoicesDone())
+        bool allDone = AllChoicesDone();
+        Console.WriteLine($"[BattleAsync.Choose] {sideId} choice accepted. All choices done: {allDone}");
+
+        if (allDone)
         {
             CommitChoices();
         }
@@ -296,7 +301,9 @@ public partial class BattleAsync
 
     public void CommitChoices()
     {
-        UpdateSpeed();
+   Console.WriteLine($"[BattleAsync.CommitChoices] Committing choices for turn {Turn}");
+  
+   UpdateSpeed();
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not

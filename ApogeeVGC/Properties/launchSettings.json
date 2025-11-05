@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ApogeeVGC": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:63468;http://localhost:63469"
+    }
+  }
+}

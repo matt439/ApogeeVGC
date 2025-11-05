@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
@@ -78,7 +79,7 @@ public static partial class State
                 {
                     ["condition"] = switchData.Condition.ToString(),
                     ["active"] = switchData.Active,
-                    ["stats"] = SerializeStatsTable(switchData.Stats),
+                    ["stats"] = switchData.Stats, // Already a Dictionary<string, int> without HP
                     ["moves"] = switchData.MoveNames.ToList(),
                     ["baseAbility"] = switchData.BaseAbilityName.ToLower(),
                     ["item"] = switchData.ItemName.ToLower(),
@@ -176,6 +177,11 @@ public static partial class State
 
             // Handle enums - serialize as string
             case Enum enumValue:
+                // Special case for SideId - needs to be lowercase
+                if (enumValue is SideId sideId)
+                {
+                    return sideId.ToString().ToLower();
+                }
                 return enumValue.ToString();
 
             // Handle union types - extract the actual value
