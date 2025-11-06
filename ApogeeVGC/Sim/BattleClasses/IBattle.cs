@@ -171,7 +171,7 @@ public interface IBattle
 
     Action<SendType, IEnumerable<string>> Send { get; }
 
-    bool StrictChoices { get; }
+    //bool StrictChoices { get; }
 
     bool ValidTargetLoc(int targetLoc, Pokemon source, MoveTarget targetType);
 

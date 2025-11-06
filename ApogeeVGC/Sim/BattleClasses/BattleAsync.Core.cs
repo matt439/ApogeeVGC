@@ -16,9 +16,6 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class BattleAsync : IBattle
 {
     public bool DebugMode { get; init; }
-    public bool? ForceRandomChange { get; init; }
-    public bool Deserialized { get; init; }
-    public bool StrictChoices { get; init; }
     public Format Format { get; init; }
     public EffectState FormatData { get; init; }
     public GameType GameType { get; init; }
@@ -185,7 +182,7 @@ public partial class BattleAsync : IBattle
 
     public bool RandomChance(int numerator, int denominator)
     {
-        return ForceRandomChange ?? Prng.RandomChance(numerator, denominator);
+        return Prng.RandomChance(numerator, denominator);
     }
 
     public T Sample<T>(IReadOnlyList<T> items)

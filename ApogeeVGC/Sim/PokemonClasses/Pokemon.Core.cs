@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
-public partial class Pokemon : IPriorityComparison, IDisposable
+public partial class Pokemon : IPriorityComparison
 {
     public Side Side { get; }
     public IBattle Battle => Side.Battle;
@@ -401,15 +401,5 @@ public partial class Pokemon : IPriorityComparison, IDisposable
             Secret: secret,
             Shared: shared
         );
-    }
-
-    public void Dispose()
-    {
-        // Clean up resources if needed
-    }
-
-    public void Destroy()
-    {
-        Dispose();
     }
 }

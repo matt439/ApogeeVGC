@@ -17,8 +17,8 @@ public partial class BattleAsync
 {
     public void Start()
     {
-        // Deserialized games should use Restart()
-        if (Deserialized) return;
+        //// Deserialized games should use Restart()
+        //if (Deserialized) return;
 
         // Need all players to start
         if (!Sides.All(_ => true))
@@ -100,14 +100,14 @@ public partial class BattleAsync
         }
     }
 
-    public void Restart(Action<string, List<string>>? send)
-    {
-        if (!Deserialized)
-        {
-            throw new InvalidOperationException("Attempt to restart a battle which has not been deserialized");
-        }
-        throw new Exception("Not sure what this is suppsed to do");
-    }
+    //public void Restart(Action<string, List<string>>? send)
+    //{
+    //    if (!Deserialized)
+    //    {
+    //        throw new InvalidOperationException("Attempt to restart a battle which has not been deserialized");
+    //    }
+    //    throw new Exception("Not sure what this is suppsed to do");
+    //}
 
     public void EndTurn()
     {

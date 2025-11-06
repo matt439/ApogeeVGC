@@ -870,10 +870,10 @@ public partial class Side
             EmitRequest(ActiveRequest, true);
         }
 
-        if (Battle.StrictChoices)
-        {
-            throw new InvalidOperationException($"{type} {message}");
-        }
+        //if (Battle.StrictChoices)
+        //{
+        //    throw new InvalidOperationException($"{type} {message}");
+        //}
 
         return false;
     }
