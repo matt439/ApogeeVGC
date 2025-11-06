@@ -1,10 +1,11 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
-using System.Text.Json.Nodes;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
@@ -22,7 +23,7 @@ public partial class Side
     public List<PokemonSet> Team { get; set; }
     public List<Pokemon> Pokemon { get; set; }
     public List<Pokemon?> Active { get; set; }
-    
+
     // Foe is set during Battle.Start(), not during construction
     // This is nullable until Start() is called, but should never be accessed before then
     public Side Foe { get; set; } = null!;
@@ -104,11 +105,6 @@ public partial class Side
         };
     }
 
-    public JsonObject ToJson()
-    {
-        throw new NotImplementedException();
-    }
-
     private Pokemon? AddPokemon(PokemonSet set)
     {
         if (Pokemon.Count >= 24) return null;
@@ -119,11 +115,6 @@ public partial class Side
         Pokemon.Add(newPokemon);
         PokemonLeft++;
         return newPokemon;
-    }
-
-    public override string ToString()
-    {
-        throw new NotImplementedException();
     }
 
     public SideRequestData GetRequestData(bool forAlly = false)
@@ -164,11 +155,111 @@ public partial class Side
 
     public SidePlayerPerspective GetPlayerPerspective()
     {
-        throw new NotImplementedException();
+        return new SidePlayerPerspective
+        {
+            Team = Team.AsReadOnly(),
+            Pokemon = Pokemon.Select(p => new PokemonPlayerPerspective
+            {
+                Name = p.Name,
+                Species = p.Species.Id,
+                Level = p.Level,
+                Gender = p.Gender,
+                Shiny = p.Set.Shiny,
+                Hp = p.Hp,
+                MaxHp = p.MaxHp,
+                Fainted = p.Fainted,
+                Status = p.Status,
+                MoveSlots = p.MoveSlots.AsReadOnly(),
+                Boosts = p.Boosts,
+                StoredStats = p.StoredStats,
+                Ability = p.Ability,
+                Item = p.Item,
+                Types = p.Types.AsReadOnly(),
+                Terastallized = p.Terastallized,
+                TeraType = p.TeraType,
+                CanTerastallize = p.CanTerastallize,
+                Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                Position = p.Position,
+                IsActive = p.IsActive,
+            }).ToList().AsReadOnly(),
+            Active = Active.Select(p => p == null
+                ? null
+                : new PokemonPlayerPerspective
+                {
+                    Name = p.Name,
+                    Species = p.Species.Id,
+                    Level = p.Level,
+                    Gender = p.Gender,
+                    Shiny = p.Set.Shiny,
+                    Hp = p.Hp,
+                    MaxHp = p.MaxHp,
+                    Fainted = p.Fainted,
+                    Status = p.Status,
+                    MoveSlots = p.MoveSlots.AsReadOnly(),
+                    Boosts = p.Boosts,
+                    StoredStats = p.StoredStats,
+                    Ability = p.Ability,
+                    Item = p.Item,
+                    Types = p.Types.AsReadOnly(),
+                    Terastallized = p.Terastallized,
+                    TeraType = p.TeraType,
+                    CanTerastallize = p.CanTerastallize,
+                    Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                    Position = p.Position,
+                    IsActive = p.IsActive,
+                }).ToList().AsReadOnly(),
+        };
     }
 
     public SideOpponentPerspective GetOpponentPerspective()
     {
-        throw new NotImplementedException();
+        return new SideOpponentPerspective
+        {
+            Pokemon = Pokemon.Select(p => new PokemonOpponentPerspective
+            {
+                Name = p.Name,
+                Species = p.Species.Id,
+                Level = p.Level,
+                Gender = p.Gender,
+                Shiny = p.Set.Shiny,
+                HpPercentage = p.MaxHp > 0 ? (double)p.Hp / p.MaxHp * 100.0 : 0.0,
+                Fainted = p.Fainted,
+                Status = p.Status,
+                // Only reveal ability/item/moves if they've been revealed in battle
+                // For now, we'll show them as revealed (you may want to track this separately)
+                RevealedAbility = p.Ability != AbilityId.None ? p.Ability : null,
+                RevealedItem = p.Item != ItemId.None ? p.Item : null,
+                RevealedMoves = p.MoveSlots.Where(m => m.Used).Select(m => m.Id).ToList()
+                    .AsReadOnly(),
+                Types = p.Types.AsReadOnly(),
+                Terastallized = p.Terastallized,
+                Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                Position = p.Position,
+                IsActive = p.IsActive,
+            }).ToList().AsReadOnly(),
+            Active = Active.Select(p => p == null
+                ? null
+                : new PokemonOpponentPerspective
+                {
+                    Name = p.Name,
+                    Species = p.Species.Id,
+                    Level = p.Level,
+                    Gender = p.Gender,
+                    Shiny = p.Set.Shiny,
+                    HpPercentage = p.MaxHp > 0 ? (double)p.Hp / p.MaxHp * 100.0 : 0.0,
+                    Fainted = p.Fainted,
+                    Status = p.Status,
+                    // Only reveal ability/item/moves if they've been revealed in battle
+                    RevealedAbility = p.Ability != AbilityId.None ? p.Ability : null,
+                    RevealedItem = p.Item != ItemId.None ? p.Item : null,
+                    RevealedMoves = p.MoveSlots.Where(m => m.Used).Select(m => m.Id).ToList()
+                        .AsReadOnly(),
+                    Types = p.Types.AsReadOnly(),
+                    Terastallized = p.Terastallized,
+                    Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                    Position = p.Position,
+                    IsActive = p.IsActive,
+                }).ToList().AsReadOnly(),
+        };
     }
 }
