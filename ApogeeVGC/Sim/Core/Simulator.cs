@@ -23,39 +23,27 @@ public class Simulator
 
         try
         {
-            // Run the async battle loop
-            using var cancellationTokenSource = new CancellationTokenSource();
-
             // Set a reasonable timeout for the entire battle
+            using var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
 
-            //await Battle.RunBattleAsync(cancellationTokenSource.Token);
-
-            //// Determine the winner
-            //if (Battle.Ended)
-            //{
-            //    GameResults gameResults = Battle.GetGameResults();
-            //    PlayerId winner = gameResults.Winner;
-
-            //    if (!PrintDebug)
-            //        return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
-
-            //    string winnerName = winner == PlayerId.Player1
-            //        ? Battle.Side1.Team.Trainer.Name
-            //        : Battle.Side2.Team.Trainer.Name;
-            //    UiGenerator.PrintBattleEnd(winnerName);
-
-            //    return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
-            //}
-
-            // Battle was cancelled or timed out
-            if (PrintDebug)
+            // Wait until the battle ends or we timeout
+            while (!Battle.Ended)
             {
-                Console.WriteLine("Battle ended without a clear winner");
+                // Check for cancellation
+                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                // Small delay to avoid busy waiting
+                await Task.Delay(100, cancellationTokenSource.Token);
             }
 
-            // Use tiebreak to determine winner
-            return DetermineTiebreakWinner();
+            // Battle ended - determine the winner
+            if (PrintDebug)
+            {
+                Console.WriteLine("Battle has ended.");
+            }
+
+            return DetermineWinner();
         }
         catch (OperationCanceledException)
         {
@@ -80,6 +68,32 @@ public class Simulator
     //{
     //    return Run().GetAwaiter().GetResult();
     //}
+
+    private SimulatorResult DetermineWinner()
+    {
+        // Check if we have a winner
+        if (!string.IsNullOrEmpty(Battle.Winner))
+        {
+            // Winner is stored as side ID string ("p1" or "p2")
+            bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase);
+
+            if (PrintDebug)
+            {
+                string winnerName = isP1Winner ? "Player 1" : "Player 2";
+                Console.WriteLine($"Winner: {winnerName}");
+            }
+
+            return isP1Winner ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+        }
+
+        // No clear winner - use tiebreak
+        if (PrintDebug)
+        {
+            Console.WriteLine("Battle ended without a clear winner");
+        }
+
+        return DetermineTiebreakWinner();
+    }
 
     private SimulatorResult DetermineTiebreakWinner()
     {
