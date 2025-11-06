@@ -1,10 +1,16 @@
+# PowerShell script to add pokemon-showdown folders to the solution
+# Close the solution in Visual Studio before running this script
 
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35913.81
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApogeeVGC", "ApogeeVGC\ApogeeVGC.csproj", "{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}"
-EndProject
+$solutionFile = "ApogeeVGC.sln"
+
+# Read the current solution content
+$content = Get-Content $solutionFile -Raw
+
+# Find the insertion point (after the last Project line but before Global)
+$insertionPoint = $content.IndexOf("Global")
+
+# Define the new solution folders
+$newContent = @"
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pokemon-showdown", "pokemon-showdown", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sim", "sim", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
@@ -53,38 +59,43 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{C3D4E5F6-A
 		pokemon-showdown\data\typechart.ts = pokemon-showdown\data\typechart.ts
 	EndProjectSection
 EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Any CPU = Release|Any CPU
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|x64.Build.0 = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Debug|x86.Build.0 = Debug|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x64.ActiveCfg = Release|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x64.Build.0 = Release|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x86.ActiveCfg = Release|Any CPU
-		{0E1E3C98-72BE-44A0-9EA1-71F88ECE9C88}.Release|x86.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-		GlobalSection(NestedProjects) = preSolution
+
+"@
+
+# Insert the new content
+$before = $content.Substring(0, $insertionPoint)
+$after = $content.Substring($insertionPoint)
+$newSolutionContent = $before + $newContent + $after
+
+# Find the NestedProjects section or create it
+if ($newSolutionContent -match "GlobalSection\(NestedProjects\) = preSolution") {
+    # Add to existing NestedProjects section
+    $nestedProjectsEnd = $newSolutionContent.IndexOf("EndGlobalSection", $newSolutionContent.IndexOf("GlobalSection(NestedProjects)"))
+    $nestingEntries = @"
+		{B2C3D4E5-F6A7-8901-BCDE-F12345678901} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+
+"@
+    $before = $newSolutionContent.Substring(0, $nestedProjectsEnd)
+    $after = $newSolutionContent.Substring($nestedProjectsEnd)
+    $newSolutionContent = $before + $nestingEntries + $after
+} else {
+    # Create NestedProjects section
+    $extensibilityGlobalsStart = $newSolutionContent.IndexOf("GlobalSection(ExtensibilityGlobals)")
+    $nestedProjectsSection = @"
+	GlobalSection(NestedProjects) = preSolution
 		{B2C3D4E5-F6A7-8901-BCDE-F12345678901} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
 		{C3D4E5F6-A7B8-9012-CDEF-123456789012} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
 	EndGlobalSection
-GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D4980C97-4378-47AD-B4AE-F4C7E358EFAA}
-	EndGlobalSection
-EndGlobal
 
+"@
+    $before = $newSolutionContent.Substring(0, $extensibilityGlobalsStart)
+    $after = $newSolutionContent.Substring($extensibilityGlobalsStart)
+    $newSolutionContent = $before + $nestedProjectsSection + $after
+}
+
+# Write the updated content
+Set-Content -Path $solutionFile -Value $newSolutionContent
+
+Write-Host "Successfully added pokemon-showdown solution folder with /sim and /data subdirectories!"
+Write-Host "Please reopen the solution in Visual Studio to see the changes."
