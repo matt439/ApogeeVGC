@@ -10,7 +10,6 @@ namespace ApogeeVGC.Gui;
 /// </summary>
 public class BattleGame : Game
 {
-    private GraphicsDeviceManager _graphics;
     private SpriteBatch? _spriteBatch;
     private SpriteFont? _defaultFont;
     private BattleRenderer? _battleRenderer;
@@ -22,13 +21,13 @@ public class BattleGame : Game
 
     public BattleGame()
     {
-        _graphics = new GraphicsDeviceManager(this);
+        var graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
         // Set window size
-        _graphics.PreferredBackBufferWidth = ScreenWidth;
-        _graphics.PreferredBackBufferHeight = ScreenHeight;
+        graphics.PreferredBackBufferWidth = ScreenWidth;
+        graphics.PreferredBackBufferHeight = ScreenHeight;
     }
 
     protected override void Initialize()
@@ -58,31 +57,33 @@ public class BattleGame : Game
         _currentBattleState = new BattleState
         {
             Turn = 1,
-            PlayerActivePokemon = new List<PokemonDisplayInfo>
-            {
-                new()
+            PlayerActivePokemon =
+            [
+                new PokemonDisplayInfo
                 {
-                    Name = "Pikachu", Species = "Pikachu", CurrentHp = 95, MaxHp = 95, Level = 50
+                    Name = "Pikachu", Species = "Pikachu", CurrentHp = 95, MaxHp = 95, Level = 50,
                 },
-                new()
+
+                new PokemonDisplayInfo
                 {
                     Name = "Charizard", Species = "Charizard", CurrentHp = 153, MaxHp = 153,
-                    Level = 50
-                }
-            },
-            OpponentActivePokemon = new List<PokemonDisplayInfo>
-            {
-                new()
+                    Level = 50,
+                },
+            ],
+            OpponentActivePokemon =
+            [
+                new PokemonDisplayInfo
                 {
                     Name = "Blastoise", Species = "Blastoise", CurrentHp = 158, MaxHp = 158,
-                    Level = 50
+                    Level = 50,
                 },
-                new()
+
+                new PokemonDisplayInfo
                 {
                     Name = "Venusaur", Species = "Venusaur", CurrentHp = 155, MaxHp = 155,
-                    Level = 50
-                }
-            }
+                    Level = 50,
+                },
+            ],
         };
     }
 

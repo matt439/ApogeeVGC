@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync : IBattle, IDisposable
+public partial class BattleAsync : IBattle
 {
     public BattleId Id { get; init; }
     public bool DebugMode { get; init; }
@@ -114,17 +114,14 @@ public partial class BattleAsync : IBattle, IDisposable
     public static Side P4 => throw new Exception("4v4 battles are not implemented.");
     private HashSet<string> Hints { get; set; } = [];
 
-    private bool _disposed;
-
     public BattleAsync(BattleOptions options, Library library)
     {
         Library = library;
         Dex = new ModdedDex(Library);
-        RuleTable = new RuleTable();
         Field = new Field(this);
 
         Format = options.Format ?? Library.Formats[options.Id];
-        // RuleTable
+        RuleTable = Format.RuleTable ?? new RuleTable();
         Id = BattleId.Default;
         DebugMode = options.Debug;
         DisplayUi = true; // Always display UI for battle streams
@@ -294,48 +291,6 @@ public partial class BattleAsync : IBattle, IDisposable
             Target = prevTarget,
             EffectOrder = 0,
         };
-    }
-
-    /// <summary>
-    /// Disposes of battle resources and breaks circular references.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-
-        if (disposing)
-        {
-            // Dispose managed resources
-            Field.Destroy();
-
-            foreach (Side side in Sides)
-            {
-                side.Destroy();
-            }
-
-            Queue.Clear();
-            Log.Clear();
-            InputLog.Clear();
-            MessageLog.Clear();
-            FaintQueue.Clear();
-        }
-
-        // Mark as disposed
-        _disposed = true;
-    }
-
-    /// <summary>
-    /// Public method for backwards compatibility with original API
-    /// </summary>
-    public void Destroy()
-    {
-        Dispose();
     }
 
     public IBattle Copy()

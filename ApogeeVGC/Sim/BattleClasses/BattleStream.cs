@@ -14,11 +14,10 @@ namespace ApogeeVGC.Sim.BattleClasses;
 /// Supports interacting with a Pokemon battle in Stream format.
 /// Provides asynchronous message-based communication with the battle engine.
 /// </summary>
-public class BattleStream : IDisposable
+public class BattleStream
 {
     private readonly Channel<string> _inputChannel;
     private readonly Channel<string> _outputChannel;
-    private bool _disposed;
     private readonly Task? _processingTask;
     private readonly CancellationTokenSource _cancellationTokenSource;
 
@@ -62,10 +61,7 @@ public class BattleStream : IDisposable
     /// </summary>
     public async Task WriteAsync(string message, CancellationToken cancellationToken = default)
     {
-        if (!_disposed)
-            await _inputChannel.Writer.WriteAsync(message, cancellationToken);
-        else
-            throw new ObjectDisposedException(nameof(BattleStream));
+        await _inputChannel.Writer.WriteAsync(message, cancellationToken);
     }
 
     /// <summary>
@@ -73,7 +69,6 @@ public class BattleStream : IDisposable
     /// </summary>
     public async Task<string?> ReadAsync(CancellationToken cancellationToken = default)
     {
-        if (_disposed) throw new ObjectDisposedException(nameof(BattleStream));
         if (!await _outputChannel.Reader.WaitToReadAsync(cancellationToken)) return null;
         return _outputChannel.Reader.TryRead(out string? message) ? message : null;
 
@@ -610,37 +605,6 @@ public class BattleStream : IDisposable
 
         choice.Actions = actions;
         return choice;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-
-        if (disposing)
-        {
-            _cancellationTokenSource.Cancel();
-            _inputChannel.Writer.Complete();
-
-            try
-            {
-                _processingTask?.Wait(TimeSpan.FromSeconds(5));
-            }
-            catch
-            {
-                // Ignore timeout
-            }
-
-            Battle?.Dispose();
-            _cancellationTokenSource.Dispose();
-        }
-
-        _disposed = true;
     }
 }
 

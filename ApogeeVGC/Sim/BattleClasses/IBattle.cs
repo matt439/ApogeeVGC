@@ -220,8 +220,6 @@ public interface IBattle
 
     void Debug(string activity);
 
-    void Dispose();
-
     void SendUpdates();
 
     void SetPlayer(SideId slot, PlayerOptions options);

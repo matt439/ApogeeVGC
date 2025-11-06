@@ -13,61 +13,67 @@ public partial class BattleAsync
 {
     public void RunPickTeam()
     {
-        // onTeamPreview handlers are expected to show full teams to all active sides,
-        // and send a 'teampreview' request for players to pick their leads / team order.
-        Format.OnTeamPreview?.Invoke(this);
+        //// onTeamPreview handlers are expected to show full teams to all active sides,
+        //// and send a 'teampreview' request for players to pick their leads / team order.
+        //Format.OnTeamPreview?.Invoke(this);
 
-        foreach (RuleId rule in RuleTable.Keys)
+        //foreach (RuleId rule in RuleTable.Keys)
+        //{
+        //    string ruleString = rule.ToString();
+        //    if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+        //    Format subFormat = Library.Rulesets[rule];
+        //    subFormat.OnTeamPreview?.Invoke(this);
+        //}
+
+        //if (RequestState == RequestState.TeamPreview)
+        //{
+        //    return;
+        //}
+
+        //if (RuleTable.PickedTeamSize > 0)
+        //{
+        //    // There was no onTeamPreview handler (e.g. Team Preview rule missing).
+        //    // Players must still pick their own Pokémon, so we show them privately.
+        //    if (DisplayUi)
+        //    {
+        //        Add("clearpoke");
+        //    }
+
+        //    foreach (Pokemon pokemon in GetAllPokemon())
+        //    {
+        //        // Get the details object and convert to string
+        //        Pokemon.PokemonDetails detailsObj = pokemon.Details;
+
+        //        // Create a modified copy for display (hide certain formes)
+        //        var maskedDetails = new Pokemon.PokemonDetails
+        //        {
+        //            Id = MaskSpeciesForTeamPreview(detailsObj.Id),
+        //            Level = detailsObj.Level,
+        //            Gender = detailsObj.Gender,
+        //            Shiny = false, // Always hide shiny in team preview
+        //            TeraType = detailsObj.TeraType,
+        //        };
+
+        //        // Convert to protocol string
+        //        string detailsString = maskedDetails.ToString();
+
+        //        AddSplit(pokemon.Side.Id,
+        //            [
+        //                new StringPart("poke"),
+        //            new StringPart(pokemon.Side.Id.ToString()),
+        //            new StringPart(detailsString),
+        //            new StringPart(string.Empty),
+        //            ]);
+        //    }
+
+        //    MakeRequest(RequestState.TeamPreview);
+        //}
+
+        if (DisplayUi)
         {
-            string ruleString = rule.ToString();
-            if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-            Format subFormat = Library.Rulesets[rule];
-            subFormat.OnTeamPreview?.Invoke(this);
+            Add("clearpoke");
         }
-
-        if (RequestState == RequestState.TeamPreview)
-        {
-            return;
-        }
-
-        if (RuleTable.PickedTeamSize > 0)
-        {
-            // There was no onTeamPreview handler (e.g. Team Preview rule missing).
-            // Players must still pick their own Pokémon, so we show them privately.
-            if (DisplayUi)
-            {
-                Add("clearpoke");
-            }
-
-            foreach (Pokemon pokemon in GetAllPokemon())
-            {
-                // Get the details object and convert to string
-                Pokemon.PokemonDetails detailsObj = pokemon.Details;
-
-                // Create a modified copy for display (hide certain formes)
-                var maskedDetails = new Pokemon.PokemonDetails
-                {
-                    Id = MaskSpeciesForTeamPreview(detailsObj.Id),
-                    Level = detailsObj.Level,
-                    Gender = detailsObj.Gender,
-                    Shiny = false, // Always hide shiny in team preview
-                    TeraType = detailsObj.TeraType,
-                };
-
-                // Convert to protocol string
-                string detailsString = maskedDetails.ToString();
-
-                AddSplit(pokemon.Side.Id,
-                    [
-                        new StringPart("poke"),
-                    new StringPart(pokemon.Side.Id.ToString()),
-                    new StringPart(detailsString),
-                    new StringPart(string.Empty),
-                    ]);
-            }
-
-            MakeRequest(RequestState.TeamPreview);
-        }
+        MakeRequest(RequestState.TeamPreview);
     }
 
     public void CheckEvBalance()

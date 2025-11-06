@@ -4,9 +4,11 @@ using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerRandom(SideId sideId, int? seed = null) : IPlayer
+public class PlayerRandom(SideId sideId, PlayerOptions options, int? seed = null) : IPlayer
 {
     public SideId SideId { get; } = sideId;
+    public PlayerOptions Options { get; } = options;
+    public PlayerUiType UiType => PlayerUiType.None;
 
     private readonly Random _random = seed is null ? new Random() : new Random(seed.Value);
 
@@ -48,6 +50,12 @@ public class PlayerRandom(SideId sideId, int? seed = null) : IPlayer
         });
         ChoiceSubmitted?.Invoke(this, choice);
         return Task.FromResult(choice);
+    }
+
+    public Task UpdateUi(BattlePerspective perspective)
+    {
+        // Random player doesn't have a UI to update so just complete the task
+        return Task.CompletedTask;
     }
 
     // Events from interfaces

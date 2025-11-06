@@ -26,6 +26,10 @@ public record Formats
             Name = "Custom Singles",
             Ruleset = [],
             Banlist = [],
+            RuleTable = new RuleTable
+            {
+                PickedTeamSize = 6,
+            },
         },
         [FormatId.CustomDoubles] = new Format
         {
@@ -33,6 +37,10 @@ public record Formats
             GameType = GameType.Doubles,
             Ruleset = [],
             Banlist = [],
+            RuleTable = new RuleTable
+            {
+                PickedTeamSize = 4,
+            },
         },
     };
 }

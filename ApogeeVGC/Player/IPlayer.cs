@@ -4,13 +4,23 @@ using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
+public enum PlayerUiType
+{
+    None,
+    Graphical,
+}
+
 public interface IPlayer
 {
     SideId SideId { get; }
+    PlayerOptions Options { get; }
+    PlayerUiType UiType { get; }
 
     // Async choice submission
     Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken);
+
+    Task UpdateUi(BattlePerspective perspective);
 
     // Events for notifications
     event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

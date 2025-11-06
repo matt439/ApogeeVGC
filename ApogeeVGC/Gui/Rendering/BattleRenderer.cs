@@ -35,9 +35,9 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
             graphicsDevice.Viewport.Width / 2f,
             graphicsDevice.Viewport.Height / 2f);
 
-        string message = "Waiting for battle to start...";
-        var messageSize = font.MeasureString(message);
-        var position = screenCenter - messageSize / 2f;
+        const string message = "Waiting for battle to start...";
+        Vector2 messageSize = font.MeasureString(message);
+        Vector2 position = screenCenter - messageSize / 2f;
 
         spriteBatch.DrawString(font, message, position, Color.White);
     }
@@ -58,7 +58,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 
         for (int i = 0; i < battleState.PlayerActivePokemon.Count; i++)
         {
-            var pokemon = battleState.PlayerActivePokemon[i];
+            PokemonDisplayInfo pokemon = battleState.PlayerActivePokemon[i];
             int xPosition = Padding + (i * (PokemonSpriteSize + Padding));
 
             RenderPokemonInfo(pokemon, new Vector2(xPosition, yPosition), true);
@@ -69,11 +69,11 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     {
         // TODO: Render opponent's active Pokémon sprites and info
         // Position in top-right area
-        int yPosition = Padding + 60;
+        const int yPosition = Padding + 60;
 
         for (int i = 0; i < battleState.OpponentActivePokemon.Count; i++)
         {
-            var pokemon = battleState.OpponentActivePokemon[i];
+            PokemonDisplayInfo pokemon = battleState.OpponentActivePokemon[i];
             int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
                             (i * (PokemonSpriteSize + Padding));
 
@@ -91,7 +91,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 
         // Draw name and HP
         string info = $"{pokemon.Name}\nHP: {pokemon.CurrentHp}/{pokemon.MaxHp}";
-        var textPosition = position + new Vector2(0, PokemonSpriteSize + 5);
+        Vector2 textPosition = position + new Vector2(0, PokemonSpriteSize + 5);
         spriteBatch.DrawString(font, info, textPosition, Color.White);
     }
 
@@ -99,7 +99,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     {
         // TODO: Render action buttons, move selection, etc.
         // For now, show available actions
-        string uiInfo = "Press ESC to exit";
+        const string uiInfo = "Press ESC to exit";
         var uiPosition = new Vector2(
             graphicsDevice.Viewport.Width / 2f - 100,
             graphicsDevice.Viewport.Height - 40);
@@ -114,7 +114,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     {
         // Create a 1x1 white texture if needed (lazy init in real implementation)
         var pixel = new Texture2D(graphicsDevice, 1, 1);
-        pixel.SetData(new[] { Color.White });
+        pixel.SetData([Color.White]);
 
         // Draw four lines
         spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Y, rect.Width, lineWidth),
@@ -134,8 +134,8 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 public class BattleState
 {
     public int Turn { get; set; }
-    public List<PokemonDisplayInfo> PlayerActivePokemon { get; set; } = new();
-    public List<PokemonDisplayInfo> OpponentActivePokemon { get; set; } = new();
+    public List<PokemonDisplayInfo> PlayerActivePokemon { get; set; } = [];
+    public List<PokemonDisplayInfo> OpponentActivePokemon { get; set; } = [];
 }
 
 /// <summary>

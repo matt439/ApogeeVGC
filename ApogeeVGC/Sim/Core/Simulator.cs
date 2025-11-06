@@ -18,8 +18,8 @@ public class Simulator
 
     public async Task<SimulatorResult> Run()
     {
-        // Initialize the battle
-        Battle.Start();
+        Battle.SetPlayer(SideId.P1, Player1.Options);
+        Battle.SetPlayer(SideId.P2, Player2.Options);
 
         if (PrintDebug)
         {
