@@ -15,74 +15,89 @@ public class BattleGame : Game
     private SpriteFont? _defaultFont;
     private BattleRenderer? _battleRenderer;
     private BattleState? _currentBattleState;
-    
+
     // Screen dimensions
     private const int ScreenWidth = 1280;
     private const int ScreenHeight = 720;
-    
+
     public BattleGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        
-  // Set window size
+
+        // Set window size
         _graphics.PreferredBackBufferWidth = ScreenWidth;
         _graphics.PreferredBackBufferHeight = ScreenHeight;
     }
 
     protected override void Initialize()
     {
-  Window.Title = "Apogee VGC - Pokémon Battle Simulator";
-        
+        Window.Title = "Apogee VGC - Pokémon Battle Simulator";
+
         // Create demo battle state
-    InitializeDemoBattle();
-        
-   base.Initialize();
+        InitializeDemoBattle();
+
+        base.Initialize();
     }
 
- protected override void LoadContent()
+    protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        
- // Load default font
-     _defaultFont = Content.Load<SpriteFont>("Fonts/DefaultFont");
-        
+
+        // Load default font
+        _defaultFont = Content.Load<SpriteFont>("Fonts/DefaultFont");
+
         // Initialize battle renderer
         _battleRenderer = new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice);
     }
-    
+
     private void InitializeDemoBattle()
     {
         // Create a simple demo battle for testing
         _currentBattleState = new BattleState
         {
-       Turn = 1,
-       PlayerActivePokemon = new List<PokemonDisplayInfo>
-       {
-       new() { Name = "Pikachu", Species = "Pikachu", CurrentHp = 95, MaxHp = 95, Level = 50 },
-    new() { Name = "Charizard", Species = "Charizard", CurrentHp = 153, MaxHp = 153, Level = 50 }
+            Turn = 1,
+            PlayerActivePokemon = new List<PokemonDisplayInfo>
+            {
+                new()
+                {
+                    Name = "Pikachu", Species = "Pikachu", CurrentHp = 95, MaxHp = 95, Level = 50
+                },
+                new()
+                {
+                    Name = "Charizard", Species = "Charizard", CurrentHp = 153, MaxHp = 153,
+                    Level = 50
+                }
             },
-        OpponentActivePokemon = new List<PokemonDisplayInfo>
-    {
-    new() { Name = "Blastoise", Species = "Blastoise", CurrentHp = 158, MaxHp = 158, Level = 50 },
-       new() { Name = "Venusaur", Species = "Venusaur", CurrentHp = 155, MaxHp = 155, Level = 50 }
-     }
+            OpponentActivePokemon = new List<PokemonDisplayInfo>
+            {
+                new()
+                {
+                    Name = "Blastoise", Species = "Blastoise", CurrentHp = 158, MaxHp = 158,
+                    Level = 50
+                },
+                new()
+                {
+                    Name = "Venusaur", Species = "Venusaur", CurrentHp = 155, MaxHp = 155,
+                    Level = 50
+                }
+            }
         };
     }
 
     protected override void Update(GameTime gameTime)
     {
-  // Exit on Escape key
+        // Exit on Escape key
         if (Keyboard.GetState().IsKeyDown(Keys.Escape))
         {
-     Exit();
+            Exit();
         }
 
-  // TODO: Update battle state here
-      // Future: Handle input for move selection, switching, etc.
+        // TODO: Update battle state here
+        // Future: Handle input for move selection, switching, etc.
 
-     base.Update(gameTime);
+        base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
@@ -90,18 +105,18 @@ public class BattleGame : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         _spriteBatch?.Begin();
-        
+
         // Render battle using the renderer
         _battleRenderer?.Render(gameTime, _currentBattleState);
- 
+
         _spriteBatch?.End();
 
         base.Draw(gameTime);
     }
 
- protected override void UnloadContent()
+    protected override void UnloadContent()
     {
-   // Clean up resources
+        // Clean up resources
         _spriteBatch?.Dispose();
         base.UnloadContent();
     }
