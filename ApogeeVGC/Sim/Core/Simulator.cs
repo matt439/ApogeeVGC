@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Player;
+using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -33,24 +34,24 @@ public class Simulator
             // Set a reasonable timeout for the entire battle
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
 
-            await Battle.RunBattleAsync(cancellationTokenSource.Token);
+            //await Battle.RunBattleAsync(cancellationTokenSource.Token);
 
-            // Determine the winner
-            if (Battle.Ended)
-            {
-                GameResults gameResults = Battle.GetGameResults();
-                PlayerId winner = gameResults.Winner;
+            //// Determine the winner
+            //if (Battle.Ended)
+            //{
+            //    GameResults gameResults = Battle.GetGameResults();
+            //    PlayerId winner = gameResults.Winner;
 
-                if (!PrintDebug)
-                    return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+            //    if (!PrintDebug)
+            //        return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
 
-                string winnerName = winner == PlayerId.Player1
-                    ? Battle.Side1.Team.Trainer.Name
-                    : Battle.Side2.Team.Trainer.Name;
-                UiGenerator.PrintBattleEnd(winnerName);
+            //    string winnerName = winner == PlayerId.Player1
+            //        ? Battle.Side1.Team.Trainer.Name
+            //        : Battle.Side2.Team.Trainer.Name;
+            //    UiGenerator.PrintBattleEnd(winnerName);
 
-                return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
-            }
+            //    return winner == PlayerId.Player1 ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+            //}
 
             // Battle was cancelled or timed out
             if (PrintDebug)

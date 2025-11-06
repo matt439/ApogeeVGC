@@ -7,9 +7,46 @@ using ApogeeVGC.Sim.Player;
 
 namespace ApogeeVGC.Sim.Core;
 
+public enum DriverMode
+{
+    //RandomVsRandom,
+    //RandomVsRandomEvaluation,
+    //RandomVsRandomEvaluationDoubles,
+    ConsoleVsRandom,
+    ConsoleVsRandomDoubles,
+    //ConsoleVsConsole,
+    //ConsoleVsMcts,
+    //MctsVsRandom,
+    //MctsVsRandomEvaluation,
+    //MctsVsRandomEvaluationDoubles,
+}
+
 public class Driver
 {
     private Library Library { get; } = new();
+
+    public void Start(DriverMode mode)
+    {
+        switch (mode)
+        {
+            case DriverMode.ConsoleVsRandom:
+            case DriverMode.ConsoleVsRandomDoubles:
+                StartTest().GetAwaiter().GetResult();
+                break;
+            default:
+                throw new NotImplementedException($"Driver mode {mode} is not implemented.");
+        }
+    }
+
+    private async Task RunConsolveVsRandom()
+    {
+        Simulator simulator = new()
+        {
+
+        };
+
+        throw new NotImplementedException();
+    }
 
     public async Task StartTest()
     {

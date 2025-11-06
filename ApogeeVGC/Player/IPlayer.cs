@@ -4,7 +4,7 @@ using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
-public interface IPlayer
+public interface IPlayerNew
 {
     SideId SideId { get; }
 
@@ -19,4 +19,14 @@ public interface IPlayer
     // Optional: For handling timeouts gracefully
     Task NotifyTimeoutWarningAsync(TimeSpan remainingTime);
     Task NotifyChoiceTimeoutAsync();
+}
+
+public interface IPlayer : IPlayerNew
+{
+    // Sync version for MCTS (fast)
+    Choice GetNextChoiceSync(List<IChoiceRequest> choices, BattlePerspective perspective);
+
+    // Simplified async version for human players (with events, timeouts)
+    Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> choices, BattlePerspective perspective,
+        CancellationToken cancellationToken);
 }
