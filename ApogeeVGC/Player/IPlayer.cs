@@ -7,7 +7,7 @@ namespace ApogeeVGC.Player;
 public enum PlayerUiType
 {
     None,
-    Graphical,
+    Gui,
 }
 
 public interface IPlayer
@@ -20,7 +20,7 @@ public interface IPlayer
     Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken);
 
-    Task UpdateUi(BattlePerspective perspective);
+    void UpdateUi(BattlePerspective perspective);
 
     // Events for notifications
     event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

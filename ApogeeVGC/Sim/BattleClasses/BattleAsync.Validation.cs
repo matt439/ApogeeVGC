@@ -69,11 +69,9 @@ public partial class BattleAsync
         //    MakeRequest(RequestState.TeamPreview);
         //}
 
-        if (DisplayUi)
-        {
-            Add("clearpoke");
-        }
+        UpdateAllPlayersUi();
         MakeRequest(RequestState.TeamPreview);
+        Debug("Exiting RunPickTeam().");
     }
 
     public void CheckEvBalance()

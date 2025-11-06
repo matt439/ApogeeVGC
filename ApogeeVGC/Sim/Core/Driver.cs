@@ -1,11 +1,8 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Generators;
-using System.Text.Json;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.FormatClasses;
-using ApogeeVGC.Sim.Utils.Extensions;
-using ApogeeVGC.Sim.Player;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -57,13 +54,6 @@ public class Driver
 
     private async Task RunGuiVsRandomSinglesTest()
     {
-        BattleOptions options = new()
-        {
-            Id = FormatId.CustomSingles,
-            Debug = true,
-        };
-        BattleAsync battle = new(options, Library);
-
         PlayerOptions player1Options = new()
         {
             Name = "Matt",
@@ -78,11 +68,18 @@ public class Driver
         };
         IPlayer player2 = new PlayerRandom(SideId.P2, player2Options, PlayerRandom2Seed);
 
+        BattleOptions options = new()
+        {
+            Id = FormatId.CustomSingles,
+            P1 = player1,
+            P2 = player2,
+            Debug = true,
+        };
+        BattleAsync battle = new(options, Library);
+
         Simulator simulator = new()
         {
             Battle = battle,
-            Player1 = player1,
-            Player2 = player2,
             PrintDebug = true,
         };
 

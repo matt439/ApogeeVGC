@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Conditions;
+﻿using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -10,6 +11,21 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync
 {
+    private void UpdateAllPlayersUi()
+    {
+        foreach (IPlayer player in Players)
+        {
+            UpdatePlayerUi(player);
+        }
+    }
+    
+    private void UpdatePlayerUi(IPlayer player)
+    {
+        if (player.UiType != PlayerUiType.Gui) return;
+        BattlePerspective perspective = GetPerspectiveForSide(player.SideId);
+        player.UpdateUi(perspective);
+    }
+    
     public void Add(params PartFuncUnion[] parts)
     {
         // Check if any part is a function that generates side-specific content
@@ -117,7 +133,8 @@ public partial class BattleAsync
     {
         if (DebugMode)
         {
-            Add("debug", activity);
+            //Add("debug", activity);
+            Console.WriteLine(activity);
         }
     }
 

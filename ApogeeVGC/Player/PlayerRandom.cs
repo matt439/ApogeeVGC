@@ -52,10 +52,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, int? seed = null
         return Task.FromResult(choice);
     }
 
-    public Task UpdateUi(BattlePerspective perspective)
+    public void UpdateUi(BattlePerspective perspective)
     {
-        // Random player doesn't have a UI to update so just complete the task
-        return Task.CompletedTask;
+        // Random player doesn't have a UI to update so jut return
     }
 
     // Events from interfaces

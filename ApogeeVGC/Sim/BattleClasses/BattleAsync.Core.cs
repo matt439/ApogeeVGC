@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Data;
+using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -14,7 +15,6 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleAsync : IBattle
 {
-    public BattleId Id { get; init; }
     public bool DebugMode { get; init; }
     public bool? ForceRandomChange { get; init; }
     public bool Deserialized { get; init; }
@@ -65,7 +65,7 @@ public partial class BattleAsync : IBattle
 
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
-    public List<string> MessageLog { get; set; } = [];
+    //public List<string> MessageLog { get; set; } = [];
     public int SentLogPos { get; set; }
     public bool SentEnd { get; set; }
     public static bool SentRequests => true;
@@ -110,9 +110,11 @@ public partial class BattleAsync : IBattle
     public bool DisplayUi { get; init; }
     public Side P1 => Sides[0];
     public Side P2 => Sides[1];
-    public static Side P3 => throw new Exception("3v3 battles are not implemented.");
-    public static Side P4 => throw new Exception("4v4 battles are not implemented.");
-    private HashSet<string> Hints { get; set; } = [];
+    private HashSet<string> Hints { get; } = [];
+
+    public IPlayer Player1 { get; }
+    public IPlayer Player2 { get; }
+    public IReadOnlyList<IPlayer> Players => [Player1, Player2];
 
     public BattleAsync(BattleOptions options, Library library)
     {
@@ -122,12 +124,8 @@ public partial class BattleAsync : IBattle
 
         Format = options.Format ?? Library.Formats[options.Id];
         RuleTable = Format.RuleTable ?? new RuleTable();
-        Id = BattleId.Default;
         DebugMode = options.Debug;
         DisplayUi = true; // Always display UI for battle streams
-        ForceRandomChange = options.ForceRandomChance;
-        Deserialized = options.Deserialized;
-        StrictChoices = options.StrictChoices;
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
         
@@ -142,7 +140,7 @@ public partial class BattleAsync : IBattle
         Sides = [side1, side2];
         
         ActivePerHalf = 1;
-        Prng = options.Prng ?? new Prng(options.Seed);
+        Prng = new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
 
         Rated = options.Rated ?? false;
@@ -160,18 +158,13 @@ public partial class BattleAsync : IBattle
         // TeamGenerator
         // Hints
 
-        Send = options.Send ?? ((type, messages) => { });
+        Send = options.Send ?? ((_, _) => { });
 
         // InputOptions
-
-        if (options.P1 is not null)
-        {
-            SetPlayer(SideId.P1, options.P1);
-        }
-        if (options.P2 is not null)
-        {
-            SetPlayer(SideId.P2, options.P2);
-        }
+        Player1 = options.P1;
+        Player2 = options.P2;
+        SetPlayer(SideId.P1, options.P1.Options);
+        SetPlayer(SideId.P2, options.P2.Options);
 
         Console.WriteLine("Battle constructor complete.");
     }
@@ -291,6 +284,13 @@ public partial class BattleAsync : IBattle
             Target = prevTarget,
             EffectOrder = 0,
         };
+    }
+
+    private BattlePerspective GetPerspectiveForSide(SideId sideId)
+    {
+        Side playerSide = GetSide(sideId);
+        Side opponentSide = playerSide.Foe;
+        return BattlePerspective.CreateSafe(playerSide, opponentSide, Field.Copy(), Turn);
     }
 
     public IBattle Copy()

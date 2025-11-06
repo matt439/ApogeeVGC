@@ -12,15 +12,10 @@ public enum SimulatorResult
 public class Simulator
 {
     public required IBattle Battle { get; init; }
-    public required IPlayer Player1 { get; init; }
-    public required IPlayer Player2 { get; init; }
     public bool PrintDebug { get; set; }
 
     public async Task<SimulatorResult> Run()
     {
-        Battle.SetPlayer(SideId.P1, Player1.Options);
-        Battle.SetPlayer(SideId.P2, Player2.Options);
-
         if (PrintDebug)
         {
             Console.WriteLine("Starting battle simulation...");
