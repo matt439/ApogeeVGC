@@ -8,16 +8,9 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FieldClasses;
 
-public enum FieldId
-{
-    Default,
-}
-
 public class Field : IDisposable
 {
     public IBattle Battle { get; init; }
-    public FieldId Id { get; init; } = FieldId.Default;
-
     public ConditionId Weather { get; set; }
     public EffectState WeatherState { get; set; }
     public ConditionId Terrain { get; set; }
@@ -438,6 +431,14 @@ public class Field : IDisposable
     {
         throw new NotImplementedException();
     }
+
+    public FieldPerspective GetPerspective()
+    {
+        return new FieldPerspective
+        {
+            Weather = Weather,
+            Terrain = Terrain,
+            PseudoWeather = PseudoWeather.Keys.ToList(),
+        };
+    }
 }
-
-

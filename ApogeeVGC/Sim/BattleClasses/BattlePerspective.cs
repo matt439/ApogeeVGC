@@ -9,22 +9,8 @@ namespace ApogeeVGC.Sim.BattleClasses;
 /// </summary>
 public record BattlePerspective
 {
-    public required Side PlayerSide { get; init; }
-    public required Side OpponentSide { get; init; }
-    public required Field Field { get; init; }
+    public required SidePlayerPerspective PlayerSide { get; init; }
+    public required SideOpponentPerspective OpponentSide { get; init; }
+    public required FieldPerspective Field { get; init; }
     public required int TurnCounter { get; init; }
-
-    /// <summary>
-    /// Creates a battle perspective with deep copies to prevent external modification
-    /// </summary>
-    public static BattlePerspective CreateSafe(Side playerSide, Side opponentSide, Field field, int turnCounter)
-    {
-        return new BattlePerspective
-        {
-            PlayerSide = playerSide.Copy(),
-            OpponentSide = opponentSide.Copy(),
-            Field = field.Copy(),
-            TurnCounter = turnCounter,
-        };
-    }
 }

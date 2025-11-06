@@ -289,8 +289,13 @@ public partial class BattleAsync : IBattle
     private BattlePerspective GetPerspectiveForSide(SideId sideId)
     {
         Side playerSide = GetSide(sideId);
-        Side opponentSide = playerSide.Foe;
-        return BattlePerspective.CreateSafe(playerSide, opponentSide, Field.Copy(), Turn);
+        return new BattlePerspective
+        {
+            Field = Field.GetPerspective(),
+            PlayerSide = playerSide.GetPlayerPerspective(),
+            OpponentSide = playerSide.GetOpponentPerspective(),
+            TurnCounter = Turn,
+        };
     }
 
     public IBattle Copy()

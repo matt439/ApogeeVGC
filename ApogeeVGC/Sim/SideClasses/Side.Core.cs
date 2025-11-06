@@ -8,9 +8,8 @@ using System.Text.Json.Nodes;
 
 namespace ApogeeVGC.Sim.SideClasses;
 
-public partial class Side : IDisposable
+public partial class Side
 {
-    private bool _disposed;
     public IBattle Battle { get; }
     public SideId Id { get; }
     public int N { get; set; }
@@ -139,53 +138,6 @@ public partial class Side : IDisposable
     }
 
     /// <summary>
-    /// Disposes all resources held by this Side instance.
-    /// Cleans up Pokemon references and choice actions to break circular references.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-            return;
-
-        if (disposing)
-        {
-            // Dispose children and clear references to them
-            foreach (Pokemon pokemon in Pokemon)
-            {
-                if (pokemon is IDisposable disposablePokemon)
-                {
-                    disposablePokemon.Dispose();
-                }
-            }
-
-            // Clear choice actions by replacing with an empty list
-            // Note: ChosenAction is a record with init-only properties,
-            // so we can't modify individual instances. We replace the entire list instead.
-            Choice.Actions = [];
-
-            // Clear circular/large references
-            Pokemon.Clear();
-            Active.Clear();
-        }
-
-        _disposed = true;
-    }
-
-    /// <summary>
-    /// Legacy method for compatibility. Calls Dispose().
-    /// </summary>
-    public void Destroy()
-    {
-        Dispose();
-    }
-
-    /// <summary>
     /// Gets a Pokemon from the Active list at the specified index.
     /// Throws an exception if the slot is null, as this indicates an invalid battle state.
     /// </summary>
@@ -206,6 +158,16 @@ public partial class Side : IDisposable
     }
 
     public Side Copy()
+    {
+        throw new NotImplementedException();
+    }
+
+    public SidePlayerPerspective GetPlayerPerspective()
+    {
+        throw new NotImplementedException();
+    }
+
+    public SideOpponentPerspective GetOpponentPerspective()
     {
         throw new NotImplementedException();
     }
