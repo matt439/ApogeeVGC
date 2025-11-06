@@ -30,7 +30,7 @@ public class PlayerRandom(SideId sideId, int? seed = null) : IPlayer
         return Task.FromResult(choice);
     }
 
-    // Full async version for backward compatibility (IPlayerNew)
+    // Full async version for backward compatibility (IPlayer)
     public Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
@@ -54,7 +54,7 @@ public class PlayerRandom(SideId sideId, int? seed = null) : IPlayer
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<Choice>? ChoiceSubmitted;
 
-    // Timeout methods from IPlayerNew
+    // Timeout methods from IPlayer
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         // Random player doesn't need timeout warnings since it's automated

@@ -12,8 +12,8 @@ public enum SimulatorResult
 public class Simulator
 {
     public required IBattle Battle { get; init; }
-    public required IPlayerNew Player1 { get; init; }
-    public required IPlayerNew Player2 { get; init; }
+    public required IPlayer Player1 { get; init; }
+    public required IPlayer Player2 { get; init; }
     public bool PrintDebug { get; set; }
 
     public async Task<SimulatorResult> Run()

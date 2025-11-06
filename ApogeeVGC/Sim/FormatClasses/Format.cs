@@ -18,6 +18,8 @@ namespace ApogeeVGC.Sim.FormatClasses;
 public enum FormatId
 {
     Gen9Ou,
+    CustomSingles,
+    CustomDoubles,
 }
 
 public enum FormatEffectType

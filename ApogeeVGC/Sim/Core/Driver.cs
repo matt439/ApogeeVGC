@@ -2,6 +2,8 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Generators;
 using System.Text.Json;
+using ApogeeVGC.Player;
+using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Player;
 
@@ -12,8 +14,8 @@ public enum DriverMode
     //RandomVsRandom,
     //RandomVsRandomEvaluation,
     //RandomVsRandomEvaluationDoubles,
-    ConsoleVsRandom,
-    ConsoleVsRandomDoubles,
+    GuiVsRandomSingles,
+    GuiVsRandomDoubles,
     //ConsoleVsConsole,
     //ConsoleVsMcts,
     //MctsVsRandom,
@@ -23,28 +25,73 @@ public enum DriverMode
 
 public class Driver
 {
+    //private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
+
+    //private const int RandomEvaluationNumTest = 1000;
+
+    //private const int MctsEvaluationNumTest = 100;
+    //private const int MctsMaxIterations = 10000;
+    //private const double MctsExplorationParameter = Root2;
+    //private readonly int? _mctsMaxTimer = null; // in milliseconds
+
+    //private static readonly int NumThreads = Environment.ProcessorCount;
+
+    //private const int PlayerRandom1Seed = 439;
+    private const int PlayerRandom2Seed = 1818;
 
     public void Start(DriverMode mode)
     {
         switch (mode)
         {
-            case DriverMode.ConsoleVsRandom:
-            case DriverMode.ConsoleVsRandomDoubles:
-                StartTest().GetAwaiter().GetResult();
+            case DriverMode.GuiVsRandomSingles:
+                RunGuiVsRandomSinglesTest().GetAwaiter().GetResult();
+                break;
+            case DriverMode.GuiVsRandomDoubles:
+                RunGuiVsRandomDoublesTest().GetAwaiter().GetResult();
                 break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
         }
     }
 
-    private async Task RunConsolveVsRandom()
+    private async Task RunGuiVsRandomSinglesTest()
     {
-        Simulator simulator = new()
+        BattleOptions options = new()
         {
-
+            Id = FormatId.CustomSingles,
+            Debug = true,
         };
 
+        BattleAsync battle = new(options, Library);
+
+        IPlayer player1 = new PlayerGui(SideId.P1);
+        IPlayer player2 = new PlayerRandom(SideId.P2, PlayerRandom2Seed);
+
+        Simulator simulator = new()
+        {
+            Battle = battle,
+            Player1 = player1,
+            Player2 = player2,
+            PrintDebug = true,
+        };
+
+        SimulatorResult result = await simulator.Run();
+
+        string winner = result switch
+        {
+            SimulatorResult.Player1Win => "Matt",
+            SimulatorResult.Player2Win => "Random",
+            _ => "Unknown",
+        };
+
+        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadKey();
+    }
+
+    private async Task RunGuiVsRandomDoublesTest()
+    {
         throw new NotImplementedException();
     }
 

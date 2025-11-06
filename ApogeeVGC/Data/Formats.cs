@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 
 namespace ApogeeVGC.Data;
@@ -19,6 +20,19 @@ public record Formats
             Name = "[Gen 9] OU",
             Ruleset = [RuleId.Standard], //TODO: fill in rules
             Banlist = [], //TODO: fill in bans
+        },
+        [FormatId.CustomSingles] = new Format
+        {
+            Name = "Custom Singles",
+            Ruleset = [],
+            Banlist = [],
+        },
+        [FormatId.CustomDoubles] = new Format
+        {
+            Name = "Custom Doubles",
+            GameType = GameType.Doubles,
+            Ruleset = [],
+            Banlist = [],
         },
     };
 }
