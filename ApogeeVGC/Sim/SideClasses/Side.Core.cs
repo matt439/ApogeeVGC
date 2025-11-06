@@ -204,4 +204,9 @@ public partial class Side : IDisposable
             $"Active slot {index} for {Name} (Side {Id}) is empty. " +
             "This indicates an invalid battle state where a Pokemon should be present.");
     }
+
+    public Side Copy()
+    {
+        throw new NotImplementedException();
+    }
 }

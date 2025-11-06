@@ -251,4 +251,6 @@ public interface IBattle
     void ShowOpenTeamSheets();
 
     void Hint(string hint, bool once = false, Side? side = null);
+
+    void Start();
 }
