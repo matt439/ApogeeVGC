@@ -7,9 +7,9 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public class BattleQueue(IBattle battle)
+public class BattleQueue(Battle battle)
 {
-    public IBattle Battle { get; init; } = battle;
+    public Battle Battle { get; init; } = battle;
     public List<IAction> List { get; init; } = [];
 
     public IAction? Shift()

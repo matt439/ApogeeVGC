@@ -13,7 +13,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class Battle : IBattle
+public partial class Battle
 {
     public bool DebugMode { get; init; }
     public Format Format { get; init; }
@@ -295,7 +295,7 @@ public partial class Battle : IBattle
         };
     }
 
-    public IBattle Copy()
+    public Battle Copy()
     {
         throw new NotImplementedException();
     }

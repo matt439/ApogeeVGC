@@ -15,7 +15,7 @@ namespace ApogeeVGC.Sim.PokemonClasses;
 public partial class Pokemon : IPriorityComparison
 {
     public Side Side { get; }
-    public IBattle Battle => Side.Battle;
+    public Battle Battle => Side.Battle;
     public PokemonSet Set { get; }
     public string Name => Set.Name[..Math.Min(20, Set.Name.Length)];
     public string FullName => $"{Side.Id.ToString()}: {Name}";
@@ -161,7 +161,7 @@ public partial class Pokemon : IPriorityComparison
 
     private const int TrickRoomSpeedOffset = 10000;
 
-    public Pokemon(IBattle battle, PokemonSet set, Side side)
+    public Pokemon(Battle battle, PokemonSet set, Side side)
     {
         Side = side;
         Set = set;

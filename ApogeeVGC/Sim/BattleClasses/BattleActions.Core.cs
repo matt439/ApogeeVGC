@@ -5,9 +5,9 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleActions(IBattle battle)
+public partial class BattleActions(Battle battle)
 {
-    public IBattle Battle { get; init; } = battle;
+    public Battle Battle { get; init; } = battle;
     public Library Library => Battle.Library;
     // public ModdedDex Dex => Battle.Dex;
 

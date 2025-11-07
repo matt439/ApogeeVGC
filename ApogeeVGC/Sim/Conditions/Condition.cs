@@ -71,108 +71,108 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     /// <summary>
     /// battle, target, source, effect -> number
     /// </summary>
-    public Func<IBattle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    public Action<IBattle, Pokemon>? OnCopy { get; init; }
+    public Action<Battle, Pokemon>? OnCopy { get; init; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    public Action<IBattle, Pokemon>? OnEnd { get; init; }
+    public Action<Battle, Pokemon>? OnEnd { get; init; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
-    public Func<IBattle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnRestart { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnRestart { get; init; }
 
     /// <summary>
     /// battle, target, source, sourceEffect -> boolean | null
     /// </summary>
-    public Func<IBattle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnStart { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnStart { get; init; }
 
 
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
-    public Action<IBattle, Pokemon>? OnEmergencyExit { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
+    public Action<Battle, Pokemon>? OnEmergencyExit { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAfterHit { get; init; }
-    public Action<IBattle, Pokemon>? OnAfterMega { get; init; }
-    public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAfterSetStatus { get; init; }
+    public Action<Battle, Pokemon>? OnAfterMega { get; init; }
+    public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAfterSetStatus { get; init; }
     public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnAfterSwitchInSelf { get; init; }
-    public Action<IBattle, Pokemon>? OnAfterTerastallization { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAfterUseItem { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAfterTakeItem { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterBoost { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAfterFaint { get; init; }
+    public Action<Battle, Pokemon>? OnAfterSwitchInSelf { get; init; }
+    public Action<Battle, Pokemon>? OnAfterTerastallization { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAfterUseItem { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAfterTakeItem { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAfterFaint { get; init; }
     public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
     public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
     public VoidSourceMoveHandler? OnAfterMove { get; init; }
     public VoidSourceMoveHandler? OnAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnAttract { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
+    public Action<Battle, Pokemon, IEffect>? OnBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnBeforeMove { get; init; }
-    public Action<IBattle, Pokemon>? OnBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnBeforeSwitchOut { get; init; }
-    public Action<IBattle, Pokemon>? OnBeforeTurn { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; init; }
+    public Action<Battle, Pokemon>? OnBeforeSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnBeforeSwitchOut { get; init; }
+    public Action<Battle, Pokemon>? OnBeforeTurn { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; init; }
     public VoidSourceMoveHandler? OnChargeMove { get; init; }
     public OnCriticalHit? OnCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnEatItem { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; init; }
+    public Action<Battle, Pokemon>? OnDisableMove { get; init; }
+    public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; init; }
+    public Action<Battle, Item, Pokemon>? OnEatItem { get; init; }
     public OnEffectivenessHandler? OnEffectiveness { get; init; }
-    public Action<IBattle, Pokemon>? OnEntryHazard { get; init; }
+    public Action<Battle, Pokemon>? OnEntryHazard { get; init; }
     public VoidEffectHandler? OnFaint { get; init; }
     public OnFlinch? OnFlinch { get; init; }
     public OnFractionalPriority? OnFractionalPriority { get; init; }
     public ResultMoveHandler? OnHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnImmunity { get; init; }
+    public Action<Battle, PokemonType, Pokemon>? OnImmunity { get; init; }
     public OnLockMove? OnLockMove { get; init; }
-    public Action<IBattle, Pokemon>? OnMaybeTrapPokemon { get; init; }
+    public Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnModifyAtk { get; init; }
-    public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; init; }
+    public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; init; }
     public ModifierSourceMoveHandler? OnModifyCritRatio { get; init; }
     public ModifierSourceMoveHandler? OnModifyDamage { get; init; }
     public ModifierMoveHandler? OnModifyDef { get; init; }
     public OnModifyMoveHandler? OnModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
+    public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; init; }
     public OnModifyTypeHandler? OnModifyType { get; init; }
     public OnModifyTargetHandler? OnModifyTarget { get; init; }
     public ModifierSourceMoveHandler? OnModifySpA { get; init; }
     public ModifierMoveHandler? OnModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnModifyStab { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; init; }
     public VoidMoveHandler? OnMoveAborted { get; init; }
     public OnNegateImmunity? OnNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnPrepareHit { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, IEffect>? OnResidual { get; init; }
-    public Action<IBattle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; init; }
-    public Action<IBattle, Side, Pokemon, Condition>? OnSideConditionStart { get; init; }
-    public Func<IBattle, Pokemon, BoolVoidUnion>? OnStallMove { get; init; }
-    public Action<IBattle, Pokemon>? OnSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnSwitchOut { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnSwap { get; init; }
+    public Action<Battle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; init; }
+    public Action<Battle, Pokemon, Pokemon, IEffect>? OnResidual { get; init; }
+    public Action<Battle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; init; }
+    public Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; init; }
+    public Action<Battle, Side, Pokemon, Condition>? OnSideConditionStart { get; init; }
+    public Func<Battle, Pokemon, BoolVoidUnion>? OnStallMove { get; init; }
+    public Action<Battle, Pokemon>? OnSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnSwitchOut { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnSwap { get; init; }
     public OnTakeItem? OnTakeItem { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; init; }
-    public Action<IBattle, Pokemon>? OnTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; init; }
+    public Action<Battle, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; init; }
+    public Action<Battle, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; init; }
+    public Action<Battle, Pokemon>? OnTrapPokemon { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; init; }
     public OnTryEatItem? OnTryEatItem { get; init; }
     public OnTryHeal? OnTryHeal { get; init; }
     public ExtResultSourceMoveHandler? OnTryHit { get; init; }
@@ -180,80 +180,80 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public ResultMoveHandler? OnTryHitSide { get; init; }
     public ExtResultMoveHandler? OnInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; init; }
-    public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnUseItem { get; init; }
-    public Action<IBattle, Pokemon>? OnUpdate { get; init; }
-    public Action<IBattle, Pokemon, object?, Condition>? OnWeather { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; init; }
+    public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; init; }
+    public Action<Battle, Item, Pokemon>? OnUseItem { get; init; }
+    public Action<Battle, Pokemon>? OnUpdate { get; init; }
+    public Action<Battle, Pokemon, object?, Condition>? OnWeather { get; init; }
     public ModifierSourceMoveHandler? OnWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterHit { get; init; }
-    public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; init; }
+    public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; init; }
     public OnAfterSubDamageHandler? OnFoeAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeAfterSwitchInSelf { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnFoeAfterUseItem { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeAfterBoost { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnFoeAfterFaint { get; init; }
+    public Action<Battle, Pokemon>? OnFoeAfterSwitchInSelf { get; init; }
+    public Action<Battle, Item, Pokemon>? OnFoeAfterUseItem { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeAfterBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnFoeAfterFaint { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterMoveSecondarySelf { get; init; }
     public VoidMoveHandler? OnFoeAfterMoveSecondary { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterMove { get; init; }
     public VoidSourceMoveHandler? OnFoeAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnFoeAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnFoeAttract { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnFoeBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnFoeBeforeFaint { get; init; }
+    public Action<Battle, Pokemon, IEffect>? OnFoeBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnFoeBeforeMove { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeBeforeSwitchOut { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; init; }
+    public Action<Battle, Pokemon>? OnFoeBeforeSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnFoeBeforeSwitchOut { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; init; }
     public VoidSourceMoveHandler? OnFoeChargeMove { get; init; }
     public OnCriticalHit? OnFoeCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnFoeEatItem { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; init; }
+    public Action<Battle, Pokemon>? OnFoeDisableMove { get; init; }
+    public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; init; }
+    public Action<Battle, Item, Pokemon>? OnFoeEatItem { get; init; }
     public OnEffectivenessHandler? OnFoeEffectiveness { get; init; }
     public VoidEffectHandler? OnFoeFaint { get; init; }
     public OnFlinch? OnFoeFlinch { get; init; }
     public ResultMoveHandler? OnFoeHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnFoeImmunity { get; init; }
+    public Action<Battle, PokemonType, Pokemon>? OnFoeImmunity { get; init; }
     public OnLockMove? OnFoeLockMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
+    public Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnFoeModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyAtk { get; init; }
-    public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; init; }
+    public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyCritRatio { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyDamage { get; init; }
     public ModifierMoveHandler? OnFoeModifyDef { get; init; }
     public OnModifyMoveHandler? OnFoeModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
+    public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifySpA { get; init; }
     public ModifierMoveHandler? OnFoeModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyStab { get; init; }
     public OnModifyTypeHandler? OnFoeModifyType { get; init; }
     public OnModifyTargetHandler? OnFoeModifyTarget { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; init; }
     public VoidMoveHandler? OnFoeMoveAborted { get; init; }
     public OnNegateImmunity? OnFoeNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnFoePrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; init; }
-    public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; init; }
-    public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; init; }
-    public Func<IBattle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeSwitchOut { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; init; }
+    public Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; init; }
+    public Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; init; }
+    public Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; init; }
+    public Func<Battle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; init; }
+    public Action<Battle, Pokemon>? OnFoeSwitchOut { get; init; }
     public OnTakeItem? OnFoeTakeItem { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeTerrain { get; init; }
-    public Action<IBattle, Pokemon>? OnFoeTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; init; }
+    public Action<Battle, Pokemon>? OnFoeTerrain { get; init; }
+    public Action<Battle, Pokemon>? OnFoeTrapPokemon { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; init; }
     public OnTryEatItem? OnFoeTryEatItem { get; init; }
     public OnTryHeal? OnFoeTryHeal { get; init; }
     public ExtResultSourceMoveHandler? OnFoeTryHit { get; init; }
@@ -261,77 +261,77 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public ResultMoveHandler? OnFoeTryHitSide { get; init; }
     public ExtResultMoveHandler? OnFoeInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnFoeTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; init; }
-    public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; init; }
+    public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; init; }
     public ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnFoeModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterHit { get; init; }
-    public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; init; }
+    public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; init; }
     public OnAfterSubDamageHandler? OnSourceAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceAfterSwitchInSelf { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnSourceAfterUseItem { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceAfterBoost { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnSourceAfterFaint { get; init; }
+    public Action<Battle, Pokemon>? OnSourceAfterSwitchInSelf { get; init; }
+    public Action<Battle, Item, Pokemon>? OnSourceAfterUseItem { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceAfterBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnSourceAfterFaint { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterMoveSecondarySelf { get; init; }
     public VoidMoveHandler? OnSourceAfterMoveSecondary { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterMove { get; init; }
     public VoidSourceMoveHandler? OnSourceAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnSourceAttract { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnSourceBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
+    public Action<Battle, Pokemon, IEffect>? OnSourceBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnSourceBeforeMove { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceBeforeSwitchOut { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; init; }
+    public Action<Battle, Pokemon>? OnSourceBeforeSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnSourceBeforeSwitchOut { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; init; }
     public VoidSourceMoveHandler? OnSourceChargeMove { get; init; }
     public OnCriticalHit? OnSourceCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnSourceEatItem { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; init; }
+    public Action<Battle, Pokemon>? OnSourceDisableMove { get; init; }
+    public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; init; }
+    public Action<Battle, Item, Pokemon>? OnSourceEatItem { get; init; }
     public OnEffectivenessHandler? OnSourceEffectiveness { get; init; }
     public VoidEffectHandler? OnSourceFaint { get; init; }
     public OnFlinch? OnSourceFlinch { get; init; }
     public ResultMoveHandler? OnSourceHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnSourceImmunity { get; init; }
+    public Action<Battle, PokemonType, Pokemon>? OnSourceImmunity { get; init; }
     public OnLockMove? OnSourceLockMove { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
+    public Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnSourceModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyAtk { get; init; }
-    public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; init; }
+    public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyCritRatio { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyDamage { get; init; }
     public ModifierMoveHandler? OnSourceModifyDef { get; init; }
     public OnModifyMoveHandler? OnSourceModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
+    public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifySpA { get; init; }
     public ModifierMoveHandler? OnSourceModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyStab { get; init; }
     public OnModifyTypeHandler? OnSourceModifyType { get; init; }
     public OnModifyTargetHandler? OnSourceModifyTarget { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; init; }
     public VoidMoveHandler? OnSourceMoveAborted { get; init; }
     public OnNegateImmunity? OnSourceNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnSourcePrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; init; }
-    public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; init; }
-    public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; init; }
-    public Func<IBattle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceSwitchOut { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; init; }
+    public Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; init; }
+    public Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; init; }
+    public Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; init; }
+    public Func<Battle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; init; }
+    public Action<Battle, Pokemon>? OnSourceSwitchOut { get; init; }
     public OnTakeItem? OnSourceTakeItem { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceTerrain { get; init; }
-    public Action<IBattle, Pokemon>? OnSourceTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; init; }
+    public Action<Battle, Pokemon>? OnSourceTerrain { get; init; }
+    public Action<Battle, Pokemon>? OnSourceTrapPokemon { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; init; }
     public OnTryEatItem? OnSourceTryEatItem { get; init; }
     public OnTryHeal? OnSourceTryHeal { get; init; }
     public ExtResultSourceMoveHandler? OnSourceTryHit { get; init; }
@@ -339,81 +339,81 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public ResultMoveHandler? OnSourceTryHitSide { get; init; }
     public ExtResultMoveHandler? OnSourceInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnSourceTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; init; }
-    public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; init; }
+    public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; init; }
     public ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnSourceModifyDamagePhase2 { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAnyAfterHit { get; init; }
-    public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; init; }
+    public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; init; }
     public OnAfterSubDamageHandler? OnAnyAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyAfterSwitchInSelf { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAnyAfterUseItem { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyAfterBoost { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAnyAfterFaint { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyAfterMega { get; init; }
+    public Action<Battle, Pokemon>? OnAnyAfterSwitchInSelf { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAnyAfterUseItem { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyAfterBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAnyAfterFaint { get; init; }
+    public Action<Battle, Pokemon>? OnAnyAfterMega { get; init; }
     public VoidSourceMoveHandler? OnAnyAfterMoveSecondarySelf { get; init; }
     public VoidMoveHandler? OnAnyAfterMoveSecondary { get; init; }
     public VoidSourceMoveHandler? OnAnyAfterMove { get; init; }
     public VoidSourceMoveHandler? OnAnyAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyAfterTerastallization { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnAnyAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; init; }
+    public Action<Battle, Pokemon>? OnAnyAfterTerastallization { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnAnyAttract { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAnyBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnAnyBeforeFaint { get; init; }
+    public Action<Battle, Pokemon, IEffect>? OnAnyBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnAnyBeforeMove { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyBeforeSwitchOut { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; init; }
+    public Action<Battle, Pokemon>? OnAnyBeforeSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnAnyBeforeSwitchOut { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; init; }
     public VoidSourceMoveHandler? OnAnyChargeMove { get; init; }
     public OnCriticalHit? OnAnyCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAnyEatItem { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; init; }
+    public Action<Battle, Pokemon>? OnAnyDisableMove { get; init; }
+    public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAnyEatItem { get; init; }
     public OnEffectivenessHandler? OnAnyEffectiveness { get; init; }
     public VoidEffectHandler? OnAnyFaint { get; init; }
     public OnFlinch? OnAnyFlinch { get; init; }
     public ResultMoveHandler? OnAnyHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnAnyImmunity { get; init; }
+    public Action<Battle, PokemonType, Pokemon>? OnAnyImmunity { get; init; }
     public OnLockMove? OnAnyLockMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
+    public Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnAnyModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyAtk { get; init; }
-    public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; init; }
+    public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyCritRatio { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyDamage { get; init; }
     public ModifierMoveHandler? OnAnyModifyDef { get; init; }
     public OnModifyMoveHandler? OnAnyModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
+    public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifySpA { get; init; }
     public ModifierMoveHandler? OnAnyModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyStab { get; init; }
     public OnModifyTypeHandler? OnAnyModifyType { get; init; }
     public OnModifyTargetHandler? OnAnyModifyTarget { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; init; }
+    public Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; init; }
     public OnNegateImmunity? OnAnyNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnAnyPrepareHit { get; init; }
-    public Action<IBattle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; init; }
-    public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; init; }
-    public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; init; }
-    public Func<IBattle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; init; }
-    public Action<IBattle, Pokemon>? OnAnySwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnAnySwitchOut { get; init; }
+    public Action<Battle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; init; }
+    public Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; init; }
+    public Func<Battle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; init; }
+    public Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; init; }
+    public Func<Battle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; init; }
+    public Action<Battle, Pokemon>? OnAnySwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnAnySwitchOut { get; init; }
     public OnTakeItem? OnAnyTakeItem { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyTerrain { get; init; }
-    public Action<IBattle, Pokemon>? OnAnyTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; init; }
+    public Action<Battle, Pokemon>? OnAnyTerrain { get; init; }
+    public Action<Battle, Pokemon>? OnAnyTrapPokemon { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; init; }
     public OnTryEatItem? OnAnyTryEatItem { get; init; }
     public OnTryHeal? OnAnyTryHeal { get; init; }
     public ExtResultSourceMoveHandler? OnAnyTryHit { get; init; }
@@ -421,8 +421,8 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public ResultMoveHandler? OnAnyTryHitSide { get; init; }
     public ExtResultMoveHandler? OnAnyInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnAnyTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; init; }
-    public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; init; }
+    public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; init; }
     public ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnAnyModifyDamagePhase2 { get; init; }
@@ -492,95 +492,95 @@ public record Condition : ISideEventMethods, IFieldEventMethods, IPokemonEventMe
     public int? OnTryMovePriority { get; init; }
     public int? OnTryPrimaryHitPriority { get; init; }
     public int? OnTypePriority { get; init; }
-    public Action<IBattle, Side, Pokemon, IEffect>? OnSideStart { get; init; }
-    public Action<IBattle, Side, Pokemon, IEffect>? OnSideRestart { get; init; }
-    public Action<IBattle, Side, Pokemon, IEffect>? OnSideResidual { get; init; }
-    public Action<IBattle, Side>? OnSideEnd { get; init; }
+    public Action<Battle, Side, Pokemon, IEffect>? OnSideStart { get; init; }
+    public Action<Battle, Side, Pokemon, IEffect>? OnSideRestart { get; init; }
+    public Action<Battle, Side, Pokemon, IEffect>? OnSideResidual { get; init; }
+    public Action<Battle, Side>? OnSideEnd { get; init; }
     public int? OnSideResidualOrder { get; init; }
     public int? OnSideResidualPriority { get; init; }
     public int? OnSideResidualSubOrder { get; init; }
-    public Action<IBattle, Field, Pokemon, IEffect>? OnFieldStart { get; init; }
-    public Action<IBattle, Field, Pokemon, IEffect>? OnFieldRestart { get; init; }
-    public Action<IBattle, Field, Pokemon, IEffect>? OnFieldResidual { get; init; }
-    public Action<IBattle, Field>? OnFieldEnd { get; init; }
+    public Action<Battle, Field, Pokemon, IEffect>? OnFieldStart { get; init; }
+    public Action<Battle, Field, Pokemon, IEffect>? OnFieldRestart { get; init; }
+    public Action<Battle, Field, Pokemon, IEffect>? OnFieldResidual { get; init; }
+    public Action<Battle, Field>? OnFieldEnd { get; init; }
     public int? OnFieldResidualOrder { get; init; }
     public int? OnFieldResidualPriority { get; init; }
     public int? OnFieldResidualSubOrder { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterHit { get; init; }
-    public Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; init; }
+    public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; init; }
     public OnAfterSubDamageHandler? OnAllyAfterSubDamage { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyAfterSwitchInSelf { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAllyAfterUseItem { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyAfterBoost { get; init; }
-    public Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAllyAfterFaint { get; init; }
+    public Action<Battle, Pokemon>? OnAllyAfterSwitchInSelf { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAllyAfterUseItem { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyAfterBoost { get; init; }
+    public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAllyAfterFaint { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterMoveSecondarySelf { get; init; }
     public VoidMoveHandler? OnAllyAfterMoveSecondary { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterMove { get; init; }
     public VoidSourceMoveHandler? OnAllyAfterMoveSelf { get; init; }
-    public Action<IBattle, Pokemon, Pokemon>? OnAllyAttract { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyAccuracy { get; init; }
+    public Action<Battle, Pokemon, Pokemon>? OnAllyAttract { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAllyBasePower { get; init; }
-    public Action<IBattle, Pokemon, IEffect>? OnAllyBeforeFaint { get; init; }
+    public Action<Battle, Pokemon, IEffect>? OnAllyBeforeFaint { get; init; }
     public VoidSourceMoveHandler? OnAllyBeforeMove { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyBeforeSwitchIn { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyBeforeSwitchOut { get; init; }
-    public Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyTryBoost { get; init; }
+    public Action<Battle, Pokemon>? OnAllyBeforeSwitchIn { get; init; }
+    public Action<Battle, Pokemon>? OnAllyBeforeSwitchOut { get; init; }
+    public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyTryBoost { get; init; }
     public VoidSourceMoveHandler? OnAllyChargeMove { get; init; }
     public OnCriticalHit? OnAllyCriticalHit { get; init; }
-    public Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAllyDamage { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAllyDeductPp { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyDisableMove { get; init; }
-    public Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; init; }
-    public Action<IBattle, Item, Pokemon>? OnAllyEatItem { get; init; }
+    public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAllyDamage { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnAllyDeductPp { get; init; }
+    public Action<Battle, Pokemon>? OnAllyDisableMove { get; init; }
+    public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; init; }
+    public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; init; }
     public OnEffectivenessHandler? OnAllyEffectiveness { get; init; }
     public VoidEffectHandler? OnAllyFaint { get; init; }
     public OnFlinch? OnAllyFlinch { get; init; }
     public ResultMoveHandler? OnAllyHit { get; init; }
-    public Action<IBattle, PokemonType, Pokemon>? OnAllyImmunity { get; init; }
+    public Action<Battle, PokemonType, Pokemon>? OnAllyImmunity { get; init; }
     public OnLockMove? OnAllyLockMove { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
+    public Action<Battle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
     public ModifierMoveHandler? OnAllyModifyAccuracy { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyAtk { get; init; }
-    public Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAllyModifyBoost { get; init; }
+    public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAllyModifyBoost { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyCritRatio { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamage { get; init; }
     public ModifierMoveHandler? OnAllyModifyDef { get; init; }
     public OnModifyMoveHandler? OnAllyModifyMove { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyPriority { get; init; }
-    public Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
+    public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifySpA { get; init; }
     public ModifierMoveHandler? OnAllyModifySpD { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAllyModifySpe { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifySpe { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyStab { get; init; }
     public OnModifyTypeHandler? OnAllyModifyType { get; init; }
     public OnModifyTargetHandler? OnAllyModifyTarget { get; init; }
-    public Func<IBattle, int, Pokemon, IntVoidUnion>? OnAllyModifyWeight { get; init; }
+    public Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifyWeight { get; init; }
     public VoidMoveHandler? OnAllyMoveAborted { get; init; }
     public OnNegateImmunity? OnAllyNegateImmunity { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAllyOverrideAction { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAllyOverrideAction { get; init; }
     public ResultSourceMoveHandler? OnAllyPrepareHit { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAllyRedirectTarget { get; init; }
-    public Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; init; }
-    public Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAllySetAbility { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, PokemonVoidUnion?>? OnAllySetStatus { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAllySetWeather { get; init; }
-    public Func<IBattle, Pokemon, PokemonVoidUnion>? OnAllyStallMove { get; init; }
-    public Action<IBattle, Pokemon>? OnAllySwitchOut { get; init; }
+    public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAllyRedirectTarget { get; init; }
+    public Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; init; }
+    public Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAllySetAbility { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, PokemonVoidUnion?>? OnAllySetStatus { get; init; }
+    public Func<Battle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAllySetWeather { get; init; }
+    public Func<Battle, Pokemon, PokemonVoidUnion>? OnAllyStallMove { get; init; }
+    public Action<Battle, Pokemon>? OnAllySwitchOut { get; init; }
     public OnTakeItem? OnAllyTakeItem { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyTerrain { get; init; }
-    public Action<IBattle, Pokemon>? OnAllyTrapPokemon { get; init; }
-    public Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAllyTryAddVolatile { get; init; }
-    public Func<IBattle, Item, Pokemon, BoolVoidUnion>? OnAllyTryEatItem { get; init; }
+    public Action<Battle, Pokemon>? OnAllyTerrain { get; init; }
+    public Action<Battle, Pokemon>? OnAllyTrapPokemon { get; init; }
+    public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAllyTryAddVolatile { get; init; }
+    public Func<Battle, Item, Pokemon, BoolVoidUnion>? OnAllyTryEatItem { get; init; }
     public OnTryHeal? OnAllyTryHeal { get; init; }
     public ExtResultSourceMoveHandler? OnAllyTryHit { get; init; }
     public ExtResultSourceMoveHandler? OnAllyTryHitField { get; init; }
     public ResultMoveHandler? OnAllyTryHitSide { get; init; }
     public ExtResultMoveHandler? OnAllyInvulnerability { get; init; }
     public ResultSourceMoveHandler? OnAllyTryMove { get; init; }
-    public Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyTryPrimaryHit { get; init; }
-    public Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAllyType { get; init; }
+    public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyTryPrimaryHit { get; init; }
+    public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnAllyType { get; init; }
     public ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; init; }
     public ModifierSourceMoveHandler? OnAllyModifyDamagePhase2 { get; init; }

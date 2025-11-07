@@ -6,36 +6,36 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
 
-public delegate DoubleVoidUnion ModifierEffectHandler(IBattle battle, int relayVar, Pokemon target,
+public delegate DoubleVoidUnion ModifierEffectHandler(Battle battle, int relayVar, Pokemon target,
     Pokemon source, IEffect effect);
 
-public delegate DoubleVoidUnion ModifierMoveHandler(IBattle battle, int relayVar, Pokemon target,
+public delegate DoubleVoidUnion ModifierMoveHandler(Battle battle, int relayVar, Pokemon target,
     Pokemon source, ActiveMove move);
 
-public delegate BoolEmptyVoidUnion? ResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
+public delegate BoolEmptyVoidUnion? ResultMoveHandler(Battle battle, Pokemon target, Pokemon source,
     ActiveMove move);
 
-public delegate BoolIntEmptyVoidUnion? ExtResultMoveHandler(IBattle battle, Pokemon target, Pokemon source,
+public delegate BoolIntEmptyVoidUnion? ExtResultMoveHandler(Battle battle, Pokemon target, Pokemon source,
     ActiveMove move);
 
-public delegate void VoidEffectHandler(IBattle battle, Pokemon target, Pokemon source, IEffect effect);
-public delegate void VoidMoveHandler(IBattle battle, Pokemon target, Pokemon source, ActiveMove move);
+public delegate void VoidEffectHandler(Battle battle, Pokemon target, Pokemon source, IEffect effect);
+public delegate void VoidMoveHandler(Battle battle, Pokemon target, Pokemon source, ActiveMove move);
 
 // Source-based variants (source comes first in parameters)
-public delegate DoubleVoidUnion ModifierSourceEffectHandler(IBattle battle, int relayVar, Pokemon source,
+public delegate DoubleVoidUnion ModifierSourceEffectHandler(Battle battle, int relayVar, Pokemon source,
     Pokemon target, IEffect effect);
 
-public delegate DoubleVoidUnion ModifierSourceMoveHandler(IBattle battle, int relayVar, Pokemon source,
+public delegate DoubleVoidUnion ModifierSourceMoveHandler(Battle battle, int relayVar, Pokemon source,
     Pokemon target, ActiveMove move);
 
-public delegate BoolEmptyVoidUnion? ResultSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target,
+public delegate BoolEmptyVoidUnion? ResultSourceMoveHandler(Battle battle, Pokemon source, Pokemon target,
     ActiveMove move);
 
-public delegate BoolIntEmptyVoidUnion? ExtResultSourceMoveHandler(IBattle battle, Pokemon source,
+public delegate BoolIntEmptyVoidUnion? ExtResultSourceMoveHandler(Battle battle, Pokemon source,
     Pokemon target, ActiveMove move);
 
-public delegate void VoidSourceEffectHandler(IBattle battle, Pokemon source, Pokemon target, IEffect effect);
+public delegate void VoidSourceEffectHandler(Battle battle, Pokemon source, Pokemon target, IEffect effect);
 
 // Note: The name "VoidSourceMoveHandler" might be a bit misleading since it returns a BoolVoidUnion.
 // This was changed due to Paralysis' OnBeforeMove event needing to return a bool value.
-public delegate BoolVoidUnion VoidSourceMoveHandler(IBattle battle, Pokemon source, Pokemon target, ActiveMove move);
+public delegate BoolVoidUnion VoidSourceMoveHandler(Battle battle, Pokemon source, Pokemon target, ActiveMove move);

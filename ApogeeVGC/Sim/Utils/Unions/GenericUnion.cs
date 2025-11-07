@@ -408,13 +408,13 @@ public abstract record PokemonSideFieldBattleUnion
         new PokemonSideFieldBattleSide(side);
     public static implicit operator PokemonSideFieldBattleUnion(Field field) =>
         new PokemonSideFieldBattleField(field);
-    public static PokemonSideFieldBattleUnion FromIBattle(IBattle battle) =>
+    public static PokemonSideFieldBattleUnion FromBattle(Battle battle) =>
         new PokemonSideFieldBattleBattle(battle);
 }
 public record PokemonSideFieldBattlePokemon(Pokemon Pokemon) : PokemonSideFieldBattleUnion;
 public record PokemonSideFieldBattleSide(Side Side) : PokemonSideFieldBattleUnion;
 public record PokemonSideFieldBattleField(Field Field) : PokemonSideFieldBattleUnion;
-public record PokemonSideFieldBattleBattle(IBattle Battle) : PokemonSideFieldBattleUnion;
+public record PokemonSideFieldBattleBattle(Battle Battle) : PokemonSideFieldBattleUnion;
 
 
 /// <summary>
@@ -425,7 +425,7 @@ public abstract record PokemonSideBattleUnion
     public static implicit operator PokemonSideBattleUnion(Pokemon pokemon) =>
         new PokemonSideBattlePokemon(pokemon);
     public static implicit operator PokemonSideBattleUnion(Side side) => new PokemonSideBattleSide(side);
-    public static PokemonSideBattleUnion FromIBattle(IBattle battle) => new PokemonSideBattleBattle(battle);
+    public static PokemonSideBattleUnion FromBattle(Battle battle) => new PokemonSideBattleBattle(battle);
     public static PokemonSideBattleUnion? FromNullablePokemon(Pokemon? pokemon)
     {
         return pokemon is null ? null : new PokemonSideBattleNullablePokemon(pokemon);
@@ -445,7 +445,7 @@ public abstract record PokemonSideBattleUnion
 }
 public record PokemonSideBattlePokemon(Pokemon Pokemon) : PokemonSideBattleUnion;
 public record PokemonSideBattleSide(Side Side) : PokemonSideBattleUnion;
-public record PokemonSideBattleBattle(IBattle Battle) : PokemonSideBattleUnion;
+public record PokemonSideBattleBattle(Battle Battle) : PokemonSideBattleUnion;
 public record PokemonSideBattleNullablePokemon(Pokemon? Pokemon) : PokemonSideBattleUnion;
 
 

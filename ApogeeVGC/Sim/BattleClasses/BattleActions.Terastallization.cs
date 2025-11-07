@@ -9,7 +9,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleActions
 {
-    public MoveType? CanTerastallize(IBattle battle, Pokemon pokemon)
+    public MoveType? CanTerastallize(Battle battle, Pokemon pokemon)
     {
         if (Battle.Gen != 9)
         {

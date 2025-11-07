@@ -337,7 +337,7 @@ public partial class Battle
         List<EventListener> handlers = [];
 
         // Check format (ruleset) for handlers
-        EffectDelegate? callback = GetCallback(RunEventTarget.FromIBattle(this), Format, callbackName);
+        EffectDelegate? callback = GetCallback(RunEventTarget.FromBattle(this), Format, callbackName);
 
         if (callback != null || (getKey != null && FormatData.GetProperty(getKey) != null))
         {
@@ -347,7 +347,7 @@ public partial class Battle
                 Callback = callback,
                 State = FormatData,
                 End = null,
-                EffectHolder = customHolder ?? EffectHolder.FromIBattle(this),
+                EffectHolder = customHolder ?? EffectHolder.FromBattle(this),
             }, callbackName));
         }
 
@@ -380,7 +380,7 @@ public partial class Battle
                 Callback = eventDelegate,
                 State = state,
                 End = null,
-                EffectHolder = customHolder ?? EffectHolder.FromIBattle(this),
+                EffectHolder = customHolder ?? EffectHolder.FromBattle(this),
                 // These would come from the handler data in a full implementation
                 Order = IntFalseUnion.FromInt(0),
                 Priority = 0,

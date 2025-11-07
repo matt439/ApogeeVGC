@@ -25,7 +25,7 @@
 //    public bool NoCatch { get; }
 //    public bool KeepAlive { get; }
 //    public BattleReplayMode Replay { get; }
-//    private IBattle? Battle { get; set; }
+//    private Battle? Battle { get; set; }
 //    private Library Library { get; }
 
 //    public BattleStream(Library lib, BattleStreamOptions? options = null)

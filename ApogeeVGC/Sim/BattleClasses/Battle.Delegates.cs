@@ -13,7 +13,7 @@ public partial class Battle
         var parameters = del.Method.GetParameters();
         int paramCount = parameters.Length;
 
-        // Most common signature: (IBattle battle, ...)
+        // Most common signature: (Battle battle, ...)
         if (paramCount == 0)
         {
             return (RelayVar?)del.DynamicInvoke(null);
@@ -55,8 +55,8 @@ public partial class Battle
         object?[] args = new object?[paramCount];
         int argIndex = 0;
 
-        // First parameter is typically IBattle (this)
-        if (parameters[0].ParameterType.IsAssignableFrom(typeof(IBattle)))
+        // First parameter is typically Battle (this)
+        if (parameters[0].ParameterType.IsAssignableFrom(typeof(Battle)))
         {
             args[argIndex++] = this;
         }
@@ -118,8 +118,8 @@ public partial class Battle
     {
         Type paramType = param.ParameterType;
 
-        // First parameter is typically IBattle
-        if (position == 0 && paramType.IsAssignableFrom(typeof(IBattle)))
+        // First parameter is typically Battle
+        if (position == 0 && paramType.IsAssignableFrom(typeof(Battle)))
         {
             return this;
         }
@@ -130,9 +130,9 @@ public partial class Battle
             return relayVar;
         }
 
-        // Adjust position if IBattle was first
+        // Adjust position if Battle was first
         int adjustedPos = position;
-        if (position > 0 && paramType.IsAssignableFrom(typeof(IBattle)))
+        if (position > 0 && paramType.IsAssignableFrom(typeof(Battle)))
         {
             adjustedPos--;
         }

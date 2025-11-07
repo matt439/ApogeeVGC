@@ -155,7 +155,7 @@ public partial class Battle
         }
 
         // Default target to Battle if not provided
-        target ??= RunEventTarget.FromIBattle(this);
+        target ??= RunEventTarget.FromBattle(this);
 
         // Extract the source Pokemon for handler lookup
         Pokemon? effectSource = source switch
@@ -195,7 +195,7 @@ public partial class Battle
                         PokemonRunEventTarget pokemonTarget => pokemonTarget.Pokemon,
                         SideRunEventTarget sideTarget => sideTarget.Side,
                         FieldRunEventTarget fieldTarget => fieldTarget.Field,
-                        BattleRunEventTarget => EffectHolder.FromIBattle(this),
+                        BattleRunEventTarget => EffectHolder.FromBattle(this),
                         _ => throw new InvalidOperationException($"Unknown target type: {target.GetType().Name}"),
                     },
                 }, eventId));
@@ -377,7 +377,7 @@ public partial class Battle
                 PokemonEffectHolder pokemonEh => new PokemonEffectStateTarget(pokemonEh.Pokemon),
                 SideEffectHolder sideEh => new SideEffectStateTarget(sideEh.Side),
                 FieldEffectHolder fieldEh => new FieldEffectStateTarget(fieldEh.Field),
-                BattleEffectHolder battleEh => EffectStateTarget.FromIBattle(battleEh.Battle),
+                BattleEffectHolder battleEh => EffectStateTarget.FromBattle(battleEh.Battle),
                 _ => null,
             };
 
@@ -662,7 +662,7 @@ public partial class Battle
                     PokemonEffectHolder pokemonEh => new PokemonSingleEventTarget(pokemonEh.Pokemon),
                     SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
                     FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
-                    BattleEffectHolder battleEh => SingleEventTarget.FromIBattle(battleEh.Battle),
+                    BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
                     _ => null,
                 };
 

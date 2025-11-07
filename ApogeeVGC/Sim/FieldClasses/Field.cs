@@ -10,14 +10,14 @@ namespace ApogeeVGC.Sim.FieldClasses;
 
 public class Field : IDisposable
 {
-    public IBattle Battle { get; init; }
+    public Battle Battle { get; init; }
     public ConditionId Weather { get; set; }
     public EffectState WeatherState { get; set; }
     public ConditionId Terrain { get; set; }
     public EffectState TerrainState { get; set; }
     public Dictionary<ConditionId, EffectState> PseudoWeather { get; init; } = [];
 
-    public Field(IBattle battle)
+    public Field(Battle battle)
     {
         Battle = battle;
         WeatherState = Battle.InitEffectState();

@@ -16,59 +16,59 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, move
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; }
+    Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnEmergencyExit { get; }
+    Action<Battle, Pokemon>? OnEmergencyExit { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterEachBoost { get; }
 
     VoidSourceMoveHandler? OnAfterHit { get; } // MoveEventMethods['onAfterHit']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAfterMega { get; }
+    Action<Battle, Pokemon>? OnAfterMega { get; }
 
     /// <summary>
     /// battle, status, target, source, effect
     /// </summary>
-    Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAfterSetStatus { get; }
+    Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAfterSetStatus { get; }
 
     OnAfterSubDamageHandler? OnAfterSubDamage { get; } // MoveEventMethods['onAfterSubDamage']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAfterSwitchInSelf { get; }
+    Action<Battle, Pokemon>? OnAfterSwitchInSelf { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAfterTerastallization { get; }
+    Action<Battle, Pokemon>? OnAfterTerastallization { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnAfterUseItem { get; }
+    Action<Battle, Item, Pokemon>? OnAfterUseItem { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnAfterTakeItem { get; }
+    Action<Battle, Item, Pokemon>? OnAfterTakeItem { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAfterBoost { get; }
 
     /// <summary>
     /// battle, length, target, source, effect
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAfterFaint { get; }
+    Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAfterFaint { get; }
 
     VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; } // MoveEventMethods['onAfterMoveSecondarySelf'] 
     VoidMoveHandler? OnAfterMoveSecondary { get; } // MoveEventMethods['onAfterMoveSecondary']
@@ -77,44 +77,44 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon>? OnAttract { get; }
+    Action<Battle, Pokemon, Pokemon>? OnAttract { get; }
 
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; }
+    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAccuracy { get; }
 
     ModifierSourceMoveHandler? OnBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, pokemon, effect
     /// </summary>
-    Action<IBattle, Pokemon, IEffect>? OnBeforeFaint { get; }
+    Action<Battle, Pokemon, IEffect>? OnBeforeFaint { get; }
 
     VoidSourceMoveHandler? OnBeforeMove { get; } // CommonHandlers['VoidSourceMove']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnBeforeSwitchIn { get; }
+    Action<Battle, Pokemon>? OnBeforeSwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnBeforeSwitchOut { get; }
+    Action<Battle, Pokemon>? OnBeforeSwitchOut { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnBeforeTurn { get; }
+    Action<Battle, Pokemon>? OnBeforeTurn { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnChangeBoost { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnTryBoost { get; }
 
     VoidSourceMoveHandler? OnChargeMove { get; } // CommonHandlers['VoidSourceMove']
     OnCriticalHit? OnCriticalHit { get; }
@@ -122,33 +122,33 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; }
+    Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; }
+    Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnDisableMove { get; }
+    Action<Battle, Pokemon>? OnDisableMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?, move?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; }
+    Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnDragOut { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnEatItem { get; }
+    Action<Battle, Item, Pokemon>? OnEatItem { get; }
 
     OnEffectivenessHandler? OnEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnEntryHazard { get; }
+    Action<Battle, Pokemon>? OnEntryHazard { get; }
 
     VoidEffectHandler? OnFaint { get; } // CommonHandlers['VoidEffect']
     OnFlinch? OnFlinch { get; }
@@ -157,7 +157,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, type, pokemon
     /// </summary>
-    Action<IBattle, PokemonType, Pokemon>? OnImmunity { get; }
+    Action<Battle, PokemonType, Pokemon>? OnImmunity { get; }
 
     /// <summary>
     /// battle, pokemon -> move
@@ -167,14 +167,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnMaybeTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnMaybeTrapPokemon { get; }
 
     ModifierMoveHandler? OnModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; }
+    Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -184,7 +184,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, secondaries, target, source, move
     /// </summary>
-    Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; }
+    Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnModifySecondaries { get; }
 
     OnModifyTypeHandler? OnModifyType { get; } // MoveEventMethods['onModifyType']
     OnModifyTargetHandler? OnModifyTarget { get; } // MoveEventMethods['onModifyTarget']
@@ -193,13 +193,13 @@ public interface IEventMethods
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnModifySpe { get; }
 
     ModifierSourceMoveHandler? OnModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnModifyWeight { get; }
 
     VoidMoveHandler? OnMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnNegateImmunity { get; }
@@ -207,85 +207,85 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnOverrideAction { get; }
 
     ResultSourceMoveHandler? OnPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, pseudoWeather
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; }
+    Action<Battle, Pokemon, Pokemon, Condition>? OnPseudoWeatherChange { get; }
 
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; }
+    Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnRedirectTarget { get; }
 
     /// <summary>
     /// battle, target, source, effect
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, IEffect>? OnResidual { get; }
+    Action<Battle, Pokemon, Pokemon, IEffect>? OnResidual { get; }
 
     /// <summary>
     /// battle, ability, target, source, effect
     /// </summary>
-    Action<IBattle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; }
+    Action<Battle, Ability, Pokemon, Pokemon, IEffect>? OnSetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; }
+    Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSetWeather { get; }
 
     /// <summary>
     /// battle, target, source, sideCondition
     /// </summary>
-    Action<IBattle, Side, Pokemon, Condition>? OnSideConditionStart { get; }
+    Action<Battle, Side, Pokemon, Condition>? OnSideConditionStart { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, BoolVoidUnion>? OnStallMove { get; }
+    Func<Battle, Pokemon, BoolVoidUnion>? OnStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSwitchIn { get; }
+    Action<Battle, Pokemon>? OnSwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSwitchOut { get; }
+    Action<Battle, Pokemon>? OnSwitchOut { get; }
 
     /// <summary>
     /// battle, target, source
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon>? OnSwap { get; }
+    Action<Battle, Pokemon, Pokemon>? OnSwap { get; }
 
     OnTakeItem? OnTakeItem { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; }
+    Action<Battle, Pokemon, Pokemon, IEffect>? OnWeatherChange { get; }
 
     /// <summary>
     /// battle, target, source, sourceEffect
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; }
+    Action<Battle, Pokemon, Pokemon, IEffect>? OnTerrainChange { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnTrapPokemon { get; }
 
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
@@ -306,27 +306,27 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; }
+    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnType { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnUseItem { get; }
+    Action<Battle, Item, Pokemon>? OnUseItem { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnUpdate { get; }
+    Action<Battle, Pokemon>? OnUpdate { get; }
 
     /// <summary>
     /// battle, target, source, effect
     /// </summary>
-    Action<IBattle, Pokemon, object?, Condition>? OnWeather { get; }
+    Action<Battle, Pokemon, object?, Condition>? OnWeather { get; }
 
     ModifierSourceMoveHandler? OnWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
@@ -334,39 +334,39 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, move
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; }
+    Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnFoeDamagingHit { get; }
 
     /// <summary>
     /// battle, boost, target, source
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnFoeAfterEachBoost { get; }
 
     VoidSourceMoveHandler? OnFoeAfterHit { get; } // MoveEventMethods['onAfterHit']
     /// <summary>
     /// battle, status, target, source, effect
     /// </summary>
-    Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; }
+    Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnFoeAfterSetStatus { get; }
 
     OnAfterSubDamageHandler? OnFoeAfterSubDamage { get; } // MoveEventMethods['onAfterSubDamage']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeAfterSwitchInSelf { get; }
+    Action<Battle, Pokemon>? OnFoeAfterSwitchInSelf { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnFoeAfterUseItem { get; }
+    Action<Battle, Item, Pokemon>? OnFoeAfterUseItem { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeAfterBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeAfterBoost { get; }
 
     /// <summary>
     /// battle, length, target, source, effect
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnFoeAfterFaint { get; }
+    Action<Battle, int, Pokemon, Pokemon, IEffect>? OnFoeAfterFaint { get; }
 
     VoidSourceMoveHandler? OnFoeAfterMoveSecondarySelf { get; } // MoveEventMethods['onAfterMoveSecondarySelf']
     VoidMoveHandler? OnFoeAfterMoveSecondary { get; } // MoveEventMethods['onAfterMoveSecondary']
@@ -375,34 +375,34 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon>? OnFoeAttract { get; }
+    Action<Battle, Pokemon, Pokemon>? OnFoeAttract { get; }
 
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; }
+    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeAccuracy { get; }
 
     ModifierSourceMoveHandler? OnFoeBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, pokemon, effect
     /// </summary>
-    Action<IBattle, Pokemon, IEffect>? OnFoeBeforeFaint { get; }
+    Action<Battle, Pokemon, IEffect>? OnFoeBeforeFaint { get; }
 
     VoidSourceMoveHandler? OnFoeBeforeMove { get; } // CommonHandlers['VoidSourceMove']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeBeforeSwitchIn { get; }
+    Action<Battle, Pokemon>? OnFoeBeforeSwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeBeforeSwitchOut { get; }
+    Action<Battle, Pokemon>? OnFoeBeforeSwitchOut { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnFoeTryBoost { get; }
 
     VoidSourceMoveHandler? OnFoeChargeMove { get; } // CommonHandlers['VoidSourceMove']
     OnCriticalHit? OnFoeCriticalHit { get; }
@@ -410,27 +410,27 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; }
+    Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnFoeDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; }
+    Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnFoeDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeDisableMove { get; }
+    Action<Battle, Pokemon>? OnFoeDisableMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?, move?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; }
+    Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnFoeDragOut { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnFoeEatItem { get; }
+    Action<Battle, Item, Pokemon>? OnFoeEatItem { get; }
 
     OnEffectivenessHandler? OnFoeEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnFoeFaint { get; } // CommonHandlers['VoidEffect']
@@ -439,7 +439,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, type, pokemon
     /// </summary>
-    Action<IBattle, PokemonType, Pokemon>? OnFoeImmunity { get; }
+    Action<Battle, PokemonType, Pokemon>? OnFoeImmunity { get; }
 
     /// <summary>
     /// battle, pokemon -> move
@@ -449,14 +449,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, source?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; }
+    Action<Battle, Pokemon, Pokemon?>? OnFoeMaybeTrapPokemon { get; }
 
     ModifierMoveHandler? OnFoeModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnFoeModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; }
+    Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnFoeModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnFoeModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -466,14 +466,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, secondaries, target, source, move
     /// </summary>
-    Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; }
+    Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnFoeModifySecondaries { get; }
 
     ModifierSourceMoveHandler? OnFoeModifySpA { get; } // CommonHandlers['ModifierSourceMove']
     ModifierMoveHandler? OnFoeModifySpD { get; } // CommonHandlers['ModifierMove']
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnFoeModifySpe { get; }
 
     ModifierSourceMoveHandler? OnFoeModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnFoeModifyType { get; } // MoveEventMethods['onModifyType']
@@ -481,7 +481,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnFoeModifyWeight { get; }
 
     VoidMoveHandler? OnFoeMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnFoeNegateImmunity { get; }
@@ -489,60 +489,60 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnFoeOverrideAction { get; }
 
     ResultSourceMoveHandler? OnFoePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; }
+    Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnFoeRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
     /// </summary>
-    Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; }
+    Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnFoeResidual { get; }
 
     /// <summary>
     /// battle, ability, target, source, effect -> boolean
     /// </summary>
-    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; }
+    Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnFoeSetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; }
+    Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnFoeSetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; }
+    Func<Battle, Pokemon, BoolVoidUnion>? OnFoeStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeSwitchOut { get; }
+    Action<Battle, Pokemon>? OnFoeSwitchOut { get; }
 
     OnTakeItem? OnFoeTakeItem { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeTerrain { get; }
+    Action<Battle, Pokemon>? OnFoeTerrain { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnFoeTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnFoeTrapPokemon { get; }
 
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnFoeTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
@@ -558,12 +558,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnFoeTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; }
+    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnFoeType { get; }
 
     ModifierSourceMoveHandler? OnFoeWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnFoeModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
@@ -571,39 +571,39 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, move
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; }
+    Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnSourceDamagingHit { get; }
 
     /// <summary>
     /// battle, boost, target, source
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnSourceAfterEachBoost { get; }
 
     VoidSourceMoveHandler? OnSourceAfterHit { get; } // MoveEventMethods['onAfterHit']
     /// <summary>
     /// battle, status, target, source, effect
     /// </summary>
-    Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; }
+    Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnSourceAfterSetStatus { get; }
 
     OnAfterSubDamageHandler? OnSourceAfterSubDamage { get; } // MoveEventMethods['onAfterSubDamage']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceAfterSwitchInSelf { get; }
+    Action<Battle, Pokemon>? OnSourceAfterSwitchInSelf { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnSourceAfterUseItem { get; }
+    Action<Battle, Item, Pokemon>? OnSourceAfterUseItem { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceAfterBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceAfterBoost { get; }
 
     /// <summary>
     /// battle, length, target, source, effect
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnSourceAfterFaint { get; }
+    Action<Battle, int, Pokemon, Pokemon, IEffect>? OnSourceAfterFaint { get; }
 
     VoidSourceMoveHandler? OnSourceAfterMoveSecondarySelf { get; } // MoveEventMethods['onAfterMoveSecondarySelf']
     VoidMoveHandler? OnSourceAfterMoveSecondary { get; } // MoveEventMethods['onAfterMoveSecondary']
@@ -612,34 +612,34 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon>? OnSourceAttract { get; }
+    Action<Battle, Pokemon, Pokemon>? OnSourceAttract { get; }
 
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; }
+    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceAccuracy { get; }
 
     ModifierSourceMoveHandler? OnSourceBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, pokemon, effect
     /// </summary>
-    Action<IBattle, Pokemon, IEffect>? OnSourceBeforeFaint { get; }
+    Action<Battle, Pokemon, IEffect>? OnSourceBeforeFaint { get; }
 
     VoidSourceMoveHandler? OnSourceBeforeMove { get; } // CommonHandlers['VoidSourceMove']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceBeforeSwitchIn { get; }
+    Action<Battle, Pokemon>? OnSourceBeforeSwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceBeforeSwitchOut { get; }
+    Action<Battle, Pokemon>? OnSourceBeforeSwitchOut { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnSourceTryBoost { get; }
 
     VoidSourceMoveHandler? OnSourceChargeMove { get; } // CommonHandlers['VoidSourceMove']
     OnCriticalHit? OnSourceCriticalHit { get; }
@@ -647,27 +647,27 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; }
+    Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnSourceDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; }
+    Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnSourceDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceDisableMove { get; }
+    Action<Battle, Pokemon>? OnSourceDisableMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?, move?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; }
+    Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnSourceDragOut { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnSourceEatItem { get; }
+    Action<Battle, Item, Pokemon>? OnSourceEatItem { get; }
 
     OnEffectivenessHandler? OnSourceEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnSourceFaint { get; } // CommonHandlers['VoidEffect']
@@ -676,7 +676,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, type, pokemon
     /// </summary>
-    Action<IBattle, PokemonType, Pokemon>? OnSourceImmunity { get; }
+    Action<Battle, PokemonType, Pokemon>? OnSourceImmunity { get; }
 
     /// <summary>
     /// battle, pokemon -> move
@@ -686,14 +686,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceMaybeTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnSourceMaybeTrapPokemon { get; }
 
     ModifierMoveHandler? OnSourceModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnSourceModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; }
+    Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnSourceModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnSourceModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -703,14 +703,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, secondaries, target, source, move
     /// </summary>
-    Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; }
+    Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnSourceModifySecondaries { get; }
 
     ModifierSourceMoveHandler? OnSourceModifySpA { get; } // CommonHandlers['ModifierSourceMove']
     ModifierMoveHandler? OnSourceModifySpD { get; } // CommonHandlers['ModifierMove']
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnSourceModifySpe { get; }
 
     ModifierSourceMoveHandler? OnSourceModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnSourceModifyType { get; } // MoveEventMethods['onModifyType']
@@ -718,7 +718,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnSourceModifyWeight { get; }
 
     VoidMoveHandler? OnSourceMoveAborted { get; } // CommonHandlers['VoidMove']
     OnNegateImmunity? OnSourceNegateImmunity { get; }
@@ -726,60 +726,60 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnSourceOverrideAction { get; }
 
     ResultSourceMoveHandler? OnSourcePrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; }
+    Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnSourceRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
     /// </summary>
-    Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; }
+    Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnSourceResidual { get; }
 
     /// <summary>
     /// battle, ability, target, source, effect -> boolean
     /// </summary>
-    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; }
+    Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnSourceSetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceSetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; }
+    Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnSourceSetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; }
+    Func<Battle, Pokemon, BoolVoidUnion>? OnSourceStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceSwitchOut { get; }
+    Action<Battle, Pokemon>? OnSourceSwitchOut { get; }
 
     OnTakeItem? OnSourceTakeItem { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceTerrain { get; }
+    Action<Battle, Pokemon>? OnSourceTerrain { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnSourceTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnSourceTrapPokemon { get; }
 
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnSourceTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
@@ -795,12 +795,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnSourceTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; }
+    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnSourceType { get; }
 
     ModifierSourceMoveHandler? OnSourceWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnSourceModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
@@ -808,44 +808,44 @@ public interface IEventMethods
     /// <summary>
     /// battle, damage, target, source, move
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; }
+    Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAnyDamagingHit { get; }
 
     /// <summary>
     /// battle, boost, target, source
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAnyAfterEachBoost { get; }
 
     VoidSourceMoveHandler? OnAnyAfterHit { get; } // MoveEventMethods['onAfterHit']
     /// <summary>
     /// battle, status, target, source, effect
     /// </summary>
-    Action<IBattle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; }
+    Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAnyAfterSetStatus { get; }
 
     OnAfterSubDamageHandler? OnAnyAfterSubDamage { get; } // MoveEventMethods['onAfterSubDamage']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyAfterSwitchInSelf { get; }
+    Action<Battle, Pokemon>? OnAnyAfterSwitchInSelf { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnAnyAfterUseItem { get; }
+    Action<Battle, Item, Pokemon>? OnAnyAfterUseItem { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyAfterBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyAfterBoost { get; }
 
     /// <summary>
     /// battle, length, target, source, effect
     /// </summary>
-    Action<IBattle, int, Pokemon, Pokemon, IEffect>? OnAnyAfterFaint { get; }
+    Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAnyAfterFaint { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyAfterMega { get; }
+    Action<Battle, Pokemon>? OnAnyAfterMega { get; }
 
     VoidSourceMoveHandler? OnAnyAfterMoveSecondarySelf { get; } // MoveEventMethods['onAfterMoveSecondarySelf']
     VoidMoveHandler? OnAnyAfterMoveSecondary { get; } // MoveEventMethods['onAfterMoveSecondary']
@@ -854,65 +854,65 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyAfterTerastallization { get; }
+    Action<Battle, Pokemon>? OnAnyAfterTerastallization { get; }
 
     /// <summary>
     /// battle, target, source
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon>? OnAnyAttract { get; }
+    Action<Battle, Pokemon, Pokemon>? OnAnyAttract { get; }
     /// <summary>
     /// battle, accuracy, target, source, move -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; }
+    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyAccuracy { get; }
 
     ModifierSourceMoveHandler? OnAnyBasePower { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, pokemon, effect
     /// </summary>
-    Action<IBattle, Pokemon, IEffect>? OnAnyBeforeFaint { get; }
+    Action<Battle, Pokemon, IEffect>? OnAnyBeforeFaint { get; }
 
     VoidSourceMoveHandler? OnAnyBeforeMove { get; } // CommonHandlers['VoidSourceMove']
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyBeforeSwitchIn { get; }
+    Action<Battle, Pokemon>? OnAnyBeforeSwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyBeforeSwitchOut { get; }
+    Action<Battle, Pokemon>? OnAnyBeforeSwitchOut { get; }
 
     /// <summary>
     /// battle, boost, target, source, effect
     /// </summary>
-    Action<IBattle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; }
+    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAnyTryBoost { get; }
 
     VoidSourceMoveHandler? OnAnyChargeMove { get; } // CommonHandlers['VoidSourceMove']
     OnCriticalHit? OnAnyCriticalHit { get; }
     /// <summary>
     /// battle, damage, target, source, effect -> number | boolean | null
     /// </summary>
-    Func<IBattle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; }
+    Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAnyDamage { get; }
 
     /// <summary>
     /// battle, target, source -> number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; }
+    Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnAnyDeductPp { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyDisableMove { get; }
+    Action<Battle, Pokemon>? OnAnyDisableMove { get; }
 
     /// <summary>
     /// battle, pokemon, source?, move?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; }
+    Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAnyDragOut { get; }
 
     /// <summary>
     /// battle, item, pokemon
     /// </summary>
-    Action<IBattle, Item, Pokemon>? OnAnyEatItem { get; }
+    Action<Battle, Item, Pokemon>? OnAnyEatItem { get; }
 
     OnEffectivenessHandler? OnAnyEffectiveness { get; } // MoveEventMethods['onEffectiveness']
     VoidEffectHandler? OnAnyFaint { get; } // CommonHandlers['VoidEffect']
@@ -921,7 +921,7 @@ public interface IEventMethods
     /// <summary>
     /// battle, type, pokemon
     /// </summary>
-    Action<IBattle, PokemonType, Pokemon>? OnAnyImmunity { get; }
+    Action<Battle, PokemonType, Pokemon>? OnAnyImmunity { get; }
 
     /// <summary>
     /// battle, pokemon -> move
@@ -931,14 +931,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, pokemon, source?
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; }
+    Action<Battle, Pokemon, Pokemon?>? OnAnyMaybeTrapPokemon { get; }
 
     ModifierMoveHandler? OnAnyModifyAccuracy { get; } // CommonHandlers['ModifierMove']
     ModifierSourceMoveHandler? OnAnyModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
     /// <summary>
     /// battle, boosts, pokemon -> SparseBoostsTable
     /// </summary>
-    Func<IBattle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; }
+    Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAnyModifyBoost { get; }
 
     ModifierSourceMoveHandler? OnAnyModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
@@ -948,14 +948,14 @@ public interface IEventMethods
     /// <summary>
     /// battle, secondaries, target, source, move
     /// </summary>
-    Action<IBattle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; }
+    Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAnyModifySecondaries { get; }
 
     ModifierSourceMoveHandler? OnAnyModifySpA { get; } // CommonHandlers['ModifierSourceMove']
     ModifierMoveHandler? OnAnyModifySpD { get; } // CommonHandlers['ModifierMove']
     /// <summary>
     /// battle, spe, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnAnyModifySpe { get; }
 
     ModifierSourceMoveHandler? OnAnyModifyStab { get; } // CommonHandlers['ModifierSourceMove']
     OnModifyTypeHandler? OnAnyModifyType { get; } // MoveEventMethods['onModifyType']
@@ -963,80 +963,80 @@ public interface IEventMethods
     /// <summary>
     /// battle, weighthg, pokemon -> number
     /// </summary>
-    Func<IBattle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; }
+    Func<Battle, int, Pokemon, IntVoidUnion>? OnAnyModifyWeight { get; }
 
     /// <summary>
     /// battle, target, source, move
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; }
+    Action<Battle, Pokemon, Pokemon, ActiveMove>? OnAnyMoveAborted { get; }
 
     OnNegateImmunity? OnAnyNegateImmunity { get; }
     /// <summary>
     /// battle, pokemon, target, move -> string
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAnyOverrideAction { get; }
 
     ResultSourceMoveHandler? OnAnyPrepareHit { get; } // CommonHandlers['ResultSourceMove']
     /// <summary>
     /// battle, target, source, pseudoWeather
     /// </summary>
-    Action<IBattle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; }
+    Action<Battle, Pokemon, Pokemon, Condition>? OnAnyPseudoWeatherChange { get; }
 
     /// <summary>
     /// battle, target, source, source2, move -> Pokemon
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; }
+    Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAnyRedirectTarget { get; }
 
     /// <summary>
     /// battle, target & side, source, effect
     /// </summary>
-    Action<IBattle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; }
+    Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnAnyResidual { get; }
 
     /// <summary>
     /// battle, ability, target, source, effect -> boolean
     /// </summary>
-    Func<IBattle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; }
+    Func<Battle, Ability, Pokemon, Pokemon, IEffect, bool?>? OnAnySetAbility { get; }
 
     /// <summary>
     /// battle, status, target, source, effect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAnySetStatus { get; }
 
     /// <summary>
     /// battle, target, source, weather -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; }
+    Func<Battle, Pokemon, Pokemon, Condition, BoolVoidUnion>? OnAnySetWeather { get; }
 
     /// <summary>
     /// battle, pokemon -> boolean
     /// </summary>
-    Func<IBattle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; }
+    Func<Battle, Pokemon, BoolVoidUnion>? OnAnyStallMove { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnySwitchIn { get; }
+    Action<Battle, Pokemon>? OnAnySwitchIn { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnySwitchOut { get; }
+    Action<Battle, Pokemon>? OnAnySwitchOut { get; }
 
     OnTakeItem? OnAnyTakeItem { get; }
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyTerrain { get; }
+    Action<Battle, Pokemon>? OnAnyTerrain { get; }
 
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnAnyTrapPokemon { get; }
+    Action<Battle, Pokemon>? OnAnyTrapPokemon { get; }
 
     /// <summary>
     /// battle, status, target, source, sourceEffect -> boolean | null
     /// </summary>
-    Func<IBattle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; }
+    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAnyTryAddVolatile { get; }
 
     /// <summary>
     /// battle, item, pokemon -> boolean
@@ -1052,12 +1052,12 @@ public interface IEventMethods
     /// <summary>
     /// battle, target, source, move -> boolean | null | number
     /// </summary>
-    Func<IBattle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; }
+    Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAnyTryPrimaryHit { get; }
 
     /// <summary>
     /// battle, types, pokemon -> string[]
     /// </summary>
-    Func<IBattle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; }
+    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnAnyType { get; }
 
     ModifierSourceMoveHandler? OnAnyWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
     ModifierSourceMoveHandler? OnAnyModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']

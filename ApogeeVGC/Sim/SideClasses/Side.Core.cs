@@ -11,7 +11,7 @@ namespace ApogeeVGC.Sim.SideClasses;
 
 public partial class Side
 {
-    public IBattle Battle { get; }
+    public Battle Battle { get; }
     public SideId Id { get; }
     public int N { get; set; }
 
@@ -43,7 +43,7 @@ public partial class Side
 
     public RequestState RequestState { get; set; }
 
-    public Side(IBattle battle)
+    public Side(Battle battle)
     {
         Battle = battle;
         Id = SideId.P1;
@@ -74,7 +74,7 @@ public partial class Side
         Initialised = false;
     }
 
-    public Side(string name, IBattle battle, SideId sideNum, PokemonSet[] team)
+    public Side(string name, Battle battle, SideId sideNum, PokemonSet[] team)
         : this(battle)
     {
         // Override values set by base constructor

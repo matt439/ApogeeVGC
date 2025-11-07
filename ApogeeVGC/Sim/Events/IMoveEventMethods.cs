@@ -7,33 +7,33 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
 
-public delegate IntFalseUnion? BasePowerCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target,
+public delegate IntFalseUnion? BasePowerCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target,
     ActiveMove move);
 
-public delegate BoolVoidUnion BeforeMoveCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon? target,
+public delegate BoolVoidUnion BeforeMoveCallbackHandler(Battle battle, Pokemon pokemon, Pokemon? target,
     ActiveMove move);
 
-public delegate void BeforeTurnCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
-public delegate IntFalseUnion DamageCallbackHandler(IBattle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
-public delegate void PriorityChargeCallbackHandler(IBattle battle, Pokemon pokemon);
+public delegate void BeforeTurnCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate IntFalseUnion DamageCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
+public delegate void PriorityChargeCallbackHandler(Battle battle, Pokemon pokemon);
 
-public delegate void OnDisableMoveHandler(IBattle battle, Pokemon pokemon);
-public delegate void OnAfterSubDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source,
+public delegate void OnDisableMoveHandler(Battle battle, Pokemon pokemon);
+public delegate void OnAfterSubDamageHandler(Battle battle, int damage, Pokemon target, Pokemon source,
     ActiveMove move);
 
-public delegate IntBoolVoidUnion? OnDamageHandler(IBattle battle, int damage, Pokemon target, Pokemon source,
+public delegate IntBoolVoidUnion? OnDamageHandler(Battle battle, int damage, Pokemon target, Pokemon source,
     IEffect effect);
 
-public delegate IntVoidUnion OnEffectivenessHandler(IBattle battle, int typeMod, Pokemon? target, PokemonType type,
+public delegate IntVoidUnion OnEffectivenessHandler(Battle battle, int typeMod, Pokemon? target, PokemonType type,
     ActiveMove move);
-public delegate BoolEmptyVoidUnion? OnHitSideHandler(IBattle battle, Side side, Pokemon source, ActiveMove move);
-public delegate void OnModifyMoveHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
-public delegate void OnModifyTypeHandler(IBattle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
+public delegate BoolEmptyVoidUnion? OnHitSideHandler(Battle battle, Side side, Pokemon source, ActiveMove move);
+public delegate void OnModifyMoveHandler(Battle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
+public delegate void OnModifyTypeHandler(Battle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
 
-public delegate void OnModifyTargetHandler(IBattle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target,
+public delegate void OnModifyTargetHandler(Battle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target,
     ActiveMove move);
 
-public delegate BoolEmptyVoidUnion? OnTryHitSideHandler(IBattle battle, Side side, Pokemon source,
+public delegate BoolEmptyVoidUnion? OnTryHitSideHandler(Battle battle, Side side, Pokemon source,
     ActiveMove move);
 
 public interface IMoveEventMethods

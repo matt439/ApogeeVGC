@@ -51,7 +51,7 @@ public record Abilities
                 {
                     battle.EffectState.Unnerved = false;
                 },
-                OnFoeTryEatItem = (Func<IBattle, Item, Pokemon, BoolVoidUnion>)((battle, _, _) =>
+                OnFoeTryEatItem = (Func<Battle, Item, Pokemon, BoolVoidUnion>)((battle, _, _) =>
                     BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
                 OnSourceAfterFaint = (battle, length, _, source, effect) =>
                 {

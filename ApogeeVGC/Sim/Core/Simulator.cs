@@ -11,7 +11,7 @@ public enum SimulatorResult
 
 public class Simulator
 {
-    public required IBattle Battle { get; init; }
+    public required Battle Battle { get; init; }
     public bool PrintDebug { get; set; }
 
     public async Task<SimulatorResult> Run()

@@ -9,15 +9,15 @@ public interface IAbilityEventMethods
     /// <summary>
     /// battle, pokemon
     /// </summary>
-    Action<IBattle, Pokemon>? OnCheckShow { get; }
+    Action<Battle, Pokemon>? OnCheckShow { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<IBattle, PokemonSideFieldUnion>? OnEnd { get; }
+    Action<Battle, PokemonSideFieldUnion>? OnEnd { get; }
 
     /// <summary>
     /// battle, target
     /// </summary>
-    Action<IBattle, Pokemon>? OnStart { get; }
+    Action<Battle, Pokemon>? OnStart { get; }
 }
