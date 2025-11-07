@@ -22,41 +22,8 @@ public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController b
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // Convert BattlePerspective to BattleState for rendering
-        BattleState battleState = ConvertPerspectiveToBattleState(perspective);
-
         // Update the GUI window (thread-safe)
-        GuiWindow.UpdateBattleState(battleState);
-    }
-
-    private static BattleState ConvertPerspectiveToBattleState(BattlePerspective perspective)
-    {
-        return new BattleState
-        {
-            Turn = perspective.TurnCounter,
-            PlayerActivePokemon = perspective.PlayerSide.Active
-                .Where(p => p != null)
-                .Select(p => new PokemonDisplayInfo
-                {
-                    Name = p!.Name,
-                    Species = p.Species.ToString(),
-                    CurrentHp = p.Hp,
-                    MaxHp = p.MaxHp,
-                    Level = p.Level
-                })
-                .ToList(),
-            OpponentActivePokemon = perspective.OpponentSide.Active
-                .Where(p => p != null)
-                .Select(p => new PokemonDisplayInfo
-                {
-                    Name = p!.Name,
-                    Species = p.Species.ToString(),
-                    CurrentHp = (int)(p.HpPercentage * 100), // Estimate HP from percentage
-                    MaxHp = 100, // Use normalized max HP for opponent
-                    Level = p.Level
-                })
-                .ToList()
-        };
+        GuiWindow.UpdateBattlePerspective(perspective);
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

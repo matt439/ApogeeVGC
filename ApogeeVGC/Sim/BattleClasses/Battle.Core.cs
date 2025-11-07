@@ -289,11 +289,13 @@ public partial class Battle
         };
     }
 
-    public BattlePerspective GetPerspectiveForSide(SideId sideId)
+    public BattlePerspective GetPerspectiveForSide(SideId sideId,
+        BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
         Side playerSide = GetSide(sideId);
         return new BattlePerspective
         {
+            PerspectiveType = battlePerspectiveType,
             Field = Field.GetPerspective(),
             PlayerSide = playerSide.GetPlayerPerspective(),
             OpponentSide = playerSide.GetOpponentPerspective(),

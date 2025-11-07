@@ -11,18 +11,19 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    private void UpdateAllPlayersUi()
+    private void UpdateAllPlayersUi(BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
         foreach (Side side in Sides)
         {
-            UpdatePlayerUi(side.Id);
+            UpdatePlayerUi(side.Id, battlePerspectiveType);
         }
     }
     
-    private void UpdatePlayerUi(SideId sideId)
+    private void UpdatePlayerUi(SideId sideId,
+        BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
         if (PlayerController.GetPlayerUiType(sideId) != PlayerUiType.Gui) return;
-        BattlePerspective perspective = GetPerspectiveForSide(sideId);
+        BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
         PlayerController.UpdatePlayerUi(sideId, perspective);
     }
     

@@ -69,7 +69,7 @@ public partial class Battle
         //    MakeRequest(RequestState.TeamPreview);
         //}
 
-        UpdateAllPlayersUi();
+        UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
         MakeRequest(RequestState.TeamPreview);
         Debug("Exiting RunPickTeam().");
     }

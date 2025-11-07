@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ApogeeVGC.Gui.Rendering;
+using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Gui;
 
@@ -13,7 +14,8 @@ public class BattleGame : Game
     private SpriteBatch? _spriteBatch;
     private SpriteFont? _defaultFont;
     private BattleRenderer? _battleRenderer;
-    private BattleState? _currentBattleState;
+    private SpriteManager? _spriteManager;
+    private BattlePerspective? _currentBattlePerspective;
     private readonly object _stateLock = new();
     private bool _shouldExit;
 
@@ -46,8 +48,12 @@ public class BattleGame : Game
         // Load default font
         _defaultFont = Content.Load<SpriteFont>("Fonts/DefaultFont");
 
-        // Initialize battle renderer
-        _battleRenderer = new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice);
+        // Initialize sprite manager and load sprites
+        _spriteManager = new SpriteManager();
+        _spriteManager.LoadSprites(Content, GraphicsDevice);
+
+        // Initialize battle renderer with sprite manager
+        _battleRenderer = new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice, _spriteManager);
     }
 
     protected override void Update(GameTime gameTime)
@@ -73,15 +79,15 @@ public class BattleGame : Game
 
         _spriteBatch?.Begin();
 
-        // Thread-safe read of battle state
-        BattleState? stateToRender;
+        // Thread-safe read of battle perspective
+        BattlePerspective? perspectiveToRender;
         lock (_stateLock)
         {
-            stateToRender = _currentBattleState;
+            perspectiveToRender = _currentBattlePerspective;
         }
 
         // Render battle using the renderer
-        _battleRenderer?.Render(gameTime, stateToRender);
+        _battleRenderer?.Render(gameTime, perspectiveToRender);
 
         _spriteBatch?.End();
 
@@ -92,18 +98,19 @@ public class BattleGame : Game
     {
         // Clean up resources
         _spriteBatch?.Dispose();
+        _spriteManager?.Unload();
         base.UnloadContent();
     }
 
     /// <summary>
-    /// Update the battle state to be rendered (thread-safe)
+    /// Update the battle perspective to be rendered (thread-safe)
     /// </summary>
-    /// <param name="battleState">New battle state to display</param>
-    public void UpdateBattleState(BattleState battleState)
+    /// <param name="battlePerspective">New battle perspective to display</param>
+    public void UpdateBattlePerspective(BattlePerspective battlePerspective)
     {
         lock (_stateLock)
         {
-            _currentBattleState = battleState;
+            _currentBattlePerspective = battlePerspective;
         }
     }
 
