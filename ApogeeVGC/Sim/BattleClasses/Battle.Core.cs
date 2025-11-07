@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -97,7 +96,7 @@ public partial class Battle
     // Hints
 
     public static Undefined NotFail => new();
-    public int HitSubstitute => 0;
+    public static int HitSubstitute => 0;
     public static bool Fail => false;
     public const object? SilentFail = null;
 
@@ -109,11 +108,13 @@ public partial class Battle
     public Side P2 => Sides[1];
     private HashSet<string> Hints { get; } = [];
 
-    public IPlayer Player1 { get; }
-    public IPlayer Player2 { get; }
-    public IReadOnlyList<IPlayer> Players => [Player1, Player2];
+    private IUpdatePlayerUi UpdateUi { get; init; }
 
-    public Battle(BattleOptions options, Library library)
+    //public IPlayer Player1 { get; }
+    //public IPlayer Player2 { get; }
+    //public IReadOnlyList<IPlayer> Players => [Player1, Player2];
+
+    public Battle(BattleOptions options, Library library, IUpdatePlayerUi updateUi)
     {
         Library = library;
         Dex = new ModdedDex(Library);
@@ -127,9 +128,12 @@ public partial class Battle
         GameType = Format.GameType;
         
         // Create sides with temporary Foe references (will be set properly below)
-        var side1 = new Side(this);
-        var side2 = new Side(this);
-        
+        var side1 = new Side(options.Player1Options.Name, this, SideId.P1,
+            options.Player1Options.Team.ToArray());
+
+        var side2 = new Side(options.Player2Options.Name, this, SideId.P2,
+            options.Player2Options.Team.ToArray());
+
         // Set up bidirectional Foe relationships
         side1.Foe = side2;
         side2.Foe = side1;
@@ -157,11 +161,13 @@ public partial class Battle
 
         Send = options.Send ?? ((_, _) => { });
 
+        UpdateUi = updateUi;
+
         // InputOptions
-        Player1 = options.P1;
-        Player2 = options.P2;
-        SetPlayer(SideId.P1, options.P1.Options);
-        SetPlayer(SideId.P2, options.P2.Options);
+        //Player1 = options.P1;
+        //Player2 = options.P2;
+        //SetPlayer(SideId.P1, options.P1.Options);
+        //SetPlayer(SideId.P2, options.P2.Options);
 
         Console.WriteLine("Battle constructor complete.");
     }

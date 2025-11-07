@@ -7,88 +7,73 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    public void SetPlayer(SideId slot, PlayerOptions options)
-    {
-        Side? side;
-        bool didSomething = true;
+    //public void SetPlayer(SideId slot, PlayerOptions options)
+    //{
+    //    Side? side;
+    //    bool didSomething = true;
 
-        // Convert Side enum to array index (P1=0, P2=1)
-        int slotNum = slot == SideId.P1 ? 0 : 1;
+    //    // Convert Side enum to array index (P1=0, P2=1)
+    //    int slotNum = slot == SideId.P1 ? 0 : 1;
 
-        if (!Sides[slotNum].Initialised)
-        {
-            // Create new player
-            var team = GetTeam(options);
-            string playerName = options.Name ?? $"Player {slotNum + 1}";
+    //    if (!Sides[slotNum].Initialised)
+    //    {
+    //        // Create new player
+    //        var team = GetTeam(options);
+    //        string playerName = options.Name ?? $"Player {slotNum + 1}";
             
-            // The Side constructor already initializes Team, Pokemon, Active, SideConditions, SlotConditions, and Choice
-            side = new Side(playerName, this, slot, [.. team]);
-            
-            // Only override properties not handled by constructor
-            side.Avatar = options.Avatar ?? string.Empty;
+    //        // The Side constructor already initializes Team, Pokemon, Active, SideConditions, SlotConditions, and Choice
+    //        side = new Side(playerName, this, slot, [.. team]);
 
-            Sides[slotNum] = side;
+    //        Sides[slotNum] = side;
 
-            if (DisplayUi)
-            {
-                Debug($"Created new player for {slot}: {playerName}");
-            }
-        }
-        else
-        {
-            // Edit existing player
-            side = Sides[slotNum];
-            didSomething = false;
+    //        if (DisplayUi)
+    //        {
+    //            Debug($"Created new player for {slot}: {playerName}");
+    //        }
+    //    }
+    //    else
+    //    {
+    //        // Edit existing player
+    //        side = Sides[slotNum];
+    //        didSomething = false;
 
-            // Update name if different
-            if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
-            {
-                if (DisplayUi)
-                {
-                    Debug($"Updating player name for {slot}: {side.Name} -> {options.Name}");
-                }
-                side.Name = options.Name;
-                didSomething = true;
-            }
+    //        // Update name if different
+    //        if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
+    //        {
+    //            if (DisplayUi)
+    //            {
+    //                Debug($"Updating player name for {slot}: {side.Name} -> {options.Name}");
+    //            }
+    //            side.Name = options.Name;
+    //            didSomething = true;
+    //        }
 
-            // Update avatar if different
-            if (!string.IsNullOrEmpty(options.Avatar) && side.Avatar != options.Avatar)
-            {
-                if (DisplayUi)
-                {
-                    Debug($"Updating player avatar for {slot}: {side.Avatar} -> {options.Avatar}");
-                }
-                side.Avatar = options.Avatar;
-                didSomething = true;
-            }
+    //        // Prevent team changes for existing players
+    //        if (options.Team != null)
+    //        {
+    //            throw new InvalidOperationException($"Player {slot} already has a team!");
+    //        }
+    //    }
 
-            // Prevent team changes for existing players
-            if (options.Team != null)
-            {
-                throw new InvalidOperationException($"Player {slot} already has a team!");
-            }
-        }
+    //    // Exit early if no changes were made
+    //    if (!didSomething) return;
 
-        // Exit early if no changes were made
-        if (!didSomething) return;
+    //    // Log the player setup
+    //    string optionsJson = System.Text.Json.JsonSerializer.Serialize(options);
+    //    InputLog.Add($"> player {slot} {optionsJson}");
 
-        // Log the player setup
-        string optionsJson = System.Text.Json.JsonSerializer.Serialize(options);
-        InputLog.Add($"> player {slot} {optionsJson}");
+    //    // Add player info to battle log
+    //    if (DisplayUi)
+    //    {
+    //        Add("player", side.Id.GetSideIdName(), side.Name, side.Avatar);
+    //    }
 
-        // Add player info to battle log
-        if (DisplayUi)
-        {
-            string rating = options.Rating?.ToString() ?? string.Empty;
-            Add("player", side.Id.GetSideIdName(), side.Name, side.Avatar, rating);
-        }
-
-        // Start battle if all sides are ready and battle hasn't started
-        if (Sides.All(playerSide => playerSide.Initialised) && !Started)
-        {
-            Start();
-        }
-    }
+    //    // Start battle if all sides are ready and battle hasn't started
+    //    if (Sides.All(playerSide => playerSide.Initialised) && !Started)
+    //    {
+    //        Start();
+    //    }
+    //}
 
     /// <summary>
     /// Gets a Pokemon by its full name string.

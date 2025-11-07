@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Gui;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -57,76 +58,33 @@ public class Driver
     {
         PlayerOptions player1Options = new()
         {
+            Type = PlayerType.Gui,
             Name = "Matt",
             Team = TeamGenerator.GenerateTestTeam(Library),
         };
-        IPlayer player1 = new PlayerGui(SideId.P1, player1Options);
 
         PlayerOptions player2Options = new()
         {
+            Type = PlayerType.Random,
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
-        };
-        IPlayer player2 = new PlayerRandom(SideId.P2, player2Options, PlayerRandom2Seed);
+            Seed = new PrngSeed(PlayerRandom2Seed),
 
-        BattleOptions options = new()
+        };
+
+        BattleOptions battleOptions = new()
         {
             Id = FormatId.CustomSingles,
-            P1 = player1,
-            P2 = player2,
+            Player1Options = player1Options,
+            Player2Options = player2Options,
             Debug = true,
         };
 
-        // Driver owns both the battle and the GUI
-        Battle battle = new(options, Library);
-        BattleGame guiWindow = new();
+        var simulator = new Simulator(Library, battleOptions);
 
-        // Set up the GUI player to use the shared GUI window
-        if (player1 is PlayerGui guiPlayer)
-        {
-            guiPlayer.GuiWindow = guiWindow;
-        }
+        var result = simulator.Run();
 
-        // Start battle simulation on background thread
-        var battleTask = Task.Run(() =>
-        {
-            try
-            {
-                battle.Start();
-
-                // After battle ends, request GUI to close
-                guiWindow.RequestExit();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Battle error: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                guiWindow.RequestExit();
-            }
-        });
-
-        // Run the GUI on the main thread (blocks until window closes)
-        guiWindow.Run();
-
-        // Wait for battle task to complete
-        try
-        {
-            battleTask.Wait(TimeSpan.FromSeconds(5));
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error waiting for battle task: {ex.Message}");
-        }
-
-        // After window closes, check battle result
-        string winner = battle.Winner switch
-        {
-            "p1" => "Matt",
-            "p2" => "Random",
-            _ => battle.Ended ? "Tie" : "Battle incomplete",
-        };
-
-        Console.WriteLine($"Battle finished. Winner: {winner}");
+        Console.WriteLine($"Battle result: {result}");
     }
 
     private void RunGuiVsRandomDoublesTest() // Changed from async Task

@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Player;
+﻿using ApogeeVGC.Data;
+using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 
 namespace ApogeeVGC.Sim.Core;
@@ -9,10 +10,44 @@ public enum SimulatorResult
     Player2Win,
 }
 
-public class Simulator
+public enum PlayerType
 {
-    public required Battle Battle { get; init; }
-    public bool PrintDebug { get; set; }
+    Random,
+    Gui,
+    Mcts,
+}
+
+public interface IUpdatePlayerUi
+{
+    void UpdatePlayerUi(SideId sideId, BattlePerspective perspective);
+}
+
+public class Simulator(
+    Library library,
+    BattleOptions battleOptions,
+    bool printDebug = true) : IUpdatePlayerUi
+{
+    public Battle Battle { get; } = new(battleOptions, library, this);
+    public IPlayer Player1 { get; } = CreatePlayer(SideId.P1, battleOptions.Player1Options);
+    public IPlayer Player2 { get; } = CreatePlayer(SideId.P2, battleOptions.Player2Options);
+    public bool PrintDebug { get; set; } = printDebug;
+
+    private static IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
+    {
+        return options.Type switch
+        {
+            PlayerType.Random => new PlayerRandom(sideId, options),
+            PlayerType.Gui => new PlayerGui(sideId, options),
+            PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
+            _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
+        };
+    }
+
+    public void UpdatePlayerUi(SideId sideId, BattlePerspective perspective)
+    {
+        IPlayer player = sideId == SideId.P1 ? Player1 : Player2;
+        player.UpdateUi(perspective);
+    }
 
     public async Task<SimulatorResult> Run()
     {
@@ -23,6 +58,8 @@ public class Simulator
 
         try
         {
+            Battle.Start();
+            
             // Set a reasonable timeout for the entire battle
             using var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));

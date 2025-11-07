@@ -1,16 +1,17 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerRandom(SideId sideId, PlayerOptions options, int? seed = null) : IPlayer
+public class PlayerRandom(SideId sideId, PlayerOptions options) : IPlayer
 {
     public SideId SideId { get; } = sideId;
     public PlayerOptions Options { get; } = options;
     public PlayerUiType UiType => PlayerUiType.None;
 
-    private readonly Random _random = seed is null ? new Random() : new Random(seed.Value);
+    private readonly Prng _random = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 
     // Fast sync version for MCTS rollouts (IPlayer)
     public Choice GetNextChoiceSync(List<IChoiceRequest> choices, BattlePerspective perspective)
@@ -81,7 +82,7 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, int? seed = null
         {
             throw new ArgumentException("No available choices to select from.", nameof(availableChoices));
         }
-        int randomIndex = _random.Next(availableChoices.Count);
+        int randomIndex = _random.Random(availableChoices.Count);
         //return availableChoices[randomIndex];
         throw new NotImplementedException();
     }

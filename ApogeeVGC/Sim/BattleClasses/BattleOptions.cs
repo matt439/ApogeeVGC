@@ -11,7 +11,7 @@ public record BattleOptions
     public Action<SendType, IEnumerable<string>>? Send { get; set; } // Output callback
     public PrngSeed? Seed { get; init; } // PRNG seed
     public bool? Rated { get; init; } // Rated string
-    public required IPlayer P1 { get; init; }
-    public required IPlayer P2 { get; init; }
+    public required PlayerOptions Player1Options { get; init; }
+    public required PlayerOptions Player2Options { get; init; }
     public bool Debug { get; set; } // show debug mode option
 }
