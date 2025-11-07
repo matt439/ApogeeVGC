@@ -21,9 +21,9 @@ public partial class Battle
     
     private void UpdatePlayerUi(SideId sideId)
     {
-        if (UpdateUi.GetPlayerUiType(sideId) != PlayerUiType.Gui) return;
+        if (PlayerController.GetPlayerUiType(sideId) != PlayerUiType.Gui) return;
         BattlePerspective perspective = GetPerspectiveForSide(sideId);
-        UpdateUi.UpdatePlayerUi(sideId, perspective);
+        PlayerController.UpdatePlayerUi(sideId, perspective);
     }
     
     public void Add(params PartFuncUnion[] parts)

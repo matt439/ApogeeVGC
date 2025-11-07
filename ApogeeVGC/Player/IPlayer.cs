@@ -15,6 +15,7 @@ public interface IPlayer
     SideId SideId { get; }
     PlayerOptions Options { get; }
     PlayerUiType UiType { get; }
+    IBattleController BattleController { get; }
 
     // Async choice submission
     Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,

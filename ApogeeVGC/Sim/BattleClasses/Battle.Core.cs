@@ -108,13 +108,13 @@ public partial class Battle
     public Side P2 => Sides[1];
     private HashSet<string> Hints { get; } = [];
 
-    private IUpdatePlayerUi UpdateUi { get; init; }
+    private IPlayerController PlayerController { get; init; }
 
     //public IPlayer Player1 { get; }
     //public IPlayer Player2 { get; }
     //public IReadOnlyList<IPlayer> Players => [Player1, Player2];
 
-    public Battle(BattleOptions options, Library library, IUpdatePlayerUi updateUi)
+    public Battle(BattleOptions options, Library library, IPlayerController playerController)
     {
         Library = library;
         Dex = new ModdedDex(Library);
@@ -161,7 +161,7 @@ public partial class Battle
 
         Send = options.Send ?? ((_, _) => { });
 
-        UpdateUi = updateUi;
+        PlayerController = playerController;
 
         // InputOptions
         //Player1 = options.P1;
@@ -289,7 +289,7 @@ public partial class Battle
         };
     }
 
-    private BattlePerspective GetPerspectiveForSide(SideId sideId)
+    public BattlePerspective GetPerspectiveForSide(SideId sideId)
     {
         Side playerSide = GetSide(sideId);
         return new BattlePerspective

@@ -5,11 +5,12 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerRandom(SideId sideId, PlayerOptions options) : IPlayer
+public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleController battleController) : IPlayer
 {
     public SideId SideId { get; } = sideId;
     public PlayerOptions Options { get; } = options;
     public PlayerUiType UiType => PlayerUiType.None;
+    public IBattleController BattleController { get; } = battleController;
 
     private readonly Prng _random = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 

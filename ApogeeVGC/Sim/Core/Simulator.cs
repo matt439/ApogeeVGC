@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Data;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -10,20 +11,7 @@ public enum SimulatorResult
     Player2Win,
 }
 
-public enum PlayerType
-{
-    Random,
-    Gui,
-    Mcts,
-}
-
-public interface IUpdatePlayerUi
-{
-    void UpdatePlayerUi(SideId sideId, BattlePerspective perspective);
-    PlayerUiType GetPlayerUiType(SideId sideId);
-}
-
-public class Simulator : IUpdatePlayerUi
+public class Simulator : IPlayerController, IBattleController
 {
     public Battle? Battle { get; set; }
     public IPlayer? Player1 { get; set; }
@@ -38,31 +26,27 @@ public class Simulator : IUpdatePlayerUi
     //    PrintDebug = printDebug;
     //}
 
-    private static IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
+    public Task<Choice> RequestChoiceAsync(SideId sideId, List<IChoiceRequest> availableChoices,
+        BattleRequestType requestType, BattlePerspective perspective,
+        CancellationToken cancellationToken)
     {
-        return options.Type switch
-        {
-            PlayerType.Random => new PlayerRandom(sideId, options),
-            PlayerType.Gui => new PlayerGui(sideId, options),
-            PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
-            _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
-        };
-    }
-
-    private IPlayer GetPlayer(SideId sideId)
-    {
-        return sideId switch
-        {
-            SideId.P1 => Player1 ?? throw new InvalidOperationException("Player 1 is not initialized"),
-            SideId.P2 => Player2 ?? throw new InvalidOperationException("Player 2 is not initialized"),
-            _ => throw new ArgumentOutOfRangeException(nameof(sideId), $"Invalid SideId: {sideId}"),
-        };
+        IPlayer player = GetPlayer(sideId);
+        return player.GetNextChoiceAsync(availableChoices, requestType, perspective, cancellationToken);
     }
 
     public void UpdatePlayerUi(SideId sideId, BattlePerspective perspective)
     {
         IPlayer player = GetPlayer(sideId);
         player.UpdateUi(perspective);
+    }
+
+    public BattlePerspective GetCurrentPerspective(SideId sideId)
+    {
+        if (Battle == null)
+        {
+            throw new InvalidOperationException("Battle is not initialized");
+        }
+        return Battle.GetPerspectiveForSide(sideId);
     }
 
     public PlayerUiType GetPlayerUiType(SideId sideId)
@@ -177,5 +161,26 @@ public class Simulator : IUpdatePlayerUi
         // For now, always return Player 1 as winner in tiebreak
         Console.WriteLine("Tiebreaker applied: Player 1 declared winner by default.");
         return SimulatorResult.Player1Win;
+    }
+
+    private IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
+    {
+        return options.Type switch
+        {
+            PlayerType.Random => new PlayerRandom(sideId, options, this),
+            PlayerType.Gui => new PlayerGui(sideId, options, this),
+            PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
+            _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
+        };
+    }
+
+    private IPlayer GetPlayer(SideId sideId)
+    {
+        return sideId switch
+        {
+            SideId.P1 => Player1 ?? throw new InvalidOperationException("Player 1 is not initialized"),
+            SideId.P2 => Player2 ?? throw new InvalidOperationException("Player 2 is not initialized"),
+            _ => throw new ArgumentOutOfRangeException(nameof(sideId), $"Invalid SideId: {sideId}"),
+        };
     }
 }

@@ -6,11 +6,12 @@ using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerGui(SideId sideId, PlayerOptions options) : IPlayer
+public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController battleController) : IPlayer
 {
     public SideId SideId { get; } = sideId;
     public PlayerOptions Options { get; } = options;
     public PlayerUiType UiType => PlayerUiType.Gui;
+    public IBattleController BattleController { get; } = battleController;
     public BattleGame GuiWindow { get; set; } = new();
 
     public Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
