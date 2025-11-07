@@ -156,44 +156,55 @@ public partial class Pokemon
     public Species? SetSpecie(Species rawSpecies, IEffect? source, bool isTransform = false)
     {
         RelayVar? rv = Battle.RunEvent(EventId.ModifySpecie, this, null, source, rawSpecies);
-        if (rv is null) return null;
+      if (rv is null) return null;
 
         if (rv is SpecieRelayVar srv)
         {
-            Species = srv.Species;
+  Species = srv.Species;
         }
         else
         {
             throw new InvalidOperationException("species must be a SpecieRelayVar");
         }
-        Species species = srv.Species;
+      Species species = srv.Species;
 
         SetType(species.Types.ToArray(), true);
         ApparentType = rawSpecies.Types.ToList();
         AddedType = species.AddedType;
-        KnownType = true;
+     KnownType = true;
         WeightHg = species.WeightHg;
 
         StatsTable stats = Battle.SpreadModify(Species.BaseStats, Set);
-        if (Species.MaxHp is not null)
-        {
+     if (Species.MaxHp is not null)
+   {
             stats.Hp = Species.MaxHp.Value;
-        }
+    }
 
-        if (MaxHp != 0)
+        // Always set HP stats during initial setup (MaxHp == 0) or during transformation
+ // During transformation, preserve current HP
+        if (MaxHp == 0)
         {
+       // Initial setup - set all HP values
             BaseMaxHp = stats.Hp;
-            MaxHp = stats.Hp;
-            Hp = stats.Hp;
+  MaxHp = stats.Hp;
+   Hp = stats.Hp;
         }
-
-        if (!isTransform) BaseStoredStats = stats;
-        foreach (var statName in StoredStats)
+        else if (!isTransform)
         {
-            StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
+ // Not a transform - update HP values but preserve HP ratio
+     BaseMaxHp = stats.Hp;
+          MaxHp = stats.Hp;
+          Hp = stats.Hp;
+     }
+    // else: isTransform == true, don't change HP values
+
+      if (!isTransform) BaseStoredStats = stats;
+        foreach (var statName in StoredStats)
+      {
+    StoredStats[statName.Key] = stats[statName.Key.ConvertToStatId()];
         }
 
-        Speed = StoredStats.Spe;
+   Speed = StoredStats.Spe;
         return species;
     }
 

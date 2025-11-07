@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.SpeciesClasses;
 using XnaColor = Microsoft.Xna.Framework.Color;
 using XnaRectangle = Microsoft.Xna.Framework.Rectangle;
 using XnaVector2 = Microsoft.Xna.Framework.Vector2;
@@ -17,6 +18,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     // Layout constants
     private const int Padding = 20;
     private const int PokemonSpriteSize = 128;
+    private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
 
     // Reference to choice input manager for team preview state
     private ChoiceUI.ChoiceInputManager? _choiceInputManager;
@@ -104,7 +106,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     private void RenderTeamPreviewPlayerTeam(BattlePerspective battlePerspective)
     {
         // Display all Pokemon in a horizontal row at the bottom
-        int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding - 60;
+        int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding - InfoTextHeight;
         int totalWidth = battlePerspective.PlayerSide.Pokemon.Count * (PokemonSpriteSize + Padding);
         int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
 
@@ -154,7 +156,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     private void RenderTeamPreviewOpponentTeam(BattlePerspective battlePerspective)
     {
         // Display all Pokemon in a horizontal row at the top
-        const int yPosition = Padding + 90;
+        int yPosition = Padding + 60;
         int totalWidth = battlePerspective.OpponentSide.Pokemon.Count * (PokemonSpriteSize + Padding);
         int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
 
@@ -180,9 +182,10 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     private void RenderTeamPreviewUi(BattlePerspective battlePerspective)
     {
         const string uiInfo = "Team Preview - Select your lead Pokemon";
+        XnaVector2 uiSize = font.MeasureString(uiInfo);
         var uiPosition = new XnaVector2(
-            graphicsDevice.Viewport.Width / 2f - 200,
-            graphicsDevice.Viewport.Height / 2f);
+            (graphicsDevice.Viewport.Width - uiSize.X) / 2f,
+            Padding);
         spriteBatch.DrawString(font, uiInfo, uiPosition, XnaColor.Yellow);
     }
 
@@ -322,11 +325,36 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
             bgTexture.Dispose();
         }
 
-        // Draw name and item instead of HP during team preview
-        string itemName = GetItemName(pokemon.Item);
-        string info = $"{pokemon.Name}\n{itemName}";
-        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
-        spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+        // Build info string with name, gender, level on first line
+        string genderSymbol = GetGenderSymbol(pokemon.Gender);
+        string line1 = $"{pokemon.Name}{genderSymbol}";
+        string line2 = $"Lv{pokemon.Level} HP:{pokemon.MaxHp}";
+        string line3 = GetItemName(pokemon.Item);
+        
+        // Ensure text fits within the Pokemon sprite area
+        float maxWidth = PokemonSpriteSize;
+        if (font.MeasureString(line1).X > maxWidth)
+        {
+        // Truncate name if too long
+            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+          {
+      line1 = line1.Substring(0, line1.Length - 1);
+            }
+       line1 += "...";
+  }
+        if (font.MeasureString(line3).X > maxWidth)
+  {
+            // Truncate item name if too long
+          while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+ {
+           line3 = line3.Substring(0, line3.Length - 1);
+      }
+    line3 += "...";
+        }
+
+     string info = $"{line1}\n{line2}\n{line3}";
+   XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+     spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
     private void RenderOpponentPokemonInfo(PokemonOpponentPerspective pokemon, XnaVector2 position)
@@ -367,15 +395,30 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
- // Draw border around sprite area
-        var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize, PokemonSpriteSize);
+        // Draw border around sprite area
+     var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize, PokemonSpriteSize);
         DrawRectangle(borderRect, XnaColor.Red, 2);
 
-        // During team preview, show item name (revealed items are shown in team preview)
-        string itemInfo = pokemon.RevealedItem.HasValue ? GetItemName(pokemon.RevealedItem.Value) : "(No Item)";
-        string info = $"{pokemon.Name}\n{itemInfo}";
+        // During team preview, show name, gender, and level (no item info)
+        string genderSymbol = GetGenderSymbol(pokemon.Gender);
+   string line1 = $"{pokemon.Name}{genderSymbol}";
+        string line2 = $"Lv{pokemon.Level}";
+        
+      // Ensure text fits within the Pokemon sprite area
+      float maxWidth = PokemonSpriteSize;
+        if (font.MeasureString(line1).X > maxWidth)
+        {
+  // Truncate name if too long
+       while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+       {
+   line1 = line1.Substring(0, line1.Length - 1);
+        }
+ line1 += "...";
+     }
+
+      string info = $"{line1}\n{line2}";
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
-spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+        spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
     /// <summary>
@@ -393,6 +436,19 @@ spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
         // Convert PascalCase to space-separated words
         string name = itemId.ToString();
         return System.Text.RegularExpressions.Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
+    }
+
+    /// <summary>
+    /// Get gender symbol for display
+    /// </summary>
+    private string GetGenderSymbol(GenderId gender)
+    {
+        return gender switch
+        {
+         GenderId.M => " (M)",
+        GenderId.F => " (F)",
+            _ => ""
+     };
     }
 
     /// <summary>

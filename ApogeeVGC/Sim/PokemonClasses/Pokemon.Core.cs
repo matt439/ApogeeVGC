@@ -241,6 +241,10 @@ public partial class Pokemon : IPriorityComparison
 
         CanTerastallize = TeraType;
 
+        // Initialize stats by calling SetSpecie
+        // This must be done before ClearVolatile() and Hp = MaxHp
+        SetSpecie(BaseSpecies, null, isTransform: false);
+
         ClearVolatile();
         Hp = MaxHp;
         Details = GetUpdatedDetails();
