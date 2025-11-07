@@ -36,6 +36,17 @@ public class ChoiceInputManager(
     private string _keyboardInput = "";
     private int _selectedPokemonIndex;
 
+    // Team preview keyboard state
+    private int _currentHighlightedIndex = 0;
+    private readonly List<int> _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
+    private readonly HashSet<int> _lockedInIndices = []; // Tracks which indices are already locked
+
+    // Public properties for renderer access
+    public int CurrentHighlightedIndex => _currentHighlightedIndex;
+    public IReadOnlyList<int> LockedInPositions => _lockedInPositions.AsReadOnly();
+    public IReadOnlySet<int> LockedInIndices => _lockedInIndices;
+    public BattleRequestType CurrentRequestType => _requestType;
+
     // Layout constants
     private const int ButtonWidth = 200;
     private const int ButtonHeight = 50;
@@ -112,6 +123,13 @@ public class ChoiceInputManager(
         if (_currentRequest == null)
             return;
 
+        // For team preview, render different UI
+        if (_requestType == BattleRequestType.TeamPreview)
+        {
+            RenderTeamPreviewUi();
+            return;
+        }
+
         // Draw instruction text
         string instructionText = GetInstructionText();
         spriteBatch.DrawString(font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
@@ -137,6 +155,33 @@ public class ChoiceInputManager(
         string statusText =
             $"Selected: {string.Join(", ", _pendingChoice.Actions.Select(GetActionDescription))}";
         spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+    }
+
+    private void RenderTeamPreviewUi()
+    {
+        // Draw instruction text
+        string instructionText = "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
+        Vector2 instructionPos = new Vector2(
+        (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2,
+            graphicsDevice.Viewport.Height / 2);
+ spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
+
+        // Draw locked-in status
+        if (_lockedInPositions.Count > 0)
+  {
+            string statusText = $"Locked in {_lockedInPositions.Count}/6 Pokemon";
+        Vector2 statusPos = new Vector2(
+    (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2,
+     graphicsDevice.Viewport.Height / 2 + 30);
+  spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
+
+      // Show the order
+            string orderText = $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
+            Vector2 orderPos = new Vector2(
+                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2,
+          graphicsDevice.Viewport.Height / 2 + 60);
+     spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
+        }
     }
 
     private void SetupChoiceUi()
@@ -272,50 +317,24 @@ public class ChoiceInputManager(
 
     private void SetupTeamPreviewUi(TeamPreviewRequest request)
     {
-        int x = LeftMargin;
-        int y = TopMargin;
+        // Reset team preview state
+        _currentHighlightedIndex = 0;
+        _lockedInPositions.Clear();
+        _lockedInIndices.Clear();
 
-        // Show all Pokemon for team ordering
-        int pokemonIndex = 1;
-        foreach (PokemonSwitchRequestData _ in request.Side.Pokemon)
-        {
-            // Use Pokemon index since Details is not available
-            int index = pokemonIndex;
-            var button = new ChoiceButton(
-                new Rectangle(x, y, ButtonWidth, ButtonHeight),
-                $"{pokemonIndex}. Pokemon {pokemonIndex}",
-                Color.Cyan,
-                () => SelectTeamPosition(index - 1)
-            );
-
-            _buttons.Add(button);
-
-            if (pokemonIndex % 3 == 0)
-            {
-                x = LeftMargin;
-                y += ButtonHeight + ButtonSpacing;
-            }
-            else
-            {
-                x += ButtonWidth + ButtonSpacing;
-            }
-
-            pokemonIndex++;
-        }
-
-        // Add submit button
-        y += ButtonHeight + ButtonSpacing * 2;
-        var submitButton = new ChoiceButton(
-            new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "Enter. Submit",
-            Color.Orange,
-            SubmitChoice
-        );
-        _buttons.Add(submitButton);
+        // No buttons needed for keyboard-only input
+        // Pokemon display and highlighting will be handled in BattleRenderer
     }
 
     private void ProcessKeyboardInput(KeyboardState keyboardState)
     {
+        // Handle team preview keyboard controls separately
+        if (_requestType == BattleRequestType.TeamPreview && _currentRequest is TeamPreviewRequest)
+        {
+            ProcessTeamPreviewKeyboardInput(keyboardState);
+            return;
+        }
+
         // Determine max number based on request type
         int maxNumbers = _requestType switch
         {
@@ -363,44 +382,92 @@ public class ChoiceInputManager(
         }
     }
 
-    private void ProcessMouseInput(MouseState mouseState)
+    private void ProcessTeamPreviewKeyboardInput(KeyboardState keyboardState)
     {
-        // Check button clicks
-        if (IsMouseClicked(mouseState))
+        if (_currentRequest is not TeamPreviewRequest request) return;
+
+        int teamSize = request.Side.Pokemon.Count;
+
+        // Left arrow - move highlight left
+        if (IsKeyPressed(keyboardState, Keys.Left))
         {
-            var mousePos = new Point(mouseState.X, mouseState.Y);
-            foreach (ChoiceButton button in _buttons)
+            _currentHighlightedIndex--;
+            if (_currentHighlightedIndex < 0)
+                _currentHighlightedIndex = teamSize - 1; // Wrap around
+        }
+
+        // Right arrow - move highlight right
+        if (IsKeyPressed(keyboardState, Keys.Right))
+        {
+            _currentHighlightedIndex++;
+            if (_currentHighlightedIndex >= teamSize)
+                _currentHighlightedIndex = 0; // Wrap around
+        }
+
+        // Enter - lock in the currently highlighted Pokemon
+        if (IsKeyPressed(keyboardState, Keys.Enter))
+        {
+            // Check if this Pokemon is already locked in
+            if (!_lockedInIndices.Contains(_currentHighlightedIndex))
             {
-                if (button.Bounds.Contains(mousePos))
+                _lockedInPositions.Add(_currentHighlightedIndex);
+                _lockedInIndices.Add(_currentHighlightedIndex);
+
+                // If all Pokemon are locked in, submit the choice
+                if (_lockedInPositions.Count == teamSize)
                 {
-                    button.OnClick();
-                    break;
+                    SubmitTeamPreviewChoice();
                 }
             }
         }
     }
 
-    private void ProcessNumericInput(int number)
+    private void ProcessMouseInput(MouseState mouseState)
     {
+        // Disable mouse input for team preview
+        if (_requestType == BattleRequestType.TeamPreview)
+            return;
+
+        // Check button clicks
+        if (IsMouseClicked(mouseState))
+{
+     var mousePos = new Point(mouseState.X, mouseState.Y);
+    foreach (ChoiceButton button in _buttons)
+  {
+  if (button.Bounds.Contains(mousePos))
+      {
+     button.OnClick();
+        break;
+             }
+    }
+}
+    }
+
+    private void ProcessNumericInput(int number)
+ {
+   // Disable numeric input for team preview
+   if (_requestType == BattleRequestType.TeamPreview)
+   return;
+
         if (_currentRequest is MoveRequest moveRequest)
-        {
-            if (number <= moveRequest.Active[0].Moves.Count)
-            {
-                SelectMove(number - 1, moveRequest.Active[0]);
-            }
+  {
+    if (number <= moveRequest.Active[0].Moves.Count)
+    {
+        SelectMove(number - 1, moveRequest.Active[0]);
         }
+ }
         else if (_currentRequest is SwitchRequest or TeamPreviewRequest)
         {
-            // Handle numeric switch/team selection
-            if (_currentRequest is SwitchRequest sr && number <= sr.Side.Pokemon.Count)
-            {
-                SelectSwitch(number - 1, sr);
-            }
-            else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon.Count)
-            {
-                SelectTeamPosition(number - 1);
-            }
-        }
+        // Handle numeric switch/team selection
+   if (_currentRequest is SwitchRequest sr && number <= sr.Side.Pokemon.Count)
+      {
+       SelectSwitch(number - 1, sr);
+}
+else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon.Count)
+     {
+   SelectTeamPosition(number - 1);
+      }
+    }
     }
 
     private void SelectMove(int moveIndex, PokemonMoveRequestData pokemonRequest)
@@ -505,19 +572,39 @@ public class ChoiceInputManager(
         _isRequestActive = false;
     }
 
+    private void SubmitTeamPreviewChoice()
+    {
+        if (_pendingChoice == null || _choiceCompletionSource == null)
+            return;
+
+        // Build the team preview choice with the locked-in order
+        _pendingChoice.Actions = _lockedInPositions.Select((pokemonIndex, orderPosition) =>
+            new ChosenAction
+            {
+                Choice = ChoiceType.Team,
+                Pokemon = null,
+                MoveId = MoveId.None,
+                Index = pokemonIndex,
+                Priority = -orderPosition, // Earlier picks have higher priority
+            }).ToList();
+
+        // Submit the choice
+        SubmitChoice();
+    }
+
     private string GetInstructionText()
     {
         return _requestType switch
-        {
-            BattleRequestType.TurnStart =>
-                "Select a move (1-4) or Switch (S). Press Enter to confirm.",
-            BattleRequestType.ForceSwitch =>
-                "Select a Pokemon to switch in (1-6). Press Enter to confirm.",
-            BattleRequestType.TeamPreview =>
-                "Select your lead Pokemon order. Click or type numbers, then Enter.",
+      {
+  BattleRequestType.TurnStart =>
+   "Select a move (1-4) or Switch (S). Press Enter to confirm.",
+  BattleRequestType.ForceSwitch =>
+          "Select a Pokemon to switch in (1-6). Press Enter to confirm.",
+       BattleRequestType.TeamPreview =>
+         "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in each Pokemon.",
             _ => "Make your choice and press Enter.",
-        };
-    }
+      };
+  }
 
     private string GetActionDescription(ChosenAction action)
     {
@@ -538,7 +625,7 @@ public class ChoiceInputManager(
     private bool IsMouseClicked(MouseState currentState)
     {
         return currentState.LeftButton == ButtonState.Pressed &&
-               _previousMouseState.LeftButton == ButtonState.Released;
+      _previousMouseState.LeftButton == ButtonState.Released;
     }
 }
 

@@ -79,6 +79,9 @@ public class BattleGame : Game
             _choiceInputManager =
                 new ChoiceInputManager(_spriteBatch, _defaultFont, GraphicsDevice);
             Console.WriteLine("[BattleGame] ChoiceInputManager initialized successfully");
+
+            // Connect choice input manager to battle renderer
+            _battleRenderer.SetChoiceInputManager(_choiceInputManager);
         }
         catch (Exception ex)
         {

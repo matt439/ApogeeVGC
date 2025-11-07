@@ -58,169 +58,49 @@ public class Driver
     {
         // Create BattleGame instance on main thread (required by MonoGame)
         using var battleGame = new BattleGame();
-    Console.WriteLine($"[Driver] BattleGame created, instance: {battleGame.GetHashCode()}");
-     
-     PlayerOptions player1Options = new()
- {
-         Type = PlayerType.Gui,
-  Name = "Matt",
-  Team = TeamGenerator.GenerateTestTeam(Library),
-         GuiWindow = battleGame, // Pass BattleGame to PlayerGui
+        Console.WriteLine($"[Driver] BattleGame created, instance: {battleGame.GetHashCode()}");
+
+        PlayerOptions player1Options = new()
+        {
+            Type = PlayerType.Gui,
+            Name = "Matt",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+            GuiWindow = battleGame, // Pass BattleGame to PlayerGui
         };
 
         PlayerOptions player2Options = new()
         {
-     Type = PlayerType.Random,
+            Type = PlayerType.Random,
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
-      Seed = new PrngSeed(PlayerRandom2Seed),
+            Seed = new PrngSeed(PlayerRandom2Seed),
         };
 
- BattleOptions battleOptions = new()
+        BattleOptions battleOptions = new()
         {
- Id = FormatId.CustomSingles,
-         Player1Options = player1Options,
-      Player2Options = player2Options,
-  Debug = true,
+            Id = FormatId.CustomSingles,
+            Player1Options = player1Options,
+            Player2Options = player2Options,
+            Debug = true,
         };
 
- var simulator = new Simulator();
-      Console.WriteLine("[Driver] Simulator created");
+        var simulator = new Simulator();
+        Console.WriteLine("[Driver] Simulator created");
 
         // Start the battle using BattleGame's deferred start mechanism
-  // This will queue the battle to start after LoadContent()
+        // This will queue the battle to start after LoadContent()
         battleGame.StartBattle(Library, battleOptions, simulator);
- Console.WriteLine("[Driver] Battle queued, calling battleGame.Run()");
+        Console.WriteLine("[Driver] Battle queued, calling battleGame.Run()");
 
-     // Run MonoGame on main thread - this blocks until game window closes
+        // Run MonoGame on main thread - this blocks until game window closes
         // LoadContent() will be called during initialization and will start the queued battle
         battleGame.Run();
-  
-     Console.WriteLine("[Driver] BattleGame.Run() exited");
+
+        Console.WriteLine("[Driver] BattleGame.Run() exited");
     }
 
     private void RunGuiVsRandomDoublesTest() // Changed from async Task
     {
         throw new NotImplementedException();
     }
-
-    //public async Task StartTest()
-    //{
-    //    PlayerStreams streams = BattleStreamExtensions.GetPlayerStreams(new BattleStream(Library));
-
-    //    // Battle specification
-    //    var spec = new
-    //    {
-    //        formatid = "gen9customgame",
-    //    };
-
-    //    PlayerOptions p1Spec = new()
-    //    {
-    //        Name = "Bot 1",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //    };
-
-    //    PlayerOptions p2Spec = new()
-    //    {
-    //        Name = "Bot 2",
-    //        Team = TeamGenerator.GenerateTestTeam(Library),
-    //    };
-
-    //    var p1 = new RandomPlayerAi(streams.P1);
-    //    var p2 = new RandomPlayerAi(streams.P2);
-
-    //    Console.WriteLine($"p1 is {p1.GetType().Name}");
-    //    Console.WriteLine($"p2 is {p2.GetType().Name}");
-
-    //    // Start the AI players (don't await - they run in background)
-    //    Task p1Task = p1.StartAsync();
-    //    Task p2Task = p2.StartAsync();
-
-    //    // Start consuming the omniscient stream to see battle output
-    //    Task streamConsumerTask = Task.Run(async () =>
-    //    {
-    //        try
-    //        {
-    //            await foreach (string chunk in streams.Omniscient.ReadAllAsync())
-    //            {
-    //                Console.WriteLine(chunk);
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Console.WriteLine($"Stream consumer error: {ex.Message}");
-    //            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    //            if (ex.InnerException != null)
-    //            {
-    //                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-    //                Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
-    //            }
-    //        }
-    //    });
-
-    //    // Initialize the battle by writing commands to the omniscient stream
-    //    string startCommand = $"""
-    //                           >start {JsonSerializer.Serialize(spec)}
-    //                           >player p1 {JsonSerializer.Serialize(p1Spec)}
-    //                           >player p2 {JsonSerializer.Serialize(p2Spec)}
-    //                           """;
-
-    //    await streams.Omniscient.WriteAsync(startCommand);
-
-    //    // Wait for all tasks to complete (or timeout)
-    //    try
-    //    {
-    //        Task allTasks = Task.WhenAll(p1Task, p2Task, streamConsumerTask);
-    //        Task timeoutTask = Task.Delay(TimeSpan.FromMinutes(5));
-
-    //        Task completedTask = await Task.WhenAny(allTasks, timeoutTask);
-
-    //        if (completedTask == timeoutTask)
-    //        {
-    //            Console.WriteLine("Battle timed out after 5 minutes.");
-    //        }
-    //        else
-    //        {
-    //            // Wait for the allTasks to ensure we capture any exceptions
-    //            await allTasks;
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Console.WriteLine($"Battle error: {ex.Message}");
-    //        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    //        if (ex.InnerException != null)
-    //        {
-    //            Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-    //            Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
-    //        }
-    //    }
-    //    finally
-    //    {
-    //        // Ensure all tasks are completed before disposing streams
-    //        // Give tasks a short grace period to finish after stream closure
-    //        try
-    //        {
-    //            await Task.WhenAll(p1Task, p2Task, streamConsumerTask).WaitAsync(TimeSpan.FromSeconds(5));
-    //        }
-    //        catch (TimeoutException)
-    //        {
-    //            Console.WriteLine("Warning: Some tasks did not complete within grace period.");
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Console.WriteLine($"Task completion error: {ex.Message}");
-    //            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    //            if (ex.InnerException != null)
-    //            {
-    //                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-    //                Console.WriteLine($"Inner stack trace: {ex.InnerException.StackTrace}");
-    //            }
-    //        }
-
-    //        // Cleanup
-    //        streams.Dispose();
-    //        Console.WriteLine("Battle completed or timed out.");
-    //    }
-    //}
 }
