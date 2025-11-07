@@ -170,15 +170,8 @@ public class Simulator : IPlayerController, IBattleController
 
     private PlayerGui CreateGuiPlayer(SideId sideId, PlayerOptions options)
     {
-        var playerGui = new PlayerGui(sideId, options, this);
-
-        // If GuiWindow was provided in options, set it on the player
-        if (options.GuiWindow is { } battleGame)
-        {
-            playerGui.GuiWindow = battleGame;
-        }
-
-        return playerGui;
+        // PlayerGui constructor now handles GuiWindow from options
+        return new PlayerGui(sideId, options, this);
     }
 
     private IPlayer GetPlayer(SideId sideId)

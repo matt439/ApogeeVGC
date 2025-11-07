@@ -5,17 +5,34 @@ using ApogeeVGC.Sim.Core;
 
 namespace ApogeeVGC.Player;
 
-public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController battleController) : IPlayer
+public class PlayerGui : IPlayer
 {
-    public SideId SideId { get; } = sideId;
-    public PlayerOptions Options { get; } = options;
+    public SideId SideId { get; }
+    public PlayerOptions Options { get; }
     public PlayerUiType UiType => PlayerUiType.Gui;
-    public IBattleController BattleController { get; } = battleController;
-    public BattleGame GuiWindow { get; set; } = new();
+    public IBattleController BattleController { get; }
+    public BattleGame GuiWindow { get; set; }
+
+    public PlayerGui(SideId sideId, PlayerOptions options, IBattleController battleController)
+    {
+        SideId = sideId;
+        Options = options;
+        BattleController = battleController;
+
+        // Use the GuiWindow from options if provided, otherwise create a new one
+        GuiWindow = options.GuiWindow ?? new BattleGame();
+
+        Console.WriteLine($"[PlayerGui] Constructor called for {sideId}");
+        Console.WriteLine($"[PlayerGui] GuiWindow from options: {options.GuiWindow?.GetHashCode() ?? -1}");
+        Console.WriteLine($"[PlayerGui] GuiWindow assigned: {GuiWindow.GetHashCode()}");
+    }
 
     public async Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
         BattleRequestType requestType, BattlePerspective perspective, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[PlayerGui] GetNextChoiceAsync called for {SideId}");
+        Console.WriteLine($"[PlayerGui] GuiWindow instance: {GuiWindow.GetHashCode()}");
+
         // Fire the choice requested event
         ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
         {
@@ -47,6 +64,7 @@ public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController b
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<Choice>? ChoiceSubmitted;
+
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         // TODO: Show a warning in the GUI that time is running out

@@ -16,11 +16,15 @@ public class GuiBattleExample
 {
     public static void RunGuiBattle()
     {
+        Console.WriteLine("[GuiBattleExample] Starting...");
+        
         // Load the library
         var library = new Library();
+        Console.WriteLine("[GuiBattleExample] Library loaded");
 
         // Create the MonoGame window
         using var game = new BattleGame();
+        Console.WriteLine($"[GuiBattleExample] BattleGame created, instance: {game.GetHashCode()}");
   
         // Create battle options
         var battleOptions = new BattleOptions
@@ -41,12 +45,15 @@ public class GuiBattleExample
             // Format = library.Formats[...], // TODO: Set format
             Seed = null, // Random seed
         };
+        Console.WriteLine($"[GuiBattleExample] BattleOptions created, GuiWindow in options: {battleOptions.Player1Options.GuiWindow?.GetHashCode() ?? -1}");
 
         // Create the player controller (the Simulator in your case)
         var simulator = new Simulator();
-        
+        Console.WriteLine("[GuiBattleExample] Simulator created");
+      
         // Start the battle on a background thread
         game.StartBattle(library, battleOptions, simulator);
+        Console.WriteLine("[GuiBattleExample] Battle started, calling game.Run()");
   
         // Run the MonoGame loop (this blocks until the window closes)
         game.Run();
