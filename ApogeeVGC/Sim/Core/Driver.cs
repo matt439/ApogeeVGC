@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Generators;
 using ApogeeVGC.Player;
 using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Gui;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -42,17 +43,17 @@ public class Driver
         switch (mode)
         {
             case DriverMode.GuiVsRandomSingles:
-                RunGuiVsRandomSinglesTest().GetAwaiter().GetResult();
+                RunGuiVsRandomSinglesTest(); // No longer async
                 break;
             case DriverMode.GuiVsRandomDoubles:
-                RunGuiVsRandomDoublesTest().GetAwaiter().GetResult();
+                RunGuiVsRandomDoublesTest(); // No longer async
                 break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
         }
     }
 
-    private async Task RunGuiVsRandomSinglesTest()
+    private void RunGuiVsRandomSinglesTest() // Changed from async Task
     {
         PlayerOptions player1Options = new()
         {
@@ -75,29 +76,60 @@ public class Driver
             P2 = player2,
             Debug = true,
         };
+
+        // Driver owns both the battle and the GUI
         BattleAsync battle = new(options, Library);
+        BattleGame guiWindow = new();
 
-        Simulator simulator = new()
+        // Set up the GUI player to use the shared GUI window
+        if (player1 is PlayerGui guiPlayer)
         {
-            Battle = battle,
-            PrintDebug = true,
-        };
+            guiPlayer.GuiWindow = guiWindow;
+        }
 
-        SimulatorResult result = await simulator.Run();
-
-        string winner = result switch
+        // Start battle simulation on background thread
+        var battleTask = Task.Run(() =>
         {
-            SimulatorResult.Player1Win => "Matt",
-            SimulatorResult.Player2Win => "Random",
-            _ => "Unknown",
+            try
+            {
+                battle.Start();
+
+                // After battle ends, request GUI to close
+                guiWindow.RequestExit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Battle error: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                guiWindow.RequestExit();
+            }
+        });
+
+        // Run the GUI on the main thread (blocks until window closes)
+        guiWindow.Run();
+
+        // Wait for battle task to complete
+        try
+        {
+            battleTask.Wait(TimeSpan.FromSeconds(5));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error waiting for battle task: {ex.Message}");
+        }
+
+        // After window closes, check battle result
+        string winner = battle.Winner switch
+        {
+            "p1" => "Matt",
+            "p2" => "Random",
+            _ => battle.Ended ? "Tie" : "Battle incomplete",
         };
 
         Console.WriteLine($"Battle finished. Winner: {winner}");
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
     }
 
-    private async Task RunGuiVsRandomDoublesTest()
+    private void RunGuiVsRandomDoublesTest() // Changed from async Task
     {
         throw new NotImplementedException();
     }

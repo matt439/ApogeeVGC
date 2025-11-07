@@ -14,6 +14,8 @@ public class BattleGame : Game
     private SpriteFont? _defaultFont;
     private BattleRenderer? _battleRenderer;
     private BattleState? _currentBattleState;
+    private readonly object _stateLock = new();
+    private bool _shouldExit;
 
     // Screen dimensions
     private const int ScreenWidth = 1280;
@@ -34,9 +36,6 @@ public class BattleGame : Game
     {
         Window.Title = "Apogee VGC - Pokémon Battle Simulator";
 
-        // Create demo battle state
-        InitializeDemoBattle();
-
         base.Initialize();
     }
 
@@ -51,42 +50,6 @@ public class BattleGame : Game
         _battleRenderer = new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice);
     }
 
-    private void InitializeDemoBattle()
-    {
-        // Create a simple demo battle for testing
-        _currentBattleState = new BattleState
-        {
-            Turn = 1,
-            PlayerActivePokemon =
-            [
-                new PokemonDisplayInfo
-                {
-                    Name = "Pikachu", Species = "Pikachu", CurrentHp = 95, MaxHp = 95, Level = 50,
-                },
-
-                new PokemonDisplayInfo
-                {
-                    Name = "Charizard", Species = "Charizard", CurrentHp = 153, MaxHp = 153,
-                    Level = 50,
-                },
-            ],
-            OpponentActivePokemon =
-            [
-                new PokemonDisplayInfo
-                {
-                    Name = "Blastoise", Species = "Blastoise", CurrentHp = 158, MaxHp = 158,
-                    Level = 50,
-                },
-
-                new PokemonDisplayInfo
-                {
-                    Name = "Venusaur", Species = "Venusaur", CurrentHp = 155, MaxHp = 155,
-                    Level = 50,
-                },
-            ],
-        };
-    }
-
     protected override void Update(GameTime gameTime)
     {
         // Exit on Escape key
@@ -95,8 +58,11 @@ public class BattleGame : Game
             Exit();
         }
 
-        // TODO: Update battle state here
-        // Future: Handle input for move selection, switching, etc.
+        // Check if external code requested exit
+        if (_shouldExit)
+        {
+            Exit();
+        }
 
         base.Update(gameTime);
     }
@@ -107,8 +73,15 @@ public class BattleGame : Game
 
         _spriteBatch?.Begin();
 
+        // Thread-safe read of battle state
+        BattleState? stateToRender;
+        lock (_stateLock)
+        {
+            stateToRender = _currentBattleState;
+        }
+
         // Render battle using the renderer
-        _battleRenderer?.Render(gameTime, _currentBattleState);
+        _battleRenderer?.Render(gameTime, stateToRender);
 
         _spriteBatch?.End();
 
@@ -120,5 +93,25 @@ public class BattleGame : Game
         // Clean up resources
         _spriteBatch?.Dispose();
         base.UnloadContent();
+    }
+
+    /// <summary>
+    /// Update the battle state to be rendered (thread-safe)
+    /// </summary>
+    /// <param name="battleState">New battle state to display</param>
+    public void UpdateBattleState(BattleState battleState)
+    {
+        lock (_stateLock)
+        {
+            _currentBattleState = battleState;
+        }
+    }
+
+    /// <summary>
+    /// Request the GUI window to exit gracefully
+    /// </summary>
+    public void RequestExit()
+    {
+        _shouldExit = true;
     }
 }

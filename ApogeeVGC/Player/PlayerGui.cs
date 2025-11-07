@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Gui;
+using ApogeeVGC.Gui.Rendering;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -20,7 +21,41 @@ public class PlayerGui(SideId sideId, PlayerOptions options) : IPlayer
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // TODO: Implement GUI update logic here
+        // Convert BattlePerspective to BattleState for rendering
+        BattleState battleState = ConvertPerspectiveToBattleState(perspective);
+
+        // Update the GUI window (thread-safe)
+        GuiWindow.UpdateBattleState(battleState);
+    }
+
+    private static BattleState ConvertPerspectiveToBattleState(BattlePerspective perspective)
+    {
+        return new BattleState
+        {
+            Turn = perspective.TurnCounter,
+            PlayerActivePokemon = perspective.PlayerSide.Active
+                .Where(p => p != null)
+                .Select(p => new PokemonDisplayInfo
+                {
+                    Name = p!.Name,
+                    Species = p.Species.ToString(),
+                    CurrentHp = p.Hp,
+                    MaxHp = p.MaxHp,
+                    Level = p.Level
+                })
+                .ToList(),
+            OpponentActivePokemon = perspective.OpponentSide.Active
+                .Where(p => p != null)
+                .Select(p => new PokemonDisplayInfo
+                {
+                    Name = p!.Name,
+                    Species = p.Species.ToString(),
+                    CurrentHp = (int)(p.HpPercentage * 100), // Estimate HP from percentage
+                    MaxHp = 100, // Use normalized max HP for opponent
+                    Level = p.Level
+                })
+                .ToList()
+        };
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
