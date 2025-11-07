@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Actions;
+using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
@@ -66,9 +67,31 @@ public class BattleQueue(Battle battle)
         // Start with the action itself
         List<IAction> actions = [];
 
-        // Cast to IAction - all ActionChoices should be IActions in practice
-        IAction currentAction = action as IAction ??
-                                throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+        // Handle ChosenAction conversion to specific action types
+        IAction currentAction;
+        if (action is ChosenAction chosenAction)
+        {
+            // Convert ChosenAction to the appropriate specific action type
+            currentAction = chosenAction.Choice switch
+            {
+                ChoiceType.Team => new TeamAction
+                {
+                    Choice = ActionId.Team,
+                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Team action requires a Pokemon"),
+                    Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires an Index"),
+                    Priority = chosenAction.Priority,
+                },
+                ChoiceType.Move => throw new NotImplementedException("Move actions should be converted elsewhere"),
+                ChoiceType.Switch or ChoiceType.InstaSwitch => throw new NotImplementedException("Switch actions should be converted elsewhere"),
+                _ => action as IAction ?? throw new InvalidOperationException("ChosenAction must be convertible to IAction"),
+            };
+        }
+        else
+        {
+            // Cast to IAction - all ActionChoices should be IActions in practice
+            currentAction = action as IAction ??
+                            throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+        }
 
         // Populate move if missing (from moveId)
         if (currentAction is MoveAction moveAction)
