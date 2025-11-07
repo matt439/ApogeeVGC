@@ -15,38 +15,28 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     private readonly Prng _random = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 
     // Fast sync version for MCTS rollouts (IPlayer)
-    public Choice GetNextChoiceSync(List<IChoiceRequest> choices, BattlePerspective perspective)
+    public Choice GetNextChoiceSync(IChoiceRequest choice, BattlePerspective perspective)
     {
-        return GetNextChoiceFromAll(choices);
+        return GetNextChoiceFromAll(choice);
     }
 
     // Simplified async version (IPlayer)
-    public Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> choices, BattlePerspective perspective,
+    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest, BattlePerspective perspective,
         CancellationToken cancellationToken)
     {
-        if (choices.Count == 0)
-        {
-            throw new ArgumentException("No available choices to select from.", nameof(choices));
-        }
-
-        Choice choice = GetNextChoiceFromAll(choices);
+        Choice choice = GetNextChoiceFromAll(choiceRequest);
         ChoiceSubmitted?.Invoke(this, choice);
         return Task.FromResult(choice);
     }
 
     // Full async version for backward compatibility (IPlayer)
-    public Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
+    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        if (availableChoices.Count == 0)
-        {
-            throw new ArgumentException("No available choices to select from.", nameof(availableChoices));
-        }
-
-        Choice choice = GetNextChoiceFromAll(availableChoices);
+        Choice choice = GetNextChoiceFromAll(choiceRequest);
         ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
         {
-            AvailableChoices = availableChoices,
+            Choice = choiceRequest,
             TimeLimit = TimeSpan.FromSeconds(45),
             RequestTime = DateTime.UtcNow,
         });
@@ -76,15 +66,8 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         return Task.CompletedTask;
     }
 
-    private Choice GetNextChoiceFromAll(List<IChoiceRequest> availableChoices)
+    private Choice GetNextChoiceFromAll(IChoiceRequest choice)
     {
-        // Select a random choice from all available choices
-        if (availableChoices.Count == 0)
-        {
-            throw new ArgumentException("No available choices to select from.", nameof(availableChoices));
-        }
-        int randomIndex = _random.Random(availableChoices.Count);
-        //return availableChoices[randomIndex];
         throw new NotImplementedException();
     }
 }

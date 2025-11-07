@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Gui;
-using ApogeeVGC.Gui.Rendering;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -14,10 +13,30 @@ public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController b
     public IBattleController BattleController { get; } = battleController;
     public BattleGame GuiWindow { get; set; } = new();
 
-    public Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
-        BattlePerspective perspective, CancellationToken cancellationToken)
+    public async Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
+        BattleRequestType requestType, BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // Fire the choice requested event
+        ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
+        {
+            Choice = choiceRequest,
+            TimeLimit = TimeSpan.FromSeconds(90), // Default 90 second timer
+            RequestTime = DateTime.UtcNow,
+        });
+
+        if (choiceRequest == null)
+        {
+            throw new InvalidOperationException("No choice requests available");
+        }
+
+        // Request the choice from the GUI
+        Choice choice = await GuiWindow.RequestChoiceAsync(choiceRequest, requestType, perspective,
+            cancellationToken);
+
+        // Fire the choice submitted event
+        ChoiceSubmitted?.Invoke(this, choice);
+
+        return choice;
     }
 
     public void UpdateUi(BattlePerspective perspective)
@@ -30,11 +49,15 @@ public class PlayerGui(SideId sideId, PlayerOptions options, IBattleController b
     public event EventHandler<Choice>? ChoiceSubmitted;
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
-        throw new NotImplementedException();
+        // TODO: Show a warning in the GUI that time is running out
+        Console.WriteLine($"[PlayerGui] Warning: {remainingTime.TotalSeconds:F0} seconds remaining");
+        return Task.CompletedTask;
     }
 
     public Task NotifyChoiceTimeoutAsync()
     {
-        throw new NotImplementedException();
+        // TODO: Show in the GUI that the choice timed out
+        Console.WriteLine("[PlayerGui] Choice timed out - battle will auto-choose");
+        return Task.CompletedTask;
     }
 }

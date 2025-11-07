@@ -18,7 +18,7 @@ public interface IPlayer
     IBattleController BattleController { get; }
 
     // Async choice submission
-    Task<Choice> GetNextChoiceAsync(List<IChoiceRequest> availableChoices, BattleRequestType requestType,
+    Task<Choice> GetNextChoiceAsync(IChoiceRequest choice, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken);
 
     void UpdateUi(BattlePerspective perspective);

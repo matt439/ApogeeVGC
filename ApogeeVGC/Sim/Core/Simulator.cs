@@ -26,12 +26,12 @@ public class Simulator : IPlayerController, IBattleController
     //    PrintDebug = printDebug;
     //}
 
-    public Task<Choice> RequestChoiceAsync(SideId sideId, List<IChoiceRequest> availableChoices,
+    public Task<Choice> RequestChoiceAsync(SideId sideId, IChoiceRequest choiceRequest,
         BattleRequestType requestType, BattlePerspective perspective,
         CancellationToken cancellationToken)
     {
         IPlayer player = GetPlayer(sideId);
-        return player.GetNextChoiceAsync(availableChoices, requestType, perspective,
+        return player.GetNextChoiceAsync(choiceRequest, requestType, perspective,
             cancellationToken);
     }
 

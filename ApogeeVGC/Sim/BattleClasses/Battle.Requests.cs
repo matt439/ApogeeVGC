@@ -427,7 +427,7 @@ public partial class Battle
                     // Request choice from the player
                     Choice choice = await PlayerController.RequestChoiceAsync(
                         side.Id,
-                        [side.ActiveRequest!],
+                        side.ActiveRequest!,
                         requestType,
                         perspective,
                         cancellationToken

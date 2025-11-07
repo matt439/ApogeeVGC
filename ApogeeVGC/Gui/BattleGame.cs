@@ -2,12 +2,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ApogeeVGC.Gui.Rendering;
+using ApogeeVGC.Gui.ChoiceUI;
 using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Data;
 
 namespace ApogeeVGC.Gui;
 
 /// <summary>
-/// Main MonoGame window for the Pokémon battle GUI
+/// Main MonoGame window for the Pokémon battle GUI.
+/// Runs the GUI loop on the main thread while the battle simulation runs on a background thread.
 /// </summary>
 public class BattleGame : Game
 {
@@ -15,6 +20,9 @@ public class BattleGame : Game
     private SpriteFont? _defaultFont;
     private BattleRenderer? _battleRenderer;
     private SpriteManager? _spriteManager;
+    private ChoiceInputManager? _choiceInputManager;
+    private BattleRunner? _battleRunner;
+
     private BattlePerspective? _currentBattlePerspective;
     private readonly object _stateLock = new();
     private bool _shouldExit;
@@ -54,6 +62,25 @@ public class BattleGame : Game
 
         // Initialize battle renderer with sprite manager
         _battleRenderer = new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice, _spriteManager);
+
+        // Initialize choice input manager
+        _choiceInputManager = new ChoiceInputManager(_spriteBatch, _defaultFont, GraphicsDevice);
+    }
+
+    /// <summary>
+    /// Starts a battle with the given options.
+    /// The battle runs on a background thread and communicates with the GUI via async mechanisms.
+    /// </summary>
+    public void StartBattle(Library library, BattleOptions battleOptions, IPlayerController playerController)
+    {
+        if (_battleRunner != null && _battleRunner.IsRunning)
+        {
+            Console.WriteLine("Battle is already running");
+            return;
+        }
+
+        _battleRunner = new BattleRunner(library, battleOptions, playerController);
+        _battleRunner.StartBattle();
     }
 
     protected override void Update(GameTime gameTime)
@@ -68,6 +95,16 @@ public class BattleGame : Game
         if (_shouldExit)
         {
             Exit();
+        }
+
+        // Update choice input manager (runs on GUI thread)
+        _choiceInputManager?.Update(gameTime);
+
+        // Check if battle is complete
+        if (_battleRunner is { IsCompleted: true })
+        {
+            Console.WriteLine($"Battle complete! Winner: {_battleRunner.Result}");
+            // TODO: Show battle results screen
         }
 
         base.Update(gameTime);
@@ -89,6 +126,9 @@ public class BattleGame : Game
         // Render battle using the renderer
         _battleRenderer?.Render(gameTime, perspectiveToRender);
 
+        // Render choice UI on top
+        _choiceInputManager?.Render(gameTime);
+
         _spriteBatch?.End();
 
         base.Draw(gameTime);
@@ -103,7 +143,8 @@ public class BattleGame : Game
     }
 
     /// <summary>
-    /// Update the battle perspective to be rendered (thread-safe)
+    /// Update the battle perspective to be rendered (thread-safe).
+    /// Called from the battle simulation thread.
     /// </summary>
     /// <param name="battlePerspective">New battle perspective to display</param>
     public void UpdateBattlePerspective(BattlePerspective battlePerspective)
@@ -112,6 +153,24 @@ public class BattleGame : Game
         {
             _currentBattlePerspective = battlePerspective;
         }
+    }
+
+    /// <summary>
+    /// Request a choice from the user via the GUI.
+    /// This is called from the battle simulation thread and returns a Task that completes
+    /// when the user makes their choice on the GUI thread.
+    /// </summary>
+    public Task<Choice> RequestChoiceAsync(IChoiceRequest request, BattleRequestType requestType,
+        BattlePerspective perspective, CancellationToken cancellationToken)
+    {
+        if (_choiceInputManager == null)
+        {
+            throw new InvalidOperationException("Choice input manager not initialized");
+        }
+
+        // The battle thread calls this and awaits the result
+        // The GUI thread will complete the TaskCompletionSource when the user makes a choice
+        return _choiceInputManager.RequestChoiceAsync(request, requestType, perspective, cancellationToken);
     }
 
     /// <summary>
