@@ -12,7 +12,7 @@ public partial class Side
 {
     public Choice GetChoice()
     {
-        throw new NotImplementedException();
+        return Choice;
     }
 
     public bool ChooseMove(MoveIdIntUnion? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)

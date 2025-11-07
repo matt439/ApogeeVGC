@@ -19,6 +19,7 @@ public enum FormatId
 {
     Gen9Ou,
     CustomSingles,
+    CustomSinglesBlind,
     CustomDoubles,
 }
 

@@ -66,8 +66,26 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         return Task.CompletedTask;
     }
 
-    private Choice GetNextChoiceFromAll(IChoiceRequest choice)
+    private Choice GetNextChoiceFromAll(IChoiceRequest request)
     {
-        throw new NotImplementedException();
+        Console.WriteLine($"[PlayerRandom] GetNextChoiceFromAll called for {SideId}");
+
+        // Create an empty choice that will be auto-filled by the battle engine
+        // The battle's Side.AutoChoose() method will fill in valid random choices
+        var choice = new Choice
+        {
+            Actions = new List<ChosenAction>(),
+            CantUndo = false,
+            Error = string.Empty,
+            ForcedSwitchesLeft = 0,
+            ForcedPassesLeft = 0,
+            SwitchIns = new HashSet<int>(),
+            Terastallize = false,
+        };
+
+        // For now, return an empty choice which signals the battle to use Side.AutoChoose()
+        // This is a valid pattern in Pokemon Showdown - empty choice = auto-choose
+        Console.WriteLine($"[PlayerRandom] Returning empty choice for auto-selection");
+        return choice;
     }
 }

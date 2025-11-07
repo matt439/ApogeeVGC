@@ -3,12 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Utils.Unions;
-using System.Collections.Concurrent;
 
 namespace ApogeeVGC.Gui.ChoiceUI;
 
@@ -16,12 +13,11 @@ namespace ApogeeVGC.Gui.ChoiceUI;
 /// Manages user input for battle choices, supporting both mouse clicks and keyboard input.
 /// Uses a thread-safe queue to communicate choices back to the async battle simulation.
 /// </summary>
-public class ChoiceInputManager
+public class ChoiceInputManager(
+    SpriteBatch spriteBatch,
+    SpriteFont font,
+    GraphicsDevice graphicsDevice)
 {
-    private readonly SpriteBatch _spriteBatch;
-    private readonly SpriteFont _font;
-    private readonly GraphicsDevice _graphicsDevice;
-
     private IChoiceRequest? _currentRequest;
     private BattleRequestType _requestType;
     private BattlePerspective? _perspective;
@@ -34,11 +30,11 @@ public class ChoiceInputManager
     private volatile bool _isRequestActive;
 
     // UI state
-    private readonly List<ChoiceButton> _buttons = new();
-    private KeyboardState _previousKeyboardState;
-    private MouseState _previousMouseState;
+    private readonly List<ChoiceButton> _buttons = [];
+    private KeyboardState _previousKeyboardState = Keyboard.GetState();
+    private MouseState _previousMouseState = Mouse.GetState();
     private string _keyboardInput = "";
-    private int _selectedPokemonIndex = 0;
+    private int _selectedPokemonIndex;
 
     // Layout constants
     private const int ButtonWidth = 200;
@@ -46,16 +42,6 @@ public class ChoiceInputManager
     private const int ButtonSpacing = 10;
     private const int LeftMargin = 50;
     private const int TopMargin = 400;
-
-    public ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font,
-        GraphicsDevice graphicsDevice)
-    {
-        _spriteBatch = spriteBatch;
-        _font = font;
-        _graphicsDevice = graphicsDevice;
-        _previousKeyboardState = Keyboard.GetState();
-        _previousMouseState = Mouse.GetState();
-    }
 
     /// <summary>
     /// Request a choice from the user and return it asynchronously.
@@ -83,7 +69,7 @@ public class ChoiceInputManager
         _isRequestActive = true;
 
         // Setup UI (this will be processed on the next Update() call on the GUI thread)
-        SetupChoiceUI();
+        SetupChoiceUi();
 
         // Register cancellation
         cancellationToken.Register(() =>
@@ -105,8 +91,8 @@ public class ChoiceInputManager
         if (!_isRequestActive || _currentRequest == null || _choiceCompletionSource == null)
             return;
 
-        var keyboardState = Keyboard.GetState();
-        var mouseState = Mouse.GetState();
+        KeyboardState keyboardState = Keyboard.GetState();
+        MouseState mouseState = Mouse.GetState();
 
         // Process keyboard input
         ProcessKeyboardInput(keyboardState);
@@ -128,33 +114,32 @@ public class ChoiceInputManager
 
         // Draw instruction text
         string instructionText = GetInstructionText();
-        _spriteBatch.DrawString(_font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
+        spriteBatch.DrawString(font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
             Color.White);
 
         // Draw keyboard input display
         if (!string.IsNullOrEmpty(_keyboardInput))
         {
-            _spriteBatch.DrawString(_font, $"Input: {_keyboardInput}",
+            spriteBatch.DrawString(font, $"Input: {_keyboardInput}",
                 new Vector2(LeftMargin, TopMargin - 30),
                 Color.Yellow);
         }
 
         // Draw buttons
-        foreach (var button in _buttons)
+        foreach (ChoiceButton button in _buttons)
         {
-            button.Draw(_spriteBatch, _font, _graphicsDevice);
+            button.Draw(spriteBatch, font, graphicsDevice);
         }
 
         // Draw current choice status
-        if (_pendingChoice != null && _pendingChoice.Actions.Count > 0)
-        {
-            var statusText =
-                $"Selected: {string.Join(", ", _pendingChoice.Actions.Select(a => GetActionDescription(a)))}";
-            _spriteBatch.DrawString(_font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
-        }
+        if (_pendingChoice is not { Actions.Count: > 0 }) return;
+
+        string statusText =
+            $"Selected: {string.Join(", ", _pendingChoice.Actions.Select(GetActionDescription))}";
+        spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
     }
 
-    private void SetupChoiceUI()
+    private void SetupChoiceUi()
     {
         _buttons.Clear();
         _keyboardInput = "";
@@ -162,30 +147,29 @@ public class ChoiceInputManager
 
         if (_currentRequest is MoveRequest moveRequest)
         {
-            SetupMoveRequestUI(moveRequest);
+            SetupMoveRequestUi(moveRequest);
         }
         else if (_currentRequest is SwitchRequest switchRequest)
         {
-            SetupSwitchRequestUI(switchRequest);
+            SetupSwitchRequestUi(switchRequest);
         }
         else if (_currentRequest is TeamPreviewRequest teamPreviewRequest)
         {
-            SetupTeamPreviewUI(teamPreviewRequest);
+            SetupTeamPreviewUi(teamPreviewRequest);
         }
     }
 
-    private void SetupMoveRequestUI(MoveRequest request)
+    private void SetupMoveRequestUi(MoveRequest request)
     {
-        int x = LeftMargin;
         int y = TopMargin;
 
         // Get the first active Pokemon's moves
         if (request.Active.Count > 0)
         {
-            var pokemonRequest = request.Active[0];
+            PokemonMoveRequestData pokemonRequest = request.Active[0];
             int moveIndex = 1;
 
-            foreach (var moveData in pokemonRequest.Moves)
+            foreach (PokemonMoveData moveData in pokemonRequest.Moves)
             {
                 // Check if move is disabled - handle the union type
                 bool disabled = moveData.Disabled switch
@@ -196,11 +180,12 @@ public class ChoiceInputManager
                     _ => false,
                 };
 
+                int index = moveIndex;
                 var button = new ChoiceButton(
-                    new Rectangle(x, y, ButtonWidth, ButtonHeight),
+                    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                     $"{moveIndex}. {moveData.Move.Name}",
                     disabled ? Color.Gray : Color.Blue,
-                    () => SelectMove(moveIndex - 1, pokemonRequest)
+                    () => SelectMove(index - 1, pokemonRequest)
                 );
 
                 _buttons.Add(button);
@@ -212,10 +197,10 @@ public class ChoiceInputManager
             // Add switch button
             y += ButtonSpacing;
             var switchButton = new ChoiceButton(
-                new Rectangle(x, y, ButtonWidth, ButtonHeight),
+                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 "S. Switch Pokemon",
                 Color.Green,
-                () => ShowSwitchOptions()
+                ShowSwitchOptions
             );
             _buttons.Add(switchButton);
 
@@ -224,10 +209,10 @@ public class ChoiceInputManager
             {
                 y += ButtonHeight + ButtonSpacing;
                 var teraButton = new ChoiceButton(
-                    new Rectangle(x, y, ButtonWidth, ButtonHeight),
+                    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                     "T. Terastallize",
                     Color.Purple,
-                    () => ToggleTerastallize()
+                    ToggleTerastallize
                 );
                 _buttons.Add(teraButton);
             }
@@ -235,16 +220,16 @@ public class ChoiceInputManager
             // Add submit button
             y += ButtonHeight + ButtonSpacing * 2;
             var submitButton = new ChoiceButton(
-                new Rectangle(x, y, ButtonWidth, ButtonHeight),
+                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 "Enter. Submit",
                 Color.Orange,
-                () => SubmitChoice()
+                SubmitChoice
             );
             _buttons.Add(submitButton);
         }
     }
 
-    private void SetupSwitchRequestUI(SwitchRequest request)
+    private void SetupSwitchRequestUi(SwitchRequest request)
     {
         int x = LeftMargin;
         int y = TopMargin;
@@ -256,16 +241,17 @@ public class ChoiceInputManager
             .ToList();
 
         int pokemonIndex = 1;
-        foreach (var pokemon in availablePokemon)
+        foreach (PokemonSwitchRequestData _ in availablePokemon)
         {
             // Get Pokemon name - we'll need to derive it from available data
             // Since Details is commented out, we can use the Pokemon's actual data
             // For now, use a simple indexing approach
+            int index = pokemonIndex;
             var button = new ChoiceButton(
                 new Rectangle(x, y, ButtonWidth, ButtonHeight),
                 $"{pokemonIndex}. Pokemon {pokemonIndex}",
                 Color.Green,
-                () => SelectSwitch(pokemonIndex - 1, request)
+                () => SelectSwitch(index - 1, request)
             );
 
             _buttons.Add(button);
@@ -279,26 +265,27 @@ public class ChoiceInputManager
             new Rectangle(x, y, ButtonWidth, ButtonHeight),
             "Enter. Submit",
             Color.Orange,
-            () => SubmitChoice()
+            SubmitChoice
         );
         _buttons.Add(submitButton);
     }
 
-    private void SetupTeamPreviewUI(TeamPreviewRequest request)
+    private void SetupTeamPreviewUi(TeamPreviewRequest request)
     {
         int x = LeftMargin;
         int y = TopMargin;
 
         // Show all Pokemon for team ordering
         int pokemonIndex = 1;
-        foreach (var pokemon in request.Side.Pokemon)
+        foreach (PokemonSwitchRequestData _ in request.Side.Pokemon)
         {
             // Use Pokemon index since Details is not available
+            int index = pokemonIndex;
             var button = new ChoiceButton(
                 new Rectangle(x, y, ButtonWidth, ButtonHeight),
                 $"{pokemonIndex}. Pokemon {pokemonIndex}",
                 Color.Cyan,
-                () => SelectTeamPosition(pokemonIndex - 1)
+                () => SelectTeamPosition(index - 1)
             );
 
             _buttons.Add(button);
@@ -322,15 +309,22 @@ public class ChoiceInputManager
             new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
             "Enter. Submit",
             Color.Orange,
-            () => SubmitChoice()
+            SubmitChoice
         );
         _buttons.Add(submitButton);
     }
 
     private void ProcessKeyboardInput(KeyboardState keyboardState)
     {
-        // Number keys 1-6 for quick selection
-        for (int i = 0; i < 6; i++)
+        // Determine max number based on request type
+        int maxNumbers = _requestType switch
+        {
+            BattleRequestType.TeamPreview => 6, // Team preview allows 1-6
+            _ => 6, // Default to 6 for safety
+        };
+
+        // Number keys 1-6 (or 1-4 for moves) for quick selection
+        for (int i = 0; i < maxNumbers; i++)
         {
             Keys numberKey = Keys.D1 + i;
             if (IsKeyPressed(keyboardState, numberKey))
@@ -375,7 +369,7 @@ public class ChoiceInputManager
         if (IsMouseClicked(mouseState))
         {
             var mousePos = new Point(mouseState.X, mouseState.Y);
-            foreach (var button in _buttons)
+            foreach (ChoiceButton button in _buttons)
             {
                 if (button.Bounds.Contains(mousePos))
                 {
@@ -414,10 +408,10 @@ public class ChoiceInputManager
         if (_perspective == null || _pendingChoice == null) return;
 
         // Get the Pokemon
-        var pokemon = _perspective.PlayerSide.Active[_selectedPokemonIndex];
+        PokemonPlayerPerspective? pokemon = _perspective.PlayerSide.Active[_selectedPokemonIndex];
         if (pokemon == null) return;
 
-        var moveData = pokemonRequest.Moves[moveIndex];
+        PokemonMoveData moveData = pokemonRequest.Moves[moveIndex];
 
         // Create the chosen action
         var action = new ChosenAction
@@ -440,7 +434,7 @@ public class ChoiceInputManager
     {
         if (_pendingChoice == null) return;
 
-        var pokemon = request.Side.Pokemon.Where((p, index) => !p.Active)
+        PokemonSwitchRequestData? pokemon = request.Side.Pokemon.Where((p, _) => !p.Active)
             .ElementAtOrDefault(pokemonIndex);
         if (pokemon == null) return;
 
@@ -469,7 +463,7 @@ public class ChoiceInputManager
         {
             Choice = ChoiceType.Team,
             Pokemon = null,
-            MoveId = MoveId.None,
+            MoveId = MoveId.None, // Required field
             Index = position,
             Priority = -_pendingChoice.Actions.Count, // Earlier picks have higher priority
         };
@@ -551,33 +545,25 @@ public class ChoiceInputManager
 /// <summary>
 /// Represents a clickable button in the choice UI
 /// </summary>
-public class ChoiceButton
+public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, Action onClick)
 {
-    public Rectangle Bounds { get; }
-    public string Text { get; }
-    public Color BackgroundColor { get; }
-    public Action OnClick { get; }
-
-    public ChoiceButton(Rectangle bounds, string text, Color backgroundColor, Action onClick)
-    {
-        Bounds = bounds;
-        Text = text;
-        BackgroundColor = backgroundColor;
-        OnClick = onClick;
-    }
+    public Rectangle Bounds { get; } = bounds;
+    public string Text { get; } = text;
+    public Color BackgroundColor { get; } = backgroundColor;
+    public Action OnClick { get; } = onClick;
 
     public void Draw(SpriteBatch spriteBatch, SpriteFont font, GraphicsDevice graphicsDevice)
     {
         // Create a 1x1 white texture for drawing rectangles
         var texture = new Texture2D(graphicsDevice, 1, 1);
-        texture.SetData(new[] { Color.White });
+        texture.SetData([Color.White]);
 
         // Draw button background
         spriteBatch.Draw(texture, Bounds, BackgroundColor);
 
         // Draw button border
-        var borderThickness = 2;
-        var borderColor = Color.White;
+        const int borderThickness = 2;
+        Color borderColor = Color.White;
 
         // Top
         spriteBatch.Draw(texture, new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, borderThickness),
@@ -595,7 +581,7 @@ public class ChoiceButton
                 Bounds.Height), borderColor);
 
         // Draw text centered in button
-        var textSize = font.MeasureString(Text);
+        Vector2 textSize = font.MeasureString(Text);
         var textPos = new Vector2(
             Bounds.X + (Bounds.Width - textSize.X) / 2,
             Bounds.Y + (Bounds.Height - textSize.Y) / 2

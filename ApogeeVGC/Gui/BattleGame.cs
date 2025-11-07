@@ -26,6 +26,7 @@ public class BattleGame : Game
     private BattlePerspective? _currentBattlePerspective;
     private readonly object _stateLock = new();
     private bool _shouldExit;
+    private bool _battleCompleteShown = false;
 
     // Pending battle start data
     private Library? _pendingLibrary;
@@ -141,7 +142,14 @@ public class BattleGame : Game
         IPlayerController playerController)
     {
         Console.WriteLine("[BattleGame] StartBattleInternal called");
-        _battleRunner = new BattleRunner(library, battleOptions, playerController);
+        
+        // PlayerController should be a Simulator instance
+  if (playerController is not Simulator simulator)
+        {
+      throw new InvalidOperationException("PlayerController must be a Simulator instance for GUI battles");
+        }
+        
+        _battleRunner = new BattleRunner(library, battleOptions, simulator);
         _battleRunner.StartBattle();
         Console.WriteLine("[BattleGame] Battle runner started");
     }
@@ -164,11 +172,15 @@ public class BattleGame : Game
         _choiceInputManager?.Update(gameTime);
 
         // Check if battle is complete
-        if (_battleRunner is { IsCompleted: true })
+    if (_battleRunner is { IsCompleted: true })
         {
-            Console.WriteLine($"Battle complete! Winner: {_battleRunner.Result}");
-            // TODO: Show battle results screen
-        }
+     if (!_battleCompleteShown)
+     {
+  Console.WriteLine($"Battle complete! Winner: {_battleRunner.Result}");
+        _battleCompleteShown = true;
+    // TODO: Show battle results screen
+      }
+      }
 
         base.Update(gameTime);
     }

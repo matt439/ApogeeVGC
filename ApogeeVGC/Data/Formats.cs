@@ -28,7 +28,17 @@ public record Formats
             Banlist = [],
             RuleTable = new RuleTable
             {
-                PickedTeamSize = 6,
+                PickedTeamSize = 6, // Full team preview - pick order of all 6
+            },
+        },
+        [FormatId.CustomSinglesBlind] = new Format
+        {
+            Name = "Custom Singles (Blind)",
+            Ruleset = [],
+            Banlist = [],
+            RuleTable = new RuleTable
+            {
+                PickedTeamSize = 0, // No team preview - team order is fixed
             },
         },
         [FormatId.CustomDoubles] = new Format
@@ -39,7 +49,7 @@ public record Formats
             Banlist = [],
             RuleTable = new RuleTable
             {
-                PickedTeamSize = 4,
+                PickedTeamSize = 4, // Doubles preview - pick 4 from 6
             },
         },
     };

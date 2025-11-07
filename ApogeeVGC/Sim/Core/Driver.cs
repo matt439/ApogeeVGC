@@ -58,51 +58,45 @@ public class Driver
     {
         // Create BattleGame instance on main thread (required by MonoGame)
         using var battleGame = new BattleGame();
+    Console.WriteLine($"[Driver] BattleGame created, instance: {battleGame.GetHashCode()}");
      
-        PlayerOptions player1Options = new()
-        {
-            Type = PlayerType.Gui,
-            Name = "Matt",
-            Team = TeamGenerator.GenerateTestTeam(Library),
-            GuiWindow = battleGame, // Pass BattleGame to PlayerGui
+     PlayerOptions player1Options = new()
+ {
+         Type = PlayerType.Gui,
+  Name = "Matt",
+  Team = TeamGenerator.GenerateTestTeam(Library),
+         GuiWindow = battleGame, // Pass BattleGame to PlayerGui
         };
 
         PlayerOptions player2Options = new()
         {
-            Type = PlayerType.Random,
+     Type = PlayerType.Random,
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
-            Seed = new PrngSeed(PlayerRandom2Seed),
+      Seed = new PrngSeed(PlayerRandom2Seed),
         };
 
-        BattleOptions battleOptions = new()
+ BattleOptions battleOptions = new()
         {
-            Id = FormatId.CustomSingles,
-            Player1Options = player1Options,
-            Player2Options = player2Options,
-            Debug = true,
+ Id = FormatId.CustomSingles,
+         Player1Options = player1Options,
+      Player2Options = player2Options,
+  Debug = true,
         };
 
-        var simulator = new Simulator();
+ var simulator = new Simulator();
+      Console.WriteLine("[Driver] Simulator created");
 
-        // Run battle async on background thread
-        var battleTask = Task.Run(async () => await simulator.Run(Library, battleOptions));
+        // Start the battle using BattleGame's deferred start mechanism
+  // This will queue the battle to start after LoadContent()
+        battleGame.StartBattle(Library, battleOptions, simulator);
+ Console.WriteLine("[Driver] Battle queued, calling battleGame.Run()");
 
-        // Run MonoGame on main thread - this blocks until game window closes
+     // Run MonoGame on main thread - this blocks until game window closes
+        // LoadContent() will be called during initialization and will start the queued battle
         battleGame.Run();
-
-        // After game window closes, wait for battle to complete (if still running)
-        if (!battleTask.IsCompleted)
-        {
-            Console.WriteLine("Waiting for battle to complete...");
-            SimulatorResult result = battleTask.GetAwaiter().GetResult();
-            Console.WriteLine($"Battle result: {result}");
-        }
-        else
-        {
-            SimulatorResult result = battleTask.Result;
-            Console.WriteLine($"Battle result: {result}");
-        }
+  
+     Console.WriteLine("[Driver] BattleGame.Run() exited");
     }
 
     private void RunGuiVsRandomDoublesTest() // Changed from async Task
