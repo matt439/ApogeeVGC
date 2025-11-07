@@ -1,12 +1,12 @@
-# PowerShell Script to Copy Sprites from Pokemon Showdown
+# PowerShell Script to Download Sprites from Pokemon Showdown Server
 # Run this from the ApogeeVGC root directory
 
 param(
-    [string]$ShowdownPath = ".\pokemon-showdown\public\sprites",
-    [string]$TargetPath = ".\ApogeeVGC\Content\Sprites"
+    [string]$TargetPath = ".\ApogeeVGC\Content\Sprites",
+    [string]$SpriteServer = "https://play.pokemonshowdown.com/sprites"
 )
 
-Write-Host "Copying Pokemon sprites from Showdown..." -ForegroundColor Green
+Write-Host "Downloading Pokemon sprites from Showdown server..." -ForegroundColor Green
 
 # Create target directories
 New-Item -ItemType Directory -Force -Path "$TargetPath\Front" | Out-Null
@@ -15,73 +15,105 @@ New-Item -ItemType Directory -Force -Path "$TargetPath\Back" | Out-Null
 # Define sprite mappings (SpecieId -> showdown filename)
 $spriteMap = @{
     "bulbasaur" = "bulbasaur"
-  "calyrexice" = "calyrex-ice"
+    "calyrexice" = "calyrex-ice"
     "miraidon" = "miraidon"
-    "ursaluna" = "ursaluna"
+"ursaluna" = "ursaluna"
     "volcarona" = "volcarona"
-  "grimmsnarl" = "grimmsnarl"
+    "grimmsnarl" = "grimmsnarl"
     "ironhands" = "ironhands"
     "calyrex" = "calyrex"
     "shayminsky" = "shaymin-sky"
     "shaymin" = "shaymin"
-    "greninbond" = "greninja-bond"
+  "greninjasbond" = "greninja-bond"
     "rockruffdusk" = "rockruff-dusk"
     "terapagosterastal" = "terapagos-terastal"
     "terapagosstellar" = "terapagos-stellar"
-  "zacian" = "zacian"
+    "zacian" = "zacian"
     "zaciancrowned" = "zacian-crowned"
     "zamazenta" = "zamazenta"
     "zamazentacrowned" = "zamazenta-crowned"
     "ogerpon" = "ogerpon"
- "ogerpontealtera" = "ogerpon-tealtera"
+    "ogerpontealtera" = "ogerpon-tealtera"
     "terapagos" = "terapagos"
-    "eternatuse eternamax" = "eternatus-eternamax"
+    "eternatuseeternamax" = "eternatus-eternamax"
     "morpeko" = "morpeko"
     "xerneas" = "xerneas"
     "xerneasneutral" = "xerneas-neutral"
     "xerneasactive" = "xerneas-active"
 }
 
-# Copy front sprites (gen5 animated or gen5)
-foreach ($key in $spriteMap.Keys) {
-    $showdownName = $spriteMap[$key]
-    $targetName = "$key.png"
- 
-    # Try gen5ani first, fall back to gen5
-    $frontSource = "$ShowdownPath\gen5ani\$showdownName.png"
-    if (-not (Test-Path $frontSource)) {
-        $frontSource = "$ShowdownPath\gen5\$showdownName.png"
-    }
-    
-    if (Test-Path $frontSource) {
-      Copy-Item $frontSource "$TargetPath\Front\$targetName" -Force
-        Write-Host "Copied front sprite: $targetName" -ForegroundColor Cyan
-    } else {
-        Write-Host "Warning: Front sprite not found for $showdownName" -ForegroundColor Yellow
-    }
-}
+$successCount = 0
+$failCount = 0
 
-# Copy back sprites (gen5ani-back or gen5-back)
+# Download front sprites (gen5ani or dex as fallback)
+Write-Host "`nDownloading front sprites..." -ForegroundColor Yellow
 foreach ($key in $spriteMap.Keys) {
     $showdownName = $spriteMap[$key]
     $targetName = "$key.png"
     
-    # Try gen5ani-back first, fall back to gen5-back
-    $backSource = "$ShowdownPath\gen5ani-back\$showdownName.png"
-    if (-not (Test-Path $backSource)) {
-   $backSource = "$ShowdownPath\gen5-back\$showdownName.png"
+    # Try gen5ani first (animated), fall back to dex (static)
+    $frontUrls = @(
+        "$SpriteServer/gen5ani/$showdownName.png",
+        "$SpriteServer/dex/$showdownName.png"
+    )
+    
+    $downloaded = $false
+    foreach ($url in $frontUrls) {
+     try {
+            Invoke-WebRequest -Uri $url -OutFile "$TargetPath\Front\$targetName" -ErrorAction Stop
+       Write-Host "  ? Downloaded front sprite: $targetName" -ForegroundColor Green
+     $successCount++
+       $downloaded = $true
+       break
+     }
+        catch {
+            # Try next URL
+        }
     }
     
-    if (Test-Path $backSource) {
-        Copy-Item $backSource "$TargetPath\Back\$targetName" -Force
-        Write-Host "Copied back sprite: $targetName" -ForegroundColor Cyan
-  } else {
-        Write-Host "Warning: Back sprite not found for $showdownName" -ForegroundColor Yellow
+    if (-not $downloaded) {
+     Write-Host "  ? Failed to download front sprite: $targetName" -ForegroundColor Red
+     $failCount++
     }
 }
 
-Write-Host "`nSprite copy complete!" -ForegroundColor Green
-Write-Host "Next steps:" -ForegroundColor Yellow
-Write-Host "1. Open Content.mgcb in MGCB Editor"
-Write-Host "2. Add the sprites from Content/Sprites/Front and Content/Sprites/Back"
-Write-Host "3. Build the content project"
+# Download back sprites (gen5ani-back or gen5-back as fallback)
+Write-Host "`nDownloading back sprites..." -ForegroundColor Yellow
+foreach ($key in $spriteMap.Keys) {
+    $showdownName = $spriteMap[$key]
+    $targetName = "$key.png"
+    
+    # Try gen5ani-back first (animated), fall back to gen5-back (static)
+    $backUrls = @(
+     "$SpriteServer/gen5ani-back/$showdownName.png",
+        "$SpriteServer/gen5-back/$showdownName.png"
+    )
+    
+    $downloaded = $false
+foreach ($url in $backUrls) {
+        try {
+            Invoke-WebRequest -Uri $url -OutFile "$TargetPath\Back\$targetName" -ErrorAction Stop
+            Write-Host "  ? Downloaded back sprite: $targetName" -ForegroundColor Green
+   $successCount++
+ $downloaded = $true
+  break
+        }
+   catch {
+            # Try next URL
+        }
+  }
+    
+    if (-not $downloaded) {
+   Write-Host "  ? Failed to download back sprite: $targetName" -ForegroundColor Red
+        $failCount++
+    }
+}
+
+Write-Host "`nSprite download complete!" -ForegroundColor Green
+Write-Host "Success: $successCount sprites" -ForegroundColor Green
+Write-Host "Failed: $failCount sprites" -ForegroundColor $(if ($failCount -gt 0) { "Red" } else { "Green" })
+
+Write-Host "`nNext steps:" -ForegroundColor Yellow
+Write-Host "1. Run: .\generate-sprite-content.ps1" -ForegroundColor Cyan
+Write-Host "2. Append the contents of 'sprite-content-entries.txt' to Content.mgcb" -ForegroundColor Cyan
+Write-Host "3. Build the content project" -ForegroundColor Cyan
