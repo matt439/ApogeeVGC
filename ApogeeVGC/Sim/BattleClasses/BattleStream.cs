@@ -203,7 +203,7 @@
 //                        options.Debug = true;
 //                    }
 
-//                    Battle = new BattleAsync(options, Library);
+//                    Battle = new Battle(options, Library);
 //                    break;
 //                }
 

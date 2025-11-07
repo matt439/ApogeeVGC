@@ -11,7 +11,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     private EffectDelegate? GetCallback(RunEventTarget target, IEffect effect, EventId callbackName)
     {

@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     public void MakeRequest(RequestState? type = null)
     {

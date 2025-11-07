@@ -8,7 +8,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     /// <summary>
     /// Sort a list, resolving speed ties the way the games do.

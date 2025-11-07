@@ -11,7 +11,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     /// <summary>
     /// Applies damage to a single Pokémon.

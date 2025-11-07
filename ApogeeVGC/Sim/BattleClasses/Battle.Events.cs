@@ -10,7 +10,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,

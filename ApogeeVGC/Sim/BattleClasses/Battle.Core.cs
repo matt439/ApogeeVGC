@@ -13,7 +13,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync : IBattle
+public partial class Battle : IBattle
 {
     public bool DebugMode { get; init; }
     public Format Format { get; init; }
@@ -113,7 +113,7 @@ public partial class BattleAsync : IBattle
     public IPlayer Player2 { get; }
     public IReadOnlyList<IPlayer> Players => [Player1, Player2];
 
-    public BattleAsync(BattleOptions options, Library library)
+    public Battle(BattleOptions options, Library library)
     {
         Library = library;
         Dex = new ModdedDex(Library);

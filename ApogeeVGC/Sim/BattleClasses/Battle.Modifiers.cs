@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     /// <summary>
     /// Chains two damage modifiers together using fixed-point arithmetic.

@@ -18,7 +18,7 @@ public partial class Side
     public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is BattleAsync { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle is Battle { Event.Target: PokemonSingleEventTarget eventTarget })
         {
             source = eventTarget.Pokemon;
         }
@@ -115,7 +115,7 @@ public partial class Side
         IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is BattleAsync { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle is Battle { Event.Target: PokemonSingleEventTarget eventTarget })
         {
             source = eventTarget.Pokemon;
         }

@@ -78,7 +78,7 @@ public class Driver
         };
 
         // Driver owns both the battle and the GUI
-        BattleAsync battle = new(options, Library);
+        Battle battle = new(options, Library);
         BattleGame guiWindow = new();
 
         // Set up the GUI player to use the shared GUI window

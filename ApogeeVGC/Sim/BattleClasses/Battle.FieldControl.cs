@@ -7,7 +7,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     /// <summary>
     /// Swaps a Pokémon's position with another Pokémon on the same side.

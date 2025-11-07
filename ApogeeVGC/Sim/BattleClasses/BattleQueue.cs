@@ -410,7 +410,7 @@ public class BattleQueue(IBattle battle)
         for (int i = 0; i < List.Count; i++)
         {
             IAction curAction = List[i];
-            int compared = BattleAsync.ComparePriority(actions[0], curAction);
+            int compared = BattleClasses.Battle.ComparePriority(actions[0], curAction);
 
             // Mark the first position where our action should go
             // (when it has equal or higher priority than the current action)
@@ -524,14 +524,14 @@ public class BattleQueue(IBattle battle)
     /// <returns>This queue (for method chaining)</returns>
     public BattleQueue Sort()
     {
-        if (Battle is BattleAsync battleAsync)
+        if (Battle is Battle battleAsync)
         {
             battleAsync.SpeedSort(List);
         }
         else
         {
             // Fallback: simple sort using ComparePriority
-            List.Sort(BattleAsync.ComparePriority);
+            List.Sort(BattleClasses.Battle.ComparePriority);
         }
 
         return this;

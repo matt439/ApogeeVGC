@@ -5,7 +5,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
-public partial class BattleAsync
+public partial class Battle
 {
     /// <summary>
     /// Returns whether a proposed target location for a move is valid.
