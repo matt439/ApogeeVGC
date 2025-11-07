@@ -383,4 +383,100 @@ public partial class Battle
 
         return totalActions >= Sides.Count;
     }
+
+    /// <summary>
+    /// Sends the current active requests to all players and waits for their choices.
+    /// This method coordinates the async request/response flow with each player.
+    /// </summary>
+    public async Task RequestAndWaitForChoicesAsync(CancellationToken cancellationToken = default)
+    {
+        // Verify that we have active requests
+        if (Sides.Any(side => side.ActiveRequest == null))
+        {
+            throw new InvalidOperationException("Cannot send requests to players: Some sides have no active request");
+        }
+
+        // Create tasks for each side to get their choice
+        var choiceTasks = new List<Task>();
+
+        foreach (Side side in Sides)
+        {
+            // Skip sides that don't need to make a choice (already done)
+            if (side.IsChoiceDone())
+            {
+                continue;
+            }
+
+            // Create a task to get this side's choice
+            Task choiceTask = Task.Run(async () =>
+            {
+                try
+                {
+                    // Get the perspective for this side
+                    BattlePerspective perspective = GetPerspectiveForSide(side.Id);
+
+                    // Determine the request type
+                    BattleRequestType requestType = RequestState switch
+                    {
+                        RequestState.TeamPreview => BattleRequestType.TeamPreview,
+                        RequestState.Move => BattleRequestType.TurnStart,
+                        RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
+                        _ => BattleRequestType.TurnStart,
+                    };
+
+                    // Request choice from the player
+                    Choice choice = await PlayerController.RequestChoiceAsync(
+                        side.Id,
+                        [side.ActiveRequest!],
+                        requestType,
+                        perspective,
+                        cancellationToken
+                    );
+
+                    // Submit the choice to the battle
+                    if (!Choose(side.Id, choice))
+                    {
+                        // Choice was invalid - the Choose method already sent an error
+                        // For now, we'll auto-choose for the player
+                        if (DisplayUi)
+                        {
+                            Debug($"Invalid choice from {side.Name}, auto-choosing");
+                        }
+                        side.AutoChoose();
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Timeout or cancellation - auto-choose for this player
+                    if (DisplayUi)
+                    {
+                        Debug($"Timeout for {side.Name}, auto-choosing");
+                    }
+                    side.AutoChoose();
+                }
+                catch (Exception ex)
+                {
+                    if (DisplayUi)
+                    {
+                        Debug($"Error getting choice from {side.Name}: {ex.Message}, auto-choosing");
+                    }
+                    side.AutoChoose();
+                }
+            }, cancellationToken);
+
+            choiceTasks.Add(choiceTask);
+        }
+
+        // Wait for all sides to make their choices
+        if (choiceTasks.Count > 0)
+        {
+            await Task.WhenAll(choiceTasks);
+        }
+
+        // If all choices are done, commit them
+        if (AllChoicesDone())
+        {
+            CommitChoices();
+        }
+    }
 }

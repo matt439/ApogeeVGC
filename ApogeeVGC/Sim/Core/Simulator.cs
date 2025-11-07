@@ -72,23 +72,14 @@ public class Simulator : IPlayerController, IBattleController
 
         try
         {
-            Battle.Start();
-
             // Set a reasonable timeout for the entire battle
             using var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
 
-            // Wait until the battle ends or we timeout
-            while (!Battle.Ended)
-            {
-                // Check for cancellation
-                cancellationTokenSource.Token.ThrowIfCancellationRequested();
+            // Start the battle asynchronously
+            await Battle.StartAsync(cancellationTokenSource.Token);
 
-                // Small delay to avoid busy waiting
-                await Task.Delay(100, cancellationTokenSource.Token);
-            }
-
-            // Battle ended - determine the winner
+            // The battle should now be complete or cancelled
             if (PrintDebug)
             {
                 Console.WriteLine("Battle has ended.");
