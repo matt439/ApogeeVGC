@@ -31,7 +31,8 @@ public class Simulator : IPlayerController, IBattleController
         CancellationToken cancellationToken)
     {
         IPlayer player = GetPlayer(sideId);
-        return player.GetNextChoiceAsync(availableChoices, requestType, perspective, cancellationToken);
+        return player.GetNextChoiceAsync(availableChoices, requestType, perspective,
+            cancellationToken);
     }
 
     public void UpdatePlayerUi(SideId sideId, BattlePerspective perspective)
@@ -46,6 +47,7 @@ public class Simulator : IPlayerController, IBattleController
         {
             throw new InvalidOperationException("Battle is not initialized");
         }
+
         return Battle.GetPerspectiveForSide(sideId);
     }
 
@@ -55,7 +57,8 @@ public class Simulator : IPlayerController, IBattleController
         return player.UiType;
     }
 
-    public async Task<SimulatorResult> Run(Library library, BattleOptions battleOptions, bool printDebug = true)
+    public async Task<SimulatorResult> Run(Library library, BattleOptions battleOptions,
+        bool printDebug = true)
     {
         Battle = new Battle(battleOptions, library, this);
         Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
@@ -168,18 +171,33 @@ public class Simulator : IPlayerController, IBattleController
         return options.Type switch
         {
             PlayerType.Random => new PlayerRandom(sideId, options, this),
-            PlayerType.Gui => new PlayerGui(sideId, options, this),
+            PlayerType.Gui => CreateGuiPlayer(sideId, options),
             PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
+    }
+
+    private PlayerGui CreateGuiPlayer(SideId sideId, PlayerOptions options)
+    {
+        var playerGui = new PlayerGui(sideId, options, this);
+
+        // If GuiWindow was provided in options, set it on the player
+        if (options.GuiWindow is { } battleGame)
+        {
+            playerGui.GuiWindow = battleGame;
+        }
+
+        return playerGui;
     }
 
     private IPlayer GetPlayer(SideId sideId)
     {
         return sideId switch
         {
-            SideId.P1 => Player1 ?? throw new InvalidOperationException("Player 1 is not initialized"),
-            SideId.P2 => Player2 ?? throw new InvalidOperationException("Player 2 is not initialized"),
+            SideId.P1 => Player1 ??
+                         throw new InvalidOperationException("Player 1 is not initialized"),
+            SideId.P2 => Player2 ??
+                         throw new InvalidOperationException("Player 2 is not initialized"),
             _ => throw new ArgumentOutOfRangeException(nameof(sideId), $"Invalid SideId: {sideId}"),
         };
     }

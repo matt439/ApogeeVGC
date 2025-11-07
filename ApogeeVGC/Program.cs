@@ -1,10 +1,10 @@
 ﻿using ApogeeVGC.Sim.Core;
-using ApogeeVGC.Gui;
 
 namespace ApogeeVGC;
 
 public class Program
 {
+    [STAThread]
     public static void Main(string[] args)
     {
         var driver = new Driver();

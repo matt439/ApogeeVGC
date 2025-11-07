@@ -1,5 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using XnaColor = Microsoft.Xna.Framework.Color;
+using XnaRectangle = Microsoft.Xna.Framework.Rectangle;
+using XnaVector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace ApogeeVGC.Gui.Rendering;
 
@@ -31,15 +34,15 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 
     private void RenderWaitingScreen()
     {
-        var screenCenter = new Vector2(
+        var screenCenter = new XnaVector2(
             graphicsDevice.Viewport.Width / 2f,
             graphicsDevice.Viewport.Height / 2f);
 
         const string message = "Waiting for battle to start...";
-        Vector2 messageSize = font.MeasureString(message);
-        Vector2 position = screenCenter - messageSize / 2f;
+        XnaVector2 messageSize = font.MeasureString(message);
+        XnaVector2 position = screenCenter - messageSize / 2f;
 
-        spriteBatch.DrawString(font, message, position, Color.White);
+        spriteBatch.DrawString(font, message, position, XnaColor.White);
     }
 
     private void RenderField(BattleState battleState)
@@ -47,7 +50,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
         // TODO: Render weather, terrain, field effects
         // For now, just show field status text
         string fieldInfo = $"Turn: {battleState.Turn}";
-        spriteBatch.DrawString(font, fieldInfo, new Vector2(Padding, Padding), Color.White);
+        spriteBatch.DrawString(font, fieldInfo, new XnaVector2(Padding, Padding), XnaColor.White);
     }
 
     private void RenderPlayerPokemon(BattleState battleState)
@@ -61,7 +64,7 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
             PokemonDisplayInfo pokemon = battleState.PlayerActivePokemon[i];
             int xPosition = Padding + (i * (PokemonSpriteSize + Padding));
 
-            RenderPokemonInfo(pokemon, new Vector2(xPosition, yPosition), true);
+            RenderPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition), true);
         }
     }
 
@@ -77,22 +80,22 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
             int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
                             (i * (PokemonSpriteSize + Padding));
 
-            RenderPokemonInfo(pokemon, new Vector2(xPosition, yPosition), false);
+            RenderPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition), false);
         }
     }
 
-    private void RenderPokemonInfo(PokemonDisplayInfo pokemon, Vector2 position, bool isPlayer)
+    private void RenderPokemonInfo(PokemonDisplayInfo pokemon, XnaVector2 position, bool isPlayer)
     {
         // TODO: Draw actual sprite texture
         // For now, draw a placeholder rectangle and text
-        var rect = new Rectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
+        var rect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
             PokemonSpriteSize);
-        DrawRectangle(rect, isPlayer ? Color.Blue : Color.Red, 2);
+        DrawRectangle(rect, isPlayer ? XnaColor.Blue : XnaColor.Red, 2);
 
         // Draw name and HP
         string info = $"{pokemon.Name}\nHP: {pokemon.CurrentHp}/{pokemon.MaxHp}";
-        Vector2 textPosition = position + new Vector2(0, PokemonSpriteSize + 5);
-        spriteBatch.DrawString(font, info, textPosition, Color.White);
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+        spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
     private void RenderUi(BattleState battleState)
@@ -100,31 +103,31 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
         // TODO: Render action buttons, move selection, etc.
         // For now, show available actions
         const string uiInfo = "Press ESC to exit";
-        var uiPosition = new Vector2(
+        var uiPosition = new XnaVector2(
             graphicsDevice.Viewport.Width / 2f - 100,
             graphicsDevice.Viewport.Height - 40);
 
-        spriteBatch.DrawString(font, uiInfo, uiPosition, Color.Yellow);
+        spriteBatch.DrawString(font, uiInfo, uiPosition, XnaColor.Yellow);
     }
 
     /// <summary>
     /// Helper to draw a rectangle outline
     /// </summary>
-    private void DrawRectangle(Rectangle rect, Color color, int lineWidth)
+    private void DrawRectangle(XnaRectangle rect, XnaColor color, int lineWidth)
     {
         // Create a 1x1 white texture if needed (lazy init in real implementation)
         var pixel = new Texture2D(graphicsDevice, 1, 1);
-        pixel.SetData([Color.White]);
+        pixel.SetData([XnaColor.White]);
 
         // Draw four lines
-        spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Y, rect.Width, lineWidth),
+        spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, rect.Width, lineWidth),
             color); // Top
         spriteBatch.Draw(pixel,
-            new Rectangle(rect.X, rect.Bottom - lineWidth, rect.Width, lineWidth), color); // Bottom
-        spriteBatch.Draw(pixel, new Rectangle(rect.X, rect.Y, lineWidth, rect.Height),
+            new XnaRectangle(rect.X, rect.Bottom - lineWidth, rect.Width, lineWidth), color); // Bottom
+        spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, lineWidth, rect.Height),
             color); // Left
         spriteBatch.Draw(pixel,
-            new Rectangle(rect.Right - lineWidth, rect.Y, lineWidth, rect.Height), color); // Right
+            new XnaRectangle(rect.Right - lineWidth, rect.Y, lineWidth, rect.Height), color); // Right
     }
 }
 

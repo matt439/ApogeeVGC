@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Player;
+﻿using ApogeeVGC.Gui;
+using ApogeeVGC.Player;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
@@ -10,4 +11,5 @@ public record PlayerOptions
     public required string Name { get; init; }
     public required IReadOnlyList<PokemonSet> Team { get; init; }
     public PrngSeed? Seed { get; init; }
+    public BattleGame? GuiWindow { get; init; } // BattleGame instance for GUI players
 }

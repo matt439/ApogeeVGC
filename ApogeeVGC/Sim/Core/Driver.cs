@@ -56,11 +56,15 @@ public class Driver
 
     private void RunGuiVsRandomSinglesTest() // Changed from async Task
     {
+        // Create BattleGame instance on main thread (required by MonoGame)
+        using var battleGame = new BattleGame();
+     
         PlayerOptions player1Options = new()
         {
             Type = PlayerType.Gui,
             Name = "Matt",
             Team = TeamGenerator.GenerateTestTeam(Library),
+            GuiWindow = battleGame, // Pass BattleGame to PlayerGui
         };
 
         PlayerOptions player2Options = new()
@@ -69,7 +73,6 @@ public class Driver
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
-
         };
 
         BattleOptions battleOptions = new()
@@ -82,10 +85,24 @@ public class Driver
 
         var simulator = new Simulator();
 
-        var result = simulator.Run(Library, battleOptions);
+        // Run battle async on background thread
+        var battleTask = Task.Run(async () => await simulator.Run(Library, battleOptions));
 
-        Console.WriteLine($"Battle result: {result}");
-        Console.ReadLine();
+        // Run MonoGame on main thread - this blocks until game window closes
+        battleGame.Run();
+
+        // After game window closes, wait for battle to complete (if still running)
+        if (!battleTask.IsCompleted)
+        {
+            Console.WriteLine("Waiting for battle to complete...");
+            SimulatorResult result = battleTask.GetAwaiter().GetResult();
+            Console.WriteLine($"Battle result: {result}");
+        }
+        else
+        {
+            SimulatorResult result = battleTask.Result;
+            Console.WriteLine($"Battle result: {result}");
+        }
     }
 
     private void RunGuiVsRandomDoublesTest() // Changed from async Task
