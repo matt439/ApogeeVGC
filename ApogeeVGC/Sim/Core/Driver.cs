@@ -80,11 +80,12 @@ public class Driver
             Debug = true,
         };
 
-        var simulator = new Simulator(Library, battleOptions);
+        var simulator = new Simulator();
 
-        var result = simulator.Run();
+        var result = simulator.Run(Library, battleOptions);
 
         Console.WriteLine($"Battle result: {result}");
+        Console.ReadLine();
     }
 
     private void RunGuiVsRandomDoublesTest() // Changed from async Task

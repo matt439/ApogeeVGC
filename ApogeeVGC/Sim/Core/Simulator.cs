@@ -20,17 +20,23 @@ public enum PlayerType
 public interface IUpdatePlayerUi
 {
     void UpdatePlayerUi(SideId sideId, BattlePerspective perspective);
+    PlayerUiType GetPlayerUiType(SideId sideId);
 }
 
-public class Simulator(
-    Library library,
-    BattleOptions battleOptions,
-    bool printDebug = true) : IUpdatePlayerUi
+public class Simulator : IUpdatePlayerUi
 {
-    public Battle Battle { get; } = new(battleOptions, library, this);
-    public IPlayer Player1 { get; } = CreatePlayer(SideId.P1, battleOptions.Player1Options);
-    public IPlayer Player2 { get; } = CreatePlayer(SideId.P2, battleOptions.Player2Options);
-    public bool PrintDebug { get; set; } = printDebug;
+    public Battle? Battle { get; set; }
+    public IPlayer? Player1 { get; set; }
+    public IPlayer? Player2 { get; set; }
+    public bool PrintDebug { get; set; }
+
+    //public Simulator(Library library, BattleOptions battleOptions, bool printDebug = true)
+    //{
+    //    Battle = new Battle(battleOptions, library, this);
+    //    Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
+    //    Player2 = CreatePlayer(SideId.P2, battleOptions.Player2Options);
+    //    PrintDebug = printDebug;
+    //}
 
     private static IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
     {
@@ -43,14 +49,35 @@ public class Simulator(
         };
     }
 
+    private IPlayer GetPlayer(SideId sideId)
+    {
+        return sideId switch
+        {
+            SideId.P1 => Player1 ?? throw new InvalidOperationException("Player 1 is not initialized"),
+            SideId.P2 => Player2 ?? throw new InvalidOperationException("Player 2 is not initialized"),
+            _ => throw new ArgumentOutOfRangeException(nameof(sideId), $"Invalid SideId: {sideId}"),
+        };
+    }
+
     public void UpdatePlayerUi(SideId sideId, BattlePerspective perspective)
     {
-        IPlayer player = sideId == SideId.P1 ? Player1 : Player2;
+        IPlayer player = GetPlayer(sideId);
         player.UpdateUi(perspective);
     }
 
-    public async Task<SimulatorResult> Run()
+    public PlayerUiType GetPlayerUiType(SideId sideId)
     {
+        IPlayer player = GetPlayer(sideId);
+        return player.UiType;
+    }
+
+    public async Task<SimulatorResult> Run(Library library, BattleOptions battleOptions, bool printDebug = true)
+    {
+        Battle = new Battle(battleOptions, library, this);
+        Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
+        Player2 = CreatePlayer(SideId.P2, battleOptions.Player2Options);
+        PrintDebug = printDebug;
+
         if (PrintDebug)
         {
             Console.WriteLine("Starting battle simulation...");
@@ -59,7 +86,7 @@ public class Simulator(
         try
         {
             Battle.Start();
-            
+
             // Set a reasonable timeout for the entire battle
             using var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
@@ -97,6 +124,7 @@ public class Simulator(
             {
                 Console.WriteLine($"Battle error: {ex.Message}");
             }
+
             throw;
         }
     }

@@ -239,8 +239,7 @@ public partial class Pokemon : IPriorityComparison
 
         WeightKg = 1.0;
 
-        var canTerastallize = Battle.Actions.CanTerastallize(battle, this);
-        CanTerastallize = canTerastallize ?? null;
+        CanTerastallize = TeraType;
 
         ClearVolatile();
         Hp = MaxHp;

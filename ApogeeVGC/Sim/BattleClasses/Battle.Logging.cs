@@ -13,17 +13,17 @@ public partial class Battle
 {
     private void UpdateAllPlayersUi()
     {
-        foreach (IPlayer player in Players)
+        foreach (Side side in Sides)
         {
-            UpdatePlayerUi(player);
+            UpdatePlayerUi(side.Id);
         }
     }
     
-    private void UpdatePlayerUi(IPlayer player)
+    private void UpdatePlayerUi(SideId sideId)
     {
-        if (player.UiType != PlayerUiType.Gui) return;
-        BattlePerspective perspective = GetPerspectiveForSide(player.SideId);
-        player.UpdateUi(perspective);
+        if (UpdateUi.GetPlayerUiType(sideId) != PlayerUiType.Gui) return;
+        BattlePerspective perspective = GetPerspectiveForSide(sideId);
+        UpdateUi.UpdatePlayerUi(sideId, perspective);
     }
     
     public void Add(params PartFuncUnion[] parts)
