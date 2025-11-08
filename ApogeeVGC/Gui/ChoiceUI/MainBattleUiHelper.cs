@@ -10,13 +10,13 @@ namespace ApogeeVGC.Gui.ChoiceUI;
 public static class MainBattleUiHelper
 {
     private const int ButtonWidth = 200;
-    private const int ButtonHeight = 50;
+    private const int ButtonHeight = 40;
 
-    private const int ButtonSpacing = 10;
+    private const int ButtonSpacing = 5;
 
     // Move buttons to the right side of the screen
-    private const int LeftMargin = 800; // Changed from 50 to 800
-    private const int TopMargin = 400;
+    private const int LeftMargin = 700; // Changed from 800 to 700
+    private const int TopMargin = 300; // Changed from 400 to 300
 
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
@@ -208,19 +208,19 @@ public static class MainBattleUiHelper
         return state switch
         {
             MainBattlePhaseState.MainMenuFirstPokemon =>
-                "Choose action for Pokemon 1: Use UP/DOWN arrows to select, ENTER to confirm",
+                "Choose action for Pokemon 1.",
             MainBattlePhaseState.MainMenuSecondPokemon =>
-                "Choose action for Pokemon 2: Use UP/DOWN arrows to select, ENTER to confirm, ESC to go back",
+                "Choose action for Pokemon 2.",
             MainBattlePhaseState.MoveSelectionFirstPokemon =>
-                "Select a move for Pokemon 1: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+                "Select a move for Pokemon 1.",
             MainBattlePhaseState.MoveSelectionSecondPokemon =>
-                "Select a move for Pokemon 2: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+                "Select a move for Pokemon 2.",
             MainBattlePhaseState.SwitchSelectionFirstPokemon =>
-                "Select a Pokemon to switch in: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+                "Select a Pokemon to switch in.",
             MainBattlePhaseState.SwitchSelectionSecondPokemon =>
-                "Select a Pokemon to switch in: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+                "Select a Pokemon to switch in.",
             MainBattlePhaseState.ForceSwitch =>
-                "Your Pokemon fainted! Select a replacement: Use UP/DOWN arrows, ENTER to confirm",
+                "Your Pokemon fainted! Select a replacement.",
             _ => "Use UP/DOWN arrows to navigate, ENTER to select",
         };
     }

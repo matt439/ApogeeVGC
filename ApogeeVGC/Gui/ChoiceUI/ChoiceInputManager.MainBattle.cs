@@ -198,8 +198,10 @@ public partial class ChoiceInputManager
     {
         // Draw instruction text based on current state
         string instructionText = MainBattleUiHelper.GetInstructionText(MainBattleState);
+        // Position instruction text to align with the main battle UI buttons (700, 300)
+        // Move it 80 pixels above the buttons instead of 60
         spriteBatch.DrawString(font, instructionText,
-            new Vector2(LeftMargin, TopMargin - 60), Color.White);
+            new Vector2(700, 220), Color.White);
 
         // Draw buttons with selection highlight
         for (int i = 0; i < _buttons.Count; i++)
@@ -218,31 +220,31 @@ public partial class ChoiceInputManager
 
         // First Pokemon selection
         if (TurnSelection.FirstPokemonMoveIndex.HasValue)
-        {
-            statusLines.Add($"P1: Move {TurnSelection.FirstPokemonMoveIndex.Value + 1}" +
-                            (TurnSelection.FirstPokemonTerastallize ? " (Tera)" : ""));
+   {
+  statusLines.Add($"P1: Move {TurnSelection.FirstPokemonMoveIndex.Value + 1}" +
+ (TurnSelection.FirstPokemonTerastallize ? " (Tera)" : ""));
         }
-        else if (TurnSelection.FirstPokemonSwitchIndex.HasValue)
-        {
-            statusLines.Add($"P1: Switch to #{TurnSelection.FirstPokemonSwitchIndex.Value + 1}");
+ else if (TurnSelection.FirstPokemonSwitchIndex.HasValue)
+      {
+  statusLines.Add($"P1: Switch to #{TurnSelection.FirstPokemonSwitchIndex.Value + 1}");
         }
 
-        // Second Pokemon selection (if applicable)
-        if (TurnSelection.SecondPokemonMoveIndex.HasValue)
-        {
+     // Second Pokemon selection (if applicable)
+   if (TurnSelection.SecondPokemonMoveIndex.HasValue)
+      {
             statusLines.Add($"P2: Move {TurnSelection.SecondPokemonMoveIndex.Value + 1}" +
-                            (TurnSelection.SecondPokemonTerastallize ? " (Tera)" : ""));
+      (TurnSelection.SecondPokemonTerastallize ? " (Tera)" : ""));
         }
         else if (TurnSelection.SecondPokemonSwitchIndex.HasValue)
         {
-            statusLines.Add($"P2: Switch to #{TurnSelection.SecondPokemonSwitchIndex.Value + 1}");
-        }
+  statusLines.Add($"P2: Switch to #{TurnSelection.SecondPokemonSwitchIndex.Value + 1}");
+  }
 
-        // Draw status
-        if (statusLines.Count > 0)
+        // Draw status - move to align with buttons at X=700
+      if (statusLines.Count > 0)
         {
-            string statusText = string.Join(" | ", statusLines);
-            spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+      string statusText = string.Join(" | ", statusLines);
+     spriteBatch.DrawString(font, statusText, new Vector2(700, 650), Color.Lime);
         }
     }
 
