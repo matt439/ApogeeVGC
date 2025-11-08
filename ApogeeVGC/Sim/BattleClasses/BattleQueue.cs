@@ -81,8 +81,29 @@ public class BattleQueue(Battle battle)
                     Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires an Index"),
                     Priority = chosenAction.Priority,
                 },
-                ChoiceType.Move => throw new NotImplementedException("Move actions should be converted elsewhere"),
-                ChoiceType.Switch or ChoiceType.InstaSwitch => throw new NotImplementedException("Switch actions should be converted elsewhere"),
+                ChoiceType.Move => new MoveAction
+                {
+                    Choice = ActionId.Move,
+                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires a Pokemon"),
+                    Move = Battle.Library.Moves[chosenAction.MoveId],
+                    TargetLoc = chosenAction.TargetLoc ?? 0,
+                    Order = 200, // Default order for moves
+                    OriginalTarget = chosenAction.Pokemon!, // Will be updated later with actual target
+                },
+                ChoiceType.Switch => new SwitchAction
+                {
+                    Choice = ActionId.Switch,
+                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Switch action requires a Pokemon"),
+                    Target = chosenAction.Target ?? throw new InvalidOperationException("Switch action requires a Target"),
+                    Order = 103, // Order for regular switches
+                },
+                ChoiceType.InstaSwitch => new SwitchAction
+                {
+                    Choice = ActionId.InstaSwitch,
+                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("InstaSwitch action requires a Pokemon"),
+                    Target = chosenAction.Target ?? throw new InvalidOperationException("InstaSwitch action requires a Target"),
+                    Order = 3, // Order for instant switches
+                },
                 _ => action as IAction ?? throw new InvalidOperationException("ChosenAction must be convertible to IAction"),
             };
         }

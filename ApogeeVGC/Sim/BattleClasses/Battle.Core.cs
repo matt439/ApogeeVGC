@@ -73,7 +73,7 @@ public partial class Battle
     public bool Ended { get; set; }
     public string? Winner { get; set; }
 
-    public IEffect Effect { get; set; } = null!;
+    public IEffect Effect { get; set; }
     public EffectState EffectState { get; set; }
 
     public Event Event { get; set; } = new();
@@ -149,6 +149,11 @@ public partial class Battle
         Queue = new BattleQueue(this);
         Actions = new BattleActions(this);
 
+        // Initialize effect as an empty Format.
+        Effect = new Format
+        {
+            Name = "EmptyEffect",
+        };
         EffectState = InitEffectState();
 
         for (int i = 0; i < ActivePerHalf * 2; i++)
