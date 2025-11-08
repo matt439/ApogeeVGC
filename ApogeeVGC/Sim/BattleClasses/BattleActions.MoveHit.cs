@@ -454,11 +454,18 @@ public partial class BattleActions
             Pokemon target = pokemonUnion.Pokemon;
             RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
 
-            if (result is not BoolIntUndefinedUnionRelayVar biuu)
-            {
-                throw new InvalidOperationException("RelayVar must be type BoolIntUndefinedUnionRelayVar here.");
-            }
-            damage[i] = biuu.Value;
+            // Convert various RelayVar types to BoolIntUndefinedUnion
+   BoolIntUndefinedUnion damageValue = result switch
+     {
+                null => BoolIntUndefinedUnion.FromBool(true), // null means continue (true)
+              BoolIntUndefinedUnionRelayVar biuu => biuu.Value, // Already the right type
+                BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value), // Convert bool
+            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value), // Convert int
+  UndefinedRelayVar => BoolIntUndefinedUnion.FromUndefined(), // Convert undefined
+         _ => BoolIntUndefinedUnion.FromBool(true), // Default to true for unknown types
+  };
+
+       damage[i] = damageValue;
         }
 
         return damage;
