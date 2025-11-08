@@ -15,7 +15,7 @@ public partial class ChoiceInputManager
     private void SetupMoveRequestUi(MoveRequest request)
     {
         // For TurnStart requests, use the main battle state machine
-        if (_requestType == BattleRequestType.TurnStart)
+        if (CurrentRequestType == BattleRequestType.TurnStart)
         {
             SetupMainBattleUi(request);
             return;
@@ -96,7 +96,7 @@ public partial class ChoiceInputManager
         _selectedButtonIndex = 0; // Reset selection to first button
 
         // Set up buttons based on current state
-        switch (_mainBattleState)
+        switch (MainBattleState)
         {
             case MainBattlePhaseState.MainMenuFirstPokemon:
                 _buttons = MainBattleUiHelper.CreateMainMenuFirstPokemon(
@@ -115,7 +115,7 @@ public partial class ChoiceInputManager
                     _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
                         pokemonData,
                         canTera,
-                        _turnSelection.FirstPokemonTerastallize,
+                        TurnSelection.FirstPokemonTerastallize,
                         (moveIndex) => HandleMoveSelection(0, moveIndex),
                         () => ToggleTerastallize(0),
                         () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
@@ -155,7 +155,7 @@ public partial class ChoiceInputManager
                     _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
                         pokemonData,
                         canTera,
-                        _turnSelection.SecondPokemonTerastallize,
+                        TurnSelection.SecondPokemonTerastallize,
                         (moveIndex) => HandleMoveSelection(1, moveIndex),
                         () => ToggleTerastallize(1),
                         () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
@@ -197,15 +197,15 @@ public partial class ChoiceInputManager
     private void RenderMainBattleUi()
     {
         // Draw instruction text based on current state
-        string instructionText = MainBattleUiHelper.GetInstructionText(_mainBattleState);
-        _spriteBatch.DrawString(_font, instructionText,
+        string instructionText = MainBattleUiHelper.GetInstructionText(MainBattleState);
+        spriteBatch.DrawString(font, instructionText,
             new Vector2(LeftMargin, TopMargin - 60), Color.White);
 
         // Draw buttons with selection highlight
         for (int i = 0; i < _buttons.Count; i++)
         {
             bool isSelected = (i == _selectedButtonIndex);
-            _buttons[i].Draw(_spriteBatch, _font, _graphicsDevice, isSelected);
+            _buttons[i].Draw(spriteBatch, font, graphicsDevice, isSelected);
         }
 
         // Draw current selections status
@@ -217,32 +217,32 @@ public partial class ChoiceInputManager
         var statusLines = new List<string>();
 
         // First Pokemon selection
-        if (_turnSelection.FirstPokemonMoveIndex.HasValue)
+        if (TurnSelection.FirstPokemonMoveIndex.HasValue)
         {
-            statusLines.Add($"P1: Move {_turnSelection.FirstPokemonMoveIndex.Value + 1}" +
-                            (_turnSelection.FirstPokemonTerastallize ? " (Tera)" : ""));
+            statusLines.Add($"P1: Move {TurnSelection.FirstPokemonMoveIndex.Value + 1}" +
+                            (TurnSelection.FirstPokemonTerastallize ? " (Tera)" : ""));
         }
-        else if (_turnSelection.FirstPokemonSwitchIndex.HasValue)
+        else if (TurnSelection.FirstPokemonSwitchIndex.HasValue)
         {
-            statusLines.Add($"P1: Switch to #{_turnSelection.FirstPokemonSwitchIndex.Value + 1}");
+            statusLines.Add($"P1: Switch to #{TurnSelection.FirstPokemonSwitchIndex.Value + 1}");
         }
 
         // Second Pokemon selection (if applicable)
-        if (_turnSelection.SecondPokemonMoveIndex.HasValue)
+        if (TurnSelection.SecondPokemonMoveIndex.HasValue)
         {
-            statusLines.Add($"P2: Move {_turnSelection.SecondPokemonMoveIndex.Value + 1}" +
-                            (_turnSelection.SecondPokemonTerastallize ? " (Tera)" : ""));
+            statusLines.Add($"P2: Move {TurnSelection.SecondPokemonMoveIndex.Value + 1}" +
+                            (TurnSelection.SecondPokemonTerastallize ? " (Tera)" : ""));
         }
-        else if (_turnSelection.SecondPokemonSwitchIndex.HasValue)
+        else if (TurnSelection.SecondPokemonSwitchIndex.HasValue)
         {
-            statusLines.Add($"P2: Switch to #{_turnSelection.SecondPokemonSwitchIndex.Value + 1}");
+            statusLines.Add($"P2: Switch to #{TurnSelection.SecondPokemonSwitchIndex.Value + 1}");
         }
 
         // Draw status
         if (statusLines.Count > 0)
         {
             string statusText = string.Join(" | ", statusLines);
-            _spriteBatch.DrawString(_font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+            spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
         }
     }
 
@@ -288,7 +288,7 @@ public partial class ChoiceInputManager
     // Main battle state machine navigation methods
     private void TransitionToState(MainBattlePhaseState newState)
     {
-        _mainBattleState = newState;
+        MainBattleState = newState;
         SetupMainBattleUi((MoveRequest)_currentRequest!);
     }
 
@@ -296,9 +296,9 @@ public partial class ChoiceInputManager
     {
         if (pokemonIndex == 0)
         {
-            _turnSelection.FirstPokemonMoveIndex = moveIndex;
-            _turnSelection.FirstPokemonTarget = 0; // Default target
-            _turnSelection.FirstPokemonSwitchIndex = null;
+            TurnSelection.FirstPokemonMoveIndex = moveIndex;
+            TurnSelection.FirstPokemonTarget = 0; // Default target
+            TurnSelection.FirstPokemonSwitchIndex = null;
 
             // In singles, submit immediately. In doubles, move to second Pokemon
             if (_currentRequest is MoveRequest request && request.Active.Count > 1)
@@ -312,9 +312,9 @@ public partial class ChoiceInputManager
         }
         else if (pokemonIndex == 1)
         {
-            _turnSelection.SecondPokemonMoveIndex = moveIndex;
-            _turnSelection.SecondPokemonTarget = 0; // Default target
-            _turnSelection.SecondPokemonSwitchIndex = null;
+            TurnSelection.SecondPokemonMoveIndex = moveIndex;
+            TurnSelection.SecondPokemonTarget = 0; // Default target
+            TurnSelection.SecondPokemonSwitchIndex = null;
 
             // Both Pokemon have selections, submit
             SubmitMainBattleTurnChoice();
@@ -325,9 +325,9 @@ public partial class ChoiceInputManager
     {
         if (pokemonIndex == 0)
         {
-            _turnSelection.FirstPokemonSwitchIndex = switchIndex;
-            _turnSelection.FirstPokemonMoveIndex = null;
-            _turnSelection.FirstPokemonTarget = null;
+            TurnSelection.FirstPokemonSwitchIndex = switchIndex;
+            TurnSelection.FirstPokemonMoveIndex = null;
+            TurnSelection.FirstPokemonTarget = null;
 
             // In singles, submit immediately. In doubles, move to second Pokemon
             if (_currentRequest is MoveRequest request && request.Active.Count > 1)
@@ -341,9 +341,9 @@ public partial class ChoiceInputManager
         }
         else if (pokemonIndex == 1)
         {
-            _turnSelection.SecondPokemonSwitchIndex = switchIndex;
-            _turnSelection.SecondPokemonMoveIndex = null;
-            _turnSelection.SecondPokemonTarget = null;
+            TurnSelection.SecondPokemonSwitchIndex = switchIndex;
+            TurnSelection.SecondPokemonMoveIndex = null;
+            TurnSelection.SecondPokemonTarget = null;
 
             // Both Pokemon have selections, submit
             SubmitMainBattleTurnChoice();
@@ -374,11 +374,11 @@ public partial class ChoiceInputManager
     {
         if (pokemonIndex == 0)
         {
-            _turnSelection.FirstPokemonTerastallize = !_turnSelection.FirstPokemonTerastallize;
+            TurnSelection.FirstPokemonTerastallize = !TurnSelection.FirstPokemonTerastallize;
         }
         else if (pokemonIndex == 1)
         {
-            _turnSelection.SecondPokemonTerastallize = !_turnSelection.SecondPokemonTerastallize;
+            TurnSelection.SecondPokemonTerastallize = !TurnSelection.SecondPokemonTerastallize;
         }
 
         // Refresh buttons to update Tera button appearance
@@ -390,7 +390,7 @@ public partial class ChoiceInputManager
 
     private void HandleForfeit()
     {
-        _turnSelection.Forfeit = true;
+        TurnSelection.Forfeit = true;
         // TODO: Implement forfeit choice submission
         Console.WriteLine("[ChoiceInputManager] Forfeit requested (not yet implemented)");
     }
@@ -398,10 +398,10 @@ public partial class ChoiceInputManager
     private void HandleBackFromSecondPokemon()
     {
         // Clear second Pokemon selections and return to first Pokemon menu
-        _turnSelection.SecondPokemonMoveIndex = null;
-        _turnSelection.SecondPokemonTarget = null;
-        _turnSelection.SecondPokemonSwitchIndex = null;
-        _turnSelection.SecondPokemonTerastallize = false;
+        TurnSelection.SecondPokemonMoveIndex = null;
+        TurnSelection.SecondPokemonTarget = null;
+        TurnSelection.SecondPokemonSwitchIndex = null;
+        TurnSelection.SecondPokemonTerastallize = false;
 
         TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon);
     }
@@ -413,63 +413,63 @@ public partial class ChoiceInputManager
         var actions = new List<ChosenAction>();
 
         // Add first Pokemon action
-        if (_turnSelection.FirstPokemonMoveIndex.HasValue)
+        if (TurnSelection.FirstPokemonMoveIndex.HasValue)
         {
             PokemonMoveRequestData pokemonData = request.Active[0];
             PokemonMoveData moveData =
-                pokemonData.Moves[_turnSelection.FirstPokemonMoveIndex.Value];
+                pokemonData.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
 
             actions.Add(new ChosenAction
             {
                 Choice = ChoiceType.Move,
                 Pokemon = null,
                 MoveId = moveData.Id,
-                TargetLoc = _turnSelection.FirstPokemonTarget ?? 0,
+                TargetLoc = TurnSelection.FirstPokemonTarget ?? 0,
             });
         }
-        else if (_turnSelection.FirstPokemonSwitchIndex.HasValue)
+        else if (TurnSelection.FirstPokemonSwitchIndex.HasValue)
         {
             actions.Add(new ChosenAction
             {
                 Choice = ChoiceType.Switch,
                 Pokemon = null,
                 MoveId = MoveId.None,
-                Index = _turnSelection.FirstPokemonSwitchIndex.Value,
+                Index = TurnSelection.FirstPokemonSwitchIndex.Value,
             });
         }
 
         // Add second Pokemon action (if doubles)
         if (request.Active.Count > 1)
         {
-            if (_turnSelection.SecondPokemonMoveIndex.HasValue)
+            if (TurnSelection.SecondPokemonMoveIndex.HasValue)
             {
                 PokemonMoveRequestData pokemonData = request.Active[1];
                 PokemonMoveData moveData =
-                    pokemonData.Moves[_turnSelection.SecondPokemonMoveIndex.Value];
+                    pokemonData.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
 
                 actions.Add(new ChosenAction
                 {
                     Choice = ChoiceType.Move,
                     Pokemon = null,
                     MoveId = moveData.Id,
-                    TargetLoc = _turnSelection.SecondPokemonTarget ?? 0,
+                    TargetLoc = TurnSelection.SecondPokemonTarget ?? 0,
                 });
             }
-            else if (_turnSelection.SecondPokemonSwitchIndex.HasValue)
+            else if (TurnSelection.SecondPokemonSwitchIndex.HasValue)
             {
                 actions.Add(new ChosenAction
                 {
                     Choice = ChoiceType.Switch,
                     Pokemon = null,
                     MoveId = MoveId.None,
-                    Index = _turnSelection.SecondPokemonSwitchIndex.Value,
+                    Index = TurnSelection.SecondPokemonSwitchIndex.Value,
                 });
             }
         }
 
         // Set Terastallize flag
-        _pendingChoice.Terastallize = _turnSelection.FirstPokemonTerastallize ||
-                                      _turnSelection.SecondPokemonTerastallize;
+        _pendingChoice.Terastallize = TurnSelection.FirstPokemonTerastallize ||
+                                      TurnSelection.SecondPokemonTerastallize;
 
         _pendingChoice.Actions = actions;
 

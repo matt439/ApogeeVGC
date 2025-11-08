@@ -9,14 +9,9 @@ namespace ApogeeVGC.Gui.ChoiceUI;
 /// <summary>
 /// Core functionality for ChoiceInputManager - fields, properties, and request handling.
 /// </summary>
-public partial class ChoiceInputManager
+public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font, GraphicsDevice graphicsDevice)
 {
-    private readonly SpriteBatch _spriteBatch;
-    private readonly SpriteFont _font;
-    private readonly GraphicsDevice _graphicsDevice;
-
     private IChoiceRequest? _currentRequest;
-    private BattleRequestType _requestType;
     private BattlePerspective? _perspective;
     private Choice? _pendingChoice;
 
@@ -37,7 +32,6 @@ public partial class ChoiceInputManager
     private int _selectedButtonIndex; // Currently highlighted button for arrow key navigation
 
     // Team preview keyboard state
-    private int _currentHighlightedIndex;
 
     private readonly List<int>
         _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
@@ -45,37 +39,28 @@ public partial class ChoiceInputManager
     private readonly HashSet<int> _lockedInIndices = []; // Tracks which indices are already locked
 
     // Main battle phase state
-    private MainBattlePhaseState _mainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
-    private readonly TurnSelectionState _turnSelection = new();
-    private readonly TimerManager _timerManager = new();
 
     // Public properties for renderer access
-    public int CurrentHighlightedIndex => _currentHighlightedIndex;
+    public int CurrentHighlightedIndex { get; private set; }
+
     public IReadOnlyList<int> LockedInPositions => _lockedInPositions.AsReadOnly();
     public IReadOnlySet<int> LockedInIndices => _lockedInIndices;
-    public BattleRequestType CurrentRequestType => _requestType;
-    public MainBattlePhaseState MainBattleState => _mainBattleState;
-    public TurnSelectionState TurnSelection => _turnSelection;
-    public TimerManager TimerManager => _timerManager;
+    public BattleRequestType CurrentRequestType { get; private set; }
+
+    public MainBattlePhaseState MainBattleState { get; private set; } = MainBattlePhaseState.MainMenuFirstPokemon;
+
+    public TurnSelectionState TurnSelection { get; } = new();
+
+    public TimerManager TimerManager { get; } = new();
 
     // Layout constants
     private const int ButtonWidth = 200;
-    private const int ButtonHeight = 50;
-    private const int ButtonSpacing = 10;
+    private const int ButtonHeight = 30;
+    private const int ButtonSpacing = 2;
 
     // Move buttons to the right side of the screen to avoid overlap with Pokemon
-    private const int LeftMargin = 800; // Changed from 50 to 800
-    private const int TopMargin = 400;
-
-    public ChoiceInputManager(
-        SpriteBatch spriteBatch,
-        SpriteFont font,
-        GraphicsDevice graphicsDevice)
-    {
-        _spriteBatch = spriteBatch;
-        _font = font;
-        _graphicsDevice = graphicsDevice;
-    }
+    private const int LeftMargin = 400; // Changed from 50 to 800
+    private const int TopMargin = 200;
 
     /// <summary>
     /// Request a choice from the user and return it asynchronously.
@@ -91,7 +76,7 @@ public partial class ChoiceInputManager
 
         // Set up the request state (thread-safe assignment)
         _currentRequest = request;
-        _requestType = requestType;
+        CurrentRequestType = requestType;
         _perspective = perspective;
         _pendingChoice = new Choice
         {
@@ -122,7 +107,7 @@ public partial class ChoiceInputManager
     public void Update(GameTime gameTime)
     {
         // Update timers
-        _timerManager.Update(gameTime);
+        TimerManager.Update(gameTime);
 
         // Only process input if we have an active request
         if (!_isRequestActive || _currentRequest == null || _choiceCompletionSource == null)
@@ -150,14 +135,14 @@ public partial class ChoiceInputManager
             return;
 
         // For team preview, render different UI
-        if (_requestType == BattleRequestType.TeamPreview)
+        if (CurrentRequestType == BattleRequestType.TeamPreview)
         {
             RenderTeamPreviewUi();
             return;
         }
 
         // For main battle with move request, show main battle UI
-        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+        if (CurrentRequestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
         {
             RenderMainBattleUi();
             return;
@@ -165,13 +150,13 @@ public partial class ChoiceInputManager
 
         // Draw instruction text (legacy UI for other request types)
         string instructionText = GetInstructionText();
-        _spriteBatch.DrawString(_font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
+        spriteBatch.DrawString(font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
             Color.White);
 
         // Draw keyboard input display
         if (!string.IsNullOrEmpty(_keyboardInput))
         {
-            _spriteBatch.DrawString(_font, $"Input: {_keyboardInput}",
+            spriteBatch.DrawString(font, $"Input: {_keyboardInput}",
                 new Vector2(LeftMargin, TopMargin - 30),
                 Color.Yellow);
         }
@@ -179,7 +164,7 @@ public partial class ChoiceInputManager
         // Draw buttons
         foreach (ChoiceButton button in _buttons)
         {
-            button.Draw(_spriteBatch, _font, _graphicsDevice, isSelected: false);
+            button.Draw(spriteBatch, font, graphicsDevice, isSelected: false);
         }
 
         // Draw current choice status
@@ -187,7 +172,7 @@ public partial class ChoiceInputManager
 
         string statusText =
             $"Selected: {string.Join(", ", _pendingChoice.Actions.Select(GetActionDescription))}";
-        _spriteBatch.DrawString(_font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+        spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
     }
 
     private void SetupChoiceUi()
@@ -197,18 +182,18 @@ public partial class ChoiceInputManager
         _selectedPokemonIndex = 0;
 
         // Reset team preview state when setting up new UI
-        if (_requestType != BattleRequestType.TeamPreview)
+        if (CurrentRequestType != BattleRequestType.TeamPreview)
         {
-            _currentHighlightedIndex = 0;
+            CurrentHighlightedIndex = 0;
             _lockedInPositions.Clear();
             _lockedInIndices.Clear();
         }
 
         // Initialize main battle state for turn start requests
-        if (_requestType == BattleRequestType.TurnStart)
+        if (CurrentRequestType == BattleRequestType.TurnStart)
         {
-            _mainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
-            _turnSelection.Reset();
+            MainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
+            TurnSelection.Reset();
         }
 
         if (_currentRequest is MoveRequest moveRequest)
@@ -244,7 +229,7 @@ public partial class ChoiceInputManager
 
     private string GetInstructionText()
     {
-        return _requestType switch
+        return CurrentRequestType switch
         {
             BattleRequestType.TurnStart =>
                 "Select a move (1-4) or Switch (S). Press Enter to confirm.",

@@ -15,7 +15,7 @@ public partial class ChoiceInputManager
     private void SetupTeamPreviewUi()
     {
         // Reset team preview state
-        _currentHighlightedIndex = 0;
+        CurrentHighlightedIndex = 0;
         _lockedInPositions.Clear();
         _lockedInIndices.Clear();
 
@@ -29,26 +29,26 @@ public partial class ChoiceInputManager
         string instructionText =
             "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
         var instructionPos = new Vector2(
-            (_graphicsDevice.Viewport.Width - _font.MeasureString(instructionText).X) / 2f,
-            _graphicsDevice.Viewport.Height / 2f);
-        _spriteBatch.DrawString(_font, instructionText, instructionPos, Color.White);
+            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2f,
+            graphicsDevice.Viewport.Height / 2f);
+        spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
 
         // Draw locked-in status
         if (_lockedInPositions.Count > 0)
         {
             string statusText = $"Locked in {_lockedInPositions.Count}/6 Pokemon";
             var statusPos = new Vector2(
-                (_graphicsDevice.Viewport.Width - _font.MeasureString(statusText).X) / 2f,
-                _graphicsDevice.Viewport.Height / 2f + 30);
-            _spriteBatch.DrawString(_font, statusText, statusPos, Color.Lime);
+                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2f,
+                graphicsDevice.Viewport.Height / 2f + 30);
+            spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
 
             // Show the order
             string orderText =
                 $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
             var orderPos = new Vector2(
-                (_graphicsDevice.Viewport.Width - _font.MeasureString(orderText).X) / 2f,
-                _graphicsDevice.Viewport.Height / 2f + 60);
-            _spriteBatch.DrawString(_font, orderText, orderPos, Color.Yellow);
+                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2f,
+                graphicsDevice.Viewport.Height / 2f + 60);
+            spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
         }
     }
 
@@ -62,38 +62,38 @@ public partial class ChoiceInputManager
         if (IsKeyPressed(keyboardState, Keys.Left))
         {
             Console.WriteLine(
-                $"[ChoiceInputManager] Left arrow pressed, moving from {_currentHighlightedIndex}");
-            _currentHighlightedIndex--;
-            if (_currentHighlightedIndex < 0)
-                _currentHighlightedIndex = teamSize - 1; // Wrap around
+                $"[ChoiceInputManager] Left arrow pressed, moving from {CurrentHighlightedIndex}");
+            CurrentHighlightedIndex--;
+            if (CurrentHighlightedIndex < 0)
+                CurrentHighlightedIndex = teamSize - 1; // Wrap around
             Console.WriteLine(
-                $"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
+                $"[ChoiceInputManager] New highlight index: {CurrentHighlightedIndex}");
         }
 
         // Right arrow - move highlight right
         if (IsKeyPressed(keyboardState, Keys.Right))
         {
             Console.WriteLine(
-                $"[ChoiceInputManager] Right arrow pressed, moving from {_currentHighlightedIndex}");
-            _currentHighlightedIndex++;
-            if (_currentHighlightedIndex >= teamSize)
-                _currentHighlightedIndex = 0; // Wrap around
+                $"[ChoiceInputManager] Right arrow pressed, moving from {CurrentHighlightedIndex}");
+            CurrentHighlightedIndex++;
+            if (CurrentHighlightedIndex >= teamSize)
+                CurrentHighlightedIndex = 0; // Wrap around
             Console.WriteLine(
-                $"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
+                $"[ChoiceInputManager] New highlight index: {CurrentHighlightedIndex}");
         }
 
         // Enter - lock in the currently highlighted Pokemon
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
             Console.WriteLine(
-                $"[ChoiceInputManager] Enter pressed, attempting to lock in Pokemon {_currentHighlightedIndex}");
+                $"[ChoiceInputManager] Enter pressed, attempting to lock in Pokemon {CurrentHighlightedIndex}");
             // Check if this Pokemon is already locked in
-            if (!_lockedInIndices.Contains(_currentHighlightedIndex))
+            if (!_lockedInIndices.Contains(CurrentHighlightedIndex))
             {
-                _lockedInPositions.Add(_currentHighlightedIndex);
-                _lockedInIndices.Add(_currentHighlightedIndex);
+                _lockedInPositions.Add(CurrentHighlightedIndex);
+                _lockedInIndices.Add(CurrentHighlightedIndex);
                 Console.WriteLine(
-                    $"[ChoiceInputManager] Locked in Pokemon {_currentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
+                    $"[ChoiceInputManager] Locked in Pokemon {CurrentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
 
                 // If all Pokemon are locked in, submit the choice
                 if (_lockedInPositions.Count == teamSize)
@@ -106,7 +106,7 @@ public partial class ChoiceInputManager
             else
             {
                 Console.WriteLine(
-                    $"[ChoiceInputManager] Pokemon {_currentHighlightedIndex} already locked in");
+                    $"[ChoiceInputManager] Pokemon {CurrentHighlightedIndex} already locked in");
             }
         }
     }
@@ -150,14 +150,14 @@ public partial class ChoiceInputManager
     private void ProcessKeyboardInput(KeyboardState keyboardState)
     {
         // Handle team preview keyboard controls separately
-        if (_requestType == BattleRequestType.TeamPreview && _currentRequest is TeamPreviewRequest)
+        if (CurrentRequestType == BattleRequestType.TeamPreview && _currentRequest is TeamPreviewRequest)
         {
             ProcessTeamPreviewKeyboardInput(keyboardState);
             return;
         }
 
         // For main battle turn start, use arrow key navigation
-        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+        if (CurrentRequestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
         {
             ProcessMainBattleKeyboardInput(keyboardState);
             return;
@@ -165,7 +165,7 @@ public partial class ChoiceInputManager
 
         // Legacy numeric input for other request types (force switch, etc.)
         // Determine max numbers based on request type
-        int maxNumbers = _requestType switch
+        int maxNumbers = CurrentRequestType switch
         {
             BattleRequestType.TeamPreview => 6, // Team preview allows 1-6
             _ => 6, // Default to 6 for safety
@@ -214,11 +214,11 @@ public partial class ChoiceInputManager
     private void ProcessMouseInput(MouseState mouseState)
     {
         // Disable mouse input for team preview
-        if (_requestType == BattleRequestType.TeamPreview)
+        if (CurrentRequestType == BattleRequestType.TeamPreview)
             return;
 
         // Disable mouse input for main battle (arrow key navigation only)
-        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+        if (CurrentRequestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
             return;
 
         // Check button clicks (for legacy UI only)
@@ -239,7 +239,7 @@ public partial class ChoiceInputManager
     private void ProcessNumericInput(int number)
     {
         // Disable numeric input for team preview
-        if (_requestType == BattleRequestType.TeamPreview)
+        if (CurrentRequestType == BattleRequestType.TeamPreview)
             return;
 
         if (_currentRequest is MoveRequest moveRequest)
