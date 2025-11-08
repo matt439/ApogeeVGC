@@ -73,6 +73,9 @@ public partial class Battle
         // Wait for team preview choices
         await RequestAndWaitForChoicesAsync(cancellationToken);
 
+        // Update UI to show battle start state (after team preview)
+        UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
+
         // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
@@ -299,11 +302,14 @@ public partial class Battle
         // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
         // Gen 9 doesn't use Quick Claw rolls the same way
 
+        // Update UI to show current battle state before requesting moves
+        UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
+
         // Request move choices for the new turn
         MakeRequest(RequestState.Move);
 
         // Wait for player choices
-      await RequestAndWaitForChoicesAsync(cancellationToken);
+        await RequestAndWaitForChoicesAsync(cancellationToken);
  }
 
     // Keep synchronous version for backward compatibility
