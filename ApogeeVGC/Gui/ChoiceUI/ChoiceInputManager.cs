@@ -41,11 +41,19 @@ public class ChoiceInputManager(
     private readonly List<int> _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
     private readonly HashSet<int> _lockedInIndices = []; // Tracks which indices are already locked
 
+    // Main battle phase state
+    private MainBattlePhaseState _mainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
+    private readonly TurnSelectionState _turnSelection = new();
+    private readonly TimerManager _timerManager = new();
+
     // Public properties for renderer access
     public int CurrentHighlightedIndex => _currentHighlightedIndex;
     public IReadOnlyList<int> LockedInPositions => _lockedInPositions.AsReadOnly();
     public IReadOnlySet<int> LockedInIndices => _lockedInIndices;
     public BattleRequestType CurrentRequestType => _requestType;
+    public MainBattlePhaseState MainBattleState => _mainBattleState;
+    public TurnSelectionState TurnSelection => _turnSelection;
+    public TimerManager TimerManager => _timerManager;
 
     // Layout constants
     private const int ButtonWidth = 200;
@@ -98,6 +106,9 @@ public class ChoiceInputManager(
     /// </summary>
     public void Update(GameTime gameTime)
     {
+        // Update timers
+        _timerManager.Update(gameTime);
+
         // Only process input if we have an active request
         if (!_isRequestActive || _currentRequest == null || _choiceCompletionSource == null)
             return;

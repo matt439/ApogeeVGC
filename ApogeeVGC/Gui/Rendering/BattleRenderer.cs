@@ -181,6 +181,9 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     /// </summary>
     private void RenderTeamPreviewUi(BattlePerspective battlePerspective)
     {
+        // Render timers
+        RenderTimers();
+
         const string uiInfo = "Team Preview - Select your lead Pokemon";
         XnaVector2 uiSize = font.MeasureString(uiInfo);
         var uiPosition = new XnaVector2(
@@ -232,6 +235,9 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     /// </summary>
     private void RenderInBattleUi(BattlePerspective battlePerspective)
     {
+        // Render timers
+        RenderTimers();
+
         // TODO: Render action buttons, move selection, etc.
         // For now, show available actions
         const string uiInfo = "Press ESC to exit";
@@ -240,6 +246,35 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
             graphicsDevice.Viewport.Height - 40);
 
         spriteBatch.DrawString(font, uiInfo, uiPosition, XnaColor.Yellow);
+    }
+
+    /// <summary>
+    /// Render the three timers: Battle Time, Your Time, Move Time
+    /// </summary>
+    private void RenderTimers()
+    {
+        if (_choiceInputManager == null) return;
+
+        var timerManager = _choiceInputManager.TimerManager;
+
+        // Timer display position (top right of screen)
+        int timerX = graphicsDevice.Viewport.Width - 200;
+        int timerY = Padding;
+        int lineHeight = 25;
+
+        // Battle Timer
+        string battleTimeText = $"Battle: {timerManager.GetBattleTimeString()}";
+        spriteBatch.DrawString(font, battleTimeText, new XnaVector2(timerX, timerY), XnaColor.White);
+        timerY += lineHeight;
+
+        // Player Timer (Your Time)
+        string playerTimeText = $"Your Time: {timerManager.GetPlayerTimeString()}";
+        spriteBatch.DrawString(font, playerTimeText, new XnaVector2(timerX, timerY), XnaColor.Yellow);
+        timerY += lineHeight;
+
+        // Move Timer
+        string moveTimeText = $"Move Time: {timerManager.GetMoveTimeString()}";
+        spriteBatch.DrawString(font, moveTimeText, new XnaVector2(timerX, timerY), XnaColor.Lime);
     }
 
     private void RenderPlayerPokemonInfo(PokemonPlayerPerspective pokemon, XnaVector2 position)
@@ -330,31 +365,31 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
         string line1 = $"{pokemon.Name}{genderSymbol}";
         string line2 = $"Lv{pokemon.Level} HP:{pokemon.MaxHp}";
         string line3 = GetItemName(pokemon.Item);
-        
+
         // Ensure text fits within the Pokemon sprite area
         float maxWidth = PokemonSpriteSize;
         if (font.MeasureString(line1).X > maxWidth)
         {
-        // Truncate name if too long
+            // Truncate name if too long
             while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
-          {
-      line1 = line1.Substring(0, line1.Length - 1);
+            {
+                line1 = line1.Substring(0, line1.Length - 1);
             }
-       line1 += "...";
-  }
+            line1 += "...";
+        }
         if (font.MeasureString(line3).X > maxWidth)
-  {
+        {
             // Truncate item name if too long
-          while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
- {
-           line3 = line3.Substring(0, line3.Length - 1);
-      }
-    line3 += "...";
+            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+            {
+                line3 = line3.Substring(0, line3.Length - 1);
+            }
+            line3 += "...";
         }
 
-     string info = $"{line1}\n{line2}\n{line3}";
-   XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
-     spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+        string info = $"{line1}\n{line2}\n{line3}";
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+        spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
     private void RenderOpponentPokemonInfo(PokemonOpponentPerspective pokemon, XnaVector2 position)
