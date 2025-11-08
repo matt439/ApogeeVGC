@@ -23,14 +23,14 @@ public class ChoiceInputManager(
     private BattlePerspective? _perspective;
     private Choice? _pendingChoice;
 
-    // Thread-safe completion source that the async battle thread will await
+    // Thread-safe completion source that the battle thread will await
     private TaskCompletionSource<Choice>? _choiceCompletionSource;
 
     // Thread-safe flag to indicate if a request is active
     private volatile bool _isRequestActive;
 
     // UI state
-    private readonly List<ChoiceButton> _buttons = [];
+    private List<ChoiceButton> _buttons = [];
     private KeyboardState _previousKeyboardState = Keyboard.GetState();
     private MouseState _previousMouseState = Mouse.GetState();
     private string _keyboardInput = "";
@@ -38,7 +38,10 @@ public class ChoiceInputManager(
 
     // Team preview keyboard state
     private int _currentHighlightedIndex = 0;
-    private readonly List<int> _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
+
+    private readonly List<int>
+        _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
+
     private readonly HashSet<int> _lockedInIndices = []; // Tracks which indices are already locked
 
     // Main battle phase state
@@ -141,7 +144,14 @@ public class ChoiceInputManager(
             return;
         }
 
-        // Draw instruction text
+        // For main battle with move request, show main battle UI
+        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+        {
+            RenderMainBattleUi();
+            return;
+        }
+
+        // Draw instruction text (legacy UI for other request types)
         string instructionText = GetInstructionText();
         spriteBatch.DrawString(font, instructionText, new Vector2(LeftMargin, TopMargin - 60),
             Color.White);
@@ -168,30 +178,85 @@ public class ChoiceInputManager(
         spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
     }
 
+    private void RenderMainBattleUi()
+    {
+        // Draw instruction text based on current state
+        string instructionText = MainBattleUiHelper.GetInstructionText(_mainBattleState);
+        spriteBatch.DrawString(font, instructionText,
+            new Vector2(LeftMargin, TopMargin - 60), Color.White);
+
+        // Draw buttons (they should already be set up based on state)
+        foreach (ChoiceButton button in _buttons)
+        {
+            button.Draw(spriteBatch, font, graphicsDevice);
+        }
+
+        // Draw current selections status
+        RenderSelectionStatus();
+    }
+
+    private void RenderSelectionStatus()
+    {
+        if (_turnSelection == null) return;
+
+        var statusLines = new List<string>();
+
+        // First Pokemon selection
+        if (_turnSelection.FirstPokemonMoveIndex.HasValue)
+        {
+            statusLines.Add($"P1: Move {_turnSelection.FirstPokemonMoveIndex.Value + 1}" +
+                            (_turnSelection.FirstPokemonTerastallize ? " (Tera)" : ""));
+        }
+        else if (_turnSelection.FirstPokemonSwitchIndex.HasValue)
+        {
+            statusLines.Add($"P1: Switch to #{_turnSelection.FirstPokemonSwitchIndex.Value + 1}");
+        }
+
+        // Second Pokemon selection (if applicable)
+        if (_turnSelection.SecondPokemonMoveIndex.HasValue)
+        {
+            statusLines.Add($"P2: Move {_turnSelection.SecondPokemonMoveIndex.Value + 1}" +
+                            (_turnSelection.SecondPokemonTerastallize ? " (Tera)" : ""));
+        }
+        else if (_turnSelection.SecondPokemonSwitchIndex.HasValue)
+        {
+            statusLines.Add($"P2: Switch to #{_turnSelection.SecondPokemonSwitchIndex.Value + 1}");
+        }
+
+        // Draw status
+        if (statusLines.Count > 0)
+        {
+            string statusText = string.Join(" | ", statusLines);
+            spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+        }
+    }
+
     private void RenderTeamPreviewUi()
     {
         // Draw instruction text
-        string instructionText = "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
+        string instructionText =
+            "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
         Vector2 instructionPos = new Vector2(
-        (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2,
+            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2,
             graphicsDevice.Viewport.Height / 2);
- spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
+        spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
 
         // Draw locked-in status
         if (_lockedInPositions.Count > 0)
-  {
+        {
             string statusText = $"Locked in {_lockedInPositions.Count}/6 Pokemon";
-        Vector2 statusPos = new Vector2(
-    (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2,
-     graphicsDevice.Viewport.Height / 2 + 30);
-  spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
+            Vector2 statusPos = new Vector2(
+                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2,
+                graphicsDevice.Viewport.Height / 2 + 30);
+            spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
 
-      // Show the order
-            string orderText = $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
+            // Show the order
+            string orderText =
+                $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
             Vector2 orderPos = new Vector2(
                 (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2,
-          graphicsDevice.Viewport.Height / 2 + 60);
-     spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
+                graphicsDevice.Viewport.Height / 2 + 60);
+            spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
         }
     }
 
@@ -200,6 +265,21 @@ public class ChoiceInputManager(
         _buttons.Clear();
         _keyboardInput = "";
         _selectedPokemonIndex = 0;
+
+        // Reset team preview state when setting up new UI
+        if (_requestType != BattleRequestType.TeamPreview)
+        {
+            _currentHighlightedIndex = 0;
+            _lockedInPositions.Clear();
+            _lockedInIndices.Clear();
+        }
+
+        // Initialize main battle state for turn start requests
+        if (_requestType == BattleRequestType.TurnStart)
+        {
+            _mainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
+            _turnSelection.Reset();
+        }
 
         if (_currentRequest is MoveRequest moveRequest)
         {
@@ -217,6 +297,14 @@ public class ChoiceInputManager(
 
     private void SetupMoveRequestUi(MoveRequest request)
     {
+        // For TurnStart requests, use the main battle state machine
+        if (_requestType == BattleRequestType.TurnStart)
+        {
+            SetupMainBattleUi(request);
+            return;
+        }
+
+        // Legacy UI for other request types (force switch, etc.)
         int y = TopMargin;
 
         // Get the first active Pokemon's moves
@@ -285,58 +373,308 @@ public class ChoiceInputManager(
         }
     }
 
-    private void SetupSwitchRequestUi(SwitchRequest request)
+    private void SetupMainBattleUi(MoveRequest request)
     {
-        int x = LeftMargin;
-        int y = TopMargin;
+        _buttons.Clear();
 
-        // Show available Pokemon to switch to
-        // Filter out active Pokemon (those with Active = true)
-        var availablePokemon = request.Side.Pokemon
-            .Where(p => !p.Active)
-            .ToList();
-
-        int pokemonIndex = 1;
-        foreach (PokemonSwitchRequestData _ in availablePokemon)
+        // Set up buttons based on current state
+        switch (_mainBattleState)
         {
-            // Get Pokemon name - we'll need to derive it from available data
-            // Since Details is commented out, we can use the Pokemon's actual data
-            // For now, use a simple indexing approach
-            int index = pokemonIndex;
-            var button = new ChoiceButton(
-                new Rectangle(x, y, ButtonWidth, ButtonHeight),
-                $"{pokemonIndex}. Pokemon {pokemonIndex}",
-                Color.Green,
-                () => SelectSwitch(index - 1, request)
-            );
+            case MainBattlePhaseState.MainMenuFirstPokemon:
+                _buttons = MainBattleUiHelper.CreateMainMenuFirstPokemon(
+                    request,
+                    () => TransitionToState(MainBattlePhaseState.MoveSelectionFirstPokemon),
+                    () => TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon),
+                    () => HandleForfeit()
+                );
+                break;
 
-            _buttons.Add(button);
-            y += ButtonHeight + ButtonSpacing;
-            pokemonIndex++;
+            case MainBattlePhaseState.MoveSelectionFirstPokemon:
+                if (request.Active.Count > 0)
+                {
+                    PokemonMoveRequestData pokemonData = request.Active[0];
+                    bool canTera = pokemonData.CanTerastallize != null;
+                    _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
+                        pokemonData,
+                        canTera,
+                        _turnSelection.FirstPokemonTerastallize,
+                        (moveIndex) => HandleMoveSelection(0, moveIndex),
+                        () => ToggleTerastallize(0),
+                        () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
+                    );
+                }
+
+                break;
+
+            case MainBattlePhaseState.SwitchSelectionFirstPokemon:
+            {
+                var availablePokemon = request.Side.Pokemon
+                    .Where(p => !p.Active)
+                    .ToList();
+                _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
+                    availablePokemon,
+                    (switchIndex) => HandleSwitchSelection(0, switchIndex),
+                    () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
+                    showBackButton: true
+                );
+            }
+                break;
+
+            case MainBattlePhaseState.MainMenuSecondPokemon:
+                _buttons = MainBattleUiHelper.CreateMainMenuSecondPokemon(
+                    request,
+                    () => TransitionToState(MainBattlePhaseState.MoveSelectionSecondPokemon),
+                    () => TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon),
+                    () => HandleBackFromSecondPokemon()
+                );
+                break;
+
+            case MainBattlePhaseState.MoveSelectionSecondPokemon:
+                if (request.Active.Count > 1)
+                {
+                    PokemonMoveRequestData pokemonData = request.Active[1];
+                    bool canTera = pokemonData.CanTerastallize != null;
+                    _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
+                        pokemonData,
+                        canTera,
+                        _turnSelection.SecondPokemonTerastallize,
+                        (moveIndex) => HandleMoveSelection(1, moveIndex),
+                        () => ToggleTerastallize(1),
+                        () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
+                    );
+                }
+
+                break;
+
+            case MainBattlePhaseState.SwitchSelectionSecondPokemon:
+            {
+                var availablePokemon = request.Side.Pokemon
+                    .Where(p => !p.Active)
+                    .ToList();
+                _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
+                    availablePokemon,
+                    (switchIndex) => HandleSwitchSelection(1, switchIndex),
+                    () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
+                    showBackButton: true
+                );
+            }
+                break;
+
+            case MainBattlePhaseState.ForceSwitch:
+            {
+                var availablePokemon = request.Side.Pokemon
+                    .Where(p => !p.Active)
+                    .ToList();
+                _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
+                    availablePokemon,
+                    (switchIndex) => HandleForceSwitchSelection(switchIndex),
+                    () => { }, // No back button for force switch
+                    showBackButton: false
+                );
+            }
+                break;
+        }
+    }
+
+    private bool IsMouseClicked(MouseState currentState)
+    {
+        return currentState.LeftButton == ButtonState.Pressed &&
+               _previousMouseState.LeftButton == ButtonState.Released;
+    }
+
+    // Main battle state machine navigation methods
+    private void TransitionToState(MainBattlePhaseState newState)
+    {
+        _mainBattleState = newState;
+        SetupMainBattleUi((MoveRequest)_currentRequest!);
+    }
+
+    private void HandleMoveSelection(int pokemonIndex, int moveIndex)
+    {
+        if (pokemonIndex == 0)
+        {
+            _turnSelection.FirstPokemonMoveIndex = moveIndex;
+            _turnSelection.FirstPokemonTarget = 0; // Default target
+            _turnSelection.FirstPokemonSwitchIndex = null;
+
+            // In singles, submit immediately. In doubles, move to second Pokemon
+            if (_currentRequest is MoveRequest request && request.Active.Count > 1)
+            {
+                TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+            }
+            else
+            {
+                SubmitMainBattleTurnChoice();
+            }
+        }
+        else if (pokemonIndex == 1)
+        {
+            _turnSelection.SecondPokemonMoveIndex = moveIndex;
+            _turnSelection.SecondPokemonTarget = 0; // Default target
+            _turnSelection.SecondPokemonSwitchIndex = null;
+
+            // Both Pokemon have selections, submit
+            SubmitMainBattleTurnChoice();
+        }
+    }
+
+    private void HandleSwitchSelection(int pokemonIndex, int switchIndex)
+    {
+        if (pokemonIndex == 0)
+        {
+            _turnSelection.FirstPokemonSwitchIndex = switchIndex;
+            _turnSelection.FirstPokemonMoveIndex = null;
+            _turnSelection.FirstPokemonTarget = null;
+
+            // In singles, submit immediately. In doubles, move to second Pokemon
+            if (_currentRequest is MoveRequest request && request.Active.Count > 1)
+            {
+                TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+            }
+            else
+            {
+                SubmitMainBattleTurnChoice();
+            }
+        }
+        else if (pokemonIndex == 1)
+        {
+            _turnSelection.SecondPokemonSwitchIndex = switchIndex;
+            _turnSelection.SecondPokemonMoveIndex = null;
+            _turnSelection.SecondPokemonTarget = null;
+
+            // Both Pokemon have selections, submit
+            SubmitMainBattleTurnChoice();
+        }
+    }
+
+    private void HandleForceSwitchSelection(int switchIndex)
+    {
+        // For force switch, create switch action and submit immediately
+        if (_pendingChoice == null || _currentRequest is not SwitchRequest request) return;
+
+        var action = new ChosenAction
+        {
+            Choice = ChoiceType.Switch,
+            Pokemon = null,
+            MoveId = MoveId.None,
+            Index = switchIndex,
+        };
+
+        var actions = _pendingChoice.Actions.ToList();
+        actions.Add(action);
+        _pendingChoice.Actions = actions;
+
+        SubmitChoice();
+    }
+
+    private void ToggleTerastallize(int pokemonIndex)
+    {
+        if (pokemonIndex == 0)
+        {
+            _turnSelection.FirstPokemonTerastallize = !_turnSelection.FirstPokemonTerastallize;
+        }
+        else if (pokemonIndex == 1)
+        {
+            _turnSelection.SecondPokemonTerastallize = !_turnSelection.SecondPokemonTerastallize;
         }
 
-        // Add submit button
-        y += ButtonSpacing;
-        var submitButton = new ChoiceButton(
-            new Rectangle(x, y, ButtonWidth, ButtonHeight),
-            "Enter. Submit",
-            Color.Orange,
-            SubmitChoice
-        );
-        _buttons.Add(submitButton);
+        // Refresh buttons to update Tera button appearance
+        if (_currentRequest is MoveRequest request)
+        {
+            SetupMainBattleUi(request);
+        }
     }
 
-    private void SetupTeamPreviewUi(TeamPreviewRequest request)
+    private void HandleForfeit()
     {
-        // Reset team preview state
-        _currentHighlightedIndex = 0;
-        _lockedInPositions.Clear();
-        _lockedInIndices.Clear();
-
-        // No buttons needed for keyboard-only input
-        // Pokemon display and highlighting will be handled in BattleRenderer
+        _turnSelection.Forfeit = true;
+        // TODO: Implement forfeit choice submission
+        Console.WriteLine("[ChoiceInputManager] Forfeit requested (not yet implemented)");
     }
 
+    private void HandleBackFromSecondPokemon()
+    {
+        // Clear second Pokemon selections and return to first Pokemon menu
+        _turnSelection.SecondPokemonMoveIndex = null;
+        _turnSelection.SecondPokemonTarget = null;
+        _turnSelection.SecondPokemonSwitchIndex = null;
+        _turnSelection.SecondPokemonTerastallize = false;
+
+        TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon);
+    }
+
+    private void SubmitMainBattleTurnChoice()
+    {
+        if (_pendingChoice == null || _currentRequest is not MoveRequest request) return;
+
+        var actions = new List<ChosenAction>();
+
+        // Add first Pokemon action
+        if (_turnSelection.FirstPokemonMoveIndex.HasValue)
+        {
+            PokemonMoveRequestData pokemonData = request.Active[0];
+            PokemonMoveData moveData =
+                pokemonData.Moves[_turnSelection.FirstPokemonMoveIndex.Value];
+
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Move,
+                Pokemon = null,
+                MoveId = moveData.Id,
+                TargetLoc = _turnSelection.FirstPokemonTarget ?? 0,
+            });
+        }
+        else if (_turnSelection.FirstPokemonSwitchIndex.HasValue)
+        {
+            actions.Add(new ChosenAction
+            {
+                Choice = ChoiceType.Switch,
+                Pokemon = null,
+                MoveId = MoveId.None,
+                Index = _turnSelection.FirstPokemonSwitchIndex.Value,
+            });
+        }
+
+        // Add second Pokemon action (if doubles)
+        if (request.Active.Count > 1)
+        {
+            if (_turnSelection.SecondPokemonMoveIndex.HasValue)
+            {
+                PokemonMoveRequestData pokemonData = request.Active[1];
+                PokemonMoveData moveData =
+                    pokemonData.Moves[_turnSelection.SecondPokemonMoveIndex.Value];
+
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Move,
+                    Pokemon = null,
+                    MoveId = moveData.Id,
+                    TargetLoc = _turnSelection.SecondPokemonTarget ?? 0,
+                });
+            }
+            else if (_turnSelection.SecondPokemonSwitchIndex.HasValue)
+            {
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Switch,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                    Index = _turnSelection.SecondPokemonSwitchIndex.Value,
+                });
+            }
+        }
+
+        // Set Terastallize flag
+        _pendingChoice.Terastallize = _turnSelection.FirstPokemonTerastallize ||
+                                      _turnSelection.SecondPokemonTerastallize;
+
+        _pendingChoice.Actions = actions;
+
+// Submit the choice
+        SubmitChoice();
+    }
+
+    // Legacy methods still needed for other UI parts
     private void ProcessKeyboardInput(KeyboardState keyboardState)
     {
         // Handle team preview keyboard controls separately
@@ -346,7 +684,7 @@ public class ChoiceInputManager(
             return;
         }
 
-        // Determine max number based on request type
+        // Determine max numbers based on request type
         int maxNumbers = _requestType switch
         {
             BattleRequestType.TeamPreview => 6, // Team preview allows 1-6
@@ -365,7 +703,7 @@ public class ChoiceInputManager(
             }
         }
 
-        // Enter to submit
+// Enter to submit
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
             SubmitChoice();
@@ -441,44 +779,44 @@ public class ChoiceInputManager(
 
         // Check button clicks
         if (IsMouseClicked(mouseState))
-{
-     var mousePos = new Point(mouseState.X, mouseState.Y);
-    foreach (ChoiceButton button in _buttons)
-  {
-  if (button.Bounds.Contains(mousePos))
-      {
-     button.OnClick();
-        break;
-             }
-    }
-}
+        {
+            var mousePos = new Point(mouseState.X, mouseState.Y);
+            foreach (ChoiceButton button in _buttons)
+            {
+                if (button.Bounds.Contains(mousePos))
+                {
+                    button.OnClick();
+                    break;
+                }
+            }
+        }
     }
 
     private void ProcessNumericInput(int number)
- {
-   // Disable numeric input for team preview
-   if (_requestType == BattleRequestType.TeamPreview)
-   return;
+    {
+        // Disable numeric input for team preview
+        if (_requestType == BattleRequestType.TeamPreview)
+            return;
 
         if (_currentRequest is MoveRequest moveRequest)
-  {
-    if (number <= moveRequest.Active[0].Moves.Count)
-    {
-        SelectMove(number - 1, moveRequest.Active[0]);
+        {
+            if (number <= moveRequest.Active[0].Moves.Count)
+            {
+                SelectMove(number - 1, moveRequest.Active[0]);
+            }
         }
- }
         else if (_currentRequest is SwitchRequest or TeamPreviewRequest)
         {
-        // Handle numeric switch/team selection
-   if (_currentRequest is SwitchRequest sr && number <= sr.Side.Pokemon.Count)
-      {
-       SelectSwitch(number - 1, sr);
-}
-else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon.Count)
-     {
-   SelectTeamPosition(number - 1);
-      }
-    }
+            // Handle numeric switch/team selection
+            if (_currentRequest is SwitchRequest sr && number <= sr.Side.Pokemon.Count)
+            {
+                SelectSwitch(number - 1, sr);
+            }
+            else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon.Count)
+            {
+                SelectTeamPosition(number - 1);
+            }
+        }
     }
 
     private void SelectMove(int moveIndex, PokemonMoveRequestData pokemonRequest)
@@ -491,7 +829,7 @@ else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon
 
         PokemonMoveData moveData = pokemonRequest.Moves[moveIndex];
 
-        // Create the chosen action
+// Create the chosen action
         var action = new ChosenAction
         {
             Choice = ChoiceType.Move,
@@ -575,7 +913,7 @@ else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon
         // This will unblock the battle simulation thread
         _choiceCompletionSource.TrySetResult(_pendingChoice);
 
-        // Clear state
+// Clear state
         _currentRequest = null;
         _pendingChoice = null;
         _buttons.Clear();
@@ -603,19 +941,71 @@ else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon
         SubmitChoice();
     }
 
+    private void SetupSwitchRequestUi(SwitchRequest request)
+    {
+        int x = LeftMargin;
+        int y = TopMargin;
+
+        // Show available Pokemon to switch to
+        // Filter out active Pokemon (those with Active = true)
+        var availablePokemon = request.Side.Pokemon
+            .Where(p => !p.Active)
+            .ToList();
+
+        int pokemonIndex = 1;
+        foreach (PokemonSwitchRequestData _ in availablePokemon)
+        {
+            // Get Pokemon name - we'll need to derive it from available data
+            // Since Details is commented out, we can use the Pokemon's actual data
+            // For now, use a simple indexing approach
+            int index = pokemonIndex;
+            var button = new ChoiceButton(
+                new Rectangle(x, y, ButtonWidth, ButtonHeight),
+                $"{pokemonIndex}. Pokemon {pokemonIndex}",
+                Color.Green,
+                () => SelectSwitch(index - 1, request)
+            );
+
+            _buttons.Add(button);
+            y += ButtonHeight + ButtonSpacing;
+            pokemonIndex++;
+        }
+
+        // Add submit button
+        y += ButtonSpacing;
+        var submitButton = new ChoiceButton(
+            new Rectangle(x, y, ButtonWidth, ButtonHeight),
+            "Enter. Submit",
+            Color.Orange,
+            SubmitChoice
+        );
+        _buttons.Add(submitButton);
+    }
+
+    private void SetupTeamPreviewUi(TeamPreviewRequest request)
+    {
+        // Reset team preview state
+        _currentHighlightedIndex = 0;
+        _lockedInPositions.Clear();
+        _lockedInIndices.Clear();
+
+        // No buttons needed for keyboard-only input
+        // Pokemon display and highlighting will be handled in BattleRenderer
+    }
+
     private string GetInstructionText()
     {
         return _requestType switch
-      {
-  BattleRequestType.TurnStart =>
-   "Select a move (1-4) or Switch (S). Press Enter to confirm.",
-  BattleRequestType.ForceSwitch =>
-          "Select a Pokemon to switch in (1-6). Press Enter to confirm.",
-       BattleRequestType.TeamPreview =>
-         "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in each Pokemon.",
+        {
+            BattleRequestType.TurnStart =>
+                "Select a move (1-4) or Switch (S). Press Enter to confirm.",
+            BattleRequestType.ForceSwitch =>
+                "Select a Pokemon to switch in (1-6). Press Enter to confirm.",
+            BattleRequestType.TeamPreview =>
+                "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in each Pokemon.",
             _ => "Make your choice and press Enter.",
-      };
-  }
+        };
+    }
 
     private string GetActionDescription(ChosenAction action)
     {
@@ -631,61 +1021,5 @@ else if (_currentRequest is TeamPreviewRequest tpr && number <= tpr.Side.Pokemon
     private bool IsKeyPressed(KeyboardState currentState, Keys key)
     {
         return currentState.IsKeyDown(key) && _previousKeyboardState.IsKeyUp(key);
-    }
-
-    private bool IsMouseClicked(MouseState currentState)
-    {
-        return currentState.LeftButton == ButtonState.Pressed &&
-      _previousMouseState.LeftButton == ButtonState.Released;
-    }
-}
-
-/// <summary>
-/// Represents a clickable button in the choice UI
-/// </summary>
-public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, Action onClick)
-{
-    public Rectangle Bounds { get; } = bounds;
-    public string Text { get; } = text;
-    public Color BackgroundColor { get; } = backgroundColor;
-    public Action OnClick { get; } = onClick;
-
-    public void Draw(SpriteBatch spriteBatch, SpriteFont font, GraphicsDevice graphicsDevice)
-    {
-        // Create a 1x1 white texture for drawing rectangles
-        var texture = new Texture2D(graphicsDevice, 1, 1);
-        texture.SetData([Color.White]);
-
-        // Draw button background
-        spriteBatch.Draw(texture, Bounds, BackgroundColor);
-
-        // Draw button border
-        const int borderThickness = 2;
-        Color borderColor = Color.White;
-
-        // Top
-        spriteBatch.Draw(texture, new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, borderThickness),
-            borderColor);
-        // Bottom
-        spriteBatch.Draw(texture,
-            new Rectangle(Bounds.X, Bounds.Y + Bounds.Height - borderThickness, Bounds.Width,
-                borderThickness), borderColor);
-        // Left
-        spriteBatch.Draw(texture, new Rectangle(Bounds.X, Bounds.Y, borderThickness, Bounds.Height),
-            borderColor);
-        // Right
-        spriteBatch.Draw(texture,
-            new Rectangle(Bounds.X + Bounds.Width - borderThickness, Bounds.Y, borderThickness,
-                Bounds.Height), borderColor);
-
-        // Draw text centered in button
-        Vector2 textSize = font.MeasureString(Text);
-        var textPos = new Vector2(
-            Bounds.X + (Bounds.Width - textSize.X) / 2,
-            Bounds.Y + (Bounds.Height - textSize.Y) / 2
-        );
-        spriteBatch.DrawString(font, Text, textPos, Color.White);
-
-        texture.Dispose();
     }
 }
