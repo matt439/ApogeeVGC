@@ -248,7 +248,7 @@ public partial class BattleActions
         }
 
         Battle.FaintMessages();
-        Battle.CheckWin();
+        // Battle.CheckWin(); // REMOVED: Win checking is handled by RunAction after switch processing
     }
 
     public record UseMoveOptions

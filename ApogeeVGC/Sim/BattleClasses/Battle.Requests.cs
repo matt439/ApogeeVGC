@@ -97,68 +97,73 @@ public partial class Battle
 
         switch (type)
         {
-            case RequestState.SwitchIn:
-                for (int i = 0; i < Sides.Count; i++)
+          case RequestState.SwitchIn:
+        for (int i = 0; i < Sides.Count; i++)
+     {
+              Side side = Sides[i];
+      if (side.PokemonLeft <= 0) continue;
+
+        // Create a table of which active Pokemon need to switch
+        // Convert MoveIdBoolUnion to bool using IsTrue() method
+          var switchTable = side.Active
+            .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
+       .ToList();
+
+  // Only create a switch request if at least one Pokemon needs to switch
+    if (switchTable.Any(flag => flag))
+      {
+   requests[i] = new SwitchRequest
+         {
+      ForceSwitch = switchTable,
+              Side = side.GetRequestData(),
+    };
+    }
+       }
+         break;
+
+         case RequestState.TeamPreview:
+         for (int i = 0; i < Sides.Count; i++)
                 {
-                    Side side = Sides[i];
-                    if (side.PokemonLeft <= 0) continue;
-
-                    // Create a table of which active Pokemon need to switch
-                    // Convert MoveIdBoolUnion to bool using IsTrue() method
-                    var switchTable = side.Active
-                        .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
-                        .ToList();
-
-                    // Only create a switch request if at least one Pokemon needs to switch
-                    if (switchTable.Any(flag => flag))
-                    {
-                        requests[i] = new SwitchRequest
-                        {
-                            ForceSwitch = switchTable,
-                            Side = side.GetRequestData(),
-                        };
-                    }
-                }
-                break;
-
-            case RequestState.TeamPreview:
-                for (int i = 0; i < Sides.Count; i++)
-                {
-                    Side side = Sides[i];
-                    int? maxChosenTeamSize = RuleTable.PickedTeamSize > 0
-                        ? RuleTable.PickedTeamSize
-                        : null;
+        Side side = Sides[i];
+   int? maxChosenTeamSize = RuleTable.PickedTeamSize > 0
+            ? RuleTable.PickedTeamSize
+        : null;
 
                     requests[i] = new TeamPreviewRequest
-                    {
-                        MaxChosenTeamSize = maxChosenTeamSize,
-                        Side = side.GetRequestData(),
-                    };
-                }
-                break;
+   {
+     MaxChosenTeamSize = maxChosenTeamSize,
+      Side = side.GetRequestData(),
+  };
+       }
+     break;
 
-            default:
-                // Regular move requests
-                for (int i = 0; i < Sides.Count; i++)
-                {
-                    Side side = Sides[i];
-                    if (side.PokemonLeft <= 0) continue;
+      default:
+   // Regular move requests
+     for (int i = 0; i < Sides.Count; i++)
+        {
+        Side side = Sides[i];
+    // Don't check PokemonLeft here - a side can make moves if they have active Pokemon
+    // PokemonLeft is for win condition checking, not for determining if moves can be made
 
-                    // Get move request data for each active Pokemon
-                    var activeData = side.Active
-                        .Where(pokemon => pokemon != null)
-                        .Select(pokemon => pokemon!.GetMoveRequestData())
-                        .ToList();
+ // Get move request data for each active, non-fainted Pokemon
+             var activeData = side.Active
+  .Where(pokemon => pokemon != null && !pokemon.Fainted)
+             .Select(pokemon => pokemon!.GetMoveRequestData())
+         .ToList();
 
-                    var moveRequest = new MoveRequest
-                    {
-                        Active = activeData,
-                        Side = side.GetRequestData()
-                    };
+     // Only create a move request if there are active Pokemon that can make moves
+       if (activeData.Count > 0)
+   {
+     var moveRequest = new MoveRequest
+         {
+       Active = activeData,
+  Side = side.GetRequestData()
+               };
 
-                    requests[i] = moveRequest;
-                }
-                break;
+  requests[i] = moveRequest;
+     }
+       }
+     break;
         }
 
         // Check if multiple requests exist (multiple players need to make choices)

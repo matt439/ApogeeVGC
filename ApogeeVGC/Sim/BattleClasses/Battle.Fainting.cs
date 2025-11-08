@@ -28,9 +28,6 @@ public partial class Battle
                 if (pokemon == null) continue;
                 if (!pokemon.Fainted) continue;
 
-                // Set the status to fainted
-                pokemon.Status = ConditionId.Fainted;
-
                 // Mark that this Pokémon needs to be switched out
                 pokemon.SwitchFlag = true;
             }
@@ -173,6 +170,9 @@ public partial class Battle
                 new IntRelayVar(length)
             );
         }
+
+        // Check for fainted Pokemon and set their switch flags
+        CheckFainted();
 
         return false;
     }

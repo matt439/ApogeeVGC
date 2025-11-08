@@ -790,53 +790,57 @@ public partial class Battle
 
         // Check for switches
         var switches = Sides
-            .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
-            .ToList();
+     .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
+        .ToList();
 
         for (int i = 0; i < Sides.Count; i++)
         {
-            bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
-            if (switches[i] && CanSwitch(Sides[i]) == 0)
-            {
-                foreach (Pokemon? pokemon in Sides[i].Active)
+ bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+    if (switches[i] && CanSwitch(Sides[i]) == 0)
+  {
+         foreach (Pokemon? pokemon in Sides[i].Active)
+     {
+         if (pokemon == null) continue;
+
+ // Check if RevivalBlessing condition exists before trying to access it
+            if (Library.Conditions.ContainsKey(ConditionId.RevivalBlessing))
+      {
+          IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
+             ConditionId.RevivalBlessing);
+       if (revivalBlessing != null)
                 {
-                    if (pokemon == null) continue;
+      reviveSwitch = true;
+continue;
+      }
+       }
 
-                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
-                        ConditionId.RevivalBlessing);
-                    if (revivalBlessing != null)
-                    {
-                        reviveSwitch = true;
-                        continue;
-                    }
-
-                    pokemon.SwitchFlag = false;
+         pokemon.SwitchFlag = false;
                 }
 
-                if (!reviveSwitch) switches[i] = false;
-            }
+    if (!reviveSwitch) switches[i] = false;
+    }
             else if (switches[i])
-            {
-                foreach (Pokemon? pokemon in Sides[i].Active)
-                {
-                    if (pokemon == null) continue;
+      {
+         foreach (Pokemon? pokemon in Sides[i].Active)
+       {
+          if (pokemon == null) continue;
 
-                    if (pokemon.Hp > 0 &&
-                        pokemon.SwitchFlag.IsTrue() &&
-                        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
-                        !pokemon.SkipBeforeSwitchOutEventFlag)
-                    {
-                        RunEvent(EventId.BeforeSwitchOut, pokemon);
-                        pokemon.SkipBeforeSwitchOutEventFlag = true;
-                        FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
-                        if (Ended) return true;
-                        if (pokemon.Fainted)
-                        {
-                            switches[i] = Sides[i].Active
-                                .Any(p => p != null && p.SwitchFlag.IsTrue());
-                        }
-                    }
-                }
+         if (pokemon.Hp > 0 &&
+      pokemon.SwitchFlag.IsTrue() &&
+        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
+      !pokemon.SkipBeforeSwitchOutEventFlag)
+       {
+  RunEvent(EventId.BeforeSwitchOut, pokemon);
+       pokemon.SkipBeforeSwitchOutEventFlag = true;
+    FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+    if (Ended) return true;
+        if (pokemon.Fainted)
+      {
+      switches[i] = Sides[i].Active
+    .Any(p => p != null && p.SwitchFlag.IsTrue());
+              }
+              }
+    }
             }
         }
 
