@@ -416,12 +416,13 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
 
         // Draw border around sprite area
         var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize, PokemonSpriteSize);
-        DrawRectangle(borderRect, XnaColor.Red, 2);
+     DrawRectangle(borderRect, XnaColor.Red, 2);
 
         // Draw name and HP percentage (for active battle)
-        string info = $"{pokemon.Name}\nHP: {pokemon.HpPercentage:P0}";
+   // HpPercentage is already 0-100, so use :F0 instead of :P0
+        string info = $"{pokemon.Name}\nHP: {pokemon.HpPercentage:F0}%";
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
-        spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+      spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
     private void RenderOpponentPokemonTeamPreview(PokemonOpponentPerspective pokemon, XnaVector2 position)
