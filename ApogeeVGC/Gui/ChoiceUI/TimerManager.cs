@@ -10,19 +10,19 @@ public class TimerManager
     /// <summary>
     /// Total time elapsed in the battle
     /// </summary>
- public TimeSpan BattleTime { get; private set; }
+    public TimeSpan BattleTime { get; private set; } = TimeSpan.Zero;
 
     /// <summary>
     /// Total time the current player has spent making decisions
     /// </summary>
-    public TimeSpan PlayerTime { get; private set; }
+    public TimeSpan PlayerTime { get; private set; } = TimeSpan.Zero;
 
     /// <summary>
     /// Time spent on the current move/decision
     /// </summary>
-    public TimeSpan MoveTime { get; private set; }
+    public TimeSpan MoveTime { get; private set; } = TimeSpan.Zero;
 
-  private bool _isMoveTimerRunning;
+    private bool _isMoveTimerRunning;
     private bool _isPlayerTimerRunning;
     private bool _isBattleTimerRunning;
 
@@ -30,14 +30,7 @@ public class TimerManager
     private double _accumulatedPlayerTime;
     private double _accumulatedMoveTime;
 
-    public TimerManager()
-    {
-        BattleTime = TimeSpan.Zero;
-        PlayerTime = TimeSpan.Zero;
-        MoveTime = TimeSpan.Zero;
-    }
-
- /// <summary>
+    /// <summary>
     /// Start the battle timer (called once at battle start)
     /// </summary>
     public void StartBattleTimer()
@@ -58,15 +51,15 @@ public class TimerManager
     /// </summary>
     public void StartPlayerTimer()
     {
-    _isPlayerTimerRunning = true;
+        _isPlayerTimerRunning = true;
     }
 
     /// <summary>
     /// Pause the player timer (called when decision is submitted or paused)
     /// </summary>
-  public void PausePlayerTimer()
+    public void PausePlayerTimer()
     {
-   _isPlayerTimerRunning = false;
+        _isPlayerTimerRunning = false;
     }
 
     /// <summary>
@@ -74,18 +67,18 @@ public class TimerManager
     /// </summary>
     public void StartMoveTimer()
     {
-     _isMoveTimerRunning = true;
+        _isMoveTimerRunning = true;
         _accumulatedMoveTime = 0;
         MoveTime = TimeSpan.Zero;
     }
 
-/// <summary>
+    /// <summary>
     /// Stop the move timer (called when move is selected)
     /// </summary>
     public void StopMoveTimer()
     {
         _isMoveTimerRunning = false;
-  }
+    }
 
     /// <summary>
     /// Reset the move timer without starting it
@@ -106,30 +99,30 @@ public class TimerManager
 
         if (_isBattleTimerRunning)
         {
-     _accumulatedBattleTime += deltaSeconds;
-      BattleTime = TimeSpan.FromSeconds(_accumulatedBattleTime);
+            _accumulatedBattleTime += deltaSeconds;
+            BattleTime = TimeSpan.FromSeconds(_accumulatedBattleTime);
         }
 
         if (_isPlayerTimerRunning)
-    {
+        {
             _accumulatedPlayerTime += deltaSeconds;
             PlayerTime = TimeSpan.FromSeconds(_accumulatedPlayerTime);
         }
 
         if (_isMoveTimerRunning)
-    {
+        {
             _accumulatedMoveTime += deltaSeconds;
             MoveTime = TimeSpan.FromSeconds(_accumulatedMoveTime);
         }
     }
 
     /// <summary>
- /// Format a TimeSpan as MM:SS.mmm
- /// </summary>
-public static string FormatTime(TimeSpan time)
+    /// Format a TimeSpan as MM:SS.mmm
+    /// </summary>
+    public static string FormatTime(TimeSpan time)
     {
         return $"{(int)time.TotalMinutes:D2}:{time.Seconds:D2}.{time.Milliseconds:D3}";
-  }
+    }
 
     /// <summary>
     /// Get formatted battle time string

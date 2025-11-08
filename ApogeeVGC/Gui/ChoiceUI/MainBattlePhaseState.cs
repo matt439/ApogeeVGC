@@ -8,7 +8,7 @@ public enum MainBattlePhaseState
     /// <summary>
     /// Main menu for first Pokemon: Battle, Pokemon, Run options
     /// </summary>
- MainMenuFirstPokemon,
+    MainMenuFirstPokemon,
 
     /// <summary>
     /// Selecting a move for the first Pokemon
@@ -18,7 +18,7 @@ public enum MainBattlePhaseState
     /// <summary>
     /// Selecting a target for the first Pokemon's move
     /// </summary>
- TargetSelectionFirstPokemon,
+    TargetSelectionFirstPokemon,
 
     /// <summary>
     /// Main menu for second Pokemon: Battle, Pokemon, Back options
@@ -28,9 +28,9 @@ public enum MainBattlePhaseState
     /// <summary>
     /// Selecting a move for the second Pokemon
     /// </summary>
-  MoveSelectionSecondPokemon,
+    MoveSelectionSecondPokemon,
 
- /// <summary>
+    /// <summary>
     /// Selecting a target for the second Pokemon's move
     /// </summary>
     TargetSelectionSecondPokemon,
@@ -43,7 +43,7 @@ public enum MainBattlePhaseState
     /// <summary>
     /// Selecting a Pokemon to switch (from second Pokemon menu)
     /// </summary>
-  SwitchSelectionSecondPokemon,
+    SwitchSelectionSecondPokemon,
 
     /// <summary>
     /// Force switch (after a Pokemon faints)
@@ -66,7 +66,7 @@ public class TurnSelectionState
     /// </summary>
     public int? FirstPokemonMoveIndex { get; set; }
 
-  /// <summary>
+    /// <summary>
     /// Selected target for the first Pokemon (if any)
     /// </summary>
     public int? FirstPokemonTarget { get; set; }
@@ -84,7 +84,7 @@ public class TurnSelectionState
     /// <summary>
     /// Selected move for the second Pokemon (if any)
     /// </summary>
-public int? SecondPokemonMoveIndex { get; set; }
+    public int? SecondPokemonMoveIndex { get; set; }
 
     /// <summary>
     /// Selected target for the second Pokemon (if any)
@@ -92,7 +92,7 @@ public int? SecondPokemonMoveIndex { get; set; }
     public int? SecondPokemonTarget { get; set; }
 
     /// <summary>
-  /// Switch index for the second Pokemon (if switching)
+    /// Switch index for the second Pokemon (if switching)
     /// </summary>
     public int? SecondPokemonSwitchIndex { get; set; }
 
@@ -107,7 +107,7 @@ public int? SecondPokemonMoveIndex { get; set; }
     public bool Forfeit { get; set; }
 
     public void Reset()
-  {
+    {
         CurrentPokemonIndex = 0;
         FirstPokemonMoveIndex = null;
         FirstPokemonTarget = null;
@@ -115,7 +115,7 @@ public int? SecondPokemonMoveIndex { get; set; }
         FirstPokemonTerastallize = false;
         SecondPokemonMoveIndex = null;
         SecondPokemonTarget = null;
-     SecondPokemonSwitchIndex = null;
+        SecondPokemonSwitchIndex = null;
         SecondPokemonTerastallize = false;
         Forfeit = false;
     }

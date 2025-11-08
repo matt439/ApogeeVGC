@@ -37,10 +37,10 @@ public class ChoiceInputManager(
     private int _selectedPokemonIndex;
 
     // Arrow key navigation state
-    private int _selectedButtonIndex = 0; // Currently highlighted button for arrow key navigation
+    private int _selectedButtonIndex; // Currently highlighted button for arrow key navigation
 
     // Team preview keyboard state
-    private int _currentHighlightedIndex = 0;
+    private int _currentHighlightedIndex;
 
     private readonly List<int>
         _lockedInPositions = []; // Tracks which Pokemon have been locked in (in order)
@@ -64,7 +64,9 @@ public class ChoiceInputManager(
     // Layout constants
     private const int ButtonWidth = 200;
     private const int ButtonHeight = 50;
+
     private const int ButtonSpacing = 10;
+
     // Move buttons to the right side of the screen to avoid overlap with Pokemon
     private const int LeftMargin = 800; // Changed from 50 to 800
     private const int TopMargin = 400;
@@ -202,8 +204,6 @@ public class ChoiceInputManager(
 
     private void RenderSelectionStatus()
     {
-        if (_turnSelection == null) return;
-
         var statusLines = new List<string>();
 
         // First Pokemon selection
@@ -241,26 +241,26 @@ public class ChoiceInputManager(
         // Draw instruction text
         string instructionText =
             "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
-        Vector2 instructionPos = new Vector2(
-            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2,
-            graphicsDevice.Viewport.Height / 2);
+        var instructionPos = new Vector2(
+            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2f,
+            graphicsDevice.Viewport.Height / 2f);
         spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
 
         // Draw locked-in status
         if (_lockedInPositions.Count > 0)
         {
             string statusText = $"Locked in {_lockedInPositions.Count}/6 Pokemon";
-            Vector2 statusPos = new Vector2(
-                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2,
-                graphicsDevice.Viewport.Height / 2 + 30);
+            var statusPos = new Vector2(
+                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2f,
+                graphicsDevice.Viewport.Height / 2f + 30);
             spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
 
             // Show the order
             string orderText =
                 $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
-            Vector2 orderPos = new Vector2(
-                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2,
-                graphicsDevice.Viewport.Height / 2 + 60);
+            var orderPos = new Vector2(
+                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2f,
+                graphicsDevice.Viewport.Height / 2f + 60);
             spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
         }
     }
@@ -294,9 +294,9 @@ public class ChoiceInputManager(
         {
             SetupSwitchRequestUi(switchRequest);
         }
-        else if (_currentRequest is TeamPreviewRequest teamPreviewRequest)
+        else if (_currentRequest is TeamPreviewRequest)
         {
-            SetupTeamPreviewUi(teamPreviewRequest);
+            SetupTeamPreviewUi();
         }
     }
 
@@ -556,7 +556,7 @@ public class ChoiceInputManager(
     private void HandleForceSwitchSelection(int switchIndex)
     {
         // For force switch, create switch action and submit immediately
-        if (_pendingChoice == null || _currentRequest is not SwitchRequest request) return;
+        if (_pendingChoice == null || _currentRequest is not SwitchRequest) return;
 
         var action = new ChosenAction
         {
@@ -749,38 +749,38 @@ public class ChoiceInputManager(
     {
         if (_buttons.Count == 0) return;
 
-    // Arrow key navigation
+        // Arrow key navigation
         if (IsKeyPressed(keyboardState, Keys.Up))
         {
-     _selectedButtonIndex--;
-        if (_selectedButtonIndex < 0)
+            _selectedButtonIndex--;
+            if (_selectedButtonIndex < 0)
                 _selectedButtonIndex = _buttons.Count - 1; // Wrap to bottom
         }
         else if (IsKeyPressed(keyboardState, Keys.Down))
-     {
+        {
             _selectedButtonIndex++;
-     if (_selectedButtonIndex >= _buttons.Count)
-          _selectedButtonIndex = 0; // Wrap to top
-      }
+            if (_selectedButtonIndex >= _buttons.Count)
+                _selectedButtonIndex = 0; // Wrap to top
+        }
 
         // Enter to select the highlighted button
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
- if (_selectedButtonIndex >= 0 && _selectedButtonIndex < _buttons.Count)
-     {
-        _buttons[_selectedButtonIndex].OnClick();
+            if (_selectedButtonIndex >= 0 && _selectedButtonIndex < _buttons.Count)
+            {
+                _buttons[_selectedButtonIndex].OnClick();
             }
         }
 
         // ESC key for back (changed from B)
         if (IsKeyPressed(keyboardState, Keys.Escape))
         {
-   // Find back button and trigger it
-  var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
+            // Find back button and trigger it
+            var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
             if (backButton != null)
-       {
-       backButton.OnClick();
-   }
+            {
+                backButton.OnClick();
+            }
         }
     }
 
@@ -793,46 +793,54 @@ public class ChoiceInputManager(
         // Left arrow - move highlight left
         if (IsKeyPressed(keyboardState, Keys.Left))
         {
-            Console.WriteLine($"[ChoiceInputManager] Left arrow pressed, moving from {_currentHighlightedIndex}");
+            Console.WriteLine(
+                $"[ChoiceInputManager] Left arrow pressed, moving from {_currentHighlightedIndex}");
             _currentHighlightedIndex--;
             if (_currentHighlightedIndex < 0)
                 _currentHighlightedIndex = teamSize - 1; // Wrap around
-            Console.WriteLine($"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
+            Console.WriteLine(
+                $"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
         }
 
         // Right arrow - move highlight right
         if (IsKeyPressed(keyboardState, Keys.Right))
         {
-            Console.WriteLine($"[ChoiceInputManager] Right arrow pressed, moving from {_currentHighlightedIndex}");
+            Console.WriteLine(
+                $"[ChoiceInputManager] Right arrow pressed, moving from {_currentHighlightedIndex}");
             _currentHighlightedIndex++;
             if (_currentHighlightedIndex >= teamSize)
                 _currentHighlightedIndex = 0; // Wrap around
-            Console.WriteLine($"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
+            Console.WriteLine(
+                $"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
         }
 
-    // Enter - lock in the currently highlighted Pokemon
+        // Enter - lock in the currently highlighted Pokemon
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
-Console.WriteLine($"[ChoiceInputManager] Enter pressed, attempting to lock in Pokemon {_currentHighlightedIndex}");
-     // Check if this Pokemon is already locked in
-   if (!_lockedInIndices.Contains(_currentHighlightedIndex))
-  {
-      _lockedInPositions.Add(_currentHighlightedIndex);
-          _lockedInIndices.Add(_currentHighlightedIndex);
-    Console.WriteLine($"[ChoiceInputManager] Locked in Pokemon {_currentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
+            Console.WriteLine(
+                $"[ChoiceInputManager] Enter pressed, attempting to lock in Pokemon {_currentHighlightedIndex}");
+            // Check if this Pokemon is already locked in
+            if (!_lockedInIndices.Contains(_currentHighlightedIndex))
+            {
+                _lockedInPositions.Add(_currentHighlightedIndex);
+                _lockedInIndices.Add(_currentHighlightedIndex);
+                Console.WriteLine(
+                    $"[ChoiceInputManager] Locked in Pokemon {_currentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
 
-   // If all Pokemon are locked in, submit the choice
-       if (_lockedInPositions.Count == teamSize)
-{
-        Console.WriteLine($"[ChoiceInputManager] All Pokemon locked in, submitting choice");
-    SubmitTeamPreviewChoice();
-    }
-   }
-    else
-     {
-      Console.WriteLine($"[ChoiceInputManager] Pokemon {_currentHighlightedIndex} already locked in");
+                // If all Pokemon are locked in, submit the choice
+                if (_lockedInPositions.Count == teamSize)
+                {
+                    Console.WriteLine(
+                        $"[ChoiceInputManager] All Pokemon locked in, submitting choice");
+                    SubmitTeamPreviewChoice();
+                }
             }
-  }
+            else
+            {
+                Console.WriteLine(
+                    $"[ChoiceInputManager] Pokemon {_currentHighlightedIndex} already locked in");
+            }
+        }
     }
 
     private void ProcessMouseInput(MouseState mouseState)
@@ -994,29 +1002,32 @@ Console.WriteLine($"[ChoiceInputManager] Enter pressed, attempting to lock in Po
         if (_pendingChoice == null || _choiceCompletionSource == null)
             return;
 
-        if (_currentRequest is not TeamPreviewRequest request)
+        if (_currentRequest is not TeamPreviewRequest)
             return;
 
-        Console.WriteLine($"[SubmitTeamPreviewChoice] Building team preview choice from {_lockedInPositions.Count} locked positions");
-        
+        Console.WriteLine(
+            $"[SubmitTeamPreviewChoice] Building team preview choice from {_lockedInPositions.Count} locked positions");
+
         // Build the team preview choice with the locked-in order
-    // Map the locked-in Pokemon indices to actual Pokemon from the request
+        // Map the locked-in Pokemon indices to actual Pokemon from the request
         var actions = _lockedInPositions.Select((pokemonIndex, orderPosition) =>
-   {
- Console.WriteLine($"[SubmitTeamPreviewChoice] Creating action: pokemonIndex={pokemonIndex}, orderPosition={orderPosition}, Priority={-orderPosition}");
-      return new ChosenAction
+        {
+            Console.WriteLine(
+                $"[SubmitTeamPreviewChoice] Creating action: pokemonIndex={pokemonIndex}, orderPosition={orderPosition}, Priority={-orderPosition}");
+            return new ChosenAction
             {
-    Choice = ChoiceType.Team,
-      Pokemon = null, // Will be filled in by battle system
-      MoveId = MoveId.None,
-        Index = pokemonIndex, // This is the key field - which Pokemon position
-         Priority = -orderPosition, // Earlier picks have higher priority
-        };
+                Choice = ChoiceType.Team,
+                Pokemon = null, // Will be filled in by battle system
+                MoveId = MoveId.None,
+                Index = pokemonIndex, // This is the key field - which Pokemon position
+                Priority = -orderPosition, // Earlier picks have higher priority
+            };
         }).ToList();
 
         Console.WriteLine($"[SubmitTeamPreviewChoice] Created {actions.Count} actions");
-    _pendingChoice.Actions = actions;
-     Console.WriteLine($"[SubmitTeamPreviewChoice] Set _pendingChoice.Actions to {_pendingChoice.Actions.Count} actions");
+        _pendingChoice.Actions = actions;
+        Console.WriteLine(
+            $"[SubmitTeamPreviewChoice] Set _pendingChoice.Actions to {_pendingChoice.Actions.Count} actions");
 
         // Submit the choice
         SubmitChoice();
@@ -1063,7 +1074,7 @@ Console.WriteLine($"[ChoiceInputManager] Enter pressed, attempting to lock in Po
         _buttons.Add(submitButton);
     }
 
-    private void SetupTeamPreviewUi(TeamPreviewRequest request)
+    private void SetupTeamPreviewUi()
     {
         // Reset team preview state
         _currentHighlightedIndex = 0;
