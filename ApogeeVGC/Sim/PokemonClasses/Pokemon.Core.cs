@@ -318,10 +318,13 @@ public partial class Pokemon : IPriorityComparison
 
         // Combine details string with health string
         string detailsStr = details.ToString();
-        string secretFullDetails = $"{detailsStr}|{health.Secret}";
-        string sharedFullDetails = $"{detailsStr}|{health.Shared}";
+        Utils.Unions.Secret secretFullDetails = $"{detailsStr}|{health.Secret}";
+        Utils.Unions.Shared sharedFullDetails = $"{detailsStr}|{health.Shared}";
 
-        return new SideSecretSharedResult(health.Side, secretFullDetails, sharedFullDetails);
+        return new SideSecretSharedResult(health.Side, secretFullDetails, sharedFullDetails)
+        {
+            HpColor = health.HpColor
+        };
     }
 
     public int GetUndynamaxedHp(int? amount = null)
@@ -342,21 +345,20 @@ public partial class Pokemon : IPriorityComparison
         // If Pokemon is fainted, return fainted status
         if (Hp <= 0)
         {
-            return new SideSecretSharedResult(
-                Side: Side.Id,
-                Secret: "0 fnt",
-                Shared: "0 fnt"
-            );
+            Utils.Unions.Secret faintedSecret = "0 fnt";
+            Utils.Unions.Shared faintedShared = "0 fnt";
+            return new SideSecretSharedResult(Side.Id, faintedSecret, faintedShared);
         }
 
         // Build secret HP string (always exact)
-        string secret = $"{Hp}/{MaxHp}";
-        string shared;
+        string secretStr = $"{Hp}/{MaxHp}";
+        string sharedStr;
+        HpColor? hpColor = null;
 
         if (Battle.ReportExactHp)
         {
             // Report exact HP
-            shared = secret;
+            sharedStr = secretStr;
         }
         else if (Battle.ReportPercentages || Battle.Gen >= 7)
         {
@@ -366,7 +368,15 @@ public partial class Pokemon : IPriorityComparison
             {
                 percentage = 99;
             }
-            shared = $"{percentage}/100";
+            sharedStr = $"{percentage}/100";
+
+            // Calculate HP color based on percentage
+            hpColor = percentage switch
+            {
+                > 50 => Utils.Unions.HpColor.Green,
+                > 20 => Utils.Unions.HpColor.Yellow,
+                _ => Utils.Unions.HpColor.Red
+            };
         }
         else
         {
@@ -377,32 +387,49 @@ public partial class Pokemon : IPriorityComparison
             int pixels = (int)Math.Floor(48.0 * Hp / MaxHp);
             if (pixels == 0) pixels = 1; // Equivalent to: || 1
 
-            shared = $"{pixels}/48";
+            sharedStr = $"{pixels}/48";
 
             if (Battle.Gen >= 5)
             {
                 if (pixels == 9)
                 {
-                    shared += Hp * 5 > MaxHp ? "y" : "r";
+                    string colorSuffix = Hp * 5 > MaxHp ? "y" : "r";
+                    sharedStr += colorSuffix;
+                    hpColor = colorSuffix == "y" ? HpColor.Yellow : HpColor.Red;
                 }
                 else if (pixels == 24)
                 {
-                    shared += Hp * 2 > MaxHp ? "g" : "y";
+                    string colorSuffix = Hp * 2 > MaxHp ? "g" : "y";
+                    sharedStr += colorSuffix;
+                    hpColor = colorSuffix == "g" ? HpColor.Green : HpColor.Yellow;
                 }
+            }
+
+            // For other pixel values, calculate color based on pixel ratio
+            if (!hpColor.HasValue)
+            {
+                double hpRatio = (double)Hp / MaxHp;
+                hpColor = hpRatio switch
+                {
+                    > 0.5 => HpColor.Green,
+                    > 0.2 => HpColor.Yellow,
+                    _ => HpColor.Red,
+                };
             }
         }
 
         // Append status condition if present
         if (Status != ConditionId.None)
         {
-            secret += $" {Status}";
-            shared += $" {Status}";
+            secretStr += $" {Status}";
+            sharedStr += $" {Status}";
         }
 
-        return new SideSecretSharedResult(
-            Side: Side.Id,
-            Secret: secret,
-            Shared: shared
-        );
-    }
-}
+        Utils.Unions.Secret secret = secretStr;
+        Utils.Unions.Shared shared = sharedStr;
+
+        return new SideSecretSharedResult(Side.Id, secret, shared)
+        {
+            HpColor = hpColor
+        };
+    }}

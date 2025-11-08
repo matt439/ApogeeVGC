@@ -403,26 +403,41 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     private void RenderOpponentPokemonInfo(PokemonOpponentPerspective pokemon, XnaVector2 position)
     {
         // Draw sprite texture (front sprite for opponent's Pokemon)
-        Texture2D sprite = spriteManager.GetFrontSprite(pokemon.Species);
+    Texture2D sprite = spriteManager.GetFrontSprite(pokemon.Species);
 
         // Calculate centered position for sprite
-        var spriteRect = new XnaRectangle(
+      var spriteRect = new XnaRectangle(
             (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
-            sprite.Width,
-            sprite.Height);
+ (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+  sprite.Width,
+    sprite.Height);
 
-        spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
+    spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
         // Draw border around sprite area
         var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize, PokemonSpriteSize);
-     DrawRectangle(borderRect, XnaColor.Red, 2);
+        DrawRectangle(borderRect, XnaColor.Red, 2);
 
-        // Draw name and HP percentage (for active battle)
-   // HpPercentage is already 0-100, so use :F0 instead of :P0
-        string info = $"{pokemon.Name}\nHP: {pokemon.HpPercentage:F0}%";
+        // Draw name
+    string nameText = pokemon.Name;
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
-      spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+        spriteBatch.DrawString(font, nameText, textPosition, XnaColor.White);
+
+        // Draw HP percentage with color based on HpColor enum
+        // HpPercentage is already 0-100, so use :F0 instead of :P0
+    string hpText = $"HP: {pokemon.HpPercentage:F0}%";
+        XnaVector2 hpPosition = textPosition + new XnaVector2(0, font.LineSpacing);
+        
+        // Determine HP text color based on HpColor enum
+XnaColor hpColor = pokemon.HpColor switch
+        {
+Sim.Utils.Unions.HpColor.Green => XnaColor.LimeGreen,
+            Sim.Utils.Unions.HpColor.Yellow => XnaColor.Yellow,
+     Sim.Utils.Unions.HpColor.Red => XnaColor.Red,
+   _ => XnaColor.White // Default to white if no color specified
+        };
+ 
+      spriteBatch.DrawString(font, hpText, hpPosition, hpColor);
     }
 
     private void RenderOpponentPokemonTeamPreview(PokemonOpponentPerspective pokemon, XnaVector2 position)

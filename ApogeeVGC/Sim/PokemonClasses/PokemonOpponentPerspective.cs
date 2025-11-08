@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
@@ -21,6 +22,7 @@ public record PokemonOpponentPerspective
     
     // Battle Status - HP as percentage for opponent
     public required double HpPercentage { get; init; }
+    public HpColor? HpColor { get; init; }
     public required bool Fainted { get; init; }
     public required ConditionId Status { get; init; }
     

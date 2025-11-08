@@ -606,7 +606,6 @@ public record DrainBattleHealEffect : BattleHealEffect;
 
 
 
-
 /// <summary>
 /// Pokemon | Side | Field | Battle
 /// </summary>
@@ -904,11 +903,14 @@ public record PartPartFuncUnion(Part Part) : PartFuncUnion;
 public record FuncPartFuncUnion(Func<SideSecretSharedResult> Func) : PartFuncUnion;
 
 /// <summary>
-/// Represents the result of a side-specific content generation function.
-/// Maps to TypeScript: { side: SideID, secret: string, shared: string }
+/// Represents HP color indicators for Pokemon health display
 /// </summary>
-public record SideSecretSharedResult(SideId Side, Secret Secret, Shared Shared);
-
+public enum HpColor
+{
+    Green,
+    Yellow,
+ Red
+}
 
 /// <summary>
 /// string | ConditionId
@@ -927,7 +929,6 @@ public record SecretConditionId(ConditionId Value) : Secret
     public override string ToString() => Value.ToString();
 }
 
-
 /// <summary>
 /// string
 /// </summary>
@@ -938,4 +939,16 @@ public abstract record Shared
 public record SharedString(string Value) : Shared
 {
     public override string ToString() => Value;
+}
+
+/// <summary>
+/// Represents the result of a side-specific content generation function.
+/// Maps to TypeScript: { side: SideID, secret: string, shared: string }
+/// </summary>
+public record SideSecretSharedResult(SideId Side, Secret Secret, Shared Shared)
+{
+ /// <summary>
+    /// Optional HP color indicator (used for opponent Pokemon HP display)
+    /// </summary>
+    public HpColor? HpColor { get; init; }
 }
