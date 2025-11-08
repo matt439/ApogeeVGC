@@ -159,12 +159,6 @@ public class BattleGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        // Exit on Escape key
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-        {
-            Exit();
-        }
-
         // Check if external code requested exit
         if (_shouldExit)
         {
@@ -230,6 +224,21 @@ public class BattleGame : Game
         lock (_stateLock)
         {
             _currentBattlePerspective = battlePerspective;
+        }
+
+        // Debug logging to track perspective updates
+        Console.WriteLine($"[BattleGame] UpdateBattlePerspective called: Type={battlePerspective.PerspectiveType}");
+        Console.WriteLine($"[BattleGame]   PlayerSide.Active.Count={battlePerspective.PlayerSide.Active.Count}");
+        for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
+        {
+        var p = battlePerspective.PlayerSide.Active[i];
+          Console.WriteLine($"[BattleGame]   PlayerSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.Hp}/{p.MaxHp})")}");
+        }
+        Console.WriteLine($"[BattleGame]   OpponentSide.Active.Count={battlePerspective.OpponentSide.Active.Count}");
+     for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
+        {
+      var p = battlePerspective.OpponentSide.Active[i];
+     Console.WriteLine($"[BattleGame]   OpponentSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.HpPercentage:F1}%)")}");
         }
     }
 

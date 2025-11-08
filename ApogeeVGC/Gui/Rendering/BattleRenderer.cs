@@ -15,7 +15,7 @@ namespace ApogeeVGC.Gui.Rendering;
 /// </summary>
 public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDevice graphicsDevice, SpriteManager spriteManager)
 {
-    // Layout constants
+  // Layout constants
     private const int Padding = 20;
     private const int PokemonSpriteSize = 128;
     private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
@@ -23,7 +23,10 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     // Reference to choice input manager for team preview state
     private ChoiceUI.ChoiceInputManager? _choiceInputManager;
 
-    /// <summary>
+    // Track last perspective type to avoid spam logging
+    private BattlePerspectiveType? _lastPerspectiveType;
+
+  /// <summary>
     /// Set the choice input manager to access team preview state
     /// </summary>
     public void SetChoiceInputManager(ChoiceUI.ChoiceInputManager choiceInputManager)
@@ -36,24 +39,33 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     /// </summary>
     public void Render(GameTime gameTime, BattlePerspective? battlePerspective)
     {
-        if (battlePerspective == null)
+     if (battlePerspective == null)
         {
-            RenderWaitingScreen();
-            return;
+        RenderWaitingScreen();
+  return;
+        }
+
+        // Debug output only when perspective type changes
+        if (_lastPerspectiveType != battlePerspective.PerspectiveType)
+  {
+       Console.WriteLine($"[BattleRenderer] Perspective changed to: {battlePerspective.PerspectiveType}, " +
+ $"Player Active: {battlePerspective.PlayerSide.Active.Count}, " +
+      $"Opponent Active: {battlePerspective.OpponentSide.Active.Count}");
+         _lastPerspectiveType = battlePerspective.PerspectiveType;
         }
 
         // Route to appropriate renderer based on perspective type
         switch (battlePerspective.PerspectiveType)
         {
             case BattlePerspectiveType.TeamPreview:
-                RenderTeamPreview(gameTime, battlePerspective);
-                break;
+        RenderTeamPreview(gameTime, battlePerspective);
+     break;
             case BattlePerspectiveType.InBattle:
-                RenderInBattle(gameTime, battlePerspective);
-                break;
-            default:
+     RenderInBattle(gameTime, battlePerspective);
+          break;
+        default:
                 RenderWaitingScreen();
-                break;
+     break;
         }
     }
 
@@ -198,35 +210,37 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
     private void RenderInBattlePlayerPokemon(BattlePerspective battlePerspective)
     {
         // Render only active Pokemon
-        int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding;
+        // Position them lower on screen but not at bottom - leave room for UI
+        int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding - InfoTextHeight - 200;
 
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
-        {
+   {
             var pokemon = battlePerspective.PlayerSide.Active[i];
             if (pokemon == null) continue;
 
             int xPosition = Padding + (i * (PokemonSpriteSize + Padding));
-            RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
+ RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
     }
 
     /// <summary>
     /// Render opponent's active Pokemon during battle
     /// </summary>
-    private void RenderInBattleOpponentPokemon(BattlePerspective battlePerspective)
+  private void RenderInBattleOpponentPokemon(BattlePerspective battlePerspective)
     {
         // Render only active Pokemon
-        const int yPosition = Padding + 60;
+        // Move down to avoid overlap with timers (changed from Padding + 60 to Padding + 120)
+    const int yPosition = Padding + 120;
 
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
-        {
+   {
             var pokemon = battlePerspective.OpponentSide.Active[i];
             if (pokemon == null) continue;
 
-            int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
-                            (i * (PokemonSpriteSize + Padding));
+      int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
+      (i * (PokemonSpriteSize + Padding));
 
-            RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
+       RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
     }
 
@@ -238,14 +252,8 @@ public class BattleRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsDe
         // Render timers
         RenderTimers();
 
-        // TODO: Render action buttons, move selection, etc.
-        // For now, show available actions
-        const string uiInfo = "Press ESC to exit";
-        var uiPosition = new XnaVector2(
-            graphicsDevice.Viewport.Width / 2f - 100,
-            graphicsDevice.Viewport.Height - 40);
-
-        spriteBatch.DrawString(font, uiInfo, uiPosition, XnaColor.Yellow);
+      // UI rendering is now handled by ChoiceInputManager
+        // No need for legacy "Press ESC to exit" text
     }
 
     /// <summary>

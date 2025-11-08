@@ -36,6 +36,9 @@ public class ChoiceInputManager(
     private string _keyboardInput = "";
     private int _selectedPokemonIndex;
 
+    // Arrow key navigation state
+    private int _selectedButtonIndex = 0; // Currently highlighted button for arrow key navigation
+
     // Team preview keyboard state
     private int _currentHighlightedIndex = 0;
 
@@ -62,7 +65,8 @@ public class ChoiceInputManager(
     private const int ButtonWidth = 200;
     private const int ButtonHeight = 50;
     private const int ButtonSpacing = 10;
-    private const int LeftMargin = 50;
+    // Move buttons to the right side of the screen to avoid overlap with Pokemon
+    private const int LeftMargin = 800; // Changed from 50 to 800
     private const int TopMargin = 400;
 
     /// <summary>
@@ -167,7 +171,7 @@ public class ChoiceInputManager(
         // Draw buttons
         foreach (ChoiceButton button in _buttons)
         {
-            button.Draw(spriteBatch, font, graphicsDevice);
+            button.Draw(spriteBatch, font, graphicsDevice, isSelected: false);
         }
 
         // Draw current choice status
@@ -185,10 +189,11 @@ public class ChoiceInputManager(
         spriteBatch.DrawString(font, instructionText,
             new Vector2(LeftMargin, TopMargin - 60), Color.White);
 
-        // Draw buttons (they should already be set up based on state)
-        foreach (ChoiceButton button in _buttons)
+        // Draw buttons with selection highlight
+        for (int i = 0; i < _buttons.Count; i++)
         {
-            button.Draw(spriteBatch, font, graphicsDevice);
+            bool isSelected = (i == _selectedButtonIndex);
+            _buttons[i].Draw(spriteBatch, font, graphicsDevice, isSelected);
         }
 
         // Draw current selections status
@@ -376,6 +381,7 @@ public class ChoiceInputManager(
     private void SetupMainBattleUi(MoveRequest request)
     {
         _buttons.Clear();
+        _selectedButtonIndex = 0; // Reset selection to first button
 
         // Set up buttons based on current state
         switch (_mainBattleState)
@@ -684,6 +690,14 @@ public class ChoiceInputManager(
             return;
         }
 
+        // For main battle turn start, use arrow key navigation
+        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+        {
+            ProcessMainBattleKeyboardInput(keyboardState);
+            return;
+        }
+
+        // Legacy numeric input for other request types (force switch, etc.)
         // Determine max numbers based on request type
         int maxNumbers = _requestType switch
         {
@@ -731,6 +745,45 @@ public class ChoiceInputManager(
         }
     }
 
+    private void ProcessMainBattleKeyboardInput(KeyboardState keyboardState)
+    {
+        if (_buttons.Count == 0) return;
+
+    // Arrow key navigation
+        if (IsKeyPressed(keyboardState, Keys.Up))
+        {
+     _selectedButtonIndex--;
+        if (_selectedButtonIndex < 0)
+                _selectedButtonIndex = _buttons.Count - 1; // Wrap to bottom
+        }
+        else if (IsKeyPressed(keyboardState, Keys.Down))
+     {
+            _selectedButtonIndex++;
+     if (_selectedButtonIndex >= _buttons.Count)
+          _selectedButtonIndex = 0; // Wrap to top
+      }
+
+        // Enter to select the highlighted button
+        if (IsKeyPressed(keyboardState, Keys.Enter))
+        {
+ if (_selectedButtonIndex >= 0 && _selectedButtonIndex < _buttons.Count)
+     {
+        _buttons[_selectedButtonIndex].OnClick();
+            }
+        }
+
+        // ESC key for back (changed from B)
+        if (IsKeyPressed(keyboardState, Keys.Escape))
+        {
+   // Find back button and trigger it
+  var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
+            if (backButton != null)
+       {
+       backButton.OnClick();
+   }
+        }
+    }
+
     private void ProcessTeamPreviewKeyboardInput(KeyboardState keyboardState)
     {
         if (_currentRequest is not TeamPreviewRequest request) return;
@@ -740,35 +793,46 @@ public class ChoiceInputManager(
         // Left arrow - move highlight left
         if (IsKeyPressed(keyboardState, Keys.Left))
         {
+            Console.WriteLine($"[ChoiceInputManager] Left arrow pressed, moving from {_currentHighlightedIndex}");
             _currentHighlightedIndex--;
             if (_currentHighlightedIndex < 0)
                 _currentHighlightedIndex = teamSize - 1; // Wrap around
+            Console.WriteLine($"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
         }
 
         // Right arrow - move highlight right
         if (IsKeyPressed(keyboardState, Keys.Right))
         {
+            Console.WriteLine($"[ChoiceInputManager] Right arrow pressed, moving from {_currentHighlightedIndex}");
             _currentHighlightedIndex++;
             if (_currentHighlightedIndex >= teamSize)
                 _currentHighlightedIndex = 0; // Wrap around
+            Console.WriteLine($"[ChoiceInputManager] New highlight index: {_currentHighlightedIndex}");
         }
 
-        // Enter - lock in the currently highlighted Pokemon
+    // Enter - lock in the currently highlighted Pokemon
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
-            // Check if this Pokemon is already locked in
-            if (!_lockedInIndices.Contains(_currentHighlightedIndex))
-            {
-                _lockedInPositions.Add(_currentHighlightedIndex);
-                _lockedInIndices.Add(_currentHighlightedIndex);
+Console.WriteLine($"[ChoiceInputManager] Enter pressed, attempting to lock in Pokemon {_currentHighlightedIndex}");
+     // Check if this Pokemon is already locked in
+   if (!_lockedInIndices.Contains(_currentHighlightedIndex))
+  {
+      _lockedInPositions.Add(_currentHighlightedIndex);
+          _lockedInIndices.Add(_currentHighlightedIndex);
+    Console.WriteLine($"[ChoiceInputManager] Locked in Pokemon {_currentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
 
-                // If all Pokemon are locked in, submit the choice
-                if (_lockedInPositions.Count == teamSize)
-                {
-                    SubmitTeamPreviewChoice();
-                }
+   // If all Pokemon are locked in, submit the choice
+       if (_lockedInPositions.Count == teamSize)
+{
+        Console.WriteLine($"[ChoiceInputManager] All Pokemon locked in, submitting choice");
+    SubmitTeamPreviewChoice();
+    }
+   }
+    else
+     {
+      Console.WriteLine($"[ChoiceInputManager] Pokemon {_currentHighlightedIndex} already locked in");
             }
-        }
+  }
     }
 
     private void ProcessMouseInput(MouseState mouseState)
@@ -777,7 +841,11 @@ public class ChoiceInputManager(
         if (_requestType == BattleRequestType.TeamPreview)
             return;
 
-        // Check button clicks
+        // Disable mouse input for main battle (arrow key navigation only)
+        if (_requestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
+            return;
+
+        // Check button clicks (for legacy UI only)
         if (IsMouseClicked(mouseState))
         {
             var mousePos = new Point(mouseState.X, mouseState.Y);
@@ -926,16 +994,29 @@ public class ChoiceInputManager(
         if (_pendingChoice == null || _choiceCompletionSource == null)
             return;
 
+        if (_currentRequest is not TeamPreviewRequest request)
+            return;
+
+        Console.WriteLine($"[SubmitTeamPreviewChoice] Building team preview choice from {_lockedInPositions.Count} locked positions");
+        
         // Build the team preview choice with the locked-in order
-        _pendingChoice.Actions = _lockedInPositions.Select((pokemonIndex, orderPosition) =>
-            new ChosenAction
+    // Map the locked-in Pokemon indices to actual Pokemon from the request
+        var actions = _lockedInPositions.Select((pokemonIndex, orderPosition) =>
+   {
+ Console.WriteLine($"[SubmitTeamPreviewChoice] Creating action: pokemonIndex={pokemonIndex}, orderPosition={orderPosition}, Priority={-orderPosition}");
+      return new ChosenAction
             {
-                Choice = ChoiceType.Team,
-                Pokemon = null,
-                MoveId = MoveId.None,
-                Index = pokemonIndex,
-                Priority = -orderPosition, // Earlier picks have higher priority
-            }).ToList();
+    Choice = ChoiceType.Team,
+      Pokemon = null, // Will be filled in by battle system
+      MoveId = MoveId.None,
+        Index = pokemonIndex, // This is the key field - which Pokemon position
+         Priority = -orderPosition, // Earlier picks have higher priority
+        };
+        }).ToList();
+
+        Console.WriteLine($"[SubmitTeamPreviewChoice] Created {actions.Count} actions");
+    _pendingChoice.Actions = actions;
+     Console.WriteLine($"[SubmitTeamPreviewChoice] Set _pendingChoice.Actions to {_pendingChoice.Actions.Count} actions");
 
         // Submit the choice
         SubmitChoice();

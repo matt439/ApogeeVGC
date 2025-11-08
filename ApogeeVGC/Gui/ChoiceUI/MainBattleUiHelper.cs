@@ -17,46 +17,47 @@ public static class MainBattleUiHelper
     private const int ButtonWidth = 200;
     private const int ButtonHeight = 50;
     private const int ButtonSpacing = 10;
-    private const int LeftMargin = 50;
+    // Move buttons to the right side of the screen
+    private const int LeftMargin = 800; // Changed from 50 to 800
     private const int TopMargin = 400;
 
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
-   Action showMoveSelection,
+        Action showMoveSelection,
         Action showSwitchSelection,
         Action selectForfeit)
     {
- var buttons = new List<ChoiceButton>();
+        var buttons = new List<ChoiceButton>();
       int y = TopMargin;
 
-     // Battle button
+        // Battle button
         var battleButton = new ChoiceButton(
-     new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "1. Battle",
+        new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+      "Battle",
             Color.Red,
-  showMoveSelection
+    showMoveSelection
         );
-        buttons.Add(battleButton);
-        y += ButtonHeight + ButtonSpacing;
+     buttons.Add(battleButton);
+      y += ButtonHeight + ButtonSpacing;
 
-        // Pokemon button
+   // Pokemon button
         var pokemonButton = new ChoiceButton(
-    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "2. Pokemon",
-       Color.Green,
-    showSwitchSelection
-        );
-        buttons.Add(pokemonButton);
-        y += ButtonHeight + ButtonSpacing;
+          new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+          "Pokemon",
+  Color.Green,
+       showSwitchSelection
+   );
+buttons.Add(pokemonButton);
+ y += ButtonHeight + ButtonSpacing;
 
         // Run button
         var runButton = new ChoiceButton(
-          new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "3. Run",
-      Color.Gray,
-            selectForfeit
-    );
-   buttons.Add(runButton);
+         new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+            "Run",
+            Color.Gray,
+      selectForfeit
+        );
+        buttons.Add(runButton);
 
         return buttons;
     }
@@ -67,140 +68,140 @@ public static class MainBattleUiHelper
         Action showSwitchSelection,
         Action goBack)
     {
-     var buttons = new List<ChoiceButton>();
-        int y = TopMargin;
+        var buttons = new List<ChoiceButton>();
+   int y = TopMargin;
 
         // Battle button
         var battleButton = new ChoiceButton(
           new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-  "1. Battle",
-    Color.Red,
-     showMoveSelection
-  );
-        buttons.Add(battleButton);
+   "Battle",
+            Color.Red,
+          showMoveSelection
+    );
+      buttons.Add(battleButton);
         y += ButtonHeight + ButtonSpacing;
 
-        // Pokemon button
+      // Pokemon button
         var pokemonButton = new ChoiceButton(
             new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-      "2. Pokemon",
-      Color.Green,
-     showSwitchSelection
-      );
+  "Pokemon",
+    Color.Green,
+            showSwitchSelection
+        );
         buttons.Add(pokemonButton);
- y += ButtonHeight + ButtonSpacing;
+        y += ButtonHeight + ButtonSpacing;
 
-      // Back button
-        var backButton = new ChoiceButton(
-new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
- "3. Back",
-   Color.Orange,
-goBack
-      );
-        buttons.Add(backButton);
+        // Back button
+    var backButton = new ChoiceButton(
+   new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+    "Back",
+Color.Orange,
+            goBack
+        );
+ buttons.Add(backButton);
 
-  return buttons;
+ return buttons;
     }
 
     public static List<ChoiceButton> CreateMoveSelectionButtons(
-     PokemonMoveRequestData pokemonRequest,
-        bool canTerastallize,
-        bool isTerastallized,
+        PokemonMoveRequestData pokemonRequest,
+ bool canTerastallize,
+   bool isTerastallized,
         Action<int> selectMove,
         Action toggleTera,
-        Action goBack)
+     Action goBack)
     {
-        var buttons = new List<ChoiceButton>();
-  int y = TopMargin;
-        int moveIndex = 1;
+ var buttons = new List<ChoiceButton>();
+      int y = TopMargin;
+  int moveIndex = 0;
 
         foreach (PokemonMoveData moveData in pokemonRequest.Moves)
-        {
-      // Check if move is disabled
-            bool disabled = moveData.Disabled switch
-      {
-  BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-   MoveIdMoveIdBoolUnion => false,
-             null => false,
-      _ => false,
- };
+{
+   // Check if move is disabled
+  bool disabled = moveData.Disabled switch
+   {
+    BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
+      MoveIdMoveIdBoolUnion => false,
+     null => false,
+    _ => false,
+       };
 
-    int index = moveIndex - 1;
-            var button = new ChoiceButton(
+     int index = moveIndex;
+   var button = new ChoiceButton(
     new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-   $"{moveIndex}. {moveData.Move.Name}",
-       disabled ? Color.Gray : Color.Blue,
-     () => selectMove(index)
-            );
+    moveData.Move.Name,
+     disabled ? Color.Gray : Color.Blue,
+                () => selectMove(index)
+  );
 
- buttons.Add(button);
-         y += ButtonHeight + ButtonSpacing;
- moveIndex++;
+    buttons.Add(button);
+     y += ButtonHeight + ButtonSpacing;
+      moveIndex++;
      }
 
-        // Add Terastallize option if available
-      if (canTerastallize)
-        {
- y += ButtonSpacing;
-            var teraButton = new ChoiceButton(
+  // Add Terastallize option if available
+        if (canTerastallize)
+      {
+            y += ButtonSpacing;
+     var teraButton = new ChoiceButton(
         new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-      "T. Terastallize",
-      isTerastallized ? Color.Purple : Color.DarkSlateBlue,
-      toggleTera
-  );
-            buttons.Add(teraButton);
+           "Terastallize",
+     isTerastallized ? Color.Purple : Color.DarkSlateBlue,
+     toggleTera
+   );
+    buttons.Add(teraButton);
         }
 
-  // Add back button
-   y += ButtonHeight + ButtonSpacing;
+      // Add back button
+  y += ButtonHeight + ButtonSpacing;
         var backButton = new ChoiceButton(
-            new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "B. Back",
-  Color.Orange,
-    goBack
-        );
+    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+    "Back",
+   Color.Orange,
+   goBack
+     );
         buttons.Add(backButton);
 
-  return buttons;
+        return buttons;
     }
 
     public static List<ChoiceButton> CreateSwitchSelectionButtons(
         IEnumerable<PokemonSwitchRequestData> availablePokemon,
-        Action<int> selectSwitch,
-        Action goBack,
-  bool showBackButton = true)
+   Action<int> selectSwitch,
+   Action goBack,
+        bool showBackButton = true)
     {
         var buttons = new List<ChoiceButton>();
-        int y = TopMargin;
+     int y = TopMargin;
         int pokemonIndex = 0;
 
         foreach (PokemonSwitchRequestData pokemon in availablePokemon)
-        {
-            int index = pokemonIndex;
-            var button = new ChoiceButton(
-         new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-         $"{pokemonIndex + 1}. Pokemon (Condition: {pokemon.Condition})",
-       Color.Green,
-     () => selectSwitch(index)
+ {
+ int index = pokemonIndex;
+  var button = new ChoiceButton(
+                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+       $"Pokemon (Condition: {pokemon.Condition})",
+   Color.Green,
+              () => selectSwitch(index)
     );
 
-          buttons.Add(button);
- y += ButtonHeight + ButtonSpacing;
-   pokemonIndex++;
+     buttons.Add(button);
+     y += ButtonHeight + ButtonSpacing;
+     pokemonIndex++;
         }
 
         // Add back button if requested
-        if (showBackButton)
-    {
+    if (showBackButton)
+        {
             y += ButtonSpacing;
-         var backButton = new ChoiceButton(
-         new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-         "B. Back",
-     Color.Orange,
-       goBack
+  var backButton = new ChoiceButton(
+     new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+        "Back",
+         Color.Orange,
+                goBack
             );
-buttons.Add(backButton);
-      }
+            buttons.Add(backButton);
+  }
 
         return buttons;
     }
@@ -208,15 +209,15 @@ buttons.Add(backButton);
     public static string GetInstructionText(MainBattlePhaseState state)
     {
         return state switch
-        {
-            MainBattlePhaseState.MainMenuFirstPokemon => "Choose action for Pokemon 1: 1=Battle, 2=Pokemon, 3=Run",
- MainBattlePhaseState.MainMenuSecondPokemon => "Choose action for Pokemon 2: 1=Battle, 2=Pokemon, 3=Back",
-            MainBattlePhaseState.MoveSelectionFirstPokemon => "Select a move for Pokemon 1 (1-4, T=Tera, B=Back)",
-         MainBattlePhaseState.MoveSelectionSecondPokemon => "Select a move for Pokemon 2 (1-4, T=Tera, B=Back)",
-    MainBattlePhaseState.SwitchSelectionFirstPokemon => "Select a Pokemon to switch in (B=Back)",
-            MainBattlePhaseState.SwitchSelectionSecondPokemon => "Select a Pokemon to switch in (B=Back)",
-    MainBattlePhaseState.ForceSwitch => "Your Pokemon fainted! Select a replacement.",
-         _ => "Make your choice",
+     {
+         MainBattlePhaseState.MainMenuFirstPokemon => "Choose action for Pokemon 1: Use UP/DOWN arrows to select, ENTER to confirm",
+            MainBattlePhaseState.MainMenuSecondPokemon => "Choose action for Pokemon 2: Use UP/DOWN arrows to select, ENTER to confirm, ESC to go back",
+          MainBattlePhaseState.MoveSelectionFirstPokemon => "Select a move for Pokemon 1: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+            MainBattlePhaseState.MoveSelectionSecondPokemon => "Select a move for Pokemon 2: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+            MainBattlePhaseState.SwitchSelectionFirstPokemon => "Select a Pokemon to switch in: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+  MainBattlePhaseState.SwitchSelectionSecondPokemon => "Select a Pokemon to switch in: Use UP/DOWN arrows, ENTER to confirm, ESC for back",
+  MainBattlePhaseState.ForceSwitch => "Your Pokemon fainted! Select a replacement: Use UP/DOWN arrows, ENTER to confirm",
+      _ => "Use UP/DOWN arrows to navigate, ENTER to select",
         };
     }
 }

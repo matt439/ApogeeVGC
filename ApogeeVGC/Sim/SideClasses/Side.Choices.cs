@@ -555,55 +555,82 @@ public partial class Side
         // Step 1: Validate that it's the player's turn
         if (RequestState == RequestState.None)
         {
-            string message = Battle.Ended
-                ? "Can't do anything: The game is over"
-                : "Can't do anything: It's not your turn";
+         string message = Battle.Ended
+            ? "Can't do anything: The game is over"
+        : "Can't do anything: It's not your turn";
             return EmitChoiceError(message);
         }
 
-        // Step 2: Check if undo is allowed
+  // Step 2: Check if undo is allowed
         if (Choice.CantUndo)
         {
-            return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
-        }
+       return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
+    }
 
         // Step 3: Clear existing choice
         ClearChoice();
 
-        // Step 4: Validate number of actions doesn't exceed active Pokemon count
-        if (input.Actions.Count > Active.Count)
+        // Step 4: Validate number of actions doesn't exceed expected count
+        // For team preview, allow up to full team size
+        // For other requests, limit to active Pokemon count
+        int maxActions = RequestState == RequestState.TeamPreview 
+            ? Pokemon.Count 
+        : Active.Count;
+    
+        if (input.Actions.Count > maxActions)
         {
-            return EmitChoiceError(
-                $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but this is a {Battle.GameType} game!"
-            );
+    return EmitChoiceError(
+      $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but only {maxActions} are allowed!"
+       );
+        }
+
+        // Debug logging
+        Console.WriteLine($"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
+        for (int i = 0; i < input.Actions.Count; i++)
+        {
+          var action = input.Actions[i];
+            Console.WriteLine($"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
         }
 
         // Step 5: Process each action in the choice
-        if (input.Actions.Select(action => action.Choice switch
+    if (input.Actions.Select((action, index) =>
         {
-            ChoiceType.Move => ProcessChosenMoveAction(action),
-            ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
-            ChoiceType.Team => ProcessChosenTeamAction(action),
-            ChoiceType.Pass => ChoosePass().IsTrue(),
-            ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
-            _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
+bool success = action.Choice switch
+      {
+     ChoiceType.Move => ProcessChosenMoveAction(action),
+         ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
+    ChoiceType.Team => ProcessChosenTeamAction(action),
+       ChoiceType.Pass => ChoosePass().IsTrue(),
+      ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
+                _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
+         };
+
+            if (!success)
+            {
+    Console.WriteLine($"[Side.Choose] Action {index} failed: {Choice.Error}");
+         }
+
+      return success;
         }).Any(success => !success))
         {
-            return false;
+     Console.WriteLine($"[Side.Choose] Overall choice failed for {Name}");
+          return false;
         }
 
         // Step 6: Apply choice-level settings
         if (input.Terastallize)
-        {
+{
             Choice.Terastallize = true;
         }
 
-        if (input.CantUndo)
+   if (input.CantUndo)
         {
             Choice.CantUndo = true;
         }
 
-        return string.IsNullOrEmpty(Choice.Error);
+        bool result = string.IsNullOrEmpty(Choice.Error);
+        Console.WriteLine($"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
+        return result;
     }
 
     private bool ProcessChosenMoveAction(ChosenAction action)
@@ -633,28 +660,47 @@ public partial class Side
 
     private bool ProcessChosenTeamAction(ChosenAction action)
     {
+        Console.WriteLine($"[ProcessChosenTeamAction] Processing action: Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}, Priority={action.Priority}");
+        
         // For team preview, the actions are already ordered by priority
         // We just need to verify this is a valid team choice
-        if (action.Pokemon == null)
-        {
-            return EmitChoiceError("Can't choose for Team Preview: No Pokemon specified");
-        }
+      
+  // Handle GUI case where Pokemon is null but Index is provided
+      int slot;
+   if (action.Pokemon == null)
+     {
+       Console.WriteLine($"[ProcessChosenTeamAction] Pokemon is null, using Index");
+            if (!action.Index.HasValue || action.Index.Value < 0 || action.Index.Value >= Pokemon.Count)
+{
+      Console.WriteLine($"[ProcessChosenTeamAction] Invalid index: {action.Index}");
+   return EmitChoiceError("Can't choose for Team Preview: Invalid Pokemon index specified");
+    }
+slot = action.Index.Value;
+       Console.WriteLine($"[ProcessChosenTeamAction] Looking up Pokemon at slot {slot}");
+    // Update the action with the Pokemon reference for proper processing
+        action = action with { Pokemon = Pokemon[slot] };
+      Console.WriteLine($"[ProcessChosenTeamAction] Pokemon found: {action.Pokemon.Name}");
+   }
+        else
+ {
+  Console.WriteLine($"[ProcessChosenTeamAction] Pokemon already set: {action.Pokemon.Name}");
+      slot = action.Pokemon.Position;
+     }
 
-        // The team ordering is handled by collecting all team actions
-        // and processing them in priority order, which is done by the caller
-        // Here we just validate and record the choice
-        int slot = action.Pokemon.Position;
-
+        Console.WriteLine($"[ProcessChosenTeamAction] Attempting to add slot {slot} to SwitchIns");
         if (!Choice.SwitchIns.Add(slot))
-        {
-            return EmitChoiceError(
-                $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
-            );
+  {
+     Console.WriteLine($"[ProcessChosenTeamAction] Slot {slot} already in SwitchIns");
+       return EmitChoiceError(
+    $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+      );
         }
 
-        Choice.Actions = [.. Choice.Actions, action];
+        Console.WriteLine($"[ProcessChosenTeamAction] Adding action to Choice.Actions (current count: {Choice.Actions.Count})");
+     Choice.Actions = [.. Choice.Actions, action];
+  Console.WriteLine($"[ProcessChosenTeamAction] Action added successfully, new count: {Choice.Actions.Count}");
 
-        return true;
+     return true;
     }
 
     private bool ProcessChosenRevivalBlessingAction(ChosenAction action)

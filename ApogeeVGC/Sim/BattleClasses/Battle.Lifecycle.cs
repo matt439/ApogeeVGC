@@ -73,16 +73,44 @@ public partial class Battle
         // Wait for team preview choices
         await RequestAndWaitForChoicesAsync(cancellationToken);
 
-        // Update UI to show battle start state (after team preview)
-        UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
+        // Manually commit team preview choices (adds Team actions to queue)
+        // Don't call TurnLoop yet - we need to add Start action first
+        UpdateSpeed();
+        var oldQueue = Queue.List.ToList();
+        Queue.Clear();
 
-        // Add start action to queue
+        if (!AllChoicesDone())
+        {
+            throw new InvalidOperationException("Not all choices done after team preview");
+        }
+
+        // Log each side's choice
+        foreach (Side side in Sides)
+        {
+            string? choice = side.GetChoice().ToString();
+            if (!string.IsNullOrEmpty(choice))
+            {
+                InputLog.Add($"> {side.Id} {choice}");
+            }
+        }
+
+        // Add team actions to queue
+        foreach (Side side in Sides)
+        {
+            Queue.AddChoice(side.Choice.Actions);
+        }
+
+        ClearRequest();
+        Queue.Sort();
+        Queue.List.AddRange(oldQueue);
+
+        // NOW add start action to queue (AFTER team actions)
         Queue.InsertChoice(new StartGameAction());
 
         // Set mid-turn flag
         MidTurn = true;
 
-        // Start turn loop if no request is pending
+        // Start turn loop - Start action will run first, switching Pokemon in
         if (RequestState == RequestState.None)
         {
             await TurnLoopAsync(cancellationToken);
@@ -327,56 +355,63 @@ public partial class Battle
     /// </summary>
     public async Task TurnLoopAsync(CancellationToken cancellationToken = default)
     {
+        Console.WriteLine($"[TurnLoopAsync] Starting, RequestState={RequestState}, MidTurn={MidTurn}, Queue.Count={Queue.List.Count}");
+
         if (DisplayUi)
-        {
-            // Add empty line for formatting
-            Add(string.Empty);
-
-          // Add timestamp in Unix epoch seconds
-long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-       Add("t:", timestamp);
-        }
-
-        // Clear request state if it exists
-  if (RequestState != RequestState.None)
-        {
-      RequestState = RequestState.None;
-        }
-
-        // First time through - set up turn structure
-  if (!MidTurn)
     {
-      // Insert BeforeTurn action at the front of the queue
-     Queue.InsertChoice(new BeforeTurnAction());
+     // Add empty line for formatting
+    Add(string.Empty);
 
-         // Add Residual action at the end of the queue
-         Queue.AddChoice(new ResidualAction());
-
-MidTurn = true;
- }
-
-        // Process actions one at a time
-  while (Queue.Shift() is { } action)
-        {
-        RunAction(action);
-
-   // Exit early if we need to wait for a request or battle ended
-         if (RequestState != RequestState.None || Ended)
-   {
-           // If we have a pending request, wait for player choices
-       if (RequestState != RequestState.None)
-            {
-          await RequestAndWaitForChoicesAsync(cancellationToken);
+       // Add timestamp in Unix epoch seconds
+  long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+      Add("t:", timestamp);
        }
-        return;
-        }
+
+      // Clear request state if it exists
+        if (RequestState != RequestState.None)
+        {
+     RequestState = RequestState.None;
+  }
+
+     // First time through - set up turn structure
+ if (!MidTurn)
+      {
+ // Insert BeforeTurn action at the front of the queue
+  Queue.InsertChoice(new BeforeTurnAction());
+
+           // Add Residual action at the end of the queue
+      Queue.AddChoice(new ResidualAction());
+
+ MidTurn = true;
+     }
+
+    Console.WriteLine($"[TurnLoopAsync] Before action loop, Queue.Count={Queue.List.Count}");
+
+  // Process actions one at a time
+    while (Queue.Shift() is { } action)
+  {
+      Console.WriteLine($"[TurnLoopAsync] Processing action: {action.Choice}");
+       RunAction(action);
+
+    // Exit early if we need to wait for a request or battle ended
+if (RequestState != RequestState.None || Ended)
+         {
+ Console.WriteLine($"[TurnLoopAsync] Exiting early: RequestState={RequestState}, Ended={Ended}");
+            // If we have a pending request, wait for player choices
+  if (RequestState != RequestState.None)
+ {
+   await RequestAndWaitForChoicesAsync(cancellationToken);
+   }
+      return;
+       }
         }
 
-     // Turn is complete
-       await EndTurnAsync(cancellationToken);
-     MidTurn = false;
-    Queue.Clear();
-   }
+  Console.WriteLine($"[TurnLoopAsync] All actions processed, calling EndTurnAsync");
+        // Turn is complete
+      await EndTurnAsync(cancellationToken);
+   MidTurn = false;
+        Queue.Clear();
+    }
 
     // Keep synchronous version for backward compatibility
     public void TurnLoop()
