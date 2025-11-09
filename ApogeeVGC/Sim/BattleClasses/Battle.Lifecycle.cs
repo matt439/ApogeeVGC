@@ -332,7 +332,10 @@ public partial class Battle
         {
             Add("turn", Turn);
         }
-
+        
+        // Reset MidTurn flag so the next TurnLoopAsync will set up properly
+        MidTurn = false;
+        
         // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
         // Gen 9 doesn't use Quick Claw rolls the same way
 
@@ -383,6 +386,18 @@ public partial class Battle
         // First time through - set up turn structure
         if (!MidTurn)
         {
+            // Clear messages from previous turn at the start of the new turn
+            // (Don't clear on Turn 1 since there are no previous messages)
+            if (Turn > 0)
+            {
+                Console.WriteLine($"[TurnLoopAsync] Clearing messages at start of Turn {Turn}");
+                PlayerController.ClearMessages();
+            }
+            else
+            {
+                Console.WriteLine($"[TurnLoopAsync] Skipping clear on Turn {Turn} (first turn)");
+            }
+   
             // Insert BeforeTurn action at the front of the queue
             Queue.InsertChoice(new BeforeTurnAction());
 

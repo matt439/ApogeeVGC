@@ -172,8 +172,8 @@ public partial class Battle
             if (source != null && effectCondition?.EffectType == EffectType.Move)
                 source.LastDamage = targetDamage;
 
-            // Log damage messages
-            PrintDamageMessage(target, source, effectCondition);
+            // Log damage messages with the actual damage amount
+            PrintDamageMessage(target, targetDamage, source, effectCondition);
 
             // Handle drain for moves (Gen 9 uses rounding)
             if (effect is EffectBattleDamageEffect { Effect: ActiveMove move })

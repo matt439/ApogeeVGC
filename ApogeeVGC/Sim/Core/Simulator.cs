@@ -47,6 +47,23 @@ public class Simulator : IPlayerController, IBattleController
         player.UpdateMessages(messages);
     }
 
+    public void ClearMessages()
+    {
+        Console.WriteLine("[Simulator.ClearMessages] Called");
+        // Directly call ClearMessages on GUI players' BattleGame windows
+        if (Player1 is PlayerGui gui1)
+        {
+            Console.WriteLine($"[Simulator.ClearMessages] Calling ClearMessages for Player1 (GuiWindow: {gui1.GuiWindow?.GetHashCode() ?? -1})");
+            gui1.GuiWindow?.ClearMessages();
+        }
+        if (Player2 is PlayerGui gui2)
+        {
+            Console.WriteLine($"[Simulator.ClearMessages] Calling ClearMessages for Player2 (GuiWindow: {gui2.GuiWindow?.GetHashCode() ?? -1})");
+            gui2.GuiWindow?.ClearMessages();
+        }
+        Console.WriteLine("[Simulator.ClearMessages] Completed");
+    }
+
     public BattlePerspective GetCurrentPerspective(SideId sideId)
     {
         if (Battle == null)

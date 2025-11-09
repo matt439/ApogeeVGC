@@ -12,6 +12,12 @@ public interface IPlayerController
     void UpdatePlayerUi(SideId sideId, BattlePerspective perspective);
     
     void UpdateMessages(SideId sideId, IEnumerable<BattleMessage> messages);
+    
+    /// <summary>
+    /// Clear all messages from the message display.
+    /// Typically called at the end of each turn to prevent message overflow.
+    /// </summary>
+    void ClearMessages();
 
     PlayerUiType GetPlayerUiType(SideId sideId);
 }

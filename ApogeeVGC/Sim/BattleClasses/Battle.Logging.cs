@@ -328,12 +328,32 @@ public partial class Battle
     /// Logs a damage message to the battle log based on the effect causing the damage.
     /// Handles special cases like partially trapped, powder, and confusion.
     /// </summary>
-    private void PrintDamageMessage(Pokemon target, Pokemon? source, Condition? effect)
+    /// <param name="target">The Pokemon that took damage</param>
+    /// <param name="damageAmount">The actual amount of damage dealt</param>
+    /// <param name="source">The Pokemon that caused the damage (optional)</param>
+    /// <param name="effect">The effect that caused the damage (optional)</param>
+    private void PrintDamageMessage(Pokemon target, int damageAmount, Pokemon? source, Condition? effect)
     {
         if (!DisplayUi) return;
 
         // Get the effect name, converting "tox" to "psn" for display
         string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
+
+        // Create the base damage message
+        DamageMessage CreateDamageMessage(string? effectNameOverride = null,
+            string? sourceNameOverride = null, string? specialTag = null)
+        {
+            return new DamageMessage
+            {
+                PokemonName = target.Name,
+                DamageAmount = damageAmount,
+                RemainingHp = target.Hp,
+                MaxHp = target.MaxHp,
+                EffectName = effectNameOverride ?? effectName,
+                SourcePokemonName = sourceNameOverride,
+                SpecialTag = specialTag
+            };
+        }
 
         switch (effect?.Id)
         {
@@ -343,6 +363,11 @@ public partial class Battle
                         out EffectState? ptState) &&
                     ptState.SourceEffect != null)
                 {
+                    AddMessage(CreateDamageMessage(
+                        effectNameOverride: ptState.SourceEffect.FullName,
+                        specialTag: "[partiallytrapped]"));
+
+                    // Still add to legacy log
                     Add("-damage", target, target.GetHealth,
                         $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
@@ -350,10 +375,17 @@ public partial class Battle
                 break;
 
             case ConditionId.Powder:
+                // Silent damage - create message but mark as silent
+                AddMessage(CreateDamageMessage(specialTag: "[silent]"));
+
+                // Still add to legacy log
                 Add("-damage", target, target.GetHealth, "[silent]");
                 break;
 
             case ConditionId.Confusion:
+                AddMessage(CreateDamageMessage(effectNameOverride: "confusion"));
+
+                // Still add to legacy log
                 Add("-damage", target, target.GetHealth, "[from] confusion");
                 break;
 
@@ -361,23 +393,29 @@ public partial class Battle
                 if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
+                    AddMessage(CreateDamageMessage());
                     Add("-damage", target, target.GetHealth);
                 }
                 else if (source != null &&
                          (source != target || effect?.EffectType == EffectType.Ability))
                 {
                     // Damage from effect with source
+                    AddMessage(CreateDamageMessage(sourceNameOverride: source.Name));
                     Add("-damage", target, target.GetHealth, $"[from] {effectName}",
                         $"[of] {source}");
                 }
                 else
                 {
                     // Damage from effect without source
+                    AddMessage(CreateDamageMessage());
                     Add("-damage", target, target.GetHealth, $"[from] {effectName}");
                 }
 
                 break;
         }
+
+        // Flush messages immediately so GUI players see damage updates
+        FlushMessages();
     }
 
     /// <summary>

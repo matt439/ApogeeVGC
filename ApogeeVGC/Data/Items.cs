@@ -33,6 +33,14 @@ public record Items
                 OnResidualSubOrder = 4,
                 OnResidual = (battle, pokemon, _, _) =>
                 {
+                    if (pokemon == null)
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Leftovers OnResidual: pokemon is null");
+                        }
+                        return;
+                    }
                     battle.Heal(pokemon.BaseMaxHp / 16);
                 },
             },
@@ -78,6 +86,10 @@ public record Items
                 OnResidualSubOrder = 3,
                 OnResidual = (_, pokemon, _, _) =>
                 {
+                    if (pokemon == null)
+                    {
+                        return;
+                    }
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);
                 },
                 Num = 273,

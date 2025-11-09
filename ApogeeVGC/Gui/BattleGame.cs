@@ -325,9 +325,10 @@ if (_shouldStartBattle && _pendingLibrary != null && _pendingBattleOptions != nu
     {
         lock (_stateLock)
         {
-   _messageQueue.Clear();
+     int count = _messageQueue.Count;
+ _messageQueue.Clear();
+ Console.WriteLine($"[BattleGame] Messages cleared ({count} messages removed)");
         }
-        Console.WriteLine("[BattleGame] Messages cleared");
     }
 
     /// <summary>

@@ -68,10 +68,39 @@ public class DamageMessage : BattleMessage
     public required int RemainingHp { get; init; }
     public required int MaxHp { get; init; }
 
+    /// <summary>
+    /// The effect that caused the damage (e.g., "psn", "brn", "confusion", move name)
+    /// </summary>
+    public string? EffectName { get; init; }
+
+    /// <summary>
+    /// The source Pokemon that caused the damage (if applicable)
+    /// </summary>
+    public string? SourcePokemonName { get; init; }
+
+    /// <summary>
+    /// Special damage tags like "[partiallytrapped]" or "[silent]"
+    /// </summary>
+    public string? SpecialTag { get; init; }
+
     public override string ToDisplayText()
     {
         double percentRemaining = (double)RemainingHp / MaxHp * 100;
-        return $"{PokemonName} took {DamageAmount} damage! ({percentRemaining:F1}% HP remaining)";
+
+        string baseMessage =
+            $"{PokemonName} took {DamageAmount} damage! ({percentRemaining:F1}% HP remaining)";
+
+        if (!string.IsNullOrEmpty(EffectName))
+        {
+            baseMessage += $" from {EffectName}";
+        }
+
+        if (!string.IsNullOrEmpty(SourcePokemonName))
+        {
+            baseMessage += $" (source: {SourcePokemonName})";
+        }
+
+        return baseMessage;
     }
 }
 

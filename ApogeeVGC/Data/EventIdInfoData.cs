@@ -43,6 +43,25 @@ public record EventIdInfoData
             UsesSpeed = true,
             UsesFractionalSpeed = true,
         },
+        [EventId.Residual] = new EventIdInfo
+        {
+            Id = EventId.Residual,
+            FieldEventId = EventId.FieldResidual,
+            SideEventId = EventId.SideResidual,
+            UsesSpeed = true,
+        },
+        [EventId.FieldResidual] = new EventIdInfo
+        {
+            Id = EventId.FieldResidual,
+            BaseEventId = EventId.Residual,
+            UsesSpeed = true,
+        },
+        [EventId.SideResidual] = new EventIdInfo
+        {
+            Id = EventId.SideResidual,
+            BaseEventId = EventId.Residual,
+            UsesSpeed = true,
+        },
         // TODO: Fill in the rest of the event infos
     };
 }
