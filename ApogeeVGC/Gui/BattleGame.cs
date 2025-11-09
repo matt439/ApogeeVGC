@@ -22,6 +22,7 @@ public class BattleGame : Game
     private SpriteManager? _spriteManager;
     private ChoiceInputManager? _choiceInputManager;
     private BattleRunner? _battleRunner;
+    private MessageRenderer? _messageRenderer;
 
     private BattlePerspective? _currentBattlePerspective;
     private readonly object _stateLock = new();
@@ -64,51 +65,73 @@ public class BattleGame : Game
     {
         Console.WriteLine("[BattleGame] LoadContent() called");
 
-        try
-        {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+     try
+      {
+    _spriteBatch = new SpriteBatch(GraphicsDevice);
+     Console.WriteLine("[BattleGame] SpriteBatch created");
 
-            // Load default font
-            _defaultFont = Content.Load<SpriteFont>("Fonts/DefaultFont");
+ // Load default font
+ _defaultFont = Content.Load<SpriteFont>("Fonts/DefaultFont");
+      Console.WriteLine("[BattleGame] Font loaded");
 
-            // Initialize sprite manager and load sprites
-            _spriteManager = new SpriteManager();
-            _spriteManager.LoadSprites(Content, GraphicsDevice);
+      // Initialize sprite manager and load sprites
+      _spriteManager = new SpriteManager();
+    _spriteManager.LoadSprites(Content, GraphicsDevice);
+    Console.WriteLine("[BattleGame] SpriteManager initialized");
 
-            // Initialize battle renderer with sprite manager
-            _battleRenderer =
-                new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice, _spriteManager);
+   // Initialize battle renderer with sprite manager
+      _battleRenderer =
+     new BattleRenderer(_spriteBatch, _defaultFont, GraphicsDevice, _spriteManager);
+ Console.WriteLine("[BattleGame] BattleRenderer initialized");
 
-            // Initialize choice input manager
-            _choiceInputManager =
-                new ChoiceInputManager(_spriteBatch, _defaultFont, GraphicsDevice);
-            Console.WriteLine("[BattleGame] ChoiceInputManager initialized successfully");
+  // Initialize choice input manager
+      _choiceInputManager =
+     new ChoiceInputManager(_spriteBatch, _defaultFont, GraphicsDevice);
+     Console.WriteLine("[BattleGame] ChoiceInputManager initialized successfully");
 
-            // Connect choice input manager to battle renderer
-            _battleRenderer.SetChoiceInputManager(_choiceInputManager);
+      // Initialize message renderer
+     _messageRenderer = new MessageRenderer(_spriteBatch, _defaultFont, GraphicsDevice);
+            Console.WriteLine("[BattleGame] MessageRenderer initialized successfully");
+
+  // Connect choice input manager to battle renderer
+   _battleRenderer.SetChoiceInputManager(_choiceInputManager);
+    Console.WriteLine("[BattleGame] Components connected");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[BattleGame] ERROR in LoadContent: {ex.Message}");
-            Console.WriteLine($"[BattleGame] Stack trace: {ex.StackTrace}");
+      Console.WriteLine($"[BattleGame] Stack trace: {ex.StackTrace}");
 
-            // Initialize with minimal setup if content loading fails
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _choiceInputManager = new ChoiceInputManager(_spriteBatch, null!, GraphicsDevice);
-            Console.WriteLine("[BattleGame] Initialized with minimal setup (no fonts/sprites)");
-        }
+  // Initialize with minimal setup if content loading fails
+    // Only initialize if not already initialized
+if (_spriteBatch == null)
+            {
+     _spriteBatch = new SpriteBatch(GraphicsDevice);
+    Console.WriteLine("[BattleGame] Created fallback SpriteBatch");
+   }
+
+   if (_choiceInputManager == null)
+   {
+    _choiceInputManager = new ChoiceInputManager(_spriteBatch, null!, GraphicsDevice);
+       Console.WriteLine("[BattleGame] Initialized with minimal setup (no fonts/sprites)");
+         }
+            else
+       {
+ Console.WriteLine("[BattleGame] ChoiceInputManager was already initialized before error");
+     }
+      }
 
         // If there's a pending battle start, start it now that content is loaded
-        if (_shouldStartBattle && _pendingLibrary != null && _pendingBattleOptions != null &&
+if (_shouldStartBattle && _pendingLibrary != null && _pendingBattleOptions != null &&
             _pendingPlayerController != null)
-        {
-            Console.WriteLine("[BattleGame] Starting pending battle...");
-            StartBattleInternal(_pendingLibrary, _pendingBattleOptions, _pendingPlayerController);
-            _shouldStartBattle = false;
-            _pendingLibrary = null;
-            _pendingBattleOptions = null;
-            _pendingPlayerController = null;
-        }
+   {
+     Console.WriteLine("[BattleGame] Starting pending battle...");
+      StartBattleInternal(_pendingLibrary, _pendingBattleOptions, _pendingPlayerController);
+ _shouldStartBattle = false;
+      _pendingLibrary = null;
+  _pendingBattleOptions = null;
+      _pendingPlayerController = null;
+   }
     }
 
     /// <summary>
@@ -149,6 +172,9 @@ public class BattleGame : Game
         IPlayerController playerController)
     {
         Console.WriteLine("[BattleGame] StartBattleInternal called");
+        
+        // Clear any previous battle messages
+        ClearMessages();
         
         // PlayerController should be a Simulator instance
   if (playerController is not Simulator simulator)
@@ -204,8 +230,15 @@ public class BattleGame : Game
 
         // Render choice UI on top
         _choiceInputManager?.Render(gameTime);
+        
+     // Render messages on top of everything
+   if (_messageRenderer != null)
+        {
+    var messages = GetMessages();
+   _messageRenderer.Render(gameTime, messages);
+  }
 
-        _spriteBatch?.End();
+   _spriteBatch?.End();
 
         base.Draw(gameTime);
     }
@@ -283,6 +316,19 @@ public class BattleGame : Game
             return new List<BattleMessage>(_messageQueue);
         }
     }
+    
+    /// <summary>
+    /// Clear all messages from the queue (thread-safe).
+    /// Useful when starting a new battle.
+    /// </summary>
+    public void ClearMessages()
+    {
+        lock (_stateLock)
+        {
+   _messageQueue.Clear();
+        }
+        Console.WriteLine("[BattleGame] Messages cleared");
+    }
 
     /// <summary>
     /// Request a choice from the user via the GUI.
@@ -293,38 +339,43 @@ public class BattleGame : Game
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
         Console.WriteLine(
-            $"[BattleGame] RequestChoiceAsync called. _choiceInputManager null? {_choiceInputManager == null}");
+        $"[BattleGame] RequestChoiceAsync called. _choiceInputManager null? {_choiceInputManager == null}");
 
-        // If _choiceInputManager is null, wait for LoadContent() to complete (with timeout)
-        if (_choiceInputManager == null)
+        // Wait for LoadContent() to complete if needed
+if (_choiceInputManager == null)
         {
-            Console.WriteLine("[BattleGame] Waiting for LoadContent() to complete...");
+          Console.WriteLine("[BattleGame] Waiting for LoadContent() to complete...");
 
-            // Wait up to 5 seconds for LoadContent to initialize _choiceInputManager
-            bool initialized = SpinWait.SpinUntil(() => _choiceInputManager != null,
-                TimeSpan.FromSeconds(5));
+  // Wait up to 10 seconds for LoadContent to initialize _choiceInputManager
+  bool initialized = SpinWait.SpinUntil(() => _choiceInputManager != null,
+        TimeSpan.FromSeconds(10));
 
-            if (!initialized)
-            {
-                Console.WriteLine(
-                    "[BattleGame] ERROR: Choice input manager not initialized after 5 second wait!");
-                Console.WriteLine($"[BattleGame] _spriteBatch null? {_spriteBatch == null}");
+        if (!initialized)
+     {
+  Console.WriteLine(
+       "[BattleGame] ERROR: Choice input manager not initialized after 10 second wait!");
+          Console.WriteLine($"[BattleGame] _spriteBatch null? {_spriteBatch == null}");
                 Console.WriteLine($"[BattleGame] _defaultFont null? {_defaultFont == null}");
-                Console.WriteLine($"[BattleGame] This BattleGame instance: {this.GetHashCode()}");
-                throw new InvalidOperationException(
-                    "Choice input manager not initialized after waiting 5 seconds. " +
-                    "LoadContent() may have failed or this is the wrong BattleGame instance.");
-            }
+      Console.WriteLine($"[BattleGame] This BattleGame instance: {this.GetHashCode()}");
+      throw new InvalidOperationException(
+      "Choice input manager not initialized after waiting 10 seconds. " +
+         "LoadContent() may have failed or this is the wrong BattleGame instance.");
+      }
 
             Console.WriteLine("[BattleGame] ChoiceInputManager is now initialized");
         }
 
         // The battle thread calls this and awaits the result
-        // The GUI thread will complete the TaskCompletionSource when the user makes a choice
-        return _choiceInputManager?.RequestChoiceAsync(request, requestType, perspective,
-            cancellationToken) ?? throw new NullReferenceException("Choice input manager is null.");
-    }
+      // The GUI thread will complete the TaskCompletionSource when the user makes a choice
+    if (_choiceInputManager == null)
+  {
+            throw new InvalidOperationException("Choice input manager is null after initialization wait.");
+     }
 
+        return _choiceInputManager.RequestChoiceAsync(request, requestType, perspective,
+    cancellationToken);
+    }
+    
     /// <summary>
     /// Request the GUI window to exit gracefully
     /// </summary>

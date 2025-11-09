@@ -816,7 +816,8 @@ public abstract record Part
     public static implicit operator Part(int value) => new IntPart(value);
     public static implicit operator Part(double value) => new DoublePart(value);
     public static implicit operator Part(bool value) => new BoolPart(value);
-    public static implicit operator Part(Pokemon pokemon) => new PokemonPart(pokemon);
+    public static implicit operator Part(Pokemon? pokemon) =>
+  pokemon == null ? new StringPart(string.Empty) : new PokemonPart(pokemon);
     public static implicit operator Part(Side side) => new SidePart(side);
     public static implicit operator Part(ActiveMove move) => new MovePart(move);
 

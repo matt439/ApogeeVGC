@@ -426,7 +426,47 @@ public partial class BattleActions
                 PokemonName = pokemon.Name,
                 MoveName = moveName
             });
-        }
+    
+          // TODO: Add more messages as battle progresses. Examples:
+            // 
+            // After damage calculation (in BattleActions.Damage.cs):
+    // Battle.AddMessage(new DamageMessage 
+     // { 
+            //     PokemonName = target.Name,
+            //     DamageAmount = damageDealt,
+  //     RemainingHp = target.Hp,
+            //     MaxHp = target.MaxHp
+            // });
+            //
+            // For type effectiveness (after checking move effectiveness):
+         // if (effectiveness > 1.0)
+            //     Battle.AddMessage(new EffectivenessMessage 
+    //     { 
+  //      Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective 
+     //     });
+   // else if (effectiveness < 1.0)
+            //     Battle.AddMessage(new EffectivenessMessage 
+            //     { 
+         //  Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective 
+          //     });
+            //
+     // For critical hits (in damage calculation):
+// if (isCriticalHit)
+          //     Battle.AddMessage(new CriticalHitMessage());
+ //
+   // For move miss:
+            // Battle.AddMessage(new MissMessage { PokemonName = pokemon.Name });
+            //
+       // For fainting (in Battle.Fainting.cs):
+// Battle.AddMessage(new FaintMessage { PokemonName = target.Name });
+   //
+     // For switching (in BattleActions.Switch.cs):
+        // Battle.AddMessage(new SwitchMessage 
+  // { 
+      //     TrainerName = side.Name,
+    //     PokemonName = newPokemon.Name 
+            // });
+     }
 
         // Handle no target
         if (target == null)
