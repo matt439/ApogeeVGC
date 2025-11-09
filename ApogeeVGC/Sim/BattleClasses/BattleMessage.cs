@@ -1,6 +1,3 @@
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
-
 namespace ApogeeVGC.Sim.BattleClasses;
 
 /// <summary>
@@ -14,7 +11,7 @@ public abstract class BattleMessage
     /// Timestamp when the message was created
     /// </summary>
     public DateTime Timestamp { get; init; } = DateTime.UtcNow;
-    
+
     /// <summary>
     /// Convert the message to a human-readable string
     /// </summary>
@@ -28,7 +25,7 @@ public class MoveUsedMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required string MoveName { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return $"{PokemonName} used {MoveName}!";
@@ -44,20 +41,20 @@ public class EffectivenessMessage : BattleMessage
     {
         SuperEffective,
         NotVeryEffective,
-        NoEffect
+        NoEffect,
     }
-    
+
     public required EffectivenessType Effectiveness { get; init; }
-    
+
     public override string ToDisplayText()
     {
-      return Effectiveness switch
-{
-   EffectivenessType.SuperEffective => "It's super effective!",
+        return Effectiveness switch
+        {
+            EffectivenessType.SuperEffective => "It's super effective!",
             EffectivenessType.NotVeryEffective => "It's not very effective...",
             EffectivenessType.NoEffect => "It doesn't affect the target...",
-        _ => string.Empty
-   };
+            _ => string.Empty,
+        };
     }
 }
 
@@ -70,7 +67,7 @@ public class DamageMessage : BattleMessage
     public required int DamageAmount { get; init; }
     public required int RemainingHp { get; init; }
     public required int MaxHp { get; init; }
-    
+
     public override string ToDisplayText()
     {
         double percentRemaining = (double)RemainingHp / MaxHp * 100;
@@ -84,7 +81,7 @@ public class DamageMessage : BattleMessage
 public class FaintMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return $"{PokemonName} fainted!";
@@ -98,10 +95,10 @@ public class SwitchMessage : BattleMessage
 {
     public required string TrainerName { get; init; }
     public required string PokemonName { get; init; }
-    
-  public override string ToDisplayText()
+
+    public override string ToDisplayText()
     {
-   return $"{TrainerName} sent out {PokemonName}!";
+        return $"{TrainerName} sent out {PokemonName}!";
     }
 }
 
@@ -112,7 +109,7 @@ public class CriticalHitMessage : BattleMessage
 {
     public override string ToDisplayText()
     {
-    return "A critical hit!";
+        return "A critical hit!";
     }
 }
 
@@ -122,7 +119,7 @@ public class CriticalHitMessage : BattleMessage
 public class MissMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return $"{PokemonName}'s attack missed!";
@@ -135,7 +132,7 @@ public class MissMessage : BattleMessage
 public class StatusMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
-  public required string StatusName { get; init; }
+    public required string StatusName { get; init; }
 
     public override string ToDisplayText()
     {
@@ -150,12 +147,12 @@ public class WeatherMessage : BattleMessage
 {
     public required string WeatherName { get; init; }
     public bool IsEnding { get; init; }
-    
+
     public override string ToDisplayText()
     {
-        return IsEnding 
-          ? $"The {WeatherName} stopped!" 
- : $"{WeatherName} started!";
+        return IsEnding
+            ? $"The {WeatherName} stopped!"
+            : $"{WeatherName} started!";
     }
 }
 
@@ -167,19 +164,19 @@ public class StatChangeMessage : BattleMessage
     public required string PokemonName { get; init; }
     public required string StatName { get; init; }
     public required int Stages { get; init; }
-    
+
     public override string ToDisplayText()
     {
         string direction = Stages > 0 ? "rose" : "fell";
-    string amount = Math.Abs(Stages) switch
+        string amount = Math.Abs(Stages) switch
         {
-  1 => "",
+            1 => "",
             2 => " sharply",
-  >= 3 => " drastically",
- _ => ""
-      };
-        
-    return $"{PokemonName}'s {StatName} {direction}{amount}!";
+            >= 3 => " drastically",
+            _ => ""
+        };
+
+        return $"{PokemonName}'s {StatName} {direction}{amount}!";
     }
 }
 
@@ -189,7 +186,7 @@ public class StatChangeMessage : BattleMessage
 public class MoveFailMessage : BattleMessage
 {
     public required string Reason { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return $"But it failed! {Reason}";
@@ -202,7 +199,7 @@ public class MoveFailMessage : BattleMessage
 public class GenericMessage : BattleMessage
 {
     public required string Text { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return Text;
@@ -215,7 +212,7 @@ public class GenericMessage : BattleMessage
 public class TurnStartMessage : BattleMessage
 {
     public required int TurnNumber { get; init; }
-    
+
     public override string ToDisplayText()
     {
         return $"--- Turn {TurnNumber} ---";
@@ -229,10 +226,10 @@ public class HealMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required int HealAmount { get; init; }
-    
+
     public override string ToDisplayText()
     {
-     return $"{PokemonName} restored {HealAmount} HP!";
+        return $"{PokemonName} restored {HealAmount} HP!";
     }
 }
 
@@ -243,10 +240,10 @@ public class ItemMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required string ItemName { get; init; }
-    
+
     public override string ToDisplayText()
     {
-      return $"{PokemonName} used its {ItemName}!";
+        return $"{PokemonName} used its {ItemName}!";
     }
 }
 
@@ -255,10 +252,10 @@ public class ItemMessage : BattleMessage
 /// </summary>
 public class AbilityMessage : BattleMessage
 {
-  public required string PokemonName { get; init; }
+    public required string PokemonName { get; init; }
     public required string AbilityName { get; init; }
     public string? AdditionalInfo { get; init; }
-    
+
     public override string ToDisplayText()
     {
         string baseText = $"{PokemonName}'s {AbilityName}!";

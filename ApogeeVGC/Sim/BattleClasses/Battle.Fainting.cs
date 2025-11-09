@@ -1,6 +1,5 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -13,7 +12,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    public void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null)
+    public static void Faint(Pokemon pokemon, Pokemon? source = null, IEffect? effect = null)
     {
         pokemon.Faint(source, effect);
     }
@@ -21,16 +20,11 @@ public partial class Battle
     public void CheckFainted()
     {
         // Iterate through all sides in the battle
-        foreach (Side side in Sides)
+        foreach (Pokemon pokemon in Sides.SelectMany(side => side.Active.OfType<Pokemon>()
+                     .Where(pokemon => pokemon.Fainted)))
         {
-            foreach (Pokemon? pokemon in side.Active)
-            {
-                if (pokemon == null) continue;
-                if (!pokemon.Fainted) continue;
-
-                // Mark that this Pokémon needs to be switched out
-                pokemon.SwitchFlag = true;
-            }
+            // Mark that this Pokémon needs to be switched out
+            pokemon.SwitchFlag = true;
         }
     }
 
