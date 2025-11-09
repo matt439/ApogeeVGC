@@ -62,6 +62,7 @@ public partial class Battle
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
     //public List<string> MessageLog { get; set; } = [];
+    public List<BattleMessage> PendingMessages { get; set; } = [];
     public int SentLogPos { get; set; }
     public bool SentEnd { get; set; }
     public static bool SentRequests => true;

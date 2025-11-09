@@ -27,6 +27,10 @@ public class BattleGame : Game
     private readonly object _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown = false;
+    
+    // Message queue for battle events
+    private readonly List<BattleMessage> _messageQueue = new();
+    private const int MaxMessagesDisplayed = 50; // Limit message history
 
     // Pending battle start data
     private Library? _pendingLibrary;
@@ -222,12 +226,12 @@ public class BattleGame : Game
     public void UpdateBattlePerspective(BattlePerspective battlePerspective)
     {
         lock (_stateLock)
-        {
-            _currentBattlePerspective = battlePerspective;
+   {
+     _currentBattlePerspective = battlePerspective;
         }
 
-        // Debug logging to track perspective updates
-        Console.WriteLine($"[BattleGame] UpdateBattlePerspective called: Type={battlePerspective.PerspectiveType}");
+      // Debug logging to track perspective updates
+      Console.WriteLine($"[BattleGame] UpdateBattlePerspective called: Type={battlePerspective.PerspectiveType}");
         Console.WriteLine($"[BattleGame]   PlayerSide.Active.Count={battlePerspective.PlayerSide.Active.Count}");
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
@@ -235,10 +239,48 @@ public class BattleGame : Game
           Console.WriteLine($"[BattleGame]   PlayerSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.Hp}/{p.MaxHp})")}");
         }
         Console.WriteLine($"[BattleGame]   OpponentSide.Active.Count={battlePerspective.OpponentSide.Active.Count}");
-     for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
+   for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
       var p = battlePerspective.OpponentSide.Active[i];
      Console.WriteLine($"[BattleGame]   OpponentSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.HpPercentage:F1}%)")}");
+        }
+    }
+    
+    /// <summary>
+    /// Update the message log with new battle messages (thread-safe).
+    /// Called from the battle simulation thread.
+    /// </summary>
+    /// <param name="messages">New messages to add to the display</param>
+    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+{
+        lock (_stateLock)
+{
+  _messageQueue.AddRange(messages);
+            
+         // Trim old messages if we exceed the maximum
+     if (_messageQueue.Count > MaxMessagesDisplayed)
+            {
+     int toRemove = _messageQueue.Count - MaxMessagesDisplayed;
+     _messageQueue.RemoveRange(0, toRemove);
+     }
+        }
+        
+        // Debug logging
+     foreach (var message in messages)
+   {
+   Console.WriteLine($"[BattleGame] Message: {message.ToDisplayText()}");
+        }
+    }
+    
+  /// <summary>
+    /// Get a copy of the current message queue (thread-safe).
+    /// Called from the GUI rendering thread.
+    /// </summary>
+    public List<BattleMessage> GetMessages()
+    {
+        lock (_stateLock)
+   {
+            return new List<BattleMessage>(_messageQueue);
         }
     }
 

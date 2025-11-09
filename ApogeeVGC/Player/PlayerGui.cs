@@ -62,6 +62,12 @@ public class PlayerGui : IPlayer
         GuiWindow.UpdateBattlePerspective(perspective);
     }
 
+    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+    {
+        // Forward messages to the GUI window (thread-safe)
+        GuiWindow.UpdateMessages(messages);
+    }
+
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
     public event EventHandler<Choice>? ChoiceSubmitted;
 

@@ -419,6 +419,13 @@ public partial class BattleActions
                 Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
                     StringNumberDelegateObjectUnion.FromObject(target));
             }
+
+            // Add GUI message for move usage
+            Battle.AddMessage(new MoveUsedMessage
+            {
+                PokemonName = pokemon.Name,
+                MoveName = moveName
+            });
         }
 
         // Handle no target

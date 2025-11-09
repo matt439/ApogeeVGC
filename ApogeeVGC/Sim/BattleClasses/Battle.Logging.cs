@@ -11,14 +11,18 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    private void UpdateAllPlayersUi(BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
+    private void UpdateAllPlayersUi(
+        BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
         foreach (Side side in Sides)
         {
             UpdatePlayerUi(side.Id, battlePerspectiveType);
         }
+
+        // Flush messages after all players have been updated
+        FlushMessages();
     }
-    
+
     private void UpdatePlayerUi(SideId sideId,
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
@@ -26,7 +30,7 @@ public partial class Battle
         BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
         PlayerController.UpdatePlayerUi(sideId, perspective);
     }
-    
+
     public void Add(params PartFuncUnion[] parts)
     {
         // Check if any part is a function that generates side-specific content
@@ -122,7 +126,6 @@ public partial class Battle
         string attributes = $"|{string.Join("|", args.Select(FormatArg))}";
         Log[LastMoveLine] += attributes;
     }
-
 
 
     /// <summary>
@@ -256,11 +259,11 @@ public partial class Battle
                 log["p3"] = Sides[2].Name;
                 log["p3team"] = Sides[2].Team;
                 log["score"] = new List<int>
-            {
-                Sides[0].PokemonLeft,
-                Sides[1].PokemonLeft,
-                Sides[2].PokemonLeft,
-            };
+                {
+                    Sides[0].PokemonLeft,
+                    Sides[1].PokemonLeft,
+                    Sides[2].PokemonLeft,
+                };
             }
 
             if (Sides.Count > 3)
@@ -268,12 +271,12 @@ public partial class Battle
                 log["p4"] = Sides[3].Name;
                 log["p4team"] = Sides[3].Team;
                 log["score"] = new List<int>
-            {
-                Sides[0].PokemonLeft,
-                Sides[1].PokemonLeft,
-                Sides[2].PokemonLeft,
-                Sides[3].PokemonLeft,
-            };
+                {
+                    Sides[0].PokemonLeft,
+                    Sides[1].PokemonLeft,
+                    Sides[2].PokemonLeft,
+                    Sides[3].PokemonLeft,
+                };
             }
 
             // Serialize and send the end message
@@ -295,7 +298,7 @@ public partial class Battle
             IntPart i => i.Value.ToString(),
             DoublePart d => d.Value.ToString("F"),
             BoolPart b => b.Value.ToString().ToLowerInvariant(),
-            PokemonPart p => p.Pokemon?.ToString() ?? string.Empty,
+            PokemonPart p => p.Pokemon.ToString(),
             SidePart s => s.Side.Id.GetSideIdName(),
             MovePart m => m.Move.Name,
             EffectPart e => e.Effect.Name,
@@ -336,11 +339,14 @@ public partial class Battle
         {
             case ConditionId.PartiallyTrapped:
                 // Get the source effect from the volatile condition
-                if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped, out EffectState? ptState) &&
+                if (target.Volatiles.TryGetValue(ConditionId.PartiallyTrapped,
+                        out EffectState? ptState) &&
                     ptState.SourceEffect != null)
                 {
-                    Add("-damage", target, target.GetHealth, $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
+                    Add("-damage", target, target.GetHealth,
+                        $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
+
                 break;
 
             case ConditionId.Powder:
@@ -357,16 +363,19 @@ public partial class Battle
                     // Simple damage from a move or no effect
                     Add("-damage", target, target.GetHealth);
                 }
-                else if (source != null && (source != target || effect?.EffectType == EffectType.Ability))
+                else if (source != null &&
+                         (source != target || effect?.EffectType == EffectType.Ability))
                 {
                     // Damage from effect with source
-                    Add("-damage", target, target.GetHealth, $"[from] {effectName}", $"[of] {source}");
+                    Add("-damage", target, target.GetHealth, $"[from] {effectName}",
+                        $"[of] {source}");
                 }
                 else
                 {
                     // Damage from effect without source
                     Add("-damage", target, target.GetHealth, $"[from] {effectName}");
                 }
+
                 break;
         }
     }
@@ -422,5 +431,45 @@ public partial class Battle
                 "Cannot format a function PartFuncUnion directly. This should be handled in the Add method."),
             _ => string.Empty,
         };
+    }
+
+    /// <summary>
+    /// Add a battle message to the pending message queue.
+    /// Messages will be sent to players when FlushMessages is called.
+    /// </summary>
+    public void AddMessage(BattleMessage message)
+    {
+        PendingMessages.Add(message);
+    }
+
+    /// <summary>
+    /// Flush all pending messages to players with GUI interfaces.
+    /// This is typically called after a state update to send accumulated messages.
+    /// </summary>
+    public void FlushMessages()
+    {
+        if (PendingMessages.Count == 0) return;
+
+        foreach (Side side in Sides)
+        {
+            if (PlayerController.GetPlayerUiType(side.Id) == PlayerUiType.Gui)
+            {
+                // Send a copy of the messages to this player
+                PlayerController.UpdateMessages(side.Id, new List<BattleMessage>(PendingMessages));
+            }
+        }
+
+        // Clear the pending messages
+        PendingMessages.Clear();
+    }
+
+    /// <summary>
+    /// Add a message and immediately flush it to players.
+    /// Use this for messages that should be sent immediately rather than batched.
+    /// </summary>
+    public void AddAndFlushMessage(BattleMessage message)
+    {
+        AddMessage(message);
+        FlushMessages();
     }
 }

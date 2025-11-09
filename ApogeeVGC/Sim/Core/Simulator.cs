@@ -41,6 +41,12 @@ public class Simulator : IPlayerController, IBattleController
         player.UpdateUi(perspective);
     }
 
+    public void UpdateMessages(SideId sideId, IEnumerable<BattleMessage> messages)
+    {
+        IPlayer player = GetPlayer(sideId);
+        player.UpdateMessages(messages);
+    }
+
     public BattlePerspective GetCurrentPerspective(SideId sideId)
     {
         if (Battle == null)

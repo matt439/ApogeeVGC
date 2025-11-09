@@ -22,6 +22,8 @@ public interface IPlayer
         BattlePerspective perspective, CancellationToken cancellationToken);
 
     void UpdateUi(BattlePerspective perspective);
+    
+    void UpdateMessages(IEnumerable<BattleMessage> messages);
 
     // Events for notifications
     event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

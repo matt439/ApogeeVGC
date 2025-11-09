@@ -46,7 +46,12 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // Random player doesn't have a UI to update so jut return
+        // Random player doesn't have a UI to update
+    }
+
+    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+    {
+        // Random player doesn't need to receive messages
     }
 
     // Events from interfaces

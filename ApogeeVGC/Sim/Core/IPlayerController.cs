@@ -10,6 +10,8 @@ public interface IPlayerController
         BattleRequestType requestType, BattlePerspective perspective, CancellationToken cancellationToken);
 
     void UpdatePlayerUi(SideId sideId, BattlePerspective perspective);
+    
+    void UpdateMessages(SideId sideId, IEnumerable<BattleMessage> messages);
 
     PlayerUiType GetPlayerUiType(SideId sideId);
 }
