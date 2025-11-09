@@ -15,8 +15,11 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    public async Task StartAsync(CancellationToken cancellationToken = default)
+    public void Start()
     {
+        //// Deserialized games should use Restart()
+        //if (Deserialized) return;
+
         // Need all players to start
         if (!Sides.All(_ => true))
         {
@@ -34,6 +37,13 @@ public partial class Battle
         Sides[1].Foe = Sides[0];
         Sides[0].Foe = Sides[1];
 
+        // If there are more than 2 sides (FFA - free-for-all)
+        if (Sides.Count > 2)
+        {
+            Sides[2].Foe = Sides[3];
+            Sides[3].Foe = Sides[2];
+        }
+
         if (DisplayUi)
         {
             // Log generation
@@ -41,6 +51,13 @@ public partial class Battle
 
             // Log tier
             Add("tier", Format.Name);
+
+            // Log rated status
+            if (Rated)
+            {
+                string ratedMessage = Rated ? string.Empty : Rated.ToString();
+                Add("rated", ratedMessage);
+            }
         }
 
         // Call format's OnBegin handler
@@ -48,9 +65,9 @@ public partial class Battle
 
         // Call OnBegin for each rule in the rule table
         foreach (Format subFormat in from rule in RuleTable.Keys
-                 let ruleString = rule.ToString()
-                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
-                 select Library.Rulesets[rule])
+                                     let ruleString = rule.ToString()
+                                     where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
+                                     select Library.Rulesets[rule])
         {
             subFormat.OnBegin?.Invoke(this);
         }
@@ -70,60 +87,29 @@ public partial class Battle
         // Run team preview/selection phase
         RunPickTeam();
 
-        // Wait for team preview choices
-        await RequestAndWaitForChoicesAsync(cancellationToken);
-
-        // Manually commit team preview choices (adds Team actions to queue)
-        // Don't call TurnLoop yet - we need to add Start action first
-        UpdateSpeed();
-        var oldQueue = Queue.List.ToList();
-        Queue.Clear();
-
-        if (!AllChoicesDone())
-        {
-            throw new InvalidOperationException("Not all choices done after team preview");
-        }
-
-        // Log each side's choice
-        foreach (Side side in Sides)
-        {
-            string? choice = side.GetChoice().ToString();
-            if (!string.IsNullOrEmpty(choice))
-            {
-                InputLog.Add($"> {side.Id} {choice}");
-            }
-        }
-
-        // Add team actions to queue
-        foreach (Side side in Sides)
-        {
-            Queue.AddChoice(side.Choice.Actions);
-        }
-
-        ClearRequest();
-        Queue.Sort();
-        Queue.List.AddRange(oldQueue);
-
-        // NOW add start action to queue (AFTER team actions)
+        // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
         // Set mid-turn flag
         MidTurn = true;
 
-        // Start turn loop - Start action will run first, switching Pokemon in
+        // Start turn loop if no request is pending
         if (RequestState == RequestState.None)
         {
-            await TurnLoopAsync(cancellationToken);
+            TurnLoop();
         }
     }
 
-    // Keep synchronous version for backward compatibility
-    public void Start()
-    {
-        StartAsync(CancellationToken.None).GetAwaiter().GetResult();
-    }
+    //public void Restart(Action<string, List<string>>? send)
+    //{
+    //    if (!Deserialized)
+    //    {
+    //        throw new InvalidOperationException("Attempt to restart a battle which has not been deserialized");
+    //    }
+    //    throw new Exception("Not sure what this is suppsed to do");
+    //}
 
-    public async Task EndTurnAsync(CancellationToken cancellationToken = default)
+    public void EndTurn()
     {
         // Increment turn counter and reset last successful move
         Turn++;
@@ -230,9 +216,7 @@ public partial class Battle
                         {
                             Add("-start", pokemon, "typechange", realTypeString, "[silent]");
                         }
-
-                        seenPokemon.ApparentType =
-                            seenPokemon.GetTypes(excludeAdded: true).ToList();
+                        seenPokemon.ApparentType = seenPokemon.GetTypes(excludeAdded: true).ToList();
 
                         if (pokemon.AddedType != null)
                         {
@@ -240,8 +224,7 @@ public partial class Battle
                             if (DisplayUi)
                             {
                                 Add("-start", pokemon, "typeadd", pokemon.AddedType?.ToString() ??
-                                    throw new InvalidOperationException(
-                                        "Added type should not be null"),
+                                    throw new InvalidOperationException("Added type should not be null"),
                                     "[silent]");
                             }
                         }
@@ -283,8 +266,7 @@ public partial class Battle
                         if (RuleTable.Has(ability.Id)) continue;
 
                         // Skip immunity check if type is known and already not immune
-                        if (pokemon.KnownType &&
-                            !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                        if (pokemon.KnownType && !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
                             continue;
 
                         // Run the FoeMaybeTrapPokemon event for this potential ability
@@ -303,9 +285,7 @@ public partial class Battle
                 if (staleness != null)
                 {
                     // External staleness takes priority
-                    sideStaleness = sideStaleness == StalenessId.External
-                        ? sideStaleness
-                        : staleness;
+                    sideStaleness = sideStaleness == StalenessId.External ? sideStaleness : staleness;
                 }
 
                 // Increment active turn counter
@@ -332,27 +312,12 @@ public partial class Battle
         {
             Add("turn", Turn);
         }
-        
-        // Reset MidTurn flag so the next TurnLoopAsync will set up properly
-        MidTurn = false;
-        
+
         // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
         // Gen 9 doesn't use Quick Claw rolls the same way
 
-        // Update UI to show current battle state before requesting moves
-        UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
-
         // Request move choices for the new turn
         MakeRequest(RequestState.Move);
-
-        // Wait for player choices
-        await RequestAndWaitForChoicesAsync(cancellationToken);
-    }
-
-    // Keep synchronous version for backward compatibility
-    public void EndTurn()
-    {
-        EndTurnAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -362,11 +327,8 @@ public partial class Battle
     /// If there is a mid-turn decision (like U-Turn), this will return
     /// and be called again later to resume the turn.
     /// </summary>
-    public async Task TurnLoopAsync(CancellationToken cancellationToken = default)
+    public void TurnLoop()
     {
-        Console.WriteLine(
-            $"[TurnLoopAsync] Starting, RequestState={RequestState}, MidTurn={MidTurn}, Queue.Count={Queue.List.Count}");
-
         if (DisplayUi)
         {
             // Add empty line for formatting
@@ -386,18 +348,6 @@ public partial class Battle
         // First time through - set up turn structure
         if (!MidTurn)
         {
-            // Clear messages from previous turn at the start of the new turn
-            // (Don't clear on Turn 1 since there are no previous messages)
-            if (Turn > 0)
-            {
-                Console.WriteLine($"[TurnLoopAsync] Clearing messages at start of Turn {Turn}");
-                PlayerController.ClearMessages();
-            }
-            else
-            {
-                Console.WriteLine($"[TurnLoopAsync] Skipping clear on Turn {Turn} (first turn)");
-            }
-   
             // Insert BeforeTurn action at the front of the queue
             Queue.InsertChoice(new BeforeTurnAction());
 
@@ -407,41 +357,24 @@ public partial class Battle
             MidTurn = true;
         }
 
-        Console.WriteLine($"[TurnLoopAsync] Before action loop, Queue.Count={Queue.List.Count}");
-
         // Process actions one at a time
         while (Queue.Shift() is { } action)
         {
-            Console.WriteLine($"[TurnLoopAsync] Processing action: {action.Choice}");
             RunAction(action);
 
             // Exit early if we need to wait for a request or battle ended
             if (RequestState != RequestState.None || Ended)
             {
-                Console.WriteLine(
-                    $"[TurnLoopAsync] Exiting early: RequestState={RequestState}, Ended={Ended}");
-                // If we have a pending request, wait for player choices
-                if (RequestState != RequestState.None)
-                {
-                    await RequestAndWaitForChoicesAsync(cancellationToken);
-                }
-
                 return;
             }
         }
 
-        Console.WriteLine($"[TurnLoopAsync] All actions processed, calling EndTurnAsync");
         // Turn is complete
-        await EndTurnAsync(cancellationToken);
+        EndTurn();
         MidTurn = false;
         Queue.Clear();
     }
 
-    // Keep synchronous version for backward compatibility
-    public void TurnLoop()
-    {
-        TurnLoopAsync(CancellationToken.None).GetAwaiter().GetResult();
-    }
 
     public bool RunAction(IAction action)
     {
@@ -459,271 +392,262 @@ public partial class Battle
         switch (action.Choice)
         {
             case ActionId.Start:
-            {
-                foreach (Side side in Sides)
                 {
-                    if (side.PokemonLeft > 0)
-                        side.PokemonLeft = side.Pokemon.Count;
+                    foreach (Side side in Sides)
+                    {
+                        if (side.PokemonLeft > 0)
+                            side.PokemonLeft = side.Pokemon.Count;
+
+                        if (DisplayUi)
+                        {
+                            Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+                        }
+                    }
 
                     if (DisplayUi)
                     {
-                        Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+                        Add("start");
                     }
-                }
 
-                if (DisplayUi)
-                {
-                    Add("start");
-                }
-
-                // Change Zacian/Zamazenta into their Crowned formes
-                foreach (Pokemon pokemon in GetAllPokemon())
-                {
-                    Species? rawSpecies = null;
-                    if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
+                    // Change Zacian/Zamazenta into their Crowned formes
+                    foreach (Pokemon pokemon in GetAllPokemon())
                     {
-                        rawSpecies = Library.Species[SpecieId.ZacianCrowned];
-                    }
-                    else if (pokemon.Species.Id == SpecieId.Zamazenta &&
-                             pokemon.Item == ItemId.RustedShield)
-                    {
-                        rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
-                    }
+                        Species? rawSpecies = null;
+                        if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
+                        {
+                            rawSpecies = Library.Species[SpecieId.ZacianCrowned];
+                        }
+                        else if (pokemon.Species.Id == SpecieId.Zamazenta && pokemon.Item == ItemId.RustedShield)
+                        {
+                            rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
+                        }
 
-                    if (rawSpecies == null) continue;
+                        if (rawSpecies == null) continue;
 
-                    Species? species = pokemon.SetSpecie(rawSpecies, Effect);
-                    if (species == null) continue;
+                        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
+                        if (species == null) continue;
 
-                    pokemon.BaseSpecies = rawSpecies;
-                    pokemon.Details = pokemon.GetUpdatedDetails();
-                    pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
-                                       ?? throw new InvalidOperationException(
-                                           "Species has no ability in slot 0"),
-                        isFromFormeChange: true);
-                    pokemon.BaseAbility = pokemon.Ability;
+                        pokemon.BaseSpecies = rawSpecies;
+                        pokemon.Details = pokemon.GetUpdatedDetails();
+                        pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
+                            ?? throw new InvalidOperationException("Species has no ability in slot 0"),
+                            isFromFormeChange: true);
+                        pokemon.BaseAbility = pokemon.Ability;
 
-                    // Replace Iron Head with Behemoth Blade/Bash
-                    Dictionary<SpecieId, MoveId> behemothMoves = new()
+                        // Replace Iron Head with Behemoth Blade/Bash
+                        Dictionary<SpecieId, MoveId> behemothMoves = new()
                     {
                         { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
                         { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
                     };
 
-                    int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
-                    if (ironHeadIndex >= 0)
-                    {
-                        Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
-                        pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
+                        int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
+                        if (ironHeadIndex >= 0)
                         {
-                            Move = move.Id,
-                            Id = move.Id,
-                            Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-                            MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-                            Target = move.Target,
-                            Disabled = false,
-                            DisabledSource = null,
-                            Used = false,
-                        };
-                        pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
-                    }
-                }
-
-                // Call format's OnBattleStart handler
-                Format.OnBattleStart?.Invoke(this);
-
-                foreach (RuleId rule in RuleTable.Keys)
-                {
-                    string ruleString = rule.ToString();
-                    if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-                    Format subFormat = Library.Rulesets[rule];
-                    subFormat.OnBattleStart?.Invoke(this);
-                }
-
-                foreach (Side side in Sides)
-                {
-                    for (int i = 0; i < side.Active.Count; i++)
-                    {
-                        if (side.PokemonLeft <= 0)
-                        {
-                            // Forfeited before starting - assign the pokemon but mark as fainted
-                            side.Active[i] = side.Pokemon[i];
-                            Pokemon assignedPokemon = side.Active[i]
-                                                      ?? throw new InvalidOperationException(
-                                                          $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
-                            assignedPokemon.Fainted = true;
-                            assignedPokemon.Hp = 0;
-                        }
-                        else
-                        {
-                            Actions.SwitchIn(side.Pokemon[i], i);
+                            Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
+                            pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
+                            {
+                                Move = move.Id,
+                                Id = move.Id,
+                                Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                                MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                                Target = move.Target,
+                                Disabled = false,
+                                DisabledSource = null,
+                                Used = false,
+                            };
+                            pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
                         }
                     }
-                }
 
-                foreach (Pokemon pokemon in GetAllPokemon())
-                {
-                    // Only apply species condition if it's not None
-                    if (pokemon.Species.Conditon != ConditionId.None)
+                    // Call format's OnBattleStart handler
+                    Format.OnBattleStart?.Invoke(this);
+
+                    foreach (RuleId rule in RuleTable.Keys)
                     {
-                        Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
-                        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                        string ruleString = rule.ToString();
+                        if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+                        Format subFormat = Library.Rulesets[rule];
+                        subFormat.OnBattleStart?.Invoke(this);
                     }
-                }
 
-                MidTurn = true;
-                break;
-            }
+                    foreach (Side side in Sides)
+                    {
+                        for (int i = 0; i < side.Active.Count; i++)
+                        {
+                            if (side.PokemonLeft <= 0)
+                            {
+                                // Forfeited before starting - assign the pokemon but mark as fainted
+                                side.Active[i] = side.Pokemon[i];
+                                Pokemon assignedPokemon = side.Active[i]
+                                    ?? throw new InvalidOperationException(
+                                        $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
+                                assignedPokemon.Fainted = true;
+                                assignedPokemon.Hp = 0;
+                            }
+                            else
+                            {
+                                Actions.SwitchIn(side.Pokemon[i], i);
+                            }
+                        }
+                    }
+
+                    foreach (Pokemon pokemon in GetAllPokemon())
+                    {
+                        // Only apply species condition if it's not None
+                        if (pokemon.Species.Conditon != ConditionId.None)
+                        {
+                            Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
+                            SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                        }
+                    }
+
+                    MidTurn = true;
+                    break;
+                }
 
             case ActionId.Move:
-            {
-                var moveAction = (MoveAction)action;
-                if (!moveAction.Pokemon.IsActive) return false;
-                if (moveAction.Pokemon.Fainted) return false;
-                Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
-                    new BattleActions.RunMoveOptions
-                    {
-                        SourceEffect = moveAction.SourceEffect,
-                        OriginalTarget = moveAction.OriginalTarget,
-                    });
-                break;
-            }
+                {
+                    var moveAction = (MoveAction)action;
+                    if (!moveAction.Pokemon.IsActive) return false;
+                    if (moveAction.Pokemon.Fainted) return false;
+                    Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
+                        new BattleActions.RunMoveOptions
+                        {
+                            SourceEffect = moveAction.SourceEffect,
+                            OriginalTarget = moveAction.OriginalTarget,
+                        });
+                    break;
+                }
 
             case ActionId.Terastallize:
-            {
-                var teraAction = (PokemonAction)action;
-                Actions.Terastallize(teraAction.Pokemon);
-                break;
-            }
+                {
+                    var teraAction = (PokemonAction)action;
+                    Actions.Terastallize(teraAction.Pokemon);
+                    break;
+                }
 
             case ActionId.BeforeTurnMove:
-            {
-                var btmAction = (MoveAction)action;
-                if (!btmAction.Pokemon.IsActive) return false;
-                if (btmAction.Pokemon.Fainted) return false;
-
-                if (DisplayUi)
                 {
-                    Debug($"before turn callback: {btmAction.Move.Id}");
-                }
+                    var btmAction = (MoveAction)action;
+                    if (!btmAction.Pokemon.IsActive) return false;
+                    if (btmAction.Pokemon.Fainted) return false;
 
-                Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
-                if (target == null) return false;
-                if (btmAction.Move.BeforeTurnCallback == null)
-                    throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
-                btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target,
-                    btmAction.Move.ToActiveMove());
-                break;
-            }
+                    if (DisplayUi)
+                    {
+                        Debug($"before turn callback: {btmAction.Move.Id}");
+                    }
+
+                    Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
+                    if (target == null) return false;
+                    if (btmAction.Move.BeforeTurnCallback == null)
+                        throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
+                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target,
+                        btmAction.Move.ToActiveMove());
+                    break;
+                }
 
             case ActionId.PriorityChargeMove:
-            {
-                var pcmAction = (MoveAction)action;
-                if (!pcmAction.Pokemon.IsActive) return false;
-                if (pcmAction.Pokemon.Fainted) return false;
-
-                if (DisplayUi)
                 {
-                    Debug($"priority charge callback: {pcmAction.Move.Id}");
-                }
+                    var pcmAction = (MoveAction)action;
+                    if (!pcmAction.Pokemon.IsActive) return false;
+                    if (pcmAction.Pokemon.Fainted) return false;
 
-                if (pcmAction.Move.PriorityChargeCallback == null)
-                    throw new InvalidOperationException(
-                        "priorityChargeMove has no priorityChargeCallback");
-                pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
-                break;
-            }
+                    if (DisplayUi)
+                    {
+                        Debug($"priority charge callback: {pcmAction.Move.Id}");
+                    }
+
+                    if (pcmAction.Move.PriorityChargeCallback == null)
+                        throw new InvalidOperationException("priorityChargeMove has no priorityChargeCallback");
+                    pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
+                    break;
+                }
 
             case ActionId.Event:
-            {
-                var eventAction = (PokemonAction)action;
-                RunEvent(eventAction.Event ??
-                         throw new InvalidOperationException("Event action must have an event"),
-                    eventAction.Pokemon);
-                break;
-            }
-
-            case ActionId.Team:
-            {
-                var teamAction = (TeamAction)action;
-                if (teamAction.Index == 0)
                 {
-                    teamAction.Pokemon.Side.Pokemon = [];
+                    var eventAction = (PokemonAction)action;
+                    RunEvent(eventAction.Event ??
+                             throw new InvalidOperationException("Event action must have an event"),
+                        eventAction.Pokemon);
+                    break;
                 }
 
-                teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
-                teamAction.Pokemon.Position = teamAction.Index;
-                // We return here because the update event would crash since there are no active pokemon yet
-                return false;
-            }
+            case ActionId.Team:
+                {
+                    var teamAction = (TeamAction)action;
+                    if (teamAction.Index == 0)
+                    {
+                        teamAction.Pokemon.Side.Pokemon = [];
+                    }
+                    teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
+                    teamAction.Pokemon.Position = teamAction.Index;
+                    // We return here because the update event would crash since there are no active pokemon yet
+                    return false;
+                }
 
             case ActionId.Pass:
                 return false;
 
             case ActionId.InstaSwitch:
             case ActionId.Switch:
-            {
-                var switchAction = (SwitchAction)action;
-                if (switchAction.Choice == ActionId.Switch &&
-                    switchAction.Pokemon.Status != ConditionId.None)
                 {
-                    Ability naturalCure = Library.Abilities[AbilityId.NaturalCure];
-                    SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
-                }
+                    var switchAction = (SwitchAction)action;
+                    if (switchAction.Choice == ActionId.Switch && switchAction.Pokemon.Status != ConditionId.None)
+                    {
+                        Ability naturalCure = Library.Abilities[AbilityId.NaturalCure];
+                        SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
+                    }
 
-                Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position,
-                    switchAction.SourceEffect);
-                break;
-            }
+                    Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position, switchAction.SourceEffect);
+                    break;
+                }
 
             case ActionId.RevivalBlessing:
-            {
-                var rbAction = (SwitchAction)action;
-                rbAction.Pokemon.Side.PokemonLeft++;
-                if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
                 {
-                    Queue.AddChoice(new SwitchAction
+                    var rbAction = (SwitchAction)action;
+                    rbAction.Pokemon.Side.PokemonLeft++;
+                    if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
                     {
-                        Choice = ActionId.InstaSwitch,
-                        Pokemon = rbAction.Target,
-                        Target = rbAction.Target,
-                        Order = 3,
-                    });
+                        Queue.AddChoice(new SwitchAction
+                        {
+                            Choice = ActionId.InstaSwitch,
+                            Pokemon = rbAction.Target,
+                            Target = rbAction.Target,
+                            Order = 3,
+                        });
+                    }
+                    rbAction.Target.Fainted = false;
+                    rbAction.Target.FaintQueued = false;
+                    rbAction.Target.SubFainted = false;
+                    rbAction.Target.Status = ConditionId.None;
+                    rbAction.Target.Hp = 1; // Needed so HP functions work
+                    rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
+
+                    if (DisplayUi)
+                    {
+                        Add("-heal", rbAction.Target, rbAction.Target.GetHealth, "[from] move: Revival Blessing");
+                    }
+
+                    rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon, ConditionId.RevivalBlessing);
+                    break;
                 }
-
-                rbAction.Target.Fainted = false;
-                rbAction.Target.FaintQueued = false;
-                rbAction.Target.SubFainted = false;
-                rbAction.Target.Status = ConditionId.None;
-                rbAction.Target.Hp = 1; // Needed so HP functions work
-                rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
-
-                if (DisplayUi)
-                {
-                    Add("-heal", rbAction.Target, rbAction.Target.GetHealth,
-                        "[from] move: Revival Blessing");
-                }
-
-                rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon,
-                    ConditionId.RevivalBlessing);
-                break;
-            }
 
             case ActionId.RunSwitch:
-            {
-                var rsAction = (RunSwitchAction)action;
-                Actions.RunSwitch(rsAction.Pokemon!);
-                break;
-            }
+                {
+                    var rsAction = (RunSwitchAction)action;
+                    Actions.RunSwitch(rsAction.Pokemon!);
+                    break;
+                }
 
             case ActionId.Shift:
-            {
-                var shiftAction = (PokemonAction)action;
-                if (!shiftAction.Pokemon.IsActive) return false;
-                if (shiftAction.Pokemon.Fainted) return false;
-                SwapPosition(shiftAction.Pokemon, 1);
-                break;
-            }
+                {
+                    var shiftAction = (PokemonAction)action;
+                    if (!shiftAction.Pokemon.IsActive) return false;
+                    if (shiftAction.Pokemon.Fainted) return false;
+                    SwapPosition(shiftAction.Pokemon, 1);
+                    break;
+                }
 
             case ActionId.BeforeTurn:
                 EachEvent(EventId.BeforeTurn);
@@ -746,7 +670,6 @@ public partial class Battle
                 {
                     Add("upkeep");
                 }
-
                 break;
         }
 
@@ -784,8 +707,7 @@ public partial class Battle
             foreach ((Pokemon pokemon, int originalHp) in residualPokemon)
             {
                 int maxHp = pokemon.GetUndynamaxedHp(pokemon.MaxHp);
-                if (pokemon.Hp > 0 && pokemon.GetUndynamaxedHp() <= maxHp / 2 &&
-                    originalHp > maxHp / 2)
+                if (pokemon.Hp > 0 && pokemon.GetUndynamaxedHp() <= maxHp / 2 && originalHp > maxHp / 2)
                 {
                     RunEvent(EventId.EmergencyExit, pokemon);
                 }
@@ -805,57 +727,50 @@ public partial class Battle
 
         // Check for switches
         var switches = Sides
-     .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
-        .ToList();
+            .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
+            .ToList();
 
         for (int i = 0; i < Sides.Count; i++)
         {
- bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
-    if (switches[i] && CanSwitch(Sides[i]) == 0)
-  {
-         foreach (Pokemon? pokemon in Sides[i].Active)
-     {
-         if (pokemon == null) continue;
-
- // Check if RevivalBlessing condition exists before trying to access it
-            if (Library.Conditions.ContainsKey(ConditionId.RevivalBlessing))
-      {
-          IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
-             ConditionId.RevivalBlessing);
-       if (revivalBlessing != null)
+            bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+            if (switches[i] && CanSwitch(Sides[i]) == 0)
+            {
+                foreach (Pokemon? pokemon in Sides[i].Active)
                 {
-      reviveSwitch = true;
-continue;
-      }
-       }
+                    if (pokemon == null) continue;
 
-         pokemon.SwitchFlag = false;
+                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
+                        ConditionId.RevivalBlessing);
+                    if (revivalBlessing != null)
+                    {
+                        reviveSwitch = true;
+                        continue;
+                    }
+                    pokemon.SwitchFlag = false;
                 }
-
-    if (!reviveSwitch) switches[i] = false;
-    }
+                if (!reviveSwitch) switches[i] = false;
+            }
             else if (switches[i])
-      {
-         foreach (Pokemon? pokemon in Sides[i].Active)
-       {
-          if (pokemon == null) continue;
+            {
+                foreach (Pokemon? pokemon in Sides[i].Active)
+                {
+                    if (pokemon == null) continue;
 
-         if (pokemon.Hp > 0 &&
-      pokemon.SwitchFlag.IsTrue() &&
-        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
-      !pokemon.SkipBeforeSwitchOutEventFlag)
-       {
-  RunEvent(EventId.BeforeSwitchOut, pokemon);
-       pokemon.SkipBeforeSwitchOutEventFlag = true;
-    FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
-    if (Ended) return true;
-        if (pokemon.Fainted)
-      {
-      switches[i] = Sides[i].Active
-    .Any(p => p != null && p.SwitchFlag.IsTrue());
-              }
-              }
-    }
+                    if (pokemon.Hp > 0 &&
+                        pokemon.SwitchFlag.IsTrue() &&
+                        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
+                        !pokemon.SkipBeforeSwitchOutEventFlag)
+                    {
+                        RunEvent(EventId.BeforeSwitchOut, pokemon);
+                        pokemon.SkipBeforeSwitchOutEventFlag = true;
+                        FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+                        if (Ended) return true;
+                        if (pokemon.Fainted)
+                        {
+                            switches[i] = Sides[i].Active.Any(p => p != null && p.SwitchFlag.IsTrue());
+                        }
+                    }
+                }
             }
         }
 
@@ -878,7 +793,6 @@ continue;
             {
                 GetActionSpeed(queueAction);
             }
-
             Queue.Sort();
         }
 
