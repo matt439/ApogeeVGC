@@ -282,137 +282,65 @@ return false;
 
     public void CommitChoices()
     {
-   UpdateSpeed();
+UpdateSpeed();
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
-   // re-sorted), but the new switch choices are sorted and inserted before
-        // the rest of the turn.
-   var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
-      Queue.Clear();
+        // re-sorted), but the new switch choices are sorted and inserted before
+  // the rest of the turn.
+        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+        Queue.Clear();
 
         if (!AllChoicesDone())
-        {
-        throw new InvalidOperationException("Not all choices done");
-  }
+     {
+throw new InvalidOperationException("Not all choices done");
+        }
 
-        // Log each side's choice to the input log
+      // Log each side's choice to the input log and history
      foreach (Side side in Sides)
-        {
-            string? choice = side.GetChoice().ToString();
-       if (!string.IsNullOrEmpty(choice))
-    {
-   InputLog.Add($"> {side.Id} {choice}");
-  }
-        }
+      {
+      string? choice = side.GetChoice().ToString();
+  if (!string.IsNullOrEmpty(choice))
+     {
+           InputLog.Add($"> {side.Id} {choice}");
+     
+            // Record choice in history
+                History.RecordChoice(side.Id, choice);
+      }
+     }
 
-        // Add each side's actions to the queue
-        foreach (Side side in Sides)
+// Add each side's actions to the queue
+   foreach (Side side in Sides)
         {
-         Queue.AddChoice(side.Choice.Actions);
-        }
+        Queue.AddChoice(side.Choice.Actions);
+    }
 
-  ClearRequest();
+        ClearRequest();
 
         // Sort the new actions by priority/speed
-     Queue.Sort();
+   Queue.Sort();
 
-     // Append the old queue actions after the new ones
-        Queue.List.AddRange(oldQueue);
+  // Append the old queue actions after the new ones
+ Queue.List.AddRange(oldQueue);
 
-    // Clear request state
+  // Clear request state
         RequestState = RequestState.None;
         foreach (Side side in Sides)
         {
-     side.ActiveRequest = null;
-   }
-
-        // Continue executing the turn
-TurnLoop();
-
-        // Workaround for tests - send updates if log is getting large
-        if (Log.Count - SentLogPos > 500)
-        {
-     SendUpdates();
-   }
-    }
-
-    public void UndoChoice(SideId sideId)
-    {
-        Side side = GetSide(sideId);
-
-        // No active request - nothing to undo
-        if (RequestState == RequestState.None)
-            return;
-
-        // Check if undo would leak information
-        if (side.GetChoice().CantUndo)
-        {
-            side.EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
-            return;
+       side.ActiveRequest = null;
         }
 
-        bool updated = false;
+      // Continue executing the turn
+     TurnLoop();
 
-        // If undoing a move selection, update disabled moves for each Pokémon
-        if (side.RequestState == RequestState.Move)
+    // Workaround for tests - send updates if log is getting large
+  if (Log.Count - SentLogPos > 500)
         {
-            foreach (ChosenAction action in side.GetChoice().Actions)
-            {
-                // Skip if not a move action
-                if (action.Choice != ChoiceType.Move)
-                    continue;
-
-                Pokemon? pokemon = action.Pokemon;
-                if (pokemon == null)
-                    continue;
-
-                // Update the request for this Pokémon, refreshing disabled moves
-                if (side.UpdateRequestForPokemon(pokemon, req =>
-                        side.UpdateDisabledRequest(pokemon, req)))
-                {
-                    updated = true;
-                }
-            }
+            SendUpdates();
         }
+ }
 
-        // Clear the current choice
-        side.ClearChoice();
-
-        // If we updated any move availability, send the updated request to the client
-        if (updated && side.ActiveRequest != null)
-        {
-            side.EmitRequest(side.ActiveRequest, updatedRequest: true);
-        }
-    }
-
-    /// <summary>
-    /// Returns true if both decisions are complete.
-    /// Checks if all sides have completed their choices for the current turn.
-    /// When supportCancel is disabled, locks completed choices to prevent information leaks.
-    /// </summary>
-    /// <returns>True if all sides have completed their choices, false otherwise</returns>
-    public bool AllChoicesDone()
-    {
-        int totalActions = 0;
-
-        foreach (Side side in Sides.Where(side => side.IsChoiceDone()))
-        {
-        // If cancellation is not supported, lock the choice to prevent undoing
-            // This prevents information leaks from trapping/disabling effects
-            if (!SupportCancel)
-       {
-    Choice choice = side.GetChoice();
-          choice.CantUndo = true;
-        }
-
-            totalActions++;
-        }
-
-        return totalActions >= Sides.Count;
-    }
-
-    // Callback to invoke when all choices are received
+// Callback to invoke when all choices are received
     private Action? _choicesCompletionCallback;
 
     /// <summary>
@@ -421,43 +349,118 @@ TurnLoop();
     /// When all choices are received, the completion callback will be invoked.
     /// </summary>
     /// <param name="onComplete">Callback to invoke when all choices have been received</param>
-    public void RequestPlayerChoices(Action? onComplete = null)
+  public void RequestPlayerChoices(Action? onComplete = null)
     {
    // Verify that we have active requests
-        if (Sides.Any(side => side.ActiveRequest == null))
-        {
-   throw new InvalidOperationException("Cannot request choices from players: Some sides have no active request");
+   if (Sides.Any(side => side.ActiveRequest == null))
+  {
+     throw new InvalidOperationException("Cannot request choices from players: Some sides have no active request");
         }
 
-        // Store the completion callback
+// Store the completion callback
         _choicesCompletionCallback = onComplete;
 
-        // Emit choice request events for each side that needs to make a choice
+   // Emit choice request events for each side that needs to make a choice
         foreach (Side side in Sides)
-        {
-     // Skip sides that don't need to make a choice (already done)
-            if (side.IsChoiceDone())
-      {
-    continue;
-            }
+  {
+        // Skip sides that don't need to make a choice (already done)
+     if (side.IsChoiceDone())
+     {
+         continue;
+    }
 
-// Determine the request type
-       BattleRequestType requestType = RequestState switch
-            {
-   RequestState.TeamPreview => BattleRequestType.TeamPreview,
-       RequestState.Move => BattleRequestType.TurnStart,
-      RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
-    _ => BattleRequestType.TurnStart,
-         };
+        // Determine the request type
+BattleRequestType requestType = RequestState switch
+        {
+     RequestState.TeamPreview => BattleRequestType.TeamPreview,
+   RequestState.Move => BattleRequestType.TurnStart,
+ RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
+ _ => BattleRequestType.TurnStart,
+      };
 
           // Emit the choice request event - external handler (Simulator) will handle async player interaction
-     RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
-        }
+       RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
+     }
 
- // Battle execution continues only when:
-        // 1. All choices are submitted via Choose()
-        // 2. Choose() detects AllChoicesDone()
+     // Battle execution continues only when:
+     // 1. All choices are submitted via Choose()
+  // 2. Choose() detects AllChoicesDone()
         // 3. The completion callback is invoked (if provided)
         // 4. CommitChoices() is called to process the choices
+    }
+
+    public void UndoChoice(SideId sideId)
+    {
+        Side side = GetSide(sideId);
+
+        // No active request - nothing to undo
+    if (RequestState == RequestState.None)
+return;
+
+        // Check if undo would leak information
+        if (side.GetChoice().CantUndo)
+        {
+            side.EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
+          return;
+        }
+
+bool updated = false;
+
+        // If undoing a move selection, update disabled moves for each Pokémon
+if (side.RequestState == RequestState.Move)
+ {
+   foreach (ChosenAction action in side.GetChoice().Actions)
+  {
+        // Skip if not a move action
+   if (action.Choice != ChoiceType.Move)
+continue;
+
+   Pokemon? pokemon = action.Pokemon;
+      if (pokemon == null)
+   continue;
+
+        // Update the request for this Pokémon, refreshing disabled moves
+    if (side.UpdateRequestForPokemon(pokemon, req =>
+side.UpdateDisabledRequest(pokemon, req)))
+ {
+      updated = true;
+    }
+  }
+ }
+
+// Clear the current choice
+     side.ClearChoice();
+
+        // If we updated any move availability, send the updated request to the client
+   if (updated && side.ActiveRequest != null)
+        {
+side.EmitRequest(side.ActiveRequest, updatedRequest: true);
+ }
+    }
+
+    /// <summary>
+    /// Returns true if both decisions are complete.
+    /// Checks if all sides have completed their choices for the current turn.
+    /// When supportCancel is disabled, locks completed choices to prevent information leaks.
+    /// </summary>
+    /// <returns>True if all sides have completed their choices, false otherwise</returns>
+ public bool AllChoicesDone()
+    {
+  int totalActions = 0;
+
+   foreach (Side side in Sides.Where(side => side.IsChoiceDone()))
+ {
+  // If cancellation is not supported, lock the choice to prevent undoing
+     // This prevents information leaks from trapping/disabling effects
+     if (!SupportCancel)
+      {
+    Choice choice = side.GetChoice();
+         choice.CantUndo = true;
+}
+
+        totalActions++;
+        }
+
+        return totalActions >= Sides.Count;
     }
 }

@@ -108,10 +108,11 @@ public partial class Battle
     public Side P1 => Sides[0];
     public Side P2 => Sides[1];
     private HashSet<string> Hints { get; } = [];
-
-    //public IPlayer Player1 { get; }
-    //public IPlayer Player2 { get; }
-    //public IReadOnlyList<IPlayer> Players => [Player1, Player2];
+    
+    /// <summary>
+    /// Battle history for debugging and analysis.
+    /// </summary>
+    public BattleHistory History { get; } = new();
 
     public Battle(BattleOptions options, Library library)
     {

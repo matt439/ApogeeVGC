@@ -115,6 +115,9 @@ public partial class Battle
         Turn++;
         LastSuccessfulMoveThisTurn = null;
 
+        // Record turn start in history
+        History.RecordTurnStart(Turn);
+
         // Process each side
         var trappedBySide = new List<bool>();
         var stalenessBySide = new List<StalenessId?>();
@@ -416,7 +419,7 @@ public partial class Battle
                         Add("start");
                     }
 
-                    // Change Zacian/Zamazenta into their Crowned formes
+                    // Change Zacian/Zamazenta into their Crowned forme
                     foreach (Pokemon pokemon in GetAllPokemon())
                     {
                         Species? rawSpecies = null;

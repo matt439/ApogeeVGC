@@ -172,6 +172,12 @@ public partial class Battle
             if (source != null && effectCondition?.EffectType == EffectType.Move)
                 source.LastDamage = targetDamage;
 
+            // Record damage in history
+            if (targetDamage > 0)
+            {
+                History.RecordDamage(target.Name, targetDamage, target.Hp, target.MaxHp);
+            }
+
             // Log damage messages with the actual damage amount
             PrintDamageMessage(target, targetDamage, source, effectCondition);
 
@@ -372,6 +378,12 @@ public partial class Battle
 
         // Apply healing to target
         int finalDamage = target.Heal(damage, source, effectCondition).ToInt();
+
+        // Record healing in history
+        if (finalDamage > 0)
+        {
+            History.RecordHeal(target.Name, finalDamage, target.Hp, target.MaxHp);
+        }
 
         // Log healing messages based on effect type
         PrintHealMessage(target, source, effectCondition);

@@ -77,6 +77,9 @@ public partial class Battle
                     Add("faint", pokemon);
                 }
 
+                // Record faint in history
+                History.RecordFaint(pokemon.Name);
+
                 // Update side's Pokemon count
                 if (pokemon.Side.PokemonLeft > 0)
                 {
@@ -321,6 +324,9 @@ public partial class Battle
         }
 
         Winner = side?.Name ?? string.Empty;
+
+        // Record battle end in history
+        History.RecordBattleEnd(Winner);
 
         if (DisplayUi)
         {
