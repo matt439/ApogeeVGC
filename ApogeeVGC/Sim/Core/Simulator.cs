@@ -83,6 +83,8 @@ public class Simulator : IPlayerController, IBattleController
     public async Task<SimulatorResult> Run(Library library, BattleOptions battleOptions,
         bool printDebug = true)
     {
+        
+        
         Battle = new Battle(battleOptions, library, this);
         Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
         Player2 = CreatePlayer(SideId.P2, battleOptions.Player2Options);
