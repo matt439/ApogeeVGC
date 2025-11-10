@@ -348,45 +348,59 @@ throw new InvalidOperationException("Not all choices done");
     /// The battle will pause here until all choices are submitted via Choose().
     /// When all choices are received, the completion callback will be invoked.
     /// </summary>
-    /// <param name="onComplete">Callback to invoke when all choices have been received</param>
-  public void RequestPlayerChoices(Action? onComplete = null)
-    {
+  /// <param name="onComplete">Callback to invoke when all choices have been received</param>
+    public void RequestPlayerChoices(Action? onComplete = null)
+ {
    // Verify that we have active requests
-   if (Sides.Any(side => side.ActiveRequest == null))
-  {
-     throw new InvalidOperationException("Cannot request choices from players: Some sides have no active request");
-        }
-
-// Store the completion callback
-        _choicesCompletionCallback = onComplete;
-
-   // Emit choice request events for each side that needs to make a choice
-        foreach (Side side in Sides)
-  {
-        // Skip sides that don't need to make a choice (already done)
-     if (side.IsChoiceDone())
-     {
-         continue;
+  if (Sides.Any(side => side.ActiveRequest == null))
+   {
+   throw new InvalidOperationException("Cannot request choices from players: Some sides have no active request");
     }
 
-        // Determine the request type
-BattleRequestType requestType = RequestState switch
+      // Reset the wait handle - Battle will block until this is set
+        _choiceWaitHandle.Reset();
+  Console.WriteLine("[RequestPlayerChoices] Wait handle reset - Battle will block");
+
+        // Wrap the callback to signal the wait handle after execution
+   Action wrappedCallback = () =>
+     {
+    Console.WriteLine("[RequestPlayerChoices] Callback invoked, executing original callback");
+     onComplete?.Invoke();
+ Console.WriteLine("[RequestPlayerChoices] Setting wait handle - Battle will continue");
+ _choiceWaitHandle.Set();
+        };
+
+        // Store the wrapped completion callback
+        _choicesCompletionCallback = wrappedCallback;
+
+        // Emit choice request events for each side that needs to make a choice
+   foreach (Side side in Sides)
         {
-     RequestState.TeamPreview => BattleRequestType.TeamPreview,
-   RequestState.Move => BattleRequestType.TurnStart,
- RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
- _ => BattleRequestType.TurnStart,
+ // Skip sides that don't need to make a choice (already done)
+if (side.IsChoiceDone())
+  {
+  continue;
+   }
+
+      // Determine the request type
+BattleRequestType requestType = RequestState switch
+{
+RequestState.TeamPreview => BattleRequestType.TeamPreview,
+    RequestState.Move => BattleRequestType.TurnStart,
+    RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
+  _ => BattleRequestType.TurnStart,
       };
 
           // Emit the choice request event - external handler (Simulator) will handle async player interaction
        RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
-     }
+        }
 
-     // Battle execution continues only when:
+    // Battle execution continues only when:
      // 1. All choices are submitted via Choose()
-  // 2. Choose() detects AllChoicesDone()
-        // 3. The completion callback is invoked (if provided)
-        // 4. CommitChoices() is called to process the choices
+   // 2. Choose() detects AllChoicesDone()
+   // 3. The completion callback is invoked (if provided)
+   // 4. CommitChoices() is called to process the choices
+        // 5. The wait handle is set, allowing Battle.Start() or TurnLoop() to continue
     }
 
     public void UndoChoice(SideId sideId)

@@ -36,30 +36,35 @@ public partial class Battle
     /// </summary>
     internal void RequestPlayerChoice(SideId sideId, IChoiceRequest request, BattleRequestType requestType)
     {
-  BattlePerspective perspective = GetPerspectiveForSide(sideId);
+      // Determine perspective type based on request state
+        BattlePerspectiveType perspectiveType = RequestState switch
+   {
+          RequestState.TeamPreview => BattlePerspectiveType.TeamPreview,
+            _ => BattlePerspectiveType.InBattle
+     };
+  
+        BattlePerspective perspective = GetPerspectiveForSide(sideId, perspectiveType);
  
-        ChoiceRequested?.Invoke(this, new BattleChoiceRequestEventArgs
+      ChoiceRequested?.Invoke(this, new BattleChoiceRequestEventArgs
  {
         SideId = sideId,
       Request = request,
   RequestType = requestType,
 Perspective = perspective
-        });
+ });
     }
 
   /// <summary>
     /// Internal method called by Battle when there are UI updates.
     /// Emits the UpdateRequested event.
- /// </summary>
-    internal void EmitUpdate(SideId sideId, IEnumerable<BattleMessage> messages)
-  {
-      BattlePerspective perspective = GetPerspectiveForSide(sideId);
-    
-  UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
+    /// </summary>
+    internal void EmitUpdate(SideId sideId, BattlePerspective perspective, IEnumerable<BattleMessage> messages)
     {
-       SideId = sideId,
-     Perspective = perspective,
-      Messages = messages
+    UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
+{
+            SideId = sideId,
+  Perspective = perspective,
+         Messages = messages
         });
     }
 

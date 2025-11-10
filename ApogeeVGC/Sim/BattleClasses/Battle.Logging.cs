@@ -26,11 +26,12 @@ public partial class Battle
     private void UpdatePlayerUi(SideId sideId,
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
-   // Emit update event regardless of player type - Simulator will handle routing
-        BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
-        EmitUpdate(sideId, new List<BattleMessage>(PendingMessages));
-    }
-
+   // Create perspective with the correct type
+      BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
+        
+      // Emit update event with the perspective
+    EmitUpdate(sideId, perspective, new List<BattleMessage>(PendingMessages));
+ }
     public void Add(params PartFuncUnion[] parts)
     {
         // Check if any part is a function that generates side-specific content
@@ -483,19 +484,33 @@ public partial class Battle
     /// <summary>
     /// Flush all pending messages to players with GUI interfaces.
     /// This is typically called after a state update to send accumulated messages.
+    /// NOTE: This only sends messages, NOT perspective updates. 
+    /// Use UpdatePlayerUi() to send perspective updates.
     /// </summary>
     public void FlushMessages()
     {
-     if (PendingMessages.Count == 0) return;
+   if (PendingMessages.Count == 0) return;
 
-        foreach (Side side in Sides)
- {
-   // Emit update events for all sides
-   EmitUpdate(side.Id, new List<BattleMessage>(PendingMessages));
-        }
+// Determine perspective type based on current request state
+    BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+  ? BattlePerspectiveType.TeamPreview
+   : BattlePerspectiveType.InBattle;
 
-        // Clear the pending messages
-   PendingMessages.Clear();
+        // Send messages via UpdateRequested event with correct perspective
+  foreach (Side side in Sides)
+     {
+     BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
+            
+     UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
+            {
+    SideId = side.Id,
+       Perspective = perspective,
+    Messages = new List<BattleMessage>(PendingMessages)
+    });
+ }
+
+   // Clear the pending messages
+        PendingMessages.Clear();
     }
 
     /// <summary>

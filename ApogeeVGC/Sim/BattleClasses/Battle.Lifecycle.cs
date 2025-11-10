@@ -10,11 +10,15 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
+using System.Threading;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
+    // Semaphore to block synchronous Battle when waiting for async player choices
+  private readonly ManualResetEventSlim _choiceWaitHandle = new(true);
+
     public void Start()
     {
         //// Deserialized games should use Restart()
@@ -86,6 +90,11 @@ public partial class Battle
 
         // Run team preview/selection phase
         RunPickTeam();
+      
+   // WAIT here until team preview choices are complete
+        Console.WriteLine("[Battle.Start] Waiting for team preview choices...");
+        _choiceWaitHandle.Wait();
+        Console.WriteLine("[Battle.Start] Team preview choices received, continuing");
 
         // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
@@ -95,8 +104,8 @@ public partial class Battle
 
         // Start turn loop if no request is pending
         if (RequestState == RequestState.None)
-        {
-            TurnLoop();
+     {
+      TurnLoop();
         }
     }
 
@@ -324,10 +333,15 @@ public partial class Battle
   
       // Request player choices - Battle will pause until callback is invoked
         RequestPlayerChoices(onComplete: () =>
-{
+        {
      Console.WriteLine("[EndTurn] Turn choices received, committing");
-   CommitChoices();
-        });
+    CommitChoices();
+  });
+  
+  // WAIT here until turn choices are complete
+        Console.WriteLine("[EndTurn] Waiting for turn choices...");
+ _choiceWaitHandle.Wait();
+        Console.WriteLine("[EndTurn] Turn choices received, continuing");
     }
 
     /// <summary>
@@ -797,9 +811,14 @@ public partial class Battle
    CommitChoices();
          });
      
-     return true;
-            }
+     // WAIT here until switch choices are complete
+            Console.WriteLine("[RunAction] Waiting for switch choices...");
+  _choiceWaitHandle.Wait();
+Console.WriteLine("[RunAction] Switch choices received, continuing");
+     
+   return true;
   }
+        }
 
         // In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();
