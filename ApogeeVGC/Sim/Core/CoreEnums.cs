@@ -15,3 +15,16 @@ public enum PositionLetter
     E = 4,
     F = 5,
 }
+
+public enum SimulatorResult
+{
+    Player1Win,
+    Player2Win,
+    Tie,
+}
+
+public enum DriverMode
+{
+    GuiVsRandomSingles,
+    GuiVsRandomDoubles,
+}

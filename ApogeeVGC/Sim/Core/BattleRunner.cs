@@ -42,13 +42,13 @@ public class BattleRunner
 
         _cancellationTokenSource = new CancellationTokenSource();
 
-        // Run the battle on a background thread using Simulator.Run()
+        // Run the battle on a background thread using Simulator.RunAsync()
         _battleTask = Task.Run(async () =>
         {
             try
             {
-                // Use Simulator.Run() which creates players and starts the battle
-                SimulatorResult result = await _simulator.Run(_library, _battleOptions, printDebug: true);
+                // Use Simulator.RunAsync() which creates players and starts the battle
+                SimulatorResult result = await _simulator.RunAsync(_library, _battleOptions, printDebug: true);
                 Result = result;
                 return result;
             }

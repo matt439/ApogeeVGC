@@ -209,39 +209,45 @@ public partial class Battle
     public bool Choose(SideId sideId, Choice input)
     {
         Console.WriteLine($"[Battle.Choose] Called for {sideId} with {input.Actions.Count} actions");
-   Side side = GetSide(sideId);
+Side side = GetSide(sideId);
 
- if (!side.Choose(input))
- {
-       Console.WriteLine($"[Battle.Choose] side.Choose returned false for {sideId}");
-            if (string.IsNullOrEmpty(side.GetChoice().Error))
-   {
-       side.EmitChoiceError(
-         $"Unknown error for choice: {input}. If you're not using a custom client," +
-           $"please report this as a bug.");
-          }
-  return false;
+        if (!side.Choose(input))
+        {
+    Console.WriteLine($"[Battle.Choose] side.Choose returned false for {sideId}");
+        if (string.IsNullOrEmpty(side.GetChoice().Error))
+     {
+    side.EmitChoiceError(
+      $"Unknown error for choice: {input}. If you're not using a custom client," +
+          $"please report this as a bug.");
+    }
+       return false;
         }
 
-    Console.WriteLine($"[Battle.Choose] side.Choose returned true for {sideId}");
-        
-     if (!side.IsChoiceDone())
+   Console.WriteLine($"[Battle.Choose] side.Choose returned true for {sideId}");
+
+        if (!side.IsChoiceDone())
         {
      Console.WriteLine($"[Battle.Choose] Choice not done for {sideId}");
             side.EmitChoiceError($"Incomplete choice: {input} - missing other pokemon");
-      return false;
-   }
+return false;
+        }
 
-     Console.WriteLine($"[Battle.Choose] Choice complete for {sideId}");
+        Console.WriteLine($"[Battle.Choose] Choice complete for {sideId}");
 
-    // Don't auto-commit here - let the caller (StartAsync or RequestAndWaitForChoicesAsync) handle it
-        // This allows proper async flow and correct action ordering
-     if (AllChoicesDone())
-     {
-            Console.WriteLine($"[Battle.Choose] All choices done (not committing - caller will handle)");
-    }
+        // Check if all choices are done
+        if (AllChoicesDone())
+        {
+            Console.WriteLine($"[Battle.Choose] All choices done, invoking completion callback");
+    
+  // Invoke the completion callback if one was provided
+            // The callback is responsible for calling CommitChoices()
+  Action? callback = _choicesCompletionCallback;
+          _choicesCompletionCallback = null; // Clear it so it's only called once
+            
+     callback?.Invoke();
+        }
 
-     return true;
+   return true;
     }
 
     /// <summary>
@@ -254,87 +260,81 @@ public partial class Battle
     {
         if (inputs is { Count: > 0 })
         {
-            // Apply provided choices to each corresponding side
+    // Apply provided choices to each corresponding side
             for (int i = 0; i < inputs.Count; i++)
-            {
+{
                 Choice input = inputs[i];
-                Sides[i].Choose(input);
-            }
+       Sides[i].Choose(input);
+}
         }
         else
         {
-            // Auto-choose for all sides
-            foreach (Side side in Sides)
-            {
-                side.AutoChoose();
+   // Auto-choose for all sides
+          foreach (Side side in Sides)
+        {
+          side.AutoChoose();
             }
         }
 
-        // Commit all choices
+  // Commit all choices
         CommitChoices();
     }
 
-    public async Task CommitChoicesAsync(CancellationToken cancellationToken = default)
+    public void CommitChoices()
     {
-        UpdateSpeed();
+   UpdateSpeed();
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
-        // re-sorted), but the new switch choices are sorted and inserted before
+   // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
-        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
-        Queue.Clear();
+   var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+      Queue.Clear();
 
         if (!AllChoicesDone())
         {
-            throw new InvalidOperationException("Not all choices done");
-        }
+        throw new InvalidOperationException("Not all choices done");
+  }
 
         // Log each side's choice to the input log
-  foreach (Side side in Sides)
+     foreach (Side side in Sides)
         {
             string? choice = side.GetChoice().ToString();
- if (!string.IsNullOrEmpty(choice))
-          {
+       if (!string.IsNullOrEmpty(choice))
+    {
    InputLog.Add($"> {side.Id} {choice}");
-      }
+  }
         }
 
- // Add each side's actions to the queue
+        // Add each side's actions to the queue
         foreach (Side side in Sides)
         {
          Queue.AddChoice(side.Choice.Actions);
         }
 
-        ClearRequest();
+  ClearRequest();
 
         // Sort the new actions by priority/speed
-        Queue.Sort();
+     Queue.Sort();
 
-        // Append the old queue actions after the new ones
+     // Append the old queue actions after the new ones
         Queue.List.AddRange(oldQueue);
 
-        // Clear request state
-     RequestState = RequestState.None;
-   foreach (Side side in Sides)
-   {
-    side.ActiveRequest = null;
-        }
+    // Clear request state
+        RequestState = RequestState.None;
+        foreach (Side side in Sides)
+        {
+     side.ActiveRequest = null;
+   }
 
-        // Start executing the turn
-     await TurnLoopAsync(cancellationToken);
+        // Continue executing the turn
+TurnLoop();
 
- // Workaround for tests - send updates if log is getting large
+        // Workaround for tests - send updates if log is getting large
         if (Log.Count - SentLogPos > 500)
         {
-            SendUpdates();
-     }
-  }
-
-    // Keep synchronous version for backward compatibility
-    public void CommitChoices()
-    {
-        CommitChoicesAsync(CancellationToken.None).GetAwaiter().GetResult();
+     SendUpdates();
+   }
     }
 
     public void UndoChoice(SideId sideId)
@@ -398,13 +398,13 @@ public partial class Battle
 
         foreach (Side side in Sides.Where(side => side.IsChoiceDone()))
         {
-            // If cancellation is not supported, lock the choice to prevent undoing
+        // If cancellation is not supported, lock the choice to prevent undoing
             // This prevents information leaks from trapping/disabling effects
             if (!SupportCancel)
-            {
-                Choice choice = side.GetChoice();
-                choice.CantUndo = true;
-            }
+       {
+    Choice choice = side.GetChoice();
+          choice.CantUndo = true;
+        }
 
             totalActions++;
         }
@@ -412,107 +412,52 @@ public partial class Battle
         return totalActions >= Sides.Count;
     }
 
+    // Callback to invoke when all choices are received
+    private Action? _choicesCompletionCallback;
+
     /// <summary>
-    /// Sends the current active requests to all players and waits for their choices.
-    /// This method coordinates the async request/response flow with each player.
+    /// Emits choice request events for all sides that need to make choices.
+    /// The battle will pause here until all choices are submitted via Choose().
+    /// When all choices are received, the completion callback will be invoked.
     /// </summary>
-    public async Task RequestAndWaitForChoicesAsync(CancellationToken cancellationToken = default)
+    /// <param name="onComplete">Callback to invoke when all choices have been received</param>
+    public void RequestPlayerChoices(Action? onComplete = null)
     {
-        // Verify that we have active requests
+   // Verify that we have active requests
         if (Sides.Any(side => side.ActiveRequest == null))
         {
-            throw new InvalidOperationException("Cannot send requests to players: Some sides have no active request");
+   throw new InvalidOperationException("Cannot request choices from players: Some sides have no active request");
         }
 
-        // Create tasks for each side to get their choice
-        var choiceTasks = new List<Task>();
+        // Store the completion callback
+        _choicesCompletionCallback = onComplete;
 
+        // Emit choice request events for each side that needs to make a choice
         foreach (Side side in Sides)
         {
-            // Skip sides that don't need to make a choice (already done)
+     // Skip sides that don't need to make a choice (already done)
             if (side.IsChoiceDone())
-            {
-                continue;
+      {
+    continue;
             }
 
-            // Create a task to get this side's choice
-            Task choiceTask = Task.Run(async () =>
+// Determine the request type
+       BattleRequestType requestType = RequestState switch
             {
-                try
-                {
-                    // Get the perspective for this side
-                    BattlePerspective perspective = GetPerspectiveForSide(side.Id);
+   RequestState.TeamPreview => BattleRequestType.TeamPreview,
+       RequestState.Move => BattleRequestType.TurnStart,
+      RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
+    _ => BattleRequestType.TurnStart,
+         };
 
-                    // Determine the request type
-                    BattleRequestType requestType = RequestState switch
-                    {
-                        RequestState.TeamPreview => BattleRequestType.TeamPreview,
-                        RequestState.Move => BattleRequestType.TurnStart,
-                        RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
-                        _ => BattleRequestType.TurnStart,
-                    };
-
-                    // Request choice from the player
-                    Choice choice = await PlayerController.RequestChoiceAsync(
-                        side.Id,
-                        side.ActiveRequest!,
-                        requestType,
-                        perspective,
-                        cancellationToken
-                    );
-
-                    Console.WriteLine($"[RequestAndWaitForChoicesAsync] Received choice for {side.Name}: {choice.Actions.Count} actions");
-                    for (int i = 0; i < choice.Actions.Count; i++)
-                    {
-                        var action = choice.Actions[i];
-                        Console.WriteLine($"[RequestAndWaitForChoicesAsync]   Action {i}: Type={action.Choice}, Index={action.Index}");
-                    }
-
-                    // Submit the choice to the battle
-                    if (!Choose(side.Id, choice))
-                    {
-                        // Choice was invalid - the Choose method already sent an error
-                        // For now, we'll auto-choose for the player
-                        if (DisplayUi)
-                        {
-                            Debug($"Invalid choice from {side.Name}, auto-choosing");
-                        }
-                        side.AutoChoose();
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    // Timeout or cancellation - auto-choose for this player
-                    if (DisplayUi)
-                    {
-                        Debug($"Timeout for {side.Name}, auto-choosing");
-                    }
-                    side.AutoChoose();
-                }
-                catch (Exception ex)
-                {
-                    if (DisplayUi)
-                    {
-                        Debug($"Error getting choice from {side.Name}: {ex.Message}, auto-choosing");
-                    }
-                    side.AutoChoose();
-                }
-            }, cancellationToken);
-
-            choiceTasks.Add(choiceTask);
+          // Emit the choice request event - external handler (Simulator) will handle async player interaction
+     RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
         }
 
-        // Wait for all sides to make their choices
-        if (choiceTasks.Count > 0)
-        {
-            await Task.WhenAll(choiceTasks);
-        }
-
-  // For team preview, don't auto-commit - let StartAsync handle it
-        // For other requests (moves, switches), commit immediately
-        if (RequestState != RequestState.TeamPreview && AllChoicesDone())
-        {
-      await CommitChoicesAsync(cancellationToken);
-        }
+ // Battle execution continues only when:
+        // 1. All choices are submitted via Choose()
+        // 2. Choose() detects AllChoicesDone()
+        // 3. The completion callback is invoked (if provided)
+        // 4. CommitChoices() is called to process the choices
     }
 }

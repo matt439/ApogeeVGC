@@ -1,42 +1,18 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Generators;
-using ApogeeVGC.Player;
-using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Gui;
+using ApogeeVGC.Player;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.Generators;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
 
-public enum DriverMode
-{
-    //RandomVsRandom,
-    //RandomVsRandomEvaluation,
-    //RandomVsRandomEvaluationDoubles,
-    GuiVsRandomSingles,
-    GuiVsRandomDoubles,
-    //ConsoleVsConsole,
-    //ConsoleVsMcts,
-    //MctsVsRandom,
-    //MctsVsRandomEvaluation,
-    //MctsVsRandomEvaluationDoubles,
-}
-
 public class Driver
 {
-    //private const double Root2 = 1.4142135623730951; // sqrt of 2
     private Library Library { get; } = new();
 
-    //private const int RandomEvaluationNumTest = 1000;
-
-    //private const int MctsEvaluationNumTest = 100;
-    //private const int MctsMaxIterations = 10000;
-    //private const double MctsExplorationParameter = Root2;
-    //private readonly int? _mctsMaxTimer = null; // in milliseconds
-
-    //private static readonly int NumThreads = Environment.ProcessorCount;
-
-    //private const int PlayerRandom1Seed = 439;
     private const int PlayerRandom2Seed = 1818;
 
     public void Start(DriverMode mode)
@@ -44,17 +20,17 @@ public class Driver
         switch (mode)
         {
             case DriverMode.GuiVsRandomSingles:
-                RunGuiVsRandomSinglesTest(); // No longer async
+                RunGuiVsRandomSinglesTest();
                 break;
             case DriverMode.GuiVsRandomDoubles:
-                RunGuiVsRandomDoublesTest(); // No longer async
+                RunGuiVsRandomDoublesTest();
                 break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
         }
     }
 
-    private void RunGuiVsRandomSinglesTest() // Changed from async Task
+    private void RunGuiVsRandomSinglesTest()
     {
         // Create BattleGame instance on main thread (required by MonoGame)
         using var battleGame = new BattleGame();
@@ -87,19 +63,46 @@ public class Driver
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
 
-        // Start the battle using BattleGame's deferred start mechanism
-        // This will queue the battle to start after LoadContent()
-        battleGame.StartBattle(Library, battleOptions, simulator);
-        Console.WriteLine("[Driver] Battle queued, calling battleGame.Run()");
+        // Start the battle asynchronously but don't await it yet
+        // The battle will run in the background while MonoGame processes events
+        Task<SimulatorResult> battleTask = simulator.RunAsync(Library, battleOptions, printDebug: true);
+
+        // Set up callback for when battle completes
+        battleTask.ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Console.WriteLine($"[Driver] Battle failed: {task.Exception?.GetBaseException().Message}");
+            }
+            else
+            {
+                Console.WriteLine($"[Driver] Battle completed with result: {task.Result}");
+            }
+        }, TaskScheduler.Default);
+
+        Console.WriteLine("[Driver] Starting BattleGame.Run()");
 
         // Run MonoGame on main thread - this blocks until game window closes
-        // LoadContent() will be called during initialization and will start the queued battle
         battleGame.Run();
 
         Console.WriteLine("[Driver] BattleGame.Run() exited");
+
+        // Wait for battle to complete if it's still running
+        if (!battleTask.IsCompleted)
+        {
+            Console.WriteLine("[Driver] Waiting for battle to complete...");
+            try
+            {
+                battleTask.Wait(TimeSpan.FromSeconds(5));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Driver] Error waiting for battle: {ex.Message}");
+            }
+        }
     }
 
-    private void RunGuiVsRandomDoublesTest() // Changed from async Task
+    private void RunGuiVsRandomDoublesTest()
     {
         throw new NotImplementedException();
     }

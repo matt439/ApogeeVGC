@@ -26,9 +26,9 @@ public partial class Battle
     private void UpdatePlayerUi(SideId sideId,
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
-        if (PlayerController.GetPlayerUiType(sideId) != PlayerUiType.Gui) return;
+   // Emit update event regardless of player type - Simulator will handle routing
         BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
-        PlayerController.UpdatePlayerUi(sideId, perspective);
+        EmitUpdate(sideId, new List<BattleMessage>(PendingMessages));
     }
 
     public void Add(params PartFuncUnion[] parts)
@@ -486,19 +486,16 @@ public partial class Battle
     /// </summary>
     public void FlushMessages()
     {
-        if (PendingMessages.Count == 0) return;
+     if (PendingMessages.Count == 0) return;
 
         foreach (Side side in Sides)
-        {
-            if (PlayerController.GetPlayerUiType(side.Id) == PlayerUiType.Gui)
-            {
-                // Send a copy of the messages to this player
-                PlayerController.UpdateMessages(side.Id, new List<BattleMessage>(PendingMessages));
-            }
+ {
+   // Emit update events for all sides
+   EmitUpdate(side.Id, new List<BattleMessage>(PendingMessages));
         }
 
         // Clear the pending messages
-        PendingMessages.Clear();
+   PendingMessages.Clear();
     }
 
     /// <summary>

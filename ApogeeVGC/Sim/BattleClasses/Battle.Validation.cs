@@ -71,6 +71,14 @@ public partial class Battle
 
         UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
         MakeRequest(RequestState.TeamPreview);
+        
+    // Request player choices - Battle will pause until callback is invoked
+        RequestPlayerChoices(onComplete: () =>
+        {
+  Console.WriteLine("[RunPickTeam] Team preview choices received, committing");
+ CommitChoices();
+        });
+        
         Debug("Exiting RunPickTeam().");
     }
 

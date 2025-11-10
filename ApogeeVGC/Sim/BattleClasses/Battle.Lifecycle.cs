@@ -318,6 +318,13 @@ public partial class Battle
 
         // Request move choices for the new turn
         MakeRequest(RequestState.Move);
+  
+      // Request player choices - Battle will pause until callback is invoked
+        RequestPlayerChoices(onComplete: () =>
+{
+     Console.WriteLine("[EndTurn] Turn choices received, committing");
+   CommitChoices();
+        });
     }
 
     /// <summary>
@@ -778,10 +785,18 @@ public partial class Battle
         {
             if (playerSwitch)
             {
-                MakeRequest(RequestState.SwitchIn);
-                return true;
+           MakeRequest(RequestState.SwitchIn);
+      
+          // Request player choices - Battle will pause until callback is invoked
+      RequestPlayerChoices(onComplete: () =>
+       {
+        Console.WriteLine("[RunAction] Switch choices received, committing");
+   CommitChoices();
+         });
+     
+     return true;
             }
-        }
+  }
 
         // In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();

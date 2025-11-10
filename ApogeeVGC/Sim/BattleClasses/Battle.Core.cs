@@ -109,13 +109,11 @@ public partial class Battle
     public Side P2 => Sides[1];
     private HashSet<string> Hints { get; } = [];
 
-    private IPlayerController PlayerController { get; init; }
-
     //public IPlayer Player1 { get; }
     //public IPlayer Player2 { get; }
     //public IReadOnlyList<IPlayer> Players => [Player1, Player2];
 
-    public Battle(BattleOptions options, Library library, IPlayerController playerController)
+    public Battle(BattleOptions options, Library library)
     {
         Library = library;
         Dex = new ModdedDex(Library);
@@ -166,14 +164,6 @@ public partial class Battle
         // Hints
 
         Send = options.Send ?? ((_, _) => { });
-
-        PlayerController = playerController;
-
-        // InputOptions
-        //Player1 = options.P1;
-        //Player2 = options.P2;
-        //SetPlayer(SideId.P1, options.P1.Options);
-        //SetPlayer(SideId.P2, options.P2.Options);
 
         Console.WriteLine("Battle constructor complete.");
     }
