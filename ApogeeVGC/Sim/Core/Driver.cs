@@ -4,7 +4,6 @@ using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Core;
@@ -65,7 +64,7 @@ public class Driver
 
         // Start the battle asynchronously but don't await it yet
         // The battle will run in the background while MonoGame processes events
-        Task<SimulatorResult> battleTask = simulator.RunAsync(Library, battleOptions, printDebug: true);
+        var battleTask = simulator.RunAsync(Library, battleOptions, printDebug: true);
 
         // Set up callback for when battle completes
         battleTask.ContinueWith(task =>
