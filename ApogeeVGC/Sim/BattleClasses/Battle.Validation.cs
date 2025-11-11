@@ -95,36 +95,38 @@ public partial class Battle
     /// </summary>
     private void ProcessTeamPreviewChoices()
     {
-  UpdateSpeed();
+        Console.WriteLine("[ProcessTeamPreviewChoices] Starting");
+        
+     UpdateSpeed();
 
     if (!AllChoicesDone())
-        {
+{
             throw new InvalidOperationException("Not all choices done");
         }
 
- // Log each side's choice to the input log and history
-   foreach (Side side in Sides)
+   // Log each side's choice to the input log and history
+        foreach (Side side in Sides)
         {
- string? choice = side.GetChoice().ToString();
+  string? choice = side.GetChoice().ToString();
             if (!string.IsNullOrEmpty(choice))
-      {
-       InputLog.Add($"> {side.Id} {choice}");
+            {
+     InputLog.Add($"> {side.Id} {choice}");
       History.RecordChoice(side.Id, choice);
-       }
-        }
+            }
+  }
 
         // Add each side's actions to the queue
-foreach (Side side in Sides)
+        foreach (Side side in Sides)
         {
-     Queue.AddChoice(side.Choice.Actions);
-   }
+ Queue.AddChoice(side.Choice.Actions);
+        }
 
    // Sort the new actions by priority/speed
-    Queue.Sort();
+        Queue.Sort();
 
-   ClearRequest();
+      ClearRequest();
 
-        Console.WriteLine("[ProcessTeamPreviewChoices] Team actions added to queue, setting wait handle");
+   Console.WriteLine("[ProcessTeamPreviewChoices] Team actions added to queue, setting wait handle");
     }
 
     public void CheckEvBalance()

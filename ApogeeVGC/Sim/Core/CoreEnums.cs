@@ -27,4 +27,20 @@ public enum DriverMode
 {
     GuiVsRandomSingles,
     GuiVsRandomDoubles,
+    RandomVsRandomSingles,
+}
+
+public enum PlayerUiType
+{
+    None,
+    Gui,
+    Console,
+}
+
+public enum PlayerType
+{
+    Random,
+    Gui,
+    Console,
+    Mcts,
 }

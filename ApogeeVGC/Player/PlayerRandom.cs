@@ -14,6 +14,27 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     private readonly Prng _random = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 
+    // Synchronous version for MCTS and fast simulations
+    public Choice GetChoiceSync(IChoiceRequest choiceRequest, BattleRequestType requestType, BattlePerspective perspective)
+    {
+        Console.WriteLine($"[PlayerRandom.GetChoiceSync] Called for {SideId}");
+        
+        // Return empty choice - battle will call AutoChoose on the Side
+        var choice = new Choice
+        {
+            Actions = new List<ChosenAction>(),
+            CantUndo = false,
+            Error = string.Empty,
+            ForcedSwitchesLeft = 0,
+            ForcedPassesLeft = 0,
+            SwitchIns = new HashSet<int>(),
+            Terastallize = false,
+        };
+        
+        Console.WriteLine($"[PlayerRandom.GetChoiceSync] Returning empty choice for auto-selection");
+        return choice;
+    }
+
     // Fast sync version for MCTS rollouts (IPlayer)
     public Choice GetNextChoiceSync(IChoiceRequest choice, BattlePerspective perspective)
     {

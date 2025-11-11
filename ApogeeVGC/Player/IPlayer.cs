@@ -8,6 +8,7 @@ public enum PlayerUiType
 {
     None,
     Gui,
+    Console,
 }
 
 public interface IPlayer
@@ -20,6 +21,9 @@ public interface IPlayer
     // Async choice submission
     Task<Choice> GetNextChoiceAsync(IChoiceRequest choice, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken);
+
+    // Synchronous choice submission (for AI players like Random, MCTS)
+    Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, BattlePerspective perspective);
 
     void UpdateUi(BattlePerspective perspective);
     

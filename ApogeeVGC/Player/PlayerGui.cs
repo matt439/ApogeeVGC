@@ -62,6 +62,11 @@ public class PlayerGui : IPlayer
         return choice;
     }
 
+    public Choice GetChoiceSync(IChoiceRequest choice, BattleRequestType requestType, BattlePerspective perspective)
+    {
+        throw new NotSupportedException("GUI player requires async input and cannot be used in synchronous mode");
+    }
+
     public void UpdateUi(BattlePerspective perspective)
     {
         // Queue the update through the coordinator instead of calling BattleGame directly

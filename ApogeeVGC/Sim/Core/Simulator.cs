@@ -185,6 +185,19 @@ public class Simulator : IBattleController
 
                 Console.WriteLine($"[Simulator.OnChoiceRequested] Received choice for {e.SideId}");
 
+                // If the choice is empty (no actions), use AutoChoose to fill it
+                // AutoChoose modifies Side state only, which is safe from the async task
+                if (choice.Actions.Count == 0)
+                {
+                    Console.WriteLine($"[Simulator.OnChoiceRequested] Empty choice received for {e.SideId}, using AutoChoose");
+                    Side side = Battle!.Sides.First(s => s.Id == e.SideId);
+                    Console.WriteLine($"[Simulator.OnChoiceRequested] Before AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
+                    side.AutoChoose();
+                    Console.WriteLine($"[Simulator.OnChoiceRequested] After AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
+                    choice = side.GetChoice();
+                    Console.WriteLine($"[Simulator.OnChoiceRequested] Final choice.Actions.Count = {choice.Actions.Count}");
+                }
+
                 // Send the choice response directly - let Battle.Choose() handle empty choices
                 // Do NOT call side.AutoChoose() here as it accesses battle state from async task
                 await _choiceResponseChannel!.Writer.WriteAsync(new ChoiceResponse
@@ -358,9 +371,10 @@ public class Simulator : IBattleController
     {
         return options.Type switch
         {
-            PlayerType.Random => new PlayerRandom(sideId, options, this),
-            PlayerType.Gui => CreateGuiPlayer(sideId, options),
-            PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
+            Player.PlayerType.Random => new PlayerRandom(sideId, options, this),
+            Player.PlayerType.Gui => CreateGuiPlayer(sideId, options),
+            Player.PlayerType.Console => new PlayerConsole(sideId, options, this),
+            Player.PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
     }

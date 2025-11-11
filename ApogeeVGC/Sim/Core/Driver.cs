@@ -1,6 +1,4 @@
 ﻿using ApogeeVGC.Data;
-using ApogeeVGC.Gui;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
@@ -24,6 +22,9 @@ public class Driver
             case DriverMode.GuiVsRandomDoubles:
                 RunGuiVsRandomDoublesTest();
                 break;
+            case DriverMode.RandomVsRandomSingles:
+                RunRandomVsRandomSinglesTest();
+                break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
         }
@@ -31,22 +32,16 @@ public class Driver
 
     private void RunGuiVsRandomSinglesTest()
     {
-        // Create BattleGame instance on main thread (required by MonoGame)
-        using var battleGame = new BattleGame();
-        Console.WriteLine($"[Driver] BattleGame created, instance: {battleGame.GetHashCode()}");
-
         PlayerOptions player1Options = new()
         {
-            Type = PlayerType.Gui,
+            Type = Player.PlayerType.Console, // Use Player namespace
             Name = "Matt",
             Team = TeamGenerator.GenerateTestTeam(Library),
-            GuiWindow = battleGame, // Pass BattleGame for UI updates
-            GuiChoiceCoordinator = battleGame.GetChoiceCoordinator(), // Pass coordinator for choice requests
         };
 
         PlayerOptions player2Options = new()
         {
-            Type = PlayerType.Random,
+            Type = Player.PlayerType.Random, // Use Player namespace
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
@@ -63,47 +58,56 @@ public class Driver
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
 
-        // Start the battle asynchronously but don't await it yet
-        // The battle will run in the background while MonoGame processes events
-        var battleTask = simulator.RunAsync(Library, battleOptions, printDebug: true);
+        // Run the battle synchronously on the main thread
+        var result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
 
-        // Set up callback for when battle completes
-        battleTask.ContinueWith(task =>
-        {
-            if (task.IsFaulted)
-            {
-                Console.WriteLine($"[Driver] Battle failed: {task.Exception?.GetBaseException().Message}");
-            }
-            else
-            {
-                Console.WriteLine($"[Driver] Battle completed with result: {task.Result}");
-            }
-        }, TaskScheduler.Default);
-
-        Console.WriteLine("[Driver] Starting BattleGame.Run()");
-
-        // Run MonoGame on main thread - this blocks until game window closes
-        battleGame.Run();
-
-        Console.WriteLine("[Driver] BattleGame.Run() exited");
-
-        // Wait for battle to complete if it's still running
-        if (!battleTask.IsCompleted)
-        {
-            Console.WriteLine("[Driver] Waiting for battle to complete...");
-            try
-            {
-                battleTask.Wait(TimeSpan.FromSeconds(5));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Driver] Error waiting for battle: {ex.Message}");
-            }
-        }
+        Console.WriteLine($"[Driver] Battle completed with result: {result}");
     }
 
     private void RunGuiVsRandomDoublesTest()
     {
         throw new NotImplementedException();
+    }
+
+    private void RunRandomVsRandomSinglesTest()
+    {
+        Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
+
+        PlayerOptions player1Options = new()
+        {
+            Type = Player.PlayerType.Random,
+            Name = "Random 1",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+            Seed = new PrngSeed(12345), // Fixed seed for reproducibility
+        };
+
+        PlayerOptions player2Options = new()
+        {
+            Type = Player.PlayerType.Random,
+            Name = "Random 2",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+            Seed = new PrngSeed(PlayerRandom2Seed),
+        };
+
+        BattleOptions battleOptions = new()
+        {
+            Id = FormatId.CustomSingles,
+            Player1Options = player1Options,
+            Player2Options = player2Options,
+            Debug = true,
+            Sync = true, // Enable synchronous mode
+        };
+
+        var simulator = new SyncSimulator();
+        Console.WriteLine("[Driver] SyncSimulator created");
+
+        // Run the battle completely synchronously - no async/await needed!
+        var result = simulator.Run(Library, battleOptions, printDebug: true);
+
+        Console.WriteLine($"[Driver] Battle completed with result: {result}");
+
+        // Show final statistics
+        Console.WriteLine("\n=== Battle Complete ===");
+        Console.WriteLine($"Winner: {result}");
     }
 }

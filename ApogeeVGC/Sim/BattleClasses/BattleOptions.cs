@@ -13,5 +13,12 @@ public record BattleOptions
     public bool? Rated { get; init; } // Rated string
     public required PlayerOptions Player1Options { get; init; }
     public required PlayerOptions Player2Options { get; init; }
-    public bool Debug { get; set; } // show debug mode option
+    public bool Debug { get; init; }
+
+    /// <summary>
+    /// If true, battle runs synchronously without async/threading complexity.
+    /// Perfect for AI training (MCTS) where speed and simplicity are important.
+    /// If false, battle uses async pattern for GUI integration.
+    /// </summary>
+    public bool Sync { get; init; } = false;
 }
