@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Sim.Events.Handlers;
+namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnDamage event.

@@ -2,7 +2,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
 
-namespace ApogeeVGC.Sim.Events.Handlers;
+namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnResidual event.
