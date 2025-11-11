@@ -5,6 +5,7 @@ namespace ApogeeVGC.Sim.Events;
 /// <summary>
 /// Modern interface for event methods using strongly-typed EventHandlerInfo records.
 /// This replaces IEventMethods with a type-safe approach that validates delegate signatures at compile-time.
+/// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
 /// </summary>
 public interface IEventMethodsV2
 {
@@ -364,72 +365,4 @@ public interface IEventMethodsV2
     OnAllyFaintEventInfo? OnAllyFaint { get; }
     OnAllyAfterBoostEventInfo? OnAllyAfterBoost { get; }
     OnAllyPrepareHitEventInfo? OnAllyPrepareHit { get; }
-
-    // Priority properties (subset - add more as needed)
-    int? OnAccuracyPriority { get; }
-    int? OnDamagingHitOrder { get; }
-    int? OnAfterMoveSecondaryPriority { get; }
-    int? OnAfterMoveSecondarySelfPriority { get; }
-    int? OnAfterMoveSelfPriority { get; }
-    int? OnAfterSetStatusPriority { get; }
-    int? OnAnyBasePowerPriority { get; }
-    int? OnAnyInvulnerabilityPriority { get; }
-    int? OnAnyModifyAccuracyPriority { get; }
-    int? OnAnyFaintPriority { get; }
-    int? OnAnyPrepareHitPriority { get; }
-    int? OnAnySwitchInPriority { get; }
-    int? OnAnySwitchInSubOrder { get; }
-    int? OnAllyBasePowerPriority { get; }
-    int? OnAllyModifyAtkPriority { get; }
-    int? OnAllyModifySpAPriority { get; }
-    int? OnAllyModifySpDPriority { get; }
-    int? OnAttractPriority { get; }
-    int? OnBasePowerPriority { get; }
-    int? OnBeforeMovePriority { get; }
-    int? OnBeforeSwitchOutPriority { get; }
-    int? OnChangeBoostPriority { get; }
-    int? OnDamagePriority { get; }
-    int? OnDragOutPriority { get; }
-    int? OnEffectivenessPriority { get; }
-    int? OnFoeBasePowerPriority { get; }
-    int? OnFoeBeforeMovePriority { get; }
-    int? OnFoeModifyDefPriority { get; }
-    int? OnFoeModifySpDPriority { get; }
-    int? OnFoeRedirectTargetPriority { get; }
-    int? OnFoeTrapPokemonPriority { get; }
-    int? OnFractionalPriorityPriority { get; }
-    int? OnHitPriority { get; }
-    int? OnInvulnerabilityPriority { get; }
-    int? OnModifyAccuracyPriority { get; }
-    int? OnModifyAtkPriority { get; }
-    int? OnModifyCritRatioPriority { get; }
-    int? OnModifyDefPriority { get; }
-    int? OnModifyMovePriority { get; }
-    int? OnModifyPriorityPriority { get; }
-    int? OnModifySpAPriority { get; }
-    int? OnModifySpDPriority { get; }
-    int? OnModifySpePriority { get; }
-    int? OnModifyStabPriority { get; }
-    int? OnModifyTypePriority { get; }
-    int? OnModifyWeightPriority { get; }
-    int? OnRedirectTargetPriority { get; }
-    int? OnResidualOrder { get; }
-    int? OnResidualPriority { get; }
-    int? OnResidualSubOrder { get; }
-    int? OnSourceBasePowerPriority { get; }
-    int? OnSourceInvulnerabilityPriority { get; }
-    int? OnSourceModifyAccuracyPriority { get; }
-    int? OnSourceModifyAtkPriority { get; }
-    int? OnSourceModifyDamagePriority { get; }
-    int? OnSourceModifySpAPriority { get; }
-    int? OnSwitchInPriority { get; }
-    int? OnSwitchInSubOrder { get; }
-    int? OnTrapPokemonPriority { get; }
-    int? OnTryBoostPriority { get; }
-    int? OnTryEatItemPriority { get; }
-    int? OnTryHealPriority { get; }
-    int? OnTryHitPriority { get; }
-    int? OnTryMovePriority { get; }
-    int? OnTryPrimaryHitPriority { get; }
-    int? OnTypePriority { get; }
 }
