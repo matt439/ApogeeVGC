@@ -282,63 +282,70 @@ return false;
 
     public void CommitChoices()
     {
-UpdateSpeed();
+   Console.WriteLine("[CommitChoices] Starting");
+      UpdateSpeed();
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
-        // re-sorted), but the new switch choices are sorted and inserted before
-  // the rest of the turn.
+// re-sorted), but the new switch choices are sorted and inserted before
+      // the rest of the turn.
         var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
         Queue.Clear();
 
         if (!AllChoicesDone())
-     {
-throw new InvalidOperationException("Not all choices done");
+        {
+     throw new InvalidOperationException("Not all choices done");
+ }
+
+        // Log each side's choice to the input log and history
+        foreach (Side side in Sides)
+    {
+            string? choice = side.GetChoice().ToString();
+     if (!string.IsNullOrEmpty(choice))
+            {
+     InputLog.Add($"> {side.Id} {choice}");
+       
+         // Record choice in history
+      History.RecordChoice(side.Id, choice);
+ }
         }
 
-      // Log each side's choice to the input log and history
+        // Add each side's actions to the queue
      foreach (Side side in Sides)
-      {
-      string? choice = side.GetChoice().ToString();
-  if (!string.IsNullOrEmpty(choice))
-     {
-           InputLog.Add($"> {side.Id} {choice}");
-     
-            // Record choice in history
-                History.RecordChoice(side.Id, choice);
-      }
-     }
-
-// Add each side's actions to the queue
-   foreach (Side side in Sides)
         {
-        Queue.AddChoice(side.Choice.Actions);
-    }
+    Queue.AddChoice(side.Choice.Actions);
+        }
+        
+      Console.WriteLine($"[CommitChoices] Added {Queue.List.Count} actions to queue");
 
         ClearRequest();
 
         // Sort the new actions by priority/speed
-   Queue.Sort();
+        Queue.Sort();
 
   // Append the old queue actions after the new ones
- Queue.List.AddRange(oldQueue);
+        Queue.List.AddRange(oldQueue);
+   
+     Console.WriteLine($"[CommitChoices] Total queue size: {Queue.List.Count}");
 
-  // Clear request state
+        // Clear request state
         RequestState = RequestState.None;
         foreach (Side side in Sides)
         {
-       side.ActiveRequest = null;
+         side.ActiveRequest = null;
         }
 
-      // Continue executing the turn
-     TurnLoop();
+        // Continue executing the turn
+        Console.WriteLine("[CommitChoices] Calling TurnLoop");
+        TurnLoop();
+        Console.WriteLine("[CommitChoices] TurnLoop returned");
 
-    // Workaround for tests - send updates if log is getting large
-  if (Log.Count - SentLogPos > 500)
+   // Workaround for tests - send updates if log is getting large
+        if (Log.Count - SentLogPos > 500)
         {
             SendUpdates();
-        }
- }
+    }
+    }
 
 // Callback to invoke when all choices are received
     private Action? _choicesCompletionCallback;

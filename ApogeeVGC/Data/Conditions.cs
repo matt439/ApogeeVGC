@@ -915,6 +915,14 @@ public record Conditions
                     }
                 },
             },
+
+            [ConditionId.RevivalBlessing] = new()
+            {
+                Id = ConditionId.RevivalBlessing,
+                Name = "Revival Blessing",
+                EffectType = EffectType.Condition,
+                // TODO: Implement Revival Blessing effect
+            },
         };
     }
 }

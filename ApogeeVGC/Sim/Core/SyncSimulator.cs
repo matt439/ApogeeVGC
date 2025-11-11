@@ -51,34 +51,47 @@ public class SyncSimulator : IBattleController
 
         try
      {
-   // Start the battle - this is completely synchronous
-   Battle.Start();
+            // Start the battle - this is completely synchronous
+            Battle.Start();
 
-        if (PrintDebug)
-      {
-      Console.WriteLine("Battle has ended.");
+            if (PrintDebug)
+    {
+           Console.WriteLine("Battle has ended.");
+    }
+
+     return DetermineWinner();
+        }
+     catch (Exception ex)
+        {
+   if (PrintDebug)
+            {
+  Console.WriteLine($"Battle error: {ex.GetType().Name}: {ex.Message}");
+                if (ex.InnerException != null)
+           {
+           Console.WriteLine($"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+ }
+          Console.WriteLine($"Stack trace (last 10 frames):");
+      var frames = ex.StackTrace?.Split('\n').Take(10);
+     if (frames != null)
+       {
+           foreach (var frame in frames)
+             {
+        Console.WriteLine($"  {frame.Trim()}");
+       }
+           }
  }
 
-            return DetermineWinner();
-        }
-    catch (Exception ex)
-        {
-      if (PrintDebug)
-   {
-    Console.WriteLine($"Battle error: {ex.Message}");
-      }
-
-   throw;
-        }
+            throw;
+     }
         finally
         {
-       // Unsubscribe from events
-       if (Battle != null)
-       {
-  Battle.ChoiceRequested -= OnChoiceRequested;
-              Battle.UpdateRequested -= OnUpdateRequested;
-              Battle.BattleEnded -= OnBattleEnded;
-      }
+            // Unsubscribe from events
+            if (Battle != null)
+  {
+        Battle.ChoiceRequested -= OnChoiceRequested;
+    Battle.UpdateRequested -= OnUpdateRequested;
+    Battle.BattleEnded -= OnBattleEnded;
+     }
         }
     }
 

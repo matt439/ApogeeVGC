@@ -326,17 +326,17 @@ public partial class Battle
         // Request move choices for the new turn
         MakeRequest(RequestState.Move);
   
-      // Request player choices - Battle will pause until callback is invoked
-        RequestPlayerChoices(onComplete: () =>
+        // Request player choices - Battle will pause until callback is invoked
+      RequestPlayerChoices(onComplete: () =>
         {
-     Console.WriteLine("[EndTurn] Turn choices received, committing");
-    CommitChoices();
-  });
+  Console.WriteLine("[EndTurn] Turn choices received, committing");
+         CommitChoices();
+     });
   
-  // WAIT here until turn choices are complete
-        Console.WriteLine("[EndTurn] Waiting for turn choices...");
- _choiceWaitHandle.Wait();
-        Console.WriteLine("[EndTurn] Turn choices received, continuing");
+        // Don't wait here - just return
+        // The callback will call CommitChoices() -> TurnLoop() which will process the turn
+        // and naturally call EndTurn() again when the turn completes
+     Console.WriteLine("[EndTurn] Request made, returning to wait for choices");
     }
 
     /// <summary>
@@ -388,10 +388,13 @@ public partial class Battle
             }
         }
 
-        // Turn is complete
-        EndTurn();
+        // Turn is complete - reset flags before calling EndTurn
+        Console.WriteLine("[TurnLoop] Turn complete, resetting MidTurn flag");
         MidTurn = false;
         Queue.Clear();
+        
+        // Now start the next turn
+        EndTurn();
     }
 
 

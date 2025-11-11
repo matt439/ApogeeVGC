@@ -551,8 +551,10 @@ public partial class Battle
                     List<object?> endCallArgsList = [.. handler.EndCallArgs ?? []];
                     if (endCallArgsList.Count == 0)
                     {
-                        endCallArgsList.Add(handler.EffectHolder);
-                        endCallArgsList.Add(effect.EffectStateId);
+                        // Default: pass Battle and the effect holder (e.g., Pokemon, Side, or Field)
+                        // OnEnd delegates typically have signature: (Battle, Pokemon) or (Battle, Side)
+                        endCallArgsList.Add(this);  // First arg: Battle
+                        endCallArgsList.Add(handler.EffectHolder);  // Second arg: target (Pokemon/Side/Field)
                     }
 
                     // Invoke the end callback

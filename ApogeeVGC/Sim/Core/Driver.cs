@@ -10,6 +10,7 @@ public class Driver
 {
     private Library Library { get; } = new();
 
+    private const int PlayerRandom1Seed = 12345;
     private const int PlayerRandom2Seed = 1818;
 
     public void Start(DriverMode mode)
@@ -78,7 +79,7 @@ public class Driver
             Type = Player.PlayerType.Random,
             Name = "Random 1",
             Team = TeamGenerator.GenerateTestTeam(Library),
-            Seed = new PrngSeed(12345), // Fixed seed for reproducibility
+            Seed = new PrngSeed(PlayerRandom1Seed),
         };
 
         PlayerOptions player2Options = new()
