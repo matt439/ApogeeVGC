@@ -40,7 +40,8 @@ public class Driver
             Type = PlayerType.Gui,
             Name = "Matt",
             Team = TeamGenerator.GenerateTestTeam(Library),
-            GuiWindow = battleGame, // Pass BattleGame to PlayerGui
+            GuiWindow = battleGame, // Pass BattleGame for UI updates
+            GuiChoiceCoordinator = battleGame.GetChoiceCoordinator(), // Pass coordinator for choice requests
         };
 
         PlayerOptions player2Options = new()

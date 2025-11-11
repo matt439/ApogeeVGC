@@ -75,11 +75,56 @@ public partial class Battle
     // Request player choices - Battle will pause until callback is invoked
         RequestPlayerChoices(onComplete: () =>
         {
-  Console.WriteLine("[RunPickTeam] Team preview choices received, committing");
- CommitChoices();
-        });
-        
+  Console.WriteLine("[RunPickTeam] Team preview choices received, processing");
+         // Process team preview choices without calling TurnLoop
+        // Battle.Start() will handle adding StartGameAction and calling TurnLoop
+            ProcessTeamPreviewChoices();
+    });
+
         Debug("Exiting RunPickTeam().");
+    
+        // WAIT here until team preview choices are complete and processed
+    Console.WriteLine("[RunPickTeam] Waiting for team preview choices...");
+  _choiceWaitHandle.Wait();
+    Console.WriteLine("[RunPickTeam] Team preview complete, continuing to battle start");
+    }
+
+    /// <summary>
+    /// Processes team preview choices by adding team actions to the queue
+    /// without starting the turn loop. Used during battle startup.
+    /// </summary>
+    private void ProcessTeamPreviewChoices()
+    {
+  UpdateSpeed();
+
+    if (!AllChoicesDone())
+        {
+            throw new InvalidOperationException("Not all choices done");
+        }
+
+ // Log each side's choice to the input log and history
+   foreach (Side side in Sides)
+        {
+ string? choice = side.GetChoice().ToString();
+            if (!string.IsNullOrEmpty(choice))
+      {
+       InputLog.Add($"> {side.Id} {choice}");
+      History.RecordChoice(side.Id, choice);
+       }
+        }
+
+        // Add each side's actions to the queue
+foreach (Side side in Sides)
+        {
+     Queue.AddChoice(side.Choice.Actions);
+   }
+
+   // Sort the new actions by priority/speed
+    Queue.Sort();
+
+   ClearRequest();
+
+        Console.WriteLine("[ProcessTeamPreviewChoices] Team actions added to queue, setting wait handle");
     }
 
     public void CheckEvBalance()

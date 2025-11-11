@@ -20,6 +20,9 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
 
     // Thread-safe flag to indicate if a request is active
     private volatile bool _isRequestActive;
+  
+    // Flag to indicate UI setup is needed (set by battle thread, read by GUI thread)
+    private volatile bool _needsUiSetup;
 
     // UI state
     private List<ChoiceButton> _buttons = [];
@@ -69,34 +72,43 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
     public Task<Choice> RequestChoiceAsync(IChoiceRequest request, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
+     Console.WriteLine($"[ChoiceInputManager.RequestChoiceAsync] Called with requestType={requestType}, _isRequestActive={_isRequestActive}");
+        
         if (_isRequestActive)
         {
+            Console.WriteLine("[ChoiceInputManager.RequestChoiceAsync] ERROR: A choice request is already active!");
             throw new InvalidOperationException("A choice request is already active");
         }
 
-        // Set up the request state (thread-safe assignment)
-        _currentRequest = request;
+      // Set up the request state (thread-safe assignment)
+    _currentRequest = request;
         CurrentRequestType = requestType;
         _perspective = perspective;
-        _pendingChoice = new Choice
+      _pendingChoice = new Choice
         {
-            Actions = new List<ChosenAction>(),
+       Actions = new List<ChosenAction>(),
         };
 
-        // Create the completion source that the battle thread will await
-        _choiceCompletionSource = new TaskCompletionSource<Choice>();
-        _isRequestActive = true;
+        Console.WriteLine($"[ChoiceInputManager.RequestChoiceAsync] Set up request: CurrentRequestType={CurrentRequestType}, request type={request.GetType().Name}");
 
-        // Setup UI (this will be processed on the next Update() call on the GUI thread)
-        SetupChoiceUi();
+      // Create the completion source that the battle thread will await
+  _choiceCompletionSource = new TaskCompletionSource<Choice>();
+        _isRequestActive = true;
+    
+        // Flag that UI setup is needed (will be processed on GUI thread in Update())
+      _needsUiSetup = true;
+
+     Console.WriteLine($"[ChoiceInputManager.RequestChoiceAsync] Set _needsUiSetup=true, _isRequestActive={_isRequestActive}");
 
         // Register cancellation
         cancellationToken.Register(() =>
         {
-            _choiceCompletionSource?.TrySetCanceled();
-            _isRequestActive = false;
+   _choiceCompletionSource?.TrySetCanceled();
+       _isRequestActive = false;
+            _needsUiSetup = false;
         });
 
+        Console.WriteLine("[ChoiceInputManager.RequestChoiceAsync] Returning task (UI will be set up on next Update)");
         return _choiceCompletionSource.Task;
     }
 
@@ -104,25 +116,57 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
     /// Update input state and process user choices.
     /// This runs on the MonoGame update thread.
     /// </summary>
+    private int _updateCallCount = 0;
+    
     public void Update(GameTime gameTime)
     {
+  _updateCallCount++;
+        
+        // Log ALL updates for first 200, then every 100th
+        bool shouldLog = _updateCallCount <= 200 || _updateCallCount % 100 == 0;
+        
+ if (shouldLog)
+        {
+   Console.WriteLine($"[ChoiceInputManager.Update #{_updateCallCount}] Called. _isRequestActive={_isRequestActive}, _needsUiSetup={_needsUiSetup}");
+        }
+     
         // Update timers
         TimerManager.Update(gameTime);
 
-        // Only process input if we have an active request
-        if (!_isRequestActive || _currentRequest == null || _choiceCompletionSource == null)
+        // Check if we need to set up UI (deferred from RequestChoiceAsync)
+        if (_needsUiSetup)
+  {
+Console.WriteLine($"[ChoiceInputManager.Update #{_updateCallCount}] Setting up UI on GUI thread");
+  _needsUiSetup = false;
+SetupChoiceUi();
+       Console.WriteLine($"[ChoiceInputManager.Update #{_updateCallCount}] UI setup complete");
+        }
+
+ // Only process input if we have an active request
+  if (!_isRequestActive || _currentRequest == null || _choiceCompletionSource == null)
+  {
+ if (shouldLog)
+{
+      Console.WriteLine($"[ChoiceInputManager.Update #{_updateCallCount}] Skipping: _isRequestActive={_isRequestActive}, _currentRequest null? {_currentRequest == null}, _choiceCompletionSource null? {_choiceCompletionSource == null}");
+ }
             return;
+        }
+
+  if (shouldLog)
+    {
+     Console.WriteLine($"[ChoiceInputManager.Update #{_updateCallCount}] Processing input. CurrentRequestType={CurrentRequestType}, MainBattleState={MainBattleState}, Buttons={_buttons.Count}");
+  }
 
         KeyboardState keyboardState = Keyboard.GetState();
         MouseState mouseState = Mouse.GetState();
 
-        // Process keyboard input
-        ProcessKeyboardInput(keyboardState);
+    // Process keyboard input
+     ProcessKeyboardInput(keyboardState);
 
-        // Process mouse input
-        ProcessMouseInput(mouseState);
+ // Process mouse input
+ ProcessMouseInput(mouseState);
 
-        _previousKeyboardState = keyboardState;
+     _previousKeyboardState = keyboardState;
         _previousMouseState = mouseState;
     }
 
@@ -177,54 +221,73 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
 
     private void SetupChoiceUi()
     {
+     Console.WriteLine($"[ChoiceInputManager.SetupChoiceUi] Called with CurrentRequestType={CurrentRequestType}");
+        
         _buttons.Clear();
         _keyboardInput = "";
-        _selectedPokemonIndex = 0;
+_selectedPokemonIndex = 0;
 
-        // Reset team preview state when setting up new UI
+     // Reset team preview state when setting up new UI
         if (CurrentRequestType != BattleRequestType.TeamPreview)
-        {
-            CurrentHighlightedIndex = 0;
-            _lockedInPositions.Clear();
-            _lockedInIndices.Clear();
+    {
+       CurrentHighlightedIndex = 0;
+       _lockedInPositions.Clear();
+_lockedInIndices.Clear();
+         Console.WriteLine("[ChoiceInputManager.SetupChoiceUi] Cleared team preview state");
         }
 
         // Initialize main battle state for turn start requests
-        if (CurrentRequestType == BattleRequestType.TurnStart)
-        {
-            MainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
-            TurnSelection.Reset();
+    if (CurrentRequestType == BattleRequestType.TurnStart)
+ {
+   MainBattleState = MainBattlePhaseState.MainMenuFirstPokemon;
+      TurnSelection.Reset();
+       Console.WriteLine($"[ChoiceInputManager.SetupChoiceUi] Initialized main battle state: {MainBattleState}");
         }
+
+    Console.WriteLine($"[ChoiceInputManager.SetupChoiceUi] Current request type: {_currentRequest?.GetType().Name}");
 
         if (_currentRequest is MoveRequest moveRequest)
         {
+     Console.WriteLine("[ChoiceInputManager.SetupChoiceUi] Setting up MoveRequest UI");
             SetupMoveRequestUi(moveRequest);
         }
         else if (_currentRequest is SwitchRequest switchRequest)
-        {
-            SetupSwitchRequestUi(switchRequest);
+      {
+       Console.WriteLine("[ChoiceInputManager.SetupChoiceUi] Setting up SwitchRequest UI");
+       SetupSwitchRequestUi(switchRequest);
         }
         else if (_currentRequest is TeamPreviewRequest)
         {
-            SetupTeamPreviewUi();
+   Console.WriteLine("[ChoiceInputManager.SetupChoiceUi] Setting up TeamPreviewRequest UI");
+       SetupTeamPreviewUi();
         }
+        
+     Console.WriteLine($"[ChoiceInputManager.SetupChoiceUi] Setup complete. Button count: {_buttons.Count}");
     }
 
     private void SubmitChoice()
     {
+      Console.WriteLine($"[ChoiceInputManager.SubmitChoice] Called. _pendingChoice null? {_pendingChoice == null}, _choiceCompletionSource null? {_choiceCompletionSource == null}");
+        
         if (_pendingChoice == null || _choiceCompletionSource == null)
-            return;
+       return;
 
-        // Complete the task with the choice (thread-safe)
+        Console.WriteLine($"[ChoiceInputManager.SubmitChoice] Submitting choice with {_pendingChoice.Actions.Count} actions");
+
+   // Complete the task with the choice (thread-safe)
         // This will unblock the battle simulation thread
         _choiceCompletionSource.TrySetResult(_pendingChoice);
 
-        // Clear state
-        _currentRequest = null;
+        Console.WriteLine("[ChoiceInputManager.SubmitChoice] Choice submitted to battle thread");
+
+    // Clear state
+      _currentRequest = null;
         _pendingChoice = null;
         _buttons.Clear();
-        _keyboardInput = "";
+       _keyboardInput = "";
         _isRequestActive = false;
+
+        Console.WriteLine($"[ChoiceInputManager.SubmitChoice] State cleared, _isRequestActive={_isRequestActive}");
     }
 
     private string GetInstructionText()

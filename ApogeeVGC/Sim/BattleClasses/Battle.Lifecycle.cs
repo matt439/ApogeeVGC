@@ -91,11 +91,6 @@ public partial class Battle
         // Run team preview/selection phase
         RunPickTeam();
       
-   // WAIT here until team preview choices are complete
-        Console.WriteLine("[Battle.Start] Waiting for team preview choices...");
-        _choiceWaitHandle.Wait();
-        Console.WriteLine("[Battle.Start] Team preview choices received, continuing");
-
         // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
@@ -417,118 +412,122 @@ public partial class Battle
         {
             case ActionId.Start:
                 {
-                    foreach (Side side in Sides)
-                    {
-                        if (side.PokemonLeft > 0)
-                            side.PokemonLeft = side.Pokemon.Count;
+   foreach (Side side in Sides)
+       {
+   if (side.PokemonLeft > 0)
+    side.PokemonLeft = side.Pokemon.Count;
 
-                        if (DisplayUi)
-                        {
-                            Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
-                        }
-                    }
+    if (DisplayUi)
+    {
+             Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+             }
+      }
 
-                    if (DisplayUi)
-                    {
-                        Add("start");
-                    }
+            if (DisplayUi)
+            {
+            Add("start");
+    }
 
-                    // Change Zacian/Zamazenta into their Crowned forme
-                    foreach (Pokemon pokemon in GetAllPokemon())
-                    {
-                        Species? rawSpecies = null;
-                        if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
-                        {
-                            rawSpecies = Library.Species[SpecieId.ZacianCrowned];
-                        }
-                        else if (pokemon.Species.Id == SpecieId.Zamazenta && pokemon.Item == ItemId.RustedShield)
-                        {
-                            rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
-                        }
+   // Change Zacian/Zamazenta into their Crowned forme
+ foreach (Pokemon pokemon in GetAllPokemon())
+        {
+  Species? rawSpecies = null;
+   if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
+       {
+      rawSpecies = Library.Species[SpecieId.ZacianCrowned];
+       }
+ else if (pokemon.Species.Id == SpecieId.Zamazenta && pokemon.Item == ItemId.RustedShield)
+    {
+      rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
+          }
 
-                        if (rawSpecies == null) continue;
+       if (rawSpecies == null) continue;
 
-                        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
-                        if (species == null) continue;
+        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
+ if (species == null) continue;
 
-                        pokemon.BaseSpecies = rawSpecies;
-                        pokemon.Details = pokemon.GetUpdatedDetails();
-                        pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
-                            ?? throw new InvalidOperationException("Species has no ability in slot 0"),
-                            isFromFormeChange: true);
-                        pokemon.BaseAbility = pokemon.Ability;
+            pokemon.BaseSpecies = rawSpecies;
+       pokemon.Details = pokemon.GetUpdatedDetails();
+pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
+    ?? throw new InvalidOperationException("Species has no ability in slot 0"),
+   isFromFormeChange: true);
+      pokemon.BaseAbility = pokemon.Ability;
 
-                        // Replace Iron Head with Behemoth Blade/Bash
-                        Dictionary<SpecieId, MoveId> behemothMoves = new()
-                    {
-                        { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
-                        { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
-                    };
+           // Replace Iron Head with Behemoth Blade/Bash
+           Dictionary<SpecieId, MoveId> behemothMoves = new()
+    {
+       { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
+                { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
+        };
 
-                        int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
-                        if (ironHeadIndex >= 0)
-                        {
-                            Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
-                            pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
-                            {
-                                Move = move.Id,
-                                Id = move.Id,
-                                Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-                                MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-                                Target = move.Target,
-                                Disabled = false,
-                                DisabledSource = null,
-                                Used = false,
-                            };
-                            pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
-                        }
-                    }
+    int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
+    if (ironHeadIndex >= 0)
+   {
+       Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
+     pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
+     {
+           Move = move.Id,
+          Id = move.Id,
+Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+               MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+  Target = move.Target,
+          Disabled = false,
+            DisabledSource = null,
+        Used = false,
+         };
+       pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
+          }
+   }
 
-                    // Call format's OnBattleStart handler
-                    Format.OnBattleStart?.Invoke(this);
+        // Call format's OnBattleStart handler
+      Format.OnBattleStart?.Invoke(this);
 
-                    foreach (RuleId rule in RuleTable.Keys)
-                    {
-                        string ruleString = rule.ToString();
-                        if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-                        Format subFormat = Library.Rulesets[rule];
-                        subFormat.OnBattleStart?.Invoke(this);
-                    }
+          foreach (RuleId rule in RuleTable.Keys)
+       {
+    string ruleString = rule.ToString();
+     if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+   Format subFormat = Library.Rulesets[rule];
+  subFormat.OnBattleStart?.Invoke(this);
+}
 
-                    foreach (Side side in Sides)
-                    {
-                        for (int i = 0; i < side.Active.Count; i++)
-                        {
-                            if (side.PokemonLeft <= 0)
-                            {
-                                // Forfeited before starting - assign the pokemon but mark as fainted
-                                side.Active[i] = side.Pokemon[i];
-                                Pokemon assignedPokemon = side.Active[i]
-                                    ?? throw new InvalidOperationException(
-                                        $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
-                                assignedPokemon.Fainted = true;
-                                assignedPokemon.Hp = 0;
-                            }
-                            else
-                            {
-                                Actions.SwitchIn(side.Pokemon[i], i);
-                            }
-                        }
-                    }
+          foreach (Side side in Sides)
+        {
+      for (int i = 0; i < side.Active.Count; i++)
+      {
+   if (side.PokemonLeft <= 0)
+                 {
+   // Forfeited before starting - assign the pokemon but mark as fainted
+   side.Active[i] = side.Pokemon[i];
+     Pokemon assignedPokemon = side.Active[i]
+     ?? throw new InvalidOperationException(
+       $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
+      assignedPokemon.Fainted = true;
+    assignedPokemon.Hp = 0;
+                 }
+   else
+         {
+   Actions.SwitchIn(side.Pokemon[i], i);
+              }
+      }
+     }
 
-                    foreach (Pokemon pokemon in GetAllPokemon())
-                    {
-                        // Only apply species condition if it's not None
-                        if (pokemon.Species.Conditon != ConditionId.None)
-                        {
-                            Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
-                            SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
-                        }
-                    }
+      foreach (Pokemon pokemon in GetAllPokemon())
+        {
+             // Only apply species condition if it's not None
+  if (pokemon.Species.Conditon != ConditionId.None)
+          {
+      Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
+        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+          }
+     }
 
-                    MidTurn = true;
-                    break;
-                }
+     // Update UI for all players now that Pokemon are switched in
+   Console.WriteLine("[RunAction.Start] Updating UI after battle start");
+  UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
+
+    MidTurn = true;
+                break;
+     }
 
             case ActionId.Move:
                 {

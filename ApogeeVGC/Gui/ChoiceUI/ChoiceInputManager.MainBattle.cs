@@ -14,12 +14,18 @@ public partial class ChoiceInputManager
 {
     private void SetupMoveRequestUi(MoveRequest request)
     {
+        Console.WriteLine($"[ChoiceInputManager.SetupMoveRequestUi] Called with CurrentRequestType={CurrentRequestType}");
+
         // For TurnStart requests, use the main battle state machine
         if (CurrentRequestType == BattleRequestType.TurnStart)
         {
+            Console.WriteLine("[ChoiceInputManager.SetupMoveRequestUi] Routing to SetupMainBattleUi");
             SetupMainBattleUi(request);
+            Console.WriteLine($"[ChoiceInputManager.SetupMoveRequestUi] SetupMainBattleUi complete. Button count: {_buttons.Count}");
             return;
         }
+
+        Console.WriteLine("[ChoiceInputManager.SetupMoveRequestUi] Using legacy UI setup");
 
         // Legacy UI for other request types (force switch, etc.)
         int y = TopMargin;
@@ -92,22 +98,29 @@ public partial class ChoiceInputManager
 
     private void SetupMainBattleUi(MoveRequest request)
     {
+        Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Called with MainBattleState={MainBattleState}");
+
         _buttons.Clear();
         _selectedButtonIndex = 0; // Reset selection to first button
+
+        Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Cleared buttons and reset selection");
 
         // Set up buttons based on current state
         switch (MainBattleState)
         {
             case MainBattlePhaseState.MainMenuFirstPokemon:
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MainMenuFirstPokemon buttons");
                 _buttons = MainBattleUiHelper.CreateMainMenuFirstPokemon(
                     request,
                     () => TransitionToState(MainBattlePhaseState.MoveSelectionFirstPokemon),
                     () => TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon),
                     () => HandleForfeit()
                 );
+                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuFirstPokemon");
                 break;
 
             case MainBattlePhaseState.MoveSelectionFirstPokemon:
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionFirstPokemon buttons");
                 if (request.Active.Count > 0)
                 {
                     PokemonMoveRequestData pokemonData = request.Active[0];
@@ -120,12 +133,14 @@ public partial class ChoiceInputManager
                         () => ToggleTerastallize(0),
                         () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
                     );
+                    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionFirstPokemon");
                 }
 
                 break;
 
             case MainBattlePhaseState.SwitchSelectionFirstPokemon:
             {
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionFirstPokemon buttons");
                 var availablePokemon = request.Side.Pokemon
                     .Where(p => !p.Active)
                     .ToList();
@@ -135,19 +150,23 @@ public partial class ChoiceInputManager
                     () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
                     showBackButton: true
                 );
+                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionFirstPokemon");
             }
                 break;
 
             case MainBattlePhaseState.MainMenuSecondPokemon:
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MainMenuSecondPokemon buttons");
                 _buttons = MainBattleUiHelper.CreateMainMenuSecondPokemon(
                     request,
                     () => TransitionToState(MainBattlePhaseState.MoveSelectionSecondPokemon),
                     () => TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon),
                     () => HandleBackFromSecondPokemon()
                 );
+                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuSecondPokemon");
                 break;
 
             case MainBattlePhaseState.MoveSelectionSecondPokemon:
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionSecondPokemon buttons");
                 if (request.Active.Count > 1)
                 {
                     PokemonMoveRequestData pokemonData = request.Active[1];
@@ -160,12 +179,14 @@ public partial class ChoiceInputManager
                         () => ToggleTerastallize(1),
                         () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
                     );
+                    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionSecondPokemon");
                 }
 
                 break;
 
             case MainBattlePhaseState.SwitchSelectionSecondPokemon:
             {
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionSecondPokemon buttons");
                 var availablePokemon = request.Side.Pokemon
                     .Where(p => !p.Active)
                     .ToList();
@@ -175,11 +196,13 @@ public partial class ChoiceInputManager
                     () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
                     showBackButton: true
                 );
+                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionSecondPokemon");
             }
                 break;
 
             case MainBattlePhaseState.ForceSwitch:
             {
+                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating ForceSwitch buttons");
                 var availablePokemon = request.Side.Pokemon
                     .Where(p => !p.Active)
                     .ToList();
@@ -189,9 +212,12 @@ public partial class ChoiceInputManager
                     () => { }, // No back button for force switch
                     showBackButton: false
                 );
+                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for ForceSwitch");
             }
                 break;
         }
+
+        Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Setup complete. Final button count: {_buttons.Count}");
     }
 
     private void RenderMainBattleUi()
@@ -250,40 +276,50 @@ public partial class ChoiceInputManager
 
     private void ProcessMainBattleKeyboardInput(KeyboardState keyboardState)
     {
+        // Log every 100 updates to see if this method is being called
+      if (_updateCallCount % 100 == 0)
+        {
+   Console.WriteLine($"[ProcessMainBattleKeyboardInput #{_updateCallCount}] Called. Buttons={_buttons.Count}, _selectedButtonIndex={_selectedButtonIndex}");
+        }
+        
         if (_buttons.Count == 0) return;
 
         // Arrow key navigation
         if (IsKeyPressed(keyboardState, Keys.Up))
-        {
-            _selectedButtonIndex--;
+   {
+Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
+    _selectedButtonIndex--;
             if (_selectedButtonIndex < 0)
-                _selectedButtonIndex = _buttons.Count - 1; // Wrap to bottom
-        }
+       _selectedButtonIndex = _buttons.Count - 1; // Wrap to bottom
+      }
         else if (IsKeyPressed(keyboardState, Keys.Down))
         {
-            _selectedButtonIndex++;
-            if (_selectedButtonIndex >= _buttons.Count)
-                _selectedButtonIndex = 0; // Wrap to top
+         Console.WriteLine($"[ProcessMainBattleKeyboardInput] DOWN key pressed");
+         _selectedButtonIndex++;
+ if (_selectedButtonIndex >= _buttons.Count)
+        _selectedButtonIndex = 0; // Wrap to top
         }
 
         // Enter to select the highlighted button
         if (IsKeyPressed(keyboardState, Keys.Enter))
         {
-            if (_selectedButtonIndex >= 0 && _selectedButtonIndex < _buttons.Count)
-            {
-                _buttons[_selectedButtonIndex].OnClick();
-            }
+   Console.WriteLine($"[ProcessMainBattleKeyboardInput] ENTER key pressed, selecting button {_selectedButtonIndex}");
+       if (_selectedButtonIndex >= 0 && _selectedButtonIndex < _buttons.Count)
+   {
+      _buttons[_selectedButtonIndex].OnClick();
+    }
         }
 
-        // ESC key for back (changed from B)
+     // ESC key for back (changed from B)
         if (IsKeyPressed(keyboardState, Keys.Escape))
         {
-            // Find back button and trigger it
-            var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
+            Console.WriteLine($"[ProcessMainBattleKeyboardInput] ESC key pressed, looking for back button");
+          // Find back button and trigger it
+         var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
             if (backButton != null)
-            {
+  {
                 backButton.OnClick();
-            }
+     }
         }
     }
 

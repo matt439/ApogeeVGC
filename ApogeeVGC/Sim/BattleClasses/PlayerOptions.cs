@@ -12,4 +12,5 @@ public record PlayerOptions
     public required IReadOnlyList<PokemonSet> Team { get; init; }
     public PrngSeed? Seed { get; init; }
     public BattleGame? GuiWindow { get; init; } // BattleGame instance for GUI players
+    public GuiChoiceCoordinator? GuiChoiceCoordinator { get; init; } // Choice coordinator for thread-safe communication with the GUI
 }

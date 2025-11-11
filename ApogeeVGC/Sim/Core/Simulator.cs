@@ -185,7 +185,8 @@ public class Simulator : IBattleController
 
                 Console.WriteLine($"[Simulator.OnChoiceRequested] Received choice for {e.SideId}");
 
-                // Send the choice response
+                // Send the choice response directly - let Battle.Choose() handle empty choices
+                // Do NOT call side.AutoChoose() here as it accesses battle state from async task
                 await _choiceResponseChannel!.Writer.WriteAsync(new ChoiceResponse
                 {
                     SideId = e.SideId,

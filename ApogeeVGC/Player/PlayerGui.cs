@@ -12,6 +12,7 @@ public class PlayerGui : IPlayer
     public PlayerUiType UiType => PlayerUiType.Gui;
     public IBattleController BattleController { get; }
     public BattleGame GuiWindow { get; set; }
+    public GuiChoiceCoordinator ChoiceCoordinator { get; set; }
 
     public PlayerGui(SideId sideId, PlayerOptions options, IBattleController battleController)
     {
@@ -22,16 +23,20 @@ public class PlayerGui : IPlayer
         // Use the GuiWindow from options if provided, otherwise create a new one
         GuiWindow = options.GuiWindow ?? new BattleGame();
 
+        // Use the coordinator from options, or get it from the GuiWindow
+        ChoiceCoordinator = options.GuiChoiceCoordinator ?? GuiWindow.GetChoiceCoordinator();
+
         Console.WriteLine($"[PlayerGui] Constructor called for {sideId}");
         Console.WriteLine($"[PlayerGui] GuiWindow from options: {options.GuiWindow?.GetHashCode() ?? -1}");
         Console.WriteLine($"[PlayerGui] GuiWindow assigned: {GuiWindow.GetHashCode()}");
+        Console.WriteLine($"[PlayerGui] ChoiceCoordinator assigned: {ChoiceCoordinator.GetHashCode()}");
     }
 
     public async Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
         BattleRequestType requestType, BattlePerspective perspective, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[PlayerGui] GetNextChoiceAsync called for {SideId}");
-        Console.WriteLine($"[PlayerGui] GuiWindow instance: {GuiWindow.GetHashCode()}");
+        Console.WriteLine($"[PlayerGui] Using ChoiceCoordinator: {ChoiceCoordinator.GetHashCode()}");
 
         // Fire the choice requested event
         ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
@@ -46,8 +51,9 @@ public class PlayerGui : IPlayer
             throw new InvalidOperationException("No choice requests available");
         }
 
-        // Request the choice from the GUI
-        Choice choice = await GuiWindow.RequestChoiceAsync(choiceRequest, requestType, perspective,
+        // Request the choice from the coordinator (NOT from BattleGame)
+        // This avoids calling any methods on the MonoGame object from the battle thread
+        Choice choice = await ChoiceCoordinator.RequestChoiceAsync(choiceRequest, requestType, perspective,
             cancellationToken);
 
         // Fire the choice submitted event
@@ -58,14 +64,16 @@ public class PlayerGui : IPlayer
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // Update the GUI window (thread-safe)
-        GuiWindow.UpdateBattlePerspective(perspective);
+        // Queue the update through the coordinator instead of calling BattleGame directly
+        // This avoids cross-thread issues with MonoGame
+        ChoiceCoordinator.QueuePerspectiveUpdate(perspective);
     }
 
     public void UpdateMessages(IEnumerable<BattleMessage> messages)
     {
-        // Forward messages to the GUI window (thread-safe)
-        GuiWindow.UpdateMessages(messages);
+        // Queue the messages through the coordinator instead of calling BattleGame directly
+        // This avoids cross-thread issues with MonoGame
+        ChoiceCoordinator.QueueMessages(messages);
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

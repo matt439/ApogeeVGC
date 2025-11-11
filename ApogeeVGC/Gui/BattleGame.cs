@@ -32,6 +32,9 @@ public class BattleGame : Game
     private readonly List<BattleMessage> _messageQueue = [];
     private const int MaxMessagesDisplayed = 50; // Limit message history
 
+  // Thread-safe coordinator for choice requests
+    private readonly GuiChoiceCoordinator _choiceCoordinator = new();
+
     // Pending battle start data
     private Library? _pendingLibrary;
     private BattleOptions? _pendingBattleOptions;
@@ -188,29 +191,168 @@ public class BattleGame : Game
         Console.WriteLine("[BattleGame] Battle runner started");
     }
 
+    private int _battleGameUpdateCount = 0;
+
     protected override void Update(GameTime gameTime)
     {
-        // Check if external code requested exit
-        if (_shouldExit)
+        // CRITICAL DIAGNOSTIC: Log FIRST before anything else
+        bool shouldLogVerbose = _battleGameUpdateCount % 60 == 0;
+      if (shouldLogVerbose)
         {
-            Exit();
+   Console.WriteLine($"[BattleGame.Update] START OF UPDATE #{_battleGameUpdateCount}, thread {Thread.CurrentThread.ManagedThreadId}");
+   }
+        
+        // Log IMMEDIATELY at the start, before try block
+        if (shouldLogVerbose)
+ {
+   Console.WriteLine($"[BattleGame.Update] HEARTBEAT #{_battleGameUpdateCount}, Queue size: {_choiceCoordinator.QueueSize}");
+  }
+
+        try
+{
+   _battleGameUpdateCount++;
+
+  // Log periodically to confirm Update is being called
+ if (_battleGameUpdateCount <= 10 || _battleGameUpdateCount % 100 == 0)
+{
+ Console.WriteLine($"[BattleGame.Update #{_battleGameUpdateCount}] Called on thread {Thread.CurrentThread.ManagedThreadId}, Queue size: {_choiceCoordinator.QueueSize}");
+      }
+      
+ // Process queued perspective updates from battle thread
+        while (_choiceCoordinator.TryDequeuePerspective(out var perspective) && perspective != null)
+        {
+    ApplyPerspectiveUpdate(perspective);
         }
-
-        // Update choice input manager (runs on GUI thread)
-        _choiceInputManager?.Update(gameTime);
-
-        // Check if battle is complete
-        if (_battleRunner is { IsCompleted: true })
+     
+        // Process queued messages from battle thread
+   while (_choiceCoordinator.TryDequeueMessages(out var messages) && messages != null)
         {
-            if (!_battleCompleteShown)
-            {
-                Console.WriteLine($"Battle complete! Winner: {_battleRunner.Result}");
-                _battleCompleteShown = true;
-                // TODO: Show battle results screen
+            ApplyMessageUpdates(messages);
+        }
+      
+  // Process any pending choice requests from the battle thread
+      int processedCount = 0;
+ while (_choiceCoordinator.TryDequeueRequest(out var pendingRequest) && pendingRequest != null)
+  {
+   processedCount++;
+       Console.WriteLine($"[BattleGame.Update #{_battleGameUpdateCount}] Processing queued choice request #{processedCount} on GUI thread");
+    
+ if (_choiceInputManager != null)
+        {
+ try
+     {
+          // Now we're on the GUI thread, safe to call ChoiceInputManager
+         var task = _choiceInputManager.RequestChoiceAsync(
+   pendingRequest.Request,
+ pendingRequest.RequestType,
+    pendingRequest.Perspective,
+pendingRequest.CancellationToken);
+     
+  Console.WriteLine($"[BattleGame.Update #{_battleGameUpdateCount}] ChoiceInputManager.RequestChoiceAsync returned, setting up continuation");
+  
+ // When the task completes, forward the result to the battle thread
+  task.ContinueWith(t =>
+  {
+       if (t.IsFaulted)
+    {
+    Console.WriteLine($"[BattleGame.ContinueWith] Task faulted: {t.Exception?.GetBaseException().Message}");
+pendingRequest.CompletionSource.SetException(t.Exception!);
+   }
+  else if (t.IsCanceled)
+ {
+      Console.WriteLine($"[BattleGame.ContinueWith] Task canceled");
+ pendingRequest.CompletionSource.SetCanceled();
+   }
+    else
+ {
+ Console.WriteLine($"[BattleGame.ContinueWith] Task completed successfully");
+ pendingRequest.CompletionSource.SetResult(t.Result);
+   }
+   }, TaskScheduler.Default);
+   }
+      catch (Exception ex)
+   {
+    Console.WriteLine($"[BattleGame.Update] EXCEPTION processing choice request: {ex.Message}");
+   Console.WriteLine($"[BattleGame.Update] Stack trace: {ex.StackTrace}");
+ pendingRequest.CompletionSource.SetException(ex);
+        }
+   }
+   else
+     {
+   Console.WriteLine($"[BattleGame.Update] _choiceInputManager is null, cannot process request");
+      }
+  }
+      
+     if (processedCount > 0)
+        {
+Console.WriteLine($"[BattleGame.Update #{_battleGameUpdateCount}] Processed {processedCount} queued requests");
+}
+      
+ // Check if external code requested exit
+  if (_shouldExit)
+  {
+ Exit();
+}
+
+     // Update choice input manager (runs on GUI thread)
+    if (_choiceInputManager != null)
+ {
+  _choiceInputManager.Update(gameTime);
+ }
+ else if (_battleGameUpdateCount <= 10 || _battleGameUpdateCount % 100 == 0)
+{
+Console.WriteLine($"[BattleGame.Update #{_battleGameUpdateCount}] _choiceInputManager is null!");
+}
+
+// Check if battle is complete
+    if (_battleRunner is { IsCompleted: true })
+  {
+if (!_battleCompleteShown)
+{
+ Console.WriteLine($"Battle complete! Winner: {_battleRunner.Result}");
+    _battleCompleteShown = true;
+        // TODO: Show battle results screen
+   }
+     }
+
+     base.Update(gameTime);
+   }
+  catch (Exception ex)
+  {
+    Console.WriteLine($"[BattleGame.Update] EXCEPTION: {ex.Message}");
+Console.WriteLine($"[BattleGame.Update] Stack trace: {ex.StackTrace}");
+      throw;
+    }
+    }
+    
+    /// <summary>
+    /// Apply a perspective update on the GUI thread (called from Update)
+    /// </summary>
+    private void ApplyPerspectiveUpdate(BattlePerspective perspective)
+    {
+        lock (_stateLock)
+        {
+    _currentBattlePerspective = perspective;
+}
+    }
+    
+  /// <summary>
+    /// Apply message updates on the GUI thread (called from Update)
+    /// </summary>
+    private void ApplyMessageUpdates(IEnumerable<BattleMessage> messages)
+    {
+  var battleMessages = messages.ToList();
+        lock (_stateLock)
+        {
+      _messageQueue.AddRange(battleMessages);
+
+  // Trim old messages if we exceed the maximum
+ if (_messageQueue.Count > MaxMessagesDisplayed)
+        {
+       int toRemove = _messageQueue.Count - MaxMessagesDisplayed;
+    _messageQueue.RemoveRange(0, toRemove);
             }
-        }
-
-        base.Update(gameTime);
+   }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -348,42 +490,11 @@ public class BattleGame : Game
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
         Console.WriteLine(
-            $"[BattleGame] RequestChoiceAsync called. _choiceInputManager null? {_choiceInputManager == null}");
+      $"[BattleGame] RequestChoiceAsync called from thread {Thread.CurrentThread.ManagedThreadId}");
 
-        // Wait for LoadContent() to complete if needed
-        if (_choiceInputManager == null)
-        {
-            Console.WriteLine("[BattleGame] Waiting for LoadContent() to complete...");
-
-            // Wait up to 10 seconds for LoadContent to initialize _choiceInputManager
-            bool initialized = SpinWait.SpinUntil(() => _choiceInputManager != null,
-                TimeSpan.FromSeconds(10));
-
-            if (!initialized)
-            {
-                Console.WriteLine(
-                    "[BattleGame] ERROR: Choice input manager not initialized after 10 second wait!");
-                Console.WriteLine($"[BattleGame] _spriteBatch null? {_spriteBatch == null}");
-                Console.WriteLine($"[BattleGame] _defaultFont null? {_defaultFont == null}");
-                Console.WriteLine($"[BattleGame] This BattleGame instance: {this.GetHashCode()}");
-                throw new InvalidOperationException(
-                    "Choice input manager not initialized after waiting 10 seconds. " +
-                    "LoadContent() may have failed or this is the wrong BattleGame instance.");
-            }
-
-            Console.WriteLine("[BattleGame] ChoiceInputManager is now initialized");
-        }
-
-        // The battle thread calls this and awaits the result
-        // The GUI thread will complete the TaskCompletionSource when the user makes a choice
-        if (_choiceInputManager == null)
-        {
-            throw new InvalidOperationException(
-                "Choice input manager is null after initialization wait.");
-        }
-
-        return _choiceInputManager.RequestChoiceAsync(request, requestType, perspective,
-            cancellationToken);
+        // Delegate to the thread-safe coordinator
+        // This avoids touching MonoGame objects from the battle thread
+        return _choiceCoordinator.RequestChoiceAsync(request, requestType, perspective, cancellationToken);
     }
 
     /// <summary>
@@ -391,6 +502,15 @@ public class BattleGame : Game
     /// </summary>
     public void RequestExit()
     {
-        _shouldExit = true;
-    }
+    _shouldExit = true;
+ }
+    
+  /// <summary>
+    /// Get the choice coordinator for this GUI window.
+    /// Used by PlayerGui to communicate with the GUI without calling methods on the Game object.
+    /// </summary>
+    public GuiChoiceCoordinator GetChoiceCoordinator()
+  {
+    return _choiceCoordinator;
+  }
 }
