@@ -1,15 +1,15 @@
 # EventHandlerInfo Architecture - Implementation Summary
 
-## Latest Update: Batch Creation Completed
+## Latest Update: Additional Custom Delegate Events Completed
 
-Successfully created **73 EventHandlerInfo records** (65 new + 8 original) covering all major base events from `IEventMethods`.
+Successfully created **94 EventHandlerInfo records** (73 base + 21 custom delegate events) covering all major base events from `IEventMethods`.
 
 ### Build Status
-? **All 73 files compile successfully with no errors**
+? **All 94 files compile successfully with no errors**
 
 ## What Was Implemented
 
-### EventHandlerInfo Records Created (73 Total)
+### EventHandlerInfo Records Created (94 Total)
 
 #### Original 8 Records
 1. OnAfterSetStatusEventInfo
@@ -22,77 +22,39 @@ Successfully created **73 EventHandlerInfo records** (65 new + 8 original) cover
 8. OnSetStatusEventInfo
 
 #### Batch 1 - Simple Action Events (10 records)
-9. OnAfterEachBoostEventInfo
-10. OnAfterHitEventInfo
-11. OnAfterMegaEventInfo
-12. OnAfterSubDamageEventInfo
-13. OnAfterSwitchInSelfEventInfo
-14. OnAfterTerastallizationEventInfo
-15. OnAfterUseItemEventInfo
-16. OnAfterTakeItemEventInfo
-17. OnAfterBoostEventInfo
-18. OnAfterFaintEventInfo
+9-18. OnAfterEachBoost, OnAfterHit, OnAfterMega, OnAfterSubDamage, OnAfterSwitchInSelf, OnAfterTerastallization, OnAfterUseItem, OnAfterTakeItem, OnAfterBoost, OnAfterFaint
 
 #### Batch 2 - More Action Events (10 records)
-19. OnAfterMoveSecondarySelfEventInfo
-20. OnAfterMoveSecondaryEventInfo
-21. OnAfterMoveEventInfo
-22. OnAfterMoveSelfEventInfo
-23. OnAttractEventInfo
-24. OnBeforeFaintEventInfo
-25. OnBeforeSwitchInEventInfo
-26. OnBeforeSwitchOutEventInfo
-27. OnBeforeTurnEventInfo
-28. OnChangeBoostEventInfo
+19-28. OnAfterMoveSecondarySelf, OnAfterMoveSecondary, OnAfterMove, OnAfterMoveSelf, OnAttract, OnBeforeFaint, OnBeforeSwitchIn, OnBeforeSwitchOut, OnBeforeTurn, OnChangeBoost
 
 #### Batch 3 - Simple Func Events (8 records)
-29. OnAccuracyEventInfo
-30. OnTryBoostEventInfo
-31. OnChargeMoveEventInfo
-32. OnDeductPpEventInfo
-33. OnDisableMoveEventInfo
-34. OnDragOutEventInfo
-35. OnEatItemEventInfo
-36. OnEntryHazardEventInfo
+29-36. OnAccuracy, OnTryBoost, OnChargeMove, OnDeductPp, OnDisableMove, OnDragOut, OnEatItem, OnEntryHazard
 
 #### Batch 4 - Complex Events (37 records)
-37. OnFaintEventInfo
-38. OnImmunityEventInfo
-39. OnMaybeTrapPokemonEventInfo
-40. OnModifyAccuracyEventInfo
-41. OnModifyAtkEventInfo
-42. OnModifyBoostEventInfo
-43. OnModifyCritRatioEventInfo
-44. OnModifyDamageEventInfo
-45. OnModifyDefEventInfo
-46. OnModifyPriorityEventInfo
-47. OnModifySecondariesEventInfo
-48. OnModifySpAEventInfo
-49. OnModifySpDEventInfo
-50. OnModifySpeEventInfo
-51. OnModifyStabEventInfo
-52. OnModifyWeightEventInfo
-53. OnMoveAbortedEventInfo
-54. OnPseudoWeatherChangeEventInfo
-55. OnSetAbilityEventInfo
-56. OnSetWeatherEventInfo
-57. OnSideConditionStartEventInfo
-58. OnStallMoveEventInfo
-59. OnSwitchInEventInfo
-60. OnSwitchOutEventInfo
-61. OnSwapEventInfo
-62. OnWeatherChangeEventInfo
-63. OnTerrainChangeEventInfo
-64. OnTrapPokemonEventInfo
-65. OnTryAddVolatileEventInfo
-66. OnTryPrimaryHitEventInfo
-67. OnTypeEventInfo
-68. OnUseItemEventInfo
-69. OnUpdateEventInfo
-70. OnWeatherEventInfo
-71. OnWeatherModifyDamageEventInfo
-72. OnModifyDamagePhase1EventInfo
-73. OnModifyDamagePhase2EventInfo
+37-73. OnFaint, OnImmunity, OnMaybeTrapPokemon, OnModifyAccuracy, OnModifyAtk, OnModifyBoost, OnModifyCritRatio, OnModifyDamage, OnModifyDef, OnModifyPriority, OnModifySecondaries, OnModifySpA, OnModifySpD, OnModifySpe, OnModifyStab, OnModifyWeight, OnMoveAborted, OnPseudoWeatherChange, OnSetAbility, OnSetWeather, OnSideConditionStart, OnStallMove, OnSwitchIn, OnSwitchOut, OnSwap, OnWeatherChange, OnTerrainChange, OnTrapPokemon, OnTryAddVolatile, OnTryPrimaryHit, OnType, OnUseItem, OnUpdate, OnWeather, OnWeatherModifyDamage, OnModifyDamagePhase1, OnModifyDamagePhase2
+
+#### Batch 5 - Custom Delegate Events (21 records) ? NEW
+74. OnRedirectTargetEventInfo
+75. OnOverrideActionEventInfo
+76. OnPrepareHitEventInfo
+77. OnHitEventInfo
+78. OnTryHitEventInfo
+79. OnTryHitFieldEventInfo
+80. OnTryHitSideEventInfo
+81. OnInvulnerabilityEventInfo
+82. OnTryMoveEventInfo
+83. OnModifyMoveEventInfo
+84. OnModifyTypeEventInfo
+85. OnModifyTargetEventInfo
+86. OnEffectivenessEventInfo
+87. OnNegateImmunityEventInfo
+88. OnLockMoveEventInfo
+89. OnFlinchEventInfo
+90. OnCriticalHitEventInfo
+91. OnFractionalPriorityEventInfo
+92. OnTryEatItemEventInfo
+93. OnTryHealEventInfo
+94. OnTakeItemEventInfo
 
 ### File Locations
 All EventHandlerInfo records are located in:
