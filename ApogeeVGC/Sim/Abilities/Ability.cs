@@ -752,4 +752,14 @@ public record Ability : IEffect, IAbilityEventMethods, IPokemonEventMethods, IBa
             _ => null,
         };
     }
+
+    /// <summary>
+    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    {
+        // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
+        // For now, return null as this hasn't been migrated yet
+        return null;
+    }
 }

@@ -693,6 +693,16 @@ public record Format : IEffect, IBasicEffect, IEventMethods, ICopyable<Format>
     }
 
     /// <summary>
+    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    {
+        // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
+        // For now, return null as this hasn't been migrated yet
+        return null;
+    }
+
+    /// <summary>
     /// Creates a copy of this Format for simulation purposes.
     /// This method creates an independent copy with the same state while sharing immutable references.
     /// </summary>

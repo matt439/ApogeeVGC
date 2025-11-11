@@ -1,6 +1,7 @@
 ﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -99,6 +100,16 @@ public record ActiveMove : Move, IEffect
     /// Store the HitEffect in this property so it can be accessed later.
     /// </summary>
     public HitEffect? HitEffect { get; set; }
+
+    /// <summary>
+    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    {
+      // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
+        // For now, return null as this hasn't been migrated yet
+        return null;
+    }
 }
 
 

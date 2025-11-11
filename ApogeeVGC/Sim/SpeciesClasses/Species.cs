@@ -205,6 +205,16 @@ public record Species : IEffect, ICopyable<Species>
     public int? GetPriority(EventId id) => null;
     public IntFalseUnion? GetOrder(EventId id) => null;
     public int? GetSubOrder(EventId id) => null;
+
+    /// <summary>
+    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    {
+    // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
+        // For now, return null as this hasn't been migrated yet
+        return null;
+    }
 }
 
 public enum SpeciesAbilityType
