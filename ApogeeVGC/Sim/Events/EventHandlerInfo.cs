@@ -1,4 +1,4 @@
-using ApogeeVGC.Sim.Effects;
+using System.Reflection;
 
 namespace ApogeeVGC.Sim.Events;
 
@@ -10,7 +10,7 @@ namespace ApogeeVGC.Sim.Events;
 public abstract record EventHandlerInfo
 {
     /// <summary>
-  /// The unique identifier for this event
+    /// The unique identifier for this event
     /// </summary>
     public required EventId Id { get; init; }
 
@@ -20,7 +20,7 @@ public abstract record EventHandlerInfo
     public Delegate? Handler { get; init; }
 
     // Metadata from EventIdInfo
-    
+
     /// <summary>
     /// Event prefix (e.g., Any, Foe, Source, Ally)
     /// </summary>
@@ -57,17 +57,17 @@ public abstract record EventHandlerInfo
     public bool UsesSpeed { get; init; }
 
     /// <summary>
-  /// Whether this event uses fractional speed ordering
+    /// Whether this event uses fractional speed ordering
     /// </summary>
     public bool UsesFractionalSpeed { get; init; }
 
     /// <summary>
     /// Whether this event uses left-to-right ordering
     /// </summary>
-  public bool UsesLeftToRightOrder { get; init; }
+    public bool UsesLeftToRightOrder { get; init; }
 
     // Priority/Ordering
-    
+
     /// <summary>
     /// Priority value for event ordering (higher = earlier execution)
     /// </summary>
@@ -97,53 +97,53 @@ public abstract record EventHandlerInfo
 
     /// <summary>
     /// Validates that the handler matches the expected signature.
-  /// Throws InvalidOperationException if validation fails.
+    /// Throws InvalidOperationException if validation fails.
     /// </summary>
     public void Validate()
-{
+    {
         if (Handler == null) return;
 
-   var method = Handler.Method;
-    var actualParams = method.GetParameters();
+        MethodInfo method = Handler.Method;
+        var actualParams = method.GetParameters();
 
         // Validate parameter count
-  if (ExpectedParameterTypes != null)
-{
+        if (ExpectedParameterTypes != null)
+        {
             if (actualParams.Length != ExpectedParameterTypes.Length)
-      {
-                throw new InvalidOperationException(
- $"Event {Id}: Expected {ExpectedParameterTypes.Length} parameters, " +
-           $"got {actualParams.Length}. " +
-             $"Expected: ({string.Join(", ", ExpectedParameterTypes.Select(t => t.Name))}), " +
-      $"Got: ({string.Join(", ", actualParams.Select(p => p.ParameterType.Name))})");
-  }
-
- // Validate each parameter type
-         for (int i = 0; i < actualParams.Length; i++)
             {
-    var expectedType = ExpectedParameterTypes[i];
-          var actualType = actualParams[i].ParameterType;
+                throw new InvalidOperationException(
+                    $"Event {Id}: Expected {ExpectedParameterTypes.Length} parameters, " +
+                    $"got {actualParams.Length}. " +
+                    $"Expected: ({string.Join(", ", ExpectedParameterTypes.Select(t => t.Name))}), " +
+                    $"Got: ({string.Join(", ", actualParams.Select(p => p.ParameterType.Name))})");
+            }
 
-     if (!expectedType.IsAssignableFrom(actualType))
+            // Validate each parameter type
+            for (int i = 0; i < actualParams.Length; i++)
+            {
+                Type expectedType = ExpectedParameterTypes[i];
+                Type actualType = actualParams[i].ParameterType;
+
+                if (!expectedType.IsAssignableFrom(actualType))
                 {
-           throw new InvalidOperationException(
-  $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +
-          $"Expected: {expectedType.Name}, Got: {actualType.Name}");
-          }
-    }
+                    throw new InvalidOperationException(
+                        $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +
+                        $"Expected: {expectedType.Name}, Got: {actualType.Name}");
+                }
+            }
         }
 
         // Validate return type
-     if (ExpectedReturnType != null)
+        if (ExpectedReturnType != null)
         {
-     var actualReturnType = method.ReturnType;
+            Type actualReturnType = method.ReturnType;
             if (!ExpectedReturnType.IsAssignableFrom(actualReturnType))
             {
-      throw new InvalidOperationException(
-      $"Event {Id}: Return type mismatch. " +
-        $"Expected: {ExpectedReturnType.Name}, Got: {actualReturnType.Name}");
- }
-    }
+                throw new InvalidOperationException(
+                    $"Event {Id}: Return type mismatch. " +
+                    $"Expected: {ExpectedReturnType.Name}, Got: {actualReturnType.Name}");
+            }
+        }
     }
 
     /// <summary>
@@ -151,11 +151,11 @@ public abstract record EventHandlerInfo
     /// </summary>
     public string GetSignatureDescription()
     {
-      if (ExpectedParameterTypes == null || ExpectedReturnType == null)
-     return "Signature not specified";
+        if (ExpectedParameterTypes == null || ExpectedReturnType == null)
+            return "Signature not specified";
 
-        var returnTypeName = ExpectedReturnType == typeof(void) ? "void" : ExpectedReturnType.Name;
-  var paramNames = string.Join(", ", ExpectedParameterTypes.Select(t => t.Name));
+        string returnTypeName = ExpectedReturnType == typeof(void) ? "void" : ExpectedReturnType.Name;
+        string paramNames = string.Join(", ", ExpectedParameterTypes.Select(t => t.Name));
 
         return $"{returnTypeName} ({paramNames})";
     }

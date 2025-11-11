@@ -22,19 +22,19 @@ public sealed record OnAfterSetStatusEventInfo : EventHandlerInfo
         Action<Battle, Condition, Pokemon, Pokemon, IEffect> handler,
         int? priority = null,
         bool usesSpeed = true)
-  {
+    {
         Id = EventId.AfterSetStatus;
         Handler = handler;
         Priority = priority;
-UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = new[] 
-        { 
-      typeof(Battle), 
-            typeof(Condition), 
-typeof(Pokemon), 
-            typeof(Pokemon), 
-      typeof(IEffect) 
-        };
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+        [
+            typeof(Battle),
+            typeof(Condition),
+            typeof(Pokemon),
+            typeof(Pokemon),
+            typeof(IEffect),
+        ];
         ExpectedReturnType = typeof(void);
     }
 }
