@@ -348,21 +348,4 @@ public interface IEventMethodsV2
     OnAnyWeatherModifyDamageEventInfo? OnAnyWeatherModifyDamage { get; }
     OnAnyModifyDamagePhase1EventInfo? OnAnyModifyDamagePhase1 { get; }
     OnAnyModifyDamagePhase2EventInfo? OnAnyModifyDamagePhase2 { get; }
-
-    // Ally Prefix Events
-    OnAllyBasePowerEventInfo? OnAllyBasePower { get; }
-    OnAllyModifyAtkEventInfo? OnAllyModifyAtk { get; }
-    OnAllyModifySpAEventInfo? OnAllyModifySpA { get; }
-    OnAllyModifySpDEventInfo? OnAllyModifySpD { get; }
-    OnAllyTryHitSideEventInfo? OnAllyTryHitSide { get; }
-    OnAllyDamagingHitEventInfo? OnAllyDamagingHit { get; }
-    OnAllyAfterHitEventInfo? OnAllyAfterHit { get; }
-    OnAllyAfterSetStatusEventInfo? OnAllyAfterSetStatus { get; }
-    OnAllyModifyAccuracyEventInfo? OnAllyModifyAccuracy { get; }
-    OnAllyTryHitEventInfo? OnAllyTryHit { get; }
-    OnAllyInvulnerabilityEventInfo? OnAllyInvulnerability { get; }
-    OnAllySwitchOutEventInfo? OnAllySwitchOut { get; }
-    OnAllyFaintEventInfo? OnAllyFaint { get; }
-    OnAllyAfterBoostEventInfo? OnAllyAfterBoost { get; }
-    OnAllyPrepareHitEventInfo? OnAllyPrepareHit { get; }
 }

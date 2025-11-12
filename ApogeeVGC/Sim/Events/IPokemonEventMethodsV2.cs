@@ -8,7 +8,7 @@ namespace ApogeeVGC.Sim.Events;
 /// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
 /// All events in this interface use the "Ally" prefix to indicate they apply to allied Pokemon.
 /// </summary>
-public interface IPokemonEventMethodsV2
+public interface IPokemonEventMethodsV2 : IEventMethodsV2
 {
     // Ally-Prefixed Events (78 total)
     
