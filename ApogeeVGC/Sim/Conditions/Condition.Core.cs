@@ -1,431 +1,102 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
+using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Sim.FormatClasses;
+namespace ApogeeVGC.Sim.Conditions;
 
-
-public enum FormatId
+public partial record Condition : ISideEventMethodsV2, IFieldEventMethodsV2, IEffect, IBasicEffect,
+    ICopyable<Condition>
 {
-    Gen9Ou,
-    CustomSingles,
-    CustomSinglesBlind,
-    CustomDoubles,
-}
-
-public enum FormatEffectType
-{
-    Format,
-    Ruleset,
-    Rule,
-    ValidatorRule,
-}
-
-public enum RuleId
-{
-    Standard,
-    OverflowStatMod,
-    EndlessBattleClause,
-}
-
-public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
-{
-    public FormatId FormatId { get; init; }
-    public EffectStateId EffectStateId => FormatId;
-    public EffectType EffectType => EffectType.Format;
-    public required string Name { get; init; }
-    public string FullName => $"format: {Name}";
-    public string? Desc { get; init; }
-    public bool AffectsFainted { get; init; }
-    public FormatEffectType FormatEffectType { get; init; }
-    public GameType GameType { get; init; }
-    public static int PlayerCount => 2;
-
-    public IReadOnlyList<RuleId> Ruleset { get; init; } = [];
-    public IReadOnlyList<RuleId> BaseRuleset { get; init; } = [];
-    public IReadOnlyList<RuleId> Banlist { get; init; } = [];
-    public IReadOnlyList<RuleId> Restricted { get; init; } = [];
-    public IReadOnlyList<RuleId> Unbanlist { get; init; } = [];
-    public IReadOnlyList<RuleId>? CustomRules { get; init; }
-    public RuleTable? RuleTable { get; set; }
-    public Action<Battle>? OnBegin { get; init; }
-    public bool NoLog { get; init; }
-
-    public FormatHasValue? HasValue { get; init; }
-    // OnValidateRule TODO: Implement this event method
-    public RuleId? MutuallyExclusiveWith { get; init; }
-    // ModdedDex fields here. Possible unnecessary in this context.
-    public bool? ChallengeShow { get; init; }
-    public bool? SearchShow { get; init; }
-    public bool? BestOfDefault { get; init; }
-    public bool? TeraPreviewDefault { get; init; }
-    // Threads // TODO: Implement thread handling
-    public bool? TournamentShow { get; init; }
-
-
-    public Func<TeamValidator, Move, Species, PokemonSources, PokemonSet, string?>? CheckCanLearn { get; init; }
-    public Func<Format, SpecieId, SpecieId>? GetEvoFamily { get; init; }
-    public Func<Format, Pokemon, HashSet<string>>? GetSharedPower { get; init; }
-    public Func<Format, Pokemon, HashSet<string>>? GetSharedItems { get; init; }
-    public Func<TeamValidator, PokemonSet, Format, object?, object?, string[]?>? OnChangeSet { get; init; }
-    public int? OnModifySpeciesPriority { get; init; }
-    public Func<Battle, Species, Pokemon?, Pokemon?, IEffect?, Species?>? OnModifySpecies { get; init; }
-    public Action<Battle>? OnBattleStart { get; init; }
-    public Action<Battle>? OnTeamPreview { get; init; }
-    public Func<TeamValidator, PokemonSet, Format, object, object, string[]?>? OnValidateSet { get; init; }
-    public Func<TeamValidator, PokemonSet[], Format, object, string[]?>? OnValidateTeam { get; init; }
-    public Func<TeamValidator, PokemonSet, object, string[]?>? ValidateSet { get; init; }
-    public Func<TeamValidator, PokemonSet[], ValidateTeamOptions?, string[]?>? ValidateTeam { get; init; }
-
-    public class ValidateTeamOptions
+    public required ConditionId Id { get; init; }
+    public EffectStateId EffectStateId => Id;
+    public EffectType EffectType
     {
-        public bool RemoveNicknames { get; init; }
-        public Dictionary<string, Dictionary<string, bool>>? SkipSets { get; init; }
+        get;
+        init
+        {
+            if (value is not (EffectType.Condition or EffectType.Weather or EffectType.Status or EffectType.Terrain))
+            {
+                throw new ArgumentException("Condition EffectType must be Condition, Weather, Status, or Terrain.");
+            }
+            field = value;
+        }
     }
-    public string? Section { get; init; }
-    public int? Column { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string FullName => Name;
 
+    //public ConditionEffectType ConditionEffectType { get; init; }
 
-    #region IEventMethods Implementation
+    ///// <summary>
+    ///// Many conditions are defined by a source effect, such as a move or ability.
+    ///// This property tracks that source effect, if any.
+    ///// </summary>
+    //public IEffect? Source { get; init; }
 
-    public OnDamagingHitEventInfo? OnDamagingHit { get; init; }
-    public OnEmergencyExitEventInfo? OnEmergencyExit { get; init; }
-    public OnAfterEachBoostEventInfo? OnAfterEachBoost { get; init; }
-    public OnAfterHitEventInfo? OnAfterHit { get; init; }
-    public OnAfterMegaEventInfo? OnAfterMega { get; init; }
-    public OnAfterSetStatusEventInfo? OnAfterSetStatus { get; init; }
-    public OnAfterSubDamageEventInfo? OnAfterSubDamage { get; init; }
-    public OnAfterSwitchInSelfEventInfo? OnAfterSwitchInSelf { get; init; }
-    public OnAfterTerastallizationEventInfo? OnAfterTerastallization { get; init; }
-    public OnAfterUseItemEventInfo? OnAfterUseItem { get; init; }
-    public OnAfterTakeItemEventInfo? OnAfterTakeItem { get; init; }
-    public OnAfterBoostEventInfo? OnAfterBoost { get; init; }
-    public OnAfterFaintEventInfo? OnAfterFaint { get; init; }
-    public OnAfterMoveSecondarySelfEventInfo? OnAfterMoveSecondarySelf { get; init; }
-    public OnAfterMoveSecondaryEventInfo? OnAfterMoveSecondary { get; init; }
-    public OnAfterMoveEventInfo? OnAfterMove { get; init; }
-    public OnAfterMoveSelfEventInfo? OnAfterMoveSelf { get; init; }
-    public OnAttractEventInfo? OnAttract { get; init; }
-    public OnAccuracyEventInfo? OnAccuracy { get; init; }
-    public OnBasePowerEventInfo? OnBasePower { get; init; }
-    public OnBeforeFaintEventInfo? OnBeforeFaint { get; init; }
-    public OnBeforeMoveEventInfo? OnBeforeMove { get; init; }
-    public OnBeforeSwitchInEventInfo? OnBeforeSwitchIn { get; init; }
-    public OnBeforeSwitchOutEventInfo? OnBeforeSwitchOut { get; init; }
-    public OnBeforeTurnEventInfo? OnBeforeTurn { get; init; }
-    public OnChangeBoostEventInfo? OnChangeBoost { get; init; }
-    public OnTryBoostEventInfo? OnTryBoost { get; init; }
-    public OnChargeMoveEventInfo? OnChargeMove { get; init; }
-    public OnCriticalHitEventInfo? OnCriticalHit { get; init; }
-    public OnDamageEventInfo? OnDamage { get; init; }
-    public OnDeductPpEventInfo? OnDeductPp { get; init; }
-    public OnDisableMoveEventInfo? OnDisableMove { get; init; }
-    public OnDragOutEventInfo? OnDragOut { get; init; }
-    public OnEatItemEventInfo? OnEatItem { get; init; }
-    public OnEffectivenessEventInfo? OnEffectiveness { get; init; }
-    public OnEntryHazardEventInfo? OnEntryHazard { get; init; }
-    public OnFaintEventInfo? OnFaint { get; init; }
-    public OnFlinchEventInfo? OnFlinch { get; init; }
-    public OnFractionalPriorityEventInfo? OnFractionalPriority { get; init; }
-    public OnHitEventInfo? OnHit { get; init; }
-    public OnImmunityEventInfo? OnImmunity { get; init; }
-    public OnLockMoveEventInfo? OnLockMove { get; init; }
-    public OnMaybeTrapPokemonEventInfo? OnMaybeTrapPokemon { get; init; }
-    public OnModifyAccuracyEventInfo? OnModifyAccuracy { get; init; }
-    public OnModifyAtkEventInfo? OnModifyAtk { get; init; }
-    public OnModifyBoostEventInfo? OnModifyBoost { get; init; }
-    public OnModifyCritRatioEventInfo? OnModifyCritRatio { get; init; }
-    public OnModifyDamageEventInfo? OnModifyDamage { get; init; }
-    public OnModifyDefEventInfo? OnModifyDef { get; init; }
-    public OnModifyMoveEventInfo? OnModifyMove { get; init; }
-    public OnModifyPriorityEventInfo? OnModifyPriority { get; init; }
-    public OnModifySecondariesEventInfo? OnModifySecondaries { get; init; }
-    public OnModifyTypeEventInfo? OnModifyType { get; init; }
-    public OnModifyTargetEventInfo? OnModifyTarget { get; init; }
-    public OnModifySpAEventInfo? OnModifySpA { get; init; }
-    public OnModifySpDEventInfo? OnModifySpD { get; init; }
-    public OnModifySpeEventInfo? OnModifySpe { get; init; }
-    public OnModifyStabEventInfo? OnModifyStab { get; init; }
-    public OnModifyWeightEventInfo? OnModifyWeight { get; init; }
-    public OnMoveAbortedEventInfo? OnMoveAborted { get; init; }
-    public OnNegateImmunityEventInfo? OnNegateImmunity { get; init; }
-    public OnOverrideActionEventInfo? OnOverrideAction { get; init; }
-    public OnPrepareHitEventInfo? OnPrepareHit { get; init; }
-    public OnPseudoWeatherChangeEventInfo? OnPseudoWeatherChange { get; init; }
-    public OnRedirectTargetEventInfo? OnRedirectTarget { get; init; }
-    public OnResidualEventInfo? OnResidual { get; init; }
-    public OnSetAbilityEventInfo? OnSetAbility { get; init; }
-    public OnSetStatusEventInfo? OnSetStatus { get; init; }
-    public OnSetWeatherEventInfo? OnSetWeather { get; init; }
-    public OnSideConditionStartEventInfo? OnSideConditionStart { get; init; }
-    public OnStallMoveEventInfo? OnStallMove { get; init; }
-    public OnSwitchInEventInfo? OnSwitchIn { get; init; }
-    public OnSwitchOutEventInfo? OnSwitchOut { get; init; }
-    public OnSwapEventInfo? OnSwap { get; init; }
-    public OnTakeItemEventInfo? OnTakeItem { get; init; }
-    public OnWeatherChangeEventInfo? OnWeatherChange { get; init; }
-    public OnTerrainChangeEventInfo? OnTerrainChange { get; init; }
-    public OnTrapPokemonEventInfo? OnTrapPokemon { get; init; }
-    public OnTryAddVolatileEventInfo? OnTryAddVolatile { get; init; }
-    public OnTryEatItemEventInfo? OnTryEatItem { get; init; }
-    public OnTryHealEventInfo? OnTryHeal { get; init; }
-    public OnTryHitEventInfo? OnTryHit { get; init; }
-    public OnTryHitFieldEventInfo? OnTryHitField { get; init; }
-    public OnTryHitSideEventInfo? OnTryHitSide { get; init; }
-    public OnInvulnerabilityEventInfo? OnInvulnerability { get; init; }
-    public OnTryMoveEventInfo? OnTryMove { get; init; }
-    public OnTryPrimaryHitEventInfo? OnTryPrimaryHit { get; init; }
-    public OnTypeEventInfo? OnType { get; init; }
-    public OnUseItemEventInfo? OnUseItem { get; init; }
-    public OnUpdateEventInfo? OnUpdate { get; init; }
-    public OnWeatherEventInfo? OnWeather { get; init; }
-    public OnWeatherModifyDamageEventInfo? OnWeatherModifyDamage { get; init; }
-    public OnModifyDamagePhase1EventInfo? OnModifyDamagePhase1 { get; init; }
-    public OnModifyDamagePhase2EventInfo? OnModifyDamagePhase2 { get; init; }
-    public OnFoeDamagingHitEventInfo? OnFoeDamagingHit { get; init; }
-    public OnFoeAfterEachBoostEventInfo? OnFoeAfterEachBoost { get; init; }
-    public OnFoeAfterHitEventInfo? OnFoeAfterHit { get; init; }
-    public OnFoeAfterSetStatusEventInfo? OnFoeAfterSetStatus { get; init; }
-    public OnFoeAfterSubDamageEventInfo? OnFoeAfterSubDamage { get; init; }
-    public OnFoeAfterSwitchInSelfEventInfo? OnFoeAfterSwitchInSelf { get; init; }
-    public OnFoeAfterUseItemEventInfo? OnFoeAfterUseItem { get; init; }
-    public OnFoeAfterBoostEventInfo? OnFoeAfterBoost { get; init; }
-    public OnFoeAfterFaintEventInfo? OnFoeAfterFaint { get; init; }
-    public OnFoeAfterMoveSecondarySelfEventInfo? OnFoeAfterMoveSecondarySelf { get; init; }
-    public OnFoeAfterMoveSecondaryEventInfo? OnFoeAfterMoveSecondary { get; init; }
-    public OnFoeAfterMoveEventInfo? OnFoeAfterMove { get; init; }
-    public OnFoeAfterMoveSelfEventInfo? OnFoeAfterMoveSelf { get; init; }
-    public OnFoeAttractEventInfo? OnFoeAttract { get; init; }
-    public OnFoeAccuracyEventInfo? OnFoeAccuracy { get; init; }
-    public OnFoeBasePowerEventInfo? OnFoeBasePower { get; init; }
-    public OnFoeBeforeFaintEventInfo? OnFoeBeforeFaint { get; init; }
-    public OnFoeBeforeMoveEventInfo? OnFoeBeforeMove { get; init; }
-    public OnFoeBeforeSwitchInEventInfo? OnFoeBeforeSwitchIn { get; init; }
-    public OnFoeBeforeSwitchOutEventInfo? OnFoeBeforeSwitchOut { get; init; }
-    public OnFoeTryBoostEventInfo? OnFoeTryBoost { get; init; }
-    public OnFoeChargeMoveEventInfo? OnFoeChargeMove { get; init; }
-    public OnFoeCriticalHitEventInfo? OnFoeCriticalHit { get; init; }
-    public OnFoeDamageEventInfo? OnFoeDamage { get; init; }
-    public OnFoeDeductPpEventInfo? OnFoeDeductPp { get; init; }
-    public OnFoeDisableMoveEventInfo? OnFoeDisableMove { get; init; }
-    public OnFoeDragOutEventInfo? OnFoeDragOut { get; init; }
-    public OnFoeEatItemEventInfo? OnFoeEatItem { get; init; }
-    public OnFoeEffectivenessEventInfo? OnFoeEffectiveness { get; init; }
-    public OnFoeFaintEventInfo? OnFoeFaint { get; init; }
-    public OnFoeFlinchEventInfo? OnFoeFlinch { get; init; }
-    public OnFoeHitEventInfo? OnFoeHit { get; init; }
-    public OnFoeImmunityEventInfo? OnFoeImmunity { get; init; }
-    public OnFoeLockMoveEventInfo? OnFoeLockMove { get; init; }
-    public OnFoeMaybeTrapPokemonEventInfo? OnFoeMaybeTrapPokemon { get; init; }
-    public OnFoeModifyAccuracyEventInfo? OnFoeModifyAccuracy { get; init; }
-    public OnFoeModifyAtkEventInfo? OnFoeModifyAtk { get; init; }
-    public OnFoeModifyBoostEventInfo? OnFoeModifyBoost { get; init; }
-    public OnFoeModifyCritRatioEventInfo? OnFoeModifyCritRatio { get; init; }
-    public OnFoeModifyDamageEventInfo? OnFoeModifyDamage { get; init; }
-    public OnFoeModifyDefEventInfo? OnFoeModifyDef { get; init; }
-    public OnFoeModifyMoveEventInfo? OnFoeModifyMove { get; init; }
-    public OnFoeModifyPriorityEventInfo? OnFoeModifyPriority { get; init; }
-    public OnFoeModifySecondariesEventInfo? OnFoeModifySecondaries { get; init; }
-    public OnFoeModifySpAEventInfo? OnFoeModifySpA { get; init; }
-    public OnFoeModifySpDEventInfo? OnFoeModifySpD { get; init; }
-    public OnFoeModifySpeEventInfo? OnFoeModifySpe { get; init; }
-    public OnFoeModifyStabEventInfo? OnFoeModifyStab { get; init; }
-    public OnFoeModifyTypeEventInfo? OnFoeModifyType { get; init; }
-    public OnFoeModifyTargetEventInfo? OnFoeModifyTarget { get; init; }
-    public OnFoeModifyWeightEventInfo? OnFoeModifyWeight { get; init; }
-    public OnFoeMoveAbortedEventInfo? OnFoeMoveAborted { get; init; }
-    public OnFoeNegateImmunityEventInfo? OnFoeNegateImmunity { get; init; }
-    public OnFoeOverrideActionEventInfo? OnFoeOverrideAction { get; init; }
-    public OnFoePrepareHitEventInfo? OnFoePrepareHit { get; init; }
-    public OnFoeRedirectTargetEventInfo? OnFoeRedirectTarget { get; init; }
-    public OnFoeResidualEventInfo? OnFoeResidual { get; init; }
-    public OnFoeSetAbilityEventInfo? OnFoeSetAbility { get; init; }
-    public OnFoeSetStatusEventInfo? OnFoeSetStatus { get; init; }
-    public OnFoeSetWeatherEventInfo? OnFoeSetWeather { get; init; }
-    public OnFoeStallMoveEventInfo? OnFoeStallMove { get; init; }
-    public OnFoeSwitchOutEventInfo? OnFoeSwitchOut { get; init; }
-    public OnFoeTakeItemEventInfo? OnFoeTakeItem { get; init; }
-    public OnFoeTerrainEventInfo? OnFoeTerrain { get; init; }
-    public OnFoeTrapPokemonEventInfo? OnFoeTrapPokemon { get; init; }
-    public OnFoeTryAddVolatileEventInfo? OnFoeTryAddVolatile { get; init; }
-    public OnFoeTryEatItemEventInfo? OnFoeTryEatItem { get; init; }
-    public OnFoeTryHealEventInfo? OnFoeTryHeal { get; init; }
-    public OnFoeTryHitEventInfo? OnFoeTryHit { get; init; }
-    public OnFoeTryHitFieldEventInfo? OnFoeTryHitField { get; init; }
-    public OnFoeTryHitSideEventInfo? OnFoeTryHitSide { get; init; }
-    public OnFoeInvulnerabilityEventInfo? OnFoeInvulnerability { get; init; }
-    public OnFoeTryMoveEventInfo? OnFoeTryMove { get; init; }
-    public OnFoeTryPrimaryHitEventInfo? OnFoeTryPrimaryHit { get; init; }
-    public OnFoeTypeEventInfo? OnFoeType { get; init; }
-    public OnFoeWeatherModifyDamageEventInfo? OnFoeWeatherModifyDamage { get; init; }
-    public OnFoeModifyDamagePhase1EventInfo? OnFoeModifyDamagePhase1 { get; init; }
-    public OnFoeModifyDamagePhase2EventInfo? OnFoeModifyDamagePhase2 { get; init; }
-    public OnSourceDamagingHitEventInfo? OnSourceDamagingHit { get; init; }
-    public OnSourceAfterEachBoostEventInfo? OnSourceAfterEachBoost { get; init; }
-    public OnSourceAfterHitEventInfo? OnSourceAfterHit { get; init; }
-    public OnSourceAfterSetStatusEventInfo? OnSourceAfterSetStatus { get; init; }
-    public OnSourceAfterSubDamageEventInfo? OnSourceAfterSubDamage { get; init; }
-    public OnSourceAfterSwitchInSelfEventInfo? OnSourceAfterSwitchInSelf { get; init; }
-    public OnSourceAfterUseItemEventInfo? OnSourceAfterUseItem { get; init; }
-    public OnSourceAfterBoostEventInfo? OnSourceAfterBoost { get; init; }
-    public OnSourceAfterFaintEventInfo? OnSourceAfterFaint { get; init; }
-    public OnSourceAfterMoveSecondarySelfEventInfo? OnSourceAfterMoveSecondarySelf { get; init; }
-    public OnSourceAfterMoveSecondaryEventInfo? OnSourceAfterMoveSecondary { get; init; }
-    public OnSourceAfterMoveEventInfo? OnSourceAfterMove { get; init; }
-    public OnSourceAfterMoveSelfEventInfo? OnSourceAfterMoveSelf { get; init; }
-    public OnSourceAttractEventInfo? OnSourceAttract { get; init; }
-    public OnSourceAccuracyEventInfo? OnSourceAccuracy { get; init; }
-    public OnSourceBasePowerEventInfo? OnSourceBasePower { get; init; }
-    public OnSourceBeforeFaintEventInfo? OnSourceBeforeFaint { get; init; }
-    public OnSourceBeforeMoveEventInfo? OnSourceBeforeMove { get; init; }
-    public OnSourceBeforeSwitchInEventInfo? OnSourceBeforeSwitchIn { get; init; }
-    public OnSourceBeforeSwitchOutEventInfo? OnSourceBeforeSwitchOut { get; init; }
-    public OnSourceTryBoostEventInfo? OnSourceTryBoost { get; init; }
-    public OnSourceChargeMoveEventInfo? OnSourceChargeMove { get; init; }
-    public OnSourceCriticalHitEventInfo? OnSourceCriticalHit { get; init; }
-    public OnSourceDamageEventInfo? OnSourceDamage { get; init; }
-    public OnSourceDeductPpEventInfo? OnSourceDeductPp { get; init; }
-    public OnSourceDisableMoveEventInfo? OnSourceDisableMove { get; init; }
-    public OnSourceDragOutEventInfo? OnSourceDragOut { get; init; }
-    public OnSourceEatItemEventInfo? OnSourceEatItem { get; init; }
-    public OnSourceEffectivenessEventInfo? OnSourceEffectiveness { get; init; }
-    public OnSourceFaintEventInfo? OnSourceFaint { get; init; }
-    public OnSourceFlinchEventInfo? OnSourceFlinch { get; init; }
-    public OnSourceHitEventInfo? OnSourceHit { get; init; }
-    public OnSourceImmunityEventInfo? OnSourceImmunity { get; init; }
-    public OnSourceLockMoveEventInfo? OnSourceLockMove { get; init; }
-    public OnSourceMaybeTrapPokemonEventInfo? OnSourceMaybeTrapPokemon { get; init; }
-    public OnSourceModifyAccuracyEventInfo? OnSourceModifyAccuracy { get; init; }
-    public OnSourceModifyAtkEventInfo? OnSourceModifyAtk { get; init; }
-    public OnSourceModifyBoostEventInfo? OnSourceModifyBoost { get; init; }
-    public OnSourceModifyCritRatioEventInfo? OnSourceModifyCritRatio { get; init; }
-    public OnSourceModifyDamageEventInfo? OnSourceModifyDamage { get; init; }
-    public OnSourceModifyDefEventInfo? OnSourceModifyDef { get; init; }
-    public OnSourceModifyMoveEventInfo? OnSourceModifyMove { get; init; }
-    public OnSourceModifyPriorityEventInfo? OnSourceModifyPriority { get; init; }
-    public OnSourceModifySecondariesEventInfo? OnSourceModifySecondaries { get; init; }
-    public OnSourceModifySpAEventInfo? OnSourceModifySpA { get; init; }
-    public OnSourceModifySpDEventInfo? OnSourceModifySpD { get; init; }
-    public OnSourceModifySpeEventInfo? OnSourceModifySpe { get; init; }
-    public OnSourceModifyStabEventInfo? OnSourceModifyStab { get; init; }
-    public OnSourceModifyTypeEventInfo? OnSourceModifyType { get; init; }
-    public OnSourceModifyTargetEventInfo? OnSourceModifyTarget { get; init; }
-    public OnSourceModifyWeightEventInfo? OnSourceModifyWeight { get; init; }
-    public OnSourceMoveAbortedEventInfo? OnSourceMoveAborted { get; init; }
-    public OnSourceNegateImmunityEventInfo? OnSourceNegateImmunity { get; init; }
-    public OnSourceOverrideActionEventInfo? OnSourceOverrideAction { get; init; }
-    public OnSourcePrepareHitEventInfo? OnSourcePrepareHit { get; init; }
-    public OnSourceRedirectTargetEventInfo? OnSourceRedirectTarget { get; init; }
-    public OnSourceResidualEventInfo? OnSourceResidual { get; init; }
-    public OnSourceSetAbilityEventInfo? OnSourceSetAbility { get; init; }
-    public OnSourceSetStatusEventInfo? OnSourceSetStatus { get; init; }
-    public OnSourceSetWeatherEventInfo? OnSourceSetWeather { get; init; }
-    public OnSourceStallMoveEventInfo? OnSourceStallMove { get; init; }
-    public OnSourceSwitchOutEventInfo? OnSourceSwitchOut { get; init; }
-    public OnSourceTakeItemEventInfo? OnSourceTakeItem { get; init; }
-    public OnSourceTerrainEventInfo? OnSourceTerrain { get; init; }
-    public OnSourceTrapPokemonEventInfo? OnSourceTrapPokemon { get; init; }
-    public OnSourceTryAddVolatileEventInfo? OnSourceTryAddVolatile { get; init; }
-    public OnSourceTryEatItemEventInfo? OnSourceTryEatItem { get; init; }
-    public OnSourceTryHealEventInfo? OnSourceTryHeal { get; init; }
-    public OnSourceTryHitEventInfo? OnSourceTryHit { get; init; }
-    public OnSourceTryHitFieldEventInfo? OnSourceTryHitField { get; init; }
-    public OnSourceTryHitSideEventInfo? OnSourceTryHitSide { get; init; }
-    public OnSourceInvulnerabilityEventInfo? OnSourceInvulnerability { get; init; }
-    public OnSourceTryMoveEventInfo? OnSourceTryMove { get; init; }
-    public OnSourceTryPrimaryHitEventInfo? OnSourceTryPrimaryHit { get; init; }
-    public OnSourceTypeEventInfo? OnSourceType { get; init; }
-    public OnSourceWeatherModifyDamageEventInfo? OnSourceWeatherModifyDamage { get; init; }
-    public OnSourceModifyDamagePhase1EventInfo? OnSourceModifyDamagePhase1 { get; init; }
-    public OnSourceModifyDamagePhase2EventInfo? OnSourceModifyDamagePhase2 { get; init; }
-    public OnAnyDamagingHitEventInfo? OnAnyDamagingHit { get; init; }
-    public OnAnyAfterEachBoostEventInfo? OnAnyAfterEachBoost { get; init; }
-    public OnAnyAfterHitEventInfo? OnAnyAfterHit { get; init; }
-    public OnAnyAfterSetStatusEventInfo? OnAnyAfterSetStatus { get; init; }
-    public OnAnyAfterSubDamageEventInfo? OnAnyAfterSubDamage { get; init; }
-    public OnAnyAfterSwitchInSelfEventInfo? OnAnyAfterSwitchInSelf { get; init; }
-    public OnAnyAfterUseItemEventInfo? OnAnyAfterUseItem { get; init; }
-    public OnAnyAfterBoostEventInfo? OnAnyAfterBoost { get; init; }
-    public OnAnyAfterFaintEventInfo? OnAnyAfterFaint { get; init; }
-    public OnAnyAfterMegaEventInfo? OnAnyAfterMega { get; init; }
-    public OnAnyAfterMoveSecondarySelfEventInfo? OnAnyAfterMoveSecondarySelf { get; init; }
-    public OnAnyAfterMoveSecondaryEventInfo? OnAnyAfterMoveSecondary { get; init; }
-    public OnAnyAfterMoveEventInfo? OnAnyAfterMove { get; init; }
-    public OnAnyAfterMoveSelfEventInfo? OnAnyAfterMoveSelf { get; init; }
-    public OnAnyAfterTerastallizationEventInfo? OnAnyAfterTerastallization { get; init; }
-    public OnAnyAttractEventInfo? OnAnyAttract { get; init; }
-    public OnAnyAccuracyEventInfo? OnAnyAccuracy { get; init; }
-    public OnAnyBasePowerEventInfo? OnAnyBasePower { get; init; }
-    public OnAnyBeforeFaintEventInfo? OnAnyBeforeFaint { get; init; }
-    public OnAnyBeforeMoveEventInfo? OnAnyBeforeMove { get; init; }
-    public OnAnyBeforeSwitchInEventInfo? OnAnyBeforeSwitchIn { get; init; }
-    public OnAnyBeforeSwitchOutEventInfo? OnAnyBeforeSwitchOut { get; init; }
-    public OnAnyTryBoostEventInfo? OnAnyTryBoost { get; init; }
-    public OnAnyChargeMoveEventInfo? OnAnyChargeMove { get; init; }
-    public OnAnyCriticalHitEventInfo? OnAnyCriticalHit { get; init; }
-    public OnAnyDamageEventInfo? OnAnyDamage { get; init; }
-    public OnAnyDeductPpEventInfo? OnAnyDeductPp { get; init; }
-    public OnAnyDisableMoveEventInfo? OnAnyDisableMove { get; init; }
-    public OnAnyDragOutEventInfo? OnAnyDragOut { get; init; }
-    public OnAnyEatItemEventInfo? OnAnyEatItem { get; init; }
-    public OnAnyEffectivenessEventInfo? OnAnyEffectiveness { get; init; }
-    public OnAnyFaintEventInfo? OnAnyFaint { get; init; }
-    public OnAnyFlinchEventInfo? OnAnyFlinch { get; init; }
-    public OnAnyHitEventInfo? OnAnyHit { get; init; }
-    public OnAnyImmunityEventInfo? OnAnyImmunity { get; init; }
-    public OnAnyLockMoveEventInfo? OnAnyLockMove { get; init; }
-    public OnAnyMaybeTrapPokemonEventInfo? OnAnyMaybeTrapPokemon { get; init; }
-    public OnAnyModifyAccuracyEventInfo? OnAnyModifyAccuracy { get; init; }
-    public OnAnyModifyAtkEventInfo? OnAnyModifyAtk { get; init; }
-    public OnAnyModifyBoostEventInfo? OnAnyModifyBoost { get; init; }
-    public OnAnyModifyCritRatioEventInfo? OnAnyModifyCritRatio { get; init; }
-    public OnAnyModifyDamageEventInfo? OnAnyModifyDamage { get; init; }
-    public OnAnyModifyDefEventInfo? OnAnyModifyDef { get; init; }
-    public OnAnyModifyMoveEventInfo? OnAnyModifyMove { get; init; }
-    public OnAnyModifyPriorityEventInfo? OnAnyModifyPriority { get; init; }
-    public OnAnyModifySecondariesEventInfo? OnAnyModifySecondaries { get; init; }
-    public OnAnyModifySpAEventInfo? OnAnyModifySpA { get; init; }
-    public OnAnyModifySpDEventInfo? OnAnyModifySpD { get; init; }
-    public OnAnyModifySpeEventInfo? OnAnyModifySpe { get; init; }
-    public OnAnyModifyStabEventInfo? OnAnyModifyStab { get; init; }
-    public OnAnyModifyTypeEventInfo? OnAnyModifyType { get; init; }
-    public OnAnyModifyTargetEventInfo? OnAnyModifyTarget { get; init; }
-    public OnAnyModifyWeightEventInfo? OnAnyModifyWeight { get; init; }
-    public OnAnyMoveAbortedEventInfo? OnAnyMoveAborted { get; init; }
-    public OnAnyNegateImmunityEventInfo? OnAnyNegateImmunity { get; init; }
-    public OnAnyOverrideActionEventInfo? OnAnyOverrideAction { get; init; }
-    public OnAnyPrepareHitEventInfo? OnAnyPrepareHit { get; init; }
-    public OnAnyPseudoWeatherChangeEventInfo? OnAnyPseudoWeatherChange { get; init; }
-    public OnAnyRedirectTargetEventInfo? OnAnyRedirectTarget { get; init; }
-    public OnAnyResidualEventInfo? OnAnyResidual { get; init; }
-    public OnAnySetAbilityEventInfo? OnAnySetAbility { get; init; }
-    public OnAnySetStatusEventInfo? OnAnySetStatus { get; init; }
-    public OnAnySetWeatherEventInfo? OnAnySetWeather { get; init; }
-    public OnAnyStallMoveEventInfo? OnAnyStallMove { get; init; }
-    public OnAnySwitchInEventInfo? OnAnySwitchIn { get; init; }
-    public OnAnySwitchOutEventInfo? OnAnySwitchOut { get; init; }
-    public OnAnyTakeItemEventInfo? OnAnyTakeItem { get; init; }
-    public OnAnyTerrainEventInfo? OnAnyTerrain { get; init; }
-    public OnAnyTrapPokemonEventInfo? OnAnyTrapPokemon { get; init; }
-    public OnAnyTryAddVolatileEventInfo? OnAnyTryAddVolatile { get; init; }
-    public OnAnyTryEatItemEventInfo? OnAnyTryEatItem { get; init; }
-    public OnAnyTryHealEventInfo? OnAnyTryHeal { get; init; }
-    public OnAnyTryHitEventInfo? OnAnyTryHit { get; init; }
-    public OnAnyTryHitFieldEventInfo? OnAnyTryHitField { get; init; }
-    public OnAnyTryHitSideEventInfo? OnAnyTryHitSide { get; init; }
-    public OnAnyInvulnerabilityEventInfo? OnAnyInvulnerability { get; init; }
-    public OnAnyTryMoveEventInfo? OnAnyTryMove { get; init; }
-    public OnAnyTryPrimaryHitEventInfo? OnAnyTryPrimaryHit { get; init; }
-    public OnAnyTypeEventInfo? OnAnyType { get; init; }
-    public OnAnyWeatherModifyDamageEventInfo? OnAnyWeatherModifyDamage { get; init; }
-    public OnAnyModifyDamagePhase1EventInfo? OnAnyModifyDamagePhase1 { get; init; }
-    public OnAnyModifyDamagePhase2EventInfo? OnAnyModifyDamagePhase2 { get; init; }
+    public AbilityId? AssociatedAbility { get; init; }
+    public ItemId? AssociatedItem { get; init; }
+    public MoveId? AssociatedMove { get; init; }
+    public SpecieId? AssociatedSpecies { get; init; }
+
+    public int? Duration { get; set; }
+    public int? CounterMax { get; init; }
+    public int? Counter { get; set; }
+
+    public bool NoCopy { get; init; }
+
+    public IReadOnlyList<PokemonType>? ImmuneTypes { get; init; }
+
+    public bool AffectsFainted { get; init; }
+
+    public Condition Copy()
+    {
+        return this with
+        {
+            // Records have built-in copy semantics with 'with' expression
+            // This creates a shallow copy which is appropriate since most properties
+            // are either value types, immutable references (strings), or function delegates
+            // The only mutable properties (Duration, Counter) are copied correctly
+        };
+    }
+
+    ///// <summary>
+    ///// battle, target, source, effect -> number
+    ///// </summary>
+    //public Func<Battle, Pokemon, Pokemon, IEffect?, int>? DurationCallback { get; init; }
+
+    ///// <summary>
+    ///// battle, pokemon
+    ///// </summary>
+    //public Action<Battle, Pokemon>? OnCopy { get; init; }
+
+    ///// <summary>
+    ///// battle, pokemon
+    ///// </summary>
+    //public Action<Battle, Pokemon>? OnEnd { get; init; }
+
+    ///// <summary>
+    ///// battle, target, source, sourceEffect -> boolean | null
+    ///// </summary>
+    //public Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnRestart { get; init; }
+
+    ///// <summary>
+    ///// battle, target, source, sourceEffect -> boolean | null
+    ///// </summary>
+    //public Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnStart { get; init; }
+
+    public DurationCallbackEventInfo? DurationCallback { get; init; }
+    public OnCopyEventInfo? OnCopy { get; init; }
+    public OnEndEventInfo? OnEnd { get; init; }
+    public OnRestartEventInfo? OnRestart { get; init; }
+    public OnStartEventInfo? OnStart { get; init; }
+
 
     //public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnDamagingHit { get; init; }
     //public Action<Battle, Pokemon>? OnEmergencyExit { get; init; }
@@ -826,12 +497,120 @@ public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
     //public int? OnTryPrimaryHitPriority { get; init; }
     //public int? OnTypePriority { get; init; }
 
-    #endregion
+
+    //public Action<Battle, Side, Pokemon, IEffect>? OnSideStart { get; init; }
+    //public Action<Battle, Side, Pokemon, IEffect>? OnSideRestart { get; init; }
+    //public Action<Battle, Side, Pokemon, IEffect>? OnSideResidual { get; init; }
+    //public Action<Battle, Side>? OnSideEnd { get; init; 
+
+    public OnSideStartEventInfo? OnSideStart { get; init; }
+    public OnSideRestartEventInfo? OnSideRestart { get; init; }
+    public OnSideResidualEventInfo? OnSideResidual { get; init; }
+    public OnSideEndEventInfo? OnSideEnd { get; init; }
+    //public int? OnSideResidualOrder { get; init; }
+    //public int? OnSideResidualPriority { get; init; }
+    //public int? OnSideResidualSubOrder { get; init; }
+
+
+
+    //public Action<Battle, Field, Pokemon, IEffect>? OnFieldStart { get; init; }
+    //public Action<Battle, Field, Pokemon, IEffect>? OnFieldRestart { get; init; }
+    //public Action<Battle, Field, Pokemon, IEffect>? OnFieldResidual { get; init; }
+    //public Action<Battle, Field>? OnFieldEnd { get; init; }
+    //public int? OnFieldResidualOrder { get; init; }
+    //public int? OnFieldResidualPriority { get; init; }
+    //public int? OnFieldResidualSubOrder { get; init; }
+
+
+
+
+
+    //public Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; init; }
+    //public Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; init; }
+    //public VoidSourceMoveHandler? OnAllyAfterHit { get; init; }
+    //public Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; init; }
+    //public OnAfterSubDamageHandler? OnAllyAfterSubDamage { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyAfterSwitchInSelf { get; init; }
+    //public Action<Battle, Item, Pokemon>? OnAllyAfterUseItem { get; init; }
+    //public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyAfterBoost { get; init; }
+    //public Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAllyAfterFaint { get; init; }
+    //public VoidSourceMoveHandler? OnAllyAfterMoveSecondarySelf { get; init; }
+    //public VoidMoveHandler? OnAllyAfterMoveSecondary { get; init; }
+    //public VoidSourceMoveHandler? OnAllyAfterMove { get; init; }
+    //public VoidSourceMoveHandler? OnAllyAfterMoveSelf { get; init; }
+    //public Action<Battle, Pokemon, Pokemon>? OnAllyAttract { get; init; }
+    //public Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyAccuracy { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyBasePower { get; init; }
+    //public Action<Battle, Pokemon, IEffect>? OnAllyBeforeFaint { get; init; }
+    //public VoidSourceMoveHandler? OnAllyBeforeMove { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyBeforeSwitchIn { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyBeforeSwitchOut { get; init; }
+    //public Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyTryBoost { get; init; }
+    //public VoidSourceMoveHandler? OnAllyChargeMove { get; init; }
+    //public OnCriticalHit? OnAllyCriticalHit { get; init; }
+    //public Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAllyDamage { get; init; }
+    //public Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnAllyDeductPp { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyDisableMove { get; init; }
+    //public Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; init; }
+    //public Action<Battle, Item, Pokemon>? OnAllyEatItem { get; init; }
+    //public OnEffectivenessHandler? OnAllyEffectiveness { get; init; }
+    //public VoidEffectHandler? OnAllyFaint { get; init; }
+    //public OnFlinch? OnAllyFlinch { get; init; }
+    //public ResultMoveHandler? OnAllyHit { get; init; }
+    //public Action<Battle, PokemonType, Pokemon>? OnAllyImmunity { get; init; }
+    //public OnLockMove? OnAllyLockMove { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyMaybeTrapPokemon { get; init; }
+    //public ModifierMoveHandler? OnAllyModifyAccuracy { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyAtk { get; init; }
+    //public Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAllyModifyBoost { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyCritRatio { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyDamage { get; init; }
+    //public ModifierMoveHandler? OnAllyModifyDef { get; init; }
+    //public OnModifyMoveHandler? OnAllyModifyMove { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyPriority { get; init; }
+    //public Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifySpA { get; init; }
+    //public ModifierMoveHandler? OnAllyModifySpD { get; init; }
+    //public Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifySpe { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyStab { get; init; }
+    //public OnModifyTypeHandler? OnAllyModifyType { get; init; }
+    //public OnModifyTargetHandler? OnAllyModifyTarget { get; init; }
+    //public Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifyWeight { get; init; }
+    //public VoidMoveHandler? OnAllyMoveAborted { get; init; }
+    //public OnNegateImmunity? OnAllyNegateImmunity { get; init; }
+    //public Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAllyOverrideAction { get; init; }
+    //public ResultSourceMoveHandler? OnAllyPrepareHit { get; init; }
+    //public Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAllyRedirectTarget { get; init; }
+    //public Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; init; }
+    //public Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAllySetAbility { get; init; }
+    //public Func<Battle, Condition, Pokemon, Pokemon, IEffect, PokemonVoidUnion?>? OnAllySetStatus { get; init; }
+    //public Func<Battle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAllySetWeather { get; init; }
+    //public Func<Battle, Pokemon, PokemonVoidUnion>? OnAllyStallMove { get; init; }
+    //public Action<Battle, Pokemon>? OnAllySwitchOut { get; init; }
+    //public OnTakeItem? OnAllyTakeItem { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyTerrain { get; init; }
+    //public Action<Battle, Pokemon>? OnAllyTrapPokemon { get; init; }
+    //public Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAllyTryAddVolatile { get; init; }
+    //public Func<Battle, Item, Pokemon, BoolVoidUnion>? OnAllyTryEatItem { get; init; }
+    //public OnTryHeal? OnAllyTryHeal { get; init; }
+    //public ExtResultSourceMoveHandler? OnAllyTryHit { get; init; }
+    //public ExtResultSourceMoveHandler? OnAllyTryHitField { get; init; }
+    //public ResultMoveHandler? OnAllyTryHitSide { get; init; }
+    //public ExtResultMoveHandler? OnAllyInvulnerability { get; init; }
+    //public ResultSourceMoveHandler? OnAllyTryMove { get; init; }
+    //public Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyTryPrimaryHit { get; init; }
+    //public Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnAllyType { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; init; }
+    //public ModifierSourceMoveHandler? OnAllyModifyDamagePhase2 { get; init; }
 
     //public EffectDelegate? GetDelegate(EventId id)
     //{
     //    return id switch
     //    {
+    //        EventId.End => EffectDelegate.FromNullableDelegate(OnEnd),
+    //        EventId.Start => EffectDelegate.FromNullableDelegate(OnStart),
+    //        EventId.Restart => EffectDelegate.FromNullableDelegate(OnRestart),
     //        EventId.DamagingHit => EffectDelegate.FromNullableDelegate(OnDamagingHit),
     //        EventId.EmergencyExit => EffectDelegate.FromNullableDelegate(OnEmergencyExit),
     //        EventId.AfterEachBoost => EffectDelegate.FromNullableDelegate(OnAfterEachBoost),
@@ -907,6 +686,7 @@ public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
     //        EventId.SwitchOut => EffectDelegate.FromNullableDelegate(OnSwitchOut),
     //        EventId.Swap => EffectDelegate.FromNullableDelegate(OnSwap),
     //        EventId.TakeItem => EffectDelegate.FromNullableOnTakeItem(OnTakeItem),
+    //        EventId.WeatherChange => EffectDelegate.FromNullableDelegate(OnWeatherChange),
     //        EventId.TerrainChange => EffectDelegate.FromNullableDelegate(OnTerrainChange),
     //        EventId.TrapPokemon => EffectDelegate.FromNullableDelegate(OnTrapPokemon),
     //        EventId.TryAddVolatile => EffectDelegate.FromNullableDelegate(OnTryAddVolatile),
@@ -925,9 +705,27 @@ public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
     //        EventId.WeatherModifyDamage => EffectDelegate.FromNullableDelegate(OnWeatherModifyDamage),
     //        EventId.ModifyDamagePhase1 => EffectDelegate.FromNullableDelegate(OnModifyDamagePhase1),
     //        EventId.ModifyDamagePhase2 => EffectDelegate.FromNullableDelegate(OnModifyDamagePhase2),
+    //        EventId.SideStart => EffectDelegate.FromNullableDelegate(OnSideStart),
+    //        EventId.SideRestart => EffectDelegate.FromNullableDelegate(OnSideRestart),
+    //        EventId.SideResidual => EffectDelegate.FromNullableDelegate(OnSideResidual),
+    //        EventId.SideEnd => EffectDelegate.FromNullableDelegate(OnSideEnd),
+    //        EventId.FieldStart => EffectDelegate.FromNullableDelegate(OnFieldStart),
+    //        EventId.FieldRestart => EffectDelegate.FromNullableDelegate(OnFieldRestart),
+    //        EventId.FieldResidual => EffectDelegate.FromNullableDelegate(OnFieldResidual),
+    //        EventId.FieldEnd => EffectDelegate.FromNullableDelegate(OnFieldEnd),
     //        _ => null,
     //    };
     //}
+
+    /// <summary>
+    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    {
+        // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
+        // For now, return null as this hasn't been migrated yet
+      return null;
+    }
 
     //public int? GetPriority(EventId id)
     //{
@@ -995,19 +793,27 @@ public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
     //        EventId.TryMove => OnTryMovePriority,
     //        EventId.TryPrimaryHit => OnTryPrimaryHitPriority,
     //        EventId.Type => OnTypePriority,
+    //        EventId.SideResidual => OnSideResidualPriority,
+    //        EventId.FieldResidual => OnFieldResidualPriority,
     //        _ => null,
     //    };
     //}
 
     //public IntFalseUnion? GetOrder(EventId id)
     //{
-    //    int? order = id switch
+    //    return id switch
     //    {
-    //        EventId.DamagingHit => OnDamagingHitOrder,
-    //        EventId.Residual => OnResidualOrder,
+    //        EventId.DamagingHit => OnDamagingHitOrder.HasValue ? IntFalseUnion.FromInt(OnDamagingHitOrder.Value) :
+    //            null,
+    //        EventId.Residual => OnResidualOrder.HasValue ? IntFalseUnion.FromInt(OnResidualOrder.Value) : null,
+    //        EventId.SideResidual => OnSideResidualOrder.HasValue ? IntFalseUnion.FromInt(OnSideResidualOrder.Value) :
+    //            null,
+
+    //        EventId.FieldResidual => OnFieldResidualOrder.HasValue ?
+    //            IntFalseUnion.FromInt(OnFieldResidualOrder.Value) : null,
+
     //        _ => null,
     //    };
-    //    return order.HasValue ? IntFalseUnion.FromInt(order.Value) : null;
     //}
 
     //public int? GetSubOrder(EventId id)
@@ -1017,29 +823,9 @@ public record Format : IEffect, IBasicEffect, IEventMethodsV2, ICopyable<Format>
     //        EventId.AnySwitchIn => OnAnySwitchInSubOrder,
     //        EventId.Residual => OnResidualSubOrder,
     //        EventId.SwitchIn => OnSwitchInSubOrder,
+    //        EventId.SideResidual => OnSideResidualSubOrder,
+    //        EventId.FieldResidual => OnFieldResidualSubOrder,
     //        _ => null,
     //    };
     //}
-
-    /// <summary>
-    /// Gets event handler information for the specified event (TODO: implement fully).
-    /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
-    {
-        // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
-        // For now, return null as this hasn't been migrated yet
-        return null;
-    }
-
-    /// <summary>
-    /// Creates a copy of this Format for simulation purposes.
-    /// This method creates an independent copy with the same state while sharing immutable references.
-    /// </summary>
-    /// <returns>A new Format instance with copied state</returns>
-    public Format Copy()
-    {
-        // Since Format is a record, we can use the with expression to create a shallow copy
-        // All delegate properties (event handlers) are immutable references and safe to share
-        return this with { };
-    }
 }

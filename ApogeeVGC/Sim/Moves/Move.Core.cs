@@ -1,7 +1,5 @@
 ﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
@@ -9,76 +7,9 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public record Move : IMoveEventMethodsV2, IBasicEffect, ICopyable<Move>
+public partial record Move : IBasicEffect, ICopyable<Move>
 {
-    #region IMoveEventMethods Implementation
-
-    public BasePowerCallbackEventInfo? BasePowerCallback { get; init; }
-    public BeforeMoveCallbackEventInfo? BeforeMoveCallback { get; init; }
-    public BeforeTurnCallbackEventInfo? BeforeTurnCallback { get; init; }
-    public DamageCallbackEventInfo? DamageCallback { get; init; }
-    public PriorityChargeCallbackEventInfo? PriorityChargeCallback { get; init; }
-    public OnDisableMoveEventInfo? OnDisableMove { get; init; }
-    public OnAfterHitEventInfo? OnAfterHit { get; init; }
-    public OnAfterSubDamageEventInfo? OnAfterSubDamage { get; init; }
-    public OnAfterMoveSecondarySelfEventInfo? OnAfterMoveSecondarySelf { get; init; }
-    public OnAfterMoveSecondaryEventInfo? OnAfterMoveSecondary { get; init; }
-    public OnAfterMoveEventInfo? OnAfterMove { get; init; }
-    public OnDamageEventInfo? OnDamage { get; init; }
-    public OnBasePowerEventInfo? OnBasePower { get; init; }
-    public OnEffectivenessEventInfo? OnEffectiveness { get; init; }
-    public OnHitEventInfo? OnHit { get; init; }
-    public OnHitFieldEventInfo? OnHitField { get; init; }
-    public OnHitSideEventInfo? OnHitSide { get; init; }
-    public OnModifyMoveEventInfo? OnModifyMove { get; init; }
-    public OnModifyPriorityEventInfo? OnModifyPriority { get; init; }
-    public OnMoveFailEventInfo? OnMoveFail { get; init; }
-    public OnModifyTypeEventInfo? OnModifyType { get; init; }
-    public OnModifyTargetEventInfo? OnModifyTarget { get; init; }
-    public OnPrepareHitEventInfo? OnPrepareHit { get; init; }
-    public OnTryEventInfo? OnTry { get; init; }
-    public OnTryHitEventInfo? OnTryHit { get; init; }
-    public OnTryHitFieldEventInfo? OnTryHitField { get; init; }
-    public OnTryHitSideEventInfo? OnTryHitSide { get; init; }
-    public OnTryImmunityEventInfo? OnTryImmunity { get; init; }
-    public OnTryMoveEventInfo? OnTryMove { get; init; }
-    public OnUseMoveMessageEventInfo? OnUseMoveMessage { get; init; }
-
-    //public BasePowerCallbackHandler? BasePowerCallback { get; init; }
-    //public BeforeMoveCallbackHandler? BeforeMoveCallback { get; init; }
-    //public BeforeTurnCallbackHandler? BeforeTurnCallback { get; init; }
-    //public DamageCallbackHandler? DamageCallback { get; init; }
-    //public PriorityChargeCallbackHandler? PriorityChargeCallback { get; init; }
-    //public OnDisableMoveHandler? OnDisableMove { get; init; }
-    //public VoidSourceMoveHandler? OnAfterHit { get; init; }
-    //public OnAfterSubDamageHandler? OnAfterSubDamage { get; init; }
-    //public VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; init; }
-    //public VoidMoveHandler? OnAfterMoveSecondary { get; init; }
-    //public VoidSourceMoveHandler? OnAfterMove { get; init; }
-    //public OnDamageHandler? OnDamage { get; init; }
-    //public ModifierSourceMoveHandler? OnBasePower { get; init; }
-    //public OnEffectivenessHandler? OnEffectiveness { get; init; }
-    //public ResultMoveHandler? OnHit { get; init; }
-    //public ResultMoveHandler? OnHitField { get; init; }
-    //public OnHitSideHandler? OnHitSide { get; init; }
-    //public OnModifyMoveHandler? OnModifyMove { get; init; }
-    //public ModifierSourceMoveHandler? OnModifyPriority { get; init; }
-    //public VoidMoveHandler? OnMoveFail { get; init; }
-    //public OnModifyTypeHandler? OnModifyType { get; init; }
-    //public OnModifyTargetHandler? OnModifyTarget { get; init; }
-    //public ResultMoveHandler? OnPrepareHit { get; init; }
-    //public ResultSourceMoveHandler? OnTry { get; init; }
-    //public ExtResultSourceMoveHandler? OnTryHit { get; init; }
-    //public ResultMoveHandler? OnTryHitField { get; init; }
-    //public OnTryHitSideHandler? OnTryHitSide { get; init; }
-    //public ResultMoveHandler? OnTryImmunity { get; init; }
-    //public ResultSourceMoveHandler? OnTryMove { get; init; }
-    //public VoidSourceMoveHandler? OnUseMoveMessage { get; init; }
-
-    #endregion
-
-
-    public MoveId Id { get; init; }
+   public MoveId Id { get; init; }
     public EffectStateId EffectStateId => Id;
     public required string Name { get; init; }
     public string FullName => $"move: {Name}";
