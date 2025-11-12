@@ -15,14 +15,15 @@ public sealed record DamageCallbackEventInfo : EventHandlerInfo
     public DamageCallbackEventInfo(
         Func<Battle, Pokemon, Pokemon, ActiveMove, IntFalseUnion> handler,
         int? priority = null,
-   bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.DamageCallback;
-   Prefix = EventPrefix.None;
+        Prefix = EventPrefix.None;
         Handler = handler;
-   Priority = priority;
-     UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+            [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(IntFalseUnion);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -55,7 +57,7 @@ public record Items
                 Name = "Choice Specs",
                 SpriteNum = 70,
                 Fling = new FlingData { BasePower = 10 },
-                OnStart = (battle, pokemon) =>
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
@@ -66,7 +68,7 @@ public record Items
                         return;
                     }
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
-                },
+                }),
                 OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);

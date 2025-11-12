@@ -1,9 +1,8 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Conditions;
+﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -89,12 +88,10 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     public (int BasePower, string Type)? NaturalGift { get; init; }
     public ItemBoosts? Boosts { get; init; }
 
-    public OnItemEatUse? OnEat { get; init; }
-    public OnItemEatUse? OnUse { get; init; }
-    public Action<Battle, Pokemon>? OnStart { get; init; }
-    public Action<Battle, Pokemon>? OnEnd { get; init; }
-
-
+    public OnEatEventInfo? OnEat { get; init; }
+    public OnUseEventInfo? OnUse { get; init; }
+    public OnStartEventInfo? OnStart { get; init; }
+    public OnEndEventInfo? OnEnd { get; init; }
 
     public bool AffectsFainted { get; init; }
 
