@@ -109,7 +109,8 @@ public partial class BattleActions
         if (activeMove.BeforeMoveCallback is not null)
         {
             var beforeMoveHandler =
-                (Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion>)activeMove.BeforeMoveCallback.Handler;
+                (Func<Battle, Pokemon, Pokemon?, ActiveMove, BoolVoidUnion>)activeMove
+                    .BeforeMoveCallback.GetDelegateOrThrow();
             BoolVoidUnion callbackResult = beforeMoveHandler(Battle, pokemon, target, activeMove);
             if (callbackResult is BoolBoolVoidUnion { Value: true })
             {

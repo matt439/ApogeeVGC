@@ -601,6 +601,9 @@ public abstract record OnTryEatItem : IUnionEventHandler
     public static implicit operator OnTryEatItem(Func<Battle, Item, Pokemon, BoolVoidUnion> func) =>
         new FuncOnTryEatItem(func);
 
+    public static OnTryEatItem FromFunc(Func<Battle, Item, Pokemon, BoolVoidUnion> func) =>
+            new FuncOnTryEatItem(func);
+
     public abstract Delegate? GetDelegate();
     public abstract bool IsConstant();
     public abstract object? GetConstantValue();

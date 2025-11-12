@@ -48,7 +48,10 @@ public partial class Side
             {
                 throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
             }
-            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+
+            var durationHandler =
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback
+                    .GetDelegateOrThrow();
             effectState.Duration = durationHandler(Battle, firstActive, source, sourceEffect);
         }
 
@@ -161,7 +164,8 @@ public partial class Side
             {
                 throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
             }
-            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.
+                GetDelegateOrThrow();
             conditionState.Duration = durationHandler(Battle, firstActive, source, sourceEffect);
         }
 

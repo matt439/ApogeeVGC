@@ -36,7 +36,7 @@ public class Field : IDisposable
         sourceEffect ??= Battle.Effect;
 
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
         {
             source = pset.Pokemon;
         }
@@ -110,7 +110,7 @@ public class Field : IDisposable
             }
 
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.GetDelegateOrThrow();
             WeatherState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
@@ -207,7 +207,7 @@ public class Field : IDisposable
         sourceEffect ??= Battle.Effect;
         
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
         {
             source = pset.Pokemon;
         }
@@ -237,7 +237,7 @@ public class Field : IDisposable
         if (condition.DurationCallback != null)
         {
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)condition.DurationCallback.Handler;
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)condition.DurationCallback.GetDelegateOrThrow();
             TerrainState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
@@ -319,7 +319,7 @@ public class Field : IDisposable
         sourceEffect ??= Battle.Effect;
         
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event?.Target is PokemonSingleEventTarget pset)
+        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
         {
             source = pset.Pokemon;
         }
@@ -360,8 +360,10 @@ public class Field : IDisposable
             {
                 throw new InvalidOperationException("Setting pseudo-weather without a source");
             }
+
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback
+                    .GetDelegateOrThrow();
             state.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 

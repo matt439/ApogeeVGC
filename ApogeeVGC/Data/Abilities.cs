@@ -54,8 +54,8 @@ public record Abilities
                     1
                 ),
                 OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
-                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo((battle, _, _) =>
-                        BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo( OnTryEatItem.FromFunc((battle, _, _) =>
+                        BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false)))),
                 OnSourceAfterFaint =
                     new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
                     {
