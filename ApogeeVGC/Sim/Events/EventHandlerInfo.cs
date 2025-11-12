@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.Events;
 /// Each concrete event type (OnDamagingHit, OnBasePower, etc.) should inherit from this
 /// to provide compile-time type safety and consistent metadata across all effect types.
 /// </summary>
-public abstract record EventHandlerInfo
+public abstract record EventHandlerInfo(Delegate Handler)
 {
     /// <summary>
     /// The unique identifier for this event
@@ -17,7 +17,7 @@ public abstract record EventHandlerInfo
     /// <summary>
     /// The actual delegate handler for this event (can be null if not implemented)
     /// </summary>
-    public Delegate? Handler { get; init; }
+    public Delegate Handler { get; init; } = Handler;
 
     // Metadata from EventIdInfo
 
@@ -118,30 +118,56 @@ public abstract record EventHandlerInfo
                     $"Got: ({string.Join(", ", actualParams.Select(p => p.ParameterType.Name))})");
             }
 
-            // Validate each parameter type
+            // Validate each parameter type (handling nullability)
             for (int i = 0; i < actualParams.Length; i++)
             {
                 Type expectedType = ExpectedParameterTypes[i];
                 Type actualType = actualParams[i].ParameterType;
 
-                if (!expectedType.IsAssignableFrom(actualType))
+                // Strip nullability for comparison
+                Type expectedBase = Nullable.GetUnderlyingType(expectedType) ?? expectedType;
+                Type actualBase = Nullable.GetUnderlyingType(actualType) ?? actualType;
+
+                // For reference types, check if either is nullable reference type
+                if (!expectedBase.IsValueType && !actualBase.IsValueType)
                 {
-                    throw new InvalidOperationException(
-                        $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +
-                        $"Expected: {expectedType.Name}, Got: {actualType.Name}");
+                    // Reference type comparison - check base types
+                    if (!expectedBase.IsAssignableFrom(actualBase))
+                    {
+                        throw new InvalidOperationException(
+                            $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +
+                            $"Expected: {expectedType.Name}, Got: {actualType.Name}");
+                    }
+                }
+                else
+                {
+                    // Value type comparison - strip nullability and compare
+                    if (!expectedBase.IsAssignableFrom(actualBase))
+                    {
+                        throw new InvalidOperationException(
+                            $"Event {Id}: Parameter {i} ({actualParams[i].Name}) type mismatch. " +
+                            $"Expected: {expectedType.Name}, Got: {actualType.Name}");
+                    }
                 }
             }
         }
 
-        // Validate return type
+        // Validate return type (handling nullability)
         if (ExpectedReturnType != null)
         {
             Type actualReturnType = method.ReturnType;
-            if (!ExpectedReturnType.IsAssignableFrom(actualReturnType))
+
+            // Strip nullability for comparison
+            Type actualBase = Nullable.GetUnderlyingType(actualReturnType) ?? actualReturnType;
+            Type expectedBase = Nullable.GetUnderlyingType(ExpectedReturnType) ?? ExpectedReturnType;
+
+            // Check base types match (nullability doesn't matter for runtime compatibility)
+            if (!expectedBase.IsAssignableFrom(actualBase))
             {
                 throw new InvalidOperationException(
                     $"Event {Id}: Return type mismatch. " +
-                    $"Expected: {ExpectedReturnType.Name}, Got: {actualReturnType.Name}");
+                    $"Expected: {ExpectedReturnType.Name} (or nullable variant), " +
+                    $"Got: {actualReturnType.Name}");
             }
         }
     }

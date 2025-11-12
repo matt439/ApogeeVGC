@@ -18,7 +18,7 @@ public partial class Side
     public bool AddSideCondition(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is Battle { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle is { Event.Target: PokemonSingleEventTarget eventTarget })
         {
             source = eventTarget.Pokemon;
         }
@@ -48,7 +48,8 @@ public partial class Side
             {
                 throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
             }
-            effectState.Duration = status.DurationCallback(Battle, firstActive, source, sourceEffect);
+            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+            effectState.Duration = durationHandler(Battle, firstActive, source, sourceEffect);
         }
 
         SideConditions[status.Id] = effectState;
@@ -115,7 +116,7 @@ public partial class Side
         IEffect? sourceEffect = null)
     {
         // Step 1: Source resolution
-        if (source == null && Battle is Battle { Event.Target: PokemonSingleEventTarget eventTarget })
+        if (source == null && Battle is { Event.Target: PokemonSingleEventTarget eventTarget })
         {
             source = eventTarget.Pokemon;
         }
@@ -160,7 +161,8 @@ public partial class Side
             {
                 throw new InvalidOperationException("Side.Active has no non-null Pokemon.");
             }
-            conditionState.Duration = status.DurationCallback(Battle, firstActive, source, sourceEffect);
+            var durationHandler = (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+            conditionState.Duration = durationHandler(Battle, firstActive, source, sourceEffect);
         }
 
         SlotConditions[targetSlot][status.Id] = conditionState;

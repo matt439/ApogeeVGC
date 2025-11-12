@@ -108,7 +108,10 @@ public class Field : IDisposable
             {
                 throw new InvalidOperationException("Setting weather without a source");
             }
-            WeatherState.Duration = status.DurationCallback(Battle, source, source, sourceEffect);
+
+            var durationHandler =
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+            WeatherState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
         // Try to start the weather - if it fails, rollback
@@ -233,7 +236,9 @@ public class Field : IDisposable
         // If the terrain has a custom duration callback, use it
         if (condition.DurationCallback != null)
         {
-            TerrainState.Duration = condition.DurationCallback(Battle, source, source, sourceEffect);
+            var durationHandler =
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)condition.DurationCallback.Handler;
+            TerrainState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
         // Try to start the terrain - if it fails, rollback
@@ -355,7 +360,9 @@ public class Field : IDisposable
             {
                 throw new InvalidOperationException("Setting pseudo-weather without a source");
             }
-            state.Duration = status.DurationCallback(Battle, source, source, sourceEffect);
+            var durationHandler =
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.Handler;
+            state.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
         // Try to start the pseudo-weather

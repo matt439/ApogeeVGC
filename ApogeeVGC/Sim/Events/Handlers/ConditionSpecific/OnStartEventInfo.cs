@@ -10,14 +10,15 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     public OnStartEventInfo(
         Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
         int? priority = null,
-        bool usesSpeed = true)
+        bool usesSpeed = true) :
+        base(handler)
     {
-        Id = EventId.DurationCallback;
         Prefix = EventPrefix.None;
         Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
+        ExpectedParameterTypes =
+            [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(BoolVoidUnion);
     }
 }

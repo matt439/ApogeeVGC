@@ -63,7 +63,7 @@ public record Conditions
                     {
                         throw new ArgumentNullException(
                             $"Source effect is null when trying to apply" +
-                            $"{ConditionId.Burn} to" + $"pokemon {(string)target.Name}.");
+                            $"{ConditionId.Burn} to" + $"pokemon {target.Name}.");
                     }
 
                     if (!battle.DisplayUi) return new VoidReturn();

@@ -20,7 +20,7 @@ public sealed record OnSetStatusEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnSetStatusEventInfo(
-        Func<Battle, Conditions.Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
+        Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
