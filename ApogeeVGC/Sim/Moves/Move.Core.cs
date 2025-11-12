@@ -1,5 +1,6 @@
-﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils;
@@ -274,9 +275,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
                 Used = false,
             },
         };
-    }
-
-    //public EffectDelegate? GetDelegate(EventId id)
+    }//public EffectDelegate? GetDelegate(EventId id)
     //{
     //    return id switch
     //    {

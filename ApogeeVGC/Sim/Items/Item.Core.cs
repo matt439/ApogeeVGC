@@ -94,6 +94,8 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     public Action<Battle, Pokemon>? OnStart { get; init; }
     public Action<Battle, Pokemon>? OnEnd { get; init; }
 
+
+
     public bool AffectsFainted { get; init; }
 
     public Item Copy()
@@ -307,5 +309,14 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
         // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
         // For now, return null as this hasn't been migrated yet
         return null;
+    }
+
+    /// <summary>
+    /// Gets event handler information for the specified event.
+    /// Uses high-performance mapper with O(1) lookups.
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
+    {
+        return EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix, suffix);
     }
 }

@@ -294,6 +294,15 @@ public partial record Format : IEffect, IBasicEffect, ICopyable<Format>
     }
 
     /// <summary>
+    /// Gets event handler information for the specified event.
+    /// Uses high-performance mapper with O(1) lookups.
+    /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
+    {
+        return EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix, suffix);
+    }
+
+    /// <summary>
     /// Creates a copy of this Format for simulation purposes.
     /// This method creates an independent copy with the same state while sharing immutable references.
     /// </summary>

@@ -79,31 +79,8 @@ public partial record Ability : IEffect, IAbilityEventMethodsV2, IBasicEffect, I
     /// Gets event handler information for the specified event.
     /// Uses high-performance mapper with O(1) lookups.
     /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
     {
-        // Extract prefix from the event handler info if it exists
-        // For abilities, we need to check all variants (base, Foe, Source, Any, Ally)
-
-        // Try base event first (no prefix)
-        var info = EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix: null);
-        if (info != null) return info;
-
-        // Try Foe prefix
-        info = EventHandlerInfoMapper.GetEventHandlerInfo(this, id, EventPrefix.Foe);
-        if (info != null) return info;
-
-        // Try Source prefix
-        info = EventHandlerInfoMapper.GetEventHandlerInfo(this, id, EventPrefix.Source);
-        if (info != null) return info;
-
-        // Try Any prefix
-        info = EventHandlerInfoMapper.GetEventHandlerInfo(this, id, EventPrefix.Any);
-        if (info != null) return info;
-
-        // Try Ally prefix
-        info = EventHandlerInfoMapper.GetEventHandlerInfo(this, id, EventPrefix.Ally);
-        if (info != null) return info;
-
-        return null;
+        return EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix, suffix);
     }
 }

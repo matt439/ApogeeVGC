@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -102,16 +102,14 @@ public record ActiveMove : Move, IEffect
     public HitEffect? HitEffect { get; set; }
 
     /// <summary>
-    /// Gets event handler information for the specified event (TODO: implement fully).
+    /// Gets event handler information for the specified event.
+    /// Uses high-performance mapper with O(1) lookups.
     /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
     {
-      // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
-        // For now, return null as this hasn't been migrated yet
-        return null;
+        return EventHandlerInfoMapper.GetEventHandlerInfo(this, id, prefix, suffix);
     }
 }
-
 
 
 // Element of MoveHitData

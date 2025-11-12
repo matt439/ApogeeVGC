@@ -207,12 +207,12 @@ public record Species : IEffect, ICopyable<Species>
     //public int? GetSubOrder(EventId id) => null;
 
     /// <summary>
-    /// Gets event handler information for the specified event (TODO: implement fully).
-    /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
+    /// Gets event handler information for the specified event.
+    /// Species doesn't have event handlers, so always returns null.
+  /// </summary>
+    public EventHandlerInfo? GetEventHandlerInfo(EventId id, EventPrefix? prefix = null, EventSuffix? suffix = null)
     {
-    // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
-        // For now, return null as this hasn't been migrated yet
+        // Species doesn't have any event handlers
         return null;
     }
 }

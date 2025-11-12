@@ -483,24 +483,27 @@ public static class EventHandlerInfoMapper
 /// <param name="effect">The effect to query</param>
 /// <param name="id">The base EventId (without prefix/suffix)</param>
 /// <param name="prefix">Optional event prefix (Foe, Source, Any, Ally)</param>
+/// <param name="suffix">Optional event suffix</param>
 /// <returns>The EventHandlerInfo if found, null otherwise</returns>
   public static EventHandlerInfo? GetEventHandlerInfo(
-     IEffect effect,
+   IEffect effect,
   EventId id,
-        EventPrefix? prefix = null)
+        EventPrefix? prefix = null,
+        EventSuffix? suffix = null)
     {
-     // Try ability-specific events first (if applicable)
+        // Try ability-specific events first (if applicable)
         if (effect is IAbilityEventMethodsV2 abilityMethods &&
          AbilityEventMethodsMap.TryGetValue(id, out var abilityAccessor))
         {
        var info = abilityAccessor(abilityMethods);
-    if (info != null) return info;
+     if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+       return info;
         }
 
-   // Handle prefixed events
+        // Handle prefixed events
         if (prefix.HasValue && effect is IEventMethodsV2 eventMethods)
      {
-   return prefix.Value switch
+            var info = prefix.Value switch
         {
        EventPrefix.Foe when FoeEventMethodsMap.TryGetValue(id, out var accessor) => accessor(eventMethods),
       EventPrefix.Source when SourceEventMethodsMap.TryGetValue(id, out var accessor) => accessor(eventMethods),
@@ -509,15 +512,34 @@ public static class EventHandlerInfoMapper
        AllyEventMethodsMap.TryGetValue(id, out var allyAccessor) => allyAccessor(pokemonMethods),
          _ => null
  };
+            
+          if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+   return info;
      }
 
      // Handle base events (no prefix)
-        if (effect is IEventMethodsV2 baseMethods &&
+      if (effect is IEventMethodsV2 baseMethods &&
     EventMethodsMap.TryGetValue(id, out var baseAccessor))
-        {
-       return baseAccessor(baseMethods);
+     {
+            var info = baseAccessor(baseMethods);
+         if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+        return info;
   }
 
         return null;
+    }
+
+    /// <summary>
+    /// Checks if an EventHandlerInfo matches the requested prefix and suffix.
+/// </summary>
+    private static bool MatchesPrefixAndSuffix(EventHandlerInfo info, EventPrefix? prefix, EventSuffix? suffix)
+    {
+        if (prefix.HasValue && info.Prefix != prefix.Value)
+            return false;
+     
+  if (suffix.HasValue && info.Suffix != suffix.Value)
+   return false;
+  
+    return true;
     }
 }

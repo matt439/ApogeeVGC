@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -29,9 +30,9 @@ public record Items
                 Fling = new FlingData { BasePower = 10 },
                 SpriteNum = 242,
                 Gen = 2,
-                OnResidualOrder = 5,
-                OnResidualSubOrder = 4,
-                OnResidual = (battle, pokemon, _, _) =>
+                //OnResidualOrder = 5,
+                //OnResidualSubOrder = 4,
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
                     if (pokemon == null)
                     {
@@ -42,6 +43,10 @@ public record Items
                         return;
                     }
                     battle.Heal(pokemon.BaseMaxHp / 16);
+                })
+                {
+                    Order = 5,
+                    SubOrder = 4,
                 },
             },
             [ItemId.ChoiceSpecs] = new()
@@ -62,12 +67,13 @@ public record Items
                     }
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 },
-                OnModifyMove = (_, _, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-                },
-                OnModifySpAPriority = 1,
-                OnModifySpA = (battle, _, _, _, _) => battle.ChainModify(1.5),
+                }),
+                //OnModifySpAPriority = 1,
+                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) => battle.ChainModify(1.5),
+                    1),
                 IsChoice = true,
                 Num = 297,
                 Gen = 4,
@@ -82,15 +88,19 @@ public record Items
                     BasePower = 30,
                     Status = ConditionId.Burn,
                 },
-                OnResidualOrder = 28,
-                OnResidualSubOrder = 3,
-                OnResidual = (_, pokemon, _, _) =>
+                //OnResidualOrder = 28,
+                //OnResidualSubOrder = 3,
+                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
                 {
                     if (pokemon == null)
                     {
                         return;
                     }
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);
+                })
+                {
+                    Order = 28,
+                    SubOrder = 3,
                 },
                 Num = 273,
                 Gen = 4,
@@ -101,13 +111,16 @@ public record Items
                 Name = "Rocky Helmet",
                 SpriteNum = 417,
                 Fling = new FlingData { BasePower = 60 },
-                OnDamagingHitOrder = 2,
-                OnDamagingHit = (battle, _, target, source, move) =>
+                //OnDamagingHitOrder = 2,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
                 {
                     if (battle.CheckMoveMakesContact(move, source, target))
                     {
                         battle.Damage(source.BaseMaxHp / 6, source, target);
                     }
+                })
+                {
+                    Order = 2,
                 },
                 Num = 540,
                 Gen = 5,
@@ -127,9 +140,10 @@ public record Items
                 Name = "Assault Vest",
                 SpriteNum = 581,
                 Fling = new FlingData { BasePower = 80 },
-                OnModifySpDPriority = 1,
-                OnModifySpD = (battle, _, _, _, _) => battle.ChainModify(1.5),
-                OnDisableMove = (_, pokemon) =>
+                //OnModifySpDPriority = 1,
+                OnModifySpD = new OnModifySpDEventInfo((battle, _, _, _, _) => battle.ChainModify(1.5),
+                    1),
+                OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
                     foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots
                              let move = _library.Moves[moveSlot.Move]
@@ -138,7 +152,7 @@ public record Items
                     {
                         pokemon.DisableMove(moveSlot.Id);
                     }
-                },
+                }),
                 Num = 640,
                 Gen = 6,
             },
