@@ -15,8 +15,6 @@
 
   <ItemGroup>
     <Folder Include="Examples\" />
-    <Folder Include="Sim\Events\Handlers\AbilityEventMethods\" />
-    <Folder Include="Sim\Events\Handlers\FieldEventMethods\" />
     <Folder Include="Sim\Events\Handlers\MoveEventMethods\" />
     <Folder Include="Sim\Events\Handlers\SideEventMethods\" />
     <Folder Include="Sim\Events\Handlers\PokemonEventMethods\" />
