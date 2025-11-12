@@ -11,19 +11,9 @@ public interface IEffect
     EffectStateId EffectStateId { get; }
     
     /// <summary>
-    /// Gets the delegate for the specified event (legacy method).
-    /// Consider using GetEventHandlerInfo for type-safe event information.
+    /// Gets comprehensive event handler information including delegate, metadata, and type signature.
+    /// This replaces the need for separate GetDelegate, GetPriority, GetOrder, and GetSubOrder calls.
+    /// Returns null if the event is not implemented by this effect.
     /// </summary>
-    EffectDelegate? GetDelegate(EventId id);
-
-  /// <summary>
-  /// Gets comprehensive event handler information including delegate, metadata, and type signature.
-  /// This replaces the need for separate GetDelegate, GetPriority, GetOrder, and GetSubOrder calls.
-  /// Returns null if the event is not implemented by this effect.
-  /// </summary>
-  EventHandlerInfo? GetEventHandlerInfo(EventId id);
-
-    IntFalseUnion? GetOrder(EventId id);
-    int? GetPriority(EventId id);
-    int? GetSubOrder(EventId id);
+    EventHandlerInfo? GetEventHandlerInfo(EventId id);
 }

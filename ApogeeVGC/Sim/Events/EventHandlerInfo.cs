@@ -12,7 +12,7 @@ public abstract record EventHandlerInfo
     /// <summary>
     /// The unique identifier for this event
     /// </summary>
-    public required EventId Id { get; init; }
+    public EventId Id { get; init; }
 
     /// <summary>
     /// The actual delegate handler for this event (can be null if not implemented)

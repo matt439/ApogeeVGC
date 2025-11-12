@@ -196,15 +196,15 @@ public record Species : IEffect, ICopyable<Species>
         };
     }
 
-    public EffectDelegate? GetDelegate(EventId id)
-    {
-        // Species doesn't have any event handlers, so always return null
-        return null;
-    }
+    //public EffectDelegate? GetDelegate(EventId id)
+    //{
+    //    // Species doesn't have any event handlers, so always return null
+    //    return null;
+    //}
 
-    public int? GetPriority(EventId id) => null;
-    public IntFalseUnion? GetOrder(EventId id) => null;
-    public int? GetSubOrder(EventId id) => null;
+    //public int? GetPriority(EventId id) => null;
+    //public IntFalseUnion? GetOrder(EventId id) => null;
+    //public int? GetSubOrder(EventId id) => null;
 
     /// <summary>
     /// Gets event handler information for the specified event (TODO: implement fully).

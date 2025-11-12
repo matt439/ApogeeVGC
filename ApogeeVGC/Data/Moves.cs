@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -59,7 +60,8 @@ public record Moves
                     Metronome = true,
                 },
                 Condition = _library.Conditions[ConditionId.LeechSeed],
-                OnTryImmunity = (_, target, _, _) => !target.HasType(PokemonType.Grass),
+                OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
+                    !target.HasType(PokemonType.Grass)),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
@@ -102,13 +104,14 @@ public record Moves
                 },
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
-                OnPrepareHit = (battle, pokemon, _, _) => battle.Queue.WillAct() is null &&
-                                                          battle.RunEvent(EventId.StallMove, pokemon) is not null,
-                OnHit = (_, pokemon, _, _) =>
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) =>
+                    battle.Queue.WillAct() is null &&
+                    battle.RunEvent(EventId.StallMove, pokemon) is not null),
+                OnHit = new OnHitEventInfo((_, pokemon, _, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.Stall);
                     return new VoidReturn();
-                },
+                }),
                 Condition = _library.Conditions[ConditionId.Protect],
                 Secondary = null,
                 Target = MoveTarget.Self,
@@ -170,15 +173,16 @@ public record Moves
                     Protect = true,
                     Mirror = true,
                 },
-                OnBasePower = (battle, _, _, target, move) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, _, target, move) =>
                 {
                     if (target.RunEffectiveness(move) <= 0.0) return new VoidReturn();
                     if (battle.DisplayUi)
                     {
                         battle.Debug("electro drift super effective buff");
                     }
+
                     return battle.ChainModify([5461, 4096]);
-                },
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
@@ -221,14 +225,16 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnBasePower = (battle, _, pokemon, _, _) =>
+                OnBasePower = new OnBasePowerEventInfo((battle, _, pokemon, _, _) =>
                 {
-                    if (pokemon.Status is not ConditionId.None && pokemon.Status != ConditionId.Sleep)
+                    if (pokemon.Status is not ConditionId.None &&
+                        pokemon.Status != ConditionId.Sleep)
                     {
                         return battle.ChainModify(2);
                     }
+
                     return new VoidReturn();
-                },
+                }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -465,15 +471,16 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                OnTry = (battle, source, _, _) =>
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
                 {
                     if (source.ActiveMoveActions <= 1) return new VoidReturn();
                     if (battle.DisplayUi)
                     {
                         battle.Hint("Fake out only works on your first turn out.");
                     }
+
                     return false;
-                },
+                }),
                 Secondary = new SecondaryEffect
                 {
                     Chance = 100,
@@ -488,7 +495,7 @@ public record Moves
                 Num = 484,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (battle, pokemon, target, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int pokemonWeight = pokemon.GetWeight();
@@ -513,12 +520,14 @@ public record Moves
                     {
                         bp = 40;
                     }
+
                     if (battle.DisplayUi)
                     {
                         battle.Debug($"BP: {bp}");
                     }
+
                     return bp;
-                },
+                }),
                 Category = MoveCategory.Physical,
                 Name = "Heavy Slam",
                 BasePp = 10,
@@ -542,7 +551,7 @@ public record Moves
                 Num = 67,
                 Accuracy = 100,
                 BasePower = 0,
-                BasePowerCallback = (battle, _, target, _) =>
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
                 {
                     int targetWeight = target.GetWeight();
                     int bp = targetWeight switch
@@ -558,8 +567,9 @@ public record Moves
                     {
                         battle.Debug($"BP: {bp}");
                     }
+
                     return bp;
-                },
+                }),
                 Category = MoveCategory.Physical,
                 Name = "Low Kick",
                 BasePp = 20,
@@ -593,13 +603,11 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Recoil = (1,  4),
+                Recoil = (1, 4),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Electric,
             },
-
-
 
 
             // Struggle
@@ -626,14 +634,14 @@ public record Moves
                     FailInstruct = true,
                     NoSketch = true,
                 },
-                OnModifyMove = (battle, move, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
                     move.Type = MoveType.Fighting;
                     if (battle.DisplayUi)
                     {
                         battle.Add("-activate", pokemon, "move: Struggle");
                     }
-                },
+                }),
                 StruggleRecoil = true,
                 Secondary = null,
                 Target = MoveTarget.RandomNormal,

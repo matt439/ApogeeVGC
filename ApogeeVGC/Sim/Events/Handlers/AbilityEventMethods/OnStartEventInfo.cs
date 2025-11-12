@@ -18,15 +18,15 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnStartEventInfo(
         Action<Battle, Pokemon> handler,
-     int? priority = null,
-bool usesSpeed = true)
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.Start;
-     Prefix = EventPrefix.None;
+        Prefix = EventPrefix.None;
         Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
- ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-    ExpectedReturnType = typeof(void);
+        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
+        ExpectedReturnType = typeof(void);
     }
 }

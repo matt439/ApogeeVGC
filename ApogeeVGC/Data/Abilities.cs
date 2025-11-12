@@ -1,14 +1,13 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Effects;
+﻿using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
 using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
+using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 namespace ApogeeVGC.Data;
 
@@ -33,33 +32,38 @@ public record Abilities
                 Name = "As One (Glastrier)",
                 Num = 266,
                 Rating = 3.5,
-                OnSwitchInPriority = 1,
-                OnStart = (battle, pokemon) =>
-                {
-                    if (battle.EffectState.Unnerved is true) return;
-                    if (battle.DisplayUi)
+                //OnSwitchInPriority = 1,
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { },
+                    1
+                ),
+                OnStart = new OnStartEventInfo(
+                    (battle, pokemon) =>
                     {
-                        //UiGenerator.PrintAbilityEvent(pokemon, "As One");
-                        //UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
+                        if (battle.EffectState.Unnerved is true) return;
+                        if (battle.DisplayUi)
+                        {
+                            //UiGenerator.PrintAbilityEvent(pokemon, "As One");
+                            //UiGenerator.PrintAbilityEvent(pokemon, _library.Abilities[AbilityId.Unnerve]);
 
-                        battle.Add("-ability", pokemon, "As One");
-                        battle.Add("-ability", pokemon, "Unnerve");
-                    }
-                    battle.EffectState.Unnerved = true;
-                },
-                OnEnd = (battle, _) =>
-                {
-                    battle.EffectState.Unnerved = false;
-                },
-                OnFoeTryEatItem = (Func<Battle, Item, Pokemon, BoolVoidUnion>)((battle, _, _) =>
-                    BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
-                OnSourceAfterFaint = (battle, length, _, source, effect) =>
-                {
-                    if (effect.EffectType != EffectType.Move) return;
+                            battle.Add("-ability", pokemon, "As One");
+                            battle.Add("-ability", pokemon, "Unnerve");
+                        }
 
-                    battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
-                        _library.Abilities[AbilityId.ChillingNeigh]);
-                },
+                        battle.EffectState.Unnerved = true;
+                    },
+                    1
+                ),
+                OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo((battle, _, _) =>
+                        BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false))),
+                OnSourceAfterFaint =
+                    new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
+                    {
+                        if (effect.EffectType != EffectType.Move) return;
+
+                        battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
+                            _library.Abilities[AbilityId.ChillingNeigh]);
+                    }),
                 Flags = new AbilityFlags
                 {
                     FailRolePlay = true,
@@ -76,9 +80,10 @@ public record Abilities
                 Name = "Hadron Engine",
                 Num = 289,
                 Rating = 4.5,
-                OnStart = (battle, pokemon) =>
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (!battle.Field.SetTerrain(_library.Conditions[ConditionId.ElectricTerrain]) &&
+                    if (!battle.Field.SetTerrain(
+                            _library.Conditions[ConditionId.ElectricTerrain]) &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
                         if (battle.DisplayUi)
@@ -88,14 +93,16 @@ public record Abilities
                             battle.Add("-activate", pokemon, "ability: Hadron Engine");
                         }
                     }
-                },
-                OnModifySpAPriority = 5,
-                OnModifySpA = (battle, _, _, _, _) =>
-                {
-                    if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null)) return new VoidReturn();
-                    battle.Debug("Hadron Engine boost");
-                    return battle.ChainModify([5461, 4096]);
-                },
+                }),
+                //OnModifySpAPriority = 5,
+                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
+                    {
+                        if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
+                            return new VoidReturn();
+                        battle.Debug("Hadron Engine boost");
+                        return battle.ChainModify([5461, 4096]);
+                    },
+                    5),
             },
             [AbilityId.Guts] = new()
             {
@@ -103,15 +110,17 @@ public record Abilities
                 Name = "Guts",
                 Num = 62,
                 Rating = 3.5,
-                OnModifyAtkPriority = 5,
-                OnModifyAtk = (battle, _, pokemon, _, _) =>
-                {
-                    if (pokemon.Status is not ConditionId.None)
+                //OnModifyAtkPriority = 5,
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, _, pokemon, _, _) =>
                     {
-                        return battle.ChainModify(1.5);
-                    }
-                    return new VoidReturn();
-                },
+                        if (pokemon.Status is not ConditionId.None)
+                        {
+                            return battle.ChainModify(1.5);
+                        }
+
+                        return new VoidReturn();
+                    },
+                    5),
             },
             [AbilityId.FlameBody] = new()
             {
@@ -119,7 +128,7 @@ public record Abilities
                 Name = "Flame Body",
                 Num = 49,
                 Rating = 2.0,
-                OnDamagingHit = (battle, _, target, source, move) =>
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
                 {
                     if (!battle.CheckMoveMakesContact(move, source, target)) return;
 
@@ -127,7 +136,7 @@ public record Abilities
                     {
                         source.TrySetStatus(ConditionId.Burn, target);
                     }
-                },
+                }),
             },
             [AbilityId.Prankster] = new()
             {
@@ -135,13 +144,13 @@ public record Abilities
                 Name = "Prankster",
                 Num = 158,
                 Rating = 4.0,
-                OnModifyPriority = (_, priority, _, _, move) =>
+                OnModifyPriority = new OnModifyPriorityEventInfo((_, priority, _, _, move) =>
                 {
                     if (move.Category != MoveCategory.Status) return new VoidReturn();
 
                     move.PranksterBooster = true;
                     return priority + 1;
-                },
+                }),
             },
             [AbilityId.QuarkDrive] = new()
             {
@@ -150,12 +159,15 @@ public record Abilities
                 Num = 282,
                 Rating = 3.0,
                 Condition = ConditionId.QuarkDrive,
-                OnSwitchInPriority = -2,
-                OnStart = (battle, pokemon) =>
+                //OnSwitchInPriority = -2,
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
+
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState, pokemon);
-                },
-                OnTerrainChange = (battle, pokemon, _, _) =>
+                    battle.SingleEvent(EventId.TerrainChange, battle.Effect, battle.EffectState,
+                        pokemon);
+                }),
+                OnTerrainChange = new OnTerrainChangeEventInfo((battle, pokemon, _, _) =>
                 {
                     Condition quarkDrive = _library.Conditions[ConditionId.QuarkDrive];
 
@@ -167,13 +179,14 @@ public record Abilities
                     {
                         pokemon.RemoveVolatile(quarkDrive);
                     }
-                },
-                OnEnd = (battle, pokemon) =>
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
                     if (pokemon is not PokemonSideFieldPokemon pok)
                     {
                         throw new ArgumentException("Expecting a Pokemon here.");
                     }
+
                     pok.Pokemon.DeleteVolatile(ConditionId.QuarkDrive);
 
                     if (battle.DisplayUi)
@@ -182,7 +195,7 @@ public record Abilities
 
                         battle.Add("-end", pok.Pokemon, "Quark Drive", "[silent]");
                     }
-                },
+                }),
                 Flags = new AbilityFlags
                 {
                     FailRolePlay = true,
