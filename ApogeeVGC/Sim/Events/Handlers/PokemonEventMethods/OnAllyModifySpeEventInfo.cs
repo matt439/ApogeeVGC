@@ -1,0 +1,27 @@
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
+
+namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
+
+/// <summary>
+/// Event handler info for OnAllyModifySpe event (pokemon/ally-specific).
+/// Triggered to modify ally's speed.
+/// Signature: Func<Battle, int, Pokemon, IntVoidUnion>
+/// </summary>
+public sealed record OnAllyModifySpeEventInfo : EventHandlerInfo
+{
+    public OnAllyModifySpeEventInfo(
+    Func<Battle, int, Pokemon, IntVoidUnion> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifySpe;
+  Prefix = EventPrefix.Ally;
+  Handler = handler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon)];
+        ExpectedReturnType = typeof(IntVoidUnion);
+  }
+}

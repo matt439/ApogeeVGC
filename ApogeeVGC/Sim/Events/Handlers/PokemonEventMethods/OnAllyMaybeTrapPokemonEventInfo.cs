@@ -1,0 +1,26 @@
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.PokemonClasses;
+
+namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
+
+/// <summary>
+/// Event handler info for OnAllyMaybeTrapPokemon event (pokemon/ally-specific).
+/// Triggered to maybe trap ally.
+/// Signature: Action<Battle, Pokemon>
+/// </summary>
+public sealed record OnAllyMaybeTrapPokemonEventInfo : EventHandlerInfo
+{
+    public OnAllyMaybeTrapPokemonEventInfo(
+    Action<Battle, Pokemon> handler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.MaybeTrapPokemon;
+  Prefix = EventPrefix.Ally;
+  Handler = handler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
+        ExpectedReturnType = typeof(void);
+  }
+}
