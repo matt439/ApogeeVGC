@@ -25,5 +25,12 @@ public sealed record DamageCallbackEventInfo : EventHandlerInfo
         ExpectedParameterTypes =
             [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(IntFalseUnion);
+
+        // Nullability: Battle (non-null), source (non-null), target (non-null), move (non-null)
+        ParameterNullability = new[] { false, false, false, false };
+        ReturnTypeNullable = false; // IntFalseUnion is a struct
+
+        // Validate configuration
+        ValidateConfiguration();
     }
 }

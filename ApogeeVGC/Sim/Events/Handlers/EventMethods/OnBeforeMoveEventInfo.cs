@@ -20,7 +20,7 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnBeforeMoveEventInfo(
         VoidSourceMoveHandler handler,
-      int? priority = null,
+        int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.BeforeMove;
@@ -29,11 +29,18 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = new[] 
         { 
-            typeof(Battle), 
-     typeof(Pokemon), // target
-            typeof(Pokemon), // source
-    typeof(ActiveMove) 
+    typeof(Battle), 
+    typeof(Pokemon), // target
+         typeof(Pokemon), // source
+ typeof(ActiveMove) 
         };
         ExpectedReturnType = typeof(BoolVoidUnion);
+        
+        // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
+        ParameterNullability = new[] { false, false, false, false };
+        ReturnTypeNullable = false; // BoolVoidUnion is a struct, never null
+        
+     // Validate configuration
+        ValidateConfiguration();
     }
 }

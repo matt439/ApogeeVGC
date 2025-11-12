@@ -9,9 +9,15 @@ public record EventListenerWithoutPriority
     public required IEffect Effect { get; init; }
     public Pokemon? Target { get; set; }
     public int? Index { get; set; }
-    public EffectDelegate? Callback { get; init; }
+    public EventHandlerInfo? HandlerInfo { get; init; }
     public EffectState? State { get; init; }
     public EffectDelegate? End { get; init; }
     public List<object>? EndCallArgs { get; init; }
-    public required EffectHolder EffectHolder { get; init; } 
+    public required EffectHolder EffectHolder { get; init; }
+    
+    // Backward compatibility: extract callback from HandlerInfo
+    [Obsolete("Use HandlerInfo instead")]
+    public EffectDelegate? Callback => HandlerInfo?.Handler != null 
+     ? EffectDelegate.FromNullableDelegate(HandlerInfo.Handler) 
+        : null;
 }

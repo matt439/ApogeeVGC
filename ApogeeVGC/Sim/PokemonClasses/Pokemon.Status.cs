@@ -107,7 +107,13 @@ public partial class Pokemon
 
         if (status.DurationCallback is not null)
         {
-            StatusState.Duration = status.DurationCallback(Battle, this, source, sourceEffect);
+            StatusState.Duration = Battle.InvokeCallback<int>(
+                status.DurationCallback,
+                Battle,
+                this,
+                source,
+                sourceEffect
+            );
         }
 
         // Run Start event (with rollback on failure)
@@ -311,7 +317,13 @@ public partial class Pokemon
         // Set duration from callback
         if (condition.DurationCallback != null)
         {
-            volatileState.Duration = condition.DurationCallback(Battle, this, source, sourceEffect);
+            volatileState.Duration = Battle.InvokeCallback<int>(
+                condition.DurationCallback,
+                Battle,
+                this,
+                source,
+                sourceEffect
+            );
         }
 
         // Run the Start event

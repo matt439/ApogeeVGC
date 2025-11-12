@@ -95,6 +95,36 @@ public abstract record EventHandlerInfo
     /// </summary>
     public Type? ExpectedReturnType { get; init; }
 
+    /// <summary>
+    /// Indicates which parameters are nullable (true = nullable, false = non-null).
+    /// Array indices correspond to ExpectedParameterTypes indices.
+    /// If null, all parameters are assumed non-nullable.
+    /// </summary>
+    public bool[]? ParameterNullability { get; init; }
+
+    /// <summary>
+    /// Indicates whether the return type is nullable.
+    /// </summary>
+    public bool ReturnTypeNullable { get; init; }
+
+    /// <summary>
+    /// Validates configuration consistency (parameter nullability array length, etc.).
+    /// Should be called in derived class constructors after setting all properties.
+    /// </summary>
+    protected void ValidateConfiguration()
+    {
+        // Validate ParameterNullability array length matches ExpectedParameterTypes
+        if (ParameterNullability != null && ExpectedParameterTypes != null)
+        {
+            if (ParameterNullability.Length != ExpectedParameterTypes.Length)
+            {
+                throw new InvalidOperationException(
+                    $"Event {Id}: ParameterNullability length ({ParameterNullability.Length}) " +
+                    $"does not match ExpectedParameterTypes length ({ExpectedParameterTypes.Length})");
+            }
+        }
+    }
+
     public Delegate GetDelegateOrThrow()
     {
         if (Handler is null)
@@ -182,7 +212,7 @@ public abstract record EventHandlerInfo
     }
 
     /// <summary>
-    /// Gets a friendly description of the expected signature
+    /// Gets a friendly description of the expected signature including nullability
     /// </summary>
     public string GetSignatureDescription()
     {
@@ -190,8 +220,45 @@ public abstract record EventHandlerInfo
             return "Signature not specified";
 
         string returnTypeName = ExpectedReturnType == typeof(void) ? "void" : ExpectedReturnType.Name;
-        string paramNames = string.Join(", ", ExpectedParameterTypes.Select(t => t.Name));
+        if (ReturnTypeNullable && ExpectedReturnType != typeof(void))
+        {
+            returnTypeName += "?";
+        }
 
-        return $"{returnTypeName} ({paramNames})";
+        var paramDescriptions = new List<string>();
+        for (int i = 0; i < ExpectedParameterTypes.Length; i++)
+        {
+            string paramName = ExpectedParameterTypes[i].Name;
+            if (ParameterNullability?[i] == true)
+            {
+                paramName += "?";
+            }
+            paramDescriptions.Add(paramName);
+        }
+
+        return $"{returnTypeName} ({string.Join(", ", paramDescriptions)})";
+    }
+
+    /// <summary>
+    /// Validates parameter nullability - checks if a parameter value is null when it shouldn't be
+    /// </summary>
+    public void ValidateParameterNullability(object?[] args)
+    {
+        if (ExpectedParameterTypes == null || args.Length != ExpectedParameterTypes.Length)
+        {
+            throw new InvalidOperationException("Parameter count mismatch");
+        }
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            bool parameterIsNullable = ParameterNullability?[i] ?? false;
+            bool valueIsNull = args[i] == null;
+
+            if (valueIsNull && !parameterIsNullable)
+            {
+                throw new InvalidOperationException(
+                    $"Event {Id}: Parameter {i} ({ExpectedParameterTypes[i].Name}) is non-nullable but null was provided");
+            }
+        }
     }
 }

@@ -89,11 +89,20 @@ public partial class Battle
         // Get event metadata from Library
         EventIdInfo eventInfo = Library.Events[callbackName];
 
-        // Look up order/priority/subOrder from the effect using the delegate system
-        // These would need to be added to IEffect interface or accessed via reflection once
-        IntFalseUnion? order = h.Effect.GetOrder(callbackName);
-        int? priority = h.Effect.GetPriority(callbackName);
-        int? subOrder = h.Effect.GetSubOrder(callbackName);
+        // Extract metadata from EventHandlerInfo if available
+        IntFalseUnion? order = null;
+        int? priority = null;
+        int? subOrder = null;
+
+        if (h.HandlerInfo != null)
+        {
+            // Use metadata from EventHandlerInfo (preferred, strongly-typed)
+            priority = h.HandlerInfo.Priority;
+            order = h.HandlerInfo.Order.HasValue 
+                ? IntFalseUnion.FromInt(h.HandlerInfo.Order.Value) 
+                : null;
+            subOrder = h.HandlerInfo.SubOrder;
+        }
 
         // Calculate default subOrder if not set
         if (subOrder == 0)
@@ -134,7 +143,7 @@ public partial class Battle
             Effect = h.Effect,
             Target = h.Target,
             Index = h.Index,
-            Callback = h.Callback,
+            HandlerInfo = h.HandlerInfo,
             State = h.State,
             End = h.End,
             EndCallArgs = h.EndCallArgs,

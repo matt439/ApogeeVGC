@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.FieldClasses;
 using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -90,42 +91,67 @@ public partial class Battle
 
         // Check if weather is suppressed
         if (effect.EffectType == EffectType.Weather &&
-            eventId != EventId.FieldStart &&
-            eventId != EventId.FieldResidual &&
-            eventId != EventId.FieldEnd &&
-            Field.SuppressingWeather())
+         eventId != EventId.FieldStart &&
+    eventId != EventId.FieldResidual &&
+        eventId != EventId.FieldEnd &&
+Field.SuppressingWeather())
         {
-            Debug($"{eventId} handler suppressed by Air Lock");
+    Debug($"{eventId} handler suppressed by Air Lock");
             return relayVar;
         }
 
-        // Get the callback - either custom or from the effect
-        EffectDelegate? callback = customCallback ?? effect.GetDelegate(eventId);
-        if (callback == null) return relayVar;
+  // Get the handler - either custom callback or from the effect's EventHandlerInfo
+        EventHandlerInfo? handlerInfo = null;
+ EffectDelegate? legacyCallback = null;
+        
+        if (customCallback != null)
+{
+  // Custom callback provided - use legacy path for now
+  legacyCallback = customCallback;
+        }
+else
+     {
+  // Get EventHandlerInfo from effect (preferred)
+  handlerInfo = effect.GetEventHandlerInfo(eventId);
+       if (handlerInfo == null) return relayVar;
+}
 
         // Save parent context
-        IEffect parentEffect = Effect;
-        EffectState parentEffectState = EffectState;
+  IEffect parentEffect = Effect;
+    EffectState parentEffectState = EffectState;
         Event parentEvent = Event;
 
-        // Set up new event context
-        Effect = effect;
-        EffectState = state ?? InitEffectState();
-        Event = new Event
-        {
-            Id = eventId,
-            Target = target,
-            Source = source,
-            Effect = sourceEffect,
+  // Set up new event context
+   Effect = effect;
+  EffectState = state ?? InitEffectState();
+   Event = new Event
+    {
+      Id = eventId,
+    Target = target,
+      Source = source,
+    Effect = sourceEffect,
         };
-        EventDepth++;
+      EventDepth++;
 
-        // Invoke the callback with appropriate parameters
-        RelayVar? returnVal;
+  // Invoke the handler with appropriate parameters
+    RelayVar? returnVal;
         try
-        {
-            returnVal = InvokeEventCallback(callback, hasRelayVar, relayVar, target, source, sourceEffect);
-        }
+   {
+      if (handlerInfo != null)
+       {
+  returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target, source, sourceEffect);
+       }
+  else if (legacyCallback != null)
+   {
+  #pragma warning disable CS0618 // Type or member is obsolete
+        returnVal = InvokeEventCallback(legacyCallback, hasRelayVar, relayVar, target, source, sourceEffect);
+      #pragma warning restore CS0618
+     }
+ else
+     {
+     returnVal = relayVar;
+   }
+   }
         finally
         {
             // Restore parent context
@@ -175,19 +201,19 @@ public partial class Battle
                 throw new ArgumentNullException(nameof(sourceEffect), "onEffect passed without an effect");
             }
 
-            EffectDelegate? callback = sourceEffect.GetDelegate(eventId);
-            if (callback != null)
+            EventHandlerInfo? handlerInfo = sourceEffect.GetEventHandlerInfo(eventId);
+            if (handlerInfo != null)
             {
                 if (target is PokemonArrayRunEventTarget)
                 {
                     throw new InvalidOperationException("Cannot use onEffect with array target");
                 }
 
-                // Add the effect's callback as the first handler
+                // Add the effect's handler as the first handler
                 handlers.Insert(0, ResolvePriority(new EventListenerWithoutPriority
                 {
                     Effect = sourceEffect,
-                    Callback = callback,
+                    HandlerInfo = handlerInfo,
                     State = InitEffectState(),
                     End = null,
                     EffectHolder = target switch
@@ -381,11 +407,11 @@ public partial class Battle
                 _ => null,
             };
 
-            // Invoke the callback if present
-            if (handler.Callback != null)
+            // Invoke the handler if present
+            if (handler.HandlerInfo != null)
             {
-                returnVal = InvokeEventCallback(
-                    handler.Callback,
+                returnVal = InvokeEventHandlerInfo(
+                    handler.HandlerInfo,
                     hasRelayVar,
                     relayVar,
                     Event.Target,
@@ -657,20 +683,20 @@ public partial class Battle
             }
 
             // Execute the handler's callback
-            if (handler.Callback != null)
+            if (handler.HandlerInfo != null)
             {
-                SingleEventTarget? singleEventTarget = handler.EffectHolder switch
-                {
-                    PokemonEffectHolder pokemonEh => new PokemonSingleEventTarget(pokemonEh.Pokemon),
-                    SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
-                    FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
-                    BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
-                    _ => null,
-                };
+           SingleEventTarget? singleEventTarget = handler.EffectHolder switch
+     {
+      PokemonEffectHolder pokemonEh => new PokemonSingleEventTarget(pokemonEh.Pokemon),
+               SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
+ FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
+              BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
+         _ => null,
+         };
 
                 SingleEvent(handlerEventId, effect, handler.State, singleEventTarget,
-                    null, null, null, handler.Callback);
-            }
+         null, null, null, null); // customCallback is null, will use effect's EventHandlerInfo
+        }
 
             // Process any faint messages and check if battle has ended
             FaintMessages();
@@ -694,9 +720,101 @@ public partial class Battle
     #region Helpers
 
     /// <summary>
+    /// Invokes an event handler using EventHandlerInfo.
+    /// This provides type-safe invocation with compile-time validation and eliminates
+    /// the need for complex pattern matching on EffectDelegate union types.
+    /// </summary>
+    private RelayVar? InvokeEventHandlerInfo(EventHandlerInfo? handlerInfo, bool hasRelayVar, RelayVar relayVar,
+      SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    {
+        if (handlerInfo == null) return relayVar;
+
+ // Check for constant values in union types (fast path)
+        if (handlerInfo is IUnionEventHandler unionHandler && unionHandler.IsConstant())
+        {
+            object? constantValue = unionHandler.GetConstantValue();
+      return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
+      }
+
+        // Get the delegate from the handler
+        Delegate? handler = handlerInfo.Handler;
+     if (handler == null) return relayVar;
+
+        // Invoke the delegate directly using the known signature from EventHandlerInfo
+        // This avoids DynamicInvoke and provides better performance
+// Note: Parameter nullability is validated by EventHandlerInfo during creation
+        return InvokeDelegateEffectDelegate(handler, hasRelayVar, relayVar, target, source, sourceEffect);
+    }
+
+    /// <summary>
+    /// Converts a constant value from a union handler to a RelayVar.
+    /// </summary>
+    private static RelayVar? ConvertConstantToRelayVar(object? constantValue, EventId eventId)
+    {
+ return constantValue switch
+        {
+         bool boolValue => new BoolRelayVar(boolValue),
+          int intValue => new IntRelayVar(intValue),
+ decimal decimalValue => new DecimalRelayVar(decimalValue),
+   string stringValue => new StringRelayVar(stringValue),
+            MoveId moveId => new MoveIdRelayVar(moveId),
+            null => null,
+         _ => throw new InvalidOperationException(
+       $"Event {eventId}: Unsupported constant value type: {constantValue.GetType().Name}"),
+        };
+    }
+
+    /// <summary>
+    /// Invokes an EventHandlerInfo callback and extracts the return value.
+ /// This is a helper for invoking callback properties like DurationCallback, BasePowerCallback, etc.
+    /// </summary>
+    /// <typeparam name="TResult">The expected return type</typeparam>
+    /// <param name="handlerInfo">The handler info to invoke</param>
+    /// <param name="args">Arguments to pass to the handler</param>
+    /// <returns>The result of the invocation, or default(TResult) if handler is null</returns>
+    public TResult? InvokeCallback<TResult>(EventHandlerInfo? handlerInfo, params object?[] args)
+    {
+        if (handlerInfo?.Handler == null)
+        {
+      return default;
+  }
+
+        // Validate parameter nullability if specified
+        if (handlerInfo.ParameterNullability != null)
+        {
+            handlerInfo.ValidateParameterNullability(args);
+        }
+
+        // Invoke the delegate
+        object? result = handlerInfo.Handler.DynamicInvoke(args);
+
+        // Handle null return values
+        if (result == null)
+        {
+ if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
+          {
+         throw new InvalidOperationException(
+       $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
+            }
+    return default;
+ }
+
+    // Cast to expected type
+        if (result is TResult typedResult)
+   {
+            return typedResult;
+    }
+
+        throw new InvalidOperationException(
+      $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
+    }
+
+    /// <summary>
     /// Invokes an event callback with the appropriate parameters based on its signature.
     /// Optimized version that avoids DynamicInvoke and reduces allocations.
+    /// [Obsolete] Use InvokeEventHandlerInfo instead for new code.
     /// </summary>
+    [Obsolete("Use InvokeEventHandlerInfo for new code")]
     private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
