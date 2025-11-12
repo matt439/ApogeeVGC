@@ -18,7 +18,7 @@ namespace ApogeeVGC.Sim.Utils.Unions;
 /// <summary>
 /// CommonHandlers['ModifierSourceMove'] | -0.1
 /// </summary>
-public abstract record OnFractionalPriority
+public abstract record OnFractionalPriority : IUnionEventHandler
 {
     public static implicit operator OnFractionalPriority(ModifierSourceMoveHandler function) =>
         new OnFractionalPriorityFunc(function);
@@ -29,29 +29,62 @@ public abstract record OnFractionalPriority
         value == PriorityValue
             ? new OnFrationalPriorityNeg(value)
             : throw new ArgumentException("Must be -0.1 for OnFractionalPriorityNeg");
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority;
-public record OnFrationalPriorityNeg(decimal Value) : OnFractionalPriority;
+
+public record OnFractionalPriorityFunc(ModifierSourceMoveHandler Function) : OnFractionalPriority
+{
+    public override Delegate GetDelegate() => Function;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnFrationalPriorityNeg(decimal Value) : OnFractionalPriority
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 
 /// <summary>
 /// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) =&gt; boolean | void) | boolean
 /// </summary>
-public abstract record OnCriticalHit
+public abstract record OnCriticalHit : IUnionEventHandler
 {
     public static implicit operator OnCriticalHit(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> function) =>
         new OnCriticalHitFunc(function);
     public static implicit operator OnCriticalHit(bool value) => new OnCriticalHitBool(value);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnCriticalHitFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Function) : OnCriticalHit;
-public record OnCriticalHitBool(bool Value) : OnCriticalHit;
+
+public record OnCriticalHitFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Function)
+    : OnCriticalHit
+{
+    public override Delegate GetDelegate() => Function;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnCriticalHitBool(bool Value) : OnCriticalHit
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 /// <summary>
 /// ((this: Battle, relayVar: number, target: Pokemon, source: Pokemon, effect: Effect) => number | boolean | void)
 /// | ((this: Battle, pokemon: Pokemon) => boolean | void)
 /// | boolean
 /// </summary>
-public abstract record OnTryHeal
+public abstract record OnTryHeal : IUnionEventHandler
 {
     public static implicit operator OnTryHeal(
         Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> func) =>
@@ -59,38 +92,92 @@ public abstract record OnTryHeal
     public static implicit operator OnTryHeal(Func<Battle, Pokemon, bool?> func) =>
         new OnTryHealFunc2(func);
     public static implicit operator OnTryHeal(bool value) => new OnTryHealBool(value);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
+
 public record OnTryHealFunc1(Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?> Func) :
-    OnTryHeal;
-public record OnTryHealFunc2(Func<Battle, Pokemon, bool?> Func) : OnTryHeal;
-public record OnTryHealBool(bool Value) : OnTryHeal;
+    OnTryHeal
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnTryHealFunc2(Func<Battle, Pokemon, bool?> Func) : OnTryHeal
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnTryHealBool(bool Value) : OnTryHeal
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 
 /// <summary>
 /// ((this: Battle, pokemon: Pokemon, source: null, move: ActiveMove) => boolean | void) | boolean
 /// </summary>
-public abstract record OnFlinch
+public abstract record OnFlinch : IUnionEventHandler
 {
     public static implicit operator OnFlinch(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> func) =>
         new OnFlinchFunc(func);
     public static implicit operator OnFlinch(bool value) => new OnFlinchBool(value);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnFlinchFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Func) : OnFlinch;
-public record OnFlinchBool(bool Value) : OnFlinch;
+
+public record OnFlinchFunc(Func<Battle, Pokemon, object?, Move, BoolVoidUnion> Func) : OnFlinch
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnFlinchBool(bool Value) : OnFlinch
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 
 
 /// <summary>
 /// string | ((this: Battle, pokemon: Pokemon) => void | string)    
 /// </summary>
-public abstract record OnLockMove
+public abstract record OnLockMove : IUnionEventHandler
 {
     public static implicit operator OnLockMove(MoveId moveId) => new OnLockMoveMoveId(moveId);
     public static implicit operator OnLockMove(Func<Battle, Pokemon, MoveIdVoidUnion> func) =>
         new OnLockMoveFunc(func);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnLockMoveMoveId(MoveId Id) : OnLockMove;
-public record OnLockMoveFunc(Func<Battle, Pokemon, MoveIdVoidUnion> Func) : OnLockMove;
+
+public record OnLockMoveMoveId(MoveId Id) : OnLockMove
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Id;
+}
+
+public record OnLockMoveFunc(Func<Battle, Pokemon, MoveIdVoidUnion> Func) : OnLockMove
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
 
 
 /// <summary>
@@ -112,14 +199,31 @@ public record VoidSparseBoostsTableVoidUnion(VoidReturn Value) : SparseBoostsTab
 /// <summary>
 /// ((this: Battle, pokemon: Pokemon, type: string) => boolean | void) | boolean
 /// </summary>
-public abstract record OnNegateImmunity
+public abstract record OnNegateImmunity : IUnionEventHandler
 {
     public static implicit operator OnNegateImmunity(Func<Battle, Pokemon, PokemonType, BoolVoidUnion> func) =>
         new OnNegateImmunityFunc(func);
     public static implicit operator OnNegateImmunity(bool value) => new OnNegateImmunityBool(value);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnNegateImmunityFunc(Func<Battle, Pokemon, PokemonType, BoolVoidUnion> Func) : OnNegateImmunity;
-public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
+
+public record OnNegateImmunityFunc(Func<Battle, Pokemon, PokemonType, BoolVoidUnion> Func)
+    : OnNegateImmunity
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnNegateImmunityBool(bool Value) : OnNegateImmunity
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 
 
@@ -127,14 +231,31 @@ public record OnNegateImmunityBool(bool Value) : OnNegateImmunity;
 /// <summary>
 /// (this: Battle, item: Item, pokemon: Pokemon, source: Pokemon, move?: ActiveMove) => boolean | void) | boolean
 /// </summary>
-public abstract record OnTakeItem
+public abstract record OnTakeItem : IUnionEventHandler
 {
     public static implicit operator OnTakeItem(Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> func)
         => new OnTakeItemFunc(func);
     public static implicit operator OnTakeItem(bool value) => new OnTakeItemBool(value);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record OnTakeItemFunc(Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> Func) : OnTakeItem;
-public record OnTakeItemBool(bool Value) : OnTakeItem;
+
+public record OnTakeItemFunc(Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion> Func)
+    : OnTakeItem
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
+
+public record OnTakeItemBool(bool Value) : OnTakeItem
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
 
 
 
@@ -474,14 +595,30 @@ public record OnItemEatUseFalse : OnItemEatUse;
 /// <summary>
 /// bool | ((this: Battle, item: Item, pokemon: Pokemon) => boolean | void)
 /// </summary>
-public abstract record OnTryEatItem
+public abstract record OnTryEatItem : IUnionEventHandler
 {
     public static implicit operator OnTryEatItem(bool value) => new BoolOnTryEatItem(value);
     public static implicit operator OnTryEatItem(Func<Battle, Item, Pokemon, BoolVoidUnion> func) =>
         new FuncOnTryEatItem(func);
+
+    public abstract Delegate? GetDelegate();
+    public abstract bool IsConstant();
+    public abstract object? GetConstantValue();
 }
-public record BoolOnTryEatItem(bool Value) : OnTryEatItem;
-public record FuncOnTryEatItem(Func<Battle, Item, Pokemon, BoolVoidUnion> Func) : OnTryEatItem;
+
+public record BoolOnTryEatItem(bool Value) : OnTryEatItem
+{
+    public override Delegate? GetDelegate() => null;
+    public override bool IsConstant() => true;
+    public override object GetConstantValue() => Value;
+}
+
+public record FuncOnTryEatItem(Func<Battle, Item, Pokemon, BoolVoidUnion> Func) : OnTryEatItem
+{
+    public override Delegate GetDelegate() => Func;
+    public override bool IsConstant() => false;
+    public override object? GetConstantValue() => null;
+}
 
 
 

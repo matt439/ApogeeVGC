@@ -7,22 +7,29 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 
 /// <summary>
 /// Event handler info for OnAllyTryEatItem event (pokemon/ally-specific).
-/// Triggered when ally tries to eat item.
-/// Signature: Func<Battle, Item, Pokemon, BoolVoidUnion>
+/// Determines if an item can be consumed.
+/// Signature: (Battle battle, Item item, Pokemon pokemon) => BoolVoidUnion | bool
 /// </summary>
-public sealed record OnAllyTryEatItemEventInfo : EventHandlerInfo
+public sealed record OnAllyTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
-    public OnAllyTryEatItemEventInfo(
-    Func<Battle, Item, Pokemon, BoolVoidUnion> handler,
+    /// <summary>
+    /// Creates a new OnAllyTryEatItem event handler.
+    /// </summary>
+    /// <param name="unionValue">The union value (delegate or bool constant)</param>
+    /// <param name="priority">Execution priority (higher executes first)</param>
+    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+ public OnAllyTryEatItemEventInfo(
+        OnTryEatItem unionValue,
         int? priority = null,
-        bool usesSpeed = true)
+     bool usesSpeed = true)
     {
         Id = EventId.TryEatItem;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+      Prefix = EventPrefix.Ally;
+        UnionValue = unionValue;
+Handler = ExtractDelegate();
         Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
+  UsesSpeed = usesSpeed;
+     ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
         ExpectedReturnType = typeof(BoolVoidUnion);
   }
 }

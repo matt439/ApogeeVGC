@@ -6,20 +6,21 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnFoeNegateImmunity event.
-/// Signature: Func<Battle, Pokemon, PokemonType?, BoolVoidUnion>
+/// Signature: Func<Battle, Pokemon, PokemonType?, BoolVoidUnion> | bool
 /// </summary>
-public sealed record OnFoeNegateImmunityEventInfo : EventHandlerInfo
+public sealed record OnFoeNegateImmunityEventInfo : UnionEventHandlerInfo<OnNegateImmunity>
 {
     public OnFoeNegateImmunityEventInfo(
-        Func<Battle, Pokemon, PokemonType?, BoolVoidUnion> handler,
+        OnNegateImmunity unionValue,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.NegateImmunity;
         Prefix = EventPrefix.Foe;
-   Handler = handler;
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
         Priority = priority;
-    UsesSpeed = usesSpeed;
+        UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(PokemonType)];
         ExpectedReturnType = typeof(BoolVoidUnion);
     }

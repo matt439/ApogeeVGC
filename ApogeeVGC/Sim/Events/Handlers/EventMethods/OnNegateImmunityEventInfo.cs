@@ -8,31 +8,32 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnNegateImmunity event.
 /// Negates type immunity for a move.
-/// Signature: (Battle battle, Pokemon pokemon, PokemonType? type) => BoolVoidUnion
+/// Signature: (Battle battle, Pokemon pokemon, PokemonType? type) => BoolVoidUnion | bool
 /// </summary>
-public sealed record OnNegateImmunityEventInfo : EventHandlerInfo
+public sealed record OnNegateImmunityEventInfo : UnionEventHandlerInfo<OnNegateImmunity>
 {
-    /// <summary>
+  /// <summary>
     /// Creates a new OnNegateImmunity event handler.
- /// </summary>
-    /// <param name="handler">The event handler delegate</param>
+    /// </summary>
+    /// <param name="unionValue">The union value (delegate or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnNegateImmunityEventInfo(
-    Func<Battle, Pokemon, PokemonType?, BoolVoidUnion> handler,
-        int? priority = null,
+  OnNegateImmunity unionValue,
+     int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.NegateImmunity;
-  Handler = handler;
-    Priority = priority;
-        UsesSpeed = usesSpeed;
- ExpectedParameterTypes =
-  [
-   typeof(Battle),
-  typeof(Pokemon),
-    typeof(PokemonType),
-        ];
-     ExpectedReturnType = typeof(BoolVoidUnion);
-    }
+ Id = EventId.NegateImmunity;
+   UnionValue = unionValue;
+    Handler = ExtractDelegate();
+        Priority = priority;
+  UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+        [
+    typeof(Battle),
+            typeof(Pokemon),
+         typeof(PokemonType),
+   ];
+        ExpectedReturnType = typeof(BoolVoidUnion);
+  }
 }

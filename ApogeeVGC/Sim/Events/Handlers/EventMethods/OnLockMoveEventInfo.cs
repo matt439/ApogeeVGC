@@ -1,36 +1,38 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnLockMove event.
 /// Returns which move a Pokemon is locked into.
-/// Signature: (Battle battle, Pokemon pokemon) => ActiveMove?
+/// Signature: (Battle, Pokemon) => MoveIdVoidUnion | MoveId constant
 /// </summary>
-public sealed record OnLockMoveEventInfo : EventHandlerInfo
+public sealed record OnLockMoveEventInfo : UnionEventHandlerInfo<OnLockMove>
 {
     /// <summary>
     /// Creates a new OnLockMove event handler.
-  /// </summary>
-    /// <param name="handler">The event handler delegate</param>
+    /// </summary>
+    /// <param name="unionValue">The union value (delegate or MoveId constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnLockMoveEventInfo(
-        Func<Battle, Pokemon, ActiveMove?> handler,
+        OnLockMove unionValue,
         int? priority = null,
-        bool usesSpeed = true)
+bool usesSpeed = true)
     {
-      Id = EventId.LockMove;
-     Handler = handler;
- Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes =
-        [
-            typeof(Battle),
-    typeof(Pokemon),
-        ];
-      ExpectedReturnType = typeof(ActiveMove);
+        Id = EventId.LockMove;
+   UnionValue = unionValue;
+     Handler = ExtractDelegate();
+  Priority = priority;
+   UsesSpeed = usesSpeed;
+ ExpectedParameterTypes =
+   [
+    typeof(Battle),
+        typeof(Pokemon),
+  ];
+    ExpectedReturnType = typeof(MoveIdVoidUnion);
     }
 }

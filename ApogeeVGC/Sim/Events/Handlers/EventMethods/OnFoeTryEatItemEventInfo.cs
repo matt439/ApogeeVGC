@@ -7,20 +7,21 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnFoeTryEatItem event.
-/// Signature: Func<Battle, Item, Pokemon, BoolVoidUnion>
+/// Signature: Func<Battle, Item, Pokemon, BoolVoidUnion> | bool
 /// </summary>
-public sealed record OnFoeTryEatItemEventInfo : EventHandlerInfo
+public sealed record OnFoeTryEatItemEventInfo : UnionEventHandlerInfo<OnTryEatItem>
 {
     public OnFoeTryEatItemEventInfo(
-        Func<Battle, Item, Pokemon, BoolVoidUnion> handler,
+        OnTryEatItem unionValue,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.TryEatItem;
         Prefix = EventPrefix.Foe;
-   Handler = handler;
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
         Priority = priority;
-    UsesSpeed = usesSpeed;
+        UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
         ExpectedReturnType = typeof(BoolVoidUnion);
     }

@@ -10,8 +10,7 @@ public sealed record OnStartEventInfo : EventHandlerInfo
     public OnStartEventInfo(
         Func<Battle, Pokemon, Pokemon, IEffect, BoolVoidUnion?> handler,
         int? priority = null,
-        bool usesSpeed = true) :
-        base(handler)
+        bool usesSpeed = true)
     {
         Prefix = EventPrefix.None;
         Handler = handler;

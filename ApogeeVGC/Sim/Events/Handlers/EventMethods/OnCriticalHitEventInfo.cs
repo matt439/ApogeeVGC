@@ -8,32 +8,33 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnCriticalHit event.
 /// Determines if a move should critically hit.
-/// Signature: (Battle battle, Pokemon target, Pokemon source, ActiveMove move) => BoolVoidUnion
+/// Signature: (Battle battle, Pokemon target, Pokemon source, ActiveMove move) => BoolVoidUnion | bool
 /// </summary>
-public sealed record OnCriticalHitEventInfo : EventHandlerInfo
+public sealed record OnCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHit>
 {
     /// <summary>
     /// Creates a new OnCriticalHit event handler.
     /// </summary>
-    /// <param name="handler">The event handler delegate</param>
+    /// <param name="unionValue">The union value (delegate or bool constant)</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnCriticalHitEventInfo(
-        Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
-  int? priority = null,
-  bool usesSpeed = true)
+        OnCriticalHit unionValue,
+        int? priority = null,
+        bool usesSpeed = true)
     {
     Id = EventId.CriticalHit;
-        Handler = handler;
-  Priority = priority;
-  UsesSpeed = usesSpeed;
-ExpectedParameterTypes =
-   [
- typeof(Battle),
-  typeof(Pokemon),
-typeof(Pokemon),
-   typeof(ActiveMove),
+        UnionValue = unionValue;
+        Handler = ExtractDelegate();
+        Priority = priority;
+     UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+  [
+       typeof(Battle),
+     typeof(Pokemon),
+   typeof(Pokemon),
+        typeof(ActiveMove),
         ];
-  ExpectedReturnType = typeof(BoolVoidUnion);
-  }
+        ExpectedReturnType = typeof(BoolVoidUnion);
+    }
 }

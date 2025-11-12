@@ -6,21 +6,29 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnSourceFlinch event.
-/// Signature: Func<Battle, Pokemon, BoolVoidUnion>
+/// Determines if a Pokémon should flinch.
+/// Signature: (Battle battle, Pokemon pokemon) => BoolVoidUnion | bool
 /// </summary>
-public sealed record OnSourceFlinchEventInfo : EventHandlerInfo
+public sealed record OnSourceFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
 {
- public OnSourceFlinchEventInfo(
-      Func<Battle, Pokemon, BoolVoidUnion> handler,
-        int? priority = null,
+    /// <summary>
+    /// Creates a new OnSourceFlinch event handler.
+    /// </summary>
+    /// <param name="unionValue">The union value (delegate or bool constant)</param>
+    /// <param name="priority">Execution priority (higher executes first)</param>
+    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
+    public OnSourceFlinchEventInfo(
+        OnFlinch unionValue,
+   int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.Flinch;
-   Prefix = EventPrefix.Source;
-        Handler = handler;
-    Priority = priority;
+     Id = EventId.Flinch;
+    Prefix = EventPrefix.Source;
+ UnionValue = unionValue;
+   Handler = ExtractDelegate();
+        Priority = priority;
   UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
+   ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
         ExpectedReturnType = typeof(BoolVoidUnion);
     }
 }

@@ -7,21 +7,29 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnAnyTakeItem event.
-/// Signature: Func<Battle, Item, Pokemon, Pokemon, BoolVoidUnion>
+/// Triggered when an item is taken from a Pokémon.
+/// Signature: (Battle battle, Item item, Pokemon source, Pokemon target) => PokemonVoidUnion | Pokemon?
 /// </summary>
-public sealed record OnAnyTakeItemEventInfo : EventHandlerInfo
+public sealed record OnAnyTakeItemEventInfo : UnionEventHandlerInfo<OnTakeItem>
 {
+    /// <summary>
+    /// Creates a new OnAnyTakeItem event handler.
+    /// </summary>
+    /// <param name="unionValue">The union value (delegate or Pokemon constant)</param>
+    /// <param name="priority">Execution priority (higher executes first)</param>
+    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnAnyTakeItemEventInfo(
-        Func<Battle, Item, Pokemon, Pokemon, BoolVoidUnion> handler,
-int? priority = null,
-bool usesSpeed = true)
+        OnTakeItem unionValue,
+        int? priority = null,
+    bool usesSpeed = true)
     {
-        Id = EventId.TakeItem;
-Prefix = EventPrefix.Any;
-        Handler = handler;
-Priority = priority;
-        UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon), typeof(Pokemon)];
+Id = EventId.TakeItem;
+        Prefix = EventPrefix.Any;
+        UnionValue = unionValue;
+ Handler = ExtractDelegate();
+        Priority = priority;
+    UsesSpeed = usesSpeed;
+        ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon), typeof(Pokemon)];
         ExpectedReturnType = typeof(BoolVoidUnion);
     }
 }

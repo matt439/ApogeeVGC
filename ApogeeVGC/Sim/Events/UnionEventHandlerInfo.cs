@@ -1,118 +1,65 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace ApogeeVGC.Sim.Events;
 
 /// <summary>
-/// Abstract base class for event handler information.
-/// Each concrete event type (OnDamagingHit, OnBasePower, etc.) should inherit from this
-/// to provide compile-time type safety and consistent metadata across all effect types.
+/// Specialized EventHandlerInfo for events that can accept either a delegate or a constant value (union types).
+/// Examples: OnCriticalHit (func | bool), OnTakeItem (func | bool), OnTryHeal (func1 | func2 | bool)
 /// </summary>
-public abstract record EventHandlerInfo
+/// <typeparam name="TUnion">The union type (OnCriticalHit, OnFlinch, OnTakeItem, etc.)</typeparam>
+public abstract record UnionEventHandlerInfo<TUnion> : EventHandlerInfo
+    where TUnion : IUnionEventHandler
 {
     /// <summary>
-    /// The unique identifier for this event
+    /// The union value (either a delegate or constant value wrapped in the union type)
     /// </summary>
-    public EventId Id { get; init; }
+    public TUnion? UnionValue { get; init; }
 
     /// <summary>
-    /// The actual delegate handler for this event (can be null if not implemented)
+    /// Extracts the actual delegate from the union value.
+    /// Returns null if the union contains a constant value instead of a delegate.
     /// </summary>
-    public Delegate? Handler { get; init; }
-
-    // Metadata from EventIdInfo
-
-    /// <summary>
-    /// Event prefix (e.g., Any, Foe, Source, Ally)
-    /// </summary>
-    public EventPrefix? Prefix { get; init; }
-
-    /// <summary>
-    /// Event suffix for specialized variants
-    /// </summary>
-    public EventSuffix? Suffix { get; init; }
-
-    /// <summary>
-    /// Base event ID if this is a derived event
-    /// </summary>
-    public EventId? BaseEventId { get; init; }
-
-    /// <summary>
-    /// Field-level variant of this event
-    /// </summary>
-    public EventId? FieldEventId { get; init; }
-
-    /// <summary>
-    /// Side-level variant of this event
-    /// </summary>
-    public EventId? SideEventId { get; init; }
-
-    /// <summary>
-    /// Whether this event uses effect ordering
-    /// </summary>
-    public bool UsesEffectOrder { get; init; }
-
-    /// <summary>
-    /// Whether this event uses speed-based ordering
-    /// </summary>
-    public bool UsesSpeed { get; init; }
-
-    /// <summary>
-    /// Whether this event uses fractional speed ordering
-    /// </summary>
-    public bool UsesFractionalSpeed { get; init; }
-
-    /// <summary>
-    /// Whether this event uses left-to-right ordering
-    /// </summary>
-    public bool UsesLeftToRightOrder { get; init; }
-
-    // Priority/Ordering
-
-    /// <summary>
-    /// Priority value for event ordering (higher = earlier execution)
-    /// </summary>
-    public int? Priority { get; init; }
-
-    /// <summary>
-    /// Order value for event execution
-    /// </summary>
-    public int? Order { get; init; }
-
-    /// <summary>
-    /// Sub-order value for fine-grained event ordering
-    /// </summary>
-    public int? SubOrder { get; init; }
-
-    // Type validation
-
-    /// <summary>
-    /// Expected parameter types for this event's delegate
-    /// </summary>
-    public Type[]? ExpectedParameterTypes { get; init; }
-
-    /// <summary>
-    /// Expected return type for this event's delegate
-    /// </summary>
-    public Type? ExpectedReturnType { get; init; }
-
-    public Delegate GetDelegateOrThrow()
+    public Delegate? ExtractDelegate()
     {
-        if (Handler is null)
-        {
-            throw new InvalidOperationException("Hander is null.");
-        }
-        return Handler;
+        return UnionValue?.GetDelegate();
     }
 
     /// <summary>
-    /// Validates that the handler matches the expected signature.
-    /// Throws InvalidOperationException if validation fails.
+    /// Checks if the union contains a constant value (e.g., true/false) rather than a delegate.
     /// </summary>
-    public void Validate()
+    public bool IsConstantValue()
     {
-        if (Handler == null) return;
+        return UnionValue?.IsConstant() ?? false;
+    }
 
-        MethodInfo method = Handler.Method;
+    /// <summary>
+    /// Gets the constant value if this union represents a constant (e.g., bool).
+    /// Returns null if the union contains a delegate.
+    /// </summary>
+    public object? GetConstantValue()
+    {
+        return UnionValue?.GetConstantValue();
+    }
+
+    /// <summary>
+    /// Overrides validation to handle union types properly.
+    /// </summary>
+    public new void Validate()
+    {
+        if (UnionValue == null) return;
+
+        // If it's a constant value, skip delegate validation
+        if (IsConstantValue())
+        {
+            // Optional: validate the constant value type
+            return;
+        }
+
+        // If it's a delegate, validate it directly
+        Delegate? extractedDelegate = ExtractDelegate();
+        if (extractedDelegate == null) return;
+
+        MethodInfo method = extractedDelegate.Method;
         var actualParams = method.GetParameters();
 
         // Validate parameter count
@@ -182,16 +129,19 @@ public abstract record EventHandlerInfo
     }
 
     /// <summary>
-    /// Gets a friendly description of the expected signature
+    /// Invokes the union handler with the given arguments.
+    /// Handles both delegate and constant value cases.
     /// </summary>
-    public string GetSignatureDescription()
+    public object? Invoke(params object[] args)
     {
-        if (ExpectedParameterTypes == null || ExpectedReturnType == null)
-            return "Signature not specified";
+        // If constant value, return it directly
+        if (IsConstantValue())
+        {
+            return GetConstantValue();
+        }
 
-        string returnTypeName = ExpectedReturnType == typeof(void) ? "void" : ExpectedReturnType.Name;
-        string paramNames = string.Join(", ", ExpectedParameterTypes.Select(t => t.Name));
-
-        return $"{returnTypeName} ({paramNames})";
+        // If delegate, invoke it
+        Delegate? del = ExtractDelegate();
+        return del?.DynamicInvoke(args);
     }
 }

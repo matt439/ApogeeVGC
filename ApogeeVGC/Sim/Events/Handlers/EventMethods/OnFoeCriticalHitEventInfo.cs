@@ -7,21 +7,22 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnFoeCriticalHit event.
-/// Signature: Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion>
+/// Signature: Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> | bool
 /// </summary>
-public sealed record OnFoeCriticalHitEventInfo : EventHandlerInfo
+public sealed record OnFoeCriticalHitEventInfo : UnionEventHandlerInfo<OnCriticalHit>
 {
- public OnFoeCriticalHitEventInfo(
-      Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
-        int? priority = null,
+    public OnFoeCriticalHitEventInfo(
+    OnCriticalHit unionValue,
+int? priority = null,
         bool usesSpeed = true)
     {
-   Id = EventId.CriticalHit;
-   Prefix = EventPrefix.Foe;
-        Handler = handler;
-    Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
+        Id = EventId.CriticalHit;
+        Prefix = EventPrefix.Foe;
+     UnionValue = unionValue;
+    Handler = ExtractDelegate();
+     Priority = priority;
+        UsesSpeed = usesSpeed;
+  ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+   ExpectedReturnType = typeof(BoolVoidUnion);
     }
 }
