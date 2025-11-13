@@ -8,7 +8,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.FieldClasses;
 
-public class Field : IDisposable
+public class Field
 {
     public Battle Battle { get; init; }
     public ConditionId Weather { get; set; }
@@ -115,7 +115,7 @@ public class Field : IDisposable
         }
 
         // Try to start the weather - if it fails, rollback
-        RelayVar? startResult = Battle.SingleEvent(
+        RelayVar startResult = Battle.SingleEvent(
             EventId.FieldStart,
             status,
             WeatherState,
@@ -169,14 +169,15 @@ public class Field : IDisposable
     /// </summary>
     public bool SuppressingWeather()
     {
-        return Battle.Sides.Any(side =>
-            (from pokemon in side.Active
-                where !pokemon.Fainted
-                where !pokemon.IgnoringAbility()
-                let ability = pokemon.GetAbility()
-                where ability.SuppressWeather
-                select pokemon).Any(pokemon =>
-                !(pokemon.AbilityState.Ending ?? false)));
+   return Battle.Sides.Any(side =>
+ (from pokemon in side.Active
+  where pokemon != null  // Check for null pokemon in active slots
+ where !pokemon.Fainted
+       where !pokemon.IgnoringAbility()
+         let ability = pokemon.GetAbility()
+ where ability.SuppressWeather
+       select pokemon).Any(pokemon =>
+            !(pokemon.AbilityState.Ending ?? false)));
     }
 
     public bool IsWeather(ConditionId weather)
@@ -232,6 +233,11 @@ public class Field : IDisposable
         Terrain = condition.Id;
         TerrainState = Battle.InitEffectState(status.EffectStateId, source, source.GetSlot(), 0);
 
+        // If the terrain has a duration specified, use it
+        if (condition.Duration.HasValue)
+        {
+            TerrainState.Duration = condition.Duration.Value;
+        }
 
         // If the terrain has a custom duration callback, use it
         if (condition.DurationCallback != null)
@@ -279,7 +285,7 @@ public class Field : IDisposable
 
     public ConditionId EffectiveTerrain(PokemonSideBattleUnion? target)
     {
-        if (Battle.Event is not null && target is null)
+        if (target is null)
         {
             target = PokemonSideBattleUnion.FromNullableSingleEventTarget(Battle.Event.Target);
         }
@@ -317,14 +323,14 @@ public class Field : IDisposable
     {
         // Fall back to battle effect if sourceEffect not provided
         sourceEffect ??= Battle.Effect;
-        
+    
         // Fall back to event target if source not provided
-        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
+  if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
         {
-            source = pset.Pokemon;
-        }
+   source = pset.Pokemon;
+ }
 
-        // Check if pseudo-weather already exists
+ // Check if pseudo-weather already exists
         if (PseudoWeather.TryGetValue(status.Id, out EffectState? existingState))
         {
             // If the condition doesn't have a restart handler, return false
@@ -368,7 +374,7 @@ public class Field : IDisposable
         }
 
         // Try to start the pseudo-weather
-        RelayVar? startResult = Battle.SingleEvent(
+        RelayVar startResult = Battle.SingleEvent(
             EventId.FieldStart,
             status,
             state,
@@ -418,22 +424,6 @@ public class Field : IDisposable
     public bool RemovePseudoWeather(ConditionId status)
     {
         return RemovePseudoWeather(Battle.Library.Conditions[status]);
-    }
-
-    public void Destroy()
-    {
-        Dispose();
-    }
-
-    public void Dispose()
-    {
-        ClearWeather();
-        ClearTerrain();
-        foreach (ConditionId status in PseudoWeather.Keys.ToList())
-        {
-            RemovePseudoWeather(status);
-        }
-        GC.SuppressFinalize(this);
     }
     
     public Field Copy()
