@@ -7,7 +7,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    public MoveCategory GetCategory(ActiveMove move)
+    public static MoveCategory GetCategory(ActiveMove move)
     {
         return move.Category;
     }
