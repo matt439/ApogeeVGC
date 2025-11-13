@@ -223,12 +223,12 @@ public partial class BattleActions
 
         if (move.Target == MoveTarget.All)
         {
-            RelayVar fieldHitResult = Battle.RunEvent(EventId.TryHitField, target, pokemon, move);
+            RelayVar? fieldHitResult = Battle.RunEvent(EventId.TryHitField, target, pokemon, move);
             hitResult = fieldHitResult is not BoolRelayVar { Value: false };
         }
         else
         {
-            RelayVar sideHitResult = Battle.RunEvent(EventId.TryHitSide, target, pokemon, move);
+            RelayVar? sideHitResult = Battle.RunEvent(EventId.TryHitSide, target, pokemon, move);
             hitResult = sideHitResult is not BoolRelayVar { Value: false };
         }
 
@@ -261,7 +261,7 @@ public partial class BattleActions
         // Run TryHit events for field/side moves
         if (move.Target == MoveTarget.All && !isSelf)
         {
-            RelayVar hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitField, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (hitResult is BoolRelayVar { Value: false })
@@ -278,7 +278,7 @@ public partial class BattleActions
         }
         else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide or MoveTarget.AllyTeam && !isSelf)
         {
-            RelayVar hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHitSide, move, Battle.InitEffectState(),
                 SingleEventTarget.FromNullablePokemon(target), pokemon, move);
 
             if (hitResult is BoolRelayVar { Value: false })
@@ -295,7 +295,7 @@ public partial class BattleActions
         }
         else
         {
-            RelayVar hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
+            RelayVar? hitResult = Battle.SingleEvent(EventId.TryHit, move, Battle.InitEffectState(),
                 target, pokemon, move);
 
             if (hitResult is BoolRelayVar { Value: false })

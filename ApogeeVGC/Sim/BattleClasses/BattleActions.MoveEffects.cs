@@ -176,7 +176,7 @@ public partial class BattleActions
             {
                 if (moveData.OnHitField != null)
                 {
-                    RelayVar fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
+                    RelayVar? fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
                         target, source, move);
                     hitResult = fieldHitResult switch
                     {
@@ -191,7 +191,7 @@ public partial class BattleActions
             {
                 if (moveData.OnHitSide != null)
                 {
-                    RelayVar sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
+                    RelayVar? sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
                         target.Side, source, move);
                     hitResult = sideHitResult switch
                     {
@@ -206,7 +206,7 @@ public partial class BattleActions
             {
                 if (moveData.OnHit != null)
                 {
-                    RelayVar hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
+                    RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
                         target, source, move);
                     hitResult = hitEventResult switch
                     {
@@ -324,7 +324,7 @@ public partial class BattleActions
             Pokemon target = pokemonUnion.Pokemon;
 
             // Run ModifySecondaries event to get the list of secondary effects
-            RelayVar modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
+            RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
                 moveData.Secondaries);
 
             var secondaries = modifyResult is SecondaryEffectArrayRelayVar secListRv

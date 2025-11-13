@@ -83,7 +83,7 @@ public partial class BattleActions
 
         // Calculate critical hit ratio (Gen 7+ logic, used in Gen 9)
         int critRatio = move.CritRatio ?? 0;
-        RelayVar critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
+        RelayVar? critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
             RunEventSource.FromNullablePokemon(target), move, critRatio);
 
         if (critRatioEvent is IntRelayVar irv)
@@ -111,13 +111,13 @@ public partial class BattleActions
         // Run CriticalHit event (can be cancelled)
         if (moveHit.Crit)
         {
-            RelayVar critEvent = Battle.RunEvent(EventId.CriticalHit, target,
+            RelayVar? critEvent = Battle.RunEvent(EventId.CriticalHit, target,
                 RunEventSource.FromNullablePokemon(null), move);
             moveHit.Crit = critEvent is not BoolRelayVar { Value: false };
         }
 
         // Run BasePower event after crit calculation
-        RelayVar basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
+        RelayVar? basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
             RunEventSource.FromNullablePokemon(target), move, basePower.ToInt(), true);
 
         if (basePowerEvent is IntRelayVar bpIrv)
@@ -217,11 +217,11 @@ public partial class BattleActions
             _ => throw new InvalidOperationException("Invalid defense stat"),
         };
 
-        RelayVar modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
+        RelayVar? modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
             RunEventSource.FromNullablePokemon(target), move, attack);
         attack = modifyAtkResult is IntRelayVar atkIrv ? atkIrv.Value : attack;
 
-        RelayVar modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
+        RelayVar? modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
             RunEventSource.FromNullablePokemon(source), move, defense);
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
@@ -288,7 +288,7 @@ public partial class BattleActions
         }
 
         // Weather modifier
-        RelayVar weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
+        RelayVar? weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
 
         if (weatherModResult is IntRelayVar weatherMod)
@@ -349,7 +349,7 @@ public partial class BattleActions
                 }
 
                 // Run ModifySTAB event
-                RelayVar modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
+                RelayVar? modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
                     RunEventSource.FromNullablePokemon(target), move,
                     new DecimalRelayVar((decimal)stab));
 
@@ -411,7 +411,7 @@ public partial class BattleActions
         }
 
         // Final modifier - Life Orb, etc.
-        RelayVar finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
+        RelayVar? finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
 
         if (finalModResult is IntRelayVar finalMod)

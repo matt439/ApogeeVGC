@@ -62,7 +62,7 @@ public partial class BattleActions
         // Allow move override via OverrideAction event (e.g., Assault Vest, Choice items)
         if (baseMove.Id != MoveId.Struggle && !externalMove)
         {
-            RelayVar changedMoveResult = Battle.RunEvent(EventId.OverrideAction, pokemon,
+            RelayVar? changedMoveResult = Battle.RunEvent(EventId.OverrideAction, pokemon,
                 RunEventSource.FromNullablePokemon(target), baseMove);
             if (changedMoveResult is MoveIdRelayVar moveIdRv && moveIdRv.MoveId != baseMove.Id)
             {
@@ -130,7 +130,7 @@ public partial class BattleActions
         if (!externalMove)
         {
             // Check if Pokemon is locked into a move (e.g., Outrage, Rollout)
-            RelayVar lockedMoveResult = Battle.RunEvent(EventId.LockMove, pokemon);
+            RelayVar? lockedMoveResult = Battle.RunEvent(EventId.LockMove, pokemon);
             lockedMove = lockedMoveResult switch
             {
                 MoveIdRelayVar lockedMoveRv => lockedMoveRv.MoveId,
@@ -337,7 +337,7 @@ public partial class BattleActions
         MoveTarget baseTarget = activeMove.Target;
 
         // Run ModifyTarget event
-        RelayVar targetRelayVar = Battle.RunEvent(EventId.ModifyTarget, pokemon,
+        RelayVar? targetRelayVar = Battle.RunEvent(EventId.ModifyTarget, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove,
             RelayVar.FromNullablePokemon(target));
 
@@ -383,7 +383,7 @@ public partial class BattleActions
         }
 
         // Run ModifyType event (global)
-        RelayVar modifyTypeResult = Battle.RunEvent(EventId.ModifyType, pokemon,
+        RelayVar? modifyTypeResult = Battle.RunEvent(EventId.ModifyType, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         if (modifyTypeResult is EffectRelayVar { Effect: ActiveMove modifiedMove1 })
@@ -392,7 +392,7 @@ public partial class BattleActions
         }
 
         // Run ModifyMove event (global)
-        RelayVar modifyMoveResult = Battle.RunEvent(EventId.ModifyMove, pokemon,
+        RelayVar? modifyMoveResult = Battle.RunEvent(EventId.ModifyMove, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         if (modifyMoveResult is EffectRelayVar { Effect: ActiveMove modifiedMove2 })
@@ -464,7 +464,7 @@ public partial class BattleActions
         if (sourceEffect == null || callerMoveForPressure != null)
         {
             int extraPp = 0;
-            foreach (RelayVar ppDropEvent in pressureTargets.Select(pressureSource =>
+            foreach (RelayVar? ppDropEvent in pressureTargets.Select(pressureSource =>
                          Battle.RunEvent(EventId.DeductPp, pressureSource, pokemon, activeMove)))
             {
                 if (ppDropEvent is IntRelayVar irv)
