@@ -13,7 +13,7 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    public RelayVar SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
+    public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
         SingleEventTarget? target = null, SingleEventSource? source = null,
         IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
@@ -27,13 +27,13 @@ public partial class Battle
                 SideSingleEventTarget s => $"Side {s.Side.Id}",
                 FieldSingleEventTarget => "Field",
                 BattleSingleEventTarget => "Battle",
-                _ => "null"
+                _ => "null",
             };
             string sourceStr = source switch
             {
                 PokemonSingleEventSource p => p.Pokemon.Name,
                 EffectSingleEventSource e => e.Effect.Name,
-                _ => "null"
+                _ => "null",
             };
             Debug(
                 $"SingleEvent: {eventId} | Effect: {effect.Name} ({effect.EffectType}) | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
@@ -65,7 +65,7 @@ public partial class Battle
             throw new InvalidOperationException("Infinite loop");
         }
 
-// Track if relayVar was explicitly provided
+        // Track if relayVar was explicitly provided
         bool hasRelayVar = relayVar != null;
         relayVar ??= new BoolRelayVar(true);
 
@@ -131,31 +131,18 @@ public partial class Battle
         }
 
         // Get the handler - either custom callback or from the effect's EventHandlerInfo
-        EventHandlerInfo? handlerInfo = null;
-        EffectDelegate? legacyCallback = null;
 
-        if (customCallback != null)
+        EventHandlerInfo? handlerInfo =
+            // Get EventHandlerInfo from effect (preferred)
+            effect.GetEventHandlerInfo(eventId);
+        if (handlerInfo == null)
         {
-            // Custom callback provided - use legacy path for now
-            legacyCallback = customCallback;
             if (DebugMode)
             {
-                Debug($"SingleEvent {eventId}: Using custom callback");
+                Debug($"SingleEvent {eventId}: No handler found for effect {effect.Name}");
             }
-        }
-        else
-        {
-            // Get EventHandlerInfo from effect (preferred)
-            handlerInfo = effect.GetEventHandlerInfo(eventId);
-            if (handlerInfo == null)
-            {
-                if (DebugMode)
-                {
-                    Debug($"SingleEvent {eventId}: No handler found for effect {effect.Name}");
-                }
 
-                return relayVar;
-            }
+            return relayVar;
         }
 
         // Save parent context
@@ -179,22 +166,8 @@ public partial class Battle
         RelayVar? returnVal;
         try
         {
-            if (handlerInfo != null)
-            {
-                returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
-                    source, sourceEffect);
-            }
-            else if (legacyCallback != null)
-            {
-#pragma warning disable CS0618 // Type or member is obsolete
-                returnVal = InvokeEventCallback(legacyCallback, hasRelayVar, relayVar, target,
-                    source, sourceEffect);
-#pragma warning restore CS0618
-            }
-            else
-            {
-                returnVal = relayVar;
-            }
+            returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
+                source, sourceEffect);
 
             // Debug logging for return value
             if (DebugMode && returnVal != null)
@@ -205,7 +178,7 @@ public partial class Battle
                     IntRelayVar i => $"int: {i.Value}",
                     DecimalRelayVar d => $"decimal: {d.Value}",
                     StringRelayVar s => $"string: {s.Value}",
-                    _ => returnVal.GetType().Name
+                    _ => returnVal.GetType().Name,
                 };
                 Debug($"SingleEvent {eventId}: Returned {returnValStr}");
             }
@@ -222,7 +195,7 @@ public partial class Battle
         return returnVal ?? relayVar;
     }
 
-    public RelayVar RunEvent(EventId eventId, RunEventTarget? target = null,
+    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,
         RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null,
         bool? fastExit = null)
@@ -266,7 +239,7 @@ public partial class Battle
         // Default target to Battle if not provided
         target ??= RunEventTarget.FromBattle(this);
 
-// Extract the source Pokemon for handler lookup
+        // Extract the source Pokemon for handler lookup
         Pokemon? effectSource = source switch
         {
             PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
@@ -280,9 +253,9 @@ public partial class Battle
         if (DebugMode)
         {
             Debug($"RunEvent {eventId}: Found {handlers.Count} handlers");
-            if (handlers.Count > 0 && handlers.Count <= 5)
+            if (handlers.Count is > 0 and <= 5)
             {
-                foreach (var h in handlers)
+                foreach (EventListener h in handlers)
                 {
                     Debug(
                         $"  - {h.Effect.Name} ({h.Effect.EffectType}) | Priority: {h.Priority} | Speed: {h.Speed}");
@@ -926,7 +899,7 @@ public partial class Battle
         }
     }
 
-    public RelayVar PriorityEvent(EventId eventId, PokemonSideBattleUnion target,
+    public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target,
         Pokemon? source = null,
         IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
     {
@@ -1037,90 +1010,17 @@ public partial class Battle
             $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
     }
 
-    /// <summary>
-    /// Invokes an event callback with the appropriate parameters based on its signature.
-    /// Optimized version that avoids DynamicInvoke and reduces allocations.
-    /// [Obsolete] Use InvokeEventHandlerInfo instead for new code.
-    /// </summary>
-    [Obsolete("Use InvokeEventHandlerInfo for new code")]
-    private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar,
-        RelayVar relayVar,
-        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
-    {
-        // Handle non-function callbacks (constants) - fast path
-        switch (callback)
-        {
-            case OnFlinchEffectDelegate { OnFlinch: OnFlinchBool ofb }:
-                return new BoolRelayVar(ofb.Value);
-            case OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitBool ocb }:
-                return new BoolRelayVar(ocb.Value);
-            case OnFractionalPriorityEffectDelegate
-            {
-                OnFractionalPriority: OnFrationalPriorityNeg ofpn
-            }:
-                return new DecimalRelayVar(ofpn.Value);
-            case OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemBool otib }:
-                return new BoolRelayVar(otib.Value);
-            case OnTryHealEffectDelegate { OnTryHeal: OnTryHealBool othb }:
-                return new BoolRelayVar(othb.Value);
-            case OnTryEatItemEffectDelegate { OnTryEatItem: BoolOnTryEatItem botei }:
-                return new BoolRelayVar(botei.Value);
-            case OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityBool onib }:
-                return new BoolRelayVar(onib.Value);
-            case OnLockMoveEffectDelegate { OnLockMove: OnLockMoveMoveId olmmi }:
-                return new MoveIdRelayVar(olmmi.Id);
-        }
-
-        // Extract the actual delegate and invoke directly based on known signatures
-        // This avoids the overhead of DynamicInvoke by pattern matching to known delegate types
-        return callback switch
-        {
-            // DelegateEffectDelegate is the generic wrapper - try common signatures first
-            DelegateEffectDelegate ded => InvokeDelegateEffectDelegate(ded.Del, hasRelayVar,
-                relayVar, target, source, sourceEffect),
-
-            // Specific delegate types with known signatures
-            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => InvokeStandardDelegate(
-                off.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } =>
-                InvokeStandardDelegate(ocf.Function, hasRelayVar, relayVar, target, source,
-                    sourceEffect),
-            OnFractionalPriorityEffectDelegate
-            {
-                OnFractionalPriority: OnFractionalPriorityFunc ofpf
-            } => InvokeStandardDelegate(ofpf.Function, hasRelayVar, relayVar, target, source,
-                sourceEffect),
-            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => InvokeStandardDelegate(
-                otif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => InvokeStandardDelegate(
-                othf1.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => InvokeStandardDelegate(
-                othf2.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } =>
-                InvokeStandardDelegate(fotei.Func, hasRelayVar, relayVar, target, source,
-                    sourceEffect),
-            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } =>
-                InvokeStandardDelegate(onif.Func, hasRelayVar, relayVar, target, source,
-                    sourceEffect),
-            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => InvokeStandardDelegate(
-                olmf.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-
-            _ => throw new InvalidOperationException(
-                $"Unknown EffectDelegate type: {callback.GetType().Name}"),
-        };
-    }
-
-    /// <summary>
-    /// Helper method for invoking standard delegates with common signatures.
-    /// This provides a single path for most delegate invocations, reducing code duplication.
-    /// </summary>
-    private RelayVar? InvokeStandardDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
-        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
-    {
-        // Reuse the optimized invocation logic
-        return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source,
-            sourceEffect);
-    }
+    ///// <summary>
+    ///// Helper method for invoking standard delegates with common signatures.
+    ///// This provides a single path for most delegate invocations, reducing code duplication.
+    ///// </summary>
+    //private RelayVar? InvokeStandardDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
+    //    SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    //{
+    //    // Reuse the optimized invocation logic
+    //    return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source,
+    //        sourceEffect);
+    //}
 
     #endregion
 }
