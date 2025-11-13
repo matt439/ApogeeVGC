@@ -258,8 +258,8 @@ public partial class Pokemon : IPriorityComparison
     public PokemonSlot GetSlot()
     {
         int positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        char positionLetter = "abcdef"[Position + positionOffset];
-    return new PokemonSlot(Side.Id, positionLetter);
+        int slotPosition = Position + positionOffset;
+        return new PokemonSlot(Side.Id, slotPosition);
     }
 
     /// <summary>
@@ -323,10 +323,7 @@ public partial class Pokemon : IPriorityComparison
         Secret secretFullDetails = $"{detailsStr}|{health.Secret}";
         Shared sharedFullDetails = $"{detailsStr}|{health.Shared}";
 
-        return new SideSecretSharedResult(health.Side, secretFullDetails, sharedFullDetails)
-        {
-            HpColor = health.HpColor
-        };
+        return health with { Secret = secretFullDetails, Shared = sharedFullDetails };
     }
 
     public int GetUndynamaxedHp(int? amount = null)

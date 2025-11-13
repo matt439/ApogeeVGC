@@ -152,10 +152,16 @@ public partial class Battle
 
         // Create sides with temporary Foe references (will be set properly below)
         var side1 = new Side(options.Player1Options.Name, this, SideId.P1,
-            options.Player1Options.Team.ToArray());
+            options.Player1Options.Team.ToArray())
+        {
+            N = 0,
+        };
 
         var side2 = new Side(options.Player2Options.Name, this, SideId.P2,
-            options.Player2Options.Team.ToArray());
+            options.Player2Options.Team.ToArray())
+        {
+            N = 1,
+        };
 
         // Set up bidirectional Foe relationships
         side1.Foe = side2;
