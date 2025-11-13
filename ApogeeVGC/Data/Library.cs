@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.Moves;
+﻿using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Conditions;
@@ -14,7 +13,6 @@ public record Library
 {
     private readonly Abilities _abilities;
     private readonly Conditions _conditions;
-    private readonly EventIdInfoData _eventInfoData = new();
     private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Learnsets _learnsets = new();
@@ -27,7 +25,6 @@ public record Library
 
     private IReadOnlyDictionary<AbilityId, Ability> AbilitiesData => _abilities.AbilitiesData;
     private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
-    private IReadOnlyDictionary<EventId, EventIdInfo> EventData => _eventInfoData.EventData;
     private IReadOnlyDictionary<FormatId, Format> FormatsData => _formats.FormatData;
     private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
     private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
@@ -40,8 +37,6 @@ public record Library
     public IReadOnlyDictionary<AbilityId, Ability> Abilities => AbilitiesData;
     
     public IReadOnlyDictionary<ConditionId, Condition> Conditions => ConditionsData;
-
-    public IReadOnlyDictionary<EventId, EventIdInfo> Events => EventData;
 
     public IReadOnlyDictionary<FormatId, Format> Formats => FormatsData;
 

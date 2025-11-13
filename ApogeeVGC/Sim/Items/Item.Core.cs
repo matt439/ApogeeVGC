@@ -299,16 +299,6 @@ public partial record Item : IEffect, IBasicEffect, ICopyable<Item>
     //}
 
     /// <summary>
-    /// Gets event handler information for the specified event (TODO: implement fully).
-    /// </summary>
-    public EventHandlerInfo? GetEventHandlerInfo(EventId id)
-    {
-        // TODO: Implement using EventHandlerInfoBuilder similar to Ability class
-        // For now, return null as this hasn't been migrated yet
-        return null;
-    }
-
-    /// <summary>
     /// Gets event handler information for the specified event.
     /// Uses high-performance mapper with O(1) lookups.
     /// </summary>
