@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 
 namespace ApogeeVGC.Sim.Moves;
 
-public partial record Move : IMoveEventMethodsV2
+public partial record Move : IMoveEventMethods
 {
     public BasePowerCallbackEventInfo? BasePowerCallback { get; init; }
     public BeforeMoveCallbackEventInfo? BeforeMoveCallback { get; init; }

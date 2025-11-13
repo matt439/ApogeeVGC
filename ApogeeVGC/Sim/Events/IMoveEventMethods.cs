@@ -1,72 +1,163 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.SideClasses;
-using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 
 namespace ApogeeVGC.Sim.Events;
 
-public delegate IntFalseUnion? BasePowerCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target,
-    ActiveMove move);
-
-public delegate BoolVoidUnion BeforeMoveCallbackHandler(Battle battle, Pokemon pokemon, Pokemon? target,
-    ActiveMove move);
-
-public delegate void BeforeTurnCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
-public delegate IntFalseUnion DamageCallbackHandler(Battle battle, Pokemon pokemon, Pokemon target, ActiveMove move);
-public delegate void PriorityChargeCallbackHandler(Battle battle, Pokemon pokemon);
-
-public delegate void OnDisableMoveHandler(Battle battle, Pokemon pokemon);
-public delegate void OnAfterSubDamageHandler(Battle battle, int damage, Pokemon target, Pokemon source,
-    ActiveMove move);
-
-public delegate IntBoolVoidUnion? OnDamageHandler(Battle battle, int damage, Pokemon target, Pokemon source,
-    IEffect effect);
-
-public delegate IntVoidUnion OnEffectivenessHandler(Battle battle, int typeMod, Pokemon? target, PokemonType type,
-    ActiveMove move);
-public delegate BoolEmptyVoidUnion? OnHitSideHandler(Battle battle, Side side, Pokemon source, ActiveMove move);
-public delegate void OnModifyMoveHandler(Battle battle, ActiveMove move, Pokemon pokemon, Pokemon? target);
-public delegate void OnModifyTypeHandler(Battle battle, ActiveMove move, Pokemon pokemon, Pokemon target);
-
-public delegate void OnModifyTargetHandler(Battle battle, Pokemon relayTarget, Pokemon pokemon, Pokemon target,
-    ActiveMove move);
-
-public delegate BoolEmptyVoidUnion? OnTryHitSideHandler(Battle battle, Side side, Pokemon source,
-    ActiveMove move);
-
+/// <summary>
+/// Modern interface for move-specific event methods using strongly-typed EventHandlerInfo records.
+/// This replaces IMoveEventMethods with a type-safe approach that validates delegate signatures at compile-time.
+/// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
+/// </summary>
 public interface IMoveEventMethods
 {
-    BasePowerCallbackHandler? BasePowerCallback { get; }
-    BeforeMoveCallbackHandler? BeforeMoveCallback { get; }
-    BeforeTurnCallbackHandler? BeforeTurnCallback { get; }
-    DamageCallbackHandler? DamageCallback { get; }
-    PriorityChargeCallbackHandler? PriorityChargeCallback { get; }
+    // Callback Events
+    /// <summary>
+    /// Callback for calculating base power dynamically.
+    /// </summary>
+    BasePowerCallbackEventInfo? BasePowerCallback { get; }
 
-    OnDisableMoveHandler? OnDisableMove { get; }
-    VoidSourceMoveHandler? OnAfterHit { get; }
-    OnAfterSubDamageHandler? OnAfterSubDamage { get; }
-    VoidSourceMoveHandler? OnAfterMoveSecondarySelf { get; }
-    VoidMoveHandler? OnAfterMoveSecondary { get; }
-    VoidSourceMoveHandler? OnAfterMove { get; }
-    OnDamageHandler? OnDamage { get; }
-    ModifierSourceMoveHandler? OnBasePower { get; }
-    OnEffectivenessHandler? OnEffectiveness { get; }
-    ResultMoveHandler? OnHit { get; }
-    ResultMoveHandler? OnHitField { get; }
-    OnHitSideHandler? OnHitSide { get; }
-    OnModifyMoveHandler? OnModifyMove { get; }
-    ModifierSourceMoveHandler? OnModifyPriority { get; }
-    VoidMoveHandler? OnMoveFail { get; }
-    OnModifyTypeHandler? OnModifyType { get; }
-    OnModifyTargetHandler? OnModifyTarget { get; }
-    ResultMoveHandler? OnPrepareHit { get; }
-    ResultSourceMoveHandler? OnTry { get; }
-    ExtResultSourceMoveHandler? OnTryHit { get; }
-    ResultMoveHandler? OnTryHitField { get; }
-    OnTryHitSideHandler? OnTryHitSide { get; }
-    ResultMoveHandler? OnTryImmunity { get; }
-    ResultSourceMoveHandler? OnTryMove { get; }
-    VoidSourceMoveHandler? OnUseMoveMessage { get; }
+    /// <summary>
+    /// Callback executed before a move is used.
+    /// </summary>
+    BeforeMoveCallbackEventInfo? BeforeMoveCallback { get; }
+
+    /// <summary>
+ /// Callback executed before a turn begins.
+    /// </summary>
+    BeforeTurnCallbackEventInfo? BeforeTurnCallback { get; }
+
+    /// <summary>
+    /// Callback for calculating damage dynamically.
+    /// </summary>
+    DamageCallbackEventInfo? DamageCallback { get; }
+
+    /// <summary>
+    /// Callback for charging moves with priority calculation.
+    /// </summary>
+    PriorityChargeCallbackEventInfo? PriorityChargeCallback { get; }
+
+    // Standard Move Events
+    /// <summary>
+    /// Triggered to disable a move.
+    /// </summary>
+    OnDisableMoveEventInfo? OnDisableMove { get; }
+
+    /// <summary>
+    /// Triggered after a move hits.
+    /// </summary>
+    OnAfterHitEventInfo? OnAfterHit { get; }
+
+    /// <summary>
+    /// Triggered after substitute damage.
+    /// </summary>
+    OnAfterSubDamageEventInfo? OnAfterSubDamage { get; }
+
+    /// <summary>
+/// Triggered after move secondary effects on self.
+    /// </summary>
+    OnAfterMoveSecondarySelfEventInfo? OnAfterMoveSecondarySelf { get; }
+
+    /// <summary>
+    /// Triggered after move secondary effects.
+    /// </summary>
+    OnAfterMoveSecondaryEventInfo? OnAfterMoveSecondary { get; }
+
+ /// <summary>
+    /// Triggered after a move completes.
+    /// </summary>
+    OnAfterMoveEventInfo? OnAfterMove { get; }
+
+    /// <summary>
+    /// Triggered to modify damage.
+    /// </summary>
+    OnDamageEventInfo? OnDamage { get; }
+
+    /// <summary>
+    /// Triggered to modify base power.
+    /// </summary>
+    OnBasePowerEventInfo? OnBasePower { get; }
+
+    /// <summary>
+    /// Triggered to modify type effectiveness.
+    /// </summary>
+    OnEffectivenessEventInfo? OnEffectiveness { get; }
+
+    /// <summary>
+    /// Triggered when a move hits.
+    /// </summary>
+    OnHitEventInfo? OnHit { get; }
+
+    /// <summary>
+    /// Triggered when a move hits the field.
+    /// </summary>
+    OnHitFieldEventInfo? OnHitField { get; }
+
+    /// <summary>
+    /// Triggered when a move hits a side.
+    /// </summary>
+    OnHitSideEventInfo? OnHitSide { get; }
+
+    /// <summary>
+    /// Triggered to modify a move.
+/// </summary>
+  OnModifyMoveEventInfo? OnModifyMove { get; }
+
+    /// <summary>
+    /// Triggered to modify move priority.
+    /// </summary>
+    OnModifyPriorityEventInfo? OnModifyPriority { get; }
+
+    /// <summary>
+    /// Triggered when a move fails.
+    /// </summary>
+    OnMoveFailEventInfo? OnMoveFail { get; }
+
+    /// <summary>
+    /// Triggered to modify move type.
+    /// </summary>
+    OnModifyTypeEventInfo? OnModifyType { get; }
+
+    /// <summary>
+    /// Triggered to modify move target.
+    /// </summary>
+ OnModifyTargetEventInfo? OnModifyTarget { get; }
+
+    /// <summary>
+    /// Triggered to prepare a hit.
+    /// </summary>
+    OnPrepareHitEventInfo? OnPrepareHit { get; }
+
+    /// <summary>
+    /// Triggered to try executing a move.
+ /// </summary>
+    OnTryEventInfo? OnTry { get; }
+
+    /// <summary>
+    /// Triggered to try hitting with a move.
+    /// </summary>
+    OnTryHitEventInfo? OnTryHit { get; }
+
+    /// <summary>
+    /// Triggered to try hitting the field.
+    /// </summary>
+    OnTryHitFieldEventInfo? OnTryHitField { get; }
+
+    /// <summary>
+    /// Triggered to try hitting a side.
+    /// </summary>
+    OnTryHitSideEventInfo? OnTryHitSide { get; }
+
+    /// <summary>
+    /// Triggered to check immunity.
+  /// </summary>
+    OnTryImmunityEventInfo? OnTryImmunity { get; }
+
+    /// <summary>
+    /// Triggered to try using a move.
+    /// </summary>
+    OnTryMoveEventInfo? OnTryMove { get; }
+
+    /// <summary>
+    /// Triggered to display move use message.
+  /// </summary>
+    OnUseMoveMessageEventInfo? OnUseMoveMessage { get; }
 }

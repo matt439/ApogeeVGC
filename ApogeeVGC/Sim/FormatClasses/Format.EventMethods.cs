@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 namespace ApogeeVGC.Sim.FormatClasses;
 
-public partial record Format : IEventMethodsV2
+public partial record Format : IEventMethods
 {
     public OnDamagingHitEventInfo? OnDamagingHit { get; init; }
     public OnEmergencyExitEventInfo? OnEmergencyExit { get; init; }

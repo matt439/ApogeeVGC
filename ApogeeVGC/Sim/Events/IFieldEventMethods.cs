@@ -1,32 +1,31 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.FieldClasses;
-using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Events.Handlers.FieldEventMethods;
 
 namespace ApogeeVGC.Sim.Events;
 
+/// <summary>
+/// Modern interface for field-specific event methods using strongly-typed EventHandlerInfo records.
+/// This replaces IFieldEventMethods with a type-safe approach that validates delegate signatures at compile-time.
+/// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
+/// </summary>
 public interface IFieldEventMethods : IEventMethods
 {
     /// <summary>
-    /// battle, target, source, sourceEffect
+    /// Triggered when a field condition starts.
     /// </summary>
-    Action<Battle, Field, Pokemon, IEffect>? OnFieldStart { get; }
+    OnFieldStartEventInfo? OnFieldStart { get; }
 
     /// <summary>
-    /// battle, target, source, sourceEffect
+    /// Triggered when a field condition restarts/reactivates.
     /// </summary>
-    Action<Battle, Field, Pokemon, IEffect>? OnFieldRestart { get; }
+    OnFieldRestartEventInfo? OnFieldRestart { get; }
 
     /// <summary>
-    /// battle, target, source, effect
+    /// Triggered for residual field condition effects (each turn).
     /// </summary>
-    Action<Battle, Field, Pokemon, IEffect>? OnFieldResidual { get; }
+    OnFieldResidualEventInfo? OnFieldResidual { get; }
 
     /// <summary>
-    /// battle, target
+    /// Triggered when a field condition ends.
     /// </summary>
-    Action<Battle, Field>? OnFieldEnd { get; }
-    int? OnFieldResidualOrder { get; }
-    int? OnFieldResidualPriority { get; }
-    int? OnFieldResidualSubOrder { get; }
+    OnFieldEndEventInfo? OnFieldEnd { get; }
 }

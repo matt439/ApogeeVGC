@@ -1,264 +1,404 @@
-﻿using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Effects;
-using ApogeeVGC.Sim.Items;
-using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils.Unions;
+using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 
 namespace ApogeeVGC.Sim.Events;
 
+/// <summary>
+/// Modern interface for Pokemon/Ally-specific event methods using strongly-typed EventHandlerInfo records.
+/// This replaces IPokemonEventMethods with a type-safe approach that validates delegate signatures at compile-time.
+/// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
+/// All events in this interface use the "Ally" prefix to indicate they apply to allied Pokemon.
+/// </summary>
 public interface IPokemonEventMethods : IEventMethods
 {
-    /// <summary>
-    /// battle, damage, target, source, move
-    /// </summary>
-    Action<Battle, int, Pokemon, Pokemon, ActiveMove>? OnAllyDamagingHit { get; }
+    // Ally-Prefixed Events (78 total)
     
     /// <summary>
-    /// battle, boost, target, source
+    /// Triggered when an ally deals damaging hit.
     /// </summary>
-    Action<Battle, SparseBoostsTable, Pokemon, Pokemon>? OnAllyAfterEachBoost { get; }
-    
-    VoidSourceMoveHandler? OnAllyAfterHit { get; } // MoveEventMethods['onAfterHit']
+    OnAllyDamagingHitEventInfo? OnAllyDamagingHit { get; }
     
     /// <summary>
-    /// battle, status, target, source, effect
-    /// </summary>
-    Action<Battle, Condition, Pokemon, Pokemon, IEffect>? OnAllyAfterSetStatus { get; }
-    
-    OnAfterSubDamageHandler? OnAllyAfterSubDamage { get; } // MoveEventMethods['onAfterSubDamage']
+    /// Triggered after each boost to an ally.
+/// </summary>
+    OnAllyAfterEachBoostEventInfo? OnAllyAfterEachBoost { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered after ally hits.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyAfterSwitchInSelf { get; }
+    OnAllyAfterHitEventInfo? OnAllyAfterHit { get; }
+ 
+    /// <summary>
+    /// Triggered after status is set on ally.
+    /// </summary>
+    OnAllyAfterSetStatusEventInfo? OnAllyAfterSetStatus { get; }
     
     /// <summary>
-    /// battle, item, pokemon
+    /// Triggered after substitute damage to ally.
     /// </summary>
-    Action<Battle, Item, Pokemon>? OnAllyAfterUseItem { get; }
+    OnAllyAfterSubDamageEventInfo? OnAllyAfterSubDamage { get; }
     
     /// <summary>
-    /// battle, boost, target, source, effect
-    /// </summary>
-    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyAfterBoost { get; }
+    /// Triggered after ally switches in.
+/// </summary>
+    OnAllyAfterSwitchInSelfEventInfo? OnAllyAfterSwitchInSelf { get; }
     
     /// <summary>
-    /// battle, length, target, source, effect
+    /// Triggered after ally uses item.
     /// </summary>
-    Action<Battle, int, Pokemon, Pokemon, IEffect>? OnAllyAfterFaint { get; }
-    
-    VoidSourceMoveHandler? OnAllyAfterMoveSecondarySelf { get; } // MoveEventMethods['onAfterMoveSecondarySelf']
-    VoidMoveHandler? OnAllyAfterMoveSecondary { get; } // MoveEventMethods['onAfterMoveSecondary']
-    VoidSourceMoveHandler? OnAllyAfterMove { get; } // MoveEventMethods['onAfterMove']
-    VoidSourceMoveHandler? OnAllyAfterMoveSelf { get; } // CommonHandlers['VoidSourceMove']
+  OnAllyAfterUseItemEventInfo? OnAllyAfterUseItem { get; }
     
     /// <summary>
-    /// battle, target, source
+    /// Triggered after ally is boosted.
     /// </summary>
-    Action<Battle, Pokemon, Pokemon>? OnAllyAttract { get; }
+    OnAllyAfterBoostEventInfo? OnAllyAfterBoost { get; }
     
     /// <summary>
-    /// battle, accuracy, target, source, move -> number | boolean | null
-    /// </summary>
-    Func<Battle, int, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyAccuracy { get; }
-    
-    ModifierSourceMoveHandler? OnAllyBasePower { get; } // CommonHandlers['ModifierSourceMove']
+    /// Triggered after ally faints.
+/// </summary>
+    OnAllyAfterFaintEventInfo? OnAllyAfterFaint { get; }
     
     /// <summary>
-    /// battle, pokemon, effect
+ /// Triggered after ally's move secondary effects on self.
     /// </summary>
-    Action<Battle, Pokemon, IEffect>? OnAllyBeforeFaint { get; }
-    
-    VoidSourceMoveHandler? OnAllyBeforeMove { get; } // CommonHandlers['VoidSourceMove']
+    OnAllyAfterMoveSecondarySelfEventInfo? OnAllyAfterMoveSecondarySelf { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered after ally's move secondary effects.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyBeforeSwitchIn { get; }
+    OnAllyAfterMoveSecondaryEventInfo? OnAllyAfterMoveSecondary { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered after ally's move.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyBeforeSwitchOut { get; }
+    OnAllyAfterMoveEventInfo? OnAllyAfterMove { get; }
+  
+    /// <summary>
+    /// Triggered after ally's move (self).
+    /// </summary>
+    OnAllyAfterMoveSelfEventInfo? OnAllyAfterMoveSelf { get; }
     
     /// <summary>
-    /// battle, boost, target, source, effect
+    /// Triggered when ally is attracted.
     /// </summary>
-    Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect>? OnAllyTryBoost { get; }
-    
-    VoidSourceMoveHandler? OnAllyChargeMove { get; } // CommonHandlers['VoidSourceMove']
-    OnCriticalHit? OnAllyCriticalHit { get; }
+    OnAllyAttractEventInfo? OnAllyAttract { get; }
     
     /// <summary>
-    /// battle, damage, target, source, effect -> number | boolean | null
+    /// Triggered to modify ally's accuracy.
     /// </summary>
-    Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolVoidUnion?>? OnAllyDamage { get; }
+    OnAllyAccuracyEventInfo? OnAllyAccuracy { get; }
     
     /// <summary>
-    /// battle, target, source -> number
+    /// Triggered to modify ally's base power.
+  /// </summary>
+    OnAllyBasePowerEventInfo? OnAllyBasePower { get; }
+ 
+    /// <summary>
+    /// Triggered before ally faints.
     /// </summary>
-    Func<Battle, Pokemon, Pokemon, IntVoidUnion>? OnAllyDeductPp { get; }
+OnAllyBeforeFaintEventInfo? OnAllyBeforeFaint { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered before ally moves.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyDisableMove { get; }
+  OnAllyBeforeMoveEventInfo? OnAllyBeforeMove { get; }
     
     /// <summary>
-    /// battle, pokemon, source?, move?
+    /// Triggered before ally switches in.
     /// </summary>
-    Action<Battle, Pokemon, Pokemon?, ActiveMove?>? OnAllyDragOut { get; }
+    OnAllyBeforeSwitchInEventInfo? OnAllyBeforeSwitchIn { get; }
     
     /// <summary>
-    /// battle, item, pokemon
-    /// </summary>
-    Action<Battle, Item, Pokemon>? OnAllyEatItem { get; }
-    
-    OnEffectivenessHandler? OnAllyEffectiveness { get; } // MoveEventMethods['onEffectiveness']
-    VoidEffectHandler? OnAllyFaint { get; } // CommonHandlers['VoidEffect']
-    OnFlinch? OnAllyFlinch { get; }
-    ResultMoveHandler? OnAllyHit { get; } // MoveEventMethods['onHit']
+    /// Triggered before ally switches out.
+  /// </summary>
+    OnAllyBeforeSwitchOutEventInfo? OnAllyBeforeSwitchOut { get; }
     
     /// <summary>
-    /// battle, type, pokemon
+    /// Triggered when trying to boost ally.
     /// </summary>
-    Action<Battle, PokemonType, Pokemon>? OnAllyImmunity { get; }
-
-    /// <summary>
-    /// battle, pokemon -> move
-    /// </summary>
-    OnLockMove? OnAllyLockMove { get; }
+    OnAllyTryBoostEventInfo? OnAllyTryBoost { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered when ally charges move.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyMaybeTrapPokemon { get; }
-    
-    ModifierMoveHandler? OnAllyModifyAccuracy { get; } // CommonHandlers['ModifierMove']
-    ModifierSourceMoveHandler? OnAllyModifyAtk { get; } // CommonHandlers['ModifierSourceMove']
+    OnAllyChargeMoveEventInfo? OnAllyChargeMove { get; }
     
     /// <summary>
-    /// battle, boosts, pokemon -> SparseBoostsTable
+    /// Triggered when ally gets critical hit.
     /// </summary>
-    Func<Battle, SparseBoostsTable, Pokemon, SparseBoostsTableVoidUnion>? OnAllyModifyBoost { get; }
-    
-    ModifierSourceMoveHandler? OnAllyModifyCritRatio { get; } // CommonHandlers['ModifierSourceMove']
-    ModifierSourceMoveHandler? OnAllyModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
-    ModifierMoveHandler? OnAllyModifyDef { get; } // CommonHandlers['ModifierMove']
-    OnModifyMoveHandler? OnAllyModifyMove { get; } // MoveEventMethods['onModifyMove']
-    ModifierSourceMoveHandler? OnAllyModifyPriority { get; } // CommonHandlers['ModifierSourceMove']
+    OnAllyCriticalHitEventInfo? OnAllyCriticalHit { get; }
     
     /// <summary>
-    /// battle, secondaries, target, source, move
+    /// Triggered to modify damage to ally.
     /// </summary>
-    Action<Battle, List<SecondaryEffect>, Pokemon, Pokemon, ActiveMove>? OnAllyModifySecondaries { get; }
+    OnAllyDamageEventInfo? OnAllyDamage { get; }
     
-    ModifierSourceMoveHandler? OnAllyModifySpA { get; } // CommonHandlers['ModifierSourceMove']
-    ModifierMoveHandler? OnAllyModifySpD { get; } // CommonHandlers['ModifierMove']
+/// <summary>
+    /// Triggered when deducting ally's PP.
+ /// </summary>
+    OnAllyDeductPpEventInfo? OnAllyDeductPp { get; }
     
     /// <summary>
-    /// battle, spe, pokemon -> number
+  /// Triggered to disable ally's move.
     /// </summary>
-    Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifySpe { get; }
+    OnAllyDisableMoveEventInfo? OnAllyDisableMove { get; }
+ 
+    /// <summary>
+    /// Triggered when ally is dragged out.
+    /// </summary>
+    OnAllyDragOutEventInfo? OnAllyDragOut { get; }
     
-    ModifierSourceMoveHandler? OnAllyModifyStab { get; } // CommonHandlers['ModifierSourceMove']
-    OnModifyTypeHandler? OnAllyModifyType { get; } // MoveEventMethods['onModifyType']
-    OnModifyTargetHandler? OnAllyModifyTarget { get; } // MoveEventMethods['onModifyTarget']
+ /// <summary>
+    /// Triggered when ally eats item.
+    /// </summary>
+    OnAllyEatItemEventInfo? OnAllyEatItem { get; }
     
     /// <summary>
-    /// battle, weighthg, pokemon -> number
+    /// Triggered to modify type effectiveness against ally.
     /// </summary>
-    Func<Battle, int, Pokemon, IntVoidUnion>? OnAllyModifyWeight { get; }
-    
-    VoidMoveHandler? OnAllyMoveAborted { get; } // CommonHandlers['VoidMove']
-    OnNegateImmunity? OnAllyNegateImmunity { get; }
+    OnAllyEffectivenessEventInfo? OnAllyEffectiveness { get; }
     
     /// <summary>
-    /// battle, pokemon, target, move -> string
+    /// Triggered when ally faints.
     /// </summary>
-    Func<Battle, Pokemon, Pokemon, ActiveMove, DelegateVoidUnion>? OnAllyOverrideAction { get; }
-    
-    ResultSourceMoveHandler? OnAllyPrepareHit { get; } // CommonHandlers['ResultSourceMove']
+    OnAllyFaintEventInfo? OnAllyFaint { get; }
     
     /// <summary>
-    /// battle, target, source, source2, move -> Pokemon
+    /// Triggered when ally flinches.
     /// </summary>
-    Func<Battle, Pokemon, Pokemon, IEffect, ActiveMove, PokemonVoidUnion>? OnAllyRedirectTarget { get; }
+    OnAllyFlinchEventInfo? OnAllyFlinch { get; }
     
     /// <summary>
-    /// battle, target & side, source, effect
+    /// Triggered when ally is hit.
     /// </summary>
-    Action<Battle, PokemonSideUnion, Pokemon, IEffect>? OnAllyResidual { get; }
+  OnAllyHitEventInfo? OnAllyHit { get; }
     
     /// <summary>
-    /// battle, ability, target, source, effect -> boolean
+    /// Triggered for ally immunity check.
     /// </summary>
-    Func<Battle, Ability, Pokemon, Pokemon, IEffect, BoolVoidUnion>? OnAllySetAbility { get; }
+    OnAllyImmunityEventInfo? OnAllyImmunity { get; }
+  
+    /// <summary>
+    /// Triggered to lock ally's move.
+/// </summary>
+    OnAllyLockMoveEventInfo? OnAllyLockMove { get; }
     
     /// <summary>
-    /// battle, status, target, source, effect -> boolean | null
+/// Triggered to maybe trap ally.
     /// </summary>
-    Func<Battle, Condition, Pokemon, Pokemon, IEffect, PokemonVoidUnion?>? OnAllySetStatus { get; }
+    OnAllyMaybeTrapPokemonEventInfo? OnAllyMaybeTrapPokemon { get; }
     
     /// <summary>
-    /// battle, target, source, weather -> boolean
+    /// Triggered to modify ally's accuracy.
     /// </summary>
-    Func<Battle, Pokemon, Pokemon, Condition, PokemonVoidUnion>? OnAllySetWeather { get; }
+    OnAllyModifyAccuracyEventInfo? OnAllyModifyAccuracy { get; }
+    
+/// <summary>
+    /// Triggered to modify ally's attack.
+    /// </summary>
+    OnAllyModifyAtkEventInfo? OnAllyModifyAtk { get; }
     
     /// <summary>
-    /// battle, pokemon -> boolean
+    /// Triggered to modify ally's boosts.
     /// </summary>
-    Func<Battle, Pokemon, PokemonVoidUnion>? OnAllyStallMove { get; }
+    OnAllyModifyBoostEventInfo? OnAllyModifyBoost { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered to modify ally's crit ratio.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllySwitchOut { get; }
-    
-    OnTakeItem? OnAllyTakeItem { get; }
+    OnAllyModifyCritRatioEventInfo? OnAllyModifyCritRatio { get; }
     
     /// <summary>
-    /// battle, pokemon
+    /// Triggered to modify damage to ally.
     /// </summary>
-    Action<Battle, Pokemon>? OnAllyTerrain { get; }
+    OnAllyModifyDamageEventInfo? OnAllyModifyDamage { get; }
     
     /// <summary>
-    /// battle, pokemon
-    /// </summary>
-    Action<Battle, Pokemon>? OnAllyTrapPokemon { get; }
+    /// Triggered to modify ally's defense.
+  /// </summary>
+    OnAllyModifyDefEventInfo? OnAllyModifyDef { get; }
     
     /// <summary>
-    /// battle, status, target, source, sourceEffect -> boolean | null
+    /// Triggered to modify ally's move.
     /// </summary>
-    Func<Battle, Condition, Pokemon, Pokemon, IEffect, BoolVoidUnion?>? OnAllyTryAddVolatile { get; }
+    OnAllyModifyMoveEventInfo? OnAllyModifyMove { get; }
     
     /// <summary>
-    /// battle, item, pokemon -> boolean
+    /// Triggered to modify ally's move priority.
     /// </summary>
-    Func<Battle, Item, Pokemon, BoolVoidUnion>? OnAllyTryEatItem { get; }
-    
-    OnTryHeal? OnAllyTryHeal { get; }
-    ExtResultSourceMoveHandler? OnAllyTryHit { get; } // MoveEventMethods['onTryHit']
-    ExtResultSourceMoveHandler? OnAllyTryHitField { get; } // MoveEventMethods['onTryHit']
-    ResultMoveHandler? OnAllyTryHitSide { get; } // CommonHandlers['ResultMove']
-    ExtResultMoveHandler? OnAllyInvulnerability { get; } // CommonHandlers['ExtResultMove']
-    ResultSourceMoveHandler? OnAllyTryMove { get; } // MoveEventMethods['onTryMove']
+    OnAllyModifyPriorityEventInfo? OnAllyModifyPriority { get; }
     
     /// <summary>
-    /// battle, target, source, move -> boolean | null | number
+    /// Triggered to modify ally's move secondary effects.
     /// </summary>
-    Func<Battle, Pokemon, Pokemon, ActiveMove, IntBoolVoidUnion?>? OnAllyTryPrimaryHit { get; }
+    OnAllyModifySecondariesEventInfo? OnAllyModifySecondaries { get; }
     
     /// <summary>
-    /// battle, types, pokemon -> string[]
+    /// Triggered to modify ally's special attack.
     /// </summary>
-    Func<Battle, PokemonType[], Pokemon, TypesVoidUnion>? OnAllyType { get; }
+    OnAllyModifySpAEventInfo? OnAllyModifySpA { get; }
     
-    ModifierSourceMoveHandler? OnAllyWeatherModifyDamage { get; } // CommonHandlers['ModifierSourceMove']
-    ModifierSourceMoveHandler? OnAllyModifyDamagePhase1 { get; } // CommonHandlers['ModifierSourceMove']
-    ModifierSourceMoveHandler? OnAllyModifyDamagePhase2 { get; } // CommonHandlers['ModifierSourceMove']
+    /// <summary>
+    /// Triggered to modify ally's special defense.
+    /// </summary>
+    OnAllyModifySpDEventInfo? OnAllyModifySpD { get; }
+    
+    /// <summary>
+    /// Triggered to modify ally's speed.
+    /// </summary>
+    OnAllyModifySpeEventInfo? OnAllyModifySpe { get; }
+    
+/// <summary>
+    /// Triggered to modify ally's STAB.
+    /// </summary>
+    OnAllyModifyStabEventInfo? OnAllyModifyStab { get; }
+    
+    /// <summary>
+    /// Triggered to modify ally's move type.
+    /// </summary>
+    OnAllyModifyTypeEventInfo? OnAllyModifyType { get; }
+    
+    /// <summary>
+    /// Triggered to modify ally's move target.
+    /// </summary>
+    OnAllyModifyTargetEventInfo? OnAllyModifyTarget { get; }
+    
+    /// <summary>
+    /// Triggered to modify ally's weight.
+    /// </summary>
+    OnAllyModifyWeightEventInfo? OnAllyModifyWeight { get; }
+ 
+    /// <summary>
+    /// Triggered when ally's move is aborted.
+    /// </summary>
+    OnAllyMoveAbortedEventInfo? OnAllyMoveAborted { get; }
+    
+    /// <summary>
+    /// Triggered to negate ally immunity.
+    /// </summary>
+  OnAllyNegateImmunityEventInfo? OnAllyNegateImmunity { get; }
+    
+    /// <summary>
+    /// Triggered to override ally action.
+    /// </summary>
+    OnAllyOverrideActionEventInfo? OnAllyOverrideAction { get; }
+    
+    /// <summary>
+    /// Triggered to prepare ally hit.
+    /// </summary>
+    OnAllyPrepareHitEventInfo? OnAllyPrepareHit { get; }
+    
+    /// <summary>
+    /// Triggered to redirect target from ally.
+    /// </summary>
+    OnAllyRedirectTargetEventInfo? OnAllyRedirectTarget { get; }
+    
+    /// <summary>
+    /// Triggered for ally residual effects.
+    /// </summary>
+    OnAllyResidualEventInfo? OnAllyResidual { get; }
+    
+    /// <summary>
+    /// Triggered when setting ally ability.
+    /// </summary>
+    OnAllySetAbilityEventInfo? OnAllySetAbility { get; }
+    
+  /// <summary>
+    /// Triggered when setting ally status.
+    /// </summary>
+    OnAllySetStatusEventInfo? OnAllySetStatus { get; }
+    
+  /// <summary>
+    /// Triggered when setting weather affecting ally.
+    /// </summary>
+    OnAllySetWeatherEventInfo? OnAllySetWeather { get; }
+    
+    /// <summary>
+/// Triggered for ally stall move.
+    /// </summary>
+    OnAllyStallMoveEventInfo? OnAllyStallMove { get; }
+    
+    /// <summary>
+    /// Triggered when ally switches out.
+    /// </summary>
+    OnAllySwitchOutEventInfo? OnAllySwitchOut { get; }
+    
+    /// <summary>
+    /// Triggered when taking ally's item.
+    /// </summary>
+    OnAllyTakeItemEventInfo? OnAllyTakeItem { get; }
+    
+    /// <summary>
+    /// Triggered for terrain affecting ally.
+    /// </summary>
+    OnAllyTerrainEventInfo? OnAllyTerrain { get; }
+    
+    /// <summary>
+    /// Triggered when trapping ally.
+    /// </summary>
+    OnAllyTrapPokemonEventInfo? OnAllyTrapPokemon { get; }
+    
+  /// <summary>
+    /// Triggered when trying to add volatile to ally.
+    /// </summary>
+    OnAllyTryAddVolatileEventInfo? OnAllyTryAddVolatile { get; }
+    
+    /// <summary>
+    /// Triggered when ally tries to eat item.
+    /// </summary>
+    OnAllyTryEatItemEventInfo? OnAllyTryEatItem { get; }
+    
+    /// <summary>
+    /// Triggered when trying to heal ally.
+    /// </summary>
+  OnAllyTryHealEventInfo? OnAllyTryHeal { get; }
+    
+    /// <summary>
+    /// Triggered when trying to hit ally.
+    /// </summary>
+    OnAllyTryHitEventInfo? OnAllyTryHit { get; }
+    
+    /// <summary>
+    /// Triggered when trying to hit field affecting ally.
+  /// </summary>
+    OnAllyTryHitFieldEventInfo? OnAllyTryHitField { get; }
+    
+    /// <summary>
+    /// Triggered when trying to hit side with ally.
+    /// </summary>
+    OnAllyTryHitSideEventInfo? OnAllyTryHitSide { get; }
+    
+    /// <summary>
+  /// Triggered for ally invulnerability check.
+    /// </summary>
+    OnAllyInvulnerabilityEventInfo? OnAllyInvulnerability { get; }
+  
+    /// <summary>
+    /// Triggered when ally tries to move.
+    /// </summary>
+    OnAllyTryMoveEventInfo? OnAllyTryMove { get; }
+    
+    /// <summary>
+    /// Triggered when trying primary hit on ally.
+    /// </summary>
+    OnAllyTryPrimaryHitEventInfo? OnAllyTryPrimaryHit { get; }
+  
+    /// <summary>
+    /// Triggered to get ally's type.
+    /// </summary>
+    OnAllyTypeEventInfo? OnAllyType { get; }
+    
+    /// <summary>
+    /// Triggered when weather modifies damage to ally.
+    /// </summary>
+    OnAllyWeatherModifyDamageEventInfo? OnAllyWeatherModifyDamage { get; }
+    
+    /// <summary>
+/// Triggered to modify damage to ally (phase 1).
+    /// </summary>
+    OnAllyModifyDamagePhase1EventInfo? OnAllyModifyDamagePhase1 { get; }
+    
+    /// <summary>
+    /// Triggered to modify damage to ally (phase 2).
+  /// </summary>
+    OnAllyModifyDamagePhase2EventInfo? OnAllyModifyDamagePhase2 { get; }
 }

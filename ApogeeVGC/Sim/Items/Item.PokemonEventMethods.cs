@@ -4,7 +4,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 
 namespace ApogeeVGC.Sim.Items;
 
-public partial record Item : IPokemonEventMethodsV2
+public partial record Item : IPokemonEventMethods
 {
     public OnDamagingHitEventInfo? OnDamagingHit { get; init; }
     public OnEmergencyExitEventInfo? OnEmergencyExit { get; init; }

@@ -12,7 +12,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Conditions;
 
-public partial record Condition : ISideEventMethodsV2, IFieldEventMethodsV2, IEffect, IBasicEffect,
+public partial record Condition : ISideEventMethods, IFieldEventMethods, IEffect, IBasicEffect,
     ICopyable<Condition>
 {
     public required ConditionId Id { get; init; }

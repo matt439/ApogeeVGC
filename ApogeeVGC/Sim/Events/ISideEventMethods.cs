@@ -1,32 +1,31 @@
-﻿//using ApogeeVGC.Sim.BattleClasses;
-//using ApogeeVGC.Sim.Effects;
-//using ApogeeVGC.Sim.PokemonClasses;
-//using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 
-//namespace ApogeeVGC.Sim.Events;
+namespace ApogeeVGC.Sim.Events;
 
-//public interface ISideEventMethods : IEventMethods
-//{
-//    /// <summary>
-//    /// battle, target, source, sourceEffect
-//    /// </summary>
-//    Action<Battle, Side, Pokemon, IEffect>? OnSideStart { get; }
+/// <summary>
+/// Modern interface for side-specific event methods using strongly-typed EventHandlerInfo records.
+/// This replaces ISideEventMethods with a type-safe approach that validates delegate signatures at compile-time.
+/// Each EventHandlerInfo record contains its own Priority, Order, and SubOrder properties.
+/// </summary>
+public interface ISideEventMethods : IEventMethods
+{
+    /// <summary>
+    /// Triggered when a side condition starts.
+    /// </summary>
+    OnSideStartEventInfo? OnSideStart { get; }
 
-//    /// <summary>
-//    /// battle, target, source, sourceEffect
-//    /// </summary>
-//    Action<Battle, Side, Pokemon, IEffect>? OnSideRestart { get; }
+    /// <summary>
+ /// Triggered when a side condition restarts/reactivates.
+    /// </summary>
+    OnSideRestartEventInfo? OnSideRestart { get; }
 
-//    /// <summary>
-//    /// battle, target, source, effect
-//    /// </summary>
-//    Action<Battle, Side, Pokemon, IEffect>? OnSideResidual { get; }
+  /// <summary>
+    /// Triggered for residual side condition effects (each turn).
+    /// </summary>
+    OnSideResidualEventInfo? OnSideResidual { get; }
 
-//    /// <summary>
-//    /// battle, target
-//    /// </summary>
-//    Action<Battle, Side>? OnSideEnd { get; }
-//    int? OnSideResidualOrder { get; }
-//    int? OnSideResidualPriority { get; }
-//    int? OnSideResidualSubOrder { get; }
-//}
+    /// <summary>
+    /// Triggered when a side condition ends.
+    /// </summary>
+    OnSideEndEventInfo? OnSideEnd { get; }
+}

@@ -13,9 +13,9 @@ public static class EventHandlerInfoMapper
     /// Maps EventId to property accessor functions for IEventMethodsV2.
     /// Each function takes an IEventMethodsV2 and returns the corresponding EventHandlerInfo.
     /// </summary>
-    private static readonly FrozenDictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+    private static readonly FrozenDictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
         EventMethodsMap =
-            new Dictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+            new Dictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
             {
                 // Base Events (no prefix)
                 [EventId.Accuracy] = e => e.OnAccuracy,
@@ -117,9 +117,9 @@ public static class EventHandlerInfoMapper
     /// <summary>
     /// Maps EventId + EventPrefix.Foe to property accessor functions.
     /// </summary>
-    private static readonly FrozenDictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+    private static readonly FrozenDictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
         FoeEventMethodsMap =
-            new Dictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+            new Dictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
             {
                 [EventId.Accuracy] = e => e.OnFoeAccuracy,
                 [EventId.AfterBoost] = e => e.OnFoeAfterBoost,
@@ -204,9 +204,9 @@ public static class EventHandlerInfoMapper
     /// <summary>
     /// Maps EventId + EventPrefix.Source to property accessor functions.
     /// </summary>
-    private static readonly FrozenDictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+    private static readonly FrozenDictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
         SourceEventMethodsMap =
-            new Dictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+            new Dictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
             {
                 [EventId.Accuracy] = e => e.OnSourceAccuracy,
                 [EventId.AfterBoost] = e => e.OnSourceAfterBoost,
@@ -291,9 +291,9 @@ public static class EventHandlerInfoMapper
     /// <summary>
     /// Maps EventId + EventPrefix.Any to property accessor functions.
     /// </summary>
-    private static readonly FrozenDictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+    private static readonly FrozenDictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
         AnyEventMethodsMap =
-            new Dictionary<EventId, Func<IEventMethodsV2, EventHandlerInfo?>>
+            new Dictionary<EventId, Func<IEventMethods, EventHandlerInfo?>>
             {
                 [EventId.Accuracy] = e => e.OnAnyAccuracy,
                 [EventId.AfterBoost] = e => e.OnAnyAfterBoost,
@@ -383,9 +383,9 @@ public static class EventHandlerInfoMapper
     /// Maps EventId + EventPrefix.Ally to property accessor functions (IPokemonEventMethodsV2).
     /// </summary>
     private static readonly
-        FrozenDictionary<EventId, Func<IPokemonEventMethodsV2, EventHandlerInfo?>>
+        FrozenDictionary<EventId, Func<IPokemonEventMethods, EventHandlerInfo?>>
         AllyEventMethodsMap =
-            new Dictionary<EventId, Func<IPokemonEventMethodsV2, EventHandlerInfo?>>
+            new Dictionary<EventId, Func<IPokemonEventMethods, EventHandlerInfo?>>
             {
                 [EventId.Accuracy] = e => e.OnAllyAccuracy,
                 [EventId.AfterBoost] = e => e.OnAllyAfterBoost,
@@ -506,7 +506,7 @@ public static class EventHandlerInfoMapper
         }
 
         // Handle prefixed events
-        if (prefix.HasValue && effect is IEventMethodsV2 eventMethods)
+        if (prefix.HasValue && effect is IEventMethods eventMethods)
         {
             EventHandlerInfo? info = prefix.Value switch
             {
@@ -516,7 +516,7 @@ public static class EventHandlerInfoMapper
                     accessor(eventMethods),
                 EventPrefix.Any when AnyEventMethodsMap.TryGetValue(id, out var accessor) =>
                     accessor(eventMethods),
-                EventPrefix.Ally when effect is IPokemonEventMethodsV2 pokemonMethods &&
+                EventPrefix.Ally when effect is IPokemonEventMethods pokemonMethods &&
                                       AllyEventMethodsMap.TryGetValue(id, out var allyAccessor) =>
                     allyAccessor(pokemonMethods),
                 _ => null,
@@ -527,7 +527,7 @@ public static class EventHandlerInfoMapper
         }
 
         // Handle base events (no prefix)
-        if (effect is IEventMethodsV2 baseMethods &&
+        if (effect is IEventMethods baseMethods &&
             EventMethodsMap.TryGetValue(id, out var baseAccessor))
         {
             EventHandlerInfo? info = baseAccessor(baseMethods);
