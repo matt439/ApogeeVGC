@@ -14,7 +14,8 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     public RelayVar? SingleEvent(EventId eventId, IEffect effect, EffectState? state = null,
-        SingleEventTarget? target = null, SingleEventSource? source = null, IEffect? sourceEffect = null,
+        SingleEventTarget? target = null, SingleEventSource? source = null,
+        IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
         // Check for stack overflow
@@ -26,6 +27,7 @@ public partial class Battle
                 Add("message", $"Event: {eventId}");
                 Add("message", $"Parent event: {Event.Id}");
             }
+
             throw new InvalidOperationException("Stack overflow");
         }
 
@@ -38,6 +40,7 @@ public partial class Battle
                 Add("message", $"Event: {eventId}");
                 Add("message", $"Parent event: {Event.Id}");
             }
+
             throw new InvalidOperationException("Infinite loop");
         }
 
@@ -91,67 +94,69 @@ public partial class Battle
 
         // Check if weather is suppressed
         if (effect.EffectType == EffectType.Weather &&
-         eventId != EventId.FieldStart &&
-    eventId != EventId.FieldResidual &&
-        eventId != EventId.FieldEnd &&
-Field.SuppressingWeather())
+            eventId != EventId.FieldStart &&
+            eventId != EventId.FieldResidual &&
+            eventId != EventId.FieldEnd &&
+            Field.SuppressingWeather())
         {
-    Debug($"{eventId} handler suppressed by Air Lock");
+            Debug($"{eventId} handler suppressed by Air Lock");
             return relayVar;
         }
 
-  // Get the handler - either custom callback or from the effect's EventHandlerInfo
+        // Get the handler - either custom callback or from the effect's EventHandlerInfo
         EventHandlerInfo? handlerInfo = null;
- EffectDelegate? legacyCallback = null;
-        
+        EffectDelegate? legacyCallback = null;
+
         if (customCallback != null)
-{
-  // Custom callback provided - use legacy path for now
-  legacyCallback = customCallback;
+        {
+            // Custom callback provided - use legacy path for now
+            legacyCallback = customCallback;
         }
-else
-     {
-  // Get EventHandlerInfo from effect (preferred)
-  handlerInfo = effect.GetEventHandlerInfo(eventId);
-       if (handlerInfo == null) return relayVar;
-}
+        else
+        {
+            // Get EventHandlerInfo from effect (preferred)
+            handlerInfo = effect.GetEventHandlerInfo(eventId);
+            if (handlerInfo == null) return relayVar;
+        }
 
         // Save parent context
-  IEffect parentEffect = Effect;
-    EffectState parentEffectState = EffectState;
+        IEffect parentEffect = Effect;
+        EffectState parentEffectState = EffectState;
         Event parentEvent = Event;
 
-  // Set up new event context
-   Effect = effect;
-  EffectState = state ?? InitEffectState();
-   Event = new Event
-    {
-      Id = eventId,
-    Target = target,
-      Source = source,
-    Effect = sourceEffect,
+        // Set up new event context
+        Effect = effect;
+        EffectState = state ?? InitEffectState();
+        Event = new Event
+        {
+            Id = eventId,
+            Target = target,
+            Source = source,
+            Effect = sourceEffect,
         };
-      EventDepth++;
+        EventDepth++;
 
-  // Invoke the handler with appropriate parameters
-    RelayVar? returnVal;
+        // Invoke the handler with appropriate parameters
+        RelayVar? returnVal;
         try
-   {
-      if (handlerInfo != null)
-       {
-  returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target, source, sourceEffect);
-       }
-  else if (legacyCallback != null)
-   {
-  #pragma warning disable CS0618 // Type or member is obsolete
-        returnVal = InvokeEventCallback(legacyCallback, hasRelayVar, relayVar, target, source, sourceEffect);
-      #pragma warning restore CS0618
-     }
- else
-     {
-     returnVal = relayVar;
-   }
-   }
+        {
+            if (handlerInfo != null)
+            {
+                returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
+                    source, sourceEffect);
+            }
+            else if (legacyCallback != null)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                returnVal = InvokeEventCallback(legacyCallback, hasRelayVar, relayVar, target,
+                    source, sourceEffect);
+#pragma warning restore CS0618
+            }
+            else
+            {
+                returnVal = relayVar;
+            }
+        }
         finally
         {
             // Restore parent context
@@ -164,8 +169,10 @@ else
         return returnVal ?? relayVar;
     }
 
-    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null, RunEventSource? source = null,
-        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null, bool? fastExit = null)
+    public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,
+        RunEventSource? source = null,
+        IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null,
+        bool? fastExit = null)
     {
         // Check for stack overflow
         if (EventDepth >= 8)
@@ -177,6 +184,7 @@ else
                 Add("message", $"Event: {eventId}");
                 Add("message", $"Parent event: {Event.Id}");
             }
+
             throw new InvalidOperationException("Stack overflow");
         }
 
@@ -198,7 +206,8 @@ else
         {
             if (sourceEffect == null)
             {
-                throw new ArgumentNullException(nameof(sourceEffect), "onEffect passed without an effect");
+                throw new ArgumentNullException(nameof(sourceEffect),
+                    "onEffect passed without an effect");
             }
 
             EventHandlerInfo? handlerInfo = sourceEffect.GetEventHandlerInfo(eventId);
@@ -222,14 +231,16 @@ else
                         SideRunEventTarget sideTarget => sideTarget.Side,
                         FieldRunEventTarget fieldTarget => fieldTarget.Field,
                         BattleRunEventTarget => EffectHolder.FromBattle(this),
-                        _ => throw new InvalidOperationException($"Unknown target type: {target.GetType().Name}"),
+                        _ => throw new InvalidOperationException(
+                            $"Unknown target type: {target.GetType().Name}"),
                     },
                 }, eventId));
             }
         }
 
         // Sort handlers based on event type
-        if (eventId is EventId.Invulnerability or EventId.TryHit or EventId.DamagingHit or EventId.EntryHazard)
+        if (eventId is EventId.Invulnerability or EventId.TryHit or EventId.DamagingHit
+            or EventId.EntryHazard)
         {
             handlers.Sort(CompareLeftToRightOrder);
         }
@@ -253,12 +264,14 @@ else
             Id = eventId,
             Target = target switch
             {
-                PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget.Pokemon),
+                PokemonRunEventTarget pokemonTarget => new PokemonSingleEventTarget(pokemonTarget
+                    .Pokemon),
                 _ => null,
             },
             Source = source switch
             {
-                PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource.Pokemon),
+                PokemonRunEventSource pokemonSource => new PokemonSingleEventSource(pokemonSource
+                    .Pokemon),
                 _ => null,
             },
             Effect = sourceEffect,
@@ -295,7 +308,8 @@ else
 
                 // Skip if falsy (except for DamagingHit with 0 damage)
                 if (!IsRelayVarTruthy(currentRelayVar) &&
-                    !(eventId == EventId.DamagingHit && currentRelayVar is IntRelayVar { Value: 0 }))
+                    !(eventId == EventId.DamagingHit &&
+                      currentRelayVar is IntRelayVar { Value: 0 }))
                 {
                     continue;
                 }
@@ -330,12 +344,14 @@ else
                 effectHolder is PokemonEffectHolder pokemonHolder2)
             {
                 var ability = (Ability)effect;
-                if ((ability.Flags.Breakable ?? false) && SuppressingAbility(pokemonHolder2.Pokemon))
+                if ((ability.Flags.Breakable ?? false) &&
+                    SuppressingAbility(pokemonHolder2.Pokemon))
                 {
                     if (DisplayUi)
                     {
                         Debug($"{eventId} handler suppressed by Mold Breaker");
                     }
+
                     continue;
                 }
 
@@ -346,6 +362,7 @@ else
                     {
                         Debug($"{eventId} handler suppressed by Mold Breaker");
                     }
+
                     continue;
                 }
             }
@@ -360,6 +377,7 @@ else
                 {
                     Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
                 }
+
                 continue;
             }
 
@@ -373,6 +391,7 @@ else
                 {
                     Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
                 }
+
                 continue;
             }
 
@@ -385,6 +404,7 @@ else
                 {
                     Debug($"{eventId} handler suppressed by Air Lock");
                 }
+
                 continue;
             }
 
@@ -463,7 +483,9 @@ else
         Event = parentEvent;
 
         // Return appropriate result
-        return target is PokemonArrayRunEventTarget ? new ArrayRelayVar([.. targetRelayVars ?? []]) : relayVar;
+        return target is PokemonArrayRunEventTarget
+            ? new ArrayRelayVar([.. targetRelayVars ?? []])
+            : relayVar;
     }
 
     /// <summary>
@@ -515,7 +537,8 @@ else
         // e.g., "Residual" becomes "FieldResidual" and "SideResidual"
         EventId fieldEventId = GetFieldEventId(eventId);
         EventId sideEventId = GetSideEventId(eventId);
-        EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventId, Library.Events);
+        EventId anyEventId =
+            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventId, Library.Events);
 
         // Collect all handlers from field-level effects
         var handlers = FindFieldEventHandlers(Field, fieldEventId, getKey);
@@ -568,7 +591,8 @@ else
             }
 
             // Handle duration tracking for Residual events
-            if (eventId == EventId.Residual && handler is { End: not null, State.Duration: not null })
+            if (eventId == EventId.Residual &&
+                handler is { End: not null, State.Duration: not null })
             {
                 handler.State.Duration--;
                 if (handler.State.Duration <= 0)
@@ -579,8 +603,9 @@ else
                     {
                         // Default: pass Battle and the effect holder (e.g., Pokemon, Side, or Field)
                         // OnEnd delegates typically have signature: (Battle, Pokemon) or (Battle, Side)
-                        endCallArgsList.Add(this);  // First arg: Battle
-                        endCallArgsList.Add(handler.EffectHolder);  // Second arg: target (Pokemon/Side/Field)
+                        endCallArgsList.Add(this); // First arg: Battle
+                        endCallArgsList.Add(handler
+                            .EffectHolder); // Second arg: target (Pokemon/Side/Field)
                     }
 
                     // Invoke the end callback
@@ -604,12 +629,14 @@ else
 
                     // Determine where this effect's state should be stored
                     // Check if this is an ability state (not starting with "ability:" prefix means it's the main ability)
-                    if (effect is { EffectType: EffectType.Ability, EffectStateId: not AbilityEffectStateId })
+                    if (effect is
+                        { EffectType: EffectType.Ability, EffectStateId: not AbilityEffectStateId })
                     {
                         expectedStateLocation = pokemon.AbilityState;
                     }
                     // Check if this is an item state (not starting with "item:" prefix means it's the main item)
-                    else if (effect is { EffectType: EffectType.Item, EffectStateId: not ItemEffectStateId })
+                    else if (effect is
+                             { EffectType: EffectType.Item, EffectStateId: not ItemEffectStateId })
                     {
                         expectedStateLocation = pokemon.ItemState;
                     }
@@ -619,7 +646,8 @@ else
                     }
                     else if (effect.EffectStateId is ConditionEffectStateId conditionId)
                     {
-                        pokemon.Volatiles.TryGetValue(conditionId.ConditionId, out expectedStateLocation);
+                        pokemon.Volatiles.TryGetValue(conditionId.ConditionId,
+                            out expectedStateLocation);
                     }
 
                     // If the state doesn't match, the effect was removed
@@ -637,7 +665,7 @@ else
                     if (effect.EffectStateId is ConditionEffectStateId conditionId)
                     {
                         if (!targetSide.SideConditions.TryGetValue(conditionId.ConditionId,
-                            out EffectState? sideConditionState) ||
+                                out EffectState? sideConditionState) ||
                             sideConditionState != handler.State)
                         {
                             continue;
@@ -685,18 +713,20 @@ else
             // Execute the handler's callback
             if (handler.HandlerInfo != null)
             {
-           SingleEventTarget? singleEventTarget = handler.EffectHolder switch
-     {
-      PokemonEffectHolder pokemonEh => new PokemonSingleEventTarget(pokemonEh.Pokemon),
-               SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
- FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
-              BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
-         _ => null,
-         };
+                SingleEventTarget? singleEventTarget = handler.EffectHolder switch
+                {
+                    PokemonEffectHolder pokemonEh =>
+                        new PokemonSingleEventTarget(pokemonEh.Pokemon),
+                    SideEffectHolder sideEh => new SideSingleEventTarget(sideEh.Side),
+                    FieldEffectHolder fieldEh => new FieldSingleEventTarget(fieldEh.Field),
+                    BattleEffectHolder battleEh => SingleEventTarget.FromBattle(battleEh.Battle),
+                    _ => null,
+                };
 
                 SingleEvent(handlerEventId, effect, handler.State, singleEventTarget,
-         null, null, null, null); // customCallback is null, will use effect's EventHandlerInfo
-        }
+                    null, null, null,
+                    null); // customCallback is null, will use effect's EventHandlerInfo
+            }
 
             // Process any faint messages and check if battle has ended
             FaintMessages();
@@ -704,7 +734,8 @@ else
         }
     }
 
-    public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target, Pokemon? source = null,
+    public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target,
+        Pokemon? source = null,
         IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
     {
         return RunEvent(eventId, RunEventTarget.FromPokemonSideBattleUnion(target),
@@ -713,8 +744,9 @@ else
 
     public void OnEvent(EventId eventId, Format target, object[] rest)
     {
-        throw new NotImplementedException("This method is for attaching custom event handlers to a Battle." +
-                                          "It shouldn't be used in this implementation.");
+        throw new NotImplementedException(
+            "This method is for attaching custom event handlers to a Battle." +
+            "It shouldn't be used in this implementation.");
     }
 
     #region Helpers
@@ -724,26 +756,28 @@ else
     /// This provides type-safe invocation with compile-time validation and eliminates
     /// the need for complex pattern matching on EffectDelegate union types.
     /// </summary>
-    private RelayVar? InvokeEventHandlerInfo(EventHandlerInfo? handlerInfo, bool hasRelayVar, RelayVar relayVar,
-      SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+    private RelayVar? InvokeEventHandlerInfo(EventHandlerInfo? handlerInfo, bool hasRelayVar,
+        RelayVar relayVar,
+        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         if (handlerInfo == null) return relayVar;
 
- // Check for constant values in union types (fast path)
+        // Check for constant values in union types (fast path)
         if (handlerInfo is IUnionEventHandler unionHandler && unionHandler.IsConstant())
         {
             object? constantValue = unionHandler.GetConstantValue();
-      return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
-      }
+            return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
+        }
 
         // Get the delegate from the handler
         Delegate? handler = handlerInfo.Handler;
-     if (handler == null) return relayVar;
+        if (handler == null) return relayVar;
 
         // Invoke the delegate directly using the known signature from EventHandlerInfo
         // This avoids DynamicInvoke and provides better performance
 // Note: Parameter nullability is validated by EventHandlerInfo during creation
-        return InvokeDelegateEffectDelegate(handler, hasRelayVar, relayVar, target, source, sourceEffect);
+        return InvokeDelegateEffectDelegate(handler, hasRelayVar, relayVar, target, source,
+            sourceEffect);
     }
 
     /// <summary>
@@ -751,22 +785,22 @@ else
     /// </summary>
     private static RelayVar? ConvertConstantToRelayVar(object? constantValue, EventId eventId)
     {
- return constantValue switch
+        return constantValue switch
         {
-         bool boolValue => new BoolRelayVar(boolValue),
-          int intValue => new IntRelayVar(intValue),
- decimal decimalValue => new DecimalRelayVar(decimalValue),
-   string stringValue => new StringRelayVar(stringValue),
+            bool boolValue => new BoolRelayVar(boolValue),
+            int intValue => new IntRelayVar(intValue),
+            decimal decimalValue => new DecimalRelayVar(decimalValue),
+            string stringValue => new StringRelayVar(stringValue),
             MoveId moveId => new MoveIdRelayVar(moveId),
             null => null,
-         _ => throw new InvalidOperationException(
-       $"Event {eventId}: Unsupported constant value type: {constantValue.GetType().Name}"),
+            _ => throw new InvalidOperationException(
+                $"Event {eventId}: Unsupported constant value type: {constantValue.GetType().Name}"),
         };
     }
 
     /// <summary>
     /// Invokes an EventHandlerInfo callback and extracts the return value.
- /// This is a helper for invoking callback properties like DurationCallback, BasePowerCallback, etc.
+    /// This is a helper for invoking callback properties like DurationCallback, BasePowerCallback, etc.
     /// </summary>
     /// <typeparam name="TResult">The expected return type</typeparam>
     /// <param name="handlerInfo">The handler info to invoke</param>
@@ -776,8 +810,8 @@ else
     {
         if (handlerInfo?.Handler == null)
         {
-      return default;
-  }
+            return default;
+        }
 
         // Validate parameter nullability if specified
         if (handlerInfo.ParameterNullability != null)
@@ -791,22 +825,23 @@ else
         // Handle null return values
         if (result == null)
         {
- if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
-          {
-         throw new InvalidOperationException(
-       $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
+            if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
+            {
+                throw new InvalidOperationException(
+                    $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
             }
-    return default;
- }
 
-    // Cast to expected type
+            return default;
+        }
+
+        // Cast to expected type
         if (result is TResult typedResult)
-   {
+        {
             return typedResult;
-    }
+        }
 
         throw new InvalidOperationException(
-      $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
+            $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
     }
 
     /// <summary>
@@ -815,7 +850,8 @@ else
     /// [Obsolete] Use InvokeEventHandlerInfo instead for new code.
     /// </summary>
     [Obsolete("Use InvokeEventHandlerInfo for new code")]
-    private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar, RelayVar relayVar,
+    private RelayVar? InvokeEventCallback(EffectDelegate callback, bool hasRelayVar,
+        RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         // Handle non-function callbacks (constants) - fast path
@@ -825,7 +861,10 @@ else
                 return new BoolRelayVar(ofb.Value);
             case OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitBool ocb }:
                 return new BoolRelayVar(ocb.Value);
-            case OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFrationalPriorityNeg ofpn }:
+            case OnFractionalPriorityEffectDelegate
+            {
+                OnFractionalPriority: OnFrationalPriorityNeg ofpn
+            }:
                 return new DecimalRelayVar(ofpn.Value);
             case OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemBool otib }:
                 return new BoolRelayVar(otib.Value);
@@ -844,20 +883,37 @@ else
         return callback switch
         {
             // DelegateEffectDelegate is the generic wrapper - try common signatures first
-            DelegateEffectDelegate ded => InvokeDelegateEffectDelegate(ded.Del, hasRelayVar, relayVar, target, source, sourceEffect),
+            DelegateEffectDelegate ded => InvokeDelegateEffectDelegate(ded.Del, hasRelayVar,
+                relayVar, target, source, sourceEffect),
 
             // Specific delegate types with known signatures
-            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => InvokeStandardDelegate(off.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } => InvokeStandardDelegate(ocf.Function, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnFractionalPriorityEffectDelegate { OnFractionalPriority: OnFractionalPriorityFunc ofpf } => InvokeStandardDelegate(ofpf.Function, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => InvokeStandardDelegate(otif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => InvokeStandardDelegate(othf1.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => InvokeStandardDelegate(othf2.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } => InvokeStandardDelegate(fotei.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } => InvokeStandardDelegate(onif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
-            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => InvokeStandardDelegate(olmf.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnFlinchEffectDelegate { OnFlinch: OnFlinchFunc off } => InvokeStandardDelegate(
+                off.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnCriticalHitEffectDelegate { OnCriticalHit: OnCriticalHitFunc ocf } =>
+                InvokeStandardDelegate(ocf.Function, hasRelayVar, relayVar, target, source,
+                    sourceEffect),
+            OnFractionalPriorityEffectDelegate
+            {
+                OnFractionalPriority: OnFractionalPriorityFunc ofpf
+            } => InvokeStandardDelegate(ofpf.Function, hasRelayVar, relayVar, target, source,
+                sourceEffect),
+            OnTakeItemEffectDelegate { OnTakeItem: OnTakeItemFunc otif } => InvokeStandardDelegate(
+                otif.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc1 othf1 } => InvokeStandardDelegate(
+                othf1.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryHealEffectDelegate { OnTryHeal: OnTryHealFunc2 othf2 } => InvokeStandardDelegate(
+                othf2.Func, hasRelayVar, relayVar, target, source, sourceEffect),
+            OnTryEatItemEffectDelegate { OnTryEatItem: FuncOnTryEatItem fotei } =>
+                InvokeStandardDelegate(fotei.Func, hasRelayVar, relayVar, target, source,
+                    sourceEffect),
+            OnNegateImmunityEffectDelegate { OnNegateImmunity: OnNegateImmunityFunc onif } =>
+                InvokeStandardDelegate(onif.Func, hasRelayVar, relayVar, target, source,
+                    sourceEffect),
+            OnLockMoveEffectDelegate { OnLockMove: OnLockMoveFunc olmf } => InvokeStandardDelegate(
+                olmf.Func, hasRelayVar, relayVar, target, source, sourceEffect),
 
-            _ => throw new InvalidOperationException($"Unknown EffectDelegate type: {callback.GetType().Name}"),
+            _ => throw new InvalidOperationException(
+                $"Unknown EffectDelegate type: {callback.GetType().Name}"),
         };
     }
 
@@ -869,7 +925,8 @@ else
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         // Reuse the optimized invocation logic
-        return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source, sourceEffect);
+        return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source,
+            sourceEffect);
     }
 
     #endregion

@@ -37,8 +37,15 @@ public partial class BattleActions
         // Damage callback (e.g., Seismic Toss, Night Shade)
         if (move.DamageCallback != null)
         {
-            return move.DamageCallback(Battle, source, target, move).ToIntUndefinedFalseUnion();
-        }
+            IntFalseUnion? damageResult = Battle.InvokeCallback<IntFalseUnion>(
+                move.DamageCallback,
+     Battle,
+source,
+        target,
+            move
+            );
+  return damageResult?.ToIntUndefinedFalseUnion() ?? IntUndefinedFalseUnion.FromFalse();
+     }
 
         // Fixed damage moves
         if (move.Damage is LevelMoveDamage)
@@ -57,8 +64,14 @@ public partial class BattleActions
         IntFalseUnion? basePower = move.BasePower;
         if (move.BasePowerCallback != null)
         {
-            basePower = move.BasePowerCallback(Battle, source, target, move);
-        }
+   basePower = Battle.InvokeCallback<IntFalseUnion>(
+       move.BasePowerCallback,
+ Battle,
+   source,
+           target,
+    move
+            );
+  }
 
         // Base power checks
         if (basePower == null || basePower == 0)

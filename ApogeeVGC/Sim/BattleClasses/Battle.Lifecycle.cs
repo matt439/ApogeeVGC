@@ -568,8 +568,12 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
                     if (target == null) return false;
                     if (btmAction.Move.BeforeTurnCallback == null)
                         throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
-                    btmAction.Move.BeforeTurnCallback(this, btmAction.Pokemon, target,
-                        btmAction.Move.ToActiveMove());
+                     this.InvokeCallback<object>(
+              btmAction.Move.BeforeTurnCallback,
+           this,
+             btmAction.Pokemon,
+         target,
+ btmAction.Move);
                     break;
                 }
 
@@ -584,9 +588,14 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
                         Debug($"priority charge callback: {pcmAction.Move.Id}");
                     }
 
-                    if (pcmAction.Move.PriorityChargeCallback == null)
-                        throw new InvalidOperationException("priorityChargeMove has no priorityChargeCallback");
-                    pcmAction.Move.PriorityChargeCallback(this, pcmAction.Pokemon);
+                    if (pcmAction.Move.PriorityChargeCallback != null)
+ {
+    this.InvokeCallback<object>(
+       pcmAction.Move.PriorityChargeCallback,
+    this,
+       pcmAction.Pokemon);
+      }
+
                     break;
                 }
 
