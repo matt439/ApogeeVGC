@@ -25,5 +25,12 @@ Priority = priority;
       UsesSpeed = usesSpeed;
       ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon), typeof(Pokemon), typeof(Move)];
    ExpectedReturnType = typeof(PokemonVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

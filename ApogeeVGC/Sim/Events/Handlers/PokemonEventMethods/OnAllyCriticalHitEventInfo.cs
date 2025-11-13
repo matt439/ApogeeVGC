@@ -21,15 +21,22 @@ public sealed record OnAllyCriticalHitEventInfo : UnionEventHandlerInfo<OnCritic
     public OnAllyCriticalHitEventInfo(
         OnCriticalHit unionValue,
         int? priority = null,
-  bool usesSpeed = true)
+        bool usesSpeed = true)
     {
         Id = EventId.CriticalHit;
-      Prefix = EventPrefix.Ally;
-UnionValue = unionValue;
+        Prefix = EventPrefix.Ally;
+        UnionValue = unionValue;
         Handler = ExtractDelegate();
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-ExpectedReturnType = typeof(BoolVoidUnion);
+        ExpectedReturnType = typeof(BoolVoidUnion);
+
+        // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
+        ParameterNullability = new[] { false, false, false, false };
+        ReturnTypeNullable = false; // BoolVoidUnion is a struct
+
+        // Validate configuration
+        ValidateConfiguration();
     }
 }

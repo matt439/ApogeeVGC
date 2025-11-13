@@ -28,5 +28,12 @@ int? priority = null,
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Field)];
  ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

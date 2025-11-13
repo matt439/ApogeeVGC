@@ -32,5 +32,12 @@ Prefix = EventPrefix.Foe;
   typeof(Pokemon),
         ];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

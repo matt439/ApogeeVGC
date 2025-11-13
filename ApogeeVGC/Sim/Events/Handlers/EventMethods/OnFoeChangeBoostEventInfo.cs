@@ -23,5 +23,12 @@ public sealed record OnFoeChangeBoostEventInfo : EventHandlerInfo
   UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

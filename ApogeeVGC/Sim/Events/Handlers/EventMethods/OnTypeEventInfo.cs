@@ -33,5 +33,12 @@ public sealed record OnTypeEventInfo : EventHandlerInfo
 typeof(Pokemon),
  ];
      ExpectedReturnType = typeof(TypesVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

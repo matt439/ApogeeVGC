@@ -15,7 +15,7 @@ public sealed record OnDamagingHitEventInfo : EventHandlerInfo
     /// Creates a new OnDamagingHit event handler.
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
-  /// <param name="order">Execution order (lower executes first)</param>
+    /// <param name="order">Execution order (lower executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
   public OnDamagingHitEventInfo(
      Action<Battle, int, Pokemon, Pokemon, ActiveMove> handler,
@@ -26,14 +26,21 @@ public sealed record OnDamagingHitEventInfo : EventHandlerInfo
    Handler = handler;
         Order = order;
  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = new[] 
-        { 
+        ExpectedParameterTypes =
+        [
             typeof(Battle), 
             typeof(int), 
      typeof(Pokemon), 
             typeof(Pokemon), 
-            typeof(ActiveMove) 
- };
+            typeof(ActiveMove),
+        ];
         ExpectedReturnType = typeof(void);
+        
+        // Nullability: All parameters are non-nullable
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false; // void
+   
+        // Validate configuration
+      ValidateConfiguration();
     }
 }

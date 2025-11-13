@@ -33,5 +33,12 @@ public sealed record OnFlinchEventInfo : UnionEventHandlerInfo<OnFlinch>
   typeof(Pokemon),
      ];
         ExpectedReturnType = typeof(BoolVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

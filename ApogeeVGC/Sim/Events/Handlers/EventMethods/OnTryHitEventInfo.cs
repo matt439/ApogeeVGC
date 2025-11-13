@@ -35,5 +35,12 @@ public sealed record OnTryHitEventInfo : EventHandlerInfo
     typeof(ActiveMove),
         ];
         ExpectedReturnType = typeof(BoolIntEmptyVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

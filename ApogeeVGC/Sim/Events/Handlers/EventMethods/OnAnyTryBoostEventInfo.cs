@@ -13,15 +13,22 @@ public sealed record OnAnyTryBoostEventInfo : EventHandlerInfo
 {
     public OnAnyTryBoostEventInfo(
         Action<Battle, SparseBoostsTable, Pokemon, Pokemon, IEffect> handler,
-int? priority = null,
-bool usesSpeed = true)
+        int? priority = null,
+     bool usesSpeed = true)
     {
         Id = EventId.TryBoost;
 Prefix = EventPrefix.Any;
         Handler = handler;
-Priority = priority;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
+        ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(void);
+
+        // Nullability: All parameters non-nullable
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false; // void
+
+        // Validate configuration
+        ValidateConfiguration();
     }
 }

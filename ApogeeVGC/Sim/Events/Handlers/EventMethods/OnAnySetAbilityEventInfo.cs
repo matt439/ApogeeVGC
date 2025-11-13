@@ -23,5 +23,12 @@ Priority = priority;
         UsesSpeed = usesSpeed;
       ExpectedParameterTypes = [typeof(Battle), typeof(Ability), typeof(Pokemon), typeof(Pokemon), typeof(IEffect)];
         ExpectedReturnType = typeof(bool?);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = true;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

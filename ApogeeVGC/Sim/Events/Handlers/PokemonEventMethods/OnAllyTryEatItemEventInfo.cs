@@ -31,5 +31,12 @@ Handler = ExtractDelegate();
   UsesSpeed = usesSpeed;
      ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
         ExpectedReturnType = typeof(BoolVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
   }
 }

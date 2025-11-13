@@ -11,17 +11,24 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// </summary>
 public sealed record OnFoeAfterMoveEventInfo : EventHandlerInfo
 {
- public OnFoeAfterMoveEventInfo(
-      Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
-        int? priority = null,
-        bool usesSpeed = true)
+    public OnFoeAfterMoveEventInfo(
+     Func<Battle, Pokemon, Pokemon, ActiveMove, BoolVoidUnion> handler,
+  int? priority = null,
+    bool usesSpeed = true)
     {
-   Id = EventId.AfterMove;
-   Prefix = EventPrefix.Foe;
-        Handler = handler;
+      Id = EventId.AfterMove;
+     Prefix = EventPrefix.Foe;
+  Handler = handler;
     Priority = priority;
-  UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
-        ExpectedReturnType = typeof(BoolVoidUnion);
+        UsesSpeed = usesSpeed;
+ ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+     ExpectedReturnType = typeof(BoolVoidUnion);
+        
+     // Nullability: All parameters non-nullable
+    ParameterNullability = [false, false, false, false];
+  ReturnTypeNullable = false; // BoolVoidUnion is a struct
+        
+   // Validate configuration
+  ValidateConfiguration();
     }
 }

@@ -33,10 +33,20 @@ bool usesSpeed = true)
         Priority = priority;
       UsesSpeed = usesSpeed;
  // Don't set ExpectedParameterTypes/ExpectedReturnType here
-        // because OnTryHeal has 2 different delegate signatures
- // Validation will determine which signature is used and validate without setting properties
-        ExpectedParameterTypes = null;
-   ExpectedReturnType = null;
+  // because OnTryHeal has 2 different delegate signatures
+        // Validation will determine which signature is used and validate without setting properties
+  ExpectedParameterTypes = null;
+  ExpectedReturnType = null;
+   
+        // Nullability info varies by signature - will be checked in custom Validate()
+  // Signature 1: (Battle, int, Pokemon, Pokemon, IEffect) - all non-nullable
+        // Signature 2: (Battle, Pokemon) - all non-nullable  
+   // Return type: nullable for both signatures
+        ParameterNullability = null; // Handled in custom validation
+        ReturnTypeNullable = true; // Both signatures return nullable types
+    
+      // Note: Don't call ValidateConfiguration() here because ExpectedParameterTypes is null
+        // Custom validation happens in Validate() method
     }
 
     /// <summary>

@@ -23,5 +23,12 @@ public sealed record OnAllyEatItemEventInfo : EventHandlerInfo
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Item), typeof(Pokemon)];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
   }
 }

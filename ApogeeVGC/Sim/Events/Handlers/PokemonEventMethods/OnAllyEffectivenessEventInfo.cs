@@ -13,16 +13,23 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 public sealed record OnAllyEffectivenessEventInfo : EventHandlerInfo
 {
     public OnAllyEffectivenessEventInfo(
-    Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
+        Func<Battle, int, Pokemon?, PokemonType, ActiveMove, IntVoidUnion> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
         Id = EventId.Effectiveness;
-  Prefix = EventPrefix.Ally;
-  Handler = handler;
+        Prefix = EventPrefix.Ally;
+        Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(PokemonType), typeof(ActiveMove)];
         ExpectedReturnType = typeof(IntVoidUnion);
-  }
+
+        // Nullability: Battle (non-null), int (non-null), Pokemon (nullable), PokemonType (non-null), ActiveMove (non-null)
+        ParameterNullability = new[] { false, false, true, false, false };
+        ReturnTypeNullable = false; // IntVoidUnion is a struct
+
+        // Validate configuration
+        ValidateConfiguration();
+    }
 }

@@ -21,5 +21,12 @@ public sealed record OnFoeImmunityEventInfo : EventHandlerInfo
   UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(PokemonType), typeof(Pokemon)];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

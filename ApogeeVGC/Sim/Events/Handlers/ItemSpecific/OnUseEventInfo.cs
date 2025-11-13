@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -16,5 +16,12 @@ public sealed record OnUseEventInfo : UnionEventHandlerInfo<OnItemEatUse>
         UnionValue = handler;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

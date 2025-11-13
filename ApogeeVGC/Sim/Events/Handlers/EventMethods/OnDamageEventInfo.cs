@@ -27,14 +27,21 @@ public sealed record OnDamageEventInfo : EventHandlerInfo
      Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-   ExpectedParameterTypes = new[] 
-   { 
-            typeof(Battle), 
+   ExpectedParameterTypes =
+   [
+       typeof(Battle), 
             typeof(int), 
   typeof(Pokemon), 
             typeof(Pokemon), 
-        typeof(IEffect) 
-        };
+        typeof(IEffect),
+   ];
   ExpectedReturnType = typeof(IntBoolVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
 }
 }

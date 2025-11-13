@@ -22,11 +22,18 @@ public sealed record OnEmergencyExitEventInfo : EventHandlerInfo
    Id = EventId.EmergencyExit;
         Handler = handler;
         UsesSpeed = usesSpeed;
-     ExpectedParameterTypes = new[] 
-        { 
-            typeof(Battle), 
-         typeof(Pokemon) 
-        };
+     ExpectedParameterTypes =
+     [
+         typeof(Battle), 
+         typeof(Pokemon),
+     ];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

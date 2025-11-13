@@ -27,17 +27,17 @@ public sealed record OnBeforeMoveEventInfo : EventHandlerInfo
         Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = new[] 
-        { 
-    typeof(Battle), 
+        ExpectedParameterTypes =
+        [
+            typeof(Battle), 
     typeof(Pokemon), // target
          typeof(Pokemon), // source
- typeof(ActiveMove) 
-        };
+ typeof(ActiveMove),
+        ];
         ExpectedReturnType = typeof(BoolVoidUnion);
         
         // Nullability: Battle (non-null), target (non-null), source (non-null), move (non-null)
-        ParameterNullability = new[] { false, false, false, false };
+        ParameterNullability = [false, false, false, false];
         ReturnTypeNullable = false; // BoolVoidUnion is a struct, never null
         
      // Validate configuration

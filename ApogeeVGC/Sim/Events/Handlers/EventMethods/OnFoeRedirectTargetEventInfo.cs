@@ -38,5 +38,12 @@ typeof(Pokemon),
     typeof(ActiveMove),
         ];
         ExpectedReturnType = typeof(PokemonVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

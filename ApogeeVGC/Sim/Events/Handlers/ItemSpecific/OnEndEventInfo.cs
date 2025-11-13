@@ -1,4 +1,4 @@
-﻿using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
@@ -15,5 +15,12 @@ public sealed record OnEndEventInfo : EventHandlerInfo
         Handler = handler;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
         ExpectedReturnType = typeof(void);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

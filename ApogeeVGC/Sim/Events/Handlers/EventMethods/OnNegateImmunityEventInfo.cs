@@ -35,5 +35,12 @@ public sealed record OnNegateImmunityEventInfo : UnionEventHandlerInfo<OnNegateI
          typeof(PokemonType),
    ];
         ExpectedReturnType = typeof(BoolVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
   }
 }

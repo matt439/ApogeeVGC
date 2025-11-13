@@ -24,5 +24,12 @@ public sealed record OnAllyModifyBoostEventInfo : EventHandlerInfo
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(SparseBoostsTable), typeof(Pokemon)];
         ExpectedReturnType = typeof(SparseBoostsTableVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = new[] { false, false, false };
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
   }
 }

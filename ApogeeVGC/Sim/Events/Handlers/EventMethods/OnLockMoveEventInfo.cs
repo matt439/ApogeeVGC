@@ -34,5 +34,12 @@ bool usesSpeed = true)
         typeof(Pokemon),
   ];
     ExpectedReturnType = typeof(MoveIdVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

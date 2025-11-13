@@ -20,17 +20,24 @@ public sealed record OnFoeAfterSwitchInSelfEventInfo : EventHandlerInfo
         Action<Battle, Pokemon> handler,
   int? priority = null,
    bool usesSpeed = true)
-{
+    {
         Id = EventId.AfterSwitchInSelf;
-    Prefix = EventPrefix.Foe;
-  Handler = handler;
+        Prefix = EventPrefix.Foe;
+    Handler = handler;
         Priority = priority;
-     UsesSpeed = usesSpeed;
-  ExpectedParameterTypes =
+        UsesSpeed = usesSpeed;
+   ExpectedParameterTypes =
   [
-  typeof(Battle),
-      typeof(Pokemon),
-        ];
-   ExpectedReturnType = typeof(void);
+      typeof(Battle),
+  typeof(Pokemon),
+   ];
+    ExpectedReturnType = typeof(void);
+        
+  // Nullability: Battle (non-null), Pokemon (non-null)
+  ParameterNullability = [false, false];
+  ReturnTypeNullable = false; // void
+      
+ // Validate configuration
+   ValidateConfiguration();
     }
 }

@@ -18,10 +18,17 @@ public sealed record OnFoeTryMoveEventInfo : EventHandlerInfo
     {
         Id = EventId.TryMove;
         Prefix = EventPrefix.Foe;
-   Handler = handler;
+        Handler = handler;
         Priority = priority;
-    UsesSpeed = usesSpeed;
+        UsesSpeed = usesSpeed;
         ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(BoolEmptyVoidUnion);
+
+        // Nullability: All parameters non-nullable
+        ParameterNullability = [false, false, false, false];
+        ReturnTypeNullable = true; // BoolEmptyVoidUnion? is nullable
+
+        // Validate configuration
+        ValidateConfiguration();
     }
 }

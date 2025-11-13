@@ -36,5 +36,12 @@ public sealed record OnAccuracyEventInfo : EventHandlerInfo
  typeof(ActiveMove),
         ];
      ExpectedReturnType = typeof(IntBoolVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

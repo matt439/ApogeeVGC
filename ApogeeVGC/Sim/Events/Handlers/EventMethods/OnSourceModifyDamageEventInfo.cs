@@ -37,5 +37,12 @@ Handler = handler;
   typeof(ActiveMove),
         ];
 ExpectedReturnType = typeof(DoubleVoidUnion);
+        
+    // Nullability: All parameters non-nullable by default (adjust as needed)
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+    // Validate configuration
+        ValidateConfiguration();
     }
 }

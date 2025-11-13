@@ -11,16 +11,23 @@ namespace ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 public sealed record OnAllyBeforeSwitchOutEventInfo : EventHandlerInfo
 {
     public OnAllyBeforeSwitchOutEventInfo(
-    Action<Battle, Pokemon> handler,
-        int? priority = null,
-        bool usesSpeed = true)
+      Action<Battle, Pokemon> handler,
+ int? priority = null,
+ bool usesSpeed = true)
     {
-        Id = EventId.BeforeSwitchOut;
-  Prefix = EventPrefix.Ally;
+   Id = EventId.BeforeSwitchOut;
+     Prefix = EventPrefix.Ally;
   Handler = handler;
-        Priority = priority;
-        UsesSpeed = usesSpeed;
-        ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
-        ExpectedReturnType = typeof(void);
-  }
+ Priority = priority;
+  UsesSpeed = usesSpeed;
+ ExpectedParameterTypes = [typeof(Battle), typeof(Pokemon)];
+ ExpectedReturnType = typeof(void);
+   
+      // Nullability: Battle (non-null), Pokemon (non-null)
+   ParameterNullability = new[] { false, false };
+  ReturnTypeNullable = false; // void
+        
+ // Validate configuration
+   ValidateConfiguration();
+    }
 }
