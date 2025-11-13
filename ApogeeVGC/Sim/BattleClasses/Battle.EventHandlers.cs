@@ -266,10 +266,8 @@ public partial class Battle
         EffectState statusState = pokemon.StatusState;
 
         List<(ConditionId id, EffectState state, Condition condition)> volatiles = [];
-        foreach (ConditionId id in pokemon.Volatiles.Keys.ToList()) // Materialize keys
-        {
-            volatiles.Add((id, pokemon.Volatiles[id], Library.Conditions[id]));
-        }
+        volatiles.AddRange(pokemon.Volatiles.Keys.ToList()
+            .Select(id => (id, pokemon.Volatiles[id], Library.Conditions[id])));
 
         Ability ability = pokemon.GetAbility();
         EffectState abilityState = pokemon.AbilityState;
@@ -284,7 +282,7 @@ public partial class Battle
         Side side = pokemon.Side;
         if (pokemon.Position < side.SlotConditions.Count)
         {
-            Dictionary<ConditionId, EffectState> slotConditionsDict =
+            var slotConditionsDict =
                 side.SlotConditions[pokemon.Position];
             foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
                          .ToList()) // Materialize
@@ -315,7 +313,8 @@ public partial class Battle
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
-        foreach ((ConditionId _, EffectState volatileState, Condition volatileCondition) in volatiles)
+        foreach ((ConditionId _, EffectState volatileState, Condition volatileCondition) in
+                 volatiles)
         {
             handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName);
             if (handlerInfo != null ||
@@ -383,7 +382,8 @@ public partial class Battle
         }
 
         // Check slot conditions (Stealth Rock trap, etc.)
-        foreach ((ConditionId conditionId, EffectState slotConditionState, Condition slotCondition) in slotConditions)
+        foreach ((ConditionId conditionId, EffectState slotConditionState,
+                     Condition slotCondition) in slotConditions)
         {
             handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName);
             if (handlerInfo != null ||
@@ -430,43 +430,33 @@ public partial class Battle
 
         // Check custom event handlers registered in this.Events
         // In TypeScript: if (this.events && (callback = this.events[callbackName]) !== undefined)
-        if (Events?.GetDelegate(callbackName) is not null)
+        if (Events != null && Events.HasHandlers(callbackName))
         {
             // The Events object contains dynamically registered handlers with their priorities
-            // These need to be processed differently from the static Format handlers
-
-            // Since we don't have the full EventHandlerData structure yet,
-            // this is a placeholder for when Events is properly implemented
-            // In the TypeScript version, each handler in callback array has:
+            // In the TypeScript version, this.events[callbackName] returns an array where each handler has:
             // - target (the effect)
             // - callback (the function)
             // - priority, order, subOrder (for sorting)
 
-            // TODO: Implement full handling of Events with priorities and multiple handlers
-
-            // For now, create a temporary EventHandlerInfo wrapper
-            EffectState? state = null;
-            if (Events.Effect is { EffectType: EffectType.Format })
+            foreach (EventHandlerData handler in Events.GetHandlers(callbackName))
             {
-                state = FormatData;
+                EffectState? state =
+                    handler.Target.EffectType == EffectType.Format ? FormatData : null;
+
+                handlers.Add(new EventListener
+                {
+                    Effect = handler.Target,
+                    HandlerInfo = null, // Dynamic handlers don't use EventHandlerInfo
+                    State = state,
+                    End = null,
+                    EffectHolder = customHolder ?? EffectHolder.FromBattle(this),
+                    Priority = handler.Priority,
+                    Order = IntFalseUnion.FromInt(handler.Order),
+                    SubOrder = handler.SubOrder,
+                    EffectOrder = 0,
+                    Speed = 0,
+                });
             }
-
-            // Create a basic DelegateEventHandlerInfo (we may need to create this class)
-            // For now, use the old path with backward compatibility
-            handlers.Add(new EventListener
-            {
-                Effect = Events.Effect ?? Format,
-                HandlerInfo = null, // TODO: Wrap eventDelegate in EventHandlerInfo
-                State = state,
-                End = null,
-                EffectHolder = customHolder ?? EffectHolder.FromBattle(this),
-                // These would come from the handler data in a full implementation
-                Order = IntFalseUnion.FromInt(0),
-                Priority = 0,
-                SubOrder = 0,
-                EffectOrder = 0,
-                Speed = 0,
-            });
         }
 
         return handlers;
