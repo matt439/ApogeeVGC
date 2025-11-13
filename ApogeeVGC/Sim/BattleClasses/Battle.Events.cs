@@ -556,51 +556,61 @@ public partial class Battle
     /// </summary>
     public void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null)
     {
-        // Debug logging for event entry
-        if (DebugMode)
+        while (true)
         {
-            Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
-        }
-
-        // Get all active Pokémon on the field
-        var actives = GetAllActive();
-
-        if (DebugMode)
-        {
-            Debug($"EachEvent {eventId}: Processing {actives.Count} active Pokemon");
-        }
-
-        // Use current battle effect if none provided
-        effect ??= Effect;
-
-        // Sort by speed (highest to lowest) with proper speed tie resolution
-        SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
-
-        if (DebugMode && actives.Count > 0)
-        {
-            Debug(
-                $"EachEvent {eventId}: Speed order: {string.Join(" > ", actives.Select(p => $"{p.Name}({p.Speed})"))}");
-        }
-
-        // Convert bool? to RelayVar? for RunEvent
-        RelayVar? relayVarConverted = relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
-
-        // Run the event on each Pokémon
-        foreach (Pokemon pokemon in actives)
-        {
-            RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect, relayVarConverted);
-        }
-
-        // Special handling for Weather events in Gen 7+
-        if (eventId == EventId.Weather && Gen >= 7)
-        {
+            // Debug logging for event entry
             if (DebugMode)
             {
-                Debug($"EachEvent {eventId}: Triggering Update event (Gen 7+ Weather handling)");
+                Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
             }
 
-            // TODO: further research when updates happen
-            EachEvent(EventId.Update);
+            // Get all active Pokémon on the field
+            var actives = GetAllActive();
+
+            if (DebugMode)
+            {
+                Debug($"EachEvent {eventId}: Processing {actives.Count} active Pokemon");
+            }
+
+            // Use current battle effect if none provided
+            effect ??= Effect;
+
+            // Sort by speed (highest to lowest) with proper speed tie resolution
+            SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
+
+            if (DebugMode && actives.Count > 0)
+            {
+                Debug(
+                    $"EachEvent {eventId}: Speed order: {string.Join(" > ", actives.Select(p => $"{p.Name}({p.Speed})"))}");
+            }
+
+            // Convert bool? to RelayVar? for RunEvent
+            RelayVar? relayVarConverted =
+                relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
+
+            // Run the event on each Pokémon
+            foreach (Pokemon pokemon in actives)
+            {
+                RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect,
+                    relayVarConverted);
+            }
+
+            // Special handling for Weather events in Gen 7+
+            if (eventId == EventId.Weather && Gen >= 7)
+            {
+                if (DebugMode)
+                {
+                    Debug(
+                        $"EachEvent {eventId}: Triggering Update event (Gen 7+ Weather handling)");
+                }
+
+                eventId = EventId.Update;
+                effect = null;
+                relayVar = null;
+                continue;
+            }
+
+            break;
         }
     }
 
@@ -641,7 +651,8 @@ public partial class Battle
             // In single battles, side.N is always < 2, so this always executes
             if (side.N < 2)
             {
-                handlers.AddRange(FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
+                handlers.AddRange(
+                    FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
             }
 
             // Process each active Pokemon on this side
@@ -657,7 +668,8 @@ public partial class Battle
                 if (targets != null && !targets.Contains(active)) continue;
 
                 // Collect handlers from this Pokemon and related effects
-                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None, getKey));
+                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None,
+                    getKey));
                 handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
                 handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
                 handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
@@ -939,7 +951,7 @@ public partial class Battle
 
         // Invoke the delegate directly using the known signature from EventHandlerInfo
         // This avoids DynamicInvoke and provides better performance
-// Note: Parameter nullability is validated by EventHandlerInfo during creation
+        // Note: Parameter nullability is validated by EventHandlerInfo during creation
         return InvokeDelegateEffectDelegate(handler, hasRelayVar, relayVar, target, source,
             sourceEffect);
     }

@@ -33,6 +33,7 @@ public partial class Battle
                 throw new ArgumentOutOfRangeException(nameof(ActivePerHalf),
                     "ActivePerHalf must be 1 (singles) or 2 (doubles).");
             }
+
             field = value;
         }
     }
@@ -230,11 +231,16 @@ public partial class Battle
     /// Initializes an EffectState object with proper effect ordering.
     /// Effect order is used to determine priority when multiple effects trigger.
     /// - Effects with explicit effectOrder use that value
-    /// - Effects on active Pokemon/entities get auto-incremented order
-    /// - Effects on inactive targets get order 0
+    /// - Effects on active Pokemon get auto-incremented order
+    /// - Effects on non-Pokemon targets (Side, Field, Battle) get auto-incremented order
+    /// - Effects on inactive Pokemon or with no target get order 0
+    /// 
+    /// TypeScript equivalent: initEffectState(obj, effectOrder)
+    /// Logic: effectOrder is incremented when obj.id exists AND obj.target exists AND
+    /// (obj.target is not a Pokemon OR obj.target is an active Pokemon)
     /// </summary>
     public EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null,
-        Pokemon? target = null)
+        EffectStateTarget? target = null)
     {
         // Create new EffectState with the provided or default ID
         EffectStateId effectId = id ?? EffectStateId.FromEmpty();
@@ -249,9 +255,20 @@ public partial class Battle
         else if (effectId != EffectStateId.FromEmpty() && target != null)
         {
             // Auto-assign effect order for effects on targets
-            // Only increment for active Pokemon, otherwise use 0
-            // Use the battle's master counter for active effects
-            finalEffectOrder = target.IsActive ? EffectOrder++ : 0;
+            // Increment if:
+            // - Target is NOT a Pokemon (Side, Field, Battle always increment)
+            // - OR target IS a Pokemon AND is active
+            bool shouldIncrement = target switch
+            {
+                PokemonEffectStateTarget pokemon => pokemon.Pokemon
+                    .IsActive, // Pokemon: only if active
+                SideEffectStateTarget => true, // Side: always increment
+                FieldEffectStateTarget => true, // Field: always increment
+                BattleEffectStateTarget => true, // Battle: always increment
+                _ => false,
+            };
+
+            finalEffectOrder = shouldIncrement ? EffectOrder++ : 0;
         }
         else
         {
@@ -265,8 +282,7 @@ public partial class Battle
             Id = effectId,
             EffectOrder = finalEffectOrder,
             Duration = null,
-
-            // TODO: Initialize other properties as needed
+            Target = target,
         };
     }
 
@@ -274,8 +290,10 @@ public partial class Battle
         int? duration)
     {
         // Use the first overload to handle basic initialization and effect ordering
-        // Pass the source Pokemon as the target for effect ordering purposes
-        EffectState state = InitEffectState(id, effectOrder: null, target: source);
+        // Pass the source Pokemon wrapped in EffectStateTarget for effect ordering purposes
+        EffectStateTarget? targetWrapper =
+            source != null ? new PokemonEffectStateTarget(source) : null;
+        EffectState state = InitEffectState(id, effectOrder: null, target: targetWrapper);
 
         // Add the additional properties specific to this overload
         state.Source = source;
@@ -290,14 +308,16 @@ public partial class Battle
         bool isSlotCondition, int? duration)
     {
         // Use the first overload to handle basic initialization and effect ordering
-        // Side conditions are considered inactive for effect ordering purposes
-        EffectState state = InitEffectState(id, effectOrder: null, target: null);
+        // Side conditions get proper effect ordering (sides always increment)
+        EffectState state = InitEffectState(id, effectOrder: null,
+            target: new SideEffectStateTarget(target));
+
         // Add the additional properties specific to this overload
-        state.Target = target;
         state.Source = source;
         state.SourceSlot = sourceSlot;
         state.IsSlotCondition = isSlotCondition;
         state.Duration = duration;
+
         return state;
     }
 
