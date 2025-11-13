@@ -10,25 +10,13 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
-using ApogeeVGC.Sim.Utils.Unions;
-using System.Threading;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    // Semaphore to block synchronous Battle when waiting for async player choices
-    private readonly ManualResetEventSlim _choiceWaitHandle = new(true);
-
-    // Infinite loop detection
-    private int _consecutiveFailedTurns = 0;
-    private const int MAX_CONSECUTIVE_FAILED_TURNS = 10;
-
     public void Start()
     {
-        //// Deserialized games should use Restart()
-        //if (Deserialized) return;
-
         // Need all players to start
         if (!Sides.All(_ => true))
         {
@@ -74,9 +62,9 @@ public partial class Battle
 
         // Call OnBegin for each rule in the rule table
         foreach (Format subFormat in from rule in RuleTable.Keys
-                                     let ruleString = rule.ToString()
-                                     where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
-                                     select Library.Rulesets[rule])
+                 let ruleString = rule.ToString()
+                 where ruleString.Length <= 0 || !"+*-!".Contains(ruleString[0])
+                 select Library.Rulesets[rule])
         {
             subFormat.OnBegin?.Invoke(this);
         }
@@ -95,69 +83,33 @@ public partial class Battle
 
         // Run team preview/selection phase
         RunPickTeam();
-      
-        // Add start action to queue
+
+// Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
         // Set mid-turn flag
         MidTurn = true;
 
         // Start turn loop if no request is pending
+        // TurnLoop() will return when it needs player input (RequestState != None)
+        // Simulator will call CommitChoices() which will call TurnLoop() again to continue
         if (RequestState == RequestState.None)
-     {
-      TurnLoop();
+        {
+            TurnLoop();
         }
 
-        // Wait for battle to actually end
-        // In async mode, TurnLoop() will return when it needs player input,
-        // so we need to wait here until the battle is actually complete
-        while (!Ended)
-        {
- // Wait for player choices to be submitted
-      _choiceWaitHandle.Wait();
-
-            // If battle ended while waiting, exit
-     if (Ended)
-            {
-   break;
-          }
-     }
-
-    Console.WriteLine("[Battle.Start] Battle complete, returning");
+        // Return immediately - Simulator handles coordination
+        // TypeScript Battle.start() returns here, doesn't wait
     }
-
-    //public void Restart(Action<string, List<string>>? send)
-    //{
-    //    if (!Deserialized)
-    //    {
-    //        throw new InvalidOperationException("Attempt to restart a battle which has not been deserialized");
-    //    }
-    //    throw new Exception("Not sure what this is suppsed to do");
-    //}
 
     public void EndTurn()
     {
         // Increment turn counter and reset last successful move
         Turn++;
- LastSuccessfulMoveThisTurn = null;
+        LastSuccessfulMoveThisTurn = null;
 
-  // Check for infinite loop - if we've had too many failed turns in a row, abort
-        if (_consecutiveFailedTurns >= MAX_CONSECUTIVE_FAILED_TURNS)
-        {
-            Console.WriteLine($"[EndTurn] ERROR: {MAX_CONSECUTIVE_FAILED_TURNS} consecutive failed turns detected - battle is stuck in an infinite loop!");
-        Console.WriteLine("[EndTurn] Aborting battle to prevent stack overflow");
-   
-   // Force-end the battle with a tie
-       if (DisplayUi)
- {
-                Add("message", "Battle ended due to infinite loop detection (too many consecutive failed turns)");
-     }
-            Tie();
-            return; // Exit immediately after ending the battle
-        }
-
-  // Record turn start in history
-      History.RecordTurnStart(Turn);
+        // Record turn start in history
+        History.RecordTurnStart(Turn);
 
         // Process each side
         var trappedBySide = new List<bool>();
@@ -184,8 +136,6 @@ public partial class Battle
                     pokemon.UsedItemThisTurn = false;
                     pokemon.StatsRaisedThisTurn = false;
                     pokemon.StatsLoweredThisTurn = false;
-                    // It shouldn't be possible in a normal battle for a Pokemon to be damaged before turn 1's move selection
-                    // However, this could be potentially relevant in certain OMs
                     pokemon.HurtThisTurn = null;
                 }
 
@@ -231,7 +181,7 @@ public partial class Battle
                     Attacker attack = pokemon.AttackedBy[i];
                     if (attack.Source.IsActive)
                     {
-                        // Mark attack as not from this turn (create new record since it's immutable)
+                        // Mark attack as not from this turn
                         pokemon.AttackedBy[i] = attack with { ThisTurn = false };
                     }
                     else
@@ -244,31 +194,31 @@ public partial class Battle
                 // Update apparent type display (not Terastallized)
                 if (pokemon.Terastallized == null)
                 {
-                    // In Gen 7+, the real type of every Pokemon is visible to all players via the bottom screen while making choices
                     // Get the visible Pokemon (accounting for Illusion)
                     Pokemon seenPokemon = pokemon.Illusion ?? pokemon;
 
-                    // Get actual types as a string (e.g., "Fire/Flying")
+                    // Get actual types as a string
                     string realTypeString = string.Join("/",
                         seenPokemon.GetTypes(excludeAdded: true).Select(t => t.ToString()));
 
                     string currentApparentType = string.Join("/", seenPokemon.ApparentType);
                     if (realTypeString != currentApparentType)
                     {
-                        // Update apparent type (this is for display purposes)
                         if (DisplayUi)
                         {
                             Add("-start", pokemon, "typechange", realTypeString, "[silent]");
                         }
-                        seenPokemon.ApparentType = seenPokemon.GetTypes(excludeAdded: true).ToList();
+
+                        seenPokemon.ApparentType =
+                            seenPokemon.GetTypes(excludeAdded: true).ToList();
 
                         if (pokemon.AddedType != null)
                         {
-                            // The typechange message removes the added type, so put it back
                             if (DisplayUi)
                             {
                                 Add("-start", pokemon, "typeadd", pokemon.AddedType?.ToString() ??
-                                    throw new InvalidOperationException("Added type should not be null"),
+                                    throw new InvalidOperationException(
+                                        "Added type should not be null"),
                                     "[silent]");
                             }
                         }
@@ -282,7 +232,6 @@ public partial class Battle
                 // Run trap events
                 RunEvent(EventId.TrapPokemon, pokemon);
 
-                // Canceling switches would leak information if a foe might have a trapping ability
                 if (pokemon.KnownType || Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
                 {
                     RunEvent(EventId.MaybeTrapPokemon, pokemon);
@@ -291,34 +240,26 @@ public partial class Battle
                 // Check foe abilities for potential trapping
                 foreach (Pokemon source in pokemon.Foes())
                 {
-                    // Get the species to check (accounting for Illusion)
                     Species species = (source.Illusion ?? source).Species;
 
-                    // Check each ability slot the species could have
                     foreach (SpeciesAbilityType abilitySlot in Enum.GetValues<SpeciesAbilityType>())
                     {
                         var abilityId = species.Abilities.GetAbility(abilitySlot);
                         if (abilityId == null) continue;
-
-                        // Skip if this is the source's current ability (already checked above)
                         if (abilityId == source.Ability) continue;
 
-                        // Get the ability
                         Ability ability = Library.Abilities[abilityId.Value];
 
-                        // Check if ability is banned
                         if (RuleTable.Has(ability.Id)) continue;
 
-                        // Skip immunity check if type is known and already not immune
-                        if (pokemon.KnownType && !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
+                        if (pokemon.KnownType &&
+                            !Dex.GetImmunity(ConditionId.Trapped, pokemon.Types))
                             continue;
 
-                        // Run the FoeMaybeTrapPokemon event for this potential ability
                         SingleEvent(EventId.FoeMaybeTrapPokemon, ability, null, pokemon, source);
                     }
                 }
 
-                // Skip if Pokemon fainted
                 if (pokemon.Fainted) continue;
 
                 // Update side-wide trap status
@@ -328,59 +269,43 @@ public partial class Battle
                 StalenessId? staleness = pokemon.VolatileStaleness ?? pokemon.Staleness;
                 if (staleness != null)
                 {
-                    // External staleness takes priority
-                    sideStaleness = sideStaleness == StalenessId.External ? sideStaleness : staleness;
+                    sideStaleness = sideStaleness == StalenessId.External
+                        ? sideStaleness
+                        : staleness;
                 }
 
-                // Increment active turn counter
                 pokemon.ActiveTurns++;
             }
 
-            // Store trap and staleness status for this side
             trappedBySide.Add(sideTrapped);
             stalenessBySide.Add(sideStaleness);
 
-            // Update fainted Pokemon tracking
             side.FaintedLastTurn = side.FaintedThisTurn;
             side.FaintedThisTurn = null;
         }
 
         // Check for endless battle clause
         if (MaybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
-   {
-         return;
+        {
+            return;
         }
 
-        // Check if battle has ended before requesting new choices
         if (Ended)
         {
-            Console.WriteLine("[EndTurn] Battle has ended, not requesting new choices");
             return;
         }
 
         // Display turn number
         if (DisplayUi)
         {
-Add("turn", Turn);
- }
-
-  // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
-        // Gen 9 doesn't use Quick Claw rolls the same way
+            Add("turn", Turn);
+        }
 
         // Request move choices for the new turn
-  MakeRequest(RequestState.Move);
-  
-        // Request player choices - Battle will pause until callback is invoked
-        RequestPlayerChoices(onComplete: () =>
-        {
-       Console.WriteLine("[EndTurn] Turn choices received, committing");
-            CommitChoices();
-        });
-  
-        // Don't wait here - just return
-        // The callback will call CommitChoices() -> TurnLoop() which will process the turn
- // and naturally call EndTurn() again when the turn completes
-  Console.WriteLine("[EndTurn] Request made, returning to wait for choices");
+        MakeRequest(RequestState.Move);
+
+        // Return immediately - Battle doesn't wait for choices
+        // Simulator will call Choose() -> CommitChoices() -> TurnLoop() to continue
     }
 
     /// <summary>
@@ -393,72 +318,43 @@ Add("turn", Turn);
     public void TurnLoop()
     {
         if (DisplayUi)
-      {
-            // Add empty line for formatting
-         Add(string.Empty);
-
-    // Add timestamp in Unix epoch seconds
+        {
+            Add(string.Empty);
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             Add("t:", timestamp);
         }
 
-        // Clear request state if it exists
         if (RequestState != RequestState.None)
-    {
-     RequestState = RequestState.None;
-      }
+        {
+            RequestState = RequestState.None;
+        }
 
         // First time through - set up turn structure
         if (!MidTurn)
         {
-        // Insert BeforeTurn action at the front of the queue
             Queue.InsertChoice(new BeforeTurnAction());
-
-// Add Residual action at the end of the queue
             Queue.AddChoice(new ResidualAction());
-
             MidTurn = true;
-      }
+        }
 
         // Process actions one at a time
         while (Queue.Shift() is { } action)
         {
             RunAction(action);
 
-     // Exit early if we need to wait for a request or battle ended
-      if (RequestState != RequestState.None || Ended)
-    {
-           return;
-     }
+            // Exit early if we need to wait for a request or battle ended
+            // Battle returns here, Simulator will call us back when choices are made
+            if (RequestState != RequestState.None || Ended)
+            {
+                return;
+            }
         }
 
-  // Update consecutive failed turns counter
-        // LastSuccessfulMoveThisTurn is set when a move actually does something
-        if (LastSuccessfulMoveThisTurn != null)
-        {
-            Console.WriteLine($"[TurnLoop] Turn {Turn} had successful move: {LastSuccessfulMoveThisTurn}, resetting failure counter");
-          _consecutiveFailedTurns = 0;
-        }
-        else
-        {
-   _consecutiveFailedTurns++;
-            Console.WriteLine($"[TurnLoop] Turn {Turn} had NO successful moves (consecutive failures: {_consecutiveFailedTurns}/{MAX_CONSECUTIVE_FAILED_TURNS})");
-        }
+// Turn is complete - reset flags and start next turn
+        MidTurn = false;
+        Queue.Clear();
 
-        // Turn is complete - reset flags before calling EndTurn
-        Console.WriteLine("[TurnLoop] Turn complete, resetting MidTurn flag");
-   MidTurn = false;
-   Queue.Clear();
-        
-   // Now start the next turn
-     EndTurn();
-
- // Check if EndTurn ended the battle (e.g., via infinite loop detection)
-     if (Ended)
-{
-            Console.WriteLine("[TurnLoop] Battle ended in EndTurn, exiting TurnLoop");
-    return;
-        }
+        EndTurn();
     }
 
     public bool RunAction(IAction action)
@@ -477,275 +373,279 @@ Add("turn", Turn);
         switch (action.Choice)
         {
             case ActionId.Start:
-                {
-   foreach (Side side in Sides)
-       {
-   if (side.PokemonLeft > 0)
-    side.PokemonLeft = side.Pokemon.Count;
-
-    if (DisplayUi)
-    {
-             Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
-             }
-      }
-
-            if (DisplayUi)
             {
-            Add("start");
-    }
+                foreach (Side side in Sides)
+                {
+                    if (side.PokemonLeft > 0)
+                        side.PokemonLeft = side.Pokemon.Count;
 
-   // Change Zacian/Zamazenta into their Crowned forme
- foreach (Pokemon pokemon in GetAllPokemon())
-        {
-  Species? rawSpecies = null;
-   if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
-       {
-      rawSpecies = Library.Species[SpecieId.ZacianCrowned];
-       }
- else if (pokemon.Species.Id == SpecieId.Zamazenta && pokemon.Item == ItemId.RustedShield)
-    {
-      rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
-          }
+                    if (DisplayUi)
+                    {
+                        Add("teamsize", side.Id.GetSideIdName(), side.Pokemon.Count.ToString());
+                    }
+                }
 
-       if (rawSpecies == null) continue;
+                if (DisplayUi)
+                {
+                    Add("start");
+                }
 
-        Species? species = pokemon.SetSpecie(rawSpecies, Effect);
- if (species == null) continue;
+                // Change Zacian/Zamazenta into their Crowned forme
+                foreach (Pokemon pokemon in GetAllPokemon())
+                {
+                    Species? rawSpecies = null;
+                    if (pokemon.Species.Id == SpecieId.Zacian && pokemon.Item == ItemId.RustedSword)
+                    {
+                        rawSpecies = Library.Species[SpecieId.ZacianCrowned];
+                    }
+                    else if (pokemon.Species.Id == SpecieId.Zamazenta &&
+                             pokemon.Item == ItemId.RustedShield)
+                    {
+                        rawSpecies = Library.Species[SpecieId.ZamazentaCrowned];
+                    }
 
-            pokemon.BaseSpecies = rawSpecies;
-       pokemon.Details = pokemon.GetUpdatedDetails();
-pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
-    ?? throw new InvalidOperationException("Species has no ability in slot 0"),
-   isFromFormeChange: true);
-      pokemon.BaseAbility = pokemon.Ability;
+                    if (rawSpecies == null) continue;
 
-           // Replace Iron Head with Behemoth Blade/Bash
-           Dictionary<SpecieId, MoveId> behemothMoves = new()
-    {
-       { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
-                { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
-        };
+                    Species? species = pokemon.SetSpecie(rawSpecies, Effect);
+                    if (species == null) continue;
 
-    int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
-    if (ironHeadIndex >= 0)
-   {
-       Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
-     pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
-     {
-           Move = move.Id,
-          Id = move.Id,
-Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-               MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
-  Target = move.Target,
-          Disabled = false,
-            DisabledSource = null,
-        Used = false,
-         };
-       pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
-          }
-   }
+                    pokemon.BaseSpecies = rawSpecies;
+                    pokemon.Details = pokemon.GetUpdatedDetails();
+                    pokemon.SetAbility(species.Abilities.GetAbility(SpeciesAbilityType.Slot0)
+                                       ?? throw new InvalidOperationException(
+                                           "Species has no ability in slot 0"),
+                        isFromFormeChange: true);
+                    pokemon.BaseAbility = pokemon.Ability;
 
-        // Call format's OnBattleStart handler
-      Format.OnBattleStart?.Invoke(this);
+                    // Replace Iron Head with Behemoth Blade/Bash
+                    Dictionary<SpecieId, MoveId> behemothMoves = new()
+                    {
+                        { SpecieId.ZacianCrowned, MoveId.BehemothBlade },
+                        { SpecieId.ZamazentaCrowned, MoveId.BehemothBash },
+                    };
 
-          foreach (RuleId rule in RuleTable.Keys)
-       {
-    string ruleString = rule.ToString();
-     if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
-   Format subFormat = Library.Rulesets[rule];
-  subFormat.OnBattleStart?.Invoke(this);
-}
+                    int ironHeadIndex = pokemon.BaseMoves.IndexOf(MoveId.IronHead);
+                    if (ironHeadIndex >= 0)
+                    {
+                        Move move = Library.Moves[behemothMoves[rawSpecies.Id]];
+                        pokemon.BaseMoveSlots[ironHeadIndex] = new MoveSlot
+                        {
+                            Move = move.Id,
+                            Id = move.Id,
+                            Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                            MaxPp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
+                            Target = move.Target,
+                            Disabled = false,
+                            DisabledSource = null,
+                            Used = false,
+                        };
+                        pokemon.MoveSlots = [.. pokemon.BaseMoveSlots];
+                    }
+                }
 
-          foreach (Side side in Sides)
-        {
-      for (int i = 0; i < side.Active.Count; i++)
-      {
-   if (side.PokemonLeft <= 0)
-                 {
-   // Forfeited before starting - assign the pokemon but mark as fainted
-   side.Active[i] = side.Pokemon[i];
-     Pokemon assignedPokemon = side.Active[i]
-     ?? throw new InvalidOperationException(
-       $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
-      assignedPokemon.Fainted = true;
-    assignedPokemon.Hp = 0;
-                 }
-   else
-         {
-   Actions.SwitchIn(side.Pokemon[i], i);
-              }
-      }
-     }
+                // Call format's OnBattleStart handler
+                Format.OnBattleStart?.Invoke(this);
 
-      foreach (Pokemon pokemon in GetAllPokemon())
-        {
-             // Only apply species condition if it's not None
-  if (pokemon.Species.Conditon != ConditionId.None)
-          {
-      Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
-        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
-          }
-     }
+                foreach (RuleId rule in RuleTable.Keys)
+                {
+                    string ruleString = rule.ToString();
+                    if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+                    Format subFormat = Library.Rulesets[rule];
+                    subFormat.OnBattleStart?.Invoke(this);
+                }
 
-     // Update UI for all players now that Pokemon are switched in
-   Console.WriteLine("[RunAction.Start] Updating UI after battle start");
-  UpdateAllPlayersUi(BattlePerspectiveType.InBattle);
+                foreach (Side side in Sides)
+                {
+                    for (int i = 0; i < side.Active.Count; i++)
+                    {
+                        if (side.PokemonLeft <= 0)
+                        {
+                            // Forfeited before starting
+                            side.Active[i] = side.Pokemon[i];
+                            Pokemon assignedPokemon = side.Active[i]
+                                                      ?? throw new InvalidOperationException(
+                                                          $"Failed to assign Pokemon to Active slot {i} for {side.Name}");
+                            assignedPokemon.Fainted = true;
+                            assignedPokemon.Hp = 0;
+                        }
+                        else
+                        {
+                            Actions.SwitchIn(side.Pokemon[i], i);
+                        }
+                    }
+                }
 
-    MidTurn = true;
+                foreach (Pokemon pokemon in GetAllPokemon())
+                {
+                    if (pokemon.Species.Conditon != ConditionId.None)
+                    {
+                        Condition speciesCondition = Library.Conditions[pokemon.Species.Conditon];
+                        SingleEvent(EventId.Start, speciesCondition, pokemon.SpeciesState, pokemon);
+                    }
+                }
+
+                UpdateAllPlayersUi();
+
+                MidTurn = true;
                 break;
-     }
+            }
 
             case ActionId.Move:
-                {
-                    var moveAction = (MoveAction)action;
-                    if (!moveAction.Pokemon.IsActive) return false;
-                    if (moveAction.Pokemon.Fainted) return false;
-                    Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
-                        new BattleActions.RunMoveOptions
-                        {
-                            SourceEffect = moveAction.SourceEffect,
-                            OriginalTarget = moveAction.OriginalTarget,
-                        });
-                    break;
-                }
+            {
+                var moveAction = (MoveAction)action;
+                if (!moveAction.Pokemon.IsActive) return false;
+                if (moveAction.Pokemon.Fainted) return false;
+                Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
+                    new BattleActions.RunMoveOptions
+                    {
+                        SourceEffect = moveAction.SourceEffect,
+                        OriginalTarget = moveAction.OriginalTarget,
+                    });
+                break;
+            }
 
             case ActionId.Terastallize:
-                {
-                    var teraAction = (PokemonAction)action;
-                    Actions.Terastallize(teraAction.Pokemon);
-                    break;
-                }
+            {
+                var teraAction = (PokemonAction)action;
+                Actions.Terastallize(teraAction.Pokemon);
+                break;
+            }
 
             case ActionId.BeforeTurnMove:
+            {
+                var btmAction = (MoveAction)action;
+                if (!btmAction.Pokemon.IsActive) return false;
+                if (btmAction.Pokemon.Fainted) return false;
+
+                if (DisplayUi)
                 {
-                    var btmAction = (MoveAction)action;
-                    if (!btmAction.Pokemon.IsActive) return false;
-                    if (btmAction.Pokemon.Fainted) return false;
-
-                    if (DisplayUi)
-                    {
-                        Debug($"before turn callback: {btmAction.Move.Id}");
-                    }
-
-                    Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
-                    if (target == null) return false;
-                    if (btmAction.Move.BeforeTurnCallback == null)
-                        throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
-                     this.InvokeCallback<object>(
-              btmAction.Move.BeforeTurnCallback,
-           this,
-             btmAction.Pokemon,
-         target,
- btmAction.Move);
-                    break;
+                    Debug($"before turn callback: {btmAction.Move.Id}");
                 }
+
+                Pokemon? target = GetTarget(btmAction.Pokemon, btmAction.Move, btmAction.TargetLoc);
+                if (target == null) return false;
+                if (btmAction.Move.BeforeTurnCallback == null)
+                    throw new InvalidOperationException("beforeTurnMove has no beforeTurnCallback");
+                this.InvokeCallback<object>(
+                    btmAction.Move.BeforeTurnCallback,
+                    this,
+                    btmAction.Pokemon,
+                    target,
+                    btmAction.Move);
+                break;
+            }
 
             case ActionId.PriorityChargeMove:
+            {
+                var pcmAction = (MoveAction)action;
+                if (!pcmAction.Pokemon.IsActive) return false;
+                if (pcmAction.Pokemon.Fainted) return false;
+
+                if (DisplayUi)
                 {
-                    var pcmAction = (MoveAction)action;
-                    if (!pcmAction.Pokemon.IsActive) return false;
-                    if (pcmAction.Pokemon.Fainted) return false;
-
-                    if (DisplayUi)
-                    {
-                        Debug($"priority charge callback: {pcmAction.Move.Id}");
-                    }
-
-                    if (pcmAction.Move.PriorityChargeCallback != null)
- {
-    this.InvokeCallback<object>(
-       pcmAction.Move.PriorityChargeCallback,
-    this,
-       pcmAction.Pokemon);
-      }
-
-                    break;
+                    Debug($"priority charge callback: {pcmAction.Move.Id}");
                 }
+
+                if (pcmAction.Move.PriorityChargeCallback != null)
+                {
+                    this.InvokeCallback<object>(
+                        pcmAction.Move.PriorityChargeCallback,
+                        this,
+                        pcmAction.Pokemon);
+                }
+
+                break;
+            }
 
             case ActionId.Event:
-                {
-                    var eventAction = (PokemonAction)action;
-                    RunEvent(eventAction.Event ??
-                             throw new InvalidOperationException("Event action must have an event"),
-                        eventAction.Pokemon);
-                    break;
-                }
+            {
+                var eventAction = (PokemonAction)action;
+                RunEvent(eventAction.Event ??
+                         throw new InvalidOperationException("Event action must have an event"),
+                    eventAction.Pokemon);
+                break;
+            }
 
             case ActionId.Team:
+            {
+                var teamAction = (TeamAction)action;
+                if (teamAction.Index == 0)
                 {
-                    var teamAction = (TeamAction)action;
-                    if (teamAction.Index == 0)
-                    {
-                        teamAction.Pokemon.Side.Pokemon = [];
-                    }
-                    teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
-                    teamAction.Pokemon.Position = teamAction.Index;
-                    // We return here because the update event would crash since there are no active pokemon yet
-                    return false;
+                    teamAction.Pokemon.Side.Pokemon = [];
                 }
+
+                teamAction.Pokemon.Side.Pokemon.Add(teamAction.Pokemon);
+                teamAction.Pokemon.Position = teamAction.Index;
+                return false;
+            }
 
             case ActionId.Pass:
                 return false;
 
             case ActionId.InstaSwitch:
             case ActionId.Switch:
+            {
+                var switchAction = (SwitchAction)action;
+                if (switchAction.Choice == ActionId.Switch &&
+                    switchAction.Pokemon.Status != ConditionId.None)
                 {
-                    var switchAction = (SwitchAction)action;
-                    if (switchAction.Choice == ActionId.Switch && switchAction.Pokemon.Status != ConditionId.None)
-                    {
-                        Ability naturalCure = Library.Abilities[AbilityId.NaturalCure];
-                        SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
-                    }
-
-                    Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position, switchAction.SourceEffect);
-                    break;
+                    Ability naturalCure = Library.Abilities[AbilityId.NaturalCure];
+                    SingleEvent(EventId.CheckShow, naturalCure, null, switchAction.Pokemon);
                 }
+
+                Actions.SwitchIn(switchAction.Target, switchAction.Pokemon.Position,
+                    switchAction.SourceEffect);
+                break;
+            }
 
             case ActionId.RevivalBlessing:
+            {
+                var rbAction = (SwitchAction)action;
+                rbAction.Pokemon.Side.PokemonLeft++;
+                if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
                 {
-                    var rbAction = (SwitchAction)action;
-                    rbAction.Pokemon.Side.PokemonLeft++;
-                    if (rbAction.Target.Position < rbAction.Pokemon.Side.Active.Count)
+                    Queue.AddChoice(new SwitchAction
                     {
-                        Queue.AddChoice(new SwitchAction
-                        {
-                            Choice = ActionId.InstaSwitch,
-                            Pokemon = rbAction.Target,
-                            Target = rbAction.Target,
-                            Order = 3,
-                        });
-                    }
-                    rbAction.Target.Fainted = false;
-                    rbAction.Target.FaintQueued = false;
-                    rbAction.Target.SubFainted = false;
-                    rbAction.Target.Status = ConditionId.None;
-                    rbAction.Target.Hp = 1; // Needed so HP functions work
-                    rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
-
-                    if (DisplayUi)
-                    {
-                        Add("-heal", rbAction.Target, rbAction.Target.GetHealth, "[from] move: Revival Blessing");
-                    }
-
-                    rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon, ConditionId.RevivalBlessing);
-                    break;
+                        Choice = ActionId.InstaSwitch,
+                        Pokemon = rbAction.Target,
+                        Target = rbAction.Target,
+                        Order = 3,
+                    });
                 }
+
+                rbAction.Target.Fainted = false;
+                rbAction.Target.FaintQueued = false;
+                rbAction.Target.SubFainted = false;
+                rbAction.Target.Status = ConditionId.None;
+                rbAction.Target.Hp = 1;
+                rbAction.Target.SetHp(rbAction.Target.MaxHp / 2);
+
+                if (DisplayUi)
+                {
+                    Add("-heal", rbAction.Target, rbAction.Target.GetHealth,
+                        "[from] move: Revival Blessing");
+                }
+
+                rbAction.Pokemon.Side.RemoveSlotCondition(rbAction.Pokemon,
+                    ConditionId.RevivalBlessing);
+                break;
+            }
 
             case ActionId.RunSwitch:
-                {
-                    var rsAction = (RunSwitchAction)action;
-                    Actions.RunSwitch(rsAction.Pokemon!);
-                    break;
-                }
+            {
+                var rsAction = (RunSwitchAction)action;
+                Actions.RunSwitch(rsAction.Pokemon!);
+                break;
+            }
 
             case ActionId.Shift:
-                {
-                    var shiftAction = (PokemonAction)action;
-                    if (!shiftAction.Pokemon.IsActive) return false;
-                    if (shiftAction.Pokemon.Fainted) return false;
-                    SwapPosition(shiftAction.Pokemon, 1);
-                    break;
-                }
+            {
+                var shiftAction = (PokemonAction)action;
+                if (!shiftAction.Pokemon.IsActive) return false;
+                if (shiftAction.Pokemon.Fainted) return false;
+                SwapPosition(shiftAction.Pokemon, 1);
+                break;
+            }
 
             case ActionId.BeforeTurn:
                 EachEvent(EventId.BeforeTurn);
@@ -768,6 +668,7 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
                 {
                     Add("upkeep");
                 }
+
                 break;
         }
 
@@ -798,14 +699,15 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
             return false;
         }
 
-        // Emergency Exit / Wimp Out check (Gen 5+)
+        // Emergency Exit / Wimp Out check
         if (action.Choice != ActionId.Start)
         {
             EachEvent(EventId.Update);
             foreach ((Pokemon pokemon, int originalHp) in residualPokemon)
             {
                 int maxHp = pokemon.GetUndynamaxedHp(pokemon.MaxHp);
-                if (pokemon.Hp > 0 && pokemon.GetUndynamaxedHp() <= maxHp / 2 && originalHp > maxHp / 2)
+                if (pokemon.Hp > 0 && pokemon.GetUndynamaxedHp() <= maxHp / 2 &&
+                    originalHp > maxHp / 2)
                 {
                     RunEvent(EventId.EmergencyExit, pokemon);
                 }
@@ -830,7 +732,7 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
 
         for (int i = 0; i < Sides.Count; i++)
         {
-            bool reviveSwitch = false; // Used to ignore the fake switch for Revival Blessing
+            bool reviveSwitch = false;
             if (switches[i] && CanSwitch(Sides[i]) == 0)
             {
                 foreach (Pokemon? pokemon in Sides[i].Active)
@@ -844,8 +746,10 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
                         reviveSwitch = true;
                         continue;
                     }
+
                     pokemon.SwitchFlag = false;
                 }
+
                 if (!reviveSwitch) switches[i] = false;
             }
             else if (switches[i])
@@ -861,11 +765,12 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
                     {
                         RunEvent(EventId.BeforeSwitchOut, pokemon);
                         pokemon.SkipBeforeSwitchOutEventFlag = true;
-                        FaintMessages(); // Pokemon may have fainted in BeforeSwitchOut
+                        FaintMessages();
                         if (Ended) return true;
                         if (pokemon.Fainted)
                         {
-                            switches[i] = Sides[i].Active.Any(p => p != null && p.SwitchFlag.IsTrue());
+                            switches[i] = Sides[i].Active
+                                .Any(p => p != null && p.SwitchFlag.IsTrue());
                         }
                     }
                 }
@@ -876,34 +781,24 @@ Pp = move.NoPpBoosts ? move.BasePp : move.BasePp * 8 / 5,
         {
             if (playerSwitch)
             {
-           MakeRequest(RequestState.SwitchIn);
-      
-          // Request player choices - Battle will pause until callback is invoked
-      RequestPlayerChoices(onComplete: () =>
-       {
-        Console.WriteLine("[RunAction] Switch choices received, committing");
-   CommitChoices();
-         });
-     
-     // WAIT here until switch choices are complete
-            Console.WriteLine("[RunAction] Waiting for switch choices...");
-  _choiceWaitHandle.Wait();
-Console.WriteLine("[RunAction] Switch choices received, continuing");
-     
-   return true;
-  }
+                MakeRequest(RequestState.SwitchIn);
+
+                // Return immediately - Simulator handles getting switch choices
+                // When Simulator calls Choose() -> CommitChoices(), TurnLoop() will be called again
+                return true;
+            }
         }
 
         // In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();
         if (nextAction?.Choice == ActionId.Move)
         {
-            // Update the queue's speed properties and sort it
             UpdateSpeed();
             foreach (IAction queueAction in Queue.List)
             {
                 GetActionSpeed(queueAction);
             }
+
             Queue.Sort();
         }
 
