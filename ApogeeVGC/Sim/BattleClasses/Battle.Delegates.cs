@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -6,12 +7,25 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
+    /// <summary>
+    /// Cache for delegate parameter info to avoid repeated reflection calls.
+    /// Key: MethodInfo, Value: ParameterInfo array
+    /// This significantly improves performance for frequently-called event handlers.
+    /// </summary>
+    private static readonly ConcurrentDictionary<MethodInfo, ParameterInfo[]> ParameterInfoCache =
+        new();
+
+    /// <summary>
+    /// Invokes a delegate event handler with the appropriate parameters.
+    /// Handles dynamic parameter binding and return value conversion for the event system.
+    /// Optimized for common parameter counts (1-4) to avoid array allocation.
+    /// </summary>
     private RelayVar? InvokeDelegateEffectDelegate(Delegate del, bool hasRelayVar,
         RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         // Cache parameter info to avoid repeated reflection calls
-        var parameters = del.Method.GetParameters();
+        var parameters = ParameterInfoCache.GetOrAdd(del.Method, m => m.GetParameters());
         int paramCount = parameters.Length;
 
         // Most common signature: (Battle battle, ...)
@@ -23,19 +37,19 @@ public partial class Battle
 
         // Optimize for the most common cases (1-4 parameters)
         // This avoids array allocation for the majority of callbacks
-        object? returnValue;
         try
         {
+            object? returnValue;
             switch (paramCount)
             {
                 case 1:
                     returnValue = del.DynamicInvoke(BuildSingleArg(parameters[0], hasRelayVar,
-                        relayVar, target, source, sourceEffect, 0));
+                        relayVar, target, source, sourceEffect));
                     return ConvertReturnValueToRelayVar(returnValue);
                 case 2:
                     returnValue = del.DynamicInvoke(
                         BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
-                            sourceEffect, 0),
+                            sourceEffect),
                         BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
                             sourceEffect, 1)
                     );
@@ -43,7 +57,7 @@ public partial class Battle
                 case 3:
                     returnValue = del.DynamicInvoke(
                         BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
-                            sourceEffect, 0),
+                            sourceEffect),
                         BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
                             sourceEffect, 1),
                         BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source,
@@ -53,7 +67,7 @@ public partial class Battle
                 case 4:
                     returnValue = del.DynamicInvoke(
                         BuildSingleArg(parameters[0], hasRelayVar, relayVar, target, source,
-                            sourceEffect, 0),
+                            sourceEffect),
                         BuildSingleArg(parameters[1], hasRelayVar, relayVar, target, source,
                             sourceEffect, 1),
                         BuildSingleArg(parameters[2], hasRelayVar, relayVar, target, source,
@@ -76,24 +90,27 @@ public partial class Battle
             returnValue = del.DynamicInvoke(args);
             return ConvertReturnValueToRelayVar(returnValue);
         }
-        catch (TargetParameterCountException ex)
+        catch (TargetParameterCountException)
         {
-            // Log detailed information about the parameter mismatch
-            Console.WriteLine($"[InvokeDelegateEffectDelegate] Parameter count mismatch!");
-            Console.WriteLine($"  Delegate: {del.Method.Name}");
-            Console.WriteLine($"  Declaring Type: {del.Method.DeclaringType?.Name}");
-            Console.WriteLine($"  Expected parameters: {paramCount}");
-            Console.WriteLine($"  hasRelayVar: {hasRelayVar}");
-            Console.WriteLine($"  target: {target?.GetType().Name ?? "null"}");
-            Console.WriteLine($"  source: {source?.GetType().Name ?? "null"}");
-            Console.WriteLine($"  sourceEffect: {sourceEffect?.GetType().Name ?? "null"}");
-
-            // Print expected parameter types
-            Console.WriteLine("  Parameter types:");
-            for (int i = 0; i < parameters.Length; i++)
+            // Only log detailed diagnostic information in debug mode
+            if (DebugMode)
             {
-                Console.WriteLine(
-                    $"    [{i}] {parameters[i].ParameterType.Name} {parameters[i].Name}");
+                Console.WriteLine($"[InvokeDelegateEffectDelegate] Parameter count mismatch!");
+                Console.WriteLine($"  Delegate: {del.Method.Name}");
+                Console.WriteLine($"  Declaring Type: {del.Method.DeclaringType?.Name}");
+                Console.WriteLine($"  Expected parameters: {paramCount}");
+                Console.WriteLine($"  hasRelayVar: {hasRelayVar}");
+                Console.WriteLine($"  target: {target?.GetType().Name ?? "null"}");
+                Console.WriteLine($"  source: {source?.GetType().Name ?? "null"}");
+                Console.WriteLine($"  sourceEffect: {sourceEffect?.GetType().Name ?? "null"}");
+
+                // Print expected parameter types
+                Console.WriteLine("  Parameter types:");
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    Console.WriteLine(
+                        $"    [{i}] {parameters[i].ParameterType.Name} {parameters[i].Name}");
+                }
             }
 
             throw;
@@ -103,6 +120,7 @@ public partial class Battle
     /// <summary>
     /// Converts various return value types from event handlers to RelayVar.
     /// Event handlers can return many different union types that need to be converted.
+    /// This handles all the union types used throughout the battle system.
     /// </summary>
     private RelayVar? ConvertReturnValueToRelayVar(object? returnValue)
     {
@@ -149,6 +167,15 @@ public partial class Battle
             IntBoolIntUndefinedUnion intIntUndefined => new IntRelayVar(intIntUndefined.Value),
             UndefinedBoolIntUndefinedUnion => new UndefinedRelayVar(),
 
+            // IntFalseUndefinedUnion -> int, false, or undefined (used by Damage method)
+            IntIntFalseUndefined intFalseUndefined => new IntRelayVar(intFalseUndefined.Value),
+            FalseIntFalseUndefined => new BoolRelayVar(false),
+            UndefinedIntFalseUndefined => new UndefinedRelayVar(),
+
+            // IntFalseUnion -> int or false (used by Heal method)
+            IntIntFalseUnion intFalse => new IntRelayVar(intFalse.Value),
+            FalseIntFalseUnion => new BoolRelayVar(false),
+
             // IntBoolUnion -> int or bool
             IntIntBoolUnion intBool => new IntRelayVar(intBool.Value),
             BoolIntBoolUnion boolBool => new BoolRelayVar(boolBool.Value),
@@ -181,16 +208,18 @@ public partial class Battle
             // Undefined means undefined (special RelayVar)
             Undefined => new UndefinedRelayVar(),
 
-            // If we don't recognize the type, log an error and return null
+            // If we don't recognize the type, throw an informative error
             _ => throw new InvalidOperationException(
                 $"Unable to convert return value of type '{returnValue.GetType().Name}' to RelayVar. " +
-                $"Event handler returned an unexpected type that needs to be handled in ConvertReturnValueToRelayVar.")
+                $"Event handler returned an unexpected type that needs to be handled in ConvertReturnValueToRelayVar. " +
+                $"This usually means a new union type was added but the conversion case wasn't added.")
         };
     }
 
     /// <summary>
     /// Builds a single argument for delegate invocation.
     /// Used by the optimized fast-path for common parameter counts.
+    /// Matches parameters by type and name to event context (target, source, effect, relayVar).
     /// </summary>
     private object? BuildSingleArg(ParameterInfo param, bool hasRelayVar, RelayVar relayVar,
         SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect,
@@ -219,29 +248,31 @@ public partial class Battle
         bool isSourceParam = paramName.Contains("source");
         bool isTargetParam = paramName.Contains("target");
 
-        // Try type-based matching
-        if (target != null)
+        // Try type-based matching for target
+        // Only match if parameter name doesn't explicitly indicate it's a source
+        if (target != null && !isSourceParam)
         {
             EventTargetParameter? targetParam =
                 EventTargetParameter.FromSingleEventTarget(target, paramType);
-            if (targetParam != null && (!isSourceParam || !isTargetParam))
+            if (targetParam != null)
             {
-                // Only return target if it's not explicitly named "source"
-                if (!isSourceParam) return targetParam.ToObject();
+                return targetParam.ToObject();
             }
         }
 
-        if (source != null)
+        // Try type-based matching for source
+        // Only match if parameter name doesn't explicitly indicate it's a target
+        if (source != null && !isTargetParam)
         {
             EventSourceParameter? sourceParam =
                 EventSourceParameter.FromSingleEventSource(source, paramType);
-            if (sourceParam != null && (!isTargetParam || !isSourceParam))
+            if (sourceParam != null)
             {
-                // Only return source if it's not explicitly named "target"
-                if (!isTargetParam) return sourceParam.ToObject();
+                return sourceParam.ToObject();
             }
         }
 
+        // Match sourceEffect by type
         if (sourceEffect != null && paramType.IsInstanceOfType(sourceEffect))
         {
             return sourceEffect;
@@ -252,6 +283,7 @@ public partial class Battle
 
     /// <summary>
     /// Checks if a parameter type can accept a RelayVar value (like int, decimal, etc.)
+    /// This allows automatic unwrapping of RelayVar values to primitive types.
     /// </summary>
     private static bool IsRelayVarCompatibleType(Type paramType, RelayVar relayVar)
     {
@@ -265,9 +297,10 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Extracts the actual value from a RelayVar based on the expected parameter type
+    /// Extracts the actual value from a RelayVar based on the expected parameter type.
+    /// This performs automatic unboxing of relay variables to their underlying values.
     /// </summary>
-    private static object? ExtractValueFromRelayVar(RelayVar relayVar, Type paramType)
+    private static object ExtractValueFromRelayVar(RelayVar relayVar, Type paramType)
     {
         return relayVar switch
         {

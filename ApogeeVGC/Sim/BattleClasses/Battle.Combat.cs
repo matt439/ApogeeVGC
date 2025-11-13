@@ -54,11 +54,13 @@ public partial class Battle
         };
 
         // Call SpreadDamage and return the first (only) result
-        SpreadMoveDamage results = SpreadDamage(damageArray, targetArray, source, effect, instafaint);
+        SpreadMoveDamage results =
+            SpreadDamage(damageArray, targetArray, source, effect, instafaint);
         return results[0].ToIntFalseUndefinedUnion();
     }
 
-    public SpreadMoveDamage SpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets? targetArray = null,
+    public SpreadMoveDamage SpreadDamage(SpreadMoveDamage damage,
+        SpreadMoveTargets? targetArray = null,
         Pokemon? source = null, BattleDamageEffect? effect = null, bool instaFaint = false)
     {
         // Return early if no targets
@@ -210,7 +212,8 @@ public partial class Battle
 
                 if (!(target?.Hp <= 0)) continue;
 
-                Debug($"instafaint: {string.Join(", ", FaintQueue.Select(entry => entry.Target.Name))}");
+                Debug(
+                    $"instafaint: {string.Join(", ", FaintQueue.Select(entry => entry.Target.Name))}");
                 FaintMessages(lastFirst: true);
             }
         }
@@ -228,7 +231,8 @@ public partial class Battle
     /// <param name="source">Source Pokémon causing the damage (defaults to event source)</param>
     /// <param name="effect">Effect causing the damage (defaults to current effect)</param>
     /// <returns>The actual amount of damage dealt (0 if target has no HP or damage was 0)</returns>
-    public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null, IEffect? effect = null)
+    public int DirectDamage(int damage, Pokemon? target = null, Pokemon? source = null,
+        IEffect? effect = null)
     {
         // Default target to event target if available
         if (target == null && Event.Target is PokemonSingleEventTarget eventTarget)
@@ -322,53 +326,53 @@ public partial class Battle
             _ => throw new InvalidOperationException("Unknown BattleHealEffect type."),
         };
 
-        // Clamp damage to minimum of 1 if positive but less than 1
-        // This handles cases where rounding might produce fractional values
-        if (damage > 0 && damage < 1)
-        {
-            damage = 1;
-        }
+        //// Clamp damage to minimum of 1 if positive but less than 1
+        //// This handles cases where rounding might produce fractional values
+        //if (damage > 0 && damage < 1)
+        //{
+        //    damage = 1;
+        //}
 
         // Truncate damage to remove any remaining fractional part
         damage = Trunc(damage);
 
         // Run TryHeal event (allows effects like Liquid Ooze to trigger even when nothing is healed)
         RelayVar? tryHealResult = RunEvent(
-          EventId.TryHeal,
-    RunEventTarget.FromNullablePokemon(target),
-        RunEventSource.FromNullablePokemon(source),
-      effectCondition,
-          new IntRelayVar(damage)
+            EventId.TryHeal,
+            RunEventTarget.FromNullablePokemon(target),
+            RunEventSource.FromNullablePokemon(source),
+            effectCondition,
+            new IntRelayVar(damage)
         );
 
         // If event prevented healing, return the result
         if (tryHealResult is not IntRelayVar healAmount)
         {
-       return new IntIntFalseUnion(0);
+            return new IntIntFalseUnion(0);
         }
 
-   if (healAmount.Value == 0)
+        if (healAmount.Value == 0)
         {
-        return new IntIntFalseUnion(0);
+            return new IntIntFalseUnion(0);
         }
 
         damage = healAmount.Value;
 
-   // Return false if target has no HP
+        // Return false if target has no HP
         if (target?.Hp <= 0)
         {
-return new FalseIntFalseUnion();
+            return new FalseIntFalseUnion();
         }
 
-  // Return false if target is not active
+        // Return false if target is not active
         if (target is { IsActive: false })
         {
             return new FalseIntFalseUnion();
- }
+        }
 
         // Return false if target is already at max HP
         if (target != null && target.Hp >= target.MaxHp)
-     {
+        {
             return new FalseIntFalseUnion();
         }
 
@@ -380,25 +384,25 @@ return new FalseIntFalseUnion();
         // Apply healing to target
         int finalDamage = target.Heal(damage, source, effectCondition).ToInt();
 
-  // Record healing in history
+        // Record healing in history
         if (finalDamage > 0)
         {
-       History.RecordHeal(target.Name, finalDamage, target.Hp, target.MaxHp);
+            History.RecordHeal(target.Name, finalDamage, target.Hp, target.MaxHp);
         }
 
-    // Log healing messages based on effect type
+        // Log healing messages based on effect type
         PrintHealMessage(target, source, effectCondition);
 
         // Run Heal event
         RunEvent(
-         EventId.Heal,
-    target,
- RunEventSource.FromNullablePokemon(source),
-        effectCondition,
-  new IntRelayVar(finalDamage)
+            EventId.Heal,
+            target,
+            RunEventSource.FromNullablePokemon(source),
+            effectCondition,
+            new IntRelayVar(finalDamage)
         );
 
-  return new IntIntFalseUnion(finalDamage);
+        return new IntIntFalseUnion(finalDamage);
     }
 
     /// <summary>
@@ -417,17 +421,20 @@ return new FalseIntFalseUnion();
     /// - 0 if target has no HP
     /// - false if target is inactive or no foes remain (Gen 9)
     /// </summary>
-    public BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null, Pokemon? source = null,
+    public BoolZeroUnion? Boost(SparseBoostsTable boost, Pokemon? target = null,
+        Pokemon? source = null,
         IEffect? effect = null, bool isSecondary = false, bool isSelf = false)
     {
         if (target is null && Event.Target is PokemonSingleEventTarget eventTarget)
         {
             target = eventTarget.Pokemon;
         }
+
         if (source is null && Event.Source is PokemonSingleEventSource eventSource)
         {
             source = eventSource.Pokemon;
         }
+
         effect ??= Event.Effect;
 
         // Validate target has HP
@@ -445,19 +452,22 @@ return new FalseIntFalseUnion();
 
         if (modifiedBoost is not SparseBoostsTableRelayVar modifiedBoostTable)
         {
-            throw new InvalidOperationException("ChangeBoost event did not return a valid SparseBoostsTable.");
+            throw new InvalidOperationException(
+                "ChangeBoost event did not return a valid SparseBoostsTable.");
         }
 
         // Cap the boosts to valid ranges (-6 to +6)
         SparseBoostsTable cappedBoost = target.GetCappedBoost(modifiedBoostTable.Table);
 
         // Run TryBoost event to allow prevention
-        RelayVar finalBoost = RunEvent(EventId.TryBoost, target, RunEventSource.FromNullablePokemon(source),
-                                   effect, cappedBoost) ?? cappedBoost;
+        RelayVar finalBoost = RunEvent(EventId.TryBoost, target,
+            RunEventSource.FromNullablePokemon(source),
+            effect, cappedBoost) ?? cappedBoost;
 
         if (finalBoost is not SparseBoostsTableRelayVar finalBoostTable)
         {
-            throw new InvalidOperationException("TryBoost event did not return a valid SparseBoostsTable.");
+            throw new InvalidOperationException(
+                "TryBoost event did not return a valid SparseBoostsTable.");
         }
 
         bool? success = null;
@@ -517,9 +527,11 @@ return new FalseIntFalseUnion();
                             default:
                                 if (effect.EffectType == EffectType.Ability && !boosted)
                                 {
-                                    Add("-ability", target, PartFuncUnion.FromIEffect(effect), "boost");
+                                    Add("-ability", target, PartFuncUnion.FromIEffect(effect),
+                                        "boost");
                                     boosted = true;
                                 }
+
                                 Add(msg, target, boostId.ConvertToString(), boostBy);
                                 break;
                         }
@@ -527,7 +539,8 @@ return new FalseIntFalseUnion();
                 }
 
                 // Trigger AfterEachBoost event
-                RunEvent(EventId.AfterEachBoost, target, RunEventSource.FromNullablePokemon(source), effect,
+                RunEvent(EventId.AfterEachBoost, target, RunEventSource.FromNullablePokemon(source),
+                    effect,
                     currentBoost);
             }
             else if (effect?.EffectType == EffectType.Ability)
@@ -547,7 +560,8 @@ return new FalseIntFalseUnion();
         }
 
         // Trigger AfterBoost event
-        RunEvent(EventId.AfterBoost, target, RunEventSource.FromNullablePokemon(source), effect, finalBoost);
+        RunEvent(EventId.AfterBoost, target, RunEventSource.FromNullablePokemon(source), effect,
+            finalBoost);
 
         // Update turn flags
         if (success == true)
@@ -579,7 +593,8 @@ return new FalseIntFalseUnion();
         return success.HasValue ? new BoolBoolZeroUnion(success.Value) : null;
     }
 
-    public bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender, bool announcePads = false)
+    public bool CheckMoveMakesContact(Move move, Pokemon attacker, Pokemon defender,
+        bool announcePads = false)
     {
         if (move.Flags.Contact is not true || !attacker.HasItem(ItemId.ProtectivePads))
         {
