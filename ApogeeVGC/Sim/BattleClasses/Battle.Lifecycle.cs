@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
+using ApogeeVGC.Sim.Utils.Unions;
 using System.Threading;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -17,7 +18,11 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public partial class Battle
 {
     // Semaphore to block synchronous Battle when waiting for async player choices
-  private readonly ManualResetEventSlim _choiceWaitHandle = new(true);
+    private readonly ManualResetEventSlim _choiceWaitHandle = new(true);
+
+    // Infinite loop detection
+    private int _consecutiveFailedTurns = 0;
+    private const int MAX_CONSECUTIVE_FAILED_TURNS = 10;
 
     public void Start()
     {
@@ -117,10 +122,25 @@ public partial class Battle
     {
         // Increment turn counter and reset last successful move
         Turn++;
-        LastSuccessfulMoveThisTurn = null;
+ LastSuccessfulMoveThisTurn = null;
 
-        // Record turn start in history
-        History.RecordTurnStart(Turn);
+  // Check for infinite loop - if we've had too many failed turns in a row, abort
+        if (_consecutiveFailedTurns >= MAX_CONSECUTIVE_FAILED_TURNS)
+        {
+            Console.WriteLine($"[EndTurn] ERROR: {MAX_CONSECUTIVE_FAILED_TURNS} consecutive failed turns detected - battle is stuck in an infinite loop!");
+        Console.WriteLine("[EndTurn] Aborting battle to prevent stack overflow");
+   
+   // Force-end the battle with a tie
+       if (DisplayUi)
+ {
+                Add("message", "Battle ended due to infinite loop detection (too many consecutive failed turns)");
+     }
+            Tie();
+            return; // Exit immediately after ending the battle
+        }
+
+  // Record turn start in history
+      History.RecordTurnStart(Turn);
 
         // Process each side
         var trappedBySide = new List<bool>();
@@ -310,33 +330,40 @@ public partial class Battle
 
         // Check for endless battle clause
         if (MaybeTriggerEndlessBattleClause(trappedBySide, stalenessBySide))
+   {
+         return;
+        }
+
+        // Check if battle has ended before requesting new choices
+        if (Ended)
         {
+            Console.WriteLine("[EndTurn] Battle has ended, not requesting new choices");
             return;
         }
 
         // Display turn number
         if (DisplayUi)
         {
-            Add("turn", Turn);
-        }
+Add("turn", Turn);
+ }
 
-        // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
+  // Pre-calculate Quick Claw roll for Gen 2-3 (skipped for Gen 9)
         // Gen 9 doesn't use Quick Claw rolls the same way
 
         // Request move choices for the new turn
-        MakeRequest(RequestState.Move);
+  MakeRequest(RequestState.Move);
   
         // Request player choices - Battle will pause until callback is invoked
-      RequestPlayerChoices(onComplete: () =>
+        RequestPlayerChoices(onComplete: () =>
         {
-  Console.WriteLine("[EndTurn] Turn choices received, committing");
-         CommitChoices();
-     });
+       Console.WriteLine("[EndTurn] Turn choices received, committing");
+            CommitChoices();
+        });
   
         // Don't wait here - just return
         // The callback will call CommitChoices() -> TurnLoop() which will process the turn
-        // and naturally call EndTurn() again when the turn completes
-     Console.WriteLine("[EndTurn] Request made, returning to wait for choices");
+ // and naturally call EndTurn() again when the turn completes
+  Console.WriteLine("[EndTurn] Request made, returning to wait for choices");
     }
 
     /// <summary>
@@ -349,54 +376,66 @@ public partial class Battle
     public void TurnLoop()
     {
         if (DisplayUi)
-        {
+      {
             // Add empty line for formatting
-            Add(string.Empty);
+         Add(string.Empty);
 
-            // Add timestamp in Unix epoch seconds
+    // Add timestamp in Unix epoch seconds
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             Add("t:", timestamp);
         }
 
         // Clear request state if it exists
         if (RequestState != RequestState.None)
-        {
-            RequestState = RequestState.None;
-        }
+    {
+     RequestState = RequestState.None;
+      }
 
         // First time through - set up turn structure
         if (!MidTurn)
         {
-            // Insert BeforeTurn action at the front of the queue
+        // Insert BeforeTurn action at the front of the queue
             Queue.InsertChoice(new BeforeTurnAction());
 
-            // Add Residual action at the end of the queue
+// Add Residual action at the end of the queue
             Queue.AddChoice(new ResidualAction());
 
             MidTurn = true;
-        }
+      }
 
         // Process actions one at a time
         while (Queue.Shift() is { } action)
         {
             RunAction(action);
 
-            // Exit early if we need to wait for a request or battle ended
-            if (RequestState != RequestState.None || Ended)
-            {
-                return;
-            }
+     // Exit early if we need to wait for a request or battle ended
+      if (RequestState != RequestState.None || Ended)
+    {
+           return;
+     }
+        }
+
+  // Update consecutive failed turns counter
+        // LastSuccessfulMoveThisTurn is set when a move actually does something
+        if (LastSuccessfulMoveThisTurn != null)
+        {
+            Console.WriteLine($"[TurnLoop] Turn {Turn} had successful move: {LastSuccessfulMoveThisTurn}, resetting failure counter");
+          _consecutiveFailedTurns = 0;
+        }
+        else
+        {
+   _consecutiveFailedTurns++;
+            Console.WriteLine($"[TurnLoop] Turn {Turn} had NO successful moves (consecutive failures: {_consecutiveFailedTurns}/{MAX_CONSECUTIVE_FAILED_TURNS})");
         }
 
         // Turn is complete - reset flags before calling EndTurn
         Console.WriteLine("[TurnLoop] Turn complete, resetting MidTurn flag");
-        MidTurn = false;
-        Queue.Clear();
+   MidTurn = false;
+   Queue.Clear();
         
         // Now start the next turn
         EndTurn();
-    }
-
+ }
 
     public bool RunAction(IAction action)
     {

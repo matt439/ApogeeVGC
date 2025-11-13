@@ -7,9 +7,44 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
+    // Infinite request loop detection
+    private int _consecutiveMoveRequests = 0;
+    private const int MAX_CONSECUTIVE_MOVE_REQUESTS = 50;
+
     public void MakeRequest(RequestState? type = null)
     {
         Console.WriteLine($"[MakeRequest] Called with type={type}, current RequestState={RequestState}");
+
+        // Don't make requests if battle has ended
+        if (Ended)
+        {
+            Console.WriteLine("[MakeRequest] Battle has ended, not making new request");
+            return;
+        }
+
+        // Detect infinite request loops
+        if (type == RequestState.Move)
+        {
+            _consecutiveMoveRequests++;
+
+            if (_consecutiveMoveRequests >= MAX_CONSECUTIVE_MOVE_REQUESTS)
+            {
+                Console.WriteLine($"[MakeRequest] ERROR: {MAX_CONSECUTIVE_MOVE_REQUESTS} consecutive move requests detected!");
+                Console.WriteLine("[MakeRequest] This indicates an infinite loop - aborting battle");
+
+                if (DisplayUi)
+                {
+                    Add("message", "Battle ended due to infinite request loop detection");
+                }
+                Tie();
+                return;
+            }
+        }
+        else
+        {
+            // Reset counter for non-move requests
+            _consecutiveMoveRequests = 0;
+        }
 
         // Update request state if provided, otherwise use current state
         if (type.HasValue)
@@ -285,15 +320,18 @@ return false;
    Console.WriteLine("[CommitChoices] Starting");
       UpdateSpeed();
 
-        // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
-        // fainting). When this happens, the rest of the turn is saved (and not
-// re-sorted), but the new switch choices are sorted and inserted before
-      // the rest of the turn.
-        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
-        Queue.Clear();
+   // Reset consecutive request counter when choices are successfully committed
+    _consecutiveMoveRequests = 0;
 
-        if (!AllChoicesDone())
-        {
+     // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
+        // fainting). When this happens, the rest of the turn is saved (and not
+        // re-sorted), but the new switch choices are sorted and inserted before
+   // the rest of the turn.
+     var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+     Queue.Clear();
+
+  if (!AllChoicesDone())
+ {
      throw new InvalidOperationException("Not all choices done");
  }
 

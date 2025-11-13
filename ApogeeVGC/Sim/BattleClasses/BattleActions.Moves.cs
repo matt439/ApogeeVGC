@@ -295,192 +295,140 @@ public partial class BattleActions
     public bool UseMoveInner(Move move, Pokemon pokemon, UseMoveOptions? options = null)
     {
         Pokemon? target = options?.Target;
-        IEffect? sourceEffect = options?.SourceEffect;
+    IEffect? sourceEffect = options?.SourceEffect;
 
         // Default sourceEffect to battle effect if not provided and battle has an active effect
-        if (sourceEffect == null && Battle.Effect.EffectStateId != EffectStateId.FromEmpty())
+  if (sourceEffect == null && Battle.Effect.EffectStateId != EffectStateId.FromEmpty())
         {
-            sourceEffect = Battle.Effect;
+     sourceEffect = Battle.Effect;
         }
 
         // Clear sourceEffect for Instruct and Custap Berry
         if (sourceEffect is ActiveMove { Id: MoveId.Instruct } or Item { Id: ItemId.CustapBerry })
         {
-            sourceEffect = null;
-        }
+    sourceEffect = null;
+     }
 
-        // Get active move
+     // Get active move
         var activeMove = move.ToActiveMove();
-        pokemon.LastMoveUsed = activeMove;
+     pokemon.LastMoveUsed = activeMove;
 
         // Copy priority and prankster boost from active move if it exists
         if (Battle.ActiveMove != null)
-        {
-            activeMove.Priority = Battle.ActiveMove.Priority;
+      {
+     activeMove.Priority = Battle.ActiveMove.Priority;
             if (activeMove.HasBounced != true)
-            {
-                activeMove.PranksterBoosted = Battle.ActiveMove.PranksterBoosted;
-            }
+       {
+         activeMove.PranksterBoosted = Battle.ActiveMove.PranksterBoosted;
+  }
         }
 
-        // Store base target for later comparison
-        MoveTarget baseTarget = activeMove.Target;
+ // Store base target for later comparison
+     MoveTarget baseTarget = activeMove.Target;
 
-        // Run ModifyTarget event
-        RelayVar? targetRelayVar = Battle.RunEvent(EventId.ModifyTarget, pokemon,
-            RunEventSource.FromNullablePokemon(target), activeMove, RelayVar.FromNullablePokemon(target));
+  // Run ModifyTarget event
+      RelayVar? targetRelayVar = Battle.RunEvent(EventId.ModifyTarget, pokemon,
+      RunEventSource.FromNullablePokemon(target), activeMove, RelayVar.FromNullablePokemon(target));
 
-        if (targetRelayVar is PokemonRelayVar prv)
-        {
+  if (targetRelayVar is PokemonRelayVar prv)
+   {
             target = prv.Pokemon;
-        }
+ }
 
-        // Get random target if target is undefined
+     // Get random target if target is undefined
         target ??= Battle.GetRandomTarget(pokemon, activeMove);
 
-        // Self/allies target always targets the user
+  // Self/allies target always targets the user
         if (activeMove.Target is MoveTarget.Self or MoveTarget.Allies)
         {
-            target = pokemon;
-        }
+          target = pokemon;
+      }
 
-        // Set source effect information
-        if (sourceEffect != null)
+      // Set source effect information
+ if (sourceEffect != null)
         {
-            activeMove.SourceEffect = sourceEffect.EffectStateId;
-            if (sourceEffect is ActiveMove sourceMove)
-            {
+      activeMove.SourceEffect = sourceEffect.EffectStateId;
+     if (sourceEffect is ActiveMove sourceMove)
+     {
                 activeMove.IgnoreAbility = sourceMove.IgnoreAbility;
-            }
-        }
+         }
+    }
 
         // Set as active move
         Battle.SetActiveMove(activeMove, pokemon, target);
 
-        // Run ModifyType event (single)
+ // Run ModifyType event (single)
         Battle.SingleEvent(EventId.ModifyType, activeMove, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         // Run ModifyMove event (single)
-        Battle.SingleEvent(EventId.ModifyMove, activeMove, null, pokemon,
+  Battle.SingleEvent(EventId.ModifyMove, activeMove, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         // Check if target changed and adjust
         if (baseTarget != activeMove.Target)
         {
-            target = Battle.GetRandomTarget(pokemon, activeMove);
-        }
+  target = Battle.GetRandomTarget(pokemon, activeMove);
+  }
 
-        // Run ModifyType event (global)
+      // Run ModifyType event (global)
         RelayVar? modifyTypeResult = Battle.RunEvent(EventId.ModifyType, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         if (modifyTypeResult is EffectRelayVar { Effect: ActiveMove modifiedMove1 })
         {
-            activeMove = modifiedMove1;
-        }
+ activeMove = modifiedMove1;
+    }
 
         // Run ModifyMove event (global)
-        RelayVar? modifyMoveResult = Battle.RunEvent(EventId.ModifyMove, pokemon,
-            RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
+  RelayVar? modifyMoveResult = Battle.RunEvent(EventId.ModifyMove, pokemon,
+      RunEventSource.FromNullablePokemon(target), activeMove, activeMove);
 
         if (modifyMoveResult is EffectRelayVar { Effect: ActiveMove modifiedMove2 })
         {
-            activeMove = modifiedMove2;
+      activeMove = modifiedMove2;
         }
 
-        // Check if target changed again and adjust
-        if (baseTarget != activeMove.Target)
+      // Check if target changed again and adjust
+   if (baseTarget != activeMove.Target)
         {
-            target = Battle.GetRandomTarget(pokemon, activeMove);
+     target = Battle.GetRandomTarget(pokemon, activeMove);
         }
 
-        // Early exit if move is null or pokemon fainted
+      // Early exit if move is null or pokemon fainted
         if (pokemon.Fainted)
         {
-            return false;
-        }
+       pokemon.MoveThisTurnResult = false;
+     return false;
+  }
 
-        // Build move message attributes
+ // Build move message attributes
         string moveName = activeMove.Name;
 
         // Add move message to battle log
         if (Battle.DisplayUi)
         {
-            if (target is null)
+  if (target is null)
             {
-                throw new InvalidOperationException("Target cannot be null when displaying move message.");
-            }
+                Console.WriteLine($"[UseMoveInner] Move {moveName} failed: no valid target");
+      pokemon.MoveThisTurnResult = false;
+       return false;
+ }
 
-            if (sourceEffect != null)
-            {
-                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
-                    StringNumberDelegateObjectUnion.FromObject(target), $"[from] {sourceEffect.EffectStateId}");
-            }
-            else
-            {
-                Battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon), moveName,
-                    StringNumberDelegateObjectUnion.FromObject(target));
-            }
+         // ...existing code...
+        }
 
-            // Add GUI message for move usage
-            Battle.AddMessage(new MoveUsedMessage
-            {
-                PokemonName = pokemon.Name,
-                MoveName = moveName
-            });
-    
-          // TODO: Add more messages as battle progresses. Examples:
-            // 
-            // After damage calculation (in BattleActions.Damage.cs):
-    // Battle.AddMessage(new DamageMessage 
-     // { 
-            //     PokemonName = target.Name,
-            //     DamageAmount = damageDealt,
-  //     RemainingHp = target.Hp,
-            //     MaxHp = target.MaxHp
-            // });
-            //
-            // For type effectiveness (after checking move effectiveness):
-         // if (effectiveness > 1.0)
-            //     Battle.AddMessage(new EffectivenessMessage 
-    //     { 
-  //      Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective 
-     //     });
-   // else if (effectiveness < 1.0)
-            //     Battle.AddMessage(new EffectivenessMessage 
-            //     { 
-         //  Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective 
-          //     });
-            //
-     // For critical hits (in damage calculation):
-// if (isCriticalHit)
-          //     Battle.AddMessage(new CriticalHitMessage());
- //
-   // For move miss:
-            // Battle.AddMessage(new MissMessage { PokemonName = pokemon.Name });
-            //
-       // For fainting (in Battle.Fainting.cs):
-// Battle.AddMessage(new FaintMessage { PokemonName = target.Name });
-   //
-     // For switching (in BattleActions.Switch.cs):
-        // Battle.AddMessage(new SwitchMessage 
-  // { 
-      //     TrainerName = side.Name,
-    //     PokemonName = newPokemon.Name 
-            // });
-     }
-
-        // Handle no target
+     // Handle no target
         if (target == null)
         {
-            if (Battle.DisplayUi)
+         if (Battle.DisplayUi)
             {
-                Battle.AttrLastMove("[notarget]");
-                Battle.Add(Battle.Gen >= 5 ? "-fail" : "-notarget", pokemon);
-            }
+    Battle.AttrLastMove("[notarget]");
+  Battle.Add(Battle.Gen >= 5 ? "-fail" : "-notarget", pokemon);
+    }
 
-            return false;
+            pokemon.MoveThisTurnResult = false;
+          return false;
         }
 
         // Get move targets for Pressure PP deduction
@@ -614,6 +562,9 @@ public partial class BattleActions
         {
             Battle.SingleEvent(EventId.MoveFail, activeMove, null, target, pokemon,
                 activeMove);
+    
+    // Ensure move result is set to false
+        pokemon.MoveThisTurnResult = false;
             return false;
         }
 
