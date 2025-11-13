@@ -320,8 +320,8 @@ public partial class Pokemon : IPriorityComparison
 
         // Combine details string with health string
         string detailsStr = details.ToString();
-        Utils.Unions.Secret secretFullDetails = $"{detailsStr}|{health.Secret}";
-        Utils.Unions.Shared sharedFullDetails = $"{detailsStr}|{health.Shared}";
+        Secret secretFullDetails = $"{detailsStr}|{health.Secret}";
+        Shared sharedFullDetails = $"{detailsStr}|{health.Shared}";
 
         return new SideSecretSharedResult(health.Side, secretFullDetails, sharedFullDetails)
         {
@@ -347,8 +347,8 @@ public partial class Pokemon : IPriorityComparison
         // If Pokemon is fainted, return fainted status
         if (Hp <= 0)
         {
-            Utils.Unions.Secret faintedSecret = "0 fnt";
-            Utils.Unions.Shared faintedShared = "0 fnt";
+            Secret faintedSecret = "0 fnt";
+            Shared faintedShared = "0 fnt";
             return new SideSecretSharedResult(Side.Id, faintedSecret, faintedShared);
         }
 
@@ -375,9 +375,9 @@ public partial class Pokemon : IPriorityComparison
             // Calculate HP color based on percentage
             hpColor = percentage switch
             {
-                > 50 => Utils.Unions.HpColor.Green,
-                > 20 => Utils.Unions.HpColor.Yellow,
-                _ => Utils.Unions.HpColor.Red
+                > 50 => HpColor.Green,
+                > 20 => HpColor.Yellow,
+                _ => HpColor.Red
             };
         }
         else
@@ -427,11 +427,11 @@ public partial class Pokemon : IPriorityComparison
             sharedStr += $" {Status}";
         }
 
-        Utils.Unions.Secret secret = secretStr;
-        Utils.Unions.Shared shared = sharedStr;
+        Secret secret = secretStr;
+        Shared shared = sharedStr;
 
         return new SideSecretSharedResult(Side.Id, secret, shared)
         {
-            HpColor = hpColor
+            HpColor = hpColor,
         };
     }}
