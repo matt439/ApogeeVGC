@@ -32,7 +32,7 @@ public partial class Battle
         }
 
         // Check for infinite loop
-        if (Log.Count - SentLogPos > 1000)
+        if (Log.Count - SentLogPos > 5000)
         {
             if (DisplayUi)
             {
@@ -598,9 +598,8 @@ public partial class Battle
                 if (handler.State.Duration <= 0)
                 {
                     // Effect has expired, trigger its end callback
-                    // Use provided EndCallArgs or default to [effectHolder, effect.EffectStateId]
-                    object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? 
-            [handler.EffectHolder, effect.EffectStateId];
+                    // Use provided EndCallArgs or empty array for no args
+                    object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
 
                     // Invoke the end callback
                     Delegate? endDelegate = handler.End.GetDelegate();

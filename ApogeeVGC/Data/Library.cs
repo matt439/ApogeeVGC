@@ -2,7 +2,6 @@
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Types;
 using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Utils;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Items;
@@ -38,38 +37,27 @@ public record Library
     private IReadOnlyDictionary<SpecieId, Species> SpeciesData => _speciesData.SpeciesDataDictionary;
     private IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormatsData => _speciesFormats.SpeciesFormatsData;
 
-    public IReadOnlyDictionary<AbilityId, Ability> Abilities => 
-        new ReadOnlyDictionaryWrapper<AbilityId, Ability>(AbilitiesData);
+    public IReadOnlyDictionary<AbilityId, Ability> Abilities => AbilitiesData;
     
-    public IReadOnlyDictionary<ConditionId, Condition> Conditions => 
-        new ReadOnlyDictionaryWrapper<ConditionId, Condition>(ConditionsData);
+    public IReadOnlyDictionary<ConditionId, Condition> Conditions => ConditionsData;
 
-    public IReadOnlyDictionary<EventId, EventIdInfo> Events =>
-        new ReadOnlyDictionaryWrapper<EventId, EventIdInfo>(EventData);
+    public IReadOnlyDictionary<EventId, EventIdInfo> Events => EventData;
 
-    public IReadOnlyDictionary<FormatId, Format> Formats => 
-        new ReadOnlyDictionaryWrapper<FormatId, Format>(FormatsData);
+    public IReadOnlyDictionary<FormatId, Format> Formats => FormatsData;
 
-    public IReadOnlyDictionary<ItemId, Item> Items => 
-        new ReadOnlyDictionaryWrapper<ItemId, Item>(ItemsData);
+    public IReadOnlyDictionary<ItemId, Item> Items => ItemsData;
     
-    public IReadOnlyDictionary<SpecieId, Learnset> Learnsets => 
-        new ReadOnlyDictionaryWrapper<SpecieId, Learnset>(LearnsetsData);
+    public IReadOnlyDictionary<SpecieId, Learnset> Learnsets => LearnsetsData;
     
-    public IReadOnlyDictionary<MoveId, Move> Moves => 
-        new ReadOnlyDictionaryWrapper<MoveId, Move>(MovesData);
-    
-    public IReadOnlyDictionary<NatureId, Nature> Natures => 
-        new ReadOnlyDictionaryWrapper<NatureId, Nature>(NaturesData);
+    public IReadOnlyDictionary<MoveId, Move> Moves => MovesData;
 
-    public IReadOnlyDictionary<RuleId, Format> Rulesets =>
-        new ReadOnlyDictionaryWrapper<RuleId, Format>(RulesetsData);
+    public IReadOnlyDictionary<NatureId, Nature> Natures => NaturesData;
 
-    public IReadOnlyDictionary<SpecieId, Species> Species => 
-        new ReadOnlyDictionaryWrapper<SpecieId, Species>(SpeciesData);
+    public IReadOnlyDictionary<RuleId, Format> Rulesets => RulesetsData;
+
+    public IReadOnlyDictionary<SpecieId, Species> Species => SpeciesData;
     
-    public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => 
-        new ReadOnlyDictionaryWrapper<SpecieId, SpeciesFormat>(SpeciesFormatsData);
+    public IReadOnlyDictionary<SpecieId, SpeciesFormat> SpeciesFormats => SpeciesFormatsData;
     
     public IReadOnlyDictionary<PokemonType, TypeData> TypeData => TypeChart.TypeData;
     public TypeChart TypeChart { get; } = new();
