@@ -9,8 +9,8 @@ namespace ApogeeVGC.Sim.Choices;
 
 public record PokemonSwitchRequestData
 {
-    //public required string Ident { get; init; }
-    //public required string Details { get; init; }
+    public required string Ident { get; init; }
+    public required string Details { get; init; }
     public ConditionId Condition { get; init; }
     public bool Active { get; init; }
     public required StatsTable Stats { get; init; }

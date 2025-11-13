@@ -258,19 +258,23 @@ public partial class Pokemon
     public bool SetItem(ItemId item, Pokemon? source = null, IEffect? effect = null)
     {
         // Early exit if Pokemon is fainted or not active
-        if (Hp <= 0 || !IsActive) return false;
+  if (Hp <= 0 || !IsActive) return false;
 
-        // Check if item was knocked off (except for Recycle move)
-        if (ItemState.KnockedOff == true && effect is ActiveMove { Id: MoveId.Recycle })
-        {
+    // Check if item was knocked off (except for Recycle move)
+ if (ItemState.KnockedOff == true && 
+            !(effect is ActiveMove { Id: MoveId.Recycle }))
+   {
             return false;
         }
 
         // Clear knocked off flag
         ItemState.KnockedOff = null;
 
+   // Default sourceEffect if not provided
+        effect ??= Battle.Effect;
+
         // Determine current effect ID
-        EffectStateId effectId = Battle.Effect.EffectStateId;
+EffectStateId effectId = effect.EffectStateId;
 
         // Check if this is a restorative berry (like Leppa Berry)
         // Note: You'll need to define RESTORATIVE_BERRIES set/list somewhere

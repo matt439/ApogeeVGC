@@ -175,6 +175,22 @@ public partial class Pokemon
                 DisabledSource = moveSlot.DisabledSource,
             });
         }
+        
+        // If no valid moves, return Struggle
+        if (!hasValidMove)
+        {
+            return
+            [
+        new PokemonMoveData
+    {
+           Move = Battle.Library.Moves[MoveId.Struggle],
+           Target = null,
+              Disabled = null,
+      DisabledSource = null,
+   }
+            ];
+        }
+        
         return hasValidMove ? moves : [];
     }
 
@@ -276,7 +292,7 @@ public partial class Pokemon
         }
 
         foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
-                     moveSlot.Id != moveId && moveSlot.Disabled != true))
+         moveSlot.Id == moveId && moveSlot.Disabled != true))
         {
             moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
             moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();

@@ -253,7 +253,8 @@ public partial class Pokemon
 
     public bool IsAlly(Pokemon? pokemon = null)
     {
-        return pokemon != null && Side == pokemon.Side;
+        if (pokemon == null) return false;
+        return Side == pokemon.Side;
     }
 
     public bool IsAdjacent(Pokemon pokemon2)

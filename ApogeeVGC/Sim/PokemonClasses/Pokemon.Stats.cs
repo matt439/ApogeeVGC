@@ -148,7 +148,7 @@ public partial class Pokemon
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)
     {
-        int bestStatValue = int.MinValue;
+        int bestStatValue = 0;
         var bestStatName = StatIdExceptHp.Atk;
 
         // Iterate through all stat types except HP

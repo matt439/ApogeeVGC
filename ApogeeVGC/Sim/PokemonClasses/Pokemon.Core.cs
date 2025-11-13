@@ -108,7 +108,7 @@ public partial class Pokemon : IPriorityComparison
     public bool TruantTurn { get; set; }
     public bool BondTriggered { get; set; }
     public bool SwordBoost { get; set; } // Gen 9 only
-    public bool ShieldBoost { get; init; } // Gen 9 only
+    public bool ShieldBoost { get; set; } // Gen 9 only
     public bool SyrupTriggered { get; set; } // Gen 9 only
     public List<MoveType> StellarBoostedTypes { get; set; } // Gen 9 only
 
@@ -214,7 +214,8 @@ public partial class Pokemon : IPriorityComparison
             Evasion = 0,
         };
 
-        Ability = BaseAbility;
+        BaseAbility = set.Ability;
+     Ability = BaseAbility;
         AbilityState = battle.InitEffectState(Ability, null, this);
 
         Item = set.Item;
@@ -256,8 +257,9 @@ public partial class Pokemon : IPriorityComparison
     /// </summary>
     public PokemonSlot GetSlot()
     {
-        int poistionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
-        return new PokemonSlot(Side.Id, poistionOffset);
+        int positionOffset = (int)Math.Floor(Side.N / 2.0) * Side.Active.Count;
+        char positionLetter = "abcdef"[Position + positionOffset];
+    return new PokemonSlot(Side.Id, positionLetter);
     }
 
     /// <summary>

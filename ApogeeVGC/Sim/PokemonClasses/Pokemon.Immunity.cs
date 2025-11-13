@@ -20,6 +20,22 @@ public partial class Pokemon
     /// <returns>True if not immune (move can hit), false if immune</returns>
     public bool RunImmunity(ActiveMove source, bool message = false)
     {
+        // Check if move ignores immunity
+        if (source.IgnoreImmunity != null)
+        {
+            switch (source.IgnoreImmunity)
+            {
+                case BoolMoveDataIgnoreImmunity boolImmunity when boolImmunity.Value:
+                    return true;
+                case TypeMoveDataIgnoreImmunity typeImmunity:
+                    if (typeImmunity.TypeImmunities.TryGetValue(source.Type.ConvertToPokemonType(), out bool ignores) && ignores)
+                    {
+                        return true;
+                    }
+                    break;
+            }
+        }
+
         return RunImmunity(source.Type, message);
     }
 

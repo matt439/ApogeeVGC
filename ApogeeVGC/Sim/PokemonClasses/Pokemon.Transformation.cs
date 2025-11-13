@@ -64,6 +64,9 @@ public partial class Pokemon
             StoredStats[stat] = pokemon.StoredStats[stat];
         }
 
+        // Copy timesAttacked
+        TimesAttacked = pokemon.TimesAttacked;
+
         // Copy moves
         MoveSlots.Clear();
         foreach (MoveSlot moveSlot in pokemon.MoveSlots)

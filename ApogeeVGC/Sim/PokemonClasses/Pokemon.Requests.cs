@@ -65,6 +65,8 @@ public partial class Pokemon
         // Create the base entry
         var entry = new PokemonSwitchRequestData
         {
+            Ident = Fullname,
+            Details = Details.ToString(),
             Condition = secretCondition.Value,
             Active = Position < Side.Active.Count,
             Stats = stats,
