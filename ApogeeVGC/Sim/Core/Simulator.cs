@@ -88,10 +88,10 @@ public class Simulator : IBattleController
             _cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
 
             // Start the battle loop task
-            var battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);
+            Task battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);
 
             // Start processing choice responses
-            var choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
+            Task choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
 
             // Wait for battle to complete
             await Task.WhenAny(battleLoopTask, choiceProcessingTask);
@@ -133,7 +133,7 @@ public class Simulator : IBattleController
                 var frames = ex.StackTrace?.Split('\n').Take(10);
                 if (frames != null)
                 {
-                    foreach (var frame in frames)
+                    foreach (string frame in frames)
                     {
                         Console.WriteLine($"  {frame.Trim()}");
                     }
@@ -189,7 +189,7 @@ public class Simulator : IBattleController
         Console.WriteLine($"[Simulator.OnChoiceRequested] Choice requested for {e.SideId}");
 
         // Start an async task to get the choice
-        var choiceTask = Task.Run(async () =>
+        Task choiceTask = Task.Run(async () =>
         {
             try
             {
@@ -513,7 +513,7 @@ public class Simulator : IBattleController
         sb.AppendLine($">reseed {Battle.PrngSeed}");
 
         // Add all logged choices and commands
-        foreach (var log in InputLog)
+        foreach (string log in InputLog)
         {
             sb.AppendLine(log);
         }
@@ -543,7 +543,7 @@ public class Simulator : IBattleController
         }
 
         var parts = new List<string>();
-        foreach (var action in choice.Actions)
+        foreach (ChosenAction action in choice.Actions)
         {
             // Format each action - this is a simplified version
             parts.Add(action.ToString() ?? "default");
