@@ -56,7 +56,7 @@ public partial class BattleActions
             oldActive.SkipBeforeSwitchOutEventFlag = false;
 
             // Run SwitchOut event - can be interrupted in custom formats
-            RelayVar? switchOutResult = Battle.RunEvent(EventId.SwitchOut, oldActive);
+            RelayVar switchOutResult = Battle.RunEvent(EventId.SwitchOut, oldActive);
             if (switchOutResult is BoolRelayVar { Value: false })
             {
                 // Warning: DO NOT interrupt a switch-out if you just want to trap a pokemon.
@@ -212,7 +212,7 @@ public partial class BattleActions
             return false;
         }
 
-        RelayVar? dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive);
+        RelayVar dragOutResult = Battle.RunEvent(EventId.DragOut, oldActive);
 
         return dragOutResult is not BoolRelayVar { Value: false } &&
                SwitchIn(pokemon, pos, null, true);

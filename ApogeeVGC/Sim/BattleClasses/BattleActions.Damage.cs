@@ -19,7 +19,7 @@ public partial class BattleActions
     /// Normal PS return value rules apply:
     /// undefined = success, null = silent failure, false = loud failure
     /// </summary>
-    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, ActiveMove move,
+    public IntUndefinedFalseUnion GetDamage(Pokemon source, Pokemon target, ActiveMove move,
         bool suppressMessages = false)
     {
         // Check immunity
@@ -39,13 +39,13 @@ public partial class BattleActions
         {
             IntFalseUnion? damageResult = Battle.InvokeCallback<IntFalseUnion>(
                 move.DamageCallback,
-     Battle,
-source,
-        target,
-            move
+                Battle,
+                source,
+                target,
+                move
             );
-  return damageResult?.ToIntUndefinedFalseUnion() ?? IntUndefinedFalseUnion.FromFalse();
-     }
+            return damageResult?.ToIntUndefinedFalseUnion() ?? IntUndefinedFalseUnion.FromFalse();
+        }
 
         // Fixed damage moves
         if (move.Damage is LevelMoveDamage)
@@ -64,25 +64,26 @@ source,
         IntFalseUnion? basePower = move.BasePower;
         if (move.BasePowerCallback != null)
         {
-   basePower = Battle.InvokeCallback<IntFalseUnion>(
-       move.BasePowerCallback,
- Battle,
-   source,
-           target,
-    move
+            basePower = Battle.InvokeCallback<IntFalseUnion>(
+                move.BasePowerCallback,
+                Battle,
+                source,
+                target,
+                move
             );
-  }
+        }
 
         // Base power checks
         if (basePower == null || basePower == 0)
         {
             return basePower == 0 ? new Undefined() : IntUndefinedFalseUnion.FromFalse();
         }
+
         basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
 
         // Calculate critical hit ratio (Gen 7+ logic, used in Gen 9)
         int critRatio = move.CritRatio ?? 0;
-        RelayVar? critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
+        RelayVar critRatioEvent = Battle.RunEvent(EventId.ModifyCritRatio, source,
             RunEventSource.FromNullablePokemon(target), move, critRatio);
 
         if (critRatioEvent is IntRelayVar irv)
@@ -110,13 +111,13 @@ source,
         // Run CriticalHit event (can be cancelled)
         if (moveHit.Crit)
         {
-            RelayVar? critEvent = Battle.RunEvent(EventId.CriticalHit, target,
+            RelayVar critEvent = Battle.RunEvent(EventId.CriticalHit, target,
                 RunEventSource.FromNullablePokemon(null), move);
             moveHit.Crit = critEvent is not BoolRelayVar { Value: false };
         }
 
         // Run BasePower event after crit calculation
-        RelayVar? basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
+        RelayVar basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
             RunEventSource.FromNullablePokemon(target), move, basePower.ToInt(), true);
 
         if (basePowerEvent is IntRelayVar bpIrv)
@@ -128,6 +129,7 @@ source,
         {
             return 0;
         }
+
         basePower = Battle.ClampIntRange(basePower.ToInt(), 1, null);
 
         // Terastallization 60 BP boost for low base power moves (Gen 9)
@@ -147,13 +149,19 @@ source,
         int level = source.Level;
 
         // Determine attacker and defender (some moves swap offensive/defensive Pokemon)
-        Pokemon attacker = move.OverrideOffensivePokemon == MoveOverridePokemon.Target ? target : source;
-        Pokemon defender = move.OverrideDefensivePokemon == MoveOverridePokemon.Source ? source : target;
+        Pokemon attacker = move.OverrideOffensivePokemon == MoveOverridePokemon.Target
+            ? target
+            : source;
+        Pokemon defender = move.OverrideDefensivePokemon == MoveOverridePokemon.Source
+            ? source
+            : target;
 
         // Determine stats to use
         bool isPhysical = category == MoveCategory.Physical;
-        StatIdExceptHp attackStat = move.OverrideOffensiveStat ?? (isPhysical ? StatIdExceptHp.Atk : StatIdExceptHp.SpA);
-        StatIdExceptHp defenseStat = move.OverrideDefensiveStat ?? (isPhysical ? StatIdExceptHp.Def : StatIdExceptHp.SpD);
+        StatIdExceptHp attackStat = move.OverrideOffensiveStat ??
+                                    (isPhysical ? StatIdExceptHp.Atk : StatIdExceptHp.SpA);
+        StatIdExceptHp defenseStat = move.OverrideDefensiveStat ??
+                                     (isPhysical ? StatIdExceptHp.Def : StatIdExceptHp.SpD);
 
         // Get boost values
         int atkBoosts = attacker.Boosts.GetBoost(attackStat.ConvertToBoostId());
@@ -170,8 +178,10 @@ source,
             ignorePositiveDefensive = true;
         }
 
-        bool ignoreOffensive = move.IgnoreOffensive == true || (ignoreNegativeOffensive && atkBoosts < 0);
-        bool ignoreDefensive = move.IgnoreDefensive == true || (ignorePositiveDefensive && defBoosts > 0);
+        bool ignoreOffensive =
+            move.IgnoreOffensive == true || (ignoreNegativeOffensive && atkBoosts < 0);
+        bool ignoreDefensive =
+            move.IgnoreDefensive == true || (ignorePositiveDefensive && defBoosts > 0);
 
         if (ignoreOffensive)
         {
@@ -207,11 +217,11 @@ source,
             _ => throw new InvalidOperationException("Invalid defense stat"),
         };
 
-        RelayVar? modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
+        RelayVar modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
             RunEventSource.FromNullablePokemon(target), move, attack);
         attack = modifyAtkResult is IntRelayVar atkIrv ? atkIrv.Value : attack;
 
-        RelayVar? modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
+        RelayVar modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
             RunEventSource.FromNullablePokemon(source), move, defense);
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
@@ -229,14 +239,14 @@ source,
         return ModifyDamage(baseDamage, source, target, move, suppressMessages);
     }
 
-    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, MoveId moveId,
+    public IntUndefinedFalseUnion GetDamage(Pokemon source, Pokemon target, MoveId moveId,
         bool suppressMessages = false)
     {
         Move move = Library.Moves[moveId];
         return GetDamage(source, target, move.ToActiveMove(), suppressMessages);
     }
 
-    public IntUndefinedFalseUnion? GetDamage(Pokemon source, Pokemon target, int basePower,
+    public IntUndefinedFalseUnion GetDamage(Pokemon source, Pokemon target, int basePower,
         bool suppressMessages = false)
     {
         // Create a temporary move with the specified base power
@@ -260,7 +270,7 @@ source,
     }
 
     public int ModifyDamage(int baseDamage, Pokemon pokemon, Pokemon target, ActiveMove move,
-    bool suppressMessages = false)
+        bool suppressMessages = false)
     {
         MoveType type = move.Type;
 
@@ -273,11 +283,12 @@ source,
             {
                 Battle.Debug("Spread modifier: 0.75");
             }
+
             baseDamage = Battle.Modify(baseDamage, 0.75);
         }
 
         // Weather modifier
-        RelayVar? weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
+        RelayVar weatherModResult = Battle.RunEvent(EventId.WeatherModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
 
         if (weatherModResult is IntRelayVar weatherMod)
@@ -305,8 +316,8 @@ source,
             double stab = 1.0;
 
             bool isStab = move.ForceStab == true ||
-                         pokemon.HasType((PokemonType)type) ||
-                         pokemon.GetTypes(false, true).Contains((PokemonType)type);
+                          pokemon.HasType((PokemonType)type) ||
+                          pokemon.GetTypes(false, true).Contains((PokemonType)type);
 
             if (isStab)
             {
@@ -338,8 +349,9 @@ source,
                 }
 
                 // Run ModifySTAB event
-                RelayVar? modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
-                    RunEventSource.FromNullablePokemon(target), move, new DecimalRelayVar((decimal)stab));
+                RelayVar modifyStabResult = Battle.RunEvent(EventId.ModifyStab, pokemon,
+                    RunEventSource.FromNullablePokemon(target), move,
+                    new DecimalRelayVar((decimal)stab));
 
                 if (modifyStabResult is DecimalRelayVar stabMod)
                 {
@@ -399,7 +411,7 @@ source,
         }
 
         // Final modifier - Life Orb, etc.
-        RelayVar? finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
+        RelayVar finalModResult = Battle.RunEvent(EventId.ModifyDamage, pokemon,
             RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(baseDamage));
 
         if (finalModResult is IntRelayVar finalMod)
@@ -431,8 +443,10 @@ source,
     public int GetConfusionDamage(Pokemon pokemon, int basePower)
     {
         // Get the Pokémon's attack and defense stats with current boosts applied
-        int attack = pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
-        int defense = pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
+        int attack =
+            pokemon.CalculateStat(StatIdExceptHp.Atk, pokemon.Boosts.GetBoost(BoostId.Atk));
+        int defense =
+            pokemon.CalculateStat(StatIdExceptHp.Def, pokemon.Boosts.GetBoost(BoostId.Def));
         int level = pokemon.Level;
 
         // Calculate base damage using the standard Pokémon damage formula
@@ -472,6 +486,5 @@ source,
         int recoilDamage = (int)Math.Round(damageDealt * move.Recoil.Value.Item1 /
                                            (double)move.Recoil.Value.Item2);
         return Battle.ClampIntRange(recoilDamage, 1, null);
-
     }
 }

@@ -176,28 +176,28 @@ public partial class BattleActions
             {
                 if (moveData.OnHitField != null)
                 {
-                    RelayVar? fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
+                    RelayVar fieldHitResult = Battle.SingleEvent(EventId.HitField, moveData, null,
                         target, source, move);
                     hitResult = fieldHitResult switch
                     {
                         BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
                         IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                        _ => BoolIntUndefinedUnion.FromUndefined()
+                        _ => BoolIntUndefinedUnion.FromUndefined(),
                     };
                     didSomething = CombineResults(didSomething, hitResult);
                 }
             }
-            else if ((move.Target == MoveTarget.FoeSide || move.Target == MoveTarget.AllySide) && !isSelf)
+            else if (move.Target is MoveTarget.FoeSide or MoveTarget.AllySide && !isSelf)
             {
                 if (moveData.OnHitSide != null)
                 {
-                    RelayVar? sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
+                    RelayVar sideHitResult = Battle.SingleEvent(EventId.HitSide, moveData, null,
                         target.Side, source, move);
                     hitResult = sideHitResult switch
                     {
                         BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
                         IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value),
-                        _ => BoolIntUndefinedUnion.FromUndefined()
+                        _ => BoolIntUndefinedUnion.FromUndefined(),
                     };
                     didSomething = CombineResults(didSomething, hitResult);
                 }
@@ -206,7 +206,7 @@ public partial class BattleActions
             {
                 if (moveData.OnHit != null)
                 {
-                    RelayVar? hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
+                    RelayVar hitEventResult = Battle.SingleEvent(EventId.Hit, moveData, null,
                         target, source, move);
                     hitResult = hitEventResult switch
                     {
@@ -324,7 +324,7 @@ public partial class BattleActions
             Pokemon target = pokemonUnion.Pokemon;
 
             // Run ModifySecondaries event to get the list of secondary effects
-            RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
+            RelayVar modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
                 moveData.Secondaries);
 
             var secondaries = modifyResult is SecondaryEffectArrayRelayVar secListRv

@@ -20,9 +20,6 @@ public partial class BattleActions(Battle battle)
         MoveTarget.AdjacentFoe,
     ];
 
-
-
-
     #region Helpers
 
     // Priority mapping (lower number = higher priority)

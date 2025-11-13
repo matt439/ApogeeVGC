@@ -9,15 +9,6 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class BattleActions
 {
-    //public MoveType? CanTerastallize(Battle battle, Pokemon pokemon)
-    //{
-    //    if (Battle.Gen != 9)
-    //    {
-    //        return null;
-    //    }
-    //    return pokemon.TeraType;
-    //}
-
     public void Terastallize(Pokemon pokemon)
     {
         // Check for Ogerpon with invalid tera types

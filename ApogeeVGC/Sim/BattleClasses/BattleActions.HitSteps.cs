@@ -44,7 +44,7 @@ public partial class BattleActions
             else
             {
                 // Run Invulnerability event to check if target can be hit
-                RelayVar? invulnResult = Battle.RunEvent(EventId.Invulnerability, target, pokemon, move);
+                RelayVar invulnResult = Battle.RunEvent(EventId.Invulnerability, target, pokemon, move);
 
                 // Convert RelayVar to boolean (false means invulnerable/miss, true/null means can hit)
                 canHit = invulnResult is not BoolRelayVar { Value: false };
@@ -87,9 +87,9 @@ public partial class BattleActions
     public List<BoolIntEmptyUndefinedUnion> HitStepTryEvent(List<Pokemon> targets, Pokemon pokemon, ActiveMove move)
     {
         // Run TryHit event for all targets
-        RelayVar? hitResult = Battle.RunEvent(EventId.TryHit, targets.ToArray(), pokemon, move);
+        RelayVar hitResult = Battle.RunEvent(EventId.TryHit, targets.ToArray(), pokemon, move);
 
-        List<RelayVar?> hitResults;
+        List<RelayVar> hitResults;
         if (hitResult is ArrayRelayVar arv)
         {
             hitResults = [];
@@ -105,7 +105,7 @@ public partial class BattleActions
         bool hasTrue = false;
         bool hasFalse = false;
 
-        foreach (RelayVar? result in hitResults)
+        foreach (RelayVar result in hitResults)
         {
             if (result is BoolRelayVar brv)
             {
@@ -296,7 +296,7 @@ public partial class BattleActions
             else
             {
                 // Non-OHKO moves: Run ModifyAccuracy event
-                RelayVar? accuracyEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
+                RelayVar accuracyEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
                     move, RelayVar.FromIntTrueUnion(accuracy));
 
                 if (accuracyEvent is IntRelayVar irv)
@@ -328,7 +328,7 @@ public partial class BattleActions
                             Evasion = pokemon.Boosts.Evasion,
                         };
 
-                        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
+                        RelayVar boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
                             null, boostsTable);
 
                         if (boostEvent is BoostsTableRelayVar brv)
@@ -354,7 +354,7 @@ public partial class BattleActions
                             Evasion = target.Boosts.Evasion,
                         };
 
-                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                        RelayVar targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
                             null, targetBoostsTable);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
@@ -392,7 +392,7 @@ public partial class BattleActions
             else
             {
                 // Run Accuracy event for final accuracy check
-                RelayVar? finalAccuracyEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
+                RelayVar finalAccuracyEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
                     move, RelayVar.FromIntTrueUnion(accuracy));
 
                 if (finalAccuracyEvent is IntRelayVar faeIrv)
@@ -716,7 +716,7 @@ public partial class BattleActions
                             Evasion = pokemon.Boosts.Evasion,
                         };
 
-                        RelayVar? boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
+                        RelayVar boostEvent = Battle.RunEvent(EventId.ModifyBoost, pokemon, null,
                             null, boosts);
 
                         if (boostEvent is BoostsTableRelayVar brv)
@@ -748,7 +748,7 @@ public partial class BattleActions
                             Evasion = target.Boosts.Evasion,
                         };
 
-                        RelayVar? targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
+                        RelayVar targetBoostEvent = Battle.RunEvent(EventId.ModifyBoost, target, null,
                             null, targetBoosts);
 
                         if (targetBoostEvent is BoostsTableRelayVar tbrv)
@@ -771,7 +771,7 @@ public partial class BattleActions
                     accuracy = IntTrueUnion.FromInt((int)accValue);
                 }
 
-                RelayVar? modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
+                RelayVar modifyAccEvent = Battle.RunEvent(EventId.ModifyAccuracy, target, pokemon,
                     move, RelayVar.FromIntTrueUnion(accuracy));
 
                 if (modifyAccEvent is IntRelayVar irv)
@@ -785,7 +785,7 @@ public partial class BattleActions
 
                 if (move.AlwaysHit != true)
                 {
-                    RelayVar? accEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
+                    RelayVar accEvent = Battle.RunEvent(EventId.Accuracy, target, pokemon,
                         move, RelayVar.FromIntTrueUnion(accuracy));
 
                     if (accEvent is IntRelayVar aerv)
