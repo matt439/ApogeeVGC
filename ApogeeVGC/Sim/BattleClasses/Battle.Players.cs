@@ -1,80 +1,11 @@
 ﻿using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
-using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
-    //public void SetPlayer(SideId slot, PlayerOptions options)
-    //{
-    //    Side? side;
-    //    bool didSomething = true;
-
-    //    // Convert Side enum to array index (P1=0, P2=1)
-    //    int slotNum = slot == SideId.P1 ? 0 : 1;
-
-    //    if (!Sides[slotNum].Initialised)
-    //    {
-    //        // Create new player
-    //        var team = GetTeam(options);
-    //        string playerName = options.Name ?? $"Player {slotNum + 1}";
-            
-    //        // The Side constructor already initializes Team, Pokemon, Active, SideConditions, SlotConditions, and Choice
-    //        side = new Side(playerName, this, slot, [.. team]);
-
-    //        Sides[slotNum] = side;
-
-    //        if (DisplayUi)
-    //        {
-    //            Debug($"Created new player for {slot}: {playerName}");
-    //        }
-    //    }
-    //    else
-    //    {
-    //        // Edit existing player
-    //        side = Sides[slotNum];
-    //        didSomething = false;
-
-    //        // Update name if different
-    //        if (!string.IsNullOrEmpty(options.Name) && side.Name != options.Name)
-    //        {
-    //            if (DisplayUi)
-    //            {
-    //                Debug($"Updating player name for {slot}: {side.Name} -> {options.Name}");
-    //            }
-    //            side.Name = options.Name;
-    //            didSomething = true;
-    //        }
-
-    //        // Prevent team changes for existing players
-    //        if (options.Team != null)
-    //        {
-    //            throw new InvalidOperationException($"Player {slot} already has a team!");
-    //        }
-    //    }
-
-    //    // Exit early if no changes were made
-    //    if (!didSomething) return;
-
-    //    // Log the player setup
-    //    string optionsJson = System.Text.Json.JsonSerializer.Serialize(options);
-    //    InputLog.Add($"> player {slot} {optionsJson}");
-
-    //    // Add player info to battle log
-    //    if (DisplayUi)
-    //    {
-    //        Add("player", side.Id.GetSideIdName(), side.Name, side.Avatar);
-    //    }
-
-    //    // Start battle if all sides are ready and battle hasn't started
-    //    if (Sides.All(playerSide => playerSide.Initialised) && !Started)
-    //    {
-    //        Start();
-    //    }
-    //}
-
     /// <summary>
     /// Gets a Pokemon by its full name string.
     /// Searches through all sides and returns the first Pokemon with a matching fullname.
@@ -109,19 +40,21 @@ public partial class Battle
         {
             pokemonList.AddRange(side.Pokemon);
         }
+
         return pokemonList;
     }
 
     public List<Pokemon> GetAllActive(bool includeFainted = false)
     {
-        List<Pokemon> pokemnoList = [];
+        List<Pokemon> pokemonList = [];
         foreach (Side side in Sides)
         {
-            pokemnoList.AddRange(side.Active
+            pokemonList.AddRange(side.Active
                 .Where(pokemon => pokemon != null && (includeFainted || !pokemon.Fainted))
                 .Select(pokemon => pokemon!));
         }
-        return pokemnoList;
+
+        return pokemonList;
     }
 
     public int CanSwitch(Side side)
