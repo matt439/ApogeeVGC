@@ -378,7 +378,28 @@ public partial class ChoiceInputManager
 
     private void ShowSwitchOptions()
     {
-        // TODO: Switch to switch UI if currently in move selection
+        // Only transition if we're in the main battle turn start phase
+        if (CurrentRequestType != BattleRequestType.TurnStart || _currentRequest is not MoveRequest)
+            return;
+
+        // Transition to switch selection based on current state
+        switch (MainBattleState)
+        {
+            case MainBattlePhaseState.MoveSelectionFirstPokemon:
+                TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon);
+                break;
+            case MainBattlePhaseState.MoveSelectionSecondPokemon:
+                TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon);
+                break;
+            case MainBattlePhaseState.MainMenuFirstPokemon:
+                // Already in main menu, just go to switch selection
+                TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon);
+                break;
+            case MainBattlePhaseState.MainMenuSecondPokemon:
+                // Already in main menu, just go to switch selection
+                TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon);
+                break;
+        }
     }
 
     private void ToggleTerastallize()
