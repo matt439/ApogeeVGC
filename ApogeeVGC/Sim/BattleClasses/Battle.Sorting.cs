@@ -169,7 +169,7 @@ public partial class Battle
 
             // Run ModifyPriority events to allow effects to change priority
             // SingleEvent: for move-specific priority changes (e.g., Grassy Glide in Grassy Terrain)
-            RelayVar? singleEventResult = SingleEvent(
+            RelayVar singleEventResult = SingleEvent(
                 EventId.ModifyPriority,
                 move,
                 null,
@@ -185,7 +185,7 @@ public partial class Battle
             }
 
             // RunEvent: for Pokemon-based priority changes (e.g., Prankster ability)
-            RelayVar? runEventResult = RunEvent(
+            RelayVar runEventResult = RunEvent(
                 EventId.ModifyPriority,
                 moveAction.Pokemon,
                 null,
