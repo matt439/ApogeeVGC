@@ -325,35 +325,12 @@ public partial class Battle
         {
             if (DebugMode)
             {
-                Console.WriteLine("[Battle.Choose] All choices done! Checking for callback...");
-                Debug("All choices done, invoking completion callback");
+                Console.WriteLine("[Battle.Choose] All choices done! Calling CommitChoices");
+                Debug("All choices done, calling CommitChoices");
             }
 
-            // Invoke the completion callback if one was provided
-            // The callback is responsible for calling CommitChoices()
-            Action? callback = _choicesCompletionCallback;
-            _choicesCompletionCallback = null; // Clear it so it's only called once
-
-            if (callback != null)
-            {
-                if (DebugMode)
-                {
-                    Console.WriteLine("[Battle.Choose] Invoking completion callback");
-                }
-
-                callback.Invoke();
-                if (DebugMode)
-                {
-                    Console.WriteLine("[Battle.Choose] Callback completed");
-                }
-            }
-            else
-            {
-                if (DebugMode)
-                {
-                    Console.WriteLine("[Battle.Choose] WARNING: No callback registered!");
-                }
-            }
+            // All choices received - process them and continue the turn
+            CommitChoices();
         }
         else
         {
@@ -495,16 +472,12 @@ public partial class Battle
         }
     }
 
-// Callback to invoke when all choices are received
-    private Action? _choicesCompletionCallback;
-
     /// <summary>
     /// Emits choice request events for all sides that need to make choices.
     /// The battle will pause (return) and wait for Simulator to call Choose() with all choices.
-    /// When all choices are received, the completion callback will be invoked.
+    /// When all choices are received, CommitChoices() will be called automatically.
     /// </summary>
-    /// <param name="onComplete">Callback to invoke when all choices have been received</param>
-    public void RequestPlayerChoices(Action? onComplete = null)
+    public void RequestPlayerChoices()
     {
         // Verify that we have active requests
         if (Sides.Any(side => side.ActiveRequest == null))
@@ -512,9 +485,6 @@ public partial class Battle
             throw new InvalidOperationException(
                 "Cannot request choices from players: Some sides have no active request");
         }
-
-        // Store the completion callback
-        _choicesCompletionCallback = onComplete;
 
         // Emit choice request events for each side that needs to make a choice
         foreach (Side side in Sides)

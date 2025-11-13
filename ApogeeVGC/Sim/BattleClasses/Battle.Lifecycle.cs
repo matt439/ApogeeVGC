@@ -82,24 +82,37 @@ public partial class Battle
         }
 
         // Run team preview/selection phase
+        Console.WriteLine(
+            $"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
+
         RunPickTeam();
+
+        Console.WriteLine($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
 
         // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
+
+        Console.WriteLine($"[Battle.Start] Added StartGameAction, queue size = {Queue.List.Count}");
 
         // Set mid-turn flag
         MidTurn = true;
 
         // Start turn loop if no request is pending
-        // TurnLoop() will return when it needs player input (RequestState != None)
-        // Simulator will call CommitChoices() which will call TurnLoop() again to continue
+        Console.WriteLine($"[Battle.Start] Checking RequestState: {RequestState}");
+
         if (RequestState == RequestState.None)
         {
+            Console.WriteLine("[Battle.Start] No request - calling TurnLoop()");
             TurnLoop();
         }
+        else
+        {
+            Console.WriteLine(
+                $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
+        }
 
-        // Return immediately - Simulator handles coordination
-        // TypeScript Battle.start() returns here, doesn't wait
+        // Return immediately - Battle doesn't wait for choices
+        // Simulator will call Choose() which will call CommitChoices() -> TurnLoop()
     }
 
     public void EndTurn()
@@ -319,7 +332,8 @@ public partial class Battle
     {
         if (DebugMode)
         {
-            Console.WriteLine($"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
+            Console.WriteLine(
+                $"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
         }
 
         if (DisplayUi)
@@ -339,7 +353,8 @@ public partial class Battle
         {
             if (DebugMode)
             {
-                Console.WriteLine("[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
+                Console.WriteLine(
+                    "[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
             }
 
             Queue.InsertChoice(new BeforeTurnAction());
@@ -370,8 +385,10 @@ public partial class Battle
             {
                 if (DebugMode)
                 {
-                    Console.WriteLine($"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
+                    Console.WriteLine(
+                        $"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
                 }
+
                 return;
             }
         }

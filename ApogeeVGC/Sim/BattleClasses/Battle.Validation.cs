@@ -1,4 +1,5 @@
-﻿using ApogeeVGC.Sim.Items;
+﻿using ApogeeVGC.Sim.FormatClasses;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
@@ -11,130 +12,52 @@ public partial class Battle
 {
     public void RunPickTeam()
     {
-        if (DebugMode)
+        Console.WriteLine("[RunPickTeam] STARTING");
+
+        // onTeamPreview handlers are expected to show full teams to all active sides,
+        // and send a 'teampreview' request for players to pick their leads / team order.
+        Console.WriteLine("[RunPickTeam] Calling Format.OnTeamPreview");
+        Format.OnTeamPreview?.Invoke(this);
+
+        foreach (RuleId rule in RuleTable.Keys)
         {
-            Console.WriteLine("[RunPickTeam] STARTING");
+            string ruleString = rule.ToString();
+            if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
+            Format subFormat = Library.Rulesets[rule];
+            Console.WriteLine($"[RunPickTeam] Calling subFormat.OnTeamPreview for {rule}");
+            subFormat.OnTeamPreview?.Invoke(this);
         }
 
-        UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
-        MakeRequest(RequestState.TeamPreview);
+        // If team preview request was set up by handlers, just return
+        // Otherwise, if pickedTeamSize is set, we need to make the request ourselves
+        Console.WriteLine($"[RunPickTeam] Checking RequestState: {RequestState}");
 
-        if (DebugMode)
+        if (RequestState == RequestState.TeamPreview)
         {
-            Console.WriteLine("[RunPickTeam] About to call RequestPlayerChoices");
+            Console.WriteLine("[RunPickTeam] Team preview already set up by handler, returning");
+            // Request was already set up, now emit it to players
+            RequestPlayerChoices();
+            Console.WriteLine("[RunPickTeam] Choice requests emitted, returning");
+            return;
         }
 
-        // Request player choices - Battle returns immediately
-        // Simulator will call Choose() -> ProcessTeamPreviewChoices() to continue
-        RequestPlayerChoices(onComplete: () =>
+        Console.WriteLine($"[RunPickTeam] PickedTeamSize = {RuleTable.PickedTeamSize}");
+
+        if (RuleTable.PickedTeamSize > 0)
         {
-            if (DebugMode)
-            {
-                Console.WriteLine("[RunPickTeam CALLBACK] Team preview callback invoked!");
-                Debug("Team preview choices received, processing");
-            }
+            // There was no onTeamPreview handler (e.g. Team Preview rule missing).
+            // Players must still pick their own Pokémon, so we show them privately.
+            Console.WriteLine("[RunPickTeam] Making team preview request");
+            UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
+            MakeRequest(RequestState.TeamPreview);
+            Console.WriteLine($"[RunPickTeam] After MakeRequest, RequestState = {RequestState}");
 
-            // Process team preview choices without calling TurnLoop
-            // Battle.Start() will handle adding StartGameAction and calling TurnLoop
-            ProcessTeamPreviewChoices();
-
-            if (DebugMode)
-            {
-                Console.WriteLine("[RunPickTeam CALLBACK] Team preview callback completed");
-            }
-        });
-
-        if (DebugMode)
-        {
-            Console.WriteLine("[RunPickTeam] RequestPlayerChoices returned, exiting RunPickTeam");
-            Debug("Exiting RunPickTeam - Battle returns, waiting for team preview choices");
+            // Now emit the request to players
+            RequestPlayerChoices();
+            Console.WriteLine("[RunPickTeam] Choice requests emitted");
         }
 
-        // Return immediately - Battle doesn't wait
-        // Simulator handles coordination
-    }
-
-    /// <summary>
-    /// Processes team preview choices by adding team actions to the queue
-    /// and starting the turn loop. Used during battle startup.
-    /// </summary>
-    private void ProcessTeamPreviewChoices()
-    {
-        if (DebugMode)
-        {
-            Console.WriteLine("[ProcessTeamPreviewChoices] STARTING");
-            Debug("ProcessTeamPreviewChoices starting");
-        }
-
-        UpdateSpeed();
-
-        if (!AllChoicesDone())
-        {
-            if (DebugMode)
-            {
-                Console.WriteLine("[ProcessTeamPreviewChoices] ERROR: Not all choices done!");
-            }
-
-            throw new InvalidOperationException("Not all choices done");
-        }
-
-        if (DebugMode)
-        {
-            Console.WriteLine("[ProcessTeamPreviewChoices] All choices done, processing...");
-        }
-
-        // Log each side's choice to the input log and history
-        foreach (Side side in Sides)
-        {
-            string? choice = side.GetChoice().ToString();
-            if (!string.IsNullOrEmpty(choice))
-            {
-                InputLog.Add($"> {side.Id} {choice}");
-                History.RecordChoice(side.Id, choice);
-            }
-        }
-
-        // Add each side's actions to the queue
-        foreach (Side side in Sides)
-        {
-            Queue.AddChoice(side.Choice.Actions);
-        }
-
-        if (DebugMode)
-        {
-            Console.WriteLine(
-                $"[ProcessTeamPreviewChoices] Queue before sort: {Queue.List.Count} actions");
-            for (int i = 0; i < Queue.List.Count; i++)
-            {
-                var action = Queue.List[i];
-                Console.WriteLine(
-                    $"  [{i}] {action.Choice}, Priority={action.Priority}, Order={action.Order}");
-            }
-        }
-
-        // Sort the new actions by priority/speed
-        Queue.Sort();
-
-        if (DebugMode)
-        {
-            Console.WriteLine(
-                $"[ProcessTeamPreviewChoices] Queue after sort: {Queue.List.Count} actions");
-            for (int i = 0; i < Queue.List.Count; i++)
-            {
-                var action = Queue.List[i];
-                Console.WriteLine(
-                    $"  [{i}] {action.Choice}, Priority={action.Priority}, Order={action.Order}");
-            }
-        }
-
-        ClearRequest();
-
-        if (DebugMode)
-        {
-            Console.WriteLine(
-                $"[ProcessTeamPreviewChoices] Queue size: {Queue.List.Count}, calling TurnLoop");
-            Debug("Team actions added to queue, starting turn loop");
-        }
+        Console.WriteLine("[RunPickTeam] COMPLETED");
     }
 
     public void CheckEvBalance()
