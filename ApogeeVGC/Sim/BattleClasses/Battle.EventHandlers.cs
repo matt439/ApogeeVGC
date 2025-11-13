@@ -305,26 +305,26 @@ EffectHolder = customHolder ?? pokemon,
         Side side = pokemon.Side;
         if (pokemon.Position < side.SlotConditions.Count)
   {
-     Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
+  Dictionary<ConditionId, EffectState> slotConditions = side.SlotConditions[pokemon.Position];
             foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditions)
 {
-         Condition slotCondition = Library.Conditions[conditionId];
+   Condition slotCondition = Library.Conditions[conditionId];
      handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName);
   if (handlerInfo != null || (getKey != null && slotConditionState.GetProperty(getKey) != null))
-                {
-           yield return ResolvePriority(new EventListenerWithoutPriority
+{
+ yield return ResolvePriority(new EventListenerWithoutPriority
      {
    Effect = slotCondition,
        HandlerInfo = handlerInfo,
           State = slotConditionState,
-           End = customHolder == null
-    ? EffectDelegate.FromNullableDelegate(new Action<ConditionId>(id =>
-       side.RemoveSideCondition(id)))
+End = customHolder == null
+    ? EffectDelegate.FromNullableDelegate(new Action<Side, Pokemon, ConditionId>((s, p, id) =>
+  s.RemoveSideCondition(id)))
    : null,
       EndCallArgs = [side, pokemon, conditionId],
-            EffectHolder = customHolder ?? pokemon,
+  EffectHolder = customHolder ?? pokemon,
       }, callbackName);
-            }
+}
    }
     }
     }
