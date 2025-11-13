@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Player;
-using ApogeeVGC.Sim.Conditions;
+﻿using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -26,12 +25,13 @@ public partial class Battle
     private void UpdatePlayerUi(SideId sideId,
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
-   // Create perspective with the correct type
-      BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
-        
-      // Emit update event with the perspective
-    EmitUpdate(sideId, perspective, new List<BattleMessage>(PendingMessages));
- }
+        // Create perspective with the correct type
+        BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
+
+        // Emit update event with the perspective
+        EmitUpdate(sideId, perspective, new List<BattleMessage>(PendingMessages));
+    }
+
     public void Add(params PartFuncUnion[] parts)
     {
         // Check if any part is a function that generates side-specific content
@@ -138,8 +138,7 @@ public partial class Battle
     {
         if (DebugMode)
         {
-            //Add("debug", activity);
-            Console.WriteLine(activity);
+            Add("debug", activity);
         }
     }
 
@@ -214,19 +213,32 @@ public partial class Battle
 
     public void SendUpdates()
     {
-        Console.WriteLine($"[SendUpdates] SentLogPos={SentLogPos}, Log.Count={Log.Count}");
+        if (DebugMode)
+        {
+            Debug($"SendUpdates: SentLogPos={SentLogPos}, Log.Count={Log.Count}");
+        }
+
         // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count) return;
 
         // Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();
-        Console.WriteLine($"[SendUpdates] Sending {updates.Count} updates");
+
+        if (DebugMode)
+        {
+            Debug($"Sending {updates.Count} updates");
+        }
+
         Send(SendType.Update, updates);
 
         // Send requests to players if not already sent
         if (!SentRequests)
         {
-            Console.WriteLine("[SendUpdates] Sending requests to players");
+            if (DebugMode)
+            {
+                Debug("Sending requests to players");
+            }
+
             foreach (Side side in Sides)
             {
                 side.EmitRequest();
@@ -333,7 +345,8 @@ public partial class Battle
     /// <param name="damageAmount">The actual amount of damage dealt</param>
     /// <param name="source">The Pokemon that caused the damage (optional)</param>
     /// <param name="effect">The effect that caused the damage (optional)</param>
-    private void PrintDamageMessage(Pokemon target, int damageAmount, Pokemon? source, Condition? effect)
+    private void PrintDamageMessage(Pokemon target, int damageAmount, Pokemon? source,
+        Condition? effect)
     {
         if (!DisplayUi) return;
 
@@ -489,27 +502,27 @@ public partial class Battle
     /// </summary>
     public void FlushMessages()
     {
-   if (PendingMessages.Count == 0) return;
+        if (PendingMessages.Count == 0) return;
 
 // Determine perspective type based on current request state
-    BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-  ? BattlePerspectiveType.TeamPreview
-   : BattlePerspectiveType.InBattle;
+        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+            ? BattlePerspectiveType.TeamPreview
+            : BattlePerspectiveType.InBattle;
 
         // Send messages via UpdateRequested event with correct perspective
-  foreach (Side side in Sides)
-     {
-     BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
-            
-     UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
-            {
-    SideId = side.Id,
-       Perspective = perspective,
-    Messages = new List<BattleMessage>(PendingMessages)
-    });
- }
+        foreach (Side side in Sides)
+        {
+            BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
 
-   // Clear the pending messages
+            UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
+            {
+                SideId = side.Id,
+                Perspective = perspective,
+                Messages = new List<BattleMessage>(PendingMessages)
+            });
+        }
+
+        // Clear the pending messages
         PendingMessages.Clear();
     }
 
