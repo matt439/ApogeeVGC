@@ -322,52 +322,53 @@ public partial class Battle
             _ => throw new InvalidOperationException("Unknown BattleHealEffect type."),
         };
 
-        // Clamp damage to minimum of 1 if non-zero
-        if (damage != 0 && damage <= 1)
+        // Clamp damage to minimum of 1 if positive but less than 1
+        // This handles cases where rounding might produce fractional values
+        if (damage > 0 && damage < 1)
         {
             damage = 1;
         }
 
-        // Truncate damage
+        // Truncate damage to remove any remaining fractional part
         damage = Trunc(damage);
 
         // Run TryHeal event (allows effects like Liquid Ooze to trigger even when nothing is healed)
         RelayVar? tryHealResult = RunEvent(
-            EventId.TryHeal,
-            RunEventTarget.FromNullablePokemon(target),
-            RunEventSource.FromNullablePokemon(source),
-            effectCondition,
-            new IntRelayVar(damage)
+          EventId.TryHeal,
+    RunEventTarget.FromNullablePokemon(target),
+        RunEventSource.FromNullablePokemon(source),
+      effectCondition,
+          new IntRelayVar(damage)
         );
 
         // If event prevented healing, return the result
         if (tryHealResult is not IntRelayVar healAmount)
         {
-            return new IntIntFalseUnion(0);
+       return new IntIntFalseUnion(0);
         }
 
-        if (healAmount.Value == 0)
+   if (healAmount.Value == 0)
         {
-            return new IntIntFalseUnion(0);
+        return new IntIntFalseUnion(0);
         }
 
         damage = healAmount.Value;
 
-        // Return false if target has no HP
+   // Return false if target has no HP
         if (target?.Hp <= 0)
         {
-            return new FalseIntFalseUnion();
+return new FalseIntFalseUnion();
         }
 
-        // Return false if target is not active
+  // Return false if target is not active
         if (target is { IsActive: false })
         {
             return new FalseIntFalseUnion();
-        }
+ }
 
         // Return false if target is already at max HP
         if (target != null && target.Hp >= target.MaxHp)
-        {
+     {
             return new FalseIntFalseUnion();
         }
 
@@ -379,25 +380,25 @@ public partial class Battle
         // Apply healing to target
         int finalDamage = target.Heal(damage, source, effectCondition).ToInt();
 
-        // Record healing in history
+  // Record healing in history
         if (finalDamage > 0)
         {
-            History.RecordHeal(target.Name, finalDamage, target.Hp, target.MaxHp);
+       History.RecordHeal(target.Name, finalDamage, target.Hp, target.MaxHp);
         }
 
-        // Log healing messages based on effect type
+    // Log healing messages based on effect type
         PrintHealMessage(target, source, effectCondition);
 
         // Run Heal event
         RunEvent(
-            EventId.Heal,
-            target,
-            RunEventSource.FromNullablePokemon(source),
-            effectCondition,
-            new IntRelayVar(finalDamage)
+         EventId.Heal,
+    target,
+ RunEventSource.FromNullablePokemon(source),
+        effectCondition,
+  new IntRelayVar(finalDamage)
         );
 
-        return new IntIntFalseUnion(finalDamage);
+  return new IntIntFalseUnion(finalDamage);
     }
 
     /// <summary>
