@@ -11,8 +11,18 @@ public partial class Battle
 {
     public void RunPickTeam()
     {
+        if (DebugMode)
+        {
+            Console.WriteLine("[RunPickTeam] STARTING");
+        }
+
         UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
         MakeRequest(RequestState.TeamPreview);
+
+        if (DebugMode)
+        {
+            Console.WriteLine("[RunPickTeam] About to call RequestPlayerChoices");
+        }
 
         // Request player choices - Battle returns immediately
         // Simulator will call Choose() -> ProcessTeamPreviewChoices() to continue
@@ -20,16 +30,23 @@ public partial class Battle
         {
             if (DebugMode)
             {
+                Console.WriteLine("[RunPickTeam CALLBACK] Team preview callback invoked!");
                 Debug("Team preview choices received, processing");
             }
 
             // Process team preview choices without calling TurnLoop
             // Battle.Start() will handle adding StartGameAction and calling TurnLoop
             ProcessTeamPreviewChoices();
+
+            if (DebugMode)
+            {
+                Console.WriteLine("[RunPickTeam CALLBACK] Team preview callback completed");
+            }
         });
 
         if (DebugMode)
         {
+            Console.WriteLine("[RunPickTeam] RequestPlayerChoices returned, exiting RunPickTeam");
             Debug("Exiting RunPickTeam - Battle returns, waiting for team preview choices");
         }
 
@@ -39,12 +56,13 @@ public partial class Battle
 
     /// <summary>
     /// Processes team preview choices by adding team actions to the queue
-    /// without starting the turn loop. Used during battle startup.
+    /// and starting the turn loop. Used during battle startup.
     /// </summary>
     private void ProcessTeamPreviewChoices()
     {
         if (DebugMode)
         {
+            Console.WriteLine("[ProcessTeamPreviewChoices] STARTING");
             Debug("ProcessTeamPreviewChoices starting");
         }
 
@@ -52,7 +70,17 @@ public partial class Battle
 
         if (!AllChoicesDone())
         {
+            if (DebugMode)
+            {
+                Console.WriteLine("[ProcessTeamPreviewChoices] ERROR: Not all choices done!");
+            }
+
             throw new InvalidOperationException("Not all choices done");
+        }
+
+        if (DebugMode)
+        {
+            Console.WriteLine("[ProcessTeamPreviewChoices] All choices done, processing...");
         }
 
         // Log each side's choice to the input log and history
@@ -72,14 +100,40 @@ public partial class Battle
             Queue.AddChoice(side.Choice.Actions);
         }
 
+        if (DebugMode)
+        {
+            Console.WriteLine(
+                $"[ProcessTeamPreviewChoices] Queue before sort: {Queue.List.Count} actions");
+            for (int i = 0; i < Queue.List.Count; i++)
+            {
+                var action = Queue.List[i];
+                Console.WriteLine(
+                    $"  [{i}] {action.Choice}, Priority={action.Priority}, Order={action.Order}");
+            }
+        }
+
         // Sort the new actions by priority/speed
         Queue.Sort();
+
+        if (DebugMode)
+        {
+            Console.WriteLine(
+                $"[ProcessTeamPreviewChoices] Queue after sort: {Queue.List.Count} actions");
+            for (int i = 0; i < Queue.List.Count; i++)
+            {
+                var action = Queue.List[i];
+                Console.WriteLine(
+                    $"  [{i}] {action.Choice}, Priority={action.Priority}, Order={action.Order}");
+            }
+        }
 
         ClearRequest();
 
         if (DebugMode)
         {
-            Debug("Team actions added to queue");
+            Console.WriteLine(
+                $"[ProcessTeamPreviewChoices] Queue size: {Queue.List.Count}, calling TurnLoop");
+            Debug("Team actions added to queue, starting turn loop");
         }
     }
 

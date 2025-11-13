@@ -84,7 +84,7 @@ public partial class Battle
         // Run team preview/selection phase
         RunPickTeam();
 
-// Add start action to queue
+        // Add start action to queue
         Queue.InsertChoice(new StartGameAction());
 
         // Set mid-turn flag
@@ -317,6 +317,11 @@ public partial class Battle
     /// </summary>
     public void TurnLoop()
     {
+        if (DebugMode)
+        {
+            Console.WriteLine($"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
+        }
+
         if (DisplayUi)
         {
             Add(string.Empty);
@@ -332,27 +337,58 @@ public partial class Battle
         // First time through - set up turn structure
         if (!MidTurn)
         {
+            if (DebugMode)
+            {
+                Console.WriteLine("[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
+            }
+
             Queue.InsertChoice(new BeforeTurnAction());
             Queue.AddChoice(new ResidualAction());
             MidTurn = true;
         }
 
+        if (DebugMode)
+        {
+            Console.WriteLine($"[TurnLoop] About to process queue - size: {Queue.List.Count}");
+        }
+
         // Process actions one at a time
+        int actionCount = 0;
         while (Queue.Shift() is { } action)
         {
+            actionCount++;
+            if (DebugMode)
+            {
+                Console.WriteLine($"[TurnLoop] Processing action {actionCount}: {action.Choice}");
+            }
+
             RunAction(action);
 
             // Exit early if we need to wait for a request or battle ended
             // Battle returns here, Simulator will call us back when choices are made
             if (RequestState != RequestState.None || Ended)
             {
+                if (DebugMode)
+                {
+                    Console.WriteLine($"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
+                }
                 return;
             }
         }
 
-// Turn is complete - reset flags and start next turn
+        if (DebugMode)
+        {
+            Console.WriteLine($"[TurnLoop] Queue empty after processing {actionCount} actions");
+        }
+
+        // Turn is complete - reset flags and start next turn
         MidTurn = false;
         Queue.Clear();
+
+        if (DebugMode)
+        {
+            Console.WriteLine("[TurnLoop] Calling EndTurn");
+        }
 
         EndTurn();
     }

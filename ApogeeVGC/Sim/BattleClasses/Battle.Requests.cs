@@ -209,7 +209,7 @@ public partial class Battle
 
                     // Get move request data for each active, non-fainted Pokemon
                     var activeData = side.Active
-                        .Where(pokemon => pokemon != null && !pokemon.Fainted)
+                        .Where(pokemon => pokemon is { Fainted: false })
                         .Select(pokemon => pokemon!.GetMoveRequestData())
                         .ToList();
 
@@ -273,6 +273,8 @@ public partial class Battle
     {
         if (DebugMode)
         {
+            Console.WriteLine(
+                $"[Battle.Choose] Called for {sideId} with {input.Actions.Count} actions");
             Debug($"Battle.Choose called for {sideId} with {input.Actions.Count} actions");
         }
 
@@ -313,6 +315,8 @@ public partial class Battle
 
         if (DebugMode)
         {
+            Console.WriteLine(
+                $"[Battle.Choose] Choice complete for {sideId}, checking if all done...");
             Debug($"Choice complete for {sideId}");
         }
 
@@ -321,6 +325,7 @@ public partial class Battle
         {
             if (DebugMode)
             {
+                Console.WriteLine("[Battle.Choose] All choices done! Checking for callback...");
                 Debug("All choices done, invoking completion callback");
             }
 
@@ -329,7 +334,33 @@ public partial class Battle
             Action? callback = _choicesCompletionCallback;
             _choicesCompletionCallback = null; // Clear it so it's only called once
 
-            callback?.Invoke();
+            if (callback != null)
+            {
+                if (DebugMode)
+                {
+                    Console.WriteLine("[Battle.Choose] Invoking completion callback");
+                }
+
+                callback.Invoke();
+                if (DebugMode)
+                {
+                    Console.WriteLine("[Battle.Choose] Callback completed");
+                }
+            }
+            else
+            {
+                if (DebugMode)
+                {
+                    Console.WriteLine("[Battle.Choose] WARNING: No callback registered!");
+                }
+            }
+        }
+        else
+        {
+            if (DebugMode)
+            {
+                Console.WriteLine("[Battle.Choose] Not all choices done yet");
+            }
         }
 
         return true;
