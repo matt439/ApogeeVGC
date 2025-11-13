@@ -192,8 +192,19 @@ public class SyncSimulator : IBattleController
         // 3. Total HP
         Battle!.Tiebreak();
 
-        // After tiebreak, check the winner
-        return DetermineWinner();
+        // After tiebreak, check if a winner was determined
+        if (!string.IsNullOrEmpty(Battle.Winner))
+        {
+            return DetermineWinner();
+        }
+
+        // If tiebreak didn't determine a winner, it's a true tie
+        if (PrintDebug)
+        {
+            Console.WriteLine("Tiebreaker did not determine a winner - result is a tie");
+        }
+
+        return SimulatorResult.Tie;
     }
 
     private IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
