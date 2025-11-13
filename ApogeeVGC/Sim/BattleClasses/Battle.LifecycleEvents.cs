@@ -95,10 +95,10 @@ Perspective = perspective
 /// </summary>
 public class BattleChoiceRequestEventArgs : EventArgs
 {
-    required public SideId SideId { get; init; }
-    required public IChoiceRequest Request { get; init; }
-    required public BattleRequestType RequestType { get; init; }
-    required public BattlePerspective Perspective { get; init; }
+    public required SideId SideId { get; init; }
+    public required IChoiceRequest Request { get; init; }
+    public required BattleRequestType RequestType { get; init; }
+    public required BattlePerspective Perspective { get; init; }
 }
 
 /// <summary>
@@ -106,9 +106,9 @@ public class BattleChoiceRequestEventArgs : EventArgs
 /// </summary>
 public class BattleUpdateEventArgs : EventArgs
 {
-    required public SideId SideId { get; init; }
-    required public BattlePerspective Perspective { get; init; }
-    required public IEnumerable<BattleMessage> Messages { get; init; }
+    public required SideId SideId { get; init; }
+    public required BattlePerspective Perspective { get; init; }
+    public required IEnumerable<BattleMessage> Messages { get; init; }
 }
 
 /// <summary>
