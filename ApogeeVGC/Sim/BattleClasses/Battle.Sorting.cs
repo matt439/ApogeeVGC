@@ -86,9 +86,6 @@ public partial class Battle
 
     public EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
     {
-        // Get event metadata from Library
-        EventIdInfo eventInfo = Library.Events[callbackName];
-
         // Extract metadata from EventHandlerInfo if available
         IntFalseUnion? order = null;
         int? priority = null;
@@ -98,8 +95,8 @@ public partial class Battle
         {
             // Use metadata from EventHandlerInfo (preferred, strongly-typed)
             priority = h.HandlerInfo.Priority;
-            order = h.HandlerInfo.Order.HasValue 
-                ? IntFalseUnion.FromInt(h.HandlerInfo.Order.Value) 
+            order = h.HandlerInfo.Order.HasValue
+                ? IntFalseUnion.FromInt(h.HandlerInfo.Order.Value)
                 : null;
             subOrder = h.HandlerInfo.SubOrder;
         }
@@ -110,14 +107,37 @@ public partial class Battle
             subOrder = CalculateDefaultSubOrder(h);
         }
 
+        // Determine if this event uses effect order for sorting
+        bool usesEffectOrder = callbackName is
+            EventId.SwitchIn or
+            EventId.RedirectTarget or
+            EventId.Start;
+
         // Determine effectOrder based on event type
-        int effectOrder = eventInfo.UsesEffectOrder
+        int effectOrder = usesEffectOrder
             ? (h.State?.EffectOrder ?? 0)
             : 0;
 
+        // Determine if this event uses speed for sorting  
+        bool usesSpeed = callbackName is not (
+            EventId.Residual or
+            EventId.FieldResidual or
+            EventId.SideResidual or
+            EventId.End or
+            EventId.FieldEnd or
+            EventId.SideEnd or
+            EventId.Start or
+            EventId.FieldStart or
+            EventId.SideStart or
+            EventId.Restart or
+            EventId.FieldRestart or
+            EventId.SideRestart or
+            EventId.Update
+            );
+
         // Calculate speed if needed
         int speed = 0;
-        if (eventInfo.UsesSpeed && h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
+        if (usesSpeed && h.EffectHolder is PokemonEffectHolder pokemonEffectHolder)
         {
             Pokemon pokemon = pokemonEffectHolder.Pokemon;
             speed = pokemon.Speed;
@@ -131,7 +151,9 @@ public partial class Battle
             }
 
             // Apply fractional speed adjustment for switch-in events
-            if (eventInfo.UsesFractionalSpeed)
+            // Check if event name ends with "SwitchIn"
+            bool usesFractionalSpeed = callbackName.ToString().EndsWith("SwitchIn");
+            if (usesFractionalSpeed)
             {
                 int fieldPositionValue = pokemon.Side.N * Sides.Count + pokemon.Position;
                 speed -= SpeedOrder.IndexOf(fieldPositionValue) / (ActivePerHalf * 2);
@@ -281,9 +303,11 @@ public partial class Battle
         {
             // Check if both handlers are from abilities
             bool aHasAbilityState = aListener.Effect.EffectType == EffectType.Ability &&
-                                    aListener is { EffectHolder: PokemonEffectHolder, State: not null };
+                                    aListener is
+                                        { EffectHolder: PokemonEffectHolder, State: not null };
             bool bHasAbilityState = bListener.Effect.EffectType == EffectType.Ability &&
-                                    bListener is { EffectHolder: PokemonEffectHolder, State: not null };
+                                    bListener is
+                                        { EffectHolder: PokemonEffectHolder, State: not null };
 
             if (aHasAbilityState && bHasAbilityState)
             {
@@ -350,9 +374,10 @@ public partial class Battle
         {
             subOrder = listener.State.Target switch
             {
-                SideEffectStateTarget when listener.State.IsSlotCondition == true => 3,  // Slot condition
-                SideEffectStateTarget => 4,                                       // Side condition
-                FieldEffectStateTarget => 5,                                      // Field condition
+                SideEffectStateTarget when listener.State.IsSlotCondition ==
+                                           true => 3, // Slot condition
+                SideEffectStateTarget => 4, // Side condition
+                FieldEffectStateTarget => 5, // Field condition
                 _ => subOrder,
             };
         }

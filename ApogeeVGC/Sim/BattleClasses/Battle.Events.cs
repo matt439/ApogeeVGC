@@ -630,11 +630,9 @@ public partial class Battle
         // e.g., "Residual" becomes "FieldResidual" and "SideResidual"
         EventId fieldEventId = GetFieldEventId(eventId);
         EventId sideEventId = GetSideEventId(eventId);
-        EventId anyEventId =
-            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventId, Library.Events);
 
         // Collect all handlers from field-level effects
-        var handlers = FindFieldEventHandlers(Field, fieldEventId, getKey);
+        var handlers = FindFieldEventHandlers(Field, fieldEventId, EventPrefix.None, getKey);
 
         // Collect handlers from sides and active Pokemon
         foreach (Side side in Sides)
@@ -643,7 +641,7 @@ public partial class Battle
             // In single battles, side.N is always < 2, so this always executes
             if (side.N < 2)
             {
-                handlers.AddRange(FindSideEventHandlers(side, sideEventId, getKey));
+                handlers.AddRange(FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
             }
 
             // Process each active Pokemon on this side
@@ -652,14 +650,14 @@ public partial class Battle
                 // For SwitchIn events, also trigger AnySwitchIn handlers
                 if (eventId == EventId.SwitchIn)
                 {
-                    handlers.AddRange(FindPokemonEventHandlers(active, anyEventId));
+                    handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.Any));
                 }
 
                 // If targets were specified, only process those Pokemon
                 if (targets != null && !targets.Contains(active)) continue;
 
                 // Collect handlers from this Pokemon and related effects
-                handlers.AddRange(FindPokemonEventHandlers(active, eventId, getKey));
+                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None, getKey));
                 handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
                 handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
                 handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
@@ -673,9 +671,9 @@ public partial class Battle
         if (DebugMode)
         {
             Debug($"FieldEvent {eventId}: Processing {handlers.Count} handlers");
-            if (handlers.Count > 0 && handlers.Count <= 10)
+            if (handlers.Count is > 0 and <= 10)
             {
-                foreach (var h in handlers.Take(10))
+                foreach (EventListener h in handlers.Take(10))
                 {
                     string holderStr = h.EffectHolder switch
                     {
@@ -683,7 +681,7 @@ public partial class Battle
                         SideEffectHolder seh => $"Side {seh.Side.Id}",
                         FieldEffectHolder => "Field",
                         BattleEffectHolder => "Battle",
-                        _ => "Unknown"
+                        _ => "Unknown",
                     };
                     Debug(
                         $"  - {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr} | Duration: {h.State?.Duration?.ToString() ?? "N/A"}");
@@ -1009,18 +1007,6 @@ public partial class Battle
         throw new InvalidOperationException(
             $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
     }
-
-    ///// <summary>
-    ///// Helper method for invoking standard delegates with common signatures.
-    ///// This provides a single path for most delegate invocations, reducing code duplication.
-    ///// </summary>
-    //private RelayVar? InvokeStandardDelegate(Delegate del, bool hasRelayVar, RelayVar relayVar,
-    //    SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
-    //{
-    //    // Reuse the optimized invocation logic
-    //    return InvokeDelegateEffectDelegate(del, hasRelayVar, relayVar, target, source,
-    //        sourceEffect);
-    //}
 
     #endregion
 }

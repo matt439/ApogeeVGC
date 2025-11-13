@@ -19,12 +19,19 @@ public partial class Battle
     /// </summary>
     /// <param name="target">The target of the event (Pokemon, Side, Field, or Battle)</param>
     /// <param name="effect">The effect to check for handlers (Ability, Item, Condition, etc.)</param>
-    /// <param name="callbackName">The event to look for handlers for</param>
+    /// <param name="callbackName">The base event to look for handlers for</param>
+    /// <param name="prefix">Optional event prefix (Ally, Foe, Source, Any)</param>
+    /// <param name="suffix">Optional event suffix</param>
     /// <returns>EventHandlerInfo if the effect has a handler for this event, null otherwise</returns>
     private EventHandlerInfo? GetHandlerInfo(RunEventTarget target, IEffect effect,
-        EventId callbackName)
+        EventId callbackName, EventPrefix prefix = EventPrefix.None,
+        EventSuffix suffix = EventSuffix.None)
     {
-        EventHandlerInfo? handlerInfo = effect.GetEventHandlerInfo(callbackName);
+        EventPrefix? prefixArg = prefix == EventPrefix.None ? null : prefix;
+        EventSuffix? suffixArg = suffix == EventSuffix.None ? null : suffix;
+
+        EventHandlerInfo? handlerInfo =
+            effect.GetEventHandlerInfo(callbackName, prefixArg, suffixArg);
 
         // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
         // instead of having a separate Start event
@@ -35,6 +42,7 @@ public partial class Battle
             target is PokemonRunEventTarget &&
             Gen >= 5 &&
             callbackName == EventId.SwitchIn &&
+            prefix == EventPrefix.None &&
             effect.GetEventHandlerInfo(EventId.AnySwitchIn) ==
             null && // Check onAnySwitchIn doesn't exist
             (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
@@ -45,19 +53,23 @@ public partial class Battle
         return handlerInfo;
     }
 
-    private EventHandlerInfo? GetHandlerInfo(Pokemon pokemon, IEffect effect, EventId callbackName)
+    private EventHandlerInfo? GetHandlerInfo(Pokemon pokemon, IEffect effect, EventId callbackName,
+        EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new PokemonRunEventTarget(pokemon), effect, callbackName);
+        return GetHandlerInfo(new PokemonRunEventTarget(pokemon), effect, callbackName, prefix,
+            suffix);
     }
 
-    private EventHandlerInfo? GetHandlerInfo(Field field, IEffect effect, EventId callbackName)
+    private EventHandlerInfo? GetHandlerInfo(Field field, IEffect effect, EventId callbackName,
+        EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new FieldRunEventTarget(field), effect, callbackName);
+        return GetHandlerInfo(new FieldRunEventTarget(field), effect, callbackName, prefix, suffix);
     }
 
-    private EventHandlerInfo? GetHandlerInfo(Side side, IEffect effect, EventId callbackName)
+    private EventHandlerInfo? GetHandlerInfo(Side side, IEffect effect, EventId callbackName,
+        EventPrefix prefix = EventPrefix.None, EventSuffix suffix = EventSuffix.None)
     {
-        return GetHandlerInfo(new SideRunEventTarget(side), effect, callbackName);
+        return GetHandlerInfo(new SideRunEventTarget(side), effect, callbackName, prefix, suffix);
     }
 
     /// <summary>
@@ -134,29 +146,19 @@ public partial class Battle
                     // Check allies (including self) for Ally and Any prefixed events
                     foreach (Pokemon allyActive in pokemon.AlliesAndSelf())
                     {
-                        EventId allyEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Ally, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindPokemonEventHandlers(allyActive, allyEventId));
-
-                        EventId anyEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindPokemonEventHandlers(allyActive, anyEventId));
+                        handlers.AddRange(FindPokemonEventHandlers(allyActive, eventName,
+                            EventPrefix.Ally));
+                        handlers.AddRange(FindPokemonEventHandlers(allyActive, eventName,
+                            EventPrefix.Any));
                     }
 
                     // Check foes for Foe and Any prefixed events
                     foreach (Pokemon foeActive in pokemon.Foes())
                     {
-                        EventId foeEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindPokemonEventHandlers(foeActive, foeEventId));
-
-                        EventId anyEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindPokemonEventHandlers(foeActive, anyEventId));
+                        handlers.AddRange(FindPokemonEventHandlers(foeActive, eventName,
+                            EventPrefix.Foe));
+                        handlers.AddRange(FindPokemonEventHandlers(foeActive, eventName,
+                            EventPrefix.Any));
                     }
                 }
 
@@ -168,9 +170,7 @@ public partial class Battle
         // Check source Pokemon for Source prefixed events
         if (source != null && prefixedHandlers)
         {
-            EventId sourceEventId =
-                EventIdInfo.CombinePrefixWithEvent(EventPrefix.Source, eventName, Library.Events);
-            handlers.AddRange(FindPokemonEventHandlers(source, sourceEventId));
+            handlers.AddRange(FindPokemonEventHandlers(source, eventName, EventPrefix.Source));
         }
 
         // Handle Side target
@@ -191,16 +191,14 @@ public partial class Battle
                         }
                         else if (prefixedHandlers)
                         {
-                            EventId foeEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe,
-                                eventName, Library.Events);
-                            handlers.AddRange(FindPokemonEventHandlers(active, foeEventId));
+                            handlers.AddRange(FindPokemonEventHandlers(active, eventName,
+                                EventPrefix.Foe));
                         }
 
                         if (prefixedHandlers)
                         {
-                            EventId anyEventId = EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any,
-                                eventName, Library.Events);
-                            handlers.AddRange(FindPokemonEventHandlers(active, anyEventId));
+                            handlers.AddRange(FindPokemonEventHandlers(active, eventName,
+                                EventPrefix.Any));
                         }
                     }
                 }
@@ -217,18 +215,12 @@ public partial class Battle
                     }
                     else if (prefixedHandlers)
                     {
-                        EventId foeEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Foe, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindSideEventHandlers(side, foeEventId));
+                        handlers.AddRange(FindSideEventHandlers(side, eventName, EventPrefix.Foe));
                     }
 
                     if (prefixedHandlers)
                     {
-                        EventId anyEventId =
-                            EventIdInfo.CombinePrefixWithEvent(EventPrefix.Any, eventName,
-                                Library.Events);
-                        handlers.AddRange(FindSideEventHandlers(side, anyEventId));
+                        handlers.AddRange(FindSideEventHandlers(side, eventName, EventPrefix.Any));
                     }
                 }
             }
@@ -246,19 +238,22 @@ public partial class Battle
     /// This collects all effects that might respond to a specific event for this Pokemon.
     /// </summary>
     /// <param name="pokemon">The Pokemon to find handlers for</param>
-    /// <param name="callbackName">The event to find handlers for</param>
+    /// <param name="callbackName">The base event to find handlers for</param>
+    /// <param name="prefix">Optional event prefix (Ally, Foe, Source, Any)</param>
     /// <param name="getKey">Optional property key to check in effect states (e.g., "duration")</param>
     /// <param name="customHolder">Optional custom effect holder (for special cases)</param>
     /// <returns>List of event listeners that can handle this event</returns>
     private List<EventListener> FindPokemonEventHandlers(Pokemon pokemon, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+        EventPrefix prefix = EventPrefix.None, EffectStateKey? getKey = null,
+        Pokemon? customHolder = null)
     {
-        return FindPokemonEventHandlersInternal(pokemon, callbackName, getKey, customHolder)
+        return FindPokemonEventHandlersInternal(pokemon, callbackName, prefix, getKey, customHolder)
             .ToList();
     }
 
     private IEnumerable<EventListener> FindPokemonEventHandlersInternal(Pokemon pokemon,
         EventId callbackName,
+        EventPrefix prefix = EventPrefix.None,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
         // Materialize all data BEFORE yielding to avoid re-entrancy issues
@@ -295,7 +290,7 @@ public partial class Battle
         // Now yield results using materialized data
 
         // Check status condition (paralysis, burn, etc.)
-        EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName);
+        EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && statusState.GetProperty(getKey) != null))
         {
             yield return ResolvePriority(new EventListenerWithoutPriority
@@ -316,7 +311,7 @@ public partial class Battle
         foreach ((ConditionId _, EffectState volatileState, Condition volatileCondition) in
                  volatiles)
         {
-            handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName);
+            handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName, prefix);
             if (handlerInfo != null ||
                 (getKey != null && volatileState.GetProperty(getKey) != null))
             {
@@ -336,7 +331,7 @@ public partial class Battle
         }
 
         // Check ability
-        handlerInfo = GetHandlerInfo(pokemon, ability, callbackName);
+        handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && abilityState.GetProperty(getKey) != null))
         {
             yield return ResolvePriority(new EventListenerWithoutPriority
@@ -352,7 +347,7 @@ public partial class Battle
         }
 
         // Check held item
-        handlerInfo = GetHandlerInfo(pokemon, item, callbackName);
+        handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
         {
             yield return ResolvePriority(new EventListenerWithoutPriority
@@ -368,7 +363,7 @@ public partial class Battle
         }
 
         // Check species (for species-specific events)
-        handlerInfo = GetHandlerInfo(pokemon, species, callbackName);
+        handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
         if (handlerInfo != null)
         {
             yield return ResolvePriority(new EventListenerWithoutPriority
@@ -385,7 +380,7 @@ public partial class Battle
         foreach ((ConditionId conditionId, EffectState slotConditionState,
                      Condition slotCondition) in slotConditions)
         {
-            handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName);
+            handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName, prefix);
             if (handlerInfo != null ||
                 (getKey != null && slotConditionState.GetProperty(getKey) != null))
             {
@@ -463,13 +458,16 @@ public partial class Battle
     }
 
     private List<EventListener> FindFieldEventHandlers(Field field, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+        EventPrefix prefix = EventPrefix.None, EffectStateKey? getKey = null,
+        Pokemon? customHolder = null)
     {
-        return FindFieldEventHandlersInternal(field, callbackName, getKey, customHolder).ToList();
+        return FindFieldEventHandlersInternal(field, callbackName, prefix, getKey, customHolder)
+            .ToList();
     }
 
     private IEnumerable<EventListener> FindFieldEventHandlersInternal(Field field,
         EventId callbackName,
+        EventPrefix prefix = EventPrefix.None,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
         // Check pseudo-weather effects (Trick Room, Gravity, etc.)
@@ -477,7 +475,8 @@ public partial class Battle
         {
             EffectState pseudoWeatherState = field.PseudoWeather[id];
             Condition pseudoWeather = Library.Conditions[id];
-            EventHandlerInfo? handlerInfo = GetHandlerInfo(field, pseudoWeather, callbackName);
+            EventHandlerInfo? handlerInfo =
+                GetHandlerInfo(field, pseudoWeather, callbackName, prefix);
 
             if (handlerInfo != null ||
                 (getKey != null && pseudoWeatherState.GetProperty(getKey) != null))
@@ -499,7 +498,7 @@ public partial class Battle
 
         // Check weather effect
         Condition weather = field.GetWeather();
-        EventHandlerInfo? weatherHandlerInfo = GetHandlerInfo(field, weather, callbackName);
+        EventHandlerInfo? weatherHandlerInfo = GetHandlerInfo(field, weather, callbackName, prefix);
         if (weatherHandlerInfo != null ||
             (getKey != null && Field.WeatherState.GetProperty(getKey) != null))
         {
@@ -517,7 +516,7 @@ public partial class Battle
 
         // Check terrain effect
         Condition terrain = field.GetTerrain();
-        EventHandlerInfo? terrainHandlerInfo = GetHandlerInfo(field, terrain, callbackName);
+        EventHandlerInfo? terrainHandlerInfo = GetHandlerInfo(field, terrain, callbackName, prefix);
         if (terrainHandlerInfo != null ||
             (getKey != null && field.TerrainState.GetProperty(getKey) != null))
         {
@@ -535,20 +534,24 @@ public partial class Battle
     }
 
     private List<EventListener> FindSideEventHandlers(Side side, EventId callbackName,
-        EffectStateKey? getKey = null, Pokemon? customHolder = null)
+        EventPrefix prefix = EventPrefix.None, EffectStateKey? getKey = null,
+        Pokemon? customHolder = null)
     {
-        return FindSideEventHandlersInternal(side, callbackName, getKey, customHolder).ToList();
+        return FindSideEventHandlersInternal(side, callbackName, prefix, getKey, customHolder)
+            .ToList();
     }
 
     private IEnumerable<EventListener> FindSideEventHandlersInternal(Side side,
         EventId callbackName,
+        EventPrefix prefix = EventPrefix.None,
         EffectStateKey? getKey = null, Pokemon? customHolder = null)
     {
         foreach (ConditionId id in side.SideConditions.Keys)
         {
             EffectState sideConditionData = side.SideConditions[id];
             Condition sideCondition = Library.Conditions[id];
-            EventHandlerInfo? handlerInfo = GetHandlerInfo(side, sideCondition, callbackName);
+            EventHandlerInfo? handlerInfo =
+                GetHandlerInfo(side, sideCondition, callbackName, prefix);
             if (handlerInfo != null ||
                 (getKey != null && sideConditionData.GetProperty(getKey) != null))
             {

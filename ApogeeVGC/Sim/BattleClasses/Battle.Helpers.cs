@@ -89,24 +89,32 @@ public partial class Battle
     /// <summary>
     /// Gets the Field-prefixed variant of an event ID.
     /// For example, Residual becomes FieldResidual.
-    /// Uses the pre-computed EventIdInfo metadata for fast lookup.
     /// </summary>
-    private EventId GetFieldEventId(EventId baseEvent)
+    private static EventId GetFieldEventId(EventId baseEvent)
     {
-        return Library.Events.TryGetValue(baseEvent, out EventIdInfo? eventInfo)
-            ? eventInfo.FieldEventId
-            : baseEvent;
+        return baseEvent switch
+        {
+            EventId.Residual => EventId.FieldResidual,
+            EventId.Start => EventId.FieldStart,
+            EventId.End => EventId.FieldEnd,
+            EventId.Restart => EventId.FieldRestart,
+            _ => baseEvent,
+        };
     }
 
     /// <summary>
     /// Gets the Side-prefixed variant of an event ID.
     /// For example, Residual becomes SideResidual.
-    /// Uses the pre-computed EventIdInfo metadata for fast lookup.
     /// </summary>
-    private EventId GetSideEventId(EventId baseEvent)
+    private static EventId GetSideEventId(EventId baseEvent)
     {
-        return Library.Events.TryGetValue(baseEvent, out EventIdInfo? eventInfo)
-            ? eventInfo.SideEventId
-            : baseEvent;
+        return baseEvent switch
+        {
+            EventId.Residual => EventId.SideResidual,
+            EventId.Start => EventId.SideStart,
+            EventId.End => EventId.SideEnd,
+            EventId.Restart => EventId.SideRestart,
+            _ => baseEvent,
+        };
     }
 }
