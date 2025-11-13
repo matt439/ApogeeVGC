@@ -17,41 +17,32 @@ Deliberately excluded: 3-4 player battles (multi/freeforall), Gen 1-8 specific f
 
 ## Critical Issues Requiring Action
 
+### Side.Queries.cs
+
+1. **ActiveTeam() has array index out of bounds bug** (Line 37)
+   - TS line 310-314: Returns active team for multi battles (4 sides)
+   - C#: Tries to access `Battle.Sides[N % 2 + 2]` which doesn't exist
+   - **Problem**: Battle only has 2 sides (P1, P2) but code tries to access sides 2-3
+   - **Impact**: CRITICAL - Will crash with IndexOutOfRangeException
+   - **Action**: Fix to only return this side's Active pokemon for standard doubles
+
 ### Side.Core.cs
 
-1. **Missing ToString() override** 
+2. **Missing ToString() override** 
    - TS line 264: `toString() { return \`${this.id}: ${this.name}\`; }`
-   - **Action**: Add `public override string ToString() => $"{Id}: {Name}";`
-
-2. **Verify SideId enum assignment in constructor** 
-   - TS line 149: `this.id = ['p1', 'p2', 'p3', 'p4'][sideNum] as SideID;`
-   - C# line 81: `Id = sideNum;`
-   - **Action**: Verify that assigning int to SideId enum works correctly
+   - **Action**: ? COMPLETED - Added `public override string ToString() => $"{Id}: {Name}";`
 
 ### Missing Methods - Need Verification
 
 3. **Query Methods** (TS lines 279-317)
-   - `RandomFoe()` - Returns random active foe Pokemon
-- `FoeSidesWithConditions()` - For iterating foe side conditions  
-   - `FoePokemonLeft()` - Counts remaining foe Pokemon
-   - `Allies(bool all = false)` - Returns list of ally Pokemon
-   - `Foes(bool all = false)` - Returns list of foe Pokemon
-   - `ActiveTeam()` - Returns active team
-   - `HasAlly(Pokemon pokemon)` - Checks if Pokemon is ally
-   - **Action**: Verify these exist in `Side.Queries.cs`
+   - ? VERIFIED - All methods exist in Side.Queries.cs
+   - ?? **ActiveTeam() is buggy** - see issue #1 above
 
 4. **Side Condition Methods** (TS lines 319-363)
-   - `AddSideCondition(Condition, Pokemon?, Effect?)` 
-   - `GetSideCondition(Condition)` 
- - `GetSideConditionData(Condition)`
-   - `RemoveSideCondition(Condition)`
-   - **Action**: Verify these exist in `Side.Conditions.cs`
+   - ? VERIFIED - All methods exist in Side.Conditions.cs
 
 5. **Slot Condition Methods** (TS lines 365-397)
-   - `AddSlotCondition(Pokemon|int, Condition, Pokemon?, Effect?)`
-   - `GetSlotCondition(Pokemon|int, Condition)`
-   - `RemoveSlotCondition(Pokemon|int, Condition)`
-   - **Action**: Verify these exist in `Side.Conditions.cs`
+   - ? VERIFIED - All methods exist in Side.Conditions.cs
 
 ---
 
@@ -133,26 +124,29 @@ Deliberately excluded: 3-4 player battles (multi/freeforall), Gen 1-8 specific f
 ## Action Items
 
 ### ? All Critical Items Complete
-1. ? **VERIFIED - Side.Queries.cs exists** with all required methods: RandomFoe, FoeSidesWithConditions, FoePokemonLeft, Allies, Foes, ActiveTeam, HasAlly
-2. ? **VERIFIED - Side.Conditions.cs exists** with all side condition and slot condition methods
-3. ? **COMPLETED - Added ToString() override** to Side.Core.cs
-4. ? **VERIFIED - SideId enum assignment works correctly** - Constructor parameter is already `SideId` type, not int
+1. ? **FIXED - ActiveTeam() bug** - Removed multi-battle logic that accessed non-existent sides
+2. ? **VERIFIED - Side.Queries.cs exists** with all required methods
+3. ? **VERIFIED - Side.Conditions.cs exists** with all side condition and slot condition methods
+4. ? **COMPLETED - Added ToString() override** to Side.Core.cs
+5. ? **VERIFIED - SideId enum assignment works correctly** - Constructor parameter is already `SideId` type, not int
 
 ### Optional Enhancements
-5. Add Pokemon name/species lookup to ChooseSwitch (if convenient)
-6. Add RuleTable.OnChooseTeam callback support (if custom formats needed)
+6. Add Pokemon name/species lookup to ChooseSwitch (if convenient)
+7. Add RuleTable.OnChooseTeam callback support (if custom formats needed)
 
 ---
 
 ## Final Status
 
-### ? Side Class Review Complete - No Issues Found!
+### ? Side Class Review Complete - All Issues Fixed!
 
 The Side class C# conversion is **complete and correct** for Gen 9 VGC format:
-- All required methods exist in Side.Queries.cs and Side.Conditions.cs
-- ToString() override added
-- Type-safe design with Choice objects instead of string parsing
-- All Gen 8- mechanics correctly excluded
-- Clean architecture with proper separation of concerns
+- ? **CRITICAL BUG FIXED**: ActiveTeam() now works for 2-side battles
+- ? All required methods exist in Side.Queries.cs and Side.Conditions.cs
+- ? ToString() override added
+- ? Type-safe design with Choice objects instead of string parsing
+- ? All Gen 8- mechanics correctly excluded
+- ? Clean architecture with proper separation of concerns
+- ? **Build successful**
 
-**The Side class is production-ready for Gen 9 VGC battles without any remaining issues.**
+**The Side class is production-ready for Gen 9 VGC battles with all critical issues resolved.**

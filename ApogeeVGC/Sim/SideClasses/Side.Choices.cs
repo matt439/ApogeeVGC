@@ -15,7 +15,8 @@ public partial class Side
         return Choice;
     }
 
-    public bool ChooseMove(MoveIdIntUnion? moveText = null, int targetLoc = 0, EventType eventType = EventType.None)
+    public bool ChooseMove(MoveIdIntUnion? moveText = null, int targetLoc = 0,
+        EventType eventType = EventType.None)
     {
         // Step 1: Validate request state
         if (RequestState != RequestState.Move)
@@ -44,30 +45,34 @@ public partial class Side
         switch (moveText)
         {
             case IntMoveIdIntUnion intUnion:
+            {
+                // Parse a one-based move index
+                int moveIndex = intUnion.Value - 1;
+                if (moveIndex < 0 || moveIndex >= request.Moves.Count)
                 {
-                    // Parse a one-based move index
-                    int moveIndex = intUnion.Value - 1;
-                    if (moveIndex < 0 || moveIndex >= request.Moves.Count)
-                    {
-                        return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
-                    }
-                    moveid = request.Moves[moveIndex].Id;
-                    break;
+                    return EmitChoiceError(
+                        $"Can't move: Your {pokemon.Name} doesn't have a move {intUnion.Value}");
                 }
+
+                moveid = request.Moves[moveIndex].Id;
+                break;
+            }
             case MoveIdMoveIdIntUnion moveIdUnion:
+            {
+                // Parse a move ID directly
+                moveid = moveIdUnion.MoveId;
+
+                // Find the move in the request
+                bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
+
+                if (!found)
                 {
-                    // Parse a move ID directly
-                    moveid = moveIdUnion.MoveId;
-
-                    // Find the move in the request
-                    bool found = request.Moves.Any(pokemonMoveData => pokemonMoveData.Id == moveid);
-
-                    if (!found)
-                    {
-                        return EmitChoiceError($"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
-                    }
-                    break;
+                    return EmitChoiceError(
+                        $"Can't move: Your {pokemon.Name} doesn't have a move matching {moveid}");
                 }
+
+                break;
+            }
         }
 
         // Step 5: Get available moves
@@ -78,7 +83,10 @@ public partial class Side
         {
             foreach (PokemonMoveData pokemonMoveData in request.Moves)
             {
-                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion { Value: true })
+                if (pokemonMoveData.Disabled is MoveIdMoveIdBoolUnion or BoolMoveIdBoolUnion
+                    {
+                        Value: true
+                    })
                 {
                     continue;
                 }
@@ -101,6 +109,7 @@ public partial class Side
             {
                 return EmitChoiceError($"Can't move: {move.Name} needs a target");
             }
+
             if (!Battle.ValidTargetLoc(targetLoc, pokemon, move.Target))
             {
                 return EmitChoiceError($"Can't move: Invalid target for {move.Name}");
@@ -126,13 +135,16 @@ public partial class Side
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
 
-            Choice.Actions = [.. Choice.Actions, new ChosenAction
-            {
-                Choice = ChoiceType.Move,
-                Pokemon = pokemon,
-                TargetLoc = lockedMoveTargetLoc,
-                MoveId = lockedMove.Value,
-            }];
+            Choice.Actions =
+            [
+                .. Choice.Actions, new ChosenAction
+                {
+                    Choice = ChoiceType.Move,
+                    Pokemon = pokemon,
+                    TargetLoc = lockedMoveTargetLoc,
+                    MoveId = lockedMove.Value,
+                }
+            ];
 
             return true;
         }
@@ -148,12 +160,15 @@ public partial class Side
 
             if (pokemon.MaybeLocked ?? false) Choice.CantUndo = true;
 
-            Choice.Actions = [.. Choice.Actions, new ChosenAction
-            {
-                Choice = ChoiceType.Move,
-                Pokemon = pokemon,
-                MoveId = MoveId.Struggle,
-            }];
+            Choice.Actions =
+            [
+                .. Choice.Actions, new ChosenAction
+                {
+                    Choice = ChoiceType.Move,
+                    Pokemon = pokemon,
+                    MoveId = MoveId.Struggle,
+                }
+            ];
 
             return true;
         }
@@ -208,14 +223,17 @@ public partial class Side
         }
 
         // Step 12: Add action to choice
-        Choice.Actions = [.. Choice.Actions, new ChosenAction
-        {
-            Choice = ChoiceType.Move,
-            Pokemon = pokemon,
-            TargetLoc = targetLoc,
-            MoveId = moveid,
-            Terastallize = terastallize ? pokemon.TeraType : null,
-        }];
+        Choice.Actions =
+        [
+            .. Choice.Actions, new ChosenAction
+            {
+                Choice = ChoiceType.Move,
+                Pokemon = pokemon,
+                TargetLoc = targetLoc,
+                MoveId = moveid,
+                Terastallize = terastallize ? pokemon.TeraType : null,
+            }
+        ];
 
         // Step 13: Handle maybeDisabled flag
         if ((pokemon.MaybeDisabled) &&
@@ -248,8 +266,10 @@ public partial class Side
         {
             if (RequestState == RequestState.Switch)
             {
-                return EmitChoiceError("Can't switch: You sent more switches than Pokémon that need to switch");
+                return EmitChoiceError(
+                    "Can't switch: You sent more switches than Pokémon that need to switch");
             }
+
             return EmitChoiceError("Can't switch: You sent more choices than unfainted Pokémon");
         }
 
@@ -297,7 +317,8 @@ public partial class Side
             // Parse the slot from the union type
             slot = slotText switch
             {
-                IntPokemonIntUnion intUnion => intUnion.Value - 1, // Convert from 1-based to 0-based
+                IntPokemonIntUnion intUnion => intUnion.Value -
+                                               1, // Convert from 1-based to 0-based
                 PokemonPokemonIntUnion pokemonUnion => pokemonUnion.Pokemon.Position,
                 _ => -1, // Invalid - will trigger error below
             };
@@ -312,7 +333,8 @@ public partial class Side
         // Step 5: Validate slot index
         if (slot >= Pokemon.Count)
         {
-            return EmitChoiceError($"Can't switch: You do not have a Pokémon in slot {slot + 1} to switch to");
+            return EmitChoiceError(
+                $"Can't switch: You do not have a Pokémon in slot {slot + 1} to switch to");
         }
         else if (slot < Active.Count &&
                  !SlotConditions[pokemon.Position].ContainsKey(ConditionId.RevivalBlessing))
@@ -321,7 +343,8 @@ public partial class Side
         }
         else if (Choice.SwitchIns.Contains(slot))
         {
-            return EmitChoiceError($"Can't switch: The Pokémon in slot {slot + 1} can only switch in once");
+            return EmitChoiceError(
+                $"Can't switch: The Pokémon in slot {slot + 1} can only switch in once");
         }
 
         // Step 6: Get target Pokemon
@@ -339,13 +362,16 @@ public partial class Side
             Choice.ForcedSwitchesLeft = Math.Max(0, Choice.ForcedSwitchesLeft - 1);
             pokemon.SwitchFlag = false;
 
-            Choice.Actions = [.. Choice.Actions, new ChosenAction
-            {
-                MoveId = MoveId.RevivalBlessing,
-                Choice = ChoiceType.RevivalBlessing,
-                Pokemon = pokemon,
-                Target = targetPokemon,
-            }];
+            Choice.Actions =
+            [
+                .. Choice.Actions, new ChosenAction
+                {
+                    MoveId = MoveId.RevivalBlessing,
+                    Choice = ChoiceType.RevivalBlessing,
+                    Pokemon = pokemon,
+                    Target = targetPokemon,
+                }
+            ];
 
             return true;
         }
@@ -364,26 +390,27 @@ public partial class Side
                 return EmitChoiceError(
                     "Can't switch: The active Pokémon is trapped",
                     (pokemon, req =>
-                    {
-                        bool updated = false;
-
-                        if (req.MaybeTrapped != null)
                         {
-                            req.MaybeTrapped = null;
-                            updated = true;
-                        }
+                            bool updated = false;
 
-                        if (req.Trapped != true)
-                        {
-                            req.Trapped = true;
-                            updated = true;
-                        }
+                            if (req.MaybeTrapped != null)
+                            {
+                                req.MaybeTrapped = null;
+                                updated = true;
+                            }
 
-                        return BoolVoidUnion.FromBool(updated);
-                    }
-                )
+                            if (req.Trapped != true)
+                            {
+                                req.Trapped = true;
+                                updated = true;
+                            }
+
+                            return BoolVoidUnion.FromBool(updated);
+                        }
+                    )
                 );
             }
+
             if (pokemon.MaybeTrapped)
             {
                 Choice.CantUndo = true;
@@ -396,6 +423,7 @@ public partial class Side
             {
                 throw new InvalidOperationException("Player somehow switched too many Pokemon");
             }
+
             Choice.ForcedSwitchesLeft--;
         }
 
@@ -406,13 +434,16 @@ public partial class Side
             ? ChoiceType.InstaSwitch
             : ChoiceType.Switch;
 
-        Choice.Actions = [.. Choice.Actions, new ChosenAction
-        {
-            MoveId = MoveId.None,
-            Choice = choiceType,
-            Pokemon = pokemon,
-            Target = targetPokemon,
-        }];
+        Choice.Actions =
+        [
+            .. Choice.Actions, new ChosenAction
+            {
+                MoveId = MoveId.None,
+                Choice = choiceType,
+                Pokemon = pokemon,
+                Target = targetPokemon,
+            }
+        ];
 
         return true;
     }
@@ -422,7 +453,8 @@ public partial class Side
         // Step 1: Validate request state
         if (RequestState != RequestState.TeamPreview)
         {
-            return EmitChoiceError("Can't choose for Team Preview: You're not in a Team Preview phase");
+            return EmitChoiceError(
+                "Can't choose for Team Preview: You're not in a Team Preview phase");
         }
 
         // Step 2: Parse positions from input
@@ -435,7 +467,8 @@ public partial class Side
         {
             char separator = data.Contains(',') ? ',' : ' ';
             positions = data.Split(separator)
-                .Select(s => int.TryParse(s.Trim(), out int val) ? val - 1 : -1) // Convert to 0-based
+                .Select(s =>
+                    int.TryParse(s.Trim(), out int val) ? val - 1 : -1) // Convert to 0-based
                 .ToList();
         }
 
@@ -475,13 +508,15 @@ public partial class Side
             // Check if position is valid
             if (pos < 0 || pos >= Pokemon.Count)
             {
-                return EmitChoiceError($"Can't choose for Team Preview: You do not have a Pokémon in slot {pos + 1}");
+                return EmitChoiceError(
+                    $"Can't choose for Team Preview: You do not have a Pokémon in slot {pos + 1}");
             }
 
             // Check for duplicates
             if (positions.IndexOf(pos) != index)
             {
-                return EmitChoiceError($"Can't choose for Team Preview: The Pokémon in slot {pos + 1} can only switch in once");
+                return EmitChoiceError(
+                    $"Can't choose for Team Preview: The Pokémon in slot {pos + 1} can only switch in once");
             }
         }
 
@@ -490,14 +525,17 @@ public partial class Side
         {
             int pos = positions[index];
             Choice.SwitchIns.Add(pos);
-            Choice.Actions = [.. Choice.Actions, new ChosenAction
-            {
-                MoveId = MoveId.None,
-                Choice = ChoiceType.Team,
-                Index = index,
-                Pokemon = Pokemon[pos],
-                Priority = -index, // Earlier picks have higher priority
-            }];
+            Choice.Actions =
+            [
+                .. Choice.Actions, new ChosenAction
+                {
+                    MoveId = MoveId.None,
+                    Choice = ChoiceType.Team,
+                    Index = index,
+                    Pokemon = Pokemon[pos],
+                    Priority = -index, // Earlier picks have higher priority
+                }
+            ];
         }
 
         return true;
@@ -505,7 +543,8 @@ public partial class Side
 
     public bool ChooseShift()
     {
-        throw new NotImplementedException("This is only used in Triple Battles which are not yet implemented.");
+        throw new NotImplementedException(
+            "This is only used in Triple Battles which are not yet implemented.");
     }
 
     public void ClearChoice()
@@ -555,17 +594,18 @@ public partial class Side
         // Step 1: Validate that it's the player's turn
         if (RequestState == RequestState.None)
         {
-         string message = Battle.Ended
-            ? "Can't do anything: The game is over"
-        : "Can't do anything: It's not your turn";
+            string message = Battle.Ended
+                ? "Can't do anything: The game is over"
+                : "Can't do anything: It's not your turn";
             return EmitChoiceError(message);
         }
 
-  // Step 2: Check if undo is allowed
+        // Step 2: Check if undo is allowed
         if (Choice.CantUndo)
         {
-       return EmitChoiceError("Can't undo: A trapping/disabling effect would cause undo to leak information");
-    }
+            return EmitChoiceError(
+                "Can't undo: A trapping/disabling effect would cause undo to leak information");
+        }
 
         // Step 3: Clear existing choice
         ClearChoice();
@@ -573,63 +613,67 @@ public partial class Side
         // Step 4: Validate number of actions doesn't exceed expected count
         // For team preview, allow up to full team size
         // For other requests, limit to active Pokemon count
-        int maxActions = RequestState == RequestState.TeamPreview 
-            ? Pokemon.Count 
-        : Active.Count;
-    
+        int maxActions = RequestState == RequestState.TeamPreview
+            ? Pokemon.Count
+            : Active.Count;
+
         if (input.Actions.Count > maxActions)
         {
-    return EmitChoiceError(
-      $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but only {maxActions} are allowed!"
-       );
+            return EmitChoiceError(
+                $"Can't make choices: You sent choices for {input.Actions.Count} Pokémon, but only {maxActions} are allowed!"
+            );
         }
 
         // Debug logging
-        Console.WriteLine($"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
+        Console.WriteLine(
+            $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
         for (int i = 0; i < input.Actions.Count; i++)
         {
-          var action = input.Actions[i];
-            Console.WriteLine($"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
+            var action = input.Actions[i];
+            Console.WriteLine(
+                $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
         }
 
         // Step 5: Process each action in the choice
-    if (input.Actions.Select((action, index) =>
-        {
-bool success = action.Choice switch
-      {
-     ChoiceType.Move => ProcessChosenMoveAction(action),
-         ChoiceType.Switch or ChoiceType.InstaSwitch => ProcessChosenSwitchAction(action),
-    ChoiceType.Team => ProcessChosenTeamAction(action),
-       ChoiceType.Pass => ChoosePass().IsTrue(),
-      ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
-                _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
-         };
-
-            if (!success)
+        if (input.Actions.Select((action, index) =>
             {
-    Console.WriteLine($"[Side.Choose] Action {index} failed: {Choice.Error}");
-         }
+                bool success = action.Choice switch
+                {
+                    ChoiceType.Move => ProcessChosenMoveAction(action),
+                    ChoiceType.Switch or ChoiceType.InstaSwitch =>
+                        ProcessChosenSwitchAction(action),
+                    ChoiceType.Team => ProcessChosenTeamAction(action),
+                    ChoiceType.Pass => ChoosePass().IsTrue(),
+                    ChoiceType.RevivalBlessing => ProcessChosenRevivalBlessingAction(action),
+                    _ => EmitChoiceError($"Unrecognized choice type: {action.Choice}"),
+                };
 
-      return success;
-        }).Any(success => !success))
+                if (!success)
+                {
+                    Console.WriteLine($"[Side.Choose] Action {index} failed: {Choice.Error}");
+                }
+
+                return success;
+            }).Any(success => !success))
         {
-     Console.WriteLine($"[Side.Choose] Overall choice failed for {Name}");
-          return false;
+            Console.WriteLine($"[Side.Choose] Overall choice failed for {Name}");
+            return false;
         }
 
         // Step 6: Apply choice-level settings
         if (input.Terastallize)
-{
+        {
             Choice.Terastallize = true;
         }
 
-   if (input.CantUndo)
+        if (input.CantUndo)
         {
             Choice.CantUndo = true;
         }
 
         bool result = string.IsNullOrEmpty(Choice.Error);
-        Console.WriteLine($"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
+        Console.WriteLine(
+            $"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
         return result;
     }
 
@@ -660,47 +704,54 @@ bool success = action.Choice switch
 
     private bool ProcessChosenTeamAction(ChosenAction action)
     {
-        Console.WriteLine($"[ProcessChosenTeamAction] Processing action: Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}, Priority={action.Priority}");
-        
+        Console.WriteLine(
+            $"[ProcessChosenTeamAction] Processing action: Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}, Priority={action.Priority}");
+
         // For team preview, the actions are already ordered by priority
         // We just need to verify this is a valid team choice
-      
-  // Handle GUI case where Pokemon is null but Index is provided
-      int slot;
-   if (action.Pokemon == null)
-     {
-       Console.WriteLine($"[ProcessChosenTeamAction] Pokemon is null, using Index");
-            if (!action.Index.HasValue || action.Index.Value < 0 || action.Index.Value >= Pokemon.Count)
-{
-      Console.WriteLine($"[ProcessChosenTeamAction] Invalid index: {action.Index}");
-   return EmitChoiceError("Can't choose for Team Preview: Invalid Pokemon index specified");
-    }
-slot = action.Index.Value;
-       Console.WriteLine($"[ProcessChosenTeamAction] Looking up Pokemon at slot {slot}");
-    // Update the action with the Pokemon reference for proper processing
-        action = action with { Pokemon = Pokemon[slot] };
-      Console.WriteLine($"[ProcessChosenTeamAction] Pokemon found: {action.Pokemon.Name}");
-   }
+
+        // Handle GUI case where Pokemon is null but Index is provided
+        int slot;
+        if (action.Pokemon == null)
+        {
+            Console.WriteLine($"[ProcessChosenTeamAction] Pokemon is null, using Index");
+            if (!action.Index.HasValue || action.Index.Value < 0 ||
+                action.Index.Value >= Pokemon.Count)
+            {
+                Console.WriteLine($"[ProcessChosenTeamAction] Invalid index: {action.Index}");
+                return EmitChoiceError(
+                    "Can't choose for Team Preview: Invalid Pokemon index specified");
+            }
+
+            slot = action.Index.Value;
+            Console.WriteLine($"[ProcessChosenTeamAction] Looking up Pokemon at slot {slot}");
+            // Update the action with the Pokemon reference for proper processing
+            action = action with { Pokemon = Pokemon[slot] };
+            Console.WriteLine($"[ProcessChosenTeamAction] Pokemon found: {action.Pokemon.Name}");
+        }
         else
- {
-  Console.WriteLine($"[ProcessChosenTeamAction] Pokemon already set: {action.Pokemon.Name}");
-      slot = action.Pokemon.Position;
-     }
+        {
+            Console.WriteLine(
+                $"[ProcessChosenTeamAction] Pokemon already set: {action.Pokemon.Name}");
+            slot = action.Pokemon.Position;
+        }
 
         Console.WriteLine($"[ProcessChosenTeamAction] Attempting to add slot {slot} to SwitchIns");
         if (!Choice.SwitchIns.Add(slot))
-  {
-     Console.WriteLine($"[ProcessChosenTeamAction] Slot {slot} already in SwitchIns");
-       return EmitChoiceError(
-    $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
-      );
+        {
+            Console.WriteLine($"[ProcessChosenTeamAction] Slot {slot} already in SwitchIns");
+            return EmitChoiceError(
+                $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+            );
         }
 
-        Console.WriteLine($"[ProcessChosenTeamAction] Adding action to Choice.Actions (current count: {Choice.Actions.Count})");
-     Choice.Actions = [.. Choice.Actions, action];
-  Console.WriteLine($"[ProcessChosenTeamAction] Action added successfully, new count: {Choice.Actions.Count}");
+        Console.WriteLine(
+            $"[ProcessChosenTeamAction] Adding action to Choice.Actions (current count: {Choice.Actions.Count})");
+        Choice.Actions = [.. Choice.Actions, action];
+        Console.WriteLine(
+            $"[ProcessChosenTeamAction] Action added successfully, new count: {Choice.Actions.Count}");
 
-     return true;
+        return true;
     }
 
     private bool ProcessChosenRevivalBlessingAction(ChosenAction action)
@@ -744,19 +795,23 @@ slot = action.Index.Value;
                     while (
                         index < Active.Count &&
                         Active[index] != null &&
-                        (Active[index]!.Fainted || Active[index]!.Volatiles.ContainsKey(ConditionId.Commanding))
+                        (Active[index]!.Fainted ||
+                         Active[index]!.Volatiles.ContainsKey(ConditionId.Commanding))
                     )
                     {
                         ChoosePass();
                         index++;
                     }
+
                     break;
                 case RequestState.Switch:
-                    while (index < Active.Count && Active[index] != null && !Active[index]!.SwitchFlag.IsTrue())
+                    while (index < Active.Count && Active[index] != null &&
+                           !Active[index]!.SwitchFlag.IsTrue())
                     {
                         ChoosePass();
                         index++;
                     }
+
                     break;
             }
         }
@@ -781,26 +836,33 @@ slot = action.Index.Value;
                         return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
                                                $"replace {pokemon.Name}");
                     }
+
                     Choice.ForcedPassesLeft--;
                 }
+
                 break;
 
             case RequestState.Move:
                 if (!pokemon.Fainted && !pokemon.Volatiles.ContainsKey(ConditionId.Commanding))
                 {
-                    return EmitChoiceError($"Can't pass: Your {pokemon.Name} must make a move (or switch)");
+                    return EmitChoiceError(
+                        $"Can't pass: Your {pokemon.Name} must make a move (or switch)");
                 }
+
                 break;
 
             default:
                 return EmitChoiceError("Can't pass: Not a move or switch request");
         }
 
-        Choice.Actions = [.. Choice.Actions, new ChosenAction
-        {
-            MoveId = MoveId.None,
-            Choice = ChoiceType.Pass,
-        }];
+        Choice.Actions =
+        [
+            .. Choice.Actions, new ChosenAction
+            {
+                MoveId = MoveId.None,
+                Choice = ChoiceType.Pass,
+            }
+        ];
 
         return true;
     }
@@ -825,8 +887,10 @@ slot = action.Index.Value;
                 SideBoolUnion result = ChooseSwitch();
                 if (!result.IsTrue())
                 {
-                    throw new InvalidOperationException($"autoChoose switch crashed: {Choice.Error}");
+                    throw new InvalidOperationException(
+                        $"autoChoose switch crashed: {Choice.Error}");
                 }
+
                 i++;
                 if (i > 10)
                 {
@@ -843,6 +907,7 @@ slot = action.Index.Value;
                 {
                     throw new InvalidOperationException($"autoChoose crashed: {Choice.Error}");
                 }
+
                 i++;
                 if (i > 10)
                 {
@@ -939,7 +1004,6 @@ slot = action.Index.Value;
     }
 
 
-
     private BoolVoidUnion UpdateDisabledRequestForMove(Pokemon pokemon, PokemonMoveRequestData req,
         MoveId moveid, string disabledSource)
     {
@@ -957,6 +1021,7 @@ slot = action.Index.Value;
             {
                 updated = true;
             }
+
             break;
         }
 
@@ -994,7 +1059,8 @@ slot = action.Index.Value;
 
                 // Check if move should be marked as disabled
                 if (disabled != null &&
-                    (Battle.Gen >= 4 || Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
+                    (Battle.Gen >= 4 ||
+                     Battle.Actions.TargetTypeChoices(m.Target ?? MoveTarget.None)))
                 {
                     m.Disabled = true;
                     updated = true;
@@ -1020,7 +1086,8 @@ slot = action.Index.Value;
         return updated;
     }
 
-    public bool UpdateRequestForPokemon(Pokemon pokemon, Func<PokemonMoveRequestData, BoolVoidUnion> update)
+    public bool UpdateRequestForPokemon(Pokemon pokemon,
+        Func<PokemonMoveRequestData, BoolVoidUnion> update)
     {
         // Ensure we have an active request with Pokemon data
         if (ActiveRequest is not MoveRequest moveRequest || moveRequest.Active == null)

@@ -34,10 +34,9 @@ public partial class Side
 
     public List<Pokemon> ActiveTeam()
     {
-        return Battle.Sides[N % 2].Active.Concat(Battle.Sides[N % 2 + 2].Active)
-            .Where(p => p != null)
-            .Select(p => p!)
-            .ToList();
+        // For standard VGC doubles (2 sides only), just return this side's active Pokemon
+        // Multi-battle logic (4 sides) is not supported
+        return Active.Where(p => p != null).Select(p => p!).ToList();
     }
 
     public bool HasAlly(Pokemon pokemon)
