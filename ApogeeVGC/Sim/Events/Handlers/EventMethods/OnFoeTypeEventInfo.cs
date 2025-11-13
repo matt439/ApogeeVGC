@@ -24,7 +24,7 @@ public sealed record OnFoeTypeEventInfo : EventHandlerInfo
         ExpectedReturnType = typeof(TypesVoidUnion);
         
     // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
+      ParameterNullability = [false, false, false];
         ReturnTypeNullable = false;
     
     // Validate configuration

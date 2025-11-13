@@ -24,8 +24,8 @@ UsesSpeed = usesSpeed;
         ExpectedReturnType = typeof(TypesVoidUnion);
         
     // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false];
-        ReturnTypeNullable = false;
+    ParameterNullability = [false, false, false];
+      ReturnTypeNullable = false;
     
     // Validate configuration
         ValidateConfiguration();
