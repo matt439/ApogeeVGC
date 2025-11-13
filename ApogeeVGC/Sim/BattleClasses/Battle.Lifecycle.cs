@@ -433,9 +433,16 @@ Add("turn", Turn);
    MidTurn = false;
    Queue.Clear();
         
-        // Now start the next turn
-        EndTurn();
- }
+   // Now start the next turn
+     EndTurn();
+
+ // Check if EndTurn ended the battle (e.g., via infinite loop detection)
+        if (Ended)
+        {
+            Console.WriteLine("[TurnLoop] Battle ended in EndTurn, exiting TurnLoop");
+    return;
+        }
+    }
 
     public bool RunAction(IAction action)
     {
