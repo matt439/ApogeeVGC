@@ -378,18 +378,18 @@ return false;
       TurnLoop();
         Console.WriteLine("[CommitChoices] TurnLoop returned");
 
-  // Check if battle ended during TurnLoop
+        // Check if battle ended during TurnLoop
         if (Ended)
         {
    Console.WriteLine("[CommitChoices] Battle ended during TurnLoop, exiting");
             return;
         }
 
-        // Workaround for tests - send updates if log is getting large
-   if (Log.Count - SentLogPos > 500)
-        {
-       SendUpdates();
-        }
+      // Workaround for tests - send updates if log is getting large
+        if (Log.Count - SentLogPos > 500)
+      {
+  SendUpdates();
+   }
     }
 
 // Callback to invoke when all choices are received

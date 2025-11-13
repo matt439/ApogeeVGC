@@ -107,6 +107,23 @@ public partial class Battle
      {
       TurnLoop();
         }
+
+        // Wait for battle to actually end
+        // In async mode, TurnLoop() will return when it needs player input,
+        // so we need to wait here until the battle is actually complete
+        while (!Ended)
+        {
+ // Wait for player choices to be submitted
+      _choiceWaitHandle.Wait();
+
+            // If battle ended while waiting, exit
+     if (Ended)
+            {
+   break;
+          }
+     }
+
+    Console.WriteLine("[Battle.Start] Battle complete, returning");
     }
 
     //public void Restart(Action<string, List<string>>? send)
@@ -437,8 +454,8 @@ Add("turn", Turn);
      EndTurn();
 
  // Check if EndTurn ended the battle (e.g., via infinite loop detection)
-        if (Ended)
-        {
+     if (Ended)
+{
             Console.WriteLine("[TurnLoop] Battle ended in EndTurn, exiting TurnLoop");
     return;
         }
