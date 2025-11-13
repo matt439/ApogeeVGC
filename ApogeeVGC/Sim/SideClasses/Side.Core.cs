@@ -5,6 +5,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Sim.SideClasses;
@@ -42,6 +43,11 @@ public partial class Side
     public bool Initialised { get; init; }
 
     public RequestState RequestState { get; set; }
+
+    /// <summary>
+    /// The last move selected by this side (used by Copycat, Mirror Move, etc.)
+    /// </summary>
+    public MoveId? LastSelectedMove { get; set; }
 
     public Side(Battle battle)
     {

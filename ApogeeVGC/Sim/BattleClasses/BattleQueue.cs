@@ -58,7 +58,8 @@ public class BattleQueue(Battle battle)
         switch (action)
         {
             case null:
-                throw new ArgumentNullException(nameof(action), "Action not passed to ResolveAction");
+                throw new ArgumentNullException(nameof(action),
+                    "Action not passed to ResolveAction");
             // Pass actions return empty list
             case IAction { Choice: ActionId.Pass }:
                 return [];
@@ -66,6 +67,10 @@ public class BattleQueue(Battle battle)
 
         // Start with the action itself
         List<IAction> actions = [];
+
+        // Populate side from pokemon if not already set (matches TS: if (!action.side && action.pokemon) action.side = action.pokemon.side;)
+        // Note: In C# we don't have a mutable side property on IAction, so this is handled implicitly through Pokemon.Side
+        // The TypeScript code sets it for convenience, but in C# it's always accessible via action.Pokemon.Side
 
         // Handle ChosenAction conversion to specific action types
         IAction currentAction;
@@ -77,41 +82,55 @@ public class BattleQueue(Battle battle)
                 ChoiceType.Team => new TeamAction
                 {
                     Choice = ActionId.Team,
-                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Team action requires a Pokemon"),
-                    Index = chosenAction.Index ?? throw new InvalidOperationException("Team action requires an Index"),
+                    Pokemon = chosenAction.Pokemon ??
+                              throw new InvalidOperationException("Team action requires a Pokemon"),
+                    Index = chosenAction.Index ??
+                            throw new InvalidOperationException("Team action requires an Index"),
                     Priority = chosenAction.Priority,
                 },
                 ChoiceType.Move => new MoveAction
                 {
                     Choice = ActionId.Move,
-                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Move action requires a Pokemon"),
+                    Pokemon = chosenAction.Pokemon ??
+                              throw new InvalidOperationException("Move action requires a Pokemon"),
                     Move = Battle.Library.Moves[chosenAction.MoveId],
                     TargetLoc = chosenAction.TargetLoc ?? 0,
                     Order = 200, // Default order for moves
-                    OriginalTarget = chosenAction.Pokemon!, // Will be updated later with actual target
+                    OriginalTarget =
+                        chosenAction.Pokemon!, // Will be updated later with actual target
                 },
                 ChoiceType.Switch => new SwitchAction
                 {
                     Choice = ActionId.Switch,
-                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("Switch action requires a Pokemon"),
-                    Target = chosenAction.Target ?? throw new InvalidOperationException("Switch action requires a Target"),
+                    Pokemon = chosenAction.Pokemon ??
+                              throw new InvalidOperationException(
+                                  "Switch action requires a Pokemon"),
+                    Target = chosenAction.Target ??
+                             throw new InvalidOperationException("Switch action requires a Target"),
                     Order = 103, // Order for regular switches
                 },
                 ChoiceType.InstaSwitch => new SwitchAction
                 {
                     Choice = ActionId.InstaSwitch,
-                    Pokemon = chosenAction.Pokemon ?? throw new InvalidOperationException("InstaSwitch action requires a Pokemon"),
-                    Target = chosenAction.Target ?? throw new InvalidOperationException("InstaSwitch action requires a Target"),
+                    Pokemon = chosenAction.Pokemon ??
+                              throw new InvalidOperationException(
+                                  "InstaSwitch action requires a Pokemon"),
+                    Target = chosenAction.Target ??
+                             throw new InvalidOperationException(
+                                 "InstaSwitch action requires a Target"),
                     Order = 3, // Order for instant switches
                 },
-                _ => action as IAction ?? throw new InvalidOperationException("ChosenAction must be convertible to IAction"),
+                _ => action as IAction ??
+                     throw new InvalidOperationException(
+                         "ChosenAction must be convertible to IAction"),
             };
         }
         else
         {
             // Cast to IAction - all ActionChoices should be IActions in practice
             currentAction = action as IAction ??
-                            throw new InvalidOperationException("ActionChoice must be convertible to IAction");
+                            throw new InvalidOperationException(
+                                "ActionChoice must be convertible to IAction");
         }
 
         // Populate move if missing (from moveId)
@@ -143,7 +162,8 @@ public class BattleQueue(Battle battle)
                 // Default order is 200 for moves and events
                 if (currentAction.Choice is not (ActionId.Move or ActionId.Event))
                 {
-                    throw new InvalidOperationException($"Unexpected orderless action {currentAction.Choice}");
+                    throw new InvalidOperationException(
+                        $"Unexpected orderless action {currentAction.Choice}");
                 }
 
                 if (currentAction is MoveAction maDefault)
@@ -158,11 +178,25 @@ public class BattleQueue(Battle battle)
         {
             if (currentAction is MoveAction ma)
             {
-                // Note: BeforeTurnCallback, Mega Evolution, and Dynamax are deliberately excluded
-                // as per requirements
+                // Add BeforeTurnMove action if the move has a beforeTurnCallback (e.g., Focus Punch)
+                if (ma.Move.BeforeTurnCallback != null)
+                {
+                    actions.InsertRange(0, ResolveAction(new MoveAction
+                    {
+                        Choice = ActionId.BeforeTurnMove,
+                        Pokemon = ma.Pokemon,
+                        Move = ma.Move,
+                        TargetLoc = ma.TargetLoc,
+                        Order = 5, // BeforeTurnMove order
+                        OriginalTarget = ma.Pokemon, // Will be updated later with actual target
+                    }));
+                }
+
+                // Note: Mega Evolution and Dynamax are deliberately excluded as per requirements
 
                 // Add Terastallize action if applicable
-                if (ma.Pokemon is { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
+                if (ma.Pokemon is
+                    { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
                 {
                     // Insert Terastallize action before the move
                     actions.InsertRange(0, ResolveAction(new PokemonAction
@@ -172,8 +206,21 @@ public class BattleQueue(Battle battle)
                     }));
                 }
 
+                // Add PriorityChargeMove action if the move has a priorityChargeCallback (e.g., Beak Blast, Shell Trap)
+                if (ma.Move.PriorityChargeCallback != null)
+                {
+                    actions.InsertRange(0, ResolveAction(new MoveAction
+                    {
+                        Choice = ActionId.PriorityChargeMove,
+                        Pokemon = ma.Pokemon,
+                        Move = ma.Move,
+                        Order = 107, // PriorityChargeMove order
+                        OriginalTarget = ma.Pokemon, // Will be updated later with actual target
+                    }));
+                }
+
                 // Calculate fractional priority from events
-                RelayVar? fractionalPriorityEvent = Battle.RunEvent(
+                RelayVar fractionalPriorityEvent = Battle.RunEvent(
                     EventId.FractionalPriority,
                     ma.Pokemon,
                     null,
@@ -222,8 +269,11 @@ public class BattleQueue(Battle battle)
                 Pokemon? target = Battle.GetRandomTarget(moveAct.Pokemon, move);
                 if (target is not null)
                 {
-                    moveAct = moveAct with { TargetLoc =
-                        moveAct.Pokemon.GetSlot().GetRelativeLocation(target.GetSlot()) };
+                    moveAct = moveAct with
+                    {
+                        TargetLoc =
+                        moveAct.Pokemon.GetSlot().GetRelativeLocation(target.GetSlot())
+                    };
                 }
             }
 
@@ -254,7 +304,8 @@ public class BattleQueue(Battle battle)
         {
             MoveActionMoveSwitchActionUnion ma => ma.MoveAction,
             SwitchActionMoveSwitchActionUnion sa => sa.SwitchAction,
-            _ => throw new InvalidOperationException("Unknown action type in MoveSwitchActionUnion"),
+            _ => throw new InvalidOperationException(
+                "Unknown action type in MoveSwitchActionUnion"),
         };
 
         // Remove the action from its current position if it exists
@@ -280,7 +331,8 @@ public class BattleQueue(Battle battle)
                 SourceEffect = sourceEffect,
                 Order = 3, // InstaSwitch priority
             },
-            _ => throw new InvalidOperationException("Unknown action type in MoveSwitchActionUnion"),
+            _ => throw new InvalidOperationException(
+                "Unknown action type in MoveSwitchActionUnion"),
         };
 
         // Add to the front of the queue
@@ -314,20 +366,41 @@ public class BattleQueue(Battle battle)
         }
 
         // Insert the new action in priority order
-        AddChoice(action);
+        InsertChoice(action);
     }
 
     public void AddChoice(IActionChoice choice)
     {
         var resolvedChoices = ResolveAction(choice);
         List.AddRange(resolvedChoices);
+
+        // Track last selected move for each side (used by Copycat, Mirror Move, etc.)
+        foreach (IAction resolvedChoice in resolvedChoices)
+        {
+            if (resolvedChoice is MoveAction { Choice: ActionId.Move } ma &&
+                ma.Move.Id != MoveId.Recharge)
+            {
+                ma.Pokemon.Side.LastSelectedMove = ma.Move.Id;
+            }
+        }
     }
 
     public void AddChoice(IEnumerable<IActionChoice> choices)
     {
-        foreach (var resolvedChoices in choices.Select(choice => ResolveAction(choice)))
+        foreach (IActionChoice choice in choices)
         {
+            var resolvedChoices = ResolveAction(choice);
             List.AddRange(resolvedChoices);
+
+            // Track last selected move for each side (used by Copycat, Mirror Move, etc.)
+            foreach (IAction resolvedChoice in resolvedChoices)
+            {
+                if (resolvedChoice is MoveAction { Choice: ActionId.Move } ma &&
+                    ma.Move.Id != MoveId.Recharge)
+                {
+                    ma.Pokemon.Side.LastSelectedMove = ma.Move.Id;
+                }
+            }
         }
     }
 
@@ -335,11 +408,13 @@ public class BattleQueue(Battle battle)
     {
         foreach (IAction action in List)
         {
-            if (action.Choice is ActionId.Move or ActionId.Switch or ActionId.InstaSwitch or ActionId.Shift)
+            if (action.Choice is ActionId.Move or ActionId.Switch or ActionId.InstaSwitch
+                or ActionId.Shift)
             {
                 return action;
             }
         }
+
         return null;
     }
 
@@ -352,14 +427,16 @@ public class BattleQueue(Battle battle)
     public MoveAction? WillMove(Pokemon pokemon)
     {
         if (pokemon.Fainted) return null;
-        
+
         foreach (IAction action in List)
         {
-            if (action.Choice is ActionId.Move && action is MoveAction moveAction && action.Pokemon == pokemon)
+            if (action.Choice is ActionId.Move && action is MoveAction moveAction &&
+                action.Pokemon == pokemon)
             {
                 return moveAction;
             }
         }
+
         return null;
     }
 
@@ -395,6 +472,7 @@ public class BattleQueue(Battle battle)
             List.RemoveAt(i);
             return true;
         }
+
         return false;
     }
 
@@ -410,7 +488,8 @@ public class BattleQueue(Battle battle)
     {
         foreach (IAction action in List)
         {
-            if (action.Choice is ActionId.Switch or ActionId.InstaSwitch && action.Pokemon == pokemon)
+            if (action.Choice is ActionId.Switch or ActionId.InstaSwitch &&
+                action.Pokemon == pokemon)
             {
                 // Return the appropriate union type based on the action type
                 return action switch
@@ -423,6 +502,7 @@ public class BattleQueue(Battle battle)
                 };
             }
         }
+
         return null;
     }
 
@@ -454,7 +534,7 @@ public class BattleQueue(Battle battle)
         for (int i = 0; i < List.Count; i++)
         {
             IAction curAction = List[i];
-            int compared = BattleClasses.Battle.ComparePriority(actions[0], curAction);
+            int compared = Battle.ComparePriority(actions[0], curAction);
 
             // Mark the first position where our action should go
             // (when it has equal or higher priority than the current action)
@@ -552,11 +632,11 @@ public class BattleQueue(Battle battle)
         return action switch
         {
             MoveAction ma => $"{choiceStr} | {pokemonName} | {ma.Move.Name} | " +
-                            $"Order: {ma.Order} | Priority: {ma.Priority} | Speed: {ma.Speed}",
+                             $"Order: {ma.Order} | Priority: {ma.Priority} | Speed: {ma.Speed}",
             SwitchAction sa => $"{choiceStr} | {pokemonName} -> {sa.Target.Name} | " +
-                              $"Order: {sa.Order} | Speed: {sa.Speed}",
+                               $"Order: {sa.Order} | Speed: {sa.Speed}",
             PokemonAction pa => $"{choiceStr} | {pokemonName} | " +
-                               $"Order: {pa.Order} | Speed: {pa.Speed}",
+                                $"Order: {pa.Order} | Speed: {pa.Speed}",
             _ => $"{choiceStr} | {pokemonName}",
         };
     }
@@ -568,16 +648,7 @@ public class BattleQueue(Battle battle)
     /// <returns>This queue (for method chaining)</returns>
     public BattleQueue Sort()
     {
-        if (Battle is Battle battleAsync)
-        {
-            battleAsync.SpeedSort(List);
-        }
-        else
-        {
-            // Fallback: simple sort using ComparePriority
-            List.Sort(BattleClasses.Battle.ComparePriority);
-        }
-
+        Battle.SpeedSort(List);
         return this;
     }
 
