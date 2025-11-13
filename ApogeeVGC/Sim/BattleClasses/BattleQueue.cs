@@ -220,7 +220,7 @@ public class BattleQueue(Battle battle)
                 }
 
                 // Calculate fractional priority from events
-                RelayVar fractionalPriorityEvent = Battle.RunEvent(
+                RelayVar? fractionalPriorityEvent = Battle.RunEvent(
                     EventId.FractionalPriority,
                     ma.Pokemon,
                     null,

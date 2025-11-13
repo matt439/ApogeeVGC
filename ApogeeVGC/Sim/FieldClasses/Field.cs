@@ -83,6 +83,7 @@ public class Field
                             $"[from] {Weather}", "[fail]");
                     }
                 }
+
                 return false;
             }
         }
@@ -110,12 +111,13 @@ public class Field
             }
 
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback.GetDelegateOrThrow();
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback
+                    .GetDelegateOrThrow();
             WeatherState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
         // Try to start the weather - if it fails, rollback
-        RelayVar startResult = Battle.SingleEvent(
+        RelayVar? startResult = Battle.SingleEvent(
             EventId.FieldStart,
             status,
             WeatherState,
@@ -169,15 +171,15 @@ public class Field
     /// </summary>
     public bool SuppressingWeather()
     {
-   return Battle.Sides.Any(side =>
- (from pokemon in side.Active
-  where pokemon != null  // Check for null pokemon in active slots
- where !pokemon.Fainted
-       where !pokemon.IgnoringAbility()
-         let ability = pokemon.GetAbility()
- where ability.SuppressWeather
-       select pokemon).Any(pokemon =>
-            !(pokemon.AbilityState.Ending ?? false)));
+        return Battle.Sides.Any(side =>
+            (from pokemon in side.Active
+                where pokemon != null // Check for null pokemon in active slots
+                where !pokemon.Fainted
+                where !pokemon.IgnoringAbility()
+                let ability = pokemon.GetAbility()
+                where ability.SuppressWeather
+                select pokemon).Any(pokemon =>
+                !(pokemon.AbilityState.Ending ?? false)));
     }
 
     public bool IsWeather(ConditionId weather)
@@ -206,13 +208,13 @@ public class Field
 
         // Fall back to battle effect if sourceEffect not provided
         sourceEffect ??= Battle.Effect;
-        
+
         // Fall back to event target if source not provided
         if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
         {
             source = pset.Pokemon;
         }
-        
+
         // Source is required
         if (source == null)
         {
@@ -228,7 +230,7 @@ public class Field
         // Save previous terrain state in case we need to rollback
         ConditionId prevTerrain = Terrain;
         EffectState prevTerrainState = TerrainState;
-        
+
         // Set the new terrain
         Terrain = condition.Id;
         TerrainState = Battle.InitEffectState(status.EffectStateId, source, source.GetSlot(), 0);
@@ -243,7 +245,8 @@ public class Field
         if (condition.DurationCallback != null)
         {
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)condition.DurationCallback.GetDelegateOrThrow();
+                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)condition.DurationCallback
+                    .GetDelegateOrThrow();
             TerrainState.Duration = durationHandler(Battle, source, source, sourceEffect);
         }
 
@@ -256,7 +259,7 @@ public class Field
             source,
             sourceEffect
         );
-        
+
         if (startResult is BoolRelayVar { Value: false } or null)
         {
             // Rollback to previous state
@@ -267,7 +270,7 @@ public class Field
 
         // Trigger terrain change event for all handlers
         Battle.EachEvent(EventId.TerrainChange, sourceEffect);
-        
+
         return true;
     }
 
@@ -291,7 +294,10 @@ public class Field
         }
 
         return Battle.RunEvent(EventId.TryTerrain,
-            RunEventTarget.FromNullablePokemonSideBattleUnion(target)) is not (null or BoolRelayVar { Value: false })
+            RunEventTarget.FromNullablePokemonSideBattleUnion(target)) is not (null or BoolRelayVar
+        {
+            Value: false
+        })
             ? Terrain
             : ConditionId.None;
     }
@@ -313,24 +319,26 @@ public class Field
         return Battle.Library.Conditions[Terrain];
     }
 
-    public bool AddPseudoWeather(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
+    public bool AddPseudoWeather(ConditionId status, Pokemon? source = null,
+        IEffect? sourceEffect = null)
     {
         Condition condition = Battle.Library.Conditions[status];
         return AddPseudoWeather(condition, source, sourceEffect);
     }
 
-    public bool AddPseudoWeather(Condition status, Pokemon? source = null, IEffect? sourceEffect = null)
+    public bool AddPseudoWeather(Condition status, Pokemon? source = null,
+        IEffect? sourceEffect = null)
     {
         // Fall back to battle effect if sourceEffect not provided
         sourceEffect ??= Battle.Effect;
-    
-        // Fall back to event target if source not provided
-  if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
-        {
-   source = pset.Pokemon;
- }
 
- // Check if pseudo-weather already exists
+        // Fall back to event target if source not provided
+        if (source == null && Battle.Event.Target is PokemonSingleEventTarget pset)
+        {
+            source = pset.Pokemon;
+        }
+
+        // Check if pseudo-weather already exists
         if (PseudoWeather.TryGetValue(status.Id, out EffectState? existingState))
         {
             // If the condition doesn't have a restart handler, return false
@@ -374,7 +382,7 @@ public class Field
         }
 
         // Try to start the pseudo-weather
-        RelayVar startResult = Battle.SingleEvent(
+        RelayVar? startResult = Battle.SingleEvent(
             EventId.FieldStart,
             status,
             state,
@@ -394,7 +402,7 @@ public class Field
 
         // Trigger pseudo-weather change event for all handlers
         Battle.RunEvent(
-            EventId.PseudoWeatherChange, 
+            EventId.PseudoWeatherChange,
             RunEventTarget.FromNullablePokemon(source),
             RunEventSource.FromNullablePokemon(source),
             status);
@@ -425,7 +433,7 @@ public class Field
     {
         return RemovePseudoWeather(Battle.Library.Conditions[status]);
     }
-    
+
     public Field Copy()
     {
         throw new NotImplementedException();
