@@ -13,6 +13,14 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
+    /// <summary>
+    /// Gets the event handler info for a given effect and event.
+    /// Handles special Gen 5+ logic where abilities/items use onStart during SwitchIn instead of a separate Start event.
+    /// </summary>
+    /// <param name="target">The target of the event (Pokemon, Side, Field, or Battle)</param>
+    /// <param name="effect">The effect to check for handlers (Ability, Item, Condition, etc.)</param>
+    /// <param name="callbackName">The event to look for handlers for</param>
+    /// <returns>EventHandlerInfo if the effect has a handler for this event, null otherwise</returns>
     private EventHandlerInfo? GetHandlerInfo(RunEventTarget target, IEffect effect,
         EventId callbackName)
     {
@@ -20,6 +28,9 @@ public partial class Battle
 
         // Special case: In Gen 5+, abilities and items trigger onStart during SwitchIn
         // instead of having a separate Start event
+        // This matches the behavior in pokemon-showdown where getCallback has special logic:
+        // callback === undefined && target instanceof Pokemon && this.gen >= 5 && 
+        // callbackName === 'onSwitchIn' && !('Ability' | 'Item').includes(effect.effectType)
         if (handlerInfo is null &&
             target is PokemonRunEventTarget &&
             Gen >= 5 &&
@@ -51,8 +62,20 @@ public partial class Battle
 
     /// <summary>
     /// Finds all event handlers for a given target and event.
-    /// Handles Pokemon arrays, event bubbling between Pokemon/Side, and prefixed event variants.
+    /// Implements the complete event handler discovery system including:
+    /// - Pokemon array handling with per-element indexing
+    /// - Event bubbling from Pokemon up to Side
+    /// - Prefixed event variants (Ally, Foe, Source, Any)
+    /// - Side condition handling for multi-battles
+    /// - Field and Battle-level handlers
+    /// 
+    /// This is the entry point for event handler discovery and corresponds to
+    /// the TypeScript findEventHandlers method in battle.ts.
     /// </summary>
+    /// <param name="target">The primary target of the event</param>
+    /// <param name="eventName">The event to find handlers for</param>
+    /// <param name="source">Optional source Pokemon (triggers Source-prefixed events)</param>
+    /// <returns>List of all event listeners that should be invoked for this event</returns>
     private List<EventListener> FindEventHandlers(RunEventTarget target, EventId eventName,
         Pokemon? source = null)
     {
@@ -183,6 +206,9 @@ public partial class Battle
                 }
 
                 // Handle Side conditions (but not for ally sides in multi battles)
+                // In TypeScript: if (side.n < 2 || !side.allySide)
+                // Since AllySide is not implemented (singles/doubles only), we just check side.N < 2
+                // In full multi-battle implementation, this would prevent duplicate processing of shared side conditions
                 if (side.N < 2)
                 {
                     if (side == targetSide)
@@ -289,7 +315,7 @@ public partial class Battle
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
-        foreach (var (id, volatileState, volatileCondition) in volatiles)
+        foreach ((ConditionId _, EffectState volatileState, Condition volatileCondition) in volatiles)
         {
             handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName);
             if (handlerInfo != null ||
@@ -357,7 +383,7 @@ public partial class Battle
         }
 
         // Check slot conditions (Stealth Rock trap, etc.)
-        foreach (var (conditionId, slotConditionState, slotCondition) in slotConditions)
+        foreach ((ConditionId conditionId, EffectState slotConditionState, Condition slotCondition) in slotConditions)
         {
             handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName);
             if (handlerInfo != null ||
@@ -370,7 +396,7 @@ public partial class Battle
                     State = slotConditionState,
                     End = customHolder == null
                         ? EffectDelegate.FromNullableDelegate(
-                            new Action<Side, Pokemon, ConditionId>((s, p, id) =>
+                            new Action<Side, Pokemon, ConditionId>((s, _, id) =>
                                 s.RemoveSideCondition(id)))
                         : null,
                     EndCallArgs = [side, pokemon, conditionId],
@@ -404,7 +430,7 @@ public partial class Battle
 
         // Check custom event handlers registered in this.Events
         // In TypeScript: if (this.events && (callback = this.events[callbackName]) !== undefined)
-        if (Events?.GetDelegate(callbackName) is { } eventDelegate)
+        if (Events?.GetDelegate(callbackName) is not null)
         {
             // The Events object contains dynamically registered handlers with their priorities
             // These need to be processed differently from the static Format handlers
