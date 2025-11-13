@@ -159,6 +159,8 @@ public partial class Side
         throw new NotImplementedException();
     }
 
+    public override string ToString() => $"{Id}: {Name}";
+
     public SidePlayerPerspective GetPlayerPerspective()
     {
         return new SidePlayerPerspective
