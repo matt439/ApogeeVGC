@@ -14,6 +14,12 @@ public class Simulator : IBattleController
     public IPlayer? Player2 { get; set; }
     public bool PrintDebug { get; set; }
 
+    /// <summary>
+    /// Log of all choices and commands submitted during the battle.
+    /// Useful for replay functionality and debugging.
+    /// </summary>
+    public List<string> InputLog { get; } = [];
+
     // Channels for async coordination
     private Channel<ChoiceResponse>? _choiceResponseChannel;
     private readonly Dictionary<SideId, Task> _pendingChoiceTasks = new();
@@ -116,7 +122,22 @@ public class Simulator : IBattleController
         {
             if (PrintDebug)
             {
-                Console.WriteLine($"Battle error: {ex.Message}");
+                Console.WriteLine($"Battle error: {ex.GetType().Name}: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine(
+                        $"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                }
+
+                Console.WriteLine($"Stack trace (last 10 frames):");
+                var frames = ex.StackTrace?.Split('\n').Take(10);
+                if (frames != null)
+                {
+                    foreach (var frame in frames)
+                    {
+                        Console.WriteLine($"  {frame.Trim()}");
+                    }
+                }
             }
 
             throw;
@@ -186,16 +207,24 @@ public class Simulator : IBattleController
                 Console.WriteLine($"[Simulator.OnChoiceRequested] Received choice for {e.SideId}");
 
                 // If the choice is empty (no actions), use AutoChoose to fill it
-                // AutoChoose modifies Side state only, which is safe from the async task
+                // THREAD SAFETY: AutoChoose is called from async task but is safe because:
+                // 1. It only modifies the Side's Choice object (Side.Choice = new Choice {...})
+                // 2. Each Side has its own Choice object
+                // 3. The Battle loop is blocked waiting for choices (not reading Side state)
+                // 4. No other tasks are modifying this Side's Choice concurrently
                 if (choice.Actions.Count == 0)
                 {
-                    Console.WriteLine($"[Simulator.OnChoiceRequested] Empty choice received for {e.SideId}, using AutoChoose");
+                    Console.WriteLine(
+                        $"[Simulator.OnChoiceRequested] Empty choice received for {e.SideId}, using AutoChoose");
                     Side side = Battle!.Sides.First(s => s.Id == e.SideId);
-                    Console.WriteLine($"[Simulator.OnChoiceRequested] Before AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
+                    Console.WriteLine(
+                        $"[Simulator.OnChoiceRequested] Before AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
                     side.AutoChoose();
-                    Console.WriteLine($"[Simulator.OnChoiceRequested] After AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
+                    Console.WriteLine(
+                        $"[Simulator.OnChoiceRequested] After AutoChoose: Choice.Actions.Count = {side.GetChoice().Actions.Count}");
                     choice = side.GetChoice();
-                    Console.WriteLine($"[Simulator.OnChoiceRequested] Final choice.Actions.Count = {choice.Actions.Count}");
+                    Console.WriteLine(
+                        $"[Simulator.OnChoiceRequested] Final choice.Actions.Count = {choice.Actions.Count}");
                 }
 
                 // Send the choice response directly - let Battle.Choose() handle empty choices
@@ -206,6 +235,9 @@ public class Simulator : IBattleController
                     Choice = choice,
                     Success = true
                 });
+
+                // Log the choice for replay
+                LogChoice(e.SideId, choice);
             }
             catch (OperationCanceledException)
             {
@@ -301,6 +333,9 @@ public class Simulator : IBattleController
                 Console.WriteLine(
                     $"[Simulator.ProcessChoiceResponsesAsync] Processing choice for {response.SideId}");
 
+                // Log the choice for replay purposes
+                LogChoice(response.SideId, response.Choice);
+
                 // Submit the choice to the battle (this will trigger the callback when all choices are done)
                 if (!Battle!.Choose(response.SideId, response.Choice))
                 {
@@ -362,9 +397,19 @@ public class Simulator : IBattleController
 
     private SimulatorResult DetermineTiebreakWinner()
     {
-        // For now, always return Player 1 as winner in tiebreak
-        Console.WriteLine("Tiebreaker applied: Player 1 declared winner by default.");
-        return SimulatorResult.Player1Win;
+        if (PrintDebug)
+        {
+            Console.WriteLine("Executing tiebreaker...");
+        }
+
+        // Use Battle's tiebreak logic which checks:
+        // 1. Remaining Pokemon count
+        // 2. HP percentage
+        // 3. Total HP
+        Battle!.Tiebreak();
+
+        // After tiebreak, check the winner
+        return DetermineWinner();
     }
 
     private IPlayer CreatePlayer(SideId sideId, PlayerOptions options)
@@ -374,7 +419,8 @@ public class Simulator : IBattleController
             Player.PlayerType.Random => new PlayerRandom(sideId, options, this),
             Player.PlayerType.Gui => CreateGuiPlayer(sideId, options),
             Player.PlayerType.Console => new PlayerConsole(sideId, options, this),
-            Player.PlayerType.Mcts => throw new NotImplementedException("MCTS player not implemented yet"),
+            Player.PlayerType.Mcts => throw new NotImplementedException(
+                "MCTS player not implemented yet"),
             _ => throw new ArgumentOutOfRangeException($"Unknown player type: {options.Type}"),
         };
     }
@@ -395,6 +441,115 @@ public class Simulator : IBattleController
                          throw new InvalidOperationException("Player 2 is not initialized"),
             _ => throw new ArgumentOutOfRangeException(nameof(sideId), $"Invalid SideId: {sideId}"),
         };
+    }
+
+    // Force win/lose/tie methods for testing purposes
+
+    /// <summary>
+    /// Forces the specified side to win the battle.
+    /// Useful for testing and debugging scenarios.
+    /// </summary>
+    public void ForceWin(SideId sideId)
+    {
+        if (Battle == null)
+        {
+            throw new InvalidOperationException("Battle is not initialized");
+        }
+
+        Side side = Battle.Sides.First(s => s.Id == sideId);
+        Battle.Win(side);
+        InputLog.Add($">forcewin {sideId.ToString().ToLower()}");
+    }
+
+    /// <summary>
+    /// Forces a tie in the battle.
+    /// Useful for testing and debugging scenarios.
+    /// </summary>
+    public void ForceTie()
+    {
+        if (Battle == null)
+        {
+            throw new InvalidOperationException("Battle is not initialized");
+        }
+
+        Battle.Tie();
+        InputLog.Add(">forcetie");
+    }
+
+    /// <summary>
+    /// Forces the specified side to lose the battle.
+    /// Useful for testing and debugging scenarios.
+    /// </summary>
+    public void ForceLose(SideId sideId)
+    {
+        if (Battle == null)
+        {
+            throw new InvalidOperationException("Battle is not initialized");
+        }
+
+        Side side = Battle.Sides.First(s => s.Id == sideId);
+        Battle.Lose(side);
+        InputLog.Add($">forcelose {sideId.ToString().ToLower()}");
+    }
+
+    /// <summary>
+    /// Exports the battle replay as a string.
+    /// Includes battle initialization and all choices made during the battle.
+    /// </summary>
+    /// <returns>String representation of the battle replay</returns>
+    public string ExportReplay()
+    {
+        if (Battle == null)
+        {
+            throw new InvalidOperationException("Battle is not initialized");
+        }
+
+        var sb = new System.Text.StringBuilder();
+
+        // Add start command with options (simplified)
+        sb.AppendLine($">start {{\"formatid\":\"{Battle.Format.FormatId}\"}}");
+
+        // Add PRNG seed
+        sb.AppendLine($">reseed {Battle.PrngSeed}");
+
+        // Add all logged choices and commands
+        foreach (var log in InputLog)
+        {
+            sb.AppendLine(log);
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Logs a choice made by a player for replay purposes.
+    /// </summary>
+    private void LogChoice(SideId sideId, Choice choice)
+    {
+        // Format choice as battle-stream protocol
+        string choiceStr = FormatChoiceForLog(choice);
+        InputLog.Add($">{sideId.ToString().ToLower()} {choiceStr}");
+    }
+
+    /// <summary>
+    /// Formats a choice object as a string for logging.
+    /// </summary>
+    private string FormatChoiceForLog(Choice choice)
+    {
+        // Simple implementation - can be enhanced based on choice type
+        if (choice.Actions.Count == 0)
+        {
+            return "pass";
+        }
+
+        var parts = new List<string>();
+        foreach (var action in choice.Actions)
+        {
+            // Format each action - this is a simplified version
+            parts.Add(action.ToString() ?? "default");
+        }
+
+        return string.Join(",", parts);
     }
 }
 
