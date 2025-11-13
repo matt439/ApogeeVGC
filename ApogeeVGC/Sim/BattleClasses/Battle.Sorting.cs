@@ -87,18 +87,18 @@ public partial class Battle
     public EventListener ResolvePriority(EventListenerWithoutPriority h, EventId callbackName)
     {
         // Extract metadata from EventHandlerInfo if available
-        IntFalseUnion? order = null;
-        int? priority = null;
-        int? subOrder = null;
+        IntFalseUnion order = IntFalseUnion.FromFalse();
+        int priority = 0;
+        int subOrder = 0;
 
         if (h.HandlerInfo != null)
         {
             // Use metadata from EventHandlerInfo (preferred, strongly-typed)
-            priority = h.HandlerInfo.Priority;
+            priority = h.HandlerInfo.Priority ?? 0;
             order = h.HandlerInfo.Order.HasValue
                 ? IntFalseUnion.FromInt(h.HandlerInfo.Order.Value)
-                : null;
-            subOrder = h.HandlerInfo.SubOrder;
+                : IntFalseUnion.FromFalse();
+            subOrder = h.HandlerInfo.SubOrder ?? 0;
         }
 
         // Calculate default subOrder if not set
@@ -108,10 +108,12 @@ public partial class Battle
         }
 
         // Determine if this event uses effect order for sorting
+        // Effect order is used for SwitchIn and RedirectTarget events
         bool usesEffectOrder = callbackName is
             EventId.SwitchIn or
+            EventId.AnySwitchIn or
             EventId.RedirectTarget or
-            EventId.Start;
+            EventId.FoeRedirectTarget;
 
         // Determine effectOrder based on event type
         int effectOrder = usesEffectOrder
@@ -151,8 +153,11 @@ public partial class Battle
             }
 
             // Apply fractional speed adjustment for switch-in events
-            // Check if event name ends with "SwitchIn"
-            bool usesFractionalSpeed = callbackName.ToString().EndsWith("SwitchIn");
+            // Check if event is a SwitchIn event
+            bool usesFractionalSpeed = callbackName is
+                EventId.SwitchIn or
+                EventId.AnySwitchIn;
+
             if (usesFractionalSpeed)
             {
                 int fieldPositionValue = pokemon.Side.N * Sides.Count + pokemon.Position;
@@ -170,10 +175,10 @@ public partial class Battle
             End = h.End,
             EndCallArgs = h.EndCallArgs,
             EffectHolder = h.EffectHolder,
-            Order = order ?? IntFalseUnion.FromFalse(),
-            Priority = priority ?? 0,
+            Order = order,
+            Priority = priority,
             Speed = speed,
-            SubOrder = subOrder ?? 0,
+            SubOrder = subOrder,
             EffectOrder = effectOrder,
         };
     }
