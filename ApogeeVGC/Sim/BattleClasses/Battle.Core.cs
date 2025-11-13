@@ -18,18 +18,25 @@ public partial class Battle
     public Format Format { get; init; }
     public EffectState FormatData { get; init; }
     public GameType GameType { get; init; }
+
+    /// <summary>
+    /// The number of active pokemon per half-field.
+    /// Currently restricted to singles (1) and Doubles (2). Triples (3) are not supported.
+    /// </summary>
     public int ActivePerHalf
     {
         get;
         init
         {
-            if (value is not 1)
+            if (value is < 1 or > 2)
             {
-                throw new ArgumentOutOfRangeException(nameof(ActivePerHalf), "ActivePerHalf must be 1.");
+                throw new ArgumentOutOfRangeException(nameof(ActivePerHalf),
+                    "ActivePerHalf must be 1 (singles) or 2 (doubles).");
             }
             field = value;
         }
     }
+
     public Field Field { get; init; }
 
     public List<Side> Sides
@@ -39,14 +46,23 @@ public partial class Battle
         {
             if (value.Count != 2)
             {
-                throw new ArgumentException("There must be exactly 2 sides in a battle.", nameof(Sides));
+                throw new ArgumentException("There must be exactly 2 sides in a battle.",
+                    nameof(Sides));
             }
+
             field = value;
         }
     }
+
     public PrngSeed PrngSeed { get; init; }
     public ModdedDex Dex { get; set; }
+
+    /// <summary>
+    /// Generation number - hardcoded to 9 as this implementation only supports Gen 9 mechanics.
+    /// Earlier generations (1-8) have significantly different mechanics and are not supported.
+    /// </summary>
     public int Gen => 9;
+
     public RuleTable RuleTable { get; set; }
 
     public Prng Prng { get; set; }
@@ -61,7 +77,12 @@ public partial class Battle
 
     public List<string> Log { get; set; } = [];
     public List<string> InputLog { get; set; } = [];
+
+    // Note: MessageLog is commented out as it's not currently used in this implementation.
+    // It was part of the original Pokemon Showdown codebase but isn't required for our battle system.
+    // Uncomment if you need separate message logging for debugging or replay purposes.
     //public List<string> MessageLog { get; set; } = [];
+
     public List<BattleMessage> PendingMessages { get; set; } = [];
     public int SentLogPos { get; set; }
     public bool SentEnd { get; set; }
@@ -93,8 +114,9 @@ public partial class Battle
     public bool QuickClawRoll { get; set; }
     public List<int> SpeedOrder { get; set; } = [];
 
-    // TeamGenerator
-    // Hints
+    // Note: TeamGenerator is not implemented as we only support constructed teams, not random battles.
+    // Random battle team generation would require implementing the full Pokemon Showdown team generator.
+    // TeamGenerator teamGenerator = null;
 
     public static Undefined NotFail => new();
     public static int HitSubstitute => 0;
@@ -108,7 +130,7 @@ public partial class Battle
     public Side P1 => Sides[0];
     public Side P2 => Sides[1];
     private HashSet<string> Hints { get; } = [];
-    
+
     /// <summary>
     /// Battle history for debugging and analysis.
     /// </summary>
@@ -126,7 +148,7 @@ public partial class Battle
         DisplayUi = true; // Always display UI for battle streams
         FormatData = InitEffectState(Format.FormatId);
         GameType = Format.GameType;
-        
+
         // Create sides with temporary Foe references (will be set properly below)
         var side1 = new Side(options.Player1Options.Name, this, SideId.P1,
             options.Player1Options.Team.ToArray());
@@ -137,9 +159,9 @@ public partial class Battle
         // Set up bidirectional Foe relationships
         side1.Foe = side2;
         side2.Foe = side1;
-        
+
         Sides = [side1, side2];
-        
+
         ActivePerHalf = 1;
         Prng = new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
@@ -161,13 +183,14 @@ public partial class Battle
             SpeedOrder.Add(i);
         }
 
-        // TeamGenerator
-        // Hints
-
         Send = options.Send ?? ((_, _) => { });
 
-        Console.WriteLine("Battle constructor complete.");
+        if (DebugMode)
+        {
+            Console.WriteLine("Battle constructor complete.");
+        }
     }
+
     public int Random(int m, int n)
     {
         return Prng.Random(m, n);
@@ -210,7 +233,8 @@ public partial class Battle
     /// - Effects on active Pokemon/entities get auto-incremented order
     /// - Effects on inactive targets get order 0
     /// </summary>
-    public EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null, Pokemon? target = null)
+    public EffectState InitEffectState(EffectStateId? id = null, int? effectOrder = null,
+        Pokemon? target = null)
     {
         // Create new EffectState with the provided or default ID
         EffectStateId effectId = id ?? EffectStateId.FromEmpty();
@@ -246,7 +270,8 @@ public partial class Battle
         };
     }
 
-    public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot, int? duration)
+    public EffectState InitEffectState(EffectStateId id, Pokemon? source, PokemonSlot? sourceSlot,
+        int? duration)
     {
         // Use the first overload to handle basic initialization and effect ordering
         // Pass the source Pokemon as the target for effect ordering purposes
@@ -260,7 +285,8 @@ public partial class Battle
         return state;
     }
 
-    public EffectState InitEffectState(EffectStateId id, Side target, Pokemon source, PokemonSlot sourceSlot,
+    public EffectState InitEffectState(EffectStateId id, Side target, Pokemon source,
+        PokemonSlot sourceSlot,
         bool isSlotCondition, int? duration)
     {
         // Use the first overload to handle basic initialization and effect ordering
