@@ -35,9 +35,7 @@ public partial class Battle
         if (RequestState == RequestState.TeamPreview)
         {
             Console.WriteLine("[RunPickTeam] Team preview already set up by handler, returning");
-            // Request was already set up, now emit it to players
-            RequestPlayerChoices();
-            Console.WriteLine("[RunPickTeam] Choice requests emitted, returning");
+            // Request was already set up - Simulator will call RequestPlayerChoices() after Start() returns
             return;
         }
 
@@ -52,9 +50,7 @@ public partial class Battle
             MakeRequest(RequestState.TeamPreview);
             Console.WriteLine($"[RunPickTeam] After MakeRequest, RequestState = {RequestState}");
 
-            // Now emit the request to players
-            RequestPlayerChoices();
-            Console.WriteLine("[RunPickTeam] Choice requests emitted");
+            // Simulator will call RequestPlayerChoices() after Start() returns
         }
 
         Console.WriteLine("[RunPickTeam] COMPLETED");

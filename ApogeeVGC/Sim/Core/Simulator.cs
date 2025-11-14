@@ -159,7 +159,8 @@ public class Simulator : IBattleController
     }
 
     /// <summary>
-    /// Runs the synchronous battle loop, waiting for async choices when needed.
+    /// Runs the asynchronous battle loop.
+/// Checks for pending requests after Battle.Start() and emits them.
     /// </summary>
     private void RunBattleLoop()
     {
@@ -167,11 +168,19 @@ public class Simulator : IBattleController
         {
             Console.WriteLine("[Simulator.RunBattleLoop] Starting battle");
 
-            // Start the battle - this is synchronous and will call RequestPlayerChoices when needed
+            // Start the battle - this will set up team preview or initial turn
             Battle!.Start();
 
             Console.WriteLine(
-                "[Simulator.RunBattleLoop] Battle.Start() returned - battle should be complete");
+                $"[Simulator.RunBattleLoop] Battle.Start() returned, RequestState: {Battle.RequestState}");
+
+            // After Start() returns, check if there's a pending request and emit it
+            // This handles team preview or initial switch-in requests
+            if (Battle.RequestState != RequestState.None && !Battle.Ended)
+            {
+                Console.WriteLine($"[Simulator.RunBattleLoop] Emitting initial request: {Battle.RequestState}");
+                Battle.RequestPlayerChoices();
+            }
         }
         catch (Exception ex)
         {
@@ -347,6 +356,18 @@ public class Simulator : IBattleController
                 lock (_pendingChoiceTasks)
                 {
                     _pendingChoiceTasks.Remove(response.SideId);
+                }
+
+                // After processing a choice, check if there are new pending requests
+                // This handles the case where CommitChoices -> TurnLoop -> MakeRequest was called
+                // We need to emit those requests here to avoid stack overflow from recursive calls
+                if (Battle.RequestState != RequestState.None && !Battle.Ended)
+                {
+                    Console.WriteLine(
+                        $"[Simulator.ProcessChoiceResponsesAsync] New request pending: {Battle.RequestState}");
+
+                    // Emit the new requests
+                    Battle.RequestPlayerChoices();
                 }
             }
         }

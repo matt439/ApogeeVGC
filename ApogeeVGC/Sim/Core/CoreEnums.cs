@@ -28,6 +28,7 @@ public enum DriverMode
     GuiVsRandomSingles,
     GuiVsRandomDoubles,
     RandomVsRandomSingles,
+    AsyncRandomVsRandomSingles,
 }
 
 public enum PlayerUiType
