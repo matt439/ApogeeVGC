@@ -8,40 +8,89 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnModifySpD event.
 /// Modifies the Special Defense stat.
-/// Signature: (Battle battle, int relayVar, Pokemon target, Pokemon source, ActiveMove move) => DoubleVoidUnion
+/// 
+/// Supports two handler patterns:
+/// 1. Legacy strongly-typed: (Battle, int, Pokemon, Pokemon, ActiveMove) => DoubleVoidUnion
+/// 2. Context-based: (EventContext) => RelayVar?
 /// </summary>
 public sealed record OnModifySpDEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnModifySpD event handler.
+ /// Creates a new OnModifySpD event handler using the legacy strongly-typed pattern.
     /// </summary>
     /// <param name="handler">The event handler delegate</param>
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnModifySpDEventInfo(
-   Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+  Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+  bool usesSpeed = true)
+    {
+        Id = EventId.ModifySpD;
+        Handler = handler;
+        Priority = priority;
+ UsesSpeed = usesSpeed;
+        ExpectedParameterTypes =
+  [
+  typeof(Battle),
+         typeof(int),
+   typeof(Pokemon),
+   typeof(Pokemon),
+ typeof(ActiveMove),
+        ];
+  ExpectedReturnType = typeof(DoubleVoidUnion);
+      
+        // Nullability: All parameters non-nullable by default (adjust as needed)
+   ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false;
+    
+        // Validate configuration
+   ValidateConfiguration();
+    }
+
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, RelayVar (int value), TargetPokemon, SourcePokemon, Move
+    /// </summary>
+    public OnModifySpDEventInfo(
+   EventHandlerDelegate contextHandler,
         int? priority = null,
         bool usesSpeed = true)
     {
-Id = EventId.ModifySpD;
-        Handler = handler;
+     Id = EventId.ModifySpD;
+        ContextHandler = contextHandler;
      Priority = priority;
-        UsesSpeed = usesSpeed;
-      ExpectedParameterTypes =
-  [
-typeof(Battle),
-    typeof(int),
-      typeof(Pokemon),
-    typeof(Pokemon),
-     typeof(ActiveMove),
-        ];
- ExpectedReturnType = typeof(DoubleVoidUnion);
-        
-    // Nullability: All parameters non-nullable by default (adjust as needed)
-        ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
-    
-    // Validate configuration
-        ValidateConfiguration();
+     UsesSpeed = usesSpeed;
     }
+    
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// Best of both worlds: strongly-typed parameters + context performance.
+    /// </summary>
+    public static OnModifySpDEventInfo Create(
+ Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+    int? priority = null,
+bool usesSpeed = true)
+    {
+ return new OnModifySpDEventInfo(
+   context =>
+{
+  var result = handler(
+   context.Battle,
+   context.GetRelayVar<IntRelayVar>().Value,
+ context.GetTargetPokemon(),
+       context.GetSourcePokemon(),
+   context.GetMove()
+ );
+     return result switch
+       {
+    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+       VoidDoubleVoidUnion => null,
+  _ => null
+       };
+ },
+            priority,
+usesSpeed
+    );
+ }
 }

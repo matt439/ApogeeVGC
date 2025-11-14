@@ -7,28 +7,78 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnAnyModifyDamage event.
-/// Signature: Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion>
+/// 
+/// Supports two handler patterns:
+/// 1. Legacy strongly-typed: (Battle, int, Pokemon, Pokemon, ActiveMove) => DoubleVoidUnion
+/// 2. Context-based: (EventContext) => RelayVar?
 /// </summary>
 public sealed record OnAnyModifyDamageEventInfo : EventHandlerInfo
 {
     public OnAnyModifyDamageEventInfo(
         Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
-int? priority = null,
-bool usesSpeed = true)
+        int? priority = null,
+        bool usesSpeed = true)
     {
         Id = EventId.ModifyDamage;
-Prefix = EventPrefix.Any;
+        Prefix = EventPrefix.Any;
         Handler = handler;
-Priority = priority;
+        Priority = priority;
         UsesSpeed = usesSpeed;
-      ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
+        ExpectedParameterTypes = [typeof(Battle), typeof(int), typeof(Pokemon), typeof(Pokemon), typeof(ActiveMove)];
         ExpectedReturnType = typeof(DoubleVoidUnion);
         
-    // Nullability: All parameters non-nullable by default (adjust as needed)
+        // Nullability: All parameters non-nullable by default (adjust as needed)
         ParameterNullability = [false, false, false, false, false];
         ReturnTypeNullable = false;
     
-    // Validate configuration
+        // Validate configuration
         ValidateConfiguration();
+    }
+    
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, RelayVar (int damage), SourcePokemon, TargetPokemon, Move
+    /// </summary>
+    public OnAnyModifyDamageEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
+    {
+        Id = EventId.ModifyDamage;
+        Prefix = EventPrefix.Any;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
+    }
+    
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+    /// Best of both worlds: strongly-typed parameters + context performance.
+    /// </summary>
+    public static OnAnyModifyDamageEventInfo Create(
+      Func<Battle, int, Pokemon, Pokemon, ActiveMove, DoubleVoidUnion> handler,
+        int? priority = null,
+ bool usesSpeed = true)
+  {
+   return new OnAnyModifyDamageEventInfo(
+context =>
+     {
+   var result = handler(
+      context.Battle,
+     context.GetRelayVar<IntRelayVar>().Value,
+     context.GetSourcePokemon(),
+       context.GetTargetPokemon(),
+   context.GetMove()
+   );
+     return result switch
+  {
+        DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+ VoidDoubleVoidUnion => null,
+       _ => null
+  };
+  },
+  priority,
+ usesSpeed
+   );
     }
 }
