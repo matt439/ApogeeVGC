@@ -13,21 +13,8 @@ public partial class Battle
     private void UpdateAllPlayersUi(
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
-        // Temporary debug: show what we're parsing
-      Console.WriteLine($"\n[UpdateAllPlayersUi] Parsing Log[{SentLogPos}..{Log.Count}):");
-        for (int i = SentLogPos; i < Log.Count; i++)
-        {
- Console.WriteLine($"  Log[{i}]: {Log[i]}");
-     }
-
         // Parse new log entries once
-  var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
-        
-        Console.WriteLine($"[UpdateAllPlayersUi] Parsed {parsedMessages.Count} messages:");
- foreach (var msg in parsedMessages)
-        {
-          Console.WriteLine($"  - {msg.ToDisplayText()}");
-        }
+        var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
 
         // Send the same messages to all players (each with their own perspective)
         foreach (Side side in Sides)
