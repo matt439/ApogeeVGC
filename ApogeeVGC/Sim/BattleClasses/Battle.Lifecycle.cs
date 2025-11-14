@@ -81,18 +81,20 @@ public partial class Battle
             CheckEvBalance();
         }
 
+        // Add start action to queue BEFORE team preview
+        // This ensures it's preserved when CommitChoices processes team preview actions
+        // In synchronous mode, RequestPlayerChoices triggers immediate processing,
+        // so the StartGameAction must be in the queue before RunPickTeam is called
+        Console.WriteLine("[Battle.Start] Adding StartGameAction to queue");
+        Queue.InsertChoice(new StartGameAction());
+        Console.WriteLine($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
+
         // Run team preview/selection phase
-        Console.WriteLine(
-            $"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
+        Console.WriteLine($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
 
         RunPickTeam();
 
         Console.WriteLine($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
-
-        // Add start action to queue
-        Queue.InsertChoice(new StartGameAction());
-
-        Console.WriteLine($"[Battle.Start] Added StartGameAction, queue size = {Queue.List.Count}");
 
         // Set mid-turn flag
         MidTurn = true;
@@ -318,7 +320,8 @@ public partial class Battle
         MakeRequest(RequestState.Move);
 
         // Return immediately - Battle doesn't wait for choices
-        // Simulator will call Choose() -> CommitChoices() -> TurnLoop() to continue
+        // The caller (CommitChoices or Start) will call RequestPlayerChoices after TurnLoop returns
+        // This avoids infinite recursion in synchronous mode
     }
 
     /// <summary>

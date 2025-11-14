@@ -9,6 +9,6 @@ public class Program
     {
         var driver = new Driver();
         driver.Start(DriverMode.RandomVsRandomSingles);
-        Console.ReadLine();
+        //Console.ReadLine();
     }
 }

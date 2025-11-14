@@ -237,7 +237,7 @@ public partial class Battle
         // Check if this parameter is actually expecting a RelayVar type
         // Only pass relayVar if the parameter type is RelayVar or a derived type
         // Also check for common relayVar types like int, decimal, etc.
-        if (hasRelayVar && (paramType.IsAssignableFrom(relayVar.GetType()) ||
+        if (hasRelayVar && (paramType.IsInstanceOfType(relayVar) ||
                             IsRelayVarCompatibleType(paramType, relayVar)))
         {
             return ExtractValueFromRelayVar(relayVar, paramType);

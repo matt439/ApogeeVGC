@@ -51,8 +51,37 @@ public class SyncSimulator : IBattleController
 
         try
         {
-            // Start the battle - this is completely synchronous
+            // Start the battle - this will set up team preview
             Battle.Start();
+
+            // Main battle loop - keep processing until battle ends
+            while (!Battle.Ended)
+            {
+                // Check if there are pending requests
+                if (Battle.RequestState != RequestState.None)
+                {
+                    if (PrintDebug)
+                    {
+                        Console.WriteLine($"[SyncSimulator] Pending request: {Battle.RequestState}");
+                    }
+
+                    // Emit request events to get choices from players
+                    Battle.RequestPlayerChoices();
+
+                    // Note: OnChoiceRequested will be called synchronously for each player
+                    // which will call Choose() and potentially trigger CommitChoices() -> TurnLoop()
+                    // After all choices are processed, RequestState should be None or battle should end
+                }
+                else
+                {
+                    // No pending request and battle hasn't ended - this shouldn't happen
+                    if (PrintDebug)
+                    {
+                        Console.WriteLine("[SyncSimulator] WARNING: No pending request but battle not ended!");
+                    }
+                    break;
+                }
+            }
 
             if (PrintDebug)
             {

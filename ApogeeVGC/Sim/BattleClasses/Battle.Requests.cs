@@ -13,6 +13,8 @@ public partial class Battle
 
     public void MakeRequest(RequestState? type = null)
     {
+        Console.WriteLine($"[MakeRequest] ENTRY: queue size = {Queue.List.Count}, type = {type}");
+
         if (DebugMode)
         {
             Debug($"MakeRequest called with type={type}, current RequestState={RequestState}");
@@ -134,6 +136,8 @@ public partial class Battle
         {
             throw new InvalidOperationException("Choices are done immediately after a request");
         }
+
+        Console.WriteLine($"[MakeRequest] EXIT: queue size = {Queue.List.Count}");
     }
 
     /// <summary>
@@ -380,6 +384,16 @@ public partial class Battle
             Debug("CommitChoices starting");
         }
 
+        Console.WriteLine($"[CommitChoices] Starting, queue size = {Queue.List.Count}");
+        if (Queue.List.Count > 0)
+        {
+            Console.WriteLine($"[CommitChoices] Current queue:");
+            for (int i = 0; i < Queue.List.Count; i++)
+            {
+                Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+            }
+        }
+
         UpdateSpeed();
 
         // Reset consecutive request counter when choices are successfully committed
@@ -390,7 +404,10 @@ public partial class Battle
         // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
         var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+        Console.WriteLine($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
+
         Queue.Clear();
+        Console.WriteLine($"[CommitChoices] Cleared queue");
 
         if (!AllChoicesDone())
         {
@@ -421,13 +438,27 @@ public partial class Battle
             Debug($"Added {Queue.List.Count} actions to queue");
         }
 
+        Console.WriteLine($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
+
         ClearRequest();
 
         // Sort the new actions by priority/speed
         Queue.Sort();
 
-// Append the old queue actions after the new ones
+        Console.WriteLine($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
+
+        // Append the old queue actions after the new ones
         Queue.List.AddRange(oldQueue);
+
+        Console.WriteLine($"[CommitChoices] After restoring oldQueue, queue size = {Queue.List.Count}");
+        if (Queue.List.Count > 0)
+        {
+            Console.WriteLine($"[CommitChoices] Final queue:");
+            for (int i = 0; i < Math.Min(20, Queue.List.Count); i++)
+            {
+                Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+            }
+        }
 
         if (DebugMode)
         {
@@ -453,6 +484,10 @@ public partial class Battle
         {
             Debug("TurnLoop returned");
         }
+
+        // In synchronous mode, do NOT call RequestPlayerChoices here
+        // This would cause infinite recursion since the simulator handles requests synchronously
+        // Instead, return and let the caller (simulator) check for pending requests
 
         // Check if battle ended during TurnLoop
         if (Ended)
@@ -552,7 +587,7 @@ public partial class Battle
             }
         }
 
-// Clear the current choice
+        // Clear the current choice
         side.ClearChoice();
 
         // If we updated any move availability, send the updated request to the client
