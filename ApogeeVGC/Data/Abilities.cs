@@ -100,7 +100,8 @@ public record Abilities
                         if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                             return new VoidReturn();
                         battle.Debug("Hadron Engine boost");
-                        return battle.ChainModify([5461, 4096]);
+                        battle.ChainModify([5461, 4096]);
+                        return new VoidReturn();
                     },
                     5),
             },
@@ -115,7 +116,8 @@ public record Abilities
                     {
                         if (pokemon.Status is not ConditionId.None)
                         {
-                            return battle.ChainModify(1.5);
+                            battle.ChainModify(1.5);
+                            return new VoidReturn();
                         }
 
                         return new VoidReturn();

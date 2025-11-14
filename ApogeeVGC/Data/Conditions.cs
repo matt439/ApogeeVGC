@@ -1059,6 +1059,10 @@ public record Conditions
                     return new VoidReturn();
                 }),
             },
+            [ConditionId.StruggleRecoil] = new()
+            {
+                Id = ConditionId.StruggleRecoil,
+            },
         };
     }
 }

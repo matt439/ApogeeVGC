@@ -181,7 +181,8 @@ public record Moves
                         battle.Debug("electro drift super effective buff");
                     }
 
-                    return battle.ChainModify([5461, 4096]);
+                    battle.ChainModify([5461, 4096]);
+                    return new VoidReturn();
                 }),
                 Secondary = null,
                 Target = MoveTarget.Normal,
@@ -230,7 +231,8 @@ public record Moves
                     if (pokemon.Status is not ConditionId.None &&
                         pokemon.Status != ConditionId.Sleep)
                     {
-                        return battle.ChainModify(2);
+                        battle.ChainModify(2);
+                        return new VoidReturn();
                     }
 
                     return new VoidReturn();
