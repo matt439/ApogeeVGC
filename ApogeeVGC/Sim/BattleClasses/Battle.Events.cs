@@ -945,15 +945,67 @@ public partial class Battle
             return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
         }
 
-        // Get the delegate from the handler
+        // Build the invocation context
+        var invocationContext = new EventInvocationContext
+        {
+            Battle = this,
+            EventId = handlerInfo.Id,
+            Target = target,
+            Source = source,
+            SourceEffect = sourceEffect,
+            RelayVar = relayVar,
+            HasRelayVar = hasRelayVar
+        };
+
+        // Use context-based handler if available
+        if (handlerInfo.UsesContextHandler)
+        {
+            EventContext eventContext = invocationContext.ToEventContext();
+
+            try
+            {
+                return handlerInfo.ContextHandler!(eventContext);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Event {handlerInfo.Id} context handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
+                    ex);
+            }
+        }
+
+        // Fall back to legacy handler
         Delegate? handler = handlerInfo.Handler;
         if (handler == null) return relayVar;
 
-        // Invoke the delegate directly using the known signature from EventHandlerInfo
-        // This avoids DynamicInvoke and provides better performance
-        // Note: Parameter nullability is validated by EventHandlerInfo during creation
-        return InvokeDelegateEffectDelegate(handler, hasRelayVar, relayVar, target, source,
-            sourceEffect);
+        // Validate the handler signature matches the EventHandlerInfo specification
+        try
+        {
+            handlerInfo.Validate();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Add context about where this validation failed
+            throw new InvalidOperationException(
+                $"EventHandlerInfo validation failed for event {handlerInfo.Id} " +
+                $"on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType}): {ex.Message}",
+                ex);
+        }
+
+        // Use adapter to convert legacy handler to context-based
+        EventHandlerDelegate adaptedHandler = EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
+        EventContext context = invocationContext.ToEventContext();
+
+        try
+        {
+            return adaptedHandler(context);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
+                ex);
+        }
     }
 
     /// <summary>

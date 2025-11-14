@@ -7,18 +7,16 @@ namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 /// <summary>
 /// Event handler info for OnResidual event.
 /// Triggered at the end of each turn for residual effects.
-/// Signature: (Battle battle, Pokemon target, Pokemon source, IEffect effect) => void
+/// 
+/// Supports two handler patterns:
+/// 1. Legacy strongly-typed: (Battle, Pokemon, Pokemon, IEffect) => void
+/// 2. Context-based: (EventContext) => RelayVar?
 /// </summary>
 public sealed record OnResidualEventInfo : EventHandlerInfo
 {
     /// <summary>
-    /// Creates a new OnResidual event handler.
+    /// Creates event handler using legacy strongly-typed pattern.
     /// </summary>
-    /// <param name="handler">The event handler delegate</param>
-    /// <param name="priority">Execution priority (higher executes first)</param>
-    /// <param name="order">Execution order (lower executes first)</param>
-    /// <param name="subOrder">Sub-order for fine-grained ordering</param>
-    /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnResidualEventInfo(
         Action<Battle, Pokemon, Pokemon, IEffect> handler,
         int? priority = null,
@@ -47,5 +45,53 @@ public sealed record OnResidualEventInfo : EventHandlerInfo
 
         // Validate configuration
         ValidateConfiguration();
+    }
+    
+    /// <summary>
+    /// Creates event handler using context-based pattern.
+    /// Context provides: Battle, TargetPokemon, SourcePokemon, SourceEffect
+    /// </summary>
+    public OnResidualEventInfo(
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        int? order = null,
+        int? subOrder = null,
+        bool usesSpeed = true)
+    {
+      Id = EventId.Residual;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        Order = order;
+        SubOrder = subOrder;
+        UsesSpeed = usesSpeed;
+    }
+  
+    /// <summary>
+    /// Creates strongly-typed context-based handler.
+ /// Best of both worlds: strongly-typed parameters + context performance.
+    /// </summary>
+    public static OnResidualEventInfo Create(
+   Action<Battle, Pokemon, Pokemon, IEffect> handler,
+ int? priority = null,
+        int? order = null,
+        int? subOrder = null,
+      bool usesSpeed = true)
+    {
+     return new OnResidualEventInfo(
+context =>
+            {
+           handler(
+       context.Battle,
+       context.GetTargetPokemon(),
+context.GetSourcePokemon(),
+      context.GetSourceEffect<IEffect>()
+    );
+       return null; // void return
+         },
+        priority,
+            order,
+            subOrder,
+            usesSpeed
+        );
     }
 }

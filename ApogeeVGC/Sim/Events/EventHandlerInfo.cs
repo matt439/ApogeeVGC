@@ -1,23 +1,44 @@
 using System.Reflection;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events;
+
+/// <summary>
+/// Unified delegate type for all context-based event handlers.
+/// Handlers receive an EventContext and return a RelayVar (or null).
+/// </summary>
+public delegate RelayVar? EventHandlerDelegate(EventContext context);
 
 /// <summary>
 /// Abstract base class for event handler information.
 /// Each concrete event type (OnDamagingHit, OnBasePower, etc.) should inherit from this
 /// to provide compile-time type safety and consistent metadata across all effect types.
+/// 
+/// Supports both legacy delegate handlers and new context-based handlers.
 /// </summary>
 public abstract record EventHandlerInfo
 {
     /// <summary>
-    /// The unique identifier for this event
+  /// The unique identifier for this event
     /// </summary>
     public EventId Id { get; init; }
 
     /// <summary>
-    /// The actual delegate handler for this event (can be null if not implemented)
+    /// The actual delegate handler for this event (can be null if not implemented).
+    /// This is the legacy delegate that takes specific parameters.
     /// </summary>
     public Delegate? Handler { get; init; }
+    
+    /// <summary>
+    /// The context-based handler (can be null if using legacy Handler).
+    /// This is the new, simplified handler that takes EventContext.
+    /// </summary>
+    public EventHandlerDelegate? ContextHandler { get; init; }
+    
+    /// <summary>
+    /// True if this handler uses the new context-based approach.
+    /// </summary>
+    public bool UsesContextHandler => ContextHandler != null;
 
     // Metadata from EventIdInfo
 
