@@ -255,7 +255,7 @@ public partial class Side
     public SideBoolUnion ChooseSwitch(PokemonIntUnion? slotText = null)
     {
         // Step 1: Validate request state
-        if (RequestState != RequestState.Move && RequestState != RequestState.Switch)
+        if (RequestState != RequestState.Move && RequestState != RequestState.Switch && RequestState != RequestState.SwitchIn)
         {
             return EmitChoiceError($"Can't switch: You need a {RequestState} response");
         }
@@ -264,13 +264,13 @@ public partial class Side
         int index = GetChoiceIndex();
         if (index >= Active.Count)
         {
-            if (RequestState == RequestState.Switch)
+            if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
             {
                 return EmitChoiceError(
-                    "Can't switch: You sent more switches than Pokémon that need to switch");
-            }
+ "Can't switch: You sent more switches than Pokémon that need to switch");
+    }
 
-            return EmitChoiceError("Can't switch: You sent more choices than unfainted Pokémon");
+        return EmitChoiceError("Can't switch: You sent more choices than unfainted Pokémon");
         }
 
         // Step 3: Get the currently active pokemon
@@ -281,7 +281,7 @@ public partial class Side
         if (slotText == null)
         {
             // Auto-select mode
-            if (RequestState != RequestState.Switch)
+            if (RequestState != RequestState.Switch && RequestState != RequestState.SwitchIn)
             {
                 return EmitChoiceError("Can't switch: You need to select a Pokémon to switch in");
             }
@@ -416,7 +416,7 @@ public partial class Side
                 Choice.CantUndo = true;
             }
         }
-        else if (RequestState == RequestState.Switch)
+        else if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
         {
             // Step 10: Handle forced switches
             if (Choice.ForcedSwitchesLeft <= 0)
@@ -430,9 +430,9 @@ public partial class Side
         // Step 11: Record the switch
         Choice.SwitchIns.Add(slot);
 
-        ChoiceType choiceType = RequestState == RequestState.Switch
-            ? ChoiceType.InstaSwitch
-            : ChoiceType.Switch;
+        ChoiceType choiceType = (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
+      ? ChoiceType.InstaSwitch
+         : ChoiceType.Switch;
 
         Choice.Actions =
         [
@@ -448,7 +448,7 @@ public partial class Side
         return true;
     }
 
-    public bool ChooseTeam(string data = "")
+    public bool ChooseTeam(String data = "")
     {
         // Step 1: Validate request state
         if (RequestState != RequestState.TeamPreview)
@@ -459,7 +459,7 @@ public partial class Side
 
         // Step 2: Parse positions from input
         List<int> positions;
-        if (string.IsNullOrWhiteSpace(data))
+        if (String.IsNullOrWhiteSpace(data))
         {
             positions = [];
         }
@@ -553,21 +553,21 @@ public partial class Side
         int forcedPasses = 0;
 
         // Calculate forced switches if we're in switch request state
-        if (Battle.RequestState == RequestState.Switch)
+        if (Battle.RequestState == RequestState.Switch || Battle.RequestState == RequestState.SwitchIn)
         {
-            // Count active Pokemon that need to switch out
-            int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
+        // Count active Pokemon that need to switch out
+     int canSwitchOut = Active.Count(pokemon => pokemon?.SwitchFlag.IsTrue() == true);
 
             // Count bench Pokemon available to switch in (not active, not fainted)
-            int canSwitchIn = Pokemon
-                .Skip(Active.Count) // Skip active slots
-                .Count(pokemon => pokemon is { Fainted: false });
+          int canSwitchIn = Pokemon
+.Skip(Active.Count) // Skip active slots
+         .Count(pokemon => pokemon is { Fainted: false });
 
             // Can only force as many switches as we have Pokemon to switch in
             forcedSwitches = Math.Min(canSwitchOut, canSwitchIn);
 
-            // Any switches we can't fulfill become forced passes
-            forcedPasses = canSwitchOut - forcedSwitches;
+  // Any switches we can't fulfill become forced passes
+   forcedPasses = canSwitchOut - forcedSwitches;
         }
 
         // Reset choice to default state
@@ -797,37 +797,38 @@ public partial class Side
     {
         int index = Choice.Actions.Count;
 
-        if (!isPass)
-        {
-            switch (RequestState)
-            {
+   if (!isPass)
+   {
+    switch (RequestState)
+      {
                 case RequestState.Move:
-                    // auto-pass
-                    while (
-                        index < Active.Count &&
-                        Active[index] != null &&
-                        (Active[index]!.Fainted ||
-                         Active[index]!.Volatiles.ContainsKey(ConditionId.Commanding))
-                    )
-                    {
-                        ChoosePass();
-                        index++;
-                    }
+    // auto-pass
+        while (
+             index < Active.Count &&
+  Active[index] != null &&
+            (Active[index]!.Fainted ||
+        Active[index]!.Volatiles.ContainsKey(ConditionId.Commanding))
+         )
+      {
+       ChoosePass();
+      index++;
+ }
 
-                    break;
-                case RequestState.Switch:
-                    while (index < Active.Count && Active[index] != null &&
-                           !Active[index]!.SwitchFlag.IsTrue())
-                    {
-                        ChoosePass();
-                        index++;
-                    }
+       break;
+        case RequestState.Switch:
+         case RequestState.SwitchIn:
+        while (index < Active.Count && Active[index] != null &&
+     !Active[index]!.SwitchFlag.IsTrue())
+    {
+            ChoosePass();
+  index++;
+       }
 
-                    break;
+         break;
             }
         }
 
-        return index;
+     return index;
     }
 
     public SideBoolUnion ChoosePass()
@@ -837,21 +838,22 @@ public partial class Side
         Pokemon pokemon = GetActiveAt(index);
 
         switch (RequestState)
-        {
+   {
             case RequestState.Switch:
-                if (pokemon.SwitchFlag.IsTrue())
-                {
-                    // This condition will always happen if called by Battle#choose()
-                    if (Choice.ForcedPassesLeft <= 0)
-                    {
-                        return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
-                                               $"replace {pokemon.Name}");
-                    }
+    case RequestState.SwitchIn:
+  if (pokemon.SwitchFlag.IsTrue())
+         {
+  // This condition will always happen if called by Battle#choose()
+      if (Choice.ForcedPassesLeft <= 0)
+      {
+                  return EmitChoiceError($"Can't pass: You need to switch in a Pokémon to" +
+   $"replace {pokemon.Name}");
+             }
 
-                    Choice.ForcedPassesLeft--;
-                }
+ Choice.ForcedPassesLeft--;
+          }
 
-                break;
+          break;
 
             case RequestState.Move:
                 if (!pokemon.Fainted && !pokemon.Volatiles.ContainsKey(ConditionId.Commanding))

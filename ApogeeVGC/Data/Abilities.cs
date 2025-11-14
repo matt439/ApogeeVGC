@@ -206,6 +206,23 @@ public record Abilities
                     NoTransform = true,
                 },
             },
+            [AbilityId.Bulletproof] = new()
+            {
+                Id = AbilityId.Bulletproof,
+                Name = "Bulletproof",
+                Num = 171,
+                Rating = 3.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryHit = new OnTryHitEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (move.Flags.Bullet == true)
+                    {
+                        battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
+                        return null;
+                    }
+                    return new VoidReturn();
+                }),
+            },
         };
     }
 }

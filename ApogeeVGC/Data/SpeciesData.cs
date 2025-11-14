@@ -105,7 +105,7 @@ public record SpeciesData
             Abilities = new SpeciesAbility
             {
                 Slot0 = AbilityId.Guts,
-                Slot1 = AbilityId.BulletProof,
+                Slot1 = AbilityId.Bulletproof,
                 Hidden = AbilityId.Unnerve,
             },
             HeightM = 2.4,
