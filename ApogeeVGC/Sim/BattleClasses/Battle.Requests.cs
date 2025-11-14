@@ -663,25 +663,29 @@ if (DebugMode)
   "Cannot request choices from players: Some sides have no active request");
         }
 
+   // Send all battle updates to players before requesting choices
+// This ensures players see all messages (moves, damage, etc.) before making decisions
+        UpdateAllPlayersUi();
+
         // Emit choice request events for each side that needs to make a choice
  foreach (Side side in Sides)
         {
             // Skip sides that don't need to make a choice (already done)
-            if (side.IsChoiceDone())
+  if (side.IsChoiceDone())
        {
   continue;
      }
 
-         // Determine the request type
-            BattleRequestType requestType = RequestState switch
+      // Determine the request type
+        BattleRequestType requestType = RequestState switch
       {
-            RequestState.TeamPreview => BattleRequestType.TeamPreview,
+   RequestState.TeamPreview => BattleRequestType.TeamPreview,
     RequestState.Move => BattleRequestType.TurnStart,
     RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
   _ => BattleRequestType.TurnStart,
-     };
+ };
 
-        // Emit the choice request event - external handler (Simulator) will handle async player interaction
+  // Emit the choice request event - external handler (Simulator) will handle async player interaction
             RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
         }
 

@@ -18,7 +18,10 @@ public partial class Battle
             UpdatePlayerUi(side.Id, battlePerspectiveType);
         }
 
-        // Flush messages after all players have been updated
+        // Update the sent log position to mark these entries as processed
+        SentLogPos = Log.Count;
+
+        // Flush manually-added messages after all players have been updated
         FlushMessages();
     }
 
@@ -28,8 +31,16 @@ public partial class Battle
         // Create perspective with the correct type
         BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
 
-        // Emit update event with the perspective
-        EmitUpdate(sideId, perspective, new List<BattleMessage>(PendingMessages));
+        // Parse new log entries since last update and convert to messages
+        var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
+
+        // Combine with any manually-added pending messages
+        var allMessages = new List<BattleMessage>();
+        allMessages.AddRange(PendingMessages);
+        allMessages.AddRange(parsedMessages);
+
+        // Emit update event with the perspective and all messages
+        EmitUpdate(sideId, perspective, allMessages);
     }
 
     public void Add(params PartFuncUnion[] parts)
@@ -534,5 +545,271 @@ public partial class Battle
     {
         AddMessage(message);
         FlushMessages();
+    }
+
+    /// <summary>
+    /// Parses log entries from the battle log and converts them to BattleMessage objects.
+    /// This allows console and GUI players to display human-readable messages.
+    /// </summary>
+    /// <param name="startIndex">The index in the Log to start parsing from</param>
+    /// <param name="endIndex">The index in the Log to stop parsing at (exclusive)</param>
+    /// <returns>A list of BattleMessage objects parsed from the log entries</returns>
+    private List<BattleMessage> ParseLogToMessages(int startIndex, int endIndex)
+    {
+        var messages = new List<BattleMessage>();
+
+        for (int i = startIndex; i < endIndex && i < Log.Count; i++)
+        {
+            string logEntry = Log[i];
+            if (string.IsNullOrEmpty(logEntry)) continue;
+
+            // Parse the log entry (format: |command|arg1|arg2|...)
+            string[] parts = logEntry.Split('|');
+            if (parts.Length < 2) continue; // Need at least || and command
+
+            string command = parts[1]; // parts[0] is empty due to leading |
+
+            try
+            {
+                BattleMessage? message = command switch
+                {
+                    "turn" when parts.Length > 2 && int.TryParse(parts[2], out int turnNum) =>
+                        new TurnStartMessage { TurnNumber = turnNum },
+
+                    "move" when parts.Length > 3 =>
+                        new MoveUsedMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            MoveName = parts[3]
+                        },
+
+                    "switch" or "drag" when parts.Length > 3 =>
+                        new SwitchMessage
+                        {
+                            TrainerName = ExtractTrainerName(parts[2]),
+                            PokemonName = ExtractPokemonName(parts[2])
+                        },
+
+                    "faint" when parts.Length > 2 =>
+                        new FaintMessage { PokemonName = ExtractPokemonName(parts[2]) },
+
+                    "-damage" when parts.Length > 3 =>
+                        ParseDamageMessage(parts),
+
+                    "-heal" when parts.Length > 3 =>
+                        ParseHealMessage(parts),
+
+                    "-status" when parts.Length > 3 =>
+                        new StatusMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            StatusName = parts[3]
+                        },
+
+                    "-supereffective" =>
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
+                        },
+
+                    "-resisted" =>
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
+                        },
+
+                    "-immune" =>
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
+                        },
+
+                    "-crit" =>
+                        new CriticalHitMessage(),
+
+                    "-miss" when parts.Length > 2 =>
+                        new MissMessage { PokemonName = ExtractPokemonName(parts[2]) },
+
+                    "-fail" when parts.Length > 2 =>
+                        new MoveFailMessage { Reason = parts.Length > 3 ? parts[3] : "Unknown" },
+
+                    "-boost" or "-unboost" when parts.Length > 4 =>
+                        ParseStatChangeMessage(parts, command == "-boost"),
+
+                    "-weather" when parts.Length > 2 =>
+                        new WeatherMessage
+                        {
+                            WeatherName = parts[2],
+                            IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
+                        },
+
+                    "-ability" when parts.Length > 3 =>
+                        new AbilityMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            AbilityName = parts[3],
+                            AdditionalInfo = parts.Length > 4 ? parts[4] : null
+                        },
+
+                    "-item" when parts.Length > 3 =>
+                        new ItemMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            ItemName = parts[3]
+                        },
+
+                    _ => null
+                };
+
+                if (message != null)
+                {
+                    messages.Add(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (DebugMode)
+                {
+                    Debug($"Error parsing log entry '{logEntry}': {ex.Message}");
+                }
+            }
+        }
+
+        return messages;
+    }
+
+    /// <summary>
+    /// Extracts a Pokemon name from a log entry part (format: "p1a: PokemonName")
+    /// </summary>
+    private static string ExtractPokemonName(string part)
+    {
+        int colonIndex = part.IndexOf(':');
+        if (colonIndex >= 0 && colonIndex < part.Length - 1)
+        {
+            return part.Substring(colonIndex + 2).Trim(); // +2 to skip ": "
+        }
+
+        return part.Trim();
+    }
+
+    /// <summary>
+    /// Extracts a trainer name from a log entry part (format: "p1a: PokemonName")
+    /// Returns "Player 1" or "Player 2" based on the side prefix
+    /// </summary>
+    private string ExtractTrainerName(string part)
+    {
+        if (part.StartsWith("p1"))
+        {
+            return Sides[0].Name;
+        }
+        else if (part.StartsWith("p2"))
+        {
+            return Sides[1].Name;
+        }
+
+        return "Unknown";
+    }
+
+    /// <summary>
+    /// Parses a damage message from log parts
+    /// </summary>
+    private static BattleMessage? ParseDamageMessage(string[] parts)
+    {
+        if (parts.Length < 4) return null;
+
+        string pokemonName = ExtractPokemonName(parts[2]);
+        string healthStr = parts[3];
+
+        // Parse health (format: "123/456" or "123/456 psn")
+        string[] healthParts = healthStr.Split(' ');
+        string[] hpParts = healthParts[0].Split('/');
+
+        if (hpParts.Length != 2 ||
+            !int.TryParse(hpParts[0], out int currentHp) ||
+            !int.TryParse(hpParts[1], out int maxHp))
+        {
+            return new GenericMessage { Text = $"{pokemonName} took damage!" };
+        }
+
+        int damageAmount = maxHp - currentHp; // Approximate, we don't have previous HP
+
+        // Extract effect name if present
+        string? effectName = null;
+        string? sourceName = null;
+
+        for (int i = 4; i < parts.Length; i++)
+        {
+            if (parts[i].StartsWith("[from]"))
+            {
+                effectName = parts[i].Substring(7).Trim(); // Remove "[from] "
+            }
+            else if (parts[i].StartsWith("[of]"))
+            {
+                sourceName = ExtractPokemonName(parts[i].Substring(5).Trim()); // Remove "[of] "
+            }
+        }
+
+        return new DamageMessage
+        {
+            PokemonName = pokemonName,
+            DamageAmount = damageAmount,
+            RemainingHp = currentHp,
+            MaxHp = maxHp,
+            EffectName = effectName,
+            SourcePokemonName = sourceName
+        };
+    }
+
+    /// <summary>
+    /// Parses a heal message from log parts
+    /// </summary>
+    private static BattleMessage? ParseHealMessage(string[] parts)
+    {
+        if (parts.Length < 4) return null;
+
+        string pokemonName = ExtractPokemonName(parts[2]);
+        string healthStr = parts[3];
+
+        // Parse health (format: "123/456")
+        string[] hpParts = healthStr.Split('/');
+
+        if (hpParts.Length != 2 ||
+            !int.TryParse(hpParts[0], out int currentHp) ||
+            !int.TryParse(hpParts[1], out int maxHp))
+        {
+            return new GenericMessage { Text = $"{pokemonName} restored HP!" };
+        }
+
+        int healAmount = currentHp; // Approximate
+
+        return new HealMessage
+        {
+            PokemonName = pokemonName,
+            HealAmount = healAmount
+        };
+    }
+
+    /// <summary>
+    /// Parses a stat change message from log parts
+    /// </summary>
+    private static BattleMessage? ParseStatChangeMessage(string[] parts, bool isBoost)
+    {
+        if (parts.Length < 5) return null;
+
+        string pokemonName = ExtractPokemonName(parts[2]);
+        string statName = parts[3];
+        int stages = int.TryParse(parts[4], out int stageNum) ? stageNum : 1;
+
+        if (!isBoost)
+        {
+            stages = -stages; // Unboost is negative
+        }
+
+        return new StatChangeMessage
+        {
+            PokemonName = pokemonName,
+            StatName = statName,
+            Stages = stages
+        };
     }
 }

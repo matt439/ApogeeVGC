@@ -84,7 +84,7 @@ public class Driver
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
 
-        const bool debug = true;
+        const bool debug = false;
 
         PlayerOptions player1Options = new()
         {
@@ -131,7 +131,7 @@ public class Driver
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (ASYNCHRONOUS)");
 
-        const bool debug = true;
+        const bool debug = false;
 
         PlayerOptions player1Options = new()
         {
