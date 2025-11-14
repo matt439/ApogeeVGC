@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
@@ -59,33 +60,103 @@ public partial class Battle
             // Reset counter for non-move requests
             _consecutiveMoveRequests = 0;
         }
+        
+        // Special validation for SwitchIn requests - check if any switches are actually possible
+        if (type == RequestState.SwitchIn)
+     {
+            bool anyValidSwitches = false;
+   
+            foreach (Side side in Sides)
+            {
+   // Check if this side has any Pokemon that need to switch
+     bool hasSwitchNeeded = side.Active.Any(p => p?.SwitchFlag.IsTrue() == true);
+         
+                if (hasSwitchNeeded)
+            {
+   // Check if there are any Pokemon available to switch in
+              int availableSwitches = CanSwitch(side);
+   
+          // Check for Revival Blessing (special case)
+         bool hasRevivalBlessing = side.Active.Any(p => 
+           p != null && side.GetSlotCondition(p.Position, ConditionId.RevivalBlessing) != null);
+     
+    if (availableSwitches > 0 || hasRevivalBlessing)
+        {
+   anyValidSwitches = true;
+       }
+       else
+         {
+   // This side needs to switch but has no Pokemon available
+        // This means they've lost - no need to make a switch request
+     if (DebugMode)
+           {
+         Debug($"{side.Name} needs to switch but has no Pokemon available - checking win condition");
+              }
+   }
+   }
+   }
+       
+    // If no valid switches are possible, the battle should end
+            // The win condition check should have already determined the winner
+            if (!anyValidSwitches)
+     {
+     if (DebugMode)
+         {
+            Debug("No valid switches possible for any side, checking win conditions");
+  }
+    
+      // Check win conditions - this will end the battle if appropriate
+                foreach (Side side in Sides)
+    {
+         if (side.PokemonLeft <= 0)
+       {
+     if (DebugMode)
+         {
+    Debug($"{side.Name} has no Pokemon left, losing");
+           }
+      
+        Lose(side);
+       return;
+       }
+                }
+      
+       // If we get here, something is wrong - tie the battle
+         if (DebugMode)
+         {
+     Debug("No switches possible but no clear winner - tying battle");
+          }
+  
+                Tie();
+      return;
+       }
+        }
 
         // Update request state if provided, otherwise use current state
-        if (type.HasValue)
+    if (type.HasValue)
         {
-            RequestState = type.Value;
+RequestState = type.Value;
 
-            if (DebugMode)
+        if (DebugMode)
             {
-                Debug($"Updated Battle RequestState to {RequestState}");
+     Debug($"Updated Battle RequestState to {RequestState}");
             }
 
             // Clear all sides' choices when starting a new request
-            // AND update each side's RequestState to match the battle
-            foreach (Side side in Sides)
+      // AND update each side's RequestState to match the battle
+   foreach (Side side in Sides)
             {
-                side.ClearChoice();
-                side.RequestState = type.Value;
+side.ClearChoice();
+        side.RequestState = type.Value;
 
-                if (DebugMode)
-                {
-                    Debug($"Updated {side.Name} RequestState to {side.RequestState}");
-                }
-            }
+        if (DebugMode)
+   {
+               Debug($"Updated {side.Name} RequestState to {side.RequestState}");
+    }
+    }
         }
         else
-        {
-            type = RequestState;
+ {
+       type = RequestState;
         }
 
         // Clear all active requests before generating new ones

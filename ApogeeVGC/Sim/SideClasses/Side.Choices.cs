@@ -610,6 +610,17 @@ public partial class Side
         // Step 3: Clear existing choice
         ClearChoice();
 
+        // Step 3.5: For SwitchIn/Switch requests, validate that we have actions (not empty)
+        // Empty choices are invalid for switch requests - the battle should have ended if no switches are possible
+        if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
+            input.Actions.Count == 0)
+        {
+            Console.WriteLine(
+                $"[Side.Choose] Empty choice for {RequestState} request - rejecting!");
+            return EmitChoiceError(
+                "Can't submit empty choice for switch request. You must switch in a Pokemon or the battle should have ended.");
+        }
+
         // Step 4: Validate number of actions doesn't exceed expected count
         // For team preview, allow up to full team size
         // For other requests, limit to active Pokemon count
@@ -879,11 +890,25 @@ public partial class Side
                 ChooseTeam();
             }
         }
-        else if (RequestState == RequestState.Switch)
+        else if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
         {
             int i = 0;
             while (!IsChoiceDone())
             {
+                // Safety check: if we're being asked to switch but have no available Pokemon, 
+                // the battle should have already ended. This indicates a bug.
+                int availableSwitches = Battle.CanSwitch(this);
+                bool hasRevivalBlessing = Active.Any(p =>
+                    p != null && SlotConditions[p.Position]
+                        .ContainsKey(ConditionId.RevivalBlessing));
+
+                if (availableSwitches == 0 && !hasRevivalBlessing)
+                {
+                    throw new InvalidOperationException(
+                        $"AutoChoose switch failed: {Name} has no available Pokemon to switch in. " +
+                        $"The battle should have ended before this point. This is a bug.");
+                }
+
                 SideBoolUnion result = ChooseSwitch();
                 if (!result.IsTrue())
                 {
@@ -993,6 +1018,11 @@ public partial class Side
     {
         if (RequestState == RequestState.None) return true;
         if (Choice.ForcedSwitchesLeft > 0) return false;
+
+        // For Switch/SwitchIn requests, also check if we have forced passes left
+        // This prevents IsChoiceDone from returning true when we still need to handle passes
+        if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
+            Choice.ForcedPassesLeft > 0) return false;
 
         if (RequestState == RequestState.TeamPreview)
         {
