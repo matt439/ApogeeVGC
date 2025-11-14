@@ -347,7 +347,7 @@ public partial class Battle
             PerspectiveType = battlePerspectiveType,
             Field = Field.GetPerspective(),
             PlayerSide = playerSide.GetPlayerPerspective(),
-            OpponentSide = playerSide.GetOpponentPerspective(),
+            OpponentSide = playerSide.Foe.GetOpponentPerspective(),
             TurnCounter = Turn,
         };
     }

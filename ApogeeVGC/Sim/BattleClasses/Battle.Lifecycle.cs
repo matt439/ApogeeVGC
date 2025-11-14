@@ -821,85 +821,85 @@ public partial class Battle
 
         // Check for switches
         var switches = Sides
-     .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
-          .ToList();
+			.Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
+			.ToList();
 
-        for (int i = 0; i < Sides.Count; i++)
-        {
-      bool reviveSwitch = false;
-   if (switches[i] && CanSwitch(Sides[i]) == 0)
-   {
-              foreach (Pokemon? pokemon in Sides[i].Active)
-      {
-if (pokemon == null) continue;
+		for (int i = 0; i < Sides.Count; i++)
+		{
+			bool reviveSwitch = false;
+			if (switches[i] && CanSwitch(Sides[i]) == 0)
+			{
+				foreach (Pokemon? pokemon in Sides[i].Active)
+				{
+					if (pokemon == null) continue;
 
-    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
-       ConditionId.RevivalBlessing);
-     if (revivalBlessing != null)
-     {
-       reviveSwitch = true;
-             continue;
-           }
+					IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
+						ConditionId.RevivalBlessing);
+					if (revivalBlessing != null)
+					{
+						reviveSwitch = true;
+						continue;
+					}
 
-           pokemon.SwitchFlag = false;
-    }
+					pokemon.SwitchFlag = false;
+				}
 
-           if (!reviveSwitch) 
-       {
- switches[i] = false;
-    
-        // If this side needs to switch but has no Pokemon available, they've lost
- // Check if the battle should end
-          if (Sides[i].PokemonLeft <= 0)
-        {
-         if (DebugMode)
-             {
- Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
-            }
-     
-       Lose(Sides[i]);
-  return true;
-         }
-           }
-   }
-        else if (switches[i])
-    {
-           foreach (Pokemon? pokemon in Sides[i].Active)
-                {
-     if (pokemon == null) continue;
+				if (!reviveSwitch)
+				{
+					switches[i] = false;
 
-              if (pokemon.Hp > 0 &&
-           pokemon.SwitchFlag.IsTrue() &&
-          pokemon.SwitchFlag != MoveId.RevivalBlessing &&
-      !pokemon.SkipBeforeSwitchOutEventFlag)
-   {
-         RunEvent(EventId.BeforeSwitchOut, pokemon);
-        pokemon.SkipBeforeSwitchOutEventFlag = true;
-    FaintMessages();
-if (Ended) return true;
-         if (pokemon.Fainted)
-     {
-            switches[i] = Sides[i].Active
-        .Any(p => p != null && p.SwitchFlag.IsTrue());
-       }
-   }
-      }
-     }
-        }
+					// If this side needs to switch but has no Pokemon available, they've lost
+					// Check if the battle should end
+					if (Sides[i].PokemonLeft <= 0)
+					{
+						if (DebugMode)
+						{
+							Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
+						}
 
-    foreach (bool playerSwitch in switches)
-     {
-            if (playerSwitch)
-            {
-MakeRequest(RequestState.SwitchIn);
+						Lose(Sides[i]);
+						return true;
+					}
+				}
+			}
+			else if (switches[i])
+			{
+				foreach (Pokemon? pokemon in Sides[i].Active)
+				{
+					if (pokemon == null) continue;
 
-       // Return immediately - Simulator handles getting switch choices
-   // When Simulator calls Choose() -> CommitChoices(), TurnLoop() will be called again
-   return true;
-  }
-        }
+					if (pokemon.Hp > 0 &&
+						pokemon.SwitchFlag.IsTrue() &&
+						pokemon.SwitchFlag != MoveId.RevivalBlessing &&
+						!pokemon.SkipBeforeSwitchOutEventFlag)
+					{
+						RunEvent(EventId.BeforeSwitchOut, pokemon);
+						pokemon.SkipBeforeSwitchOutEventFlag = true;
+						FaintMessages();
+						if (Ended) return true;
+						if (pokemon.Fainted)
+						{
+							switches[i] = Sides[i].Active
+								.Any(p => p != null && p.SwitchFlag.IsTrue());
+						}
+					}
+				}
+			}
+		}
 
-// In Gen 8+, speed is updated dynamically
+		foreach (bool playerSwitch in switches)
+		{
+			if (playerSwitch)
+			{
+				MakeRequest(RequestState.SwitchIn);
+
+				// Return immediately - Simulator handles getting switch choices
+				// When Simulator calls Choose() -> CommitChoices(), TurnLoop() will be called again
+				return true;
+			}
+		}
+
+		// In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();
         if (nextAction?.Choice == ActionId.Move)
   {
