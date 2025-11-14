@@ -1039,13 +1039,25 @@ public record Conditions
                     }
                 }),
             },
-
             [ConditionId.RevivalBlessing] = new()
             {
                 Id = ConditionId.RevivalBlessing,
                 Name = "Revival Blessing",
                 EffectType = EffectType.Condition,
-                // TODO: Implement Revival Blessing effect
+                Duration = 1,
+                AssociatedMove = MoveId.RevivalBlessing,
+                // Note: Revival Blessing's effect is handled in Side
+            },
+            [ConditionId.Trapped] = new()
+            {
+                Id = ConditionId.Trapped,
+                NoCopy = true,
+                OnTrapPokemon = new OnTrapPokemonEventInfo((_, pokemon) => { pokemon.TryTrap(); }),
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.Add("-activate", target, "trapped");
+                    return new VoidReturn();
+                }),
             },
         };
     }
