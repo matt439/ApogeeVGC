@@ -223,6 +223,23 @@ public record Abilities
                     return new VoidReturn();
                 }),
             },
+            [AbilityId.Unnerve] = new()
+            {
+                Id = AbilityId.Unnerve,
+                Name = "Unnerve",
+                Rating = 1.0,
+                Num = 127,
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, 1),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Unnerved ?? false) return;
+                    battle.Add("-ability", pokemon, "Unnerve");
+                    battle.EffectState.Unnerved = true;
+                }),
+                OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, _, _) =>
+                    !(battle.EffectState.Unnerved ?? false))),
+            },
         };
     }
 }

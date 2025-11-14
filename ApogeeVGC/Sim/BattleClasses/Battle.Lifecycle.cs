@@ -263,7 +263,11 @@ public partial class Battle
                         if (abilityId == null) continue;
                         if (abilityId == source.Ability) continue;
 
-                        Ability ability = Library.Abilities[abilityId.Value];
+                        // TODO: log or do something if key not found in library
+                        if (!Library.Abilities.TryGetValue(abilityId.Value, out Ability? ability))
+                        {
+                            continue;
+                        }
 
                         if (RuleTable.Has(ability.Id)) continue;
 
