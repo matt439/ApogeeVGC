@@ -63,7 +63,7 @@ public class Driver
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle synchronously on the main thread
-        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
+        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: false).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
     }
