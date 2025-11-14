@@ -12,6 +12,7 @@ public class Driver
 
     private const int PlayerRandom1Seed = 12345;
     private const int PlayerRandom2Seed = 1818;
+    private PrngSeed DefaultSeed { get; } = new(9876);
 
     public void Start(DriverMode mode)
     {
@@ -61,6 +62,8 @@ public class Driver
             Player1Options = player1Options,
             Player2Options = player2Options,
             Debug = debug,
+            Sync = false,
+            Seed = DefaultSeed,
         };
 
         var simulator = new Simulator();
@@ -81,12 +84,15 @@ public class Driver
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
 
+        const bool debug = true;
+
         PlayerOptions player1Options = new()
         {
             Type = Player.PlayerType.Random,
             Name = "Random 1",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom1Seed),
+            PrintDebug = debug,
         };
 
         PlayerOptions player2Options = new()
@@ -95,6 +101,7 @@ public class Driver
             Name = "Random 2",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
+            PrintDebug = debug,
         };
 
         BattleOptions battleOptions = new()
@@ -102,15 +109,16 @@ public class Driver
             Id = FormatId.CustomSingles,
             Player1Options = player1Options,
             Player2Options = player2Options,
-            Debug = true,
+            Debug = debug,
             Sync = true, // Enable synchronous mode
+            Seed = DefaultSeed,
         };
 
         var simulator = new SyncSimulator();
         Console.WriteLine("[Driver] SyncSimulator created");
 
         // Run the battle completely synchronously - no async/await needed!
-        SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: true);
+        SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
@@ -123,12 +131,15 @@ public class Driver
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (ASYNCHRONOUS)");
 
+        const bool debug = true;
+
         PlayerOptions player1Options = new()
         {
             Type = Player.PlayerType.Random,
             Name = "Random 1",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom1Seed),
+            PrintDebug = debug,
         };
 
         PlayerOptions player2Options = new()
@@ -137,6 +148,7 @@ public class Driver
             Name = "Random 2",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
+            PrintDebug = debug,
         };
 
         BattleOptions battleOptions = new()
@@ -144,15 +156,16 @@ public class Driver
             Id = FormatId.CustomSingles,
             Player1Options = player1Options,
             Player2Options = player2Options,
-            Debug = true,
+            Debug = debug,
             Sync = false, // Ensure this is false for async
+            Seed = DefaultSeed,
         };
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Async Simulator created");
 
         // Run the battle asynchronously
-        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
+        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
