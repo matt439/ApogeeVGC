@@ -565,7 +565,8 @@ public partial class Battle
                     }
                 }
 
-                UpdateAllPlayersUi();
+                // Messages will be sent when RequestPlayerChoices() is called
+                // No need to send here - just accumulate them in the log
 
                 MidTurn = true;
                 break;

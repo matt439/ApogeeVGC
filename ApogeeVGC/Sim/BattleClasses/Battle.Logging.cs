@@ -13,34 +13,31 @@ public partial class Battle
     private void UpdateAllPlayersUi(
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
+        // Temporary debug: show what we're parsing
+      Console.WriteLine($"\n[UpdateAllPlayersUi] Parsing Log[{SentLogPos}..{Log.Count}):");
+        for (int i = SentLogPos; i < Log.Count; i++)
+        {
+ Console.WriteLine($"  Log[{i}]: {Log[i]}");
+     }
+
+        // Parse new log entries once
+  var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
+        
+        Console.WriteLine($"[UpdateAllPlayersUi] Parsed {parsedMessages.Count} messages:");
+ foreach (var msg in parsedMessages)
+        {
+          Console.WriteLine($"  - {msg.ToDisplayText()}");
+        }
+
+        // Send the same messages to all players (each with their own perspective)
         foreach (Side side in Sides)
         {
-            UpdatePlayerUi(side.Id, battlePerspectiveType);
+            BattlePerspective perspective = GetPerspectiveForSide(side.Id, battlePerspectiveType);
+            EmitUpdate(side.Id, perspective, parsedMessages);
         }
 
         // Update the sent log position to mark these entries as processed
         SentLogPos = Log.Count;
-
-        // Flush manually-added messages after all players have been updated
-        FlushMessages();
-    }
-
-    private void UpdatePlayerUi(SideId sideId,
-        BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
-    {
-        // Create perspective with the correct type
-        BattlePerspective perspective = GetPerspectiveForSide(sideId, battlePerspectiveType);
-
-        // Parse new log entries since last update and convert to messages
-        var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
-
-        // Combine with any manually-added pending messages
-        var allMessages = new List<BattleMessage>();
-        allMessages.AddRange(PendingMessages);
-        allMessages.AddRange(parsedMessages);
-
-        // Emit update event with the perspective and all messages
-        EmitUpdate(sideId, perspective, allMessages);
     }
 
     public void Add(params PartFuncUnion[] parts)
@@ -224,32 +221,15 @@ public partial class Battle
 
     public void SendUpdates()
     {
-        if (DebugMode)
-        {
-            Debug($"SendUpdates: SentLogPos={SentLogPos}, Log.Count={Log.Count}");
-        }
-
         // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count) return;
 
         // Send new log entries to clients
         var updates = Log.Skip(SentLogPos).ToList();
 
-        if (DebugMode)
-        {
-            Debug($"Sending {updates.Count} updates");
-        }
-
-        Send(SendType.Update, updates);
-
         // Send requests to players if not already sent
         if (!SentRequests)
         {
-            if (DebugMode)
-            {
-                Debug("Sending requests to players");
-            }
-
             foreach (Side side in Sides)
             {
                 side.EmitRequest();
@@ -364,22 +344,6 @@ public partial class Battle
         // Get the effect name, converting "tox" to "psn" for display
         string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
 
-        // Create the base damage message
-        DamageMessage CreateDamageMessage(string? effectNameOverride = null,
-            string? sourceNameOverride = null, string? specialTag = null)
-        {
-            return new DamageMessage
-            {
-                PokemonName = target.Name,
-                DamageAmount = damageAmount,
-                RemainingHp = target.Hp,
-                MaxHp = target.MaxHp,
-                EffectName = effectNameOverride ?? effectName,
-                SourcePokemonName = sourceNameOverride,
-                SpecialTag = specialTag
-            };
-        }
-
         switch (effect?.Id)
         {
             case ConditionId.PartiallyTrapped:
@@ -388,29 +352,19 @@ public partial class Battle
                         out EffectState? ptState) &&
                     ptState.SourceEffect != null)
                 {
-                    AddMessage(CreateDamageMessage(
-                        effectNameOverride: ptState.SourceEffect.FullName,
-                        specialTag: "[partiallytrapped]"));
-
-                    // Still add to legacy log
+                    // Add to log - will be parsed to BattleMessage automatically
                     Add("-damage", target, target.GetHealth,
                         $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
-
                 break;
 
             case ConditionId.Powder:
-                // Silent damage - create message but mark as silent
-                AddMessage(CreateDamageMessage(specialTag: "[silent]"));
-
-                // Still add to legacy log
+                // Silent damage
                 Add("-damage", target, target.GetHealth, "[silent]");
                 break;
 
             case ConditionId.Confusion:
-                AddMessage(CreateDamageMessage(effectNameOverride: "confusion"));
-
-                // Still add to legacy log
+                // Add to log - will be parsed to BattleMessage automatically
                 Add("-damage", target, target.GetHealth, "[from] confusion");
                 break;
 
@@ -418,29 +372,25 @@ public partial class Battle
                 if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
-                    AddMessage(CreateDamageMessage());
                     Add("-damage", target, target.GetHealth);
                 }
                 else if (source != null &&
                          (source != target || effect?.EffectType == EffectType.Ability))
                 {
                     // Damage from effect with source
-                    AddMessage(CreateDamageMessage(sourceNameOverride: source.Name));
                     Add("-damage", target, target.GetHealth, $"[from] {effectName}",
                         $"[of] {source}");
                 }
                 else
                 {
                     // Damage from effect without source
-                    AddMessage(CreateDamageMessage());
                     Add("-damage", target, target.GetHealth, $"[from] {effectName}");
                 }
-
                 break;
         }
 
-        // Flush messages immediately so GUI players see damage updates
-        FlushMessages();
+        // Messages will be sent automatically when UpdateAllPlayersUi() is called
+        // No need to flush here - batching improves performance
     }
 
     /// <summary>
@@ -558,9 +508,41 @@ public partial class Battle
     {
         var messages = new List<BattleMessage>();
 
+        bool inSplitSection = false;
+        bool parseSplitLine = false; // True when we're on the "shared" line of a split
+
         for (int i = startIndex; i < endIndex && i < Log.Count; i++)
         {
             string logEntry = Log[i];
+
+            // Check for split marker
+            if (logEntry.StartsWith("|split|"))
+            {
+                inSplitSection = true;
+                parseSplitLine = false;
+                continue;
+            }
+
+            // If we're in a split section
+            if (inSplitSection)
+            {
+                if (string.IsNullOrEmpty(logEntry))
+                {
+                    // Empty line marks the end of the split section
+                    inSplitSection = false;
+                    parseSplitLine = false;
+                    continue;
+                }
+                else if (!parseSplitLine)
+                {
+                    // First non-empty line after split is the "secret" line - skip it
+                    parseSplitLine = true;
+                    continue;
+                }
+                // If parseSplitLine is true, this is the "shared" line - parse it below
+// After parsing this line, the next will be empty (end of split)
+            }
+
             if (string.IsNullOrEmpty(logEntry)) continue;
 
             // Parse the log entry (format: |command|arg1|arg2|...)

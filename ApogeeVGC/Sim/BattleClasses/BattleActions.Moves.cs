@@ -501,16 +501,8 @@ public partial class BattleActions
         Battle.SingleEvent(EventId.UseMoveMessage, activeMove, null, pokemon,
             SingleEventSource.FromNullablePokemon(target), activeMove);
 
-        // Add UI message showing the move was used
-        if (Battle.DisplayUi)
-        {
-            Battle.AddMessage(new MoveUsedMessage
-            {
-                PokemonName = pokemon.Name,
-                MoveName = activeMove.Name
-            });
-            Battle.FlushMessages();
-        }
+        // Move usage will be logged and parsed automatically from battle log
+        // No need to manually add messages here
 
         // Set default ignoreImmunity for Status moves
         activeMove.IgnoreImmunity ??= activeMove.Category == MoveCategory.Status;

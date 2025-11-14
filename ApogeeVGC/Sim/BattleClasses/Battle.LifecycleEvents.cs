@@ -17,7 +17,7 @@ public partial class Battle
 
     /// <summary>
     /// Raised when the battle has UI updates for a player.
-/// </summary>
+    /// </summary>
     public event EventHandler<BattleUpdateEventArgs>? UpdateRequested;
 
     /// <summary>
@@ -54,17 +54,17 @@ Perspective = perspective
  });
     }
 
-  /// <summary>
+    /// <summary>
     /// Internal method called by Battle when there are UI updates.
     /// Emits the UpdateRequested event.
     /// </summary>
     internal void EmitUpdate(SideId sideId, BattlePerspective perspective, IEnumerable<BattleMessage> messages)
     {
-    UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
-{
-            SideId = sideId,
-  Perspective = perspective,
-         Messages = messages
+     UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
+    {
+SideId = sideId,
+       Perspective = perspective,
+Messages = messages
         });
     }
 
