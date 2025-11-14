@@ -36,11 +36,14 @@ public class Driver
 
     private void RunGuiVsRandomSinglesTest()
     {
+        const bool debug = false;
+
         PlayerOptions player1Options = new()
         {
             Type = Player.PlayerType.Console, // Use Player namespace
             Name = "Matt",
             Team = TeamGenerator.GenerateTestTeam(Library),
+            PrintDebug = debug,
         };
 
         PlayerOptions player2Options = new()
@@ -49,6 +52,7 @@ public class Driver
             Name = "Random",
             Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
+            PrintDebug = debug,
         };
 
         BattleOptions battleOptions = new()
@@ -56,14 +60,14 @@ public class Driver
             Id = FormatId.CustomSingles,
             Player1Options = player1Options,
             Player2Options = player2Options,
-            Debug = false,
+            Debug = debug,
         };
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle synchronously on the main thread
-        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: false).Result;
+        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
     }

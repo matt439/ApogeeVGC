@@ -17,6 +17,7 @@ public interface IPlayer
     PlayerOptions Options { get; }
     PlayerUiType UiType { get; }
     IBattleController BattleController { get; }
+    bool PrintDebug { get; }
 
     // Async choice submission
     Task<Choice> GetNextChoiceAsync(IChoiceRequest choice, BattleRequestType requestType,

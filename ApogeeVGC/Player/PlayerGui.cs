@@ -13,12 +13,14 @@ public class PlayerGui : IPlayer
     public IBattleController BattleController { get; }
     public BattleGame GuiWindow { get; set; }
     public GuiChoiceCoordinator ChoiceCoordinator { get; set; }
+    public bool PrintDebug { get; }
 
     public PlayerGui(SideId sideId, PlayerOptions options, IBattleController battleController)
     {
         SideId = sideId;
         Options = options;
         BattleController = battleController;
+        PrintDebug = options.PrintDebug;
 
         // Use the GuiWindow from options if provided, otherwise create a new one
         GuiWindow = options.GuiWindow ?? new BattleGame();
@@ -26,17 +28,23 @@ public class PlayerGui : IPlayer
         // Use the coordinator from options, or get it from the GuiWindow
         ChoiceCoordinator = options.GuiChoiceCoordinator ?? GuiWindow.GetChoiceCoordinator();
 
-        Console.WriteLine($"[PlayerGui] Constructor called for {sideId}");
-        Console.WriteLine($"[PlayerGui] GuiWindow from options: {options.GuiWindow?.GetHashCode() ?? -1}");
-        Console.WriteLine($"[PlayerGui] GuiWindow assigned: {GuiWindow.GetHashCode()}");
-        Console.WriteLine($"[PlayerGui] ChoiceCoordinator assigned: {ChoiceCoordinator.GetHashCode()}");
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerGui] Constructor called for {sideId}");
+            Console.WriteLine($"[PlayerGui] GuiWindow from options: {options.GuiWindow?.GetHashCode() ?? -1}");
+            Console.WriteLine($"[PlayerGui] GuiWindow assigned: {GuiWindow.GetHashCode()}");
+            Console.WriteLine($"[PlayerGui] ChoiceCoordinator assigned: {ChoiceCoordinator.GetHashCode()}");
+        }
     }
 
     public async Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
         BattleRequestType requestType, BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"[PlayerGui] GetNextChoiceAsync called for {SideId}");
-        Console.WriteLine($"[PlayerGui] Using ChoiceCoordinator: {ChoiceCoordinator.GetHashCode()}");
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerGui] GetNextChoiceAsync called for {SideId}");
+            Console.WriteLine($"[PlayerGui] Using ChoiceCoordinator: {ChoiceCoordinator.GetHashCode()}");
+        }
 
         // Fire the choice requested event
         ChoiceRequested?.Invoke(this, new ChoiceRequestEventArgs
@@ -87,14 +95,20 @@ public class PlayerGui : IPlayer
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         // TODO: Show a warning in the GUI that time is running out
-        Console.WriteLine($"[PlayerGui] Warning: {remainingTime.TotalSeconds:F0} seconds remaining");
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerGui] Warning: {remainingTime.TotalSeconds:F0} seconds remaining");
+        }
         return Task.CompletedTask;
     }
 
     public Task NotifyChoiceTimeoutAsync()
     {
         // TODO: Show in the GUI that the choice timed out
-        Console.WriteLine("[PlayerGui] Choice timed out - battle will auto-choose");
+        if (PrintDebug)
+        {
+            Console.WriteLine("[PlayerGui] Choice timed out - battle will auto-choose");
+        }
         return Task.CompletedTask;
     }
 }
