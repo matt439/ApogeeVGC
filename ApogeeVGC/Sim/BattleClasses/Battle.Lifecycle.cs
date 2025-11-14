@@ -753,11 +753,23 @@ public partial class Battle
         FaintMessages();
         if (Ended) return true;
 
-        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
-        if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
+        // Cancel queued actions for all fainted Pokemon
+        foreach (Side side in Sides)
         {
-            return false;
-        }
+            foreach (Pokemon? pokemon in side.Active)
+            {
+                if (pokemon?.Fainted == true)
+      {
+        Queue.CancelAction(pokemon);
+       }
+      }
+   }
+
+        // Switching (fainted pokemon, U-turn, Baton Pass, etc)
+      if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
+        {
+          return false;
+     }
 
         // Emergency Exit / Wimp Out check
         if (action.Choice != ActionId.Start)
