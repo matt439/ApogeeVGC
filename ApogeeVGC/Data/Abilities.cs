@@ -59,7 +59,7 @@ public record Abilities
                 OnSourceAfterFaint =
                     new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
                     {
-                        if (effect.EffectType != EffectType.Move) return;
+                        if (effect is null || effect.EffectType != EffectType.Move) return;
 
                         battle.Boost(new SparseBoostsTable { Atk = length }, source, source,
                             _library.Abilities[AbilityId.ChillingNeigh]);

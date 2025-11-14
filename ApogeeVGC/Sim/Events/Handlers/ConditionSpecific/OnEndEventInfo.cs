@@ -19,7 +19,7 @@ public sealed record OnEndEventInfo : EventHandlerInfo
     int? priority = null,
    bool usesSpeed = true)
     {
-   Id = EventId.DurationCallback;
+   Id = EventId.End;
         Prefix = EventPrefix.None;
         Handler = handler;
         Priority = priority;
@@ -29,7 +29,7 @@ public sealed record OnEndEventInfo : EventHandlerInfo
         
   // Nullability: All parameters non-nullable by default (adjust as needed)
    ParameterNullability = new[] { false, false };
-        ReturnTypeNullable = false;
+   ReturnTypeNullable = false;
     
         // Validate configuration
         ValidateConfiguration();
@@ -39,16 +39,16 @@ public sealed record OnEndEventInfo : EventHandlerInfo
     /// Creates event handler using context-based pattern.
     /// Context provides: Battle, TargetPokemon
     /// </summary>
-    public OnEndEventInfo(
+  public OnEndEventInfo(
         EventHandlerDelegate contextHandler,
-        int? priority = null,
-        bool usesSpeed = true)
+  int? priority = null,
+  bool usesSpeed = true)
     {
-     Id = EventId.DurationCallback;
+     Id = EventId.End;
         Prefix = EventPrefix.None;
         ContextHandler = contextHandler;
         Priority = priority;
-        UsesSpeed = usesSpeed;
+    UsesSpeed = usesSpeed;
     }
     
     /// <summary>

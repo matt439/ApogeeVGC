@@ -122,6 +122,26 @@ internal static class EventHandlerAdapter
             return context.TargetPokemon ?? context.SourcePokemon;
         }
 
+        // Check for PokemonSideFieldUnion types
+        if (paramType == typeof(PokemonSideFieldUnion) || typeof(PokemonSideFieldUnion).IsAssignableFrom(paramType))
+        {
+            // Wrap the target Pokemon in a union type
+            if (context.TargetPokemon != null)
+            {
+                return new PokemonSideFieldPokemon(context.TargetPokemon);
+            }
+            // Fallback to Side if available
+            if (context.TargetSide != null)
+            {
+                return new PokemonSideFieldSide(context.TargetSide);
+            }
+            // Fallback to Field if available
+            if (context.TargetField != null)
+            {
+                return new PokemonSideFieldField(context.TargetField);
+            }
+        }
+
         if (typeof(IEffect).IsAssignableFrom(paramType))
         {
             return context.SourceEffect;
