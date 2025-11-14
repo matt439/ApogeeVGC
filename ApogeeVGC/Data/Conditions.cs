@@ -698,10 +698,10 @@ public record Conditions
                     }
                 }),
                 OnModifySpe = new OnModifySpeEventInfo((battle, _, _) =>
-                {
-                    battle.ChainModify(2);
-                    return new VoidReturn();
-                }),
+                    {
+                        battle.ChainModify(2);
+                        return new VoidReturn();
+                    }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 5,
                 OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
@@ -962,13 +962,14 @@ public record Conditions
                             battle.Debug("Quark Drive atk boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                        return new VoidReturn();
                     },
                     5),
                 //OnModifyDefPriority = 6,
                 OnModifyDef = new OnModifyDefEventInfo((battle, _, pokemon, _, _) =>
-                    {
-                        if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
+                {
+                    if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
                             pokemon.IgnoringAbility())
                         {
                             return new VoidReturn();
@@ -979,13 +980,14 @@ public record Conditions
                             battle.Debug("Quark Drive def boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                        return new VoidReturn();
                     },
                     6),
                 //OnModifySpAPriority = 5,
                 OnModifySpA = new OnModifySpAEventInfo((battle, _, pokemon, _, _) =>
-                    {
-                        if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
+                {
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
                             pokemon.IgnoringAbility())
                         {
                             return new VoidReturn();
@@ -996,13 +998,14 @@ public record Conditions
                             battle.Debug("Quark Drive spa boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                        return new VoidReturn();
                     },
                     5),
                 //OnModifySpDPriority = 6,
                 OnModifySpD = new OnModifySpDEventInfo((battle, _, pokemon, _, _) =>
-                    {
-                        if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
+                {
+                    if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
                             pokemon.IgnoringAbility())
                         {
                             return new VoidReturn();
@@ -1013,29 +1016,31 @@ public record Conditions
                             battle.Debug("Quark Drive spd boost");
                         }
 
-                        return battle.ChainModify([5325, 4096]);
+                        battle.ChainModify([5325, 4096]);
+                        return new VoidReturn();
                     },
                     6),
                 OnModifySpe = new OnModifySpeEventInfo((battle, _, pokemon) =>
                 {
                     if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
-                        pokemon.IgnoringAbility())
-                    {
+                            pokemon.IgnoringAbility())
+                        {
+                            return new VoidReturn();
+                        }
+
+                        if (battle.DisplayUi)
+                        {
+                            battle.Debug("Quark Drive spe boost");
+                        }
+
+                        battle.ChainModify(1.5);
                         return new VoidReturn();
-                    }
-
-                    if (battle.DisplayUi)
-                    {
-                        battle.Debug("Quark Drive spe boost");
-                    }
-
-                    return (int)battle.ChainModify(1.5);
                 }),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
                     if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pokemon, "Quark Drive");
+                  {
+                   battle.Add("-end", pokemon, "Quark Drive");
                     }
                 }),
             },

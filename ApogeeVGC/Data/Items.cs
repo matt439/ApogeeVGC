@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data;
 
@@ -74,8 +75,11 @@ public record Items
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
                 }),
                 //OnModifySpAPriority = 1,
-                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) => battle.ChainModify(1.5),
-                    1),
+                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
+                {
+                    battle.ChainModify(1.5);
+                    return new VoidReturn();
+                }, 1),
                 IsChoice = true,
                 Num = 297,
                 Gen = 4,
@@ -143,8 +147,11 @@ public record Items
                 SpriteNum = 581,
                 Fling = new FlingData { BasePower = 80 },
                 //OnModifySpDPriority = 1,
-                OnModifySpD = new OnModifySpDEventInfo((battle, _, _, _, _) => battle.ChainModify(1.5),
-                    1),
+                OnModifySpD = new OnModifySpDEventInfo((battle, _, _, _, _) =>
+                {
+                    battle.ChainModify(1.5);
+                    return new VoidReturn();
+                }, 1),
                 OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
                     foreach (MoveSlot moveSlot in from moveSlot in pokemon.MoveSlots

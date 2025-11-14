@@ -121,7 +121,7 @@ public partial class Pokemon
                 StatIdExceptHp.Spe => EventId.ModifySpe,
                 _ => throw new ArgumentOutOfRangeException(nameof(statName), "Invalid stat name."),
             };
-            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, stat);
+            RelayVar? relayVar = Battle.RunEvent(eventId, this, null, null, new IntRelayVar(stat));
             if (relayVar is IntRelayVar irv)
             {
                 stat = irv.Value;

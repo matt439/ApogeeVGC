@@ -201,20 +201,35 @@ internal static class EventHandlerAdapter
     {
         value = null;
 
-        switch (relayVar)
+        // Handle int/Int32 (they're the same but check both for safety)
+        if (relayVar is IntRelayVar intVar && (targetType == typeof(int) || targetType == typeof(Int32)))
         {
-            case IntRelayVar intVar when targetType == typeof(int):
-                value = intVar.Value;
-                return true;
-            case DecimalRelayVar decVar when targetType == typeof(decimal):
-                value = decVar.Value;
-                return true;
-            case BoolRelayVar boolVar when targetType == typeof(bool):
-                value = boolVar.Value;
-                return true;
-            default:
-                return false;
+            value = intVar.Value;
+            return true;
         }
+
+        // Handle decimal
+        if (relayVar is DecimalRelayVar decVar && targetType == typeof(decimal))
+        {
+            value = decVar.Value;
+            return true;
+        }
+
+        // Handle double (might be used for stat modifiers)
+        if (relayVar is DecimalRelayVar decVar2 && targetType == typeof(double))
+        {
+            value = (double)decVar2.Value;
+            return true;
+        }
+
+        // Handle bool/Boolean
+        if (relayVar is BoolRelayVar boolVar && (targetType == typeof(bool) || targetType == typeof(Boolean)))
+        {
+            value = boolVar.Value;
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>

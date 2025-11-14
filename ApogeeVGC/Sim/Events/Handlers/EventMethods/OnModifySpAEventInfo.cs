@@ -33,16 +33,16 @@ public sealed record OnModifySpAEventInfo : EventHandlerInfo
      ExpectedParameterTypes =
         [
          typeof(Battle),
-         typeof(int),
+    typeof(int),
       typeof(Pokemon),
-     typeof(Pokemon),
+   typeof(Pokemon),
      typeof(ActiveMove),
    ];
       ExpectedReturnType = typeof(DoubleVoidUnion);
         
-        // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = [false, false, false, false, false];
-        ReturnTypeNullable = false;
+// Nullability: Battle is non-nullable, others are nullable for discard parameters
+   ParameterNullability = [false, true, true, true, true];
+     ReturnTypeNullable = false;
     
    // Validate configuration
         ValidateConfiguration();

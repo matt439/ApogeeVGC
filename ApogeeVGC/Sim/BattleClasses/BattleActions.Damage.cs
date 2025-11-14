@@ -218,11 +218,11 @@ public partial class BattleActions
         };
 
         RelayVar? modifyAtkResult = Battle.RunEvent(modifyAtkEvent, source,
-            RunEventSource.FromNullablePokemon(target), move, attack);
+            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(attack));
         attack = modifyAtkResult is IntRelayVar atkIrv ? atkIrv.Value : attack;
 
         RelayVar? modifyDefResult = Battle.RunEvent(modifyDefEvent, target,
-            RunEventSource.FromNullablePokemon(source), move, defense);
+            RunEventSource.FromNullablePokemon(source), move, new IntRelayVar(defense));
         defense = modifyDefResult is IntRelayVar defIrv ? defIrv.Value : defense;
 
         // Calculate base damage using the standard Pokémon damage formula
