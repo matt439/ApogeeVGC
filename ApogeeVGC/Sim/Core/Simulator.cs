@@ -86,7 +86,7 @@ public class Simulator : IBattleController
         {
             // Set a reasonable timeout for the entire battle
             _cancellationTokenSource.CancelAfter(
-                TimeSpan.FromSeconds(30)); // Shorter timeout for testing
+                TimeSpan.FromSeconds(300)); // Shorter timeout for testing
 
             // Start the battle loop task
             Task battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);

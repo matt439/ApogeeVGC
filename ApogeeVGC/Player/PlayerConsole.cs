@@ -179,11 +179,11 @@ foreach (var message in messages)
         AnsiConsole.MarkupLine("Select the order for your Pokemon (1-6):");
    AnsiConsole.WriteLine();
 
-        var pokemon = request.Side.Pokemon;
+      var pokemon = request.Side.Pokemon;
     for (int i = 0; i < pokemon.Count; i++)
-    {
-            // Use Condition or other available property instead of Details.Name
-         AnsiConsole.MarkupLine($"  {i + 1}. [bold]Pokemon #{i + 1}[/]");
+        {
+ // Display the Pokemon's actual name from Details (e.g., "Pikachu, L50")
+            AnsiConsole.MarkupLine($"  {i + 1}. [bold]{pokemon[i].Details}[/]");
         }
 
         AnsiConsole.WriteLine();
@@ -193,17 +193,17 @@ foreach (var message in messages)
 
         // Return default order
         var actions = Enumerable.Range(0, pokemon.Count)
-      .Select((index, position) => new ChosenAction
-       {
-                Choice = ChoiceType.Team,
-      Pokemon = null,
-        MoveId = Sim.Moves.MoveId.None,
-        Index = index,
-          Priority = -position
-            }).ToList();
-
-        return new Choice
+        .Select((index, position) => new ChosenAction
   {
+     Choice = ChoiceType.Team,
+          Pokemon = null,
+      MoveId = Sim.Moves.MoveId.None,
+       Index = index,
+        Priority = -position
+          }).ToList();
+
+    return new Choice
+        {
             Actions = actions
         };
     }

@@ -56,14 +56,14 @@ public class Driver
             Id = FormatId.CustomSingles,
             Player1Options = player1Options,
             Player2Options = player2Options,
-            Debug = true,
+            Debug = false,
         };
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
 
         // Run the battle synchronously on the main thread
-        var result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
+        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
     }
@@ -106,7 +106,7 @@ public class Driver
         Console.WriteLine("[Driver] SyncSimulator created");
 
         // Run the battle completely synchronously - no async/await needed!
-        var result = simulator.Run(Library, battleOptions, printDebug: true);
+        SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: true);
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
@@ -148,7 +148,7 @@ public class Driver
         Console.WriteLine("[Driver] Async Simulator created");
 
         // Run the battle asynchronously
-        var result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
+        SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: true).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
 
