@@ -210,51 +210,45 @@ foreach (var message in messages)
 
     private async Task<Choice> GetMoveChoiceAsync(MoveRequest request, CancellationToken cancellationToken)
     {
-    Console.WriteLine("[PlayerConsole.GetMoveChoiceAsync] Starting");
-        
         if (request.Active.Count == 0)
 {
  throw new InvalidOperationException("No active Pokemon to make a move choice");
         }
 
-        var pokemonRequest = request.Active[0];
+ var pokemonRequest = request.Active[0];
 
-        AnsiConsole.MarkupLine("[bold cyan]Select your move:[/]");
+AnsiConsole.MarkupLine("[bold cyan]Select your move:[/]");
   AnsiConsole.WriteLine();
 
   var choices = new List<string>();
-        var moveIndices = new List<int>();
+   var moveIndices = new List<int>();
 
         // Add moves
-        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+ for (int i = 0; i < pokemonRequest.Moves.Count; i++)
       {
    var move = pokemonRequest.Moves[i];
 var disabled = IsDisabled(move.Disabled);
 
      if (!disabled)
-            {
-             // Just show move name without PP (not available in data structure)
+    {
+         // Just show move name without PP (not available in data structure)
        choices.Add($"{i + 1}. {move.Move.Name}");
 moveIndices.Add(i);
       }
         }
 
-        // Add switch option
+ // Add switch option
         choices.Add("S. Switch Pokemon");
-
-        Console.WriteLine("[PlayerConsole.GetMoveChoiceAsync] About to prompt user");
         
         // Run the blocking prompt on a background thread to avoid blocking the async pipeline
         var selection = await Task.Run(() => AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
+          new SelectionPrompt<string>()
             .Title("Choose an action:")
      .AddChoices(choices)), cancellationToken);
 
-  Console.WriteLine($"[PlayerConsole.GetMoveChoiceAsync] User selected: {selection}");
-
 if (selection.StartsWith("S"))
    {
-            // Switch - show available Pokemon  
+     // Switch - show available Pokemon  
        return await GetSwitchChoiceAsync(
        new SwitchRequest { Side = request.Side, ForceSwitch = new[] { false } },
           cancellationToken);
@@ -264,9 +258,7 @@ if (selection.StartsWith("S"))
         var moveIndex = moveIndices[choices.IndexOf(selection)];
   var selectedMove = pokemonRequest.Moves[moveIndex];
 
-      Console.WriteLine($"[PlayerConsole.GetMoveChoiceAsync] Returning choice for move: {selectedMove.Move.Name}");
-
-        return new Choice
+     return new Choice
 {
             Actions = new List<ChosenAction>
  {
@@ -275,11 +267,11 @@ if (selection.StartsWith("S"))
     Choice = ChoiceType.Move,
       Pokemon = null,
       MoveId = selectedMove.Id,
-             TargetLoc = 0
+        TargetLoc = 0
      }
-      }
+}
         };
-    }
+  }
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request, CancellationToken cancellationToken)
     {

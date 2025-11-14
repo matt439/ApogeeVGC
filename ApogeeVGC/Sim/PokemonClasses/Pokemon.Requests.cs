@@ -126,17 +126,23 @@ public partial class Pokemon
     /// </summary>
     public PokemonMoveRequestData GetMoveRequestData()
     {
-        Console.WriteLine($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
+        if (Battle.DebugMode)
+        {
+            Console.WriteLine($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
+        }
 
         // Trigger DisableMove event before getting moves
         // This allows conditions like ChoiceLock and items like Assault Vest
         // to disable appropriate moves
         Battle.RunEvent(EventId.DisableMove, this);
 
-        Console.WriteLine($"[GetMoveRequestData] {Name}: After DisableMove event, move states:");
-        foreach (var moveSlot in MoveSlots)
+        if (Battle.DebugMode)
         {
-            Console.WriteLine($"  - {Battle.Library.Moves[moveSlot.Id].Name}: Disabled={moveSlot.Disabled}");
+            Console.WriteLine($"[GetMoveRequestData] {Name}: After DisableMove event, move states:");
+            foreach (var moveSlot in MoveSlots)
+            {
+                Console.WriteLine($"  - {Battle.Library.Moves[moveSlot.Id].Name}: Disabled={moveSlot.Disabled}");
+            }
         }
 
         // Get locked move if Pokemon is not maybe-locked

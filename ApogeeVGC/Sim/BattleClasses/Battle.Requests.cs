@@ -14,12 +14,11 @@ public partial class Battle
 
     public void MakeRequest(RequestState? type = null)
     {
-        Console.WriteLine($"[MakeRequest] ENTRY: queue size = {Queue.List.Count}, type = {type}");
-
-        if (DebugMode)
+      if (DebugMode)
         {
-            Debug($"MakeRequest called with type={type}, current RequestState={RequestState}");
-        }
+   Console.WriteLine($"[MakeRequest] ENTRY: queue size = {Queue.List.Count}, type = {type}");
+        Debug($"MakeRequest called with type={type}, current RequestState={RequestState}");
+      }
 
         // Don't make requests if battle has ended
         if (Ended)
@@ -243,10 +242,13 @@ side.ClearChoice();
         // Verify that choices aren't already done (would indicate a bug)
         if (Sides.All(side => side.IsChoiceDone()))
         {
-            throw new InvalidOperationException("Choices are done immediately after a request");
+      throw new InvalidOperationException("Choices are done immediately after a request");
         }
 
-        Console.WriteLine($"[MakeRequest] EXIT: queue size = {Queue.List.Count}");
+  if (DebugMode)
+     {
+   Console.WriteLine($"[MakeRequest] EXIT: queue size = {Queue.List.Count}");
+        }
     }
 
     /// <summary>
@@ -268,8 +270,11 @@ side.ClearChoice();
         // Default to no request (null for each side)
         var requests = new IChoiceRequest?[Sides.Count];
 
+        if (DebugMode)
+        {
  Console.WriteLine($"[GetRequests] Called with type={type}");
     Console.WriteLine($"[GetRequests] Checking {Sides.Count} sides");
+        }
 
      switch (type)
    {
@@ -513,32 +518,37 @@ if (DebugMode)
         if (DebugMode)
       {
         Debug("CommitChoices starting");
-        }
-
         Console.WriteLine($"[CommitChoices] Starting, queue size = {Queue.List.Count}");
     if (Queue.List.Count > 0)
-        {
+    {
     Console.WriteLine($"[CommitChoices] Current queue:");
             for (int i = 0; i < Queue.List.Count; i++)
- {
-       Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
-       }
+       {
+      Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+        }
+        }
         }
 
         UpdateSpeed();
 
     // Reset consecutive request counter when choices are successfully committed
-        _consecutiveMoveRequests = 0;
+  _consecutiveMoveRequests = 0;
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
    // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
         var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+ if (DebugMode)
+   {
     Console.WriteLine($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
+        }
 
         Queue.Clear();
+        if (DebugMode)
+     {
         Console.WriteLine($"[CommitChoices] Cleared queue");
+        }
 
         if (!AllChoicesDone())
         {
@@ -560,41 +570,42 @@ if (DebugMode)
 
         // Add each side's actions to the queue
   foreach (Side side in Sides)
-        {
-          Queue.AddChoice(side.Choice.Actions);
+      {
+        Queue.AddChoice(side.Choice.Actions);
         }
 
    if (DebugMode)
         {
-      Debug($"Added {Queue.List.Count} actions to queue");
+  Debug($"Added {Queue.List.Count} actions to queue");
+  Console.WriteLine($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
    }
 
-        Console.WriteLine($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
-
-        ClearRequest();
+  ClearRequest();
 
       // Sort the new actions by priority/speed
         Queue.Sort();
 
+        if (DebugMode)
+ {
  Console.WriteLine($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
+ }
 
-      // Append the old queue actions after the new ones
-        Queue.List.AddRange(oldQueue);
+        // Append the old queue actions after the new ones
+   Queue.List.AddRange(oldQueue);
 
+        if (DebugMode)
+      {
         Console.WriteLine($"[CommitChoices] After restoring oldQueue, queue size = {Queue.List.Count}");
  if (Queue.List.Count > 0)
         {
  Console.WriteLine($"[CommitChoices] Final queue:");
             for (int i = 0; i < Math.Min(20, Queue.List.Count); i++)
      {
-      Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+  Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
    }
         }
-
-      if (DebugMode)
-        {
-          Debug($"Total queue size: {Queue.List.Count}");
-        }
+      Debug($"Total queue size: {Queue.List.Count}");
+  }
 
         // Clear request state
         RequestState = RequestState.None;

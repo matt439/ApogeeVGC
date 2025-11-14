@@ -85,32 +85,53 @@ public partial class Battle
         // This ensures it's preserved when CommitChoices processes team preview actions
         // In synchronous mode, RequestPlayerChoices triggers immediate processing,
         // so the StartGameAction must be in the queue before RunPickTeam is called
-        Console.WriteLine("[Battle.Start] Adding StartGameAction to queue");
+        if (DebugMode)
+        {
+            Console.WriteLine("[Battle.Start] Adding StartGameAction to queue");
+        }
         Queue.InsertChoice(new StartGameAction());
-        Console.WriteLine($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
+        if (DebugMode)
+        {
+            Console.WriteLine($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
+        }
 
         // Run team preview/selection phase
-        Console.WriteLine($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
+        if (DebugMode)
+        {
+            Console.WriteLine($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
+        }
 
         RunPickTeam();
 
-        Console.WriteLine($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
+        if (DebugMode)
+        {
+            Console.WriteLine($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
+        }
 
         // Set mid-turn flag
         MidTurn = true;
 
         // Start turn loop if no request is pending
-        Console.WriteLine($"[Battle.Start] Checking RequestState: {RequestState}");
+        if (DebugMode)
+        {
+            Console.WriteLine($"[Battle.Start] Checking RequestState: {RequestState}");
+        }
 
         if (RequestState == RequestState.None)
         {
-            Console.WriteLine("[Battle.Start] No request - calling TurnLoop()");
+            if (DebugMode)
+            {
+                Console.WriteLine("[Battle.Start] No request - calling TurnLoop()");
+            }
             TurnLoop();
         }
         else
         {
-            Console.WriteLine(
-                $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
+            if (DebugMode)
+            {
+                Console.WriteLine(
+                    $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
+            }
         }
 
         // Return immediately - Battle doesn't wait for choices
