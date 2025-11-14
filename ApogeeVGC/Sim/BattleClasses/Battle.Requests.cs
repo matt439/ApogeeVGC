@@ -191,6 +191,44 @@ side.ClearChoice();
             Debug($"Generated {requests.Count} requests");
         }
 
+   // Check if any sides got WaitRequest because they have no valid actions
+ // This can happen when all active Pokemon are fainted during a move request
+ // In this case, we need to check if the battle should end
+        if (type.Value == RequestState.Move)
+        {
+            for (int i = 0; i < requests.Count; i++)
+ {
+       if (requests[i] is WaitRequest)
+    {
+    Side side = Sides[i];
+      
+      // Check if this side has fainted active Pokemon
+     bool hasFaintedActive = side.Active.Any(p => p is { Fainted: true });
+   
+ if (hasFaintedActive)
+         {
+     if (DebugMode)
+    {
+       Debug($"WARNING: {side.Name} received WaitRequest but has fainted active Pokemon");
+    Debug("This indicates the battle should have ended or switched before requesting moves");
+        }
+         
+     // Check if battle should end
+     CheckWin();
+    
+     if (Ended)
+   {
+         if (DebugMode)
+         {
+      Debug("Battle ended after checking win conditions");
+  }
+         return;
+ }
+   }
+ }
+   }
+        }
+
         // Assign requests to each side
         for (int i = 0; i < Sides.Count; i++)
         {
@@ -230,79 +268,101 @@ side.ClearChoice();
         // Default to no request (null for each side)
         var requests = new IChoiceRequest?[Sides.Count];
 
-        switch (type)
-        {
+ Console.WriteLine($"[GetRequests] Called with type={type}");
+    Console.WriteLine($"[GetRequests] Checking {Sides.Count} sides");
+
+     switch (type)
+   {
             case RequestState.SwitchIn:
-                for (int i = 0; i < Sides.Count; i++)
-                {
+  for (int i = 0; i < Sides.Count; i++)
+             {
                     Side side = Sides[i];
-                    if (side.PokemonLeft <= 0) continue;
+            if (side.PokemonLeft <= 0) continue;
 
-                    // Create a table of which active Pokemon need to switch
-                    // Convert MoveIdBoolUnion to bool using IsTrue() method
-                    var switchTable = side.Active
-                        .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
-                        .ToList();
+         // Create a table of which active Pokemon need to switch
+       // Convert MoveIdBoolUnion to bool using IsTrue() method
+           var switchTable = side.Active
+             .Select(pokemon => pokemon?.SwitchFlag.IsTrue() ?? false)
+            .ToList();
 
-                    // Only create a switch request if at least one Pokemon needs to switch
-                    if (switchTable.Any(flag => flag))
-                    {
-                        requests[i] = new SwitchRequest
-                        {
-                            ForceSwitch = switchTable,
-                            Side = side.GetRequestData(),
-                        };
-                    }
+        // Only create a switch request if at least one Pokemon needs to switch
+           if (switchTable.Any(flag => flag))
+          {
+  requests[i] = new SwitchRequest
+      {
+ForceSwitch = switchTable,
+          Side = side.GetRequestData(),
+     };
+    }
                 }
 
-                break;
+         break;
 
-            case RequestState.TeamPreview:
-                for (int i = 0; i < Sides.Count; i++)
-                {
-                    Side side = Sides[i];
-                    int? maxChosenTeamSize = RuleTable.PickedTeamSize > 0
-                        ? RuleTable.PickedTeamSize
-                        : null;
+        case RequestState.TeamPreview:
+    for (int i = 0; i < Sides.Count; i++)
+    {
+  Side side = Sides[i];
+         int? maxChosenTeamSize = RuleTable.PickedTeamSize > 0
+  ? RuleTable.PickedTeamSize
+            : null;
 
-                    requests[i] = new TeamPreviewRequest
-                    {
-                        MaxChosenTeamSize = maxChosenTeamSize,
-                        Side = side.GetRequestData(),
-                    };
-                }
+             requests[i] = new TeamPreviewRequest
+   {
+               MaxChosenTeamSize = maxChosenTeamSize,
+  Side = side.GetRequestData(),
+                 };
+             }
 
-                break;
+              break;
 
-            default:
-                // Regular move requests
-                for (int i = 0; i < Sides.Count; i++)
-                {
-                    Side side = Sides[i];
-                    // Don't check PokemonLeft here - a side can make moves if they have active Pokemon
-                    // PokemonLeft is for win condition checking, not for determining if moves can be made
+        default:
+     // Regular move requests
+     for (int i = 0; i < Sides.Count; i++)
+ {
+          Side side = Sides[i];
+     // Don't check PokemonLeft here - a side can make moves if they have active Pokemon
+            // PokemonLeft is for win condition checking, not for determining if moves can be made
 
-                    // Get move request data for each active, non-fainted Pokemon
-                    var activeData = side.Active
-                        .Where(pokemon => pokemon is { Fainted: false })
-                        .Select(pokemon => pokemon!.GetMoveRequestData())
-                        .ToList();
+   // Get move request data for each active, non-fainted Pokemon
+              var activeData = side.Active
+    .Where(pokemon => pokemon is { Fainted: false })
+     .Select(pokemon => pokemon!.GetMoveRequestData())
+      .ToList();
 
-                    // Only create a move request if there are active Pokemon that can make moves
-                    if (activeData.Count > 0)
-                    {
-                        var moveRequest = new MoveRequest
-                        {
-                            Active = activeData,
-                            Side = side.GetRequestData()
-                        };
+// Only create a move request if there are active Pokemon that can make moves
+ if (activeData.Count > 0)
+      {
+         var moveRequest = new MoveRequest
+     {
+   Active = activeData,
+        Side = side.GetRequestData()
+   };
 
-                        requests[i] = moveRequest;
-                    }
-                }
+   requests[i] = moveRequest;
+       }
+          else
+ {
+    // If a side has no active non-fainted Pokemon during a move request,
+    // this indicates either:
+    // 1. The battle should have ended (this side has no Pokemon left)
+     // 2. A switch should have been requested before this point
+           // 
+     // This is an error state - the battle logic should have called
+// FaintMessages() which would have checked win conditions and/or
+    // set switch flags, leading to a SwitchIn request instead of a Move request.
+     //
+          // To prevent an endless loop, we'll check win conditions in MakeRequest.
+            if (DebugMode)
+    {
+       Debug($"WARNING: {side.Name} has no active non-fainted Pokemon during move request phase");
+   Debug($"  PokemonLeft: {side.PokemonLeft}");
+Debug($"  This usually indicates a bug in the fainting/switching logic");
+    }
+      }
+    }
 
-                break;
-        }
+       break;
+      }
 
         // Check if multiple requests exist (multiple players need to make choices)
         bool multipleRequestsExist = requests.Count(r => r != null) >= 2;
@@ -310,29 +370,29 @@ side.ClearChoice();
         // Finalize all requests
         for (int i = 0; i < Sides.Count; i++)
         {
-            if (requests[i] != null)
+      if (requests[i] != null)
+   {
+        // Set noCancel if cancellation is not supported or only one player is choosing
+if (!SupportCancel || !multipleRequestsExist)
+    {
+    requests[i] = requests[i] switch
             {
-                // Set noCancel if cancellation is not supported or only one player is choosing
-                if (!SupportCancel || !multipleRequestsExist)
-                {
-                    requests[i] = requests[i] switch
-                    {
-                        SwitchRequest sr => sr with { NoCancel = true },
-                        TeamPreviewRequest tpr => tpr with { NoCancel = true },
-                        MoveRequest mr => mr with { NoCancel = true },
-                        _ => requests[i],
-                    };
-                }
-            }
+         SwitchRequest sr => sr with { NoCancel = true },
+               TeamPreviewRequest tpr => tpr with { NoCancel = true },
+             MoveRequest mr => mr with { NoCancel = true },
+            _ => requests[i],
+    };
+}
+       }
             else
-            {
-                // Create a wait request for sides that don't need to make a choice
-                requests[i] = new WaitRequest
-                {
-                    Side = Sides[i].GetRequestData(),
-                };
-            }
-        }
+         {
+       // Create a wait request for sides that don't need to make a choice
+ requests[i] = new WaitRequest
+     {
+      Side = Sides[i].GetRequestData(),
+   };
+       }
+    }
 
         return requests.Where(r => r != null).Cast<IChoiceRequest>().ToList();
     }
@@ -340,82 +400,82 @@ side.ClearChoice();
     /// <summary>
     /// Takes a choice passed from the client. Starts the next
     /// turn if all required choices have been made.
-    /// </summary>
+ /// </summary>
     /// <param name="sideId">The ID of the side making the choice</param>
-    /// <param name="input">The choice being made</param>
+ /// <param name="input">The choice being made</param>
     /// <returns>True if the choice was valid and processed, false otherwise</returns>
     public bool Choose(SideId sideId, Choice input)
     {
         if (DebugMode)
         {
             Console.WriteLine(
-                $"[Battle.Choose] Called for {sideId} with {input.Actions.Count} actions");
-            Debug($"Battle.Choose called for {sideId} with {input.Actions.Count} actions");
+         $"[Battle.Choose] Called for {sideId} with {input.Actions.Count} actions");
+    Debug($"Battle.Choose called for {sideId} with {input.Actions.Count} actions");
         }
 
-        Side side = GetSide(sideId);
+     Side side = GetSide(sideId);
 
-        if (!side.Choose(input))
+    if (!side.Choose(input))
         {
-            if (DebugMode)
-            {
-                Debug($"side.Choose returned false for {sideId}");
+         if (DebugMode)
+      {
+            Debug($"side.Choose returned false for {sideId}");
             }
 
-            if (string.IsNullOrEmpty(side.GetChoice().Error))
-            {
-                side.EmitChoiceError(
-                    $"Unknown error for choice: {input}. If you're not using a custom client," +
-                    $"please report this as a bug.");
-            }
-
-            return false;
+    if (string.IsNullOrEmpty(side.GetChoice().Error))
+      {
+      side.EmitChoiceError(
+           $"Unknown error for choice: {input}. If you're not using a custom client," +
+         $"please report this as a bug.");
         }
 
-        if (DebugMode)
-        {
+    return false;
+        }
+
+  if (DebugMode)
+  {
             Debug($"side.Choose returned true for {sideId}");
         }
 
-        if (!side.IsChoiceDone())
+      if (!side.IsChoiceDone())
         {
-            if (DebugMode)
-            {
-                Debug($"Choice not done for {sideId}");
-            }
+   if (DebugMode)
+    {
+       Debug($"Choice not done for {sideId}");
+ }
 
             side.EmitChoiceError($"Incomplete choice: {input} - missing other pokemon");
-            return false;
+       return false;
         }
 
         if (DebugMode)
         {
             Console.WriteLine(
-                $"[Battle.Choose] Choice complete for {sideId}, checking if all done...");
-            Debug($"Choice complete for {sideId}");
+             $"[Battle.Choose] Choice complete for {sideId}, checking if all done...");
+        Debug($"Choice complete for {sideId}");
         }
 
-        // Check if all choices are done
+      // Check if all choices are done
         if (AllChoicesDone())
         {
-            if (DebugMode)
-            {
-                Console.WriteLine("[Battle.Choose] All choices done! Calling CommitChoices");
-                Debug("All choices done, calling CommitChoices");
-            }
+         if (DebugMode)
+       {
+              Console.WriteLine("[Battle.Choose] All choices done! Calling CommitChoices");
+     Debug("All choices done, calling CommitChoices");
+  }
 
-            // All choices received - process them and continue the turn
-            CommitChoices();
+       // All choices received - process them and continue the turn
+       CommitChoices();
         }
         else
-        {
-            if (DebugMode)
-            {
-                Console.WriteLine("[Battle.Choose] Not all choices done yet");
-            }
+      {
+if (DebugMode)
+       {
+    Console.WriteLine("[Battle.Choose] Not all choices done yet");
+       }
         }
 
-        return true;
+      return true;
     }
 
     /// <summary>
@@ -428,244 +488,244 @@ side.ClearChoice();
     {
         if (inputs is { Count: > 0 })
         {
-            // Apply provided choices to each corresponding side
-            for (int i = 0; i < inputs.Count; i++)
+          // Apply provided choices to each corresponding side
+ for (int i = 0; i < inputs.Count; i++)
             {
-                Choice input = inputs[i];
-                Sides[i].Choose(input);
+    Choice input = inputs[i];
+        Sides[i].Choose(input);
             }
-        }
+  }
         else
         {
-            // Auto-choose for all sides
-            foreach (Side side in Sides)
-            {
-                side.AutoChoose();
+      // Auto-choose for all sides
+      foreach (Side side in Sides)
+  {
+        side.AutoChoose();
             }
         }
 
-        // Commit all choices
+      // Commit all choices
         CommitChoices();
-    }
+ }
 
     public void CommitChoices()
     {
         if (DebugMode)
-        {
-            Debug("CommitChoices starting");
+      {
+        Debug("CommitChoices starting");
         }
 
         Console.WriteLine($"[CommitChoices] Starting, queue size = {Queue.List.Count}");
-        if (Queue.List.Count > 0)
+    if (Queue.List.Count > 0)
         {
-            Console.WriteLine($"[CommitChoices] Current queue:");
+    Console.WriteLine($"[CommitChoices] Current queue:");
             for (int i = 0; i < Queue.List.Count; i++)
-            {
-                Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
-            }
+ {
+       Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+       }
         }
 
         UpdateSpeed();
 
-        // Reset consecutive request counter when choices are successfully committed
+    // Reset consecutive request counter when choices are successfully committed
         _consecutiveMoveRequests = 0;
 
         // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
-        // re-sorted), but the new switch choices are sorted and inserted before
+   // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
         var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
-        Console.WriteLine($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
+    Console.WriteLine($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
 
         Queue.Clear();
         Console.WriteLine($"[CommitChoices] Cleared queue");
 
         if (!AllChoicesDone())
         {
-            throw new InvalidOperationException("Not all choices done");
-        }
+       throw new InvalidOperationException("Not all choices done");
+  }
 
-        // Log each side's choice to the input log and history
+      // Log each side's choice to the input log and history
         foreach (Side side in Sides)
         {
-            string? choice = side.GetChoice().ToString();
-            if (!string.IsNullOrEmpty(choice))
-            {
-                InputLog.Add($"> {side.Id} {choice}");
+          string? choice = side.GetChoice().ToString();
+   if (!string.IsNullOrEmpty(choice))
+        {
+       InputLog.Add($"> {side.Id} {choice}");
 
-                // Record choice in history
-                History.RecordChoice(side.Id, choice);
-            }
+        // Record choice in history
+       History.RecordChoice(side.Id, choice);
+   }
         }
 
         // Add each side's actions to the queue
-        foreach (Side side in Sides)
+  foreach (Side side in Sides)
         {
-            Queue.AddChoice(side.Choice.Actions);
+          Queue.AddChoice(side.Choice.Actions);
         }
 
-        if (DebugMode)
+   if (DebugMode)
         {
-            Debug($"Added {Queue.List.Count} actions to queue");
-        }
+      Debug($"Added {Queue.List.Count} actions to queue");
+   }
 
         Console.WriteLine($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
 
         ClearRequest();
 
-        // Sort the new actions by priority/speed
+      // Sort the new actions by priority/speed
         Queue.Sort();
 
-        Console.WriteLine($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
+ Console.WriteLine($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
 
-        // Append the old queue actions after the new ones
+      // Append the old queue actions after the new ones
         Queue.List.AddRange(oldQueue);
 
         Console.WriteLine($"[CommitChoices] After restoring oldQueue, queue size = {Queue.List.Count}");
-        if (Queue.List.Count > 0)
+ if (Queue.List.Count > 0)
         {
-            Console.WriteLine($"[CommitChoices] Final queue:");
+ Console.WriteLine($"[CommitChoices] Final queue:");
             for (int i = 0; i < Math.Min(20, Queue.List.Count); i++)
-            {
-                Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
-            }
+     {
+      Console.WriteLine($"  [{i}] {Queue.List[i].Choice}");
+   }
         }
 
-        if (DebugMode)
+      if (DebugMode)
         {
-            Debug($"Total queue size: {Queue.List.Count}");
+          Debug($"Total queue size: {Queue.List.Count}");
         }
 
         // Clear request state
         RequestState = RequestState.None;
         foreach (Side side in Sides)
-        {
-            side.ActiveRequest = null;
-        }
+     {
+          side.ActiveRequest = null;
+  }
 
-        // Continue executing the turn
+      // Continue executing the turn
         if (DebugMode)
-        {
+ {
             Debug("Calling TurnLoop");
-        }
+    }
 
-        TurnLoop();
+     TurnLoop();
 
         if (DebugMode)
-        {
-            Debug("TurnLoop returned");
+      {
+ Debug("TurnLoop returned");
         }
 
         // In synchronous mode, do NOT call RequestPlayerChoices here
         // This would cause infinite recursion since the simulator handles requests synchronously
-        // Instead, return and let the caller (simulator) check for pending requests
+    // Instead, return and let the caller (simulator) check for pending requests
 
         // Check if battle ended during TurnLoop
         if (Ended)
-        {
-            if (DebugMode)
+  {
+   if (DebugMode)
             {
-                Debug("Battle ended during TurnLoop, exiting");
-            }
+     Debug("Battle ended during TurnLoop, exiting");
+    }
 
             return;
         }
 
         // Workaround for tests - send updates if log is getting large
-        if (Log.Count - SentLogPos > 500)
-        {
-            SendUpdates();
+ if (Log.Count - SentLogPos > 500)
+    {
+         SendUpdates();
         }
     }
 
-    /// <summary>
-    /// Emits choice request events for all sides that need to make choices.
+  /// <summary>
+/// Emits choice request events for all sides that need to make choices.
     /// The battle will pause (return) and wait for Simulator to call Choose() with all choices.
-    /// When all choices are received, CommitChoices() will be called automatically.
-    /// </summary>
+ /// When all choices are received, CommitChoices() will be called automatically.
+ /// </summary>
     public void RequestPlayerChoices()
     {
         // Verify that we have active requests
         if (Sides.Any(side => side.ActiveRequest == null))
         {
-            throw new InvalidOperationException(
-                "Cannot request choices from players: Some sides have no active request");
+    throw new InvalidOperationException(
+  "Cannot request choices from players: Some sides have no active request");
         }
 
         // Emit choice request events for each side that needs to make a choice
-        foreach (Side side in Sides)
+ foreach (Side side in Sides)
         {
             // Skip sides that don't need to make a choice (already done)
             if (side.IsChoiceDone())
-            {
-                continue;
-            }
+       {
+  continue;
+     }
 
-            // Determine the request type
+         // Determine the request type
             BattleRequestType requestType = RequestState switch
-            {
-                RequestState.TeamPreview => BattleRequestType.TeamPreview,
-                RequestState.Move => BattleRequestType.TurnStart,
-                RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
-                _ => BattleRequestType.TurnStart,
-            };
+      {
+            RequestState.TeamPreview => BattleRequestType.TeamPreview,
+    RequestState.Move => BattleRequestType.TurnStart,
+    RequestState.SwitchIn or RequestState.Switch => BattleRequestType.ForceSwitch,
+  _ => BattleRequestType.TurnStart,
+     };
 
-            // Emit the choice request event - external handler (Simulator) will handle async player interaction
+        // Emit the choice request event - external handler (Simulator) will handle async player interaction
             RequestPlayerChoice(side.Id, side.ActiveRequest!, requestType);
         }
 
-        // Battle returns immediately - doesn't wait
-        // Simulator will call Choose() -> CommitChoices() to continue
+ // Battle returns immediately - doesn't wait
+ // Simulator will call Choose() -> CommitChoices() to continue
     }
 
     public void UndoChoice(SideId sideId)
-    {
+ {
         Side side = GetSide(sideId);
 
         // No active request - nothing to undo
         if (RequestState == RequestState.None)
-            return;
+          return;
 
-        // Check if undo would leak information
+// Check if undo would leak information
         if (side.GetChoice().CantUndo)
         {
-            side.EmitChoiceError(
-                "Can't undo: A trapping/disabling effect would cause undo to leak information");
-            return;
-        }
+  side.EmitChoiceError(
+    "Can't undo: A trapping/disabling effect would cause undo to leak information");
+          return;
+}
 
         bool updated = false;
 
         // If undoing a move selection, update disabled moves for each Pokémon
         if (side.RequestState == RequestState.Move)
-        {
+    {
             foreach (ChosenAction action in side.GetChoice().Actions)
             {
-                // Skip if not a move action
-                if (action.Choice != ChoiceType.Move)
-                    continue;
+       // Skip if not a move action
+        if (action.Choice != ChoiceType.Move)
+        continue;
 
-                Pokemon? pokemon = action.Pokemon;
-                if (pokemon == null)
-                    continue;
+      Pokemon? pokemon = action.Pokemon;
+       if (pokemon == null)
+             continue;
 
-                // Update the request for this Pokémon, refreshing disabled moves
-                if (side.UpdateRequestForPokemon(pokemon, req =>
-                        side.UpdateDisabledRequest(pokemon, req)))
-                {
-                    updated = true;
-                }
-            }
+       // Update the request for this Pokémon, refreshing disabled moves
+     if (side.UpdateRequestForPokemon(pokemon, req =>
+        side.UpdateDisabledRequest(pokemon, req)))
+          {
+    updated = true;
+     }
         }
+   }
 
-        // Clear the current choice
-        side.ClearChoice();
+      // Clear the current choice
+     side.ClearChoice();
 
         // If we updated any move availability, send the updated request to the client
         if (updated && side.ActiveRequest != null)
         {
             side.EmitRequest(side.ActiveRequest, updatedRequest: true);
-        }
+     }
     }
 
     /// <summary>
@@ -673,23 +733,23 @@ side.ClearChoice();
     /// Checks if all sides have completed their choices for the current turn.
     /// When supportCancel is disabled, locks completed choices to prevent information leaks.
     /// </summary>
-    /// <returns>True if all sides have completed their choices, false otherwise</returns>
+  /// <returns>True if all sides have completed their choices, false otherwise</returns>
     public bool AllChoicesDone()
     {
-        int totalActions = 0;
+  int totalActions = 0;
 
         foreach (Side side in Sides.Where(side => side.IsChoiceDone()))
-        {
-            // If cancellation is not supported, lock the choice to prevent undoing
+      {
+    // If cancellation is not supported, lock the choice to prevent undoing
             // This prevents information leaks from trapping/disabling effects
             if (!SupportCancel)
             {
                 Choice choice = side.GetChoice();
-                choice.CantUndo = true;
-            }
+       choice.CantUndo = true;
+}
 
-            totalActions++;
-        }
+         totalActions++;
+  }
 
         return totalActions >= Sides.Count;
     }
