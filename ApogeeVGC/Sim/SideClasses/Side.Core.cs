@@ -166,7 +166,7 @@ public partial class Side
         return new SidePlayerPerspective
         {
             Team = Team.AsReadOnly(),
-            Pokemon = Pokemon.Select(p => new PokemonPlayerPerspective
+            Pokemon = Pokemon.Select(p => new PokemonPerspective
             {
                 Name = p.Name,
                 Species = p.Species.Id,
@@ -192,7 +192,7 @@ public partial class Side
             }).ToList().AsReadOnly(),
             Active = Active.Select(p => p == null
                 ? null
-                : new PokemonPlayerPerspective
+                : new PokemonPerspective
                 {
                     Name = p.Name,
                     Species = p.Species.Id,
@@ -223,55 +223,53 @@ public partial class Side
     {
         return new SideOpponentPerspective
         {
-            Pokemon = Pokemon.Select(p =>
+            Pokemon = Pokemon.Select(p => new PokemonPerspective
             {
-                var healthData = p.GetHealth();
-                return new PokemonOpponentPerspective
-                {
-                    Name = p.Name,
-                    Species = p.Species.Id,
-                    Level = p.Level,
-                    Gender = p.Gender,
-                    Shiny = p.Set.Shiny,
-                    HpPercentage = p.MaxHp > 0 ? (double)p.Hp / p.MaxHp * 100.0 : 0.0,
-                    HpColor = healthData.HpColor,
-                    Fainted = p.Fainted,
-                    Status = p.Status,
-                    // Only reveal ability/item/moves if they've been revealed in battle
-                    // For now, we'll show them as revealed (you may want to track this separately)
-                    RevealedAbility = p.Ability != AbilityId.None ? p.Ability : null,
-                    RevealedItem = p.Item != ItemId.None ? p.Item : null,
-                    RevealedMoves = p.MoveSlots.Where(m => m.Used).Select(m => m.Id).ToList()
-                        .AsReadOnly(),
-                    Types = p.Types.AsReadOnly(),
-                    Terastallized = p.Terastallized,
-                    Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
-                    Position = p.Position,
-                    IsActive = p.IsActive,
-                };
+                Name = p.Name,
+                Species = p.Species.Id,
+                Level = p.Level,
+                Gender = p.Gender,
+                Shiny = p.Set.Shiny,
+                Hp = p.Hp,  // Full observability - exact HP
+                MaxHp = p.MaxHp,  // Full observability - exact MaxHp
+                Fainted = p.Fainted,
+                Status = p.Status,
+                MoveSlots = p.MoveSlots.AsReadOnly(),  // Full observability - all moves
+                Boosts = p.Boosts,  // Full observability - all boosts
+                StoredStats = p.StoredStats,  // Full observability - all stats
+                Ability = p.Ability,  // Full observability - ability always visible
+                Item = p.Item,  // Full observability - item always visible
+                Types = p.Types.AsReadOnly(),
+                Terastallized = p.Terastallized,
+                TeraType = p.TeraType,
+                CanTerastallize = p.CanTerastallize,
+                Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                Position = p.Position,
+                IsActive = p.IsActive,
             }).ToList().AsReadOnly(),
             Active = Active.Select(p =>
             {
                 if (p == null) return null;
-                var healthData = p.GetHealth();
-                return new PokemonOpponentPerspective
+                return new PokemonPerspective
                 {
                     Name = p.Name,
                     Species = p.Species.Id,
                     Level = p.Level,
                     Gender = p.Gender,
                     Shiny = p.Set.Shiny,
-                    HpPercentage = p.MaxHp > 0 ? (double)p.Hp / p.MaxHp * 100.0 : 0.0,
-                    HpColor = healthData.HpColor,
+                    Hp = p.Hp,  // Full observability - exact HP
+                    MaxHp = p.MaxHp,  // Full observability - exact MaxHp
                     Fainted = p.Fainted,
                     Status = p.Status,
-                    // Only reveal ability/item/moves if they've been revealed in battle
-                    RevealedAbility = p.Ability != AbilityId.None ? p.Ability : null,
-                    RevealedItem = p.Item != ItemId.None ? p.Item : null,
-                    RevealedMoves = p.MoveSlots.Where(m => m.Used).Select(m => m.Id).ToList()
-                        .AsReadOnly(),
+                    MoveSlots = p.MoveSlots.AsReadOnly(),  // Full observability - all moves
+                    Boosts = p.Boosts,  // Full observability - all boosts
+                    StoredStats = p.StoredStats,  // Full observability - all stats
+                    Ability = p.Ability,  // Full observability - ability always visible
+                    Item = p.Item,  // Full observability - item always visible
                     Types = p.Types.AsReadOnly(),
                     Terastallized = p.Terastallized,
+                    TeraType = p.TeraType,
+                    CanTerastallize = p.CanTerastallize,
                     Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
                     Position = p.Position,
                     IsActive = p.IsActive,

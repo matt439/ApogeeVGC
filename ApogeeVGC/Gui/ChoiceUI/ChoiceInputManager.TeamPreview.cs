@@ -309,7 +309,7 @@ public partial class ChoiceInputManager
         if (_perspective == null || _pendingChoice == null) return;
 
         // Get the Pokemon
-        PokemonPlayerPerspective? pokemon = _perspective.PlayerSide.Active[_selectedPokemonIndex];
+        PokemonPerspective? pokemon = _perspective.PlayerSide.Active[_selectedPokemonIndex];
         if (pokemon == null) return;
 
         PokemonMoveData moveData = pokemonRequest.Moves[moveIndex];

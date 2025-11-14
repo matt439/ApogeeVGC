@@ -29,56 +29,30 @@ public partial class Battle
 
     public void Add(params PartFuncUnion[] parts)
     {
-        // Check if any part is a function that generates side-specific content
-        bool hasFunction = parts.Any(part => part is FuncPartFuncUnion);
-
-        if (!hasFunction)
-        {
-            // Simple case: all parts are direct values
-            // Extract Part from PartPartFuncUnion before formatting
-            string message = $"|{string.Join("|", parts.Select(FormatPartFuncUnion))}";
-            Log.Add(message);
-            return;
-        }
-
-        // Complex case: some parts are functions
-        SideId? side = null;
-        var secret = new List<string>();
-        var shared = new List<string>();
-
+        // Full observability mode: no secret/shared split needed
+        // All information is visible to both sides
+        
+        var formattedParts = new List<string>();
+        
         foreach (PartFuncUnion part in parts)
         {
             if (part is FuncPartFuncUnion funcPart)
             {
-                // Execute the function to get side-specific content
+                // Execute the function to get content
                 SideSecretSharedResult result = funcPart.Func();
-
-                // Validate that all functions use the same side
-                if (side.HasValue && side.Value != result.Side)
-                {
-                    throw new InvalidOperationException("Multiple sides passed to add");
-                }
-
-                side = result.Side;
-                secret.Add(result.Secret.ToString());
-                shared.Add(result.Shared.ToString());
+                // In full observability mode, use the secret (full information) for everyone
+                formattedParts.Add(result.Secret.ToString());
             }
             else if (part is PartPartFuncUnion directPart)
             {
-                // Direct value: add to both secret and shared
-                string formatted = FormatPart(directPart.Part);
-                secret.Add(formatted);
-                shared.Add(formatted);
+                // Direct value
+                formattedParts.Add(FormatPart(directPart.Part));
             }
         }
-
-        // Add the split message
-        if (side.HasValue)
-        {
-            AddSplit(side.Value,
-                secret.Select(Part (s) => new StringPart(s)).ToArray(),
-                shared.Select(Part (s) => new StringPart(s)).ToArray());
-        }
+        
+        // Add single message to log
+        string message = $"|{string.Join("|", formattedParts)}";
+        Log.Add(message);
     }
 
     public void AddMove(params StringNumberDelegateObjectUnion[] args)

@@ -2,8 +2,11 @@
 
 namespace ApogeeVGC.Sim.SideClasses;
 
+/// <summary>
+/// Represents the opponent's side with full information visible (full observability mode).
+/// </summary>
 public record SideOpponentPerspective
 {
-    public IReadOnlyList<PokemonOpponentPerspective> Pokemon { get; init; } = [];
-    public IReadOnlyList<PokemonOpponentPerspective?> Active { get; init; } = [];
+    public IReadOnlyList<PokemonPerspective> Pokemon { get; init; } = [];
+    public IReadOnlyList<PokemonPerspective?> Active { get; init; } = [];
 }

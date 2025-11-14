@@ -438,7 +438,7 @@ public class BattleGame : Game
         {
             var p = battlePerspective.OpponentSide.Active[i];
             Console.WriteLine(
-                $"[BattleGame]   OpponentSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.HpPercentage:F1}%)")}");
+                $"[BattleGame]   OpponentSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.Hp}/{p.MaxHp})")}");
         }
     }
 

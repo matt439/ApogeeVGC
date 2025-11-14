@@ -3,15 +3,16 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.SpeciesClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.PokemonClasses;
 
 /// <summary>
-/// Represents the opponent's perspective of enemy Pokemon with obscured information.
-/// HP is shown as percentage, and certain details may be hidden until revealed in battle.
+/// Represents a Pokemon with full information visible.
+/// Used for both player and opponent Pokemon in full observability mode.
 /// </summary>
-public record PokemonOpponentPerspective
+public record PokemonPerspective
 {
     // Basic Info
     public required string Name { get; init; }
@@ -20,22 +21,30 @@ public record PokemonOpponentPerspective
     public required GenderId Gender { get; init; }
     public required bool Shiny { get; init; }
     
-    // Battle Status - HP as percentage for opponent
-    public required double HpPercentage { get; init; }
-    public HpColor? HpColor { get; init; }
+    // Battle Status
+    public required int Hp { get; init; }
+    public required int MaxHp { get; init; }
     public required bool Fainted { get; init; }
     public required ConditionId Status { get; init; }
     
-    // Revealed information (null if not yet revealed)
-    public AbilityId? RevealedAbility { get; init; }
-    public ItemId? RevealedItem { get; init; }
-    public IReadOnlyList<MoveId>? RevealedMoves { get; init; }
+    // Moves
+    public required IReadOnlyList<MoveSlot> MoveSlots { get; init; }
     
-    // Types (visible when Pokemon is seen)
+    // Stats and Boosts
+    public required BoostsTable Boosts { get; init; }
+    public required StatsExceptHpTable StoredStats { get; init; }
+    
+    // Ability and Item
+    public required AbilityId Ability { get; init; }
+    public required ItemId Item { get; init; }
+
+    // Types
     public required IReadOnlyList<PokemonType> Types { get; init; }
     public required MoveType? Terastallized { get; init; }
+    public required MoveType TeraType { get; init; }
+    public MoveTypeFalseUnion? CanTerastallize { get; init; }
     
-    // Volatiles (visible status conditions)
+    // Volatiles (temporary battle conditions like confusion, substitute, etc.)
     public required IReadOnlyList<ConditionId> Volatiles { get; init; }
     
     // Position

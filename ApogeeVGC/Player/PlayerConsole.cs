@@ -120,41 +120,41 @@ public class PlayerConsole : IPlayer
     private void RenderBattleState(BattlePerspective perspective)
     {
         var table = new Table()
-            .Border(TableBorder.Rounded)
-            .BorderColor(Color.Grey);
+       .Border(TableBorder.Rounded)
+          .BorderColor(Color.Grey);
 
         table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
         table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 
-        // Opponent's active Pokemon
-        var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
-        var opponentInfo = opponentActive != null
-            ? $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.HpPercentage)}"
-            : "[grey]No active Pokemon[/]";
+  // Opponent's active Pokemon
+       var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
+    var opponentInfo = opponentActive != null
+   ? $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP"
+       : "[grey]No active Pokemon[/]";
 
-        // Player's active Pokemon - handle fainted Pokemon properly
-        var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
+  // Player's active Pokemon - handle fainted Pokemon properly
+     var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
         string playerInfo;
         if (playerActive != null)
         {
-            if (playerActive.Fainted)
-            {
-                playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
-            }
-            else
-            {
-                playerInfo =
-                    $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP";
-            }
+     if (playerActive.Fainted)
+  {
+        playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
+   }
+      else
+   {
+ playerInfo =
+          $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP";
+  }
         }
         else
-        {
+  {
             playerInfo = "[grey]No active Pokemon[/]";
-        }
+      }
 
         table.AddRow(opponentInfo, playerInfo);
 
-        AnsiConsole.Write(table);
+     AnsiConsole.Write(table);
         AnsiConsole.WriteLine();
     }
 
