@@ -60,133 +60,188 @@ public class Simulator : IBattleController
     }
 
     public async Task<SimulatorResult> RunAsync(Library library, BattleOptions battleOptions,
-        bool printDebug = true)
+  bool printDebug = true)
     {
         Battle = new Battle(battleOptions, library);
         Player1 = CreatePlayer(SideId.P1, battleOptions.Player1Options);
         Player2 = CreatePlayer(SideId.P2, battleOptions.Player2Options);
         PrintDebug = printDebug;
 
-        // Subscribe to Battle events
-        Battle.ChoiceRequested += OnChoiceRequested;
+     // Subscribe to Battle events
+   Battle.ChoiceRequested += OnChoiceRequested;
         Battle.UpdateRequested += OnUpdateRequested;
         Battle.BattleEnded += OnBattleEnded;
         Battle.ClearMessagesRequested += OnClearMessagesRequested;
 
         // Create channel for choice responses
         _choiceResponseChannel = Channel.CreateUnbounded<ChoiceResponse>();
-        _cancellationTokenSource = new CancellationTokenSource();
+       _cancellationTokenSource = new CancellationTokenSource();
 
-        if (PrintDebug)
-        {
-            Console.WriteLine("Starting battle simulation...");
-        }
+     if (PrintDebug)
+    {
+       Console.WriteLine("Starting battle simulation...");
+     }
 
         try
+    {
+       // Set a reasonable timeout for the entire battle
+   _cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(30)); // Shorter timeout for testing
+
+   // Start the battle loop task
+   Task battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);
+
+      // Start processing choice responses
+     Task choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
+
+    // Wait for either the battle to end or a timeout
+   var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30), _cancellationTokenSource.Token);
+       var completedTask = await Task.WhenAny(
+   battleLoopTask,
+  choiceProcessingTask,
+  timeoutTask
+      );
+
+     string taskName = completedTask == battleLoopTask ? "battleLoop" : 
+         completedTask == choiceProcessingTask ? "choiceProcessing" : "timeout";
+   Console.WriteLine($"[Simulator.RunAsync] Completed task: {taskName}");
+  Console.WriteLine($"[Simulator.RunAsync] Battle.Ended = {Battle.Ended}");
+
+      // Check if we timed out
+   if (completedTask == timeoutTask)
+    {
+          Console.WriteLine("[Simulator.RunAsync] Battle timed out - forcing end");
+
+    // Force battle to end if it hasn't already
+      if (!Battle.Ended)
+     {
+     Console.WriteLine("[Simulator.RunAsync] Calling Tiebreak to end battle");
+     Battle.Tiebreak();
+Console.WriteLine($"[Simulator.RunAsync] After Tiebreak: Battle.Ended = {Battle.Ended}");
+     }
+  }
+      else if (completedTask == battleLoopTask)
+   {
+   Console.WriteLine("[Simulator.RunAsync] Battle loop completed");
+         }
+     else if (completedTask == choiceProcessingTask)
+      {
+     Console.WriteLine("[Simulator.RunAsync] Choice processing completed");
+            }
+
+      // Wait a bit for any final processing
+   await Task.Delay(100);
+
+           if (PrintDebug)
         {
-            // Set a reasonable timeout for the entire battle
-            _cancellationTokenSource.CancelAfter(TimeSpan.FromMinutes(30));
-
-            // Start the battle loop task
-            Task battleLoopTask = Task.Run(() => RunBattleLoop(), _cancellationTokenSource.Token);
-
-            // Start processing choice responses
-            Task choiceProcessingTask = ProcessChoiceResponsesAsync(_cancellationTokenSource.Token);
-
-            // Wait for battle to complete
-            await Task.WhenAny(battleLoopTask, choiceProcessingTask);
-
-            // If battle loop completed, wait a bit for final choices to process
-            if (battleLoopTask.IsCompleted)
-            {
-                await Task.Delay(100); // Give time for any final messages
-            }
-
-            if (PrintDebug)
-            {
-                Console.WriteLine("Battle has ended.");
-            }
+            Console.WriteLine($"Battle has ended: {Battle.Ended}");
+       }
 
             return DetermineWinner();
         }
         catch (OperationCanceledException)
         {
-            if (PrintDebug)
+  if (PrintDebug)
+    {
+     Console.WriteLine("Battle was cancelled due to timeout");
+}
+
+        // Force battle to end if it hasn't
+    if (!Battle.Ended)
             {
-                Console.WriteLine("Battle was cancelled due to timeout");
+            Battle.Tiebreak();
             }
 
-            return DetermineTiebreakWinner();
+         return DetermineWinner();
         }
         catch (Exception ex)
         {
             if (PrintDebug)
-            {
-                Console.WriteLine($"Battle error: {ex.GetType().Name}: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine(
-                        $"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
-                }
+       {
+         Console.WriteLine($"Battle error: {ex.GetType().Name}: {ex.Message}");
+        if (ex.InnerException != null)
+             {
+ Console.WriteLine(
+                 $"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+       }
 
-                Console.WriteLine($"Stack trace (last 10 frames):");
-                var frames = ex.StackTrace?.Split('\n').Take(10);
-                if (frames != null)
-                {
-                    foreach (string frame in frames)
-                    {
-                        Console.WriteLine($"  {frame.Trim()}");
-                    }
-                }
-            }
+        Console.WriteLine($"Stack trace (last 10 frames):");
+           var frames = ex.StackTrace?.Split('\n').Take(10);
+      if (frames != null)
+    {
+       foreach (string frame in frames)
+          {
+       Console.WriteLine($"  {frame.Trim()}");
+               }
+          }
+          }
 
             throw;
         }
-        finally
-        {
-// Unsubscribe from events
-            if (Battle != null)
-            {
-                Battle.ChoiceRequested -= OnChoiceRequested;
-                Battle.UpdateRequested -= OnUpdateRequested;
-                Battle.BattleEnded -= OnBattleEnded;
-                Battle.ClearMessagesRequested -= OnClearMessagesRequested;
+finally
+  {
+    // Unsubscribe from events
+         if (Battle != null)
+   {
+          Battle.ChoiceRequested -= OnChoiceRequested;
+   Battle.UpdateRequested -= OnUpdateRequested;
+        Battle.BattleEnded -= OnBattleEnded;
+       Battle.ClearMessagesRequested -= OnClearMessagesRequested;
             }
 
-            _choiceResponseChannel?.Writer.Complete();
-            _cancellationTokenSource?.Dispose();
+    // Complete the channel if not already completed
+     try
+        {
+      _choiceResponseChannel?.Writer.Complete();
+       }
+  catch (ChannelClosedException)
+{
+     // Already closed, that's fine
+      }
+
+     _cancellationTokenSource?.Dispose();
         }
     }
 
     /// <summary>
     /// Runs the asynchronous battle loop.
-/// Checks for pending requests after Battle.Start() and emits them.
+    /// Checks for pending requests after Battle.Start() and emits them.
+  /// Waits for the battle to actually end before returning.
     /// </summary>
     private void RunBattleLoop()
     {
         try
         {
-            Console.WriteLine("[Simulator.RunBattleLoop] Starting battle");
+      Console.WriteLine("[Simulator.RunBattleLoop] Starting battle");
 
             // Start the battle - this will set up team preview or initial turn
-            Battle!.Start();
+       Battle!.Start();
 
-            Console.WriteLine(
-                $"[Simulator.RunBattleLoop] Battle.Start() returned, RequestState: {Battle.RequestState}");
+ Console.WriteLine(
+    $"[Simulator.RunBattleLoop] Battle.Start() returned, RequestState: {Battle.RequestState}");
 
-            // After Start() returns, check if there's a pending request and emit it
-            // This handles team preview or initial switch-in requests
+       // After Start() returns, check if there's a pending request and emit it
+        // This handles team preview or initial switch-in requests
             if (Battle.RequestState != RequestState.None && !Battle.Ended)
-            {
-                Console.WriteLine($"[Simulator.RunBattleLoop] Emitting initial request: {Battle.RequestState}");
-                Battle.RequestPlayerChoices();
-            }
+    {
+      Console.WriteLine($"[Simulator.RunBattleLoop] Emitting initial request: {Battle.RequestState}");
+       Battle.RequestPlayerChoices();
+   }
+
+            // Wait for the battle to actually end
+    // The battle ends when OnBattleEnded is fired, which completes the choice response channel
+            // ProcessChoiceResponsesAsync will then complete, and this loop can exit
+  Console.WriteLine("[Simulator.RunBattleLoop] Waiting for battle to end...");
+   while (!Battle.Ended)
+          {
+        Thread.Sleep(100); // Check every 100ms
+     }
+    Console.WriteLine("[Simulator.RunBattleLoop] Battle has ended");
         }
-        catch (Exception ex)
-        {
+     catch (Exception ex)
+   {
             Console.WriteLine($"[Simulator.RunBattleLoop] Error: {ex.Message}");
-            throw;
-        }
+   throw;
+    }
     }
 
     /// <summary>
@@ -337,43 +392,57 @@ public class Simulator : IBattleController
         try
         {
             await foreach (ChoiceResponse response in _choiceResponseChannel!.Reader.ReadAllAsync(
-                               cancellationToken))
+          cancellationToken))
             {
-                Console.WriteLine(
-                    $"[Simulator.ProcessChoiceResponsesAsync] Processing choice for {response.SideId}");
+        Console.WriteLine(
+     $"[Simulator.ProcessChoiceResponsesAsync] Processing choice for {response.SideId}");
 
-                // Log the choice for replay purposes
-                LogChoice(response.SideId, response.Choice);
+        // Log the choice for replay purposes
+     LogChoice(response.SideId, response.Choice);
 
-                // Submit the choice to the battle (this will trigger the callback when all choices are done)
-                if (!Battle!.Choose(response.SideId, response.Choice))
+         // Submit the choice to the battle
+              // Note: This may trigger CommitChoices() if all choices are received
+     if (!Battle!.Choose(response.SideId, response.Choice))
+       {
+          Console.WriteLine(
+   $"[Simulator.ProcessChoiceResponsesAsync] Invalid choice for {response.SideId}");
+           }
+
+   // Clean up the completed task
+        lock (_pendingChoiceTasks)
+    {
+           _pendingChoiceTasks.Remove(response.SideId);
+         }
+
+     // Check if there are any pending choice tasks still running
+        bool hasPendingTasks;
+          lock (_pendingChoiceTasks)
                 {
-                    Console.WriteLine(
-                        $"[Simulator.ProcessChoiceResponsesAsync] Invalid choice for {response.SideId}");
-                }
+            hasPendingTasks = _pendingChoiceTasks.Count > 0;
+      }
 
-                // Clean up the completed task
-                lock (_pendingChoiceTasks)
+        // Only check for new requests if:
+      // 1. No pending choice tasks (all choices in current batch are processed)
+  // 2. There's a new pending request
+    // 3. Battle hasn't ended
+      // This avoids calling RequestPlayerChoices() while still processing choices,
+      // which would cause nested Battle.Choose() calls and stack overflow
+      if (!hasPendingTasks && Battle.RequestState != RequestState.None && !Battle.Ended)
                 {
-                    _pendingChoiceTasks.Remove(response.SideId);
-                }
+          Console.WriteLine(
+         $"[Simulator.ProcessChoiceResponsesAsync] All choices processed, new request pending: {Battle.RequestState}");
 
-                // After processing a choice, check if there are new pending requests
-                // This handles the case where CommitChoices -> TurnLoop -> MakeRequest was called
-                // We need to emit those requests here to avoid stack overflow from recursive calls
-                if (Battle.RequestState != RequestState.None && !Battle.Ended)
-                {
-                    Console.WriteLine(
-                        $"[Simulator.ProcessChoiceResponsesAsync] New request pending: {Battle.RequestState}");
+        // Small delay to ensure Battle.Choose() call stack has fully unwound
+         await Task.Yield();
 
-                    // Emit the new requests
-                    Battle.RequestPlayerChoices();
-                }
+        // Emit the new requests
+           Battle.RequestPlayerChoices();
+       }
             }
         }
         catch (OperationCanceledException)
-        {
-            Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Cancelled");
+     {
+    Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Cancelled");
         }
     }
 
@@ -392,28 +461,40 @@ public class Simulator : IBattleController
 
     private SimulatorResult DetermineWinner()
     {
-        // Check if we have a winner
-        if (!string.IsNullOrEmpty(Battle!.Winner))
-        {
-            // Winner is stored as side ID string ("p1" or "p2")
-            bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase);
-
-            if (PrintDebug)
-            {
-                string winnerName = isP1Winner ? "Player 1" : "Player 2";
-                Console.WriteLine($"Winner: {winnerName}");
-            }
-
-            return isP1Winner ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
-        }
-
-        // No clear winner - use tiebreak
+        // Battle must have ended to determine a winner
+        if (!Battle!.Ended)
+     {
         if (PrintDebug)
-        {
-            Console.WriteLine("Battle ended without a clear winner");
+            {
+   Console.WriteLine("WARNING: DetermineWinner called but battle hasn't ended yet");
+        }
+     // Default to tie if battle somehow hasn't ended
+    return SimulatorResult.Tie;
         }
 
-        return DetermineTiebreakWinner();
+        // Check if we have a winner (Winner will be empty string for ties)
+     if (!string.IsNullOrEmpty(Battle.Winner))
+        {
+       // Winner is stored as side ID string ("p1" or "p2")
+   bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase) ||
+         Battle.Winner.Equals("Random 1", StringComparison.OrdinalIgnoreCase);
+
+   if (PrintDebug)
+  {
+   string winnerName = isP1Winner ? "Player 1" : "Player 2";
+    Console.WriteLine($"Winner: {winnerName}");
+       }
+
+     return isP1Winner ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+        }
+
+ // Battle ended with no winner - it's a tie
+ if (PrintDebug)
+   {
+   Console.WriteLine("Battle ended in a tie");
+        }
+
+        return SimulatorResult.Tie;
     }
 
     private SimulatorResult DetermineTiebreakWinner()
@@ -424,12 +505,13 @@ public class Simulator : IBattleController
         }
 
         // Use Battle's tiebreak logic which checks:
-        // 1. Remaining Pokemon count
+   // 1. Remaining Pokemon count
         // 2. HP percentage
-        // 3. Total HP
+    // 3. Total HP
         Battle!.Tiebreak();
 
-        // After tiebreak, check the winner
+    // After tiebreak, check the result
+        // Tiebreak() calls Win() which sets Ended = true and Winner appropriately
         return DetermineWinner();
     }
 
@@ -515,31 +597,31 @@ public class Simulator : IBattleController
 
     /// <summary>
     /// Exports the battle replay as a string.
-    /// Includes battle initialization and all choices made during the battle.
+  /// Includes battle initialization and all choices made during the battle.
     /// </summary>
     /// <returns>String representation of the battle replay</returns>
     public string ExportReplay()
     {
         if (Battle == null)
         {
-            throw new InvalidOperationException("Battle is not initialized");
-        }
+    throw new InvalidOperationException("Battle is not initialized");
+  }
 
-        var sb = new System.Text.StringBuilder();
+      var sb = new System.Text.StringBuilder();
 
-        // Add start command with options (simplified)
+  // Add start command with options (simplified)
         sb.AppendLine($">start {{\"formatid\":\"{Battle.Format.FormatId}\"}}");
 
         // Add PRNG seed
         sb.AppendLine($">reseed {Battle.PrngSeed}");
 
         // Add all logged choices and commands
-        foreach (string log in InputLog)
+      foreach (string log in InputLog)
         {
             sb.AppendLine(log);
         }
 
-        return sb.ToString();
+return sb.ToString();
     }
 
     /// <summary>
@@ -549,25 +631,25 @@ public class Simulator : IBattleController
     {
         // Format choice as battle-stream protocol
         string choiceStr = FormatChoiceForLog(choice);
-        InputLog.Add($">{sideId.ToString().ToLower()} {choiceStr}");
-    }
+    InputLog.Add($">{sideId.ToString().ToLower()} {choiceStr}");
+}
 
     /// <summary>
-    /// Formats a choice object as a string for logging.
+  /// Formats a choice object as a string for logging.
     /// </summary>
     private string FormatChoiceForLog(Choice choice)
     {
-        // Simple implementation - can be enhanced based on choice type
+     // Simple implementation - can be enhanced based on choice type
         if (choice.Actions.Count == 0)
         {
-            return "pass";
-        }
+         return "pass";
+   }
 
-        var parts = new List<string>();
+  var parts = new List<string>();
         foreach (ChosenAction action in choice.Actions)
-        {
+   {
             // Format each action - this is a simplified version
-            parts.Add(action.ToString() ?? "default");
+  parts.Add(action.ToString() ?? "default");
         }
 
         return string.Join(",", parts);

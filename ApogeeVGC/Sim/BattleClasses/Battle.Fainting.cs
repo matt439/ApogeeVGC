@@ -358,6 +358,9 @@ public partial class Battle
             s.ActiveRequest = null;
         }
 
+        // Emit battle ended event to notify simulators
+        EmitBattleEnded();
+
         return true;
     }
 
