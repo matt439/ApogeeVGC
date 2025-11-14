@@ -283,62 +283,65 @@ if (selection.StartsWith("S"))
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request, CancellationToken cancellationToken)
     {
-      var availablePokemon = request.Side.Pokemon
-  .Where(p => !p.Active)
-            .ToList();
+        // Build list of available Pokemon with their original indices
+        var availablePokemonWithIndex = request.Side.Pokemon
+            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+         .Where(x => !x.PokemonData.Active)
+  .ToList();
 
-    if (availablePokemon.Count == 0)
-   {
-            AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
+        if (availablePokemonWithIndex.Count == 0)
+        {
+     AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
      throw new InvalidOperationException("No Pokemon available to switch");
         }
 
         AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
         AnsiConsole.WriteLine();
 
-        // Fix: Display actual Pokemon names and HP instead of "Pokemon (HP: None)"
-        var choices = availablePokemon
-    .Select((p, i) =>
-  {
-     // Parse the Condition (format: "HP/MaxHP status" or "HP/MaxHP" or "0 fnt")
-          string hpDisplay;
-          if (p.Condition.ToString() == "None")
+ // Build display choices
+ var choices = availablePokemonWithIndex
+   .Select((item, i) =>
+ {
+     var p = item.PokemonData;
+   // Parse the Condition (format: "HP/MaxHP status" or "HP/MaxHP" or "0 fnt")
+     string hpDisplay;
+    string conditionStr = p.Condition.ToString();
+   if (string.IsNullOrEmpty(conditionStr) || conditionStr == "None")
+       {
+ hpDisplay = "HP: Unknown";
+         }
+     else
       {
-       // Use Details.ToString() for name and parse actual HP data
-         // The Details contains the species name and other info
-    hpDisplay = "HP: Unknown";
-     }
-      else
-          {
-             // Condition is in format like "205/205" or "23/205 psn" or "0 fnt"
-       string conditionStr = p.Condition.ToString();
-         // Extract just the HP part before any status
-         hpDisplay = $"HP: {conditionStr}";
-                }
+ // Condition is in format like "205/205" or "23/205 psn" or "0 fnt"
+      hpDisplay = $"HP: {conditionStr}";
+    }
 
-   return $"{i + 1}. {p.Details} ({hpDisplay})";
+ return $"{i + 1}. {p.Details} ({hpDisplay})";
             })
-   .ToList();
+        .ToList();
 
         // Run the blocking prompt on a background thread
         var selection = await Task.Run(() => AnsiConsole.Prompt(
-         new SelectionPrompt<string>()
-   .Title("Choose a Pokemon:")
-      .AddChoices(choices)), cancellationToken);
+            new SelectionPrompt<string>()
+     .Title("Choose a Pokemon:")
+    .AddChoices(choices)), cancellationToken);
 
-        var selectedIndex = choices.IndexOf(selection);
+        var selectedDisplayIndex = choices.IndexOf(selection);
+        var selectedItem = availablePokemonWithIndex[selectedDisplayIndex];
 
-    return new Choice
+        // The target should be identified by the original index in the Side.Pokemon list
+ // The Side.Choose method will look up the Pokemon by this index
+   return new Choice
         {
-  Actions = new List<ChosenAction>
-        {
-    new()
-    {
- Choice = ChoiceType.Switch,
-         Pokemon = null,
+     Actions = new List<ChosenAction>
+   {
+  new()
+       {
+         Choice = ChoiceType.Switch,
+           Pokemon = null,
      MoveId = Sim.Moves.MoveId.None,
- Index = selectedIndex
-      }
+    Index = selectedItem.OriginalIndex
+            }
             }
         };
     }

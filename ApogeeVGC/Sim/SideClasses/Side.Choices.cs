@@ -708,12 +708,20 @@ public partial class Side
 
     private bool ProcessChosenSwitchAction(ChosenAction action)
     {
-        if (action.Target == null)
+        // Support both Target (Pokemon object) and Index (int) for switch actions
+      if (action.Target != null)
         {
-            return EmitChoiceError("Can't switch: No target Pokemon specified");
-        }
-
         return ChooseSwitch(action.Target).IsTrue();
+       }
+        else if (action.Index.HasValue)
+        {
+         // Convert 0-based index to 1-based for ChooseSwitch
+ return ChooseSwitch(action.Index.Value + 1).IsTrue();
+   }
+   else
+        {
+       return EmitChoiceError("Can't switch: No target Pokemon specified");
+        }
     }
 
     private bool ProcessChosenTeamAction(ChosenAction action)
