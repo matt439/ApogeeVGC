@@ -510,9 +510,10 @@ public record Conditions
                 }),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
                 {
-                    if (!pokemon.GetItem().IsChoice == true ||
-                        battle.EffectState.Move != null &&
-                        !pokemon.HasMove((MoveId)battle.EffectState.Move))
+                    // Check if Pokemon still has a choice item and the locked move
+                    if (!(pokemon.GetItem().IsChoice ?? false) ||
+                        (battle.EffectState.Move != null &&
+                         !pokemon.HasMove((MoveId)battle.EffectState.Move)))
                     {
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                         return;
@@ -520,6 +521,14 @@ public record Conditions
 
                     if (pokemon.IgnoringItem()) return;
 
+                    // First, clear all disabled states
+                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
+                    {
+                        moveSlot.Disabled = false;
+                        moveSlot.DisabledSource = null;
+                    }
+
+                    // Then, disable all moves except the locked move
                     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
                                  moveSlot.Move != battle.EffectState.Move))
                     {
