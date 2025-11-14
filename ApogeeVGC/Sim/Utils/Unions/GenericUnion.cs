@@ -243,10 +243,10 @@ public record IntBoolIntEmptyUndefinedUnion(int Value) : BoolIntEmptyUndefinedUn
 public record EmptyBoolIntEmptyUndefinedUnion(Empty Value) : BoolIntEmptyUndefinedUnion
 {
     public override bool IsTruthy() => false;
-    public override bool IsZero() => true;
+    public override bool IsZero() => false; // Empty (NOT_FAIL) is not zero
 
     public override BoolIntUndefinedUnion ToBoolIntUndefinedUnion() =>
-        throw new InvalidOperationException("BoolIntUndefinedUnion cannot hold the Undefined type.");
+        throw new InvalidOperationException("BoolIntUndefinedUnion cannot hold the Empty type.");
 }
 public record UndefinedBoolIntEmptyUndefinedUnion(Undefined Value) : BoolIntEmptyUndefinedUnion
 {
@@ -329,9 +329,11 @@ public record UndefinedBoolIntUndefinedUnion(Undefined Value) : BoolIntUndefined
 {
     public override bool IsTruthy() => false;
     public override bool IsZero() => false;
-    public override int ToInt() => 0;
+    public override int ToInt() =>
+    throw new InvalidOperationException(
+        "Cannot convert Undefined to int. Undefined and 0 are semantically different. " +
+    "Check for Undefined before calling ToInt().");
 }
-
 
 
 

@@ -445,31 +445,34 @@ public partial class BattleActions
         Pokemon pokemon, ActiveMove move, ActiveMove moveData, bool isSecondary = false)
     {
         for (int i = 0; i < targets.Count; i++)
-        {
-            if (targets[i] is not PokemonPokemonUnion pokemonUnion)
+    {
+    if (targets[i] is not PokemonPokemonUnion pokemonUnion)
             {
-                continue;
+         continue;
             }
 
-            Pokemon target = pokemonUnion.Pokemon;
-            RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
+  Pokemon target = pokemonUnion.Pokemon;
+  RelayVar? result = Battle.RunEvent(EventId.TryPrimaryHit, target, pokemon, moveData);
 
             // Convert various RelayVar types to BoolIntUndefinedUnion
+  // null means NOT_FAIL/continue - treat as success for hit processing
+            // VoidReturn means explicit void return - also treat as success
    BoolIntUndefinedUnion damageValue = result switch
      {
-                null => BoolIntUndefinedUnion.FromBool(true), // null means continue (true)
-              BoolIntUndefinedUnionRelayVar biuu => biuu.Value, // Already the right type
-                BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value), // Convert bool
-            IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value), // Convert int
-  UndefinedRelayVar => BoolIntUndefinedUnion.FromUndefined(), // Convert undefined
-         _ => BoolIntUndefinedUnion.FromBool(true), // Default to true for unknown types
-  };
+    null => BoolIntUndefinedUnion.FromBool(true), // null means NOT_FAIL/continue
+     VoidReturnRelayVar => BoolIntUndefinedUnion.FromBool(true), // VoidReturn also means continue
+     BoolIntUndefinedUnionRelayVar biuu => biuu.Value, // Already the right type
+          BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value), // Convert bool
+     IntRelayVar irv => BoolIntUndefinedUnion.FromInt(irv.Value), // Convert int
+           UndefinedRelayVar => BoolIntUndefinedUnion.FromUndefined(), // Convert undefined
+        _ => BoolIntUndefinedUnion.FromBool(true), // Default to true for unknown types
+            };
 
-       damage[i] = damageValue;
-        }
+     damage[i] = damageValue;
+     }
 
         return damage;
-    }
+  }
 
     public SpreadMoveDamage GetSpreadDamage(SpreadMoveDamage damage, SpreadMoveTargets targets, Pokemon source,
         ActiveMove move, ActiveMove moveData, bool isSecondary = false, bool isSelf = false)

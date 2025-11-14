@@ -28,8 +28,10 @@ public partial class BattleActions
         switch (left)
         {
             // Handle null inputs
+            // When both are null (NOT_FAIL/continue), return Empty to represent NOT_FAIL
+            // This preserves the semantic meaning that neither result failed
             case null when right == null:
-                return BoolIntEmptyUndefinedUnion.FromUndefined();
+                return BoolIntEmptyUndefinedUnion.FromEmpty();
             case null:
                 return right;
         }

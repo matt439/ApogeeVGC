@@ -220,53 +220,52 @@ internal static class EventHandlerAdapter
     /// <summary>
     /// Converts a legacy handler's return value to a RelayVar.
     /// </summary>
-    private static RelayVar? ConvertReturnValue(object? returnValue, EventHandlerInfo handlerInfo)
+  private static RelayVar? ConvertReturnValue(object? returnValue, EventHandlerInfo handlerInfo)
     {
         if (returnValue == null)
         {
             return null;
         }
 
-        // If it's already a RelayVar, return it directly
+   // If it's already a RelayVar, return it directly
         if (returnValue is RelayVar relayVar)
         {
-            return relayVar;
-        }
+       return relayVar;
+ }
 
         // Convert common union types to RelayVar
         return returnValue switch
         {
-            // BoolVoidUnion -> bool or null
-            BoolBoolVoidUnion boolVoid => new BoolRelayVar(boolVoid.Value),
-            VoidBoolVoidUnion => null,
+      // BoolVoidUnion -> bool or VoidReturn
+   BoolBoolVoidUnion boolVoid => new BoolRelayVar(boolVoid.Value),
+        VoidBoolVoidUnion => new VoidReturnRelayVar(),
 
-            // DoubleVoidUnion -> decimal or null
-            DoubleDoubleVoidUnion doubleVoid => new DecimalRelayVar((decimal)doubleVoid.Value),
-            VoidDoubleVoidUnion => null,
+            // DoubleVoidUnion -> decimal or VoidReturn
+       DoubleDoubleVoidUnion doubleVoid => new DecimalRelayVar((decimal)doubleVoid.Value),
+   VoidDoubleVoidUnion => new VoidReturnRelayVar(),
 
-            // IntVoidUnion -> int or null
-            IntIntVoidUnion intVoid => new IntRelayVar(intVoid.Value),
-            VoidIntVoidUnion => null,
+    // IntVoidUnion -> int or VoidReturn
+       IntIntVoidUnion intVoid => new IntRelayVar(intVoid.Value),
+          VoidIntVoidUnion => new VoidReturnRelayVar(),
 
-            // IntBoolVoidUnion -> int, bool, or null
-            IntIntBoolVoidUnion intBoolVoid => new IntRelayVar(intBoolVoid.Value),
+   // IntBoolVoidUnion -> int, bool, or VoidReturn
+      IntIntBoolVoidUnion intBoolVoid => new IntRelayVar(intBoolVoid.Value),
             BoolIntBoolVoidUnion boolIntVoid => new BoolRelayVar(boolIntVoid.Value),
-            VoidIntBoolVoidUnion => null,
+      VoidIntBoolVoidUnion => new VoidReturnRelayVar(),
 
             // Primitive types
-            bool boolValue => new BoolRelayVar(boolValue),
+   bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),
             decimal decValue => new DecimalRelayVar(decValue),
-            double doubleValue => new DecimalRelayVar((decimal)doubleValue),
+     double doubleValue => new DecimalRelayVar((decimal)doubleValue),
 
-            // VoidReturn means no value
-            VoidReturn => null,
+      // VoidReturn - preserve as VoidReturnRelayVar
+      VoidReturn => new VoidReturnRelayVar(),
 
-            // Undefined
-            Undefined => new UndefinedRelayVar(),
+    // Undefined
+ Undefined => new UndefinedRelayVar(),
 
-            _ => throw new InvalidOperationException(
-                $"Event {handlerInfo.Id}: Unable to convert return value of type '{returnValue.GetType().Name}' to RelayVar")
-        };
-    }
-}
+         _ => throw new InvalidOperationException(
+     $"Event {handlerInfo.Id}: Unable to convert return value of type '{returnValue.GetType().Name}' to RelayVar")
+  };
+    }}

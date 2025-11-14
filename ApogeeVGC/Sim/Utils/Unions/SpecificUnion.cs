@@ -345,7 +345,7 @@ public record TypeRunEventSource(PokemonType Type) : RunEventSource;
 /// <summary>
 /// bool | int | IEffect | PokemonType | ConditionId? | BoostsTable | List<PokemonType/> | MoveType |
 /// SparseBoostsTable | decimal | MoveId | string | RelayVar[] | Pokemon | Pokemon? | IntTrueUnion |
-/// BoolIntUndefinedUnion | SecondaryEffect[] | Undefined
+/// BoolIntUndefinedUnion | SecondaryEffect[] | Undefined | VoidReturn
 /// </summary>
 public abstract record RelayVar
 {
@@ -366,21 +366,23 @@ public abstract record RelayVar
     public static implicit operator RelayVar(decimal value) => new DecimalRelayVar(value);
     public static implicit operator RelayVar(MoveId moveId) => new MoveIdRelayVar(moveId);
     public static implicit operator RelayVar(string value) => new StringRelayVar(value);
-    public static implicit operator RelayVar(RelayVar[] values) => new ArrayRelayVar([.. values]);
+ public static implicit operator RelayVar(RelayVar[] values) => new ArrayRelayVar([.. values]);
     public static implicit operator RelayVar(List<RelayVar> values) => new ArrayRelayVar(values);
     public static implicit operator RelayVar(Pokemon pokemon) => new PokemonRelayVar(pokemon);
+    public static implicit operator RelayVar(VoidReturn value) => new VoidReturnRelayVar();
     public static RelayVar? FromNullablePokemon(Pokemon? pokemon) => pokemon is null ?
         null : new PokemonRelayVar(pokemon);
 
     public static RelayVar FromIntTrueUnion(IntTrueUnion union) => union switch
     {
-        IntIntTrueUnion intValue => new IntRelayVar(intValue.Value),
+   IntIntTrueUnion intValue => new IntRelayVar(intValue.Value),
         TrueIntTrueUnion => new BoolRelayVar(true),
-        _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
+    _ => throw new InvalidOperationException("Unknown IntTrueUnion type"),
     };
     public static implicit operator RelayVar(BoolIntUndefinedUnion union) => new BoolIntUndefinedUnionRelayVar(union);
     public static implicit operator RelayVar(SecondaryEffect[] effects) => new SecondaryEffectArrayRelayVar(effects);
     public static RelayVar FromUndefined() => new UndefinedRelayVar();
+  public static RelayVar FromVoid() => new VoidReturnRelayVar();
 }
 public record BoolRelayVar(bool Value) : RelayVar;
 public record IntRelayVar(int Value) : RelayVar;
@@ -400,6 +402,7 @@ public record PokemonRelayVar(Pokemon Pokemon) : RelayVar;
 public record BoolIntUndefinedUnionRelayVar(BoolIntUndefinedUnion Value) : RelayVar;
 public record SecondaryEffectArrayRelayVar(SecondaryEffect[] Effects) : RelayVar;
 public record UndefinedRelayVar : RelayVar;
+public record VoidReturnRelayVar : RelayVar;
 
 
 
