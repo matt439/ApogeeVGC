@@ -113,30 +113,43 @@ foreach (var message in messages)
 
     private void RenderBattleState(BattlePerspective perspective)
     {
-    var table = new Table()
-.Border(TableBorder.Rounded)
+ var table = new Table()
+ .Border(TableBorder.Rounded)
             .BorderColor(Color.Grey);
 
-      table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
+        table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
         table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 
-        // Opponent's active Pokemon
-     var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
+      // Opponent's active Pokemon
+        var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
         var opponentInfo = opponentActive != null
-       ? $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.HpPercentage)}"
-   : "[grey]No active Pokemon[/]";
+  ? $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.HpPercentage)}"
+ : "[grey]No active Pokemon[/]";
 
-        // Player's active Pokemon
+        // Player's active Pokemon - handle fainted Pokemon properly
         var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
-        var playerInfo = playerActive != null
-            ? $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP"
-       : "[grey]No active Pokemon[/]";
+    string playerInfo;
+        if (playerActive != null)
+     {
+          if (playerActive.Fainted)
+     {
+          playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
+       }
+      else
+        {
+       playerInfo = $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP";
+   }
+        }
+    else
+     {
+ playerInfo = "[grey]No active Pokemon[/]";
+        }
 
-        table.AddRow(opponentInfo, playerInfo);
+ table.AddRow(opponentInfo, playerInfo);
 
         AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
-  }
+  AnsiConsole.WriteLine();
+    }
 
     private string RenderHealthBar(double hpPercentage)
     {
@@ -270,45 +283,65 @@ if (selection.StartsWith("S"))
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request, CancellationToken cancellationToken)
     {
-        var availablePokemon = request.Side.Pokemon
-            .Where(p => !p.Active)
-  .ToList();
+      var availablePokemon = request.Side.Pokemon
+  .Where(p => !p.Active)
+            .ToList();
 
-   if (availablePokemon.Count == 0)
- {
-AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
-            throw new InvalidOperationException("No Pokemon available to switch");
-  }
+    if (availablePokemon.Count == 0)
+   {
+            AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
+     throw new InvalidOperationException("No Pokemon available to switch");
+        }
 
-  AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
+        AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
         AnsiConsole.WriteLine();
 
-     var choices = availablePokemon
-   .Select((p, i) => $"{i + 1}. Pokemon (HP: {p.Condition})")
+        // Fix: Display actual Pokemon names and HP instead of "Pokemon (HP: None)"
+        var choices = availablePokemon
+    .Select((p, i) =>
+  {
+     // Parse the Condition (format: "HP/MaxHP status" or "HP/MaxHP" or "0 fnt")
+          string hpDisplay;
+          if (p.Condition.ToString() == "None")
+      {
+       // Use Details.ToString() for name and parse actual HP data
+         // The Details contains the species name and other info
+    hpDisplay = "HP: Unknown";
+     }
+      else
+          {
+             // Condition is in format like "205/205" or "23/205 psn" or "0 fnt"
+       string conditionStr = p.Condition.ToString();
+         // Extract just the HP part before any status
+         hpDisplay = $"HP: {conditionStr}";
+                }
+
+   return $"{i + 1}. {p.Details} ({hpDisplay})";
+            })
    .ToList();
 
         // Run the blocking prompt on a background thread
-   var selection = await Task.Run(() => AnsiConsole.Prompt(
-    new SelectionPrompt<string>()
-     .Title("Choose a Pokemon:")
-  .AddChoices(choices)), cancellationToken);
+        var selection = await Task.Run(() => AnsiConsole.Prompt(
+         new SelectionPrompt<string>()
+   .Title("Choose a Pokemon:")
+      .AddChoices(choices)), cancellationToken);
 
- var selectedIndex = choices.IndexOf(selection);
+        var selectedIndex = choices.IndexOf(selection);
 
-return new Choice
+    return new Choice
         {
- Actions = new List<ChosenAction>
-     {
-      new()
-      {
-   Choice = ChoiceType.Switch,
-     Pokemon = null,
- MoveId = Sim.Moves.MoveId.None,
-    Index = selectedIndex
- }
+  Actions = new List<ChosenAction>
+        {
+    new()
+    {
+ Choice = ChoiceType.Switch,
+         Pokemon = null,
+     MoveId = Sim.Moves.MoveId.None,
+ Index = selectedIndex
       }
+            }
         };
-  }
+    }
 
  private bool IsDisabled(object? disabled)
     {
