@@ -74,8 +74,8 @@ public partial class BattleActions
             oldActive.Illusion = null;
 
             // End ability and item effects
-            Battle.SingleEvent(EventId.End, oldActive.GetAbility(), oldActive.AbilityState, oldActive);
-            Battle.SingleEvent(EventId.End, oldActive.GetItem(), oldActive.ItemState, oldActive);
+            Battle.SingleEvent(EventId.End, oldActive.GetAbility(), oldActive.AbilityState, new PokemonSingleEventTarget(oldActive));
+            Battle.SingleEvent(EventId.End, oldActive.GetItem(), oldActive.ItemState, new PokemonSingleEventTarget(oldActive));
 
             // If a pokemon is forced out by Whirlwind/etc or Eject Button/Pack, it can't use its chosen move
             Battle.Queue.CancelAction(oldActive);

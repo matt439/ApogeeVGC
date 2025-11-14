@@ -390,7 +390,7 @@ public partial class Pokemon
         Condition? linkedStatus = volatileData.LinkedStatus;
 
         // Trigger the End event
-        Battle.SingleEvent(EventId.End, status, volatileData, this);
+        Battle.SingleEvent(EventId.End, status, volatileData, new PokemonSingleEventTarget(this));
 
         // Remove the volatile (equivalent to delete this.volatiles[status.id])
         Volatiles.Remove(status.Id);
@@ -512,7 +512,7 @@ public partial class Pokemon
         foreach ((ConditionId conditionId, EffectState volatileState) in Volatiles)
         {
             Condition condition = Battle.Library.Conditions[conditionId];
-            Battle.SingleEvent(EventId.Copy, condition, volatileState, this);
+            Battle.SingleEvent(EventId.Copy, condition, volatileState, new PokemonSingleEventTarget(this));
         }
     }
 

@@ -22,76 +22,76 @@ public sealed record OnBasePowerEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnBasePowerEventInfo(
-      ModifierSourceMoveHandler handler,
-    int? priority = null,
+        ModifierSourceMoveHandler handler,
+        int? priority = null,
         bool usesSpeed = true)
-{
+    {
         Id = EventId.BasePower;
         Handler = handler;
         Priority = priority;
         UsesSpeed = usesSpeed;
         ExpectedParameterTypes =
         [
-            typeof(Battle), 
-        typeof(int), // relayVar
-    typeof(Pokemon), // source
-    typeof(Pokemon), // target
-   typeof(ActiveMove),
+            typeof(Battle),
+            typeof(int), // relayVar
+            typeof(Pokemon), // source
+            typeof(Pokemon), // target
+            typeof(ActiveMove),
         ];
-  ExpectedReturnType = typeof(DoubleVoidUnion);
-      
+        ExpectedReturnType = typeof(DoubleVoidUnion);
+
         // Nullability: All parameters are non-nullable
-ParameterNullability = [false, false, false, false, false];
-  ReturnTypeNullable = false; // DoubleVoidUnion is a struct
-        
-    // Validate configuration
-  ValidateConfiguration();
+        ParameterNullability = [false, false, false, false, false];
+        ReturnTypeNullable = false; // DoubleVoidUnion is a struct
+
+        // Validate configuration
+        ValidateConfiguration();
     }
-    
+
     /// <summary>
-  /// Creates event handler using context-based pattern.
+    /// Creates event handler using context-based pattern.
     /// Context provides: Battle, RelayVar (int base power), SourcePokemon, TargetPokemon, Move
     /// </summary>
     public OnBasePowerEventInfo(
-  EventHandlerDelegate contextHandler,
- int? priority = null,
-     bool usesSpeed = true)
+        EventHandlerDelegate contextHandler,
+        int? priority = null,
+        bool usesSpeed = true)
     {
-Id = EventId.BasePower;
- ContextHandler = contextHandler;
-     Priority = priority;
-    UsesSpeed = usesSpeed;
+        Id = EventId.BasePower;
+        ContextHandler = contextHandler;
+        Priority = priority;
+        UsesSpeed = usesSpeed;
     }
-    
+
     /// <summary>
     /// Creates strongly-typed context-based handler.
     /// Best of both worlds: strongly-typed parameters + context performance.
     /// </summary>
     public static OnBasePowerEventInfo Create(
-     ModifierSourceMoveHandler handler,
+        ModifierSourceMoveHandler handler,
         int? priority = null,
-  bool usesSpeed = true)
+        bool usesSpeed = true)
     {
-return new OnBasePowerEventInfo(
-          context =>
-     {
-     var result = handler(
-       context.Battle,
-     context.GetRelayVar<IntRelayVar>().Value,
-       context.GetSourcePokemon(),
-      context.GetTargetPokemon(),
-context.GetMove()
-      );
-         // Pattern match DoubleVoidUnion
+        return new OnBasePowerEventInfo(
+            context =>
+            {
+                var result = handler(
+                    context.Battle,
+                    context.GetRelayVar<IntRelayVar>().Value,
+                    context.GetSourcePokemon(),
+                    context.GetTargetPokemon(),
+                    context.GetMove()
+                );
+                // Pattern match DoubleVoidUnion
                 return result switch
-        {
-    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
-        VoidDoubleVoidUnion => null,
-       _ => null
-      };
-   },
-     priority,
-    usesSpeed
+                {
+                    DoubleDoubleVoidUnion d => new DecimalRelayVar((decimal)d.Value),
+                    VoidDoubleVoidUnion => null,
+                    _ => null,
+                };
+            },
+            priority,
+            usesSpeed
         );
     }
 }

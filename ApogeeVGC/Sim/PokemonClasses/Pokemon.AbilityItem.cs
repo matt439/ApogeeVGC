@@ -246,7 +246,7 @@ public partial class Pokemon
         PendingStaleness = null;
 
         // Trigger End event on the item
-        Battle.SingleEvent(EventId.End, item, oldItemState, this);
+        Battle.SingleEvent(EventId.End, item, oldItemState, new PokemonSingleEventTarget(this));
 
         // Trigger AfterTakeItem event
         Battle.RunEvent(EventId.AfterTakeItem, this, null, null, item);
@@ -305,7 +305,7 @@ EffectStateId effectId = effect.EffectStateId;
         // Trigger End event on old item if it existed
         if (oldItem.Id != ItemId.None)
         {
-            Battle.SingleEvent(EventId.End, oldItem, oldItemState, this);
+            Battle.SingleEvent(EventId.End, oldItem, oldItemState, new PokemonSingleEventTarget(this));
         }
 
         // Trigger Start event on new item if it exists
@@ -434,8 +434,8 @@ EffectStateId effectId = effect.EffectStateId;
         }
 
         // End the old ability's effects
-        Battle.SingleEvent(EventId.End, oldAbility, AbilityState, this,
-            SingleEventSource.FromNullablePokemon(source));
+        Battle.SingleEvent(EventId.End, oldAbility, AbilityState, new PokemonSingleEventTarget(this),
+   SingleEventSource.FromNullablePokemon(source));
 
         // Set the new ability
         Ability = ability;

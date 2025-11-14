@@ -33,7 +33,7 @@ public partial class Side
                 return false;
 
             // Call the restart handler
-            RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, this, source, sourceEffect);
+            RelayVar? restartResult = Battle.SingleEvent(EventId.SideRestart, status, condition, new SideSingleEventTarget(this), source, sourceEffect);
             return restartResult is BoolRelayVar { Value: true };
         }
 
@@ -58,7 +58,7 @@ public partial class Side
         SideConditions[status.Id] = effectState;
 
         // Step 6: SideStart event
-        RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, this, source, sourceEffect);
+        RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, new SideSingleEventTarget(this), source, sourceEffect);
         if (sideStartResult is not BoolRelayVar { Value: true })
         {
             SideConditions.Remove(status.Id);
@@ -98,7 +98,7 @@ public partial class Side
     {
         Condition condition = Battle.Library.Conditions[status];
         if (!SideConditions.TryGetValue(condition.Id, out EffectState? sideCondition)) return false;
-        Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, this);
+        Battle.SingleEvent(EventId.SideEnd, condition, sideCondition, new SideSingleEventTarget(this));
         SideConditions.Remove(condition.Id);
         return true;
     }
@@ -148,7 +148,7 @@ public partial class Side
                 return false;
 
             // Call the restart handler
-            RelayVar? restartResult = Battle.SingleEvent(EventId.Restart, status, condition, this, source, sourceEffect);
+            RelayVar? restartResult = Battle.SingleEvent(EventId.Restart, status, condition, new SideSingleEventTarget(this), source, sourceEffect);
             return restartResult is BoolRelayVar { Value: true };
         }
 
@@ -172,8 +172,8 @@ public partial class Side
         SlotConditions[targetSlot][status.Id] = conditionState;
 
         // Step 7: Start event
-        RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState,
-            GetActiveAt(targetSlot), source, sourceEffect);
+     RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState,
+  new PokemonSingleEventTarget(GetActiveAt(targetSlot)), source, sourceEffect);
 
         if (startResult is BoolRelayVar { Value: true }) return true;
         SlotConditions[targetSlot].Remove(status.Id);
@@ -230,7 +230,7 @@ public partial class Side
             return false;
 
         // Trigger End event
-        Battle.SingleEvent(EventId.End, status, conditionState, GetActiveAt(targetSlot));
+        Battle.SingleEvent(EventId.End, status, conditionState, new PokemonSingleEventTarget(GetActiveAt(targetSlot)));
 
         // Remove the condition
         SlotConditions[targetSlot].Remove(status.Id);
