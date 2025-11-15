@@ -24,6 +24,12 @@ public class Driver
             case DriverMode.GuiVsRandomDoubles:
                 RunGuiVsRandomDoublesTest();
                 break;
+            case DriverMode.ConsoleVsRandomSingles:
+                RunConsoleVsRandomSinglesTest();
+                break;
+            case DriverMode.ConsoleVsRandomDoubles:
+                RunConsoleVsRandomDoublesTest();
+                break;
             case DriverMode.RandomVsRandomSingles:
                 RunRandomVsRandomSinglesTest();
                 break;
@@ -35,7 +41,7 @@ public class Driver
         }
     }
 
-    private void RunGuiVsRandomSinglesTest()
+    private void RunConsoleVsRandomSinglesTest()
     {
         const bool debug = false;
 
@@ -74,6 +80,16 @@ public class Driver
             simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
+    }
+
+    private void RunConsoleVsRandomDoublesTest()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void RunGuiVsRandomSinglesTest()
+    {
+        throw new NotImplementedException();
     }
 
     private void RunGuiVsRandomDoublesTest()
