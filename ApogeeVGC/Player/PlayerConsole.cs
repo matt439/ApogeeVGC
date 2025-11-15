@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using Spectre.Console;
 
@@ -128,9 +129,17 @@ public class PlayerConsole : IPlayer
 
   // Opponent's active Pokemon
        var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
-    var opponentInfo = opponentActive != null
-   ? $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP"
-       : "[grey]No active Pokemon[/]";
+    string opponentInfo;
+        if (opponentActive != null)
+    {
+     var statusDisplay = GetStatusDisplay(opponentActive.Status);
+         var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
+       opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}";
+        }
+     else
+    {
+         opponentInfo = "[grey]No active Pokemon[/]";
+    }
 
   // Player's active Pokemon - handle fainted Pokemon properly
      var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
@@ -139,23 +148,25 @@ public class PlayerConsole : IPlayer
         {
      if (playerActive.Fainted)
   {
-        playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
+    playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
    }
       else
    {
- playerInfo =
-          $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP";
+   var statusDisplay = GetStatusDisplay(playerActive.Status);
+  var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
+              playerInfo =
+          $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}";
   }
-        }
+      }
         else
   {
-            playerInfo = "[grey]No active Pokemon[/]";
+    playerInfo = "[grey]No active Pokemon[/]";
       }
 
         table.AddRow(opponentInfo, playerInfo);
 
      AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
+      AnsiConsole.WriteLine();
     }
 
     private string RenderHealthBar(double hpPercentage)
@@ -380,18 +391,35 @@ string hpDisplay;
         if (_currentPerspective == null)
     return false;
 
-        var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
-            .FirstOrDefault(pp => pp.Position == pokemonIndex);
+   var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
+    .FirstOrDefault(pp => pp.Position == pokemonIndex);
 
     return perspectivePokemon?.Fainted ?? false;
     }
+
+    /// <summary>
+    /// Get status condition display markup for console
+    /// </summary>
+    private string GetStatusDisplay(ConditionId status)
+    {
+        return status switch
+        {
+         ConditionId.Burn => "[orange3]BRN[/]",
+     ConditionId.Paralysis => "[yellow]PAR[/]",
+ ConditionId.Sleep => "[purple]SLP[/]",
+            ConditionId.Freeze => "[cyan]FRZ[/]",
+     ConditionId.Poison => "[magenta]PSN[/]",
+            ConditionId.Toxic => "[darkmagenta]TOX[/]",
+  _ => ""
+        };
+  }
 
     private bool IsDisabled(object? disabled)
     {
         return disabled switch
         {
             Sim.Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-            _ => false
+    _ => false
         };
     }
 
@@ -401,7 +429,7 @@ string hpDisplay;
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         AnsiConsole.MarkupLine(
-            $"[yellow]Warning: {remainingTime.TotalSeconds:F0} seconds remaining![/]");
+$"[yellow]Warning: {remainingTime.TotalSeconds:F0} seconds remaining![/]");
         return Task.CompletedTask;
     }
 
