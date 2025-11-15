@@ -40,7 +40,7 @@ public abstract record BoolIntEmptyUndefinedUnion
 public record BoolBoolIntEmptyUndefinedUnion(bool Value) : BoolIntEmptyUndefinedUnion
 {
     public override bool IsTruthy() => Value;
-    public override bool IsZero() => !Value;
+    public override bool IsZero() => false; // Boolean false is NOT zero - it's a failure
 
     public override BoolIntUndefinedUnion ToBoolIntUndefinedUnion() => Value;
 }

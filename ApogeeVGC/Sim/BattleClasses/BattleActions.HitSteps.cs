@@ -135,15 +135,21 @@ public partial class BattleActions
         {
             Battle.Debug($"[HitStepTryEvent] Result type: {result?.GetType().Name ?? "null"}");
 
+            // Log the actual value if it's a BoolRelayVar
+            if (result is BoolRelayVar brv)
+            {
+                Battle.Debug($"[HitStepTryEvent] BoolRelayVar value: {brv.Value}");
+            }
+
             // If result is NOT_FAIL (null), keep it as undefined
             // Otherwise convert to boolean (default false if not a boolean)
             if (result is UndefinedRelayVar or null)
             {
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromUndefined());
             }
-            else if (result is BoolRelayVar brv)
+            else if (result is BoolRelayVar brv2)
             {
-                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(brv.Value));
+                convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(brv2.Value));
             }
             else
             {
@@ -153,6 +159,7 @@ public partial class BattleActions
             }
         }
 
+        Battle.Debug($"[HitStepTryEvent] Returning {convertedResults.Count} results");
         return convertedResults;
     }
 
