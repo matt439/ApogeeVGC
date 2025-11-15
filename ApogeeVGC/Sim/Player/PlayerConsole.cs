@@ -4,7 +4,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using Spectre.Console;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 /// <summary>
 /// Console-based player that displays battle state and accepts input via console.
@@ -215,7 +215,7 @@ public class PlayerConsole : IPlayer
             {
                 Choice = ChoiceType.Team,
                 Pokemon = null,
-                MoveId = Sim.Moves.MoveId.None,
+                MoveId = Moves.MoveId.None,
                 Index = index,
                 Priority = -position
             }).ToList();
@@ -376,7 +376,7 @@ string hpDisplay;
      {
          Choice = ChoiceType.Switch,
    Pokemon = null,
-        MoveId = Sim.Moves.MoveId.None,
+        MoveId = Moves.MoveId.None,
       Index = selectedItem.OriginalIndex
              }
   }
@@ -418,7 +418,7 @@ string hpDisplay;
     {
         return disabled switch
         {
-            Sim.Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
+            Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
     _ => false
         };
     }

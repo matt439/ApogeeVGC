@@ -1,5 +1,5 @@
 ﻿using ApogeeVGC.Gui;
-using ApogeeVGC.Player;
+using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils;
 

@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 public class PlayerGui : IPlayer
 {

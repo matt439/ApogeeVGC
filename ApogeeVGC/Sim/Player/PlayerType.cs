@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Player;
+﻿namespace ApogeeVGC.Sim.Player;
 
 public enum PlayerType
 {

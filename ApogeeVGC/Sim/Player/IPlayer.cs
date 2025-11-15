@@ -2,7 +2,7 @@
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 public enum PlayerUiType
 {

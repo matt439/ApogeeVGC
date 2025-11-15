@@ -1,7 +1,7 @@
 using ApogeeVGC.Data;
-using ApogeeVGC.Player;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Player;
 using ApogeeVGC.Sim.SideClasses;
 
 namespace ApogeeVGC.Sim.Core;

@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Utils;
 
-namespace ApogeeVGC.Player;
+namespace ApogeeVGC.Sim.Player;
 
 public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleController battleController) : IPlayer
 {

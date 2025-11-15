@@ -1,5 +1,4 @@
-﻿using ApogeeVGC.Player;
-using ApogeeVGC.Sim.FormatClasses;
+﻿using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.BattleClasses;
