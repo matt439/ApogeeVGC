@@ -528,14 +528,17 @@ public partial class Battle
             case ActionId.Move:
             {
                 var moveAction = (MoveAction)action;
+                Debug($"[RunAction.Move] Pokemon: {moveAction.Pokemon.Name}, Move: {moveAction.Move.Name}, Active: {moveAction.Pokemon.IsActive}, Fainted: {moveAction.Pokemon.Fainted}");
                 if (!moveAction.Pokemon.IsActive) return false;
                 if (moveAction.Pokemon.Fainted) return false;
+                Debug($"[RunAction.Move] Calling Actions.RunMove for {moveAction.Move.Name}");
                 Actions.RunMove(moveAction.Move, moveAction.Pokemon, moveAction.TargetLoc,
                     new BattleActions.RunMoveOptions
                     {
                         SourceEffect = moveAction.SourceEffect,
                         OriginalTarget = moveAction.OriginalTarget,
                     });
+                Debug($"[RunAction.Move] Actions.RunMove returned for {moveAction.Move.Name}");
                 break;
             }
 

@@ -680,6 +680,7 @@ public record Conditions
                 AssociatedMove = MoveId.Protect,
                 OnStart = new OnStartEventInfo((battle, target, _, _) =>
                 {
+                    battle.Debug($"[Protect.OnStart] Adding Protect volatile to {target.Name}");
                     if (battle.DisplayUi)
                     {
                         battle.Add("-singleturn", target, "Protect");
@@ -690,30 +691,33 @@ public record Conditions
                 //OnTryHitPriority = 3,
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                     {
-                        if (!(move.Flags.Protect ?? false))
-                        {
-                            return new VoidReturn();
-                        }
+                        battle.Debug($"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
+          
+         if (!(move.Flags.Protect ?? false))
+           {
+    return new VoidReturn();
+       }
 
-                        if (move.SmartTarget ?? false)
-                        {
-                            move.SmartTarget = false;
-                        }
-                        else if (battle.DisplayUi)
-                        {
-                            battle.Add("-activate", target, "move: Protect");
-                        }
+   if (move.SmartTarget ?? false)
+      {
+         move.SmartTarget = false;
+   }
+ else if (battle.DisplayUi)
+               {
+      battle.Add("-activate", target, "move: Protect");
+ }
 
-                        EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
-                        if (lockedMove is not null &&
-                            source.Volatiles[ConditionId.LockedMove].Duration == 2)
-                        {
-                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-                        }
+   EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+ if (lockedMove is not null &&
+    source.Volatiles[ConditionId.LockedMove].Duration == 2)
+            {
+    source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+        }
 
-                        return new Empty(); // in place of Battle.NOT_FAIL ("")
-                    },
-                    3),
+      battle.Debug($"[Protect.OnTryHit] Returning Empty (block move)");
+ return new Empty(); // in place of Battle.NOT_FAIL ("")
+ },
+    3),
             },
             [ConditionId.Tailwind] = new()
             {

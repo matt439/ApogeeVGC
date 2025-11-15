@@ -271,7 +271,7 @@ internal static class EventHandlerAdapter
             // BoolIntEmptyVoidUnion -> bool, int, Empty, or VoidReturn
             BoolBoolIntEmptyVoidUnion boolIntEmptyVoid => new BoolRelayVar(boolIntEmptyVoid.Value),
             IntBoolIntEmptyVoidUnion intIntEmptyVoid => new IntRelayVar(intIntEmptyVoid.Value),
-            EmptyBoolIntEmptyVoidUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
+            EmptyBoolIntEmptyVoidUnion => new BoolRelayVar(false), // Empty means blocked (e.g., by Protect)
             VoidUnionBoolIntEmptyVoidUnion => new VoidReturnRelayVar(),
 
             // BoolIntUndefinedUnion -> bool, int, or Undefined
@@ -287,14 +287,14 @@ internal static class EventHandlerAdapter
             // BoolIntEmptyUndefinedUnion -> bool, int, Empty, or Undefined
             BoolBoolIntEmptyUndefinedUnion boolIntEmptyUndef => new BoolRelayVar(boolIntEmptyUndef.Value),
             IntBoolIntEmptyUndefinedUnion intIntEmptyUndef => new IntRelayVar(intIntEmptyUndef.Value),
-            EmptyBoolIntEmptyUndefinedUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
+            EmptyBoolIntEmptyUndefinedUnion => new BoolRelayVar(false), // Empty means blocked
             UndefinedBoolIntEmptyUndefinedUnion => new UndefinedRelayVar(),
 
             // IntUndefinedFalseEmptyUnion -> int, Undefined, false, or Empty
             IntIntUndefinedFalseEmptyUnion intUndefFalseEmpty => new IntRelayVar(intUndefFalseEmpty.Value),
             UndefinedIntUndefinedFalseEmptyUnion => new UndefinedRelayVar(),
             FalseIntUndefinedFalseEmptyUnion => new BoolRelayVar(false),
-            EmptyIntUndefinedFalseEmptyUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
+            EmptyIntUndefinedFalseEmptyUnion => new BoolRelayVar(false), // Empty means blocked
 
             // BoolUndefinedUnion -> bool or Undefined
             BoolBoolUndefinedUnion boolUndef => new BoolRelayVar(boolUndef.Value),
@@ -312,8 +312,8 @@ internal static class EventHandlerAdapter
             // Undefined
             Undefined => new UndefinedRelayVar(),
 
-            // Empty - represents NOT_FAIL, should be treated as Undefined
-            Empty => new UndefinedRelayVar(),
+            // Empty - represents blocked move (e.g., by Protect), should return false
+            Empty => new BoolRelayVar(false),
 
             _ => throw new InvalidOperationException(
                 $"Event {handlerInfo.Id}: Unable to convert return value of type '{returnValue.GetType().Name}' to RelayVar")

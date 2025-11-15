@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
@@ -106,8 +107,15 @@ public record Moves
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) =>
-                    battle.Queue.WillAct() is null &&
-                    battle.RunEvent(EventId.StallMove, pokemon) is not null),
+                {
+                    var willActResult = battle.Queue.WillAct();
+                    var stallMoveResult = battle.RunEvent(EventId.StallMove, pokemon);
+                    battle.Debug($"[Protect.OnPrepareHit] WillAct: {willActResult != null}, StallMove: {stallMoveResult != null}");
+                    bool result = battle.Queue.WillAct() is not null &&
+                                  battle.RunEvent(EventId.StallMove, pokemon) is not null;
+                    battle.Debug($"[Protect.OnPrepareHit] Result: {result}");
+                    return result;
+                }),
                 OnHit = new OnHitEventInfo((_, pokemon, _, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.Stall);

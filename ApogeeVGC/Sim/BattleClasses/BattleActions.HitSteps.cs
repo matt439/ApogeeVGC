@@ -133,6 +133,8 @@ public partial class BattleActions
         var convertedResults = new List<BoolIntEmptyUndefinedUnion>();
         foreach (RelayVar? result in hitResults)
         {
+            Battle.Debug($"[HitStepTryEvent] Result type: {result?.GetType().Name ?? "null"}");
+
             // If result is NOT_FAIL (null), keep it as undefined
             // Otherwise convert to boolean (default false if not a boolean)
             if (result is UndefinedRelayVar or null)
@@ -146,6 +148,7 @@ public partial class BattleActions
             else
             {
                 // Any other RelayVar type defaults to false
+                Battle.Debug($"[HitStepTryEvent] Unknown type, defaulting to false");
                 convertedResults.Add(BoolIntEmptyUndefinedUnion.FromBool(false));
             }
         }
