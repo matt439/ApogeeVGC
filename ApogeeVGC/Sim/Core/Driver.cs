@@ -37,7 +37,7 @@ public class Driver
 
     private void RunGuiVsRandomSinglesTest()
     {
-        const bool debug = false;
+        const bool debug = true;
 
         PlayerOptions player1Options = new()
         {

@@ -258,147 +258,160 @@ public partial class Battle
     {
         // Materialize all data BEFORE yielding to avoid re-entrancy issues
         Condition status = pokemon.GetStatus();
-        EffectState statusState = pokemon.StatusState;
+   EffectState statusState = pokemon.StatusState;
 
         List<(ConditionId id, EffectState state, Condition condition)> volatiles = [];
-        volatiles.AddRange(pokemon.Volatiles.Keys.ToList()
-            .Select(id => (id, pokemon.Volatiles[id], Library.Conditions[id])));
+  volatiles.AddRange(pokemon.Volatiles.Keys.ToList()
+      .Select(id => (id, pokemon.Volatiles[id], Library.Conditions[id])));
 
         Ability ability = pokemon.GetAbility();
-        EffectState abilityState = pokemon.AbilityState;
+     EffectState abilityState = pokemon.AbilityState;
 
-        Item item = pokemon.GetItem();
-        EffectState itemState = pokemon.ItemState;
+   Item item = pokemon.GetItem();
+  EffectState itemState = pokemon.ItemState;
 
-        Species species = pokemon.BaseSpecies;
-        EffectState speciesState = pokemon.SpeciesState;
+        if (DebugMode && callbackName == EventId.Residual)
+  {
+  Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Item: {item.Name} (ID: {pokemon.Item}) | Event: {callbackName}");
+        }
 
-        List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
-        Side side = pokemon.Side;
-        if (pokemon.Position < side.SlotConditions.Count)
-        {
-            var slotConditionsDict =
-                side.SlotConditions[pokemon.Position];
-            foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
-                         .ToList()) // Materialize
-            {
-                slotConditions.Add((conditionId, slotConditionState,
-                    Library.Conditions[conditionId]));
-            }
+     Species species = pokemon.BaseSpecies;
+   EffectState speciesState = pokemon.SpeciesState;
+
+     List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
+    Side side = pokemon.Side;
+   if (pokemon.Position < side.SlotConditions.Count)
+    {
+    var slotConditionsDict =
+           side.SlotConditions[pokemon.Position];
+   foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
+             .ToList()) // Materialize
+      {
+         slotConditions.Add((conditionId, slotConditionState,
+      Library.Conditions[conditionId]));
+         }
         }
 
         // Now yield results using materialized data
 
-        // Check status condition (paralysis, burn, etc.)
+      // Check status condition (paralysis, burn, etc.)
         EventHandlerInfo? handlerInfo = GetHandlerInfo(pokemon, status, callbackName, prefix);
         if (handlerInfo != null || (getKey != null && statusState.GetProperty(getKey) != null))
-        {
+   {
             yield return ResolvePriority(new EventListenerWithoutPriority
             {
-                Effect = status,
-                HandlerInfo = handlerInfo,
+       Effect = status,
+      HandlerInfo = handlerInfo,
                 State = statusState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(new Action<bool>(_ =>
-                        pokemon.ClearStatus()))
-                    : null,
-                EndCallArgs = customHolder == null ? [false] : null,
-                EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
+End = customHolder == null
+       ? EffectDelegate.FromNullableDelegate(new Action<bool>(_ =>
+        pokemon.ClearStatus()))
+     : null,
+        EndCallArgs = customHolder == null ? [false] : null,
+   EffectHolder = customHolder ?? pokemon,
+          }, callbackName);
         }
 
         // Check volatile conditions (confusion, flinch, etc.)
         foreach ((ConditionId _, EffectState volatileState, Condition volatileCondition) in
-                 volatiles)
+           volatiles)
         {
             handlerInfo = GetHandlerInfo(pokemon, volatileCondition, callbackName, prefix);
-            if (handlerInfo != null ||
-                (getKey != null && volatileState.GetProperty(getKey) != null))
-            {
-                yield return ResolvePriority(new EventListenerWithoutPriority
+     if (handlerInfo != null ||
+             (getKey != null && volatileState.GetProperty(getKey) != null))
+     {
+      yield return ResolvePriority(new EventListenerWithoutPriority
                 {
-                    Effect = volatileCondition,
-                    HandlerInfo = handlerInfo,
-                    State = volatileState,
-                    End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(
-                            (Func<Condition, bool>)pokemon.RemoveVolatile)
-                        : null,
-                    EndCallArgs = customHolder == null ? [volatileCondition] : null,
-                    EffectHolder = customHolder ?? pokemon,
-                }, callbackName);
-            }
+          Effect = volatileCondition,
+            HandlerInfo = handlerInfo,
+        State = volatileState,
+              End = customHolder == null
+  ? EffectDelegate.FromNullableDelegate(
+            (Func<Condition, bool>)pokemon.RemoveVolatile)
+                 : null,
+      EndCallArgs = customHolder == null ? [volatileCondition] : null,
+   EffectHolder = customHolder ?? pokemon,
+     }, callbackName);
+        }
         }
 
-        // Check ability
-        handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
-        if (handlerInfo != null || (getKey != null && abilityState.GetProperty(getKey) != null))
+    // Check ability
+    handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
+  if (handlerInfo != null || (getKey != null && abilityState.GetProperty(getKey) != null))
         {
-            yield return ResolvePriority(new EventListenerWithoutPriority
-            {
+yield return ResolvePriority(new EventListenerWithoutPriority
+       {
                 Effect = ability,
-                HandlerInfo = handlerInfo,
-                State = abilityState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearAbility)
-                    : null,
-                EffectHolder = customHolder ?? pokemon,
+     HandlerInfo = handlerInfo,
+      State = abilityState,
+    End = customHolder == null
+     ? EffectDelegate.FromNullableDelegate(pokemon.ClearAbility)
+        : null,
+      EffectHolder = customHolder ?? pokemon,
             }, callbackName);
         }
 
         // Check held item
         handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
+        if (DebugMode && callbackName == EventId.Residual)
+{
+     Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Item handler for {item.Name}: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
+}
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
-        {
+ {
+       if (DebugMode && callbackName == EventId.Residual)
+{
+   Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Yielding item handler for {item.Name}");
+     }
             yield return ResolvePriority(new EventListenerWithoutPriority
-            {
-                Effect = item,
-                HandlerInfo = handlerInfo,
-                State = itemState,
-                End = customHolder == null
-                    ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
-                    : null,
-                EffectHolder = customHolder ?? pokemon,
-            }, callbackName);
-        }
+     {
+       Effect = item,
+     HandlerInfo = handlerInfo,
+    State = itemState,
+       End = customHolder == null
+         ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
+     : null,
+      EffectHolder = customHolder ?? pokemon,
+     }, callbackName);
+       }
 
         // Check species (for species-specific events)
-        handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
+     handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
         if (handlerInfo != null)
-        {
-            yield return ResolvePriority(new EventListenerWithoutPriority
-            {
-                Effect = species,
-                HandlerInfo = handlerInfo,
-                State = speciesState,
-                End = null, // Species can't be removed
-                EffectHolder = customHolder ?? pokemon,
+{
+        yield return ResolvePriority(new EventListenerWithoutPriority
+    {
+  Effect = species,
+    HandlerInfo = handlerInfo,
+ State = speciesState,
+ End = null, // Species can't be removed
+ EffectHolder = customHolder ?? pokemon,
             }, callbackName);
-        }
+  }
 
-        // Check slot conditions (Stealth Rock trap, etc.)
+    // Check slot conditions (Stealth Rock trap, etc.)
         foreach ((ConditionId conditionId, EffectState slotConditionState,
-                     Condition slotCondition) in slotConditions)
-        {
-            handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName, prefix);
-            if (handlerInfo != null ||
-                (getKey != null && slotConditionState.GetProperty(getKey) != null))
-            {
-                yield return ResolvePriority(new EventListenerWithoutPriority
-                {
-                    Effect = slotCondition,
-                    HandlerInfo = handlerInfo,
-                    State = slotConditionState,
-                    End = customHolder == null
-                        ? EffectDelegate.FromNullableDelegate(
-                            new Action<Side, Pokemon, ConditionId>((s, _, id) =>
-                                s.RemoveSideCondition(id)))
-                        : null,
-                    EndCallArgs = [side, pokemon, conditionId],
-                    EffectHolder = customHolder ?? pokemon,
-                }, callbackName);
+         Condition slotCondition) in slotConditions)
+   {
+        handlerInfo = GetHandlerInfo(pokemon, slotCondition, callbackName, prefix);
+    if (handlerInfo != null ||
+          (getKey != null && slotConditionState.GetProperty(getKey) != null))
+      {
+       yield return ResolvePriority(new EventListenerWithoutPriority
+       {
+ Effect = slotCondition,
+   HandlerInfo = handlerInfo,
+  State = slotConditionState,
+       End = customHolder == null
+   ? EffectDelegate.FromNullableDelegate(
+    new Action<Side, Pokemon, ConditionId>((s, _, id) =>
+  s.RemoveSideCondition(id)))
+         : null,
+              EndCallArgs = [side, pokemon, conditionId],
+     EffectHolder = customHolder ?? pokemon,
+          }, callbackName);
             }
-        }
+ }
     }
 
     private List<EventListener> FindBattleEventHandlers(EventId callbackName,

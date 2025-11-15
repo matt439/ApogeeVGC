@@ -112,11 +112,25 @@ public record Items
                 },
                 //OnResidualOrder = 28,
                 //OnResidualSubOrder = 3,
-                OnResidual = new OnResidualEventInfo((_, pokemon, _, _) =>
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
+                    if (battle.DebugMode)
+                    {
+                        battle.Debug($"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
+                    }
+
                     if (pokemon == null)
                     {
+                        if (battle.DebugMode)
+                        {
+                            battle.Debug("FlameOrb OnResidual: pokemon is null, returning");
+                        }
                         return;
+                    }
+
+                    if (battle.DebugMode)
+                    {
+                        battle.Debug($"FlameOrb OnResidual: Calling TrySetStatus for {pokemon.Name}");
                     }
 
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);

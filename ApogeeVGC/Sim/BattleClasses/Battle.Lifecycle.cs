@@ -739,12 +739,22 @@ public partial class Battle
                     Add(string.Empty);
                 }
 
+                if (DebugMode)
+                {
+                    Console.WriteLine($"[RunAction] About to call FieldEvent(Residual)");
+                }
+
                 ClearActiveMove(failed: true);
                 UpdateSpeed();
                 residualPokemon = GetAllActive()
                     .Select(p => (p, p.GetUndynamaxedHp()))
                     .ToList();
                 FieldEvent(EventId.Residual);
+
+                if (DebugMode)
+                {
+                    Console.WriteLine($"[RunAction] FieldEvent(Residual) returned");
+                }
 
                 if (!Ended && DisplayUi)
                 {
