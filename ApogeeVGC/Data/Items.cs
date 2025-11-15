@@ -65,10 +65,7 @@ public record Items
                     // This allows switching to reset the choice lock
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
-                        if (battle.DisplayUi || battle.DebugMode)
-                        {
-                            battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
-                        }
+                        battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
 
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
@@ -81,11 +78,8 @@ public record Items
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
                         pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
                     {
-                        if (battle.DebugMode)
-                        {
-                            Console.WriteLine(
-                                $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-                        }
+                        battle.Debug(
+                            $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
 
                         pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
                     }
@@ -114,24 +108,15 @@ public record Items
                 //OnResidualSubOrder = 3,
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (battle.DebugMode)
-                    {
-                        battle.Debug($"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
-                    }
+                    battle.Debug($"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
 
                     if (pokemon == null)
                     {
-                        if (battle.DebugMode)
-                        {
-                            battle.Debug("FlameOrb OnResidual: pokemon is null, returning");
-                        }
+                        battle.Debug("FlameOrb OnResidual: pokemon is null, returning");
                         return;
                     }
 
-                    if (battle.DebugMode)
-                    {
-                        battle.Debug($"FlameOrb OnResidual: Calling TrySetStatus for {pokemon.Name}");
-                    }
+                    battle.Debug($"FlameOrb OnResidual: Calling TrySetStatus for {pokemon.Name}");
 
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);
                 })

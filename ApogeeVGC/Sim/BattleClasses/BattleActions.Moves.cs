@@ -421,7 +421,7 @@ public partial class BattleActions
         {
             if (target is null)
             {
-                Console.WriteLine($"[UseMoveInner] Move {moveName} failed: no valid target");
+                Battle.Debug($"[UseMoveInner] Move {moveName} failed: no valid target");
                 pokemon.MoveThisTurnResult = false;
                 return false;
             }

@@ -161,7 +161,7 @@ public partial class Battle
                 source, sourceEffect);
 
             // Debug logging for return value
-            if (DebugMode && returnVal != null)
+            if (returnVal != null)
             {
                 string returnValStr = returnVal switch
                 {
@@ -192,26 +192,23 @@ public partial class Battle
         bool? fastExit = null)
     {
         // Debug logging for event entry
-        if (DebugMode)
+        string targetStr = target switch
         {
-            string targetStr = target switch
-            {
-                PokemonRunEventTarget p => p.Pokemon.Name,
-                PokemonArrayRunEventTarget a =>
-                    $"[{string.Join(", ", a.PokemonList.Select(p => p.Name))}]",
-                SideRunEventTarget s => $"Side {s.Side.Id}",
-                FieldRunEventTarget => "Field",
-                BattleRunEventTarget => "Battle",
-                _ => "null"
-            };
-            string sourceStr = source switch
-            {
-                PokemonRunEventSource p => p.Pokemon.Name,
-                _ => "null"
-            };
-            Debug(
-                $"RunEvent: {eventId} | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
-        }
+            PokemonRunEventTarget p => p.Pokemon.Name,
+            PokemonArrayRunEventTarget a =>
+                $"[{string.Join(", ", a.PokemonList.Select(p => p.Name))}]",
+            SideRunEventTarget s => $"Side {s.Side.Id}",
+            FieldRunEventTarget => "Field",
+            BattleRunEventTarget => "Battle",
+            _ => "null"
+        };
+        string sourceStr = source switch
+        {
+            PokemonRunEventSource p => p.Pokemon.Name,
+            _ => "null"
+        };
+        Debug(
+            $"RunEvent: {eventId} | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
 
         // Check for stack overflow
         if (EventDepth >= 8)
@@ -241,16 +238,13 @@ public partial class Battle
         var handlers = FindEventHandlers(target, eventId, effectSource);
 
         // Debug logging for handler count
-        if (DebugMode)
+        Debug($"RunEvent {eventId}: Found {handlers.Count} handlers");
+        if (handlers.Count is > 0 and <= 5)
         {
-            Debug($"RunEvent {eventId}: Found {handlers.Count} handlers");
-            if (handlers.Count is > 0 and <= 5)
+            foreach (EventListener h in handlers)
             {
-                foreach (EventListener h in handlers)
-                {
-                    Debug(
-                        $"  - {h.Effect.Name} ({h.Effect.EffectType}) | Priority: {h.Priority} | Speed: {h.Speed}");
-                }
+                Debug(
+                    $"  - {h.Effect.Name} ({h.Effect.EffectType}) | Priority: {h.Priority} | Speed: {h.Speed}");
             }
         }
 
@@ -563,13 +557,13 @@ public partial class Battle
             // Sort by speed (highest to lowest) with proper speed tie resolution
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
-            if (DebugMode && actives.Count > 0)
+            if (actives.Count > 0)
             {
                 Debug(
                     $"EachEvent {eventId}: Speed order: {string.Join(" > ", actives.Select(p => $"{p.Name}({p.Speed})"))}");
             }
 
-            // Convert bool? to RelayVar? for RunEvent
+// Convert bool? to RelayVar? for RunEvent
             RelayVar? relayVarConverted =
                 relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
 
@@ -583,11 +577,8 @@ public partial class Battle
             // Special handling for Weather events in Gen 7+
             if (eventId == EventId.Weather && Gen >= 7)
             {
-                if (DebugMode)
-                {
-                    Debug(
-                        $"EachEvent {eventId}: Triggering Update event (Gen 7+ Weather handling)");
-                }
+                Debug(
+                    $"EachEvent {eventId}: Triggering Update event (Gen 7+ Weather handling)");
 
                 eventId = EventId.Update;
                 effect = null;
@@ -610,30 +601,28 @@ public partial class Battle
     public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
     {
         // Debug logging for event entry
-        if (DebugMode)
+        string targetsStr = targets != null
+            ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
+            : "all";
+        Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
+
+        if (eventId == EventId.Residual)
         {
-            string targetsStr = targets != null
-                ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
-                : "all";
-            Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
-  
-            if (eventId == EventId.Residual)
-  {
-         Debug("[FieldEvent] Residual: Starting to collect handlers");
-                foreach (Side side in Sides)
-    {
-     foreach (Pokemon? active in side.Active)
-           {
-        if (active != null)
-              {
-          Debug($"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
+            Debug("[FieldEvent] Residual: Starting to collect handlers");
+            foreach (Side side in Sides)
+            {
+                foreach (Pokemon? active in side.Active)
+                {
+                    if (active != null)
+                    {
+                        Debug(
+                            $"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
+                    }
+                }
             }
-     }
-      }
-   }
         }
 
-    // Determine if we should track duration for this event
+        // Determine if we should track duration for this event
         EffectStateKey? getKey = eventId == EventId.Residual ? EffectStateKey.Duration : null;
 
         // Build the field and side event IDs based on the base event
@@ -647,100 +636,91 @@ public partial class Battle
         // Collect handlers from sides and active Pokemon
         foreach (Side side in Sides)
         {
-          // Add side condition handlers (but not for ally sides in multi battles)
+            // Add side condition handlers (but not for ally sides in multi battles)
             // In single battles, side.N is always < 2, so this always executes
-       if (side.N < 2)
-  {
-        handlers.AddRange(
-   FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
-      }
-
-  // Process each active Pokemon on this side
-     foreach (Pokemon active in side.Active.OfType<Pokemon>())
+            if (side.N < 2)
             {
-        // For SwitchIn events, also trigger AnySwitchIn handlers
-    if (eventId == EventId.SwitchIn)
-  {
-         handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.Any));
+                handlers.AddRange(
+                    FindSideEventHandlers(side, sideEventId, EventPrefix.None, getKey));
+            }
+
+            // Process each active Pokemon on this side
+            foreach (Pokemon active in side.Active.OfType<Pokemon>())
+            {
+                // For SwitchIn events, also trigger AnySwitchIn handlers
+                if (eventId == EventId.SwitchIn)
+                {
+                    handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.Any));
                 }
 
-      // If targets were specified, only process those Pokemon
- if (targets != null && !targets.Contains(active)) continue;
+                // If targets were specified, only process those Pokemon
+                if (targets != null && !targets.Contains(active)) continue;
 
                 // Collect handlers from this Pokemon and related effects
-         handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None,
-  getKey));
-        handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
-        handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
-      handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
-    }
+                handlers.AddRange(FindPokemonEventHandlers(active, eventId, EventPrefix.None,
+                    getKey));
+                handlers.AddRange(FindSideEventHandlers(side, eventId, customHolder: active));
+                handlers.AddRange(FindFieldEventHandlers(Field, eventId, customHolder: active));
+                handlers.AddRange(FindBattleEventHandlers(eventId, getKey, active));
+            }
         }
 
         // Sort handlers by speed order
         SpeedSort(handlers);
 
         // Debug logging for handler count
-        if (DebugMode)
-   {
-     Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
-  if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
-          {
-          foreach (EventListener h in handlers.Take(10))
-       {
-  string holderStr = h.EffectHolder switch
-    {
-   PokemonEffectHolder peh => peh.Pokemon.Name,
-      SideEffectHolder seh => $"Side {seh.Side.Id}",
-   FieldEffectHolder => "Field",
-     BattleEffectHolder => "Battle",
-         _ => "Unknown",
-};
-   Debug(
-      $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
-        }
-   }
+        Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
+        if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
+        {
+            foreach (EventListener h in handlers.Take(10))
+            {
+                string holderStr = h.EffectHolder switch
+                {
+                    PokemonEffectHolder peh => peh.Pokemon.Name,
+                    SideEffectHolder seh => $"Side {seh.Side.Id}",
+                    FieldEffectHolder => "Field",
+                    BattleEffectHolder => "Battle",
+                    _ => "Unknown",
+                };
+                Debug(
+                    $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
+            }
         }
 
         // Execute each handler in order
         int handlerIndex = 0;
-  while (handlers.Count > 0)
-   {
-     EventListener handler = handlers[0];
-      handlers.RemoveAt(0);
-      handlerIndex++;
+        while (handlers.Count > 0)
+        {
+            EventListener handler = handlers[0];
+            handlers.RemoveAt(0);
+            handlerIndex++;
 
- IEffect effect = handler.Effect;
+            IEffect effect = handler.Effect;
 
             Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
 
-       if (DebugMode && handlerIndex <= 20) // Limit debug output for performance
-     {
-          string holderName = handler.EffectHolder switch
-{
-          PokemonEffectHolder peh => peh.Pokemon.Name,
-        SideEffectHolder seh => $"Side {seh.Side.Id}",
-  FieldEffectHolder => "Field",
-      _ => "Unknown"
-   };
-   Debug(
-   $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
-  }
+            string holderName = handler.EffectHolder switch
+            {
+                PokemonEffectHolder peh => peh.Pokemon.Name,
+                SideEffectHolder seh => $"Side {seh.Side.Id}",
+                FieldEffectHolder => "Field",
+                _ => "Unknown"
+            };
+            Debug(
+                $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
 
-         // Skip fainted Pokemon unless this is a slot condition
- if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
-      {
-            if (handler.State?.IsSlotCondition != true)
-    {
-      if (DebugMode)
-  {
-        Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
-  }
+            // Skip fainted Pokemon unless this is a slot condition
+            if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
+            {
+                if (handler.State?.IsSlotCondition != true)
+                {
+                    Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
 
-       continue;
-         }
- }
+                    continue;
+                }
+            }
 
-     Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
+            Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
 
             // Handle duration tracking for Residual events
             if (eventId == EventId.Residual &&
@@ -749,7 +729,7 @@ public partial class Battle
                 handler.State.Duration--;
 
                 Debug(
-                        $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
+                    $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
 
                 if (handler.State.Duration <= 0)
                 {
@@ -768,7 +748,7 @@ public partial class Battle
                 }
             }
 
-       Debug($"[FieldEvent] {effect.Name}: Passed duration check");
+            Debug($"[FieldEvent] {effect.Name}: Passed duration check");
 
             // Verify the effect hasn't been removed by a prior handler
             // (e.g., Toxic Spikes being absorbed during a double switch)
@@ -805,11 +785,8 @@ public partial class Battle
                     // If the state doesn't match, the effect was removed
                     if (expectedStateLocation != handler.State)
                     {
-                        if (DebugMode)
-                        {
-                            Debug(
-                                $"FieldEvent {eventId}: Skipping {effect.Name} (effect was removed)");
-                        }
+                        Debug(
+                            $"FieldEvent {eventId}: Skipping {effect.Name} (effect was removed)");
 
                         continue;
                     }
@@ -826,11 +803,8 @@ public partial class Battle
                                 out EffectState? sideConditionState) ||
                             sideConditionState != handler.State)
                         {
-                            if (DebugMode)
-                            {
-                                Debug(
-                                    $"FieldEvent {eventId}: Skipping {effect.Name} (side condition was removed)");
-                            }
+                            Debug(
+                                $"FieldEvent {eventId}: Skipping {effect.Name} (side condition was removed)");
 
                             continue;
                         }
@@ -858,11 +832,8 @@ public partial class Battle
                     // If the state doesn't match, the effect was removed
                     if (expectedStateLocation != handler.State)
                     {
-                        if (DebugMode)
-                        {
-                            Debug(
-                                $"FieldEvent {eventId}: Skipping {effect.Name} (field effect was removed)");
-                        }
+                        Debug(
+                            $"FieldEvent {eventId}: Skipping {effect.Name} (field effect was removed)");
 
                         continue;
                     }
@@ -893,7 +864,8 @@ public partial class Battle
                     _ => null,
                 };
 
-                Debug($"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
+                Debug(
+                    $"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
 
                 SingleEvent(handlerEventId, effect, handler.State, singleEventTarget);
                 // customCallback is null, will use effect's EventHandlerInfo
@@ -994,7 +966,8 @@ public partial class Battle
         }
 
         // Use adapter to convert legacy handler to context-based
-        EventHandlerDelegate adaptedHandler = EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
+        EventHandlerDelegate adaptedHandler =
+            EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
         EventContext context = invocationContext.ToEventContext();
 
         try
@@ -1074,7 +1047,4 @@ public partial class Battle
     }
 
     #endregion
-}
-
-
-
+};

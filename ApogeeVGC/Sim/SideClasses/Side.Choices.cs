@@ -616,15 +616,12 @@ public partial class Side
         // Step 3.5: For SwitchIn/Switch requests, validate that we have actions (not empty)
         // Empty choices are invalid for switch requests - the battle should have ended if no switches are possible
         if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
-            input.Actions.Count == 0)
+      input.Actions.Count == 0)
         {
-  if (Battle.DebugMode)
-            {
-     Console.WriteLine(
-         $"[Side.Choose] Empty choice for {RequestState} request - rejecting!");
-     }
+   Battle.Debug(
+      $"[Side.Choose] Empty choice for {RequestState} request - rejecting!");
             return EmitChoiceError(
-    "Can't submit empty choice for switch request. You must switch in a Pokemon or the battle should have ended.");
+              "Can't submit empty choice for switch request. You must switch in a Pokemon or the battle should have ended.");
         }
 
         // Step 4: Validate number of actions doesn't exceed expected count
@@ -642,17 +639,14 @@ public partial class Side
         }
 
         // Debug logging
-        if (Battle.DebugMode)
+Battle.Debug(
+    $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
+    for (int i = 0; i < input.Actions.Count; i++)
         {
-        Console.WriteLine(
-            $"[Side.Choose] Processing {input.Actions.Count} actions for {Name} (RequestState: {RequestState})");
-        for (int i = 0; i < input.Actions.Count; i++)
-        {
-      var action = input.Actions[i];
-            Console.WriteLine(
- $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
-        }
-        }
+         var action = input.Actions[i];
+Battle.Debug(
+   $"[Side.Choose]   Action {i}: Type={action.Choice}, Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}");
+    }
 
         // Step 5: Process each action in the choice
         if (input.Actions.Select((action, index) =>
@@ -669,24 +663,18 @@ public partial class Side
                 };
 
                 if (!success)
- {
-       if (Battle.DebugMode)
-      {
-    Console.WriteLine($"[Side.Choose] Action {index} failed: {Choice.Error}");
-                }
- }
-
-                return success;
-         }).Any(success => !success))
-        {
-            if (Battle.DebugMode)
-    {
-            Console.WriteLine($"[Side.Choose] Overall choice failed for {Name}");
+       {
+ Battle.Debug($"[Side.Choose] Action {index} failed: {Choice.Error}");
    }
-            return false;
+
+          return success;
+      }).Any(success => !success))
+   {
+   Battle.Debug($"[Side.Choose] Overall choice failed for {Name}");
+        return false;
         }
 
-     // Step 6: Apply choice-level settings
+        // Step 6: Apply choice-level settings
         if (input.Terastallize)
         {
             Choice.Terastallize = true;
@@ -698,11 +686,8 @@ public partial class Side
         }
 
         bool result = string.IsNullOrEmpty(Choice.Error);
-     if (Battle.DebugMode)
-        {
-        Console.WriteLine(
-            $"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
-        }
+        Battle.Debug(
+    $"[Side.Choose] Choice processing complete for {Name}: {(result ? "SUCCESS" : $"FAILED - {Choice.Error}")}");
         return result;
     }
 
@@ -741,84 +726,44 @@ public partial class Side
 
     private bool ProcessChosenTeamAction(ChosenAction action)
     {
-     if (Battle.DebugMode)
-        {
-        Console.WriteLine(
-$"[ProcessChosenTeamAction] Processing action: Index={action.Index}, Pokemon={(action.Pokemon?.Name ?? "null")}, Priority={action.Priority}");
-        }
 
         // For team preview, the actions are already ordered by priority
         // We just need to verify this is a valid team choice
 
-        // Handle GUI case where Pokemon is null but Index is provided
+     // Handle GUI case where Pokemon is null but Index is provided
         int slot;
         if (action.Pokemon == null)
-   {
-       if (Battle.DebugMode)
-    {
-            Console.WriteLine($"[ProcessChosenTeamAction] Pokemon is null, using Index");
-      }
-if (!action.Index.HasValue || action.Index.Value < 0 ||
-  action.Index.Value >= Pokemon.Count)
-    {
-  if (Battle.DebugMode)
-     {
-  Console.WriteLine($"[ProcessChosenTeamAction] Invalid index: {action.Index}");
-  }
-          return EmitChoiceError(
-  "Can't choose for Team Preview: Invalid Pokemon index specified");
+        {
+
+            if (!action.Index.HasValue || action.Index.Value < 0 ||
+    action.Index.Value >= Pokemon.Count)
+ {
+        return EmitChoiceError(
+            "Can't choose for Team Preview: Invalid Pokemon index specified");
       }
 
-    slot = action.Index.Value;
-     if (Battle.DebugMode)
-      {
-     Console.WriteLine($"[ProcessChosenTeamAction] Looking up Pokemon at slot {slot}");
+            slot = action.Index.Value;
+
+      // Update the action with the Pokemon reference for proper processing
+            action = action with { Pokemon = Pokemon[slot] };
     }
-            // Update the action with the Pokemon reference for proper processing
-      action = action with { Pokemon = Pokemon[slot] };
-    if (Battle.DebugMode)
-            {
-    Console.WriteLine($"[ProcessChosenTeamAction] Pokemon found: {action.Pokemon.Name}");
-       }
-        }
- else
+      else
         {
-            if (Battle.DebugMode)
-   {
-       Console.WriteLine(
-  $"[ProcessChosenTeamAction] Pokemon already set: {action.Pokemon.Name}");
-      }
-   slot = action.Pokemon.Position;
+
+       slot = action.Pokemon.Position;
 }
 
-        if (Battle.DebugMode)
+      if (!Choice.SwitchIns.Add(slot))
         {
-    Console.WriteLine($"[ProcessChosenTeamAction] Attempting to add slot {slot} to SwitchIns");
-     }
-   if (!Choice.SwitchIns.Add(slot))
- {
-            if (Battle.DebugMode)
-            {
-     Console.WriteLine($"[ProcessChosenTeamAction] Slot {slot} already in SwitchIns");
-        }
- return EmitChoiceError(
-                $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
-     );
-        }
 
-        if (Battle.DebugMode)
-        {
-        Console.WriteLine(
-      $"[ProcessChosenTeamAction] Adding action to Choice.Actions (current count: {Choice.Actions.Count})");
-        }
+         return EmitChoiceError(
+    $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+      );
+   }
+
         Choice.Actions = [.. Choice.Actions, action];
- if (Battle.DebugMode)
-        {
-        Console.WriteLine(
-   $"[ProcessChosenTeamAction] Action added successfully, new count: {Choice.Actions.Count}");
-        }
 
-      return true;
+        return true;
     }
 
     private bool ProcessChosenRevivalBlessingAction(ChosenAction action)

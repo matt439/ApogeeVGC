@@ -611,10 +611,7 @@ public partial class Battle
             }
             catch (Exception ex)
             {
-                if (DebugMode)
-                {
-                    Debug($"Error parsing log entry '{logEntry}': {ex.Message}");
-                }
+                Debug($"Error parsing log entry '{logEntry}': {ex.Message}");
             }
         }
 
