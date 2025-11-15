@@ -1,5 +1,4 @@
-﻿using System.Windows.Forms.VisualStyles;
-using ApogeeVGC.Data;
+﻿using ApogeeVGC.Data;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.FormatClasses;
 using ApogeeVGC.Sim.Generators;
@@ -44,7 +43,7 @@ public class Driver
 
     private void RunConsoleVsRandomSinglesTest()
     {
-        const bool debug = true;
+        const bool debug = false;
 
         PlayerOptions player1Options = new()
         {

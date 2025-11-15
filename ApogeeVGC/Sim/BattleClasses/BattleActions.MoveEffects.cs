@@ -247,34 +247,36 @@ public partial class BattleActions
         // Check if move succeeded
         // For moves with damage: non-zero integer = success, zero = immunity/failure
         // For moves without damage: any truthy value = success
-     bool moveSucceeded = didAnything switch
-     {
+        // Undefined (NOT_FAIL) means move succeeded but did nothing measurable (e.g., Protect)
+      bool moveSucceeded = didAnything switch
+        {
             IntBoolIntUndefinedUnion intResult => intResult.Value > 0,  // Only non-zero damage counts as success
-        BoolBoolIntUndefinedUnion boolResult => boolResult.Value,   // Boolean true = success
-     _ => false  // null, undefined, or false = failure
+            BoolBoolIntUndefinedUnion boolResult => boolResult.Value,   // Boolean true = success
+            UndefinedBoolIntUndefinedUnion => true,  // Undefined means NOT_FAIL - move succeeded
+            _ => false  // null or false = failure
         };
 
         // Check if move failed completely
-if (!moveSucceeded && moveData.Self == null && moveData.SelfDestruct == null)
+        if (!moveSucceeded && moveData.Self == null && moveData.SelfDestruct == null)
         {
-  if (!isSelf && !isSecondary)
-       {
-       if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
-     {
-            if (Battle.DisplayUi)
-         {
-   Battle.Add("-fail", source);
-       Battle.AttrLastMove("[still]");
-     }
- }
-     }
+            if (!isSelf && !isSecondary)
+            {
+     if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
+                {
+     if (Battle.DisplayUi)
+      {
+      Battle.Add("-fail", source);
+            Battle.AttrLastMove("[still]");
+      }
+}
+            }
 
-   Battle.Debug("move failed because it did nothing");
+        Battle.Debug("move failed because it did nothing");
         }
         else if (moveSucceeded && move.SelfSwitch != null && source.Hp > 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
-     {
+        {
        source.SwitchFlag = move.Id;
-     }
+        }
 
         return damage;
     }
