@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
@@ -43,8 +42,10 @@ public record Items
                         {
                             battle.Debug("Leftovers OnResidual: pokemon is null");
                         }
+
                         return;
                     }
+
                     battle.Heal(pokemon.BaseMaxHp / 16);
                 })
                 {
@@ -68,23 +69,26 @@ public record Items
                         {
                             battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
                         }
+
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
-            
-                  // Set the locked move immediately after adding the volatile
-                  if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                     pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-          {
-                     if (battle.DebugMode)
-{
-          Console.WriteLine($"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-       }
-       pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-     }
+
+                    // Set the locked move immediately after adding the volatile
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    {
+                        if (battle.DebugMode)
+                        {
+                            Console.WriteLine(
+                                $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
+                        }
+
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                    }
                 }),
                 //OnModifySpAPriority = 1,
                 OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
@@ -114,6 +118,7 @@ public record Items
                     {
                         return;
                     }
+
                     pokemon.TrySetStatus(ConditionId.Burn, pokemon);
                 })
                 {
@@ -189,4 +194,3 @@ public record Items
         };
     }
 }
-
