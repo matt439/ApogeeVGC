@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Sim.BattleClasses;
+namespace ApogeeVGC.Sim.BattleClasses;
 
 public enum BattleRequestType
 {
@@ -22,31 +22,7 @@ public enum BattleRequestType
 
     /// <summary>
     /// The request is for the team preview phase at the start of the battle.
-    /// The choices will include selecting lead Pokemon and the order of the team.
+ /// The choices will include selecting lead Pokemon and the order of the team.
     /// </summary>
     TeamPreview,
 }
-
-public enum SendType
-{
-    Message,
-    End,
-    Update,
-    SideUpdate,
-}
-
-public enum GameType
-{
-    Singles,
-    Doubles,
-}
-
-public enum RequestState
-{
-    TeamPreview,
-    Move,
-    SwitchIn,
-    Switch,
-    None,
-}
-

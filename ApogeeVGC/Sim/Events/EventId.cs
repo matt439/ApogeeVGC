@@ -1,4 +1,4 @@
-﻿namespace ApogeeVGC.Sim.Events;
+namespace ApogeeVGC.Sim.Events;
 
 public enum EventId
 {
@@ -8,22 +8,22 @@ public enum EventId
     AfterFaint,
     AfterHit,
     AfterMega,
-    AfterMove,
+ AfterMove,
     AfterMoveSecondary,
     AfterMoveSecondarySelf,
-    AfterMoveSelf,
+AfterMoveSelf,
     AfterSetStatus,
     AfterSubDamage,
     AfterSwitchInSelf,
     AfterTakeItem,
-    AfterTerastallization,
+  AfterTerastallization,
     AfterUseItem,
     AllyBasePower,
     AllyModifyAtk,
     AllyModifySpA,
     AllyModifySpD,
     AllyTryHitSide,
-    AnyBasePower,
+  AnyBasePower,
     AnyFaint,
     AnyInvulnerability,
     AnyModifyAccuracy,
@@ -38,7 +38,7 @@ public enum EventId
     BeforeSwitchIn,
     BeforeSwitchOut,
     BeforeTurn,
-    BeforeTurnCallback,
+  BeforeTurnCallback,
     Boost,
     ChangeBoost,
     ChargeMove,
@@ -47,7 +47,7 @@ public enum EventId
     CriticalHit,
     Damage,
     DamageCallback,
-    DamagingHit,
+ DamagingHit,
     DeductPp,
     DisableMove,
     DragOut,
@@ -57,7 +57,7 @@ public enum EventId
     Effectiveness,
     EmergencyExit,
     End,
-    EntryHazard,
+EntryHazard,
     Faint,
     FieldEnd,
     FieldResidual,
@@ -84,7 +84,7 @@ public enum EventId
     ModifyAtk,
     ModifyBoost,
     ModifyCritRatio,
-    ModifyDamage,
+  ModifyDamage,
     ModifyDamagePhase1,
     ModifyDamagePhase2,
     ModifyDef,
@@ -103,7 +103,7 @@ public enum EventId
     MoveFail,
     NegateImmunity,
     OverrideAction,
-    PrepareHit,
+ PrepareHit,
     PriorityChargeCallback,
     PseudoWeatherChange,
     RedirectTarget,
@@ -127,12 +127,12 @@ public enum EventId
     Start,
     Swap,
     SwitchIn,
-    SwitchOut,
+ SwitchOut,
     TakeItem,
     Terrain,
     TerrainChange,
     TrapPokemon,
-    Try,
+  Try,
     TryAddVolatile,
     TryBoost,
     TryEatItem,
@@ -151,27 +151,5 @@ public enum EventId
     UseMoveMessage,
     Weather,
     WeatherChange,
-    WeatherModifyDamage,
-}
-
-public enum EventType
-{
-    Terastallize,
-    None,
-}
-
-public enum EventPrefix
-{
-    None,
-    Ally,
-    Foe,
-    Source,
-    Any,
-}
-
-public enum EventSuffix
-{
-    SwitchIn,
-    RedirectTarget,
-    None,
+ WeatherModifyDamage,
 }
