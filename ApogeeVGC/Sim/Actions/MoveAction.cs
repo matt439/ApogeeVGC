@@ -59,6 +59,7 @@ public record MoveAction : IAction
     public MoveId MoveId { get; init; }
     public required Move Move { get; set; }
     public IEffect? SourceEffect { get; init; }
+    public MoveType? Terastallize { get; init; }
 
 
     // To satisfy IPriorityComparison

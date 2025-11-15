@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Utils.Unions;
 using Spectre.Console;
 
 namespace ApogeeVGC.Sim.Player;
@@ -236,7 +237,7 @@ table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
     {
         if (request.Active.Count == 0)
         {
-            throw new InvalidOperationException("No active Pokemon to make a move choice");
+     throw new InvalidOperationException("No active Pokemon to make a move choice");
         }
 
         var pokemonRequest = request.Active[0];
@@ -245,61 +246,88 @@ table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
         AnsiConsole.WriteLine();
 
         var choices = new List<string>();
-        var moveIndices = new List<int>();
+ var moveIndices = new List<int>();
+    var teraOptions = new List<bool>();
+
+        // Check if terastallization is available
+        MoveType? teraType = pokemonRequest.CanTerastallize switch
+        {
+  MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+       _ => null
+        };
 
         // Add moves
-        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+      for (int i = 0; i < pokemonRequest.Moves.Count; i++)
         {
             var move = pokemonRequest.Moves[i];
             var disabled = IsDisabled(move.Disabled);
 
-            if (!disabled)
-            {
-                // Just show move name without PP (not available in data structure)
-                choices.Add($"{i + 1}. {move.Move.Name}");
-                moveIndices.Add(i);
-            }
+     if (!disabled)
+{
+          // Add regular move option
+           choices.Add($"{i + 1}. {move.Move.Name}");
+        moveIndices.Add(i);
+                teraOptions.Add(false);
+
+  // Add terastallize variant if available
+  if (teraType.HasValue)
+     {
+        choices.Add($"{i + 1}. {move.Move.Name} [bold {GetTeraTypeColor(teraType.Value)}](+ TERA {teraType.Value.ToString().ToUpper()})[/]");
+        moveIndices.Add(i);
+              teraOptions.Add(true);
+  }
+}
         }
 
         // Add switch option
         choices.Add("S. Switch Pokemon");
 
-        // Run the blocking prompt on a background thread to avoid blocking the async pipeline
-        var selection = await Task.Run(() => AnsiConsole.Prompt(
+   // Run the blocking prompt on a background thread to avoid blocking the async pipeline
+      var selection = await Task.Run(() => AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("Choose an action:")
+              .Title("Choose an action:")
                 .AddChoices(choices)), cancellationToken);
 
         if (selection.StartsWith("S"))
         {
-            // Switch - show available Pokemon  
+   // Switch - show available Pokemon  
             return await GetSwitchChoiceAsync(
-                new SwitchRequest { Side = request.Side, ForceSwitch = new[] { false } },
-                cancellationToken);
-        }
+      new SwitchRequest { Side = request.Side, ForceSwitch = new[] { false } },
+            cancellationToken);
+    }
 
-        // Move selected
-        var moveIndex = moveIndices[choices.IndexOf(selection)];
+  // Move selected
+        var choiceIndex = choices.IndexOf(selection);
+    var moveIndex = moveIndices[choiceIndex];
+   var useTerastallize = teraOptions[choiceIndex];
         var selectedMove = pokemonRequest.Moves[moveIndex];
 
         // Display which move was selected
-        AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
-        AnsiConsole.WriteLine();
+        if (useTerastallize)
+    {
+      AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]");
+        }
+ else
+      {
+    AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
+        }
+    AnsiConsole.WriteLine();
 
         return new Choice
         {
-            Actions = new List<ChosenAction>
+     Actions = new List<ChosenAction>
             {
-                new()
-                {
-                    Choice = ChoiceType.Move,
-                    Pokemon = null,
-                    MoveId = selectedMove.Id,
-                    TargetLoc = 0
-                }
+     new()
+       {
+   Choice = ChoiceType.Move,
+              Pokemon = null,
+ MoveId = selectedMove.Id,
+       TargetLoc = 0,
+            Terastallize = useTerastallize ? teraType : null
             }
-        };
-    }
+  }
+      };
+  }
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request,
         CancellationToken cancellationToken)

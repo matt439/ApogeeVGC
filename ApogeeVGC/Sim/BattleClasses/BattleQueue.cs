@@ -98,6 +98,7 @@ public class BattleQueue(Battle battle)
                     Order = 200, // Default order for moves
                     OriginalTarget =
                         chosenAction.Pokemon!, // Will be updated later with actual target
+                    Terastallize = chosenAction.Terastallize, // Preserve terastallize flag
                 },
                 ChoiceType.Switch => new SwitchAction
                 {
@@ -194,9 +195,9 @@ public class BattleQueue(Battle battle)
 
                 // Note: Mega Evolution and Dynamax are deliberately excluded as per requirements
 
-                // Add Terastallize action if applicable
-                if (ma.Pokemon is
-                    { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
+                // Add Terastallize action if the player chose to terastallize
+                if (ma.Terastallize.HasValue &&
+                    ma.Pokemon is { CanTerastallize: MoveTypeMoveTypeFalseUnion, Terastallized: null })
                 {
                     // Insert Terastallize action before the move
                     actions.InsertRange(0, ResolveAction(new PokemonAction
