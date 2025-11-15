@@ -21,7 +21,7 @@ public static class MainBattleUiHelper
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
         Action showMoveSelection,
-        Action showSwitchSelection,
+        Action? showSwitchSelection,
         Action selectForfeit)
     {
         var buttons = new List<ChoiceButton>();
@@ -37,15 +37,18 @@ public static class MainBattleUiHelper
         buttons.Add(battleButton);
         y += ButtonHeight + ButtonSpacing;
 
-        // Pokemon button
-        var pokemonButton = new ChoiceButton(
-            new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "Pokemon",
-            Color.Green,
-            showSwitchSelection
-        );
-        buttons.Add(pokemonButton);
-        y += ButtonHeight + ButtonSpacing;
+        // Pokemon button - only add if there are valid switch options
+        if (showSwitchSelection != null)
+        {
+            var pokemonButton = new ChoiceButton(
+                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+                "Pokemon",
+                Color.Green,
+                showSwitchSelection
+            );
+            buttons.Add(pokemonButton);
+            y += ButtonHeight + ButtonSpacing;
+        }
 
         // Run button
         var runButton = new ChoiceButton(
@@ -62,7 +65,7 @@ public static class MainBattleUiHelper
     public static List<ChoiceButton> CreateMainMenuSecondPokemon(
         MoveRequest request,
         Action showMoveSelection,
-        Action showSwitchSelection,
+        Action? showSwitchSelection,
         Action goBack)
     {
         var buttons = new List<ChoiceButton>();
@@ -78,15 +81,18 @@ public static class MainBattleUiHelper
         buttons.Add(battleButton);
         y += ButtonHeight + ButtonSpacing;
 
-        // Pokemon button
-        var pokemonButton = new ChoiceButton(
-            new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "Pokemon",
-            Color.Green,
-            showSwitchSelection
-        );
-        buttons.Add(pokemonButton);
-        y += ButtonHeight + ButtonSpacing;
+        // Pokemon button - only add if there are valid switch options
+        if (showSwitchSelection != null)
+        {
+            var pokemonButton = new ChoiceButton(
+                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+                "Pokemon",
+                Color.Green,
+                showSwitchSelection
+            );
+            buttons.Add(pokemonButton);
+            y += ButtonHeight + ButtonSpacing;
+        }
 
         // Back button
         var backButton = new ChoiceButton(

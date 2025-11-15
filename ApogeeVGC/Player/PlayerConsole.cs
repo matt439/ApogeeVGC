@@ -288,88 +288,102 @@ public class PlayerConsole : IPlayer
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request,
         CancellationToken cancellationToken)
     {
-        // Build list of available Pokemon with their original indices
+      // Build list of available Pokemon with their original indices, excluding fainted ones
         var availablePokemonWithIndex = request.Side.Pokemon
-            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
-            .Where(x => !x.PokemonData.Active)
-            .ToList();
+    .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.OriginalIndex))
+  .ToList();
 
         if (availablePokemonWithIndex.Count == 0)
         {
             AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
-            throw new InvalidOperationException("No Pokemon available to switch");
+      throw new InvalidOperationException("No Pokemon available to switch");
         }
 
-        AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
-        AnsiConsole.WriteLine();
+    AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
+    AnsiConsole.WriteLine();
 
         // Build display choices with HP information from current perspective
         var choices = availablePokemonWithIndex
             .Select((item, i) =>
-            {
-                var p = item.PokemonData;
-      
-  // Get current HP from perspective if available
-  string hpDisplay;
-  if (_currentPerspective != null)
        {
-      // Find matching Pokemon in perspective by position/index
-  var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
-      .FirstOrDefault(pp => pp.Position == item.OriginalIndex);
+            var p = item.PokemonData;
+      
+           // Get current HP from perspective if available
+string hpDisplay;
+      if (_currentPerspective != null)
+         {
+         // Find matching Pokemon in perspective by position/index
+     var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
+        .FirstOrDefault(pp => pp.Position == item.OriginalIndex);
         
-  if (perspectivePokemon != null)
-         {
+           if (perspectivePokemon != null)
+      {
          if (perspectivePokemon.Fainted)
-    {
-       hpDisplay = "Fainted";
+   {
+           hpDisplay = "Fainted";
+          }
+     else
+                  {
+            hpDisplay = $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
+      }
+  }
+   else
+      {
+    // Fallback to max HP from stats
+    int maxHp = p.Stats.Hp;
+     hpDisplay = $"{maxHp}/{maxHp}";
      }
-             else
-              {
-           hpDisplay = $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
-               }
-           }
-        else
-         {
-  // Fallback to max HP from stats
-      int maxHp = p.Stats.Hp;
-    hpDisplay = $"{maxHp}/{maxHp}";
-    }
-             }
-              else
-{
-         // Fallback to max HP from stats if no perspective
-       int maxHp = p.Stats.Hp;
-       hpDisplay = $"{maxHp}/{maxHp}";
-         }
+ }
+                else
+                {
+   // Fallback to max HP from stats if no perspective
+         int maxHp = p.Stats.Hp;
+     hpDisplay = $"{maxHp}/{maxHp}";
+                }
 
    return $"{i + 1}. {p.Details} (HP: {hpDisplay})";
-       })
+            })
      .ToList();
 
-        // Run the blocking prompt on a background thread
+     // Run the blocking prompt on a background thread
         var selection = await Task.Run(() => AnsiConsole.Prompt(
- new SelectionPrompt<string>()
-                .Title("Choose a Pokemon:")
-      .AddChoices(choices)), cancellationToken);
+            new SelectionPrompt<string>()
+ .Title("Choose a Pokemon:")
+       .AddChoices(choices)), cancellationToken);
 
         var selectedDisplayIndex = choices.IndexOf(selection);
-      var selectedItem = availablePokemonWithIndex[selectedDisplayIndex];
+        var selectedItem = availablePokemonWithIndex[selectedDisplayIndex];
 
         // The target should be identified by the original index in the Side.Pokemon list
-        // The Side.Choose method will look up the Pokemon by this index
+      // The Side.Choose method will look up the Pokemon by this index
         return new Choice
         {
-            Actions = new List<ChosenAction>
-   {
-    new()
-                {
-        Choice = ChoiceType.Switch,
-             Pokemon = null,
-           MoveId = Sim.Moves.MoveId.None,
-           Index = selectedItem.OriginalIndex
-                }
-            }
-  };
+          Actions = new List<ChosenAction>
+     {
+     new()
+     {
+         Choice = ChoiceType.Switch,
+   Pokemon = null,
+        MoveId = Sim.Moves.MoveId.None,
+      Index = selectedItem.OriginalIndex
+             }
+  }
+    };
+    }
+
+  /// <summary>
+    /// Helper method to check if a Pokemon is fainted based on the current perspective
+    /// </summary>
+    private bool IsPokemonFainted(int pokemonIndex)
+    {
+        if (_currentPerspective == null)
+    return false;
+
+        var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
+            .FirstOrDefault(pp => pp.Position == pokemonIndex);
+
+    return perspectivePokemon?.Fainted ?? false;
     }
 
     private bool IsDisabled(object? disabled)

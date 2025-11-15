@@ -107,124 +107,138 @@ public partial class ChoiceInputManager
     {
         Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Called with MainBattleState={MainBattleState}");
 
-        _buttons.Clear();
-        _selectedButtonIndex = 0; // Reset selection to first button
+      _buttons.Clear();
+     _selectedButtonIndex = 0; // Reset selection to first button
 
         Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Cleared buttons and reset selection");
 
-        // Set up buttons based on current state
-        switch (MainBattleState)
+        // Check if there are any valid switch options (non-active, non-fainted Pokemon)
+ bool hasValidSwitchOptions = request.Side.Pokemon.Any(p => !p.Active && !IsFainted(p));
+
+    // Set up buttons based on current state
+ switch (MainBattleState)
         {
             case MainBattlePhaseState.MainMenuFirstPokemon:
-                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MainMenuFirstPokemon buttons");
-                _buttons = MainBattleUiHelper.CreateMainMenuFirstPokemon(
-                    request,
-                    () => TransitionToState(MainBattlePhaseState.MoveSelectionFirstPokemon),
-                    () => TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon),
-                    () => HandleForfeit()
-                );
-                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuFirstPokemon");
-                break;
+      Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MainMenuFirstPokemon buttons");
+    _buttons = MainBattleUiHelper.CreateMainMenuFirstPokemon(
+         request,
+         () => TransitionToState(MainBattlePhaseState.MoveSelectionFirstPokemon),
+  hasValidSwitchOptions ? () => TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon) : null,
+          () => HandleForfeit()
+    );
+      Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuFirstPokemon");
+    break;
 
-            case MainBattlePhaseState.MoveSelectionFirstPokemon:
+         case MainBattlePhaseState.MoveSelectionFirstPokemon:
                 Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionFirstPokemon buttons");
-                if (request.Active.Count > 0)
-                {
-                    PokemonMoveRequestData pokemonData = request.Active[0];
-                    bool canTera = pokemonData.CanTerastallize != null;
-                    _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
-                        pokemonData,
-                        canTera,
-                        TurnSelection.FirstPokemonTerastallize,
-                        (moveIndex) => HandleMoveSelection(0, moveIndex),
-                        () => ToggleTerastallize(0),
-                        () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
-                    );
-                    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionFirstPokemon");
-                }
+ if (request.Active.Count > 0)
+ {
+       PokemonMoveRequestData pokemonData = request.Active[0];
+         bool canTera = pokemonData.CanTerastallize != null;
+ _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
+           pokemonData,
+ canTera,
+     TurnSelection.FirstPokemonTerastallize,
+                 (moveIndex) => HandleMoveSelection(0, moveIndex),
+         () => ToggleTerastallize(0),
+         () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
+      );
+            Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionFirstPokemon");
+  }
 
-                break;
+    break;
 
-            case MainBattlePhaseState.SwitchSelectionFirstPokemon:
-            {
-                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionFirstPokemon buttons");
-                var availablePokemon = request.Side.Pokemon
-                    .Where(p => !p.Active)
-                    .ToList();
+     case MainBattlePhaseState.SwitchSelectionFirstPokemon:
+     {
+         Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionFirstPokemon buttons");
+             var availablePokemon = request.Side.Pokemon
+           .Where(p => !p.Active && !IsFainted(p))
+   .ToList();
                 _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
-                    availablePokemon,
-                    (switchIndex) => HandleSwitchSelection(0, switchIndex),
-                    () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
-                    showBackButton: true
+              availablePokemon,
+           (switchIndex) => HandleSwitchSelection(0, switchIndex),
+               () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
+                 showBackButton: true
                 );
-                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionFirstPokemon");
-            }
-                break;
+    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionFirstPokemon");
+    }
+     break;
 
             case MainBattlePhaseState.MainMenuSecondPokemon:
                 Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MainMenuSecondPokemon buttons");
-                _buttons = MainBattleUiHelper.CreateMainMenuSecondPokemon(
-                    request,
-                    () => TransitionToState(MainBattlePhaseState.MoveSelectionSecondPokemon),
-                    () => TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon),
-                    () => HandleBackFromSecondPokemon()
-                );
-                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuSecondPokemon");
-                break;
+         _buttons = MainBattleUiHelper.CreateMainMenuSecondPokemon(
+           request,
+          () => TransitionToState(MainBattlePhaseState.MoveSelectionSecondPokemon),
+     () => TransitionToState(MainBattlePhaseState.SwitchSelectionSecondPokemon),
+          () => HandleBackFromSecondPokemon()
+  );
+   Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuSecondPokemon");
+         break;
 
-            case MainBattlePhaseState.MoveSelectionSecondPokemon:
-                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionSecondPokemon buttons");
-                if (request.Active.Count > 1)
-                {
-                    PokemonMoveRequestData pokemonData = request.Active[1];
-                    bool canTera = pokemonData.CanTerastallize != null;
-                    _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
-                        pokemonData,
-                        canTera,
-                        TurnSelection.SecondPokemonTerastallize,
-                        (moveIndex) => HandleMoveSelection(1, moveIndex),
-                        () => ToggleTerastallize(1),
-                        () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
-                    );
-                    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionSecondPokemon");
-                }
+         case MainBattlePhaseState.MoveSelectionSecondPokemon:
+          Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionSecondPokemon buttons");
+    if (request.Active.Count > 1)
+          {
+    PokemonMoveRequestData pokemonData = request.Active[1];
+  bool canTera = pokemonData.CanTerastallize != null;
+ _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
+            pokemonData,
+        canTera,
+            TurnSelection.SecondPokemonTerastallize,
+       (moveIndex) => HandleMoveSelection(1, moveIndex),
+   () => ToggleTerastallize(1),
+      () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
+         );
+          Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MoveSelectionSecondPokemon");
+          }
 
-                break;
+      break;
 
             case MainBattlePhaseState.SwitchSelectionSecondPokemon:
-            {
-                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionSecondPokemon buttons");
-                var availablePokemon = request.Side.Pokemon
-                    .Where(p => !p.Active)
-                    .ToList();
-                _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
-                    availablePokemon,
-                    (switchIndex) => HandleSwitchSelection(1, switchIndex),
-                    () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
-                    showBackButton: true
-                );
-                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionSecondPokemon");
+     {
+      Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionSecondPokemon buttons");
+       var availablePokemon = request.Side.Pokemon
+     .Where(p => !p.Active && !IsFainted(p))
+           .ToList();
+      _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
+           availablePokemon,
+      (switchIndex) => HandleSwitchSelection(1, switchIndex),
+  () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
+          showBackButton: true
+    );
+    Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionSecondPokemon");
             }
                 break;
 
-            case MainBattlePhaseState.ForceSwitch:
-            {
-                Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating ForceSwitch buttons");
-                var availablePokemon = request.Side.Pokemon
-                    .Where(p => !p.Active)
-                    .ToList();
-                _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
-                    availablePokemon,
-                    (switchIndex) => HandleForceSwitchSelection(switchIndex),
-                    () => { }, // No back button for force switch
-                    showBackButton: false
-                );
-                Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for ForceSwitch");
-            }
-                break;
+       case MainBattlePhaseState.ForceSwitch:
+          {
+    Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating ForceSwitch buttons");
+       var availablePokemon = request.Side.Pokemon
+    .Where(p => !p.Active && !IsFainted(p))
+ .ToList();
+   _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
+     availablePokemon,
+    (switchIndex) => HandleForceSwitchSelection(switchIndex),
+        () => { }, // No back button for force switch
+          showBackButton: false
+    );
+       Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for ForceSwitch");
+      }
+      break;
         }
 
         Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Setup complete. Final button count: {_buttons.Count}");
+    }
+
+    /// <summary>
+    /// Helper method to check if a Pokemon is fainted based on its Condition
+    /// </summary>
+    private static bool IsFainted(PokemonSwitchRequestData pokemon)
+    {
+        // In Pokemon Showdown protocol, fainted Pokemon have condition like "0 fnt"
+  string conditionStr = pokemon.Condition.ToString();
+    return conditionStr.Contains("fnt", StringComparison.OrdinalIgnoreCase) ||
+     conditionStr.StartsWith("0 ", StringComparison.Ordinal);
     }
 
     private void RenderMainBattleUi()

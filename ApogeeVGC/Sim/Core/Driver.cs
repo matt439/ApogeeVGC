@@ -61,7 +61,7 @@ public class Driver
             Id = FormatId.CustomSingles,
             Player1Options = player1Options,
             Player2Options = player2Options,
-            Debug = debug, // Enable battle debug mode
+            Debug = debug,
             Sync = false,
             Seed = DefaultSeed,
         };
