@@ -1,4 +1,4 @@
-ï»¿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
@@ -551,7 +551,7 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Runs an event with no source on each PokÃ©mon on the field, in Speed order.
+    /// Runs an event with no source on each Pokémon on the field, in Speed order.
     /// Speed ties are resolved randomly using the battle's PRNG.
     /// </summary>
     public void EachEvent(EventId eventId, IEffect? effect = null, bool? relayVar = null)
@@ -564,7 +564,7 @@ public partial class Battle
                 Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
             }
 
-            // Get all active PokÃ©mon on the field
+            // Get all active Pokémon on the field
             var actives = GetAllActive();
 
             if (DebugMode)
@@ -588,7 +588,7 @@ public partial class Battle
             RelayVar? relayVarConverted =
                 relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
 
-            // Run the event on each PokÃ©mon
+            // Run the event on each Pokémon
             foreach (Pokemon pokemon in actives)
             {
                 RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect,
@@ -818,8 +818,7 @@ public partial class Battle
                         expectedStateLocation = pokemon.AbilityState;
                     }
                     // Check if this is an item state (not starting with "item:" prefix means it's the main item)
-                    else if (effect is
-                             { EffectType: EffectType.Item, EffectStateId: not ItemEffectStateId })
+                    else if (effect.EffectType == EffectType.Item)
                     {
                         expectedStateLocation = pokemon.ItemState;
                     }
