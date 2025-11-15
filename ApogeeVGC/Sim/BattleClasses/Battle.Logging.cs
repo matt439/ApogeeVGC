@@ -711,21 +711,26 @@ public partial class Battle
         string healthStr = parts[3];
 
         // Parse health (format: "123/456")
-        string[] hpParts = healthStr.Split('/');
+        string[] healthParts = healthStr.Split(' ');
+        string[] hpParts = healthParts[0].Split('/');
 
         if (hpParts.Length != 2 ||
-            !int.TryParse(hpParts[0], out int currentHp) ||
-            !int.TryParse(hpParts[1], out int maxHp))
-        {
-            return new GenericMessage { Text = $"{pokemonName} restored HP!" };
+      !int.TryParse(hpParts[0], out int currentHp) ||
+ !int.TryParse(hpParts[1], out int maxHp))
+      {
+    return new GenericMessage { Text = $"{pokemonName} restored HP!" };
         }
 
-        int healAmount = currentHp; // Approximate
+    // The heal amount is unknown from just the current HP in the log
+        // This is a limitation of parsing from logs - we only know the result
+        int healAmount = 0; // Will show as "healed to X HP" which is more accurate
 
         return new HealMessage
         {
-            PokemonName = pokemonName,
-            HealAmount = healAmount
+        PokemonName = pokemonName,
+            HealAmount = healAmount,
+       CurrentHp = currentHp,
+  MaxHp = maxHp
         };
     }
 

@@ -255,10 +255,12 @@ public class HealMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required int HealAmount { get; init; }
+    public required int CurrentHp { get; init; }
+    public required int MaxHp { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName} restored {HealAmount} HP!";
+        return $"{PokemonName} healed to {CurrentHp} HP!";
     }
 }
 
