@@ -56,7 +56,7 @@ When combining two values of different types, the type with the **lower priority
 
 ## The Fix
 
-The fix involves **preserving integer damage values** and not overwriting them with boolean success indicators:
+The fix involves **preserving integer damage values** and not overwriting them with boolean success indicators, while also **distinguishing zero damage (immunity) from actual damage**:
 
 ```csharp
 // Only combine didSomething into damage if damage isn't already an integer (actual damage dealt)
@@ -64,8 +64,21 @@ The fix involves **preserving integer damage values** and not overwriting them w
 if (damage[i] is not IntBoolIntUndefinedUnion)
 {
     damage[i] = CombineResults(damage[i], didSomething);
-    didAnything = CombineResults(didAnything, didSomething);
+  didAnything = CombineResults(didAnything, didSomething);
 }
+```
+
+And then check for **non-zero** damage to determine success:
+
+```csharp
+// For moves with damage: non-zero integer = success, zero = immunity/failure
+// For moves without damage: any truthy value = success
+bool moveSucceeded = didAnything switch
+{
+    IntBoolIntUndefinedUnion intResult => intResult.Value > 0,  // Only non-zero damage counts
+    BoolBoolIntUndefinedUnion boolResult => boolResult.Value,   // Boolean true = success
+    _ => false
+};
 ```
 
 ### Why This Works
@@ -106,9 +119,23 @@ Without these logs, it would have been much harder to identify that the issue wa
 After the fix, Volt Switch correctly:
 1. Deals damage (integer stored in `damage` array)
 2. Sets `didAnything` to an integer
-3. Passes the success check
+3. Passes the success check **only if damage > 0**
 4. Sets `SwitchFlag` on the source Pokémon
 5. Triggers a switch request instead of a move request
+
+### Edge Cases Handled
+
+**Immunity (0 damage)**:
+- Volt Switch used against Ground-type
+- `didAnything` = `IntBoolIntUndefinedUnion { Value: 0 }`
+- `moveSucceeded` = `false` (because `0 > 0` is false)
+- Move fails, **no switch prompt** ?
+
+**Actual damage**:
+- Volt Switch used against non-Ground type
+- `didAnything` = `IntBoolIntUndefinedUnion { Value: 27 }`
+- `moveSucceeded` = `true` (because `27 > 0` is true)
+- Move succeeds, **switch prompt shown** ?
 
 ## Related Code Locations
 
