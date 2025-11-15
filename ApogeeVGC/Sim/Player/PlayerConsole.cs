@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Moves;
 using Spectre.Console;
 
 namespace ApogeeVGC.Sim.Player;
@@ -121,20 +122,22 @@ public class PlayerConsole : IPlayer
     private void RenderBattleState(BattlePerspective perspective)
     {
         var table = new Table()
-       .Border(TableBorder.Rounded)
+    .Border(TableBorder.Rounded)
           .BorderColor(Color.Grey);
 
-        table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
+table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
         table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 
   // Opponent's active Pokemon
-       var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
+   var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
     string opponentInfo;
         if (opponentActive != null)
     {
-     var statusDisplay = GetStatusDisplay(opponentActive.Status);
+  var statusDisplay = GetStatusDisplay(opponentActive.Status);
          var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
-       opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}";
+            var teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
+            var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+       opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{teraLine}";
         }
      else
     {
@@ -144,7 +147,7 @@ public class PlayerConsole : IPlayer
   // Player's active Pokemon - handle fainted Pokemon properly
      var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
         string playerInfo;
-        if (playerActive != null)
+   if (playerActive != null)
         {
      if (playerActive.Fainted)
   {
@@ -154,18 +157,20 @@ public class PlayerConsole : IPlayer
    {
    var statusDisplay = GetStatusDisplay(playerActive.Status);
   var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
-              playerInfo =
-          $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}";
+       var teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
+      var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+    playerInfo =
+          $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{teraLine}";
   }
       }
-        else
+     else
   {
     playerInfo = "[grey]No active Pokemon[/]";
       }
 
         table.AddRow(opponentInfo, playerInfo);
 
-     AnsiConsole.Write(table);
+   AnsiConsole.Write(table);
       AnsiConsole.WriteLine();
     }
 
@@ -177,7 +182,7 @@ public class PlayerConsole : IPlayer
 
         var color = hpPercentage > 50 ? "green" : hpPercentage > 20 ? "yellow" : "red";
 
-        // Use ASCII-safe characters that work in all console encodings
+        // Use ASCII-safe characters that work in all console encoding
         // = for health, - for damage
         var bar = $"[{color}]{"=".Repeat(filled)}[/]{"-".Repeat(empty)}";
 
@@ -404,15 +409,63 @@ string hpDisplay;
     {
         return status switch
         {
-         ConditionId.Burn => "[orange3]BRN[/]",
+  ConditionId.Burn => "[orange3]BRN[/]",
      ConditionId.Paralysis => "[yellow]PAR[/]",
  ConditionId.Sleep => "[purple]SLP[/]",
-            ConditionId.Freeze => "[cyan]FRZ[/]",
+    ConditionId.Freeze => "[cyan]FRZ[/]",
      ConditionId.Poison => "[magenta]PSN[/]",
-            ConditionId.Toxic => "[darkmagenta]TOX[/]",
+     ConditionId.Toxic => "[darkmagenta]TOX[/]",
   _ => ""
-        };
+    };
   }
+
+    /// <summary>
+    /// Get terastallization display markup for console
+    /// Shows "TERA: [Type]" if terastallized, or "Tera: [Type]" if available but not active
+    /// </summary>
+  private string GetTeraDisplay(Moves.MoveType? terastallized, Moves.MoveType teraType)
+    {
+ if (terastallized.HasValue)
+        {
+        // Pokemon is currently terastallized - show in bold with color
+            return $"[bold {GetTeraTypeColor(terastallized.Value)}]TERA: {terastallized.Value.ToString().ToUpper()}[/]";
+        }
+        else
+        {
+    // Pokemon has tera available but not active - show in grey
+ return $"[grey]Tera: {teraType.ToString()}[/]";
+        }
+    }
+
+    /// <summary>
+    /// Get the console color for a tera type
+    /// </summary>
+    private string GetTeraTypeColor(Moves.MoveType teraType)
+    {
+        return teraType switch
+        {
+            Moves.MoveType.Normal => "white",
+    Moves.MoveType.Fire => "red",
+            Moves.MoveType.Water => "blue",
+       Moves.MoveType.Electric => "yellow",
+            Moves.MoveType.Grass => "green",
+      Moves.MoveType.Ice => "cyan",
+            Moves.MoveType.Fighting => "darkorange",
+   Moves.MoveType.Poison => "purple",
+  Moves.MoveType.Ground => "gold3",
+  Moves.MoveType.Flying => "lightblue",
+  Moves.MoveType.Psychic => "magenta",
+    Moves.MoveType.Bug => "olive",
+  Moves.MoveType.Rock => "tan",
+         Moves.MoveType.Ghost => "purple",
+  Moves.MoveType.Dragon => "blue",
+    Moves.MoveType.Dark => "grey",
+            Moves.MoveType.Steel => "silver",
+            Moves.MoveType.Fairy => "pink",
+            Moves.MoveType.Stellar => "white",
+  _ => "white"
+        };
+    }
 
     private bool IsDisabled(object? disabled)
     {
