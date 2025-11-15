@@ -56,7 +56,7 @@ public partial class Pokemon
         // Run NegateImmunity event
         RelayVar? negateEvent = Battle.RunEvent(EventId.NegateImmunity, this, null, null,
             source);
-        bool negateImmunity = negateEvent is not BoolRelayVar { Value: true };
+        bool negateImmunity = negateEvent is BoolRelayVar { Value: true };
 
         // Special handling for Ground-type
         bool? notImmune;
