@@ -18,122 +18,98 @@ public partial class Battle
         IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
-        // Debug logging for event entry
-        string targetStr = target switch
-        {
-            PokemonSingleEventTarget p => p.Pokemon.Name,
-            SideSingleEventTarget s => $"Side {s.Side.Id}",
-            FieldSingleEventTarget => "Field",
-            BattleSingleEventTarget => "Battle",
-            _ => "null",
-        };
-        string sourceStr = source switch
-        {
-            PokemonSingleEventSource p => p.Pokemon.Name,
-            EffectSingleEventSource e => e.Effect.Name,
-            _ => "null",
-        };
-        Debug(
-            $"SingleEvent: {eventId} | Effect: {effect.Name} ({effect.EffectType}) | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
-
+        // Debug logging for event entry - commented out for reduced verbosity
+        
         // Check for stack overflow
         if (EventDepth >= 8)
         {
-            if (DisplayUi)
-            {
-                Add("message", "STACK LIMIT EXCEEDED");
-                Add("message", $"Event: {eventId}");
-                Add("message", $"Parent event: {Event.Id}");
-            }
+       if (DisplayUi)
+  {
+         Add("message", "STACK LIMIT EXCEEDED");
+          Add("message", $"Event: {eventId}");
+       Add("message", $"Parent event: {Event.Id}");
+ }
 
             throw new InvalidOperationException("Stack overflow");
         }
 
         // Check for infinite loop
-        if (Log.Count - SentLogPos > 5000)
-        {
+if (Log.Count - SentLogPos > 5000)
+  {
             if (DisplayUi)
             {
-                Add("message", "LINE LIMIT EXCEEDED");
-                Add("message", $"Event: {eventId}");
+     Add("message", "LINE LIMIT EXCEEDED");
+           Add("message", $"Event: {eventId}");
                 Add("message", $"Parent event: {Event.Id}");
-            }
+ }
 
             throw new InvalidOperationException("Infinite loop");
-        }
+  }
 
         // Track if relayVar was explicitly provided
         bool hasRelayVar = relayVar != null;
-        relayVar ??= new BoolRelayVar(true);
+    relayVar ??= new BoolRelayVar(true);
 
         // Check if status effect has changed
         if (effect.EffectType == EffectType.Status &&
             target is PokemonSingleEventTarget pokemonTarget)
-        {
-            Pokemon targetPokemon = pokemonTarget.Pokemon;
+    {
+Pokemon targetPokemon = pokemonTarget.Pokemon;
             if (effect is Condition condition && targetPokemon.Status != condition.Id)
             {
-                // Status has changed; abort the event
-                Debug(
-                    $"SingleEvent {eventId}: Status changed for {targetPokemon.Name}, aborting");
-
-                return relayVar;
-            }
+          // Status has changed; abort the event
+        return relayVar;
+ }
         }
 
         // Check if ability is suppressed by Mold Breaker
-        if (eventId == EventId.SwitchIn &&
+     if (eventId == EventId.SwitchIn &&
             effect.EffectType == EffectType.Ability &&
             effect is Ability { Flags.Breakable: true } &&
             target is PokemonSingleEventTarget moldbreakerTarget &&
-            SuppressingAbility(moldbreakerTarget.Pokemon))
-        {
-            Debug($"{eventId} handler suppressed by Mold Breaker");
-            return relayVar;
+          SuppressingAbility(moldbreakerTarget.Pokemon))
+      {
+   Debug($"{eventId} handler suppressed by Mold Breaker");
+  return relayVar;
         }
 
         // Check if item is suppressed
-        if (eventId != EventId.Start &&
+    if (eventId != EventId.Start &&
             eventId != EventId.TakeItem &&
-            effect.EffectType == EffectType.Item &&
-            target is PokemonSingleEventTarget itemTarget &&
+ effect.EffectType == EffectType.Item &&
+          target is PokemonSingleEventTarget itemTarget &&
             itemTarget.Pokemon.IgnoringItem())
-        {
-            Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
-            return relayVar;
-        }
+ {
+     Debug($"{eventId} handler suppressed by Embargo, Klutz or Magic Room");
+     return relayVar;
+    }
 
         // Check if ability is suppressed by Gastro Acid/Neutralizing Gas
         if (eventId != EventId.End &&
             effect.EffectType == EffectType.Ability &&
-            target is PokemonSingleEventTarget abilityTarget &&
-            abilityTarget.Pokemon.IgnoringAbility())
+      target is PokemonSingleEventTarget abilityTarget &&
+          abilityTarget.Pokemon.IgnoringAbility())
         {
             Debug($"{eventId} handler suppressed by Gastro Acid or Neutralizing Gas");
             return relayVar;
-        }
+ }
 
         // Check if weather is suppressed
         if (effect.EffectType == EffectType.Weather &&
-            eventId != EventId.FieldStart &&
-            eventId != EventId.FieldResidual &&
-            eventId != EventId.FieldEnd &&
+    eventId != EventId.FieldStart &&
+          eventId != EventId.FieldResidual &&
+          eventId != EventId.FieldEnd &&
             Field.SuppressingWeather())
         {
-            Debug($"{eventId} handler suppressed by Air Lock");
+       Debug($"{eventId} handler suppressed by Air Lock");
             return relayVar;
-        }
+   }
 
         // Get the handler - either custom callback or from the effect's EventHandlerInfo
-
-        EventHandlerInfo? handlerInfo =
-            // Get EventHandlerInfo from effect (preferred)
-            effect.GetEventHandlerInfo(eventId);
+        EventHandlerInfo? handlerInfo = effect.GetEventHandlerInfo(eventId);
         if (handlerInfo == null)
         {
-            Debug($"SingleEvent {eventId}: No handler found for effect {effect.Name}");
-
-            return relayVar;
+       return relayVar;
         }
 
         // Save parent context
@@ -143,110 +119,71 @@ public partial class Battle
 
         // Set up new event context
         Effect = effect;
-        EffectState = state ?? InitEffectState();
+      EffectState = state ?? InitEffectState();
         Event = new Event
-        {
-            Id = eventId,
+    {
+Id = eventId,
             Target = target,
-            Source = source,
+   Source = source,
             Effect = sourceEffect,
         };
-        EventDepth++;
+  EventDepth++;
 
-        // Invoke the handler with appropriate parameters
-        RelayVar? returnVal;
+  // Invoke the handler with appropriate parameters
+   RelayVar? returnVal;
         try
         {
-            returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
-                source, sourceEffect);
+         returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
+     source, sourceEffect);
 
-            // Debug logging for return value
-            if (returnVal != null)
-            {
-                string returnValStr = returnVal switch
-                {
-                    BoolRelayVar b => $"bool: {b.Value}",
-                    IntRelayVar i => $"int: {i.Value}",
-                    DecimalRelayVar d => $"decimal: {d.Value}",
-                    StringRelayVar s => $"string: {s.Value}",
-                    _ => returnVal.GetType().Name,
-                };
-                Debug($"SingleEvent {eventId}: Returned {returnValStr}");
-            }
-        }
+          // Debug logging for return value - commented out for reduced verbosity
+  }
         finally
-        {
+     {
             // Restore parent context
-            EventDepth--;
-            Effect = parentEffect;
-            EffectState = parentEffectState;
-            Event = parentEvent;
+   EventDepth--;
+    Effect = parentEffect;
+   EffectState = parentEffectState;
+        Event = parentEvent;
         }
 
         return returnVal ?? relayVar;
     }
-
     public RelayVar? RunEvent(EventId eventId, RunEventTarget? target = null,
         RunEventSource? source = null,
         IEffect? sourceEffect = null, RelayVar? relayVar = null, bool? onEffect = null,
         bool? fastExit = null)
     {
-        // Debug logging for event entry
-        string targetStr = target switch
-        {
-            PokemonRunEventTarget p => p.Pokemon.Name,
-            PokemonArrayRunEventTarget a =>
-                $"[{string.Join(", ", a.PokemonList.Select(p => p.Name))}]",
-            SideRunEventTarget s => $"Side {s.Side.Id}",
-            FieldRunEventTarget => "Field",
-            BattleRunEventTarget => "Battle",
-            _ => "null"
-        };
-        string sourceStr = source switch
-        {
-            PokemonRunEventSource p => p.Pokemon.Name,
-            _ => "null"
-        };
-        Debug(
-            $"RunEvent: {eventId} | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
+        // Debug logging for event entry - commented out for reduced verbosity
 
         // Check for stack overflow
         if (EventDepth >= 8)
-        {
-            if (DisplayUi)
-            {
-                Add("message", "STACK LIMIT EXCEEDED");
-                Add("message", "PLEASE REPORT IN BUG THREAD");
-                Add("message", $"Event: {eventId}");
-                Add("message", $"Parent event: {Event.Id}");
-            }
+   {
+        if (DisplayUi)
+      {
+ Add("message", "STACK LIMIT EXCEEDED");
+    Add("message", "PLEASE REPORT IN BUG THREAD");
+     Add("message", $"Event: {eventId}");
+       Add("message", $"Parent event: {Event.Id}");
+      }
 
-            throw new InvalidOperationException("Stack overflow");
-        }
+    throw new InvalidOperationException("Stack overflow");
+ }
 
         // Default target to Battle if not provided
         target ??= RunEventTarget.FromBattle(this);
 
-        // Extract the source Pokemon for handler lookup
+     // Extract the source Pokemon for handler lookup
         Pokemon? effectSource = source switch
         {
-            PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
-            _ => null,
-        };
+    PokemonRunEventSource pokemonSource => pokemonSource.Pokemon,
+_ => null,
+  };
 
         // Find all handlers for this event
         var handlers = FindEventHandlers(target, eventId, effectSource);
 
-        // Debug logging for handler count
-        Debug($"RunEvent {eventId}: Found {handlers.Count} handlers");
-        if (handlers.Count is > 0 and <= 5)
-        {
-            foreach (EventListener h in handlers)
-            {
-                Debug(
-                    $"  - {h.Effect.Name} ({h.Effect.EffectType}) | Priority: {h.Priority} | Speed: {h.Speed}");
-            }
-        }
+        // Debug logging for handler count - commented out for reduced verbosity
 
         // If onEffect is true, add the sourceEffect's handler at the front
         if (onEffect == true)
@@ -543,86 +480,71 @@ public partial class Battle
     {
         while (true)
         {
-            // Debug logging for event entry
-            Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
+      // Debug logging for event entry - commented out for reduced verbosity
 
             // Get all active Pokémon on the field
             var actives = GetAllActive();
 
-            Debug($"EachEvent {eventId}: Processing {actives.Count} active Pokemon");
+          // Debug active count - commented out for reduced verbosity
 
-            // Use current battle effect if none provided
-            effect ??= Effect;
+       // Use current battle effect if none provided
+     effect ??= Effect;
 
-            // Sort by speed (highest to lowest) with proper speed tie resolution
+   // Sort by speed (highest to lowest) with proper speed tie resolution
             SpeedSort(actives, (a, b) => b.Speed.CompareTo(a.Speed));
 
-            if (actives.Count > 0)
-            {
-                Debug(
-                    $"EachEvent {eventId}: Speed order: {string.Join(" > ", actives.Select(p => $"{p.Name}({p.Speed})"))}");
-            }
+      // Debug speed order - commented out for reduced verbosity
 
-// Convert bool? to RelayVar? for RunEvent
-            RelayVar? relayVarConverted =
-                relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
+          // Convert bool? to RelayVar? for RunEvent
+        RelayVar? relayVarConverted =
+       relayVar.HasValue ? new BoolRelayVar(relayVar.Value) : null;
 
             // Run the event on each Pokémon
-            foreach (Pokemon pokemon in actives)
-            {
-                RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect,
-                    relayVarConverted);
-            }
+       foreach (Pokemon pokemon in actives)
+      {
+   RunEvent(eventId, new PokemonRunEventTarget(pokemon), null, effect,
+     relayVarConverted);
+          }
 
             // Special handling for Weather events in Gen 7+
-            if (eventId == EventId.Weather && Gen >= 7)
+     if (eventId == EventId.Weather && Gen >= 7)
             {
-                Debug(
-                    $"EachEvent {eventId}: Triggering Update event (Gen 7+ Weather handling)");
-
+         // Debug weather handling - commented out for reduced verbosity
                 eventId = EventId.Update;
-                effect = null;
-                relayVar = null;
-                continue;
+       effect = null;
+            relayVar = null;
+       continue;
             }
 
-            break;
+       break;
         }
     }
 
-    /// <summary>
-    /// Runs an event with no source on each effect on the field, in Speed order.
-    /// 
-    /// Unlike EachEvent, this contains a lot of other handling and is only intended for
-    /// the 'Residual' and 'SwitchIn' events.
-    /// </summary>
-    /// <param name="eventId">The event to trigger (typically Residual or SwitchIn)</param>
-    /// <param name="targets">Optional list of Pokemon to filter handlers for</param>
     public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
     {
         // Debug logging for event entry
-        string targetsStr = targets != null
-            ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
-            : "all";
-        Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
+        // string targetsStr = targets != null
+        //  ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
+      //     : "all";
+        // Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
 
-        if (eventId == EventId.Residual)
-        {
-            Debug("[FieldEvent] Residual: Starting to collect handlers");
-            foreach (Side side in Sides)
-            {
-                foreach (Pokemon? active in side.Active)
-                {
-                    if (active != null)
-                    {
-                        Debug(
-                            $"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
-                    }
-                }
-            }
-        }
+        // if (eventId == EventId.Residual)
+        // {
+        //     Debug("[FieldEvent] Residual: Starting to collect handlers");
+        //     foreach (Side side in Sides)
+        //     {
+        //         foreach (Pokemon? active in side.Active)
+        //         {
+        //        if (active != null)
+        //  {
+        // Debug(
+    //     $"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
+      //       }
+  //         }
+   //     }
+        // }
 
-        // Determine if we should track duration for this event
+ // Determine if we should track duration for this event
         EffectStateKey? getKey = eventId == EventId.Residual ? EffectStateKey.Duration : null;
 
         // Build the field and side event IDs based on the base event
@@ -666,89 +588,89 @@ public partial class Battle
         }
 
         // Sort handlers by speed order
-        SpeedSort(handlers);
+ SpeedSort(handlers);
 
         // Debug logging for handler count
-        Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
-        if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
-        {
-            foreach (EventListener h in handlers.Take(10))
-            {
-                string holderStr = h.EffectHolder switch
-                {
-                    PokemonEffectHolder peh => peh.Pokemon.Name,
-                    SideEffectHolder seh => $"Side {seh.Side.Id}",
-                    FieldEffectHolder => "Field",
-                    BattleEffectHolder => "Battle",
-                    _ => "Unknown",
-                };
-                Debug(
-                    $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
-            }
-        }
+  // Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
+// if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
+        // {
+        //     foreach (EventListener h in handlers.Take(10))
+    //     {
+        //         string holderStr = h.EffectHolder switch
+        //         {
+     //  PokemonEffectHolder peh => peh.Pokemon.Name,
+      //     SideEffectHolder seh => $"Side {seh.Side.Id}",
+        // FieldEffectHolder => "Field",
+        //             BattleEffectHolder => "Battle",
+        //    _ => "Unknown",
+   //         };
+ //         Debug(
+        //     $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
+        //     }
+        // }
 
-        // Execute each handler in order
-        int handlerIndex = 0;
-        while (handlers.Count > 0)
+    // Execute each handler in order
+ int handlerIndex = 0;
+  while (handlers.Count > 0)
         {
             EventListener handler = handlers[0];
             handlers.RemoveAt(0);
-            handlerIndex++;
+ handlerIndex++;
 
-            IEffect effect = handler.Effect;
+      IEffect effect = handler.Effect;
 
-            Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
+          // Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
 
-            string holderName = handler.EffectHolder switch
-            {
-                PokemonEffectHolder peh => peh.Pokemon.Name,
-                SideEffectHolder seh => $"Side {seh.Side.Id}",
-                FieldEffectHolder => "Field",
-                _ => "Unknown"
-            };
-            Debug(
-                $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
+            // string holderName = handler.EffectHolder switch
+            // {
+ //     PokemonEffectHolder peh => peh.Pokemon.Name,
+  //     SideEffectHolder seh => $"Side {seh.Side.Id}",
+         //     FieldEffectHolder => "Field",
+            //     _ => "Unknown"
+            // };
+            // Debug(
+         //     $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
 
-            // Skip fainted Pokemon unless this is a slot condition
+  // Skip fainted Pokemon unless this is a slot condition
             if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
-            {
-                if (handler.State?.IsSlotCondition != true)
+      {
+           if (handler.State?.IsSlotCondition != true)
                 {
-                    Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
+  // Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
 
-                    continue;
-                }
+          continue;
+            }
             }
 
-            Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
+        // Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
 
-            // Handle duration tracking for Residual events
+   // Handle duration tracking for Residual events
             if (eventId == EventId.Residual &&
                 handler is { End: not null, State.Duration: not null })
             {
-                handler.State.Duration--;
+       handler.State.Duration--;
 
-                Debug(
-                    $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
+        // Debug(
+       // $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
 
-                if (handler.State.Duration <= 0)
-                {
-                    Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
+      if (handler.State.Duration <= 0)
+        {
+          // Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
 
-                    // Effect has expired, trigger its end callback
-                    // Use provided EndCallArgs or empty array for no args
-                    object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
+          // Effect has expired, trigger its end callback
+    // Use provided EndCallArgs or empty array for no args
+   object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
 
-                    // Invoke the end callback
-                    Delegate? endDelegate = handler.End.GetDelegate();
-                    endDelegate?.DynamicInvoke(endCallArgs);
+         // Invoke the end callback
+          Delegate? endDelegate = handler.End.GetDelegate();
+             endDelegate?.DynamicInvoke(endCallArgs);
 
-                    if (Ended) return;
-                    continue;
-                }
-            }
+   if (Ended) return;
+            continue;
+           }
+  }
 
-            Debug($"[FieldEvent] {effect.Name}: Passed duration check");
+  // Debug($"[FieldEvent] {effect.Name}: Passed duration check");
 
             // Verify the effect hasn't been removed by a prior handler
             // (e.g., Toxic Spikes being absorbed during a double switch)
@@ -784,63 +706,63 @@ public partial class Battle
 
                     // If the state doesn't match, the effect was removed
                     if (expectedStateLocation != handler.State)
-                    {
-                        Debug(
-                            $"FieldEvent {eventId}: Skipping {effect.Name} (effect was removed)");
+         {
+     // Debug(
+  // $"FieldEvent {eventId}: Skipping {effect.Name} (effect was removed)");
 
-                        continue;
-                    }
+           continue;
+       }
+   }
+   else if (handler.State.Target is SideEffectStateTarget sideTarget &&
+     handler.State.IsSlotCondition != true)
+       {
+     Side targetSide = sideTarget.Side;
+
+         // Check if side condition still exists
+            if (effect.EffectStateId is ConditionEffectStateId conditionId)
+         {
+   if (!targetSide.SideConditions.TryGetValue(conditionId.ConditionId,
+ out EffectState? sideConditionState) ||
+       sideConditionState != handler.State)
+ {
+           // Debug(
+         //  $"FieldEvent {eventId}: Skipping {effect.Name} (side condition was removed)");
+
+              continue;
+     }
+      }
                 }
-                else if (handler.State.Target is SideEffectStateTarget sideTarget &&
-                         handler.State.IsSlotCondition != true)
-                {
-                    Side targetSide = sideTarget.Side;
+       else if (handler.State.Target is FieldEffectStateTarget fieldTarget)
+             {
+  Field targetField = fieldTarget.Field;
 
-                    // Check if side condition still exists
-                    if (effect.EffectStateId is ConditionEffectStateId conditionId)
-                    {
-                        if (!targetSide.SideConditions.TryGetValue(conditionId.ConditionId,
-                                out EffectState? sideConditionState) ||
-                            sideConditionState != handler.State)
-                        {
-                            Debug(
-                                $"FieldEvent {eventId}: Skipping {effect.Name} (side condition was removed)");
+       // Determine where this field effect's state should be stored
+        if (effect.EffectType == EffectType.Weather)
+       {
+        expectedStateLocation = targetField.WeatherState;
+     }
+          else if (effect.EffectType == EffectType.Terrain)
+        {
+         expectedStateLocation = targetField.TerrainState;
+  }
+        else if (effect.EffectStateId is ConditionEffectStateId conditionId)
+        {
+          targetField.PseudoWeather.TryGetValue(conditionId.ConditionId,
+     out expectedStateLocation);
+           }
 
-                            continue;
-                        }
-                    }
-                }
-                else if (handler.State.Target is FieldEffectStateTarget fieldTarget)
-                {
-                    Field targetField = fieldTarget.Field;
+            // If the state doesn't match, the effect was removed
+                if (expectedStateLocation != handler.State)
+           {
+          // Debug(
+            //     $"FieldEvent {eventId}: Skipping {effect.Name} (field effect was removed)");
 
-                    // Determine where this field effect's state should be stored
-                    if (effect.EffectType == EffectType.Weather)
-                    {
-                        expectedStateLocation = targetField.WeatherState;
-                    }
-                    else if (effect.EffectType == EffectType.Terrain)
-                    {
-                        expectedStateLocation = targetField.TerrainState;
-                    }
-                    else if (effect.EffectStateId is ConditionEffectStateId conditionId)
-                    {
-                        targetField.PseudoWeather.TryGetValue(conditionId.ConditionId,
-                            out expectedStateLocation);
-                    }
+        continue;
+       }
+     }
+     }
 
-                    // If the state doesn't match, the effect was removed
-                    if (expectedStateLocation != handler.State)
-                    {
-                        Debug(
-                            $"FieldEvent {eventId}: Skipping {effect.Name} (field effect was removed)");
-
-                        continue;
-                    }
-                }
-            }
-
-            // Determine the appropriate event ID based on the effect holder type
+    // Determine the appropriate event ID based on the effect holder type
             EventId handlerEventId = eventId;
             if (handler.EffectHolder is SideEffectHolder)
             {
@@ -867,32 +789,32 @@ public partial class Battle
                 Debug(
                     $"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
 
-                SingleEvent(handlerEventId, effect, handler.State, singleEventTarget);
-                // customCallback is null, will use effect's EventHandlerInfo
+      SingleEvent(handlerEventId, effect, handler.State, singleEventTarget);
+      // customCallback is null, will use effect's EventHandlerInfo
 
-                Debug($"[FieldEvent] SingleEvent returned for {effect.Name}");
-            }
-            else Debug($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
+             // Debug($"[FieldEvent] SingleEvent returned for {effect.Name}");
+   }
+        // else Debug($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
 
-            // Process any faint messages and check if battle has ended
-            FaintMessages();
-            if (Ended) return;
+          // Process any faint messages and check if battle has ended
+     FaintMessages();
+  if (Ended) return;
         }
 
-        Debug($"FieldEvent {eventId}: Completed processing all handlers");
+        // Debug($"FieldEvent {eventId}: Completed processing all handlers");
     }
 
     public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target,
         Pokemon? source = null,
-        IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
+     IEffect? effect = null, RelayVar? relayVar = null, bool onEffect = false)
     {
-        return RunEvent(eventId, RunEventTarget.FromPokemonSideBattleUnion(target),
+ return RunEvent(eventId, RunEventTarget.FromPokemonSideBattleUnion(target),
             RunEventSource.FromNullablePokemon(source), effect, relayVar, onEffect, true);
     }
 
     public void OnEvent(EventId eventId, Format target, object[] rest)
     {
-        throw new NotImplementedException(
+  throw new NotImplementedException(
             "This method is for attaching custom event handlers to a Battle." +
             "It shouldn't be used in this implementation.");
     }
@@ -906,97 +828,97 @@ public partial class Battle
     /// </summary>
     private RelayVar? InvokeEventHandlerInfo(EventHandlerInfo? handlerInfo, bool hasRelayVar,
         RelayVar relayVar,
-        SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
+   SingleEventTarget? target, SingleEventSource? source, IEffect? sourceEffect)
     {
         if (handlerInfo == null) return relayVar;
 
         // Check for constant values in union types (fast path)
         // ReSharper disable once SuspiciousTypeConversion.Global
         if (handlerInfo is IUnionEventHandler unionHandler && unionHandler.IsConstant())
-        {
-            object? constantValue = unionHandler.GetConstantValue();
-            return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
+  {
+       object? constantValue = unionHandler.GetConstantValue();
+      return ConvertConstantToRelayVar(constantValue, handlerInfo.Id);
         }
 
         // Build the invocation context
-        var invocationContext = new EventInvocationContext
-        {
-            Battle = this,
-            EventId = handlerInfo.Id,
-            Target = target,
-            Source = source,
-            SourceEffect = sourceEffect,
-            RelayVar = relayVar,
-            HasRelayVar = hasRelayVar
+  var invocationContext = new EventInvocationContext
+{
+    Battle = this,
+        EventId = handlerInfo.Id,
+          Target = target,
+     Source = source,
+    SourceEffect = sourceEffect,
+   RelayVar = relayVar,
+       HasRelayVar = hasRelayVar
         };
 
-        // Use context-based handler if available
-        if (handlerInfo.UsesContextHandler)
+   // Use context-based handler if available
+if (handlerInfo.UsesContextHandler)
         {
             EventContext eventContext = invocationContext.ToEventContext();
 
             try
             {
-                return handlerInfo.ContextHandler!(eventContext);
+    return handlerInfo.ContextHandler!(eventContext);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException(
-                    $"Event {handlerInfo.Id} context handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
-                    ex);
-            }
+   $"Event {handlerInfo.Id} context handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
+       ex);
+        }
         }
 
         // Fall back to legacy handler
-        Delegate? handler = handlerInfo.Handler;
+      Delegate? handler = handlerInfo.Handler;
         if (handler == null) return relayVar;
 
-        // Validate the handler signature matches the EventHandlerInfo specification
+  // Validate the handler signature matches the EventHandlerInfo specification
         try
         {
             handlerInfo.Validate();
         }
-        catch (InvalidOperationException ex)
+ catch (InvalidOperationException ex)
         {
             // Add context about where this validation failed
-            throw new InvalidOperationException(
-                $"EventHandlerInfo validation failed for event {handlerInfo.Id} " +
-                $"on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType}): {ex.Message}",
-                ex);
+throw new InvalidOperationException(
+           $"EventHandlerInfo validation failed for event {handlerInfo.Id} " +
+         $"on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType}): {ex.Message}",
+     ex);
         }
 
         // Use adapter to convert legacy handler to context-based
         EventHandlerDelegate adaptedHandler =
             EventHandlerAdapter.AdaptLegacyHandler(handler, handlerInfo);
-        EventContext context = invocationContext.ToEventContext();
+    EventContext context = invocationContext.ToEventContext();
 
         try
         {
-            return adaptedHandler(context);
-        }
-        catch (Exception ex)
+   return adaptedHandler(context);
+      }
+      catch (Exception ex)
         {
             throw new InvalidOperationException(
-                $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
-                ex);
-        }
+              $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
+          ex);
+     }
     }
 
-    /// <summary>
+ /// <summary>
     /// Converts a constant value from a union handler to a RelayVar.
-    /// </summary>
+  /// </summary>
     private static RelayVar? ConvertConstantToRelayVar(object? constantValue, EventId eventId)
     {
-        return constantValue switch
+      return constantValue switch
         {
-            bool boolValue => new BoolRelayVar(boolValue),
+   bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),
-            decimal decimalValue => new DecimalRelayVar(decimalValue),
-            string stringValue => new StringRelayVar(stringValue),
-            MoveId moveId => new MoveIdRelayVar(moveId),
-            null => null,
+         decimal decimalValue => new DecimalRelayVar(decimalValue),
+      string stringValue => new StringRelayVar(stringValue),
+       MoveId moveId => new MoveIdRelayVar(moveId),
+null => null,
             _ => throw new InvalidOperationException(
-                $"Event {eventId}: Unsupported constant value type: {constantValue.GetType().Name}"),
+    $"Event {eventId}: Unsupported constant value type: {constantValue.GetType().Name}"),
         };
     }
 
@@ -1005,20 +927,20 @@ public partial class Battle
     /// This is a helper for invoking callback properties like DurationCallback, BasePowerCallback, etc.
     /// </summary>
     /// <typeparam name="TResult">The expected return type</typeparam>
-    /// <param name="handlerInfo">The handler info to invoke</param>
-    /// <param name="args">Arguments to pass to the handler</param>
+/// <param name="handlerInfo">The handler info to invoke</param>
+  /// <param name="args">Arguments to pass to the handler</param>
     /// <returns>The result of the invocation, or default(TResult) if handler is null</returns>
     public TResult? InvokeCallback<TResult>(EventHandlerInfo? handlerInfo, params object?[] args)
     {
         if (handlerInfo?.Handler == null)
         {
-            return default;
-        }
+      return default;
+      }
 
-        // Validate parameter nullability if specified
-        if (handlerInfo.ParameterNullability != null)
-        {
-            handlerInfo.ValidateParameterNullability(args);
+   // Validate parameter nullability if specified
+if (handlerInfo.ParameterNullability != null)
+   {
+    handlerInfo.ValidateParameterNullability(args);
         }
 
         // Invoke the delegate
@@ -1027,24 +949,24 @@ public partial class Battle
         // Handle null return values
         if (result == null)
         {
-            if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
+       if (!handlerInfo.ReturnTypeNullable && handlerInfo.ExpectedReturnType != typeof(void))
             {
-                throw new InvalidOperationException(
-                    $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
+  throw new InvalidOperationException(
+          $"Event {handlerInfo.Id}: Handler returned null but return type is non-nullable");
             }
 
             return default;
-        }
+   }
 
-        // Cast to expected type
-        if (result is TResult typedResult)
+   // Cast to expected type
+ if (result is TResult typedResult)
         {
-            return typedResult;
+        return typedResult;
         }
 
         throw new InvalidOperationException(
-            $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
+    $"Event {handlerInfo.Id}: Handler returned {result.GetType().Name} but expected {typeof(TResult).Name}");
     }
 
-    #endregion
-};
+  #endregion
+}

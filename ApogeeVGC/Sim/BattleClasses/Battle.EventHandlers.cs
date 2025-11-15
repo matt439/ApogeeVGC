@@ -258,35 +258,35 @@ public partial class Battle
     {
         // Materialize all data BEFORE yielding to avoid re-entrancy issues
         Condition status = pokemon.GetStatus();
-   EffectState statusState = pokemon.StatusState;
+        EffectState statusState = pokemon.StatusState;
 
         List<(ConditionId id, EffectState state, Condition condition)> volatiles = [];
-  volatiles.AddRange(pokemon.Volatiles.Keys.ToList()
-      .Select(id => (id, pokemon.Volatiles[id], Library.Conditions[id])));
+    volatiles.AddRange(pokemon.Volatiles.Keys.ToList()
+   .Select(id => (id, pokemon.Volatiles[id], Library.Conditions[id])));
 
         Ability ability = pokemon.GetAbility();
-     EffectState abilityState = pokemon.AbilityState;
+        EffectState abilityState = pokemon.AbilityState;
 
-      Item item = pokemon.GetItem();
+  Item item = pokemon.GetItem();
         EffectState itemState = pokemon.ItemState;
 
-        Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item: {item.Name} (ID: {pokemon.Item}) | Event: {callbackName}");
+        // Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item: {item.Name} (ID: {pokemon.Item}) | Event: {callbackName}");
 
         Species species = pokemon.BaseSpecies;
-   EffectState speciesState = pokemon.SpeciesState;
+        EffectState speciesState = pokemon.SpeciesState;
 
-     List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
-    Side side = pokemon.Side;
-   if (pokemon.Position < side.SlotConditions.Count)
-    {
-    var slotConditionsDict =
-           side.SlotConditions[pokemon.Position];
-   foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
-             .ToList()) // Materialize
-      {
-         slotConditions.Add((conditionId, slotConditionState,
-      Library.Conditions[conditionId]));
-         }
+      List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
+      Side side = pokemon.Side;
+      if (pokemon.Position < side.SlotConditions.Count)
+        {
+var slotConditionsDict =
+        side.SlotConditions[pokemon.Position];
+     foreach ((ConditionId conditionId, EffectState slotConditionState) in slotConditionsDict
+.ToList()) // Materialize
+            {
+   slotConditions.Add((conditionId, slotConditionState,
+  Library.Conditions[conditionId]));
+            }
         }
 
         // Now yield results using materialized data
@@ -350,23 +350,23 @@ yield return ResolvePriority(new EventListenerWithoutPriority
 
         // Check held item
         handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
-        Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item handler for {item.Name}: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
-        if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
- {
-       Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Yielding item handler for {item.Name}");
+        // Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item handler for {item.Name}: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
+     if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
+        {
+            // Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Yielding item handler for {item.Name}");
             yield return ResolvePriority(new EventListenerWithoutPriority
-     {
-       Effect = item,
+         {
+          Effect = item,
      HandlerInfo = handlerInfo,
-    State = itemState,
-       End = customHolder == null
+                State = itemState,
+      End = customHolder == null
          ? EffectDelegate.FromNullableDelegate(pokemon.ClearItem)
-     : null,
-      EffectHolder = customHolder ?? pokemon,
-     }, callbackName);
-       }
+    : null,
+       EffectHolder = customHolder ?? pokemon,
+       }, callbackName);
+        }
 
-        // Check species (for species-specific events)
+   // Check species (for species-specific events)
      handlerInfo = GetHandlerInfo(pokemon, species, callbackName, prefix);
         if (handlerInfo != null)
 {
