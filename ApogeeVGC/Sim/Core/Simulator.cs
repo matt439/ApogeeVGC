@@ -485,12 +485,6 @@ public class Simulator : IBattleController
             await foreach (ChoiceResponse response in _choiceResponseChannel!.Reader.ReadAllAsync(
                                cancellationToken))
             {
-                if (PrintDebug)
-                {
-                    Console.WriteLine(
-                        $"[Simulator.ProcessChoiceResponsesAsync] Processing choice for {response.SideId}");
-                }
-
                 // Log the choice for replay purposes
                 LogChoice(response.SideId, response.Choice);
 
@@ -539,12 +533,25 @@ public class Simulator : IBattleController
                     Battle.RequestPlayerChoices();
                 }
             }
+
+            if (PrintDebug)
+            {
+                Console.WriteLine(
+                    "[Simulator.ProcessChoiceResponsesAsync] Exited foreach loop normally");
+            }
         }
         catch (OperationCanceledException)
         {
             if (PrintDebug)
             {
                 Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Cancelled");
+            }
+        }
+        finally
+        {
+            if (PrintDebug)
+            {
+                Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Completed");
             }
         }
     }

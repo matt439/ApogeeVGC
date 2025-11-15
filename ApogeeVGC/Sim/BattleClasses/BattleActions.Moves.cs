@@ -416,19 +416,6 @@ public partial class BattleActions
         // Build move message attributes
         string moveName = activeMove.Name;
 
-        // Add move message to battle log
-        if (Battle.DisplayUi)
-        {
-            if (target is null)
-            {
-                Battle.Debug($"[UseMoveInner] Move {moveName} failed: no valid target");
-                pokemon.MoveThisTurnResult = false;
-                return false;
-            }
-
-            // ...existing code...
-        }
-
         // Handle no target
         if (target == null)
         {

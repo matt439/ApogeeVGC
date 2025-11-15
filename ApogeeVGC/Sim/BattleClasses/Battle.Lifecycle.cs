@@ -84,9 +84,9 @@ public partial class Battle
         // so the StartGameAction must be in the queue before RunPickTeam is called
         Debug("[Battle.Start] Adding StartGameAction to queue");
         Queue.InsertChoice(new StartGameAction());
-  Debug($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
+        Debug($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
 
-   // Run team preview/selection phase
+        // Run team preview/selection phase
         Debug($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
 
         RunPickTeam();
@@ -97,17 +97,17 @@ public partial class Battle
         MidTurn = true;
 
         // Start turn loop if no request is pending
-    Debug($"[Battle.Start] Checking RequestState: {RequestState}");
+        Debug($"[Battle.Start] Checking RequestState: {RequestState}");
 
         if (RequestState == RequestState.None)
-     {
-       Debug("[Battle.Start] No request - calling TurnLoop()");
-       TurnLoop();
+        {
+            Debug("[Battle.Start] No request - calling TurnLoop()");
+            TurnLoop();
         }
         else
-  {
-     Debug(
-      $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
+        {
+            Debug(
+                $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
         }
 
         // Return immediately - Battle doesn't wait for choices
@@ -335,29 +335,29 @@ public partial class Battle
     public void TurnLoop()
     {
         Debug(
-  $"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
+            $"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
 
         if (DisplayUi)
         {
             Add(string.Empty);
-      long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-     Add("t:", timestamp);
-     }
-
-   if (RequestState != RequestState.None)
-  {
-       RequestState = RequestState.None;
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            Add("t:", timestamp);
         }
 
-  // First time through - set up turn structure
+        if (RequestState != RequestState.None)
+        {
+            RequestState = RequestState.None;
+        }
+
+        // First time through - set up turn structure
         if (!MidTurn)
         {
             Debug(
-         "[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
+                "[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
 
             Queue.InsertChoice(new BeforeTurnAction());
-   Queue.AddChoice(new ResidualAction());
-     MidTurn = true;
+            Queue.AddChoice(new ResidualAction());
+            MidTurn = true;
         }
 
         Debug($"[TurnLoop] About to process queue - size: {Queue.List.Count}");
@@ -369,20 +369,18 @@ public partial class Battle
             actionCount++;
             Debug($"[TurnLoop] Processing action {actionCount}: {action.Choice}");
 
-     RunAction(action);
+            RunAction(action);
 
-   // Exit early if we need to wait for a request or battle ended
+            // Exit early if we need to wait for a request or battle ended
             // Battle returns here, Simulator will call us back when choices are made
-   if (RequestState != RequestState.None || Ended)
-     {
-    Debug(
-          $"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
-
-     return;
-     }
+            if (RequestState != RequestState.None || Ended)
+            {
+                Debug($"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
+                return;
+            }
         }
 
-   Debug($"[TurnLoop] Queue empty after processing {actionCount} actions");
+        Debug($"[TurnLoop] Queue empty after processing {actionCount} actions");
 
         // Turn is complete - reset flags and start next turn
         MidTurn = false;
@@ -690,27 +688,27 @@ public partial class Battle
 
             case ActionId.Residual:
                 if (DisplayUi)
-     {
-      Add(string.Empty);
-      }
+                {
+                    Add(string.Empty);
+                }
 
-  Debug($"[RunAction] About to call FieldEvent(Residual)");
+                Debug($"[RunAction] About to call FieldEvent(Residual)");
 
-        ClearActiveMove(failed: true);
-    UpdateSpeed();
+                ClearActiveMove(failed: true);
+                UpdateSpeed();
                 residualPokemon = GetAllActive()
-          .Select(p => (p, p.GetUndynamaxedHp()))
-        .ToList();
-         FieldEvent(EventId.Residual);
+                    .Select(p => (p, p.GetUndynamaxedHp()))
+                    .ToList();
+                FieldEvent(EventId.Residual);
 
                 Debug($"[RunAction] FieldEvent(Residual) returned");
 
-   if (!Ended && DisplayUi)
-          {
-           Add("upkeep");
-       }
+                if (!Ended && DisplayUi)
+                {
+                    Add("upkeep");
+                }
 
-         break;
+                break;
         }
 
         // Phazing (Roar, etc)
@@ -740,17 +738,17 @@ public partial class Battle
             foreach (Pokemon? pokemon in side.Active)
             {
                 if (pokemon?.Fainted == true)
-      {
-        Queue.CancelAction(pokemon);
-       }
-      }
-   }
+                {
+                    Queue.CancelAction(pokemon);
+                }
+            }
+        }
 
         // Switching (fainted pokemon, U-turn, Baton Pass, etc)
-      if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
+        if (Queue.Peek()?.Choice == ActionId.InstaSwitch)
         {
-          return false;
-     }
+            return false;
+        }
 
         // Emergency Exit / Wimp Out check
         if (action.Choice != ActionId.Start)
@@ -779,88 +777,88 @@ public partial class Battle
         }
 
         // Check for switches
-      var switches = Sides
-			.Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
-			.ToList();
+        var switches = Sides
+            .Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
+            .ToList();
 
-		for (int i = 0; i < Sides.Count; i++)
-		{
-			bool reviveSwitch = false;
-			if (switches[i] && CanSwitch(Sides[i]) == 0)
-			{
-				foreach (Pokemon? pokemon in Sides[i].Active)
-				{
-					if (pokemon == null) continue;
+        for (int i = 0; i < Sides.Count; i++)
+        {
+            bool reviveSwitch = false;
+            if (switches[i] && CanSwitch(Sides[i]) == 0)
+            {
+                foreach (Pokemon? pokemon in Sides[i].Active)
+                {
+                    if (pokemon == null) continue;
 
-					IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
-						ConditionId.RevivalBlessing);
-					if (revivalBlessing != null)
-					{
-						reviveSwitch = true;
-						continue;
-					}
+                    IEffect? revivalBlessing = Sides[i].GetSlotCondition(pokemon.Position,
+                        ConditionId.RevivalBlessing);
+                    if (revivalBlessing != null)
+                    {
+                        reviveSwitch = true;
+                        continue;
+                    }
 
-					pokemon.SwitchFlag = false;
-				}
+                    pokemon.SwitchFlag = false;
+                }
 
-				if (!reviveSwitch)
-				{
-					switches[i] = false;
+                if (!reviveSwitch)
+                {
+                    switches[i] = false;
 
-					// If this side needs to switch but has no Pokemon available, they've lost
-					// Check if the battle should end
-					if (Sides[i].PokemonLeft <= 0)
-         {
-  Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
+                    // If this side needs to switch but has no Pokemon available, they've lost
+                    // Check if the battle should end
+                    if (Sides[i].PokemonLeft <= 0)
+                    {
+                        Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
 
-          Lose(Sides[i]);
-    return true;
+                        Lose(Sides[i]);
+                        return true;
+                    }
+                }
             }
-				}
-			}
-			else if (switches[i])
-			{
-				foreach (Pokemon? pokemon in Sides[i].Active)
-				{
-					if (pokemon == null) continue;
+            else if (switches[i])
+            {
+                foreach (Pokemon? pokemon in Sides[i].Active)
+                {
+                    if (pokemon == null) continue;
 
-					if (pokemon.Hp > 0 &&
-						pokemon.SwitchFlag.IsTrue() &&
-						pokemon.SwitchFlag != MoveId.RevivalBlessing &&
-						!pokemon.SkipBeforeSwitchOutEventFlag)
-					{
-						RunEvent(EventId.BeforeSwitchOut, pokemon);
-						pokemon.SkipBeforeSwitchOutEventFlag = true;
-						FaintMessages();
-						if (Ended) return true;
-						if (pokemon.Fainted)
-						{
-							switches[i] = Sides[i].Active
-								.Any(p => p != null && p.SwitchFlag.IsTrue());
-						}
-					}
-				}
-			}
-		}
+                    if (pokemon.Hp > 0 &&
+                        pokemon.SwitchFlag.IsTrue() &&
+                        pokemon.SwitchFlag != MoveId.RevivalBlessing &&
+                        !pokemon.SkipBeforeSwitchOutEventFlag)
+                    {
+                        RunEvent(EventId.BeforeSwitchOut, pokemon);
+                        pokemon.SkipBeforeSwitchOutEventFlag = true;
+                        FaintMessages();
+                        if (Ended) return true;
+                        if (pokemon.Fainted)
+                        {
+                            switches[i] = Sides[i].Active
+                                .Any(p => p != null && p.SwitchFlag.IsTrue());
+                        }
+                    }
+                }
+            }
+        }
 
-		foreach (bool playerSwitch in switches)
-		{
-			if (playerSwitch)
-			{
-				MakeRequest(RequestState.SwitchIn);
+        foreach (bool playerSwitch in switches)
+        {
+            if (playerSwitch)
+            {
+                MakeRequest(RequestState.SwitchIn);
 
-				// Return immediately - Simulator handles getting switch choices
-				// When Simulator calls Choose() -> CommitChoices(), TurnLoop() will be called again
-				return true;
-			}
-		}
+                // Return immediately - Simulator handles getting switch choices
+                // When Simulator calls Choose() -> CommitChoices(), TurnLoop() will be called again
+                return true;
+            }
+        }
 
-		// In Gen 8+, speed is updated dynamically
+        // In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();
         if (nextAction?.Choice == ActionId.Move)
         {
             UpdateSpeed();
-     foreach (IAction queueAction in Queue.List)
+            foreach (IAction queueAction in Queue.List)
                 GetActionSpeed(queueAction);
 
             Queue.Sort();
