@@ -126,22 +126,6 @@ public enum MoveCategory
     Status,
 }
 
-//public enum MoveSlot
-//{
-//    Move1,
-//    Move2,
-//    Move3,
-//    Move4,
-//}
-
-public enum MoveNormalTarget
-{
-    FoeSlot1,
-    FoeSlot2,
-    AllySlot1,
-    AllySlot2,
-    None,
-}
 
 /// <summary>
 /// Describes the acceptable target(s) of a move.
