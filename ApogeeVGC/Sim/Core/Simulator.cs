@@ -483,79 +483,71 @@ public class Simulator : IBattleController
         try
         {
             await foreach (ChoiceResponse response in _choiceResponseChannel!.Reader.ReadAllAsync(
-                               cancellationToken))
+      cancellationToken))
+         {
+    if (PrintDebug)
+    {
+         Console.WriteLine(
+              $"[Simulator.ProcessChoiceResponsesAsync] Processing choice for {response.SideId}");
+   }
+
+    // Log the choice for replay purposes
+         LogChoice(response.SideId, response.Choice);
+
+    // Submit the choice to the battle
+    // Note: This may trigger CommitChoices() if all choices are received
+    if (!Battle!.Choose(response.SideId, response.Choice))
+{
+            if (PrintDebug)
             {
-                // Log the choice for replay purposes
-                LogChoice(response.SideId, response.Choice);
+  Console.WriteLine(
+    $"[Simulator.ProcessChoiceResponsesAsync] Invalid choice for {response.SideId}");
+       }
+          }
 
-                // Submit the choice to the battle
-                // Note: This may trigger CommitChoices() if all choices are received
-                if (!Battle!.Choose(response.SideId, response.Choice))
-                {
-                    if (PrintDebug)
-                    {
-                        Console.WriteLine(
-                            $"[Simulator.ProcessChoiceResponsesAsync] Invalid choice for {response.SideId}");
-                    }
-                }
-
-                // Clean up the completed task
+         // Clean up the completed task
                 lock (_pendingChoiceTasks)
-                {
-                    _pendingChoiceTasks.Remove(response.SideId);
+         {
+     _pendingChoiceTasks.Remove(response.SideId);
+     }
+
+    // Check if there are any pending choice tasks still running
+          bool hasPendingTasks;
+        lock (_pendingChoiceTasks)
+            {
+      hasPendingTasks = _pendingChoiceTasks.Count > 0;
                 }
 
-                // Check if there are any pending choice tasks still running
-                bool hasPendingTasks;
-                lock (_pendingChoiceTasks)
-                {
-                    hasPendingTasks = _pendingChoiceTasks.Count > 0;
-                }
+      // Only check for new requests if:
+       // 1. No pending choice tasks (all choices in current batch are processed)
+           // 2. There's a new pending request
+  // 3. Battle hasn't ended
+           // This avoids calling RequestPlayerChoices() while still processing choices,
+            // which would cause nested Battle.Choose() calls and stack overflow
+          if (!hasPendingTasks && Battle.RequestState != RequestState.None && !Battle.Ended)
+           {
+     if (PrintDebug)
+    {
+            Console.WriteLine(
+    $"[Simulator.ProcessChoiceResponsesAsync] All choices processed, new request pending: {Battle.RequestState}");
+               }
 
-                // Only check for new requests if:
-                // 1. No pending choice tasks (all choices in current batch are processed)
-                // 2. There's a new pending request
-                // 3. Battle hasn't ended
-                // This avoids calling RequestPlayerChoices() while still processing choices,
-                // which would cause nested Battle.Choose() calls and stack overflow
-                if (!hasPendingTasks && Battle.RequestState != RequestState.None && !Battle.Ended)
-                {
-                    if (PrintDebug)
-                    {
-                        Console.WriteLine(
-                            $"[Simulator.ProcessChoiceResponsesAsync] All choices processed, new request pending: {Battle.RequestState}");
-                    }
+      // Small delay to ensure Battle.Choose() call stack has fully unwound
+        await Task.Yield();
 
-                    // Small delay to ensure Battle.Choose() call stack has fully unwound
-                    await Task.Yield();
-
-                    // Emit the new requests
-                    Battle.RequestPlayerChoices();
+           // Emit the new requests
+         Battle.RequestPlayerChoices();
                 }
             }
-
-            if (PrintDebug)
-            {
-                Console.WriteLine(
-                    "[Simulator.ProcessChoiceResponsesAsync] Exited foreach loop normally");
-            }
+      }
+    catch (OperationCanceledException)
+     {
+   if (PrintDebug)
+       {
+         Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Cancelled");
+   }
         }
-        catch (OperationCanceledException)
-        {
-            if (PrintDebug)
-            {
-                Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Cancelled");
-            }
-        }
-        finally
-        {
-            if (PrintDebug)
-            {
-                Console.WriteLine("[Simulator.ProcessChoiceResponsesAsync] Completed");
-            }
-        }
-    }
-
+  }
     /// <summary>
     /// Callback invoked by Battle when all choices are received.
     /// Commits the choices and releases the battle loop to continue.

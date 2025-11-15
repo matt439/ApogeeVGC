@@ -907,17 +907,18 @@ public partial class BattleActions
         }
 
         // Recoil damage
-        if ((move.Recoil != null || move.Id == MoveId.Chloroblast) && move.TotalDamage.ToInt() > 0)
+        if ((move.Recoil != null || move.Id == MoveId.Chloroblast) && 
+ move.TotalDamage is IntIntFalseUnion totalDamageInt && totalDamageInt.Value > 0)
         {
-            int hpBeforeRecoil = pokemon.Hp;
+  int hpBeforeRecoil = pokemon.Hp;
 
-            Battle.Damage(CalcRecoilDamage(move.TotalDamage.ToInt(), move, pokemon), pokemon, pokemon,
-                BattleDamageEffect.FromIEffect(Library.Conditions[ConditionId.Recoil]));
+            Battle.Damage(CalcRecoilDamage(totalDamageInt.Value, move, pokemon), pokemon, pokemon,
+        BattleDamageEffect.FromIEffect(Library.Conditions[ConditionId.Recoil]));
 
-            if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
-            {
-                Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
-            }
+   if (pokemon.Hp <= pokemon.MaxHp / 2 && hpBeforeRecoil > pokemon.MaxHp / 2)
+{
+  Battle.RunEvent(EventId.EmergencyExit, pokemon, pokemon);
+      }
         }
 
         // Struggle recoil
@@ -984,20 +985,33 @@ public partial class BattleActions
         {
             for (int i = 0; i < damage.Count; i++)
             {
-                // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
-                // The previous check was for `move.multihit`, but that fails for Dragon Darts
-                int curDamage = targets.Count == 1 ? move.TotalDamage.ToInt() :
-                    damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt ? dmgInt.Value : 0;
+      // There are no multihit spread moves, so it's safe to use move.totalDamage for multihit moves
+    // The previous check was for `move.multihit`, but that fails for Dragon Darts
+      int curDamage;
+       if (targets.Count == 1)
+     {
+         // For single target moves, use TotalDamage if it's an integer
+        curDamage = move.TotalDamage is IntIntFalseUnion totalDmgInt 
+               ? totalDmgInt.Value 
+        : 0;
+     }
+       else
+      {
+     // For multi-target moves, use individual damage value
+          curDamage = damage[i] is IntBoolIntEmptyUndefinedUnion dmgInt 
+    ? dmgInt.Value 
+     : 0;
+          }
 
-                if (curDamage > 0 && targets[i].Hp > 0)
-                {
-                    int targetHpBeforeDamage = (targets[i].HurtThisTurn ?? 0) + curDamage;
-                    if (targets[i].Hp <= targets[i].MaxHp / 2 && targetHpBeforeDamage > targets[i].MaxHp / 2)
-                    {
-                        Battle.RunEvent(EventId.EmergencyExit, targets[i], pokemon);
-                    }
-                }
-            }
+    if (curDamage > 0 && targets[i].Hp > 0)
+       {
+            int targetHpBeforeDamage = (targets[i].HurtThisTurn ?? 0) + curDamage;
+     if (targets[i].Hp <= targets[i].MaxHp / 2 && targetHpBeforeDamage > targets[i].MaxHp / 2)
+          {
+         Battle.RunEvent(EventId.EmergencyExit, targets[i], pokemon);
+      }
+ }
+          }
         }
 
         return damage;

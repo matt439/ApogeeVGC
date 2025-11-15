@@ -100,14 +100,14 @@ public partial class Battle
                 _ => null,
             };
 
-            int targetDamage = curDamage[0].ToInt();
-
-            // Handle undefined damage values
+            // Handle undefined damage values FIRST before calling ToInt()
             if (curDamage[0] is UndefinedBoolIntUndefinedUnion)
             {
                 retVals.Add(curDamage[0]);
                 continue;
             }
+
+            int targetDamage = curDamage[0].ToInt();
 
             // Target has no HP - return 0
             if (target is not { Hp: > 0 })
