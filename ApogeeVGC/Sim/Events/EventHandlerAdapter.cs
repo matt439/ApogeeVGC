@@ -274,6 +274,32 @@ internal static class EventHandlerAdapter
             EmptyBoolIntEmptyVoidUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
             VoidUnionBoolIntEmptyVoidUnion => new VoidReturnRelayVar(),
 
+            // BoolIntUndefinedUnion -> bool, int, or Undefined
+            BoolBoolIntUndefinedUnion boolIntUndef => new BoolRelayVar(boolIntUndef.Value),
+            IntBoolIntUndefinedUnion intIntUndef => new IntRelayVar(intIntUndef.Value),
+            UndefinedBoolIntUndefinedUnion => new UndefinedRelayVar(),
+
+            // IntFalseUndefinedUnion -> int, false, or Undefined
+            IntIntFalseUndefined intFalseUndef => new IntRelayVar(intFalseUndef.Value),
+            FalseIntFalseUndefined => new BoolRelayVar(false),
+            UndefinedIntFalseUndefined => new UndefinedRelayVar(),
+
+            // BoolIntEmptyUndefinedUnion -> bool, int, Empty, or Undefined
+            BoolBoolIntEmptyUndefinedUnion boolIntEmptyUndef => new BoolRelayVar(boolIntEmptyUndef.Value),
+            IntBoolIntEmptyUndefinedUnion intIntEmptyUndef => new IntRelayVar(intIntEmptyUndef.Value),
+            EmptyBoolIntEmptyUndefinedUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
+            UndefinedBoolIntEmptyUndefinedUnion => new UndefinedRelayVar(),
+
+            // IntUndefinedFalseEmptyUnion -> int, Undefined, false, or Empty
+            IntIntUndefinedFalseEmptyUnion intUndefFalseEmpty => new IntRelayVar(intUndefFalseEmpty.Value),
+            UndefinedIntUndefinedFalseEmptyUnion => new UndefinedRelayVar(),
+            FalseIntUndefinedFalseEmptyUnion => new BoolRelayVar(false),
+            EmptyIntUndefinedFalseEmptyUnion => new UndefinedRelayVar(), // Empty means NOT_FAIL
+
+            // BoolUndefinedUnion -> bool or Undefined
+            BoolBoolUndefinedUnion boolUndef => new BoolRelayVar(boolUndef.Value),
+            UndefinedBoolUndefinedUnion => new UndefinedRelayVar(),
+
             // Primitive types
             bool boolValue => new BoolRelayVar(boolValue),
             int intValue => new IntRelayVar(intValue),

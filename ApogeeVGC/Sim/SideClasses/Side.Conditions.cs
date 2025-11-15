@@ -59,17 +59,20 @@ public partial class Side
 
         // Step 6: SideStart event
         RelayVar? sideStartResult = Battle.SingleEvent(EventId.SideStart, status, effectState, new SideSingleEventTarget(this), source, sourceEffect);
-        if (sideStartResult is not BoolRelayVar { Value: true })
-        {
-            SideConditions.Remove(status.Id);
-            return false;
-        }
+        
+        // Only treat explicit false as failure
+        // Undefined, null, VoidReturn, and true all mean success (NOT_FAIL)
+        if (sideStartResult is BoolRelayVar { Value: false })
+      {
+     SideConditions.Remove(status.Id);
+ return false;
+      }
 
         // Step 7: Run SideConditionStart event
         Battle.RunEvent(EventId.SideConditionStart, this, source, status);
 
         // Step 8: Success
-        return true;
+     return true;
     }
 
     public Condition? GetSideCondition(ConditionId status)
@@ -175,9 +178,16 @@ public partial class Side
      RelayVar? startResult = Battle.SingleEvent(EventId.Start, status, conditionState,
   new PokemonSingleEventTarget(GetActiveAt(targetSlot)), source, sourceEffect);
 
-        if (startResult is BoolRelayVar { Value: true }) return true;
-        SlotConditions[targetSlot].Remove(status.Id);
-        return false;
+    // Only treat explicit false as failure
+  // Undefined, null, VoidReturn, and true all mean success (NOT_FAIL)
+        if (startResult is BoolRelayVar { Value: false })
+        {
+ SlotConditions[targetSlot].Remove(status.Id);
+    return false;
+        }
+        
+        return true;
+
     }
 
     public IEffect? GetSlotCondition(PokemonIntUnion target, Condition status)
