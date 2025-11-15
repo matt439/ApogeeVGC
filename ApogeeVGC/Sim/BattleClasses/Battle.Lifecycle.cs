@@ -76,62 +76,38 @@ public partial class Battle
         }
 
         // Check EV balance in debug mode
-        if (DebugMode)
-        {
-            CheckEvBalance();
-        }
+        CheckEvBalance();
 
         // Add start action to queue BEFORE team preview
         // This ensures it's preserved when CommitChoices processes team preview actions
         // In synchronous mode, RequestPlayerChoices triggers immediate processing,
         // so the StartGameAction must be in the queue before RunPickTeam is called
-        if (DebugMode)
-        {
-            Console.WriteLine("[Battle.Start] Adding StartGameAction to queue");
-        }
+        Debug("[Battle.Start] Adding StartGameAction to queue");
         Queue.InsertChoice(new StartGameAction());
-        if (DebugMode)
-        {
-            Console.WriteLine($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
-        }
+  Debug($"[Battle.Start] StartGameAction added, queue size = {Queue.List.Count}");
 
-        // Run team preview/selection phase
-        if (DebugMode)
-        {
-            Console.WriteLine($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
-        }
+   // Run team preview/selection phase
+        Debug($"[Battle.Start] About to call RunPickTeam(), RequestState = {RequestState}");
 
         RunPickTeam();
 
-        if (DebugMode)
-        {
-            Console.WriteLine($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
-        }
+        Debug($"[Battle.Start] RunPickTeam() returned, RequestState = {RequestState}");
 
         // Set mid-turn flag
         MidTurn = true;
 
         // Start turn loop if no request is pending
-        if (DebugMode)
-        {
-            Console.WriteLine($"[Battle.Start] Checking RequestState: {RequestState}");
-        }
+    Debug($"[Battle.Start] Checking RequestState: {RequestState}");
 
         if (RequestState == RequestState.None)
-        {
-            if (DebugMode)
-            {
-                Console.WriteLine("[Battle.Start] No request - calling TurnLoop()");
-            }
-            TurnLoop();
+     {
+       Debug("[Battle.Start] No request - calling TurnLoop()");
+       TurnLoop();
         }
         else
-        {
-            if (DebugMode)
-            {
-                Console.WriteLine(
-                    $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
-            }
+  {
+     Debug(
+      $"[Battle.Start] Request pending ({RequestState}) - returning, waiting for choices");
         }
 
         // Return immediately - Battle doesn't wait for choices
@@ -358,82 +334,61 @@ public partial class Battle
     /// </summary>
     public void TurnLoop()
     {
-        if (DebugMode)
-        {
-            Console.WriteLine(
-                $"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
-        }
+        Debug(
+  $"[TurnLoop] STARTING - Queue size: {Queue.List.Count}, MidTurn: {MidTurn}, RequestState: {RequestState}");
 
         if (DisplayUi)
         {
             Add(string.Empty);
-            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            Add("t:", timestamp);
+      long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+     Add("t:", timestamp);
+     }
+
+   if (RequestState != RequestState.None)
+  {
+       RequestState = RequestState.None;
         }
 
-        if (RequestState != RequestState.None)
-        {
-            RequestState = RequestState.None;
-        }
-
-        // First time through - set up turn structure
+  // First time through - set up turn structure
         if (!MidTurn)
         {
-            if (DebugMode)
-            {
-                Console.WriteLine(
-                    "[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
-            }
+            Debug(
+         "[TurnLoop] First time through, adding BeforeTurnAction and ResidualAction");
 
             Queue.InsertChoice(new BeforeTurnAction());
-            Queue.AddChoice(new ResidualAction());
-            MidTurn = true;
+   Queue.AddChoice(new ResidualAction());
+     MidTurn = true;
         }
 
-        if (DebugMode)
-        {
-            Console.WriteLine($"[TurnLoop] About to process queue - size: {Queue.List.Count}");
-        }
+        Debug($"[TurnLoop] About to process queue - size: {Queue.List.Count}");
 
         // Process actions one at a time
         int actionCount = 0;
         while (Queue.Shift() is { } action)
         {
             actionCount++;
-            if (DebugMode)
-            {
-                Console.WriteLine($"[TurnLoop] Processing action {actionCount}: {action.Choice}");
-            }
+            Debug($"[TurnLoop] Processing action {actionCount}: {action.Choice}");
 
-            RunAction(action);
+     RunAction(action);
 
-            // Exit early if we need to wait for a request or battle ended
+   // Exit early if we need to wait for a request or battle ended
             // Battle returns here, Simulator will call us back when choices are made
-            if (RequestState != RequestState.None || Ended)
-            {
-                if (DebugMode)
-                {
-                    Console.WriteLine(
-                        $"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
-                }
+   if (RequestState != RequestState.None || Ended)
+     {
+    Debug(
+          $"[TurnLoop] Exiting early - RequestState: {RequestState}, Ended: {Ended}");
 
-                return;
-            }
+     return;
+     }
         }
 
-        if (DebugMode)
-        {
-            Console.WriteLine($"[TurnLoop] Queue empty after processing {actionCount} actions");
-        }
+   Debug($"[TurnLoop] Queue empty after processing {actionCount} actions");
 
         // Turn is complete - reset flags and start next turn
         MidTurn = false;
         Queue.Clear();
 
-        if (DebugMode)
-        {
-            Console.WriteLine("[TurnLoop] Calling EndTurn");
-        }
+        Debug("[TurnLoop] Calling EndTurn");
 
         EndTurn();
     }
@@ -735,33 +690,27 @@ public partial class Battle
 
             case ActionId.Residual:
                 if (DisplayUi)
-                {
-                    Add(string.Empty);
-                }
+     {
+      Add(string.Empty);
+      }
 
-                if (DebugMode)
-                {
-                    Console.WriteLine($"[RunAction] About to call FieldEvent(Residual)");
-                }
+  Debug($"[RunAction] About to call FieldEvent(Residual)");
 
-                ClearActiveMove(failed: true);
-                UpdateSpeed();
+        ClearActiveMove(failed: true);
+    UpdateSpeed();
                 residualPokemon = GetAllActive()
-                    .Select(p => (p, p.GetUndynamaxedHp()))
-                    .ToList();
-                FieldEvent(EventId.Residual);
+          .Select(p => (p, p.GetUndynamaxedHp()))
+        .ToList();
+         FieldEvent(EventId.Residual);
 
-                if (DebugMode)
-                {
-                    Console.WriteLine($"[RunAction] FieldEvent(Residual) returned");
-                }
+                Debug($"[RunAction] FieldEvent(Residual) returned");
 
-                if (!Ended && DisplayUi)
-                {
-                    Add("upkeep");
-                }
+   if (!Ended && DisplayUi)
+          {
+           Add("upkeep");
+       }
 
-                break;
+         break;
         }
 
         // Phazing (Roar, etc)
@@ -861,15 +810,12 @@ public partial class Battle
 					// If this side needs to switch but has no Pokemon available, they've lost
 					// Check if the battle should end
 					if (Sides[i].PokemonLeft <= 0)
-					{
-						if (DebugMode)
-						{
-							Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
-						}
+         {
+  Debug($"{Sides[i].Name} has no Pokemon left to switch in, losing");
 
-						Lose(Sides[i]);
-						return true;
-					}
+          Lose(Sides[i]);
+    return true;
+            }
 				}
 			}
 			else if (switches[i])
@@ -915,9 +861,7 @@ public partial class Battle
   {
             UpdateSpeed();
             foreach (IAction queueAction in Queue.List)
-            {
         GetActionSpeed(queueAction);
-            }
 
             Queue.Sort();
         }

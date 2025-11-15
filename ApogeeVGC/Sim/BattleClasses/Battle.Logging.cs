@@ -99,15 +99,15 @@ public partial class Battle
 
 
     /// <summary>
-    /// Logs debug information to the battle log.
-    /// Only adds the message if debug mode is enabled.
+    /// Logs debug information to the console.
+    /// Only outputs the message if debug mode is enabled.
     /// </summary>
     /// <param name="activity">The debug message to log</param>
     public void Debug(string activity)
     {
         if (DebugMode)
         {
-            Add("debug", activity);
+            Console.WriteLine(activity);
         }
     }
 

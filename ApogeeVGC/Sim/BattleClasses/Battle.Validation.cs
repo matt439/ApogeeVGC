@@ -12,17 +12,11 @@ public partial class Battle
 {
     public void RunPickTeam()
     {
-        if (DebugMode)
-        {
-            Console.WriteLine("[RunPickTeam] STARTING");
-        }
+        Debug("[RunPickTeam] STARTING");
 
         // onTeamPreview handlers are expected to show full teams to all active sides,
         // and send a 'teampreview' request for players to pick their leads / team order.
-        if (DebugMode)
-        {
-            Console.WriteLine("[RunPickTeam] Calling Format.OnTeamPreview");
-        }
+        Debug("[RunPickTeam] Calling Format.OnTeamPreview");
         Format.OnTeamPreview?.Invoke(this);
 
         foreach (RuleId rule in RuleTable.Keys)
@@ -30,57 +24,36 @@ public partial class Battle
             string ruleString = rule.ToString();
             if (ruleString.Length > 0 && "+*-!".Contains(ruleString[0])) continue;
             Format subFormat = Library.Rulesets[rule];
-            if (DebugMode)
-            {
-                Console.WriteLine($"[RunPickTeam] Calling subFormat.OnTeamPreview for {rule}");
-            }
+            Debug($"[RunPickTeam] Calling subFormat.OnTeamPreview for {rule}");
             subFormat.OnTeamPreview?.Invoke(this);
         }
 
         // If team preview request was set up by handlers, just return
         // Otherwise, if pickedTeamSize is set, we need to make the request ourselves
-        if (DebugMode)
-        {
-            Console.WriteLine($"[RunPickTeam] Checking RequestState: {RequestState}");
-        }
+        Debug($"[RunPickTeam] Checking RequestState: {RequestState}");
 
         if (RequestState == RequestState.TeamPreview)
         {
-            if (DebugMode)
-            {
-                Console.WriteLine("[RunPickTeam] Team preview already set up by handler, returning");
-            }
+            Debug("[RunPickTeam] Team preview already set up by handler, returning");
             // Request was already set up - Simulator will call RequestPlayerChoices() after Start() returns
             return;
         }
 
-        if (DebugMode)
-        {
-            Console.WriteLine($"[RunPickTeam] PickedTeamSize = {RuleTable.PickedTeamSize}");
-        }
+        Debug($"[RunPickTeam] PickedTeamSize = {RuleTable.PickedTeamSize}");
 
         if (RuleTable.PickedTeamSize > 0)
         {
             // There was no onTeamPreview handler (e.g. Team Preview rule missing).
             // Players must still pick their own Pokémon, so we show them privately.
-            if (DebugMode)
-            {
-                Console.WriteLine("[RunPickTeam] Making team preview request");
-            }
+            Debug("[RunPickTeam] Making team preview request");
             UpdateAllPlayersUi(BattlePerspectiveType.TeamPreview);
             MakeRequest(RequestState.TeamPreview);
-            if (DebugMode)
-            {
-                Console.WriteLine($"[RunPickTeam] After MakeRequest, RequestState = {RequestState}");
-            }
+            Debug($"[RunPickTeam] After MakeRequest, RequestState = {RequestState}");
 
             // Simulator will call RequestPlayerChoices() after Start() returns
         }
 
-        if (DebugMode)
-        {
-            Console.WriteLine("[RunPickTeam] COMPLETED");
-        }
+        Debug("[RunPickTeam] COMPLETED");
     }
 
     public void CheckEvBalance()

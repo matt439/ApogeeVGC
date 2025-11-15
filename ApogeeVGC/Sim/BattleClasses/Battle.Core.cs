@@ -192,10 +192,7 @@ public partial class Battle
 
         Send = options.Send ?? ((_, _) => { });
 
-        if (DebugMode)
-        {
-            Console.WriteLine("Battle constructor complete.");
-        }
+        Debug("Battle constructor complete.");
     }
 
     public int Random(int m, int n)

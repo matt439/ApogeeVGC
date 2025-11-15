@@ -19,25 +19,22 @@ public partial class Battle
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
         // Debug logging for event entry
-        if (DebugMode)
+        string targetStr = target switch
         {
-            string targetStr = target switch
-            {
-                PokemonSingleEventTarget p => p.Pokemon.Name,
-                SideSingleEventTarget s => $"Side {s.Side.Id}",
-                FieldSingleEventTarget => "Field",
-                BattleSingleEventTarget => "Battle",
-                _ => "null",
-            };
-            string sourceStr = source switch
-            {
-                PokemonSingleEventSource p => p.Pokemon.Name,
-                EffectSingleEventSource e => e.Effect.Name,
-                _ => "null",
-            };
-            Debug(
-                $"SingleEvent: {eventId} | Effect: {effect.Name} ({effect.EffectType}) | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
-        }
+            PokemonSingleEventTarget p => p.Pokemon.Name,
+            SideSingleEventTarget s => $"Side {s.Side.Id}",
+            FieldSingleEventTarget => "Field",
+            BattleSingleEventTarget => "Battle",
+            _ => "null",
+        };
+        string sourceStr = source switch
+        {
+            PokemonSingleEventSource p => p.Pokemon.Name,
+            EffectSingleEventSource e => e.Effect.Name,
+            _ => "null",
+        };
+        Debug(
+            $"SingleEvent: {eventId} | Effect: {effect.Name} ({effect.EffectType}) | Target: {targetStr} | Source: {sourceStr} | Depth: {EventDepth}");
 
         // Check for stack overflow
         if (EventDepth >= 8)
@@ -77,11 +74,8 @@ public partial class Battle
             if (effect is Condition condition && targetPokemon.Status != condition.Id)
             {
                 // Status has changed; abort the event
-                if (DebugMode)
-                {
-                    Debug(
-                        $"SingleEvent {eventId}: Status changed for {targetPokemon.Name}, aborting");
-                }
+                Debug(
+                    $"SingleEvent {eventId}: Status changed for {targetPokemon.Name}, aborting");
 
                 return relayVar;
             }
@@ -137,10 +131,7 @@ public partial class Battle
             effect.GetEventHandlerInfo(eventId);
         if (handlerInfo == null)
         {
-            if (DebugMode)
-            {
-                Debug($"SingleEvent {eventId}: No handler found for effect {effect.Name}");
-            }
+            Debug($"SingleEvent {eventId}: No handler found for effect {effect.Name}");
 
             return relayVar;
         }
@@ -559,18 +550,12 @@ public partial class Battle
         while (true)
         {
             // Debug logging for event entry
-            if (DebugMode)
-            {
-                Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
-            }
+            Debug($"EachEvent: {eventId} | Effect: {effect?.Name ?? "current"}");
 
             // Get all active Pokémon on the field
             var actives = GetAllActive();
 
-            if (DebugMode)
-            {
-                Debug($"EachEvent {eventId}: Processing {actives.Count} active Pokemon");
-            }
+            Debug($"EachEvent {eventId}: Processing {actives.Count} active Pokemon");
 
             // Use current battle effect if none provided
             effect ??= Effect;
@@ -630,18 +615,18 @@ public partial class Battle
             string targetsStr = targets != null
                 ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
                 : "all";
-            Console.WriteLine($"[FieldEvent] {eventId} | Targets: {targetsStr}");
+            Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
   
             if (eventId == EventId.Residual)
   {
-         Console.WriteLine("[FieldEvent] Residual: Starting to collect handlers");
+         Debug("[FieldEvent] Residual: Starting to collect handlers");
                 foreach (Side side in Sides)
     {
      foreach (Pokemon? active in side.Active)
            {
         if (active != null)
               {
-          Console.WriteLine($"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
+          Debug($"[FieldEvent] Residual: Active Pokemon: {active.Name}, Item: {active.Item}");
             }
      }
       }
@@ -697,7 +682,7 @@ public partial class Battle
         // Debug logging for handler count
         if (DebugMode)
    {
-     Console.WriteLine($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
+     Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
   if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
           {
           foreach (EventListener h in handlers.Take(10))
@@ -710,7 +695,7 @@ public partial class Battle
      BattleEffectHolder => "Battle",
          _ => "Unknown",
 };
-   Console.WriteLine(
+   Debug(
       $"[FieldEvent]   - Handler: {h.Effect.Name} ({h.Effect.EffectType}) on {holderStr}");
         }
    }
@@ -726,10 +711,7 @@ public partial class Battle
 
  IEffect effect = handler.Effect;
 
-            if (DebugMode && eventId == EventId.Residual)
-     {
-          Console.WriteLine($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
-   }
+            Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
 
        if (DebugMode && handlerIndex <= 20) // Limit debug output for performance
      {
@@ -740,7 +722,7 @@ public partial class Battle
   FieldEffectHolder => "Field",
       _ => "Unknown"
    };
-   Console.WriteLine(
+   Debug(
    $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
   }
 
@@ -751,17 +733,14 @@ public partial class Battle
     {
       if (DebugMode)
   {
-        Console.WriteLine($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
+        Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
   }
 
        continue;
          }
  }
 
-     if (DebugMode && eventId == EventId.Residual)
-   {
-          Console.WriteLine($"[FieldEvent] {effect.Name}: Passed fainted check");
-}
+     Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
 
             // Handle duration tracking for Residual events
             if (eventId == EventId.Residual &&
@@ -769,18 +748,12 @@ public partial class Battle
             {
                 handler.State.Duration--;
 
-                if (DebugMode)
-                {
-                    Console.WriteLine(
+                Debug(
                         $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
-                }
 
                 if (handler.State.Duration <= 0)
                 {
-                    if (DebugMode)
-                    {
-                        Console.WriteLine($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
-                    }
+                    Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
 
                     // Effect has expired, trigger its end callback
                     // Use provided EndCallArgs or empty array for no args
@@ -795,10 +768,7 @@ public partial class Battle
                 }
             }
 
-       if (DebugMode && eventId == EventId.Residual)
-  {
- Console.WriteLine($"[FieldEvent] {effect.Name}: Passed duration check");
-            }
+       Debug($"[FieldEvent] {effect.Name}: Passed duration check");
 
             // Verify the effect hasn't been removed by a prior handler
             // (e.g., Toxic Spikes being absorbed during a double switch)
@@ -923,33 +893,21 @@ public partial class Battle
                     _ => null,
                 };
 
-                if (DebugMode && eventId == EventId.Residual && effect.EffectType == EffectType.Item)
-                {
-                    Console.WriteLine($"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
-                }
+                Debug($"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
 
                 SingleEvent(handlerEventId, effect, handler.State, singleEventTarget);
                 // customCallback is null, will use effect's EventHandlerInfo
 
-                if (DebugMode && eventId == EventId.Residual && effect.EffectType == EffectType.Item)
-                {
-                    Console.WriteLine($"[FieldEvent] SingleEvent returned for {effect.Name}");
-                }
+                Debug($"[FieldEvent] SingleEvent returned for {effect.Name}");
             }
-            else if (DebugMode && eventId == EventId.Residual)
-            {
-                Console.WriteLine($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
-            }
+            else Debug($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
 
             // Process any faint messages and check if battle has ended
             FaintMessages();
             if (Ended) return;
         }
 
-        if (DebugMode)
-        {
-            Debug($"FieldEvent {eventId}: Completed processing all handlers");
-        }
+        Debug($"FieldEvent {eventId}: Completed processing all handlers");
     }
 
     public RelayVar? PriorityEvent(EventId eventId, PokemonSideBattleUnion target,
@@ -1117,3 +1075,6 @@ public partial class Battle
 
     #endregion
 }
+
+
+

@@ -267,15 +267,12 @@ public partial class Battle
         Ability ability = pokemon.GetAbility();
      EffectState abilityState = pokemon.AbilityState;
 
-   Item item = pokemon.GetItem();
-  EffectState itemState = pokemon.ItemState;
+      Item item = pokemon.GetItem();
+        EffectState itemState = pokemon.ItemState;
 
-        if (DebugMode && callbackName == EventId.Residual)
-  {
-  Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Item: {item.Name} (ID: {pokemon.Item}) | Event: {callbackName}");
-        }
+        Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item: {item.Name} (ID: {pokemon.Item}) | Event: {callbackName}");
 
-     Species species = pokemon.BaseSpecies;
+        Species species = pokemon.BaseSpecies;
    EffectState speciesState = pokemon.SpeciesState;
 
      List<(ConditionId id, EffectState state, Condition condition)> slotConditions = [];
@@ -353,16 +350,10 @@ yield return ResolvePriority(new EventListenerWithoutPriority
 
         // Check held item
         handlerInfo = GetHandlerInfo(pokemon, item, callbackName, prefix);
-        if (DebugMode && callbackName == EventId.Residual)
-{
-     Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Item handler for {item.Name}: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
-}
+        Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Item handler for {item.Name}: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
         if (handlerInfo != null || (getKey != null && itemState.GetProperty(getKey) != null))
  {
-       if (DebugMode && callbackName == EventId.Residual)
-{
-   Console.WriteLine($"[FindPokemonEventHandlers] {pokemon.Name} | Yielding item handler for {item.Name}");
-     }
+       Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Yielding item handler for {item.Name}");
             yield return ResolvePriority(new EventListenerWithoutPriority
      {
        Effect = item,
