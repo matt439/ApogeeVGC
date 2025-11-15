@@ -229,33 +229,32 @@ public partial class BattleActions
                 Battle.Faint(source, source, move);
             }
 
-            // Handle self-switch
-            if (moveData.SelfSwitch != null)
-            {
-                if (Battle.CanSwitch(source.Side) != 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
-                {
-                    didSomething = BoolIntUndefinedUnion.FromBool(true);
-                }
-                else
-                {
-                    didSomething = CombineResults(didSomething, BoolIntUndefinedUnion.FromBool(false));
-                }
-            }
-
             // Move didn't fail because it didn't try to do anything
             if (didSomething is UndefinedBoolIntUndefinedUnion)
             {
                 didSomething = BoolIntUndefinedUnion.FromBool(true);
             }
 
-            damage[i] = CombineResults(damage[i], didSomething);
-            didAnything = CombineResults(didAnything, didSomething);
+            // Only combine didSomething into damage if damage isn't already an integer (actual damage dealt)
+            // If damage was dealt, preserve that integer value instead of replacing it with a boolean
+            if (damage[i] is not IntBoolIntUndefinedUnion)
+            {
+                damage[i] = CombineResults(damage[i], didSomething);
+                didAnything = CombineResults(didAnything, didSomething);
+            }
         }
 
         // Check if move failed completely
+        Console.WriteLine($"[VOLTSWITCH-DEBUG] Evaluating move failure condition:");
+        Console.WriteLine($"[VOLTSWITCH-DEBUG]   didAnything type: {didAnything?.GetType().Name ?? "null"}");
+        Console.WriteLine($"[VOLTSWITCH-DEBUG]   moveData.Self: {moveData.Self}");
+        Console.WriteLine($"[VOLTSWITCH-DEBUG]   moveData.SelfDestruct: {moveData.SelfDestruct}");
+        Console.WriteLine($"[VOLTSWITCH-DEBUG]   move.SelfSwitch: {move.SelfSwitch}");
+
         if (didAnything is not (IntBoolIntUndefinedUnion { Value: 0 } or IntBoolIntUndefinedUnion) &&
             moveData.Self == null && moveData.SelfDestruct == null)
         {
+            Console.WriteLine($"[VOLTSWITCH-DEBUG] Entering 'move failed' branch");
             if (!isSelf && !isSecondary)
             {
                 if (didAnything is BoolBoolIntUndefinedUnion { Value: false })
@@ -267,11 +266,21 @@ public partial class BattleActions
                     }
                 }
             }
+
             Battle.Debug("move failed because it did nothing");
         }
         else if (move.SelfSwitch != null && source.Hp > 0 && !source.Volatiles.ContainsKey(ConditionId.Commanded))
         {
+            Console.WriteLine($"[VOLTSWITCH] Setting SwitchFlag for {source.Name} to {move.Id}");
             source.SwitchFlag = move.Id;
+            Console.WriteLine($"[VOLTSWITCH] SwitchFlag set to: {source.SwitchFlag} (IsTrue: {source.SwitchFlag.IsTrue()})");
+        }
+        else
+        {
+            Console.WriteLine($"[VOLTSWITCH-DEBUG] Condition not met for setting SwitchFlag:");
+            Console.WriteLine($"[VOLTSWITCH-DEBUG]   move.SelfSwitch is null: {move.SelfSwitch == null}");
+            Console.WriteLine($"[VOLTSWITCH-DEBUG]   source.Hp > 0: {source.Hp > 0}");
+            Console.WriteLine($"[VOLTSWITCH-DEBUG]   Has Commanded volatile: {source.Volatiles.ContainsKey(ConditionId.Commanded)}");
         }
 
         return damage;
