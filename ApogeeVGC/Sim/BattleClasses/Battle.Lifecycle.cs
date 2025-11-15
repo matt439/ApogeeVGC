@@ -779,25 +779,9 @@ public partial class Battle
         }
 
         // Check for switches
-        Console.WriteLine("[VOLTSWITCH] Checking for switches after action...");
-        var switches = Sides
+      var switches = Sides
 			.Select(side => side.Active.Any(p => p != null && p.SwitchFlag.IsTrue()))
 			.ToList();
-
-        for (int i = 0; i < Sides.Count; i++)
-        {
-    Console.WriteLine($"[VOLTSWITCH] Side {i} ({Sides[i].Name}): switches[{i}] = {switches[i]}");
-        if (switches[i])
-    {
-     foreach (Pokemon? p in Sides[i].Active)
-         {
-         if (p != null)
-                    {
-       Console.WriteLine($"[VOLTSWITCH]   Pokemon {p.Name}: SwitchFlag.IsTrue() = {p.SwitchFlag.IsTrue()}");
-             }
-      }
-   }
-  }
 
 		for (int i = 0; i < Sides.Count; i++)
 		{
@@ -863,7 +847,6 @@ public partial class Battle
 		{
 			if (playerSwitch)
 			{
-    Console.WriteLine("[VOLTSWITCH] Making SwitchIn request!");
 				MakeRequest(RequestState.SwitchIn);
 
 				// Return immediately - Simulator handles getting switch choices
@@ -875,10 +858,10 @@ public partial class Battle
 		// In Gen 8+, speed is updated dynamically
         IAction? nextAction = Queue.Peek();
         if (nextAction?.Choice == ActionId.Move)
-  {
+        {
             UpdateSpeed();
-            foreach (IAction queueAction in Queue.List)
-        GetActionSpeed(queueAction);
+     foreach (IAction queueAction in Queue.List)
+                GetActionSpeed(queueAction);
 
             Queue.Sort();
         }
