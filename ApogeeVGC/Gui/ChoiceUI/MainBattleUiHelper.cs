@@ -123,11 +123,18 @@ public static class MainBattleUiHelper
                 _ => false,
             };
 
+            // Skip disabled moves - don't show them at all
+            if (disabled)
+            {
+                moveIndex++;
+                continue;
+            }
+
             int index = moveIndex;
             var button = new ChoiceButton(
                 new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 moveData.Move.Name,
-                disabled ? Color.Gray : Color.Blue,
+                Color.Blue,
                 () => selectMove(index)
             );
 

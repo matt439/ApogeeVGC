@@ -131,7 +131,15 @@ public partial class Pokemon
             Console.WriteLine($"[GetMoveRequestData] {Name}: Has ChoiceLock={Volatiles.ContainsKey(ConditionId.ChoiceLock)}, Item={Item}");
         }
 
-        // Trigger DisableMove event before getting moves
+        // Clear disabled states before evaluating them for this turn
+        // This ensures disabled states are re-evaluated fresh each turn
+        foreach (var moveSlot in MoveSlots)
+        {
+            moveSlot.Disabled = false;
+            moveSlot.DisabledSource = null;
+        }
+
+        // Trigger DisableMove event to re-apply disabled states
         // This allows conditions like ChoiceLock and items like Assault Vest
         // to disable appropriate moves
         Battle.RunEvent(EventId.DisableMove, this);

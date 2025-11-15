@@ -60,15 +60,16 @@ public record Items
                 Fling = new FlingData { BasePower = 10 },
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
+                    // Remove any existing choice lock when this Pokemon enters battle
+                    // This allows switching to reset the choice lock
                     if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
                     {
-                        if (battle.DisplayUi)
+                        if (battle.DisplayUi || battle.DebugMode)
                         {
-                            battle.Debug("removing choicelock");
+                            battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
                         }
-                        return;
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
-                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                 }),
                 OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
                 {

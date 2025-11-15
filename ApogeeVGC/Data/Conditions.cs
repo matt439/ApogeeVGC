@@ -462,80 +462,124 @@ public record Conditions
                 Id = ConditionId.ChoiceLock,
                 NoCopy = true,
                 EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
-                {
-                    if (battle.ActiveMove is null)
-                    {
-                        throw new InvalidOperationException(
-                            "Active move is null when trying to apply" +
-                            $"{ConditionId.ChoiceLock}.");
-                    }
-
-                    if (battle.ActiveMove.HasBounced ?? false)
-                    {
-                        return false;
-                    }
-
-                    if (battle.ActiveMove.SourceEffect is MoveEffectStateId
-                        {
-                            MoveId: MoveId.Snatch
-                        })
-                    {
-                        return false;
-                    }
-
-                    battle.EffectState.Move = battle.ActiveMove.Id;
-                    return new VoidReturn();
-                }),
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+          {
+      // Don't set the move here - it will be set in OnBeforeMove
+        // This handler is called when the volatile is added, which happens
+     // during OnModifyMove before ActiveMove is set
+    if (battle.DebugMode)
+   {
+            Console.WriteLine($"[ChoiceLock.OnStart] {pokemon.Name}: Volatile added, move will be set on first use");
+         }
+return new VoidReturn();
+         }),
                 OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, move) =>
-                {
-                    if (!(pokemon.GetItem().IsChoice ?? false))
-                    {
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
-                        return new VoidReturn();
-                    }
+  {
+       if (battle.DebugMode)
+       {
+           Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Attempting {move.Id}, Locked={battle.EffectState.Move}, HasItem={pokemon.GetItem().IsChoice}");
+  }
+           
+   if (!(pokemon.GetItem().IsChoice ?? false))
+          {
+   if (battle.DebugMode)
+      {
+   Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: No choice item, removing volatile");
+   }
+     pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
+            return new VoidReturn();
+   }
 
-                    if (pokemon.IgnoringItem() ||
-                        move.Id == battle.EffectState.Move ||
-                        move.Id == MoveId.Struggle) return new VoidReturn();
+           if (pokemon.IgnoringItem())
+        {
+if (battle.DebugMode)
+      {
+        Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Ignoring item");
+      }
+     return new VoidReturn();
+ }
 
-                    if (!battle.DisplayUi) return false;
+    // If no move is locked yet, lock to this move
+   if (battle.EffectState.Move == null)
+{
+      if (battle.DebugMode)
+  {
+            Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Locking to {move.Id}");
+ }
+   battle.EffectState.Move = move.Id;
+      return new VoidReturn();
+     }
 
-                    battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
-                        move.Name);
-                    battle.AttrLastMove("[still]");
-                    battle.Debug("Disabled by Choice item lock");
-                    battle.Add("-fail", pokemon);
-                    return false;
-                }),
+ // If the move matches the locked move or is Struggle, allow it
+   if (move.Id == battle.EffectState.Move || move.Id == MoveId.Struggle)
+     {
+           if (battle.DebugMode)
+     {
+   Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Move allowed");
+        }
+      return new VoidReturn();
+}
+
+      // Move is blocked by choice lock
+      if (battle.DebugMode)
+           {
+ Console.WriteLine($"[ChoiceLock.OnBeforeMove] {pokemon.Name}: Move {move.Id} BLOCKED!");
+        }
+       
+    if (!battle.DisplayUi) return false;
+
+         battle.AddMove("move", StringNumberDelegateObjectUnion.FromObject(pokemon),
+      move.Name);
+       battle.AttrLastMove("[still]");
+         battle.Debug("Disabled by Choice item lock");
+          battle.Add("-fail", pokemon);
+       return false;
+    }),
                 OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
-                {
-                    // Check if Pokemon still has a choice item and the locked move
-                    if (!(pokemon.GetItem().IsChoice ?? false) ||
-                        (battle.EffectState.Move != null &&
-                         !pokemon.HasMove((MoveId)battle.EffectState.Move)))
-                    {
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
-                        return;
-                    }
+    {
+  if (battle.DebugMode)
+   {
+     Console.WriteLine($"[ChoiceLock.OnDisableMove] {pokemon.Name}: LockedMove={battle.EffectState.Move}");
+      }
+   
+  // Check if Pokemon still has a choice item and the locked move
+     if (!(pokemon.GetItem().IsChoice ?? false) ||
+       (battle.EffectState.Move != null &&
+       !pokemon.HasMove((MoveId)battle.EffectState.Move)))
+  {
+    if (battle.DebugMode)
+    {
+         Console.WriteLine($"[ChoiceLock.OnDisableMove] {pokemon.Name}: Removing volatile");
+  }
+    pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
+  return;
+   }
 
-                    if (pokemon.IgnoringItem()) return;
+           if (pokemon.IgnoringItem()) return;
 
-                    // First, clear all disabled states
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots)
-                    {
-                        moveSlot.Disabled = false;
-                        moveSlot.DisabledSource = null;
-                    }
+// Only disable moves if a move has been locked
+     if (battle.EffectState.Move == null)
+       {
+          if (battle.DebugMode)
+       {
+  Console.WriteLine($"[ChoiceLock.OnDisableMove] {pokemon.Name}: No move locked yet");
+        }
+  return;
+        }
 
-                    // Then, disable all moves except the locked move
-                    foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
-                                 moveSlot.Move != battle.EffectState.Move))
-                    {
-                        pokemon.DisableMove(moveSlot.Id, false, battle.EffectState.SourceEffect);
-                    }
-                }),
-            },
+if (battle.DebugMode)
+   {
+ Console.WriteLine($"[ChoiceLock.OnDisableMove] {pokemon.Name}: Disabling all except {battle.EffectState.Move}");
+    }
+       
+         // Disable all moves except the locked move
+     foreach (MoveSlot moveSlot in pokemon.MoveSlots.Where(moveSlot =>
+   moveSlot.Move != battle.EffectState.Move))
+      {
+      pokemon.DisableMove(moveSlot.Id, false, battle.EffectState.SourceEffect);
+    }
+      }),
+  },
             [ConditionId.LeechSeed] = new()
             {
                 Id = ConditionId.LeechSeed,
