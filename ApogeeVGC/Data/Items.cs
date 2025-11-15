@@ -71,9 +71,20 @@ public record Items
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
                     }
                 }),
-                OnModifyMove = new OnModifyMoveEventInfo((_, _, pokemon, _) =>
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
                 {
                     pokemon.AddVolatile(ConditionId.ChoiceLock);
+            
+                  // Set the locked move immediately after adding the volatile
+                  if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
+                     pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+          {
+                     if (battle.DebugMode)
+{
+          Console.WriteLine($"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
+       }
+       pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+     }
                 }),
                 //OnModifySpAPriority = 1,
                 OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
