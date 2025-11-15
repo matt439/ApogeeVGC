@@ -27,18 +27,6 @@ public enum BattleRequestType
     TeamPreview,
 }
 
-public enum GameplayExecutionStage
-{
-    TurnStart,
-    ForceSwitch,
-    FaintedSwitch,
-}
-
-public enum BattleId
-{
-    Default,
-}
-
 public enum SendType
 {
     Message,
