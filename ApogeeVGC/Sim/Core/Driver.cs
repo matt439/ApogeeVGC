@@ -37,39 +37,39 @@ public class Driver
 
     private void RunGuiVsRandomSinglesTest()
     {
-        const bool debug = false;
+        const bool debug = true;  // Enable debug mode
 
         PlayerOptions player1Options = new()
         {
-            Type = Player.PlayerType.Console, // Use Player namespace
+      Type = Player.PlayerType.Console, // Use Player namespace
             Name = "Matt",
-            Team = TeamGenerator.GenerateTestTeam(Library),
-            PrintDebug = debug,
+         Team = TeamGenerator.GenerateTestTeam(Library),
+PrintDebug = debug,
         };
 
         PlayerOptions player2Options = new()
         {
-            Type = Player.PlayerType.Random, // Use Player namespace
-            Name = "Random",
-            Team = TeamGenerator.GenerateTestTeam(Library),
+  Type = Player.PlayerType.Random, // Use Player namespace
+         Name = "Random",
+    Team = TeamGenerator.GenerateTestTeam(Library),
             Seed = new PrngSeed(PlayerRandom2Seed),
-            PrintDebug = debug,
-        };
+  PrintDebug = debug,
+  };
 
         BattleOptions battleOptions = new()
         {
-            Id = FormatId.CustomSingles,
-            Player1Options = player1Options,
-            Player2Options = player2Options,
-            Debug = debug,
-            Sync = false,
+  Id = FormatId.CustomSingles,
+  Player1Options = player1Options,
+ Player2Options = player2Options,
+   Debug = debug,  // Enable battle debug mode
+         Sync = false,
             Seed = DefaultSeed,
         };
 
         var simulator = new Simulator();
         Console.WriteLine("[Driver] Simulator created");
 
-        // Run the battle synchronously on the main thread
+  // Run the battle synchronously on the main thread
         SimulatorResult result = simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
 
         Console.WriteLine($"[Driver] Battle completed with result: {result}");
