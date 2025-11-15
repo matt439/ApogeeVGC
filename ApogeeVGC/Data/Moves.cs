@@ -59,6 +59,7 @@ public record Moves
                     Mirror = true,
                     Metronome = true,
                 },
+                VolatileStatus = ConditionId.LeechSeed,
                 Condition = _library.Conditions[ConditionId.LeechSeed],
                 OnTryImmunity = new OnTryImmunityEventInfo((_, target, _, _) =>
                     !target.HasType(PokemonType.Grass)),
