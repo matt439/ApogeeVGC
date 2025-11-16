@@ -131,19 +131,22 @@ table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 
   // Opponent's active Pokemon
   var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
-        string opponentInfo;
+ string opponentInfo;
  if (opponentActive != null)
-        {
+ {
 var statusDisplay = GetStatusDisplay(opponentActive.Status);
     var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
     
             var volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
       var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
     
+       var boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
+  var boostsLine = $"\n{boostsDisplay}";
+    
    var teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
 var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
 
-     opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{volatilesLine}{teraLine}";
+     opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
   }
      else
         {
@@ -156,22 +159,25 @@ var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
         if (playerActive != null)
       {
  if (playerActive.Fainted)
-            {
+   {
      playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
-        }
+  }
        else
 {
 var statusDisplay = GetStatusDisplay(playerActive.Status);
      var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
        
             var volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
-    var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
+ var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
             
+     var boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
+   var boostsLine = $"\n{boostsDisplay}";
+       
         var teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
      var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
  
   playerInfo =
-      $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{teraLine}";
+      $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
   }
         }
         else
@@ -181,7 +187,7 @@ playerInfo = "[grey]No active Pokemon[/]";
 
      table.AddRow(opponentInfo, playerInfo);
 
-        AnsiConsole.Write(table);
+   AnsiConsole.Write(table);
         AnsiConsole.WriteLine();
     }
 
@@ -551,17 +557,17 @@ ConditionId.QuickGuard => "QuickGuard",
     private string GetConditionColor(ConditionId condition)
     {
      return condition switch
-        {
+    {
     ConditionId.Stall or ConditionId.Protect or ConditionId.Detect or 
  ConditionId.MaxGuard or ConditionId.KingsShield or ConditionId.SpikyShield or
      ConditionId.BanefulBunker or ConditionId.Obstruct or ConditionId.SilkTrap or
       ConditionId.BurningBulwark or ConditionId.QuickGuard or ConditionId.WideGuard => "blue",
    ConditionId.Confusion => "yellow",
-      ConditionId.Substitute or ConditionId.ShedTail => "green",
+    ConditionId.Substitute or ConditionId.ShedTail => "green",
   ConditionId.LeechSeed => "darkgreen",
        ConditionId.ChoiceLock => "red",
-      ConditionId.HealBlock or ConditionId.Embargo => "darkred",
-   ConditionId.Ingrain or ConditionId.Wish => "cyan",
+   ConditionId.HealBlock or ConditionId.Embargo => "darkred",
+ConditionId.Ingrain or ConditionId.Wish => "cyan",
    ConditionId.FocusEnergy or ConditionId.LaserFocus or ConditionId.DragonCheer => "orange",
        ConditionId.Tailwind or ConditionId.QuarkDrive => "yellow",
     ConditionId.Reflect or ConditionId.LightScreen => "lightblue",
@@ -571,6 +577,48 @@ ConditionId.QuickGuard => "QuickGuard",
     }
 
     /// <summary>
+    /// Get stat boosts display showing all stats with their current values
+    /// Shows format: Atk+2 Def+0 SpA-1 SpD+0 Spe+0 Acc+0 Eva+0
+    /// </summary>
+    private string GetStatBoostsDisplay(Stats.BoostsTable boosts)
+    {
+        var boostStrings = new List<string>();
+
+      // Format: StatName+Value or StatName-Value
+boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
+        boostStrings.Add(FormatStatBoost("Def", boosts.Def));
+   boostStrings.Add(FormatStatBoost("SpA", boosts.SpA));
+  boostStrings.Add(FormatStatBoost("SpD", boosts.SpD));
+        boostStrings.Add(FormatStatBoost("Spe", boosts.Spe));
+  boostStrings.Add(FormatStatBoost("Acc", boosts.Accuracy));
+        boostStrings.Add(FormatStatBoost("Eva", boosts.Evasion));
+
+  return string.Join(" ", boostStrings);
+    }
+
+    /// <summary>
+    /// Format a single stat boost with appropriate color
+    /// </summary>
+ private string FormatStatBoost(string statName, int boostValue)
+    {
+   string color = boostValue switch
+     {
+      > 0 => "green",
+            < 0 => "red",
+            _ => "grey"
+        };
+
+        string sign = boostValue switch
+{
+      > 0 => "+",
+       < 0 => "", // Negative sign is automatic
+         _ => "="
+        };
+
+   return $"[{color}]{statName}{sign}{boostValue}[/]";
+}
+
+    /// <summary>
     /// Get terastallization display markup for console
     /// Shows "TERA: [Type]" if terastallized, or "Tera: [Type]" if available but not active
     /// </summary>
@@ -578,35 +626,35 @@ ConditionId.QuickGuard => "QuickGuard",
     {
  if (terastallized.HasValue)
         {
-         // Pokemon is currently terastallized - show in bold with color
+    // Pokemon is currently terastallized - show in bold with color
       return $"[bold {GetTeraTypeColor(terastallized.Value)}]TERA: {terastallized.Value.ToString().ToUpper()}[/]";
        }
         else
        {
       // Pokemon has tera available but not active - show in grey
  return $"[grey]Tera: {teraType.ToString()}[/]";
-       }
+    }
 }
 
     /// <summary>
- /// Get the console color for a tera type
- /// </summary>
-    private string GetTeraTypeColor(Moves.MoveType teraType)
-    {
+    /// Get the console color for a tera type
+    /// </summary>
+private string GetTeraTypeColor(Moves.MoveType teraType)
+  {
       return teraType switch
-        {
-     Moves.MoveType.Normal => "white",
+   {
+    Moves.MoveType.Normal => "white",
    Moves.MoveType.Fire => "red",
-            Moves.MoveType.Water => "blue",
-     Moves.MoveType.Electric => "yellow",
-       Moves.MoveType.Grass => "green",
-          Moves.MoveType.Ice => "cyan",
-  Moves.MoveType.Fighting => "darkorange",
-      Moves.MoveType.Poison => "purple",
+     Moves.MoveType.Water => "blue",
+          Moves.MoveType.Electric => "yellow",
+Moves.MoveType.Grass => "green",
+   Moves.MoveType.Ice => "cyan",
+     Moves.MoveType.Fighting => "darkorange",
+   Moves.MoveType.Poison => "purple",
      Moves.MoveType.Ground => "gold3",
      Moves.MoveType.Flying => "lightblue",
    Moves.MoveType.Psychic => "magenta",
-         Moves.MoveType.Bug => "olive",
+     Moves.MoveType.Bug => "olive",
     Moves.MoveType.Rock => "tan",
        Moves.MoveType.Ghost => "purple",
        Moves.MoveType.Dragon => "blue",
@@ -614,33 +662,33 @@ ConditionId.QuickGuard => "QuickGuard",
     Moves.MoveType.Steel => "silver",
        Moves.MoveType.Fairy => "pink",
       Moves.MoveType.Stellar => "white",
-          _ => "white"
+   _ => "white"
    };
     }
 
-    private bool IsDisabled(object? disabled)
+ private bool IsDisabled(object? disabled)
     {
-        return disabled switch
-        {
-Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-   _ => false
-  };
+   return disabled switch
+  {
+     Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
+    _ => false
+      };
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
-    public event EventHandler<Choice>? ChoiceSubmitted;
+ public event EventHandler<Choice>? ChoiceSubmitted;
 
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         AnsiConsole.MarkupLine(
 $"[yellow]Warning: {remainingTime.TotalSeconds:F0} seconds remaining![/]");
-        return Task.CompletedTask;
+   return Task.CompletedTask;
     }
 
     public Task NotifyChoiceTimeoutAsync()
     {
         AnsiConsole.MarkupLine("[red]Time's up! Auto-selecting...[/]");
-        return Task.CompletedTask;
+      return Task.CompletedTask;
     }
 }
 
@@ -649,6 +697,6 @@ internal static class StringExtensions
 {
     public static string Repeat(this string s, int count)
     {
-        return string.Concat(Enumerable.Repeat(s, count));
+  return string.Concat(Enumerable.Repeat(s, count));
     }
 }
