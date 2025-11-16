@@ -405,6 +405,17 @@ public class Simulator : IBattleController
             }
             catch (Exception ex)
             {
+#if DEBUG
+                // In DEBUG mode, rethrow immediately to expose errors during debugging
+                if (PrintDebug)
+                {
+                    Console.WriteLine(
+                        $"[Simulator.OnChoiceRequested] ERROR for {e.SideId}: {ex.GetType().Name}: {ex.Message}");
+                }
+
+                throw;
+#else
+                // In RELEASE mode, auto-choose on error for graceful degradation
                 if (PrintDebug)
                 {
                     Console.WriteLine(
@@ -421,6 +432,7 @@ public class Simulator : IBattleController
                     Choice = side.GetChoice(),
                     Success = true
                 });
+#endif
             }
         });
 
@@ -568,13 +580,24 @@ public class Simulator : IBattleController
         }
         catch (Exception ex)
         {
+#if DEBUG
+            // In DEBUG mode, rethrow immediately to expose errors during debugging
+            if (PrintDebug)
+            {
+                Console.WriteLine(
+                    $"[Simulator.ProcessChoiceResponsesAsync] ERROR: {ex.GetType().Name}: {ex.Message}");
+            }
+
+            throw;
+#else
+            // In RELEASE mode, log and continue for graceful degradation
             if (PrintDebug)
             {
                 Console.WriteLine(
                     $"[Simulator.ProcessChoiceResponsesAsync] Exception: {ex.GetType().Name}: {ex.Message}");
             }
-
             throw;
+#endif
         }
         finally
         {
