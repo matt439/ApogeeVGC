@@ -255,6 +255,11 @@ internal static class EventHandlerAdapter
             BoolBoolVoidUnion boolVoid => new BoolRelayVar(boolVoid.Value),
             VoidBoolVoidUnion => new VoidReturnRelayVar(),
 
+            // BoolEmptyVoidUnion -> bool, Empty, or VoidReturn
+            BoolBoolEmptyVoidUnion boolEmptyVoid => new BoolRelayVar(boolEmptyVoid.Value),
+            EmptyBoolEmptyVoidUnion => new BoolRelayVar(false), // Empty means blocked
+            VoidUnionBoolEmptyVoidUnion => new VoidReturnRelayVar(),
+
             // DoubleVoidUnion -> decimal or VoidReturn
             DoubleDoubleVoidUnion doubleVoid => new DecimalRelayVar((decimal)doubleVoid.Value),
             VoidDoubleVoidUnion => new VoidReturnRelayVar(),

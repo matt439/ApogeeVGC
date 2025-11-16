@@ -106,20 +106,33 @@ public record Moves
                 },
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, pokemon, _, _) =>
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, target, source, move) =>
                 {
-                    var willActResult = battle.Queue.WillAct();
-                    var stallMoveResult = battle.RunEvent(EventId.StallMove, pokemon);
-                    battle.Debug($"[Protect.OnPrepareHit] WillAct: {willActResult != null}, StallMove: {stallMoveResult != null}");
-                    bool result = battle.Queue.WillAct() is not null &&
-                                  battle.RunEvent(EventId.StallMove, pokemon) is not null;
-                    battle.Debug($"[Protect.OnPrepareHit] Result: {result}");
-                    return result;
+                    // source is the Pokemon using Protect
+                    // Always run both checks, let Stall condition handle the logic
+                    bool willAct = battle.Queue.WillAct() is not null;
+                    RelayVar? stallResult = battle.RunEvent(EventId.StallMove, source);
+                    bool stallSuccess = stallResult is BoolRelayVar { Value: true };
+                    bool result = willAct && stallSuccess;
+
+                    // Return BoolEmptyVoidUnion explicitly
+                    return result ? (BoolEmptyVoidUnion)true : (BoolEmptyVoidUnion)false;
                 }),
-                OnHit = new OnHitEventInfo((_, pokemon, _, _) =>
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    pokemon.AddVolatile(ConditionId.Stall);
-                    return new VoidReturn();
+  // source is the Pokemon using Protect
+          battle.Debug($"[Protect.OnHit] BEFORE AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
+         
+          source.AddVolatile(ConditionId.Stall);
+    
+       battle.Debug($"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
+    
+       if (source.Volatiles.TryGetValue(ConditionId.Stall, out var stallState))
+           {
+ battle.Debug($"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
+      }
+      
+    return new VoidReturn();
                 }),
                 Condition = _library.Conditions[ConditionId.Protect],
                 Secondary = null,

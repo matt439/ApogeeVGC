@@ -482,6 +482,46 @@ public static class EventHandlerInfoMapper
             }.ToFrozenDictionary();
 
     /// <summary>
+    /// Maps EventId to property accessor functions for IMoveEventMethods.
+    /// These are move-specific events like OnPrepareHit, OnTry, OnHit, OnTryHit, etc.
+    /// </summary>
+    private static readonly FrozenDictionary<EventId, Func<IMoveEventMethods, EventHandlerInfo?>>
+        MoveEventMethodsMap =
+            new Dictionary<EventId, Func<IMoveEventMethods, EventHandlerInfo?>>
+            {
+                [EventId.AfterHit] = e => e.OnAfterHit,
+                [EventId.AfterMoveSecondary] = e => e.OnAfterMoveSecondary,
+                [EventId.AfterMoveSecondarySelf] = e => e.OnAfterMoveSecondarySelf,
+                [EventId.AfterMove] = e => e.OnAfterMove,
+                [EventId.AfterSubDamage] = e => e.OnAfterSubDamage,
+                [EventId.BasePower] = e => e.OnBasePower,
+                [EventId.BasePowerCallback] = e => e.BasePowerCallback,
+                [EventId.BeforeMoveCallback] = e => e.BeforeMoveCallback,
+                [EventId.BeforeTurnCallback] = e => e.BeforeTurnCallback,
+                [EventId.Damage] = e => e.OnDamage,
+                [EventId.DamageCallback] = e => e.DamageCallback,
+                [EventId.DisableMove] = e => e.OnDisableMove,
+                [EventId.Effectiveness] = e => e.OnEffectiveness,
+                [EventId.Hit] = e => e.OnHit,
+                [EventId.HitField] = e => e.OnHitField,
+                [EventId.HitSide] = e => e.OnHitSide,
+                [EventId.ModifyMove] = e => e.OnModifyMove,
+                [EventId.ModifyPriority] = e => e.OnModifyPriority,
+                [EventId.ModifyTarget] = e => e.OnModifyTarget,
+                [EventId.ModifyType] = e => e.OnModifyType,
+                [EventId.MoveFail] = e => e.OnMoveFail,
+                [EventId.PrepareHit] = e => e.OnPrepareHit,
+                [EventId.PriorityChargeCallback] = e => e.PriorityChargeCallback,
+                [EventId.Try] = e => e.OnTry,
+                [EventId.TryHit] = e => e.OnTryHit,
+                [EventId.TryHitField] = e => e.OnTryHitField,
+                [EventId.TryHitSide] = e => e.OnTryHitSide,
+                [EventId.TryImmunity] = e => e.OnTryImmunity,
+                [EventId.TryMove] = e => e.OnTryMove,
+                [EventId.UseMoveMessage] = e => e.OnUseMoveMessage,
+            }.ToFrozenDictionary();
+
+    /// <summary>
     /// Gets the EventHandlerInfo for a given EventId from an IEffect.
     /// Uses static dictionaries for O(1) lookups without reflection.
     /// </summary>
@@ -496,6 +536,15 @@ public static class EventHandlerInfoMapper
         EventPrefix? prefix = null,
         EventSuffix? suffix = null)
     {
+        // Try move-specific events first (if applicable)
+        if (effect is IMoveEventMethods moveMethods &&
+            MoveEventMethodsMap.TryGetValue(id, out var moveAccessor))
+        {
+            EventHandlerInfo? info = moveAccessor(moveMethods);
+            if (info != null && MatchesPrefixAndSuffix(info, prefix, suffix))
+                return info;
+        }
+
         // Try ability-specific events first (if applicable)
         if (effect is IAbilityEventMethodsV2 abilityMethods &&
             AbilityEventMethodsMap.TryGetValue(id, out var abilityAccessor))

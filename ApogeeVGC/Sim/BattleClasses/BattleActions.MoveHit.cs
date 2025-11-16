@@ -67,34 +67,34 @@ public partial class BattleActions
             targets.Count > 0 ? SingleEventSource.FromNullablePokemon(targets[0]) : null, move);
 
         RelayVar? prepareHitResult1 = Battle.SingleEvent(EventId.PrepareHit, move,
-            Battle.InitEffectState(),
-            targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
-            pokemon, move);
+     Battle.InitEffectState(),
+          targets.Count > 0 ? SingleEventTarget.FromNullablePokemon(targets[0]) : null,
+  pokemon, move);
 
         RelayVar? prepareHitResult2 = Battle.RunEvent(EventId.PrepareHit, pokemon,
-            targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
+  targets.Count > 0 ? RunEventSource.FromNullablePokemon(targets[0]) : null, move);
 
-        bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
-                        prepareHitResult1 is not BoolRelayVar { Value: false } &&
-                        prepareHitResult2 is not BoolRelayVar { Value: false };
+    bool hitResult = tryResult is not BoolRelayVar { Value: false } &&
+      prepareHitResult1 is not BoolRelayVar { Value: false } &&
+        prepareHitResult2 is not BoolRelayVar { Value: false };
 
-        if (!hitResult)
-        {
-            // Move failed preliminary checks
-            if (tryResult is BoolRelayVar { Value: false } ||
-                prepareHitResult1 is BoolRelayVar { Value: false } ||
-                prepareHitResult2 is BoolRelayVar { Value: false })
-            {
-                if (Battle.DisplayUi)
-                {
-                    Battle.Add("-fail", pokemon);
-                    Battle.AttrLastMove("[still]");
-                }
-            }
+   if (!hitResult)
+     {
+// Move failed preliminary checks
+if (tryResult is BoolRelayVar { Value: false } ||
+       prepareHitResult1 is BoolRelayVar { Value: false } ||
+             prepareHitResult2 is BoolRelayVar { Value: false })
+         {
+      if (Battle.DisplayUi)
+   {
+  Battle.Add("-fail", pokemon);
+    Battle.AttrLastMove("[still]");
+  }
+      }
 
-            // Return true only if this is a "not a failure" case (null result means NOT_FAIL)
-            return tryResult is null || prepareHitResult1 is null || prepareHitResult2 is null;
-        }
+      // Return true only if this is a "not a failure" case (null result means NOT_FAIL)
+    return tryResult is null || prepareHitResult1 is null || prepareHitResult2 is null;
+    }
 
         // Process each hit validation step
         bool atLeastOneFailure = false;

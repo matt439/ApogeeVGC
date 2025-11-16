@@ -638,36 +638,57 @@ public record Conditions
                 Duration = 2,
                 CounterMax = 729,
                 EffectType = EffectType.Condition,
-                OnStart = new OnStartEventInfo((battle, _, _, _) =>
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
+                    // During OnStart, battle.EffectState IS the volatile's state being created
                     battle.EffectState.Counter = 3;
+                    battle.Debug($"[Stall.OnStart] {pokemon.Name}: Initialized counter to 3");
                     return new VoidReturn();
                 }),
                 OnStallMove = new OnStallMoveEventInfo((battle, pokemon) =>
                 {
-                    int counter = battle.EffectState.Counter ?? 1;
-                    if (battle.DisplayUi)
+                    // Get the counter from the Pokemon's Stall volatile state
+                    int counter = 1; // Default for first use
+
+                    if (pokemon.Volatiles.TryGetValue(ConditionId.Stall, out var stallState))
                     {
-                        battle.Debug($"Success change: {Math.Round(100.0 / counter)}%");
+                        counter = stallState.Counter ?? 1;
                     }
 
+                    battle.Debug(
+                        $"[Stall.OnStallMove] {pokemon.Name}: Checking with counter={counter}, Success chance: {Math.Round(100.0 / counter, 2)}%");
+
                     bool success = battle.RandomChance(1, counter);
+
                     if (!success)
                     {
+                        battle.Debug(
+                            $"[Stall.OnStallMove] {pokemon.Name}: FAILED! Deleting Stall volatile");
                         pokemon.DeleteVolatile(ConditionId.Stall);
+                    }
+                    else
+                    {
+                        battle.Debug($"[Stall.OnStallMove] {pokemon.Name}: SUCCESS!");
                     }
 
                     return success;
                 }),
-                OnRestart = new OnRestartEventInfo((battle, _, _, _) =>
+                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
                 {
-                    if (battle.Effect is Condition condition &&
-                        battle.EffectState.Counter < condition.CounterMax)
+                    // During OnRestart, battle.EffectState IS the volatile's state being restarted
+                    int oldCounter = battle.EffectState.Counter ?? 1;
+
+                    // Update the counter in the volatile's state
+                    if (battle.EffectState.Counter < 729) // CounterMax
                     {
                         battle.EffectState.Counter *= 3;
                     }
 
                     battle.EffectState.Duration = 2;
+
+                    battle.Debug(
+                        $"[Stall.OnRestart] {pokemon.Name}: Counter increased from {oldCounter} to {battle.EffectState.Counter}, Duration reset to 2");
+
                     return new VoidReturn();
                 }),
             },
@@ -691,33 +712,34 @@ public record Conditions
                 //OnTryHitPriority = 3,
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                     {
-                        battle.Debug($"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
-          
-         if (!(move.Flags.Protect ?? false))
-           {
-    return new VoidReturn();
-       }
+                        battle.Debug(
+                            $"[Protect.OnTryHit] CALLED! Target={target.Name}, Source={source.Name}, Move={move.Name}, HasProtectFlag={move.Flags.Protect ?? false}");
 
-   if (move.SmartTarget ?? false)
-      {
-         move.SmartTarget = false;
-   }
- else if (battle.DisplayUi)
-               {
-      battle.Add("-activate", target, "move: Protect");
- }
+                        if (!(move.Flags.Protect ?? false))
+                        {
+                            return new VoidReturn();
+                        }
 
-   EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
- if (lockedMove is not null &&
-    source.Volatiles[ConditionId.LockedMove].Duration == 2)
-            {
-    source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
-        }
+                        if (move.SmartTarget ?? false)
+                        {
+                            move.SmartTarget = false;
+                        }
+                        else if (battle.DisplayUi)
+                        {
+                            battle.Add("-activate", target, "move: Protect");
+                        }
 
-      battle.Debug($"[Protect.OnTryHit] Returning Empty (block move)");
- return new Empty(); // in place of Battle.NOT_FAIL ("")
- },
-    3),
+                        EffectState? lockedMove = source.GetVolatile(ConditionId.LockedMove);
+                        if (lockedMove is not null &&
+                            source.Volatiles[ConditionId.LockedMove].Duration == 2)
+                        {
+                            source.RemoveVolatile(_library.Conditions[ConditionId.LockedMove]);
+                        }
+
+                        battle.Debug($"[Protect.OnTryHit] Returning Empty (block move)");
+                        return new Empty(); // in place of Battle.NOT_FAIL ("")
+                    },
+                    3),
             },
             [ConditionId.Tailwind] = new()
             {
