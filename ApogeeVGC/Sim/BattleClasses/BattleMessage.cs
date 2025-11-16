@@ -283,9 +283,10 @@ public class HealMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
  public required int HealAmount { get; init; }
-    public required int CurrentHp { get; init; }
+  public required int CurrentHp { get; init; }
     public required int MaxHp { get; init; }
     public SideId? SideId { get; init; }
+    public string? EffectName { get; init; }
 
     public override string ToDisplayText()
     {
@@ -294,15 +295,18 @@ public class HealMessage : BattleMessage
     : PokemonName;
         
         // If we have a heal amount, show it as relative heal
-        // Otherwise fall back to showing current HP
+  // Otherwise fall back to showing current HP
         if (HealAmount > 0)
         {
-            return $"{pokemonDisplay} healed {HealAmount} HP!";
+         string effectInfo = !string.IsNullOrEmpty(EffectName) 
+        ? $" from {EffectName}" 
+   : "";
+          return $"{pokemonDisplay} healed {HealAmount} HP{effectInfo}!";
         }
         else
-        {
+      {
          return $"{pokemonDisplay} healed to {CurrentHp} HP!";
-        }
+}
     }
 }
 

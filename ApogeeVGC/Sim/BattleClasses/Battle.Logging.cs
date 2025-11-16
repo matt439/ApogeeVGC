@@ -1,6 +1,9 @@
-﻿using ApogeeVGC.Sim.Conditions;
+﻿using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Utils.Extensions;
@@ -357,39 +360,47 @@ public partial class Battle
     /// <summary>
     /// Logs a heal message to the battle log based on the effect causing the healing.
     /// </summary>
-    private void PrintHealMessage(Pokemon target, int healAmount, Pokemon? source, Condition? effect)
+    private void PrintHealMessage(Pokemon target, int healAmount, Pokemon? source, IEffect? effect)
     {
         if (!DisplayUi) return;
 
         // Get the health status for the log message
-        var healthFunc = target.GetHealth;
+    var healthFunc = target.GetHealth;
 
-        // Determine if this is a drain effect
-      bool isDrain = effect?.Id == ConditionId.Drain;
+     // Determine if this is a drain effect
+        bool isDrain = effect is Condition { Id: ConditionId.Drain };
 
-        if (isDrain && source != null)
+      if (isDrain && source != null)
         {
-       // Drain healing shows the source
-            Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain", $"[of] {source}");
+    // Drain healing shows the source
+    Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain", $"[of] {source}");
    }
-   else if (effect != null && effect.Id != ConditionId.None)
-   {
-            // Healing from a specific effect
-            string effectName = effect.FullName == "tox" ? "psn" : effect.FullName;
-   if (source != null && source != target)
-      {
-        Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}", $"[of] {source}");
-            }
-    else
-         {
-Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+        else if (effect != null && effect.EffectType != EffectType.Format)
+  {
+     // Healing from a specific effect
+   string effectName = effect switch
+    {
+     Condition { FullName: "tox" } => "psn",
+     Condition condition => condition.FullName,
+   Item item => $"item: {item.Name}",
+   Ability ability => $"ability: {ability.Name}",
+          _ => effect.Name
+   };
+   
+  if (source != null && source != target)
+     {
+  Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}", $"[of] {source}");
+       }
+      else
+     {
+       Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
  }
-        }
+  }
         else
-        {
+ {
   // Simple heal with no effect
- Add("-heal", target, healthFunc, $"[heal]{healAmount}");
-     }
+  Add("-heal", target, healthFunc, $"[heal]{healAmount}");
+      }
     }
 
     /// <summary>
@@ -753,28 +764,34 @@ SideId? sideId = ExtractSideId(parts[2]);
     return new GenericMessage { Text = $"{pokemonName} restored HP!" };
         }
 
-        // Extract heal amount from [heal]amount tag
+        // Extract heal amount and effect name from tags
     int healAmount = 0;
+     string? effectName = null;
+        
         for (int i = 4; i < parts.Length; i++)
      {
  if (parts[i].StartsWith("[heal]"))
     {
-                string amountStr = parts[i].Substring(6); // Remove "[heal]" prefix
+           string amountStr = parts[i].Substring(6); // Remove "[heal]" prefix
           if (int.TryParse(amountStr, out int amount))
       {
-             healAmount = amount;
+       healAmount = amount;
    }
- break;
-        }
+ }
+ else if (parts[i].StartsWith("[from]"))
+            {
+                effectName = parts[i].Substring(7).Trim(); // Remove "[from] " prefix
+   }
    }
 
      return new HealMessage
    {
         PokemonName = pokemonName,
       SideId = sideId,
-            HealAmount = healAmount,
-       CurrentHp = currentHp,
-  MaxHp = maxHp
+   HealAmount = healAmount,
+     CurrentHp = currentHp,
+  MaxHp = maxHp,
+  EffectName = effectName
       };
     }
 

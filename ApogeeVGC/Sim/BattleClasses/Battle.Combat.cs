@@ -391,7 +391,15 @@ public partial class Battle
         }
 
         // Log healing messages based on effect type
-        PrintHealMessage(target, finalDamage, source, effectCondition);
+        // Pass the original effect (IEffect) if available, otherwise fall back to Effect
+        IEffect? healEffect = effect switch
+        {
+            EffectBattleHealEffect ebhe => ebhe.Effect,
+            DrainBattleHealEffect => Library.Conditions[ConditionId.Drain],
+            null => Effect,
+            _ => effectCondition
+        };
+        PrintHealMessage(target, finalDamage, source, healEffect);
 
         // Run Heal event
         RunEvent(
