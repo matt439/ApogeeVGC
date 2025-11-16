@@ -106,6 +106,7 @@ public record Moves
                 },
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
+
                 OnPrepareHit = new OnPrepareHitEventInfo((battle, target, source, move) =>
                 {
                     // source is the Pokemon using Protect
@@ -118,21 +119,24 @@ public record Moves
                     // Return BoolEmptyVoidUnion explicitly
                     return result ? (BoolEmptyVoidUnion)true : (BoolEmptyVoidUnion)false;
                 }),
+
                 OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-  // source is the Pokemon using Protect
-          battle.Debug($"[Protect.OnHit] BEFORE AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-         
-          source.AddVolatile(ConditionId.Stall);
-    
-       battle.Debug($"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
-    
-       if (source.Volatiles.TryGetValue(ConditionId.Stall, out var stallState))
-           {
- battle.Debug($"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
-      }
-      
-    return new VoidReturn();
+                    // source is the Pokemon using Protect
+                    battle.Debug(
+                        $"[Protect.OnHit] BEFORE AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
+
+                    source.AddVolatile(ConditionId.Stall);
+
+                    battle.Debug(
+                        $"[Protect.OnHit] AFTER AddVolatile: {source.Name} has Stall volatile = {source.Volatiles.ContainsKey(ConditionId.Stall)}");
+                    if (source.Volatiles.TryGetValue(ConditionId.Stall, out var stallState))
+                    {
+                        battle.Debug(
+                            $"[Protect.OnHit] Stall volatile state: Counter={stallState.Counter}, Duration={stallState.Duration}");
+                    }
+
+                    return new VoidReturn();
                 }),
                 Condition = _library.Conditions[ConditionId.Protect],
                 Secondary = null,

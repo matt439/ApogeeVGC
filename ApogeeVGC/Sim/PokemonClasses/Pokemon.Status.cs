@@ -130,6 +130,18 @@ public partial class Pokemon
                 _ => true, // Non-boolean RelayVar types are treated as success
             };
 
+            // Debug: Check volatile state after OnStart
+            Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: Status={status}, Counter={StatusState.Counter}, Duration={StatusState.Duration}");
+            Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: volatileState is same reference as Volatiles[{status}]? {ReferenceEquals(StatusState, Volatiles[status.Id])}");
+
+            // BUGFIX: Ensure Counter is initialized for Stall condition
+            // OnStart should set it to 3, but if it didn't, set it here as a failsafe
+            if (status.Id == ConditionId.Stall && StatusState.Counter == null)
+            {
+                Battle.Debug($"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
+                StatusState.Counter = 3;
+            }
+
             if (!startSucceeded)
             {
                 if (Battle.DisplayUi)
@@ -329,6 +341,18 @@ public partial class Pokemon
         // Run the Start event
         RelayVar? startResult = Battle.SingleEvent(EventId.Start, condition, volatileState,
             this, source, sourceEffect);
+
+        // Debug: Check volatile state after OnStart
+        Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: Status={status}, Counter={volatileState.Counter}, Duration={volatileState.Duration}");
+        Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: volatileState is same reference as Volatiles[{status}]? {ReferenceEquals(volatileState, Volatiles[status])}");
+
+        // BUGFIX: Ensure Counter is initialized for Stall condition
+        // OnStart should set it to 3, but if it didn't, set it here as a failsafe
+        if (status == ConditionId.Stall && volatileState.Counter == null)
+        {
+            Battle.Debug($"[AddVolatile.BUGFIX] {Name}: Stall Counter was null after OnStart, setting to 3");
+            volatileState.Counter = 3;
+        }
 
         // Check if start event failed
         bool startSucceeded = startResult switch
