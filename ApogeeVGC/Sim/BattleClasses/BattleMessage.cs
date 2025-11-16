@@ -1,3 +1,5 @@
+using ApogeeVGC.Sim.Core;
+
 namespace ApogeeVGC.Sim.BattleClasses;
 
 /// <summary>
@@ -25,10 +27,14 @@ public class MoveUsedMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required string MoveName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName} used {MoveName}!";
+    string pokemonDisplay = SideId.HasValue 
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+      : PokemonName;
+        return $"{pokemonDisplay} used {MoveName}!";
     }
 }
 
@@ -67,9 +73,10 @@ public class DamageMessage : BattleMessage
     public required int DamageAmount { get; init; }
     public required int RemainingHp { get; init; }
     public required int MaxHp { get; init; }
+    public SideId? SideId { get; init; }
 
     /// <summary>
-    /// The effect that caused the damage (e.g., "psn", "brn", "confusion", move name)
+ /// The effect that caused the damage (e.g., "psn", "brn", "confusion", move name)
     /// </summary>
     public string? EffectName { get; init; }
 
@@ -84,16 +91,20 @@ public class DamageMessage : BattleMessage
     public string? SpecialTag { get; init; }
 
     public override string ToDisplayText()
-    {
-        double percentRemaining = (double)RemainingHp / MaxHp * 100;
+  {
+    double percentRemaining = (double)RemainingHp / MaxHp * 100;
+
+  string pokemonDisplay = SideId.HasValue 
+       ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
 
         string baseMessage =
-            $"{PokemonName} took {DamageAmount} damage! ({percentRemaining:F1}% HP remaining)";
+            $"{pokemonDisplay} took {DamageAmount} damage! ({percentRemaining:F1}% HP remaining)";
 
         if (!string.IsNullOrEmpty(EffectName))
         {
-            baseMessage += $" from {EffectName}";
-        }
+          baseMessage += $" from {EffectName}";
+      }
 
         if (!string.IsNullOrEmpty(SourcePokemonName))
         {
@@ -110,10 +121,14 @@ public class DamageMessage : BattleMessage
 public class FaintMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName} fainted!";
+        string pokemonDisplay = SideId.HasValue 
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+    return $"{pokemonDisplay} fainted!";
     }
 }
 
@@ -148,10 +163,14 @@ public class CriticalHitMessage : BattleMessage
 public class MissMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName}'s attack missed!";
+        string pokemonDisplay = SideId.HasValue 
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+         : PokemonName;
+        return $"{pokemonDisplay}'s attack missed!";
     }
 }
 
@@ -161,11 +180,15 @@ public class MissMessage : BattleMessage
 public class StatusMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
-    public required string StatusName { get; init; }
+  public required string StatusName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
-    {
-        return $"{PokemonName} was {StatusName}!";
+ {
+        string pokemonDisplay = SideId.HasValue 
+       ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+ : PokemonName;
+        return $"{pokemonDisplay} was {StatusName}!";
     }
 }
 
@@ -193,19 +216,24 @@ public class StatChangeMessage : BattleMessage
     public required string PokemonName { get; init; }
     public required string StatName { get; init; }
     public required int Stages { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
         string direction = Stages > 0 ? "rose" : "fell";
         string amount = Math.Abs(Stages) switch
-        {
-            1 => "",
+    {
+  1 => "",
             2 => " sharply",
             >= 3 => " drastically",
             _ => ""
         };
 
-        return $"{PokemonName}'s {StatName} {direction}{amount}!";
+        string pokemonDisplay = SideId.HasValue 
+      ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+   : PokemonName;
+
+        return $"{pokemonDisplay}'s {StatName} {direction}{amount}!";
     }
 }
 
@@ -254,13 +282,17 @@ public class TurnStartMessage : BattleMessage
 public class HealMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
-    public required int HealAmount { get; init; }
+ public required int HealAmount { get; init; }
     public required int CurrentHp { get; init; }
     public required int MaxHp { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName} healed to {CurrentHp} HP!";
+        string pokemonDisplay = SideId.HasValue 
+        ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+    : PokemonName;
+        return $"{pokemonDisplay} healed to {CurrentHp} HP!";
     }
 }
 
@@ -271,10 +303,14 @@ public class ItemMessage : BattleMessage
 {
     public required string PokemonName { get; init; }
     public required string ItemName { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        return $"{PokemonName} used its {ItemName}!";
+     string pokemonDisplay = SideId.HasValue 
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+        return $"{pokemonDisplay} used its {ItemName}!";
     }
 }
 
@@ -283,13 +319,17 @@ public class ItemMessage : BattleMessage
 /// </summary>
 public class AbilityMessage : BattleMessage
 {
-    public required string PokemonName { get; init; }
+ public required string PokemonName { get; init; }
     public required string AbilityName { get; init; }
     public string? AdditionalInfo { get; init; }
+    public SideId? SideId { get; init; }
 
     public override string ToDisplayText()
     {
-        string baseText = $"{PokemonName}'s {AbilityName}!";
+        string pokemonDisplay = SideId.HasValue 
+      ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+        string baseText = $"{pokemonDisplay}'s {AbilityName}!";
         return AdditionalInfo != null ? $"{baseText} {AdditionalInfo}" : baseText;
     }
 }

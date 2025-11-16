@@ -93,7 +93,6 @@ public partial record Format : IEventMethods
     public OnTryMoveEventInfo? OnTryMove { get; init; }
     public OnTryPrimaryHitEventInfo? OnTryPrimaryHit { get; init; }
     public OnTypeEventInfo? OnType { get; init; }
-    public OnUseItemEventInfo? OnUseItem { get; init; }
     public OnUpdateEventInfo? OnUpdate { get; init; }
     public OnWeatherEventInfo? OnWeather { get; init; }
     public OnWeatherModifyDamageEventInfo? OnWeatherModifyDamage { get; init; }
@@ -337,4 +336,5 @@ public partial record Format : IEventMethods
     public OnAnyWeatherModifyDamageEventInfo? OnAnyWeatherModifyDamage { get; init; }
     public OnAnyModifyDamagePhase1EventInfo? OnAnyModifyDamagePhase1 { get; init; }
     public OnAnyModifyDamagePhase2EventInfo? OnAnyModifyDamagePhase2 { get; init; }
+    public OnUseItemEventInfo? OnUseItem { get; init; }
 }

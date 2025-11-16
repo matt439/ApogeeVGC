@@ -520,89 +520,101 @@ public partial class Battle
                         new TurnStartMessage { TurnNumber = turnNum },
 
                     "move" when parts.Length > 3 =>
-                        new MoveUsedMessage
-                        {
-                            PokemonName = ExtractPokemonName(parts[2]),
-                            MoveName = parts[3]
-                        },
+                     new MoveUsedMessage
+        {
+          PokemonName = ExtractPokemonName(parts[2]),
+              SideId = ExtractSideId(parts[2]),
+                MoveName = parts[3]
+       },
 
-                    "switch" or "drag" when parts.Length > 3 =>
-                        new SwitchMessage
-                        {
-                            TrainerName = ExtractTrainerName(parts[2]),
-                            PokemonName = ExtractPokemonName(parts[2])
-                        },
+     "switch" or "drag" when parts.Length > 3 =>
+     new SwitchMessage
+             {
+     TrainerName = ExtractTrainerName(parts[2]),
+     PokemonName = ExtractPokemonName(parts[2])
+    },
 
-                    "faint" when parts.Length > 2 =>
-                        new FaintMessage { PokemonName = ExtractPokemonName(parts[2]) },
+   "faint" when parts.Length > 2 =>
+     new FaintMessage 
+     { 
+      PokemonName = ExtractPokemonName(parts[2]),
+           SideId = ExtractSideId(parts[2])
+  },
 
-                    "-damage" when parts.Length > 3 =>
-                        ParseDamageMessage(parts),
+    "-damage" when parts.Length > 3 =>
+    ParseDamageMessage(parts),
 
-                    "-heal" when parts.Length > 3 =>
-                        ParseHealMessage(parts),
+ "-heal" when parts.Length > 3 =>
+  ParseHealMessage(parts),
 
-                    "-status" when parts.Length > 3 =>
-                        new StatusMessage
-                        {
-                            PokemonName = ExtractPokemonName(parts[2]),
-                            StatusName = parts[3]
-                        },
+        "-status" when parts.Length > 3 =>
+     new StatusMessage
+      {
+    PokemonName = ExtractPokemonName(parts[2]),
+SideId = ExtractSideId(parts[2]),
+     StatusName = parts[3]
+                },
 
-                    "-supereffective" =>
-                        new EffectivenessMessage
-                        {
-                            Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
-                        },
+          "-supereffective" =>
+new EffectivenessMessage
+ {
+                Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
+             },
 
                     "-resisted" =>
-                        new EffectivenessMessage
-                        {
-                            Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
-                        },
+         new EffectivenessMessage
+  {
+         Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
+     },
 
-                    "-immune" =>
-                        new EffectivenessMessage
-                        {
-                            Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
-                        },
+              "-immune" =>
+             new EffectivenessMessage
+   {
+     Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
+           },
 
-                    "-crit" =>
-                        new CriticalHitMessage(),
+          "-crit" =>
+    new CriticalHitMessage(),
 
-                    "-miss" when parts.Length > 2 =>
-                        new MissMessage { PokemonName = ExtractPokemonName(parts[2]) },
+         "-miss" when parts.Length > 2 =>
+     new MissMessage 
+           { 
+          PokemonName = ExtractPokemonName(parts[2]),
+     SideId = ExtractSideId(parts[2])
+      },
 
-                    "-fail" when parts.Length > 2 =>
-                        new MoveFailMessage { Reason = parts.Length > 3 ? parts[3] : "Unknown" },
+             "-fail" when parts.Length > 2 =>
+              new MoveFailMessage { Reason = parts.Length > 3 ? parts[3] : "Unknown" },
 
-                    "-boost" or "-unboost" when parts.Length > 4 =>
-                        ParseStatChangeMessage(parts, command == "-boost"),
+      "-boost" or "-unboost" when parts.Length > 4 =>
+     ParseStatChangeMessage(parts, command == "-boost"),
 
-                    "-weather" when parts.Length > 2 =>
-                        new WeatherMessage
-                        {
-                            WeatherName = parts[2],
-                            IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
-                        },
+  "-weather" when parts.Length > 2 =>
+            new WeatherMessage
+{
+                 WeatherName = parts[2],
+       IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
+ },
 
-                    "-ability" when parts.Length > 3 =>
-                        new AbilityMessage
-                        {
-                            PokemonName = ExtractPokemonName(parts[2]),
-                            AbilityName = parts[3],
-                            AdditionalInfo = parts.Length > 4 ? parts[4] : null
-                        },
+         "-ability" when parts.Length > 3 =>
+      new AbilityMessage
+  {
+     PokemonName = ExtractPokemonName(parts[2]),
+     SideId = ExtractSideId(parts[2]),
+           AbilityName = parts[3],
+ AdditionalInfo = parts.Length > 4 ? parts[4] : null
+         },
 
-                    "-item" when parts.Length > 3 =>
-                        new ItemMessage
-                        {
-                            PokemonName = ExtractPokemonName(parts[2]),
-                            ItemName = parts[3]
-                        },
+         "-item" when parts.Length > 3 =>
+      new ItemMessage
+    {
+     PokemonName = ExtractPokemonName(parts[2]),
+  SideId = ExtractSideId(parts[2]),
+         ItemName = parts[3]
+        },
 
-                    _ => null
-                };
+ _ => null
+     };
 
                 if (message != null)
                 {
@@ -626,25 +638,42 @@ public partial class Battle
         int colonIndex = part.IndexOf(':');
         if (colonIndex >= 0 && colonIndex < part.Length - 1)
         {
-            return part.Substring(colonIndex + 2).Trim(); // +2 to skip ": "
+      return part.Substring(colonIndex + 2).Trim(); // +2 to skip ": "
         }
 
         return part.Trim();
     }
 
     /// <summary>
+    /// Extracts the SideId from a Pokemon identifier in a log entry part (format: "p1a: PokemonName")
+    /// Returns null if the side cannot be determined.
+/// </summary>
+    private static SideId? ExtractSideId(string part)
+    {
+        if (part.StartsWith("p1"))
+        {
+        return SideId.P1;
+        }
+        else if (part.StartsWith("p2"))
+        {
+      return SideId.P2;
+        }
+        return null;
+  }
+
+    /// <summary>
     /// Extracts a trainer name from a log entry part (format: "p1a: PokemonName")
-    /// Returns "Player 1" or "Player 2" based on the side prefix
+  /// Returns "Player 1" or "Player 2" based on the side prefix
     /// </summary>
     private string ExtractTrainerName(string part)
     {
         if (part.StartsWith("p1"))
         {
-            return Sides[0].Name;
+          return Sides[0].Name;
         }
         else if (part.StartsWith("p2"))
-        {
-            return Sides[1].Name;
+      {
+        return Sides[1].Name;
         }
 
         return "Unknown";
@@ -658,46 +687,48 @@ public partial class Battle
         if (parts.Length < 4) return null;
 
         string pokemonName = ExtractPokemonName(parts[2]);
-        string healthStr = parts[3];
+        SideId? sideId = ExtractSideId(parts[2]);
+  string healthStr = parts[3];
 
-        // Parse health (format: "123/456" or "123/456 psn")
-        string[] healthParts = healthStr.Split(' ');
+   // Parse health (format: "123/456" or "123/456 psn")
+ string[] healthParts = healthStr.Split(' ');
         string[] hpParts = healthParts[0].Split('/');
 
-        if (hpParts.Length != 2 ||
-            !int.TryParse(hpParts[0], out int currentHp) ||
-            !int.TryParse(hpParts[1], out int maxHp))
+    if (hpParts.Length != 2 ||
+   !int.TryParse(hpParts[0], out int currentHp) ||
+   !int.TryParse(hpParts[1], out int maxHp))
         {
             return new GenericMessage { Text = $"{pokemonName} took damage!" };
         }
 
-        int damageAmount = maxHp - currentHp; // Approximate, we don't have previous HP
+ int damageAmount = maxHp - currentHp; // Approximate, we don't have previous HP
 
-        // Extract effect name if present
+   // Extract effect name if present
         string? effectName = null;
-        string? sourceName = null;
+string? sourceName = null;
 
-        for (int i = 4; i < parts.Length; i++)
-        {
+     for (int i = 4; i < parts.Length; i++)
+     {
             if (parts[i].StartsWith("[from]"))
             {
                 effectName = parts[i].Substring(7).Trim(); // Remove "[from] "
-            }
-            else if (parts[i].StartsWith("[of]"))
-            {
-                sourceName = ExtractPokemonName(parts[i].Substring(5).Trim()); // Remove "[of] "
-            }
+  }
+   else if (parts[i].StartsWith("[of]"))
+   {
+  sourceName = ExtractPokemonName(parts[i].Substring(5).Trim()); // Remove "[of] "
+  }
         }
 
         return new DamageMessage
         {
-            PokemonName = pokemonName,
-            DamageAmount = damageAmount,
+   PokemonName = pokemonName,
+        SideId = sideId,
+       DamageAmount = damageAmount,
             RemainingHp = currentHp,
-            MaxHp = maxHp,
-            EffectName = effectName,
-            SourcePokemonName = sourceName
-        };
+      MaxHp = maxHp,
+   EffectName = effectName,
+      SourcePokemonName = sourceName
+ };
     }
 
     /// <summary>
@@ -705,16 +736,17 @@ public partial class Battle
     /// </summary>
     private static BattleMessage? ParseHealMessage(string[] parts)
     {
-        if (parts.Length < 4) return null;
+      if (parts.Length < 4) return null;
 
-        string pokemonName = ExtractPokemonName(parts[2]);
-        string healthStr = parts[3];
+   string pokemonName = ExtractPokemonName(parts[2]);
+    SideId? sideId = ExtractSideId(parts[2]);
+      string healthStr = parts[3];
 
-        // Parse health (format: "123/456")
+     // Parse health (format: "123/456")
         string[] healthParts = healthStr.Split(' ');
         string[] hpParts = healthParts[0].Split('/');
 
-        if (hpParts.Length != 2 ||
+   if (hpParts.Length != 2 ||
       !int.TryParse(hpParts[0], out int currentHp) ||
  !int.TryParse(hpParts[1], out int maxHp))
       {
@@ -723,11 +755,12 @@ public partial class Battle
 
     // The heal amount is unknown from just the current HP in the log
         // This is a limitation of parsing from logs - we only know the result
-        int healAmount = 0; // Will show as "healed to X HP" which is more accurate
+ int healAmount = 0; // Will show as "healed to X HP" which is more accurate
 
-        return new HealMessage
-        {
+     return new HealMessage
+   {
         PokemonName = pokemonName,
+      SideId = sideId,
             HealAmount = healAmount,
        CurrentHp = currentHp,
   MaxHp = maxHp
@@ -737,24 +770,26 @@ public partial class Battle
     /// <summary>
     /// Parses a stat change message from log parts
     /// </summary>
-    private static BattleMessage? ParseStatChangeMessage(string[] parts, bool isBoost)
+  private static BattleMessage? ParseStatChangeMessage(string[] parts, bool isBoost)
     {
-        if (parts.Length < 5) return null;
+      if (parts.Length < 5) return null;
 
         string pokemonName = ExtractPokemonName(parts[2]);
+        SideId? sideId = ExtractSideId(parts[2]);
         string statName = parts[3];
-        int stages = int.TryParse(parts[4], out int stageNum) ? stageNum : 1;
+     int stages = int.TryParse(parts[4], out int stageNum) ? stageNum : 1;
 
-        if (!isBoost)
+ if (!isBoost)
         {
-            stages = -stages; // Unboost is negative
+   stages = -stages; // Unboost is negative
         }
 
-        return new StatChangeMessage
+      return new StatChangeMessage
         {
-            PokemonName = pokemonName,
-            StatName = statName,
-            Stages = stages
+PokemonName = pokemonName,
+        SideId = sideId,
+     StatName = statName,
+          Stages = stages
         };
     }
 }
