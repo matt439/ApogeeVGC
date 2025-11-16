@@ -444,8 +444,14 @@ public class Field
         return new FieldPerspective
         {
             Weather = Weather,
+            WeatherDuration = WeatherState.Duration,
             Terrain = Terrain,
-            PseudoWeather = PseudoWeather.Keys.ToList(),
-        };
+            TerrainDuration = TerrainState.Duration,
+          PseudoWeather = PseudoWeather.Keys.ToList(),
+       PseudoWeatherWithDuration = PseudoWeather.ToDictionary(
+kvp => kvp.Key,
+  kvp => kvp.Value.Duration
+     ),
+   };
     }
 }

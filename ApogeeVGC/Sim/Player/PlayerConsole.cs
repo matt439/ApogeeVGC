@@ -122,6 +122,14 @@ public class PlayerConsole : IPlayer
 
     private void RenderBattleState(BattlePerspective perspective)
     {
+        // Display field state if any conditions are active
+        string fieldState = GetFieldStateDisplay(perspective.Field);
+  if (!string.IsNullOrEmpty(fieldState))
+        {
+            AnsiConsole.MarkupLine($"[bold]{fieldState}[/]");
+            AnsiConsole.WriteLine();
+        }
+
         var table = new Table()
       .Border(TableBorder.Rounded)
    .BorderColor(Color.Grey);
@@ -137,12 +145,12 @@ table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 var statusDisplay = GetStatusDisplay(opponentActive.Status);
     var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
     
-            var volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
+    var volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
       var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
     
        var boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
   var boostsLine = $"\n{boostsDisplay}";
-    
+  
    var teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
 var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
 
@@ -153,31 +161,31 @@ var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
   opponentInfo = "[grey]No active Pokemon[/]";
   }
 
-   // Player's active Pokemon - handle fainted Pokemon properly
+ // Player's active Pokemon - handle fainted Pokemon properly
  var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
    string playerInfo;
-        if (playerActive != null)
+  if (playerActive != null)
       {
  if (playerActive.Fainted)
    {
-     playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
+   playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
   }
        else
 {
 var statusDisplay = GetStatusDisplay(playerActive.Status);
      var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
        
-            var volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
+    var volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
  var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
-            
+  
      var boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
    var boostsLine = $"\n{boostsDisplay}";
        
-        var teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
+      var teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
      var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
  
   playerInfo =
-      $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
+  $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
   }
         }
         else
@@ -185,10 +193,10 @@ var statusDisplay = GetStatusDisplay(playerActive.Status);
 playerInfo = "[grey]No active Pokemon[/]";
  }
 
-     table.AddRow(opponentInfo, playerInfo);
+ table.AddRow(opponentInfo, playerInfo);
 
    AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
+  AnsiConsole.WriteLine();
     }
 
     private string RenderHealthBar(double hpPercentage)
@@ -604,8 +612,8 @@ boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
    string color = boostValue switch
      {
       > 0 => "green",
-            < 0 => "red",
-            _ => "grey"
+  < 0 => "red",
+  _ => "grey"
         };
 
         string sign = boostValue switch
@@ -619,17 +627,86 @@ boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
 }
 
     /// <summary>
+    /// Get field state display showing Weather, Terrain, and PseudoWeather with durations
+    /// </summary>
+ private string GetFieldStateDisplay(FieldClasses.FieldPerspective fieldPerspective)
+    {
+      var fieldParts = new List<string>();
+
+   // Weather
+  if (fieldPerspective.Weather != ConditionId.None)
+        {
+            string weatherName = GetFieldConditionDisplayName(fieldPerspective.Weather);
+            string duration = fieldPerspective.WeatherDuration.HasValue 
+    ? $":{fieldPerspective.WeatherDuration}" 
+         : "";
+            fieldParts.Add($"[yellow]{weatherName}{duration}[/]");
+ }
+
+        // Terrain
+        if (fieldPerspective.Terrain != ConditionId.None)
+        {
+      string terrainName = GetFieldConditionDisplayName(fieldPerspective.Terrain);
+          string duration = fieldPerspective.TerrainDuration.HasValue 
+     ? $":{fieldPerspective.TerrainDuration}" 
+      : "";
+       fieldParts.Add($"[green]{terrainName}{duration}[/]");
+        }
+
+        // PseudoWeather
+      foreach (var (conditionId, duration) in fieldPerspective.PseudoWeatherWithDuration)
+        {
+            string pwName = GetFieldConditionDisplayName(conditionId);
+   string durationText = duration.HasValue ? $":{duration}" : "";
+        fieldParts.Add($"[cyan]{pwName}{durationText}[/]");
+}
+
+     return fieldParts.Count > 0 
+            ? $"Field: {string.Join(" ", fieldParts)}" 
+          : "";
+    }
+
+    /// <summary>
+    /// Get display name for field conditions (Weather, Terrain, PseudoWeather)
+    /// </summary>
+    private string GetFieldConditionDisplayName(ConditionId condition)
+    {
+        return condition switch
+        {
+            // Weather
+    ConditionId.SunnyDay => "Sun",
+ ConditionId.RainDance => "Rain",
+            ConditionId.DesolateLand => "HarshSun",
+            ConditionId.PrimordialSea => "HeavyRain",
+         
+  // Terrain
+            ConditionId.ElectricTerrain => "Electric",
+            
+            // PseudoWeather
+ConditionId.TrickRoom => "TrickRoom",
+  ConditionId.Tailwind => "Tailwind",
+            ConditionId.Reflect => "Reflect",
+            ConditionId.LightScreen => "LightScreen",
+            ConditionId.Gravity => "Gravity",
+            ConditionId.MagicRoom => "MagicRoom",
+      ConditionId.WonderRoom => "WonderRoom",
+    
+            _ => condition.ToString()
+        };
+    }
+
+    /// <summary>
     /// Get terastallization display markup for console
     /// Shows "TERA: [Type]" if terastallized, or "Tera: [Type]" if available but not active
-    /// </summary>
+  /// </summary>
     private string GetTeraDisplay(Moves.MoveType? terastallized, Moves.MoveType teraType)
     {
  if (terastallized.HasValue)
-        {
+{
     // Pokemon is currently terastallized - show in bold with color
       return $"[bold {GetTeraTypeColor(terastallized.Value)}]TERA: {terastallized.Value.ToString().ToUpper()}[/]";
        }
-        else
+      else
        {
       // Pokemon has tera available but not active - show in grey
  return $"[grey]Tera: {teraType.ToString()}[/]";
@@ -639,34 +716,34 @@ boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
     /// <summary>
     /// Get the console color for a tera type
     /// </summary>
-private string GetTeraTypeColor(Moves.MoveType teraType)
+    private string GetTeraTypeColor(Moves.MoveType teraType)
+    {
+        return teraType switch
   {
-      return teraType switch
-   {
-    Moves.MoveType.Normal => "white",
-   Moves.MoveType.Fire => "red",
-     Moves.MoveType.Water => "blue",
-          Moves.MoveType.Electric => "yellow",
+        Moves.MoveType.Normal => "white",
+         Moves.MoveType.Fire => "red",
+Moves.MoveType.Water => "blue",
+    Moves.MoveType.Electric => "yellow",
 Moves.MoveType.Grass => "green",
-   Moves.MoveType.Ice => "cyan",
+            Moves.MoveType.Ice => "cyan",
      Moves.MoveType.Fighting => "darkorange",
-   Moves.MoveType.Poison => "purple",
-     Moves.MoveType.Ground => "gold3",
-     Moves.MoveType.Flying => "lightblue",
-   Moves.MoveType.Psychic => "magenta",
-     Moves.MoveType.Bug => "olive",
-    Moves.MoveType.Rock => "tan",
-       Moves.MoveType.Ghost => "purple",
-       Moves.MoveType.Dragon => "blue",
-      Moves.MoveType.Dark => "grey",
-    Moves.MoveType.Steel => "silver",
-       Moves.MoveType.Fairy => "pink",
-      Moves.MoveType.Stellar => "white",
-   _ => "white"
-   };
+  Moves.MoveType.Poison => "purple",
+            Moves.MoveType.Ground => "gold3",
+ Moves.MoveType.Flying => "lightblue",
+            Moves.MoveType.Psychic => "magenta",
+       Moves.MoveType.Bug => "olive",
+            Moves.MoveType.Rock => "tan",
+            Moves.MoveType.Ghost => "purple",
+  Moves.MoveType.Dragon => "blue",
+            Moves.MoveType.Dark => "grey",
+Moves.MoveType.Steel => "silver",
+    Moves.MoveType.Fairy => "pink",
+         Moves.MoveType.Stellar => "white",
+_ => "white"
+        };
     }
 
- private bool IsDisabled(object? disabled)
+private bool IsDisabled(object? disabled)
     {
    return disabled switch
   {
