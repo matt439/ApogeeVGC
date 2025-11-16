@@ -46,6 +46,10 @@ public record PokemonPerspective
     
     // Volatiles (temporary battle conditions like confusion, substitute, etc.)
     public required IReadOnlyList<ConditionId> Volatiles { get; init; }
+  
+    // Volatiles with duration tracking (includes conditions like Stall, Protect, etc.)
+    // Key: ConditionId, Value: Duration remaining (null if no duration limit)
+    public required IReadOnlyDictionary<ConditionId, int?> VolatilesWithDuration { get; init; }
     
     // Position
     public required int Position { get; init; }

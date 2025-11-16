@@ -187,6 +187,10 @@ public partial class Side
                 TeraType = p.TeraType,
                 CanTerastallize = p.CanTerastallize,
                 Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                VolatilesWithDuration = p.Volatiles.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Duration
+                 ).AsReadOnly(),
                 Position = p.Position,
                 IsActive = p.IsActive,
             }).ToList().AsReadOnly(),
@@ -213,6 +217,10 @@ public partial class Side
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,
                     Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                    VolatilesWithDuration = p.Volatiles.ToDictionary(
+                     kvp => kvp.Key,
+                     kvp => kvp.Value.Duration
+                   ).AsReadOnly(),
                     Position = p.Position,
                     IsActive = p.IsActive,
                 }).ToList().AsReadOnly(),
@@ -244,6 +252,10 @@ public partial class Side
                 TeraType = p.TeraType,
                 CanTerastallize = p.CanTerastallize,
                 Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                VolatilesWithDuration = p.Volatiles.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Duration
+                 ).AsReadOnly(),
                 Position = p.Position,
                 IsActive = p.IsActive,
             }).ToList().AsReadOnly(),
@@ -271,6 +283,10 @@ public partial class Side
                     TeraType = p.TeraType,
                     CanTerastallize = p.CanTerastallize,
                     Volatiles = p.Volatiles.Keys.ToList().AsReadOnly(),
+                    VolatilesWithDuration = p.Volatiles.ToDictionary(
+                     kvp => kvp.Key,
+                     kvp => kvp.Value.Duration
+                   ).AsReadOnly(),
                     Position = p.Position,
                     IsActive = p.IsActive,
                 };
