@@ -289,10 +289,20 @@ public class HealMessage : BattleMessage
 
     public override string ToDisplayText()
     {
-        string pokemonDisplay = SideId.HasValue 
+      string pokemonDisplay = SideId.HasValue 
         ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
     : PokemonName;
-        return $"{pokemonDisplay} healed to {CurrentHp} HP!";
+        
+        // If we have a heal amount, show it as relative heal
+        // Otherwise fall back to showing current HP
+        if (HealAmount > 0)
+        {
+            return $"{pokemonDisplay} healed {HealAmount} HP!";
+        }
+        else
+        {
+         return $"{pokemonDisplay} healed to {CurrentHp} HP!";
+        }
     }
 }
 

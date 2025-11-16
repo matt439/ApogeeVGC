@@ -391,7 +391,7 @@ public partial class Battle
         }
 
         // Log healing messages based on effect type
-        PrintHealMessage(target, source, effectCondition);
+        PrintHealMessage(target, finalDamage, source, effectCondition);
 
         // Run Heal event
         RunEvent(

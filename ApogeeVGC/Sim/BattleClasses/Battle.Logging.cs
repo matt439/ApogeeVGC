@@ -357,7 +357,7 @@ public partial class Battle
     /// <summary>
     /// Logs a heal message to the battle log based on the effect causing the healing.
     /// </summary>
-    private void PrintHealMessage(Pokemon target, Pokemon? source, Condition? effect)
+    private void PrintHealMessage(Pokemon target, int healAmount, Pokemon? source, Condition? effect)
     {
         if (!DisplayUi) return;
 
@@ -365,31 +365,31 @@ public partial class Battle
         var healthFunc = target.GetHealth;
 
         // Determine if this is a drain effect
-        bool isDrain = effect?.Id == ConditionId.Drain;
+      bool isDrain = effect?.Id == ConditionId.Drain;
 
         if (isDrain && source != null)
         {
-            // Drain healing shows the source
-            Add("-heal", target, healthFunc, "[from] drain", $"[of] {source}");
-        }
-        else if (effect != null && effect.Id != ConditionId.None)
-        {
+       // Drain healing shows the source
+            Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain", $"[of] {source}");
+   }
+   else if (effect != null && effect.Id != ConditionId.None)
+   {
             // Healing from a specific effect
             string effectName = effect.FullName == "tox" ? "psn" : effect.FullName;
-            if (source != null && source != target)
-            {
-                Add("-heal", target, healthFunc, $"[from] {effectName}", $"[of] {source}");
+   if (source != null && source != target)
+      {
+        Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}", $"[of] {source}");
             }
-            else
-            {
-                Add("-heal", target, healthFunc, $"[from] {effectName}");
-            }
+    else
+         {
+Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+ }
         }
         else
         {
-            // Simple heal with no effect
-            Add("-heal", target, healthFunc);
-        }
+  // Simple heal with no effect
+ Add("-heal", target, healthFunc, $"[heal]{healAmount}");
+     }
     }
 
     /// <summary>
@@ -736,14 +736,14 @@ string? sourceName = null;
     /// </summary>
     private static BattleMessage? ParseHealMessage(string[] parts)
     {
-      if (parts.Length < 4) return null;
+if (parts.Length < 4) return null;
 
    string pokemonName = ExtractPokemonName(parts[2]);
-    SideId? sideId = ExtractSideId(parts[2]);
+SideId? sideId = ExtractSideId(parts[2]);
       string healthStr = parts[3];
 
      // Parse health (format: "123/456")
-        string[] healthParts = healthStr.Split(' ');
+     string[] healthParts = healthStr.Split(' ');
         string[] hpParts = healthParts[0].Split('/');
 
    if (hpParts.Length != 2 ||
@@ -753,9 +753,20 @@ string? sourceName = null;
     return new GenericMessage { Text = $"{pokemonName} restored HP!" };
         }
 
-    // The heal amount is unknown from just the current HP in the log
-        // This is a limitation of parsing from logs - we only know the result
- int healAmount = 0; // Will show as "healed to X HP" which is more accurate
+        // Extract heal amount from [heal]amount tag
+    int healAmount = 0;
+        for (int i = 4; i < parts.Length; i++)
+     {
+ if (parts[i].StartsWith("[heal]"))
+    {
+                string amountStr = parts[i].Substring(6); // Remove "[heal]" prefix
+          if (int.TryParse(amountStr, out int amount))
+      {
+             healAmount = amount;
+   }
+ break;
+        }
+   }
 
      return new HealMessage
    {
@@ -764,7 +775,7 @@ string? sourceName = null;
             HealAmount = healAmount,
        CurrentHp = currentHp,
   MaxHp = maxHp
-        };
+      };
     }
 
     /// <summary>
