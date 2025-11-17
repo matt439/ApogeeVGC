@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 using Spectre.Console;
 
@@ -46,7 +47,6 @@ public class PlayerConsole : IPlayer
             .Centered()
             .Color(Color.Cyan1));
         AnsiConsole.WriteLine();
-
     }
 
     public async Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
@@ -98,7 +98,8 @@ public class PlayerConsole : IPlayer
 
     public void UpdateMessages(IEnumerable<BattleMessage> messages)
     {
-        foreach (var message in messages)
+        var battleMessages = messages as BattleMessage[] ?? messages.ToArray();
+        foreach (BattleMessage message in battleMessages)
         {
             _recentMessages.Add(message);
         }
@@ -110,9 +111,9 @@ public class PlayerConsole : IPlayer
         }
 
         // Display messages
-        foreach (var message in messages)
+        foreach (BattleMessage message in battleMessages)
         {
-            var text = message.ToDisplayText();
+            string text = message.ToDisplayText();
             if (!string.IsNullOrEmpty(text))
             {
                 AnsiConsole.MarkupLine($"[grey]{text}[/]");
@@ -124,99 +125,103 @@ public class PlayerConsole : IPlayer
     {
         // Display field state if any conditions are active
         string fieldState = GetFieldStateDisplay(perspective.Field);
-  if (!string.IsNullOrEmpty(fieldState))
+        if (!string.IsNullOrEmpty(fieldState))
         {
             AnsiConsole.MarkupLine($"[bold]{fieldState}[/]");
             AnsiConsole.WriteLine();
         }
 
-        var table = new Table()
-      .Border(TableBorder.Rounded)
-   .BorderColor(Color.Grey);
+        Table table = new Table()
+            .Border(TableBorder.Rounded)
+            .BorderColor(Color.Grey);
 
-   table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
-table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
+        table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
+        table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
 
-  // Opponent's active Pokemon
-  var opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
- string opponentInfo;
- if (opponentActive != null)
- {
-var statusDisplay = GetStatusDisplay(opponentActive.Status);
-    var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
-    
-    var volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
-      var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
-    
-       var boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
-  var boostsLine = $"\n{boostsDisplay}";
-  
-   var teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
-var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
-
-     opponentInfo = $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
-  }
-     else
+        // Opponent's active Pokemon
+        PokemonPerspective? opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
+        string opponentInfo;
+        if (opponentActive != null)
         {
-  opponentInfo = "[grey]No active Pokemon[/]";
-  }
+            string statusDisplay = GetStatusDisplay(opponentActive.Status);
+            string statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
 
- // Player's active Pokemon - handle fainted Pokemon properly
- var playerActive = perspective.PlayerSide.Active.FirstOrDefault();
-   string playerInfo;
-  if (playerActive != null)
-      {
- if (playerActive.Fainted)
-   {
-   playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
-  }
-       else
-{
-var statusDisplay = GetStatusDisplay(playerActive.Status);
-     var statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
-       
-    var volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
- var volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
-  
-     var boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
-   var boostsLine = $"\n{boostsDisplay}";
-       
-      var teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
-     var teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
- 
-  playerInfo =
-  $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
-  }
+            string volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
+            string volatilesLine =
+                !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
+
+            string boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
+            string boostsLine = $"\n{boostsDisplay}";
+
+            string teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
+            string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+
+            opponentInfo =
+                $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
         }
         else
-   {
-playerInfo = "[grey]No active Pokemon[/]";
- }
+        {
+            opponentInfo = "[grey]No active Pokemon[/]";
+        }
 
- table.AddRow(opponentInfo, playerInfo);
+        // Player's active Pokemon - handle fainted Pokemon properly
+        PokemonPerspective? playerActive = perspective.PlayerSide.Active.FirstOrDefault();
+        string playerInfo;
+        if (playerActive != null)
+        {
+            if (playerActive.Fainted)
+            {
+                playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
+            }
+            else
+            {
+                string statusDisplay = GetStatusDisplay(playerActive.Status);
+                string statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
 
-   AnsiConsole.Write(table);
-  AnsiConsole.WriteLine();
+                string volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
+                string volatilesLine = !string.IsNullOrEmpty(volatileDisplay)
+                    ? $"\n{volatileDisplay}"
+                    : "";
+
+                string boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
+                string boostsLine = $"\n{boostsDisplay}";
+
+                string teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
+                string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+
+                playerInfo =
+                    $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
+            }
+        }
+        else
+        {
+            playerInfo = "[grey]No active Pokemon[/]";
+        }
+
+        table.AddRow(opponentInfo, playerInfo);
+
+        AnsiConsole.Write(table);
+        AnsiConsole.WriteLine();
     }
 
     private string RenderHealthBar(double hpPercentage)
     {
-        var barLength = 20;
-        var filled = (int)(barLength * (hpPercentage / 100.0));
-        var empty = barLength - filled;
+        const int barLength = 20;
+        int filled = (int)(barLength * (hpPercentage / 100.0));
+        int empty = barLength - filled;
 
-        var color = hpPercentage > 50 ? "green" : hpPercentage > 20 ? "yellow" : "red";
+        string color = hpPercentage > 50 ? "green" : hpPercentage > 20 ? "yellow" : "red";
 
         // Use ASCII-safe characters that work in all console encoding
         // = for health, - for damage
-        var bar = $"[{color}]{"=".Repeat(filled)}[/]{"-".Repeat(empty)}";
+        string bar = $"[{color}]{"=".Repeat(filled)}[/]{"-".Repeat(empty)}";
 
         return $"{bar} {hpPercentage:F1}%";
     }
 
     private string RenderHealthBar(int hp, int maxHp)
     {
-        var percentage = (double)hp / maxHp * 100;
+        double percentage = (double)hp / maxHp * 100;
         return RenderHealthBar(percentage);
     }
 
@@ -245,14 +250,14 @@ playerInfo = "[grey]No active Pokemon[/]";
             {
                 Choice = ChoiceType.Team,
                 Pokemon = null,
-                MoveId = Moves.MoveId.None,
+                MoveId = MoveId.None,
                 Index = index,
-                Priority = -position
+                Priority = -position,
             }).ToList();
 
         return new Choice
         {
-            Actions = actions
+            Actions = actions,
         };
     }
 
@@ -261,197 +266,200 @@ playerInfo = "[grey]No active Pokemon[/]";
     {
         if (request.Active.Count == 0)
         {
-     throw new InvalidOperationException("No active Pokemon to make a move choice");
+            throw new InvalidOperationException("No active Pokemon to make a move choice");
         }
 
-        var pokemonRequest = request.Active[0];
+        PokemonMoveRequestData pokemonRequest = request.Active[0];
 
         AnsiConsole.MarkupLine("[bold cyan]Select your move:[/]");
         AnsiConsole.WriteLine();
 
         var choices = new List<string>();
- var moveIndices = new List<int>();
-    var teraOptions = new List<bool>();
+        var moveIndices = new List<int>();
+        var teraOptions = new List<bool>();
 
         // Check if terastallization is available
         MoveType? teraType = pokemonRequest.CanTerastallize switch
         {
-  MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
-       _ => null
+            MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+            _ => null,
         };
 
         // Add moves
-      for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
         {
-            var move = pokemonRequest.Moves[i];
-            var disabled = IsDisabled(move.Disabled);
+            PokemonMoveData move = pokemonRequest.Moves[i];
+            bool disabled = IsDisabled(move.Disabled);
 
-     if (!disabled)
-{
-          // Add regular move option
-           choices.Add($"{i + 1}. {move.Move.Name}");
-        moveIndices.Add(i);
+            if (!disabled)
+            {
+                // Add regular move option
+                choices.Add($"{i + 1}. {move.Move.Name}");
+                moveIndices.Add(i);
                 teraOptions.Add(false);
 
-  // Add terastallize variant if available
-  if (teraType.HasValue)
-     {
-        choices.Add($"{i + 1}. {move.Move.Name} [bold {GetTeraTypeColor(teraType.Value)}](+ TERA {teraType.Value.ToString().ToUpper()})[/]");
-        moveIndices.Add(i);
-              teraOptions.Add(true);
-  }
-}
+                // Add terastallize variant if available
+                if (teraType.HasValue)
+                {
+                    choices.Add(
+                        $"{i + 1}. {move.Move.Name} [bold {GetTeraTypeColor(teraType.Value)}](+ TERA {teraType.Value.ToString().ToUpper()})[/]");
+                    moveIndices.Add(i);
+                    teraOptions.Add(true);
+                }
+            }
         }
 
         // Add switch option
         choices.Add("S. Switch Pokemon");
 
-   // Run the blocking prompt on a background thread to avoid blocking the async pipeline
-      var selection = await Task.Run(() => AnsiConsole.Prompt(
+        // Run the blocking prompt on a background thread to avoid blocking the async pipeline
+        string selection = await Task.Run(() => AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-              .Title("Choose an action:")
+                .Title("Choose an action:")
                 .AddChoices(choices)), cancellationToken);
 
-        if (selection.StartsWith("S"))
+        if (selection.StartsWith('S'))
         {
-   // Switch - show available Pokemon  
+            // Switch - show available Pokemon  
             return await GetSwitchChoiceAsync(
-      new SwitchRequest { Side = request.Side, ForceSwitch = new[] { false } },
-            cancellationToken);
-    }
+                new SwitchRequest { Side = request.Side, ForceSwitch = [false] },
+                cancellationToken);
+        }
 
-  // Move selected
-        var choiceIndex = choices.IndexOf(selection);
-    var moveIndex = moveIndices[choiceIndex];
-   var useTerastallize = teraOptions[choiceIndex];
-        var selectedMove = pokemonRequest.Moves[moveIndex];
+        // Move selected
+        int choiceIndex = choices.IndexOf(selection);
+        int moveIndex = moveIndices[choiceIndex];
+        bool useTerastallize = teraOptions[choiceIndex];
+        PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
 
         // Display which move was selected
         if (useTerastallize)
-    {
-      AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]");
+        {
+            AnsiConsole.MarkupLine(
+                $"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]");
         }
- else
-      {
-    AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
+        else
+        {
+            AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
         }
-    AnsiConsole.WriteLine();
+
+        AnsiConsole.WriteLine();
 
         return new Choice
         {
-     Actions = new List<ChosenAction>
+            Actions = new List<ChosenAction>
             {
-     new()
-       {
-   Choice = ChoiceType.Move,
-              Pokemon = null,
- MoveId = selectedMove.Id,
-       TargetLoc = 0,
-            Terastallize = useTerastallize ? teraType : null
+                new()
+                {
+                    Choice = ChoiceType.Move,
+                    Pokemon = null,
+                    MoveId = selectedMove.Id,
+                    TargetLoc = 0,
+                    Terastallize = useTerastallize ? teraType : null
+                }
             }
-  }
-      };
-  }
+        };
+    }
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request,
         CancellationToken cancellationToken)
     {
-      // Build list of available Pokemon with their original indices, excluding fainted ones
+        // Build list of available Pokemon with their original indices, excluding fainted ones
         var availablePokemonWithIndex = request.Side.Pokemon
-    .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
             .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.OriginalIndex))
-  .ToList();
+            .ToList();
 
         if (availablePokemonWithIndex.Count == 0)
         {
             AnsiConsole.MarkupLine("[red]No Pokemon available to switch![/]");
-      throw new InvalidOperationException("No Pokemon available to switch");
+            throw new InvalidOperationException("No Pokemon available to switch");
         }
 
-    AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
-    AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine("[bold cyan]Select Pokemon to switch to:[/]");
+        AnsiConsole.WriteLine();
 
         // Build display choices with HP information from current perspective
         var choices = availablePokemonWithIndex
             .Select((item, i) =>
-       {
-            var p = item.PokemonData;
-      
-           // Get current HP from perspective if available
-string hpDisplay;
-      if (_currentPerspective != null)
-         {
-         // Find matching Pokemon in perspective by position/index
-     var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
-        .FirstOrDefault(pp => pp.Position == item.OriginalIndex);
-        
-           if (perspectivePokemon != null)
-      {
-         if (perspectivePokemon.Fainted)
-   {
-           hpDisplay = "Fainted";
-          }
-     else
-                  {
-            hpDisplay = $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
-      }
-  }
-   else
-      {
-    // Fallback to max HP from stats
-    int maxHp = p.Stats.Hp;
-     hpDisplay = $"{maxHp}/{maxHp}";
-     }
- }
+            {
+                PokemonSwitchRequestData p = item.PokemonData;
+
+                // Get current HP from perspective if available
+                string hpDisplay;
+                if (_currentPerspective != null)
+                {
+                    // Find matching Pokemon in perspective by position/index
+                    PokemonPerspective? perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
+                        .FirstOrDefault(pp => pp.Position == item.OriginalIndex);
+
+                    if (perspectivePokemon != null)
+                    {
+                        if (perspectivePokemon.Fainted)
+                        {
+                            hpDisplay = "Fainted";
+                        }
+                        else
+                        {
+                            hpDisplay = $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
+                        }
+                    }
+                    else
+                    {
+                        // Fallback to max HP from stats
+                        int maxHp = p.Stats.Hp;
+                        hpDisplay = $"{maxHp}/{maxHp}";
+                    }
+                }
                 else
                 {
-   // Fallback to max HP from stats if no perspective
-         int maxHp = p.Stats.Hp;
-     hpDisplay = $"{maxHp}/{maxHp}";
+                    // Fallback to max HP from stats if no perspective
+                    int maxHp = p.Stats.Hp;
+                    hpDisplay = $"{maxHp}/{maxHp}";
                 }
 
-   return $"{i + 1}. {p.Details} (HP: {hpDisplay})";
+                return $"{i + 1}. {p.Details} (HP: {hpDisplay})";
             })
-     .ToList();
+            .ToList();
 
-     // Run the blocking prompt on a background thread
-        var selection = await Task.Run(() => AnsiConsole.Prompt(
+        // Run the blocking prompt on a background thread
+        string selection = await Task.Run(() => AnsiConsole.Prompt(
             new SelectionPrompt<string>()
- .Title("Choose a Pokemon:")
-       .AddChoices(choices)), cancellationToken);
+                .Title("Choose a Pokemon:")
+                .AddChoices(choices)), cancellationToken);
 
-        var selectedDisplayIndex = choices.IndexOf(selection);
+        int selectedDisplayIndex = choices.IndexOf(selection);
         var selectedItem = availablePokemonWithIndex[selectedDisplayIndex];
 
         // The target should be identified by the original index in the Side.Pokemon list
-      // The Side.Choose method will look up the Pokemon by this index
+        // The Side.Choose method will look up the Pokemon by this index
         return new Choice
         {
-          Actions = new List<ChosenAction>
-     {
-     new()
-     {
-         Choice = ChoiceType.Switch,
-   Pokemon = null,
-        MoveId = Moves.MoveId.None,
-      Index = selectedItem.OriginalIndex
-             }
-  }
-    };
+            Actions = new List<ChosenAction>
+            {
+                new()
+                {
+                    Choice = ChoiceType.Switch,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                    Index = selectedItem.OriginalIndex,
+                }
+            }
+        };
     }
 
-  /// <summary>
+    /// <summary>
     /// Helper method to check if a Pokemon is fainted based on the current perspective
     /// </summary>
     private bool IsPokemonFainted(int pokemonIndex)
     {
         if (_currentPerspective == null)
-    return false;
+            return false;
 
-   var perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
-    .FirstOrDefault(pp => pp.Position == pokemonIndex);
+        PokemonPerspective? perspectivePokemon = _currentPerspective.PlayerSide.Pokemon
+            .FirstOrDefault(pp => pp.Position == pokemonIndex);
 
-    return perspectivePokemon?.Fainted ?? false;
+        return perspectivePokemon?.Fainted ?? false;
     }
 
     /// <summary>
@@ -459,39 +467,39 @@ string hpDisplay;
     /// </summary>
     private string GetStatusDisplay(ConditionId status)
     {
- return status switch
-     {
-  ConditionId.Burn => "[orange3]BRN[/]",
-        ConditionId.Paralysis => "[yellow]PAR[/]",
-        ConditionId.Sleep => "[purple]SLP[/]",
-          ConditionId.Freeze => "[cyan]FRZ[/]",
-    ConditionId.Poison => "[magenta]PSN[/]",
-      ConditionId.Toxic => "[darkmagenta]TOX[/]",
-        _ => ""
-  };
+        return status switch
+        {
+            ConditionId.Burn => "[orange3]BRN[/]",
+            ConditionId.Paralysis => "[yellow]PAR[/]",
+            ConditionId.Sleep => "[purple]SLP[/]",
+            ConditionId.Freeze => "[cyan]FRZ[/]",
+            ConditionId.Poison => "[magenta]PSN[/]",
+            ConditionId.Toxic => "[darkmagenta]TOX[/]",
+            _ => "",
+        };
     }
 
-  /// <summary>
+    /// <summary>
     /// Get volatile conditions display with durations
     /// Shows all volatile conditions including hidden ones like Stall, Protect, etc.
     /// </summary>
     private string GetVolatilesDisplay(IReadOnlyDictionary<ConditionId, int?> volatilesWithDuration)
     {
-    if (volatilesWithDuration.Count == 0)
+        if (volatilesWithDuration.Count == 0)
         {
             return "";
         }
 
         var volatileStrings = new List<string>();
 
-     foreach (var (conditionId, duration) in volatilesWithDuration)
-  {
-string conditionName = GetConditionDisplayName(conditionId);
+        foreach ((ConditionId conditionId, int? duration) in volatilesWithDuration)
+        {
+            string conditionName = GetConditionDisplayName(conditionId);
             string durationText = duration.HasValue ? $":{duration}" : "";
-    string color = GetConditionColor(conditionId);
-     
-     volatileStrings.Add($"[{color}]{conditionName}{durationText}[/]");
-      }
+            string color = GetConditionColor(conditionId);
+
+            volatileStrings.Add($"[{color}]{conditionName}{durationText}[/]");
+        }
 
         return string.Join(" ", volatileStrings);
     }
@@ -502,86 +510,89 @@ string conditionName = GetConditionDisplayName(conditionId);
     private string GetConditionDisplayName(ConditionId condition)
     {
         return condition switch
- {
-  ConditionId.Stall => "Stall",
-      ConditionId.Protect => "Protect",
- ConditionId.Confusion => "Confused",
-ConditionId.Substitute => "Sub",
+        {
+            ConditionId.Stall => "Stall",
+            ConditionId.Protect => "Protect",
+            ConditionId.Confusion => "Confused",
+            ConditionId.Substitute => "Sub",
             ConditionId.LeechSeed => "Seeded",
-  ConditionId.ChoiceLock => "ChoiceLock",
-     ConditionId.HealBlock => "HealBlock",
-        ConditionId.Embargo => "Embargo",
-       ConditionId.Ingrain => "Ingrain",
+            ConditionId.ChoiceLock => "ChoiceLock",
+            ConditionId.HealBlock => "HealBlock",
+            ConditionId.Embargo => "Embargo",
+            ConditionId.Ingrain => "Ingrain",
             ConditionId.MagnetRise => "MagRise",
-         ConditionId.Telekinesis => "Telekns",
- ConditionId.PartiallyTrapped => "Trapped",
-ConditionId.FocusEnergy => "FocusEng",
-     ConditionId.Nightmare => "Nightmare",
-          ConditionId.GastroAcid => "GastroAcd",
-         ConditionId.Yawn => "Yawn",
-  ConditionId.Tailwind => "Tailwind",
-       ConditionId.Reflect => "Reflect",
-      ConditionId.LightScreen => "LightScreen",
- ConditionId.TrickRoom => "TrickRoom",
-     ConditionId.Gravity => "Gravity",
-      ConditionId.MagicRoom => "MagicRoom",
-       ConditionId.WonderRoom => "WonderRoom",
-        ConditionId.SmackDown => "SmackDown",
-      ConditionId.Roost => "Roost",
+            ConditionId.Telekinesis => "Telekns",
+            ConditionId.PartiallyTrapped => "Trapped",
+            ConditionId.FocusEnergy => "FocusEng",
+            ConditionId.Nightmare => "Nightmare",
+            ConditionId.GastroAcid => "GastroAcd",
+            ConditionId.Yawn => "Yawn",
+            ConditionId.Tailwind => "Tailwind",
+            ConditionId.Reflect => "Reflect",
+            ConditionId.LightScreen => "LightScreen",
+            ConditionId.TrickRoom => "TrickRoom",
+            ConditionId.Gravity => "Gravity",
+            ConditionId.MagicRoom => "MagicRoom",
+            ConditionId.WonderRoom => "WonderRoom",
+            ConditionId.SmackDown => "SmackDown",
+            ConditionId.Roost => "Roost",
             ConditionId.QuarkDrive => "QuarkDrive",
-      ConditionId.Commanding => "Commanding",
-         ConditionId.Commanded => "Commanded",
-  ConditionId.Detect => "Detect",
-       ConditionId.MaxGuard => "MaxGuard",
-       ConditionId.KingsShield => "KingsShield",
-      ConditionId.SpikyShield => "SpikyShield",
-      ConditionId.BanefulBunker => "BanefulBunker",
- ConditionId.Obstruct => "Obstruct",
+            ConditionId.Commanding => "Commanding",
+            ConditionId.Commanded => "Commanded",
+            ConditionId.Detect => "Detect",
+            ConditionId.MaxGuard => "MaxGuard",
+            ConditionId.KingsShield => "KingsShield",
+            ConditionId.SpikyShield => "SpikyShield",
+            ConditionId.BanefulBunker => "BanefulBunker",
+            ConditionId.Obstruct => "Obstruct",
             ConditionId.SilkTrap => "SilkTrap",
-         ConditionId.BurningBulwark => "BurningBulwark",
-ConditionId.QuickGuard => "QuickGuard",
-       ConditionId.WideGuard => "WideGuard",
-     ConditionId.LaserFocus => "LaserFocus",
-  ConditionId.ShedTail => "ShedTail",
-  ConditionId.DragonCheer => "DragonCheer",
-        ConditionId.Rest => "Rest",
-     ConditionId.Wish => "Wish",
-      ConditionId.IceBall => "IceBall",
-        ConditionId.Rollout => "Rollout",
-       ConditionId.Fly => "Fly",
-   ConditionId.Bounce => "Bounce",
- ConditionId.Dive => "Dive",
-        ConditionId.Dig => "Dig",
-        ConditionId.PhantomForce => "PhantomForce",
-      ConditionId.ShadowForce => "ShadowForce",
-         ConditionId.SkyDrop => "SkyDrop",
-       _ => condition.ToString()
-      };
+            ConditionId.BurningBulwark => "BurningBulwark",
+            ConditionId.QuickGuard => "QuickGuard",
+            ConditionId.WideGuard => "WideGuard",
+            ConditionId.LaserFocus => "LaserFocus",
+            ConditionId.ShedTail => "ShedTail",
+            ConditionId.DragonCheer => "DragonCheer",
+            ConditionId.Rest => "Rest",
+            ConditionId.Wish => "Wish",
+            ConditionId.IceBall => "IceBall",
+            ConditionId.Rollout => "Rollout",
+            ConditionId.Fly => "Fly",
+            ConditionId.Bounce => "Bounce",
+            ConditionId.Dive => "Dive",
+            ConditionId.Dig => "Dig",
+            ConditionId.PhantomForce => "PhantomForce",
+            ConditionId.ShadowForce => "ShadowForce",
+            ConditionId.SkyDrop => "SkyDrop",
+            _ => condition.ToString()
+        };
     }
 
- /// <summary>
+    /// <summary>
     /// Get color for condition display
     /// </summary>
     private string GetConditionColor(ConditionId condition)
     {
-     return condition switch
-    {
-    ConditionId.Stall or ConditionId.Protect or ConditionId.Detect or 
- ConditionId.MaxGuard or ConditionId.KingsShield or ConditionId.SpikyShield or
-     ConditionId.BanefulBunker or ConditionId.Obstruct or ConditionId.SilkTrap or
-      ConditionId.BurningBulwark or ConditionId.QuickGuard or ConditionId.WideGuard => "blue",
-   ConditionId.Confusion => "yellow",
-    ConditionId.Substitute or ConditionId.ShedTail => "green",
-  ConditionId.LeechSeed => "darkgreen",
-       ConditionId.ChoiceLock => "red",
-   ConditionId.HealBlock or ConditionId.Embargo => "darkred",
-ConditionId.Ingrain or ConditionId.Wish => "cyan",
-   ConditionId.FocusEnergy or ConditionId.LaserFocus or ConditionId.DragonCheer => "orange",
-       ConditionId.Tailwind or ConditionId.QuarkDrive => "yellow",
-    ConditionId.Reflect or ConditionId.LightScreen => "lightblue",
-       ConditionId.TrickRoom or ConditionId.Gravity or ConditionId.MagicRoom or ConditionId.WonderRoom => "purple",
-     _ => "grey"
-   };
+        return condition switch
+        {
+            ConditionId.Stall or ConditionId.Protect or ConditionId.Detect or
+                ConditionId.MaxGuard or ConditionId.KingsShield or ConditionId.SpikyShield or
+                ConditionId.BanefulBunker or ConditionId.Obstruct or ConditionId.SilkTrap or
+                ConditionId.BurningBulwark or ConditionId.QuickGuard
+                or ConditionId.WideGuard => "blue",
+            ConditionId.Confusion => "yellow",
+            ConditionId.Substitute or ConditionId.ShedTail => "green",
+            ConditionId.LeechSeed => "darkgreen",
+            ConditionId.ChoiceLock => "red",
+            ConditionId.HealBlock or ConditionId.Embargo => "darkred",
+            ConditionId.Ingrain or ConditionId.Wish => "cyan",
+            ConditionId.FocusEnergy or ConditionId.LaserFocus or ConditionId.DragonCheer =>
+                "orange",
+            ConditionId.Tailwind or ConditionId.QuarkDrive => "yellow",
+            ConditionId.Reflect or ConditionId.LightScreen => "lightblue",
+            ConditionId.TrickRoom or ConditionId.Gravity or ConditionId.MagicRoom
+                or ConditionId.WonderRoom => "purple",
+            _ => "grey"
+        };
     }
 
     /// <summary>
@@ -592,78 +603,78 @@ ConditionId.Ingrain or ConditionId.Wish => "cyan",
     {
         var boostStrings = new List<string>();
 
-      // Format: StatName+Value or StatName-Value
-boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
+        // Format: StatName+Value or StatName-Value
+        boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
         boostStrings.Add(FormatStatBoost("Def", boosts.Def));
-   boostStrings.Add(FormatStatBoost("SpA", boosts.SpA));
-  boostStrings.Add(FormatStatBoost("SpD", boosts.SpD));
+        boostStrings.Add(FormatStatBoost("SpA", boosts.SpA));
+        boostStrings.Add(FormatStatBoost("SpD", boosts.SpD));
         boostStrings.Add(FormatStatBoost("Spe", boosts.Spe));
-  boostStrings.Add(FormatStatBoost("Acc", boosts.Accuracy));
+        boostStrings.Add(FormatStatBoost("Acc", boosts.Accuracy));
         boostStrings.Add(FormatStatBoost("Eva", boosts.Evasion));
 
-  return string.Join(" ", boostStrings);
+        return string.Join(" ", boostStrings);
     }
 
     /// <summary>
     /// Format a single stat boost with appropriate color
     /// </summary>
- private string FormatStatBoost(string statName, int boostValue)
+    private string FormatStatBoost(string statName, int boostValue)
     {
-   string color = boostValue switch
-     {
-      > 0 => "green",
-  < 0 => "red",
-  _ => "grey"
+        string color = boostValue switch
+        {
+            > 0 => "green",
+            < 0 => "red",
+            _ => "grey"
         };
 
         string sign = boostValue switch
-{
-      > 0 => "+",
-       < 0 => "", // Negative sign is automatic
-         _ => "="
+        {
+            > 0 => "+",
+            < 0 => "", // Negative sign is automatic
+            _ => "="
         };
 
-   return $"[{color}]{statName}{sign}{boostValue}[/]";
-}
+        return $"[{color}]{statName}{sign}{boostValue}[/]";
+    }
 
     /// <summary>
     /// Get field state display showing Weather, Terrain, and PseudoWeather with durations
     /// </summary>
- private string GetFieldStateDisplay(FieldClasses.FieldPerspective fieldPerspective)
+    private string GetFieldStateDisplay(FieldClasses.FieldPerspective fieldPerspective)
     {
-      var fieldParts = new List<string>();
+        var fieldParts = new List<string>();
 
-   // Weather
-  if (fieldPerspective.Weather != ConditionId.None)
+        // Weather
+        if (fieldPerspective.Weather != ConditionId.None)
         {
             string weatherName = GetFieldConditionDisplayName(fieldPerspective.Weather);
-            string duration = fieldPerspective.WeatherDuration.HasValue 
-    ? $":{fieldPerspective.WeatherDuration}" 
-         : "";
+            string duration = fieldPerspective.WeatherDuration.HasValue
+                ? $":{fieldPerspective.WeatherDuration}"
+                : "";
             fieldParts.Add($"[yellow]{weatherName}{duration}[/]");
- }
+        }
 
         // Terrain
         if (fieldPerspective.Terrain != ConditionId.None)
         {
-      string terrainName = GetFieldConditionDisplayName(fieldPerspective.Terrain);
-          string duration = fieldPerspective.TerrainDuration.HasValue 
-     ? $":{fieldPerspective.TerrainDuration}" 
-      : "";
-       fieldParts.Add($"[green]{terrainName}{duration}[/]");
+            string terrainName = GetFieldConditionDisplayName(fieldPerspective.Terrain);
+            string duration = fieldPerspective.TerrainDuration.HasValue
+                ? $":{fieldPerspective.TerrainDuration}"
+                : "";
+            fieldParts.Add($"[green]{terrainName}{duration}[/]");
         }
 
         // PseudoWeather
-      foreach (var (conditionId, duration) in fieldPerspective.PseudoWeatherWithDuration)
+        foreach ((ConditionId conditionId, int? duration) in fieldPerspective.PseudoWeatherWithDuration)
         {
             string pwName = GetFieldConditionDisplayName(conditionId);
-   string durationText = duration.HasValue ? $":{duration}" : "";
-        fieldParts.Add($"[cyan]{pwName}{durationText}[/]");
-}
+            string durationText = duration.HasValue ? $":{duration}" : "";
+            fieldParts.Add($"[cyan]{pwName}{durationText}[/]");
+        }
 
-     return fieldParts.Count > 0 
-            ? $"Field: {string.Join(" ", fieldParts)}" 
-          : "";
+        return fieldParts.Count > 0
+            ? $"Field: {string.Join(" ", fieldParts)}"
+            : "";
     }
 
     /// <summary>
@@ -674,23 +685,23 @@ boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
         return condition switch
         {
             // Weather
-    ConditionId.SunnyDay => "Sun",
- ConditionId.RainDance => "Rain",
+            ConditionId.SunnyDay => "Sun",
+            ConditionId.RainDance => "Rain",
             ConditionId.DesolateLand => "HarshSun",
             ConditionId.PrimordialSea => "HeavyRain",
-         
-  // Terrain
+
+            // Terrain
             ConditionId.ElectricTerrain => "Electric",
-            
+
             // PseudoWeather
-ConditionId.TrickRoom => "TrickRoom",
-  ConditionId.Tailwind => "Tailwind",
+            ConditionId.TrickRoom => "TrickRoom",
+            ConditionId.Tailwind => "Tailwind",
             ConditionId.Reflect => "Reflect",
             ConditionId.LightScreen => "LightScreen",
             ConditionId.Gravity => "Gravity",
             ConditionId.MagicRoom => "MagicRoom",
-      ConditionId.WonderRoom => "WonderRoom",
-    
+            ConditionId.WonderRoom => "WonderRoom",
+
             _ => condition.ToString()
         };
     }
@@ -698,74 +709,75 @@ ConditionId.TrickRoom => "TrickRoom",
     /// <summary>
     /// Get terastallization display markup for console
     /// Shows "TERA: [Type]" if terastallized, or "Tera: [Type]" if available but not active
-  /// </summary>
-    private string GetTeraDisplay(Moves.MoveType? terastallized, Moves.MoveType teraType)
+    /// </summary>
+    private string GetTeraDisplay(MoveType? terastallized, MoveType teraType)
     {
- if (terastallized.HasValue)
-{
-    // Pokemon is currently terastallized - show in bold with color
-      return $"[bold {GetTeraTypeColor(terastallized.Value)}]TERA: {terastallized.Value.ToString().ToUpper()}[/]";
-       }
-      else
-       {
-      // Pokemon has tera available but not active - show in grey
- return $"[grey]Tera: {teraType.ToString()}[/]";
+        if (terastallized.HasValue)
+        {
+            // Pokemon is currently terastallized - show in bold with color
+            return
+                $"[bold {GetTeraTypeColor(terastallized.Value)}]TERA: {terastallized.Value.ToString().ToUpper()}[/]";
+        }
+        else
+        {
+            // Pokemon has tera available but not active - show in grey
+            return $"[grey]Tera: {teraType.ToString()}[/]";
+        }
     }
-}
 
     /// <summary>
     /// Get the console color for a tera type
     /// </summary>
-    private string GetTeraTypeColor(Moves.MoveType teraType)
+    private string GetTeraTypeColor(MoveType teraType)
     {
         return teraType switch
-  {
-        Moves.MoveType.Normal => "white",
-         Moves.MoveType.Fire => "red",
-Moves.MoveType.Water => "blue",
-    Moves.MoveType.Electric => "yellow",
-Moves.MoveType.Grass => "green",
-            Moves.MoveType.Ice => "cyan",
-     Moves.MoveType.Fighting => "darkorange",
-  Moves.MoveType.Poison => "purple",
-            Moves.MoveType.Ground => "gold3",
- Moves.MoveType.Flying => "lightblue",
-            Moves.MoveType.Psychic => "magenta",
-       Moves.MoveType.Bug => "olive",
-            Moves.MoveType.Rock => "tan",
-            Moves.MoveType.Ghost => "purple",
-  Moves.MoveType.Dragon => "blue",
-            Moves.MoveType.Dark => "grey",
-Moves.MoveType.Steel => "silver",
-    Moves.MoveType.Fairy => "pink",
-         Moves.MoveType.Stellar => "white",
-_ => "white"
+        {
+   MoveType.Normal => "white",
+            MoveType.Fire => "red",
+            MoveType.Water => "blue",
+            MoveType.Electric => "yellow",
+ MoveType.Grass => "green",
+            MoveType.Ice => "cyan",
+        MoveType.Fighting => "darkorange",
+            MoveType.Poison => "purple",
+            MoveType.Ground => "gold3",
+        MoveType.Flying => "deepskyblue1",
+            MoveType.Psychic => "magenta",
+            MoveType.Bug => "yellowgreen",
+ MoveType.Rock => "orange3",
+   MoveType.Ghost => "purple",
+            MoveType.Dragon => "blue",
+     MoveType.Dark => "grey",
+    MoveType.Steel => "grey74",
+MoveType.Fairy => "hotpink",
+    MoveType.Stellar => "white",
+            _ => "white"
         };
     }
 
-private bool IsDisabled(object? disabled)
+    private bool IsDisabled(object? disabled)
     {
-   return disabled switch
-  {
-     Utils.Unions.BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-    _ => false
-      };
+        return disabled switch
+        {
+            BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
+            _ => false
+        };
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
- public event EventHandler<Choice>? ChoiceSubmitted;
+    public event EventHandler<Choice>? ChoiceSubmitted;
 
     public Task NotifyTimeoutWarningAsync(TimeSpan remainingTime)
     {
         AnsiConsole.MarkupLine(
-$"[yellow]Warning: {remainingTime.TotalSeconds:F0} seconds remaining![/]");
-   return Task.CompletedTask;
+            $"[yellow]Warning: {remainingTime.TotalSeconds:F0} seconds remaining![/]");
+        return Task.CompletedTask;
     }
 
     public Task NotifyChoiceTimeoutAsync()
     {
         AnsiConsole.MarkupLine("[red]Time's up! Auto-selecting...[/]");
-      return Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }
 
@@ -774,6 +786,6 @@ internal static class StringExtensions
 {
     public static string Repeat(this string s, int count)
     {
-  return string.Concat(Enumerable.Repeat(s, count));
+        return string.Concat(Enumerable.Repeat(s, count));
     }
 }
