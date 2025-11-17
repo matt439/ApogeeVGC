@@ -726,45 +726,38 @@ Battle.Debug(
 
     private bool ProcessChosenTeamAction(ChosenAction action)
     {
-
-        // For team preview, the actions are already ordered by priority
-        // We just need to verify this is a valid team choice
-
-     // Handle GUI case where Pokemon is null but Index is provided
+    // Handle case where Pokemon is null but TargetLoc/Index is provided
         int slot;
         if (action.Pokemon == null)
-        {
-
-            if (!action.Index.HasValue || action.Index.Value < 0 ||
-    action.Index.Value >= Pokemon.Count)
+     {
+         // Try TargetLoc first (used by console player to specify original Pokemon index)
+            // Fall back to Index (used by older code or GUI)
+      int? pokemonIndex = action.TargetLoc ?? action.Index;
+   
+            if (!pokemonIndex.HasValue || pokemonIndex.Value < 0 || pokemonIndex.Value >= Pokemon.Count)
  {
-        return EmitChoiceError(
-            "Can't choose for Team Preview: Invalid Pokemon index specified");
+         return EmitChoiceError("Can't choose for Team Preview: Invalid Pokemon index specified");
       }
-
-            slot = action.Index.Value;
-
-      // Update the action with the Pokemon reference for proper processing
-            action = action with { Pokemon = Pokemon[slot] };
+        
+     slot = pokemonIndex.Value;
+            // Update the action with the Pokemon reference for proper processing
+         action = action with { Pokemon = Pokemon[slot] };
     }
-      else
+        else
         {
-
-       slot = action.Pokemon.Position;
-}
-
-      if (!Choice.SwitchIns.Add(slot))
-        {
-
-         return EmitChoiceError(
-    $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
-      );
+    slot = action.Pokemon.Position;
    }
 
-        Choice.Actions = [.. Choice.Actions, action];
+        if (!Choice.SwitchIns.Add(slot))
+        {
+         return EmitChoiceError(
+         $"Can't choose for Team Preview: The Pokémon in slot {slot + 1} can only switch in once"
+  );
+      }
 
+        Choice.Actions = [.. Choice.Actions, action];
         return true;
-    }
+  }
 
     private bool ProcessChosenRevivalBlessingAction(ChosenAction action)
     {

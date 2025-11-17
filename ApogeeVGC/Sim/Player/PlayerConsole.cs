@@ -207,7 +207,7 @@ public class PlayerConsole : IPlayer
         AnsiConsole.WriteLine();
     }
 
-    private string RenderHealthBar(double hpPercentage)
+    private static string RenderHealthBar(double hpPercentage)
     {
         const int barLength = 20;
         int filled = (int)(barLength * (hpPercentage / 100.0));
@@ -222,7 +222,7 @@ public class PlayerConsole : IPlayer
         return $"{bar} {hpPercentage:F1}%";
     }
 
-    private string RenderHealthBar(int hp, int maxHp)
+    private static string RenderHealthBar(int hp, int maxHp)
     {
         double percentage = (double)hp / maxHp * 100;
         return RenderHealthBar(percentage);
@@ -244,19 +244,98 @@ public class PlayerConsole : IPlayer
 
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[grey]Press Enter to use default order (1,2,3,4,5,6)[/]");
+        AnsiConsole.MarkupLine(
+            "[grey]Enter a single number (e.g., 2) to lead with that Pokemon[/]");
+        AnsiConsole.MarkupLine("[grey]Or enter custom order (e.g., 2,1,3,4,5,6)[/]");
 
-        Console.ReadLine(); // Wait for user
+        string? input = Console.ReadLine();
 
-        // Return default order
-        var actions = Enumerable.Range(0, pokemon.Count)
-            .Select((index, position) => new ChosenAction
+        // Parse custom order if provided
+        List<int> order;
+        if (!string.IsNullOrWhiteSpace(input))
+        {
+            try
             {
-                Choice = ChoiceType.Team,
-                Pokemon = null,
-                MoveId = MoveId.None,
-                Index = index,
-                Priority = -position,
-            }).ToList();
+                // Check if input contains comma (full custom order) or single number
+                if (input.Contains(','))
+                {
+                    // Parse comma-separated indices (1-based)
+                    order = input.Split(',')
+                        .Select(s => int.Parse(s.Trim()) - 1) // Convert to 0-based
+                        .ToList();
+
+                    // Validate order
+                    if (order.Count != pokemon.Count ||
+                        order.Any(i => i < 0 || i >= pokemon.Count) ||
+                        order.Distinct().Count() != order.Count)
+                    {
+                        AnsiConsole.MarkupLine(
+                            "[yellow]Invalid order, using default (1,2,3,4,5,6)[/]");
+                        order = Enumerable.Range(0, pokemon.Count).ToList();
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine(
+                            $"[green]Using order: {string.Join(",", order.Select(i => i + 1))}[/]");
+                    }
+                }
+                else
+                {
+                    // Single integer - use as lead, fill rest in ascending order
+                    int leadIndex = int.Parse(input.Trim()) - 1; // Convert to 0-based
+
+                    if (leadIndex < 0 || leadIndex >= pokemon.Count)
+                    {
+                        AnsiConsole.MarkupLine(
+                            "[yellow]Invalid Pokemon number, using default (1,2,3,4,5,6)[/]");
+                        order = Enumerable.Range(0, pokemon.Count).ToList();
+                    }
+                    else
+                    {
+                        // Start with the lead Pokemon, then add all others in ascending order
+                        order = [leadIndex];
+                        for (int i = 0; i < pokemon.Count; i++)
+                        {
+                            if (i != leadIndex)
+                            {
+                                order.Add(i);
+                            }
+                        }
+
+                        AnsiConsole.MarkupLine(
+                            $"[green]Leading with {pokemon[leadIndex].Details}, order: {string.Join(",", order.Select(i => i + 1))}[/]");
+                    }
+                }
+            }
+            catch
+            {
+                AnsiConsole.MarkupLine(
+                    "[yellow]Invalid input, using default order (1,2,3,4,5,6)[/]");
+                order = Enumerable.Range(0, pokemon.Count).ToList();
+            }
+        }
+        else
+        {
+            // Use default order
+            order = Enumerable.Range(0, pokemon.Count).ToList();
+        }
+
+        // Build actions based on the selected order
+        // order[newPosition] = originalPokemonIndex
+        // For each new position, create an action with:
+        //   - Index = newPosition (where this Pokemon will be placed in the team)
+//   - TargetLoc = originalPokemonIndex (which Pokemon from the original team to use)
+        //   - Priority = -newPosition (earlier positions have higher priority for sorting)
+        //   - Pokemon = null (will be set by ProcessChosenTeamAction using TargetLoc)
+        var actions = order.Select((originalPokemonIndex, newPosition) => new ChosenAction
+        {
+            Choice = ChoiceType.Team,
+            Pokemon = null, // Will be set by ProcessChosenTeamAction
+            MoveId = MoveId.None,
+            Index = newPosition, // The new position in the team (0, 1, 2, ...)
+            TargetLoc = originalPokemonIndex, // Which Pokemon from the original team
+            Priority = -newPosition, // Sorting priority (0, -1, -2, ... so 0 is highest)
+        }).ToList();
 
         return new Choice
         {
@@ -336,15 +415,10 @@ public class PlayerConsole : IPlayer
         PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
 
         // Display which move was selected
-        if (useTerastallize)
-        {
-            AnsiConsole.MarkupLine(
-                $"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]");
-        }
-        else
-        {
-            AnsiConsole.MarkupLine($"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
-        }
+        AnsiConsole.MarkupLine(
+            useTerastallize
+                ? $"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]"
+                : $"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
 
         AnsiConsole.WriteLine();
 
@@ -398,14 +472,9 @@ public class PlayerConsole : IPlayer
 
                     if (perspectivePokemon != null)
                     {
-                        if (perspectivePokemon.Fainted)
-                        {
-                            hpDisplay = "Fainted";
-                        }
-                        else
-                        {
-                            hpDisplay = $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
-                        }
+                        hpDisplay = perspectivePokemon.Fainted
+                            ? "Fainted"
+                            : $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
                     }
                     else
                     {
@@ -604,16 +673,17 @@ public class PlayerConsole : IPlayer
     /// </summary>
     private string GetStatBoostsDisplay(Stats.BoostsTable boosts)
     {
-        var boostStrings = new List<string>();
-
-        // Format: StatName+Value or StatName-Value
-        boostStrings.Add(FormatStatBoost("Atk", boosts.Atk));
-        boostStrings.Add(FormatStatBoost("Def", boosts.Def));
-        boostStrings.Add(FormatStatBoost("SpA", boosts.SpA));
-        boostStrings.Add(FormatStatBoost("SpD", boosts.SpD));
-        boostStrings.Add(FormatStatBoost("Spe", boosts.Spe));
-        boostStrings.Add(FormatStatBoost("Acc", boosts.Accuracy));
-        boostStrings.Add(FormatStatBoost("Eva", boosts.Evasion));
+        var boostStrings = new List<string>
+        {
+            // Format: StatName+Value or StatName-Value
+            FormatStatBoost("Atk", boosts.Atk),
+            FormatStatBoost("Def", boosts.Def),
+            FormatStatBoost("SpA", boosts.SpA),
+            FormatStatBoost("SpD", boosts.SpD),
+            FormatStatBoost("Spe", boosts.Spe),
+            FormatStatBoost("Acc", boosts.Accuracy),
+            FormatStatBoost("Eva", boosts.Evasion),
+        };
 
         return string.Join(" ", boostStrings);
     }
