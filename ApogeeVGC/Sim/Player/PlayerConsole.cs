@@ -153,7 +153,8 @@ public class PlayerConsole : IPlayer
             string boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
             string boostsLine = $"\n{boostsDisplay}";
 
-            string teraDisplay = GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
+            string teraDisplay =
+                GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
             string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
 
             opponentInfo =
@@ -176,7 +177,8 @@ public class PlayerConsole : IPlayer
             else
             {
                 string statusDisplay = GetStatusDisplay(playerActive.Status);
-                string statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
+                string statusLine =
+                    !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
 
                 string volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
                 string volatilesLine = !string.IsNullOrEmpty(volatileDisplay)
@@ -186,7 +188,8 @@ public class PlayerConsole : IPlayer
                 string boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
                 string boostsLine = $"\n{boostsDisplay}";
 
-                string teraDisplay = GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
+                string teraDisplay =
+                    GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
                 string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
 
                 playerInfo =
@@ -665,7 +668,8 @@ public class PlayerConsole : IPlayer
         }
 
         // PseudoWeather
-        foreach ((ConditionId conditionId, int? duration) in fieldPerspective.PseudoWeatherWithDuration)
+        foreach ((ConditionId conditionId, int? duration) in fieldPerspective
+                     .PseudoWeatherWithDuration)
         {
             string pwName = GetFieldConditionDisplayName(conditionId);
             string durationText = duration.HasValue ? $":{duration}" : "";
@@ -732,26 +736,25 @@ public class PlayerConsole : IPlayer
     {
         return teraType switch
         {
-   MoveType.Normal => "white",
+            MoveType.Normal => "white",
             MoveType.Fire => "red",
             MoveType.Water => "blue",
             MoveType.Electric => "yellow",
- MoveType.Grass => "green",
+            MoveType.Grass => "green",
             MoveType.Ice => "cyan",
-        MoveType.Fighting => "darkorange",
+            MoveType.Fighting => "darkorange",
             MoveType.Poison => "purple",
             MoveType.Ground => "gold3",
-        MoveType.Flying => "deepskyblue1",
+            MoveType.Flying => "deepskyblue1",
             MoveType.Psychic => "magenta",
             MoveType.Bug => "yellowgreen",
- MoveType.Rock => "orange3",
-   MoveType.Ghost => "purple",
+            MoveType.Rock => "orange3",
+            MoveType.Ghost => "purple",
             MoveType.Dragon => "blue",
-     MoveType.Dark => "grey",
-    MoveType.Steel => "grey74",
-MoveType.Fairy => "hotpink",
-    MoveType.Stellar => "white",
-            _ => "white"
+            MoveType.Dark => "grey",
+            MoveType.Steel => "grey74",
+            MoveType.Fairy => "hotpink",
+            _ => "white",
         };
     }
 
