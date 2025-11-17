@@ -1,6 +1,7 @@
 using System.Reflection;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Effects;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -138,6 +139,18 @@ internal static class EventHandlerAdapter
         if (paramType == typeof(ApogeeVGC.Sim.SideClasses.Side) || typeof(ApogeeVGC.Sim.SideClasses.Side).IsAssignableFrom(paramType))
         {
             return context.TargetSide;
+        }
+
+        // Add support for Move/ActiveMove type
+        if (paramType == typeof(ActiveMove) || typeof(ActiveMove).IsAssignableFrom(paramType))
+        {
+            return context.Move;
+        }
+
+        // Also check for base Move type
+        if (paramType == typeof(Move) || typeof(Move).IsAssignableFrom(paramType))
+        {
+            return context.Move;
         }
 
         // Check for PokemonSideFieldUnion types
