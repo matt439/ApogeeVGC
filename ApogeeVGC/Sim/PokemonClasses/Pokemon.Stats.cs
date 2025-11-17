@@ -143,7 +143,7 @@ public partial class Pokemon
         {
             speed = TrickRoomSpeedOffset - speed;
         }
-        return Battle.Trunc(speed, 13);
+        return speed;
     }
 
     public StatIdExceptHp GetBestStat(bool unboosted = false, bool unmodified = false)

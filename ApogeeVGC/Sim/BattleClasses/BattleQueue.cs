@@ -285,8 +285,8 @@ public class BattleQueue(Battle battle)
             };
         }
 
-        // Calculate action speed for queue sorting
-        Battle.GetActionSpeed(currentAction);
+        // Calculate action speed for queue sorting and get the updated action
+        currentAction = Battle.GetActionSpeed(currentAction);
 
         // Add the action to the list
         actions.Add(currentAction);

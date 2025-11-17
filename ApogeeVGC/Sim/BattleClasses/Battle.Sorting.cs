@@ -183,7 +183,7 @@ public partial class Battle
         };
     }
 
-    public void GetActionSpeed(IAction action)
+    public IAction GetActionSpeed(IAction action)
     {
         // Only process move actions for priority calculation
         if (action is MoveAction moveAction)
@@ -234,6 +234,10 @@ public partial class Battle
             {
                 moveAction.Move.Priority = priority;
             }
+
+            // Update the speed - since Speed is init-only, create a new record with updated speed
+            int actionSpeed = moveAction.Pokemon.GetActionSpeed();
+            return moveAction with { Speed = actionSpeed };
         }
 
         // Get the Pokemon's action speed (factors in speed stat, paralysis, etc.)
@@ -242,10 +246,12 @@ public partial class Battle
         {
             case SwitchAction switchAction:
                 switchAction.Speed = switchAction.Pokemon.GetActionSpeed();
-                break;
+                return switchAction;
             case PokemonAction pokemonAction:
                 pokemonAction.Speed = pokemonAction.Pokemon.GetActionSpeed();
-                break;
+                return pokemonAction;
+            default:
+                return action;
         }
     }
 

@@ -400,6 +400,9 @@ public class Field
         // Add the pseudo-weather to the dictionary
         PseudoWeather[status.Id] = state;
 
+        // Update all Pokemon speeds since pseudo-weather like Trick Room affects speed calculation
+        Battle.UpdateSpeed();
+
         // Trigger pseudo-weather change event for all handlers
         Battle.RunEvent(
             EventId.PseudoWeatherChange,
@@ -426,6 +429,10 @@ public class Field
         if (state is null) return false;
         Battle.SingleEvent(EventId.FieldEnd, status, state, this);
         PseudoWeather.Remove(status.Id);
+        
+        // Update all Pokemon speeds since removing pseudo-weather like Trick Room affects speed calculation
+        Battle.UpdateSpeed();
+        
         return true;
     }
 
