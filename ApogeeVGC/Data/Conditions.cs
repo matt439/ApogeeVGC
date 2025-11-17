@@ -617,8 +617,18 @@ public record Conditions
                 }),
                 OnFieldRestart = new OnFieldRestartEventInfo((battle, _, _, _) =>
                 {
-                    battle.Field.RemovePseudoWeather(
-                        _library.Conditions[ConditionId.TrickRoom]);
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("[TrickRoom.OnFieldRestart] Handler called!");
+                    }
+
+                    // When Trick Room is used while already active, it should end instead of restart
+                    battle.Field.RemovePseudoWeather(ConditionId.TrickRoom);
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug("[TrickRoom.OnFieldRestart] After RemovePseudoWeather call");
+                    }
                 }),
                 //OnFieldResidualOrder = 27,
                 //OnFieldResidualSubOrder = 1,

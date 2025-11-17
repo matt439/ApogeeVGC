@@ -338,79 +338,113 @@ public class Field
             source = pset.Pokemon;
         }
 
-        // Check if pseudo-weather already exists
-        if (PseudoWeather.TryGetValue(status.Id, out EffectState? existingState))
+        if (Battle.DisplayUi)
         {
-            // If the condition doesn't have a restart handler, return false
-            if (status.OnFieldRestart == null)
-            {
-                return false;
-            }
+      Battle.Debug($"[AddPseudoWeather] Called for {status.Id}, already exists: {PseudoWeather.ContainsKey(status.Id)}");
+        }
+
+     // Check if pseudo-weather already exists
+      if (PseudoWeather.TryGetValue(status.Id, out EffectState? existingState))
+        {
+            if (Battle.DisplayUi)
+ {
+     Battle.Debug($"[AddPseudoWeather] {status.Id} already exists, has restart handler: {status.OnFieldRestart != null}");
+      }
+
+       // If the condition doesn't have a restart handler, return false
+    if (status.OnFieldRestart == null)
+       {
+ return false;
+          }
+
+    if (Battle.DisplayUi)
+      {
+           Battle.Debug($"[AddPseudoWeather] Calling OnFieldRestart for {status.Id}");
+        }
 
             // Try to restart the pseudo-weather
-            Battle.SingleEvent(
-                EventId.FieldRestart,
-                status,
-                existingState,
-                this,
-                SingleEventSource.FromNullablePokemon(source),
-                sourceEffect
-            );
+  Battle.SingleEvent(
+     EventId.FieldRestart,
+       status,
+ existingState,
+   this,
+     SingleEventSource.FromNullablePokemon(source),
+     sourceEffect
+   );
+        
+    if (Battle.DisplayUi)
+            {
+        Battle.Debug($"[AddPseudoWeather] After OnFieldRestart, {status.Id} still exists: {PseudoWeather.ContainsKey(status.Id)}");
+            }
+
+            // Check if the restart handler removed the pseudo-weather (like Trick Room does)
+            // If it was removed, the move succeeded in ending the effect
+  // If it still exists, the move succeeded in restarting it
             return true;
+        }
+
+        if (Battle.DisplayUi)
+        {
+            Battle.Debug($"[AddPseudoWeather] {status.Id} doesn't exist, creating new");
         }
 
         // Initialize new pseudo-weather state
         EffectState state = Battle.InitEffectState(
-            status.EffectStateId,
-            source,
-            source?.GetSlot(),
+         status.EffectStateId,
+       source,
+    source?.GetSlot(),
             status.Duration ?? 0
-        );
+ );
 
         // If the condition has a custom duration callback, use it
-        if (status.DurationCallback != null)
+  if (status.DurationCallback != null)
         {
-            if (source == null)
+ if (source == null)
             {
-                throw new InvalidOperationException("Setting pseudo-weather without a source");
+       throw new InvalidOperationException("Setting pseudo-weather without a source");
             }
 
             var durationHandler =
-                (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback
-                    .GetDelegateOrThrow();
-            state.Duration = durationHandler(Battle, source, source, sourceEffect);
-        }
+         (Func<Battle, Pokemon, Pokemon, IEffect?, int>)status.DurationCallback
+      .GetDelegateOrThrow();
+       state.Duration = durationHandler(Battle, source, source, sourceEffect);
+ }
 
         // Try to start the pseudo-weather
         RelayVar? startResult = Battle.SingleEvent(
-            EventId.FieldStart,
-            status,
+  EventId.FieldStart,
+      status,
             state,
             this,
-            SingleEventSource.FromNullablePokemon(source),
+SingleEventSource.FromNullablePokemon(source),
             sourceEffect
-        );
+  );
 
-        // If the start event failed, don't add the pseudo-weather
+    // If the start event failed, don't add the pseudo-weather
         if (startResult is BoolRelayVar { Value: false })
         {
-            return false;
+        return false;
         }
 
-        // Add the pseudo-weather to the dictionary
+// Add the pseudo-weather to the dictionary
         PseudoWeather[status.Id] = state;
 
+        if (Battle.DisplayUi)
+    {
+            Battle.Debug($"[AddPseudoWeather] Added {status.Id} with duration {state.Duration}");
+  }
+
         // Update all Pokemon speeds since pseudo-weather like Trick Room affects speed calculation
-        Battle.UpdateSpeed();
+     Battle.UpdateSpeed();
 
         // Trigger pseudo-weather change event for all handlers
         Battle.RunEvent(
-            EventId.PseudoWeatherChange,
-            RunEventTarget.FromNullablePokemon(source),
+  EventId.PseudoWeatherChange,
+       RunEventTarget.FromNullablePokemon(source),
             RunEventSource.FromNullablePokemon(source),
-            status);
+     status);
 
-        return true;
+      return true;
     }
 
     public Condition? GetPseudoWeather(ConditionId status)
@@ -425,15 +459,31 @@ public class Field
 
     public bool RemovePseudoWeather(Condition status)
     {
-        PseudoWeather.TryGetValue(status.Id, out EffectState? state);
-        if (state is null) return false;
+       if (Battle.DisplayUi)
+        {
+    Battle.Debug($"[RemovePseudoWeather] Called for {status.Id}, exists: {PseudoWeather.ContainsKey(status.Id)}");
+       }
+
+PseudoWeather.TryGetValue(status.Id, out EffectState? state);
+     if (state is null) return false;
+
+   if (Battle.DisplayUi)
+        {
+    Battle.Debug($"[RemovePseudoWeather] Calling OnFieldEnd for {status.Id}");
+  }
+
         Battle.SingleEvent(EventId.FieldEnd, status, state, this);
         PseudoWeather.Remove(status.Id);
+     
+  if (Battle.DisplayUi)
+     {
+Battle.Debug($"[RemovePseudoWeather] Removed {status.Id}, still exists: {PseudoWeather.ContainsKey(status.Id)}");
+        }
+
+     // Update all Pokemon speeds since removing pseudo-weather like Trick Room affects speed calculation
+     Battle.UpdateSpeed();
         
-        // Update all Pokemon speeds since removing pseudo-weather like Trick Room affects speed calculation
-        Battle.UpdateSpeed();
-        
-        return true;
+   return true;
     }
 
     public bool RemovePseudoWeather(ConditionId status)

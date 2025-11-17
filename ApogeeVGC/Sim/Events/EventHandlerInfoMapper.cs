@@ -112,6 +112,18 @@ public static class EventHandlerInfoMapper
                 [EventId.Weather] = e => e.OnWeather,
                 [EventId.WeatherChange] = e => e.OnWeatherChange,
                 [EventId.WeatherModifyDamage] = e => e.OnWeatherModifyDamage,
+
+                // Field event handlers
+                [EventId.FieldStart] = e => e is IFieldEventMethods f ? f.OnFieldStart : null,
+                [EventId.FieldRestart] = e => e is IFieldEventMethods f ? f.OnFieldRestart : null,
+                [EventId.FieldResidual] = e => e is IFieldEventMethods f ? f.OnFieldResidual : null,
+                [EventId.FieldEnd] = e => e is IFieldEventMethods f ? f.OnFieldEnd : null,
+
+                // Side event handlers
+                [EventId.SideStart] = e => e is ISideEventMethods s ? s.OnSideStart : null,
+                [EventId.SideRestart] = e => e is ISideEventMethods s ? s.OnSideRestart : null,
+                [EventId.SideResidual] = e => e is ISideEventMethods s ? s.OnSideResidual : null,
+                [EventId.SideEnd] = e => e is ISideEventMethods s ? s.OnSideEnd : null,
             }.ToFrozenDictionary();
 
     /// <summary>

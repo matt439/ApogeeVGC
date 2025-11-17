@@ -115,11 +115,29 @@ internal static class EventHandlerAdapter
             return context.TargetSide;
         }
 
+        // Add support for Field parameters
+        if (paramName.Contains("field"))
+        {
+            return context.TargetField;
+        }
+
         // Match by type
         if (paramType == typeof(Pokemon) || typeof(Pokemon).IsAssignableFrom(paramType))
         {
             // Prefer target over source if ambiguous
             return context.TargetPokemon ?? context.SourcePokemon;
+        }
+
+        // Add support for Field type
+        if (paramType == typeof(ApogeeVGC.Sim.FieldClasses.Field) || typeof(ApogeeVGC.Sim.FieldClasses.Field).IsAssignableFrom(paramType))
+        {
+            return context.TargetField;
+        }
+
+        // Add support for Side type
+        if (paramType == typeof(ApogeeVGC.Sim.SideClasses.Side) || typeof(ApogeeVGC.Sim.SideClasses.Side).IsAssignableFrom(paramType))
+        {
+            return context.TargetSide;
         }
 
         // Check for PokemonSideFieldUnion types
