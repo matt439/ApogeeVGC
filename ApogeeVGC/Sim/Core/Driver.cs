@@ -43,7 +43,7 @@ public class Driver
 
     private void RunConsoleVsRandomSinglesTest()
     {
-        const bool debug = true;
+        const bool debug = false;
 
         PlayerOptions player1Options = new()
         {
