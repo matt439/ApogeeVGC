@@ -37,17 +37,30 @@ public partial class Battle
         // instead of having a separate Start event
         // This matches the behavior in pokemon-showdown where getCallback has special logic:
         // callback === undefined && target instanceof Pokemon && this.gen >= 5 && 
-        // callbackName === 'onSwitchIn' && !('Ability' | 'Item').includes(effect.effectType)
+        // callbackName === 'onSwitchIn' && !(effect as any).onAnySwitchIn &&
+        // (['Ability', 'Item'].includes(effect.effectType) || innate ability/item check)
         if (handlerInfo is null &&
-            target is PokemonRunEventTarget &&
+            target is PokemonRunEventTarget pokemonTarget &&
             Gen >= 5 &&
             callbackName == EventId.SwitchIn &&
             prefix == EventPrefix.None &&
-            effect.GetEventHandlerInfo(EventId.AnySwitchIn) ==
-            null && // Check onAnySwitchIn doesn't exist
+            suffix == EventSuffix.None &&
+            effect.GetEventHandlerInfo(EventId.AnySwitchIn, null, null) == null && // Check onAnySwitchIn doesn't exist
             (IsAbilityOrItem(effect) || IsInnateAbilityOrItem(effect)))
         {
-            handlerInfo = effect.GetEventHandlerInfo(EventId.Start);
+            // Use onStart handler for the SwitchIn event
+            EventHandlerInfo? startHandler = effect.GetEventHandlerInfo(EventId.Start, null, null);
+            if (startHandler != null)
+            {
+                // Create a modified handler with SwitchIn as the event ID
+                // This ensures the handler is properly invoked during the SwitchIn event
+                handlerInfo = startHandler with { Id = EventId.SwitchIn };
+                
+                if (DisplayUi)
+                {
+                    Debug($"[GetHandlerInfo] Using OnStart for SwitchIn event: {effect.Name} (Type: {effect.EffectType}) for Pokemon");
+                }
+            }
         }
 
         return handlerInfo;
@@ -334,6 +347,10 @@ End = customHolder == null
 
     // Check ability
     handlerInfo = GetHandlerInfo(pokemon, ability, callbackName, prefix);
+    if (DisplayUi && callbackName == EventId.SwitchIn)
+    {
+        Debug($"[FindPokemonEventHandlers] {pokemon.Name} | Ability: {ability.Name} | Event: {callbackName} | Handler: {(handlerInfo != null ? "FOUND" : "NOT FOUND")}");
+    }
   if (handlerInfo != null || (getKey != null && abilityState.GetProperty(getKey) != null))
         {
 yield return ResolvePriority(new EventListenerWithoutPriority

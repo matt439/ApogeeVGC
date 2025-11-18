@@ -82,14 +82,20 @@ public record Abilities
                 Rating = 4.5,
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
-                    if (!battle.Field.SetTerrain(
-                            _library.Conditions[ConditionId.ElectricTerrain]) &&
+                    battle.Debug($"[HadronEngine.OnStart] HANDLER EXECUTING for {pokemon.Name}");
+                    
+                    bool terrainSet = battle.Field.SetTerrain(
+                        _library.Conditions[ConditionId.ElectricTerrain]);
+                    
+                    battle.Debug($"[HadronEngine.OnStart] SetTerrain returned: {terrainSet}");
+                    battle.Debug($"[HadronEngine.OnStart] Current terrain: {battle.Field.Terrain}");
+                    
+                    if (!terrainSet &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
+                        battle.Debug($"[HadronEngine.OnStart] Terrain already Electric, showing activate");
                         if (battle.DisplayUi)
                         {
-                            //UiGenerator.PrintActivateEvent(pokemon, _library.Abilities[pokemon.Ability]);
-
                             battle.Add("-activate", pokemon, "ability: Hadron Engine");
                         }
                     }

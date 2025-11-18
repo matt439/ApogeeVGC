@@ -18,7 +18,11 @@ public partial class Battle
         IEffect? sourceEffect = null,
         RelayVar? relayVar = null, EffectDelegate? customCallback = null)
     {
-        // Debug logging for event entry - commented out for reduced verbosity
+        // Debug logging for event entry
+        if (DisplayUi && eventId == EventId.SwitchIn)
+        {
+            Debug($"[SingleEvent] ENTRY: eventId={eventId}, effect={effect.Name}, effectType={effect.EffectType}");
+        }
         
         // Check for stack overflow
         if (EventDepth >= 8)
@@ -107,9 +111,15 @@ Pokemon targetPokemon = pokemonTarget.Pokemon;
 
         // Get the handler - either custom callback or from the effect's EventHandlerInfo
         EventHandlerInfo? handlerInfo = effect.GetEventHandlerInfo(eventId);
+        
+        if (DisplayUi && eventId == EventId.SwitchIn)
+        {
+            Debug($"[SingleEvent] handlerInfo for {effect.Name}: {(handlerInfo != null ? $"FOUND (Id={handlerInfo.Id})" : "NULL")}");
+        }
+        
         if (handlerInfo == null)
         {
-       return relayVar;
+            return relayVar;
         }
 
         // Save parent context
@@ -129,22 +139,30 @@ Id = eventId,
         };
   EventDepth++;
 
-  // Invoke the handler with appropriate parameters
-   RelayVar? returnVal;
+        // Invoke the handler with appropriate parameters
+        RelayVar? returnVal;
         try
         {
-         returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
-     source, sourceEffect);
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[SingleEvent] About to invoke handler for {effect.Name}, handlerInfo.Id={handlerInfo.Id}");
+            }
+            
+            returnVal = InvokeEventHandlerInfo(handlerInfo, hasRelayVar, relayVar, target,
+                source, sourceEffect);
 
-          // Debug logging for return value - commented out for reduced verbosity
-  }
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[SingleEvent] Handler invoked for {effect.Name}, returnVal={(returnVal != null ? returnVal.GetType().Name : "null")}");
+            }
+        }
         finally
-     {
+        {
             // Restore parent context
-   EventDepth--;
-    Effect = parentEffect;
-   EffectState = parentEffectState;
-        Event = parentEvent;
+            EventDepth--;
+            Effect = parentEffect;
+            EffectState = parentEffectState;
+            Event = parentEvent;
         }
 
         return returnVal ?? relayVar;
@@ -523,10 +541,13 @@ _ => null,
     public void FieldEvent(EventId eventId, List<Pokemon>? targets = null)
     {
         // Debug logging for event entry
-        // string targetsStr = targets != null
-        //  ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
-      //     : "all";
-        // Debug($"[FieldEvent] {eventId} | Targets: {targetsStr}");
+        if (DisplayUi && eventId == EventId.SwitchIn)
+        {
+            string targetsStr = targets != null
+                ? $"[{string.Join(", ", targets.Select(p => p.Name))}]"
+                : "all";
+            Debug($"[FieldEvent] ENTRY: {eventId} | Targets: {targetsStr}");
+        }
 
         // if (eventId == EventId.Residual)
         // {
@@ -588,10 +609,13 @@ _ => null,
         }
 
         // Sort handlers by speed order
- SpeedSort(handlers);
+        SpeedSort(handlers);
 
         // Debug logging for handler count
-  // Debug($"[FieldEvent] {eventId}: Processing {handlers.Count} handlers");
+        if (DisplayUi && eventId == EventId.SwitchIn)
+        {
+            Debug($"[FieldEvent] {eventId}: Found {handlers.Count} handlers to process");
+        }
 // if (eventId == EventId.Residual && handlers.Count is > 0 and <= 10)
         // {
         //     foreach (EventListener h in handlers.Take(10))
@@ -609,15 +633,20 @@ _ => null,
         //     }
         // }
 
-    // Execute each handler in order
- int handlerIndex = 0;
-  while (handlers.Count > 0)
+        // Execute each handler in order
+        int handlerIndex = 0;
+        while (handlers.Count > 0)
         {
             EventListener handler = handlers[0];
             handlers.RemoveAt(0);
- handlerIndex++;
+            handlerIndex++;
 
-      IEffect effect = handler.Effect;
+            IEffect effect = handler.Effect;
+            
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] Processing handler {handlerIndex}: {effect.Name} ({effect.EffectType})");
+            }
 
           // Debug($"[FieldEvent] Loop iteration {handlerIndex}: Processing {effect.Name}");
 
@@ -631,50 +660,73 @@ _ => null,
             // Debug(
          //     $"[FieldEvent] {eventId}: Handler {handlerIndex}/{handlerIndex + handlers.Count} - {effect.Name} ({effect.EffectType}) on {holderName}");
 
-  // Skip fainted Pokemon unless this is a slot condition
+            // Skip fainted Pokemon unless this is a slot condition
             if (handler.EffectHolder is PokemonEffectHolder { Pokemon.Fainted: true })
-      {
-           if (handler.State?.IsSlotCondition != true)
+            {
+                if (handler.State?.IsSlotCondition != true)
                 {
-  // Debug($"[FieldEvent] {eventId}: Skipping {effect.Name} (Pokemon fainted)");
-
-          continue;
+                    if (DisplayUi && eventId == EventId.SwitchIn)
+                    {
+                        Debug($"[FieldEvent] Skipping {effect.Name} (Pokemon fainted)");
+                    }
+                    continue;
+                }
             }
+            
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
             }
 
         // Debug($"[FieldEvent] {effect.Name}: Passed fainted check");
 
-   // Handle duration tracking for Residual events
+            // Handle duration tracking for Residual events
             if (eventId == EventId.Residual &&
                 handler is { End: not null, State.Duration: not null })
             {
-       handler.State.Duration--;
+                handler.State.Duration--;
 
-        // Debug(
-       // $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
+                // Debug(
+                // $"[FieldEvent] {eventId}: {effect.Name} duration decremented to {handler.State.Duration}");
 
-      if (handler.State.Duration <= 0)
-        {
-          // Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
+                if (handler.State.Duration <= 0)
+                {
+                    // Debug($"[FieldEvent] {eventId}: {effect.Name} expired, calling end callback");
 
-          // Effect has expired, trigger its end callback
-    // Use provided EndCallArgs or empty array for no args
-   object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
+                    // Effect has expired, trigger its end callback
+                    // Use provided EndCallArgs or empty array for no args
+                    object?[] endCallArgs = handler.EndCallArgs?.ToArray() ?? [];
 
-         // Invoke the end callback
-          Delegate? endDelegate = handler.End.GetDelegate();
-             endDelegate?.DynamicInvoke(endCallArgs);
+                    // Invoke the end callback
+                    Delegate? endDelegate = handler.End.GetDelegate();
+                    endDelegate?.DynamicInvoke(endCallArgs);
 
-   if (Ended) return;
-            continue;
-           }
-  }
+                    if (Ended) return;
+                    continue;
+                }
+            }
+            
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] {effect.Name}: Passed duration check");
+                Debug($"[FieldEvent] {effect.Name}: handler.State is {(handler.State != null ? "NOT NULL" : "NULL")}");
+                if (handler.State != null)
+                {
+                    Debug($"[FieldEvent] {effect.Name}: handler.State.Target is {(handler.State.Target != null ? "NOT NULL" : "NULL")}");
+                }
+            }
 
-  // Debug($"[FieldEvent] {effect.Name}: Passed duration check");
+            // Debug($"[FieldEvent] {effect.Name}: Passed duration check");
 
             // Verify the effect hasn't been removed by a prior handler
             // (e.g., Toxic Spikes being absorbed during a double switch)
-            if (handler.State?.Target != null)
+            //
+            // Skip verification for abilities and items on SwitchIn events, since these are
+            // triggered via their OnStart handlers and the state references may not match yet
+            bool skipVerification = eventId == EventId.SwitchIn &&
+                                   effect.EffectType is EffectType.Ability or EffectType.Item;
+            
+            if (!skipVerification && handler.State?.Target != null)
             {
                 EffectState? expectedStateLocation = null;
 
@@ -688,6 +740,11 @@ _ => null,
                         { EffectType: EffectType.Ability, EffectStateId: not AbilityEffectStateId })
                     {
                         expectedStateLocation = pokemon.AbilityState;
+                        
+                        if (DisplayUi && eventId == EventId.SwitchIn)
+                        {
+                            Debug($"[FieldEvent] {effect.Name}: Ability state check - expectedStateLocation == handler.State? {ReferenceEquals(expectedStateLocation, handler.State)}");
+                        }
                     }
                     // Check if this is an item state (not starting with "item:" prefix means it's the main item)
                     else if (effect.EffectType == EffectType.Item)
@@ -762,7 +819,12 @@ _ => null,
      }
      }
 
-    // Determine the appropriate event ID based on the effect holder type
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] {effect.Name}: Passed effect verification check");
+            }
+            
+            // Determine the appropriate event ID based on the effect holder type
             EventId handlerEventId = eventId;
             if (handler.EffectHolder is SideEffectHolder)
             {
@@ -772,8 +834,18 @@ _ => null,
             {
                 handlerEventId = GetFieldEventId(eventId);
             }
+            
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] {effect.Name}: Determined handlerEventId={handlerEventId}");
+            }
 
             // Execute the handler's callback
+            if (DisplayUi && eventId == EventId.SwitchIn)
+            {
+                Debug($"[FieldEvent] handler.HandlerInfo is {(handler.HandlerInfo != null ? "NOT NULL" : "NULL")} for {effect.Name}");
+            }
+            
             if (handler.HandlerInfo != null)
             {
                 SingleEventTarget? singleEventTarget = handler.EffectHolder switch
@@ -786,14 +858,53 @@ _ => null,
                     _ => null,
                 };
 
-                Debug(
-                    $"[FieldEvent] About to call SingleEvent for {effect.Name}, handlerEventId={handlerEventId}");
+                if (DisplayUi)
+                {
+                    Debug(
+                        $"[FieldEvent] About to invoke handler for {effect.Name}, handlerEventId={handlerEventId}, handler.HandlerInfo.Id={handler.HandlerInfo.Id}");
+                }
 
-      SingleEvent(handlerEventId, effect, handler.State, singleEventTarget);
-      // customCallback is null, will use effect's EventHandlerInfo
+                // Save parent context
+                IEffect parentEffect = Effect;
+                EffectState parentEffectState = EffectState;
+                Event parentEvent = Event;
 
-             // Debug($"[FieldEvent] SingleEvent returned for {effect.Name}");
-   }
+                // Set up new event context
+                Effect = effect;
+                EffectState = handler.State ?? InitEffectState();
+                Event = new Event
+                {
+                    Id = handlerEventId,
+                    Target = singleEventTarget,
+                    Source = null,
+                    Effect = null,
+                };
+                EventDepth++;
+
+                // Invoke the handler directly
+                RelayVar? returnVal;
+                try
+                {
+                    returnVal = InvokeEventHandlerInfo(handler.HandlerInfo, false, new BoolRelayVar(true), singleEventTarget, null, null);
+                    
+                    if (DisplayUi)
+                    {
+                        Debug($"[FieldEvent] Handler invoked for {effect.Name}, returnVal={(returnVal != null ? returnVal.GetType().Name : "null")}");
+                    }
+                }
+                finally
+                {
+                    // Restore parent context
+                    EventDepth--;
+                    Effect = parentEffect;
+                    EffectState = parentEffectState;
+                    Event = parentEvent;
+                }
+            }
+            else if (DisplayUi)
+            {
+                Debug($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
+            }
         // else Debug($"[FieldEvent] Handler.HandlerInfo is NULL for {effect.Name}");
 
           // Process any faint messages and check if battle has ended
