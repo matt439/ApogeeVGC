@@ -329,6 +329,8 @@ if (tryResult is BoolRelayVar { Value: false } ||
                 targets[i] = PokemonFalseUnion.FromFalse();
             }
 
+            // TypeScript: if (targets[i] && isSecondary && !moveData.self)
+            // Skip damage calculation for secondary effects that don't have self-targeting
             if (targets[i] is PokemonPokemonUnion && isSecondary && move.Self == null)
             {
                 damage[i] = BoolIntUndefinedUnion.FromBool(true);
@@ -488,44 +490,49 @@ if (tryResult is BoolRelayVar { Value: false } ||
             Battle.ActiveTarget = target;
             damage[i] = BoolIntUndefinedUnion.FromUndefined();
 
-            IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
-
-            // getDamage has several possible return values:
-            //
-            //   a number:
-            //     means that much damage is dealt (0 damage still counts as dealing
-            //     damage for the purposes of things like Static)
-            //   false:
-            //     gives error message: "But it failed!" and move ends
-            //   null:
-            //     the move ends, with no message (usually, a custom fail message
-            //     was already output by an event handler)
-            //   undefined:
-            //     means no damage is dealt and the move continues
-            //
-            // basically, these values have the same meanings as they do for event
-            // handlers.
-
-            switch (curDamage)
+            // Skip damage calculation for self-targeting effects
+            // This matches TypeScript behavior and prevents infinite recursion
+            if (!isSelf)
             {
-                case FalseIntUndefinedFalseUnion or null:
-                    {
-                        if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
-                        {
-                            if (Battle.DisplayUi)
-                            {
-                                Battle.Add("-fail", source);
-                                Battle.AttrLastMove("[still]");
-                            }
-                        }
+                IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
 
-                        Battle.Debug("damage calculation interrupted");
-                        damage[i] = BoolIntUndefinedUnion.FromBool(false);
-                        continue;
-                    }
-                case IntIntUndefinedFalseUnion intDamage:
-                    damage[i] = BoolIntUndefinedUnion.FromInt(intDamage.Value);
-                    break;
+                // getDamage has several possible return values:
+                //
+                //   a number:
+                //     means that much damage is dealt (0 damage still counts as dealing
+                //     damage for the purposes of things like Static)
+                //   false:
+                //     gives error message: "But it failed!" and move ends
+                //   null:
+                //     the move ends, with no message (usually, a custom fail message
+                //     was already output by an event handler)
+                //   undefined:
+                //     means no damage is dealt and the move continues
+                //
+                // basically, these values have the same meanings as they do for event
+                // handlers.
+
+                switch (curDamage)
+                {
+                    case FalseIntUndefinedFalseUnion or null:
+                        {
+                            if (damage[i] is BoolBoolIntUndefinedUnion { Value: false } && !isSecondary && !isSelf)
+                            {
+                                if (Battle.DisplayUi)
+                                {
+                                    Battle.Add("-fail", source);
+                                    Battle.AttrLastMove("[still]");
+                                }
+                            }
+
+                            Battle.Debug("damage calculation interrupted");
+                            damage[i] = BoolIntUndefinedUnion.FromBool(false);
+                            continue;
+                        }
+                    case IntIntUndefinedFalseUnion intDamage:
+                        damage[i] = BoolIntUndefinedUnion.FromInt(intDamage.Value);
+                        break;
+                }
             }
         }
 

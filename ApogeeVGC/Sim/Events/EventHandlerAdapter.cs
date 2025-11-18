@@ -88,6 +88,14 @@ internal static class EventHandlerAdapter
             {
                 return unwrapped;
             }
+            
+            // Check for Effect unwrapping from EffectRelayVar
+            // This handles cases like TryAddVolatile where a Condition is passed as RelayVar
+            if (context.RelayVar is EffectRelayVar effectRelayVar && 
+                paramType.IsAssignableFrom(effectRelayVar.Effect.GetType()))
+            {
+                return effectRelayVar.Effect;
+            }
         }
 
         // Match by parameter name

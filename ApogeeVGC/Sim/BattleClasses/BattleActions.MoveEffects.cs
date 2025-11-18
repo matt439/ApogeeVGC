@@ -298,6 +298,7 @@ public partial class BattleActions
                     int secondaryRoll = Battle.Random(100);
                     if (moveData.Self.Chance == null || secondaryRoll < moveData.Self.Chance)
                     {
+                        // isSelf=true prevents damage calculation (matching TypeScript behavior)
                         MoveHit(source, source, move, moveData.Self, isSecondary, true);
                     }
                     if (move.MultiHit == null)
@@ -307,6 +308,7 @@ public partial class BattleActions
                 }
                 else
                 {
+                    // isSelf=true prevents damage calculation (matching TypeScript behavior)
                     MoveHit(source, source, move, moveData.Self, isSecondary, true);
                 }
             }
