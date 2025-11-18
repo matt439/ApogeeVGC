@@ -16,7 +16,15 @@ public partial class Pokemon
         // Initial HP check
         if (Hp <= 0) return false;
 
-        Condition status = Battle.Library.Conditions[statusId];
+        // Defensive check: ensure the status exists in the dictionary
+        if (!Battle.Library.Conditions.TryGetValue(statusId, out Condition? status))
+        {
+            throw new InvalidOperationException(
+                $"Condition '{statusId}' not found in Battle.Library.Conditions dictionary. " +
+                $"Pokemon: {Name}, Battle has {Battle.Library.Conditions.Count} conditions. " +
+                $"Available conditions: {string.Join(", ", Battle.Library.Conditions.Keys)}"
+            );
+        }
 
         // Resolve source and sourceEffect from battle event if not provided
         if (Battle.Event is not null)
@@ -36,6 +44,14 @@ public partial class Pokemon
             {
                 if (Battle.DisplayUi)
                 {
+                    // Defensive check before accessing the dictionary
+                    if (!Battle.Library.Conditions.ContainsKey(Status))
+                    {
+                        throw new InvalidOperationException(
+                            $"Pokemon {Name} has Status={Status} which is not in the Conditions dictionary. " +
+                            $"Dictionary has {Battle.Library.Conditions.Count} entries: {string.Join(", ", Battle.Library.Conditions.Keys)}"
+                        );
+                    }
                     Battle.Add("-fail", this, Battle.Library.Conditions[Status]);
                 }
             }
@@ -130,9 +146,8 @@ public partial class Pokemon
                 _ => true, // Non-boolean RelayVar types are treated as success
             };
 
-            // Debug: Check volatile state after OnStart
-            Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: Status={status}, Counter={StatusState.Counter}, Duration={StatusState.Duration}");
-            Battle.Debug($"[AddVolatile.AfterOnStart] {Name}: volatileState is same reference as Volatiles[{status}]? {ReferenceEquals(StatusState, Volatiles[status.Id])}");
+            // Debug: Check status state after OnStart
+            Battle.Debug($"[SetStatus.AfterOnStart] {Name}: Status={status.Id}, Counter={StatusState.Counter}, Duration={StatusState.Duration}");
 
             // BUGFIX: Ensure Counter is initialized for Stall condition
             // OnStart should set it to 3, but if it didn't, set it here as a failsafe
@@ -205,7 +220,7 @@ public partial class Pokemon
 
     public bool TrySetStatus(ConditionId status, Pokemon? source = null, IEffect? sourceEffect = null)
     {
-        return SetStatus(Status == ConditionId.None ? status : ConditionId.None, source, sourceEffect);
+        return SetStatus(Status == ConditionId.None ? status : Status, source, sourceEffect);
     }
 
     public bool CureStatus(bool silent = false)
