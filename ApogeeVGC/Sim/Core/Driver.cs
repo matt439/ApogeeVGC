@@ -205,11 +205,6 @@ public class Driver
         Console.WriteLine("[Driver] Starting Random vs Random Singles Evaluation Test");
         Console.WriteLine($"[Driver] Running {RandomEvaluationNumTest} battles with {NumThreads} threads");
 
-        RunRandomVsRandomEvaluationTestAsync().Wait();
-    }
-
-    private async Task RunRandomVsRandomEvaluationTestAsync()
-    {
         const bool debug = false;
 
         var simResults = new ConcurrentBag<SimulatorResult>();
@@ -218,61 +213,51 @@ public class Driver
         int seedCounter = 0;
         var turnOnBattleEnd = new ConcurrentBag<int>();
 
-        using var semaphore = new SemaphoreSlim(NumThreads, NumThreads);
+        // Run simulations in parallel with specified number of threads
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = NumThreads
+        };
 
-        // Create tasks for each simulation with concurrency control
-        var tasks = Enumerable.Range(0, RandomEvaluationNumTest)
-            .Select(async _ =>
+        Parallel.For(0, RandomEvaluationNumTest, parallelOptions, _ =>
+        {
+            int currentSeed = Interlocked.Increment(ref seedCounter);
+            int player1Seed = PlayerRandom1Seed + currentSeed;
+            int player2Seed = PlayerRandom2Seed + currentSeed;
+
+            PlayerOptions player1Options = new()
             {
-                await semaphore.WaitAsync(); // Wait for available slot
-                try
-                {
-                    int currentSeed = Interlocked.Increment(ref seedCounter);
-                    int player1Seed = PlayerRandom1Seed + currentSeed;
-                    int player2Seed = PlayerRandom2Seed + currentSeed;
+                Type = Player.PlayerType.Random,
+                Name = "Random 1",
+                Team = TeamGenerator.GenerateTestTeam(Library),
+                Seed = new PrngSeed(player1Seed),
+                PrintDebug = debug,
+            };
 
-                    PlayerOptions player1Options = new()
-                    {
-                        Type = Player.PlayerType.Random,
-                        Name = "Random 1",
-                        Team = TeamGenerator.GenerateTestTeam(Library),
-                        Seed = new PrngSeed(player1Seed),
-                        PrintDebug = debug,
-                    };
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random 2",
+                Team = TeamGenerator.GenerateTestTeam(Library),
+                Seed = new PrngSeed(player2Seed),
+                PrintDebug = debug,
+            };
 
-                    PlayerOptions player2Options = new()
-                    {
-                        Type = Player.PlayerType.Random,
-                        Name = "Random 2",
-                        Team = TeamGenerator.GenerateTestTeam(Library),
-                        Seed = new PrngSeed(player2Seed),
-                        PrintDebug = debug,
-                    };
+            BattleOptions battleOptions = new()
+            {
+                Id = FormatId.CustomSingles,
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true, // Use synchronous mode for evaluation
+                Seed = new PrngSeed(currentSeed),
+            };
 
-                    BattleOptions battleOptions = new()
-                    {
-                        Id = FormatId.CustomSingles,
-                        Player1Options = player1Options,
-                        Player2Options = player2Options,
-                        Debug = debug,
-                        Sync = true, // Use synchronous mode for evaluation
-                        Seed = new PrngSeed(currentSeed),
-                    };
-
-                    var simulator = new SyncSimulator();
-                    SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
-                    simResults.Add(result);
-                    turnOnBattleEnd.Add(simulator.Battle?.Turn ?? 0);
-                }
-                finally
-                {
-                    semaphore.Release(); // Release the slot
-                }
-            })
-            .ToArray();
-
-        // Wait for all simulations to complete
-        await Task.WhenAll(tasks);
+            var simulator = new SyncSimulator();
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+            simResults.Add(result);
+            turnOnBattleEnd.Add(simulator.Battle?.Turn ?? 0);
+        });
 
         stopwatch.Stop();
 
