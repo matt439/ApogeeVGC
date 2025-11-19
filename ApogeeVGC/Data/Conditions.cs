@@ -1139,6 +1139,12 @@ public record Conditions
             {
                 Id = ConditionId.StruggleRecoil,
             },
+            [ConditionId.Recoil] = new()
+            {
+                Id = ConditionId.Recoil,
+                Name = "Recoil",
+                EffectType = EffectType.Condition,
+            },
         };
     }
 }

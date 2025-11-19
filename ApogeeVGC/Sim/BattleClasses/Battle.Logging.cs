@@ -308,6 +308,9 @@ public partial class Battle
         // Get the effect name, converting "tox" to "psn" for display
         string? effectName = effect?.FullName == "tox" ? "psn" : effect?.FullName;
 
+        // Add damage amount tag for parser
+        string damageTag = $"[dmg]{damageAmount}";
+
         switch (effect?.Id)
         {
             case ConditionId.PartiallyTrapped:
@@ -317,38 +320,38 @@ public partial class Battle
                     ptState.SourceEffect != null)
                 {
                     // Add to log - will be parsed to BattleMessage automatically
-                    Add("-damage", target, target.GetHealth,
+                    Add("-damage", target, target.GetHealth, damageTag,
                         $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
                 break;
 
             case ConditionId.Powder:
                 // Silent damage
-                Add("-damage", target, target.GetHealth, "[silent]");
+                Add("-damage", target, target.GetHealth, damageTag, "[silent]");
                 break;
 
             case ConditionId.Confusion:
                 // Add to log - will be parsed to BattleMessage automatically
-                Add("-damage", target, target.GetHealth, "[from] confusion");
+                Add("-damage", target, target.GetHealth, damageTag, "[from] confusion");
                 break;
 
             default:
                 if (effect?.EffectType == EffectType.Move || string.IsNullOrEmpty(effectName))
                 {
                     // Simple damage from a move or no effect
-                    Add("-damage", target, target.GetHealth);
+                    Add("-damage", target, target.GetHealth, damageTag);
                 }
                 else if (source != null &&
                          (source != target || effect?.EffectType == EffectType.Ability))
                 {
                     // Damage from effect with source
-                    Add("-damage", target, target.GetHealth, $"[from] {effectName}",
+                    Add("-damage", target, target.GetHealth, damageTag, $"[from] {effectName}",
                         $"[of] {source}");
                 }
                 else
                 {
                     // Damage from effect without source
-                    Add("-damage", target, target.GetHealth, $"[from] {effectName}");
+                    Add("-damage", target, target.GetHealth, damageTag, $"[from] {effectName}");
                 }
                 break;
         }
@@ -761,22 +764,35 @@ new EffectivenessMessage
             return new GenericMessage { Text = $"{pokemonName} took damage!" };
         }
 
- int damageAmount = maxHp - currentHp; // Approximate, we don't have previous HP
-
-   // Extract effect name if present
+        // Extract damage amount, effect name, and source from tags
+        int damageAmount = 0;
         string? effectName = null;
-string? sourceName = null;
+        string? sourceName = null;
 
-     for (int i = 4; i < parts.Length; i++)
-     {
-            if (parts[i].StartsWith("[from]"))
+        for (int i = 4; i < parts.Length; i++)
+        {
+            if (parts[i].StartsWith("[dmg]"))
+            {
+                string amountStr = parts[i].Substring(5); // Remove "[dmg]" prefix
+                if (int.TryParse(amountStr, out int amount))
+                {
+                    damageAmount = amount;
+                }
+            }
+            else if (parts[i].StartsWith("[from]"))
             {
                 effectName = parts[i].Substring(7).Trim(); // Remove "[from] "
-  }
-   else if (parts[i].StartsWith("[of]"))
-   {
-  sourceName = ExtractPokemonName(parts[i].Substring(5).Trim()); // Remove "[of] "
-  }
+            }
+            else if (parts[i].StartsWith("[of]"))
+            {
+                sourceName = ExtractPokemonName(parts[i].Substring(5).Trim()); // Remove "[of] "
+            }
+        }
+
+        // Fallback: if no [dmg] tag, calculate from total HP (less accurate)
+        if (damageAmount == 0)
+        {
+            damageAmount = maxHp - currentHp;
         }
 
         return new DamageMessage

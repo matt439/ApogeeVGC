@@ -26,6 +26,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
+- [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Missing Recoil condition dictionary entry
 
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
@@ -227,6 +228,23 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Wild Charge Recoil Fix
+**File**: `WildChargeRecoilFix.md`  
+**Severity**: High  
+**Systems Affected**: Recoil damage moves, move execution pipeline
+
+**Problem**: When any Pokémon used a recoil move (e.g., Wild Charge, Double-Edge, Brave Bird), the move would deal damage correctly but immediately after applying recoil damage, the battle would end prematurely as a tie with `KeyNotFoundException: The given key 'Recoil' was not present in the dictionary.`
+
+**Root Cause**: The `ConditionId.Recoil` enum value existed in the `ConditionId` enum, but there was no corresponding entry in the `Conditions` dictionary in `Conditions.cs`. When `BattleActions.HitSteps.cs` tried to apply recoil damage using `Library.Conditions[ConditionId.Recoil]`, the dictionary lookup threw a `KeyNotFoundException`.
+
+**Solution**: Added the missing `ConditionId.Recoil` entry to the `Conditions` dictionary with a minimal definition (`Id`, `Name`, `EffectType`). Recoil damage doesn't require event handlers since the actual damage calculation is handled by `CalcRecoilDamage()`.
+
+**Affected Moves**: All moves with recoil damage - Wild Charge, Volt Tackle, Take Down, Double-Edge, Head Smash, Brave Bird, Submission, High Jump Kick, Wood Hammer, Chloroblast, and others.
+
+**Keywords**: `recoil`, `Wild Charge`, `KeyNotFoundException`, `Conditions`, `dictionary`, `missing entry`, `enum mismatch`, `damage`, `recoil moves`
+
+---
+
 ### Union Type Handling Guide
 **File**: `UnionTypeHandlingGuide.md`  
 **Type**: Reference Guide  
@@ -327,6 +345,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Battle crashes/exceptions**:
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined to int conversion
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Dictionary key not found
+- [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -369,6 +388,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Status/Conditions**:
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
 - [Leech Seed Bug Fix](#leech-seed-bug-fix)
+- [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
 
 **UI/Display**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
@@ -414,6 +434,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **PlayerConsole.cs**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**Conditions.cs**:
+- [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
 
 ---
 
@@ -519,5 +542,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 15  
+*Total Bug Fixes Documented*: 16  
 *Reference Guides*: 1
