@@ -1022,9 +1022,18 @@ public partial class Battle
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException(
-                $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})",
-                ex);
+            // Log the inner exception details for debugging
+            string errorDetails = $"Event {handlerInfo.Id} adapted handler failed on effect {Effect?.Name ?? "unknown"} ({Effect?.EffectType})";
+            if (ex.InnerException != null)
+            {
+                errorDetails += $"\nInner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+                if (ex.InnerException.StackTrace != null)
+                {
+                    errorDetails += $"\nInner stack trace: {ex.InnerException.StackTrace.Split('\n').Take(5).Aggregate((a, b) => a + "\n" + b)}";
+                }
+            }
+            
+            throw new InvalidOperationException(errorDetails, ex);
         }
     }
 

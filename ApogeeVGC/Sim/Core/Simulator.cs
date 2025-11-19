@@ -586,6 +586,28 @@ public class Simulator : IBattleController
             {
                 Console.WriteLine(
                     $"[Simulator.ProcessChoiceResponsesAsync] ERROR: {ex.GetType().Name}: {ex.Message}");
+                
+                // Print inner exception details if present
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"  Inner Exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                    
+                    if (ex.InnerException.InnerException != null)
+                    {
+                        Console.WriteLine($"    Inner Inner Exception: {ex.InnerException.InnerException.GetType().Name}: {ex.InnerException.InnerException.Message}");
+                    }
+                }
+                
+                // Print first 15 lines of stack trace
+                if (ex.StackTrace != null)
+                {
+                    var stackLines = ex.StackTrace.Split('\n').Take(15);
+                    Console.WriteLine($"  Stack Trace:");
+                    foreach (var line in stackLines)
+                    {
+                        Console.WriteLine($"    {line.Trim()}");
+                    }
+                }
             }
 
             throw;

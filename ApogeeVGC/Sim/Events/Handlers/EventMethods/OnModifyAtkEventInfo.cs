@@ -40,8 +40,9 @@ Priority = priority;
       ];
   ExpectedReturnType = typeof(DoubleVoidUnion);
         
-     // Nullability: All parameters non-nullable by default (adjust as needed)
-   ParameterNullability = [false, false, false, false, false];
+     // Nullability: Battle, int, and source Pokemon are non-nullable
+        // Target Pokemon and Move can be null (e.g., when calculating base stats)
+   ParameterNullability = [false, false, false, true, true];
         ReturnTypeNullable = false;
     
      // Validate configuration

@@ -16,6 +16,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined check occurring after .ToInt() conversion
 - [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix) - VoidReturn causing IntRelayVar type mismatch
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - Multiple stat handlers returning VoidReturn instead of int
+- [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Incorrect nullability constraints on stat modification parameters
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -375,6 +376,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Dictionary key not found
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - VoidReturn instead of int in stat handlers
+- [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Null parameter when non-nullable expected
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -477,6 +479,15 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Pokemon.Stats.cs**:
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
 
+**OnModify*EventInfo.cs files**:
+- [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix)
+
+**Battle.Events.cs**:
+- [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) (enhanced error logging)
+
+**EventHandlerAdapter.cs**:
+- [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) (enhanced error logging)
+
 ---
 
 ## Common Patterns
@@ -518,14 +529,15 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 4. Are you avoiding infinite recursion in event handlers?
 
 ### Pattern: Stat Modification Handler Issues
-**See**: [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix), [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+**See**: [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix), [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix), [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix)
 
 **Checklist**:
 1. Does the handler ALWAYS return an integer (never `VoidReturn()`)?
 2. When condition doesn't apply, does it return the unmodified stat value?
 3. When using `ChainModify()`, does it return `battle.FinalModify(stat)`?
 4. Are you using the correct parameter name (`stat`/`atk`/`def`/etc, not `_`)?
-5. Have you tested with different Pokemon/items/abilities that trigger the handler?
+5. Are the parameter nullability settings correct in the EventHandlerInfo?
+6. Have you tested with different Pokemon/items/abilities that trigger the handler?
 
 ---
 
@@ -573,6 +585,36 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
 - **2025-01-XX**: Added Stat Modification Handler VoidReturn Fix (comprehensive fix for all stat handlers returning VoidReturn)
 
+### Stat Modification Parameter Nullability and Type Conversion Fix
+**File**: `StatModificationParameterNullabilityFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Stat modification handler chaining, damage calculation, event parameter resolution
+
+**Problem**: Battle ended in a tie with `Event ModifySpA adapted handler failed on effect Choice Specs (Item)` when Miraidon (with both Hadron Engine and Choice Specs) used Dazzling Gleam. The error occurred when the second stat modification handler tried to execute after the first one completed.
+
+**Root Causes**:
+1. **Primary**: `EventHandlerAdapter.TryUnwrapRelayVar` couldn't convert `DecimalRelayVar` ? `int`. When handlers chain, the first handler returns `DecimalRelayVar`, but the second handler expects `int` parameters.
+2. **Secondary**: Parameters were marked non-nullable but could legitimately be null in some contexts.
+
+**Solution**: 
+1. Added `DecimalRelayVar` ? `int` conversion support in `EventHandlerAdapter.TryUnwrapRelayVar`
+2. Updated `ParameterNullability` arrays to mark source Pokemon and move as nullable
+
+**Files Modified**:
+- `EventHandlerAdapter.cs` - Added DecimalRelayVar ? int conversion
+- `OnModifyAtkEventInfo.cs` - Allowed null target Pokemon and move
+- `OnModifyDefEventInfo.cs` - Allowed null source Pokemon and move  
+- `OnModifySpAEventInfo.cs` - Fixed incorrect int nullability and allowed null target/move
+- `OnModifySpDEventInfo.cs` - Allowed null source Pokemon and move
+
+**Key Insight**: Stat modification handlers return `DoubleVoidUnion` (converted to `DecimalRelayVar`) but expect `int` parameters. When chaining multiple handlers, type conversion is required between each handler's output and the next handler's input.
+
+**Impact**: Enables multiple stat-modifying effects to stack correctly (abilities + items, multiple abilities, etc.)
+
+**Keywords**: `stat modification`, `handler chaining`, `parameter nullability`, `type conversion`, `DecimalRelayVar`, `OnModifySpA`, `Choice Specs`, `Hadron Engine`, `Assault Vest`, `EventHandlerAdapter`, `TryUnwrapRelayVar`, `damage calculation`, `InvalidOperationException`, `adapted handler failed`, `parameter resolution`
+
+---
+
 ### Fake Out Flinch Fix
 **File**: `FakeOutFlinchFix.md`  
 **Severity**: High  
@@ -592,5 +634,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 17  
+*Total Bug Fixes Documented*: 18  
 *Reference Guides*: 1

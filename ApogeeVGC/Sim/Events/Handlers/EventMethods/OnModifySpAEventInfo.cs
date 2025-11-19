@@ -40,9 +40,10 @@ public sealed record OnModifySpAEventInfo : EventHandlerInfo
    ];
       ExpectedReturnType = typeof(DoubleVoidUnion);
         
-// Nullability: Battle is non-nullable, others are nullable for discard parameters
-   ParameterNullability = [false, true, true, true, true];
-     ReturnTypeNullable = false;
+// Nullability: Battle, int, and source Pokemon are non-nullable
+     // Target Pokemon and Move can be null (e.g., when calculating base stats)
+ParameterNullability = [false, false, false, true, true];
+  ReturnTypeNullable = false;
     
    // Validate configuration
         ValidateConfiguration();

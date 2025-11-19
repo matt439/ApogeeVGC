@@ -41,9 +41,23 @@ internal static class EventHandlerAdapter
             }
             catch (TargetInvocationException ex)
             {
-                throw new InvalidOperationException(
-                    $"Event {handlerInfo.Id}: Exception in legacy handler {legacyHandler.Method.DeclaringType?.Name}.{legacyHandler.Method.Name}",
-                    ex.InnerException ?? ex);
+                var innerEx = ex.InnerException ?? ex;
+                string errorMsg = $"Event {handlerInfo.Id}: Exception in legacy handler {legacyHandler.Method.DeclaringType?.Name}.{legacyHandler.Method.Name}";
+                errorMsg += $"\nException type: {innerEx.GetType().Name}";
+                errorMsg += $"\nException message: {innerEx.Message}";
+                if (innerEx.StackTrace != null)
+                {
+                    var stackLines = innerEx.StackTrace.Split('\n').Take(10);
+                    errorMsg += $"\nStack trace:\n{string.Join("\n", stackLines)}";
+                }
+                throw new InvalidOperationException(errorMsg, innerEx);
+            }
+            catch (Exception ex)
+            {
+                string errorMsg = $"Event {handlerInfo.Id}: Unexpected exception in legacy handler {legacyHandler.Method.DeclaringType?.Name}.{legacyHandler.Method.Name}";
+                errorMsg += $"\nException type: {ex.GetType().Name}";
+                errorMsg += $"\nException message: {ex.Message}";
+                throw new InvalidOperationException(errorMsg, ex);
             }
         };
     }
@@ -244,6 +258,13 @@ internal static class EventHandlerAdapter
         if (relayVar is IntRelayVar intVar && (targetType == typeof(int) || targetType == typeof(Int32)))
         {
             value = intVar.Value;
+            return true;
+        }
+
+        // Handle decimal -> int conversion (for stat modifications that return decimal but parameter expects int)
+        if (relayVar is DecimalRelayVar decVarToInt && (targetType == typeof(int) || targetType == typeof(Int32)))
+        {
+            value = (int)decVarToInt.Value;
             return true;
         }
 
