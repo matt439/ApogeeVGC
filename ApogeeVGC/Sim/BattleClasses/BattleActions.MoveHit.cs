@@ -511,9 +511,10 @@ if (tryResult is BoolRelayVar { Value: false } ||
             Battle.ActiveTarget = target;
             damage[i] = BoolIntUndefinedUnion.FromUndefined();
 
-            // Skip damage calculation for self-targeting effects
+            // Skip damage calculation for self-targeting effects and secondary effects
             // This matches TypeScript behavior and prevents infinite recursion
-            if (!isSelf)
+            // Secondary effects should only apply status/volatile/boosts, not damage
+            if (!isSelf && !isSecondary)
             {
                 IntUndefinedFalseUnion? curDamage = GetDamage(source, target, moveData);
 

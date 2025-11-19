@@ -2,6 +2,7 @@
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.BattleClasses;
@@ -26,9 +27,11 @@ public partial class BattleActions
             BoolIntUndefinedUnion didSomething = BoolIntUndefinedUnion.FromUndefined();
 
             // Apply boosts
-            if (moveData.HitEffect?.Boosts != null && !target.Fainted)
+            // Check both moveData.HitEffect?.Boosts and move.HitEffect?.Boosts (for secondary effects)
+            SparseBoostsTable? boostsToApply = moveData.HitEffect?.Boosts ?? (move.HitEffect as HitEffect)?.Boosts;
+            if (boostsToApply != null && !target.Fainted)
             {
-                BoolZeroUnion? boostResult = Battle.Boost(moveData.HitEffect.Boosts, target, source, move, isSecondary, isSelf);
+                BoolZeroUnion? boostResult = Battle.Boost(boostsToApply, target, source, move, isSecondary, isSelf);
                 hitResult = boostResult switch
                 {
                     BoolBoolZeroUnion bbz => bbz.Value,
@@ -80,13 +83,15 @@ public partial class BattleActions
             }
 
             // Try to apply status
-            if (moveData.Status != null)
+            // Check both moveData.Status and move.HitEffect?.Status (for secondary effects)
+            ConditionId? statusToApply = moveData.Status ?? (move.HitEffect as HitEffect)?.Status;
+            if (statusToApply != null)
             {
-                bool statusResult = target.TrySetStatus(moveData.Status.Value, source,
+                bool statusResult = target.TrySetStatus(statusToApply.Value, source,
                     moveData.Ability != null ? Library.Abilities[moveData.Ability.Id] : move);
                 hitResult = BoolIntUndefinedUnion.FromBool(statusResult);
 
-                if (!statusResult && move.Status != null)
+                if (!statusResult && (move.Status != null || (move.HitEffect as HitEffect)?.Status != null))
                 {
                     damage[i] = CombineResults(damage[i], BoolIntUndefinedUnion.FromBool(false));
                     didAnything = CombineResults(didAnything, null);
@@ -105,9 +110,17 @@ public partial class BattleActions
             }
 
             // Apply volatile status
-            if (moveData.VolatileStatus != null)
+            // Check both moveData.VolatileStatus and move.HitEffect?.VolatileStatus (for secondary effects)
+            ConditionId? volatileToApply = moveData.VolatileStatus ?? (move.HitEffect as HitEffect)?.VolatileStatus;
+            if (volatileToApply != null)
             {
-                RelayVar volatileResult = target.AddVolatile(moveData.VolatileStatus.Value, source, move);
+                Battle.Debug($"[RunMoveEffects] Attempting to apply volatile status {volatileToApply.Value} to {target.Name}");
+                RelayVar volatileResult = target.AddVolatile(volatileToApply.Value, source, move);
+                Battle.Debug($"[RunMoveEffects] AddVolatile returned: {volatileResult?.GetType().Name ?? "null"}");
+                if (volatileResult is BoolRelayVar brvCheck)
+                {
+                    Battle.Debug($"[RunMoveEffects] Volatile application result: {brvCheck.Value}");
+                }
                 hitResult = volatileResult switch
                 {
                     BoolRelayVar brv => BoolIntUndefinedUnion.FromBool(brv.Value),
@@ -345,6 +358,8 @@ public partial class BattleActions
     {
         if (moveData.Secondaries == null) return;
 
+        Battle.Debug($"[Secondaries] Called for move {move.Name}, Secondaries count={moveData.Secondaries.Length}");
+
         foreach (PokemonFalseUnion targetUnion in targets)
         {
             if (targetUnion is not PokemonPokemonUnion pokemonUnion)
@@ -353,6 +368,8 @@ public partial class BattleActions
             }
 
             Pokemon target = pokemonUnion.Pokemon;
+
+            Battle.Debug($"[Secondaries] Processing secondary effects for target {target.Name}");
 
             // Run ModifySecondaries event to get the list of secondary effects
             RelayVar? modifyResult = Battle.RunEvent(EventId.ModifySecondaries, target, source, moveData,
@@ -364,6 +381,8 @@ public partial class BattleActions
 
             foreach (SecondaryEffect secondary in secondaries)
             {
+                Battle.Debug($"[Secondaries] Secondary effect: VolatileStatus={secondary.VolatileStatus}, Chance={secondary.Chance}");
+                
                 int secondaryRoll = Battle.Random(100);
 
                 // User stat boosts or target stat drops can possibly overflow if it goes beyond 256 in Gen 8 or prior
@@ -375,9 +394,16 @@ public partial class BattleActions
                     effectiveChance %= 256;
                 }
 
+                Battle.Debug($"[Secondaries] secondaryRoll={secondaryRoll}, effectiveChance={effectiveChance}");
+
                 if (secondary.Chance == null || secondaryRoll < effectiveChance)
                 {
+                    Battle.Debug($"[Secondaries] Applying secondary effect, calling MoveHit");
                     MoveHit(target, source, move, secondary, true, isSelf);
+                }
+                else
+                {
+                    Battle.Debug($"[Secondaries] Secondary effect chance failed");
                 }
             }
         }

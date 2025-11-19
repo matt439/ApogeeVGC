@@ -636,6 +636,14 @@ new EffectivenessMessage
                             Text = $"{GetSideName(parts[2])}'s {parts[3]} wore off!" 
                         },
 
+                    "cant" when parts.Length > 3 =>
+                        new CantMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            Reason = parts[3]
+                        },
+
  _ => null
      };
 

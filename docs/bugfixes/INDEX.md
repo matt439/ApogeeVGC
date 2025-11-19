@@ -500,8 +500,24 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Reflect Side Condition Display Fix (UI/perspective issue)
 - **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
 
+### Fake Out Flinch Fix
+**File**: `FakeOutFlinchFix.md`  
+**Severity**: High  
+**Systems Affected**: Secondary effects, volatile status application
+
+**Problem**: When Fake Out was used, the flinch volatile status was not applied to the target, so the target could still move normally on the same turn.
+
+**Root Cause**: In `RunMoveEffects`, when processing secondary effects, the code checked `moveData.VolatileStatus` for the volatile status to apply. However, for secondary effects, the `SecondaryEffect` object is stored in `move.HitEffect`, not in `moveData`. Since `moveData` is the `ActiveMove` itself (which doesn't have the secondary effect's properties set), the volatile status check failed and the flinch was never applied.
+
+**Solution**:
+- Modified `RunMoveEffects` to check both `moveData` properties AND `move.HitEffect` properties when applying effects
+- Applied the same pattern to volatile status, boosts, and status condition application
+- Used null-coalescing operator: `moveData.VolatileStatus ?? (move.HitEffect as HitEffect)?.VolatileStatus`
+
+**Keywords**: `Fake Out`, `flinch`, `secondary effect`, `volatile status`, `RunMoveEffects`, `HitEffect`, `SecondaryEffect`, `move.HitEffect`
+
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 14  
+*Total Bug Fixes Documented*: 15  
 *Reference Guides*: 1

@@ -347,3 +347,29 @@ public class AbilityMessage : BattleMessage
         return AdditionalInfo != null ? $"{baseText} {AdditionalInfo}" : baseText;
     }
 }
+
+/// <summary>
+/// Message for when a Pokémon can't move (flinch, paralysis, sleep, etc.)
+/// </summary>
+public class CantMessage : BattleMessage
+{
+    public required string PokemonName { get; init; }
+    public required string Reason { get; init; }
+    public SideId? SideId { get; init; }
+
+    public override string ToDisplayText()
+    {
+        string pokemonDisplay = SideId.HasValue 
+            ? $"{PokemonName} (Side {(int)SideId.Value + 1})"
+            : PokemonName;
+
+        return Reason switch
+        {
+            "flinch" => $"{pokemonDisplay} flinched and couldn't move!",
+            "par" => $"{pokemonDisplay} is paralyzed! It can't move!",
+            "slp" => $"{pokemonDisplay} is fast asleep.",
+            "frz" => $"{pokemonDisplay} is frozen solid!",
+            _ => $"{pokemonDisplay} can't move!"
+        };
+    }
+}

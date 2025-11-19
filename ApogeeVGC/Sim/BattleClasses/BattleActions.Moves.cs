@@ -83,11 +83,25 @@ public partial class BattleActions
         Battle.ActiveTarget = target;
 
         // Run BeforeMove event - can prevent the move from happening
+        Battle.Debug($"[RunMove] About to call BeforeMove event for {pokemon.Name} using {activeMove.Name}");
+        Battle.Debug($"[RunMove] {pokemon.Name} has {pokemon.Volatiles.Count} volatile conditions");
+        foreach (var volatileId in pokemon.Volatiles.Keys)
+        {
+            Battle.Debug($"[RunMove]   - {volatileId} (Duration: {pokemon.Volatiles[volatileId].Duration})");
+        }
+        
         RelayVar? willTryMove = Battle.RunEvent(EventId.BeforeMove, pokemon,
             RunEventSource.FromNullablePokemon(target), activeMove);
 
+        Battle.Debug($"[RunMove] BeforeMove event returned: {willTryMove?.GetType().Name ?? "null"}");
+        if (willTryMove is BoolRelayVar brv)
+        {
+            Battle.Debug($"[RunMove] BeforeMove returned bool: {brv.Value}");
+        }
+
         if (willTryMove is BoolRelayVar { Value: false } or null)
         {
+            Battle.Debug($"[RunMove] Move prevented by BeforeMove event");
             Battle.RunEvent(EventId.MoveAborted, pokemon,
                 RunEventSource.FromNullablePokemon(target), activeMove);
             ClearActiveMove(true);
@@ -95,9 +109,12 @@ public partial class BattleActions
             // The event 'BeforeMove' could have returned false or null
             // false indicates that this counts as a move failing for the purpose of calculating Stomping Tantrum's base power
             // null indicates the opposite, as the Pokemon didn't have an option to choose anything
-            pokemon.MoveThisTurnResult = willTryMove is BoolRelayVar brv ? brv.Value : null;
+            pokemon.MoveThisTurnResult = willTryMove is BoolRelayVar brv2 ? brv2.Value : null;
             return;
         }
+        
+        Battle.Debug($"[RunMove] Move allowed to proceed");
+
 
         // Used exclusively for a hint later (moves that can't be used twice in a row)
         if (activeMove.Flags.CantUseTwice ?? false)

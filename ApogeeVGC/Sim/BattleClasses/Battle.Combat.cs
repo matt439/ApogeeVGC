@@ -163,7 +163,9 @@ public partial class Battle
                 targetDamage = ClampIntRange(targetDamage, 1, null);
 
             // Apply damage to target
+            Debug($"[SpreadDamage] About to apply {targetDamage} damage to {target.Name} (current HP: {target.Hp})");
             targetDamage = target.Damage(targetDamage, source, effectCondition);
+            Debug($"[SpreadDamage] Applied {targetDamage} damage to {target.Name} (new HP: {target.Hp})");
             retVals.Add(targetDamage);
 
             // Track that the Pokemon was hurt this turn
@@ -181,6 +183,7 @@ public partial class Battle
             }
 
             // Log damage messages with the actual damage amount
+            Debug($"[SpreadDamage] Calling PrintDamageMessage for {target.Name}, damage={targetDamage}");
             PrintDamageMessage(target, targetDamage, source, effectCondition);
 
             // Handle drain for moves (Gen 9 uses rounding)
