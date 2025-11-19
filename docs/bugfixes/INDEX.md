@@ -10,6 +10,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Ability OnStart handlers not executing during switch-in
 - [Trick Room Bug Fix](#trick-room-bug-fix) - Field event handlers not mapped/invoked
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue) - Move event handlers not mapped
+- [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Int passed to RunEvent instead of IntRelayVar
 
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
@@ -377,6 +378,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - VoidReturn instead of int in stat handlers
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) - Null parameter when non-nullable expected
+- [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix) - Primitive int instead of IntRelayVar
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -403,6 +405,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) (partial)
+- [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
 
 **Union Types**:
 - [Protect Bug Fix](#protect-bug-fix)
@@ -435,6 +438,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **EventHandlerInfoMapper.cs**:
 - [Trick Room Bug Fix](#trick-room-bug-fix)
 - [Protect Stalling Mechanic Issue](#protect-stalling-mechanic-issue)
+
+**BattleActions.Damage.cs**:
+- [Facade BasePower Event Parameter Fix](#facade-basepower-event-parameter-fix)
 
 **BattleActions.MoveEffects.cs**:
 - [Volt Switch Damage Type Bug](#volt-switch-damage-type-bug)
@@ -633,6 +639,31 @@ When documenting a new bug fix:
 
 ---
 
+### Facade BasePower Event Parameter Fix
+**File**: `FacadeBasePowerEventParameterFix.md`  
+**Severity**: High  
+**Systems Affected**: Event system, damage calculation, BasePower events, handler chaining
+
+**Problem**: When Ursaluna (with Burn status) used Facade, the battle crashed with `Event BasePower adapted handler failed` and inner exception `Parameter 1 (Int32 _) is non-nullable but no matching value found in context`. The error occurred on the second handler invocation when multiple handlers existed for the `BasePower` event.
+
+**Root Causes**: 
+1. **Primary**: In `Battle.Events.cs`, the `RunEvent` method unconditionally replaced `relayVar` with handler return values. When a handler returned `VoidReturnRelayVar`, it overwrote the `IntRelayVar` containing the base power value, breaking the handler chain.
+2. **Secondary**: In `BattleActions.Damage.cs`, the `BasePower` event was called with a primitive `int` instead of wrapping it in an `IntRelayVar`.
+
+**Solution**: 
+1. Modified `RunEvent` to check if return value is `VoidReturnRelayVar` and preserve the original `relayVar` in that case (VoidReturn means "no value change, just side effects")
+2. Changed to pass `new IntRelayVar(basePower.ToInt())` instead of the raw int value
+
+**Key Patterns**: 
+- **RelayVar Passing**: Always wrap primitive values in appropriate RelayVar types when calling `RunEvent`
+- **VoidReturn Handling**: Don't replace `relayVar` when handlers return `VoidReturnRelayVar` - it means "I used ChainModify() for side effects but have no replacement value"
+
+**Impact**: Enables all moves with `OnBasePower` handlers to execute correctly and allows multiple handlers to chain properly for any event using the ChainModify() + VoidReturn pattern.
+
+**Keywords**: `Facade`, `BasePower`, `event parameter`, `RelayVar`, `IntRelayVar`, `VoidReturn`, `VoidReturnRelayVar`, `EventHandlerAdapter`, `parameter resolution`, `non-nullable`, `type mismatch`, `GetDamage`, `RunEvent`, `damage calculation`, `handler chaining`, `ChainModify`
+
+---
+
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 18  
+*Total Bug Fixes Documented*: 19  
 *Reference Guides*: 1

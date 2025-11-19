@@ -454,7 +454,11 @@ public partial class Battle
             // Process return value
             if (returnVal != null)
             {
-                relayVar = returnVal;
+                // Don't replace relayVar if handler returned VoidReturn (meaning "no change")
+                if (returnVal is not VoidReturnRelayVar)
+                {
+                    relayVar = returnVal;
+                }
 
                 // Check for early exit
                 if (!IsRelayVarTruthy(relayVar) || fastExit == true)

@@ -117,8 +117,10 @@ public partial class BattleActions
         }
 
         // Run BasePower event after crit calculation
+        Battle.Debug($"[GetDamage] About to call BasePower event with IntRelayVar({basePower.ToInt()})");
         RelayVar? basePowerEvent = Battle.RunEvent(EventId.BasePower, source,
-            RunEventSource.FromNullablePokemon(target), move, basePower.ToInt(), true);
+            RunEventSource.FromNullablePokemon(target), move, new IntRelayVar(basePower.ToInt()), true);
+        Battle.Debug($"[GetDamage] BasePower event returned: {(basePowerEvent != null ? basePowerEvent.GetType().Name : "null")}");
 
         if (basePowerEvent is IntRelayVar bpIrv)
         {

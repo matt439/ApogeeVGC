@@ -109,7 +109,7 @@ public class Driver
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles test (SYNCHRONOUS)");
 
-        const bool debug = false;
+        const bool debug = true;
 
         PlayerOptions player1Options = new()
         {
