@@ -101,13 +101,13 @@ public record Abilities
                     }
                 }),
                 //OnModifySpAPriority = 5,
-                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
                     {
                         if (!battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
-                            return new VoidReturn();
+                            return spa;
                         battle.Debug("Hadron Engine boost");
                         battle.ChainModify([5461, 4096]);
-                        return new VoidReturn();
+                        return battle.FinalModify(spa);
                     },
                     5),
             },
@@ -118,15 +118,15 @@ public record Abilities
                 Num = 62,
                 Rating = 3.5,
                 //OnModifyAtkPriority = 5,
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, _, pokemon, _, _) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
                     {
                         if (pokemon.Status is not ConditionId.None)
                         {
                             battle.ChainModify(1.5);
-                            return new VoidReturn();
+                            return battle.FinalModify(atk);
                         }
 
-                        return new VoidReturn();
+                        return atk;
                     },
                     5),
             },

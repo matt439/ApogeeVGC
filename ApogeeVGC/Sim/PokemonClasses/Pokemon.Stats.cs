@@ -128,7 +128,9 @@ public partial class Pokemon
             }
             else
             {
-                throw new InvalidOperationException("stat must be an IntRelayVar");
+                string relayVarType = relayVar?.GetType().Name ?? "null";
+                throw new InvalidOperationException(
+                    $"stat must be an IntRelayVar, but got {relayVarType} for {Name}'s {statName} (Event: {eventId})");
             }
         }
 

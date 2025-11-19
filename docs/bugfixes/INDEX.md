@@ -15,6 +15,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined check occurring after .ToInt() conversion
 - [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix) - VoidReturn causing IntRelayVar type mismatch
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - Multiple stat handlers returning VoidReturn instead of int
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -315,6 +316,33 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Stat Modification Handler VoidReturn Fix
+**File**: `StatModificationHandlerVoidReturnFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Stat modification handlers, abilities, items, conditions
+
+**Problem**: Battle ended immediately in a tie on Turn 1 with `InvalidOperationException: stat must be an IntRelayVar, but got VoidReturnRelayVar for Ironhands's Spe (Event: ModifySpe)`. The battle crashed during `CommitChoices` when calculating Pokemon stats for move order determination.
+
+**Root Cause**: Stat modification handlers (`OnModifyAtk`, `OnModifyDef`, `OnModifySpA`, `OnModifySpD`, `OnModifySpe`) were incorrectly returning `VoidReturn()` in two scenarios:
+1. When using `ChainModify()` to apply boosts - returned `VoidReturn()` instead of `FinalModify(stat)`
+2. When conditions didn't apply - returned `VoidReturn()` instead of the unmodified stat value
+
+**Affected Components**:
+- **Abilities**: Hadron Engine (OnModifySpA), Guts (OnModifyAtk)
+- **Conditions**: QuarkDrive volatile (all 5 stat handlers)
+- **Items**: Choice Specs (OnModifySpA), Assault Vest (OnModifySpD)
+
+**Solution**: Fixed all stat modification handlers to follow the correct pattern:
+- Always return an integer value, never `VoidReturn()`
+- Return `stat` when condition doesn't apply (unmodified value)
+- Return `battle.FinalModify(stat)` when using `ChainModify()`
+
+**Key Rule**: Stat modification handlers MUST ALWAYS return an integer, never `VoidReturn()`.
+
+**Keywords**: `stat modification`, `OnModifyAtk`, `OnModifyDef`, `OnModifySpA`, `OnModifySpD`, `OnModifySpe`, `VoidReturn`, `IntRelayVar`, `ChainModify`, `FinalModify`, `Hadron Engine`, `Quark Drive`, `Choice Specs`, `Assault Vest`, `Guts`, `type mismatch`
+
+---
+
 ### Reflect Side Condition Display Fix
 **File**: `ReflectSideConditionDisplayFix.md`  
 **Severity**: Medium  
@@ -346,6 +374,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined to int conversion
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Dictionary key not found
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix) - VoidReturn instead of int in stat handlers
 
 **Feature not working**:
 - [Hadron Engine Bug Fix](#hadron-engine-bug-fix) - Abilities not activating
@@ -437,6 +466,16 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Conditions.cs**:
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**Abilities.cs**:
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**Items.cs**:
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**Pokemon.Stats.cs**:
+- [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
 
 ---
 
@@ -477,6 +516,16 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 2. Is `isSelf=true` flag properly skipping damage calculation?
 3. Are self-targeting effects going through the correct pipeline?
 4. Are you avoiding infinite recursion in event handlers?
+
+### Pattern: Stat Modification Handler Issues
+**See**: [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix), [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**Checklist**:
+1. Does the handler ALWAYS return an integer (never `VoidReturn()`)?
+2. When condition doesn't apply, does it return the unmodified stat value?
+3. When using `ChainModify()`, does it return `battle.FinalModify(stat)`?
+4. Are you using the correct parameter name (`stat`/`atk`/`def`/etc, not `_`)?
+5. Have you tested with different Pokemon/items/abilities that trigger the handler?
 
 ---
 
@@ -522,6 +571,7 @@ When documenting a new bug fix:
 - Organized by category, symptom, component, and file
 - **2025-01-XX**: Added Reflect Side Condition Display Fix (UI/perspective issue)
 - **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
+- **2025-01-XX**: Added Stat Modification Handler VoidReturn Fix (comprehensive fix for all stat handlers returning VoidReturn)
 
 ### Fake Out Flinch Fix
 **File**: `FakeOutFlinchFix.md`  
@@ -542,5 +592,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 16  
+*Total Bug Fixes Documented*: 17  
 *Reference Guides*: 1

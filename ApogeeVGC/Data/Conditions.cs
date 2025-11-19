@@ -1020,12 +1020,12 @@ public record Conditions
                     return new VoidReturn();
                 }),
                 //OnModifyAtkPriority = 5,
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, _, pokemon, _, _) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Atk ||
                             pokemon.IgnoringAbility())
                         {
-                            return new VoidReturn();
+                            return atk;
                         }
 
                         if (battle.DisplayUi)
@@ -1034,16 +1034,16 @@ public record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return new VoidReturn();
+                        return battle.FinalModify(atk);
                     },
                     5),
                 //OnModifyDefPriority = 6,
-                OnModifyDef = new OnModifyDefEventInfo((battle, _, pokemon, _, _) =>
+                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.Def ||
                             pokemon.IgnoringAbility())
                         {
-                            return new VoidReturn();
+                            return def;
                         }
 
                         if (battle.DisplayUi)
@@ -1052,16 +1052,16 @@ public record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return new VoidReturn();
+                        return battle.FinalModify(def);
                     },
                     6),
                 //OnModifySpAPriority = 5,
-                OnModifySpA = new OnModifySpAEventInfo((battle, _, pokemon, _, _) =>
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpA ||
                             pokemon.IgnoringAbility())
                         {
-                            return new VoidReturn();
+                            return spa;
                         }
 
                         if (battle.DisplayUi)
@@ -1070,16 +1070,16 @@ public record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return new VoidReturn();
+                        return battle.FinalModify(spa);
                     },
                     5),
                 //OnModifySpDPriority = 6,
-                OnModifySpD = new OnModifySpDEventInfo((battle, _, pokemon, _, _) =>
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
                     {
                         if (battle.EffectState.BestStat != StatIdExceptHp.SpD ||
                             pokemon.IgnoringAbility())
                         {
-                            return new VoidReturn();
+                            return spd;
                         }
 
                         if (battle.DisplayUi)
@@ -1088,7 +1088,7 @@ public record Conditions
                         }
 
                         battle.ChainModify([5325, 4096]);
-                        return new VoidReturn();
+                        return battle.FinalModify(spd);
                     },
                     6),
                 OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
@@ -1096,7 +1096,7 @@ public record Conditions
                     if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
                         pokemon.IgnoringAbility())
                     {
-                        return new VoidReturn();
+                        return spe;
                     }
 
                     if (battle.DisplayUi)

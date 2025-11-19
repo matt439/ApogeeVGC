@@ -85,10 +85,10 @@ public record Items
                     }
                 }),
                 //OnModifySpAPriority = 1,
-                OnModifySpA = new OnModifySpAEventInfo((battle, _, _, _, _) =>
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return new VoidReturn();
+                    return battle.FinalModify(spa);
                 }, 1),
                 IsChoice = true,
                 Num = 297,
@@ -163,10 +163,10 @@ public record Items
                 SpriteNum = 581,
                 Fling = new FlingData { BasePower = 80 },
                 //OnModifySpDPriority = 1,
-                OnModifySpD = new OnModifySpDEventInfo((battle, _, _, _, _) =>
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, _, _, _) =>
                 {
                     battle.ChainModify(1.5);
-                    return new VoidReturn();
+                    return battle.FinalModify(spd);
                 }, 1),
                 OnDisableMove = new OnDisableMoveEventInfo((_, pokemon) =>
                 {
