@@ -8,4 +8,5 @@ public enum DriverMode
     ConsoleVsRandomDoubles,
     RandomVsRandomSingles,
     AsyncRandomVsRandomSingles,
+    RandomVsRandomSinglesEvaluation,
 }
