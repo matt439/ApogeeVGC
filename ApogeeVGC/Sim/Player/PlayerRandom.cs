@@ -1,7 +1,9 @@
 ﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Player;
 
@@ -25,25 +27,8 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom.GetChoiceSync] Called for {SideId}");
         }
 
-        // Return empty choice - battle will call AutoChoose on the Side
-        var choice = new Choice
-        {
-            Actions = new List<ChosenAction>(),
-            CantUndo = false,
-            Error = string.Empty,
-            ForcedSwitchesLeft = 0,
-            ForcedPassesLeft = 0,
-            SwitchIns = new HashSet<int>(),
-            Terastallize = false,
-        };
-
-        if (PrintDebug)
-        {
-            Console.WriteLine(
-                $"[PlayerRandom.GetChoiceSync] Returning empty choice for auto-selection");
-        }
-
-        return choice;
+        // Use the same logic as GetNextChoiceFromAll
+        return GetNextChoiceFromAll(choiceRequest);
     }
 
     // Fast sync version for MCTS rollouts (IPlayer)
@@ -112,26 +97,222 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] GetNextChoiceFromAll called for {SideId}");
         }
 
-        // Create an empty choice that will be auto-filled by the battle engine
-        // The battle's Side.AutoChoose() method will fill in valid random choices
-        var choice = new Choice
+        // Dispatch to appropriate handler based on request type
+        return request switch
         {
-            Actions = new List<ChosenAction>(),
-            CantUndo = false,
-            Error = string.Empty,
-            ForcedSwitchesLeft = 0,
-            ForcedPassesLeft = 0,
-            SwitchIns = new HashSet<int>(),
-            Terastallize = false,
+            TeamPreviewRequest tpr => GetRandomTeamPreviewChoice(tpr),
+            MoveRequest mr => GetRandomMoveChoice(mr),
+            SwitchRequest sr => GetRandomSwitchChoice(sr),
+            _ => throw new NotImplementedException(
+                $"Request type {request.GetType().Name} not implemented")
         };
+    }
 
-        // For now, return an empty choice which signals the battle to use Side.AutoChoose()
-        // This is a valid pattern in Pokemon Showdown - empty choice = auto-choose
+    private Choice GetRandomTeamPreviewChoice(TeamPreviewRequest request)
+    {
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerRandom] Returning empty choice for auto-selection");
+            Console.WriteLine($"[PlayerRandom] Generating random team preview choice for {SideId}");
         }
 
-        return choice;
+        var pokemon = request.Side.Pokemon;
+
+        // Generate a random order for the team
+        var order = Enumerable.Range(0, pokemon.Count).ToList();
+
+        // Shuffle using Fisher-Yates algorithm
+        for (int i = order.Count - 1; i > 0; i--)
+        {
+            int j = _random.Random(0, i + 1);
+            (order[i], order[j]) = (order[j], order[i]);
+        }
+
+        if (PrintDebug)
+        {
+            Console.WriteLine(
+                $"[PlayerRandom] Selected order: {string.Join(",", order.Select(i => i + 1))}");
+        }
+
+        // Build actions based on the randomly selected order
+        var actions = order.Select((originalPokemonIndex, newPosition) => new ChosenAction
+        {
+            Choice = ChoiceType.Team,
+            Pokemon = null,
+            MoveId = MoveId.None,
+            Index = newPosition,
+            TargetLoc = originalPokemonIndex,
+            Priority = -newPosition,
+        }).ToList();
+
+        return new Choice
+        {
+            Actions = actions,
+        };
+    }
+
+    private Choice GetRandomMoveChoice(MoveRequest request)
+    {
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerRandom] Generating random move choice for {SideId}");
+        }
+
+        if (request.Active.Count == 0)
+        {
+            throw new InvalidOperationException("No active Pokemon to make a move choice");
+        }
+
+        PokemonMoveRequestData pokemonRequest = request.Active[0];
+
+        // Build list of all available choices (moves with and without tera, plus switch option)
+        var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>();
+
+        // Check if terastallization is available
+        MoveType? teraType = pokemonRequest.CanTerastallize switch
+        {
+            MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+            _ => null,
+        };
+
+        // Add moves to available choices
+        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+        {
+            PokemonMoveData move = pokemonRequest.Moves[i];
+            bool disabled = IsDisabled(move.Disabled);
+
+            if (!disabled)
+            {
+                // Add regular move option
+                availableChoices.Add((true, i, false));
+
+                // Add tera variant if available
+                if (teraType.HasValue)
+                {
+                    availableChoices.Add((true, i, true));
+                }
+            }
+        }
+
+        // Add switch option (checking if any switches are available)
+        var availableSwitches = request.Side.Pokemon
+            .Select((p, index) => new { PokemonData = p, Index = index })
+            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
+            .ToList();
+
+        bool canSwitch = availableSwitches.Count > 0;
+        if (canSwitch)
+        {
+            availableChoices.Add((false, -1, false)); // Switch option
+        }
+
+        // Pick a random choice
+        if (availableChoices.Count == 0)
+        {
+            throw new InvalidOperationException("No available choices for random player");
+        }
+
+        int randomIndex = _random.Random(0, availableChoices.Count);
+        (bool isMove, int moveIndex, bool useTera) = availableChoices[randomIndex];
+
+        if (isMove)
+        {
+            // Selected a move
+            PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
+
+            if (PrintDebug)
+            {
+                string teraStr = useTera ? $" with Tera ({teraType})" : "";
+                Console.WriteLine(
+                    $"[PlayerRandom] Selected move: {selectedMove.Move.Name}{teraStr}");
+            }
+
+            return new Choice
+            {
+                Actions = new List<ChosenAction>
+                {
+                    new()
+                    {
+                        Choice = ChoiceType.Move,
+                        Pokemon = null,
+                        MoveId = selectedMove.Id,
+                        TargetLoc = 0,
+                        Terastallize = useTera ? teraType : null
+                    }
+                }
+            };
+        }
+        else
+        {
+            // Selected switch
+            if (PrintDebug)
+            {
+                Console.WriteLine($"[PlayerRandom] Selected switch option");
+            }
+
+            return GetRandomSwitchChoice(new SwitchRequest
+            {
+                Side = request.Side,
+                ForceSwitch = [false]
+            });
+        }
+    }
+
+    private bool IsDisabled(MoveIdBoolUnion disabled)
+    {
+        return disabled switch
+        {
+            BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
+            _ => false
+        };
+    }
+
+    private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)
+    {
+        // Check if Pokemon has 0 HP (fainted) by checking if HP stat is available
+        // In Pokemon Showdown protocol, fainted Pokemon have HP=0 in their stats
+        return pokemon.Stats.Hp == 0 || pokemon.Reviving;
+    }
+
+    private Choice GetRandomSwitchChoice(SwitchRequest request)
+    {
+        if (PrintDebug)
+        {
+            Console.WriteLine($"[PlayerRandom] Generating random switch choice for {SideId}");
+        }
+
+        // Build list of available Pokemon (excluding active and fainted)
+        var availablePokemonWithIndex = request.Side.Pokemon
+            .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
+            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
+            .ToList();
+
+        if (availablePokemonWithIndex.Count == 0)
+        {
+            throw new InvalidOperationException("No Pokemon available to switch");
+        }
+
+        // Pick a random Pokemon
+        int randomIndex = _random.Random(0, availablePokemonWithIndex.Count);
+        var selectedItem = availablePokemonWithIndex[randomIndex];
+
+        if (PrintDebug)
+        {
+            Console.WriteLine(
+                $"[PlayerRandom] Selected switch to: {selectedItem.PokemonData.Details}");
+        }
+
+        return new Choice
+        {
+            Actions = new List<ChosenAction>
+            {
+                new()
+                {
+                    Choice = ChoiceType.Switch,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                    Index = selectedItem.OriginalIndex,
+                },
+            },
+        };
     }
 }
