@@ -884,7 +884,7 @@ public class PlayerConsole : IPlayer
             MoveType.Ground => "gold3",
             MoveType.Flying => "deepskyblue1",
             MoveType.Psychic => "magenta",
-            MoveType.Bug => "yellowgreen",
+            MoveType.Bug => "greenyellow",
             MoveType.Rock => "orange3",
             MoveType.Ghost => "purple",
             MoveType.Dragon => "blue",

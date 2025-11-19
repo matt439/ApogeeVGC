@@ -248,6 +248,14 @@ public record Abilities
                 OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, _, _) =>
                     !(battle.EffectState.Unnerved ?? false))),
             },
+            [AbilityId.NaturalCure] = new()
+            {
+                Id = AbilityId.NaturalCure,
+                Name = "Natural Cure",
+                Rating = 2.5,
+                Num = 30,
+                // TODO: Implement OnSwitchOut and OnCheckShow
+            },
         };
     }
 }
