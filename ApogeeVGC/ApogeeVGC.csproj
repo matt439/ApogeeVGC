@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <Folder Include="Sim\Events\Handlers\PokemonEventMethods\" />
-    <Folder Include="Sim\Ui\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +31,12 @@
     <None Include="..\docs\**\*.md" Link="docs\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Sim\Ui\**" />
+    <EmbeddedResource Remove="Sim\Ui\**" />
+    <None Remove="Sim\Ui\**" />
   </ItemGroup>
 
 </Project>

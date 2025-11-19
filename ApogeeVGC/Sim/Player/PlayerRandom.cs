@@ -5,7 +5,8 @@ using ApogeeVGC.Sim.Utils;
 
 namespace ApogeeVGC.Sim.Player;
 
-public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleController battleController) : IPlayer
+public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleController battleController)
+    : IPlayer
 {
     public SideId SideId { get; } = sideId;
     public PlayerOptions Options { get; } = options;
@@ -16,29 +17,32 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     private readonly Prng _random = options.Seed is null ? new Prng(null) : new Prng(options.Seed);
 
     // Synchronous version for MCTS and fast simulations
-    public Choice GetChoiceSync(IChoiceRequest choiceRequest, BattleRequestType requestType, BattlePerspective perspective)
+    public Choice GetChoiceSync(IChoiceRequest choiceRequest, BattleRequestType requestType,
+        BattlePerspective perspective)
     {
         if (PrintDebug)
-   {
- Console.WriteLine($"[PlayerRandom.GetChoiceSync] Called for {SideId}");
+        {
+            Console.WriteLine($"[PlayerRandom.GetChoiceSync] Called for {SideId}");
         }
- 
+
         // Return empty choice - battle will call AutoChoose on the Side
         var choice = new Choice
- {
-     Actions = new List<ChosenAction>(),
+        {
+            Actions = new List<ChosenAction>(),
             CantUndo = false,
-    Error = string.Empty,
-      ForcedSwitchesLeft = 0,
+            Error = string.Empty,
+            ForcedSwitchesLeft = 0,
             ForcedPassesLeft = 0,
-    SwitchIns = new HashSet<int>(),
+            SwitchIns = new HashSet<int>(),
             Terastallize = false,
         };
-   
+
         if (PrintDebug)
         {
-            Console.WriteLine($"[PlayerRandom.GetChoiceSync] Returning empty choice for auto-selection");
+            Console.WriteLine(
+                $"[PlayerRandom.GetChoiceSync] Returning empty choice for auto-selection");
         }
+
         return choice;
     }
 
@@ -49,7 +53,8 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     }
 
     // Simplified async version (IPlayer)
-    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest, BattlePerspective perspective,
+    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
+        BattlePerspective perspective,
         CancellationToken cancellationToken)
     {
         Choice choice = GetNextChoiceFromAll(choiceRequest);
@@ -58,7 +63,8 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     }
 
     // Full async version for backward compatibility (IPlayer)
-    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest, BattleRequestType requestType,
+    public Task<Choice> GetNextChoiceAsync(IChoiceRequest choiceRequest,
+        BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
         Choice choice = GetNextChoiceFromAll(choiceRequest);
@@ -102,29 +108,30 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
     private Choice GetNextChoiceFromAll(IChoiceRequest request)
     {
         if (PrintDebug)
-   {
-        Console.WriteLine($"[PlayerRandom] GetNextChoiceFromAll called for {SideId}");
+        {
+            Console.WriteLine($"[PlayerRandom] GetNextChoiceFromAll called for {SideId}");
         }
 
-   // Create an empty choice that will be auto-filled by the battle engine
+        // Create an empty choice that will be auto-filled by the battle engine
         // The battle's Side.AutoChoose() method will fill in valid random choices
         var choice = new Choice
         {
-   Actions = new List<ChosenAction>(),
-        CantUndo = false,
-   Error = string.Empty,
-      ForcedSwitchesLeft = 0,
-    ForcedPassesLeft = 0,
-  SwitchIns = new HashSet<int>(),
+            Actions = new List<ChosenAction>(),
+            CantUndo = false,
+            Error = string.Empty,
+            ForcedSwitchesLeft = 0,
+            ForcedPassesLeft = 0,
+            SwitchIns = new HashSet<int>(),
             Terastallize = false,
- };
+        };
 
-   // For now, return an empty choice which signals the battle to use Side.AutoChoose()
-     // This is a valid pattern in Pokemon Showdown - empty choice = auto-choose
- if (PrintDebug)
+        // For now, return an empty choice which signals the battle to use Side.AutoChoose()
+        // This is a valid pattern in Pokemon Showdown - empty choice = auto-choose
+        if (PrintDebug)
         {
-         Console.WriteLine($"[PlayerRandom] Returning empty choice for auto-selection");
-   }
- return choice;
- }
+            Console.WriteLine($"[PlayerRandom] Returning empty choice for auto-selection");
+        }
+
+        return choice;
+    }
 }
