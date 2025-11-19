@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
@@ -107,7 +106,7 @@ public record Moves
                 StallingMove = true,
                 VolatileStatus = ConditionId.Protect,
 
-                OnPrepareHit = new OnPrepareHitEventInfo((battle, target, source, move) =>
+                OnPrepareHit = new OnPrepareHitEventInfo((battle, _, source, _) =>
                 {
                     // source is the Pokemon using Protect
                     // Always run both checks, let Stall condition handle the logic
@@ -117,10 +116,10 @@ public record Moves
                     bool result = willAct && stallSuccess;
 
                     // Return BoolEmptyVoidUnion explicitly
-                    return result ? (BoolEmptyVoidUnion)true : (BoolEmptyVoidUnion)false;
+                    return result ? true : (BoolEmptyVoidUnion)false;
                 }),
 
-                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                OnHit = new OnHitEventInfo((battle, _, source, _) =>
                 {
                     // source is the Pokemon using Protect
                     battle.Debug(
@@ -257,8 +256,8 @@ public record Moves
                     if (pokemon.Status is not ConditionId.None &&
                         pokemon.Status != ConditionId.Sleep)
                     {
+                        battle.Debug("[Facade.OnBasePower] Facade is increasing move damage.");
                         battle.ChainModify(2);
-                        return new VoidReturn();
                     }
 
                     return new VoidReturn();
