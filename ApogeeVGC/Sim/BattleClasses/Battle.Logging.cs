@@ -616,13 +616,25 @@ new EffectivenessMessage
  AdditionalInfo = parts.Length > 4 ? parts[4] : null
          },
 
-         "-item" when parts.Length > 3 =>
+          "-item" when parts.Length > 3 =>
       new ItemMessage
     {
      PokemonName = ExtractPokemonName(parts[2]),
   SideId = ExtractSideId(parts[2]),
          ItemName = parts[3]
         },
+
+                    "-sidestart" when parts.Length > 3 =>
+                        new GenericMessage 
+                        { 
+                            Text = $"{parts[3]} raised {GetSideName(parts[2])}'s team's {GetStatNameForCondition(parts[3])}!" 
+                        },
+
+                    "-sideend" when parts.Length > 3 =>
+                        new GenericMessage 
+                        { 
+                            Text = $"{GetSideName(parts[2])}'s {parts[3]} wore off!" 
+                        },
 
  _ => null
      };
@@ -688,6 +700,35 @@ new EffectivenessMessage
         }
 
         return "Unknown";
+    }
+
+    /// <summary>
+    /// Gets the side name from a side identifier (e.g., "p1" or "p2")
+    /// </summary>
+    private string GetSideName(string sideId)
+    {
+        if (sideId.StartsWith("p1"))
+        {
+            return Sides[0].Name;
+        }
+        else if (sideId.StartsWith("p2"))
+        {
+            return Sides[1].Name;
+        }
+        return "Unknown";
+    }
+
+    /// <summary>
+    /// Gets the stat name for a side condition (e.g., "Reflect" -> "Defense", "Light Screen" -> "Special Defense")
+    /// </summary>
+    private static string GetStatNameForCondition(string conditionName)
+    {
+        return conditionName switch
+        {
+            "Reflect" => "Defense",
+            "Light Screen" => "Special Defense",
+            _ => "stats"
+        };
     }
 
     /// <summary>

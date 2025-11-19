@@ -131,6 +131,24 @@ public class PlayerConsole : IPlayer
             AnsiConsole.WriteLine();
         }
 
+        // Display side conditions for both sides
+        string opponentSideState = GetSideConditionsDisplay(perspective.OpponentSide.SideConditionsWithDuration, "Opponent");
+        if (!string.IsNullOrEmpty(opponentSideState))
+        {
+            AnsiConsole.MarkupLine($"[bold]{opponentSideState}[/]");
+        }
+
+        string playerSideState = GetSideConditionsDisplay(perspective.PlayerSide.SideConditionsWithDuration, "Your Team");
+        if (!string.IsNullOrEmpty(playerSideState))
+        {
+            AnsiConsole.MarkupLine($"[bold]{playerSideState}[/]");
+        }
+
+        if (!string.IsNullOrEmpty(opponentSideState) || !string.IsNullOrEmpty(playerSideState))
+        {
+            AnsiConsole.WriteLine();
+        }
+
         Table table = new Table()
             .Border(TableBorder.Rounded)
             .BorderColor(Color.Grey);
@@ -752,6 +770,31 @@ public class PlayerConsole : IPlayer
     }
 
     /// <summary>
+    /// Get side conditions display showing screen moves and other side conditions with durations
+    /// </summary>
+    private string GetSideConditionsDisplay(IReadOnlyDictionary<ConditionId, int?> sideConditions, string sideName)
+    {
+        if (sideConditions.Count == 0)
+        {
+            return "";
+        }
+
+        var conditionParts = new List<string>();
+
+        foreach ((ConditionId conditionId, int? duration) in sideConditions)
+        {
+            string conditionName = GetSideConditionDisplayName(conditionId);
+            string durationText = duration.HasValue ? $":{duration}" : "";
+            string color = GetSideConditionColor(conditionId);
+            conditionParts.Add($"[{color}]{conditionName}{durationText}[/]");
+        }
+
+        return conditionParts.Count > 0
+            ? $"{sideName}: {string.Join(" ", conditionParts)}"
+            : "";
+    }
+
+    /// <summary>
     /// Get display name for field conditions (Weather, Terrain, PseudoWeather)
     /// </summary>
     private string GetFieldConditionDisplayName(ConditionId condition)
@@ -769,14 +812,38 @@ public class PlayerConsole : IPlayer
 
             // PseudoWeather
             ConditionId.TrickRoom => "TrickRoom",
-            ConditionId.Tailwind => "Tailwind",
-            ConditionId.Reflect => "Reflect",
-            ConditionId.LightScreen => "LightScreen",
             ConditionId.Gravity => "Gravity",
             ConditionId.MagicRoom => "MagicRoom",
             ConditionId.WonderRoom => "WonderRoom",
 
             _ => condition.ToString()
+        };
+    }
+
+    /// <summary>
+    /// Get display name for side conditions (Reflect, Light Screen, Tailwind, etc.)
+    /// </summary>
+    private string GetSideConditionDisplayName(ConditionId condition)
+    {
+        return condition switch
+        {
+            ConditionId.Reflect => "Reflect",
+            ConditionId.LightScreen => "Light Screen",
+            ConditionId.Tailwind => "Tailwind",
+            _ => condition.ToString()
+        };
+    }
+
+    /// <summary>
+    /// Get color for side condition display
+    /// </summary>
+    private string GetSideConditionColor(ConditionId condition)
+    {
+        return condition switch
+        {
+            ConditionId.Reflect or ConditionId.LightScreen => "cyan",
+            ConditionId.Tailwind => "yellow",
+            _ => "grey"
         };
     }
 

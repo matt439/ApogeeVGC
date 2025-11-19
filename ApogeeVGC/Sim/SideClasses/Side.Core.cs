@@ -224,6 +224,10 @@ public partial class Side
                     Position = p.Position,
                     IsActive = p.IsActive,
                 }).ToList().AsReadOnly(),
+            SideConditionsWithDuration = SideConditions.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Duration
+            ).AsReadOnly(),
         };
     }
 
@@ -291,6 +295,10 @@ public partial class Side
                     IsActive = p.IsActive,
                 };
             }).ToList().AsReadOnly(),
+            SideConditionsWithDuration = SideConditions.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Duration
+            ).AsReadOnly(),
         };
     }
 }
