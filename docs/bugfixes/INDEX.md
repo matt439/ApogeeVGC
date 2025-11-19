@@ -26,6 +26,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
 
+### UI and Display
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
+
 ---
 
 ## Detailed Summaries
@@ -273,6 +276,29 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Reflect Side Condition Display Fix
+**File**: `ReflectSideConditionDisplayFix.md`  
+**Severity**: Medium  
+**Systems Affected**: Side conditions, UI display, console player
+
+**Problem**: When moves like Reflect were used, the side condition was applied correctly internally, but no visual feedback was shown to players. The move execution message appeared ("Grimmsnarl used Reflect!") but the confirmation message and field status display section were missing.
+
+**Root Causes**:
+1. **Missing Message Parsing**: `ParseLogToMessages()` in `Battle.Logging.cs` didn't have cases for `-sidestart` or `-sideend` messages. The log entries were being added correctly but couldn't be parsed and displayed.
+2. **Missing Perspective Data**: Side conditions weren't included in `BattlePerspective` data sent to players, so they couldn't appear in the field status section like weather/terrain do.
+
+**Solution**:
+- Added `-sidestart` and `-sideend` parsing cases with helper methods `GetSideName()` and `GetStatNameForCondition()`
+- Extended `SidePlayerPerspective` and `SideOpponentPerspective` with `SideConditionsWithDuration` property
+- Updated `Side.Core.cs` to populate side conditions in perspectives
+- Modified `PlayerConsole.RenderBattleState()` to display side conditions in a separate section with durations
+
+**Result**: Side conditions now display in their own section (e.g., "Your Team: Reflect:8") showing which side has them active and how many turns remain.
+
+**Keywords**: `side condition`, `Reflect`, `Light Screen`, `Tailwind`, `log parsing`, `battle perspective`, `console UI`, `visual feedback`, `message display`
+
+---
+
 ## Search Guide
 
 ### By Symptom
@@ -286,6 +312,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Protect Bug Fix](#protect-bug-fix) - Blocking not working
 - [Trick Room Bug Fix](#trick-room-bug-fix) - Toggle effect not working
 - [Protect Stalling Mechanic](#protect-stalling-mechanic-issue) - Success rate always 100%
+
+**Visual/UI issues**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible
 
 **Wrong behavior**:
 - [Volt Switch Damage Type Bug](#volt-switch-damage-type-bug) - No switch prompt after damage
@@ -320,6 +349,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
 - [Leech Seed Bug Fix](#leech-seed-bug-fix)
 
+**UI/Display**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
 ### By File Modified
 
 **EventHandlerAdapter.cs**:
@@ -349,6 +381,18 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **BoolIntEmptyUndefinedUnion.cs**:
 - [Protect Bug Fix](#protect-bug-fix)
+
+**Battle.Logging.cs**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**SidePlayerPerspective.cs / SideOpponentPerspective.cs**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**Side.Core.cs**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**PlayerConsole.cs**:
+- [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
 
 ---
 
@@ -432,9 +476,10 @@ When documenting a new bug fix:
 - **2025-01-XX**: Initial index created with 11 bug fix summaries
 - Includes guides for event system, union types, and move mechanics
 - Organized by category, symptom, component, and file
+- **2025-01-XX**: Added Reflect Side Condition Display Fix (UI/perspective issue)
 
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 12  
+*Total Bug Fixes Documented*: 13  
 *Reference Guides*: 1
