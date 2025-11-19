@@ -16,6 +16,18 @@ public static class TeamGenerator
         [
             new PokemonSet
             {
+                Name = "Volcarona",
+                Species = SpecieId.Volcarona,
+                Item = ItemId.RockyHelmet,
+                Ability = AbilityId.FlameBody,
+                Moves = [ MoveId.StruggleBug, MoveId.Overheat, MoveId.Protect, MoveId.Tailwind ],
+                Nature = library.Natures[NatureId.Bold],
+                Gender = GenderId.M,
+                Evs = new StatsTable { Hp = 252, Def = 196, SpD = 60 },
+                TeraType = MoveType.Water,
+            },
+            new PokemonSet
+            {
                 Name = "Grimmsnarl",
                 Species = SpecieId.Grimmsnarl,
                 Item = ItemId.LightClay,
@@ -61,18 +73,6 @@ public static class TeamGenerator
                 Gender = GenderId.M,
                 Evs = new StatsTable { Hp = 108, Atk = 156, Def = 4, SpD = 116, Spe = 124 },
                 TeraType = MoveType.Ghost,
-            },
-            new PokemonSet
-            {
-                Name = "Volcarona",
-                Species = SpecieId.Volcarona,
-                Item = ItemId.RockyHelmet,
-                Ability = AbilityId.FlameBody,
-                Moves = [ MoveId.StruggleBug, MoveId.Overheat, MoveId.Protect, MoveId.Tailwind ],
-                Nature = library.Natures[NatureId.Bold],
-                Gender = GenderId.M,
-                Evs = new StatsTable { Hp = 252, Def = 196, SpD = 60 },
-                TeraType = MoveType.Water,
             },
             new PokemonSet
             {
