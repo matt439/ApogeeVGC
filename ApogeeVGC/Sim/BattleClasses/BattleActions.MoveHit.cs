@@ -405,7 +405,8 @@ if (tryResult is BoolRelayVar { Value: false } ||
         }
 
         // 5. secondary effects
-        if (move.Secondaries != null)
+        // Only process secondaries if this is not already a secondary effect (prevents infinite recursion)
+        if (move.Secondaries != null && !isSecondary)
         {
             Secondaries(targets, pokemon, move, move, isSelf);
         }

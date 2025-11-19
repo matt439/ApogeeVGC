@@ -21,6 +21,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix) - HitEffect not being stored for self-targeting effects
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple interconnected issues with self-targeting moves
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Infinite loop in damage calculation for self-stat changes
+- [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Secondary property not converted to Secondaries array
 
 ### Status Conditions
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Incorrect conditional logic when applying status
@@ -253,6 +254,25 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Spirit Break Secondary Effect Fix
+**File**: `SpiritBreakSecondaryEffectFix.md`  
+**Severity**: High  
+**Systems Affected**: Moves with secondary effects using `Secondary` property
+
+**Problem**: Spirit Break and other moves using `Secondary` (singular) instead of `Secondaries` (plural) were not applying their secondary effects. After initial fix, infinite recursion caused stack overflow.
+
+**Root Causes**:
+1. **Missing Property Conversion**: TypeScript automatically converts `secondary` to `secondaries` array in constructor; C# was missing this logic
+2. **Infinite Recursion**: Secondary effect processing re-triggered secondary processing in a loop
+
+**Solutions**:
+1. Added conversion logic in `Move.ToActiveMove()` to wrap `Secondary` in array as `Secondaries`
+2. Added `!isSecondary` check in `SpreadMoveHit` step 5 to prevent recursive secondary processing
+
+**Keywords**: `Spirit Break`, `Secondary`, `Secondaries`, `secondary effects`, `stat drops`, `infinite recursion`, `property conversion`, `Struggle Bug`
+
+---
+
 ## Search Guide
 
 ### By Symptom
@@ -274,6 +294,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Infinite loops**:
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Stack overflow
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple issues including recursion
+- [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
 
 ### By Component
 
@@ -318,6 +339,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **BattleActions.MoveHit.cs**:
 - [Headlong Rush Self-Stat Drops Fix](#headlong-rush-self-stat-drops-fix)
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix)
+- [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix)
 
 **Pokemon.Status.cs**:
 - [TrySetStatus Logic Error](#trysetstatus-logic-error)
@@ -414,5 +436,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 11  
+*Total Bug Fixes Documented*: 12  
 *Reference Guides*: 1

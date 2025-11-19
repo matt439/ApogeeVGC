@@ -154,6 +154,10 @@ public partial record Move : IBasicEffect, ICopyable<Move>
 
     public ActiveMove ToActiveMove()
     {
+        // Match TypeScript behavior: if secondaries is null but secondary exists,
+        // wrap secondary in an array to populate secondaries
+        SecondaryEffect[]? secondaries = Secondaries ?? (Secondary != null ? [Secondary] : null);
+        
         return new ActiveMove
         {
             // Copy all base Move properties
@@ -186,7 +190,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
             StealsBoosts = StealsBoosts,
             StruggleRecoil = StruggleRecoil,
             Secondary = Secondary,
-            Secondaries = Secondaries,
+            Secondaries = secondaries,
             Self = Self,
             HasSheerForce = HasSheerForce,
             AlwaysHit = AlwaysHit,
