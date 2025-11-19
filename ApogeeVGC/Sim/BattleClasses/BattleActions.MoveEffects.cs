@@ -284,6 +284,8 @@ public partial class BattleActions
     public void SelfDrops(SpreadMoveTargets targets, Pokemon source, ActiveMove move, ActiveMove moveData,
         bool isSecondary = false)
     {
+        Battle.Debug($"[SelfDrops] Called for {move.Name}, isSecondary={isSecondary}, moveData.Self != null: {moveData.Self != null}, move.SelfDropped: {move.SelfDropped}");
+        
         foreach (PokemonFalseUnion targetUnion in targets)
         {
             if (targetUnion is not PokemonPokemonUnion)
@@ -293,14 +295,25 @@ public partial class BattleActions
 
             if (moveData.Self != null && move.SelfDropped != true)
             {
+                Battle.Debug($"[SelfDrops] Processing self effect for {source.Name}");
+                
                 if (!isSecondary && moveData.Self.Boosts != null)
                 {
+                    Battle.Debug($"[SelfDrops] Branch 1: !isSecondary && moveData.Self.Boosts != null");
                     int secondaryRoll = Battle.Random(100);
+                    Battle.Debug($"[SelfDrops] secondaryRoll={secondaryRoll}, Chance={moveData.Self.Chance}");
+                    
                     if (moveData.Self.Chance == null || secondaryRoll < moveData.Self.Chance)
                     {
+                        Battle.Debug($"[SelfDrops] Calling MoveHit for self boosts");
                         // isSelf=true prevents damage calculation (matching TypeScript behavior)
                         MoveHit(source, source, move, moveData.Self, isSecondary, true);
                     }
+                    else
+                    {
+                        Battle.Debug($"[SelfDrops] Chance check failed, skipping self boosts");
+                    }
+                    
                     if (move.MultiHit == null)
                     {
                         move.SelfDropped = true;
@@ -308,8 +321,20 @@ public partial class BattleActions
                 }
                 else
                 {
+                    Battle.Debug($"[SelfDrops] Branch 2: else branch (isSecondary={isSecondary} or Boosts=null)");
                     // isSelf=true prevents damage calculation (matching TypeScript behavior)
                     MoveHit(source, source, move, moveData.Self, isSecondary, true);
+                }
+            }
+            else
+            {
+                if (moveData.Self == null)
+                {
+                    Battle.Debug($"[SelfDrops] moveData.Self is null, skipping");
+                }
+                if (move.SelfDropped == true)
+                {
+                    Battle.Debug($"[SelfDrops] move.SelfDropped is true, skipping");
                 }
             }
         }
