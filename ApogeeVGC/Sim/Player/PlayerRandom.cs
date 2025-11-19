@@ -268,9 +268,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     private bool IsPokemonFainted(PokemonSwitchRequestData pokemon)
     {
-        // Check if Pokemon has 0 HP (fainted) by checking if HP stat is available
-        // In Pokemon Showdown protocol, fainted Pokemon have HP=0 in their stats
-        return pokemon.Stats.Hp == 0 || pokemon.Reviving;
+        // The Reviving flag indicates a Pokemon being revived by Revival Blessing
+        // Treat these as fainted/unavailable for normal switching
+        return pokemon.Reviving;
     }
 
     private Choice GetRandomSwitchChoice(SwitchRequest request)

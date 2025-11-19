@@ -69,7 +69,7 @@ public partial class Pokemon
             Ident = Fullname,
             Details = Details.ToString(),
             Condition = secretCondition.Value,
-            Active = Position < Side.Active.Count,
+            Active = IsActive, // Use IsActive property instead of position check
             Stats = stats,
             Moves = moves,
             BaseAbility = Battle.Library.Abilities[BaseAbility],
