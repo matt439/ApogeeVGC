@@ -452,65 +452,65 @@ public partial class Battle
     public void CommitChoices()
     {
         Debug("CommitChoices starting");
-  Debug($"[CommitChoices] Starting, queue size = {Queue.List.Count}");
+        Debug($"[CommitChoices] Starting, queue size = {Queue.List.Count}");
 
-     UpdateSpeed();
+        UpdateSpeed();
 
         // Reset consecutive request counter when choices are successfully committed
-_consecutiveMoveRequests = 0;
+        _consecutiveMoveRequests = 0;
 
- // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
+        // Sometimes you need to make switch choices mid-turn (e.g. U-turn,
         // fainting). When this happens, the rest of the turn is saved (and not
-     // re-sorted), but the new switch choices are sorted and inserted before
+        // re-sorted), but the new switch choices are sorted and inserted before
         // the rest of the turn.
-   var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
+        var oldQueue = Queue.List.ToList(); // Create a copy of the current queue
         Debug($"[CommitChoices] Saved oldQueue with {oldQueue.Count} items");
 
-      Queue.Clear();
+        Queue.Clear();
         Debug($"[CommitChoices] Cleared queue");
 
         if (!AllChoicesDone())
         {
-  throw new InvalidOperationException("Not all choices done");
+            throw new InvalidOperationException("Not all choices done");
         }
 
         // Log each side's choice to the input log and history
         foreach (Side side in Sides)
-     {
-            string? choice = side.GetChoice().ToString();
-   if (!string.IsNullOrEmpty(choice))
-            {
-          InputLog.Add($"> {side.Id} {choice}");
-
- // Record choice in history
-    History.RecordChoice(side.Id, choice);
-       }
-    }
-
-  // Add each side's actions to the queue
-   foreach (Side side in Sides)
         {
-    Queue.AddChoice(side.Choice.Actions);
-  }
+            string? choice = side.GetChoice().ToString();
+            if (!string.IsNullOrEmpty(choice))
+            {
+                InputLog.Add($"> {side.Id} {choice}");
 
-      Debug($"Added {Queue.List.Count} actions to queue");
+                // Record choice in history
+                History.RecordChoice(side.Id, choice);
+            }
+        }
+
+        // Add each side's actions to the queue
+        foreach (Side side in Sides)
+        {
+            Queue.AddChoice(side.Choice.Actions);
+        }
+
+        Debug($"Added {Queue.List.Count} actions to queue");
         Debug($"[CommitChoices] After adding side actions, queue size = {Queue.List.Count}");
 
         // Update action speeds now that Pokemon speeds have been recalculated
         for (int i = 0; i < Queue.List.Count; i++)
         {
-          Queue.List[i] = GetActionSpeed(Queue.List[i]);
+            Queue.List[i] = GetActionSpeed(Queue.List[i]);
         }
 
         ClearRequest();
 
-    // Sort the new actions by priority/speed
-   Queue.Sort();
+        // Sort the new actions by priority/speed
+        Queue.Sort();
 
-Debug($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
+        Debug($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
 
-      // Append the old queue actions after the new ones
-  Queue.List.AddRange(oldQueue);
+        // Append the old queue actions after the new ones
+        Queue.List.AddRange(oldQueue);
 
         Debug($"[CommitChoices] After restoring oldQueue, queue size = {Queue.List.Count}");
         Debug($"Total queue size: {Queue.List.Count}");
@@ -523,27 +523,27 @@ Debug($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
         }
 
         // Continue executing the turn
-     Debug("Calling TurnLoop");
+        Debug("Calling TurnLoop");
 
-TurnLoop();
+        TurnLoop();
 
         Debug("TurnLoop returned");
 
         // In synchronous mode, do NOT call RequestPlayerChoices here
         // This would cause infinite recursion since the simulator handles requests synchronously
- // Instead, return and let the caller (simulator) check for pending requests
+        // Instead, return and let the caller (simulator) check for pending requests
 
-   // Check if battle ended during TurnLoop
-    if (Ended)
- {
-       Debug("Battle ended during TurnLoop, exiting");
+        // Check if battle ended during TurnLoop
+        if (Ended)
+        {
+            Debug("Battle ended during TurnLoop, exiting");
             return;
         }
 
-     // Workaround for tests - send updates if log is getting large
+        // Workaround for tests - send updates if log is getting large
         if (Log.Count - SentLogPos > 500)
         {
- SendUpdates();
+            SendUpdates();
         }
     }
 
