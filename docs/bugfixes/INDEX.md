@@ -14,6 +14,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### Union Type Handling
 - [Protect Bug Fix](#protect-bug-fix) - IsZero() logic error treating false as zero
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined check occurring after .ToInt() conversion
+- [Tailwind OnModifySpe Fix](#tailwind-onmodifyspe-fix) - VoidReturn causing IntRelayVar type mismatch
 - [Union Type Handling Guide](#union-type-handling-guide) - Comprehensive guide for preventing union type issues
 
 ### Move Mechanics
@@ -276,6 +277,26 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ---
 
+### Tailwind OnModifySpe Fix
+**File**: `TailwindOnModifySpeFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Side conditions, stat modification, speed calculation
+
+**Problem**: When Volcarona used Tailwind, the battle immediately ended in a tie with `InvalidOperationException: stat must be an IntRelayVar`. The Tailwind side condition's `OnModifySpe` handler was returning `VoidReturn()` after calling `ChainModify(2)`, which got converted to `VoidReturnRelayVar` instead of the expected `IntRelayVar`.
+
+**Root Cause**: `OnModifySpe` handlers that use `ChainModify()` were returning `VoidReturn()` instead of applying the modifier and returning the result. The stat calculation code in `Pokemon.GetStat()` strictly checks for `IntRelayVar` and throws an exception when it receives `VoidReturnRelayVar`.
+
+**Solution**:
+- Changed Tailwind's `OnModifySpe` to return `battle.FinalModify(spe)` after calling `battle.ChainModify(2)`
+- Changed QuarkDrive's `OnModifySpe` to return `battle.FinalModify(spe)` after calling `battle.ChainModify(1.5)`
+- Added documentation on the correct pattern for stat modification handlers
+
+**Key Pattern**: When using `ChainModify()` in stat modification handlers, always call `FinalModify(value)` and return the result. Only return `VoidReturn()` for early exits when no modification should occur.
+
+**Keywords**: `Tailwind`, `QuarkDrive`, `OnModifySpe`, `VoidReturn`, `ChainModify`, `FinalModify`, `IntRelayVar`, `speed modification`, `stat events`
+
+---
+
 ### Reflect Side Condition Display Fix
 **File**: `ReflectSideConditionDisplayFix.md`  
 **Severity**: Medium  
@@ -477,9 +498,10 @@ When documenting a new bug fix:
 - Includes guides for event system, union types, and move mechanics
 - Organized by category, symptom, component, and file
 - **2025-01-XX**: Added Reflect Side Condition Display Fix (UI/perspective issue)
+- **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
 
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 13  
+*Total Bug Fixes Documented*: 14  
 *Reference Guides*: 1

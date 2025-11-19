@@ -766,10 +766,12 @@ public record Conditions
                         battle.Add("-sidestart", side, "move: Tailwind");
                     }
                 }),
-                OnModifySpe = new OnModifySpeEventInfo((battle, _, _) =>
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, _) =>
                 {
+                    // Tailwind doubles speed using chain modification
                     battle.ChainModify(2);
-                    return new VoidReturn();
+                    // Apply the accumulated modifier to the speed value
+                    return battle.FinalModify(spe);
                 }),
                 //OnSideResidualOrder = 26,
                 //OnSideResidualSubOrder = 5,
@@ -1089,7 +1091,7 @@ public record Conditions
                         return new VoidReturn();
                     },
                     6),
-                OnModifySpe = new OnModifySpeEventInfo((battle, _, pokemon) =>
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
                 {
                     if (battle.EffectState.BestStat != StatIdExceptHp.Spe ||
                         pokemon.IgnoringAbility())
@@ -1103,7 +1105,7 @@ public record Conditions
                     }
 
                     battle.ChainModify(1.5);
-                    return new VoidReturn();
+                    return battle.FinalModify(spe);
                 }),
                 OnEnd = new OnEndEventInfo((battle, pokemon) =>
                 {
