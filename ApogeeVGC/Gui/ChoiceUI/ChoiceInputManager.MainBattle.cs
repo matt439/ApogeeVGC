@@ -113,7 +113,9 @@ public partial class ChoiceInputManager
         Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Cleared buttons and reset selection");
 
         // Check if there are any valid switch options (non-active, non-fainted Pokemon)
- bool hasValidSwitchOptions = request.Side.Pokemon.Any(p => !p.Active && !IsFainted(p));
+ bool hasValidSwitchOptions = request.Side.Pokemon
+    .Select((p, index) => new { Pokemon = p, Index = index })
+    .Any(x => !x.Pokemon.Active && !IsFainted(x.Index));
 
     // Set up buttons based on current state
  switch (MainBattleState)
@@ -152,12 +154,14 @@ public partial class ChoiceInputManager
      {
          Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionFirstPokemon buttons");
              var availablePokemon = request.Side.Pokemon
-           .Where(p => !p.Active && !IsFainted(p))
+           .Select((p, index) => (Pokemon: p, OriginalIndex: index))
+           .Where(x => !x.Pokemon.Active && !IsFainted(x.OriginalIndex))
    .ToList();
                 _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
               availablePokemon,
            (switchIndex) => HandleSwitchSelection(0, switchIndex),
                () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
+                 _perspective,
                  showBackButton: true
                 );
     Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionFirstPokemon");
@@ -199,12 +203,14 @@ public partial class ChoiceInputManager
      {
       Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating SwitchSelectionSecondPokemon buttons");
        var availablePokemon = request.Side.Pokemon
-     .Where(p => !p.Active && !IsFainted(p))
+     .Select((p, index) => (Pokemon: p, OriginalIndex: index))
+     .Where(x => !x.Pokemon.Active && !IsFainted(x.OriginalIndex))
            .ToList();
       _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
            availablePokemon,
       (switchIndex) => HandleSwitchSelection(1, switchIndex),
   () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
+          _perspective,
           showBackButton: true
     );
     Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for SwitchSelectionSecondPokemon");
@@ -215,12 +221,14 @@ public partial class ChoiceInputManager
           {
     Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating ForceSwitch buttons");
        var availablePokemon = request.Side.Pokemon
-    .Where(p => !p.Active && !IsFainted(p))
+    .Select((p, index) => (Pokemon: p, OriginalIndex: index))
+    .Where(x => !x.Pokemon.Active && !IsFainted(x.OriginalIndex))
  .ToList();
    _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
      availablePokemon,
     (switchIndex) => HandleForceSwitchSelection(switchIndex),
         () => { }, // No back button for force switch
+          _perspective,
           showBackButton: false
     );
        Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for ForceSwitch");
@@ -232,14 +240,18 @@ public partial class ChoiceInputManager
     }
 
     /// <summary>
-    /// Helper method to check if a Pokemon is fainted based on its Condition
+    /// Helper method to check if a Pokemon is fainted based on its position in the perspective
     /// </summary>
-    private static bool IsFainted(PokemonSwitchRequestData pokemon)
+    private bool IsFainted(int pokemonIndex)
     {
-        // In Pokemon Showdown protocol, fainted Pokemon have condition like "0 fnt"
-  string conditionStr = pokemon.Condition.ToString();
-    return conditionStr.Contains("fnt", StringComparison.OrdinalIgnoreCase) ||
-     conditionStr.StartsWith("0 ", StringComparison.Ordinal);
+        if (_perspective == null)
+            return false;
+
+        // Find matching Pokemon in perspective by position
+        var perspectivePokemon = _perspective.PlayerSide.Pokemon
+            .FirstOrDefault(pp => pp.Position == pokemonIndex);
+
+        return perspectivePokemon?.Fainted ?? false;
     }
 
     private void RenderMainBattleUi()

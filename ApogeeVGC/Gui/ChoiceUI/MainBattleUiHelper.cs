@@ -1,3 +1,4 @@
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Utils.Unions;
 using Microsoft.Xna.Framework;
@@ -191,28 +192,61 @@ public static class MainBattleUiHelper
     }
 
     public static List<ChoiceButton> CreateSwitchSelectionButtons(
-        IEnumerable<PokemonSwitchRequestData> availablePokemon,
+        IEnumerable<(PokemonSwitchRequestData Pokemon, int OriginalIndex)> availablePokemon,
         Action<int> selectSwitch,
         Action goBack,
+        BattlePerspective? perspective,
         bool showBackButton = true)
     {
         var buttons = new List<ChoiceButton>();
         int y = TopMargin;
-        int pokemonIndex = 0;
 
-        foreach (PokemonSwitchRequestData pokemon in availablePokemon)
+        foreach (var (pokemon, originalIndex) in availablePokemon)
         {
-            int index = pokemonIndex;
+            int index = originalIndex; // Use original index for switch selection
+            
+            // Get HP information and name from perspective if available
+            string displayName = pokemon.Details;
+            string hpDisplay;
+            
+            if (perspective != null)
+            {
+                // Find matching Pokemon in perspective by position
+                var perspectivePokemon = perspective.PlayerSide.Pokemon
+                    .FirstOrDefault(pp => pp.Position == originalIndex);
+
+                if (perspectivePokemon != null)
+                {
+                    // Use name from perspective
+                    displayName = $"{perspectivePokemon.Name}, L{perspectivePokemon.Level}";
+                    
+                    hpDisplay = perspectivePokemon.Fainted
+                        ? "Fainted"
+                        : $"{perspectivePokemon.Hp}/{perspectivePokemon.MaxHp}";
+                }
+                else
+                {
+                    // Fallback to max HP from stats
+                    int maxHp = pokemon.Stats.Hp;
+                    hpDisplay = $"{maxHp}/{maxHp}";
+                }
+            }
+            else
+            {
+                // Fallback to max HP from stats if no perspective
+                int maxHp = pokemon.Stats.Hp;
+                hpDisplay = $"{maxHp}/{maxHp}";
+            }
+            
             var button = new ChoiceButton(
                 new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                $"Pokemon (Condition: {pokemon.Condition})",
+                $"{displayName} (HP: {hpDisplay})",
                 Color.Green,
                 () => selectSwitch(index)
             );
 
             buttons.Add(button);
             y += ButtonHeight + ButtonSpacing;
-            pokemonIndex++;
         }
 
         // Add back button if requested

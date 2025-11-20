@@ -25,9 +25,16 @@ public partial class ChoiceInputManager
 
     private void RenderTeamPreviewUi()
     {
+        // Get the required team size from the request
+        int requiredTeamSize = 6; // Default
+        if (_currentRequest is TeamPreviewRequest tpr)
+        {
+            requiredTeamSize = tpr.MaxChosenTeamSize ?? tpr.Side.Pokemon.Count;
+        }
+        
         // Draw instruction text
         string instructionText =
-            "Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in all 6 Pokemon.";
+            $"Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in {requiredTeamSize} Pokemon.";
         var instructionPos = new Vector2(
             (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2f,
             graphicsDevice.Viewport.Height / 2f);
@@ -36,7 +43,7 @@ public partial class ChoiceInputManager
         // Draw locked-in status
         if (_lockedInPositions.Count > 0)
         {
-            string statusText = $"Locked in {_lockedInPositions.Count}/6 Pokemon";
+            string statusText = $"Locked in {_lockedInPositions.Count}/{requiredTeamSize} Pokemon";
             var statusPos = new Vector2(
                 (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2f,
                 graphicsDevice.Viewport.Height / 2f + 30);
@@ -57,6 +64,7 @@ public partial class ChoiceInputManager
         if (_currentRequest is not TeamPreviewRequest request) return;
 
         int teamSize = request.Side.Pokemon.Count;
+        int requiredTeamSize = request.MaxChosenTeamSize ?? teamSize;
 
         // Left arrow - move highlight left
         if (IsKeyPressed(keyboardState, Keys.Left))
@@ -93,13 +101,13 @@ public partial class ChoiceInputManager
                 _lockedInPositions.Add(CurrentHighlightedIndex);
                 _lockedInIndices.Add(CurrentHighlightedIndex);
                 Console.WriteLine(
-                    $"[ChoiceInputManager] Locked in Pokemon {CurrentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{teamSize}");
+                    $"[ChoiceInputManager] Locked in Pokemon {CurrentHighlightedIndex}, total locked: {_lockedInPositions.Count}/{requiredTeamSize}");
 
-                // If all Pokemon are locked in, submit the choice
-                if (_lockedInPositions.Count == teamSize)
+                // If required number of Pokemon are locked in, submit the choice
+                if (_lockedInPositions.Count == requiredTeamSize)
                 {
                     Console.WriteLine(
-                        $"[ChoiceInputManager] All Pokemon locked in, submitting choice");
+                        $"[ChoiceInputManager] Required {requiredTeamSize} Pokemon locked in, submitting choice");
                     SubmitTeamPreviewChoice();
                 }
             }
