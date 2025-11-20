@@ -23,7 +23,7 @@ public class Driver
     private const int PlayerRandom2EvalSeed = 1818;
     private const int BattleEvalSeed = 9876;
 
-    private const int RandomEvaluationNumTest = 5;
+    private const int RandomEvaluationNumTest = 100000;
     private const int NumThreads = 10;
     private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 

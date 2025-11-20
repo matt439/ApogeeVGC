@@ -10,7 +10,7 @@ public class Program
         //DebugRandomBias.RunDebugTest();
 
         var driver = new Driver();
-        driver.Start(DriverMode.RandomVsRandomDoubles);
+        driver.Start(DriverMode.RandomVsRandomDoublesEvaluation);
         Console.WriteLine("Press Enter key to exit...");
         Console.ReadLine();
     }
