@@ -9,14 +9,27 @@ namespace ApogeeVGC.Gui.ChoiceUI;
 /// </summary>
 public static class MainBattleUiHelper
 {
+    // ===== MAIN BATTLE CHOICE UI LAYOUT CONSTANTS =====
+    
+    // Button dimensions
     private const int ButtonWidth = 200;
-    private const int ButtonHeight = 40;
-
-    private const int ButtonSpacing = 5;
-
-    // Move buttons to the right side of the screen
-    private const int LeftMargin = 700; // Changed from 800 to 700
-    private const int TopMargin = 300; // Changed from 400 to 300
+    private const int ButtonHeight = 35;
+    
+    // Vertical spacing between buttons
+    private const int ButtonSpacing = 3;
+    
+    // Extra spacing before certain buttons (e.g., before "Back" button)
+    private const int ButtonSpacingLarge = 8;
+    
+    // Position of choice menu on screen
+    private const int LeftMargin = 700;  // X position from left edge
+    private const int TopMargin = 300;   // Y position from top edge
+    
+    // Position of instruction text (appears above buttons)
+    private const int InstructionTextYOffset = 80; // Distance above TopMargin
+    
+    // Position of selection status text (appears below buttons)
+    private const int SelectionStatusY = 650; // Fixed Y position at bottom
 
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
@@ -165,7 +178,7 @@ public static class MainBattleUiHelper
         }
 
         // Add back button
-        y += ButtonHeight + ButtonSpacing;
+        y += ButtonHeight + ButtonSpacingLarge;
         var backButton = new ChoiceButton(
             new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
             "Back",
@@ -205,7 +218,7 @@ public static class MainBattleUiHelper
         // Add back button if requested
         if (showBackButton)
         {
-            y += ButtonSpacing;
+            y += ButtonSpacingLarge;
             var backButton = new ChoiceButton(
                 new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 "Back",
@@ -238,5 +251,21 @@ public static class MainBattleUiHelper
                 "Your Pokemon fainted! Select a replacement.",
             _ => "Use UP/DOWN arrows to navigate, ENTER to select",
         };
+    }
+
+    /// <summary>
+    /// Get the position for instruction text (appears above buttons)
+    /// </summary>
+    public static Vector2 GetInstructionTextPosition()
+    {
+        return new Vector2(LeftMargin, TopMargin - InstructionTextYOffset);
+    }
+
+    /// <summary>
+    /// Get the position for selection status text (appears at bottom)
+    /// </summary>
+    public static Vector2 GetSelectionStatusPosition()
+    {
+        return new Vector2(LeftMargin, SelectionStatusY);
     }
 }

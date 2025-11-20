@@ -20,10 +20,44 @@ public class BattleRenderer(
     GraphicsDevice graphicsDevice,
     SpriteManager spriteManager)
 {
-    // Layout constants
-    private const int Padding = 20;
+    // ===== LAYOUT CONSTANTS =====
+
+    // General spacing and padding
+    private const int Padding = 10;
     private const int PokemonSpriteSize = 128;
     private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
+    private const int PokemonSpacing = 20; // Horizontal spacing between Pokemon sprites
+
+    // Team Preview layout
+    private const int TeamPreviewOpponentYOffset = 60; // Offset from top padding for opponent team
+    private const int TeamPreviewLabelYOffset = 30; // Distance of label above Pokemon sprites
+
+    // In-Battle layout
+    private const int InBattlePlayerYOffset = 200; // Offset from bottom to position player Pokemon
+    private const int InBattleOpponentYOffset = 120; // Offset from top padding for opponent Pokemon
+
+    // Timer display layout
+    private const int TimerXOffset = 200; // Distance from right edge of screen
+    private const int TimerLineHeight = 25; // Vertical spacing between timer lines
+
+    // Pokemon info text layout
+    private const int InfoTextYOffset = 5; // Distance below sprite to start text
+
+    // Lock order indicator
+    private const int LockOrderXPadding = 5; // Padding from right edge of sprite
+    private const int LockOrderYPadding = 5; // Padding from top edge of sprite
+    private const int LockOrderBackgroundPadding = 2; // Padding around lock order text background
+
+    // Border styling
+    private const int BorderThicknessNormal = 2;
+    private const int BorderThicknessHighlighted = 4;
+
+    // HP color thresholds
+    private const double HpColorThresholdGreen = 0.5; // Above 50% HP shows green
+    private const double HpColorThresholdYellow = 0.2; // Above 20% HP shows yellow, below shows red
+
+    // Lock order background transparency
+    private const float LockOrderBackgroundAlpha = 0.7f;
 
     // Reference to choice input manager for team preview state
     private ChoiceUI.ChoiceInputManager? _choiceInputManager;
@@ -126,13 +160,14 @@ public class BattleRenderer(
         // Display all Pokemon in a horizontal row at the bottom
         int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding -
                         InfoTextHeight;
-        int totalWidth = battlePerspective.PlayerSide.Pokemon.Count * (PokemonSpriteSize + Padding);
+        int totalWidth = battlePerspective.PlayerSide.Pokemon.Count *
+                         (PokemonSpriteSize + PokemonSpacing);
         int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
 
         for (int i = 0; i < battlePerspective.PlayerSide.Pokemon.Count; i++)
         {
             var pokemon = battlePerspective.PlayerSide.Pokemon[i];
-            int xPosition = startX + (i * (PokemonSpriteSize + Padding));
+            int xPosition = startX + (i * (PokemonSpriteSize + PokemonSpacing));
 
             // Check if this Pokemon is highlighted or locked
             bool isHighlighted =
@@ -166,7 +201,7 @@ public class BattleRenderer(
         XnaVector2 labelSize = font.MeasureString(label);
         XnaVector2 labelPos = new XnaVector2(
             (graphicsDevice.Viewport.Width - labelSize.X) / 2,
-            yPosition - 30);
+            yPosition - TeamPreviewLabelYOffset);
         spriteBatch.DrawString(font, label, labelPos, XnaColor.White);
     }
 
@@ -176,25 +211,25 @@ public class BattleRenderer(
     private void RenderTeamPreviewOpponentTeam(BattlePerspective battlePerspective)
     {
         // Display all Pokemon in a horizontal row at the top
-        const int yPosition = Padding + 60;
+        int yPosition = Padding + TeamPreviewOpponentYOffset;
         int totalWidth = battlePerspective.OpponentSide.Pokemon.Count *
-              (PokemonSpriteSize + Padding);
+                         (PokemonSpriteSize + PokemonSpacing);
         int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
 
         for (int i = 0; i < battlePerspective.OpponentSide.Pokemon.Count; i++)
-    {
-      PokemonPerspective pokemon = battlePerspective.OpponentSide.Pokemon[i];
-  int xPosition = startX + (i * (PokemonSpriteSize + Padding));
-  RenderOpponentPokemonTeamPreview(pokemon, new XnaVector2(xPosition, yPosition));
-    }
+        {
+            PokemonPerspective pokemon = battlePerspective.OpponentSide.Pokemon[i];
+            int xPosition = startX + (i * (PokemonSpriteSize + PokemonSpacing));
+            RenderOpponentPokemonTeamPreview(pokemon, new XnaVector2(xPosition, yPosition));
+        }
 
         // Draw label
         const string label = "Opponent's Team";
         XnaVector2 labelSize = font.MeasureString(label);
         var labelPos = new XnaVector2(
-     (graphicsDevice.Viewport.Width - labelSize.X) / 2,
-     yPosition - 30);
-      spriteBatch.DrawString(font, label, labelPos, XnaColor.White);
+            (graphicsDevice.Viewport.Width - labelSize.X) / 2,
+            yPosition - TeamPreviewLabelYOffset);
+        spriteBatch.DrawString(font, label, labelPos, XnaColor.White);
     }
 
     /// <summary>
@@ -221,14 +256,14 @@ public class BattleRenderer(
         // Render only active Pokemon
         // Position them lower on screen but not at bottom - leave room for UI
         int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding -
-                        InfoTextHeight - 200;
+                        InfoTextHeight - InBattlePlayerYOffset;
 
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
             var pokemon = battlePerspective.PlayerSide.Active[i];
             if (pokemon == null) continue;
 
-            int xPosition = Padding + (i * (PokemonSpriteSize + Padding));
+            int xPosition = Padding + (i * (PokemonSpriteSize + PokemonSpacing));
             RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
     }
@@ -239,20 +274,21 @@ public class BattleRenderer(
     private void RenderInBattleOpponentPokemon(BattlePerspective battlePerspective)
     {
         // Render only active Pokemon
-        // Move down to avoid overlap with timers (changed from Padding + 60 to Padding + 120)
-    const int yPosition = Padding + 120;
+        // Move down to avoid overlap with timers
+        int yPosition = Padding + InBattleOpponentYOffset;
 
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
-      var pokemon = battlePerspective.OpponentSide.Active[i];
-        if (pokemon == null) continue;
+            var pokemon = battlePerspective.OpponentSide.Active[i];
+            if (pokemon == null) continue;
 
             int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
-         (i * (PokemonSpriteSize + Padding));
+                            (i * (PokemonSpriteSize + PokemonSpacing));
 
             RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
- }
+    }
+
     /// <summary>
     /// Render UI for active battle
     /// </summary>
@@ -275,9 +311,9 @@ public class BattleRenderer(
         var timerManager = _choiceInputManager.TimerManager;
 
         // Timer display position (top right of screen)
-        int timerX = graphicsDevice.Viewport.Width - 200;
+        int timerX = graphicsDevice.Viewport.Width - TimerXOffset;
         int timerY = Padding;
-        int lineHeight = 25;
+        int lineHeight = TimerLineHeight;
 
         // Battle Timer
         string battleTimeText = $"Battle: {timerManager.GetBattleTimeString()}";
@@ -303,46 +339,46 @@ public class BattleRenderer(
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-   (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-    (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
-  sprite.Width,
+            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
+            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            sprite.Width,
             sprite.Height);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
-     // Draw border around sprite area
+        // Draw border around sprite area
         var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
-   PokemonSpriteSize);
-    DrawRectangle(borderRect, XnaColor.Blue, 2);
+            PokemonSpriteSize);
+        DrawRectangle(borderRect, XnaColor.Blue, BorderThicknessNormal);
 
         // Build info string with name, HP, and status
         string nameHpInfo = $"{pokemon.Name}\nHP: {pokemon.Hp}/{pokemon.MaxHp}";
-  
+
         // Add status condition if present
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
-    if (!string.IsNullOrEmpty(statusName))
+        if (!string.IsNullOrEmpty(statusName))
         {
-   nameHpInfo += $"\n{statusName}";
+            nameHpInfo += $"\n{statusName}";
         }
-        
-  // Draw name and HP
-   XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
- spriteBatch.DrawString(font, nameHpInfo, textPosition, XnaColor.White);
+
+        // Draw name and HP
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
+        spriteBatch.DrawString(font, nameHpInfo, textPosition, XnaColor.White);
     }
 
     private void RenderPlayerPokemonInfoWithState(PokemonPerspective pokemon,
         XnaVector2 position,
-  bool isHighlighted, bool isLocked, int? lockOrder)
+        bool isHighlighted, bool isLocked, int? lockOrder)
     {
         // Draw sprite texture (back sprite for player's Pokemon)
-  Texture2D sprite = spriteManager.GetBackSprite(pokemon.Species);
+        Texture2D sprite = spriteManager.GetBackSprite(pokemon.Species);
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
             (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-  (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
-          sprite.Width,
-   sprite.Height);
+            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            sprite.Width,
+            sprite.Height);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
@@ -352,83 +388,86 @@ public class BattleRenderer(
 
         if (isLocked)
         {
-  borderColor = XnaColor.Green;
-         borderThickness = 4;
+            borderColor = XnaColor.Green;
+            borderThickness = BorderThicknessHighlighted;
         }
         else if (isHighlighted)
-     {
-         borderColor = XnaColor.Yellow;
-       borderThickness = 4;
-      }
-      else
-  {
-     borderColor = XnaColor.Blue;
-   borderThickness = 2;
- }
+        {
+            borderColor = XnaColor.Yellow;
+            borderThickness = BorderThicknessHighlighted;
+        }
+        else
+        {
+            borderColor = XnaColor.Blue;
+            borderThickness = BorderThicknessNormal;
+        }
 
-  // Draw border around sprite area
+        // Draw border around sprite area
         var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
-      PokemonSpriteSize);
-DrawRectangle(borderRect, borderColor, borderThickness);
+            PokemonSpriteSize);
+        DrawRectangle(borderRect, borderColor, borderThickness);
 
         // Draw lock order indicator if locked
         if (isLocked && lockOrder.HasValue)
-  {
-       string orderText = $"#{lockOrder.Value + 1}";
-    XnaVector2 orderSize = font.MeasureString(orderText);
-    XnaVector2 orderPos = new XnaVector2(
- position.X + PokemonSpriteSize - orderSize.X - 5,
-       position.Y + 5);
+        {
+            string orderText = $"#{lockOrder.Value + 1}";
+            XnaVector2 orderSize = font.MeasureString(orderText);
+            XnaVector2 orderPos = new XnaVector2(
+                position.X + PokemonSpriteSize - orderSize.X - LockOrderXPadding,
+                position.Y + LockOrderYPadding);
 
-  // Draw background for order number
-  var orderBg = new XnaRectangle((int)orderPos.X - 2, (int)orderPos.Y - 2,
-     (int)orderSize.X + 4, (int)orderSize.Y + 4);
-     var bgTexture = new Texture2D(graphicsDevice, 1, 1);
-     bgTexture.SetData([XnaColor.Black]);
-        spriteBatch.Draw(bgTexture, orderBg, XnaColor.Black * 0.7f);
+            // Draw background for order number
+            var orderBg = new XnaRectangle(
+                (int)orderPos.X - LockOrderBackgroundPadding,
+                (int)orderPos.Y - LockOrderBackgroundPadding,
+                (int)orderSize.X + (LockOrderBackgroundPadding * 2),
+                (int)orderSize.Y + (LockOrderBackgroundPadding * 2));
+            var bgTexture = new Texture2D(graphicsDevice, 1, 1);
+            bgTexture.SetData([XnaColor.Black]);
+            spriteBatch.Draw(bgTexture, orderBg, XnaColor.Black * LockOrderBackgroundAlpha);
 
-       spriteBatch.DrawString(font, orderText, orderPos, XnaColor.White);
+            spriteBatch.DrawString(font, orderText, orderPos, XnaColor.White);
             bgTexture.Dispose();
         }
 
-      // Build info string with name, gender, level on first line
+        // Build info string with name, gender, level on first line
         string genderSymbol = GetGenderSymbol(pokemon.Gender);
-   string line1 = $"{pokemon.Name}{genderSymbol}";
+        string line1 = $"{pokemon.Name}{genderSymbol}";
         string line2 = $"Lv{pokemon.Level} HP:{pokemon.MaxHp}";
-      string line3 = GetItemName(pokemon.Item);
-        
+        string line3 = GetItemName(pokemon.Item);
+
         // Add status condition if present
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         string line4 = !string.IsNullOrEmpty(statusName) ? statusName : "";
 
         // Ensure text fits within the Pokemon sprite area
-  float maxWidth = PokemonSpriteSize;
+        float maxWidth = PokemonSpriteSize;
         if (font.MeasureString(line1).X > maxWidth)
-    {
-      // Truncate name if too long
-    while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
-  {
-  line1 = line1.Substring(0, line1.Length - 1);
-   }
+        {
+            // Truncate name if too long
+            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+            {
+                line1 = line1.Substring(0, line1.Length - 1);
+            }
 
-  line1 += "...";
+            line1 += "...";
         }
 
- if (font.MeasureString(line3).X > maxWidth)
-  {
-       // Truncate item name if too long
-    while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
-       {
-      line3 = line3.Substring(0, line3.Length - 1);
-     }
+        if (font.MeasureString(line3).X > maxWidth)
+        {
+            // Truncate item name if too long
+            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+            {
+                line3 = line3.Substring(0, line3.Length - 1);
+            }
 
- line3 += "...";
- }
+            line3 += "...";
+        }
 
-   string info = !string.IsNullOrEmpty(line4) 
+        string info = !string.IsNullOrEmpty(line4)
             ? $"{line1}\n{line2}\n{line3}\n{line4}"
             : $"{line1}\n{line2}\n{line3}";
-        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
@@ -437,47 +476,47 @@ DrawRectangle(borderRect, borderColor, borderThickness);
         // Draw sprite texture (front sprite for opponent's Pokemon)
         Texture2D sprite = spriteManager.GetFrontSprite(pokemon.Species);
 
-      // Calculate centered position for sprite
+        // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-      (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-       (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
-       sprite.Width,
+            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
+            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            sprite.Width,
             sprite.Height);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
         // Draw border around sprite area
         var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
-    PokemonSpriteSize);
-        DrawRectangle(borderRect, XnaColor.Red, 2);
+            PokemonSpriteSize);
+        DrawRectangle(borderRect, XnaColor.Red, BorderThicknessNormal);
 
         // Draw name
         string nameText = pokemon.Name;
-XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, nameText, textPosition, XnaColor.White);
 
- // Draw exact HP values (full observability)
+        // Draw exact HP values (full observability)
         string hpText = $"HP: {pokemon.Hp}/{pokemon.MaxHp}";
         XnaVector2 hpPosition = textPosition + new XnaVector2(0, font.LineSpacing);
 
         // Determine HP text color based on percentage
-   double hpPercentage = (double)pokemon.Hp / pokemon.MaxHp;
+        double hpPercentage = (double)pokemon.Hp / pokemon.MaxHp;
         XnaColor hpColor = hpPercentage switch
-  {
- > 0.5 => XnaColor.LimeGreen,
-    > 0.2 => XnaColor.Yellow,
-    _ => XnaColor.Red
- };
-
-      spriteBatch.DrawString(font, hpText, hpPosition, hpColor);
-        
-    // Draw status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
-   if (!string.IsNullOrEmpty(statusName))
         {
-   XnaVector2 statusPosition = hpPosition + new XnaVector2(0, font.LineSpacing);
+            > HpColorThresholdGreen => XnaColor.LimeGreen,
+            > HpColorThresholdYellow => XnaColor.Yellow,
+            _ => XnaColor.Red
+        };
+
+        spriteBatch.DrawString(font, hpText, hpPosition, hpColor);
+
+        // Draw status condition if present
+        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        if (!string.IsNullOrEmpty(statusName))
+        {
+            XnaVector2 statusPosition = hpPosition + new XnaVector2(0, font.LineSpacing);
             spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
-   }
+        }
     }
 
     private void RenderOpponentPokemonTeamPreview(PokemonPerspective pokemon,
@@ -490,54 +529,54 @@ XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
         var spriteRect = new XnaRectangle(
             (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
             (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
-        sprite.Width,
+            sprite.Width,
             sprite.Height);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
- // Draw border around sprite area
-   var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
-  PokemonSpriteSize);
-   DrawRectangle(borderRect, XnaColor.Red, 2);
+        // Draw border around sprite area
+        var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize,
+            PokemonSpriteSize);
+        DrawRectangle(borderRect, XnaColor.Red, BorderThicknessNormal);
 
         // During team preview, show name, gender, level, and item (full observability)
-  string genderSymbol = GetGenderSymbol(pokemon.Gender);
+        string genderSymbol = GetGenderSymbol(pokemon.Gender);
         string line1 = $"{pokemon.Name}{genderSymbol}";
         string line2 = $"Lv{pokemon.Level}";
         string line3 = GetItemName(pokemon.Item);
-        
-      // Add status condition if present
+
+        // Add status condition if present
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         string line4 = !string.IsNullOrEmpty(statusName) ? statusName : "";
 
-  // Ensure text fits within the Pokemon sprite area
-   float maxWidth = PokemonSpriteSize;
- if (font.MeasureString(line1).X > maxWidth)
+        // Ensure text fits within the Pokemon sprite area
+        float maxWidth = PokemonSpriteSize;
+        if (font.MeasureString(line1).X > maxWidth)
         {
-       // Truncate name if too long
-    while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
-        {
-   line1 = line1.Substring(0, line1.Length - 1);
-         }
+            // Truncate name if too long
+            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+            {
+                line1 = line1.Substring(0, line1.Length - 1);
+            }
 
-     line1 += "...";
- }
+            line1 += "...";
+        }
 
         if (font.MeasureString(line3).X > maxWidth)
-    {
-       // Truncate item name if too long
-    while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+        {
+            // Truncate item name if too long
+            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
             {
-          line3 = line3.Substring(0, line3.Length - 1);
-      }
+                line3 = line3.Substring(0, line3.Length - 1);
+            }
 
             line3 += "...";
         }
 
         string info = !string.IsNullOrEmpty(line4)
-        ? $"{line1}\n{line2}\n{line3}\n{line4}"
-        : $"{line1}\n{line2}\n{line3}";
- XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
+            ? $"{line1}\n{line2}\n{line3}\n{line4}"
+            : $"{line1}\n{line2}\n{line3}";
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
     }
 
@@ -566,9 +605,9 @@ XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
         return gender switch
         {
             GenderId.M => " (M)",
-   GenderId.F => " (F)",
-    _ => ""
-     };
+            GenderId.F => " (F)",
+            _ => ""
+        };
     }
 
     /// <summary>
@@ -577,36 +616,36 @@ XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + 5);
     private (string DisplayName, XnaColor Color) GetStatusDisplay(ConditionId status)
     {
         return status switch
-     {
-         ConditionId.Burn => ("BRN", XnaColor.Orange),
+        {
+            ConditionId.Burn => ("BRN", XnaColor.Orange),
             ConditionId.Paralysis => ("PAR", XnaColor.Yellow),
             ConditionId.Sleep => ("SLP", XnaColor.Purple),
-          ConditionId.Freeze => ("FRZ", XnaColor.Cyan),
-    ConditionId.Poison => ("PSN", XnaColor.Magenta),
-          ConditionId.Toxic => ("TOX", XnaColor.DarkMagenta),
-    _ => ("", XnaColor.White)
+            ConditionId.Freeze => ("FRZ", XnaColor.Cyan),
+            ConditionId.Poison => ("PSN", XnaColor.Magenta),
+            ConditionId.Toxic => ("TOX", XnaColor.DarkMagenta),
+            _ => ("", XnaColor.White)
         };
     }
 
-  /// <summary>
- /// Helper to draw a rectangle outline
- /// </summary>
+    /// <summary>
+    /// Helper to draw a rectangle outline
+    /// </summary>
     private void DrawRectangle(XnaRectangle rect, XnaColor color, int lineWidth)
     {
         // Create a 1x1 white texture if needed (lazy init in real implementation)
         var pixel = new Texture2D(graphicsDevice, 1, 1);
- pixel.SetData([XnaColor.White]);
+        pixel.SetData([XnaColor.White]);
 
-    // Draw four lines
-      spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, rect.Width, lineWidth),
-    color); // Top
+        // Draw four lines
+        spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, rect.Width, lineWidth),
+            color); // Top
         spriteBatch.Draw(pixel,
-  new XnaRectangle(rect.X, rect.Bottom - lineWidth, rect.Width, lineWidth),
+            new XnaRectangle(rect.X, rect.Bottom - lineWidth, rect.Width, lineWidth),
             color); // Bottom
-   spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, lineWidth, rect.Height),
-   color); // Left
-  spriteBatch.Draw(pixel,
+        spriteBatch.Draw(pixel, new XnaRectangle(rect.X, rect.Y, lineWidth, rect.Height),
+            color); // Left
+        spriteBatch.Draw(pixel,
             new XnaRectangle(rect.Right - lineWidth, rect.Y, lineWidth, rect.Height),
-  color); // Right
+            color); // Right
     }
 }

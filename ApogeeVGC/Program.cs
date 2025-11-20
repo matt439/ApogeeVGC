@@ -10,16 +10,9 @@ public class Program
         //DebugRandomBias.RunDebugTest();
 
         var driver = new Driver();
-        
-        // Switch to GUI mode for testing
         driver.Start(DriverMode.GuiVsRandomDoubles);
         
-        // Uncomment to test other modes:
-        // driver.Start(DriverMode.GuiVsRandomSingles);
-        // driver.Start(DriverMode.ConsoleVsRandomDoubles);
-        // driver.Start(DriverMode.RandomVsRandomDoublesEvaluation);
-        
-        Console.WriteLine("Press Enter key to exit...");
-        Console.ReadLine();
+        //Console.WriteLine("Press Enter key to exit...");
+        //Console.ReadLine();
     }
 }

@@ -246,10 +246,9 @@ public partial class ChoiceInputManager
     {
         // Draw instruction text based on current state
         string instructionText = MainBattleUiHelper.GetInstructionText(MainBattleState);
-        // Position instruction text to align with the main battle UI buttons (700, 300)
-        // Move it 80 pixels above the buttons instead of 60
-        spriteBatch.DrawString(font, instructionText,
-            new Vector2(700, 220), Color.White);
+        // Position instruction text above the main battle UI buttons
+        var instructionPosition = MainBattleUiHelper.GetInstructionTextPosition();
+        spriteBatch.DrawString(font, instructionText, instructionPosition, Color.White);
 
         // Draw buttons with selection highlight
         for (int i = 0; i < _buttons.Count; i++)
@@ -288,11 +287,12 @@ public partial class ChoiceInputManager
   statusLines.Add($"P2: Switch to #{TurnSelection.SecondPokemonSwitchIndex.Value + 1}");
   }
 
-        // Draw status - move to align with buttons at X=700
+        // Draw status text aligned with buttons
       if (statusLines.Count > 0)
         {
       string statusText = string.Join(" | ", statusLines);
-     spriteBatch.DrawString(font, statusText, new Vector2(700, 650), Color.Lime);
+      var statusPosition = MainBattleUiHelper.GetSelectionStatusPosition();
+     spriteBatch.DrawString(font, statusText, statusPosition, Color.Lime);
         }
     }
 
