@@ -129,7 +129,7 @@ public partial class ChoiceInputManager
       Console.WriteLine($"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuFirstPokemon");
     break;
 
-         case MainBattlePhaseState.MoveSelectionFirstPokemon:
+            case MainBattlePhaseState.MoveSelectionFirstPokemon:
                 Console.WriteLine("[ChoiceInputManager.SetupMainBattleUi] Creating MoveSelectionFirstPokemon buttons");
  if (request.Active.Count > 0)
  {
@@ -139,7 +139,7 @@ public partial class ChoiceInputManager
            pokemonData,
  canTera,
      TurnSelection.FirstPokemonTerastallize,
-                 (moveIndex) => HandleMoveSelection(0, moveIndex),
+                 (moveIndex, useTera) => HandleMoveSelection(0, moveIndex, useTera),
          () => ToggleTerastallize(0),
          () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon)
       );
@@ -185,7 +185,7 @@ public partial class ChoiceInputManager
             pokemonData,
         canTera,
             TurnSelection.SecondPokemonTerastallize,
-       (moveIndex) => HandleMoveSelection(1, moveIndex),
+       (moveIndex, useTera) => HandleMoveSelection(1, moveIndex, useTera),
    () => ToggleTerastallize(1),
       () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon)
          );
@@ -345,13 +345,14 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
         SetupMainBattleUi((MoveRequest)_currentRequest!);
     }
 
-    private void HandleMoveSelection(int pokemonIndex, int moveIndex)
+    private void HandleMoveSelection(int pokemonIndex, int moveIndex, bool useTera)
     {
         if (pokemonIndex == 0)
         {
             TurnSelection.FirstPokemonMoveIndex = moveIndex;
             TurnSelection.FirstPokemonTarget = 0; // Default target
             TurnSelection.FirstPokemonSwitchIndex = null;
+            TurnSelection.FirstPokemonTerastallize = useTera;
 
             // In singles, submit immediately. In doubles, move to second Pokemon
             if (_currentRequest is MoveRequest request && request.Active.Count > 1)
@@ -368,6 +369,7 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
             TurnSelection.SecondPokemonMoveIndex = moveIndex;
             TurnSelection.SecondPokemonTarget = 0; // Default target
             TurnSelection.SecondPokemonSwitchIndex = null;
+            TurnSelection.SecondPokemonTerastallize = useTera;
 
             // Both Pokemon have selections, submit
             SubmitMainBattleTurnChoice();
@@ -472,12 +474,24 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
             PokemonMoveData moveData =
                 pokemonData.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
 
+            // Get Tera type if terastallizing
+            MoveType? teraType = null;
+            if (TurnSelection.FirstPokemonTerastallize && pokemonData.CanTerastallize != null)
+            {
+                teraType = pokemonData.CanTerastallize switch
+                {
+                    MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+                    _ => null,
+                };
+            }
+
             actions.Add(new ChosenAction
             {
                 Choice = ChoiceType.Move,
                 Pokemon = null,
                 MoveId = moveData.Id,
                 TargetLoc = TurnSelection.FirstPokemonTarget ?? 0,
+                Terastallize = teraType,
             });
         }
         else if (TurnSelection.FirstPokemonSwitchIndex.HasValue)
@@ -500,12 +514,24 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
                 PokemonMoveData moveData =
                     pokemonData.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
 
+                // Get Tera type if terastallizing
+                MoveType? teraType = null;
+                if (TurnSelection.SecondPokemonTerastallize && pokemonData.CanTerastallize != null)
+                {
+                    teraType = pokemonData.CanTerastallize switch
+                    {
+                        MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+                        _ => null,
+                    };
+                }
+
                 actions.Add(new ChosenAction
                 {
                     Choice = ChoiceType.Move,
                     Pokemon = null,
                     MoveId = moveData.Id,
                     TargetLoc = TurnSelection.SecondPokemonTarget ?? 0,
+                    Terastallize = teraType,
                 });
             }
             else if (TurnSelection.SecondPokemonSwitchIndex.HasValue)
@@ -519,10 +545,6 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
                 });
             }
         }
-
-        // Set Terastallize flag
-        _pendingChoice.Terastallize = TurnSelection.FirstPokemonTerastallize ||
-                                      TurnSelection.SecondPokemonTerastallize;
 
         _pendingChoice.Actions = actions;
 

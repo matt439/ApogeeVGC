@@ -110,7 +110,7 @@ public static class MainBattleUiHelper
         PokemonMoveRequestData pokemonRequest,
         bool canTerastallize,
         bool isTerastallized,
-        Action<int> selectMove,
+        Action<int, bool> selectMove,
         Action toggleTera,
         Action goBack)
     {
@@ -137,29 +137,31 @@ public static class MainBattleUiHelper
             }
 
             int index = moveIndex;
+            
+            // Add regular move option
             var button = new ChoiceButton(
                 new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 moveData.Move.Name,
                 Color.Blue,
-                () => selectMove(index)
+                () => selectMove(index, false)
             );
-
             buttons.Add(button);
             y += ButtonHeight + ButtonSpacing;
-            moveIndex++;
-        }
 
-        // Add Terastallize option if available
-        if (canTerastallize)
-        {
-            y += ButtonSpacing;
-            var teraButton = new ChoiceButton(
-                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                "Terastallize",
-                isTerastallized ? Color.Purple : Color.DarkSlateBlue,
-                toggleTera
-            );
-            buttons.Add(teraButton);
+            // Add Tera variant if terastallization is available
+            if (canTerastallize)
+            {
+                var teraButton = new ChoiceButton(
+                    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
+                    $"{moveData.Move.Name} (+ TERA)",
+                    Color.Purple,
+                    () => selectMove(index, true)
+                );
+                buttons.Add(teraButton);
+                y += ButtonHeight + ButtonSpacing;
+            }
+
+            moveIndex++;
         }
 
         // Add back button
