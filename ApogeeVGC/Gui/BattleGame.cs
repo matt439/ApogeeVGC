@@ -38,7 +38,7 @@ public class BattleGame : Game
     // Pending battle start data
     private Library? _pendingLibrary;
     private BattleOptions? _pendingBattleOptions;
-    private IPlayerController? _pendingPlayerController;
+    private Simulator? _pendingPlayerController;
     private bool _shouldStartBattle;
 
     // Screen dimensions
@@ -143,7 +143,7 @@ public class BattleGame : Game
     /// If called before LoadContent(), the battle will be queued and started after content loads.
     /// </summary>
     public void StartBattle(Library library, BattleOptions battleOptions,
-        IPlayerController playerController)
+        Simulator simulator)
     {
         Console.WriteLine(
             $"[BattleGame] StartBattle called. _choiceInputManager null? {_choiceInputManager == null}");
@@ -158,7 +158,7 @@ public class BattleGame : Game
         if (_choiceInputManager != null)
         {
             Console.WriteLine("[BattleGame] Content already loaded, starting battle immediately");
-            StartBattleInternal(library, battleOptions, playerController);
+            StartBattleInternal(library, battleOptions, simulator);
         }
         else
         {
@@ -166,25 +166,18 @@ public class BattleGame : Game
             Console.WriteLine("[BattleGame] Content not loaded yet, queueing battle start");
             _pendingLibrary = library;
             _pendingBattleOptions = battleOptions;
-            _pendingPlayerController = playerController;
+            _pendingPlayerController = simulator;
             _shouldStartBattle = true;
         }
     }
 
     private void StartBattleInternal(Library library, BattleOptions battleOptions,
-        IPlayerController playerController)
+        Simulator simulator)
     {
         Console.WriteLine("[BattleGame] StartBattleInternal called");
 
         // Clear any previous battle messages
         ClearMessages();
-
-        // PlayerController should be a Simulator instance
-        if (playerController is not Simulator simulator)
-        {
-            throw new InvalidOperationException(
-                "PlayerController must be a Simulator instance for GUI battles");
-        }
 
         _battleRunner = new BattleRunner(library, battleOptions, simulator);
         _battleRunner.StartBattle();
