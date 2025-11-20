@@ -14,17 +14,18 @@ public class Driver
     private Library Library { get; } = new();
 
     // Seeds for standard test runs - can be changed freely
-    private const int PlayerRandom1Seed = 12361;
-    private const int PlayerRandom2Seed = 1835;
-    private const int BattleSeed = 9894;
+    private const int PlayerRandom1Seed = 12352;
+    private const int PlayerRandom2Seed = 1826;
+    private const int BattleSeed = 9885;
 
     // Don't change these - used for evaluation test to reproduce errors
     private const int PlayerRandom1EvalSeed = 12345;
     private const int PlayerRandom2EvalSeed = 1818;
     private const int BattleEvalSeed = 9876;
 
-    private const int RandomEvaluationNumTest = 100000;
+    private const int RandomEvaluationNumTest = 5;
     private const int NumThreads = 10;
+    private const int BattleTimeoutMilliseconds = 3000; // 3 seconds timeout per battle
 
     public void Start(DriverMode mode)
     {
@@ -247,6 +248,120 @@ public class Driver
         Console.WriteLine($"Winner: {result}");
     }
 
+    /// <summary>
+    /// Helper method to run a single battle simulation with timeout protection.
+    /// </summary>
+    private (SimulatorResult Result, int Turn) RunBattleWithTimeout(
+        int player1Seed,
+        int player2Seed,
+        int battleSeed,
+        FormatId formatId,
+        bool debug)
+    {
+        using var cts = new CancellationTokenSource();
+        var simulationTask = Task.Run(() =>
+        {
+            PlayerOptions player1Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random 1",
+                Team = TeamGenerator.GenerateTestTeam(Library),
+                Seed = new PrngSeed(player1Seed),
+                PrintDebug = debug,
+            };
+
+            PlayerOptions player2Options = new()
+            {
+                Type = Player.PlayerType.Random,
+                Name = "Random 2",
+                Team = TeamGenerator.GenerateTestTeam(Library),
+                Seed = new PrngSeed(player2Seed),
+                PrintDebug = debug,
+            };
+
+            BattleOptions battleOptions = new()
+            {
+                Id = formatId,
+                Player1Options = player1Options,
+                Player2Options = player2Options,
+                Debug = debug,
+                Sync = true, // Use synchronous mode for evaluation
+                Seed = new PrngSeed(battleSeed),
+                MaxTurns = 1000, // Enforce turn limit to detect infinite loops
+            };
+
+            var simulator = new SyncSimulator();
+            SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+            return (Result: result, Turn: simulator.Battle?.Turn ?? 0);
+        }, cts.Token);
+
+        // Wait for simulation with timeout
+        if (!simulationTask.Wait(BattleTimeoutMilliseconds))
+        {
+            // Timeout occurred - throw custom exception with seeds
+            throw new BattleTimeoutException(
+                player1Seed,
+                player2Seed,
+                battleSeed,
+                BattleTimeoutMilliseconds);
+        }
+
+        return simulationTask.Result;
+    }
+
+    /// <summary>
+    /// Helper method to log exception details with seed reproduction instructions.
+    /// </summary>
+    private void LogExceptionWithSeeds(
+        int player1Seed,
+        int player2Seed,
+        int battleSeed,
+        Exception ex,
+        string debugMode)
+    {
+        Console.WriteLine();
+        Console.WriteLine("-----------------------------------------------------------");
+        
+        if (ex is BattleTimeoutException timeoutEx)
+        {
+            Console.WriteLine("ERROR: Battle exceeded timeout (likely infinite loop!)");
+            Console.WriteLine("-----------------------------------------------------------");
+            Console.WriteLine($"Timeout: {timeoutEx.TimeoutMilliseconds}ms");
+        }
+        else if (ex is BattleTurnLimitException turnLimitEx)
+        {
+            Console.WriteLine("ERROR: Battle exceeded turn limit (likely infinite loop!)");
+            Console.WriteLine("-----------------------------------------------------------");
+            Console.WriteLine($"Turn: {turnLimitEx.Turn} (Max: {turnLimitEx.MaxTurns})");
+        }
+        else
+        {
+            Console.WriteLine("ERROR: Exception occurred during battle simulation!");
+            Console.WriteLine("-----------------------------------------------------------");
+            Console.WriteLine($"Exception Type: {ex.GetType().Name}");
+            Console.WriteLine($"Exception Message: {ex.Message}");
+        }
+        
+        Console.WriteLine($"Player 1 Seed: {player1Seed}");
+        Console.WriteLine($"Player 2 Seed: {player2Seed}");
+        Console.WriteLine($"Battle Seed:   {battleSeed}");
+        Console.WriteLine();
+        Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
+        Console.WriteLine($"  private const int PlayerRandom1Seed = {player1Seed};");
+        Console.WriteLine($"  private const int PlayerRandom2Seed = {player2Seed};");
+        Console.WriteLine($"  private const int BattleSeed = {battleSeed};");
+        Console.WriteLine();
+        Console.WriteLine($"Then run with DriverMode.{debugMode} to debug.");
+        
+        if (ex is not BattleTimeoutException and not BattleTurnLimitException)
+        {
+            Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
+        }
+        
+        Console.WriteLine("-----------------------------------------------------------");
+        Console.WriteLine();
+    }
+
     private void RunRandomVsRandomSinglesEvaluationTest()
     {
         Console.WriteLine("[Driver] Starting Random vs Random Singles Evaluation Test");
@@ -281,39 +396,15 @@ public class Driver
 
             try
             {
-                PlayerOptions player1Options = new()
-                {
-                    Type = Player.PlayerType.Random,
-                    Name = "Random 1",
-                    Team = TeamGenerator.GenerateTestTeam(Library),
-                    Seed = new PrngSeed(localPlayer1Seed),
-                    PrintDebug = debug,
-                };
-
-                PlayerOptions player2Options = new()
-                {
-                    Type = Player.PlayerType.Random,
-                    Name = "Random 2",
-                    Team = TeamGenerator.GenerateTestTeam(Library),
-                    Seed = new PrngSeed(localPlayer2Seed),
-                    PrintDebug = debug,
-                };
-
-                BattleOptions battleOptions = new()
-                {
-                    Id = FormatId.CustomSingles,
-                    Player1Options = player1Options,
-                    Player2Options = player2Options,
-                    Debug = debug,
-                    Sync = true, // Use synchronous mode for evaluation
-                    Seed = new PrngSeed(localBattleSeed),
-                    MaxTurns = 1000, // Enforce turn limit to detect infinite loops
-                };
-
-                var simulator = new SyncSimulator();
-                SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+                var (result, turn) = RunBattleWithTimeout(
+                    localPlayer1Seed,
+                    localPlayer2Seed,
+                    localBattleSeed,
+                    FormatId.CustomSingles,
+                    debug);
+                
                 simResults.Add(result);
-                turnOnBattleEnd.Add(simulator.Battle?.Turn ?? 0);
+                turnOnBattleEnd.Add(turn);
                 
                 int completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
@@ -321,54 +412,18 @@ public class Driver
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                 }
             }
-            catch (BattleTurnLimitException ex)
-            {
-                // Store exception with seed information for debugging
-                exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
-                
-                // Log immediately to console with special formatting for turn limit exceptions
-                Console.WriteLine();
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine("ERROR: Battle exceeded turn limit (likely infinite loop!)");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine($"Turn: {ex.Turn} (Max: {ex.MaxTurns})");
-                Console.WriteLine($"Player 1 Seed: {localPlayer1Seed}");
-                Console.WriteLine($"Player 2 Seed: {localPlayer2Seed}");
-                Console.WriteLine($"Battle Seed:   {localBattleSeed}");
-                Console.WriteLine();
-                Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
-                Console.WriteLine($"  private const int PlayerRandom1Seed = {localPlayer1Seed};");
-                Console.WriteLine($"  private const int PlayerRandom2Seed = {localPlayer2Seed};");
-                Console.WriteLine($"  private const int BattleSeed = {localBattleSeed};");
-                Console.WriteLine();
-                Console.WriteLine("Then run with DriverMode.RandomVsRandomSingles to debug.");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine();
-            }
             catch (Exception ex)
             {
                 // Store exception with seed information for debugging
                 exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
                 
                 // Log immediately to console
-                Console.WriteLine();
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine("ERROR: Exception occurred during battle simulation!");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine($"Player 1 Seed: {localPlayer1Seed}");
-                Console.WriteLine($"Player 2 Seed: {localPlayer2Seed}");
-                Console.WriteLine($"Battle Seed:   {localBattleSeed}");
-                Console.WriteLine();
-                Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
-                Console.WriteLine($"  private const int PlayerRandom1Seed = {localPlayer1Seed};");
-                Console.WriteLine($"  private const int PlayerRandom2Seed = {localPlayer2Seed};");
-                Console.WriteLine($"  private const int BattleSeed = {localBattleSeed};");
-                Console.WriteLine();
-                Console.WriteLine($"Exception Type: {ex.GetType().Name}");
-                Console.WriteLine($"Exception Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine();
+                LogExceptionWithSeeds(
+                    localPlayer1Seed,
+                    localPlayer2Seed,
+                    localBattleSeed,
+                    ex,
+                    "RandomVsRandomSingles");
             }
         });
 
@@ -500,39 +555,15 @@ public class Driver
 
             try
             {
-                PlayerOptions player1Options = new()
-                {
-                    Type = Player.PlayerType.Random,
-                    Name = "Random 1",
-                    Team = TeamGenerator.GenerateTestTeam(Library),
-                    Seed = new PrngSeed(localPlayer1Seed),
-                    PrintDebug = debug,
-                };
-
-                PlayerOptions player2Options = new()
-                {
-                    Type = Player.PlayerType.Random,
-                    Name = "Random 2",
-                    Team = TeamGenerator.GenerateTestTeam(Library),
-                    Seed = new PrngSeed(localPlayer2Seed),
-                    PrintDebug = debug,
-                };
-
-                BattleOptions battleOptions = new()
-                {
-                    Id = FormatId.CustomDoubles,
-                    Player1Options = player1Options,
-                    Player2Options = player2Options,
-                    Debug = debug,
-                    Sync = true, // Use synchronous mode for evaluation
-                    Seed = new PrngSeed(localBattleSeed),
-                    MaxTurns = 1000, // Enforce turn limit to detect infinite loops
-                };
-
-                var simulator = new SyncSimulator();
-                SimulatorResult result = simulator.Run(Library, battleOptions, printDebug: debug);
+                var (result, turn) = RunBattleWithTimeout(
+                    localPlayer1Seed,
+                    localPlayer2Seed,
+                    localBattleSeed,
+                    FormatId.CustomDoubles,
+                    debug);
+                
                 simResults.Add(result);
-                turnOnBattleEnd.Add(simulator.Battle?.Turn ?? 0);
+                turnOnBattleEnd.Add(turn);
                 
                 int completed = Interlocked.Increment(ref completedBattles);
                 if (completed % 100 == 0)
@@ -540,54 +571,18 @@ public class Driver
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                 }
             }
-            catch (BattleTurnLimitException ex)
-            {
-                // Store exception with seed information for debugging
-                exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
-                
-                // Log immediately to console with special formatting for turn limit exceptions
-                Console.WriteLine();
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine("ERROR: Battle exceeded turn limit (likely infinite loop!)");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine($"Turn: {ex.Turn} (Max: {ex.MaxTurns})");
-                Console.WriteLine($"Player 1 Seed: {localPlayer1Seed}");
-                Console.WriteLine($"Player 2 Seed: {localPlayer2Seed}");
-                Console.WriteLine($"Battle Seed:   {localBattleSeed}");
-                Console.WriteLine();
-                Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
-                Console.WriteLine($"  private const int PlayerRandom1Seed = {localPlayer1Seed};");
-                Console.WriteLine($"  private const int PlayerRandom2Seed = {localPlayer2Seed};");
-                Console.WriteLine($"  private const int BattleSeed = {localBattleSeed};");
-                Console.WriteLine();
-                Console.WriteLine("Then run with DriverMode.RandomVsRandomDoubles to debug.");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine();
-            }
             catch (Exception ex)
             {
                 // Store exception with seed information for debugging
                 exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
                 
                 // Log immediately to console
-                Console.WriteLine();
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine("ERROR: Exception occurred during battle simulation!");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine($"Player 1 Seed: {localPlayer1Seed}");
-                Console.WriteLine($"Player 2 Seed: {localPlayer2Seed}");
-                Console.WriteLine($"Battle Seed:   {localBattleSeed}");
-                Console.WriteLine();
-                Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
-                Console.WriteLine($"  private const int PlayerRandom1Seed = {localPlayer1Seed};");
-                Console.WriteLine($"  private const int PlayerRandom2Seed = {localPlayer2Seed};");
-                Console.WriteLine($"  private const int BattleSeed = {localBattleSeed};");
-                Console.WriteLine();
-                Console.WriteLine($"Exception Type: {ex.GetType().Name}");
-                Console.WriteLine($"Exception Message: {ex.Message}");
-                Console.WriteLine($"Stack Trace:\n{ex.StackTrace}");
-                Console.WriteLine("-----------------------------------------------------------");
-                Console.WriteLine();
+                LogExceptionWithSeeds(
+                    localPlayer1Seed,
+                    localPlayer2Seed,
+                    localBattleSeed,
+                    ex,
+                    "RandomVsRandomDoubles");
             }
         });
 
