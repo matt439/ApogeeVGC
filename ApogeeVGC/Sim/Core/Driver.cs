@@ -13,9 +13,9 @@ public class Driver
 {
     private Library Library { get; } = new();
 
-    private const int PlayerRandom1Seed = 12345;
-    private const int PlayerRandom2Seed = 1818;
-    private const int BattleSeed = 9876;
+    private const int PlayerRandom1Seed = 12373; //12345;
+    private const int PlayerRandom2Seed = 1847; //1818;
+    private const int BattleSeed = 9906; //9876;
     private const int RandomEvaluationNumTest = 10;
     private const int NumThreads = 1;
 

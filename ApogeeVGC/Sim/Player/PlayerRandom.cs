@@ -97,6 +97,12 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] GetNextChoiceFromAll called for {SideId}");
         }
 
+        // Validate request is not null
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request), "Choice request cannot be null");
+        }
+
         // Dispatch to appropriate handler based on request type
         return request switch
         {
@@ -157,12 +163,32 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             Console.WriteLine($"[PlayerRandom] Generating random move choice for {SideId}");
         }
 
+        if (request == null)
+        {
+            throw new ArgumentNullException(nameof(request), "MoveRequest cannot be null");
+        }
+
+        if (request.Active == null)
+        {
+            throw new InvalidOperationException("MoveRequest.Active cannot be null");
+        }
+
         if (request.Active.Count == 0)
         {
             throw new InvalidOperationException("No active Pokemon to make a move choice");
         }
 
+        if (request.Side == null)
+        {
+            throw new InvalidOperationException("MoveRequest.Side cannot be null");
+        }
+
         PokemonMoveRequestData pokemonRequest = request.Active[0];
+        
+        if (pokemonRequest == null)
+        {
+            throw new InvalidOperationException("Active Pokemon request data cannot be null");
+        }
 
         // Build list of all available choices (moves with and without tera, plus switch option)
         var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>();
