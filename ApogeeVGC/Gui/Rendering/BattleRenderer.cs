@@ -59,8 +59,17 @@ public class BattleRenderer(
     // Lock order background transparency
     private const float LockOrderBackgroundAlpha = 0.7f;
 
+    // HP bar layout
+    private const int HpBarWidth = 100; // Width of HP bar
+    private const int HpBarHeight = 8; // Height of HP bar
+    private const int HpBarBorderThickness = 1; // Border thickness around HP bar
+    private const int HpBarYSpacing = 2; // Vertical spacing between HP text and HP bar
+
     // Reference to choice input manager for team preview state
     private ChoiceUI.ChoiceInputManager? _choiceInputManager;
+
+    // Cached pixel texture for drawing filled rectangles (HP bars)
+    private Texture2D? _pixelTexture;
 
     // Track last perspective type to avoid spam logging
     private BattlePerspectiveType? _lastPerspectiveType;
@@ -351,19 +360,26 @@ public class BattleRenderer(
             PokemonSpriteSize);
         DrawRectangle(borderRect, XnaColor.Blue, BorderThicknessNormal);
 
-        // Build info string with name, HP, and status
-        string nameHpInfo = $"{pokemon.Name}\nHP: {pokemon.Hp}/{pokemon.MaxHp}";
+        // Draw name
+        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
+        spriteBatch.DrawString(font, pokemon.Name, textPosition, XnaColor.White);
 
-        // Add status condition if present
+        // Draw HP text
+        string hpText = $"HP: {pokemon.Hp}/{pokemon.MaxHp}";
+        XnaVector2 hpTextPosition = textPosition + new XnaVector2(0, font.LineSpacing);
+        spriteBatch.DrawString(font, hpText, hpTextPosition, XnaColor.White);
+
+        // Draw HP bar
+        XnaVector2 hpBarPosition = hpTextPosition + new XnaVector2(0, font.LineSpacing + HpBarYSpacing);
+        DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
+
+        // Draw status condition if present
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
-            nameHpInfo += $"\n{statusName}";
+            XnaVector2 statusPosition = hpBarPosition + new XnaVector2(0, HpBarHeight + HpBarYSpacing);
+            spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
         }
-
-        // Draw name and HP
-        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
-        spriteBatch.DrawString(font, nameHpInfo, textPosition, XnaColor.White);
     }
 
     private void RenderPlayerPokemonInfoWithState(PokemonPerspective pokemon,
@@ -430,15 +446,11 @@ public class BattleRenderer(
             bgTexture.Dispose();
         }
 
-        // Build info string with name, gender, level on first line
+        // Build info string with name, gender, level
         string genderSymbol = GetGenderSymbol(pokemon.Gender);
         string line1 = $"{pokemon.Name}{genderSymbol}";
         string line2 = $"Lv{pokemon.Level} HP:{pokemon.MaxHp}";
         string line3 = GetItemName(pokemon.Item);
-
-        // Add status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
-        string line4 = !string.IsNullOrEmpty(statusName) ? statusName : "";
 
         // Ensure text fits within the Pokemon sprite area
         float maxWidth = PokemonSpriteSize;
@@ -464,11 +476,21 @@ public class BattleRenderer(
             line3 += "...";
         }
 
-        string info = !string.IsNullOrEmpty(line4)
-            ? $"{line1}\n{line2}\n{line3}\n{line4}"
-            : $"{line1}\n{line2}\n{line3}";
+        // Draw info text
+        string info = $"{line1}\n{line2}\n{line3}";
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+
+        // Draw HP bar (not shown during team preview)
+        // Team preview shows max HP only, so bar would always be full
+
+        // Add status condition if present
+        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        if (!string.IsNullOrEmpty(statusName))
+        {
+            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * 3);
+            spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
+        }
     }
 
     private void RenderOpponentPokemonInfo(PokemonPerspective pokemon, XnaVector2 position)
@@ -510,11 +532,15 @@ public class BattleRenderer(
 
         spriteBatch.DrawString(font, hpText, hpPosition, hpColor);
 
+        // Draw HP bar
+        XnaVector2 hpBarPosition = hpPosition + new XnaVector2(0, font.LineSpacing + HpBarYSpacing);
+        DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
+
         // Draw status condition if present
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
-            XnaVector2 statusPosition = hpPosition + new XnaVector2(0, font.LineSpacing);
+            XnaVector2 statusPosition = hpBarPosition + new XnaVector2(0, HpBarHeight + HpBarYSpacing);
             spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
         }
     }
@@ -545,10 +571,6 @@ public class BattleRenderer(
         string line2 = $"Lv{pokemon.Level}";
         string line3 = GetItemName(pokemon.Item);
 
-        // Add status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
-        string line4 = !string.IsNullOrEmpty(statusName) ? statusName : "";
-
         // Ensure text fits within the Pokemon sprite area
         float maxWidth = PokemonSpriteSize;
         if (font.MeasureString(line1).X > maxWidth)
@@ -573,11 +595,21 @@ public class BattleRenderer(
             line3 += "...";
         }
 
-        string info = !string.IsNullOrEmpty(line4)
-            ? $"{line1}\n{line2}\n{line3}\n{line4}"
-            : $"{line1}\n{line2}\n{line3}";
+        // Draw info text
+        string info = $"{line1}\n{line2}\n{line3}";
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, info, textPosition, XnaColor.White);
+
+        // Draw HP bar (not shown during team preview)
+        // Team preview shows max HP only in the info, so bar would always be full
+
+        // Add status condition if present
+        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        if (!string.IsNullOrEmpty(statusName))
+        {
+            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * 3);
+            spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
+        }
     }
 
     /// <summary>
@@ -647,5 +679,63 @@ public class BattleRenderer(
         spriteBatch.Draw(pixel,
             new XnaRectangle(rect.Right - lineWidth, rect.Y, lineWidth, rect.Height),
             color); // Right
+    }
+
+    /// <summary>
+    /// Helper to draw a filled rectangle
+    /// </summary>
+    private void DrawFilledRectangle(XnaRectangle rect, XnaColor color)
+    {
+        // Lazy init pixel texture
+        if (_pixelTexture == null)
+        {
+            _pixelTexture = new Texture2D(graphicsDevice, 1, 1);
+            _pixelTexture.SetData([XnaColor.White]);
+        }
+
+        spriteBatch.Draw(_pixelTexture, rect, color);
+    }
+
+    /// <summary>
+    /// Draw an HP bar for a Pokemon
+    /// </summary>
+    /// <param name="position">Top-left position for the HP bar</param>
+    /// <param name="currentHp">Current HP value</param>
+    /// <param name="maxHp">Maximum HP value</param>
+    private void DrawHpBar(XnaVector2 position, int currentHp, int maxHp)
+    {
+        // Calculate HP percentage
+        double hpPercentage = maxHp > 0 ? (double)currentHp / maxHp : 0.0;
+        
+        // Determine HP bar color based on percentage
+        XnaColor hpBarColor = hpPercentage switch
+        {
+            > HpColorThresholdGreen => XnaColor.LimeGreen,
+            > HpColorThresholdYellow => XnaColor.Yellow,
+            _ => XnaColor.Red
+        };
+
+        // Draw HP bar background (dark gray)
+        var backgroundRect = new XnaRectangle(
+            (int)position.X,
+            (int)position.Y,
+            HpBarWidth,
+            HpBarHeight);
+        DrawFilledRectangle(backgroundRect, XnaColor.DarkGray);
+
+        // Draw HP bar fill
+        int fillWidth = (int)(HpBarWidth * hpPercentage);
+        if (fillWidth > 0)
+        {
+            var fillRect = new XnaRectangle(
+                (int)position.X,
+                (int)position.Y,
+                fillWidth,
+                HpBarHeight);
+            DrawFilledRectangle(fillRect, hpBarColor);
+        }
+
+        // Draw HP bar border
+        DrawRectangle(backgroundRect, XnaColor.Black, HpBarBorderThickness);
     }
 }
