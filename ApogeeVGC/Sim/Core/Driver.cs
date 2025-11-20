@@ -23,8 +23,8 @@ public class Driver
     private const int PlayerRandom2EvalSeed = 1818;
     private const int BattleEvalSeed = 9876;
 
-    private const int RandomEvaluationNumTest = 100;
-    private const int NumThreads = 16;
+    private const int RandomEvaluationNumTest = 100000;
+    private const int NumThreads = 10;
 
     public void Start(DriverMode mode)
     {
