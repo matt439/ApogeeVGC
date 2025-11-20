@@ -33,6 +33,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
+- [GUI Team Preview Fix](#gui-team-preview-fix) - No Pokémon displayed during GUI team preview
 
 ### Battle Lifecycle
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
@@ -517,6 +518,24 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **PlayerRandom.cs**:
 - [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix)
+
+**Battle.Requests.cs**:
+- [GUI Team Preview Fix](#gui-team-preview-fix)
+
+---
+
+### GUI Team Preview Fix
+**File**: `GuiTeamPreviewFix.md`  
+**Severity**: High  
+**Systems Affected**: GUI rendering, battle perspectives, team preview
+
+**Problem**: When running GUI battles, no Pokémon were displayed during the team preview phase. The screen showed an empty battlefield with no Pokémon sprites or information.
+
+**Root Cause**: The `BattleRenderer` was receiving perspectives with the wrong `BattlePerspectiveType`. When `RequestPlayerChoices()` was called during team preview, it called `UpdateAllPlayersUi()` without parameters, which defaulted to `BattlePerspectiveType.InBattle` instead of `TeamPreview`. This caused the renderer to use `RenderInBattle()` (which only shows active Pokémon) instead of `RenderTeamPreview()` (which shows the full team).
+
+**Solution**: Modified `Battle.Requests.RequestPlayerChoices()` to determine the correct perspective type based on `RequestState` and pass it explicitly to `UpdateAllPlayersUi()`.
+
+**Keywords**: `GUI`, `team preview`, `BattleRenderer`, `BattlePerspective`, `perspective type`, `UpdateAllPlayersUi`, `RequestPlayerChoices`, `RenderTeamPreview`, `default parameter`
 
 ---
 

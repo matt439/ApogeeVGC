@@ -647,7 +647,11 @@ public partial class Battle
 
         // Send all battle updates to players before requesting choices
         // This ensures players see all messages (moves, damage, etc.) before making decisions
-        UpdateAllPlayersUi();
+        // Determine the perspective type based on request state
+        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+            ? BattlePerspectiveType.TeamPreview
+            : BattlePerspectiveType.InBattle;
+        UpdateAllPlayersUi(perspectiveType);
 
         // Emit choice request events for each side that needs to make a choice
         foreach (Side side in Sides)

@@ -297,12 +297,6 @@ public partial class ChoiceInputManager
 
     private void ProcessMainBattleKeyboardInput(KeyboardState keyboardState)
     {
-        // Log every 100 updates to see if this method is being called
-      if (_updateCallCount % 100 == 0)
-        {
-   Console.WriteLine($"[ProcessMainBattleKeyboardInput #{_updateCallCount}] Called. Buttons={_buttons.Count}, _selectedButtonIndex={_selectedButtonIndex}");
-        }
-        
         if (_buttons.Count == 0) return;
 
         // Arrow key navigation

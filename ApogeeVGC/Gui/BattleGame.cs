@@ -184,35 +184,10 @@ public class BattleGame : Game
         Console.WriteLine("[BattleGame] Battle runner started");
     }
 
-    private int _battleGameUpdateCount;
-
     protected override void Update(GameTime gameTime)
     {
-        // CRITICAL DIAGNOSTIC: Log FIRST before anything else
-        bool shouldLogVerbose = _battleGameUpdateCount % 60 == 0;
-        if (shouldLogVerbose)
-        {
-            Console.WriteLine(
-                $"[BattleGame.Update] START OF UPDATE #{_battleGameUpdateCount}, thread {Thread.CurrentThread.ManagedThreadId}");
-        }
-
-        // Log IMMEDIATELY at the start, before try block
-        if (shouldLogVerbose)
-        {
-            Console.WriteLine(
-                $"[BattleGame.Update] HEARTBEAT #{_battleGameUpdateCount}, Queue size: {_choiceCoordinator.QueueSize}");
-        }
-
         try
         {
-            _battleGameUpdateCount++;
-
-            // Log periodically to confirm Update is being called
-            if (_battleGameUpdateCount <= 10 || _battleGameUpdateCount % 100 == 0)
-            {
-                Console.WriteLine(
-                    $"[BattleGame.Update #{_battleGameUpdateCount}] Called on thread {Thread.CurrentThread.ManagedThreadId}, Queue size: {_choiceCoordinator.QueueSize}");
-            }
 
             // Process queued perspective updates from battle thread
             while (_choiceCoordinator.TryDequeuePerspective(out var perspective) &&
@@ -233,8 +208,6 @@ public class BattleGame : Game
                    pendingRequest != null)
             {
                 processedCount++;
-                Console.WriteLine(
-                    $"[BattleGame.Update #{_battleGameUpdateCount}] Processing queued choice request #{processedCount} on GUI thread");
 
                 if (_choiceInputManager != null)
                 {
@@ -247,28 +220,20 @@ public class BattleGame : Game
                             pendingRequest.Perspective,
                             pendingRequest.CancellationToken);
 
-                        Console.WriteLine(
-                            $"[BattleGame.Update #{_battleGameUpdateCount}] ChoiceInputManager.RequestChoiceAsync returned, setting up continuation");
-
                         // When the task completes, forward the result to the battle thread
                         PendingChoiceRequest request = pendingRequest;
                         task.ContinueWith(t =>
                         {
                             if (t.IsFaulted)
                             {
-                                Console.WriteLine(
-                                    $"[BattleGame.ContinueWith] Task faulted: {t.Exception?.GetBaseException().Message}");
                                 request.CompletionSource.SetException(t.Exception!);
                             }
                             else if (t.IsCanceled)
                             {
-                                Console.WriteLine($"[BattleGame.ContinueWith] Task canceled");
                                 request.CompletionSource.SetCanceled();
                             }
                             else
                             {
-                                Console.WriteLine(
-                                    $"[BattleGame.ContinueWith] Task completed successfully");
                                 request.CompletionSource.SetResult(t.Result);
                             }
                         }, TaskScheduler.Default);
@@ -288,11 +253,7 @@ public class BattleGame : Game
                 }
             }
 
-            if (processedCount > 0)
-            {
-                Console.WriteLine(
-                    $"[BattleGame.Update #{_battleGameUpdateCount}] Processed {processedCount} queued requests");
-            }
+            // Note: processedCount tracking kept for debugging but not logged every frame
 
             // Check if external code requested exit
             if (_shouldExit)
@@ -301,15 +262,7 @@ public class BattleGame : Game
             }
 
             // Update choice input manager (runs on GUI thread)
-            if (_choiceInputManager != null)
-            {
-                _choiceInputManager.Update(gameTime);
-            }
-            else if (_battleGameUpdateCount <= 10 || _battleGameUpdateCount % 100 == 0)
-            {
-                Console.WriteLine(
-                    $"[BattleGame.Update #{_battleGameUpdateCount}] _choiceInputManager is null!");
-            }
+            _choiceInputManager?.Update(gameTime);
 
             // Check if battle is complete
             if (_battleRunner is { IsCompleted: true })
