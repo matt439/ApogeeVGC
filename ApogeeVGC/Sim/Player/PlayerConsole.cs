@@ -541,6 +541,7 @@ public class PlayerConsole : IPlayer
 
         var actions = new List<ChosenAction>();
         var alreadySelectedSwitchIndices = new HashSet<int>(); // Track Pokemon already selected for switching
+        bool teraAlreadySelected = false; // Track if terastallization has been selected this turn
 
         // Handle each active Pokemon
         for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
@@ -561,12 +562,19 @@ public class PlayerConsole : IPlayer
             var moveIndices = new List<int>();
             var teraOptions = new List<bool>();
 
-            // Check if terastallization is available
+            // Check if terastallization is available for this Pokemon
+            // Only allow tera options if it hasn't been selected yet this turn
             MoveType? teraType = pokemonRequest.CanTerastallize switch
             {
                 MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
                 _ => null,
             };
+
+            // Disable tera options if already selected by another Pokemon
+            if (teraAlreadySelected)
+            {
+                teraType = null;
+            }
 
             // Add moves
             for (int i = 0; i < pokemonRequest.Moves.Count; i++)
@@ -627,6 +635,12 @@ public class PlayerConsole : IPlayer
                 int moveIndex = moveIndices[choiceIndex];
                 bool useTerastallize = teraOptions[choiceIndex];
                 PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
+
+                // Track if terastallization was selected
+                if (useTerastallize)
+                {
+                    teraAlreadySelected = true;
+                }
 
                 // Display which move was selected
                 AnsiConsole.MarkupLine(

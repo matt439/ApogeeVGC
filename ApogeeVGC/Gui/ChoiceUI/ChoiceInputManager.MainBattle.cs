@@ -180,7 +180,8 @@ public partial class ChoiceInputManager
     if (request.Active.Count > 1)
           {
     PokemonMoveRequestData pokemonData = request.Active[1];
-  bool canTera = pokemonData.CanTerastallize != null;
+  // Only allow tera if first Pokemon hasn't already selected it
+  bool canTera = pokemonData.CanTerastallize != null && !TurnSelection.FirstPokemonTerastallize;
  _buttons = MainBattleUiHelper.CreateMoveSelectionButtons(
             pokemonData,
         canTera,
