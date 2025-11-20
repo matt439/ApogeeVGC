@@ -318,8 +318,10 @@ public partial class Battle
                         if (availableSwitches == 0 && side.PokemonLeft <= 0)
                         {
                             // This side has lost - end the battle
+                            // Note: We call Win() directly on the foe because Lose() checks if PokemonLeft <= 0
+                            // and returns early without ending the battle if it's already 0
                             Debug($"  {side.Name} has no Pokemon left - they lose");
-                            Lose(side);
+                            Win(side.Foe);
                             return new List<IChoiceRequest>();
                         }
                         

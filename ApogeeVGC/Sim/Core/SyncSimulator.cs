@@ -63,6 +63,13 @@ public class SyncSimulator : IBattleController
                 // Check if there are pending requests
                 if (Battle.RequestState != RequestState.None)
                 {
+                    // Double-check that battle hasn't ended before requesting choices
+                    // This can happen if GetRequests() detects a win/loss condition
+                    if (Battle.Ended)
+                    {
+                        break;
+                    }
+
                     // Emit request events to get choices from players
                     // This will trigger OnChoiceRequested for each side that needs to make a choice
                     // In synchronous mode, all event handlers run immediately within this call

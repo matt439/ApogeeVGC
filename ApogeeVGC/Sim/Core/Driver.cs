@@ -13,16 +13,18 @@ public class Driver
 {
     private Library Library { get; } = new();
 
-    //private const int PlayerRandom1Seed = 12345;
-    //private const int PlayerRandom2Seed = 1818;
-    //private const int BattleSeed = 9876;
+    // Seeds for standard test runs - can be changed freely
+    private const int PlayerRandom1Seed = 12361;
+    private const int PlayerRandom2Seed = 1835;
+    private const int BattleSeed = 9894;
 
-    private const int PlayerRandom1Seed = 12401;
-    private const int PlayerRandom2Seed = 1876;
-    private const int BattleSeed = 9936;
+    // Don't change these - used for evaluation test to reproduce errors
+    private const int PlayerRandom1EvalSeed = 12345;
+    private const int PlayerRandom2EvalSeed = 1818;
+    private const int BattleEvalSeed = 9876;
 
-    private const int RandomEvaluationNumTest = 100;
-    private const int NumThreads = 1;
+    private const int RandomEvaluationNumTest = 1000;
+    private const int NumThreads = 16;
 
     public void Start(DriverMode mode)
     {
@@ -234,9 +236,9 @@ public class Driver
             int offset2 = Interlocked.Increment(ref seedCounter);
             int offset3 = Interlocked.Increment(ref seedCounter);
             
-            int localPlayer1Seed = PlayerRandom1Seed + offset1;
-            int localPlayer2Seed = PlayerRandom2Seed + offset2;
-            int localBattleSeed = BattleSeed + offset3;
+            int localPlayer1Seed = PlayerRandom1EvalSeed + offset1;
+            int localPlayer2Seed = PlayerRandom2EvalSeed + offset2;
+            int localBattleSeed = BattleEvalSeed + offset3;
 
             try
             {

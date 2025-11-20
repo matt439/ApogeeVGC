@@ -7,7 +7,7 @@ public class Program
     public static void Main(string[] args)
     {
         var driver = new Driver();
-        driver.Start(DriverMode.RandomVsRandomSingles);
+        driver.Start(DriverMode.RandomVsRandomSinglesEvaluation);
         //Console.WriteLine("Press any key to exit...");
         //Console.ReadKey();
     }

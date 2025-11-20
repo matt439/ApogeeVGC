@@ -37,6 +37,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### Battle Lifecycle
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
+- [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
 
 ---
 
@@ -378,6 +379,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Battle crashes/exceptions**:
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request after battle ends
+- [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined to int conversion
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Dictionary key not found
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
@@ -507,6 +509,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **EventHandlerAdapter.cs**:
 - [Stat Modification Parameter Nullability Fix](#stat-modification-parameter-nullability-fix) (enhanced error logging)
 
+**SyncSimulator.cs**:
+- [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix)
+
 ---
 
 ## Common Patterns
@@ -605,6 +610,7 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Stat Modification Handler VoidReturn Fix (comprehensive fix for all stat handlers returning VoidReturn)
 - **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
 - **2025-01-19**: Added Endless Battle Loop Fix (infinite loop when active Pokemon fainted without proper switch handling)
+- **2025-01-19**: Added Sync Simulator Request After Battle End Fix (RequestPlayerChoices called after battle ended during request generation)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -703,6 +709,25 @@ When documenting a new bug fix:
 
 ---
 
+### Sync Simulator Request After Battle End Fix
+**File**: `SyncSimulatorRequestAfterBattleEndFix.md`  
+**Severity**: High  
+**Systems Affected**: Synchronous simulation, battle lifecycle, request/choice system
+
+**Problem**: When running a synchronous battle test (`SyncSimulator`), the battle crashed with `InvalidOperationException: Cannot request choices from players: Some sides have no active request` after one side's last Pokémon fainted. This occurred when `GetRequests()` detected a win condition and called `Lose()`, but the simulator still attempted to request player choices.
+
+**Root Cause**: In `SyncSimulator.Run()`, the main loop checks `if (Battle.RequestState != RequestState.None)` before calling `RequestPlayerChoices()`. When `GetRequests()` calls `Lose()` during request generation, it sets `Ended = true` but doesn't clear `RequestState`. The simulator checks for pending requests before checking if the battle ended during request generation, causing it to attempt requesting choices with no active requests.
+
+**Solution**: Added a battle-ended check in `SyncSimulator.Run()` immediately before calling `RequestPlayerChoices()`. This prevents attempting to request choices when the battle ended during request generation.
+
+**Key Insight**: `RequestState` can be set before the battle ends during request generation. The simulator must check both `RequestState != None` AND `!Ended` before attempting to request choices.
+
+**Impact**: Fixes crashes in all synchronous battle simulations when win conditions are detected during `GetRequests()`.
+
+**Keywords**: `SyncSimulator`, `RequestPlayerChoices`, `InvalidOperationException`, `no active request`, `battle end`, `GetRequests`, `Lose`, `RequestState`, `battle lifecycle`, `synchronous simulation`, `win condition`, `request generation`, `state consistency`, `defensive programming`
+
+---
+
 ### Facade BasePower Event Parameter Fix
 **File**: `FacadeBasePowerEventParameterFix.md`  
 **Severity**: High  
@@ -729,5 +754,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 21  
+*Total Bug Fixes Documented*: 22  
 *Reference Guides*: 1
