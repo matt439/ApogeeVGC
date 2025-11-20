@@ -44,48 +44,59 @@ public class SyncSimulator : IBattleController
         Battle.UpdateRequested += OnUpdateRequested;
         Battle.BattleEnded += OnBattleEnded;
 
-        if (PrintDebug)
-        {
-            Console.WriteLine("Starting synchronous battle simulation...");
-        }
-
         try
         {
-            // Start the battle - this will set up team preview
+            // Start the battle - this will set up team preview or first turn
             Battle.Start();
 
             // Main battle loop - keep processing until battle ends
+            // Flow:
+            // 1. Battle.Start() or TurnLoop() sets RequestState != None when choices are needed
+            // 2. We call RequestPlayerChoices() which emits events synchronously
+            // 3. Event handlers call GetChoiceSync() and Battle.Choose()
+            // 4. When all choices are submitted, Choose() calls CommitChoices() which calls TurnLoop()
+            // 5. TurnLoop() processes actions and may set a new RequestState or end the battle
+            // 6. Control returns to us, and we loop to check for new requests
+            
             while (!Battle.Ended)
             {
                 // Check if there are pending requests
                 if (Battle.RequestState != RequestState.None)
                 {
-                    if (PrintDebug)
-                    {
-                        Console.WriteLine($"[SyncSimulator] Pending request: {Battle.RequestState}");
-                    }
-
                     // Emit request events to get choices from players
+                    // This will trigger OnChoiceRequested for each side that needs to make a choice
+                    // In synchronous mode, all event handlers run immediately within this call
                     Battle.RequestPlayerChoices();
 
-                    // Note: OnChoiceRequested will be called synchronously for each player
-                    // which will call Choose() and potentially trigger CommitChoices() -> TurnLoop()
-                    // After all choices are processed, RequestState should be None or battle should end
+                    // After RequestPlayerChoices() completes, all OnChoiceRequested events have been
+                    // processed synchronously. The handlers called GetChoiceSync() and Battle.Choose().
+                    // When the last side submitted their choice, Choose() called CommitChoices() 
+                    // which called TurnLoop() to process the actions.
+                    //
+                    // During TurnLoop():
+                    // - Actions are processed (moves, switches, etc.)
+                    // - Turn may complete and EndTurn() called, which sets RequestState = Move again
+                    // - Or a mid-turn switch is needed, which sets RequestState = SwitchIn
+                    // - Or the battle ends, which sets Ended = true
+                    //
+                    // After all this synchronous processing, TurnLoop returns to CommitChoices,
+                    // which returns to the event handler, which returns to RequestPlayerChoices,
+                    // which returns to us here.
+                    //
+                    // Note: RequestState may be the SAME value as before (e.g., Move after turn ends)
+                    // but this is normal - it means a new turn started and needs new move choices.
+                    // The loop will continue and RequestPlayerChoices will be called again.
+                    //
+                    // The loop only exits when:
+                    // - Battle.Ended becomes true
+                    // - RequestState becomes None (shouldn't happen if battle isn't ended)
                 }
                 else
                 {
-                    // No pending request and battle hasn't ended - this shouldn't happen
-                    if (PrintDebug)
-                    {
-                        Console.WriteLine("[SyncSimulator] WARNING: No pending request but battle not ended!");
-                    }
+                    // No pending request - exit loop
+                    // Either battle ended or no more requests
                     break;
                 }
-            }
-
-            if (PrintDebug)
-            {
-                Console.WriteLine("Battle has ended.");
             }
 
             return DetermineWinner();
@@ -132,35 +143,21 @@ public class SyncSimulator : IBattleController
     /// </summary>
     private void OnChoiceRequested(object? sender, BattleChoiceRequestEventArgs e)
     {
-        Console.WriteLine($"[SyncSimulator.OnChoiceRequested] Choice requested for {e.SideId}");
-
         IPlayer player = GetPlayer(e.SideId);
         Side side = Battle!.Sides.First(s => s.Id == e.SideId);
 
         // Get choice synchronously
         Choice choice = player.GetChoiceSync(e.Request, e.RequestType, e.Perspective);
 
-        Console.WriteLine(
-            $"[SyncSimulator.OnChoiceRequested] Received choice for {e.SideId}: {choice.Actions.Count} actions");
-
         // If the choice is empty, use AutoChoose
         if (choice.Actions.Count == 0)
         {
-            Console.WriteLine(
-                $"[SyncSimulator.OnChoiceRequested] Empty choice, using AutoChoose for {e.SideId}");
             side.AutoChoose();
             choice = side.GetChoice();
-            Console.WriteLine(
-                $"[SyncSimulator.OnChoiceRequested] After AutoChoose: {choice.Actions.Count} actions");
         }
 
         // Submit the choice immediately (synchronous)
-        bool success = Battle.Choose(e.SideId, choice);
-
-        if (!success)
-        {
-            Console.WriteLine($"[SyncSimulator.OnChoiceRequested] Invalid choice for {e.SideId}");
-        }
+        Battle.Choose(e.SideId, choice);
     }
 
     /// <summary>
@@ -178,8 +175,7 @@ public class SyncSimulator : IBattleController
     /// </summary>
     private void OnBattleEnded(object? sender, BattleEndedEventArgs e)
     {
-        Console.WriteLine(
-            $"[SyncSimulator.OnBattleEnded] Battle ended, winner: {e.Winner ?? "tie"}");
+        // Battle ended - no action needed, just for notification
     }
 
     private SimulatorResult DetermineWinner()
@@ -189,32 +185,15 @@ public class SyncSimulator : IBattleController
         {
             // Winner is stored as side ID string ("p1" or "p2")
             bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase);
-
-            if (PrintDebug)
-            {
-                string winnerName = isP1Winner ? "Player 1" : "Player 2";
-                Console.WriteLine($"Winner: {winnerName}");
-            }
-
             return isP1Winner ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
         }
 
         // No clear winner - use tiebreak
-        if (PrintDebug)
-        {
-            Console.WriteLine("Battle ended without a clear winner");
-        }
-
         return DetermineTiebreakWinner();
     }
 
     private SimulatorResult DetermineTiebreakWinner()
     {
-        if (PrintDebug)
-        {
-            Console.WriteLine("Executing tiebreaker...");
-        }
-
         // Use Battle's tiebreak logic which checks:
         // 1. Remaining Pokemon count
         // 2. HP percentage
@@ -228,11 +207,6 @@ public class SyncSimulator : IBattleController
         }
 
         // If tiebreak didn't determine a winner, it's a true tie
-        if (PrintDebug)
-        {
-            Console.WriteLine("Tiebreaker did not determine a winner - result is a tie");
-        }
-
         return SimulatorResult.Tie;
     }
 
