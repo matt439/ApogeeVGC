@@ -159,7 +159,6 @@ public static class MainBattleUiHelper
         Action goBack)
     {
         var buttons = new List<ChoiceButton>();
-        int y = TopMargin;
         int moveIndex = 0;
 
         // Extract tera type if terastallization is available
@@ -173,6 +172,8 @@ public static class MainBattleUiHelper
             };
         }
 
+        // Collect non-disabled moves
+        var availableMoves = new List<(PokemonMoveData MoveData, int Index)>();
         foreach (PokemonMoveData moveData in pokemonRequest.Moves)
         {
             // Check if move is disabled
@@ -185,42 +186,59 @@ public static class MainBattleUiHelper
             };
 
             // Skip disabled moves - don't show them at all
-            if (disabled)
+            if (!disabled)
             {
-                moveIndex++;
-                continue;
+                availableMoves.Add((moveData, moveIndex));
             }
-
-            int index = moveIndex;
-            
-            // Add move button - clicking it will use the current tera toggle state
-            var button = new ChoiceButton(
-                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                moveData.Move.Name,
-                Color.Blue,
-                () => selectMove(index, isTerastallized)
-            );
-            buttons.Add(button);
-            y += ButtonHeight + ButtonSpacing;
 
             moveIndex++;
         }
 
-        // Add Tera toggle button to the right of the move list if available
+        // Layout moves in a 2x2 grid
+        // Grid constants
+        const int gridColumns = 2;
+        const int moveButtonWidth = 180;
+        const int moveButtonHeight = 28;
+        const int horizontalSpacing = 10;
+        const int verticalSpacing = 10;
+
+        for (int i = 0; i < availableMoves.Count; i++)
+        {
+            var (moveData, originalIndex) = availableMoves[i];
+            
+            // Calculate grid position (column, row)
+            int col = i % gridColumns;
+            int row = i / gridColumns;
+            
+            // Calculate button position
+            int x = LeftMargin + (col * (moveButtonWidth + horizontalSpacing));
+            int y = TopMargin + (row * (moveButtonHeight + verticalSpacing));
+            
+            // Add move button - clicking it will use the current tera toggle state
+            var button = new ChoiceButton(
+                new Rectangle(x, y, moveButtonWidth, moveButtonHeight),
+                moveData.Move.Name,
+                Color.Blue,
+                () => selectMove(originalIndex, isTerastallized)
+            );
+            buttons.Add(button);
+        }
+
+        // Add Tera toggle button below the move grid if available
         if (canTerastallize && teraType.HasValue)
         {
             Color teraColor = GetTeraTypeColor(teraType.Value);
             string teraTypeName = teraType.Value.ToString().ToUpper();
             
-            // Position to the right of the move buttons
-            int teraButtonX = LeftMargin + ButtonWidth + 10;
-            int teraButtonY = TopMargin;
-            int teraButtonWidth = 120;
-            int teraButtonHeight = ButtonHeight * 2; // Make it taller
+            // Position below the move grid
+            int teraButtonX = LeftMargin;
+            int teraButtonY = TopMargin + (2 * (moveButtonHeight + verticalSpacing)) + verticalSpacing;
+            int teraButtonWidth = (moveButtonWidth * 2) + horizontalSpacing; // Span full width of grid
+            int teraButtonHeight = 28;
             
             // Split text into parts for color coding
             string statusText = isTerastallized ? "[ON]" : "[OFF]";
-            string teraButtonText = $"TERA {teraTypeName}\n{statusText}";
+            string teraButtonText = $"TERA {teraTypeName} {statusText}";
             Color teraButtonBg = isTerastallized ? teraColor : Color.DarkGray;
             
             var teraToggleButton = new ChoiceButton(
