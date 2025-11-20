@@ -426,6 +426,9 @@ public partial class Side
             }
 
             Choice.ForcedSwitchesLeft--;
+            
+            // Clear the switch flag so IsChoiceDone() knows this Pokemon's switch has been handled
+            pokemon.SwitchFlag = false;
         }
 
         // Step 11: Record the switch
@@ -1013,20 +1016,45 @@ Battle.Debug(
     public bool IsChoiceDone()
     {
         if (RequestState == RequestState.None) return true;
-        if (Choice.ForcedSwitchesLeft > 0) return false;
+        
+        if (Choice.ForcedSwitchesLeft > 0)
+        {
+            Battle.Debug($"[IsChoiceDone] {Name}: ForcedSwitchesLeft={Choice.ForcedSwitchesLeft}, returning false");
+            return false;
+        }
 
         // For Switch/SwitchIn requests, also check if we have forced passes left
         // This prevents IsChoiceDone from returning true when we still need to handle passes
         if ((RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn) &&
-            Choice.ForcedPassesLeft > 0) return false;
+            Choice.ForcedPassesLeft > 0)
+        {
+            Battle.Debug($"[IsChoiceDone] {Name}: ForcedPassesLeft={Choice.ForcedPassesLeft}, returning false");
+            return false;
+        }
 
         if (RequestState == RequestState.TeamPreview)
         {
-            return Choice.Actions.Count >= PickedTeamSize();
+            bool done = Choice.Actions.Count >= PickedTeamSize();
+            Battle.Debug($"[IsChoiceDone] {Name}: TeamPreview - Actions={Choice.Actions.Count}, PickedTeamSize={PickedTeamSize()}, done={done}");
+            return done;
+        }
+
+        // For Switch/SwitchIn requests, only count Pokemon that actually need to switch
+        // In doubles, you might have 2 active Pokemon but only 1 needs to switch
+        if (RequestState == RequestState.Switch || RequestState == RequestState.SwitchIn)
+        {
+            int pokemonNeedingSwitch = Active.Count(p => p?.SwitchFlag.IsTrue() == true);
+            GetChoiceIndex();
+            bool done = Choice.Actions.Count >= pokemonNeedingSwitch;
+            Battle.Debug($"[IsChoiceDone] {Name}: Switch request - Actions={Choice.Actions.Count}, PokemonNeedingSwitch={pokemonNeedingSwitch}, done={done}");
+            Battle.Debug($"[IsChoiceDone]   Active Pokemon with SwitchFlag: {string.Join(", ", Active.Where(p => p != null).Select(p => $"{p.Name}:{p.SwitchFlag}"))}");
+            return done;
         }
 
         GetChoiceIndex();
-        return Choice.Actions.Count >= Active.Count;
+        bool moveDone = Choice.Actions.Count >= Active.Count;
+        Battle.Debug($"[IsChoiceDone] {Name}: Move request - Actions={Choice.Actions.Count}, Active.Count={Active.Count}, done={moveDone}");
+        return moveDone;
     }
 
 
