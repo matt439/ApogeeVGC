@@ -28,17 +28,23 @@ public class BattleRenderer(
     private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
     private const int PokemonSpacing = 20; // Horizontal spacing between Pokemon sprites
 
+    // Screen division - left half for battle, right half for messages
+    private const int ScreenHalfWidth = 640; // Half of 1280 (screen width)
+
     // Team Preview layout
     private const int TeamPreviewOpponentYOffset = 60; // Offset from top padding for opponent team
     private const int TeamPreviewLabelYOffset = 30; // Distance of label above Pokemon sprites
 
-    // In-Battle layout
-    private const int InBattlePlayerYOffset = 200; // Offset from bottom to position player Pokemon
-    private const int InBattleOpponentYOffset = 120; // Offset from top padding for opponent Pokemon
+    // In-Battle layout - all Pokemon in left half only
+    private const int InBattleOpponentXOffset = 20; // X position from left edge for opponent Pokemon
+    private const int InBattleOpponentYOffset = 10; // Y position from top for opponent Pokemon
+    private const int InBattlePlayerXOffset = 180; // X position from left edge for player Pokemon (offset to right)
+    private const int InBattlePlayerYOffset = 220; // Y position from top for player Pokemon (below opponent)
 
-    // Timer display layout
-    private const int TimerXOffset = 200; // Distance from right edge of screen
-    private const int TimerLineHeight = 25; // Vertical spacing between timer lines
+    // Timer display layout - position in top-right of left half
+    private const int TimerXPosition = 400; // X position in left half
+    private const int TimerYPosition = 10; // Y position from top
+    private const int TimerLineHeight = 20; // Vertical spacing between timer lines
 
     // Pokemon info text layout
     private const int InfoTextYOffset = 5; // Distance below sprite to start text
@@ -156,9 +162,8 @@ public class BattleRenderer(
     private void RenderField(BattlePerspective battlePerspective)
     {
         // TODO: Render weather, terrain, field effects
-        // For now, just show field status text
-        string fieldInfo = $"Turn: {battlePerspective.TurnCounter}";
-        spriteBatch.DrawString(font, fieldInfo, new XnaVector2(Padding, Padding), XnaColor.White);
+        // Turn counter is now displayed in message log, so no need to render here
+        // Field info can be shown in a better position later if needed
     }
 
     /// <summary>
@@ -263,16 +268,15 @@ public class BattleRenderer(
     private void RenderInBattlePlayerPokemon(BattlePerspective battlePerspective)
     {
         // Render only active Pokemon
-        // Position them lower on screen but not at bottom - leave room for UI
-        int yPosition = graphicsDevice.Viewport.Height - PokemonSpriteSize - Padding -
-                        InfoTextHeight - InBattlePlayerYOffset;
+        // Position them in left half, offset to the right of opponent Pokemon
+        int yPosition = InBattlePlayerYOffset;
 
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
             var pokemon = battlePerspective.PlayerSide.Active[i];
             if (pokemon == null) continue;
 
-            int xPosition = Padding + (i * (PokemonSpriteSize + PokemonSpacing));
+            int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
             RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
     }
@@ -283,16 +287,15 @@ public class BattleRenderer(
     private void RenderInBattleOpponentPokemon(BattlePerspective battlePerspective)
     {
         // Render only active Pokemon
-        // Move down to avoid overlap with timers
-        int yPosition = Padding + InBattleOpponentYOffset;
+        // Position them in left half at the top
+        int yPosition = InBattleOpponentYOffset;
 
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
             var pokemon = battlePerspective.OpponentSide.Active[i];
             if (pokemon == null) continue;
 
-            int xPosition = graphicsDevice.Viewport.Width - PokemonSpriteSize - Padding -
-                            (i * (PokemonSpriteSize + PokemonSpacing));
+            int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
 
             RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
         }
@@ -319,9 +322,9 @@ public class BattleRenderer(
 
         var timerManager = _choiceInputManager.TimerManager;
 
-        // Timer display position (top right of screen)
-        int timerX = graphicsDevice.Viewport.Width - TimerXOffset;
-        int timerY = Padding;
+        // Timer display position (top right of left half)
+        int timerX = TimerXPosition;
+        int timerY = TimerYPosition;
         int lineHeight = TimerLineHeight;
 
         // Battle Timer

@@ -14,24 +14,24 @@ public static class MainBattleUiHelper
     // ===== MAIN BATTLE CHOICE UI LAYOUT CONSTANTS =====
     
     // Button dimensions
-    private const int ButtonWidth = 200;
-    private const int ButtonHeight = 35;
+    private const int ButtonWidth = 180;
+    private const int ButtonHeight = 28;
     
     // Vertical spacing between buttons
-    private const int ButtonSpacing = 3;
+    private const int ButtonSpacing = 2;
     
     // Extra spacing before certain buttons (e.g., before "Back" button)
-    private const int ButtonSpacingLarge = 8;
+    private const int ButtonSpacingLarge = 5;
     
-    // Position of choice menu on screen
-    private const int LeftMargin = 700;  // X position from left edge
-    private const int TopMargin = 300;   // Y position from top edge
+    // Position of choice menu on screen - in left half below Pokemon
+    private const int LeftMargin = 20;   // X position from left edge (aligned with opponent Pokemon)
+    private const int TopMargin = 430;   // Y position from top edge (below player Pokemon)
     
     // Position of instruction text (appears above buttons)
-    private const int InstructionTextYOffset = 80; // Distance above TopMargin
+    private const int InstructionTextYOffset = 20; // Distance above TopMargin
     
     // Position of selection status text (appears below buttons)
-    private const int SelectionStatusY = 650; // Fixed Y position at bottom
+    private const int SelectionStatusY = 695; // Fixed Y position at bottom
 
     /// <summary>
     /// Get the MonoGame Color for a tera type (matching PlayerConsole colors)

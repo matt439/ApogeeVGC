@@ -15,26 +15,31 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     // Layout constants
     private const int Padding = 10;
     private const int LineHeight = 20;
-    private const int MaxVisibleLines = 6; // Number of messages to show at once
+    private const int MaxVisibleLines = 30; // Number of messages to show at once (increased for right-half display)
+
+    // Screen division - messages occupy right half
+    private const int ScreenHalfWidth = 640; // Half of 1280 (screen width)
 
     // Message box positioning and size
-    private const int MessageBoxHeight = MaxVisibleLines * LineHeight + (Padding * 2);
-    private const int MessageBoxWidth = 600;
+    private const int MessageBoxX = ScreenHalfWidth + 10; // Position in right half with small margin
+    private const int MessageBoxY = 10; // Position from top
+    private const int MessageBoxWidth = ScreenHalfWidth - 20; // Width of right half minus margins
+    private const int MessageBoxHeight = 700; // Full height minus margins
 
     // Auto-scroll tracking
     private double _lastMessageTime = 0;
     private const double AutoScrollDelay = 3.0; // Seconds to show each new message
 
     /// <summary>
-    /// Render the message log at the bottom center of the screen
+    /// Render the message log in the right half of the screen
     /// </summary>
     public void Render(GameTime gameTime, List<BattleMessage> messages)
     {
         if (messages.Count == 0) return;
 
-        // Calculate message box position (bottom center of screen)
-        int boxX = (graphicsDevice.Viewport.Width - MessageBoxWidth) / 2;
-        int boxY = graphicsDevice.Viewport.Height - MessageBoxHeight - 20;
+        // Use fixed position in right half of screen
+        int boxX = MessageBoxX;
+        int boxY = MessageBoxY;
 
         var messageBox = new XnaRectangle(boxX, boxY, MessageBoxWidth, MessageBoxHeight);
 
@@ -44,10 +49,13 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
         // Draw border
         DrawRectangleBorder(messageBox, XnaColor.White, 2);
 
-        // Determine which messages to show (last MaxVisibleLines messages)
-        int startIndex = Math.Max(0, messages.Count - MaxVisibleLines);
+        // Calculate how many messages can fit in the box
+        int maxLines = (MessageBoxHeight - (Padding * 2)) / LineHeight;
+        
+        // Determine which messages to show (last maxLines messages)
+        int startIndex = Math.Max(0, messages.Count - maxLines);
 
-        // Render messages from bottom to top (newest at bottom)
+        // Render messages from top to bottom (oldest at top, newest at bottom)
         int yOffset = boxY + Padding;
         for (int i = startIndex; i < messages.Count; i++)
         {
