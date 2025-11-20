@@ -315,18 +315,18 @@ public static class MainBattleUiHelper
         return buttons;
     }
 
-    public static string GetInstructionText(MainBattlePhaseState state)
+    public static string GetInstructionText(MainBattlePhaseState state, string? firstPokemonName = null, string? secondPokemonName = null)
     {
         return state switch
         {
             MainBattlePhaseState.MainMenuFirstPokemon =>
-                "Choose action for Pokemon 1.",
+                $"Choose action for {firstPokemonName ?? "Pokemon 1"}.",
             MainBattlePhaseState.MainMenuSecondPokemon =>
-                "Choose action for Pokemon 2.",
+                $"Choose action for {secondPokemonName ?? "Pokemon 2"}.",
             MainBattlePhaseState.MoveSelectionFirstPokemon =>
-                "Select a move for Pokemon 1.",
+                $"Select a move for {firstPokemonName ?? "Pokemon 1"}.",
             MainBattlePhaseState.MoveSelectionSecondPokemon =>
-                "Select a move for Pokemon 2.",
+                $"Select a move for {secondPokemonName ?? "Pokemon 2"}.",
             MainBattlePhaseState.SwitchSelectionFirstPokemon =>
                 "Select a Pokemon to switch in.",
             MainBattlePhaseState.SwitchSelectionSecondPokemon =>

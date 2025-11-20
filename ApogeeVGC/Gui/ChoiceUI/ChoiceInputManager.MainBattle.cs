@@ -256,8 +256,23 @@ public partial class ChoiceInputManager
 
     private void RenderMainBattleUi()
     {
+        // Get Pokemon names from perspective for instruction text
+        string? firstPokemonName = null;
+        string? secondPokemonName = null;
+        if (_perspective != null)
+        {
+            if (_perspective.PlayerSide.Active.Count > 0 && _perspective.PlayerSide.Active[0] != null)
+            {
+                firstPokemonName = _perspective.PlayerSide.Active[0].Name;
+            }
+            if (_perspective.PlayerSide.Active.Count > 1 && _perspective.PlayerSide.Active[1] != null)
+            {
+                secondPokemonName = _perspective.PlayerSide.Active[1].Name;
+            }
+        }
+
         // Draw instruction text based on current state
-        string instructionText = MainBattleUiHelper.GetInstructionText(MainBattleState);
+        string instructionText = MainBattleUiHelper.GetInstructionText(MainBattleState, firstPokemonName, secondPokemonName);
         // Position instruction text above the main battle UI buttons
         var instructionPosition = MainBattleUiHelper.GetInstructionTextPosition();
         spriteBatch.DrawString(font, instructionText, instructionPosition, Color.White);
