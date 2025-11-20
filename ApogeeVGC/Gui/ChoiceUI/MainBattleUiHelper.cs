@@ -233,16 +233,6 @@ public static class MainBattleUiHelper
             buttons.Add(teraToggleButton);
         }
 
-        // Add back button
-        y += ButtonHeight + ButtonSpacingLarge;
-        var backButton = new ChoiceButton(
-            new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-            "Back",
-            Color.Orange,
-            goBack
-        );
-        buttons.Add(backButton);
-
         return buttons;
     }
 
@@ -302,19 +292,6 @@ public static class MainBattleUiHelper
 
             buttons.Add(button);
             y += ButtonHeight + ButtonSpacing;
-        }
-
-        // Add back button if requested
-        if (showBackButton)
-        {
-            y += ButtonSpacingLarge;
-            var backButton = new ChoiceButton(
-                new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                "Back",
-                Color.Orange,
-                goBack
-            );
-            buttons.Add(backButton);
         }
 
         return buttons;

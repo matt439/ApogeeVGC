@@ -338,16 +338,11 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
     }
         }
 
-     // ESC key for back (changed from B)
+        // ESC key for back
         if (IsKeyPressed(keyboardState, Keys.Escape))
         {
-            Console.WriteLine($"[ProcessMainBattleKeyboardInput] ESC key pressed, looking for back button");
-          // Find back button and trigger it
-         var backButton = _buttons.FirstOrDefault(b => b.Text.Contains("Back"));
-            if (backButton != null)
-  {
-                backButton.OnClick();
-     }
+            Console.WriteLine($"[ProcessMainBattleKeyboardInput] ESC key pressed, navigating back");
+            HandleEscapeKeyNavigation();
         }
     }
 
@@ -356,6 +351,34 @@ Console.WriteLine($"[ProcessMainBattleKeyboardInput] UP key pressed");
     {
         MainBattleState = newState;
         SetupMainBattleUi((MoveRequest)_currentRequest!);
+    }
+
+    private void HandleEscapeKeyNavigation()
+    {
+        // Handle back navigation based on current state
+        switch (MainBattleState)
+        {
+            case MainBattlePhaseState.MoveSelectionFirstPokemon:
+            case MainBattlePhaseState.SwitchSelectionFirstPokemon:
+                // Go back to first Pokemon main menu
+                TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon);
+                break;
+
+            case MainBattlePhaseState.MoveSelectionSecondPokemon:
+            case MainBattlePhaseState.SwitchSelectionSecondPokemon:
+                // Go back to second Pokemon main menu
+                TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+                break;
+
+            case MainBattlePhaseState.MainMenuSecondPokemon:
+                // Go back to first Pokemon menu
+                HandleBackFromSecondPokemon();
+                break;
+
+            // MainMenuFirstPokemon and ForceSwitch have no back action
+            default:
+                break;
+        }
     }
 
     private void HandleMoveSelection(int pokemonIndex, int moveIndex, bool useTera)
