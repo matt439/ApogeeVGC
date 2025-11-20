@@ -162,48 +162,18 @@ public partial class Battle
 
         Debug($"Generated {requests.Count} requests");
 
-        // Check if any sides got WaitRequest because they have no valid actions
-        // This can happen when all active Pokemon are fainted during a move request
-// In this case, we need to check if the battle should end
-        if (type.Value == RequestState.Move)
+        // Check if battle ended during request generation
+        if (Ended)
         {
-            for (int i = 0; i < requests.Count; i++)
-            {
-                if (requests[i] is WaitRequest)
-                {
-                    Side side = Sides[i];
-
-                    // Check if this side has fainted active Pokemon
-                    bool hasFaintedActive = side.Active.Any(p => p is { Fainted: true });
-
-                    if (hasFaintedActive)
-                    {
-                        Debug(
-                            $"WARNING: {side.Name} received WaitRequest but has fainted active Pokemon");
-                        Debug(
-                            "This indicates the battle should have ended or switched before requesting moves");
-
-                        // Check if battle should end
-                        CheckWin();
-
-                        if (Ended)
-                        {
-                            Debug("Battle ended after checking win conditions");
-                            // Battle has ended - clear request state and active requests
-                            RequestState = RequestState.None;
-                            foreach (Side s in Sides)
-                            {
-                                s.ActiveRequest = null;
-                            }
-                            return;
-                        }
-                    }
-                }
-            }
+            Debug("Battle ended during GetRequests, exiting MakeRequest");
+            return;
         }
 
+        // Note: Win condition checking is now done in GetRequests() when detecting
+        // sides with no active Pokemon, so we don't need to check again here
+
         // Assign requests to each side
-        for (int i = 0; i < Sides.Count; i++)
+        for (int i = 0; i < Sides.Count && i < requests.Count; i++)
         {
             Sides[i].ActiveRequest = requests[i];
 
@@ -314,18 +284,48 @@ public partial class Battle
                     {
                         // If a side has no active non-fainted Pokemon during a move request,
                         // this indicates either:
-// 1. The battle should have ended (this side has no Pokemon left)
-// 2. A switch should have been requested before this point
-// 
-// This is an error state - the battle logic should have called
+                        // 1. The battle should have ended (this side has no Pokemon left)
+                        // 2. A switch should have been requested before this point
+                        // 
+                        // This is an error state - the battle logic should have called
                         // FaintMessages() which would have checked win conditions and/or
                         // set switch flags, leading to a SwitchIn request instead of a Move request.
-                        //
-                        // To prevent an endless loop, we'll check win conditions in MakeRequest.
                         Debug(
-                            $"WARNING: {side.Name} has no active non-fainted Pokemon during move request phase");
+                            $"ERROR: {side.Name} has no active non-fainted Pokemon during move request phase");
                         Debug($"  PokemonLeft: {side.PokemonLeft}");
-                        Debug($"  This usually indicates a bug in the fainting/switching logic");
+                        Debug($"  Active Pokemon: {string.Join(", ", side.Active.Select(p => p == null ? "null" : $"{p.Name}(Fainted:{p.Fainted})"))}");
+                        Debug($"  Active count: {side.Active.Count(p => p != null)}");
+                        Debug($"  Non-fainted count: {side.Active.Count(p => p is { Fainted: false })}");
+                        
+                        // This should NEVER happen in normal battle flow
+                        // It means Pokemon fainted but FaintMessages/CheckFainted didn't properly handle it
+                        // Force a switch request instead of a move request
+                        Debug($"  FORCING switch flags for all fainted active Pokemon");
+                        
+                        foreach (Pokemon? pokemon in side.Active)
+                        {
+                            if (pokemon is { Fainted: true })
+                            {
+                                pokemon.SwitchFlag = true;
+                                Debug($"  Set SwitchFlag=true for {pokemon.Name}");
+                            }
+                        }
+                        
+                        // Now check if this side has any Pokemon left to switch in
+                        int availableSwitches = CanSwitch(side);
+                        Debug($"  Available switches: {availableSwitches}");
+                        
+                        if (availableSwitches == 0 && side.PokemonLeft <= 0)
+                        {
+                            // This side has lost - end the battle
+                            Debug($"  {side.Name} has no Pokemon left - they lose");
+                            Lose(side);
+                            return new List<IChoiceRequest>();
+                        }
+                        
+                        // If we get here, switch flags are set - return to allow switch request
+                        // The battle will detect the switch flags and make a switch request next
+                        Debug($"  Switch flags set - battle should request switches next turn");
                     }
                 }
 

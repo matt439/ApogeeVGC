@@ -36,6 +36,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 ### Battle Lifecycle
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
+- [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
 
 ---
 
@@ -401,6 +402,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Self-Drops Infinite Recursion Fix](#self-drops-infinite-recursion-fix) - Stack overflow
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple issues including recursion
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
+- [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
 
 ### By Component
 
@@ -469,6 +471,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Battle.Requests.cs**:
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix)
+- [Endless Battle Loop Fix](#endless-battle-loop-fix)
 
 **SidePlayerPerspective.cs / SideOpponentPerspective.cs**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
@@ -482,6 +485,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 **Conditions.cs**:
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix)
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
+
+**Battle.Fainting.cs**:
+- [Endless Battle Loop Fix](#endless-battle-loop-fix)
 
 **Abilities.cs**:
 - [Stat Modification Handler VoidReturn Fix](#stat-modification-handler-voidreturn-fix)
@@ -598,6 +604,7 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
 - **2025-01-XX**: Added Stat Modification Handler VoidReturn Fix (comprehensive fix for all stat handlers returning VoidReturn)
 - **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
+- **2025-01-19**: Added Endless Battle Loop Fix (infinite loop when active Pokemon fainted without proper switch handling)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -672,6 +679,30 @@ When documenting a new bug fix:
 
 ---
 
+### Endless Battle Loop Fix
+**File**: `EndlessBattleLoopFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Battle lifecycle, request generation, win condition detection
+
+**Problem**: Battle entered an infinite loop when a side had all active Pokémon fainted but still had Pokémon in reserve. The battle continued for 1000+ turns with one player receiving `WaitRequest` while the other switched Pokémon indefinitely, eventually throwing `BattleTurnLimitException`.
+
+**Root Cause**: Active Pokémon fainted but weren't properly processed through `FaintMessages()` and `CheckFainted()`, so `SwitchFlag` was never set. This caused `EndTurn()` to call `MakeRequest(RequestState.Move)` instead of detecting that switches were needed. `GetRequests()` then created a `WaitRequest` for the side with no active Pokémon but didn't check if the battle should end.
+
+**Solution**: 
+1. **GetRequests()**: When detecting a side has no active non-fainted Pokémon, force switch flags on fainted Pokémon, check available switches, and call `Lose(side)` if no switches available
+2. **MakeRequest()**: Check if battle ended during `GetRequests()` and return early if so
+3. **CheckFainted()**: Added validation logging to detect problematic states
+
+**Key Insight**: This is a defensive recovery mechanism that handles cases where earlier battle logic failed to properly process faints. The fix forces the battle into the correct state and ends it properly if a side has truly lost.
+
+**Debug Pattern**: Look for warnings:
+- `WARNING: {side} has no active non-fainted Pokemon during move request phase`
+- `ERROR: {side} has no active non-fainted Pokemon during move request phase`
+
+**Keywords**: `endless loop`, `infinite battle`, `turn limit`, `BattleTurnLimitException`, `WaitRequest`, `fainted Pokemon`, `switch flag`, `move request`, `battle state`, `win condition`, `defensive programming`, `error recovery`
+
+---
+
 ### Facade BasePower Event Parameter Fix
 **File**: `FacadeBasePowerEventParameterFix.md`  
 **Severity**: High  
@@ -697,6 +728,6 @@ When documenting a new bug fix:
 
 ---
 
-*Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 20  
+*Last Updated*: 2025-01-19  
+*Total Bug Fixes Documented*: 21  
 *Reference Guides*: 1

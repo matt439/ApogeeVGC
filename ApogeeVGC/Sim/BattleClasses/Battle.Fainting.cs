@@ -26,6 +26,23 @@ public partial class Battle
             // Mark that this Pokémon needs to be switched out
             pokemon.SwitchFlag = true;
         }
+        
+        // CRITICAL: After setting switch flags, verify battle state is consistent
+        // If any side has all active Pokemon fainted and no Pokemon left to switch in,
+        // they should lose the battle immediately
+        foreach (Side side in Sides)
+        {
+            // Check if all active slots have fainted Pokemon
+            bool allActiveFainted = side.Active.All(p => p == null || p.Fainted);
+            
+            if (allActiveFainted && side.PokemonLeft <= 0)
+            {
+                Debug($"[CheckFainted] {side.Name} has all active Pokemon fainted and no Pokemon left to switch");
+                Debug($"[CheckFainted] This side should lose the battle");
+                // Don't call Win/Lose here - just ensure CheckWin will be called next
+                // The battle loop will handle this properly
+            }
+        }
     }
 
     public bool? FaintMessages(bool lastFirst = false, bool forceCheck = false, bool checkWin = true)
