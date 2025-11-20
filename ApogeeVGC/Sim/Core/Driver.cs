@@ -13,10 +13,15 @@ public class Driver
 {
     private Library Library { get; } = new();
 
-    private const int PlayerRandom1Seed = 12373; //12345;
-    private const int PlayerRandom2Seed = 1847; //1818;
-    private const int BattleSeed = 9906; //9876;
-    private const int RandomEvaluationNumTest = 10;
+    //private const int PlayerRandom1Seed = 12345;
+    //private const int PlayerRandom2Seed = 1818;
+    //private const int BattleSeed = 9876;
+
+    private const int PlayerRandom1Seed = 12401;
+    private const int PlayerRandom2Seed = 1876;
+    private const int BattleSeed = 9936;
+
+    private const int RandomEvaluationNumTest = 100;
     private const int NumThreads = 1;
 
     public void Start(DriverMode mode)
@@ -261,6 +266,7 @@ public class Driver
                     Debug = debug,
                     Sync = true, // Use synchronous mode for evaluation
                     Seed = new PrngSeed(localBattleSeed),
+                    MaxTurns = 1000, // Enforce turn limit to detect infinite loops
                 };
 
                 var simulator = new SyncSimulator();
@@ -273,6 +279,30 @@ public class Driver
                 {
                     Console.WriteLine($"[Driver] Completed {completed}/{RandomEvaluationNumTest} battles");
                 }
+            }
+            catch (BattleTurnLimitException ex)
+            {
+                // Store exception with seed information for debugging
+                exceptions.Add((localPlayer1Seed, localPlayer2Seed, localBattleSeed, ex));
+                
+                // Log immediately to console with special formatting for turn limit exceptions
+                Console.WriteLine();
+                Console.WriteLine("═══════════════════════════════════════════════════════════");
+                Console.WriteLine("ERROR: Battle exceeded turn limit (likely infinite loop!)");
+                Console.WriteLine("═══════════════════════════════════════════════════════════");
+                Console.WriteLine($"Turn: {ex.Turn} (Max: {ex.MaxTurns})");
+                Console.WriteLine($"Player 1 Seed: {localPlayer1Seed}");
+                Console.WriteLine($"Player 2 Seed: {localPlayer2Seed}");
+                Console.WriteLine($"Battle Seed:   {localBattleSeed}");
+                Console.WriteLine();
+                Console.WriteLine("To reproduce this error, use these constants in Driver.cs:");
+                Console.WriteLine($"  private const int PlayerRandom1Seed = {localPlayer1Seed};");
+                Console.WriteLine($"  private const int PlayerRandom2Seed = {localPlayer2Seed};");
+                Console.WriteLine($"  private const int BattleSeed = {localBattleSeed};");
+                Console.WriteLine();
+                Console.WriteLine("Then run with DriverMode.RandomVsRandomSingles to debug.");
+                Console.WriteLine("═══════════════════════════════════════════════════════════");
+                Console.WriteLine();
             }
             catch (Exception ex)
             {

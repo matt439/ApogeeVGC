@@ -137,6 +137,12 @@ public partial class Battle
     /// </summary>
     public BattleHistory History { get; } = new();
 
+    /// <summary>
+    /// Maximum number of turns before the battle is automatically ended as a tie.
+    /// If null or 0, no turn limit is enforced.
+    /// </summary>
+    public int? MaxTurns { get; init; }
+
     public Battle(BattleOptions options, Library library)
     {
         Library = library;
@@ -191,6 +197,8 @@ public partial class Battle
         }
 
         Send = options.Send ?? ((_, _) => { });
+
+        MaxTurns = options.MaxTurns;
 
         Debug("Battle constructor complete.");
     }

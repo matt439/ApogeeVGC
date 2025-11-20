@@ -20,4 +20,11 @@ public record BattleOptions
     /// If false, battle uses async pattern for GUI integration.
     /// </summary>
     public bool Sync { get; init; } = false;
+
+    /// <summary>
+    /// Maximum number of turns before the battle is automatically ended as a tie.
+    /// If null or 0, no turn limit is enforced (useful for debugging exceptions).
+    /// Default is 1000 turns.
+    /// </summary>
+    public int? MaxTurns { get; init; } = 1000;
 }

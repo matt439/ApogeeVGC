@@ -14,26 +14,31 @@ public partial class Battle
         if (Turn <= 100) return false;
 
         // Turn limit check (not part of Endless Battle Clause, but hard limit)
-        if (Turn >= 1000)
+        // Only enforced if MaxTurns is set (non-null and > 0)
+        // Throws an exception instead of ending as a tie so infinite loops can be debugged
+        if (MaxTurns.HasValue && MaxTurns.Value > 0 && Turn >= MaxTurns.Value)
         {
             if (DisplayUi)
             {
-                Add("-message", "It is turn 1000. You have hit the turn limit!");
+                Add("-message", $"It is turn {MaxTurns.Value}. Turn limit exceeded!");
             }
-            Tie();
-            return true;
+            
+            // Throw exception to surface the infinite loop for debugging
+            throw new BattleTurnLimitException(Turn, MaxTurns.Value);
         }
 
-        // Warning messages for approaching turn limit
-        if ((Turn >= 500 && Turn % 100 == 0) || // Every 100 turns past turn 500
-            (Turn >= 900 && Turn % 10 == 0) ||  // Every 10 turns past turn 900
-            Turn >= 990)                         // Every turn past turn 990
+        // Warning messages for approaching turn limit (only if MaxTurns is enforced)
+        if (MaxTurns.HasValue && MaxTurns.Value > 0)
         {
-            if (DisplayUi)
+            int turnsLeft = MaxTurns.Value - Turn;
+            bool showWarning = (Turn >= 500 && Turn % 100 == 0) || // Every 100 turns past turn 500
+                               (Turn >= MaxTurns.Value - 100 && Turn % 10 == 0) || // Every 10 turns in last 100
+                               (turnsLeft <= 10 && turnsLeft > 0); // Every turn in last 10
+
+            if (showWarning && DisplayUi)
             {
-                int turnsLeft = 1000 - Turn;
                 string turnsLeftText = turnsLeft == 1 ? "1 turn" : $"{turnsLeft} turns";
-                Add("bigerror", $"You will auto-tie if the battle doesn't end in {turnsLeftText} (on turn 1000).");
+                Add("bigerror", $"You will auto-tie if the battle doesn't end in {turnsLeftText} (on turn {MaxTurns.Value}).");
             }
         }
 
