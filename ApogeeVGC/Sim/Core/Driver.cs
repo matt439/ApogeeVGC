@@ -6,7 +6,6 @@ using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
-using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -46,11 +45,13 @@ public class Driver
             case DriverMode.RandomVsRandomSingles:
                 RunRandomVsRandomSinglesTest();
                 break;
-            case DriverMode.AsyncRandomVsRandomSingles:
-                RunAsyncRandomVsRandomSinglesTest();
-                break;
+            case DriverMode.RandomVsRandomDoubles:
+                throw new NotImplementedException("Random vs Random Doubles test is not implemented.");
             case DriverMode.RandomVsRandomSinglesEvaluation:
                 RunRandomVsRandomSinglesEvaluationTest();
+                break;
+            case DriverMode.RandomVsRandomDoublesEvaluation:
+                RunRandomVsRandomDoublesEvaluationTest();
                 break;
             default:
                 throw new NotImplementedException($"Driver mode {mode} is not implemented.");
@@ -197,52 +198,9 @@ public class Driver
         Console.WriteLine($"Winner: {result}");
     }
 
-    private void RunAsyncRandomVsRandomSinglesTest()
+    private void RunRandomVsRandomDoublesTest()
     {
-        Console.WriteLine("[Driver] Starting Random vs Random Singles test (ASYNCHRONOUS)");
-
-        const bool debug = false;
-
-        PlayerOptions player1Options = new()
-        {
-            Type = Player.PlayerType.Random,
-            Name = "Random 1",
-            Team = TeamGenerator.GenerateTestTeam(Library),
-            Seed = new PrngSeed(PlayerRandom1Seed),
-            PrintDebug = debug,
-        };
-
-        PlayerOptions player2Options = new()
-        {
-            Type = Player.PlayerType.Random,
-            Name = "Random 2",
-            Team = TeamGenerator.GenerateTestTeam(Library),
-            Seed = new PrngSeed(PlayerRandom2Seed),
-            PrintDebug = debug,
-        };
-
-        BattleOptions battleOptions = new()
-        {
-            Id = FormatId.CustomSingles,
-            Player1Options = player1Options,
-            Player2Options = player2Options,
-            Debug = debug,
-            Sync = false, // Ensure this is false for async
-            Seed = new PrngSeed(BattleSeed),
-        };
-
-        var simulator = new Simulator();
-        Console.WriteLine("[Driver] Async Simulator created");
-
-        // Run the battle asynchronously
-        SimulatorResult result =
-            simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
-
-        Console.WriteLine($"[Driver] Battle completed with result: {result}");
-
-        // Show final statistics
-        Console.WriteLine("\n=== Battle Complete ===");
-        Console.WriteLine($"Winner: {result}");
+        throw new NotImplementedException();
     }
 
     private void RunRandomVsRandomSinglesEvaluationTest()
@@ -463,4 +421,8 @@ public class Driver
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();
     }
-}
+
+    private void RunRandomVsRandomDoublesEvaluationTest()
+    {
+        throw new NotImplementedException();
+    }

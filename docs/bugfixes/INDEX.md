@@ -39,6 +39,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
 - [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
+- [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player always returning invalid target location 0 for targeting moves in doubles
 
 ---
 
@@ -406,6 +407,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Complete Draco Meteor Bug Fix](#complete-draco-meteor-bug-fix) - Multiple issues including recursion
 - [Spirit Break Secondary Effect Fix](#spirit-break-secondary-effect-fix) - Stack overflow from recursive secondary processing
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Battle runs for 1000+ turns
+- [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix) - Random player repeatedly failing move validation in doubles
 
 ### By Component
 
@@ -512,6 +514,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **SyncSimulator.cs**:
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix)
+
+**PlayerRandom.cs**:
+- [Player Random Doubles Targeting Fix](#player-random-doubles-targeting-fix)
 
 ---
 
@@ -773,6 +778,37 @@ When documenting a new bug fix:
 
 ---
 
+### Player Random Doubles Targeting Fix
+**File**: `PlayerRandomDoublesTargetingFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Random player AI, doubles battles, move targeting
+
+**Problem**: When running doubles battles with `PlayerRandom`, the battle entered an infinite loop where the random player repeatedly generated invalid move choices. Every move choice was rejected with errors like "Can't move: Heavy Slam needs a target", causing the player to regenerate choices indefinitely.
+
+**Root Cause**: The `PlayerRandom.GetRandomTargetLocation()` method always returned `0` (auto-targeting), regardless of move type or battle format. In doubles battles, moves requiring explicit targeting (Normal, Any, AdjacentFoe, etc.) fail validation when `targetLoc == 0` and `Active.Count >= 2`.
+
+**Move Types Requiring Explicit Targets**:
+- `MoveTarget.Normal` - Standard single-target moves
+- `MoveTarget.Any` - Can target any Pokemon
+- `MoveTarget.AdjacentAlly` - Target an adjacent ally
+- `MoveTarget.AdjacentAllyOrSelf` - Target self or adjacent ally
+- `MoveTarget.AdjacentFoe` - Target an adjacent opponent
+
+**Solution**: Modified `GetRandomTargetLocation()` to detect moves requiring explicit targeting and return a valid target location (1 or 2) for doubles battles. The random player now picks between opponent slots 1 and 2 for all targeting moves.
+
+**Target Location System**:
+- `0` = Auto-targeting (for moves that don't need explicit targets)
+- `1` = Left opponent slot
+- `2` = Right opponent slot
+- `-1` = Left ally slot (rarely used)
+- `-2` = Right ally slot (rarely used)
+
+**Impact**: Makes `PlayerRandom` functional in doubles format. The infinite loop is resolved, allowing doubles battles to complete normally.
+
+**Keywords**: `PlayerRandom`, `doubles battle`, `infinite loop`, `target location`, `targeting moves`, `TargetTypeChoices`, `MoveTarget`, `GetRandomTargetLocation`, `Side.ChooseMove`, `AdjacentFoe`, `Normal target`, `doubles format`, `auto-targeting`, `move validation`
+
+---
+
 *Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 23  
+*Total Bug Fixes Documented*: 24  
 *Reference Guides*: 1

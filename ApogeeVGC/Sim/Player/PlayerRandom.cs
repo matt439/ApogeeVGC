@@ -299,15 +299,31 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
 
     /// <summary>
     /// Gets a random target location for a move.
-    /// Returns 0 for most moves (auto-targeting), or a specific slot for targeting moves.
+    /// Returns 0 for most moves (auto-targeting), or a specific slot for targeting moves in doubles.
     /// </summary>
     private int GetRandomTargetLocation(MoveTarget targetType)
     {
-        // Most moves use auto-targeting (0)
-        // The battle engine will resolve the actual target
-        // For doubles, we could implement more sophisticated targeting here,
-        // but for a random player, auto-targeting (letting the engine pick) is sufficient
-        return 0;
+        // In singles, always use auto-targeting
+        // In doubles, moves that require explicit targeting (Normal, Any, AdjacentFoe, etc.)
+        // need a non-zero target location
+        
+        // Check if this move type requires explicit targeting
+        var requiresExplicitTarget = targetType is MoveTarget.Normal 
+            or MoveTarget.Any 
+            or MoveTarget.AdjacentAlly 
+            or MoveTarget.AdjacentAllyOrSelf 
+            or MoveTarget.AdjacentFoe;
+
+        if (!requiresExplicitTarget)
+        {
+            // Moves like AllAdjacent, AllAdjacentFoes, etc. use auto-targeting (0)
+            return 0;
+        }
+
+        // For moves requiring explicit targets, pick a random opponent slot (1 or 2)
+        // In doubles: 1 = left opponent, 2 = right opponent
+        // Random player will pick between the two opponent slots
+        return _random.Random(1, 3); // Returns 1 or 2
     }
 
     private bool IsDisabled(MoveIdBoolUnion disabled)

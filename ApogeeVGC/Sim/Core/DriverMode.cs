@@ -4,9 +4,13 @@ public enum DriverMode
 {
     GuiVsRandomSingles,
     GuiVsRandomDoubles,
+
     ConsoleVsRandomSingles,
     ConsoleVsRandomDoubles,
+
     RandomVsRandomSingles,
-    AsyncRandomVsRandomSingles,
+    RandomVsRandomDoubles,
+
     RandomVsRandomSinglesEvaluation,
+    RandomVsRandomDoublesEvaluation,
 }
