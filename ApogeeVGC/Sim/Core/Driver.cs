@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text;
+using ApogeeVGC.Sim.Moves;
 
 namespace ApogeeVGC.Sim.Core;
 
@@ -99,7 +100,43 @@ public class Driver
 
     private void RunConsoleVsRandomDoublesTest()
     {
-        throw new NotImplementedException();
+        const bool debug = true;
+
+        PlayerOptions player1Options = new()
+        {
+            Type = Player.PlayerType.Console,
+            Name = "Matt",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+            PrintDebug = debug,
+        };
+
+        PlayerOptions player2Options = new()
+        {
+            Type = Player.PlayerType.Random,
+            Name = "Random",
+            Team = TeamGenerator.GenerateTestTeam(Library),
+            Seed = new PrngSeed(PlayerRandom2Seed),
+            PrintDebug = debug,
+        };
+
+        BattleOptions battleOptions = new()
+        {
+            Id = FormatId.CustomDoubles,
+            Player1Options = player1Options,
+            Player2Options = player2Options,
+            Debug = debug,
+            Sync = false,
+            Seed = new PrngSeed(BattleSeed),
+        };
+
+        var simulator = new Simulator();
+        Console.WriteLine("[Driver] Simulator created");
+
+        // Run the battle asynchronously on the main thread
+        SimulatorResult result =
+            simulator.RunAsync(Library, battleOptions, printDebug: debug).Result;
+
+        Console.WriteLine($"[Driver] Battle completed with result: {result}");
     }
 
     private void RunGuiVsRandomSinglesTest()

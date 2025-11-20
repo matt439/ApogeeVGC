@@ -183,104 +183,131 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
             throw new InvalidOperationException("MoveRequest.Side cannot be null");
         }
 
-        PokemonMoveRequestData pokemonRequest = request.Active[0];
-        
-        if (pokemonRequest == null)
+        var actions = new List<ChosenAction>();
+
+        // Handle each active Pokemon
+        for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
         {
-            throw new InvalidOperationException("Active Pokemon request data cannot be null");
-        }
+            PokemonMoveRequestData pokemonRequest = request.Active[pokemonIndex];
 
-        // Build list of all available choices (moves with and without tera, plus switch option)
-        var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>();
-
-        // Check if terastallization is available
-        MoveType? teraType = pokemonRequest.CanTerastallize switch
-        {
-            MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
-            _ => null,
-        };
-
-        // Add moves to available choices
-        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
-        {
-            PokemonMoveData move = pokemonRequest.Moves[i];
-            bool disabled = IsDisabled(move.Disabled);
-
-            if (!disabled)
+            if (pokemonRequest == null)
             {
-                // Add regular move option
-                availableChoices.Add((true, i, false));
-
-                // Add tera variant if available
-                if (teraType.HasValue)
-                {
-                    availableChoices.Add((true, i, true));
-                }
-            }
-        }
-
-        // Add switch option (checking if any switches are available)
-        var availableSwitches = request.Side.Pokemon
-            .Select((p, index) => new { PokemonData = p, Index = index })
-            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
-            .ToList();
-
-        bool canSwitch = availableSwitches.Count > 0;
-        if (canSwitch)
-        {
-            availableChoices.Add((false, -1, false)); // Switch option
-        }
-
-        // Pick a random choice
-        if (availableChoices.Count == 0)
-        {
-            throw new InvalidOperationException("No available choices for random player");
-        }
-
-        int randomIndex = _random.Random(0, availableChoices.Count);
-        (bool isMove, int moveIndex, bool useTera) = availableChoices[randomIndex];
-
-        if (isMove)
-        {
-            // Selected a move
-            PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
-
-            if (PrintDebug)
-            {
-                string teraStr = useTera ? $" with Tera ({teraType})" : "";
-                Console.WriteLine(
-                    $"[PlayerRandom] Selected move: {selectedMove.Move.Name}{teraStr}");
+                throw new InvalidOperationException($"Active Pokemon request data at index {pokemonIndex} cannot be null");
             }
 
-            return new Choice
+            // Build list of all available choices (moves with and without tera, plus switch option)
+            var availableChoices = new List<(bool isMove, int moveIndex, bool useTera)>();
+
+            // Check if terastallization is available
+            MoveType? teraType = pokemonRequest.CanTerastallize switch
             {
-                Actions = new List<ChosenAction>
+                MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+                _ => null,
+            };
+
+            // Add moves to available choices
+            for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+            {
+                PokemonMoveData move = pokemonRequest.Moves[i];
+                bool disabled = IsDisabled(move.Disabled);
+
+                if (!disabled)
                 {
-                    new()
+                    // Add regular move option
+                    availableChoices.Add((true, i, false));
+
+                    // Add tera variant if available
+                    if (teraType.HasValue)
                     {
-                        Choice = ChoiceType.Move,
-                        Pokemon = null,
-                        MoveId = selectedMove.Id,
-                        TargetLoc = 0,
-                        Terastallize = useTera ? teraType : null
+                        availableChoices.Add((true, i, true));
                     }
                 }
-            };
-        }
-        else
-        {
-            // Selected switch
-            if (PrintDebug)
-            {
-                Console.WriteLine($"[PlayerRandom] Selected switch option");
             }
 
-            return GetRandomSwitchChoice(new SwitchRequest
+            // Add switch option (checking if any switches are available)
+            var availableSwitches = request.Side.Pokemon
+                .Select((p, index) => new { PokemonData = p, Index = index })
+                .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.PokemonData))
+                .ToList();
+
+            bool canSwitch = availableSwitches.Count > 0;
+            if (canSwitch)
             {
-                Side = request.Side,
-                ForceSwitch = [false]
-            });
+                availableChoices.Add((false, -1, false)); // Switch option
+            }
+
+            // Pick a random choice
+            if (availableChoices.Count == 0)
+            {
+                throw new InvalidOperationException($"No available choices for random player at Pokemon index {pokemonIndex}");
+            }
+
+            int randomIndex = _random.Random(0, availableChoices.Count);
+            (bool isMove, int moveIndex, bool useTera) = availableChoices[randomIndex];
+
+            if (isMove)
+            {
+                // Selected a move
+                PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
+
+                if (PrintDebug)
+                {
+                    string teraStr = useTera ? $" with Tera ({teraType})" : "";
+                    Console.WriteLine(
+                        $"[PlayerRandom] Pokemon {pokemonIndex + 1} selected move: {selectedMove.Move.Name}{teraStr}");
+                }
+
+                // Random target location (0 for auto-targeting, will be resolved by battle engine)
+                int targetLoc = GetRandomTargetLocation(selectedMove.Move.Target);
+
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Move,
+                    Pokemon = null,
+                    MoveId = selectedMove.Id,
+                    TargetLoc = targetLoc,
+                    Terastallize = useTera ? teraType : null
+                });
+            }
+            else
+            {
+                // Selected switch
+                if (PrintDebug)
+                {
+                    Console.WriteLine($"[PlayerRandom] Pokemon {pokemonIndex + 1} selected switch option");
+                }
+
+                // Pick a random Pokemon to switch in
+                int randomSwitchIndex = _random.Random(0, availableSwitches.Count);
+                var selectedSwitch = availableSwitches[randomSwitchIndex];
+
+                actions.Add(new ChosenAction
+                {
+                    Choice = ChoiceType.Switch,
+                    Pokemon = null,
+                    MoveId = MoveId.None,
+                    Index = selectedSwitch.Index,
+                });
+            }
         }
+
+        return new Choice
+        {
+            Actions = actions
+        };
+    }
+
+    /// <summary>
+    /// Gets a random target location for a move.
+    /// Returns 0 for most moves (auto-targeting), or a specific slot for targeting moves.
+    /// </summary>
+    private int GetRandomTargetLocation(MoveTarget targetType)
+    {
+        // Most moves use auto-targeting (0)
+        // The battle engine will resolve the actual target
+        // For doubles, we could implement more sophisticated targeting here,
+        // but for a random player, auto-targeting (letting the engine pick) is sufficient
+        return 0;
     }
 
     private bool IsDisabled(MoveIdBoolUnion disabled)

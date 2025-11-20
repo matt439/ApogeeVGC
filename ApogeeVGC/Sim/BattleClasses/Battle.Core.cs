@@ -175,7 +175,14 @@ public partial class Battle
 
         Sides = [side1, side2];
 
-        ActivePerHalf = 1;
+        // Set ActivePerHalf based on game type
+        ActivePerHalf = GameType switch
+        {
+            GameType.Singles => 1,
+            GameType.Doubles => 2,
+            _ => throw new NotImplementedException($"GameType {GameType} is not supported")
+        };
+
         Prng = new Prng(options.Seed);
         PrngSeed = Prng.StartingSeed;
 

@@ -40,12 +40,12 @@ public enum MoveTarget
     /// </summary>
     Allies,
 
-  /// <summary>
+    /// <summary>
     /// The move adds a side condition on the user's side.
     /// </summary>
     AllySide,
 
- /// <summary>
+    /// <summary>
     /// The move affects all unfainted Pokémon on the user's side.
     /// </summary>
     AllyTeam,
@@ -53,7 +53,7 @@ public enum MoveTarget
     /// <summary>
     /// The move can hit any other active Pokémon, not just those adjacent.
     /// </summary>
-  Any,
+    Any,
 
     /// <summary>
     /// The move adds a side condition on the foe's side.
@@ -85,7 +85,7 @@ public enum MoveTarget
     /// </summary>
     None,
 
- /// <summary>
+    /// <summary>
     /// Added for Trick Room - the move targets the entire battlefield.
     /// </summary>
     Field,

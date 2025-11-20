@@ -149,80 +149,68 @@ public class PlayerConsole : IPlayer
             AnsiConsole.WriteLine();
         }
 
-        Table table = new Table()
-            .Border(TableBorder.Rounded)
-            .BorderColor(Color.Grey);
+        // Check if this is a doubles battle
+        bool isDoubles = perspective.OpponentSide.Active.Count > 1 ||
+                         perspective.PlayerSide.Active.Count > 1;
 
-        table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
-        table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
-
-        // Opponent's active Pokemon
-        PokemonPerspective? opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
-        string opponentInfo;
-        if (opponentActive != null)
+        if (isDoubles)
         {
-            string statusDisplay = GetStatusDisplay(opponentActive.Status);
-            string statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
+            // Doubles: 2x2 grid layout (opponents on top, player on bottom)
+            var opponentActives = perspective.OpponentSide.Active.ToList();
+            var playerActives = perspective.PlayerSide.Active.ToList();
 
-            string volatileDisplay = GetVolatilesDisplay(opponentActive.VolatilesWithDuration);
-            string volatilesLine =
-                !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
+            string opponent1Info = GetPokemonInfo(opponentActives.ElementAtOrDefault(0));
+            string opponent2Info = GetPokemonInfo(opponentActives.ElementAtOrDefault(1));
+            string player1Info = GetPokemonInfo(playerActives.ElementAtOrDefault(0));
+            string player2Info = GetPokemonInfo(playerActives.ElementAtOrDefault(1));
 
-            string boostsDisplay = GetStatBoostsDisplay(opponentActive.Boosts);
-            string boostsLine = $"\n{boostsDisplay}";
+            // Create opponent row (top)
+            // NOTE: From player's perspective, opponent slots appear mirrored
+            // Opponent's slot 1 (their right) appears on player's left
+            Table opponentTable = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Yellow);
 
-            string teraDisplay =
-                GetTeraDisplay(opponentActive.Terastallized, opponentActive.TeraType);
-            string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+            opponentTable.AddColumn(new TableColumn("[bold yellow]Opponent Slot 2[/]").Centered());
+            opponentTable.AddColumn(new TableColumn("[bold yellow]Opponent Slot 1[/]").Centered());
+            opponentTable.AddRow(opponent2Info, opponent1Info);
 
-            opponentInfo =
-                $"[bold]{opponentActive.Name}[/]\nHP: {RenderHealthBar(opponentActive.Hp, opponentActive.MaxHp)}\n{opponentActive.Hp}/{opponentActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
+            AnsiConsole.Write(opponentTable);
+            AnsiConsole.WriteLine();
+
+            // Create player row (bottom)
+            Table playerTable = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Cyan1);
+
+            playerTable.AddColumn(new TableColumn("[bold cyan]Your Slot 1[/]").Centered());
+            playerTable.AddColumn(new TableColumn("[bold cyan]Your Slot 2[/]").Centered());
+            playerTable.AddRow(player1Info, player2Info);
+
+            AnsiConsole.Write(playerTable);
+            AnsiConsole.WriteLine();
         }
         else
         {
-            opponentInfo = "[grey]No active Pokemon[/]";
+            // Singles: side-by-side layout
+            Table table = new Table()
+                .Border(TableBorder.Rounded)
+                .BorderColor(Color.Grey);
+
+            table.AddColumn(new TableColumn("[bold yellow]Opponent[/]").Centered());
+            table.AddColumn(new TableColumn("[bold cyan]Your Team[/]").Centered());
+
+            PokemonPerspective? opponentActive = perspective.OpponentSide.Active.FirstOrDefault();
+            PokemonPerspective? playerActive = perspective.PlayerSide.Active.FirstOrDefault();
+
+            string opponentInfo = GetPokemonInfo(opponentActive);
+            string playerInfo = GetPokemonInfo(playerActive);
+
+            table.AddRow(opponentInfo, playerInfo);
+
+            AnsiConsole.Write(table);
+            AnsiConsole.WriteLine();
         }
-
-        // Player's active Pokemon - handle fainted Pokemon properly
-        PokemonPerspective? playerActive = perspective.PlayerSide.Active.FirstOrDefault();
-        string playerInfo;
-        if (playerActive != null)
-        {
-            if (playerActive.Fainted)
-            {
-                playerInfo = $"[bold]{playerActive.Name}[/]\n[red]Fainted[/]";
-            }
-            else
-            {
-                string statusDisplay = GetStatusDisplay(playerActive.Status);
-                string statusLine =
-                    !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
-
-                string volatileDisplay = GetVolatilesDisplay(playerActive.VolatilesWithDuration);
-                string volatilesLine = !string.IsNullOrEmpty(volatileDisplay)
-                    ? $"\n{volatileDisplay}"
-                    : "";
-
-                string boostsDisplay = GetStatBoostsDisplay(playerActive.Boosts);
-                string boostsLine = $"\n{boostsDisplay}";
-
-                string teraDisplay =
-                    GetTeraDisplay(playerActive.Terastallized, playerActive.TeraType);
-                string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
-
-                playerInfo =
-                    $"[bold]{playerActive.Name}[/]\nHP: {RenderHealthBar(playerActive.Hp, playerActive.MaxHp)}\n{playerActive.Hp}/{playerActive.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
-            }
-        }
-        else
-        {
-            playerInfo = "[grey]No active Pokemon[/]";
-        }
-
-        table.AddRow(opponentInfo, playerInfo);
-
-        AnsiConsole.Write(table);
-        AnsiConsole.WriteLine();
     }
 
     private static string RenderHealthBar(double hpPercentage)
@@ -246,14 +234,175 @@ public class PlayerConsole : IPlayer
         return RenderHealthBar(percentage);
     }
 
+    /// <summary>
+    /// Prompts the player to select a target for a move in doubles battles.
+    /// </summary>
+    /// <param name="selectedMove">The move being used</param>
+    /// <param name="request">The move request containing active Pokemon data</param>
+    /// <param name="currentPokemonIndex">The index of the Pokemon making the move (0 or 1 in doubles)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    private async Task<int> GetTargetLocationAsync(PokemonMoveData selectedMove, MoveRequest request,
+        int currentPokemonIndex, CancellationToken cancellationToken)
+    {
+        MoveTarget targetType = selectedMove.Move.Target;
+
+        // Moves that don't require target selection
+        if (targetType is MoveTarget.Self or MoveTarget.All or MoveTarget.AllySide
+            or MoveTarget.AllyTeam or MoveTarget.FoeSide or MoveTarget.AllAdjacent
+            or MoveTarget.AllAdjacentFoes or MoveTarget.Allies or MoveTarget.Field)
+        {
+            return 0; // No specific target needed
+        }
+
+        // Singles battles or moves that auto-target
+        if (_currentPerspective?.OpponentSide.Active.Count <= 1 &&
+            targetType is not (MoveTarget.AdjacentAlly or MoveTarget.AdjacentAllyOrSelf))
+        {
+            return 0; // Auto-target in singles
+        }
+
+        // Doubles: prompt for target selection
+        AnsiConsole.MarkupLine("[bold cyan]Select target:[/]");
+        AnsiConsole.WriteLine();
+
+        var targetChoices = new List<string>();
+        var targetLocs = new List<int>();
+
+        // Check if move can target opponents
+        bool canTargetFoes = targetType is MoveTarget.Normal or MoveTarget.AdjacentFoe
+            or MoveTarget.Any or MoveTarget.RandomNormal;
+
+        // Check if move can target allies
+        // Normal moves CAN target allies (but not self)
+        // AdjacentAllyOrSelf can target allies AND self
+        bool canTargetAllies = targetType is MoveTarget.Normal or MoveTarget.AdjacentAlly
+            or MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
+        
+        // Check if move can target self specifically
+        bool canTargetSelf = targetType is MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
+
+        if (_currentPerspective == null)
+        {
+            return 0; // Fallback if no perspective available
+        }
+
+        // Add opponent targets
+        if (canTargetFoes)
+        {
+            var opponents = _currentPerspective.OpponentSide.Active.ToList();
+            for (int i = 0; i < opponents.Count; i++)
+            {
+                PokemonPerspective? opp = opponents[i];
+                if (opp != null && !opp.Fainted)
+                {
+                    targetChoices.Add($"Opponent {i + 1}: {opp.Name} ({opp.Hp}/{opp.MaxHp} HP)");
+                    targetLocs.Add(i + 1); // Positive for opponents
+                }
+            }
+        }
+
+        // Add ally targets (excluding self unless move explicitly allows it)
+        if (canTargetAllies && _currentPerspective.PlayerSide.Active.Count > 1)
+        {
+            var allies = _currentPerspective.PlayerSide.Active.ToList();
+            for (int i = 0; i < allies.Count; i++)
+            {
+                PokemonPerspective? ally = allies[i];
+                if (ally != null && !ally.Fainted)
+                {
+                    // Skip current Pokemon unless move can target self
+                    if (i == currentPokemonIndex && !canTargetSelf)
+                    {
+                        continue;
+                    }
+
+                    string label = i == currentPokemonIndex 
+                        ? $"Your Pokemon {i + 1}: {ally.Name} (Self) ({ally.Hp}/{ally.MaxHp} HP)"
+                        : $"Your Pokemon {i + 1}: {ally.Name} ({ally.Hp}/{ally.MaxHp} HP)";
+                    
+                    targetChoices.Add(label);
+                    targetLocs.Add(-(i + 1)); // Negative for allies
+                }
+            }
+        }
+
+        // If only one valid target, use it automatically
+        if (targetChoices.Count == 1)
+        {
+            AnsiConsole.MarkupLine($"[grey]Auto-targeting: {targetChoices[0]}[/]");
+            return targetLocs[0];
+        }
+
+        // If no valid targets, return 0 (will likely cause move to fail)
+        if (targetChoices.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]No valid targets available[/]");
+            return 0;
+        }
+
+        // Prompt user to select target
+        string targetSelection = await Task.Run(() => AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("Choose a target:")
+                .AddChoices(targetChoices)), cancellationToken);
+
+        int targetIndex = targetChoices.IndexOf(targetSelection);
+        return targetLocs[targetIndex];
+    }
+
+    /// <summary>
+    /// Gets formatted info string for a Pokemon in battle display
+    /// </summary>
+    private string GetPokemonInfo(PokemonPerspective? pokemon)
+    {
+        if (pokemon == null)
+        {
+            return "[grey]No active Pokemon[/]";
+        }
+
+        if (pokemon.Fainted)
+        {
+            return $"[bold]{pokemon.Name}[/]\n[red]Fainted[/]";
+        }
+
+        string statusDisplay = GetStatusDisplay(pokemon.Status);
+        string statusLine = !string.IsNullOrEmpty(statusDisplay) ? $"\n{statusDisplay}" : "";
+
+        string volatileDisplay = GetVolatilesDisplay(pokemon.VolatilesWithDuration);
+        string volatilesLine = !string.IsNullOrEmpty(volatileDisplay) ? $"\n{volatileDisplay}" : "";
+
+        string boostsDisplay = GetStatBoostsDisplay(pokemon.Boosts);
+        string boostsLine = $"\n{boostsDisplay}";
+
+        string teraDisplay = GetTeraDisplay(pokemon.Terastallized, pokemon.TeraType);
+        string teraLine = !string.IsNullOrEmpty(teraDisplay) ? $"\n{teraDisplay}" : "";
+
+        return
+            $"[bold]{pokemon.Name}[/]\nHP: {RenderHealthBar(pokemon.Hp, pokemon.MaxHp)}\n{pokemon.Hp}/{pokemon.MaxHp} HP{statusLine}{volatilesLine}{boostsLine}{teraLine}";
+    }
+
     private async Task<Choice> GetTeamPreviewChoiceAsync(TeamPreviewRequest request,
         CancellationToken cancellationToken)
     {
+        var pokemon = request.Side.Pokemon;
+        int? maxChosenTeamSize = request.MaxChosenTeamSize;
+        int pickCount = maxChosenTeamSize ?? pokemon.Count;
+
+        // Determine if this is singles or doubles based on pick count
+        bool isDoubles = pickCount == 4 && pokemon.Count == 6;
+
         AnsiConsole.MarkupLine("[bold cyan]Team Preview[/]");
-        AnsiConsole.MarkupLine("Select the order for your Pokemon (1-6):");
+        if (isDoubles)
+        {
+            AnsiConsole.MarkupLine("Select 4 Pokemon from your team of 6 for this Doubles battle:");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("Select the order for your Pokemon (1-6):");
+        }
+
         AnsiConsole.WriteLine();
 
-        var pokemon = request.Side.Pokemon;
         for (int i = 0; i < pokemon.Count; i++)
         {
             // Display the Pokemon's actual name from Details (e.g., "Pikachu, L50")
@@ -261,10 +410,21 @@ public class PlayerConsole : IPlayer
         }
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[grey]Press Enter to use default order (1,2,3,4,5,6)[/]");
-        AnsiConsole.MarkupLine(
-            "[grey]Enter a single number (e.g., 2) to lead with that Pokemon[/]");
-        AnsiConsole.MarkupLine("[grey]Or enter custom order (e.g., 2,1,3,4,5,6)[/]");
+
+        if (isDoubles)
+        {
+            AnsiConsole.MarkupLine(
+                "[grey]Press Enter to use default (1,2,3,4)[/]");
+            AnsiConsole.MarkupLine(
+                "[grey]Or enter 4 numbers (e.g., 1,2,4,5 or 3,1,2,4)[/]");
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("[grey]Press Enter to use default order (1,2,3,4,5,6)[/]");
+            AnsiConsole.MarkupLine(
+                "[grey]Enter a single number (e.g., 2) to lead with that Pokemon[/]");
+            AnsiConsole.MarkupLine("[grey]Or enter custom order (e.g., 2,1,3,4,5,6)[/]");
+        }
 
         string? input = Console.ReadLine();
 
@@ -283,13 +443,15 @@ public class PlayerConsole : IPlayer
                         .ToList();
 
                     // Validate order
-                    if (order.Count != pokemon.Count ||
+                    if (order.Count != pickCount ||
                         order.Any(i => i < 0 || i >= pokemon.Count) ||
                         order.Distinct().Count() != order.Count)
                     {
+                        string defaultOrder = string.Join(",",
+                            Enumerable.Range(1, pickCount));
                         AnsiConsole.MarkupLine(
-                            "[yellow]Invalid order, using default (1,2,3,4,5,6)[/]");
-                        order = Enumerable.Range(0, pokemon.Count).ToList();
+                            $"[yellow]Invalid order, using default ({defaultOrder})[/]");
+                        order = Enumerable.Range(0, pickCount).ToList();
                     }
                     else
                     {
@@ -297,9 +459,16 @@ public class PlayerConsole : IPlayer
                             $"[green]Using order: {string.Join(",", order.Select(i => i + 1))}[/]");
                     }
                 }
+                else if (isDoubles)
+                {
+                    // For doubles, single number input is not supported - must specify 4 Pokemon
+                    AnsiConsole.MarkupLine(
+                        "[yellow]Please enter 4 Pokemon numbers, using default (1,2,3,4)[/]");
+                    order = Enumerable.Range(0, pickCount).ToList();
+                }
                 else
                 {
-                    // Single integer - use as lead, fill rest in ascending order
+                    // Single integer - use as lead, fill rest in ascending order (singles only)
                     int leadIndex = int.Parse(input.Trim()) - 1; // Convert to 0-based
 
                     if (leadIndex < 0 || leadIndex >= pokemon.Count)
@@ -327,22 +496,23 @@ public class PlayerConsole : IPlayer
             }
             catch
             {
+                string defaultOrder = string.Join(",", Enumerable.Range(1, pickCount));
                 AnsiConsole.MarkupLine(
-                    "[yellow]Invalid input, using default order (1,2,3,4,5,6)[/]");
-                order = Enumerable.Range(0, pokemon.Count).ToList();
+                    $"[yellow]Invalid input, using default order ({defaultOrder})[/]");
+                order = Enumerable.Range(0, pickCount).ToList();
             }
         }
         else
         {
             // Use default order
-            order = Enumerable.Range(0, pokemon.Count).ToList();
+            order = Enumerable.Range(0, pickCount).ToList();
         }
 
         // Build actions based on the selected order
         // order[newPosition] = originalPokemonIndex
         // For each new position, create an action with:
         //   - Index = newPosition (where this Pokemon will be placed in the team)
-//   - TargetLoc = originalPokemonIndex (which Pokemon from the original team to use)
+        //   - TargetLoc = originalPokemonIndex (which Pokemon from the original team to use)
         //   - Priority = -newPosition (earlier positions have higher priority for sorting)
         //   - Pokemon = null (will be set by ProcessChosenTeamAction using TargetLoc)
         var actions = order.Select((originalPokemonIndex, newPosition) => new ChosenAction
@@ -369,100 +539,138 @@ public class PlayerConsole : IPlayer
             throw new InvalidOperationException("No active Pokemon to make a move choice");
         }
 
-        PokemonMoveRequestData pokemonRequest = request.Active[0];
+        var actions = new List<ChosenAction>();
+        var alreadySelectedSwitchIndices = new HashSet<int>(); // Track Pokemon already selected for switching
 
-        AnsiConsole.MarkupLine("[bold cyan]Select your move:[/]");
-        AnsiConsole.WriteLine();
-
-        var choices = new List<string>();
-        var moveIndices = new List<int>();
-        var teraOptions = new List<bool>();
-
-        // Check if terastallization is available
-        MoveType? teraType = pokemonRequest.CanTerastallize switch
+        // Handle each active Pokemon
+        for (int pokemonIndex = 0; pokemonIndex < request.Active.Count; pokemonIndex++)
         {
-            MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
-            _ => null,
-        };
+            PokemonMoveRequestData pokemonRequest = request.Active[pokemonIndex];
 
-        // Add moves
-        for (int i = 0; i < pokemonRequest.Moves.Count; i++)
-        {
-            PokemonMoveData move = pokemonRequest.Moves[i];
-            bool disabled = IsDisabled(move.Disabled);
-
-            if (!disabled)
+            // Display which Pokemon is making the choice (for doubles)
+            if (request.Active.Count > 1)
             {
-                // Add regular move option
-                choices.Add($"{i + 1}. {move.Move.Name}");
-                moveIndices.Add(i);
-                teraOptions.Add(false);
+                AnsiConsole.MarkupLine(
+                    $"[bold yellow]Pokemon {pokemonIndex + 1} / {request.Active.Count}[/]");
+            }
 
-                // Add terastallize variant if available
-                if (teraType.HasValue)
+            AnsiConsole.MarkupLine("[bold cyan]Select your move:[/]");
+            AnsiConsole.WriteLine();
+
+            var choices = new List<string>();
+            var moveIndices = new List<int>();
+            var teraOptions = new List<bool>();
+
+            // Check if terastallization is available
+            MoveType? teraType = pokemonRequest.CanTerastallize switch
+            {
+                MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+                _ => null,
+            };
+
+            // Add moves
+            for (int i = 0; i < pokemonRequest.Moves.Count; i++)
+            {
+                PokemonMoveData move = pokemonRequest.Moves[i];
+                bool disabled = IsDisabled(move.Disabled);
+
+                if (!disabled)
                 {
-                    choices.Add(
-                        $"{i + 1}. {move.Move.Name} [bold {GetTeraTypeColor(teraType.Value)}](+ TERA {teraType.Value.ToString().ToUpper()})[/]");
+                    // Add regular move option
+                    choices.Add($"{i + 1}. {move.Move.Name}");
                     moveIndices.Add(i);
-                    teraOptions.Add(true);
+                    teraOptions.Add(false);
+
+                    // Add terastallize variant if available
+                    if (teraType.HasValue)
+                    {
+                        choices.Add(
+                            $"{i + 1}. {move.Move.Name} [bold {GetTeraTypeColor(teraType.Value)}](+ TERA {teraType.Value.ToString().ToUpper()})[/]");
+                        moveIndices.Add(i);
+                        teraOptions.Add(true);
+                    }
                 }
             }
-        }
 
-        // Add switch option
-        choices.Add("S. Switch Pokemon");
+            // Add switch option
+            choices.Add("S. Switch Pokemon");
 
-        // Run the blocking prompt on a background thread to avoid blocking the async pipeline
-        string selection = await Task.Run(() => AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("Choose an action:")
-                .AddChoices(choices)), cancellationToken);
+            // Run the blocking prompt on a background thread to avoid blocking the async pipeline
+            string selection = await Task.Run(() => AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Choose an action:")
+                    .AddChoices(choices)), cancellationToken);
 
-        if (selection.StartsWith('S'))
-        {
-            // Switch - show available Pokemon  
-            return await GetSwitchChoiceAsync(
-                new SwitchRequest { Side = request.Side, ForceSwitch = [false] },
-                cancellationToken);
-        }
-
-        // Move selected
-        int choiceIndex = choices.IndexOf(selection);
-        int moveIndex = moveIndices[choiceIndex];
-        bool useTerastallize = teraOptions[choiceIndex];
-        PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
-
-        // Display which move was selected
-        AnsiConsole.MarkupLine(
-            useTerastallize
-                ? $"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]"
-                : $"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
-
-        AnsiConsole.WriteLine();
-
-        return new Choice
-        {
-            Actions = new List<ChosenAction>
+            if (selection.StartsWith('S'))
             {
-                new()
+                // Switch - show available Pokemon (excluding already selected ones)
+                var switchChoice = await GetSwitchChoiceAsync(
+                    new SwitchRequest
+                    {
+                        Side = request.Side,
+                        ForceSwitch = request.Active.Select((_, i) => i == pokemonIndex).ToList()
+                    },
+                    alreadySelectedSwitchIndices,
+                    cancellationToken);
+                
+                // Track this Pokemon as selected so it can't be chosen again
+                int selectedPokemonIndex = switchChoice.Actions[0].Index!.Value;
+                alreadySelectedSwitchIndices.Add(selectedPokemonIndex);
+                
+                // Add the switch action to our actions list
+                actions.Add(switchChoice.Actions[0]);
+            }
+            else
+            {
+                // Move selected
+                int choiceIndex = choices.IndexOf(selection);
+                int moveIndex = moveIndices[choiceIndex];
+                bool useTerastallize = teraOptions[choiceIndex];
+                PokemonMoveData selectedMove = pokemonRequest.Moves[moveIndex];
+
+                // Display which move was selected
+                AnsiConsole.MarkupLine(
+                    useTerastallize
+                        ? $"[bold cyan]Selected: {selectedMove.Move.Name} with Terastallization ({teraType})[/]"
+                        : $"[bold cyan]Selected: {selectedMove.Move.Name}[/]");
+
+                AnsiConsole.WriteLine();
+
+                // Determine target location based on move target type
+                int targetLoc = await GetTargetLocationAsync(selectedMove, request, pokemonIndex, cancellationToken);
+
+                actions.Add(new ChosenAction
                 {
                     Choice = ChoiceType.Move,
                     Pokemon = null,
                     MoveId = selectedMove.Id,
-                    TargetLoc = 0,
+                    TargetLoc = targetLoc,
                     Terastallize = useTerastallize ? teraType : null
-                }
+                });
             }
+        }
+
+        return new Choice
+        {
+            Actions = actions
         };
     }
 
     private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request,
         CancellationToken cancellationToken)
     {
-        // Build list of available Pokemon with their original indices, excluding fainted ones
+        return await GetSwitchChoiceAsync(request, new HashSet<int>(), cancellationToken);
+    }
+
+    private async Task<Choice> GetSwitchChoiceAsync(SwitchRequest request,
+        HashSet<int> excludedPokemonIndices, CancellationToken cancellationToken)
+    {
+        // Build list of available Pokemon with their original indices, excluding fainted ones and already selected ones
         var availablePokemonWithIndex = request.Side.Pokemon
             .Select((p, index) => new { PokemonData = p, OriginalIndex = index })
-            .Where(x => !x.PokemonData.Active && !IsPokemonFainted(x.OriginalIndex))
+            .Where(x => !x.PokemonData.Active && 
+                        !IsPokemonFainted(x.OriginalIndex) &&
+                        !excludedPokemonIndices.Contains(x.OriginalIndex))
             .ToList();
 
         if (availablePokemonWithIndex.Count == 0)
