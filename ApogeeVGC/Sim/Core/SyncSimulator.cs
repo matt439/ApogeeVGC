@@ -190,9 +190,33 @@ public class SyncSimulator : IBattleController
         // Check if we have a winner
         if (!string.IsNullOrEmpty(Battle!.Winner))
         {
-            // Winner is stored as side ID string ("p1" or "p2")
-            bool isP1Winner = Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase);
-            return isP1Winner ? SimulatorResult.Player1Win : SimulatorResult.Player2Win;
+            // Winner is stored as side name (e.g., "Player 1", "Player 2")
+            // Compare against both P1 and P2 side names to determine the winner
+            string p1Name = Battle.P1.Name;
+            string p2Name = Battle.P2.Name;
+            
+            if (Battle.Winner.Equals(p1Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return SimulatorResult.Player1Win;
+            }
+            else if (Battle.Winner.Equals(p2Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return SimulatorResult.Player2Win;
+            }
+            
+            // Fallback: also check for side ID strings ("p1", "p2") for backwards compatibility
+            if (Battle.Winner.Equals("p1", StringComparison.OrdinalIgnoreCase))
+            {
+                return SimulatorResult.Player1Win;
+            }
+            else if (Battle.Winner.Equals("p2", StringComparison.OrdinalIgnoreCase))
+            {
+                return SimulatorResult.Player2Win;
+            }
+            
+            // Unknown winner format - log error and treat as tie
+            Console.WriteLine($"WARNING: Unknown winner format: '{Battle.Winner}'");
+            return SimulatorResult.Tie;
         }
 
         // No clear winner - use tiebreak

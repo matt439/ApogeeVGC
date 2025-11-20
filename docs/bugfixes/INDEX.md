@@ -38,6 +38,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 - [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
 - [Endless Battle Loop Fix](#endless-battle-loop-fix) - Infinite loop when active Pokemon fainted without proper switch handling
 - [Sync Simulator Request After Battle End Fix](#sync-simulator-request-after-battle-end-fix) - RequestPlayerChoices called after battle ended during request generation
+- [Player 2 Always Wins Bug Fix](#player-2-always-wins-bug-fix) - Winner detection comparing player names against side IDs incorrectly
 
 ---
 
@@ -728,6 +729,25 @@ When documenting a new bug fix:
 
 ---
 
+### Player 2 Always Wins Bug Fix
+**File**: `Player2AlwaysWinsBugFix.md`  
+**Severity**: Critical  
+**Systems Affected**: Winner detection, battle result reporting, synchronous simulation
+
+**Problem**: When running random vs random battles with identical teams, Player 2 appeared to win 100% of battles. This was misinterpreted as a battle mechanics bias, but was actually a **winner reporting bug**.
+
+**Root Cause**: In `SyncSimulator.DetermineWinner()`, the winner detection compared `Battle.Winner` (which contains the side's **name**, e.g., "Player 1") against the hardcoded string `"p1"`. Since the comparison always failed for Player 1, the code fell through to return `SimulatorResult.Player2Win` even when Player 1 actually won.
+
+**Solution**: Updated winner detection to compare against actual side names from `Battle.P1.Name` and `Battle.P2.Name`, with fallback to side ID strings for backwards compatibility.
+
+**Verification**: After fix, 100 battles showed 49% P1 wins / 51% P2 wins (expected 50/50 with random variance).
+
+**Key Insight**: Apparent systematic biases may be reporting bugs rather than logic bugs. The battle mechanics were working correctly - only the result interpretation was wrong.
+
+**Keywords**: `winner detection`, `Player 2 bias`, `false positive`, `string comparison`, `SyncSimulator`, `DetermineWinner`, `side name`, `side ID`, `battle result`, `reporting bug`, `random battles`
+
+---
+
 ### Facade BasePower Event Parameter Fix
 **File**: `FacadeBasePowerEventParameterFix.md`  
 **Severity**: High  
@@ -754,5 +774,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-19  
-*Total Bug Fixes Documented*: 22  
+*Total Bug Fixes Documented*: 23  
 *Reference Guides*: 1

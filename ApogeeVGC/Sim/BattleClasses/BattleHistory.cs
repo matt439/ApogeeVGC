@@ -13,6 +13,36 @@ public class BattleHistory
     private int _currentTurn = 0;
 
     /// <summary>
+    /// Tracks damage dealt by Player 1
+    /// </summary>
+    public List<int> P1DamageDealt { get; } = new();
+
+    /// <summary>
+    /// Tracks damage dealt by Player 2
+    /// </summary>
+    public List<int> P2DamageDealt { get; } = new();
+
+    /// <summary>
+    /// Tracks damage received by Player 1
+    /// </summary>
+    public List<int> P1DamageReceived { get; } = new();
+
+    /// <summary>
+    /// Tracks damage received by Player 2
+    /// </summary>
+    public List<int> P2DamageReceived { get; } = new();
+
+    /// <summary>
+    /// Tracks moves used by Player 1
+    /// </summary>
+    public List<string> P1MovesUsed { get; } = new();
+
+    /// <summary>
+    /// Tracks moves used by Player 2
+    /// </summary>
+    public List<string> P2MovesUsed { get; } = new();
+
+    /// <summary>
     /// Records a new turn starting.
     /// </summary>
     public void RecordTurnStart(int turnNumber)
@@ -41,11 +71,53 @@ public class BattleHistory
     }
 
     /// <summary>
+    /// Records a move being used with side information for bias analysis.
+    /// </summary>
+    public void RecordMoveWithSide(string pokemonName, SideId sideId, string moveName, string? target = null)
+    {
+        // Track moves by side
+        if (sideId == SideId.P1)
+        {
+            P1MovesUsed.Add(moveName);
+        }
+        else
+        {
+            P2MovesUsed.Add(moveName);
+        }
+
+        string message = target != null
+            ? $"{pokemonName} ({sideId}) used {moveName} on {target}"
+            : $"{pokemonName} ({sideId}) used {moveName}";
+        AddEntry(message, HistoryEntryType.Move);
+    }
+
+    /// <summary>
     /// Records damage dealt.
     /// </summary>
     public void RecordDamage(string pokemonName, int damage, int remainingHp, int maxHp)
     {
         AddEntry($"{pokemonName} took {damage} damage ({remainingHp}/{maxHp} HP remaining)", 
+            HistoryEntryType.Damage);
+    }
+
+    /// <summary>
+    /// Records damage dealt with attacker and defender information for bias analysis.
+    /// </summary>
+    public void RecordDamageWithSides(string attackerName, SideId attackerSide, string defenderName, SideId defenderSide, int damage, int remainingHp, int maxHp)
+    {
+        // Track damage by side
+        if (attackerSide == SideId.P1)
+        {
+            P1DamageDealt.Add(damage);
+            P2DamageReceived.Add(damage);
+        }
+        else
+        {
+            P2DamageDealt.Add(damage);
+            P1DamageReceived.Add(damage);
+        }
+
+        AddEntry($"{attackerName} ({attackerSide}) dealt {damage} damage to {defenderName} ({defenderSide}) - {remainingHp}/{maxHp} HP remaining", 
             HistoryEntryType.Damage);
     }
 

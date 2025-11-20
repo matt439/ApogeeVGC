@@ -91,9 +91,12 @@ public class Prng
     {
         int endIndex = end ?? items.Count;
         
+        Console.WriteLine($"[Prng.Shuffle] Shuffling {endIndex - start} items from index {start} to {endIndex}");
+        
         while (start < endIndex - 1)
         {
             int nextIndex = Random(start, endIndex);
+            Console.WriteLine($"[Prng.Shuffle] Swapping index {start} with {nextIndex}");
             if (start != nextIndex)
             {
                 (items[start], items[nextIndex]) = (items[nextIndex], items[start]);
