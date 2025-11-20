@@ -512,8 +512,39 @@ public partial class Battle
 
         ClearRequest();
 
+        // DEBUG: Log queue before sorting (only for move requests)
+        bool hasMoveActions = Queue.List.Any(a => a.Choice == ActionId.Move);
+        if (DebugMode && hasMoveActions && Turn >= 1 && Turn <= 2)
+        {
+            Console.WriteLine($"[CommitChoices] Turn {Turn} Queue BEFORE sorting (has {Queue.List.Count} actions):");
+            for (int i = 0; i < Queue.List.Count; i++)
+            {
+                var action = Queue.List[i];
+                Console.WriteLine($"  [{i}] Choice={action.Choice}, Pokemon={action.Pokemon?.Side.Id} {action.Pokemon?.Name}, Speed={action.Speed}");
+                if (action is MoveAction ma)
+                {
+                    Console.WriteLine($"       Move={ma.Move.Name}, Priority={ma.Priority}, FracPri={ma.FractionalPriority}");
+                }
+            }
+        }
+        
         // Sort the new actions by priority/speed
         Queue.Sort();
+
+        // DEBUG: Log queue after sorting (only for move requests)
+        if (DebugMode && hasMoveActions && Turn >= 1 && Turn <= 2)
+        {
+            Console.WriteLine($"[CommitChoices] Turn {Turn} Queue AFTER sorting:");
+            for (int i = 0; i < Queue.List.Count; i++)
+            {
+                var action = Queue.List[i];
+                Console.WriteLine($"  [{i}] Choice={action.Choice}, Pokemon={action.Pokemon?.Side.Id} {action.Pokemon?.Name}, Speed={action.Speed}");
+                if (action is MoveAction ma)
+                {
+                    Console.WriteLine($"       Move={ma.Move.Name}, Priority={ma.Priority}, FracPri={ma.FractionalPriority}");
+                }
+            }
+        }
 
         Debug($"[CommitChoices] After sorting, queue size = {Queue.List.Count}");
 
