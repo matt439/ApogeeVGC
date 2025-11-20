@@ -34,6 +34,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### UI and Display
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix) - Side conditions not visible in console UI
 
+### Battle Lifecycle
+- [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request passed to player after battle ends
+
 ---
 
 ## Detailed Summaries
@@ -373,6 +376,7 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 ### By Symptom
 
 **Battle crashes/exceptions**:
+- [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix) - Null request after battle ends
 - [Leech Seed Bug Fix](#leech-seed-bug-fix) - Undefined to int conversion
 - [TrySetStatus Logic Error](#trysetstatus-logic-error) - Dictionary key not found
 - [Wild Charge Recoil Fix](#wild-charge-recoil-fix) - Dictionary key not found for Recoil condition
@@ -462,6 +466,9 @@ This index provides summaries of all documented bug fixes in the ApogeeVGC proje
 
 **Battle.Logging.cs**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
+
+**Battle.Requests.cs**:
+- [Battle End Condition Null Request Fix](#battle-end-condition-null-request-fix)
 
 **SidePlayerPerspective.cs / SideOpponentPerspective.cs**:
 - [Reflect Side Condition Display Fix](#reflect-side-condition-display-fix)
@@ -590,6 +597,7 @@ When documenting a new bug fix:
 - **2025-01-XX**: Added Reflect Side Condition Display Fix (UI/perspective issue)
 - **2025-01-XX**: Added Tailwind OnModifySpe Fix (VoidReturn causing IntRelayVar type mismatch)
 - **2025-01-XX**: Added Stat Modification Handler VoidReturn Fix (comprehensive fix for all stat handlers returning VoidReturn)
+- **2025-01-XX**: Added Battle End Condition Null Request Fix (null request passed after battle ends mid-loop)
 
 ### Stat Modification Parameter Nullability and Type Conversion Fix
 **File**: `StatModificationParameterNullabilityFix.md`  
@@ -639,6 +647,31 @@ When documenting a new bug fix:
 
 ---
 
+### Battle End Condition Null Request Fix
+**File**: `BattleEndConditionNullRequestFix.md`  
+**Severity**: High  
+**Systems Affected**: Battle lifecycle, request/choice system, win condition detection
+
+**Problem**: When one side's last Pokémon fainted, the battle attempted to request moves from the losing player (who had no Pokémon left), causing `ArgumentNullException: Choice request cannot be null`. The battle correctly detected the win condition but continued to process choice requests.
+
+**Root Causes**:
+1. **Request Assignment Before End Check**: Requests were assigned to all sides (including WaitRequest for loser) before detecting the battle should end
+2. **Loop Continuation After Battle End**: `RequestPlayerChoices` was iterating through sides; when processing the first side triggered battle end, the loop continued to the next side
+3. **Missing Mid-Loop Exit Check**: No check for `Ended` between processing each side in the request loop
+
+**Solutions**:
+1. Clear `RequestState` and all `ActiveRequest`s when `MakeRequest` detects battle end after generating WaitRequests
+2. **Critical Fix**: Added `if (Ended)` check inside `RequestPlayerChoices` loop before processing each side
+3. Existing early return in `MakeRequest` if battle already ended
+
+**Key Insight**: Even in "synchronous" code, event-driven architecture creates deep call nesting. When `RequestPlayerChoices` calls an event that triggers battle end, control unwinds back to the loop which must check if state changed before continuing iteration.
+
+**Call Flow**: SyncSimulator.Run ? RequestPlayerChoices ? RequestPlayerChoice(P1) ? OnChoiceRequested ? Choose ? CommitChoices ? TurnLoop ? FaintMessages ? CheckWin (sets Ended=true) ? unwind to RequestPlayerChoices loop ? [FIX] check Ended before RequestPlayerChoice(P2)
+
+**Keywords**: `battle end`, `win condition`, `null request`, `ArgumentNullException`, `MakeRequest`, `RequestPlayerChoices`, `ActiveRequest`, `RequestState`, `fainting`, `CheckWin`, `event loop`, `mid-loop exit`, `state consistency`
+
+---
+
 ### Facade BasePower Event Parameter Fix
 **File**: `FacadeBasePowerEventParameterFix.md`  
 **Severity**: High  
@@ -665,5 +698,5 @@ When documenting a new bug fix:
 ---
 
 *Last Updated*: 2025-01-XX  
-*Total Bug Fixes Documented*: 19  
+*Total Bug Fixes Documented*: 20  
 *Reference Guides*: 1

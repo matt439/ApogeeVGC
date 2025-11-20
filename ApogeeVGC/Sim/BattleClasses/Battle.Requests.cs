@@ -162,7 +162,7 @@ public partial class Battle
 
         Debug($"Generated {requests.Count} requests");
 
-// Check if any sides got WaitRequest because they have no valid actions
+        // Check if any sides got WaitRequest because they have no valid actions
         // This can happen when all active Pokemon are fainted during a move request
 // In this case, we need to check if the battle should end
         if (type.Value == RequestState.Move)
@@ -189,6 +189,12 @@ public partial class Battle
                         if (Ended)
                         {
                             Debug("Battle ended after checking win conditions");
+                            // Battle has ended - clear request state and active requests
+                            RequestState = RequestState.None;
+                            foreach (Side s in Sides)
+                            {
+                                s.ActiveRequest = null;
+                            }
                             return;
                         }
                     }
@@ -648,6 +654,13 @@ public partial class Battle
             if (side.IsChoiceDone())
             {
                 continue;
+            }
+
+            // Check if battle ended (can happen during event handling)
+            if (Ended)
+            {
+                Debug("Battle ended during RequestPlayerChoices, stopping");
+                return;
             }
 
             // Determine the request type
