@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
 using Microsoft.Xna.Framework;
 
@@ -31,6 +32,35 @@ public static class MainBattleUiHelper
     
     // Position of selection status text (appears below buttons)
     private const int SelectionStatusY = 650; // Fixed Y position at bottom
+
+    /// <summary>
+    /// Get the MonoGame Color for a tera type (matching PlayerConsole colors)
+    /// </summary>
+    private static Color GetTeraTypeColor(MoveType teraType)
+    {
+        return teraType switch
+        {
+            MoveType.Normal => Color.White,
+            MoveType.Fire => Color.Red,
+            MoveType.Water => Color.Blue,
+            MoveType.Electric => Color.Yellow,
+            MoveType.Grass => Color.Green,
+            MoveType.Ice => Color.Cyan,
+            MoveType.Fighting => Color.DarkOrange,
+            MoveType.Poison => Color.Purple,
+            MoveType.Ground => new Color(255, 215, 0), // Gold3-like
+            MoveType.Flying => Color.DeepSkyBlue,
+            MoveType.Psychic => Color.Magenta,
+            MoveType.Bug => Color.GreenYellow,
+            MoveType.Rock => Color.Orange,
+            MoveType.Ghost => Color.Purple,
+            MoveType.Dragon => Color.Blue,
+            MoveType.Dark => Color.Gray,
+            MoveType.Steel => new Color(188, 188, 188), // Grey74-like
+            MoveType.Fairy => Color.HotPink,
+            _ => Color.White,
+        };
+    }
 
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
@@ -132,6 +162,17 @@ public static class MainBattleUiHelper
         int y = TopMargin;
         int moveIndex = 0;
 
+        // Extract tera type if terastallization is available
+        MoveType? teraType = null;
+        if (canTerastallize && pokemonRequest.CanTerastallize != null)
+        {
+            teraType = pokemonRequest.CanTerastallize switch
+            {
+                MoveTypeMoveTypeFalseUnion mtfu => mtfu.MoveType,
+                _ => null,
+            };
+        }
+
         foreach (PokemonMoveData moveData in pokemonRequest.Moves)
         {
             // Check if move is disabled
@@ -163,13 +204,19 @@ public static class MainBattleUiHelper
             y += ButtonHeight + ButtonSpacing;
 
             // Add Tera variant if terastallization is available
-            if (canTerastallize)
+            if (canTerastallize && teraType.HasValue)
             {
+                Color teraColor = GetTeraTypeColor(teraType.Value);
+                string teraTypeName = teraType.Value.ToString().ToUpper();
+                
                 var teraButton = new ChoiceButton(
                     new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                    $"{moveData.Move.Name} (+ TERA)",
-                    Color.Purple,
-                    () => selectMove(index, true)
+                    $"{moveData.Move.Name} ",        // Primary text (white) - move name with trailing space
+                    Color.Purple,                     // Keep purple background for consistency
+                    () => selectMove(index, true),
+                    Color.White,                      // Primary text color (white)
+                    $"(+ TERA {teraTypeName})",      // Secondary text - tera info
+                    teraColor                         // Secondary text color (type color)
                 );
                 buttons.Add(teraButton);
                 y += ButtonHeight + ButtonSpacing;
