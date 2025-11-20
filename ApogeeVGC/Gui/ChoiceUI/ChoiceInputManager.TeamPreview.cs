@@ -34,7 +34,7 @@ public partial class ChoiceInputManager
         
         // Draw instruction text
         string instructionText =
-            $"Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Lock in {requiredTeamSize} Pokemon.";
+            $"Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Press A to auto-lock first 4. Lock in {requiredTeamSize} Pokemon.";
         var instructionPos = new Vector2(
             (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2f,
             graphicsDevice.Viewport.Height / 2f);
@@ -88,6 +88,36 @@ public partial class ChoiceInputManager
                 CurrentHighlightedIndex = 0; // Wrap around
             Console.WriteLine(
                 $"[ChoiceInputManager] New highlight index: {CurrentHighlightedIndex}");
+        }
+
+        // A key - automatically lock in first 4 Pokemon
+        if (IsKeyPressed(keyboardState, Keys.A))
+        {
+            Console.WriteLine("[ChoiceInputManager] 'A' key pressed, auto-locking first 4 Pokemon");
+            
+            // Clear any existing locked selections
+            _lockedInPositions.Clear();
+            _lockedInIndices.Clear();
+            
+            // Lock in the first 4 Pokemon (or fewer if team has less than 4)
+            int pokemonToLock = Math.Min(4, teamSize);
+            for (int i = 0; i < pokemonToLock; i++)
+            {
+                _lockedInPositions.Add(i);
+                _lockedInIndices.Add(i);
+                Console.WriteLine($"[ChoiceInputManager] Auto-locked Pokemon {i}");
+            }
+            
+            Console.WriteLine(
+                $"[ChoiceInputManager] Auto-locked {pokemonToLock} Pokemon, total locked: {_lockedInPositions.Count}/{requiredTeamSize}");
+            
+            // If we've locked in the required number, submit immediately
+            if (_lockedInPositions.Count >= requiredTeamSize)
+            {
+                Console.WriteLine(
+                    $"[ChoiceInputManager] Required {requiredTeamSize} Pokemon locked in, submitting choice");
+                SubmitTeamPreviewChoice();
+            }
         }
 
         // Enter - lock in the currently highlighted Pokemon
