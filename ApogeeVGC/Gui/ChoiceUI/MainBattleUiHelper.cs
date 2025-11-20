@@ -193,36 +193,44 @@ public static class MainBattleUiHelper
 
             int index = moveIndex;
             
-            // Add regular move option
+            // Add move button - clicking it will use the current tera toggle state
             var button = new ChoiceButton(
                 new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
                 moveData.Move.Name,
                 Color.Blue,
-                () => selectMove(index, false)
+                () => selectMove(index, isTerastallized)
             );
             buttons.Add(button);
             y += ButtonHeight + ButtonSpacing;
 
-            // Add Tera variant if terastallization is available
-            if (canTerastallize && teraType.HasValue)
-            {
-                Color teraColor = GetTeraTypeColor(teraType.Value);
-                string teraTypeName = teraType.Value.ToString().ToUpper();
-                
-                var teraButton = new ChoiceButton(
-                    new Rectangle(LeftMargin, y, ButtonWidth, ButtonHeight),
-                    $"{moveData.Move.Name} ",        // Primary text (white) - move name with trailing space
-                    Color.Purple,                     // Keep purple background for consistency
-                    () => selectMove(index, true),
-                    Color.White,                      // Primary text color (white)
-                    $"(+ TERA {teraTypeName})",      // Secondary text - tera info
-                    teraColor                         // Secondary text color (type color)
-                );
-                buttons.Add(teraButton);
-                y += ButtonHeight + ButtonSpacing;
-            }
-
             moveIndex++;
+        }
+
+        // Add Tera toggle button to the right of the move list if available
+        if (canTerastallize && teraType.HasValue)
+        {
+            Color teraColor = GetTeraTypeColor(teraType.Value);
+            string teraTypeName = teraType.Value.ToString().ToUpper();
+            
+            // Position to the right of the move buttons
+            int teraButtonX = LeftMargin + ButtonWidth + 10;
+            int teraButtonY = TopMargin;
+            int teraButtonWidth = 120;
+            int teraButtonHeight = ButtonHeight * 2; // Make it taller
+            
+            // Split text into parts for color coding
+            string statusText = isTerastallized ? "[ON]" : "[OFF]";
+            string teraButtonText = $"TERA {teraTypeName}\n{statusText}";
+            Color teraButtonBg = isTerastallized ? teraColor : Color.DarkGray;
+            
+            var teraToggleButton = new ChoiceButton(
+                new Rectangle(teraButtonX, teraButtonY, teraButtonWidth, teraButtonHeight),
+                teraButtonText,
+                teraButtonBg,
+                toggleTera,
+                teraColor  // Use tera type color for text
+            );
+            buttons.Add(teraToggleButton);
         }
 
         // Add back button
