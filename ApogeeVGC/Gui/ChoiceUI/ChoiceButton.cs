@@ -69,9 +69,28 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
         
         spriteBatch.Draw(texture, Bounds, bgColor);
 
-        // Draw button border (much thicker and brighter if selected)
+        // Draw button border (much thicker if selected)
         int borderThickness = isSelected ? 6 : 2;
-        Color borderColor = isSelected ? Color.Yellow : Color.White;
+        
+        // Calculate border color that contrasts with background
+        Color borderColor;
+        if (isSelected)
+        {
+            // For selected buttons, use a color that contrasts with the background
+            // Calculate perceived luminance to determine if background is light or dark
+            double luminance = (0.299 * BackgroundColor.R + 
+                               0.587 * BackgroundColor.G + 
+                               0.114 * BackgroundColor.B) / 255.0;
+            
+            // For yellow/light backgrounds, use a dark cyan border
+            // For dark backgrounds, use a bright cyan border
+            // Cyan contrasts well with both yellow and most type colors
+            borderColor = luminance > 0.5 ? new Color(0, 100, 150) : Color.Cyan;
+        }
+        else
+        {
+            borderColor = Color.White;
+        }
 
         // Top
         spriteBatch.Draw(texture, new Rectangle(Bounds.X, Bounds.Y, Bounds.Width, borderThickness),
