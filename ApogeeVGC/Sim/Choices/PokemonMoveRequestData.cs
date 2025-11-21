@@ -11,6 +11,8 @@ public record PokemonMoveData
     public MoveTarget? Target { get; init; }
     public MoveIdBoolUnion? Disabled { get; set; }
     public IEffect? DisabledSource { get; init; }
+    public int Pp { get; init; }
+    public int MaxPp { get; init; }
 }
 
 public record PokemonMoveRequestData

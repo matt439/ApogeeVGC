@@ -239,10 +239,13 @@ public static class MainBattleUiHelper
             // For dark backgrounds, use white text
             Color textColor = GetTextColorForBackground(moveTypeColor);
             
+            // Format move name with PP information
+            string moveDisplayText = $"{moveData.Move.Name} ({moveData.Pp}/{moveData.MaxPp})";
+            
             // Add move button with type-colored background
             var button = new ChoiceButton(
                 new Rectangle(x, y, moveButtonWidth, moveButtonHeight),
-                moveData.Move.Name,
+                moveDisplayText,
                 moveTypeColor,  // Use move's type color instead of generic blue
                 () => selectMove(originalIndex, isTerastallized),
                 textColor  // Use appropriate text color for readability

@@ -158,14 +158,17 @@ public partial class Pokemon
         // If no moves available, default to Struggle
         if (moves.Count == 0)
         {
+            Move struggleMove = Battle.Library.Moves[MoveId.Struggle];
             moves =
             [
                 new PokemonMoveData
                 {
-                    Move = Battle.Library.Moves[MoveId.Struggle],
+                    Move = struggleMove,
                     Target = null,
                     Disabled = null,
                     DisabledSource = null,
+                    Pp = struggleMove.BasePp,
+                    MaxPp = struggleMove.BasePp,
                 }
             ];
             lockedMove = MoveId.Struggle;

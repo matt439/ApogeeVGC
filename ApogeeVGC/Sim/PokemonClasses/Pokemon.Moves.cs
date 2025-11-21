@@ -67,14 +67,17 @@ public partial class Pokemon
             // Special case: Recharge turn (after Hyper Beam, etc.)
             if (lockedMove == MoveId.Recharge)
             {
+                Move rechargeMove = Battle.Library.Moves[MoveId.Recharge];
                 return
                 [
                     new PokemonMoveData
                     {
-                        Move = Battle.Library.Moves[MoveId.Recharge],
+                        Move = rechargeMove,
                         Target = null,
                         Disabled = null,
                         DisabledSource = null,
+                        Pp = rechargeMove.BasePp,
+                        MaxPp = rechargeMove.BasePp,
                     },
                 ];
             }
@@ -90,19 +93,24 @@ public partial class Pokemon
                         Target = null,
                         Disabled = null,
                         DisabledSource = null,
+                        Pp = moveSlot.Pp,
+                        MaxPp = moveSlot.MaxPp,
                     },
                 ];
             }
 
             // Fallback: lookup move by ID (shouldn't normally happen)
+            Move fallbackMove = Battle.Library.Moves[lockedMove.Value];
             return
             [
                 new PokemonMoveData
                 {
-                    Move = Battle.Library.Moves[lockedMove.Value],
+                    Move = fallbackMove,
                     Target = null,
                     Disabled = null,
                     DisabledSource = null,
+                    Pp = fallbackMove.BasePp,
+                    MaxPp = fallbackMove.BasePp,
                 },
             ];
         }
@@ -123,6 +131,7 @@ public partial class Pokemon
                     if (Volatiles.ContainsKey(ConditionId.HealBlock))
                     {
                     }
+
                     break;
 
                 case MoveId.TeraStarStorm:
@@ -130,6 +139,7 @@ public partial class Pokemon
                     if (Species.Id == SpecieId.TerapagosStellar)
                     {
                     }
+
                     break;
             }
 
@@ -173,24 +183,29 @@ public partial class Pokemon
                 Target = null, // Target is not set in this context
                 Disabled = disabledUnion,
                 DisabledSource = moveSlot.DisabledSource,
+                Pp = moveSlot.Pp,
+                MaxPp = moveSlot.MaxPp,
             });
         }
-        
+
         // If no valid moves, return Struggle
         if (!hasValidMove)
         {
+            Move struggleMove = Battle.Library.Moves[MoveId.Struggle];
             return
             [
-        new PokemonMoveData
-    {
-           Move = Battle.Library.Moves[MoveId.Struggle],
-           Target = null,
-              Disabled = null,
-      DisabledSource = null,
-   }
+                new PokemonMoveData
+                {
+                    Move = struggleMove,
+                    Target = null,
+                    Disabled = null,
+                    DisabledSource = null,
+                    Pp = struggleMove.BasePp,
+                    MaxPp = struggleMove.BasePp,
+                }
             ];
         }
-        
+
         return hasValidMove ? moves : [];
     }
 
@@ -292,10 +307,11 @@ public partial class Pokemon
         }
 
         foreach (MoveSlot moveSlot in MoveSlots.Where(moveSlot =>
-         moveSlot.Id == moveId && moveSlot.Disabled != true))
+                     moveSlot.Id == moveId && moveSlot.Disabled != true))
         {
             moveSlot.Disabled = isHidden ? BoolHiddenUnion.FromHidden() : true;
-            moveSlot.DisabledSource = sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
+            moveSlot.DisabledSource =
+                sourceEffect ?? Battle.Library.Moves[moveSlot.Move].ToActiveMove();
         }
     }
 }
