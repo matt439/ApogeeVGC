@@ -62,6 +62,23 @@ public static class MainBattleUiHelper
         };
     }
 
+    /// <summary>
+    /// Determine appropriate text color (black or white) based on background brightness
+    /// Uses perceived luminance formula to determine if background is light or dark
+    /// </summary>
+    private static Color GetTextColorForBackground(Color backgroundColor)
+    {
+        // Calculate perceived luminance (0.0 to 1.0)
+        // Formula: Y = 0.299*R + 0.587*G + 0.114*B
+        double luminance = (0.299 * backgroundColor.R + 
+                           0.587 * backgroundColor.G + 
+                           0.114 * backgroundColor.B) / 255.0;
+        
+        // If background is bright (luminance > 0.5), use black text
+        // Otherwise use white text
+        return luminance > 0.5 ? Color.Black : Color.White;
+    }
+
     public static List<ChoiceButton> CreateMainMenuFirstPokemon(
         MoveRequest request,
         Action showMoveSelection,
@@ -214,12 +231,21 @@ public static class MainBattleUiHelper
             int x = LeftMargin + (col * (moveButtonWidth + horizontalSpacing));
             int y = TopMargin + (row * (moveButtonHeight + verticalSpacing));
             
-            // Add move button - clicking it will use the current tera toggle state
+            // Get the move's type color
+            Color moveTypeColor = GetTeraTypeColor(moveData.Move.Type);
+            
+            // Determine text color based on background brightness
+            // For light backgrounds (Normal, Electric, Ice, etc.), use black text
+            // For dark backgrounds, use white text
+            Color textColor = GetTextColorForBackground(moveTypeColor);
+            
+            // Add move button with type-colored background
             var button = new ChoiceButton(
                 new Rectangle(x, y, moveButtonWidth, moveButtonHeight),
                 moveData.Move.Name,
-                Color.Blue,
-                () => selectMove(originalIndex, isTerastallized)
+                moveTypeColor,  // Use move's type color instead of generic blue
+                () => selectMove(originalIndex, isTerastallized),
+                textColor  // Use appropriate text color for readability
             );
             buttons.Add(button);
         }
@@ -236,17 +262,39 @@ public static class MainBattleUiHelper
             int teraButtonWidth = (moveButtonWidth * 2) + horizontalSpacing; // Span full width of grid
             int teraButtonHeight = 28;
             
-            // Split text into parts for color coding
-            string statusText = isTerastallized ? "[ON]" : "[OFF]";
-            string teraButtonText = $"TERA {teraTypeName} {statusText}";
-            Color teraButtonBg = isTerastallized ? teraColor : Color.DarkGray;
+            // Split text into white "Tera " prefix and colored type name
+            string teraPrefix = "Tera ";
+            string teraTypeText = teraTypeName;
+            
+            // Visual feedback through background color:
+            // - Active (ON): Use the full type color for maximum visibility
+            // - Inactive (OFF): Use a light gray that's very easy to see
+            Color teraButtonBg;
+            if (isTerastallized)
+            {
+                // Active: Use the FULL BRIGHT type color - maximum saturation
+                teraButtonBg = teraColor;
+            }
+            else
+            {
+                // Inactive: Use a LIGHT gray - much brighter so it's super obvious
+                teraButtonBg = new Color(100, 100, 110);
+            }
+            
+            Console.WriteLine($"[MainBattleUiHelper] Tera button: Type={teraTypeName}, Active={isTerastallized}, BgColor=({teraButtonBg.R},{teraButtonBg.G},{teraButtonBg.B})");
+            
+            // When active, use white text for readability against colored background
+            // When inactive, use type color for the type name against gray background
+            Color typeTextColor = isTerastallized ? Color.White : teraColor;
             
             var teraToggleButton = new ChoiceButton(
                 new Rectangle(teraButtonX, teraButtonY, teraButtonWidth, teraButtonHeight),
-                teraButtonText,
-                teraButtonBg,
+                teraPrefix,           // Primary text (white)
+                teraButtonBg,         // Background color shows activation state
                 toggleTera,
-                teraColor  // Use tera type color for text
+                Color.White,          // Primary text color (always white)
+                teraTypeText,         // Secondary text (type name)
+                typeTextColor         // Secondary text color (white when active, type color when inactive)
             );
             buttons.Add(teraToggleButton);
         }

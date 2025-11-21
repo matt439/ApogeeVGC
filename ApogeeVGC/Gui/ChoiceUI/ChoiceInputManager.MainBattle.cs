@@ -3,6 +3,7 @@ using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace ApogeeVGC.Gui.ChoiceUI;
@@ -637,19 +638,34 @@ public partial class ChoiceInputManager
 
     private void ToggleTerastallize(int pokemonIndex)
     {
+        Console.WriteLine($"[ToggleTerastallize] Called for pokemon {pokemonIndex}");
+        
         if (pokemonIndex == 0)
         {
+            bool oldValue = TurnSelection.FirstPokemonTerastallize;
             TurnSelection.FirstPokemonTerastallize = !TurnSelection.FirstPokemonTerastallize;
+            Console.WriteLine($"[ToggleTerastallize] FirstPokemon Tera: {oldValue} -> {TurnSelection.FirstPokemonTerastallize}");
         }
         else if (pokemonIndex == 1)
         {
+            bool oldValue = TurnSelection.SecondPokemonTerastallize;
             TurnSelection.SecondPokemonTerastallize = !TurnSelection.SecondPokemonTerastallize;
+            Console.WriteLine($"[ToggleTerastallize] SecondPokemon Tera: {oldValue} -> {TurnSelection.SecondPokemonTerastallize}");
         }
 
         // Refresh buttons to update Tera button appearance
+        // BUT preserve the current selection index so user stays on the Tera button
         if (_currentRequest is MoveRequest request)
         {
+            int previousSelection = _selectedButtonIndex;
+            Console.WriteLine($"[ToggleTerastallize] Refreshing UI, preserving selection index: {previousSelection}");
             SetupMainBattleUi(request);
+            _selectedButtonIndex = previousSelection; // Restore selection to Tera button
+            Console.WriteLine($"[ToggleTerastallize] UI refreshed, restored selection to: {_selectedButtonIndex}");
+        }
+        else
+        {
+            Console.WriteLine($"[ToggleTerastallize] WARNING: _currentRequest is not a MoveRequest!");
         }
     }
 
