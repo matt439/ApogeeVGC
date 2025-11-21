@@ -42,8 +42,8 @@ public class BattleGame : Game
     private bool _shouldStartBattle;
 
     // Screen dimensions
-    private const int ScreenWidth = 1280;
-    private const int ScreenHeight = 720;
+    private const int ScreenWidth = 1920;
+    private const int ScreenHeight = 1080;
 
     public BattleGame()
     {

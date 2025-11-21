@@ -15,16 +15,16 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     // Layout constants
     private const int Padding = 10;
     private const int LineHeight = 20;
-    private const int MaxVisibleLines = 30; // Number of messages to show at once (increased for right-half display)
+    private const int MaxVisibleLines = 45; // Number of messages to show at once (increased for higher resolution)
 
     // Screen division - messages occupy right half
-    private const int ScreenHalfWidth = 640; // Half of 1280 (screen width)
+    private const int ScreenHalfWidth = 960; // Half of 1920 (screen width)
 
     // Message box positioning and size
     private const int MessageBoxX = ScreenHalfWidth + 10; // Position in right half with small margin
     private const int MessageBoxY = 10; // Position from top
     private const int MessageBoxWidth = ScreenHalfWidth - 20; // Width of right half minus margins
-    private const int MessageBoxHeight = 700; // Full height minus margins
+    private const int MessageBoxHeight = 1060; // Full height minus margins (1080 - 20)
 
     // Auto-scroll tracking
     private double _lastMessageTime = 0;

@@ -29,7 +29,7 @@ public class BattleRenderer(
     private const int PokemonSpacing = 20; // Horizontal spacing between Pokemon sprites
 
     // Screen division - left half for battle, right half for messages
-    private const int ScreenHalfWidth = 640; // Half of 1280 (screen width)
+    private const int ScreenHalfWidth = 960; // Half of 1920 (screen width)
 
     // Team Preview layout
     private const int TeamPreviewOpponentYOffset = 60; // Offset from top padding for opponent team

@@ -62,8 +62,8 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
     private const int ButtonSpacing = 2;
 
     // Move buttons to the right side of the screen to avoid overlap with Pokemon
-    private const int LeftMargin = 400; // Changed from 50 to 800
-    private const int TopMargin = 200;
+    private const int LeftMargin = 600; // Adjusted for 1920x1080 resolution
+    private const int TopMargin = 300; // Adjusted for 1920x1080 resolution
 
     /// <summary>
     /// Request a choice from the user and return it asynchronously.
@@ -185,7 +185,7 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
 
         string statusText =
             $"Selected: {string.Join(", ", _pendingChoice.Actions.Select(GetActionDescription))}";
-        spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 650), Color.Lime);
+        spriteBatch.DrawString(font, statusText, new Vector2(LeftMargin, 975), Color.Lime);
     }
 
     private void SetupChoiceUi()

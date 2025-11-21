@@ -25,13 +25,13 @@ public static class MainBattleUiHelper
     
     // Position of choice menu on screen - in left half below Pokemon
     private const int LeftMargin = 20;   // X position from left edge (aligned with opponent Pokemon)
-    private const int TopMargin = 430;   // Y position from top edge (below player Pokemon)
+    private const int TopMargin = 650;   // Y position from top edge (below player Pokemon) - adjusted for 1080p
     
     // Position of instruction text (appears above buttons)
     private const int InstructionTextYOffset = 20; // Distance above TopMargin
     
     // Position of selection status text (appears below buttons)
-    private const int SelectionStatusY = 695; // Fixed Y position at bottom
+    private const int SelectionStatusY = 1045; // Fixed Y position at bottom - adjusted for 1080p
 
     /// <summary>
     /// Get the MonoGame Color for a tera type (matching PlayerConsole colors)
