@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Gui.Rendering;
 using ApogeeVGC.Gui.ChoiceUI;
+using ApogeeVGC.Gui.Animations;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -23,6 +24,8 @@ public class BattleGame : Game
     private ChoiceInputManager? _choiceInputManager;
     private BattleRunner? _battleRunner;
     private MessageRenderer? _messageRenderer;
+    private AnimationManager? _animationManager;
+    private AnimationCoordinator? _animationCoordinator;
 
     private BattlePerspective? _currentBattlePerspective;
     private readonly Lock _stateLock = new();
@@ -182,6 +185,18 @@ public class BattleGame : Game
         // Clear any previous battle messages
         ClearMessages();
 
+        // Initialize animation system
+        if (_defaultFont != null)
+        {
+            _animationManager = new AnimationManager(GraphicsDevice, _defaultFont);
+            _animationCoordinator = new AnimationCoordinator(_animationManager, library);
+            
+            // Connect animation manager to battle renderer
+            _battleRenderer?.SetAnimationManager(_animationManager);
+            
+            Console.WriteLine("[BattleGame] Animation system initialized");
+        }
+
         _battleRunner = new BattleRunner(library, battleOptions, simulator);
         _battleRunner.StartBattle();
         Console.WriteLine("[BattleGame] Battle runner started");
@@ -264,6 +279,9 @@ public class BattleGame : Game
             // Update choice input manager (runs on GUI thread)
             _choiceInputManager?.Update(gameTime);
 
+            // Update animation manager
+            _animationManager?.Update(gameTime);
+
             // Check if battle is complete
             if (_battleRunner is { IsCompleted: true })
             {
@@ -313,6 +331,15 @@ public class BattleGame : Game
                 _messageQueue.RemoveRange(0, toRemove);
             }
         }
+
+        // Process messages through animation coordinator
+        if (_animationCoordinator != null)
+        {
+            foreach (var message in battleMessages)
+            {
+                _animationCoordinator.ProcessMessage(message);
+            }
+        }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -326,6 +353,39 @@ public class BattleGame : Game
         lock (_stateLock)
         {
             perspectiveToRender = _currentBattlePerspective;
+        }
+
+        // Register Pokemon positions for animation coordinator
+        if (_animationCoordinator != null && perspectiveToRender != null && 
+            perspectiveToRender.PerspectiveType == BattlePerspectiveType.InBattle)
+        {
+            _animationCoordinator.ClearPokemonPositions();
+            
+            // Register player Pokemon
+            for (int i = 0; i < perspectiveToRender.PlayerSide.Active.Count; i++)
+            {
+                var pokemon = perspectiveToRender.PlayerSide.Active[i];
+                if (pokemon != null)
+                {
+                    // Use same position calculation as BattleRenderer
+                    int xPosition = 20 + (i * 188); // InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing))
+                    var position = new Vector2(xPosition + 64, 400 + 64); // Center of sprite
+                    _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, i, true);
+                }
+            }
+            
+            // Register opponent Pokemon
+            for (int i = 0; i < perspectiveToRender.OpponentSide.Active.Count; i++)
+            {
+                var pokemon = perspectiveToRender.OpponentSide.Active[i];
+                if (pokemon != null)
+                {
+                    // Use same position calculation as BattleRenderer
+                    int xPosition = 480 + (i * 188); // InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing))
+                    var position = new Vector2(xPosition + 64, 80 + 64); // Center of sprite
+                    _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, i, false);
+                }
+            }
         }
 
         // Render battle using the renderer
@@ -439,6 +499,10 @@ public class BattleGame : Game
             _messageQueue.Clear();
             Console.WriteLine($"[BattleGame] Messages cleared ({count} messages removed)");
         }
+        
+        // Clear animations as well
+        _animationManager?.Clear();
+        _animationCoordinator?.ClearPokemonPositions();
     }
 
     /// <summary>

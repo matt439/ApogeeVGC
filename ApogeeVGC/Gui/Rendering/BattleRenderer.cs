@@ -1,4 +1,5 @@
 using ApogeeVGC.Gui.ChoiceUI;
+using ApogeeVGC.Gui.Animations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Sim.BattleClasses;
@@ -78,6 +79,9 @@ public class BattleRenderer(
     // Reference to choice input manager for team preview state
     private ChoiceInputManager? _choiceInputManager;
 
+    // Animation manager for battle animations
+    private AnimationManager? _animationManager;
+
     // Cached pixel texture for drawing filled rectangles (HP bars)
     private Texture2D? _pixelTexture;
 
@@ -94,6 +98,14 @@ public class BattleRenderer(
     public void SetChoiceInputManager(ChoiceInputManager choiceInputManager)
     {
         _choiceInputManager = choiceInputManager;
+    }
+
+    /// <summary>
+    /// Set the animation manager for battle animations
+    /// </summary>
+    public void SetAnimationManager(AnimationManager animationManager)
+    {
+        _animationManager = animationManager;
     }
 
     /// <summary>
@@ -130,6 +142,9 @@ public class BattleRenderer(
                 RenderWaitingScreen();
                 break;
         }
+
+        // Render animations on top of everything
+        _animationManager?.Render(spriteBatch, gameTime);
     }
 
     /// <summary>
@@ -372,10 +387,14 @@ public class BattleRenderer(
         // Draw sprite texture (back sprite for player's Pokemon)
         Texture2D sprite = spriteManager.GetBackSprite(pokemon.Species);
 
+        // Apply animation offset if animation manager is available
+        XnaVector2 animationOffset = _animationManager?.GetPlayerSpriteOffset(pokemon.Position) ?? XnaVector2.Zero;
+        XnaVector2 adjustedPosition = position + animationOffset;
+
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
-            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
+            (int)adjustedPosition.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
@@ -524,10 +543,14 @@ public class BattleRenderer(
         // Draw sprite texture (front sprite for opponent's Pokemon)
         Texture2D sprite = spriteManager.GetFrontSprite(pokemon.Species);
 
+        // Apply animation offset if animation manager is available
+        XnaVector2 animationOffset = _animationManager?.GetOpponentSpriteOffset(pokemon.Position) ?? XnaVector2.Zero;
+        XnaVector2 adjustedPosition = position + animationOffset;
+
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
-            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
+            (int)adjustedPosition.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
