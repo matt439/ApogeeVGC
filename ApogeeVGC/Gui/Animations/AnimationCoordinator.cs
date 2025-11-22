@@ -28,6 +28,9 @@ public class AnimationCoordinator
     // Track which SideId represents the player in the current perspective
     // This is needed to map absolute SideId values from messages to the perspective's player/opponent concept
     private SideId? _playerSideId;
+    
+    // Track fainted Pokemon that should still be shown until switch animation
+    private readonly HashSet<string> _faintedPokemonKeys = new();
 
     /// <summary>
     /// Create a new animation coordinator
@@ -117,7 +120,7 @@ public class AnimationCoordinator
     }
 
     /// <summary>
-    /// Handle damage - queue damage indicator
+    /// Handle damage - queue damage indicator and HP bar animation
     /// </summary>
     private void HandleDamage(DamageMessage damageMsg)
     {
@@ -139,6 +142,10 @@ public class AnimationCoordinator
                 damageMsg.DamageAmount,
                 damageMsg.MaxHp,
                 pokemonInfo.Position);
+            
+            // Start HP bar animation (oldHp = remainingHp + damage, newHp = remainingHp)
+            int oldHp = damageMsg.RemainingHp + damageMsg.DamageAmount;
+            _animationManager.StartHpBarAnimation(key, oldHp, damageMsg.RemainingHp, damageMsg.MaxHp);
         }
 
         // Note: Don't clear _pendingMoveAnimation here yet - it might hit multiple targets

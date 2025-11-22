@@ -87,6 +87,9 @@ public class BattleRenderer(
 
     // Track last perspective type to avoid spam logging
     private BattlePerspectiveType? _lastPerspectiveType;
+    
+    // Cache previous perspective to show fainted Pokemon until animations complete
+    private BattlePerspective? _previousPerspective;
 
     // Target selection state
     private readonly Dictionary<int, XnaRectangle> _playerPokemonBoxes = new();
@@ -128,6 +131,9 @@ public class BattleRenderer(
                 $"Opponent Active: {battlePerspective.OpponentSide.Active.Count}");
             _lastPerspectiveType = battlePerspective.PerspectiveType;
         }
+
+        // Cache this perspective for showing fainted Pokemon
+        _previousPerspective = battlePerspective;
 
         // Route to appropriate renderer based on perspective type
         switch (battlePerspective.PerspectiveType)
@@ -409,14 +415,18 @@ public class BattleRenderer(
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, pokemon.Name, textPosition, XnaColor.White);
 
-        // Draw HP text
-        string hpText = $"HP: {pokemon.Hp}/{pokemon.MaxHp}";
+        // Get animated HP value if available, otherwise use current HP
+        string pokemonKey = $"{pokemon.Name}|0"; // Player is always SideId.P1 (0)
+        int displayHp = _animationManager?.GetAnimatedHp(pokemonKey) ?? pokemon.Hp;
+
+        // Draw HP text with animated value
+        string hpText = $"HP: {displayHp}/{pokemon.MaxHp}";
         XnaVector2 hpTextPosition = textPosition + new XnaVector2(0, font.LineSpacing);
         spriteBatch.DrawString(font, hpText, hpTextPosition, XnaColor.White);
 
-        // Draw HP bar
+        // Draw HP bar with animated value
         XnaVector2 hpBarPosition = hpTextPosition + new XnaVector2(0, font.LineSpacing + HpBarYSpacing);
-        DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
+        DrawHpBar(hpBarPosition, displayHp, pokemon.MaxHp);
 
         // Draw status condition if present
         (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
@@ -566,12 +576,16 @@ public class BattleRenderer(
         XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
         spriteBatch.DrawString(font, nameText, textPosition, XnaColor.White);
 
-        // Draw exact HP values (full observability)
-        string hpText = $"HP: {pokemon.Hp}/{pokemon.MaxHp}";
+        // Get animated HP value if available, otherwise use current HP
+        string pokemonKey = $"{pokemon.Name}|1"; // Opponent is always SideId.P2 (1)
+        int displayHp = _animationManager?.GetAnimatedHp(pokemonKey) ?? pokemon.Hp;
+
+        // Draw exact HP values (full observability) with animated value
+        string hpText = $"HP: {displayHp}/{pokemon.MaxHp}";
         XnaVector2 hpPosition = textPosition + new XnaVector2(0, font.LineSpacing);
 
-        // Determine HP text color based on percentage
-        double hpPercentage = (double)pokemon.Hp / pokemon.MaxHp;
+        // Determine HP text color based on percentage (use animated HP)
+        double hpPercentage = (double)displayHp / pokemon.MaxHp;
         XnaColor hpColor = hpPercentage switch
         {
             > HpColorThresholdGreen => XnaColor.LimeGreen,
@@ -581,9 +595,9 @@ public class BattleRenderer(
 
         spriteBatch.DrawString(font, hpText, hpPosition, hpColor);
 
-        // Draw HP bar
+        // Draw HP bar with animated value
         XnaVector2 hpBarPosition = hpPosition + new XnaVector2(0, font.LineSpacing + HpBarYSpacing);
-        DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
+        DrawHpBar(hpBarPosition, displayHp, pokemon.MaxHp);
 
         // Draw status condition if present
         (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);

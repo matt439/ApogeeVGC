@@ -23,6 +23,9 @@ public class AnimationManager
     // Temporary storage for sprite position offsets during contact animations
     private readonly Dictionary<int, Vector2> _playerSpriteOffsets = new();
     private readonly Dictionary<int, Vector2> _opponentSpriteOffsets = new();
+    
+    // HP bar animations - track animated HP values for each Pokemon
+    private readonly Dictionary<string, HpBarAnimation> _hpBarAnimations = new();
 
     /// <summary>
     /// Create a new animation manager
@@ -100,6 +103,17 @@ public class AnimationManager
             if (indicator.IsComplete)
             {
                 _damageIndicators.Remove(indicator);
+            }
+        }
+        
+        // Update HP bar animations
+        foreach (var hpAnimation in _hpBarAnimations.Values.ToList())
+        {
+            hpAnimation.Update(gameTime);
+            
+            if (hpAnimation.IsComplete)
+            {
+                _hpBarAnimations.Remove(hpAnimation.PokemonKey);
             }
         }
     }
@@ -228,6 +242,39 @@ public class AnimationManager
     }
 
     /// <summary>
+    /// Start an HP bar animation for a Pokemon
+    /// This should be called when damage/healing occurs
+    /// </summary>
+    /// <param name="pokemonKey">Unique key for the Pokemon (e.g., "Miraidon|0")</param>
+    /// <param name="oldHp">Previous HP value</param>
+    /// <param name="newHp">New HP value</param>
+    /// <param name="maxHp">Maximum HP value</param>
+    public void StartHpBarAnimation(string pokemonKey, int oldHp, int newHp, int maxHp)
+    {
+        // Remove any existing animation for this Pokemon
+        _hpBarAnimations.Remove(pokemonKey);
+        
+        // Create and start new animation
+        var hpAnimation = new HpBarAnimation(pokemonKey, oldHp, newHp, maxHp);
+        hpAnimation.Start();
+        _hpBarAnimations[pokemonKey] = hpAnimation;
+    }
+
+    /// <summary>
+    /// Get the animated HP value for a Pokemon, or null if no animation is active
+    /// </summary>
+    /// <param name="pokemonKey">Unique key for the Pokemon</param>
+    /// <returns>Animated HP value, or null if no animation</returns>
+    public int? GetAnimatedHp(string pokemonKey)
+    {
+        if (_hpBarAnimations.TryGetValue(pokemonKey, out var animation))
+        {
+            return animation.CurrentHp;
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Trigger a damage indicator over a Pokemon (DEPRECATED - use QueueDamageIndicator)
     /// </summary>
     public void TriggerDamageIndicator(int damageAmount, int maxHp, Vector2 pokemonPosition)
@@ -279,6 +326,7 @@ public class AnimationManager
         _playerSpriteOffsets.Clear();
         _opponentSpriteOffsets.Clear();
         _animationQueue.Clear();
+        _hpBarAnimations.Clear();
     }
 
     /// <summary>
