@@ -71,6 +71,12 @@ public class BattleRenderer(
     private const int HpBarBorderThickness = 1; // Border thickness around HP bar
     private const int HpBarYSpacing = 2; // Vertical spacing between HP text and HP bar
 
+    // Text and rendering constants
+    private const int PixelTextureSize = 1; // Size of 1x1 pixel texture for drawing shapes
+    private const int StatusLineSpacingMultiplier = 3; // Multiplier for font.LineSpacing to position status text
+    private const float CenteringDivisor = 2f; // Divisor for centering calculations
+    private const int MinTruncationLength = 3; // Minimum string length before adding "..."
+
     // Reference to choice input manager for team preview state
     private ChoiceUI.ChoiceInputManager? _choiceInputManager;
 
@@ -149,8 +155,8 @@ public class BattleRenderer(
     private void RenderWaitingScreen()
     {
         var screenCenter = new XnaVector2(
-            graphicsDevice.Viewport.Width / 2f,
-            graphicsDevice.Viewport.Height / 2f);
+            graphicsDevice.Viewport.Width / CenteringDivisor,
+            graphicsDevice.Viewport.Height / CenteringDivisor);
 
         const string message = "Waiting for battle to start...";
         XnaVector2 messageSize = font.MeasureString(message);
@@ -176,7 +182,7 @@ public class BattleRenderer(
                         InfoTextHeight;
         int totalWidth = battlePerspective.PlayerSide.Pokemon.Count *
                          (PokemonSpriteSize + PokemonSpacing);
-        int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
+        int startX = (int)((graphicsDevice.Viewport.Width - totalWidth) / CenteringDivisor);
 
         for (int i = 0; i < battlePerspective.PlayerSide.Pokemon.Count; i++)
         {
@@ -214,7 +220,7 @@ public class BattleRenderer(
         string label = "Your Team";
         XnaVector2 labelSize = font.MeasureString(label);
         XnaVector2 labelPos = new XnaVector2(
-            (graphicsDevice.Viewport.Width - labelSize.X) / 2,
+            (graphicsDevice.Viewport.Width - labelSize.X) / CenteringDivisor,
             yPosition - TeamPreviewLabelYOffset);
         spriteBatch.DrawString(font, label, labelPos, XnaColor.White);
     }
@@ -228,7 +234,7 @@ public class BattleRenderer(
         int yPosition = Padding + TeamPreviewOpponentYOffset;
         int totalWidth = battlePerspective.OpponentSide.Pokemon.Count *
                          (PokemonSpriteSize + PokemonSpacing);
-        int startX = (graphicsDevice.Viewport.Width - totalWidth) / 2;
+        int startX = (int)((graphicsDevice.Viewport.Width - totalWidth) / CenteringDivisor);
 
         for (int i = 0; i < battlePerspective.OpponentSide.Pokemon.Count; i++)
         {
@@ -241,7 +247,7 @@ public class BattleRenderer(
         const string label = "Opponent's Team";
         XnaVector2 labelSize = font.MeasureString(label);
         var labelPos = new XnaVector2(
-            (graphicsDevice.Viewport.Width - labelSize.X) / 2,
+            (graphicsDevice.Viewport.Width - labelSize.X) / CenteringDivisor,
             yPosition - TeamPreviewLabelYOffset);
         spriteBatch.DrawString(font, label, labelPos, XnaColor.White);
     }
@@ -257,7 +263,7 @@ public class BattleRenderer(
         const string uiInfo = "Team Preview - Select your lead Pokemon";
         XnaVector2 uiSize = font.MeasureString(uiInfo);
         var uiPosition = new XnaVector2(
-            (graphicsDevice.Viewport.Width - uiSize.X) / 2f,
+            (graphicsDevice.Viewport.Width - uiSize.X) / CenteringDivisor,
             Padding);
         spriteBatch.DrawString(font, uiInfo, uiPosition, XnaColor.Yellow);
     }
@@ -351,8 +357,8 @@ public class BattleRenderer(
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
@@ -394,8 +400,8 @@ public class BattleRenderer(
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
@@ -460,7 +466,7 @@ public class BattleRenderer(
         if (font.MeasureString(line1).X > maxWidth)
         {
             // Truncate name if too long
-            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > MinTruncationLength)
             {
                 line1 = line1.Substring(0, line1.Length - 1);
             }
@@ -471,7 +477,7 @@ public class BattleRenderer(
         if (font.MeasureString(line3).X > maxWidth)
         {
             // Truncate item name if too long
-            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > MinTruncationLength)
             {
                 line3 = line3.Substring(0, line3.Length - 1);
             }
@@ -491,7 +497,7 @@ public class BattleRenderer(
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
-            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * 3);
+            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * StatusLineSpacingMultiplier);
             spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
         }
     }
@@ -503,8 +509,8 @@ public class BattleRenderer(
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
@@ -556,8 +562,8 @@ public class BattleRenderer(
 
         // Calculate centered position for sprite
         var spriteRect = new XnaRectangle(
-            (int)position.X + (PokemonSpriteSize - sprite.Width) / 2,
-            (int)position.Y + (PokemonSpriteSize - sprite.Height) / 2,
+            (int)position.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
+            (int)position.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
             sprite.Width,
             sprite.Height);
 
@@ -579,7 +585,7 @@ public class BattleRenderer(
         if (font.MeasureString(line1).X > maxWidth)
         {
             // Truncate name if too long
-            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > 3)
+            while (font.MeasureString(line1 + "...").X > maxWidth && line1.Length > MinTruncationLength)
             {
                 line1 = line1.Substring(0, line1.Length - 1);
             }
@@ -590,7 +596,7 @@ public class BattleRenderer(
         if (font.MeasureString(line3).X > maxWidth)
         {
             // Truncate item name if too long
-            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > 3)
+            while (font.MeasureString(line3 + "...").X > maxWidth && line3.Length > MinTruncationLength)
             {
                 line3 = line3.Substring(0, line3.Length - 1);
             }
@@ -610,7 +616,7 @@ public class BattleRenderer(
         var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
-            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * 3);
+            XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * StatusLineSpacingMultiplier);
             spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
         }
     }
@@ -668,7 +674,7 @@ public class BattleRenderer(
     private void DrawRectangle(XnaRectangle rect, XnaColor color, int lineWidth)
     {
         // Create a 1x1 white texture if needed (lazy init in real implementation)
-        var pixel = new Texture2D(graphicsDevice, 1, 1);
+        var pixel = new Texture2D(graphicsDevice, PixelTextureSize, PixelTextureSize);
         pixel.SetData([XnaColor.White]);
 
         // Draw four lines
@@ -692,7 +698,7 @@ public class BattleRenderer(
         // Lazy init pixel texture
         if (_pixelTexture == null)
         {
-            _pixelTexture = new Texture2D(graphicsDevice, 1, 1);
+            _pixelTexture = new Texture2D(graphicsDevice, PixelTextureSize, PixelTextureSize);
             _pixelTexture.SetData([XnaColor.White]);
         }
 

@@ -34,10 +34,10 @@ public partial class ChoiceInputManager
         
         // Draw instruction text
         string instructionText =
-            $"Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Press A to auto-lock first 4. Lock in {requiredTeamSize} Pokemon.";
+            $"Use LEFT/RIGHT arrows to navigate. Press ENTER to lock in. Press A to auto-lock first {AutoLockPokemonCount}. Lock in {requiredTeamSize} Pokemon.";
         var instructionPos = new Vector2(
-            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / 2f,
-            graphicsDevice.Viewport.Height / 2f);
+            (graphicsDevice.Viewport.Width - font.MeasureString(instructionText).X) / CenteringDivisor,
+            graphicsDevice.Viewport.Height / CenteringDivisor);
         spriteBatch.DrawString(font, instructionText, instructionPos, Color.White);
 
         // Draw locked-in status
@@ -45,16 +45,16 @@ public partial class ChoiceInputManager
         {
             string statusText = $"Locked in {_lockedInPositions.Count}/{requiredTeamSize} Pokemon";
             var statusPos = new Vector2(
-                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / 2f,
-                graphicsDevice.Viewport.Height / 2f + 30);
+                (graphicsDevice.Viewport.Width - font.MeasureString(statusText).X) / CenteringDivisor,
+                graphicsDevice.Viewport.Height / CenteringDivisor + TeamPreviewStatusYOffset);
             spriteBatch.DrawString(font, statusText, statusPos, Color.Lime);
 
             // Show the order
             string orderText =
                 $"Order: {string.Join(" -> ", _lockedInPositions.Select(i => $"#{i + 1}"))}";
             var orderPos = new Vector2(
-                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / 2f,
-                graphicsDevice.Viewport.Height / 2f + 60);
+                (graphicsDevice.Viewport.Width - font.MeasureString(orderText).X) / CenteringDivisor,
+                graphicsDevice.Viewport.Height / CenteringDivisor + TeamPreviewOrderYOffset);
             spriteBatch.DrawString(font, orderText, orderPos, Color.Yellow);
         }
     }
@@ -99,8 +99,8 @@ public partial class ChoiceInputManager
             _lockedInPositions.Clear();
             _lockedInIndices.Clear();
             
-            // Lock in the first 4 Pokemon (or fewer if team has less than 4)
-            int pokemonToLock = Math.Min(4, teamSize);
+            // Lock in the first N Pokemon (or fewer if team has less than N)
+            int pokemonToLock = Math.Min(AutoLockPokemonCount, teamSize);
             for (int i = 0; i < pokemonToLock; i++)
             {
                 _lockedInPositions.Add(i);

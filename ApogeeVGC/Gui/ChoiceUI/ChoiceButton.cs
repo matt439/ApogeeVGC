@@ -19,11 +19,32 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
     // Shared pixel texture for all buttons (lazy initialized)
     private static Texture2D? _sharedPixelTexture;
 
+    // Button rendering constants
+    private const int PixelTextureSize = 1; // Size of 1x1 pixel texture for drawing shapes
+    private const int SelectionBrighteningAmount = 100; // Amount to brighten background when selected
+    private const int SelectedBorderThickness = 6; // Border thickness when selected
+    private const int NormalBorderThickness = 2; // Border thickness when not selected
+    private const int ShadowOffsetX = 2; // X offset for text shadow
+    private const int ShadowOffsetY = 2; // Y offset for text shadow
+    private const float CenteringDivisor = 2f; // Divisor for centering calculations
+    
+    // Luminance calculation constants (ITU-R BT.601 standard)
+    private const double LuminanceRedWeight = 0.299;
+    private const double LuminanceGreenWeight = 0.587;
+    private const double LuminanceBlueWeight = 0.114;
+    private const double LuminanceThreshold = 0.5; // Threshold for light vs dark colors
+    private const int ColorChannelMax = 255; // Maximum RGB color value
+    
+    // Border color for selected buttons
+    private const int DarkBorderR = 0;
+    private const int DarkBorderG = 100;
+    private const int DarkBorderB = 150;
+
     private static Texture2D GetPixelTexture(GraphicsDevice graphicsDevice)
     {
         if (_sharedPixelTexture == null || _sharedPixelTexture.IsDisposed)
         {
-            _sharedPixelTexture = new Texture2D(graphicsDevice, 1, 1);
+            _sharedPixelTexture = new Texture2D(graphicsDevice, PixelTextureSize, PixelTextureSize);
             _sharedPixelTexture.SetData([Color.White]);
         }
         return _sharedPixelTexture;
@@ -35,13 +56,13 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
     private static Color GetShadowColor(Color textColor)
     {
         // Calculate perceived luminance of the text color
-        double luminance = (0.299 * textColor.R + 
-                           0.587 * textColor.G + 
-                           0.114 * textColor.B) / 255.0;
+        double luminance = (LuminanceRedWeight * textColor.R + 
+                           LuminanceGreenWeight * textColor.G + 
+                           LuminanceBlueWeight * textColor.B) / ColorChannelMax;
         
         // If text is light (white), use black shadow
         // If text is dark (black), use white shadow
-        return luminance > 0.5 ? Color.Black : Color.White;
+        return luminance > LuminanceThreshold ? Color.Black : Color.White;
     }
 
     public void Draw(SpriteBatch spriteBatch, SpriteFont font, GraphicsDevice graphicsDevice, bool isSelected = false)
@@ -57,9 +78,9 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
         {
             // Selected: Brighten the background color by adding white
             // This makes the button clearly selected while preserving the base color
-            int r = Math.Min(255, BackgroundColor.R + 100);
-            int g = Math.Min(255, BackgroundColor.G + 100);
-            int b = Math.Min(255, BackgroundColor.B + 100);
+            int r = Math.Min(ColorChannelMax, BackgroundColor.R + SelectionBrighteningAmount);
+            int g = Math.Min(ColorChannelMax, BackgroundColor.G + SelectionBrighteningAmount);
+            int b = Math.Min(ColorChannelMax, BackgroundColor.B + SelectionBrighteningAmount);
             bgColor = new Color(r, g, b);
         }
         else
@@ -70,7 +91,7 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
         spriteBatch.Draw(texture, Bounds, bgColor);
 
         // Draw button border (much thicker if selected)
-        int borderThickness = isSelected ? 6 : 2;
+        int borderThickness = isSelected ? SelectedBorderThickness : NormalBorderThickness;
         
         // Calculate border color that contrasts with background
         Color borderColor;
@@ -78,14 +99,14 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
         {
             // For selected buttons, use a color that contrasts with the background
             // Calculate perceived luminance to determine if background is light or dark
-            double luminance = (0.299 * BackgroundColor.R + 
-                               0.587 * BackgroundColor.G + 
-                               0.114 * BackgroundColor.B) / 255.0;
+            double luminance = (LuminanceRedWeight * BackgroundColor.R + 
+                               LuminanceGreenWeight * BackgroundColor.G + 
+                               LuminanceBlueWeight * BackgroundColor.B) / ColorChannelMax;
             
             // For yellow/light backgrounds, use a dark cyan border
             // For dark backgrounds, use a bright cyan border
             // Cyan contrasts well with both yellow and most type colors
-            borderColor = luminance > 0.5 ? new Color(0, 100, 150) : Color.Cyan;
+            borderColor = luminance > LuminanceThreshold ? new Color(DarkBorderR, DarkBorderG, DarkBorderB) : Color.Cyan;
         }
         else
         {
@@ -117,8 +138,8 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
             float totalWidth = primarySize.X + secondarySize.X;
 
             // Calculate starting position to center the combined text
-            float startX = Bounds.X + (Bounds.Width - totalWidth) / 2;
-            float startY = Bounds.Y + (Bounds.Height - primarySize.Y) / 2;
+            float startX = Bounds.X + (Bounds.Width - totalWidth) / CenteringDivisor;
+            float startY = Bounds.Y + (Bounds.Height - primarySize.Y) / CenteringDivisor;
 
             var primaryPos = new Vector2(startX, startY);
             var secondaryPos = new Vector2(startX + primarySize.X, startY);
@@ -130,8 +151,8 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
                 Color primaryShadowColor = GetShadowColor(TextColor);
                 Color secondaryShadowColor = GetShadowColor(SecondaryTextColor.Value);
                 
-                spriteBatch.DrawString(font, Text, primaryPos + new Vector2(2, 2), primaryShadowColor);
-                spriteBatch.DrawString(font, SecondaryText, secondaryPos + new Vector2(2, 2), secondaryShadowColor);
+                spriteBatch.DrawString(font, Text, primaryPos + new Vector2(ShadowOffsetX, ShadowOffsetY), primaryShadowColor);
+                spriteBatch.DrawString(font, SecondaryText, secondaryPos + new Vector2(ShadowOffsetX, ShadowOffsetY), secondaryShadowColor);
             }
 
             // Draw primary text
@@ -144,8 +165,8 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
             // Single color text (original behavior)
             Vector2 textSize = font.MeasureString(Text);
             var textPos = new Vector2(
-                Bounds.X + (Bounds.Width - textSize.X) / 2,
-                Bounds.Y + (Bounds.Height - textSize.Y) / 2
+                Bounds.X + (Bounds.Width - textSize.X) / CenteringDivisor,
+                Bounds.Y + (Bounds.Height - textSize.Y) / CenteringDivisor
             );
 
             // Draw text with shadow/outline effect when selected for extra visibility
@@ -153,7 +174,7 @@ public class ChoiceButton(Rectangle bounds, string text, Color backgroundColor, 
             {
                 // Use contrasting shadow color based on text color
                 Color shadowColor = GetShadowColor(TextColor);
-                spriteBatch.DrawString(font, Text, textPos + new Vector2(2, 2), shadowColor);
+                spriteBatch.DrawString(font, Text, textPos + new Vector2(ShadowOffsetX, ShadowOffsetY), shadowColor);
             }
 
             spriteBatch.DrawString(font, Text, textPos, TextColor);

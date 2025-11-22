@@ -30,6 +30,13 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     private double _lastMessageTime = 0;
     private const double AutoScrollDelay = 3.0; // Seconds to show each new message
 
+    // Rendering constants
+    private const float BackgroundTransparency = 0.7f; // Semi-transparent background alpha
+    private const int BorderWidth = 2; // Border line width
+    private const int PaddingMultiplier = 2; // Multiplier for padding in calculations
+    private const int MinTruncationLength = 3; // Minimum string length before adding "..."
+    private const int PixelTextureSize = 1; // Size of 1x1 pixel texture for drawing shapes
+
     /// <summary>
     /// Render the message log in the right half of the screen
     /// </summary>
@@ -44,13 +51,13 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
         var messageBox = new XnaRectangle(boxX, boxY, MessageBoxWidth, MessageBoxHeight);
 
         // Draw semi-transparent background
-        DrawFilledRectangle(messageBox, XnaColor.Black * 0.7f);
+        DrawFilledRectangle(messageBox, XnaColor.Black * BackgroundTransparency);
 
         // Draw border
-        DrawRectangleBorder(messageBox, XnaColor.White, 2);
+        DrawRectangleBorder(messageBox, XnaColor.White, BorderWidth);
 
         // Calculate how many messages can fit in the box
-        int maxLines = (MessageBoxHeight - (Padding * 2)) / LineHeight;
+        int maxLines = (MessageBoxHeight - (Padding * PaddingMultiplier)) / LineHeight;
         
         // Determine which messages to show (last maxLines messages)
         int startIndex = Math.Max(0, messages.Count - maxLines);
@@ -63,11 +70,11 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
             string displayText = message.ToDisplayText();
 
             // Truncate message if it's too long
-            const float maxWidth = MessageBoxWidth - (Padding * 2);
+            float maxWidth = MessageBoxWidth - (Padding * PaddingMultiplier);
             if (font.MeasureString(displayText).X > maxWidth)
             {
                 while (font.MeasureString(displayText + "...").X > maxWidth &&
-                       displayText.Length > 3)
+                       displayText.Length > MinTruncationLength)
                 {
                     displayText = displayText[..^1];
                 }
@@ -124,7 +131,7 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     /// </summary>
     private void DrawFilledRectangle(XnaRectangle rect, XnaColor color)
     {
-        var pixel = new Texture2D(graphicsDevice, 1, 1);
+        var pixel = new Texture2D(graphicsDevice, PixelTextureSize, PixelTextureSize);
         pixel.SetData([XnaColor.White]);
         spriteBatch.Draw(pixel, rect, color);
         pixel.Dispose();
@@ -135,7 +142,7 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     /// </summary>
     private void DrawRectangleBorder(XnaRectangle rect, XnaColor color, int lineWidth)
     {
-        var pixel = new Texture2D(graphicsDevice, 1, 1);
+        var pixel = new Texture2D(graphicsDevice, PixelTextureSize, PixelTextureSize);
         pixel.SetData([XnaColor.White]);
 
         // Draw four lines

@@ -65,6 +65,12 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
     private const int LeftMargin = 480; // Aligned with opponent's Pokemon X position (midscreen)
     private const int TopMargin = 400; // Aligned with player's Pokemon Y position
 
+    // Team Preview UI constants
+    private const float CenteringDivisor = 2f; // Divisor for centering calculations
+    private const int TeamPreviewStatusYOffset = 30; // Y offset for status text below instruction
+    private const int TeamPreviewOrderYOffset = 60; // Y offset for order text below instruction
+    private const int AutoLockPokemonCount = 4; // Number of Pokemon to auto-lock with 'A' key
+
     /// <summary>
     /// Request a choice from the user and return it asynchronously.
     /// This is called from the battle simulation thread, NOT the GUI thread.
