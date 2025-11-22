@@ -1,5 +1,6 @@
-using ApogeeVGC.Sim.BattleClasses;
+﻿using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Core;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Gui.State;
 
@@ -37,7 +38,7 @@ public class GuiBattleState
         // Initialize player team
         for (int i = 0; i < perspective.PlayerSide.Pokemon.Count; i++)
         {
-            var pokemon = PokemonState.FromPerspective(
+            PokemonState pokemon = PokemonState.FromPerspective(
                 perspective.PlayerSide.Pokemon[i], 
                 i, 
                 SideId.P1);
@@ -47,7 +48,7 @@ public class GuiBattleState
         // Initialize opponent team
         for (int i = 0; i < perspective.OpponentSide.Pokemon.Count; i++)
         {
-            var pokemon = PokemonState.FromPerspective(
+            PokemonState pokemon = PokemonState.FromPerspective(
                 perspective.OpponentSide.Pokemon[i], 
                 i, 
                 SideId.P2);
@@ -60,13 +61,13 @@ public class GuiBattleState
         // - The active.Position represents the team slot (0-5)
         for (int battlePosition = 0; battlePosition < perspective.PlayerSide.Active.Count; battlePosition++)
         {
-            var active = perspective.PlayerSide.Active[battlePosition];
+            PokemonPerspective? active = perspective.PlayerSide.Active[battlePosition];
             if (active != null)
             {
-                var teamSlot = active.Position;
+                int teamSlot = active.Position;
                 if (teamSlot >= 0 && teamSlot < _playerTeam.Count)
                 {
-                    var pokemon = _playerTeam[teamSlot];
+                    PokemonState pokemon = _playerTeam[teamSlot];
                     pokemon.IsActive = true;
                     pokemon.Position = battlePosition;
                     _playerActive[battlePosition] = pokemon;
@@ -76,13 +77,13 @@ public class GuiBattleState
         
         for (int battlePosition = 0; battlePosition < perspective.OpponentSide.Active.Count; battlePosition++)
         {
-            var active = perspective.OpponentSide.Active[battlePosition];
+            PokemonPerspective? active = perspective.OpponentSide.Active[battlePosition];
             if (active != null)
             {
-                var teamSlot = active.Position;
+                int teamSlot = active.Position;
                 if (teamSlot >= 0 && teamSlot < _opponentTeam.Count)
                 {
-                    var pokemon = _opponentTeam[teamSlot];
+                    PokemonState pokemon = _opponentTeam[teamSlot];
                     pokemon.IsActive = true;
                     pokemon.Position = battlePosition;
                     _opponentActive[battlePosition] = pokemon;
@@ -133,7 +134,7 @@ public class GuiBattleState
     
     private void HandleDamage(DamageMessage message)
     {
-        var pokemon = GetPokemon(message.PokemonName, message.SideId);
+        PokemonState? pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
         // Use the current state HP as the "old HP" because damage messages
@@ -146,14 +147,14 @@ public class GuiBattleState
         int newHp = Math.Max(0, oldHp - message.DamageAmount);
         pokemon.Hp = newHp;
         
-        Console.WriteLine($"[GuiBattleState.HandleDamage] {pokemon.Name}: {oldHp} ? {newHp} (damage: {message.DamageAmount}, message claimed: {message.RemainingHp})");
+        Console.WriteLine($"[GuiBattleState.HandleDamage] {pokemon.Name}: {oldHp} → {newHp} (damage: {message.DamageAmount}, message claimed: {message.RemainingHp})");
         
         PokemonDamaged?.Invoke(pokemon, oldHp, newHp);
     }
     
     private void HandleFaint(FaintMessage message)
     {
-        var pokemon = GetPokemon(message.PokemonName, message.SideId);
+        PokemonState? pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
         Console.WriteLine($"[GuiBattleState.HandleFaint] {pokemon.Name} fainted (HP was: {pokemon.Hp}, IsActive was: {pokemon.IsActive})");
@@ -170,18 +171,18 @@ public class GuiBattleState
         Console.WriteLine($"[GuiBattleState.HandleSwitch] Processing switch for {message.PokemonName} from trainer {message.TrainerName}");
         
         // Determine which side and slot
-        var (side, slot, pokemon) = FindPokemonForSwitch(message.PokemonName, message.TrainerName);
+        (SideId side, int slot, PokemonState? pokemon) = FindPokemonForSwitch(message.PokemonName, message.TrainerName);
         
         Console.WriteLine($"[GuiBattleState.HandleSwitch] FindPokemonForSwitch returned: side={side}, slot={slot}, pokemon={(pokemon?.Name ?? "null")}");
         
         if (pokemon == null || slot < 0)
         {
-            Console.WriteLine($"[GuiBattleState.HandleSwitch] Aborting switch - invalid pokemon or slot");
+            Console.WriteLine("[GuiBattleState.HandleSwitch] Aborting switch - invalid pokemon or slot");
             return;
         }
         
         // Get current active Pokemon in that slot (if any)
-        var currentActive = side == SideId.P1 
+        PokemonState? currentActive = side == SideId.P1 
             ? _playerActive.GetValueOrDefault(slot)
             : _opponentActive.GetValueOrDefault(slot);
         
@@ -212,7 +213,7 @@ public class GuiBattleState
     
     private void HandleHeal(HealMessage message)
     {
-        var pokemon = GetPokemon(message.PokemonName, message.SideId);
+        PokemonState? pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
         int oldHp = pokemon.Hp;
@@ -228,7 +229,7 @@ public class GuiBattleState
     
     private void HandleStatus(StatusMessage message)
     {
-        var pokemon = GetPokemon(message.PokemonName, message.SideId);
+        PokemonState? pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
         // Update status based on status name
@@ -260,8 +261,8 @@ public class GuiBattleState
         if (isPlayerSwitch)
         {
             // Search player team first
-            var pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
-            if (pokemon != null && !pokemon.IsActive)
+            PokemonState? pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
+            if (pokemon is { IsActive: false })
             {
                 var emptySlot = _playerActive.FirstOrDefault(kvp => 
                     kvp.Value.IsFainted || !kvp.Value.IsActive);
@@ -280,8 +281,8 @@ public class GuiBattleState
         else
         {
             // Search opponent team first
-            var pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
-            if (pokemon != null && !pokemon.IsActive)
+            PokemonState? pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
+            if (pokemon is { IsActive: false })
             {
                 var emptySlot = _opponentActive.FirstOrDefault(kvp => 
                     kvp.Value.IsFainted || !kvp.Value.IsActive);
