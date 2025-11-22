@@ -244,10 +244,17 @@ public class AnimationManager
     /// <param name="maxHp">Maximum HP value</param>
     public void StartHpBarAnimation(string pokemonKey, int oldHp, int newHp, int maxHp)
     {
-        // Remove any existing animation for this Pokemon
+        // If there's already an animation for this Pokemon, chain from its current HP
+        if (_hpBarAnimations.TryGetValue(pokemonKey, out HpBarAnimation? existingAnimation))
+        {
+            // Chain from the target HP of the existing animation
+            oldHp = existingAnimation.TargetHp;
+        }
+        
+        // Remove the existing animation (it will be replaced)
         _hpBarAnimations.Remove(pokemonKey);
         
-        // Create and start new animation
+        // Create and start new animation from the correct starting HP
         var hpAnimation = new HpBarAnimation(pokemonKey, oldHp, newHp, maxHp);
         hpAnimation.Start();
         _hpBarAnimations[pokemonKey] = hpAnimation;

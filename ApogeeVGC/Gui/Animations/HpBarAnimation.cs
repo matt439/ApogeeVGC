@@ -39,6 +39,11 @@ public class HpBarAnimation : BattleAnimation
     /// </summary>
     public int CurrentHp { get; private set; }
 
+    /// <summary>
+    /// Get the target HP value (where the animation is heading)
+    /// </summary>
+    public int TargetHp => _endHp;
+
     public override void Start()
     {
         base.Start();

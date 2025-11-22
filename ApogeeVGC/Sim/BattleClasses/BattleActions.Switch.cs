@@ -243,6 +243,9 @@ public partial class BattleActions
             poke.DraggedIn = null;
         }
 
+        // Flush messages immediately after switches complete so the GUI shows the new Pokemon
+        Battle.FlushMessages();
+
         return true;
     }
 }

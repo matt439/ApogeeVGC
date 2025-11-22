@@ -136,10 +136,19 @@ public class GuiBattleState
         var pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
+        // Use the current state HP as the "old HP" because damage messages
+        // from the battle engine may have stale HP values when multiple attacks
+        // hit the same Pokemon in quick succession
         int oldHp = pokemon.Hp;
-        pokemon.Hp = message.RemainingHp;
         
-        PokemonDamaged?.Invoke(pokemon, oldHp, pokemon.Hp);
+        // Calculate the new HP by subtracting the damage amount from current HP
+        // Don't trust message.RemainingHp as it may be based on stale initial HP
+        int newHp = Math.Max(0, oldHp - message.DamageAmount);
+        pokemon.Hp = newHp;
+        
+        Console.WriteLine($"[GuiBattleState.HandleDamage] {pokemon.Name}: {oldHp} ? {newHp} (damage: {message.DamageAmount}, message claimed: {message.RemainingHp})");
+        
+        PokemonDamaged?.Invoke(pokemon, oldHp, newHp);
     }
     
     private void HandleFaint(FaintMessage message)
@@ -147,17 +156,29 @@ public class GuiBattleState
         var pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
+        Console.WriteLine($"[GuiBattleState.HandleFaint] {pokemon.Name} fainted (HP was: {pokemon.Hp}, IsActive was: {pokemon.IsActive})");
+        
         pokemon.IsFainted = true;
-        pokemon.Hp = 0;
+        pokemon.IsActive = false; // Clear active flag when fainting
+        // Don't set Hp to 0 here - it should already be 0 from HandleDamage
         
         PokemonFainted?.Invoke(pokemon);
     }
     
     private void HandleSwitch(SwitchMessage message)
     {
+        Console.WriteLine($"[GuiBattleState.HandleSwitch] Processing switch for {message.PokemonName} from trainer {message.TrainerName}");
+        
         // Determine which side and slot
         var (side, slot, pokemon) = FindPokemonForSwitch(message.PokemonName, message.TrainerName);
-        if (pokemon == null || slot < 0) return;
+        
+        Console.WriteLine($"[GuiBattleState.HandleSwitch] FindPokemonForSwitch returned: side={side}, slot={slot}, pokemon={(pokemon?.Name ?? "null")}");
+        
+        if (pokemon == null || slot < 0)
+        {
+            Console.WriteLine($"[GuiBattleState.HandleSwitch] Aborting switch - invalid pokemon or slot");
+            return;
+        }
         
         // Get current active Pokemon in that slot (if any)
         var currentActive = side == SideId.P1 
@@ -166,6 +187,7 @@ public class GuiBattleState
         
         if (currentActive != null)
         {
+            Console.WriteLine($"[GuiBattleState.HandleSwitch] Switching out {currentActive.Name} from slot {slot}");
             currentActive.IsActive = false;
             PokemonSwitchedOut?.Invoke(currentActive, slot);
         }
@@ -177,10 +199,12 @@ public class GuiBattleState
         if (side == SideId.P1)
         {
             _playerActive[slot] = pokemon;
+            Console.WriteLine($"[GuiBattleState.HandleSwitch] Set player slot {slot} to {pokemon.Name}");
         }
         else
         {
             _opponentActive[slot] = pokemon;
+            Console.WriteLine($"[GuiBattleState.HandleSwitch] Set opponent slot {slot} to {pokemon.Name}");
         }
         
         PokemonSwitchedIn?.Invoke(pokemon, slot);
@@ -225,43 +249,56 @@ public class GuiBattleState
         string pokemonName, 
         string trainerName)
     {
-        // Try player side first
-        var pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
-        if (pokemon != null)
+        Console.WriteLine($"[FindPokemonForSwitch] Looking for '{pokemonName}' from trainer '{trainerName}'");
+        
+        // Determine which side based on trainer name
+        // In a GUI battle, the player is always "Matt" (or the local player name)
+        // The opponent is the other trainer (e.g., "Random")
+        bool isPlayerSwitch = trainerName != "Random"; // Simple heuristic - improve if needed
+        
+        // Search the correct team first based on trainer name
+        if (isPlayerSwitch)
         {
-            // Check if this Pokemon is already active - ignore initial switch-in messages
-            if (pokemon.IsActive)
+            // Search player team first
+            var pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
+            if (pokemon != null && !pokemon.IsActive)
             {
+                var emptySlot = _playerActive.FirstOrDefault(kvp => 
+                    kvp.Value.IsFainted || !kvp.Value.IsActive);
+                int slot = emptySlot.Value != null ? emptySlot.Key : 0;
+                Console.WriteLine($"[FindPokemonForSwitch] Found {pokemonName} in player team, switching to slot {slot}");
+                return (SideId.P1, slot, pokemon);
+            }
+            
+            // If already active, ignore
+            if (pokemon?.IsActive == true)
+            {
+                Console.WriteLine($"[FindPokemonForSwitch] Player {pokemonName} is already active, ignoring");
                 return (SideId.P1, -1, null);
             }
-            
-            // Find empty slot or slot with fainted Pokemon
-            var emptySlot = _playerActive.FirstOrDefault(kvp => 
-                kvp.Value.IsFainted || !kvp.Value.IsActive);
-            
-            int slot = emptySlot.Value != null ? emptySlot.Key : 0;
-            
-            return (SideId.P1, slot, pokemon);
         }
-        
-        // Try opponent side
-        pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
-        if (pokemon != null)
+        else
         {
-            // Check if this Pokemon is already active - ignore initial switch-in messages
-            if (pokemon.IsActive)
+            // Search opponent team first
+            var pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
+            if (pokemon != null && !pokemon.IsActive)
             {
-                return (SideId.P2, -1, null);
+                var emptySlot = _opponentActive.FirstOrDefault(kvp => 
+                    kvp.Value.IsFainted || !kvp.Value.IsActive);
+                int slot = emptySlot.Value != null ? emptySlot.Key : 0;
+                Console.WriteLine($"[FindPokemonForSwitch] Found {pokemonName} in opponent team, switching to slot {slot}");
+                return (SideId.P2, slot, pokemon);
             }
             
-            var emptySlot = _opponentActive.FirstOrDefault(kvp => 
-                kvp.Value.IsFainted || !kvp.Value.IsActive);
-            
-            int slot = emptySlot.Value != null ? emptySlot.Key : 0;
-            
-            return (SideId.P2, slot, pokemon);
+            // If already active, ignore
+            if (pokemon?.IsActive == true)
+            {
+                Console.WriteLine($"[FindPokemonForSwitch] Opponent {pokemonName} is already active, ignoring");
+                return (SideId.P2, -1, null);
+            }
         }
         
+        Console.WriteLine($"[FindPokemonForSwitch] Pokemon '{pokemonName}' from trainer '{trainerName}' NOT FOUND or already active!");
         return (SideId.P1, -1, null);
     }
     
