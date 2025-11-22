@@ -32,7 +32,7 @@ public static class MainBattleUiHelper
     
     // Move selection grid layout
     private const int MoveGridColumns = 1; // Number of columns in move grid (2x2)
-    private const int MoveButtonWidth = 300; // Width of individual move buttons
+    private const int MoveButtonWidth = 270; // Width of individual move buttons
     private const int MoveButtonHeight = 45; // Height of individual move buttons
     private const int MoveHorizontalSpacing = 10; // Horizontal spacing between move buttons
     private const int MoveVerticalSpacing = 5; // Vertical spacing between move buttons
