@@ -1,7 +1,9 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Data;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace ApogeeVGC.Gui.Animations;
@@ -16,7 +18,14 @@ public class AnimationCoordinator
 
     // Track pending move animations to link with damage/miss messages
     private MoveUsedMessage? _pendingMoveAnimation;
+    // Track the target of the pending move (if known)
+    private string? _pendingMoveTarget;
+    // Key format: "PokemonName|SideId" to handle duplicate names on different sides
     private readonly Dictionary<string, (Vector2 Position, int Slot, bool IsPlayer)> _pokemonPositions = new();
+    
+    // Track which SideId represents the player in the current perspective
+    // This is needed to map absolute SideId values from messages to the perspective's player/opponent concept
+    private SideId? _playerSideId;
 
     /// <summary>
     /// Create a new animation coordinator
@@ -33,7 +42,8 @@ public class AnimationCoordinator
     /// </summary>
     public void RegisterPokemonPosition(string pokemonName, Vector2 position, int slot, bool isPlayer)
     {
-        _pokemonPositions[pokemonName] = (position, slot, isPlayer);
+        string key = CreatePositionKey(pokemonName, isPlayer);
+        _pokemonPositions[key] = (position, slot, isPlayer);
     }
 
     /// <summary>
@@ -42,6 +52,15 @@ public class AnimationCoordinator
     public void ClearPokemonPositions()
     {
         _pokemonPositions.Clear();
+    }
+
+    /// <summary>
+    /// Set which SideId represents the player in the current perspective
+    /// This must be called before registering positions or processing messages
+    /// </summary>
+    public void SetPlayerSideId(SideId playerSideId)
+    {
+        _playerSideId = playerSideId;
     }
 
     /// <summary>
@@ -66,6 +85,7 @@ public class AnimationCoordinator
             // Clear pending move on turn start
             case TurnStartMessage:
                 _pendingMoveAnimation = null;
+                _pendingMoveTarget = null;
                 break;
         }
     }
@@ -77,6 +97,10 @@ public class AnimationCoordinator
     {
         // Store this move for linking with subsequent damage/miss messages
         _pendingMoveAnimation = moveMsg;
+        
+        // Extract target information if available
+        // MoveUsedMessage may contain target info in the future, for now we'll track it from damage messages
+        _pendingMoveTarget = null;
 
         // Try to trigger attack animation immediately if we know the target
         TriggerAttackAnimationIfReady();
@@ -87,8 +111,18 @@ public class AnimationCoordinator
     /// </summary>
     private void HandleDamage(DamageMessage damageMsg)
     {
-        // Find the damaged Pokemon's position
-        if (_pokemonPositions.TryGetValue(damageMsg.PokemonName, out var pokemonInfo))
+        // Store the target for the pending move animation
+        // This ensures the next attack animation targets the correct Pokemon
+        if (_pendingMoveAnimation != null && _pendingMoveTarget == null)
+        {
+            _pendingMoveTarget = CreatePositionKey(damageMsg.PokemonName, damageMsg.SideId);
+            // Retry animation now that we know the target
+            TriggerAttackAnimationIfReady();
+        }
+        
+        // Find the damaged Pokemon's position using name and side
+        string key = CreatePositionKey(damageMsg.PokemonName, damageMsg.SideId);
+        if (_pokemonPositions.TryGetValue(key, out var pokemonInfo))
         {
             // Queue damage indicator to play after attack animation
             _animationManager.QueueDamageIndicator(
@@ -97,8 +131,9 @@ public class AnimationCoordinator
                 pokemonInfo.Position);
         }
 
-        // Clear pending move after damage is shown
+        // Clear pending move and target after damage is shown
         _pendingMoveAnimation = null;
+        _pendingMoveTarget = null;
     }
 
     /// <summary>
@@ -106,15 +141,25 @@ public class AnimationCoordinator
     /// </summary>
     private void HandleMiss(MissMessage missMsg)
     {
-        // Find the Pokemon's position
-        if (_pokemonPositions.TryGetValue(missMsg.PokemonName, out var pokemonInfo))
+        // Store the target for the pending move animation
+        if (_pendingMoveAnimation != null && _pendingMoveTarget == null)
+        {
+            _pendingMoveTarget = CreatePositionKey(missMsg.PokemonName, missMsg.SideId);
+            // Retry animation now that we know the target
+            TriggerAttackAnimationIfReady();
+        }
+        
+        // Find the Pokemon's position using name and side
+        string key = CreatePositionKey(missMsg.PokemonName, missMsg.SideId);
+        if (_pokemonPositions.TryGetValue(key, out var pokemonInfo))
         {
             // Queue miss indicator to play after attack animation
             _animationManager.QueueMissIndicator(pokemonInfo.Position);
         }
 
-        // Clear pending move after miss is shown
+        // Clear pending move and target after miss is shown
         _pendingMoveAnimation = null;
+        _pendingMoveTarget = null;
     }
 
     /// <summary>
@@ -134,13 +179,28 @@ public class AnimationCoordinator
         if (move == null)
             return;
 
-        // Find attacker position
-        if (!_pokemonPositions.TryGetValue(_pendingMoveAnimation.PokemonName, out var attackerInfo))
+        // Skip animations for status moves (Protect, Trick Room, etc.)
+        if (move.Category == MoveCategory.Status)
             return;
 
-        // For now, we'll need to infer the defender(s) from context
-        // This is a simplified approach - in practice you might need more sophisticated tracking
-        List<Vector2> defenderPositions = GetPotentialDefenderPositions(attackerInfo.IsPlayer);
+        // Find attacker position using name and side
+        string attackerKey = CreatePositionKey(_pendingMoveAnimation.PokemonName, _pendingMoveAnimation.SideId);
+        if (!_pokemonPositions.TryGetValue(attackerKey, out var attackerInfo))
+            return;
+
+        // Get defender position(s)
+        List<Vector2> defenderPositions;
+        
+        if (_pendingMoveTarget != null && _pokemonPositions.TryGetValue(_pendingMoveTarget, out var targetInfo))
+        {
+            // We know the specific target from the damage/miss message
+            defenderPositions = new List<Vector2> { targetInfo.Position };
+        }
+        else
+        {
+            // Fall back to targeting all opponents (for multi-target moves or when target is unknown)
+            defenderPositions = GetPotentialDefenderPositions(attackerInfo.IsPlayer);
+        }
 
         if (defenderPositions.Count == 0)
             return;
@@ -192,5 +252,34 @@ public class AnimationCoordinator
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Create a unique key for position lookup that includes both name and side
+    /// </summary>
+    private string CreatePositionKey(string pokemonName, SideId? sideId)
+    {
+        // If no side ID, fall back to just name (shouldn't happen in normal battles)
+        if (!sideId.HasValue)
+            return pokemonName;
+
+        // Create composite key: "Name|SideId"
+        return $"{pokemonName}|{(int)sideId.Value}";
+    }
+
+    /// <summary>
+    /// Create a unique key for position lookup using isPlayer boolean
+    /// </summary>
+    private string CreatePositionKey(string pokemonName, bool isPlayer)
+    {
+        // Map isPlayer to absolute SideId using the tracked player side
+        // If no player side is set, fall back to simple name-based key
+        if (_playerSideId == null)
+            return pokemonName;
+
+        // isPlayer=true means PlayerSide in perspective, which maps to _playerSideId
+        // isPlayer=false means OpponentSide in perspective, which maps to the other side
+        SideId sideId = isPlayer ? _playerSideId.Value : (_playerSideId.Value == SideId.P1 ? SideId.P2 : SideId.P1);
+        return CreatePositionKey(pokemonName, sideId);
     }
 }

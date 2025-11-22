@@ -361,6 +361,10 @@ public class BattleGame : Game
         {
             _animationCoordinator.ClearPokemonPositions();
             
+            // Set which SideId is the player in this perspective
+            // In GUI battles, Player 1 is always the GUI player and is always SideId.P1
+            _animationCoordinator.SetPlayerSideId(SideId.P1);
+            
             // Register player Pokemon
             for (int i = 0; i < perspectiveToRender.PlayerSide.Active.Count; i++)
             {
