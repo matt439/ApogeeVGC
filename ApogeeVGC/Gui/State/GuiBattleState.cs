@@ -29,16 +29,10 @@ public class GuiBattleState
     /// </summary>
     public void Initialize(BattlePerspective perspective)
     {
-        Console.WriteLine($"[GuiBattleState] ===== INITIALIZING =====");
-        Console.WriteLine($"[GuiBattleState] Current state before clear - PlayerActive: {_playerActive.Count}, OpponentActive: {_opponentActive.Count}");
-        
         _playerActive.Clear();
         _opponentActive.Clear();
         _playerTeam.Clear();
         _opponentTeam.Clear();
-        
-        Console.WriteLine($"[GuiBattleState] Perspective - Player Pokemon count: {perspective.PlayerSide.Pokemon.Count}, Opponent Pokemon count: {perspective.OpponentSide.Pokemon.Count}");
-        Console.WriteLine($"[GuiBattleState] Perspective - Player Active count: {perspective.PlayerSide.Active.Count}, Opponent Active count: {perspective.OpponentSide.Active.Count}");
         
         // Initialize player team
         for (int i = 0; i < perspective.PlayerSide.Pokemon.Count; i++)
@@ -48,7 +42,6 @@ public class GuiBattleState
                 i, 
                 SideId.P1);
             _playerTeam.Add(pokemon);
-            Console.WriteLine($"[GuiBattleState] Added player team member {i}: {pokemon.Name}");
         }
         
         // Initialize opponent team
@@ -59,29 +52,24 @@ public class GuiBattleState
                 i, 
                 SideId.P2);
             _opponentTeam.Add(pokemon);
-            Console.WriteLine($"[GuiBattleState] Added opponent team member {i}: {pokemon.Name}");
         }
         
         // Set active Pokemon
         // Important: perspective.PlayerSide.Active is a list where:
-        // - The INDEX (i) represents the battle field position (0 or 1 for doubles)
+        // - The INDEX represents the battle field position (0 or 1 for doubles)
         // - The active.Position represents the team slot (0-5)
         for (int battlePosition = 0; battlePosition < perspective.PlayerSide.Active.Count; battlePosition++)
         {
             var active = perspective.PlayerSide.Active[battlePosition];
             if (active != null)
             {
-                // Find the team member that matches this active Pokemon by slot index
-                // The active Pokemon's Position field tells us which team slot it came from
                 var teamSlot = active.Position;
                 if (teamSlot >= 0 && teamSlot < _playerTeam.Count)
                 {
                     var pokemon = _playerTeam[teamSlot];
                     pokemon.IsActive = true;
-                    pokemon.Position = battlePosition; // Set the battle field position (0 or 1 for doubles)
-                    // KEY FIX: Use battlePosition as the key, not teamSlot!
+                    pokemon.Position = battlePosition;
                     _playerActive[battlePosition] = pokemon;
-                    Console.WriteLine($"[GuiBattleState] Player battle position {battlePosition}: {pokemon.Name} (from team slot {teamSlot})");
                 }
             }
         }
@@ -91,16 +79,13 @@ public class GuiBattleState
             var active = perspective.OpponentSide.Active[battlePosition];
             if (active != null)
             {
-                // Find the team member that matches this active Pokemon by slot index
                 var teamSlot = active.Position;
                 if (teamSlot >= 0 && teamSlot < _opponentTeam.Count)
                 {
                     var pokemon = _opponentTeam[teamSlot];
                     pokemon.IsActive = true;
-                    pokemon.Position = battlePosition; // Set the battle field position (0 or 1 for doubles)
-                    // KEY FIX: Use battlePosition as the key, not teamSlot!
+                    pokemon.Position = battlePosition;
                     _opponentActive[battlePosition] = pokemon;
-                    Console.WriteLine($"[GuiBattleState] Opponent battle position {battlePosition}: {pokemon.Name} (from team slot {teamSlot})");
                 }
             }
         }
@@ -244,11 +229,9 @@ public class GuiBattleState
         var pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
         if (pokemon != null)
         {
-            // Check if this Pokemon is already active - if so, don't process the switch
-            // (This handles initial switch-in messages at battle start)
+            // Check if this Pokemon is already active - ignore initial switch-in messages
             if (pokemon.IsActive)
             {
-                Console.WriteLine($"[GuiBattleState] Player {pokemon.Name} is already active, ignoring switch message");
                 return (SideId.P1, -1, null);
             }
             
@@ -265,11 +248,9 @@ public class GuiBattleState
         pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
         if (pokemon != null)
         {
-            // Check if this Pokemon is already active - if so, don't process the switch
-            // (This handles initial switch-in messages at battle start)
+            // Check if this Pokemon is already active - ignore initial switch-in messages
             if (pokemon.IsActive)
             {
-                Console.WriteLine($"[GuiBattleState] Opponent {pokemon.Name} is already active, ignoring switch message");
                 return (SideId.P2, -1, null);
             }
             

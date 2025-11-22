@@ -851,11 +851,8 @@ public class BattleRenderer(
     {
         _playerPokemonBoxes.Clear();
         
-        Console.WriteLine($"[BattleRenderer] RenderPlayerPokemonFromState: PlayerActive count = {state.PlayerActive.Count}");
         foreach (var (slot, pokemon) in state.PlayerActive)
         {
-            Console.WriteLine($"[BattleRenderer] Player slot {slot}: {pokemon.Name}, IsActive={pokemon.IsActive}, IsFainted={pokemon.IsFainted}");
-            
             // Don't render if fainted and switched out
             if (pokemon.IsFainted && !pokemon.IsActive) continue;
             
@@ -879,11 +876,8 @@ public class BattleRenderer(
     {
         _opponentPokemonBoxes.Clear();
         
-        Console.WriteLine($"[BattleRenderer] RenderOpponentPokemonFromState: OpponentActive count = {state.OpponentActive.Count}");
         foreach (var (slot, pokemon) in state.OpponentActive)
         {
-            Console.WriteLine($"[BattleRenderer] Opponent slot {slot}: {pokemon.Name}, IsActive={pokemon.IsActive}, IsFainted={pokemon.IsFainted}");
-            
             // Don't render if fainted and switched out
             if (pokemon.IsFainted && !pokemon.IsActive) continue;
             

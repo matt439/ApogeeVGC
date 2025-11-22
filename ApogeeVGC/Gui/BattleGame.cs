@@ -340,8 +340,6 @@ public class BattleGame : Game
         // Start HP bar animation
         string key = $"{pokemon.Name}|{(int)pokemon.Side}";
         _animationManager?.StartHpBarAnimation(key, oldHp, newHp, pokemon.MaxHp);
-        
-        Console.WriteLine($"[BattleGame] {pokemon.Name} damaged: {oldHp} -> {newHp}");
     }
     
     /// <summary>
@@ -349,7 +347,6 @@ public class BattleGame : Game
     /// </summary>
     private void OnPokemonFainted(PokemonState pokemon)
     {
-        Console.WriteLine($"[BattleGame] {pokemon.Name} fainted!");
         // Could trigger faint animation here
     }
     
@@ -358,7 +355,7 @@ public class BattleGame : Game
     /// </summary>
     private void OnPokemonSwitchedIn(PokemonState pokemon, int slot)
     {
-        Console.WriteLine($"[BattleGame] {pokemon.Name} switched into slot {slot}");
+        // Could trigger switch-in animation here
     }
     
     /// <summary>
@@ -366,7 +363,7 @@ public class BattleGame : Game
     /// </summary>
     private void OnPokemonSwitchedOut(PokemonState pokemon, int slot)
     {
-        Console.WriteLine($"[BattleGame] {pokemon.Name} switched out of slot {slot}");
+        // Could trigger switch-out animation here
     }
     
     /// <summary>
@@ -374,7 +371,7 @@ public class BattleGame : Game
     /// </summary>
     private void OnTurnStarted(int turnNumber)
     {
-        Console.WriteLine($"[BattleGame] Turn {turnNumber} started");
+        // Turn started - could show turn indicator here
     }
 
     /// <summary>
