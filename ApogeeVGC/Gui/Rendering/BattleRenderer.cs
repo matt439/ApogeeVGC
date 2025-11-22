@@ -84,6 +84,12 @@ public class BattleRenderer(
 
     // Cached pixel texture for drawing filled rectangles (HP bars)
     private Texture2D? _pixelTexture;
+    
+    // Cached Pokemon to show during faint animations (set by BattleGame)
+    private Dictionary<int, PokemonPerspective>? _cachedPlayerActive;
+    private Dictionary<int, PokemonPerspective>? _cachedOpponentActive;
+    private HashSet<int>? _pendingFaintPlayer;
+    private HashSet<int>? _pendingFaintOpponent;
 
     // Track last perspective type to avoid spam logging
     private BattlePerspectiveType? _lastPerspectiveType;
@@ -109,6 +115,21 @@ public class BattleRenderer(
     public void SetAnimationManager(AnimationManager animationManager)
     {
         _animationManager = animationManager;
+    }
+
+    /// <summary>
+    /// Set the cached Pokemon data for showing faint animations
+    /// </summary>
+    public void SetCachedPokemon(
+        Dictionary<int, PokemonPerspective> cachedPlayerActive,
+        Dictionary<int, PokemonPerspective> cachedOpponentActive,
+        HashSet<int> pendingFaintPlayer,
+        HashSet<int> pendingFaintOpponent)
+    {
+        _cachedPlayerActive = cachedPlayerActive;
+        _cachedOpponentActive = cachedOpponentActive;
+        _pendingFaintPlayer = pendingFaintPlayer;
+        _pendingFaintOpponent = pendingFaintOpponent;
     }
 
     /// <summary>
@@ -302,7 +323,18 @@ public class BattleRenderer(
         _playerPokemonBoxes.Clear();
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
-            PokemonPerspective? pokemon = battlePerspective.PlayerSide.Active[i];
+            // Use cached Pokemon if slot is pending faint, otherwise use perspective Pokemon
+            PokemonPerspective? pokemon;
+            if (_pendingFaintPlayer != null && _pendingFaintPlayer.Contains(i) &&
+                _cachedPlayerActive != null && _cachedPlayerActive.TryGetValue(i, out var cached))
+            {
+                pokemon = cached; // Show cached Pokemon during faint animation
+            }
+            else
+            {
+                pokemon = battlePerspective.PlayerSide.Active[i];
+            }
+            
             if (pokemon == null) continue;
 
             int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
@@ -330,7 +362,18 @@ public class BattleRenderer(
         _opponentPokemonBoxes.Clear();
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
-            PokemonPerspective? pokemon = battlePerspective.OpponentSide.Active[i];
+            // Use cached Pokemon if slot is pending faint, otherwise use perspective Pokemon
+            PokemonPerspective? pokemon;
+            if (_pendingFaintOpponent != null && _pendingFaintOpponent.Contains(i) &&
+                _cachedOpponentActive != null && _cachedOpponentActive.TryGetValue(i, out var cached))
+            {
+                pokemon = cached; // Show cached Pokemon during faint animation
+            }
+            else
+            {
+                pokemon = battlePerspective.OpponentSide.Active[i];
+            }
+            
             if (pokemon == null) continue;
 
             int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));

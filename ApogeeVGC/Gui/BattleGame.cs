@@ -31,6 +31,12 @@ public class BattleGame : Game
     private readonly Lock _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown;
+    
+    // Cache Active Pokemon to show fainting process before replacement
+    private readonly Dictionary<int, PokemonPerspective> _cachedPlayerActive = new();
+    private readonly Dictionary<int, PokemonPerspective> _cachedOpponentActive = new();
+    private readonly HashSet<int> _pendingFaintPlayer = new();
+    private readonly HashSet<int> _pendingFaintOpponent = new();
 
     // Message queue for battle events
     private readonly List<BattleMessage> _messageQueue = [];
@@ -310,6 +316,31 @@ public class BattleGame : Game
     {
         lock (_stateLock)
         {
+            // Initialize cache on first InBattle perspective if empty
+            if (perspective.PerspectiveType == BattlePerspectiveType.InBattle &&
+                _cachedPlayerActive.Count == 0 && _cachedOpponentActive.Count == 0)
+            {
+                for (int i = 0; i < perspective.PlayerSide.Active.Count; i++)
+                {
+                    var pokemon = perspective.PlayerSide.Active[i];
+                    if (pokemon != null)
+                    {
+                        _cachedPlayerActive[i] = pokemon;
+                        Console.WriteLine($"[BattleGame] Initial cache player slot {i}: {pokemon.Name}");
+                    }
+                }
+                
+                for (int i = 0; i < perspective.OpponentSide.Active.Count; i++)
+                {
+                    var pokemon = perspective.OpponentSide.Active[i];
+                    if (pokemon != null)
+                    {
+                        _cachedOpponentActive[i] = pokemon;
+                        Console.WriteLine($"[BattleGame] Initial cache opponent slot {i}: {pokemon.Name}");
+                    }
+                }
+            }
+            
             _currentBattlePerspective = perspective;
         }
     }
@@ -332,12 +363,239 @@ public class BattleGame : Game
             }
         }
 
-        // Process messages through animation coordinator
+        // Process messages through animation coordinator and handle special messages
         if (_animationCoordinator != null)
         {
             foreach (var message in battleMessages)
             {
+                // Handle DamageMessage - update cached Pokemon HP
+                if (message is DamageMessage damageMsg)
+                {
+                    HandleDamageMessage(damageMsg);
+                }
+                // Handle FaintMessage - mark slot as pending faint
+                else if (message is FaintMessage faintMsg)
+                {
+                    HandleFaintMessage(faintMsg);
+                }
+                // Handle SwitchMessage - update cached Pokemon
+                else if (message is SwitchMessage switchMsg)
+                {
+                    HandleSwitchMessage(switchMsg);
+                }
+                // Handle TurnStartMessage - refresh cache HP values while preserving sprites
+                else if (message is TurnStartMessage turnStartMsg)
+                {
+                    if (_currentBattlePerspective != null && 
+                        _currentBattlePerspective.PerspectiveType == BattlePerspectiveType.InBattle)
+                    {
+                        if (turnStartMsg.TurnNumber > 1)
+                        {
+                            // Update cache: For slots NOT pending faint, replace entirely
+                            // For slots pending faint, only update HP values (keep the fainted Pokemon's sprite)
+                            for (int i = 0; i < _currentBattlePerspective.PlayerSide.Active.Count; i++)
+                            {
+                                var pokemon = _currentBattlePerspective.PlayerSide.Active[i];
+                                if (pokemon != null)
+                                {
+                                    if (!_pendingFaintPlayer.Contains(i))
+                                    {
+                                        _cachedPlayerActive[i] = pokemon;
+                                        Console.WriteLine($"[BattleGame] Turn {turnStartMsg.TurnNumber} start: Updated player slot {i}: {pokemon.Name}");
+                                    }
+                                    else if (_cachedPlayerActive.TryGetValue(i, out var cached))
+                                    {
+                                        // Update HP but keep the cached Pokemon (for sprite continuity)
+                                        // Don't update - the perspective shows the REPLACEMENT Pokemon here
+                                        Console.WriteLine($"[BattleGame] Turn {turnStartMsg.TurnNumber} start: Kept cached player slot {i}: {cached.Name} (pending faint)");
+                                    }
+                                }
+                            }
+                            
+                            for (int i = 0; i < _currentBattlePerspective.OpponentSide.Active.Count; i++)
+                            {
+                                var pokemon = _currentBattlePerspective.OpponentSide.Active[i];
+                                if (pokemon != null)
+                                {
+                                    if (!_pendingFaintOpponent.Contains(i))
+                                    {
+                                        _cachedOpponentActive[i] = pokemon;
+                                        Console.WriteLine($"[BattleGame] Turn {turnStartMsg.TurnNumber} start: Updated opponent slot {i}: {pokemon.Name}");
+                                    }
+                                    else if (_cachedOpponentActive.TryGetValue(i, out var cached))
+                                    {
+                                        // Keep cached Pokemon (for sprite continuity)
+                                        Console.WriteLine($"[BattleGame] Turn {turnStartMsg.TurnNumber} start: Kept cached opponent slot {i}: {cached.Name} (pending faint)");
+                                    }
+                                }
+                            }
+                        }
+                        else if (turnStartMsg.TurnNumber == 1)
+                        {
+                            // First turn: initialize cache
+                            _cachedPlayerActive.Clear();
+                            _cachedOpponentActive.Clear();
+                            
+                            for (int i = 0; i < _currentBattlePerspective.PlayerSide.Active.Count; i++)
+                            {
+                                var pokemon = _currentBattlePerspective.PlayerSide.Active[i];
+                                if (pokemon != null)
+                                {
+                                    _cachedPlayerActive[i] = pokemon;
+                                    Console.WriteLine($"[BattleGame] Turn 1 start: Initial cache player slot {i}: {pokemon.Name}");
+                                }
+                            }
+                            
+                            for (int i = 0; i < _currentBattlePerspective.OpponentSide.Active.Count; i++)
+                            {
+                                var pokemon = _currentBattlePerspective.OpponentSide.Active[i];
+                                if (pokemon != null)
+                                {
+                                    _cachedOpponentActive[i] = pokemon;
+                                    Console.WriteLine($"[BattleGame] Turn 1 start: Initial cache opponent slot {i}: {pokemon.Name}");
+                                }
+                            }
+                        }
+                    }
+                    
+                    // DON'T clear pending faints here!
+                    // They should only be cleared when SwitchMessage arrives
+                    // This ensures the fainted Pokemon remains visible until replaced
+                }
+                
                 _animationCoordinator.ProcessMessage(message);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Handle a DamageMessage by updating the cached Pokemon's HP
+    /// </summary>
+    private void HandleDamageMessage(DamageMessage damageMsg)
+    {
+        // Update the cached Pokemon's HP so it reflects the damage taken
+        bool isPlayer = damageMsg.SideId == SideId.P1;
+        
+        if (isPlayer)
+        {
+            foreach (var kvp in _cachedPlayerActive.ToList())
+            {
+                if (kvp.Value.Name == damageMsg.PokemonName)
+                {
+                    // Create updated Pokemon with new HP
+                    var updated = kvp.Value with { Hp = damageMsg.RemainingHp };
+                    _cachedPlayerActive[kvp.Key] = updated;
+                    Console.WriteLine($"[BattleGame] Updated cached player {damageMsg.PokemonName} HP: {damageMsg.RemainingHp}/{damageMsg.MaxHp}");
+                    break;
+                }
+            }
+        }
+        else
+        {
+            foreach (var kvp in _cachedOpponentActive.ToList())
+            {
+                if (kvp.Value.Name == damageMsg.PokemonName)
+                {
+                    // Create updated Pokemon with new HP
+                    var updated = kvp.Value with { Hp = damageMsg.RemainingHp };
+                    _cachedOpponentActive[kvp.Key] = updated;
+                    Console.WriteLine($"[BattleGame] Updated cached opponent {damageMsg.PokemonName} HP: {damageMsg.RemainingHp}/{damageMsg.MaxHp}");
+                    break;
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Handle a FaintMessage by marking the slot as pending faint
+    /// </summary>
+    private void HandleFaintMessage(FaintMessage faintMsg)
+    {
+        if (_currentBattlePerspective == null) return;
+        
+        // Determine if this is a player or opponent Pokemon
+        bool isPlayer = faintMsg.SideId == SideId.P1;
+        
+        Console.WriteLine($"[BattleGame] HandleFaintMessage: {faintMsg.PokemonName} (Side: {faintMsg.SideId})");
+        
+        // Find which slot the fainted Pokemon was in by checking our cache
+        // (The perspective may already show the replacement Pokemon)
+        if (isPlayer)
+        {
+            Console.WriteLine($"[BattleGame] Player cache contains {_cachedPlayerActive.Count} entries:");
+            foreach (var kvp in _cachedPlayerActive)
+            {
+                Console.WriteLine($"  Slot {kvp.Key}: {kvp.Value.Name}");
+            }
+            
+            for (int slot = 0; slot < _cachedPlayerActive.Count; slot++)
+            {
+                if (_cachedPlayerActive.TryGetValue(slot, out var cached) && 
+                    cached.Name == faintMsg.PokemonName)
+                {
+                    _pendingFaintPlayer.Add(slot);
+                    Console.WriteLine($"[BattleGame] ? Marked player slot {slot} as pending faint: {cached.Name}");
+                    break;
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine($"[BattleGame] Opponent cache contains {_cachedOpponentActive.Count} entries:");
+            foreach (var kvp in _cachedOpponentActive)
+            {
+                Console.WriteLine($"  Slot {kvp.Key}: {kvp.Value.Name}");
+            }
+            
+            for (int slot = 0; slot < _cachedOpponentActive.Count; slot++)
+            {
+                if (_cachedOpponentActive.TryGetValue(slot, out var cached) && 
+                    cached.Name == faintMsg.PokemonName)
+                {
+                    _pendingFaintOpponent.Add(slot);
+                    Console.WriteLine($"[BattleGame] ? Marked opponent slot {slot} as pending faint: {cached.Name}");
+                    break;
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Handle a SwitchMessage by clearing the pending faint for that slot
+    /// </summary>
+    private void HandleSwitchMessage(SwitchMessage switchMsg)
+    {
+        if (_currentBattlePerspective == null) return;
+        
+        // Determine which side is switching
+        // The trainer name tells us which side
+        bool isPlayer = switchMsg.TrainerName == _currentBattlePerspective.PlayerSide.Pokemon[0].Name 
+            || _currentBattlePerspective.PlayerSide.Pokemon.Any(p => p.Name == switchMsg.PokemonName);
+        
+        // Find the slot where this Pokemon appears in the new perspective
+        var activeList = isPlayer 
+            ? _currentBattlePerspective.PlayerSide.Active 
+            : _currentBattlePerspective.OpponentSide.Active;
+            
+        for (int slot = 0; slot < activeList.Count; slot++)
+        {
+            var pokemon = activeList[slot];
+            if (pokemon != null && pokemon.Name == switchMsg.PokemonName)
+            {
+                // Clear pending faint and cache for this slot
+                if (isPlayer)
+                {
+                    _pendingFaintPlayer.Remove(slot);
+                    _cachedPlayerActive.Remove(slot);
+                    Console.WriteLine($"[BattleGame] Cleared player slot {slot} cache after switch to {pokemon.Name}");
+                }
+                else
+                {
+                    _pendingFaintOpponent.Remove(slot);
+                    _cachedOpponentActive.Remove(slot);
+                    Console.WriteLine($"[BattleGame] Cleared opponent slot {slot} cache after switch to {pokemon.Name}");
+                }
+                break;
             }
         }
     }
@@ -365,32 +623,63 @@ public class BattleGame : Game
             // In GUI battles, Player 1 is always the GUI player and is always SideId.P1
             _animationCoordinator.SetPlayerSideId(SideId.P1);
             
-            // Register player Pokemon
+            // Register player Pokemon (ALWAYS use cached if available to maintain position consistency)
             for (int i = 0; i < perspectiveToRender.PlayerSide.Active.Count; i++)
             {
-                var pokemon = perspectiveToRender.PlayerSide.Active[i];
+                PokemonPerspective? pokemon;
+                // Use cached Pokemon if it exists (regardless of pending faint status)
+                // This ensures animations target the correct Pokemon name
+                if (_cachedPlayerActive.TryGetValue(i, out var cached))
+                {
+                    pokemon = cached;
+                }
+                else
+                {
+                    pokemon = perspectiveToRender.PlayerSide.Active[i];
+                }
+                
                 if (pokemon != null)
                 {
                     // Use same position calculation as BattleRenderer
                     int xPosition = 20 + (i * 188); // InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing))
                     var position = new Vector2(xPosition + 64, 400 + 64); // Center of sprite
                     _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, i, true);
+                    Console.WriteLine($"[BattleGame.Draw] Registered player slot {i}: {pokemon.Name} at position {position}");
                 }
             }
             
-            // Register opponent Pokemon
+            // Register opponent Pokemon (ALWAYS use cached if available)
             for (int i = 0; i < perspectiveToRender.OpponentSide.Active.Count; i++)
             {
-                var pokemon = perspectiveToRender.OpponentSide.Active[i];
+                PokemonPerspective? pokemon;
+                // Use cached Pokemon if it exists (regardless of pending faint status)
+                // This ensures animations target the correct Pokemon name
+                if (_cachedOpponentActive.TryGetValue(i, out var cached))
+                {
+                    pokemon = cached;
+                }
+                else
+                {
+                    pokemon = perspectiveToRender.OpponentSide.Active[i];
+                }
+                
                 if (pokemon != null)
                 {
                     // Use same position calculation as BattleRenderer
                     int xPosition = 480 + (i * 188); // InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing))
                     var position = new Vector2(xPosition + 64, 80 + 64); // Center of sprite
                     _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, i, false);
+                    Console.WriteLine($"[BattleGame.Draw] Registered opponent slot {i}: {pokemon.Name} at position {position}");
                 }
             }
         }
+
+        // Pass cached Pokemon data to renderer
+        _battleRenderer?.SetCachedPokemon(
+            _cachedPlayerActive,
+            _cachedOpponentActive,
+            _pendingFaintPlayer,
+            _pendingFaintOpponent);
 
         // Render battle using the renderer
         _battleRenderer?.Render(gameTime, perspectiveToRender);
