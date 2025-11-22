@@ -418,17 +418,11 @@ public partial class ChoiceInputManager
         int moveButtonCount = _buttons.Count;
         bool hasTeraButton = false;
 
-        // Check if last button is a Tera button (it will have "TERA" in its text)
+        // Check if last button is a Tera button by checking its text
         if (_buttons.Count > 0)
         {
-            // Tera button is always added last in CreateMoveSelectionButtons
-            // It will have wider width than move buttons
             var lastButton = _buttons[^1];
-            // We can identify Tera button by checking if button count is 5 (4 moves + tera)
-            // or 4 (3 moves + tera), etc.
-            // For simplicity, check button bounds - tera spans full width
-            hasTeraButton = _buttons.Count > 4 ||
-                            (_buttons.Count > 0 && lastButton.Bounds.Width > 200);
+            hasTeraButton = lastButton.Text.Contains("Tera", StringComparison.OrdinalIgnoreCase);
         }
 
         if (hasTeraButton)
@@ -436,124 +430,31 @@ public partial class ChoiceInputManager
             moveButtonCount = _buttons.Count - 1;
         }
 
-        // Determine current position in grid
+        // Determine current position
         bool isOnTeraButton = hasTeraButton && _selectedButtonIndex == _buttons.Count - 1;
-        int currentMoveIndex = isOnTeraButton ? -1 : _selectedButtonIndex;
 
-        // Handle navigation
+        // Handle navigation - simple up/down for single column
         if (IsKeyPressed(keyboardState, Keys.Up))
         {
             Console.WriteLine("[ProcessMoveSelectionGridNavigation] UP key pressed");
-            if (isOnTeraButton)
+            _selectedButtonIndex--;
+            if (_selectedButtonIndex < 0)
             {
-                // From Tera, go to move 3 (index 2) if it exists, otherwise move 1 (index 0)
-                _selectedButtonIndex = moveButtonCount >= 3 ? 2 : 0;
-            }
-            else
-            {
-                // From move buttons
-                if (currentMoveIndex < 2)
-                {
-                    // From move 1 or 2 (top row), go to Tera if available, otherwise wrap to bottom row
-                    if (hasTeraButton)
-                    {
-                        _selectedButtonIndex = _buttons.Count - 1; // Tera button
-                    }
-                    else
-                    {
-                        // Wrap to bottom row
-                        _selectedButtonIndex = currentMoveIndex + 2;
-                        if (_selectedButtonIndex >= moveButtonCount)
-                            _selectedButtonIndex = moveButtonCount - 1;
-                    }
-                }
-                else
-                {
-                    // From move 3 or 4 (bottom row), go to move 1 or 2 (top row)
-                    _selectedButtonIndex = currentMoveIndex - 2;
-                }
+                // Wrap to last button (Tera if available, otherwise last move)
+                _selectedButtonIndex = _buttons.Count - 1;
             }
         }
         else if (IsKeyPressed(keyboardState, Keys.Down))
         {
             Console.WriteLine("[ProcessMoveSelectionGridNavigation] DOWN key pressed");
-            if (isOnTeraButton)
+            _selectedButtonIndex++;
+            if (_selectedButtonIndex >= _buttons.Count)
             {
-                // From Tera, go to move 1 (index 0)
+                // Wrap to first button
                 _selectedButtonIndex = 0;
             }
-            else
-            {
-                // From move buttons
-                if (currentMoveIndex < 2)
-                {
-                    // From move 1 or 2 (top row), go to move 3 or 4 (bottom row)
-                    _selectedButtonIndex = currentMoveIndex + 2;
-                    if (_selectedButtonIndex >= moveButtonCount)
-                    {
-                        // If move 3/4 doesn't exist, go to Tera or wrap
-                        _selectedButtonIndex =
-                            hasTeraButton ? _buttons.Count - 1 : currentMoveIndex;
-                    }
-                }
-                else
-                {
-                    // From move 3 or 4 (bottom row), go to Tera if available, otherwise wrap to top
-                    _selectedButtonIndex =
-                        hasTeraButton ? _buttons.Count - 1 : currentMoveIndex - 2;
-                }
-            }
         }
-        else if (IsKeyPressed(keyboardState, Keys.Left))
-        {
-            Console.WriteLine("[ProcessMoveSelectionGridNavigation] LEFT key pressed");
-            if (!isOnTeraButton)
-            {
-                // Swap within row: move 1 <-> 2, move 3 <-> 4
-                if (currentMoveIndex == 0 && moveButtonCount >= 2)
-                {
-                    _selectedButtonIndex = 1; // Move 1 left goes to 2
-                }
-                else if (currentMoveIndex == 1)
-                {
-                    _selectedButtonIndex = 0; // Move 2 left goes to 1
-                }
-                else if (currentMoveIndex == 2 && moveButtonCount >= 4)
-                {
-                    _selectedButtonIndex = 3; // Move 3 left goes to 4
-                }
-                else if (currentMoveIndex == 3 && moveButtonCount >= 3)
-                {
-                    _selectedButtonIndex = 2; // Move 4 left goes to 3
-                }
-            }
-            // Tera button doesn't respond to left/right
-        }
-        else if (IsKeyPressed(keyboardState, Keys.Right))
-        {
-            Console.WriteLine("[ProcessMoveSelectionGridNavigation] RIGHT key pressed");
-            if (!isOnTeraButton)
-            {
-                // Swap within row: move 2 <-> 1, move 4 <-> 3
-                if (currentMoveIndex == 1)
-                {
-                    _selectedButtonIndex = 0; // Move 2 right goes to 1
-                }
-                else if (currentMoveIndex == 0 && moveButtonCount >= 2)
-                {
-                    _selectedButtonIndex = 1; // Move 1 right goes to 2
-                }
-                else if (currentMoveIndex == 3 && moveButtonCount >= 3)
-                {
-                    _selectedButtonIndex = 2; // Move 4 right goes to 3
-                }
-                else if (currentMoveIndex == 2 && moveButtonCount >= 4)
-                {
-                    _selectedButtonIndex = 3; // Move 3 right goes to 4
-                }
-            }
-            // Tera button doesn't respond to left/right
-        }
+        // Left/Right keys do nothing in single-column layout
     }
 
     // Main battle state machine navigation methods

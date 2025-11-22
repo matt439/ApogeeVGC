@@ -262,29 +262,21 @@ public static class MainBattleUiHelper
             Color teraColor = GetTeraTypeColor(teraType.Value);
             string teraTypeName = teraType.Value.ToString().ToUpper();
             
-            // Position below the move grid
-            int teraButtonX = LeftMargin;
-            int teraButtonY = TopMargin + (2 * (MoveButtonHeight + MoveVerticalSpacing)) + MoveVerticalSpacing;
-            int teraButtonWidth = (MoveButtonWidth * 2) + MoveHorizontalSpacing; // Span full width of grid
-            
+            // Position below the last move button
+            int numMoveRows = (availableMoves.Count + MoveGridColumns - 1) / MoveGridColumns; // Ceiling division
+            int teraButtonY = TopMargin + (numMoveRows * (MoveButtonHeight + MoveVerticalSpacing)) + MoveVerticalSpacing;
+
             // Split text into white "Tera " prefix and colored type name
-            string teraPrefix = "Tera ";
-            string teraTypeText = teraTypeName;
-            
+            const string teraPrefix = "Tera ";
+
             // Visual feedback through background color:
             // - Active (ON): Use the full type color for maximum visibility
             // - Inactive (OFF): Use a light gray that's very easy to see
-            Color teraButtonBg;
-            if (isTerastallized)
-            {
+            Color teraButtonBg =
                 // Active: Use the FULL BRIGHT type color - maximum saturation
-                teraButtonBg = teraColor;
-            }
-            else
-            {
+                isTerastallized ? teraColor :
                 // Inactive: Use a LIGHT gray - much brighter so it's super obvious
-                teraButtonBg = new Color(TeraInactiveColorR, TeraInactiveColorG, TeraInactiveColorB);
-            }
+                new Color(TeraInactiveColorR, TeraInactiveColorG, TeraInactiveColorB);
             
             Console.WriteLine($"[MainBattleUiHelper] Tera button: Type={teraTypeName}, Active={isTerastallized}, BgColor=({teraButtonBg.R},{teraButtonBg.G},{teraButtonBg.B})");
             
@@ -293,12 +285,12 @@ public static class MainBattleUiHelper
             Color typeTextColor = isTerastallized ? Color.White : teraColor;
             
             var teraToggleButton = new ChoiceButton(
-                new Rectangle(teraButtonX, teraButtonY, teraButtonWidth, TeraButtonHeight),
+                new Rectangle(LeftMargin, teraButtonY, MoveButtonWidth, TeraButtonHeight),
                 teraPrefix,           // Primary text (white)
                 teraButtonBg,         // Background color shows activation state
                 toggleTera,
                 Color.White,          // Primary text color (always white)
-                teraTypeText,         // Secondary text (type name)
+                teraTypeName,         // Secondary text (type name)
                 typeTextColor         // Secondary text color (white when active, type color when inactive)
             );
             buttons.Add(teraToggleButton);
