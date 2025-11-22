@@ -161,18 +161,23 @@ public partial class ChoiceInputManager
             $"[SubmitTeamPreviewChoice] Building team preview choice from {_lockedInPositions.Count} locked positions");
 
         // Build the team preview choice with the locked-in order
-        // Map the locked-in Pokemon indices to actual Pokemon from the request
-        var actions = _lockedInPositions.Select((pokemonIndex, orderPosition) =>
+        // _lockedInPositions contains the Pokemon indices in the order they were locked in
+        // For each position in the new team order:
+        //   - Index = newPosition (where this Pokemon will be placed in the team: 0, 1, 2, ...)
+        //   - TargetLoc = originalPokemonIndex (which Pokemon from the original team to use)
+        //   - Priority = -newPosition (earlier positions have higher priority for sorting)
+        var actions = _lockedInPositions.Select((originalPokemonIndex, newPosition) =>
         {
             Console.WriteLine(
-                $"[SubmitTeamPreviewChoice] Creating action: pokemonIndex={pokemonIndex}, orderPosition={orderPosition}, Priority={-orderPosition}");
+                $"[SubmitTeamPreviewChoice] Creating action: originalPokemonIndex={originalPokemonIndex}, newPosition={newPosition}, Priority={-newPosition}");
             return new ChosenAction
             {
                 Choice = ChoiceType.Team,
-                Pokemon = null, // Will be filled in by battle system
+                Pokemon = null, // Will be filled in by battle system using TargetLoc
                 MoveId = MoveId.None,
-                Index = pokemonIndex, // This is the key field - which Pokemon position
-                Priority = -orderPosition, // Earlier picks have higher priority
+                Index = newPosition, // The new position in the team (0, 1, 2, ...)
+                TargetLoc = originalPokemonIndex, // Which Pokemon from the original team to use
+                Priority = -newPosition, // Earlier picks have higher priority (0, -1, -2, ...)
             };
         }).ToList();
 
@@ -255,9 +260,18 @@ public partial class ChoiceInputManager
         if (CurrentRequestType == BattleRequestType.TeamPreview)
             return;
 
-        // Disable mouse input for main battle (arrow key navigation only)
+        // Handle mouse input for target selection (clicking Pokemon boxes)
         if (CurrentRequestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
-            return;
+        {
+            bool isTargetSelection = MainBattleState == MainBattlePhaseState.TargetSelectionFirstPokemon ||
+                                     MainBattleState == MainBattlePhaseState.TargetSelectionSecondPokemon;
+
+            if (isTargetSelection && IsMouseClicked(mouseState))
+            {
+                ProcessTargetSelectionMouseClick(mouseState);
+            }
+            return; // No other mouse input during main battle
+        }
 
         // Check button clicks (for legacy UI only)
         if (IsMouseClicked(mouseState))
@@ -270,6 +284,38 @@ public partial class ChoiceInputManager
                     button.OnClick();
                     break;
                 }
+            }
+        }
+    }
+
+    private void ProcessTargetSelectionMouseClick(MouseState mouseState)
+    {
+        if (_battleRenderer == null) return;
+
+        var mousePos = new Point(mouseState.X, mouseState.Y);
+
+        // Check each valid target to see if it was clicked
+        foreach (int targetLoc in ValidTargets)
+        {
+            Rectangle? box;
+
+            if (targetLoc > 0)
+            {
+                // Opponent target (positive location)
+                box = _battleRenderer.GetOpponentPokemonBox(targetLoc - 1);
+            }
+            else
+            {
+                // Ally target (negative location)
+                box = _battleRenderer.GetPlayerPokemonBox((-targetLoc) - 1);
+            }
+
+            if (box.HasValue && box.Value.Contains(mousePos))
+            {
+                // Target was clicked - handle selection
+                int pokemonIndex = MainBattleState == MainBattlePhaseState.TargetSelectionFirstPokemon ? 0 : 1;
+                HandleTargetSelection(pokemonIndex, targetLoc);
+                break;
             }
         }
     }

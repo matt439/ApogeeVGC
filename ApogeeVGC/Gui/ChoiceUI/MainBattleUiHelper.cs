@@ -372,6 +372,10 @@ public static class MainBattleUiHelper
                 $"Select a move for {firstPokemonName ?? "Pokemon 1"}.",
             MainBattlePhaseState.MoveSelectionSecondPokemon =>
                 $"Select a move for {secondPokemonName ?? "Pokemon 2"}.",
+            MainBattlePhaseState.TargetSelectionFirstPokemon =>
+                $"Click a Pokemon or use LEFT/RIGHT arrows to select target for {firstPokemonName ?? "Pokemon 1"}'s move.",
+            MainBattlePhaseState.TargetSelectionSecondPokemon =>
+                $"Click a Pokemon or use LEFT/RIGHT arrows to select target for {secondPokemonName ?? "Pokemon 2"}'s move.",
             MainBattlePhaseState.SwitchSelectionFirstPokemon =>
                 "Select a Pokemon to switch in.",
             MainBattlePhaseState.SwitchSelectionSecondPokemon =>

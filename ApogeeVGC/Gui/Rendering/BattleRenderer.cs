@@ -84,6 +84,10 @@ public class BattleRenderer(
     // Track last perspective type to avoid spam logging
     private BattlePerspectiveType? _lastPerspectiveType;
 
+    // Target selection state
+    private readonly Dictionary<int, XnaRectangle> _playerPokemonBoxes = new();
+    private readonly Dictionary<int, XnaRectangle> _opponentPokemonBoxes = new();
+
     /// <summary>
     /// Set the choice input manager to access team preview state
     /// </summary>
@@ -274,13 +278,23 @@ public class BattleRenderer(
         // Render only active Pokemon
         // Position them in left half, offset to the right of opponent Pokemon
 
+        _playerPokemonBoxes.Clear();
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
             PokemonPerspective? pokemon = battlePerspective.PlayerSide.Active[i];
             if (pokemon == null) continue;
 
             int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
-            RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, InBattlePlayerYOffset));
+            var position = new XnaVector2(xPosition, InBattlePlayerYOffset);
+
+            // Store box rectangle for hit testing
+            _playerPokemonBoxes[i] = new XnaRectangle(
+                (int)position.X,
+                (int)position.Y,
+                PokemonSpriteSize,
+                PokemonSpriteSize);
+
+            RenderPlayerPokemonInfo(pokemon, position);
         }
     }
 
@@ -292,14 +306,23 @@ public class BattleRenderer(
         // Render only active Pokemon
         // Position them in left half at the top
 
+        _opponentPokemonBoxes.Clear();
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
             PokemonPerspective? pokemon = battlePerspective.OpponentSide.Active[i];
             if (pokemon == null) continue;
 
             int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
+            var position = new XnaVector2(xPosition, InBattleOpponentYOffset);
 
-            RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, InBattleOpponentYOffset));
+            // Store box rectangle for hit testing
+            _opponentPokemonBoxes[i] = new XnaRectangle(
+                (int)position.X,
+                (int)position.Y,
+                PokemonSpriteSize,
+                PokemonSpriteSize);
+
+            RenderOpponentPokemonInfo(pokemon, position);
         }
     }
 
@@ -740,5 +763,80 @@ public class BattleRenderer(
 
         // Draw HP bar border
         DrawRectangle(backgroundRect, XnaColor.Black, HpBarBorderThickness);
+    }
+
+    // ===== TARGET SELECTION SUPPORT =====
+
+    /// <summary>
+    /// Get the rectangle for a player Pokemon box (for hit testing)
+    /// </summary>
+    public XnaRectangle? GetPlayerPokemonBox(int index)
+    {
+        return _playerPokemonBoxes.TryGetValue(index, out var rect) ? rect : null;
+    }
+
+    /// <summary>
+    /// Get the rectangle for an opponent Pokemon box (for hit testing)
+    /// </summary>
+    public XnaRectangle? GetOpponentPokemonBox(int index)
+    {
+        return _opponentPokemonBoxes.TryGetValue(index, out var rect) ? rect : null;
+    }
+
+    /// <summary>
+    /// Get all player Pokemon boxes
+    /// </summary>
+    public IReadOnlyDictionary<int, XnaRectangle> GetPlayerPokemonBoxes()
+    {
+        return _playerPokemonBoxes;
+    }
+
+    /// <summary>
+    /// Get all opponent Pokemon boxes
+    /// </summary>
+    public IReadOnlyDictionary<int, XnaRectangle> GetOpponentPokemonBoxes()
+    {
+        return _opponentPokemonBoxes;
+    }
+
+    /// <summary>
+    /// Render target selection overlay showing which Pokemon can be targeted
+    /// </summary>
+    /// <param name="validTargets">List of valid target locations (positive for opponents, negative for allies)</param>
+    /// <param name="highlightedTarget">Currently highlighted target location (or null)</param>
+    public void RenderTargetSelectionOverlay(List<int> validTargets, int? highlightedTarget)
+    {
+        foreach (int targetLoc in validTargets)
+        {
+            bool isHighlighted = highlightedTarget == targetLoc;
+            XnaRectangle? box;
+            XnaColor overlayColor;
+
+            if (targetLoc > 0)
+            {
+                // Opponent target (positive location)
+                box = GetOpponentPokemonBox(targetLoc - 1);
+                overlayColor = isHighlighted ? XnaColor.Red * 0.5f : XnaColor.Red * 0.2f;
+            }
+            else
+            {
+                // Ally target (negative location)
+                box = GetPlayerPokemonBox((-targetLoc) - 1);
+                overlayColor = isHighlighted ? XnaColor.Green * 0.5f : XnaColor.Green * 0.2f;
+            }
+
+            if (box.HasValue)
+            {
+                // Draw semi-transparent overlay
+                DrawFilledRectangle(box.Value, overlayColor);
+
+                // Draw highlighted border if this is the selected target
+                if (isHighlighted)
+                {
+                    XnaColor borderColor = targetLoc > 0 ? XnaColor.Red : XnaColor.Green;
+                    DrawRectangle(box.Value, borderColor, BorderThicknessHighlighted);
+                }
+            }
+        }
     }
 }

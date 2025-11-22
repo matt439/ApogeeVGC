@@ -237,6 +237,32 @@ public partial class ChoiceInputManager
             }
                 break;
 
+            case MainBattlePhaseState.TargetSelectionFirstPokemon:
+                Console.WriteLine(
+                    "[ChoiceInputManager.SetupMainBattleUi] Setting up TargetSelectionFirstPokemon (visual box selection)");
+                if (request.Active.Count > 0 && TurnSelection.FirstPokemonMoveIndex.HasValue)
+                {
+                    PokemonMoveRequestData pokemonData = request.Active[0];
+                    PokemonMoveData moveData = pokemonData.Moves[TurnSelection.FirstPokemonMoveIndex.Value];
+                    SetupVisualTargetSelection(moveData, 0); // Current Pokemon index
+                    Console.WriteLine(
+                        $"[ChoiceInputManager.SetupMainBattleUi] Set up {ValidTargets.Count} valid targets for visual selection");
+                }
+                break;
+
+            case MainBattlePhaseState.TargetSelectionSecondPokemon:
+                Console.WriteLine(
+                    "[ChoiceInputManager.SetupMainBattleUi] Setting up TargetSelectionSecondPokemon (visual box selection)");
+                if (request.Active.Count > 1 && TurnSelection.SecondPokemonMoveIndex.HasValue)
+                {
+                    PokemonMoveRequestData pokemonData = request.Active[1];
+                    PokemonMoveData moveData = pokemonData.Moves[TurnSelection.SecondPokemonMoveIndex.Value];
+                    SetupVisualTargetSelection(moveData, 1); // Current Pokemon index
+                    Console.WriteLine(
+                        $"[ChoiceInputManager.SetupMainBattleUi] Set up {ValidTargets.Count} valid targets for visual selection");
+                }
+                break;
+
             case MainBattlePhaseState.ForceSwitch:
             {
                 Console.WriteLine(
@@ -309,7 +335,7 @@ public partial class ChoiceInputManager
         var instructionPosition = MainBattleUiHelper.GetInstructionTextPosition();
         spriteBatch.DrawString(font, instructionText, instructionPosition, Color.White);
 
-        // Draw buttons with selection highlight
+        // Draw buttons with selection highlight (only for button-based states)
         for (int i = 0; i < _buttons.Count; i++)
         {
             bool isSelected = (i == _selectedButtonIndex);
@@ -357,6 +383,17 @@ public partial class ChoiceInputManager
 
     private void ProcessMainBattleKeyboardInput(KeyboardState keyboardState)
     {
+        // Check if we're in target selection state (visual box selection)
+        bool isTargetSelection = MainBattleState == MainBattlePhaseState.TargetSelectionFirstPokemon ||
+                                 MainBattleState == MainBattlePhaseState.TargetSelectionSecondPokemon;
+
+        if (isTargetSelection)
+        {
+            // Visual target selection navigation
+            ProcessTargetSelectionInput(keyboardState);
+            return;
+        }
+
         if (_buttons.Count == 0) return;
 
         // Check if we're in move selection state (uses grid navigation)
@@ -389,6 +426,43 @@ public partial class ChoiceInputManager
         if (IsKeyPressed(keyboardState, Keys.Escape))
         {
             Console.WriteLine("[ProcessMainBattleKeyboardInput] ESC key pressed, navigating back");
+            HandleEscapeKeyNavigation();
+        }
+    }
+
+    private void ProcessTargetSelectionInput(KeyboardState keyboardState)
+    {
+        if (ValidTargets.Count == 0) return;
+
+        // Left/Right arrows to cycle through valid targets
+        if (IsKeyPressed(keyboardState, Keys.Left))
+        {
+            _highlightedTargetIndex--;
+            if (_highlightedTargetIndex < 0)
+                _highlightedTargetIndex = ValidTargets.Count - 1; // Wrap
+            HighlightedTarget = ValidTargets[_highlightedTargetIndex];
+        }
+        else if (IsKeyPressed(keyboardState, Keys.Right))
+        {
+            _highlightedTargetIndex++;
+            if (_highlightedTargetIndex >= ValidTargets.Count)
+                _highlightedTargetIndex = 0; // Wrap
+            HighlightedTarget = ValidTargets[_highlightedTargetIndex];
+        }
+
+        // Enter to confirm target selection
+        if (IsKeyPressed(keyboardState, Keys.Enter))
+        {
+            if (HighlightedTarget.HasValue)
+            {
+                int pokemonIndex = MainBattleState == MainBattlePhaseState.TargetSelectionFirstPokemon ? 0 : 1;
+                HandleTargetSelection(pokemonIndex, HighlightedTarget.Value);
+            }
+        }
+
+        // ESC key for back
+        if (IsKeyPressed(keyboardState, Keys.Escape))
+        {
             HandleEscapeKeyNavigation();
         }
     }
@@ -475,10 +549,20 @@ public partial class ChoiceInputManager
                 TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon);
                 break;
 
+            case MainBattlePhaseState.TargetSelectionFirstPokemon:
+                // Go back to move selection for first Pokemon
+                TransitionToState(MainBattlePhaseState.MoveSelectionFirstPokemon);
+                break;
+
             case MainBattlePhaseState.MoveSelectionSecondPokemon:
             case MainBattlePhaseState.SwitchSelectionSecondPokemon:
                 // Go back to second Pokemon main menu
                 TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+                break;
+
+            case MainBattlePhaseState.TargetSelectionSecondPokemon:
+                // Go back to move selection for second Pokemon
+                TransitionToState(MainBattlePhaseState.MoveSelectionSecondPokemon);
                 break;
 
             case MainBattlePhaseState.MainMenuSecondPokemon:
@@ -490,34 +574,91 @@ public partial class ChoiceInputManager
         }
     }
 
+    /// <summary>
+    /// Check if a move requires target selection in doubles battles
+    /// </summary>
+    private bool MoveRequiresTargetSelection(PokemonMoveData moveData)
+    {
+        MoveTarget target = moveData.Move.Target;
+
+        // Moves that don't require target selection
+        if (target is MoveTarget.Self or MoveTarget.All or MoveTarget.AllySide
+            or MoveTarget.AllyTeam or MoveTarget.FoeSide or MoveTarget.AllAdjacent
+            or MoveTarget.AllAdjacentFoes or MoveTarget.Allies or MoveTarget.Field)
+        {
+            return false;
+        }
+
+        // Singles battles don't need target selection (except for ally-targeting moves)
+        if (_currentRequest is MoveRequest { Active.Count: <= 1 } &&
+            target is not (MoveTarget.AdjacentAlly or MoveTarget.AdjacentAllyOrSelf))
+        {
+            return false;
+        }
+
+        // Doubles battles with choosable targets
+        return target is MoveTarget.Normal or MoveTarget.AdjacentFoe or MoveTarget.Any
+            or MoveTarget.AdjacentAlly or MoveTarget.AdjacentAllyOrSelf or MoveTarget.RandomNormal;
+    }
+
     private void HandleMoveSelection(int pokemonIndex, int moveIndex, bool useTera)
     {
+        if (_currentRequest is not MoveRequest request) return;
+
         if (pokemonIndex == 0)
         {
             TurnSelection.FirstPokemonMoveIndex = moveIndex;
-            TurnSelection.FirstPokemonTarget = 0; // Default target
             TurnSelection.FirstPokemonSwitchIndex = null;
             TurnSelection.FirstPokemonTerastallize = useTera;
 
-            // In singles, submit immediately. In doubles, move to second Pokemon
-            if (_currentRequest is MoveRequest { Active.Count: > 1 })
+            // Check if we need to select a target
+            PokemonMoveRequestData pokemonData = request.Active[0];
+            PokemonMoveData moveData = pokemonData.Moves[moveIndex];
+
+            if (MoveRequiresTargetSelection(moveData))
             {
-                TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+                // Transition to target selection
+                TransitionToState(MainBattlePhaseState.TargetSelectionFirstPokemon);
             }
             else
             {
-                SubmitMainBattleTurnChoice();
+                // No target selection needed, use default target
+                TurnSelection.FirstPokemonTarget = 0;
+
+                // In singles, submit immediately. In doubles, move to second Pokemon
+                if (request.Active.Count > 1)
+                {
+                    TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+                }
+                else
+                {
+                    SubmitMainBattleTurnChoice();
+                }
             }
         }
         else if (pokemonIndex == 1)
         {
             TurnSelection.SecondPokemonMoveIndex = moveIndex;
-            TurnSelection.SecondPokemonTarget = 0; // Default target
             TurnSelection.SecondPokemonSwitchIndex = null;
             TurnSelection.SecondPokemonTerastallize = useTera;
 
-            // Both Pokemon have selections, submit
-            SubmitMainBattleTurnChoice();
+            // Check if we need to select a target
+            PokemonMoveRequestData pokemonData = request.Active[1];
+            PokemonMoveData moveData = pokemonData.Moves[moveIndex];
+
+            if (MoveRequiresTargetSelection(moveData))
+            {
+                // Transition to target selection
+                TransitionToState(MainBattlePhaseState.TargetSelectionSecondPokemon);
+            }
+            else
+            {
+                // No target selection needed, use default target
+                TurnSelection.SecondPokemonTarget = 0;
+
+                // Both Pokemon have selections, submit
+                SubmitMainBattleTurnChoice();
+            }
         }
     }
 
@@ -548,6 +689,102 @@ public partial class ChoiceInputManager
             // Both Pokemon have selections, submit
             SubmitMainBattleTurnChoice();
         }
+    }
+
+    private void HandleTargetSelection(int pokemonIndex, int targetLoc)
+    {
+        if (_currentRequest is not MoveRequest request) return;
+
+        if (pokemonIndex == 0)
+        {
+            TurnSelection.FirstPokemonTarget = targetLoc;
+
+            // In singles, submit immediately. In doubles, move to second Pokemon
+            if (request.Active.Count > 1)
+            {
+                TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
+            }
+            else
+            {
+                SubmitMainBattleTurnChoice();
+            }
+        }
+        else if (pokemonIndex == 1)
+        {
+            TurnSelection.SecondPokemonTarget = targetLoc;
+
+            // Both Pokemon have selections, submit
+            SubmitMainBattleTurnChoice();
+        }
+    }
+
+    /// <summary>
+    /// Set up visual target selection by identifying valid targets based on move
+    /// (Based on PlayerConsole.GetTargetLocationAsync logic)
+    /// </summary>
+    private void SetupVisualTargetSelection(PokemonMoveData moveData, int currentPokemonIndex)
+    {
+        ValidTargets.Clear();
+        _highlightedTargetIndex = 0;
+
+        MoveTarget targetType = moveData.Move.Target;
+
+        // Check what types of targets this move can hit
+        bool canTargetFoes = targetType is MoveTarget.Normal or MoveTarget.AdjacentFoe
+            or MoveTarget.Any or MoveTarget.RandomNormal;
+
+        bool canTargetAllies = targetType is MoveTarget.Normal or MoveTarget.AdjacentAlly
+            or MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
+        
+        bool canTargetSelf = targetType is MoveTarget.AdjacentAllyOrSelf or MoveTarget.Any;
+
+        if (_perspective == null)
+        {
+            // Fallback: just add opponent targets if no perspective
+            for (int i = 1; i <= 2; i++)
+            {
+                ValidTargets.Add(i);
+            }
+        }
+        else
+        {
+            // Add opponent targets
+            if (canTargetFoes)
+            {
+                var opponents = _perspective.OpponentSide.Active.ToList();
+                for (int i = 0; i < opponents.Count; i++)
+                {
+                    var opp = opponents[i];
+                    if (opp != null && !opp.Fainted)
+                    {
+                        ValidTargets.Add(i + 1); // Positive for opponents
+                    }
+                }
+            }
+
+            // Add ally targets
+            if (canTargetAllies && _perspective.PlayerSide.Active.Count > 1)
+            {
+                var allies = _perspective.PlayerSide.Active.ToList();
+                for (int i = 0; i < allies.Count; i++)
+                {
+                    var ally = allies[i];
+                    if (ally != null && !ally.Fainted)
+                    {
+                        // Skip current Pokemon unless move can target self
+                        if (i == currentPokemonIndex && !canTargetSelf)
+                        {
+                            continue;
+                        }
+
+                        ValidTargets.Add(-(i + 1)); // Negative for allies
+                    }
+                }
+            }
+        }
+
+        // Set initial highlighted target (first in list)
+        HighlightedTarget = ValidTargets.Count > 0 ? ValidTargets[0] : null;
     }
 
     private void HandleForceSwitchSelection(int switchIndex)

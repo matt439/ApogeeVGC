@@ -56,6 +56,14 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
 
     public TimerManager TimerManager { get; } = new();
 
+    // Target selection state (visual box selection)
+    public List<int> ValidTargets { get; private set; } = [];
+    public int? HighlightedTarget { get; private set; }
+    private int _highlightedTargetIndex; // Index in ValidTargets list
+
+    // Reference to battle renderer for Pokemon box hit testing
+    private Rendering.BattleRenderer? _battleRenderer;
+
     // Layout constants
     private const int ButtonWidth = 200;
     private const int ButtonHeight = 30;
@@ -70,6 +78,14 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
     private const int TeamPreviewStatusYOffset = 30; // Y offset for status text below instruction
     private const int TeamPreviewOrderYOffset = 60; // Y offset for order text below instruction
     private const int AutoLockPokemonCount = 4; // Number of Pokemon to auto-lock with 'A' key
+
+    /// <summary>
+    /// Set the battle renderer reference for Pokemon box hit testing
+    /// </summary>
+    public void SetBattleRenderer(Rendering.BattleRenderer battleRenderer)
+    {
+        _battleRenderer = battleRenderer;
+    }
 
     /// <summary>
     /// Request a choice from the user and return it asynchronously.
@@ -164,6 +180,14 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
         if (CurrentRequestType == BattleRequestType.TurnStart && _currentRequest is MoveRequest)
         {
             RenderMainBattleUi();
+
+            // Render target selection overlay if in target selection state
+            bool isTargetSelection = MainBattleState == MainBattlePhaseState.TargetSelectionFirstPokemon ||
+                                     MainBattleState == MainBattlePhaseState.TargetSelectionSecondPokemon;
+            if (isTargetSelection && _battleRenderer != null)
+            {
+                _battleRenderer.RenderTargetSelectionOverlay(ValidTargets, HighlightedTarget);
+            }
             return;
         }
 

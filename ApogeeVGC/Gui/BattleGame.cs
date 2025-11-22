@@ -98,6 +98,8 @@ public class BattleGame : Game
 
             // Connect choice input manager to battle renderer
             _battleRenderer.SetChoiceInputManager(_choiceInputManager);
+            // Connect battle renderer to choice input manager (for Pokemon box hit testing)
+            _choiceInputManager.SetBattleRenderer(_battleRenderer);
             Console.WriteLine("[BattleGame] Components connected");
         }
         catch (Exception ex)
