@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using System;
 
 namespace ApogeeVGC.Gui.Animations;
 
@@ -8,13 +7,10 @@ namespace ApogeeVGC.Gui.Animations;
 /// </summary>
 public class HpBarAnimation : BattleAnimation
 {
-    private readonly string _pokemonKey;  // Unique identifier for the Pokemon
     private readonly int _startHp;
     private readonly int _endHp;
     private readonly int _maxHp;
     private readonly float _duration;
-    
-    private int _currentHp;
 
     /// <summary>
     /// Create a new HP bar animation
@@ -25,28 +21,28 @@ public class HpBarAnimation : BattleAnimation
     /// <param name="maxHp">Maximum HP value</param>
     public HpBarAnimation(string pokemonKey, int startHp, int endHp, int maxHp)
     {
-        _pokemonKey = pokemonKey;
+        PokemonKey = pokemonKey;
         _startHp = startHp;
         _endHp = endHp;
         _maxHp = maxHp;
         _duration = AnimationSettings.DamageIndicatorDuration; // Same duration as damage indicator
-        _currentHp = startHp;
+        CurrentHp = startHp;
     }
 
     /// <summary>
     /// Get the unique key for this Pokemon
     /// </summary>
-    public string PokemonKey => _pokemonKey;
+    public string PokemonKey { get; }
 
     /// <summary>
     /// Get the current animated HP value
     /// </summary>
-    public int CurrentHp => _currentHp;
+    public int CurrentHp { get; private set; }
 
     public override void Start()
     {
         base.Start();
-        _currentHp = _startHp;
+        CurrentHp = _startHp;
     }
 
     public override void Update(GameTime gameTime)
@@ -63,12 +59,12 @@ public class HpBarAnimation : BattleAnimation
         float easedProgress = 1f - (float)Math.Pow(1f - progress, 2);
         
         // Interpolate HP value
-        _currentHp = (int)MathHelper.Lerp(_startHp, _endHp, easedProgress);
+        CurrentHp = (int)MathHelper.Lerp(_startHp, _endHp, easedProgress);
         
         // Complete animation when done
         if (progress >= 1.0f)
         {
-            _currentHp = _endHp; // Ensure we end at exact value
+            CurrentHp = _endHp; // Ensure we end at exact value
             Stop();
         }
     }

@@ -14,8 +14,8 @@ public class GuiBattleState
     private readonly Dictionary<int, PokemonState> _opponentActive = new();
     
     // Team rosters (for switch messages)
-    private readonly List<PokemonState> _playerTeam = new();
-    private readonly List<PokemonState> _opponentTeam = new();
+    private readonly List<PokemonState> _playerTeam = [];
+    private readonly List<PokemonState> _opponentTeam = [];
     
     // Events for UI updates
     public event Action<PokemonState, int, int>? PokemonDamaged; // pokemon, oldHp, newHp

@@ -1,11 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Sim.BattleClasses;
-using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Moves;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ApogeeVGC.Gui.Animations;
 
@@ -14,10 +9,8 @@ namespace ApogeeVGC.Gui.Animations;
 /// </summary>
 public class AnimationManager
 {
-    private readonly List<BattleAnimation> _activeAnimations = new();
-    private readonly List<DamageIndicator> _damageIndicators = new();
-    private readonly GraphicsDevice _graphicsDevice;
-    private readonly SpriteFont _font;
+    private readonly List<BattleAnimation> _activeAnimations = [];
+    private readonly List<DamageIndicator> _damageIndicators = [];
     private readonly AnimationQueue _animationQueue = new();
 
     // Temporary storage for sprite position offsets during contact animations
@@ -32,19 +25,19 @@ public class AnimationManager
     /// </summary>
     public AnimationManager(GraphicsDevice graphicsDevice, SpriteFont font)
     {
-        _graphicsDevice = graphicsDevice;
-        _font = font;
+        GraphicsDevice = graphicsDevice;
+        Font = font;
     }
 
     /// <summary>
     /// Get the graphics device (for creating projectile textures)
     /// </summary>
-    public GraphicsDevice GraphicsDevice => _graphicsDevice;
+    public GraphicsDevice GraphicsDevice { get; }
 
     /// <summary>
     /// Get the font (for creating damage indicators)
     /// </summary>
-    public SpriteFont Font => _font;
+    public SpriteFont Font { get; }
 
     /// <summary>
     /// Update all active animations
@@ -55,9 +48,9 @@ public class AnimationManager
         _animationQueue.Update(gameTime);
 
         // If an animation completed in the queue, move it to active lists for rendering
-        if (_animationQueue.CurrentAnimation != null && !_animationQueue.CurrentAnimation.IsComplete)
+        if (_animationQueue.CurrentAnimation is { IsComplete: false })
         {
-            var currentAnim = _animationQueue.CurrentAnimation;
+            BattleAnimation? currentAnim = _animationQueue.CurrentAnimation;
             
             // Add to appropriate list if not already present
             if (currentAnim is DamageIndicator indicator && !_damageIndicators.Contains(indicator))
@@ -74,7 +67,7 @@ public class AnimationManager
         }
 
         // Update all animations
-        foreach (var animation in _activeAnimations.ToList())
+        foreach (BattleAnimation animation in _activeAnimations.ToList())
         {
             animation.Update(gameTime);
 
@@ -96,7 +89,7 @@ public class AnimationManager
         }
 
         // Update damage indicators separately
-        foreach (var indicator in _damageIndicators.ToList())
+        foreach (DamageIndicator indicator in _damageIndicators.ToList())
         {
             indicator.Update(gameTime);
 
@@ -107,7 +100,7 @@ public class AnimationManager
         }
         
         // Update HP bar animations
-        foreach (var hpAnimation in _hpBarAnimations.Values.ToList())
+        foreach (HpBarAnimation hpAnimation in _hpBarAnimations.Values.ToList())
         {
             hpAnimation.Update(gameTime);
             
@@ -127,18 +120,18 @@ public class AnimationManager
         _animationQueue.Render(spriteBatch, gameTime);
 
         // Render projectiles (both single and multi-target)
-        foreach (var animation in _activeAnimations.OfType<ProjectileAnimation>())
+        foreach (ProjectileAnimation animation in _activeAnimations.OfType<ProjectileAnimation>())
         {
             animation.Render(spriteBatch, gameTime);
         }
         
-        foreach (var animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
+        foreach (MultiTargetProjectileAnimation animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
         {
             animation.Render(spriteBatch, gameTime);
         }
 
         // Render damage indicators on top
-        foreach (var indicator in _damageIndicators)
+        foreach (DamageIndicator indicator in _damageIndicators)
         {
             indicator.Render(spriteBatch, gameTime);
         }
@@ -267,7 +260,7 @@ public class AnimationManager
     /// <returns>Animated HP value, or null if no animation</returns>
     public int? GetAnimatedHp(string pokemonKey)
     {
-        if (_hpBarAnimations.TryGetValue(pokemonKey, out var animation))
+        if (_hpBarAnimations.TryGetValue(pokemonKey, out HpBarAnimation? animation))
         {
             return animation.CurrentHp;
         }
@@ -295,7 +288,7 @@ public class AnimationManager
     /// </summary>
     public Vector2 GetPlayerSpriteOffset(int slot)
     {
-        return _playerSpriteOffsets.TryGetValue(slot, out var offset) ? offset : Vector2.Zero;
+        return _playerSpriteOffsets.TryGetValue(slot, out Vector2 offset) ? offset : Vector2.Zero;
     }
 
     /// <summary>
@@ -303,7 +296,7 @@ public class AnimationManager
     /// </summary>
     public Vector2 GetOpponentSpriteOffset(int slot)
     {
-        return _opponentSpriteOffsets.TryGetValue(slot, out var offset) ? offset : Vector2.Zero;
+        return _opponentSpriteOffsets.TryGetValue(slot, out Vector2 offset) ? offset : Vector2.Zero;
     }
 
     /// <summary>
@@ -311,12 +304,12 @@ public class AnimationManager
     /// </summary>
     public void Clear()
     {
-        foreach (var animation in _activeAnimations.OfType<ProjectileAnimation>())
+        foreach (ProjectileAnimation animation in _activeAnimations.OfType<ProjectileAnimation>())
         {
             animation.Dispose();
         }
         
-        foreach (var animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
+        foreach (MultiTargetProjectileAnimation animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
         {
             animation.Dispose();
         }
@@ -339,7 +332,7 @@ public class AnimationManager
     /// </summary>
     public Action<Vector2> CreateOffsetCallback(int slot, bool isPlayer)
     {
-        return (Vector2 offset) =>
+        return offset =>
         {
             if (isPlayer)
             {

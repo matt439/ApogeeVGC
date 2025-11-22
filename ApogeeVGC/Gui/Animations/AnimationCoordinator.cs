@@ -3,8 +3,6 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Data;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 
 namespace ApogeeVGC.Gui.Animations;
 
@@ -30,7 +28,7 @@ public class AnimationCoordinator
     private SideId? _playerSideId;
     
     // Track fainted Pokemon that should still be shown until switch animation
-    private readonly HashSet<string> _faintedPokemonKeys = new();
+    private readonly HashSet<string> _faintedPokemonKeys = [];
 
     /// <summary>
     /// Create a new animation coordinator
@@ -184,7 +182,7 @@ public class AnimationCoordinator
     private void HandleMoveFail(MoveFailMessage failMsg)
     {
         // If there's a target (e.g., Protect blocked the move), trigger animation and show indicator
-        if (failMsg.TargetPokemonName != null && failMsg.TargetSideId.HasValue)
+        if (failMsg is { TargetPokemonName: not null, TargetSideId: not null })
         {
             // Trigger attack animation only once per move
             if (_pendingMoveAnimation != null && !_animationTriggered)
@@ -227,7 +225,7 @@ public class AnimationCoordinator
         if (moveId == null)
             return;
 
-        Move? move = _library.Moves.TryGetValue(moveId.Value, out var foundMove) ? foundMove : null;
+        Move? move = _library.Moves.GetValueOrDefault(moveId.Value);
         if (move == null)
             return;
 
@@ -267,7 +265,7 @@ public class AnimationCoordinator
         var positions = new List<Vector2>();
 
         // Get positions of Pokemon on the opposite side
-        foreach (var (name, (position, slot, isPlayer)) in _pokemonPositions)
+        foreach ((string _, (Vector2 position, int _, bool isPlayer)) in _pokemonPositions)
         {
             if (isPlayer != attackerIsPlayer)
             {

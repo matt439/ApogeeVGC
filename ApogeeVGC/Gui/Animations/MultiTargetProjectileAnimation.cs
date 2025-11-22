@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 
 namespace ApogeeVGC.Gui.Animations;
 
@@ -66,15 +64,15 @@ public class MultiTargetProjectileAnimation : BattleAnimation
         _projectileTexture = new Texture2D(_graphicsDevice, textureSize, textureSize);
         
         // Create a circle with anti-aliasing
-        Color[] colorData = new Color[textureSize * textureSize];
-        Vector2 center = new Vector2(textureSize / 2f, textureSize / 2f);
+        var colorData = new Color[textureSize * textureSize];
+        var center = new Vector2(textureSize / 2f, textureSize / 2f);
         float radius = textureSize / 2f;
         
         for (int y = 0; y < textureSize; y++)
         {
             for (int x = 0; x < textureSize; x++)
             {
-                Vector2 pos = new Vector2(x, y);
+                var pos = new Vector2(x, y);
                 float distance = Vector2.Distance(pos, center);
                 
                 // Anti-aliased edge
@@ -132,7 +130,7 @@ public class MultiTargetProjectileAnimation : BattleAnimation
             
             // Calculate maximum distance from center to any target
             float maxDistance = 0f;
-            foreach (var target in _targetPositions)
+            foreach (Vector2 target in _targetPositions)
             {
                 float distance = Vector2.Distance(centerTarget, target);
                 if (distance > maxDistance)
@@ -168,7 +166,7 @@ public class MultiTargetProjectileAnimation : BattleAnimation
         float scale = (_currentSize * 2) / textureSize;
         
         // Draw the projectile centered at current position
-        Vector2 origin = new Vector2(textureSize / 2f, textureSize / 2f);
+        var origin = new Vector2(textureSize / 2f, textureSize / 2f);
         Color renderColor = _projectileColor * _currentAlpha;
         
         spriteBatch.Draw(
@@ -195,7 +193,7 @@ public class MultiTargetProjectileAnimation : BattleAnimation
             return positions[0];
         
         Vector2 sum = Vector2.Zero;
-        foreach (var pos in positions)
+        foreach (Vector2 pos in positions)
         {
             sum += pos;
         }
