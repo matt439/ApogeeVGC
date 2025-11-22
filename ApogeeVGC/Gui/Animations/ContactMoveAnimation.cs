@@ -83,13 +83,16 @@ public class ContactMoveAnimation : BattleAnimation
             currentPosition = Vector2.Lerp(_targetPosition, _startPosition, easedProgress);
         }
 
-        // Update position via callback
-        _updatePositionCallback?.Invoke(currentPosition);
+        // Calculate offset from start position (not absolute position)
+        Vector2 offset = currentPosition - _startPosition;
+
+        // Update offset via callback
+        _updatePositionCallback?.Invoke(offset);
 
         // Complete animation when done
         if (progress >= 1.0f)
         {
-            _updatePositionCallback?.Invoke(_startPosition); // Ensure we end at start position
+            _updatePositionCallback?.Invoke(Vector2.Zero); // Ensure offset returns to zero
             Stop();
         }
     }
