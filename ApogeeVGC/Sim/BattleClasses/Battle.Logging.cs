@@ -598,7 +598,12 @@ new EffectivenessMessage
       },
 
              "-fail" when parts.Length > 2 =>
-              new MoveFailMessage { Reason = parts.Length > 3 ? parts[3] : "Unknown" },
+              new MoveFailMessage 
+              { 
+                  Reason = parts.Length > 4 ? parts[4] : (parts.Length > 3 ? parts[3] : "Unknown"),
+                  TargetPokemonName = parts.Length > 3 ? ExtractPokemonName(parts[3]) : null,
+                  TargetSideId = parts.Length > 3 ? ExtractSideId(parts[3]) : null
+              },
 
       "-boost" or "-unboost" when parts.Length > 4 =>
      ParseStatChangeMessage(parts, command == "-boost"),

@@ -124,7 +124,15 @@ public partial class BattleActions
         {
             if (Battle.DisplayUi)
             {
-                Battle.Add("-fail", pokemon);
+                // If there's a single target, include it in the fail message
+                if (targets.Count == 1)
+                {
+                    Battle.Add("-fail", pokemon, targets[0]);
+                }
+                else
+                {
+                    Battle.Add("-fail", pokemon);
+                }
             }
             Battle.AttrLastMove("[still]");
         }

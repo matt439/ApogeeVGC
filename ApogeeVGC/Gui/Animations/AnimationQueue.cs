@@ -37,7 +37,7 @@ public class QueuedAttackAnimation : QueuedAnimation
 
         if (IsContactMove)
         {
-            // Contact move: shift attacker sprite
+            // Contact move: shift attacker sprite toward first target
             var offsetCallback = AnimationManager.CreateOffsetCallback(AttackerSlot, IsPlayerAttacker);
             var contactAnimation = new ContactMoveAnimation(
                 AttackerPosition,
@@ -49,17 +49,35 @@ public class QueuedAttackAnimation : QueuedAnimation
         }
         else
         {
-            // Projectile move: show projectile
+            // Projectile move
             Color projectileColor = AnimationManager.GetProjectileColorForMove(MoveName);
-            var projectileAnimation = new ProjectileAnimation(
-                AttackerPosition,
-                defenderPosition,
-                projectileColor,
-                16f,
-                AnimationManager.GraphicsDevice);
+            
+            if (DefenderPositions.Count > 1)
+            {
+                // Multi-target: use expanding projectile animation
+                var multiProjectileAnimation = new MultiTargetProjectileAnimation(
+                    AttackerPosition,
+                    DefenderPositions,
+                    projectileColor,
+                    16f,
+                    AnimationManager.GraphicsDevice);
 
-            projectileAnimation.Start();
-            return projectileAnimation;
+                multiProjectileAnimation.Start();
+                return multiProjectileAnimation;
+            }
+            else
+            {
+                // Single target: use regular projectile animation
+                var projectileAnimation = new ProjectileAnimation(
+                    AttackerPosition,
+                    defenderPosition,
+                    projectileColor,
+                    16f,
+                    AnimationManager.GraphicsDevice);
+
+                projectileAnimation.Start();
+                return projectileAnimation;
+            }
         }
     }
 }
@@ -100,6 +118,29 @@ public class QueuedMissIndicator : QueuedAnimation
         var indicator = DamageIndicator.CreateMissIndicator(
             PokemonPosition,
             AnimationManager.Font);
+
+        indicator.Start();
+        return indicator;
+    }
+}
+
+/// <summary>
+/// Queued custom text indicator animation
+/// </summary>
+public class QueuedCustomIndicator : QueuedAnimation
+{
+    public required string Text { get; init; }
+    public required Vector2 PokemonPosition { get; init; }
+    public required Color Color { get; init; }
+    public required AnimationManager AnimationManager { get; init; }
+
+    public override BattleAnimation Start()
+    {
+        var indicator = DamageIndicator.CreateCustomIndicator(
+            Text,
+            PokemonPosition,
+            AnimationManager.Font,
+            Color);
 
         indicator.Start();
         return indicator;

@@ -61,7 +61,7 @@ public class AnimationManager
             {
                 _damageIndicators.Add(indicator);
             }
-            else if (currentAnim is ProjectileAnimation or ContactMoveAnimation)
+            else if (currentAnim is ProjectileAnimation or ContactMoveAnimation or MultiTargetProjectileAnimation)
             {
                 if (!_activeAnimations.Contains(currentAnim))
                 {
@@ -84,6 +84,10 @@ public class AnimationManager
                 if (animation is ProjectileAnimation projectile)
                 {
                     projectile.Dispose();
+                }
+                else if (animation is MultiTargetProjectileAnimation multiProjectile)
+                {
+                    multiProjectile.Dispose();
                 }
             }
         }
@@ -108,8 +112,13 @@ public class AnimationManager
         // Render the queued animation
         _animationQueue.Render(spriteBatch, gameTime);
 
-        // Render projectiles
+        // Render projectiles (both single and multi-target)
         foreach (var animation in _activeAnimations.OfType<ProjectileAnimation>())
+        {
+            animation.Render(spriteBatch, gameTime);
+        }
+        
+        foreach (var animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
         {
             animation.Render(spriteBatch, gameTime);
         }
@@ -203,6 +212,22 @@ public class AnimationManager
     }
 
     /// <summary>
+    /// Queue a custom text indicator to play sequentially
+    /// </summary>
+    public void QueueCustomIndicator(string text, Vector2 pokemonPosition, Color color)
+    {
+        var queuedIndicator = new QueuedCustomIndicator
+        {
+            Text = text,
+            PokemonPosition = pokemonPosition,
+            Color = color,
+            AnimationManager = this
+        };
+
+        _animationQueue.Enqueue(queuedIndicator);
+    }
+
+    /// <summary>
     /// Trigger a damage indicator over a Pokemon (DEPRECATED - use QueueDamageIndicator)
     /// </summary>
     public void TriggerDamageIndicator(int damageAmount, int maxHp, Vector2 pokemonPosition)
@@ -240,6 +265,11 @@ public class AnimationManager
     public void Clear()
     {
         foreach (var animation in _activeAnimations.OfType<ProjectileAnimation>())
+        {
+            animation.Dispose();
+        }
+        
+        foreach (var animation in _activeAnimations.OfType<MultiTargetProjectileAnimation>())
         {
             animation.Dispose();
         }

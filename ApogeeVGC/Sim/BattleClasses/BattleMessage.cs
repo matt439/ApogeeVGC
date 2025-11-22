@@ -243,9 +243,24 @@ public class StatChangeMessage : BattleMessage
 public class MoveFailMessage : BattleMessage
 {
     public required string Reason { get; init; }
+    
+    /// <summary>
+    /// The target Pokemon that the move failed against (if applicable, e.g., for Protect)
+    /// </summary>
+    public string? TargetPokemonName { get; init; }
+    
+    /// <summary>
+    /// The side of the target Pokemon (if applicable)
+    /// </summary>
+    public SideId? TargetSideId { get; init; }
 
     public override string ToDisplayText()
     {
+        if (!string.IsNullOrEmpty(TargetPokemonName) && TargetSideId.HasValue)
+        {
+            string targetDisplay = $"{TargetPokemonName} (Side {(int)TargetSideId.Value + 1})";
+            return $"But it failed against {targetDisplay}! {Reason}";
+        }
         return $"But it failed! {Reason}";
     }
 }
