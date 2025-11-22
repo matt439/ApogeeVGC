@@ -1,3 +1,4 @@
+using ApogeeVGC.Gui.ChoiceUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Sim.BattleClasses;
@@ -27,9 +28,6 @@ public class BattleRenderer(
     private const int PokemonSpriteSize = 128;
     private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
     private const int PokemonSpacing = 60; // Horizontal spacing between Pokemon sprites (increased to prevent clipping)
-
-    // Screen division - left half for battle, right half for messages
-    private const int ScreenHalfWidth = 960; // Half of 1920 (screen width)
 
     // Team Preview layout
     private const int TeamPreviewOpponentYOffset = 60; // Offset from top padding for opponent team
@@ -78,7 +76,7 @@ public class BattleRenderer(
     private const int MinTruncationLength = 3; // Minimum string length before adding "..."
 
     // Reference to choice input manager for team preview state
-    private ChoiceUI.ChoiceInputManager? _choiceInputManager;
+    private ChoiceInputManager? _choiceInputManager;
 
     // Cached pixel texture for drawing filled rectangles (HP bars)
     private Texture2D? _pixelTexture;
@@ -89,7 +87,7 @@ public class BattleRenderer(
     /// <summary>
     /// Set the choice input manager to access team preview state
     /// </summary>
-    public void SetChoiceInputManager(ChoiceUI.ChoiceInputManager choiceInputManager)
+    public void SetChoiceInputManager(ChoiceInputManager choiceInputManager)
     {
         _choiceInputManager = choiceInputManager;
     }
@@ -119,10 +117,10 @@ public class BattleRenderer(
         switch (battlePerspective.PerspectiveType)
         {
             case BattlePerspectiveType.TeamPreview:
-                RenderTeamPreview(gameTime, battlePerspective);
+                RenderTeamPreview(battlePerspective);
                 break;
             case BattlePerspectiveType.InBattle:
-                RenderInBattle(gameTime, battlePerspective);
+                RenderInBattle(battlePerspective);
                 break;
             default:
                 RenderWaitingScreen();
@@ -133,23 +131,23 @@ public class BattleRenderer(
     /// <summary>
     /// Render the team preview screen showing all Pokemon from both teams
     /// </summary>
-    private void RenderTeamPreview(GameTime gameTime, BattlePerspective battlePerspective)
+    private void RenderTeamPreview(BattlePerspective battlePerspective)
     {
-        RenderField(battlePerspective);
+        RenderField();
         RenderTeamPreviewPlayerTeam(battlePerspective);
         RenderTeamPreviewOpponentTeam(battlePerspective);
-        RenderTeamPreviewUi(battlePerspective);
+        RenderTeamPreviewUi();
     }
 
     /// <summary>
     /// Render the active battle screen showing only active Pokemon
     /// </summary>
-    private void RenderInBattle(GameTime gameTime, BattlePerspective battlePerspective)
+    private void RenderInBattle(BattlePerspective battlePerspective)
     {
-        RenderField(battlePerspective);
+        RenderField();
         RenderInBattlePlayerPokemon(battlePerspective);
         RenderInBattleOpponentPokemon(battlePerspective);
-        RenderInBattleUi(battlePerspective);
+        RenderInBattleUi();
     }
 
     private void RenderWaitingScreen()
@@ -165,7 +163,7 @@ public class BattleRenderer(
         spriteBatch.DrawString(font, message, position, XnaColor.White);
     }
 
-    private void RenderField(BattlePerspective battlePerspective)
+    private void RenderField()
     {
         // TODO: Render weather, terrain, field effects
         // Turn counter is now displayed in message log, so no need to render here
@@ -186,7 +184,7 @@ public class BattleRenderer(
 
         for (int i = 0; i < battlePerspective.PlayerSide.Pokemon.Count; i++)
         {
-            var pokemon = battlePerspective.PlayerSide.Pokemon[i];
+            PokemonPerspective pokemon = battlePerspective.PlayerSide.Pokemon[i];
             int xPosition = startX + (i * (PokemonSpriteSize + PokemonSpacing));
 
             // Check if this Pokemon is highlighted or locked
@@ -255,7 +253,7 @@ public class BattleRenderer(
     /// <summary>
     /// Render UI for team preview
     /// </summary>
-    private void RenderTeamPreviewUi(BattlePerspective battlePerspective)
+    private void RenderTeamPreviewUi()
     {
         // Render timers
         RenderTimers();
@@ -275,15 +273,14 @@ public class BattleRenderer(
     {
         // Render only active Pokemon
         // Position them in left half, offset to the right of opponent Pokemon
-        int yPosition = InBattlePlayerYOffset;
 
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
-            var pokemon = battlePerspective.PlayerSide.Active[i];
+            PokemonPerspective? pokemon = battlePerspective.PlayerSide.Active[i];
             if (pokemon == null) continue;
 
             int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
-            RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
+            RenderPlayerPokemonInfo(pokemon, new XnaVector2(xPosition, InBattlePlayerYOffset));
         }
     }
 
@@ -294,23 +291,22 @@ public class BattleRenderer(
     {
         // Render only active Pokemon
         // Position them in left half at the top
-        int yPosition = InBattleOpponentYOffset;
 
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
-            var pokemon = battlePerspective.OpponentSide.Active[i];
+            PokemonPerspective? pokemon = battlePerspective.OpponentSide.Active[i];
             if (pokemon == null) continue;
 
             int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
 
-            RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, yPosition));
+            RenderOpponentPokemonInfo(pokemon, new XnaVector2(xPosition, InBattleOpponentYOffset));
         }
     }
 
     /// <summary>
     /// Render UI for active battle
     /// </summary>
-    private void RenderInBattleUi(BattlePerspective battlePerspective)
+    private void RenderInBattleUi()
     {
         // Render timers
         RenderTimers();
@@ -326,28 +322,26 @@ public class BattleRenderer(
     {
         if (_choiceInputManager == null) return;
 
-        var timerManager = _choiceInputManager.TimerManager;
+        TimerManager timerManager = _choiceInputManager.TimerManager;
 
         // Timer display position (top right of left half)
-        int timerX = TimerXPosition;
         int timerY = TimerYPosition;
-        int lineHeight = TimerLineHeight;
 
         // Battle Timer
         string battleTimeText = $"Battle: {timerManager.GetBattleTimeString()}";
-        spriteBatch.DrawString(font, battleTimeText, new XnaVector2(timerX, timerY),
+        spriteBatch.DrawString(font, battleTimeText, new XnaVector2(TimerXPosition, timerY),
             XnaColor.White);
-        timerY += lineHeight;
+        timerY += TimerLineHeight;
 
         // Player Timer (Your Time)
         string playerTimeText = $"Your Time: {timerManager.GetPlayerTimeString()}";
-        spriteBatch.DrawString(font, playerTimeText, new XnaVector2(timerX, timerY),
+        spriteBatch.DrawString(font, playerTimeText, new XnaVector2(TimerXPosition, timerY),
             XnaColor.Yellow);
-        timerY += lineHeight;
+        timerY += TimerLineHeight;
 
         // Move Timer
         string moveTimeText = $"Move Time: {timerManager.GetMoveTimeString()}";
-        spriteBatch.DrawString(font, moveTimeText, new XnaVector2(timerX, timerY), XnaColor.Lime);
+        spriteBatch.DrawString(font, moveTimeText, new XnaVector2(TimerXPosition, timerY), XnaColor.Lime);
     }
 
     private void RenderPlayerPokemonInfo(PokemonPerspective pokemon, XnaVector2 position)
@@ -383,7 +377,7 @@ public class BattleRenderer(
         DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
 
         // Draw status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
             XnaVector2 statusPosition = hpBarPosition + new XnaVector2(0, HpBarHeight + HpBarYSpacing);
@@ -494,7 +488,7 @@ public class BattleRenderer(
         // Team preview shows max HP only, so bar would always be full
 
         // Add status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
             XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * StatusLineSpacingMultiplier);
@@ -546,7 +540,7 @@ public class BattleRenderer(
         DrawHpBar(hpBarPosition, pokemon.Hp, pokemon.MaxHp);
 
         // Draw status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
             XnaVector2 statusPosition = hpBarPosition + new XnaVector2(0, HpBarHeight + HpBarYSpacing);
@@ -613,7 +607,7 @@ public class BattleRenderer(
         // Team preview shows max HP only in the info, so bar would always be full
 
         // Add status condition if present
-        var (statusName, statusColor) = GetStatusDisplay(pokemon.Status);
+        (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
         if (!string.IsNullOrEmpty(statusName))
         {
             XnaVector2 statusPosition = textPosition + new XnaVector2(0, font.LineSpacing * StatusLineSpacingMultiplier);

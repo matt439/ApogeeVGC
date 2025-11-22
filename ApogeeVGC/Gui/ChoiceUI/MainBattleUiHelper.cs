@@ -15,13 +15,10 @@ public static class MainBattleUiHelper
     
     // Button dimensions
     private const int ButtonWidth = 180;
-    private const int ButtonHeight = 28;
+    private const int ButtonHeight = 40;
     
     // Vertical spacing between buttons
-    private const int ButtonSpacing = 2;
-    
-    // Extra spacing before certain buttons (e.g., before "Back" button)
-    private const int ButtonSpacingLarge = 5;
+    private const int ButtonSpacing = 4;
     
     // Position of choice menu on screen - inline with player's Pokemon, aligned with opponent horizontally
     private const int LeftMargin = 480;   // X position aligned with opponent Pokemon (midscreen)
@@ -197,8 +194,6 @@ public static class MainBattleUiHelper
             bool disabled = moveData.Disabled switch
             {
                 BoolMoveIdBoolUnion boolUnion => boolUnion.Value,
-                MoveIdMoveIdBoolUnion => false,
-                null => false,
                 _ => false,
             };
 

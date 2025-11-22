@@ -1,7 +1,7 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
-using ApogeeVGC.Sim.Core;
 using System.Collections.Concurrent;
+using static System.Threading.Thread;
 
 namespace ApogeeVGC.Gui;
 
@@ -14,7 +14,7 @@ public class GuiChoiceCoordinator
     private readonly ConcurrentQueue<PendingChoiceRequest> _pendingRequests = new();
     private readonly ConcurrentQueue<BattlePerspective> _pendingPerspectives = new();
     private readonly ConcurrentQueue<IEnumerable<BattleMessage>> _pendingMessages = new();
-    
+
     /// <summary>
     /// Queue a choice request from the battle thread.
     /// This method is thread-safe and can be called from any thread.
@@ -22,25 +22,27 @@ public class GuiChoiceCoordinator
     public Task<Choice> RequestChoiceAsync(IChoiceRequest request, BattleRequestType requestType,
         BattlePerspective perspective, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"[GuiChoiceCoordinator] RequestChoiceAsync called from thread {Thread.CurrentThread.ManagedThreadId}");
-        
+        Console.WriteLine(
+            $"[GuiChoiceCoordinator] RequestChoiceAsync called from thread {CurrentThread.ManagedThreadId}");
+
         var completionSource = new TaskCompletionSource<Choice>();
-    
+
         var pendingRequest = new PendingChoiceRequest
         {
             Request = request,
             RequestType = requestType,
             Perspective = perspective,
             CancellationToken = cancellationToken,
-            CompletionSource = completionSource
+            CompletionSource = completionSource,
         };
-        
+
         _pendingRequests.Enqueue(pendingRequest);
-        Console.WriteLine($"[GuiChoiceCoordinator] Queued request. Queue size: {_pendingRequests.Count}");
-        
+        Console.WriteLine(
+            $"[GuiChoiceCoordinator] Queued request. Queue size: {_pendingRequests.Count}");
+
         return completionSource.Task;
     }
-    
+
     /// <summary>
     /// Queue a perspective update from the battle thread.
     /// This method is thread-safe and can be called from any thread.
@@ -49,7 +51,7 @@ public class GuiChoiceCoordinator
     {
         _pendingPerspectives.Enqueue(perspective);
     }
-    
+
     /// <summary>
     /// Queue messages from the battle thread.
     /// This method is thread-safe and can be called from any thread.
@@ -58,7 +60,7 @@ public class GuiChoiceCoordinator
     {
         _pendingMessages.Enqueue(messages);
     }
-    
+
     /// <summary>
     /// Try to dequeue a pending request. Called from the GUI thread.
     /// </summary>
@@ -66,7 +68,7 @@ public class GuiChoiceCoordinator
     {
         return _pendingRequests.TryDequeue(out request);
     }
-    
+
     /// <summary>
     /// Try to dequeue a pending perspective update. Called from the GUI thread.
     /// </summary>
@@ -74,15 +76,15 @@ public class GuiChoiceCoordinator
     {
         return _pendingPerspectives.TryDequeue(out perspective);
     }
-    
+
     /// <summary>
     /// Try to dequeue pending messages. Called from the GUI thread.
     /// </summary>
     public bool TryDequeueMessages(out IEnumerable<BattleMessage>? messages)
     {
-      return _pendingMessages.TryDequeue(out messages);
+        return _pendingMessages.TryDequeue(out messages);
     }
-    
+
     /// <summary>
     /// Get the current queue size (for debugging)
     /// </summary>

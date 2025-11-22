@@ -15,10 +15,6 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
     // Layout constants
     private const int Padding = 10;
     private const int LineHeight = 20;
-    private const int MaxVisibleLines = 20; // Number of messages to show at once (bottom section only)
-
-    // Screen division - messages occupy bottom-left corner
-    private const int ScreenHalfWidth = 960; // Half of 1920 (screen width)
 
     // Message box positioning and size
     private const int MessageBoxX = 10; // Position in left corner with small margin
@@ -28,7 +24,6 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
 
     // Auto-scroll tracking
     private double _lastMessageTime = 0;
-    private const double AutoScrollDelay = 3.0; // Seconds to show each new message
 
     // Rendering constants
     private const float BackgroundTransparency = 0.7f; // Semi-transparent background alpha
@@ -45,10 +40,8 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
         if (messages.Count == 0) return;
 
         // Use fixed position in right half of screen
-        int boxX = MessageBoxX;
-        int boxY = MessageBoxY;
 
-        var messageBox = new XnaRectangle(boxX, boxY, MessageBoxWidth, MessageBoxHeight);
+        var messageBox = new XnaRectangle(MessageBoxX, MessageBoxY, MessageBoxWidth, MessageBoxHeight);
 
         // Draw semi-transparent background
         DrawFilledRectangle(messageBox, XnaColor.Black * BackgroundTransparency);
@@ -57,13 +50,13 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
         DrawRectangleBorder(messageBox, XnaColor.White, BorderWidth);
 
         // Calculate how many messages can fit in the box
-        int maxLines = (MessageBoxHeight - (Padding * PaddingMultiplier)) / LineHeight;
+        const int maxLines = (MessageBoxHeight - (Padding * PaddingMultiplier)) / LineHeight;
         
         // Determine which messages to show (last maxLines messages)
         int startIndex = Math.Max(0, messages.Count - maxLines);
 
         // Render messages from top to bottom (oldest at top, newest at bottom)
-        int yOffset = boxY + Padding;
+        int yOffset = MessageBoxY + Padding;
         for (int i = startIndex; i < messages.Count; i++)
         {
             BattleMessage message = messages[i];
@@ -86,7 +79,7 @@ public class MessageRenderer(SpriteBatch spriteBatch, SpriteFont font, GraphicsD
             XnaColor messageColor = GetMessageColor(message);
 
             // Draw the message text
-            var textPosition = new XnaVector2(boxX + Padding, yOffset);
+            var textPosition = new XnaVector2(MessageBoxX + Padding, yOffset);
             spriteBatch.DrawString(font, displayText, textPosition, messageColor);
 
             yOffset += LineHeight;

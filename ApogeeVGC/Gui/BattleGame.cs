@@ -6,6 +6,7 @@ using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Data;
+using ApogeeVGC.Sim.PokemonClasses;
 
 namespace ApogeeVGC.Gui;
 
@@ -148,7 +149,7 @@ public class BattleGame : Game
         Console.WriteLine(
             $"[BattleGame] StartBattle called. _choiceInputManager null? {_choiceInputManager == null}");
 
-        if (_battleRunner != null && _battleRunner.IsRunning)
+        if (_battleRunner is { IsRunning: true })
         {
             Console.WriteLine("[BattleGame] Battle is already running");
             return;
@@ -190,7 +191,7 @@ public class BattleGame : Game
         {
 
             // Process queued perspective updates from battle thread
-            while (_choiceCoordinator.TryDequeuePerspective(out var perspective) &&
+            while (_choiceCoordinator.TryDequeuePerspective(out BattlePerspective? perspective) &&
                    perspective != null)
             {
                 ApplyPerspectiveUpdate(perspective);
@@ -203,12 +204,9 @@ public class BattleGame : Game
             }
 
             // Process any pending choice requests from the battle thread
-            int processedCount = 0;
-            while (_choiceCoordinator.TryDequeueRequest(out var pendingRequest) &&
+            while (_choiceCoordinator.TryDequeueRequest(out PendingChoiceRequest? pendingRequest) &&
                    pendingRequest != null)
             {
-                processedCount++;
-
                 if (_choiceInputManager != null)
                 {
                     try
@@ -249,7 +247,7 @@ public class BattleGame : Game
                 else
                 {
                     Console.WriteLine(
-                        $"[BattleGame.Update] _choiceInputManager is null, cannot process request");
+                        "[BattleGame.Update] _choiceInputManager is null, cannot process request");
                 }
             }
 
@@ -373,7 +371,7 @@ public class BattleGame : Game
             $"[BattleGame]   PlayerSide.Active.Count={battlePerspective.PlayerSide.Active.Count}");
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
-            var p = battlePerspective.PlayerSide.Active[i];
+            PokemonPerspective? p = battlePerspective.PlayerSide.Active[i];
             Console.WriteLine(
                 $"[BattleGame]   PlayerSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.Hp}/{p.MaxHp})")}");
         }
@@ -382,7 +380,7 @@ public class BattleGame : Game
             $"[BattleGame]   OpponentSide.Active.Count={battlePerspective.OpponentSide.Active.Count}");
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
-            var p = battlePerspective.OpponentSide.Active[i];
+            PokemonPerspective? p = battlePerspective.OpponentSide.Active[i];
             Console.WriteLine(
                 $"[BattleGame]   OpponentSide.Active[{i}] = {(p == null ? "null" : $"{p.Name} (HP: {p.Hp}/{p.MaxHp})")}");
         }
@@ -423,7 +421,7 @@ public class BattleGame : Game
     {
         lock (_stateLock)
         {
-            return new List<BattleMessage>(_messageQueue);
+            return [.._messageQueue];
         }
     }
 

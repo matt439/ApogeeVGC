@@ -58,7 +58,7 @@ public partial class ChoiceInputManager(SpriteBatch spriteBatch, SpriteFont font
 
     // Layout constants
     private const int ButtonWidth = 200;
-    private const int ButtonHeight = 30;
+    private const int ButtonHeight = 60;
     private const int ButtonSpacing = 2;
 
     // Position buttons inline with player's Pokemon vertically, aligned with opponent's Pokemon horizontally
