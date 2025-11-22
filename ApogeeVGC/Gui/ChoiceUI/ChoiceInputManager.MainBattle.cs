@@ -134,7 +134,7 @@ public partial class ChoiceInputManager
                     hasValidSwitchOptions
                         ? () => TransitionToState(MainBattlePhaseState.SwitchSelectionFirstPokemon)
                         : null,
-                    () => HandleForfeit()
+                    HandleForfeit
                 );
                 Console.WriteLine(
                     $"[ChoiceInputManager.SetupMainBattleUi] Created {_buttons.Count} buttons for MainMenuFirstPokemon");
@@ -171,7 +171,7 @@ public partial class ChoiceInputManager
                     .ToList();
                 _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
                     availablePokemon,
-                    (switchIndex) => HandleSwitchSelection(0, switchIndex),
+                    switchIndex => HandleSwitchSelection(0, switchIndex),
                     () => TransitionToState(MainBattlePhaseState.MainMenuFirstPokemon),
                     _perspective,
                     showBackButton: true
@@ -227,7 +227,7 @@ public partial class ChoiceInputManager
                     .ToList();
                 _buttons = MainBattleUiHelper.CreateSwitchSelectionButtons(
                     availablePokemon,
-                    (switchIndex) => HandleSwitchSelection(1, switchIndex),
+                    switchIndex => HandleSwitchSelection(1, switchIndex),
                     () => TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon),
                     _perspective,
                     showBackButton: true
@@ -287,13 +287,17 @@ public partial class ChoiceInputManager
             if (_perspective.PlayerSide.Active.Count > 0 &&
                 _perspective.PlayerSide.Active[0] != null)
             {
-                firstPokemonName = _perspective.PlayerSide.Active[0].Name;
+                firstPokemonName = _perspective.PlayerSide.Active[0]?.Name ??
+                                   throw new InvalidOperationException(
+                                       "First active Pokemon is null");
             }
 
             if (_perspective.PlayerSide.Active.Count > 1 &&
                 _perspective.PlayerSide.Active[1] != null)
             {
-                secondPokemonName = _perspective.PlayerSide.Active[1].Name;
+                secondPokemonName = _perspective.PlayerSide.Active[1]?.Name ??
+                                    throw new InvalidOperationException(
+                                        "Second active Pokemon is null");
             }
         }
 
@@ -384,7 +388,7 @@ public partial class ChoiceInputManager
         // ESC key for back
         if (IsKeyPressed(keyboardState, Keys.Escape))
         {
-            Console.WriteLine($"[ProcessMainBattleKeyboardInput] ESC key pressed, navigating back");
+            Console.WriteLine("[ProcessMainBattleKeyboardInput] ESC key pressed, navigating back");
             HandleEscapeKeyNavigation();
         }
     }
@@ -394,14 +398,14 @@ public partial class ChoiceInputManager
         // Arrow key navigation (up/down only)
         if (IsKeyPressed(keyboardState, Keys.Up))
         {
-            Console.WriteLine($"[ProcessLinearNavigation] UP key pressed");
+            Console.WriteLine("[ProcessLinearNavigation] UP key pressed");
             _selectedButtonIndex--;
             if (_selectedButtonIndex < 0)
                 _selectedButtonIndex = _buttons.Count - 1; // Wrap to bottom
         }
         else if (IsKeyPressed(keyboardState, Keys.Down))
         {
-            Console.WriteLine($"[ProcessLinearNavigation] DOWN key pressed");
+            Console.WriteLine("[ProcessLinearNavigation] DOWN key pressed");
             _selectedButtonIndex++;
             if (_selectedButtonIndex >= _buttons.Count)
                 _selectedButtonIndex = 0; // Wrap to top
@@ -419,7 +423,7 @@ public partial class ChoiceInputManager
         {
             // Tera button is always added last in CreateMoveSelectionButtons
             // It will have wider width than move buttons
-            var lastButton = _buttons[_buttons.Count - 1];
+            var lastButton = _buttons[^1];
             // We can identify Tera button by checking if button count is 5 (4 moves + tera)
             // or 4 (3 moves + tera), etc.
             // For simplicity, check button bounds - tera spans full width
@@ -439,7 +443,7 @@ public partial class ChoiceInputManager
         // Handle navigation
         if (IsKeyPressed(keyboardState, Keys.Up))
         {
-            Console.WriteLine($"[ProcessMoveSelectionGridNavigation] UP key pressed");
+            Console.WriteLine("[ProcessMoveSelectionGridNavigation] UP key pressed");
             if (isOnTeraButton)
             {
                 // From Tera, go to move 3 (index 2) if it exists, otherwise move 1 (index 0)
@@ -472,7 +476,7 @@ public partial class ChoiceInputManager
         }
         else if (IsKeyPressed(keyboardState, Keys.Down))
         {
-            Console.WriteLine($"[ProcessMoveSelectionGridNavigation] DOWN key pressed");
+            Console.WriteLine("[ProcessMoveSelectionGridNavigation] DOWN key pressed");
             if (isOnTeraButton)
             {
                 // From Tera, go to move 1 (index 0)
@@ -502,7 +506,7 @@ public partial class ChoiceInputManager
         }
         else if (IsKeyPressed(keyboardState, Keys.Left))
         {
-            Console.WriteLine($"[ProcessMoveSelectionGridNavigation] LEFT key pressed");
+            Console.WriteLine("[ProcessMoveSelectionGridNavigation] LEFT key pressed");
             if (!isOnTeraButton)
             {
                 // Swap within row: move 1 <-> 2, move 3 <-> 4
@@ -527,7 +531,7 @@ public partial class ChoiceInputManager
         }
         else if (IsKeyPressed(keyboardState, Keys.Right))
         {
-            Console.WriteLine($"[ProcessMoveSelectionGridNavigation] RIGHT key pressed");
+            Console.WriteLine("[ProcessMoveSelectionGridNavigation] RIGHT key pressed");
             if (!isOnTeraButton)
             {
                 // Swap within row: move 2 <-> 1, move 4 <-> 3
@@ -582,8 +586,6 @@ public partial class ChoiceInputManager
                 break;
 
             // MainMenuFirstPokemon and ForceSwitch have no back action
-            default:
-                break;
         }
     }
 
@@ -597,7 +599,7 @@ public partial class ChoiceInputManager
             TurnSelection.FirstPokemonTerastallize = useTera;
 
             // In singles, submit immediately. In doubles, move to second Pokemon
-            if (_currentRequest is MoveRequest request && request.Active.Count > 1)
+            if (_currentRequest is MoveRequest { Active.Count: > 1 })
             {
                 TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
             }
@@ -627,7 +629,7 @@ public partial class ChoiceInputManager
             TurnSelection.FirstPokemonTarget = null;
 
             // In singles, submit immediately. In doubles, move to second Pokemon
-            if (_currentRequest is MoveRequest request && request.Active.Count > 1)
+            if (_currentRequest is MoveRequest { Active.Count: > 1 })
             {
                 TransitionToState(MainBattlePhaseState.MainMenuSecondPokemon);
             }
@@ -701,7 +703,7 @@ public partial class ChoiceInputManager
         else
         {
             Console.WriteLine(
-                $"[ToggleTerastallize] WARNING: _currentRequest is not a MoveRequest!");
+                "[ToggleTerastallize] WARNING: _currentRequest is not a MoveRequest!");
         }
     }
 

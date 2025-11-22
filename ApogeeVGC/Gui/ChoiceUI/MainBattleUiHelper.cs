@@ -15,17 +15,17 @@ public static class MainBattleUiHelper
     
     // Button dimensions
     private const int ButtonWidth = 180;
-    private const int ButtonHeight = 40;
+    private const int ButtonHeight = 50;
     
     // Vertical spacing between buttons
-    private const int ButtonSpacing = 4;
+    private const int ButtonSpacing = 8;
     
     // Position of choice menu on screen - inline with player's Pokemon, aligned with opponent horizontally
     private const int LeftMargin = 480;   // X position aligned with opponent Pokemon (midscreen)
     private const int TopMargin = 400;   // Y position inline with player Pokemon
     
     // Position of instruction text (appears above buttons)
-    private const int InstructionTextYOffset = 20; // Distance above TopMargin
+    private const int InstructionTextYOffset = 30; // Distance above TopMargin
     
     // Position of selection status text (appears above message box)
     private const int SelectionStatusY = 635; // Fixed Y position above message box
