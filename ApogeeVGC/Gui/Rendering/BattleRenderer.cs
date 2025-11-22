@@ -26,7 +26,7 @@ public class BattleRenderer(
     private const int Padding = 10;
     private const int PokemonSpriteSize = 128;
     private const int InfoTextHeight = 75; // Height reserved for Pokemon info text below sprite
-    private const int PokemonSpacing = 20; // Horizontal spacing between Pokemon sprites
+    private const int PokemonSpacing = 60; // Horizontal spacing between Pokemon sprites (increased to prevent clipping)
 
     // Screen division - left half for battle, right half for messages
     private const int ScreenHalfWidth = 960; // Half of 1920 (screen width)
@@ -36,13 +36,13 @@ public class BattleRenderer(
     private const int TeamPreviewLabelYOffset = 30; // Distance of label above Pokemon sprites
 
     // In-Battle layout - all Pokemon in left half only
-    private const int InBattleOpponentXOffset = 20; // X position from left edge for opponent Pokemon
-    private const int InBattleOpponentYOffset = 10; // Y position from top for opponent Pokemon
-    private const int InBattlePlayerXOffset = 180; // X position from left edge for player Pokemon (offset to right)
-    private const int InBattlePlayerYOffset = 220; // Y position from top for player Pokemon (below opponent)
+    private const int InBattleOpponentXOffset = 480; // X position from left edge for opponent Pokemon (midscreen in left half)
+    private const int InBattleOpponentYOffset = 80; // Y position from top for opponent Pokemon (below timers)
+    private const int InBattlePlayerXOffset = 20; // X position from left edge for player Pokemon (at screen edge)
+    private const int InBattlePlayerYOffset = 400; // Y position from top for player Pokemon (moved down to avoid overlap)
 
-    // Timer display layout - position in top-right of left half
-    private const int TimerXPosition = 400; // X position in left half
+    // Timer display layout - position in upper left corner
+    private const int TimerXPosition = 10; // X position in upper left corner
     private const int TimerYPosition = 10; // Y position from top
     private const int TimerLineHeight = 20; // Vertical spacing between timer lines
 

@@ -23,15 +23,15 @@ public static class MainBattleUiHelper
     // Extra spacing before certain buttons (e.g., before "Back" button)
     private const int ButtonSpacingLarge = 5;
     
-    // Position of choice menu on screen - in left half below Pokemon
-    private const int LeftMargin = 20;   // X position from left edge (aligned with opponent Pokemon)
-    private const int TopMargin = 650;   // Y position from top edge (below player Pokemon) - adjusted for 1080p
+    // Position of choice menu on screen - inline with player's Pokemon, aligned with opponent horizontally
+    private const int LeftMargin = 480;   // X position aligned with opponent Pokemon (midscreen)
+    private const int TopMargin = 400;   // Y position inline with player Pokemon
     
     // Position of instruction text (appears above buttons)
     private const int InstructionTextYOffset = 20; // Distance above TopMargin
     
-    // Position of selection status text (appears below buttons)
-    private const int SelectionStatusY = 1045; // Fixed Y position at bottom - adjusted for 1080p
+    // Position of selection status text (appears above message box)
+    private const int SelectionStatusY = 635; // Fixed Y position above message box
 
     /// <summary>
     /// Get the MonoGame Color for a tera type (matching PlayerConsole colors)
