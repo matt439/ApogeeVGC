@@ -13,11 +13,11 @@ public static class MainBattleUiHelper
 {
     // ===== MAIN BATTLE CHOICE UI LAYOUT CONSTANTS =====
     
-    // Button dimensions
+    // Main menu button dimensions
     private const int ButtonWidth = 180;
     private const int ButtonHeight = 50;
     
-    // Vertical spacing between buttons
+    // Button spacing
     private const int ButtonSpacing = 8;
     
     // Position of choice menu on screen - inline with player's Pokemon, aligned with opponent horizontally
@@ -29,6 +29,21 @@ public static class MainBattleUiHelper
     
     // Position of selection status text (appears above message box)
     private const int SelectionStatusY = 635; // Fixed Y position above message box
+    
+    // Move selection grid layout
+    private const int MoveGridColumns = 1; // Number of columns in move grid (2x2)
+    private const int MoveButtonWidth = 300; // Width of individual move buttons
+    private const int MoveButtonHeight = 45; // Height of individual move buttons
+    private const int MoveHorizontalSpacing = 10; // Horizontal spacing between move buttons
+    private const int MoveVerticalSpacing = 5; // Vertical spacing between move buttons
+    
+    // Tera button dimensions (spans full width of move grid)
+    private const int TeraButtonHeight = 50; // Height of Tera toggle button
+    
+    // Tera button colors
+    private const int TeraInactiveColorR = 100; // R value for inactive Tera button
+    private const int TeraInactiveColorG = 100; // G value for inactive Tera button
+    private const int TeraInactiveColorB = 110; // B value for inactive Tera button
 
     /// <summary>
     /// Get the MonoGame Color for a tera type (matching PlayerConsole colors)
@@ -207,24 +222,17 @@ public static class MainBattleUiHelper
         }
 
         // Layout moves in a 2x2 grid
-        // Grid constants
-        const int gridColumns = 2;
-        const int moveButtonWidth = 180;
-        const int moveButtonHeight = 28;
-        const int horizontalSpacing = 10;
-        const int verticalSpacing = 10;
-
         for (int i = 0; i < availableMoves.Count; i++)
         {
             var (moveData, originalIndex) = availableMoves[i];
             
             // Calculate grid position (column, row)
-            int col = i % gridColumns;
-            int row = i / gridColumns;
+            int col = i % MoveGridColumns;
+            int row = i / MoveGridColumns;
             
             // Calculate button position
-            int x = LeftMargin + (col * (moveButtonWidth + horizontalSpacing));
-            int y = TopMargin + (row * (moveButtonHeight + verticalSpacing));
+            int x = LeftMargin + (col * (MoveButtonWidth + MoveHorizontalSpacing));
+            int y = TopMargin + (row * (MoveButtonHeight + MoveVerticalSpacing));
             
             // Get the move's type color
             Color moveTypeColor = GetTeraTypeColor(moveData.Move.Type);
@@ -239,7 +247,7 @@ public static class MainBattleUiHelper
             
             // Add move button with type-colored background
             var button = new ChoiceButton(
-                new Rectangle(x, y, moveButtonWidth, moveButtonHeight),
+                new Rectangle(x, y, MoveButtonWidth, MoveButtonHeight),
                 moveDisplayText,
                 moveTypeColor,  // Use move's type color instead of generic blue
                 () => selectMove(originalIndex, isTerastallized),
@@ -256,9 +264,8 @@ public static class MainBattleUiHelper
             
             // Position below the move grid
             int teraButtonX = LeftMargin;
-            int teraButtonY = TopMargin + (2 * (moveButtonHeight + verticalSpacing)) + verticalSpacing;
-            int teraButtonWidth = (moveButtonWidth * 2) + horizontalSpacing; // Span full width of grid
-            int teraButtonHeight = 28;
+            int teraButtonY = TopMargin + (2 * (MoveButtonHeight + MoveVerticalSpacing)) + MoveVerticalSpacing;
+            int teraButtonWidth = (MoveButtonWidth * 2) + MoveHorizontalSpacing; // Span full width of grid
             
             // Split text into white "Tera " prefix and colored type name
             string teraPrefix = "Tera ";
@@ -276,7 +283,7 @@ public static class MainBattleUiHelper
             else
             {
                 // Inactive: Use a LIGHT gray - much brighter so it's super obvious
-                teraButtonBg = new Color(100, 100, 110);
+                teraButtonBg = new Color(TeraInactiveColorR, TeraInactiveColorG, TeraInactiveColorB);
             }
             
             Console.WriteLine($"[MainBattleUiHelper] Tera button: Type={teraTypeName}, Active={isTerastallized}, BgColor=({teraButtonBg.R},{teraButtonBg.G},{teraButtonBg.B})");
@@ -286,7 +293,7 @@ public static class MainBattleUiHelper
             Color typeTextColor = isTerastallized ? Color.White : teraColor;
             
             var teraToggleButton = new ChoiceButton(
-                new Rectangle(teraButtonX, teraButtonY, teraButtonWidth, teraButtonHeight),
+                new Rectangle(teraButtonX, teraButtonY, teraButtonWidth, TeraButtonHeight),
                 teraPrefix,           // Primary text (white)
                 teraButtonBg,         // Background color shows activation state
                 toggleTera,
