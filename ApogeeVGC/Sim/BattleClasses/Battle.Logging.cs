@@ -1,5 +1,4 @@
 ﻿using ApogeeVGC.Sim.Abilities;
-using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
@@ -290,9 +289,6 @@ public partial class Battle
     {
         // Don't send if there are no new log entries
         if (SentLogPos >= Log.Count) return;
-
-        // Send new log entries to clients
-        var updates = Log.Skip(SentLogPos).ToList();
 
         // Send requests to players if not already sent
         if (!SentRequests)
@@ -589,11 +585,11 @@ public partial class Battle
 
                 var events = new List<BattleEvent>
                 {
-                    new BattleEvent
+                    new()
                     {
                         Message = null,
-                        Perspective = perspective
-                    }
+                        Perspective = perspective,
+                    },
                 };
 
                 EmitUpdate(side.Id, events);
