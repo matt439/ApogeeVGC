@@ -59,7 +59,8 @@ public class GuiChoiceCoordinator
     public void AddBattleEvent(BattleEvent evt)
     {
         _eventQueue.Enqueue(evt);
-        Console.WriteLine($"[GuiChoiceCoordinator] Enqueued event: {evt.Message.GetType().Name}");
+        string messageType = evt.Message?.GetType().Name ?? "PerspectiveOnly";
+        Console.WriteLine($"[GuiChoiceCoordinator] Enqueued event: {messageType}");
     }
 
     /// <summary>

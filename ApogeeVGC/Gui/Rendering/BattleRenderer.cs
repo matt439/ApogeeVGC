@@ -122,15 +122,8 @@ public class BattleRenderer(
             return;
         }
 
-        // Debug output only when perspective type changes
-        if (_lastPerspectiveType != battlePerspective.PerspectiveType)
-        {
-            Console.WriteLine(
-                $"[BattleRenderer] Perspective changed to: {battlePerspective.PerspectiveType}, " +
-                $"Player Active: {battlePerspective.PlayerSide.Active.Count}, " +
-                $"Opponent Active: {battlePerspective.OpponentSide.Active.Count}");
-            _lastPerspectiveType = battlePerspective.PerspectiveType;
-        }
+        // Track perspective type changes
+        _lastPerspectiveType = battlePerspective.PerspectiveType;
 
         // Cache this perspective for showing fainted Pokemon
         _previousPerspective = battlePerspective;

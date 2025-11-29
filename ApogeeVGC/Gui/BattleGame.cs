@@ -213,18 +213,21 @@ public class BattleGame : Game
             _currentBattlePerspective = evt.Perspective;
         }
 
-        // Add message to display queue
-        lock (_stateLock)
+        // Add message to display queue (if present)
+        if (evt.Message != null)
         {
-            _messageQueue.Add(evt.Message);
-            if (_messageQueue.Count > MaxMessagesDisplayed)
+            lock (_stateLock)
             {
-                _messageQueue.RemoveRange(0, _messageQueue.Count - MaxMessagesDisplayed);
+                _messageQueue.Add(evt.Message);
+                if (_messageQueue.Count > MaxMessagesDisplayed)
+                {
+                    _messageQueue.RemoveRange(0, _messageQueue.Count - MaxMessagesDisplayed);
+                }
             }
-        }
 
-        // Process message for animations
-        _animationCoordinator?.ProcessMessage(evt.Message);
+            // Process message for animations
+            _animationCoordinator?.ProcessMessage(evt.Message);
+        }
     }
 
     protected override void Update(GameTime gameTime)

@@ -6,9 +6,10 @@ namespace ApogeeVGC.Sim.BattleClasses;
 public record BattleEvent
 {
     /// <summary>
-    /// The message describing what happened
+    /// The message describing what happened.
+    /// Null for events that only update the perspective without a message (e.g., team preview initial state).
     /// </summary>
-    public required BattleMessage Message { get; init; }
+    public required BattleMessage? Message { get; init; }
     
     /// <summary>
     /// The battle perspective AFTER this message was processed

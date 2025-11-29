@@ -467,18 +467,92 @@ public partial class Battle
     /// <summary>
     /// Flush all pending events to players with GUI interfaces.
     /// Emits UpdateRequested events for each side with their respective events.
+    /// Creates events from pending log messages or sends just perspective if no new messages.
     /// </summary>
     public void FlushEvents()
     {
-        if (PendingEvents.Count == 0) return;
+        if (!DisplayUi) return;
 
-        // Send events to each side's player via UpdateRequested event
-        foreach (Side side in Sides)
+        // Determine perspective type based on current request state
+        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+            ? BattlePerspectiveType.TeamPreview
+            : BattlePerspectiveType.InBattle;
+
+        // Check if there are new log messages since last flush
+        bool hasNewMessages = SentLogPos < Log.Count;
+
+        // If we have pending events OR new log messages, create events and send them
+        if (PendingEvents.Count > 0 || hasNewMessages)
         {
-            EmitUpdate(side.Id, new List<BattleEvent>(PendingEvents));
-        }
+            var eventsToSend = new List<BattleEvent>();
 
-        PendingEvents.Clear();
+            // Add any manually created events first
+            eventsToSend.AddRange(PendingEvents);
+
+            // Parse new log messages into events
+            if (hasNewMessages)
+            {
+                var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
+                
+                // Get current perspective (will be updated after each message in a real impl,
+                // but for now we use the current state)
+                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+                
+                if (parsedMessages.Count > 0)
+                {
+                    // We have messages - create events with messages
+                    foreach (BattleMessage message in parsedMessages)
+                    {
+                        eventsToSend.Add(new BattleEvent
+                        {
+                            Message = message,
+                            Perspective = perspective
+                        });
+                    }
+                }
+                else
+                {
+                    // No parseable messages (e.g., teampreview), but we still need to send perspective
+                    eventsToSend.Add(new BattleEvent
+                    {
+                        Message = null,
+                        Perspective = perspective
+                    });
+                }
+
+                // Update the sent log position
+                SentLogPos = Log.Count;
+            }
+
+            // Send events to each side's player
+            foreach (Side side in Sides)
+            {
+                EmitUpdate(side.Id, new List<BattleEvent>(eventsToSend));
+            }
+
+            PendingEvents.Clear();
+        }
+        else
+        {
+            // No pending events or messages, but we still need to send the current perspective
+            // This happens during team preview or when requesting choices without new messages
+            foreach (Side side in Sides)
+            {
+                BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
+                
+                // Create a single event with just the perspective (no message)
+                var events = new List<BattleEvent>
+                {
+                    new BattleEvent
+                    {
+                        Message = null,
+                        Perspective = perspective
+                    }
+                };
+                
+                EmitUpdate(side.Id, events);
+            }
+        }
     }
 
     /// <summary>

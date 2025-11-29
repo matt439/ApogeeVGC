@@ -645,13 +645,9 @@ public partial class Battle
                 "Cannot request choices from players: Some sides have no active request");
         }
 
-        // Send all battle updates to players before requesting choices
-        // This ensures players see all messages (moves, damage, etc.) before making decisions
-        // Determine the perspective type based on request state
-        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-            ? BattlePerspectiveType.TeamPreview
-            : BattlePerspectiveType.InBattle;
-        UpdateAllPlayersUi(perspectiveType);
+        // Send all pending battle events to players before requesting choices
+        // This ensures players see all messages (moves, damage, etc.) and current state before making decisions
+        FlushEvents();
 
         // Emit choice request events for each side that needs to make a choice
         foreach (Side side in Sides)
