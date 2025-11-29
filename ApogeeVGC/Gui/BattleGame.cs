@@ -227,19 +227,30 @@ public class BattleGame : Game
             while (_choiceCoordinator.TryDequeueTurnBatch(out TurnEventBatch? turnBatch) && turnBatch != null)
             {
                 Console.WriteLine($"[BattleGame.Update] Received turn batch with {turnBatch.Events.Count} events");
-                _eventQueue?.EnqueueTurnBatch(turnBatch);
                 
-                // Initialize state from start perspective if this is the first turn
-                if (turnBatch.StartPerspective != null && 
-                    _battleState != null && 
-                    turnBatch.StartPerspective.PerspectiveType == BattlePerspectiveType.InBattle)
+                // Check if this turn batch contains the first InBattle events (initial switch-ins)
+                // We identify this by checking if we have switch messages but no active Pokemon yet
+                if (_battleState != null && 
+                    _battleState.PlayerActive.Count == 0 && 
+                    _battleState.OpponentActive.Count == 0 &&
+                    turnBatch.Events.Any(e => e is SwitchMessage))
                 {
-                    if (_battleState.PlayerActive.Count == 0 && _battleState.OpponentActive.Count == 0)
+                    // This is the first turn with switch-ins - process switch messages immediately
+                    // so that hasActivePokemon becomes true before rendering
+                    Console.WriteLine("[BattleGame.Update] First turn with switch-ins detected, processing switches immediately");
+                    
+                    foreach (var evt in turnBatch.Events)
                     {
-                        _battleState.Initialize(turnBatch.StartPerspective);
-                        Console.WriteLine("[BattleGame.Update] Initialized battle state from start perspective");
+                        if (evt is SwitchMessage)
+                        {
+                            _battleState.ProcessMessage(evt);
+                        }
                     }
+                    
+                    Console.WriteLine($"[BattleGame.Update] After initial switches: Player active={_battleState.PlayerActive.Count}, Opponent active={_battleState.OpponentActive.Count}");
                 }
+                
+                _eventQueue?.EnqueueTurnBatch(turnBatch);
             }
             
             // Process old-style perspective updates (LEGACY - for team preview)

@@ -137,17 +137,15 @@ public class GuiBattleState
         PokemonState? pokemon = GetPokemon(message.PokemonName, message.SideId);
         if (pokemon == null) return;
         
-        // Use the current state HP as the "old HP" because damage messages
-        // from the battle engine may have stale HP values when multiple attacks
-        // hit the same Pokemon in quick succession
         int oldHp = pokemon.Hp;
         
-        // Calculate the new HP by subtracting the damage amount from current HP
-        // Don't trust message.RemainingHp as it may be based on stale initial HP
+        // Calculate new HP by subtracting damage from old HP
         int newHp = Math.Max(0, oldHp - message.DamageAmount);
+        
+        // Update the Pokemon's HP
         pokemon.Hp = newHp;
         
-        Console.WriteLine($"[GuiBattleState.HandleDamage] {pokemon.Name}: {oldHp} → {newHp} (damage: {message.DamageAmount}, message claimed: {message.RemainingHp})");
+        Console.WriteLine($"[GuiBattleState.HandleDamage] {pokemon.Name}: {oldHp} → {newHp} (damage: {message.DamageAmount})");
         
         PokemonDamaged?.Invoke(pokemon, oldHp, newHp);
     }
@@ -264,9 +262,20 @@ public class GuiBattleState
             PokemonState? pokemon = _playerTeam.FirstOrDefault(p => p.Name == pokemonName);
             if (pokemon is { IsActive: false })
             {
-                var emptySlot = _playerActive.FirstOrDefault(kvp => 
-                    kvp.Value.IsFainted || !kvp.Value.IsActive);
-                int slot = emptySlot.Value != null ? emptySlot.Key : 0;
+                // Find the first slot that has a fainted Pokemon
+                int slot = -1;
+                foreach (var kvp in _playerActive)
+                {
+                    if (kvp.Value.IsFainted || !kvp.Value.IsActive)
+                    {
+                        slot = kvp.Key;
+                        break;
+                    }
+                }
+                
+                // If no fainted slot found, use slot 0 (shouldn't happen in valid battles)
+                if (slot < 0) slot = 0;
+                
                 Console.WriteLine($"[FindPokemonForSwitch] Found {pokemonName} in player team, switching to slot {slot}");
                 return (SideId.P1, slot, pokemon);
             }
@@ -284,9 +293,20 @@ public class GuiBattleState
             PokemonState? pokemon = _opponentTeam.FirstOrDefault(p => p.Name == pokemonName);
             if (pokemon is { IsActive: false })
             {
-                var emptySlot = _opponentActive.FirstOrDefault(kvp => 
-                    kvp.Value.IsFainted || !kvp.Value.IsActive);
-                int slot = emptySlot.Value != null ? emptySlot.Key : 0;
+                // Find the first slot that has a fainted Pokemon
+                int slot = -1;
+                foreach (var kvp in _opponentActive)
+                {
+                    if (kvp.Value.IsFainted || !kvp.Value.IsActive)
+                    {
+                        slot = kvp.Key;
+                        break;
+                    }
+                }
+                
+                // If no fainted slot found, use slot 0 (shouldn't happen in valid battles)
+                if (slot < 0) slot = 0;
+                
                 Console.WriteLine($"[FindPokemonForSwitch] Found {pokemonName} in opponent team, switching to slot {slot}");
                 return (SideId.P2, slot, pokemon);
             }

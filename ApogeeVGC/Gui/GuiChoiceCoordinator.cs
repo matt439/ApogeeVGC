@@ -98,9 +98,9 @@ public class GuiChoiceCoordinator
     // ========== NEW TURN-BATCHED EVENT API ==========
     
     /// <summary>
-    /// Start a new turn batch with the start-of-turn perspective
+    /// Start a new turn batch with the start-of-turn perspective (optional)
     /// </summary>
-    public void StartTurnBatch(BattlePerspective startPerspective)
+    public void StartTurnBatch(BattlePerspective? startPerspective)
     {
         if (_currentTurnBatch != null)
         {
