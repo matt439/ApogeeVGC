@@ -220,6 +220,10 @@ public partial class BattleActions
 
     public bool RunSwitch(Pokemon pokemon)
     {
+        // Flush any pending events (like faint messages) BEFORE processing the switch
+        // This ensures the GUI sees the fainted Pokemon before the replacement appears
+        Battle.FlushEvents();
+
         List<Pokemon> switchersIn = [pokemon];
 
         while (Battle.Queue.Peek() is RunSwitchAction)
