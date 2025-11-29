@@ -58,13 +58,12 @@ Perspective = perspective
     /// Internal method called by Battle when there are UI updates.
     /// Emits the UpdateRequested event.
     /// </summary>
-    internal void EmitUpdate(SideId sideId, BattlePerspective perspective, IEnumerable<BattleMessage> messages)
+    internal void EmitUpdate(SideId sideId, IEnumerable<BattleEvent> events)
     {
      UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
     {
 SideId = sideId,
-       Perspective = perspective,
-Messages = messages
+Events = events
         });
     }
 
@@ -107,8 +106,7 @@ public class BattleChoiceRequestEventArgs : EventArgs
 public class BattleUpdateEventArgs : EventArgs
 {
     public required SideId SideId { get; init; }
-    public required BattlePerspective Perspective { get; init; }
-    public required IEnumerable<BattleMessage> Messages { get; init; }
+    public required IEnumerable<BattleEvent> Events { get; init; }
 }
 
 /// <summary>

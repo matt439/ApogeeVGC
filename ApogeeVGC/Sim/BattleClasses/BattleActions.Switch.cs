@@ -244,7 +244,7 @@ public partial class BattleActions
         }
 
         // Flush messages immediately after switches complete so the GUI shows the new Pokemon
-        Battle.FlushMessages();
+        Battle.FlushEvents();
 
         return true;
     }

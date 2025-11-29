@@ -13,17 +13,33 @@ namespace ApogeeVGC.Sim.BattleClasses;
 
 public partial class Battle
 {
+    /// <summary>
+    /// Legacy method - no longer used. Events are now sent via AddMessage/FlushEvents.
+    /// Kept for reference only.
+    /// </summary>
+    [Obsolete("Use AddMessage and FlushEvents instead")]
     private void UpdateAllPlayersUi(
         BattlePerspectiveType battlePerspectiveType = BattlePerspectiveType.InBattle)
     {
         // Parse new log entries once
         var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
 
-        // Send the same messages to all players (each with their own perspective)
+        // Create events for each message with the current perspective
+        var events = new List<BattleEvent>();
+        foreach (BattleMessage message in parsedMessages)
+        {
+            BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, battlePerspectiveType);
+            events.Add(new BattleEvent
+            {
+                Message = message,
+                Perspective = perspective
+            });
+        }
+
+        // Send the same events to all players
         foreach (Side side in Sides)
         {
-            BattlePerspective perspective = GetPerspectiveForSide(side.Id, battlePerspectiveType);
-            EmitUpdate(side.Id, perspective, parsedMessages);
+            EmitUpdate(side.Id, events);
         }
 
         // Update the sent log position to mark these entries as processed
@@ -450,13 +466,19 @@ public partial class Battle
 
     /// <summary>
     /// Flush all pending events to players with GUI interfaces.
-    /// Events are available in PendingEvents and will be sent by the Driver/Simulator.
-    /// This method is kept for API compatibility but events are pulled by the Driver.
+    /// Emits UpdateRequested events for each side with their respective events.
     /// </summary>
     public void FlushEvents()
     {
-        // Events in PendingEvents will be pulled and sent by the Driver/Simulator
-        // infrastructure. This method is a placeholder for future functionality.
+        if (PendingEvents.Count == 0) return;
+
+        // Send events to each side's player via UpdateRequested event
+        foreach (Side side in Sides)
+        {
+            EmitUpdate(side.Id, new List<BattleEvent>(PendingEvents));
+        }
+
+        PendingEvents.Clear();
     }
 
     /// <summary>

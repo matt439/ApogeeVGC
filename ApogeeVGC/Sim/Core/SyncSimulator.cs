@@ -173,8 +173,7 @@ public class SyncSimulator : IBattleController
     private void OnUpdateRequested(object? sender, BattleUpdateEventArgs e)
     {
         IPlayer player = GetPlayer(e.SideId);
-        player.UpdateUi(e.Perspective);
-        player.UpdateMessages(e.Messages);
+        player.UpdateEvents(e.Events);
     }
 
     /// <summary>
