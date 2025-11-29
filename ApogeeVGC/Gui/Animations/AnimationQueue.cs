@@ -91,9 +91,14 @@ public class QueuedDamageIndicator : QueuedAnimation
     public required int MaxHp { get; init; }
     public required Vector2 PokemonPosition { get; init; }
     public required AnimationManager AnimationManager { get; init; }
+    public string? PokemonKey { get; init; } // Optional: for triggering HP bar animation
+    public int? OldHp { get; init; } // Optional: for HP bar animation
+    public int? NewHp { get; init; } // Optional: for HP bar animation
 
     public override BattleAnimation Start()
     {
+        Console.WriteLine($"[QueuedDamageIndicator] Starting damage indicator for {PokemonKey}");
+        
         var indicator = DamageIndicator.CreateDamageIndicator(
             DamageAmount,
             MaxHp,
@@ -101,6 +106,16 @@ public class QueuedDamageIndicator : QueuedAnimation
             AnimationManager.Font);
 
         indicator.Start();
+        
+        // If this damage indicator has associated HP bar animation data, schedule it to start
+        // AFTER this damage indicator completes, not immediately
+        if (PokemonKey != null && OldHp.HasValue && NewHp.HasValue)
+        {
+            Console.WriteLine($"[QueuedDamageIndicator] Queueing HP bar animation for {PokemonKey}: {OldHp} -> {NewHp}");
+            // Queue HP bar animation to start after damage indicator
+            AnimationManager.QueueHpBarAnimationDirectly(PokemonKey, OldHp.Value, NewHp.Value, MaxHp);
+        }
+        
         return indicator;
     }
 }
@@ -144,6 +159,38 @@ public class QueuedCustomIndicator : QueuedAnimation
 
         indicator.Start();
         return indicator;
+    }
+}
+
+/// <summary>
+/// Queued HP bar animation  
+/// Note: This animation delays registration to allow frozen animations to display first
+/// </summary>
+public class QueuedHpBarAnimation : QueuedAnimation
+{
+    public required string PokemonKey { get; init; }
+    public required int OldHp { get; init; }
+    public required int NewHp { get; init; }
+    public required int MaxHp { get; init; }
+    public required AnimationManager AnimationManager { get; init; }
+
+    public override BattleAnimation Start()
+    {
+        Console.WriteLine($"[QueuedHpBarAnimation] Starting HP animation for {PokemonKey}: {OldHp} -> {NewHp}");
+        
+        var hpAnimation = new HpBarAnimation(PokemonKey, OldHp, NewHp, MaxHp);
+        hpAnimation.Start();
+        
+        // DELAYED registration: Register on the next frame update cycle
+        // This allows the frozen animation to be displayed first
+        Task.Run(async () =>
+        {
+            await Task.Delay(16); // Wait one frame (~16ms)
+            AnimationManager.RegisterHpBarAnimation(PokemonKey, hpAnimation);
+            Console.WriteLine($"[QueuedHpBarAnimation] Registered HP animation for {PokemonKey} after delay");
+        });
+        
+        return hpAnimation;
     }
 }
 

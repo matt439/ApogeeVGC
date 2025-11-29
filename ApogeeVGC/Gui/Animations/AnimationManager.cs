@@ -64,6 +64,12 @@ public class AnimationManager
                     _activeAnimations.Add(currentAnim);
                 }
             }
+            else if (currentAnim is HpBarAnimation)
+            {
+                // HP bar animations are already registered via RegisterHpBarAnimation in QueuedHpBarAnimation.Start()
+                // They update independently via _hpBarAnimations dictionary
+                // Don't add to _activeAnimations - they're managed separately
+            }
         }
 
         // Update all animations
@@ -203,6 +209,27 @@ public class AnimationManager
 
         _animationQueue.Enqueue(queuedIndicator);
     }
+    
+    /// <summary>
+    /// Queue a damage indicator with associated HP bar animation
+    /// The HP bar animation will start when the damage indicator starts (after attack lands)
+    /// </summary>
+    public void QueueDamageIndicatorWithHpBar(int damageAmount, int maxHp, Vector2 pokemonPosition, 
+        string pokemonKey, int oldHp, int newHp)
+    {
+        var queuedIndicator = new QueuedDamageIndicator
+        {
+            DamageAmount = damageAmount,
+            MaxHp = maxHp,
+            PokemonPosition = pokemonPosition,
+            AnimationManager = this,
+            PokemonKey = pokemonKey,
+            OldHp = oldHp,
+            NewHp = newHp
+        };
+
+        _animationQueue.Enqueue(queuedIndicator);
+    }
 
     /// <summary>
     /// Queue a miss indicator to play sequentially
@@ -232,6 +259,98 @@ public class AnimationManager
         };
 
         _animationQueue.Enqueue(queuedIndicator);
+    }
+
+    /// <summary>
+    /// Queue an HP bar animation to play sequentially
+    /// This ensures the HP bar starts animating after the attack animation completes
+    /// </summary>
+    public void QueueHpBarAnimation(string pokemonKey, int oldHp, int newHp, int maxHp)
+    {
+        // If there's already an animation for this Pokemon, use its current state
+        if (_hpBarAnimations.TryGetValue(pokemonKey, out HpBarAnimation? existingAnimation))
+        {
+            // If the existing animation is frozen (not active), keep it frozen
+            // This preserves the HP from PreservePokemonHpBeforePerspectiveUpdate
+            if (!existingAnimation.IsActive)
+            {
+                // Keep the existing frozen animation - don't replace it!
+                // Just queue the real animation to play later, starting from the frozen HP
+                oldHp = existingAnimation.CurrentHp;
+                Console.WriteLine($"[AnimationManager] Preserving frozen animation for {pokemonKey} at {oldHp} HP");
+            }
+            else
+            {
+                // Animation is active - chain from its target HP
+                oldHp = existingAnimation.TargetHp;
+                Console.WriteLine($"[AnimationManager] Chaining from active animation for {pokemonKey}, target HP: {oldHp}");
+                
+                // Create a new frozen animation to hold at the target HP until this animation starts
+                var frozenAnimation = new HpBarAnimation(pokemonKey, oldHp, oldHp, maxHp);
+                frozenAnimation.Start();
+                frozenAnimation.Stop(); // Freeze it at the old HP value
+                _hpBarAnimations[pokemonKey] = frozenAnimation;
+            }
+        }
+        else
+        {
+            // No existing animation - create a frozen one at the old HP
+            Console.WriteLine($"[AnimationManager] Creating new frozen animation for {pokemonKey} at {oldHp} HP");
+            var frozenAnimation = new HpBarAnimation(pokemonKey, oldHp, oldHp, maxHp);
+            frozenAnimation.Start();
+            frozenAnimation.Stop(); // Freeze it at the old HP value
+            _hpBarAnimations[pokemonKey] = frozenAnimation;
+        }
+        
+        var queuedHpAnimation = new QueuedHpBarAnimation
+        {
+            PokemonKey = pokemonKey,
+            OldHp = oldHp,
+            NewHp = newHp,
+            MaxHp = maxHp,
+            AnimationManager = this
+        };
+
+        _animationQueue.Enqueue(queuedHpAnimation);
+    }
+    
+    /// <summary>
+    /// Queue an HP bar animation directly without creating a frozen animation
+    /// Assumes a frozen animation already exists (created by PreservePokemonHpBeforePerspectiveUpdate)
+    /// </summary>
+    public void QueueHpBarAnimationDirectly(string pokemonKey, int oldHp, int newHp, int maxHp)
+    {
+        Console.WriteLine($"[AnimationManager] QueueHpBarAnimationDirectly for {pokemonKey}: {oldHp} -> {newHp}");
+        
+        // If there's already an animation, use its current HP as the starting point
+        if (_hpBarAnimations.TryGetValue(pokemonKey, out HpBarAnimation? existingAnimation))
+        {
+            oldHp = existingAnimation.CurrentHp;
+            Console.WriteLine($"[AnimationManager] Using existing animation HP: {oldHp}");
+        }
+        
+        var queuedHpAnimation = new QueuedHpBarAnimation
+        {
+            PokemonKey = pokemonKey,
+            OldHp = oldHp,
+            NewHp = newHp,
+            MaxHp = maxHp,
+            AnimationManager = this
+        };
+
+        _animationQueue.Enqueue(queuedHpAnimation);
+    }
+
+    /// <summary>
+    /// Register an HP bar animation that was started from the queue
+    /// </summary>
+    internal void RegisterHpBarAnimation(string pokemonKey, HpBarAnimation hpAnimation)
+    {
+        // Remove any existing animation for this Pokemon
+        _hpBarAnimations.Remove(pokemonKey);
+        
+        // Register the new animation
+        _hpBarAnimations[pokemonKey] = hpAnimation;
     }
 
     /// <summary>
@@ -272,6 +391,16 @@ public class AnimationManager
             return animation.CurrentHp;
         }
         return null;
+    }
+    
+    /// <summary>
+    /// Get the HP bar animation for a Pokemon, or null if no animation exists
+    /// </summary>
+    /// <param name="pokemonKey">Unique key for the Pokemon</param>
+    /// <returns>HP bar animation, or null if not found</returns>
+    public HpBarAnimation? GetHpBarAnimation(string pokemonKey)
+    {
+        return _hpBarAnimations.TryGetValue(pokemonKey, out HpBarAnimation? animation) ? animation : null;
     }
 
     /// <summary>

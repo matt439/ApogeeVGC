@@ -28,6 +28,7 @@ public class BattleGame : Game
     private AnimationCoordinator? _animationCoordinator;
 
     private BattlePerspective? _currentBattlePerspective;
+    private BattlePerspective? _hpSnapshotPerspective; // Snapshot for HP preservation across event batches
     private readonly Lock _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown;
@@ -210,12 +211,11 @@ public class BattleGame : Game
         Console.WriteLine($"[BattleGame.ProcessBattleEvent] Processing event with message type: {evt.Message?.GetType().Name ?? "null"}");
         Console.WriteLine($"[BattleGame.ProcessBattleEvent] _animationCoordinator is null? {_animationCoordinator == null}");
         
-        // Store perspective for rendering
-        lock (_stateLock)
-        {
-            _currentBattlePerspective = evt.Perspective;
-        }
-
+        // Before processing any messages, ensure all Pokemon have frozen HP animations if perspective changed
+        // Use the HP snapshot (not _currentBattlePerspective) to detect changes
+        // This prevents the "jump" effect when perspective updates with new HP before animations are queued
+        PreservePokemonHpBeforePerspectiveUpdate(evt.Perspective);
+        
         // Add message to display queue (if present)
         if (evt.Message != null)
         {
@@ -230,10 +230,98 @@ public class BattleGame : Game
 
             Console.WriteLine($"[BattleGame.ProcessBattleEvent] About to call ProcessMessage for {evt.Message.GetType().Name}");
             
-            // Process message for animations
+            // Process message for animations BEFORE storing perspective
+            // This ensures HP bar animations are queued with the correct old HP values
             _animationCoordinator?.ProcessMessage(evt.Message);
             
             Console.WriteLine($"[BattleGame.ProcessBattleEvent] ProcessMessage called");
+        }
+        
+        // Store perspective for rendering AFTER processing animations
+        // This ensures frozen HP bar animations are created before the perspective with new HP is stored
+        lock (_stateLock)
+        {
+            _currentBattlePerspective = evt.Perspective;
+        }
+    }
+    
+    /// <summary>
+    /// Preserve Pokemon HP values before perspective update by creating frozen animations
+    /// This prevents HP bars from jumping to new values before animations are queued
+    /// Uses _hpSnapshotPerspective instead of _currentBattlePerspective to detect changes
+    /// </summary>
+    private void PreservePokemonHpBeforePerspectiveUpdate(BattlePerspective newPerspective)
+    {
+        if (_animationManager == null)
+            return;
+            
+        // Only preserve HP during active battle (not team preview)
+        if (newPerspective.PerspectiveType != BattlePerspectiveType.InBattle)
+            return;
+        
+        // Use HP snapshot as the baseline (if it exists), otherwise use current perspective
+        BattlePerspective? baselinePerspective = _hpSnapshotPerspective ?? _currentBattlePerspective;
+        
+        if (baselinePerspective == null)
+        {
+            // First event - create snapshot
+            _hpSnapshotPerspective = newPerspective;
+            return;
+        }
+        
+        // Check each Pokemon in the new perspective and create frozen animations if HP changed from baseline
+        for (int slot = 0; slot < newPerspective.PlayerSide.Active.Count; slot++)
+        {
+            var newPokemon = newPerspective.PlayerSide.Active[slot];
+            var oldPokemon = slot < baselinePerspective.PlayerSide.Active.Count 
+                ? baselinePerspective.PlayerSide.Active[slot] 
+                : null;
+                
+            if (newPokemon != null && oldPokemon != null && newPokemon.Name == oldPokemon.Name)
+            {
+                // Same Pokemon in same slot - check if HP changed
+                if (newPokemon.Hp != oldPokemon.Hp)
+                {
+                    string key = $"{newPokemon.Name}|0"; // Player is always SideId.P1 (0)
+                    
+                    // Only create frozen animation if one doesn't already exist
+                    if (_animationManager.GetAnimatedHp(key) == null)
+                    {
+                        Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
+                        _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
+                        // Immediately stop it to freeze at old HP
+                        var frozenAnim = _animationManager.GetHpBarAnimation(key);
+                        frozenAnim?.Stop();
+                    }
+                }
+            }
+        }
+        
+        for (int slot = 0; slot < newPerspective.OpponentSide.Active.Count; slot++)
+        {
+            var newPokemon = newPerspective.OpponentSide.Active[slot];
+            var oldPokemon = slot < baselinePerspective.OpponentSide.Active.Count 
+                ? baselinePerspective.OpponentSide.Active[slot] 
+                : null;
+                
+            if (newPokemon != null && oldPokemon != null && newPokemon.Name == oldPokemon.Name)
+            {
+                // Same Pokemon in same slot - check if HP changed
+                if (newPokemon.Hp != oldPokemon.Hp)
+                {
+                    string key = $"{newPokemon.Name}|1"; // Opponent is always SideId.P2 (1)
+                    
+                    // Only create frozen animation if one doesn't already exist
+                    if (_animationManager.GetAnimatedHp(key) == null)
+                    {
+                        Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
+                        _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
+                        // Immediately stop it to freeze at old HP
+                        var frozenAnim = _animationManager.GetHpBarAnimation(key);
+                        frozenAnim?.Stop();
+                    }
+                }
+            }
         }
     }
 
@@ -247,7 +335,15 @@ public class BattleGame : Game
             
             if (!hasActiveAnimations)
             {
-                // No animations running - process events until we trigger an animation
+                // No animations running - update HP snapshot to current perspective before processing new events
+                // This ensures the next batch of events compares against the latest stable HP values
+                if (_currentBattlePerspective != null && 
+                    _currentBattlePerspective.PerspectiveType == BattlePerspectiveType.InBattle)
+                {
+                    _hpSnapshotPerspective = _currentBattlePerspective;
+                }
+                
+                // Process events until we trigger an animation
                 // This allows related messages (move used + damage) to be processed together
                 bool hadActiveAnimationsBefore = false;
                 int maxEventsPerFrame = 10; // Safety limit to prevent infinite loops

@@ -118,7 +118,7 @@ public class AnimationCoordinator
     }
 
     /// <summary>
-    /// Handle damage - queue damage indicator and HP bar animation
+    /// Handle damage - queue damage indicator with HP bar animation
     /// </summary>
     private void HandleDamage(DamageMessage damageMsg)
     {
@@ -135,15 +135,18 @@ public class AnimationCoordinator
         string key = CreatePositionKey(damageMsg.PokemonName, damageMsg.SideId);
         if (_pokemonPositions.TryGetValue(key, out var pokemonInfo))
         {
-            // Queue damage indicator to play after attack animation
-            _animationManager.QueueDamageIndicator(
+            // Calculate old HP (before damage)
+            int oldHp = damageMsg.RemainingHp + damageMsg.DamageAmount;
+            
+            // Queue damage indicator with HP bar animation data
+            // The HP bar will start when the damage indicator starts (after attack lands)
+            _animationManager.QueueDamageIndicatorWithHpBar(
                 damageMsg.DamageAmount,
                 damageMsg.MaxHp,
-                pokemonInfo.Position);
-            
-            // Start HP bar animation (oldHp = remainingHp + damage, newHp = remainingHp)
-            int oldHp = damageMsg.RemainingHp + damageMsg.DamageAmount;
-            _animationManager.StartHpBarAnimation(key, oldHp, damageMsg.RemainingHp, damageMsg.MaxHp);
+                pokemonInfo.Position,
+                key,
+                oldHp,
+                damageMsg.RemainingHp);
         }
 
         // Note: Don't clear _pendingMoveAnimation here yet - it might hit multiple targets
