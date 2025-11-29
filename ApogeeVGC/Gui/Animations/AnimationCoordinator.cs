@@ -321,4 +321,12 @@ public class AnimationCoordinator
         SideId sideId = isPlayer ? _playerSideId.Value : (_playerSideId.Value == SideId.P1 ? SideId.P2 : SideId.P1);
         return CreatePositionKey(pokemonName, sideId);
     }
+
+    /// <summary>
+    /// Check if any animations are currently active
+    /// </summary>
+    public bool HasActiveAnimations()
+    {
+        return _animationManager.HasActiveAnimations;
+    }
 }

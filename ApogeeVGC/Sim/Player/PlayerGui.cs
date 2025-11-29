@@ -77,16 +77,32 @@ public class PlayerGui : IPlayer
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // Queue the update through the coordinator instead of calling BattleGame directly
-        // This avoids cross-thread issues with MonoGame
-        ChoiceCoordinator.QueuePerspectiveUpdate(perspective);
+        // The perspective represents the state AFTER the messages
+        // We'll store it and use it when completing the batch in UpdateMessages
+        // Note: Battle always calls UpdateUi then UpdateMessages in the same event
+        
+        // Start a new turn batch (without start perspective - will use previous end as implicit start)
+        ChoiceCoordinator.StartTurnBatch(perspective);
+        
+        // Also queue legacy perspective update for team preview compatibility
+        if (perspective.PerspectiveType == BattlePerspectiveType.TeamPreview)
+        {
+            ChoiceCoordinator.QueuePerspectiveUpdate(perspective);
+        }
     }
 
     public void UpdateMessages(IEnumerable<BattleMessage> messages)
     {
-        // Queue the messages through the coordinator instead of calling BattleGame directly
-        // This avoids cross-thread issues with MonoGame
-        ChoiceCoordinator.QueueMessages(messages);
+        // Add messages to the current turn batch
+        foreach (var message in messages)
+        {
+            ChoiceCoordinator.AddEventToTurnBatch(message);
+        }
+        
+        // Complete the turn batch with the perspective as the end state
+        // The perspective was already set in UpdateUi - now we just add the end perspective
+        BattlePerspective? currentPerspective = ChoiceCoordinator.GetCurrentTurnBatchPerspective();
+        ChoiceCoordinator.CompleteTurnBatch(currentPerspective);
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
