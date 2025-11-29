@@ -96,24 +96,24 @@ public class PlayerConsole : IPlayer
         _currentPerspective = perspective;
     }
 
-    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+    public void UpdateEvents(IEnumerable<BattleEvent> events)
     {
-        var battleMessages = messages as BattleMessage[] ?? messages.ToArray();
-        foreach (BattleMessage message in battleMessages)
+        foreach (var evt in events)
         {
-            _recentMessages.Add(message);
-        }
-
-        // Keep only recent messages
-        while (_recentMessages.Count > MaxMessages)
-        {
-            _recentMessages.RemoveAt(0);
-        }
-
-        // Display messages
-        foreach (BattleMessage message in battleMessages)
-        {
-            string text = message.ToDisplayText();
+            // Update perspective
+            _currentPerspective = evt.Perspective;
+            
+            // Add message
+            _recentMessages.Add(evt.Message);
+            
+            // Keep only recent messages
+            while (_recentMessages.Count > MaxMessages)
+            {
+                _recentMessages.RemoveAt(0);
+            }
+            
+            // Display message
+            string text = evt.Message.ToDisplayText();
             if (!string.IsNullOrEmpty(text))
             {
                 AnsiConsole.MarkupLine($"[grey]{text}[/]");

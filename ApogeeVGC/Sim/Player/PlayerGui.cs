@@ -77,37 +77,21 @@ public class PlayerGui : IPlayer
 
     public void UpdateUi(BattlePerspective perspective)
     {
-        // The perspective represents the state AFTER the messages
-        // We DON'T use it as the start perspective - just store it for the end
-        // Note: Battle always calls UpdateUi then UpdateMessages in the same event
-        
-        // Start a new turn batch WITHOUT a start perspective
-        // The start perspective would just be the end of the previous turn
-        ChoiceCoordinator.StartTurnBatch(null);
-        
-        // Store the perspective for completing the batch
-        _pendingEndPerspective = perspective;
-        
-        // Also queue legacy perspective update for team preview compatibility
+        // Legacy method for team preview compatibility
+        // For team preview, we still queue perspective updates
         if (perspective.PerspectiveType == BattlePerspectiveType.TeamPreview)
         {
             ChoiceCoordinator.QueuePerspectiveUpdate(perspective);
         }
     }
-    
-    private BattlePerspective? _pendingEndPerspective;
 
-    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+    public void UpdateEvents(IEnumerable<BattleEvent> events)
     {
-        // Add messages to the current turn batch
-        foreach (var message in messages)
+        // No longer building turn batches - just forward events to coordinator
+        foreach (var evt in events)
         {
-            ChoiceCoordinator.AddEventToTurnBatch(message);
+            ChoiceCoordinator.AddBattleEvent(evt);
         }
-        
-        // Complete the turn batch with the perspective as the end state
-        ChoiceCoordinator.CompleteTurnBatch(_pendingEndPerspective);
-        _pendingEndPerspective = null;
     }
 
     public event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;

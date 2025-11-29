@@ -1,6 +1,5 @@
 using ApogeeVGC.Gui.ChoiceUI;
 using ApogeeVGC.Gui.Animations;
-using ApogeeVGC.Gui.State;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Sim.BattleClasses;
@@ -153,26 +152,6 @@ public class BattleRenderer(
         // Render animations on top of everything
         _animationManager?.Render(spriteBatch, gameTime);
     }
-    
-    /// <summary>
-    /// NEW: Render battle scene using GuiBattleState (message-driven architecture)
-    /// </summary>
-    public void RenderBattleState(GameTime gameTime, GuiBattleState? battleState)
-    {
-        if (battleState == null)
-        {
-            RenderWaitingScreen();
-            return;
-        }
-        
-        RenderField();
-        RenderPlayerPokemonFromState(battleState);
-        RenderOpponentPokemonFromState(battleState);
-        RenderInBattleUi();
-        
-        // Render animations on top
-        _animationManager?.Render(spriteBatch, gameTime);
-    }
 
     /// <summary>
     /// Render the team preview screen showing all Pokemon from both teams
@@ -187,13 +166,63 @@ public class BattleRenderer(
 
     /// <summary>
     /// Render the active battle screen showing only active Pokemon
-    /// This is now only used for fallback when battle state is not available
     /// </summary>
     private void RenderInBattle(BattlePerspective battlePerspective)
     {
         RenderField();
+        RenderInBattlePlayerPokemon(battlePerspective);
+        RenderInBattleOpponentPokemon(battlePerspective);
         RenderInBattleUi();
-        // Note: Pokemon rendering is now handled by RenderBattleState
+    }
+
+    /// <summary>
+    /// Render player's active Pokemon during battle
+    /// </summary>
+    private void RenderInBattlePlayerPokemon(BattlePerspective battlePerspective)
+    {
+        _playerPokemonBoxes.Clear();
+
+        for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
+        {
+            PokemonPerspective? pokemon = battlePerspective.PlayerSide.Active[i];
+            if (pokemon == null) continue;
+
+            int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
+            var position = new XnaVector2(xPosition, InBattlePlayerYOffset);
+
+            _playerPokemonBoxes[i] = new XnaRectangle(
+                (int)position.X,
+                (int)position.Y,
+                PokemonSpriteSize,
+                PokemonSpriteSize);
+
+            RenderPlayerPokemonInfo(pokemon, position);
+        }
+    }
+
+    /// <summary>
+    /// Render opponent's active Pokemon during battle
+    /// </summary>
+    private void RenderInBattleOpponentPokemon(BattlePerspective battlePerspective)
+    {
+        _opponentPokemonBoxes.Clear();
+
+        for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
+        {
+            PokemonPerspective? pokemon = battlePerspective.OpponentSide.Active[i];
+            if (pokemon == null) continue;
+
+            int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
+            var position = new XnaVector2(xPosition, InBattleOpponentYOffset);
+
+            _opponentPokemonBoxes[i] = new XnaRectangle(
+                (int)position.X,
+                (int)position.Y,
+                PokemonSpriteSize,
+                PokemonSpriteSize);
+
+            RenderOpponentPokemonInfo(pokemon, position);
+        }
     }
 
     private void RenderWaitingScreen()
@@ -842,110 +871,4 @@ public class BattleRenderer(
         }
     }
     
-    // ===== STATE-BASED RENDERING METHODS =====
-    
-    /// <summary>
-    /// NEW: Render player Pokemon from battle state
-    /// </summary>
-    private void RenderPlayerPokemonFromState(GuiBattleState state)
-    {
-        _playerPokemonBoxes.Clear();
-        
-        foreach (var (slot, pokemon) in state.PlayerActive)
-        {
-            // Don't render if fainted and switched out
-            if (pokemon.IsFainted && !pokemon.IsActive) continue;
-            
-            int xPosition = InBattlePlayerXOffset + (slot * (PokemonSpriteSize + PokemonSpacing));
-            var position = new XnaVector2(xPosition, InBattlePlayerYOffset);
-            
-            _playerPokemonBoxes[slot] = new XnaRectangle(
-                (int)position.X,
-                (int)position.Y,
-                PokemonSpriteSize,
-                PokemonSpriteSize);
-            
-            RenderPokemonState(pokemon, position, true);
-        }
-    }
-    
-    /// <summary>
-    /// NEW: Render opponent Pokemon from battle state
-    /// </summary>
-    private void RenderOpponentPokemonFromState(GuiBattleState state)
-    {
-        _opponentPokemonBoxes.Clear();
-        
-        foreach (var (slot, pokemon) in state.OpponentActive)
-        {
-            // Don't render if fainted and switched out
-            if (pokemon.IsFainted && !pokemon.IsActive) continue;
-            
-            int xPosition = InBattleOpponentXOffset + (slot * (PokemonSpriteSize + PokemonSpacing));
-            var position = new XnaVector2(xPosition, InBattleOpponentYOffset);
-            
-            _opponentPokemonBoxes[slot] = new XnaRectangle(
-                (int)position.X,
-                (int)position.Y,
-                PokemonSpriteSize,
-                PokemonSpriteSize);
-            
-            RenderPokemonState(pokemon, position, false);
-        }
-    }
-    
-    /// <summary>
-    /// NEW: Render a Pokemon from state data
-    /// </summary>
-    private void RenderPokemonState(PokemonState pokemon, XnaVector2 position, bool isPlayer)
-    {
-        // Get sprite
-        Texture2D sprite = isPlayer 
-            ? spriteManager.GetBackSprite(pokemon.Species)
-            : spriteManager.GetFrontSprite(pokemon.Species);
-        
-        // Apply animation offset
-        XnaVector2 animationOffset = isPlayer
-            ? _animationManager?.GetPlayerSpriteOffset(pokemon.Position) ?? XnaVector2.Zero
-            : _animationManager?.GetOpponentSpriteOffset(pokemon.Position) ?? XnaVector2.Zero;
-        XnaVector2 adjustedPosition = position + animationOffset;
-        
-        // Draw sprite
-        var spriteRect = new XnaRectangle(
-            (int)adjustedPosition.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
-            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
-            sprite.Width,
-            sprite.Height);
-        spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
-        
-        // Draw border
-        var borderRect = new XnaRectangle((int)position.X, (int)position.Y, PokemonSpriteSize, PokemonSpriteSize);
-        XnaColor borderColor = isPlayer ? XnaColor.Blue : XnaColor.Red;
-        DrawRectangle(borderRect, borderColor, BorderThicknessNormal);
-        
-        // Draw info text
-        XnaVector2 textPosition = position + new XnaVector2(0, PokemonSpriteSize + InfoTextYOffset);
-        spriteBatch.DrawString(font, pokemon.Name, textPosition, XnaColor.White);
-        
-        // Get animated HP
-        string pokemonKey = $"{pokemon.Name}|{(int)pokemon.Side}";
-        int displayHp = _animationManager?.GetAnimatedHp(pokemonKey) ?? pokemon.Hp;
-        
-        // Draw HP text
-        string hpText = $"HP: {displayHp}/{pokemon.MaxHp}";
-        XnaVector2 hpTextPosition = textPosition + new XnaVector2(0, font.LineSpacing);
-        spriteBatch.DrawString(font, hpText, hpTextPosition, XnaColor.White);
-        
-        // Draw HP bar
-        XnaVector2 hpBarPosition = hpTextPosition + new XnaVector2(0, font.LineSpacing + HpBarYSpacing);
-        DrawHpBar(hpBarPosition, displayHp, pokemon.MaxHp);
-        
-        // Draw status
-        (string statusName, XnaColor statusColor) = GetStatusDisplay(pokemon.Status);
-        if (!string.IsNullOrEmpty(statusName))
-        {
-            XnaVector2 statusPosition = hpBarPosition + new XnaVector2(0, HpBarHeight + HpBarYSpacing);
-            spriteBatch.DrawString(font, statusName, statusPosition, statusColor);
-        }
-    }
 }

@@ -422,44 +422,41 @@ public partial class Battle
     }
 
     /// <summary>
-    /// Add a battle message to the pending message queue.
-    /// Messages will be sent to players when FlushMessages is called.
+    /// Add a battle message to the pending event queue.
+    /// Events will be sent to players when FlushEvents is called.
+    /// Only generates perspectives when DisplayUi is true.
     /// </summary>
     public void AddMessage(BattleMessage message)
     {
-        PendingMessages.Add(message);
+        if (DisplayUi)
+        {
+            // Determine perspective type based on current request state
+            BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                ? BattlePerspectiveType.TeamPreview
+                : BattlePerspectiveType.InBattle;
+
+            // Generate perspective for P1 (GUI player)
+            BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+
+            var battleEvent = new BattleEvent
+            {
+                Message = message,
+                Perspective = perspective
+            };
+
+            PendingEvents.Add(battleEvent);
+        }
     }
 
     /// <summary>
-    /// Flush all pending messages to players with GUI interfaces.
-    /// This is typically called after a state update to send accumulated messages.
-    /// NOTE: This only sends messages, NOT perspective updates. 
-    /// Use UpdatePlayerUi() to send perspective updates.
+    /// Flush all pending events to players with GUI interfaces.
+    /// Events are available in PendingEvents and will be sent by the Driver/Simulator.
+    /// This method is kept for API compatibility but events are pulled by the Driver.
     /// </summary>
-    public void FlushMessages()
+    public void FlushEvents()
     {
-        if (PendingMessages.Count == 0) return;
-
-// Determine perspective type based on current request state
-        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-            ? BattlePerspectiveType.TeamPreview
-            : BattlePerspectiveType.InBattle;
-
-        // Send messages via UpdateRequested event with correct perspective
-        foreach (Side side in Sides)
-        {
-            BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
-
-            UpdateRequested?.Invoke(this, new BattleUpdateEventArgs
-            {
-                SideId = side.Id,
-                Perspective = perspective,
-                Messages = new List<BattleMessage>(PendingMessages)
-            });
-        }
-
-        // Clear the pending messages
-        PendingMessages.Clear();
+        // Events in PendingEvents will be pulled and sent by the Driver/Simulator
+        // infrastructure. This method is a placeholder for future functionality.
     }
 
     /// <summary>
@@ -469,7 +466,7 @@ public partial class Battle
     public void AddAndFlushMessage(BattleMessage message)
     {
         AddMessage(message);
-        FlushMessages();
+        FlushEvents();
     }
 
     /// <summary>

@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using ApogeeVGC.Gui.Rendering;
 using ApogeeVGC.Gui.ChoiceUI;
 using ApogeeVGC.Gui.Animations;
-using ApogeeVGC.Gui.State;
-using ApogeeVGC.Gui.EventProcessing;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using ApogeeVGC.Sim.Core;
@@ -33,9 +31,6 @@ public class BattleGame : Game
     private readonly Lock _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown;
-    
-    // Message-driven GUI state
-    private GuiBattleState? _battleState;
 
     // Message queue for battle events
     private readonly List<BattleMessage> _messageQueue = [];
@@ -43,10 +38,6 @@ public class BattleGame : Game
 
     // Thread-safe coordinator for choice requests
     private readonly GuiChoiceCoordinator _choiceCoordinator = new();
-    
-    // New sequential event processing system
-    private BattleEventQueue? _eventQueue;
-    private EventProcessor? _eventProcessor;
 
     // Pending battle start data
     private Library? _pendingLibrary;
@@ -205,113 +196,52 @@ public class BattleGame : Game
             
             Console.WriteLine("[BattleGame] Animation system initialized");
         }
-        
-        // Initialize battle state
-        _battleState = new GuiBattleState();
-        
-        // Initialize event processing system
-        _eventQueue = new BattleEventQueue();
-        _eventProcessor = new EventProcessor(_battleState, _animationCoordinator);
-        Console.WriteLine("[BattleGame] Event processing system initialized");
 
         _battleRunner = new BattleRunner(library, battleOptions, simulator);
         _battleRunner.StartBattle();
         Console.WriteLine("[BattleGame] Battle runner started");
     }
 
+    /// <summary>
+    /// Process a battle event: store perspective and trigger animations
+    /// </summary>
+    private void ProcessBattleEvent(BattleEvent evt)
+    {
+        // Store perspective for rendering
+        lock (_stateLock)
+        {
+            _currentBattlePerspective = evt.Perspective;
+        }
+
+        // Add message to display queue
+        lock (_stateLock)
+        {
+            _messageQueue.Add(evt.Message);
+            if (_messageQueue.Count > MaxMessagesDisplayed)
+            {
+                _messageQueue.RemoveRange(0, _messageQueue.Count - MaxMessagesDisplayed);
+            }
+        }
+
+        // Process message for animations
+        _animationCoordinator?.ProcessMessage(evt.Message);
+    }
+
     protected override void Update(GameTime gameTime)
     {
         try
         {
-            // Process queued turn batches from battle thread (NEW SYSTEM)
-            while (_choiceCoordinator.TryDequeueTurnBatch(out TurnEventBatch? turnBatch) && turnBatch != null)
+            // Process events from battle thread
+            while (_choiceCoordinator.TryDequeueEvent(out BattleEvent? evt) && evt != null)
             {
-                Console.WriteLine($"[BattleGame.Update] Received turn batch with {turnBatch.Events.Count} events");
-                
-                // Check if this turn batch contains the first InBattle events (initial switch-ins)
-                // We identify this by checking if we have switch messages but no active Pokemon yet
-                if (_battleState != null && 
-                    _battleState.PlayerActive.Count == 0 && 
-                    _battleState.OpponentActive.Count == 0 &&
-                    turnBatch.Events.Any(e => e is SwitchMessage))
-                {
-                    // This is the first turn with switch-ins - process switch messages immediately
-                    // so that hasActivePokemon becomes true before rendering
-                    Console.WriteLine("[BattleGame.Update] First turn with switch-ins detected, processing switches immediately");
-                    
-                    foreach (var evt in turnBatch.Events)
-                    {
-                        if (evt is SwitchMessage)
-                        {
-                            _battleState.ProcessMessage(evt);
-                        }
-                    }
-                    
-                    Console.WriteLine($"[BattleGame.Update] After initial switches: Player active={_battleState.PlayerActive.Count}, Opponent active={_battleState.OpponentActive.Count}");
-                }
-                
-                _eventQueue?.EnqueueTurnBatch(turnBatch);
+                ProcessBattleEvent(evt);
             }
             
-            // Process old-style perspective updates (LEGACY - for team preview)
+            // Process perspective updates (LEGACY - for team preview)
             while (_choiceCoordinator.TryDequeuePerspective(out BattlePerspective? perspective) &&
                    perspective != null)
             {
                 ApplyPerspectiveUpdate(perspective);
-            }
-
-            // Process old-style messages (LEGACY - shouldn't be used anymore)
-            while (_choiceCoordinator.TryDequeueMessages(out var messages) && messages != null)
-            {
-                Console.WriteLine("[BattleGame.Update] WARNING: Received legacy messages (should use turn batches)");
-                ApplyMessageUpdates(messages);
-            }
-            
-            // Sequential event processing: process ONE event per frame if not waiting for animation
-            if (_eventProcessor != null && _eventQueue != null)
-            {
-                if (!_eventProcessor.IsWaitingForAnimation())
-                {
-                    // Get next event to process
-                    BattleMessage? nextEvent = _eventQueue.DequeueNextEvent();
-                    if (nextEvent != null)
-                    {
-                        // Process the event and check if it started an animation
-                        bool animationStarted = _eventProcessor.ProcessEvent(nextEvent);
-                        
-                        // Add to message display queue
-                        lock (_stateLock)
-                        {
-                            _messageQueue.Add(nextEvent);
-                            if (_messageQueue.Count > MaxMessagesDisplayed)
-                            {
-                                _messageQueue.RemoveRange(0, _messageQueue.Count - MaxMessagesDisplayed);
-                            }
-                        }
-                        
-                        if (animationStarted)
-                        {
-                            Console.WriteLine("[BattleGame.Update] Animation started, waiting for completion");
-                        }
-                    }
-                    else if (_eventQueue.IsCurrentTurnComplete())
-                    {
-                        // Turn is complete - validate state
-                        BattlePerspective? endPerspective = _eventQueue.GetCurrentTurnEndPerspective();
-                        if (endPerspective != null && _battleState != null)
-                        {
-                            bool isValid = _eventProcessor.ValidateState(endPerspective);
-                            if (!isValid)
-                            {
-                                Console.WriteLine("[BattleGame.Update] STATE VALIDATION FAILED!");
-                            }
-                        }
-                        
-                        // Complete the turn
-                        _eventQueue.CompleteCurrentTurn();
-                        Console.WriteLine("[BattleGame.Update] Turn processing complete");
-                    }
-                }
             }
 
             // Process any pending choice requests from the battle thread
@@ -397,104 +327,45 @@ public class BattleGame : Game
 
     /// <summary>
     /// Apply a perspective update on the GUI thread (called from Update)
+    /// Legacy method for team preview compatibility
     /// </summary>
     private void ApplyPerspectiveUpdate(BattlePerspective perspective)
     {
         lock (_stateLock)
         {
             _currentBattlePerspective = perspective;
-            
-            // Initialize GUI battle state on first InBattle perspective
-            if (_battleState == null && perspective.PerspectiveType == BattlePerspectiveType.InBattle)
-            {
-                _battleState = new GuiBattleState();
-                _battleState.Initialize(perspective);
-                
-                // Subscribe to state events
-                _battleState.PokemonDamaged += OnPokemonDamaged;
-                _battleState.PokemonFainted += OnPokemonFainted;
-                _battleState.PokemonSwitchedIn += OnPokemonSwitchedIn;
-                _battleState.PokemonSwitchedOut += OnPokemonSwitchedOut;
-                _battleState.TurnStarted += OnTurnStarted;
-            }
         }
-    }
-    
-    /// <summary>
-    /// Event handler for when a Pokemon takes damage
-    /// </summary>
-    private void OnPokemonDamaged(PokemonState pokemon, int oldHp, int newHp)
-    {
-        // Start HP bar animation
-        string key = $"{pokemon.Name}|{(int)pokemon.Side}";
-        _animationManager?.StartHpBarAnimation(key, oldHp, newHp, pokemon.MaxHp);
-    }
-    
-    /// <summary>
-    /// Event handler for when a Pokemon faints
-    /// </summary>
-    private void OnPokemonFainted(PokemonState pokemon)
-    {
-        // Could trigger faint animation here
-    }
-    
-    /// <summary>
-    /// Event handler for when a Pokemon switches in
-    /// </summary>
-    private void OnPokemonSwitchedIn(PokemonState pokemon, int slot)
-    {
-        // Could trigger switch-in animation here
-    }
-    
-    /// <summary>
-    /// Event handler for when a Pokemon switches out
-    /// </summary>
-    private void OnPokemonSwitchedOut(PokemonState pokemon, int slot)
-    {
-        // Could trigger switch-out animation here
-    }
-    
-    /// <summary>
-    /// Event handler for when a turn starts
-    /// </summary>
-    private void OnTurnStarted(int turnNumber)
-    {
-        // Turn started - could show turn indicator here
     }
 
     /// <summary>
-    /// Apply message updates on the GUI thread (called from Update)
+    /// Register Pokemon positions for animations based on perspective
     /// </summary>
-    private void ApplyMessageUpdates(IEnumerable<BattleMessage> messages)
+    private void RegisterPokemonPositions(BattlePerspective perspective)
     {
-        var battleMessages = messages.ToList();
-        lock (_stateLock)
-        {
-            _messageQueue.AddRange(battleMessages);
+        _animationCoordinator!.ClearPokemonPositions();
+        _animationCoordinator.SetPlayerSideId(SideId.P1);
 
-            // Trim old messages if we exceed the maximum
-            if (_messageQueue.Count > MaxMessagesDisplayed)
-            {
-                int toRemove = _messageQueue.Count - MaxMessagesDisplayed;
-                _messageQueue.RemoveRange(0, toRemove);
-            }
-        }
-        
-        // Process messages through battle state
-        if (_battleState != null)
+        // Register player active Pokemon
+        for (int slot = 0; slot < perspective.PlayerSide.Active.Count; slot++)
         {
-            foreach (var message in battleMessages)
+            var pokemon = perspective.PlayerSide.Active[slot];
+            if (pokemon != null)
             {
-                _battleState.ProcessMessage(message);
+                int xPosition = 20 + (slot * 188);
+                var position = new Vector2(xPosition + 64, 400 + 64);
+                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, true);
             }
         }
 
-        // Process messages through animation coordinator
-        if (_animationCoordinator != null)
+        // Register opponent active Pokemon
+        for (int slot = 0; slot < perspective.OpponentSide.Active.Count; slot++)
         {
-            foreach (var message in battleMessages)
+            var pokemon = perspective.OpponentSide.Active[slot];
+            if (pokemon != null)
             {
-                _animationCoordinator.ProcessMessage(message);
+                int xPosition = 480 + (slot * 188);
+                var position = new Vector2(xPosition + 64, 80 + 64);
+                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, false);
             }
         }
     }
@@ -515,45 +386,14 @@ public class BattleGame : Game
         }
 
         // Register Pokemon positions for animation coordinator
-        if (_animationCoordinator != null && _battleState != null && perspectiveToRender != null && 
+        if (_animationCoordinator != null && perspectiveToRender != null && 
             perspectiveToRender.PerspectiveType == BattlePerspectiveType.InBattle)
         {
-            _animationCoordinator.ClearPokemonPositions();
-            _animationCoordinator.SetPlayerSideId(SideId.P1);
-            
-            // Register player Pokemon from state
-            foreach (var (slot, pokemon) in _battleState.PlayerActive)
-            {
-                int xPosition = 20 + (slot * 188); // InBattlePlayerXOffset + (slot * (PokemonSpriteSize + PokemonSpacing))
-                var position = new Vector2(xPosition + 64, 400 + 64); // Center of sprite
-                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, true);
-            }
-            
-            // Register opponent Pokemon from state
-            foreach (var (slot, pokemon) in _battleState.OpponentActive)
-            {
-                int xPosition = 480 + (slot * 188); // InBattleOpponentXOffset + (slot * (PokemonSpriteSize + PokemonSpacing))
-                var position = new Vector2(xPosition + 64, 80 + 64); // Center of sprite
-                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, false);
-            }
+            RegisterPokemonPositions(perspectiveToRender);
         }
 
-        // Determine which rendering path to use based on battle state
-        // If battle state has active Pokemon, we're in the main battle - use state-based rendering
-        // Otherwise, use perspective-based rendering (team preview)
-        bool hasActivePokemon = _battleState != null && 
-                                (_battleState.PlayerActive.Count > 0 || _battleState.OpponentActive.Count > 0);
-        
-        if (hasActivePokemon)
-        {
-            // Render using battle state (message-driven architecture)
-            _battleRenderer?.RenderBattleState(gameTime, _battleState);
-        }
-        else
-        {
-            // Render using traditional perspective (for team preview or when state not initialized)
-            _battleRenderer?.Render(gameTime, perspectiveToRender);
-        }
+        // Always render from perspective - single code path!
+        _battleRenderer?.Render(gameTime, perspectiveToRender);
 
         // Render choice UI on top
         _choiceInputManager?.Render(gameTime);
@@ -667,9 +507,6 @@ public class BattleGame : Game
         // Clear animations as well
         _animationManager?.Clear();
         _animationCoordinator?.ClearPokemonPositions();
-        
-        // Clear event queue
-        _eventQueue?.Clear();
     }
 
     /// <summary>

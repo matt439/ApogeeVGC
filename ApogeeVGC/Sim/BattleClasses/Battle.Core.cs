@@ -84,7 +84,7 @@ public partial class Battle
     // Uncomment if you need separate message logging for debugging or replay purposes.
     //public List<string> MessageLog { get; set; } = [];
 
-    public List<BattleMessage> PendingMessages { get; set; } = [];
+    public List<BattleEvent> PendingEvents { get; set; } = [];
     public int SentLogPos { get; set; }
     public bool SentEnd { get; set; }
     public static bool SentRequests => true;

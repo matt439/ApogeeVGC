@@ -68,9 +68,9 @@ public class PlayerRandom(SideId sideId, PlayerOptions options, IBattleControlle
         // Random player doesn't have a UI to update
     }
 
-    public void UpdateMessages(IEnumerable<BattleMessage> messages)
+    public void UpdateEvents(IEnumerable<BattleEvent> events)
     {
-        // Random player doesn't need to receive messages
+        // Random player doesn't need to receive events
     }
 
     // Events from interfaces

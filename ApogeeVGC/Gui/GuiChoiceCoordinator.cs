@@ -1,4 +1,3 @@
-using ApogeeVGC.Gui.EventProcessing;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Choices;
 using System.Collections.Concurrent;
@@ -7,18 +6,14 @@ using static System.Threading.Thread;
 namespace ApogeeVGC.Gui;
 
 /// <summary>
-/// Thread-safe coordinator for choice requests between the battle thread and GUI thread.
+/// Thread-safe coordinator for choice requests and battle events between the battle thread and GUI thread.
 /// This object can be safely accessed from both threads without affecting MonoGame's state.
 /// </summary>
 public class GuiChoiceCoordinator
 {
     private readonly ConcurrentQueue<PendingChoiceRequest> _pendingRequests = new();
     private readonly ConcurrentQueue<BattlePerspective> _pendingPerspectives = new();
-    private readonly ConcurrentQueue<IEnumerable<BattleMessage>> _pendingMessages = new();
-    
-    // New turn-batched event queue
-    private readonly ConcurrentQueue<TurnEventBatch> _pendingTurnBatches = new();
-    private TurnEventBatch? _currentTurnBatch;
+    private readonly ConcurrentQueue<BattleEvent> _eventQueue = new();
 
     /// <summary>
     /// Queue a choice request from the battle thread.
@@ -49,7 +44,7 @@ public class GuiChoiceCoordinator
     }
 
     /// <summary>
-    /// Queue a perspective update from the battle thread.
+    /// Queue a perspective update from the battle thread (legacy for team preview).
     /// This method is thread-safe and can be called from any thread.
     /// </summary>
     public void QueuePerspectiveUpdate(BattlePerspective perspective)
@@ -58,12 +53,13 @@ public class GuiChoiceCoordinator
     }
 
     /// <summary>
-    /// Queue messages from the battle thread.
+    /// Add a battle event to the queue.
     /// This method is thread-safe and can be called from any thread.
     /// </summary>
-    public void QueueMessages(IEnumerable<BattleMessage> messages)
+    public void AddBattleEvent(BattleEvent evt)
     {
-        _pendingMessages.Enqueue(messages);
+        _eventQueue.Enqueue(evt);
+        Console.WriteLine($"[GuiChoiceCoordinator] Enqueued event: {evt.Message.GetType().Name}");
     }
 
     /// <summary>
@@ -83,88 +79,17 @@ public class GuiChoiceCoordinator
     }
 
     /// <summary>
-    /// Try to dequeue pending messages. Called from the GUI thread.
+    /// Try to dequeue a battle event. Called from the GUI thread.
     /// </summary>
-    public bool TryDequeueMessages(out IEnumerable<BattleMessage>? messages)
+    public bool TryDequeueEvent(out BattleEvent? evt)
     {
-        return _pendingMessages.TryDequeue(out messages);
+        return _eventQueue.TryDequeue(out evt);
     }
 
     /// <summary>
     /// Get the current queue size (for debugging)
     /// </summary>
     public int QueueSize => _pendingRequests.Count;
-    
-    // ========== NEW TURN-BATCHED EVENT API ==========
-    
-    /// <summary>
-    /// Start a new turn batch with the start-of-turn perspective (optional)
-    /// </summary>
-    public void StartTurnBatch(BattlePerspective? startPerspective)
-    {
-        if (_currentTurnBatch != null)
-        {
-            Console.WriteLine("[GuiChoiceCoordinator] WARNING: Starting new turn batch without completing previous one");
-            // Auto-complete the previous batch
-            CompleteTurnBatch();
-        }
-        
-        _currentTurnBatch = new TurnEventBatch
-        {
-            StartPerspective = startPerspective
-        };
-        
-        Console.WriteLine("[GuiChoiceCoordinator] Started new turn batch");
-    }
-    
-    /// <summary>
-    /// Add an event to the current turn batch
-    /// </summary>
-    public void AddEventToTurnBatch(BattleMessage message)
-    {
-        if (_currentTurnBatch == null)
-        {
-            Console.WriteLine("[GuiChoiceCoordinator] WARNING: Adding event without active turn batch");
-            // Auto-create a batch if needed
-            _currentTurnBatch = new TurnEventBatch();
-        }
-        
-        _currentTurnBatch.Events.Add(message);
-    }
-    
-    /// <summary>
-    /// Complete the current turn batch with the end-of-turn perspective and enqueue it
-    /// </summary>
-    public void CompleteTurnBatch(BattlePerspective? endPerspective = null)
-    {
-        if (_currentTurnBatch == null)
-        {
-            Console.WriteLine("[GuiChoiceCoordinator] WARNING: Completing turn batch but none is active");
-            return;
-        }
-        
-        _currentTurnBatch.EndPerspective = endPerspective;
-        _pendingTurnBatches.Enqueue(_currentTurnBatch);
-        
-        Console.WriteLine($"[GuiChoiceCoordinator] Completed turn batch with {_currentTurnBatch.Events.Count} events");
-        _currentTurnBatch = null;
-    }
-    
-    /// <summary>
-    /// Try to dequeue a completed turn batch
-    /// </summary>
-    public bool TryDequeueTurnBatch(out TurnEventBatch? batch)
-    {
-        return _pendingTurnBatches.TryDequeue(out batch);
-    }
-    
-    /// <summary>
-    /// Get the perspective from the current turn batch (for completing the batch)
-    /// </summary>
-    public BattlePerspective? GetCurrentTurnBatchPerspective()
-    {
-        return _currentTurnBatch?.StartPerspective;
-    }
 }
 
 /// <summary>

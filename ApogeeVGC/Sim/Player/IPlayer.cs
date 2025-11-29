@@ -28,7 +28,7 @@ public interface IPlayer
 
     void UpdateUi(BattlePerspective perspective);
     
-    void UpdateMessages(IEnumerable<BattleMessage> messages);
+    void UpdateEvents(IEnumerable<BattleEvent> events);
 
     // Events for notifications
     event EventHandler<ChoiceRequestEventArgs>? ChoiceRequested;
