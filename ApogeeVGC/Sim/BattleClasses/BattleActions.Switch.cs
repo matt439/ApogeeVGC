@@ -1,5 +1,6 @@
 ﻿using ApogeeVGC.Sim.Actions;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Core;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Items;
@@ -138,6 +139,17 @@ public partial class BattleActions
             side.Pokemon[oldActive.Position] = oldActive;
         }
 
+        // CRITICAL: Capture perspective BEFORE placing new Pokemon in active slot
+        // This ensures the switch message shows the "before" state (fainted Pokemon still visible)
+        BattlePerspective? preSwitchPerspective = null;
+        if (Battle.DisplayUi)
+        {
+            BattlePerspectiveType perspectiveType = Battle.RequestState == RequestState.TeamPreview
+                ? BattlePerspectiveType.TeamPreview
+                : BattlePerspectiveType.InBattle;
+            preSwitchPerspective = Battle.GetPerspectiveForSide(SideId.P1, perspectiveType);
+        }
+
         // Swap positions in the side's Pokemon list
         pokemon.Position = pos;
         side.Pokemon[pokemon.Position] = pokemon;
@@ -160,17 +172,17 @@ public partial class BattleActions
         // Run BeforeSwitchIn event
         Battle.RunEvent(EventId.BeforeSwitchIn, pokemon);
 
-        // Add switch/drag message to battle log
-        if (Battle.DisplayUi)
+        // Add switch/drag message to battle log with pre-captured perspective
+        if (Battle.DisplayUi && preSwitchPerspective != null)
         {
             if (sourceEffect != null)
             {
-                Battle.Add(isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails,
+                Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails,
                     $"[from] {sourceEffect.EffectStateId}");
             }
             else
             {
-                Battle.Add(isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails);
+                Battle.AddWithPerspective(preSwitchPerspective, isDrag ? "drag" : "switch", pokemon, pokemon.GetFullDetails);
             }
         }
 
@@ -247,8 +259,9 @@ public partial class BattleActions
             poke.DraggedIn = null;
         }
 
-        // Flush messages immediately after switches complete so the GUI shows the new Pokemon
-        Battle.FlushEvents();
+        // Don't flush here - switch messages were already added with correct pre-captured perspectives
+        // Flushing here would send a perspective showing the new Pokemon already in place
+        // The next FlushEvents() call will happen naturally in the battle loop
 
         return true;
     }

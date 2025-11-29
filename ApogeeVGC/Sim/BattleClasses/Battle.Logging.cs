@@ -50,9 +50,9 @@ public partial class Battle
     {
         // Full observability mode: no secret/shared split needed
         // All information is visible to both sides
-        
+
         var formattedParts = new List<string>();
-        
+
         foreach (PartFuncUnion part in parts)
         {
             if (part is FuncPartFuncUnion funcPart)
@@ -68,10 +68,77 @@ public partial class Battle
                 formattedParts.Add(FormatPart(directPart.Part));
             }
         }
-        
+
         // Add single message to log
         string message = $"|{string.Join("|", formattedParts)}";
         Log.Add(message);
+
+        // NEW: Capture perspective immediately when message is added
+        if (DisplayUi)
+        {
+            BattleMessage? parsed = ParseSingleLogEntry(message);
+            if (parsed != null)
+            {
+                BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                    ? BattlePerspectiveType.TeamPreview
+                    : BattlePerspectiveType.InBattle;
+
+                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+
+                PendingEvents.Add(new BattleEvent
+                {
+                    Message = parsed,
+                    Perspective = perspective // Captured NOW, not later!
+                });
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds a message with a pre-captured perspective.
+    /// Use this when the perspective must be captured at a different time than when the message is added.
+    /// For example, switch messages need the perspective from before the Pokemon is placed in the active slot.
+    /// </summary>
+    public void AddWithPerspective(BattlePerspective perspective, params PartFuncUnion[] parts)
+    {
+        // Full observability mode: no secret/shared split needed
+        // All information is visible to both sides
+
+        var formattedParts = new List<string>();
+
+        foreach (PartFuncUnion part in parts)
+        {
+            if (part is FuncPartFuncUnion funcPart)
+            {
+                // Execute the function to get content
+                SideSecretSharedResult result = funcPart.Func();
+                // In full observability mode, use the secret (full information) for everyone
+                formattedParts.Add(result.Secret.ToString());
+            }
+            else if (part is PartPartFuncUnion directPart)
+            {
+                // Direct value
+                formattedParts.Add(FormatPart(directPart.Part));
+            }
+        }
+
+        // Add single message to log
+        string message = $"|{string.Join("|", formattedParts)}";
+        Log.Add(message);
+
+        // Use the provided pre-captured perspective
+        if (DisplayUi)
+        {
+            BattleMessage? parsed = ParseSingleLogEntry(message);
+            if (parsed != null)
+            {
+                PendingEvents.Add(new BattleEvent
+                {
+                    Message = parsed,
+                    Perspective = perspective // Use pre-captured perspective!
+                });
+            }
+        }
     }
 
     public void AddMove(params StringNumberDelegateObjectUnion[] args)
@@ -82,6 +149,26 @@ public partial class Battle
         // Format and add the move line to the log
         string message = $"|{string.Join("|", args.Select(FormatArg))}";
         Log.Add(message);
+
+        // ALSO parse and create battle event for GUI animations
+        if (DisplayUi)
+        {
+            BattleMessage? parsed = ParseSingleLogEntry(message);
+            if (parsed != null)
+            {
+                BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                    ? BattlePerspectiveType.TeamPreview
+                    : BattlePerspectiveType.InBattle;
+
+                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
+
+                PendingEvents.Add(new BattleEvent
+                {
+                    Message = parsed,
+                    Perspective = perspective
+                });
+            }
+        }
     }
 
     public void AttrLastMove(params StringNumberDelegateObjectUnion[] args)
@@ -339,6 +426,7 @@ public partial class Battle
                     Add("-damage", target, target.GetHealth, damageTag,
                         $"[from] {ptState.SourceEffect.FullName}", "[partiallytrapped]");
                 }
+
                 break;
 
             case ConditionId.Powder:
@@ -369,6 +457,7 @@ public partial class Battle
                     // Damage from effect without source
                     Add("-damage", target, target.GetHealth, damageTag, $"[from] {effectName}");
                 }
+
                 break;
         }
 
@@ -384,42 +473,44 @@ public partial class Battle
         if (!DisplayUi) return;
 
         // Get the health status for the log message
-    var healthFunc = target.GetHealth;
+        var healthFunc = target.GetHealth;
 
-     // Determine if this is a drain effect
+        // Determine if this is a drain effect
         bool isDrain = effect is Condition { Id: ConditionId.Drain };
 
-      if (isDrain && source != null)
+        if (isDrain && source != null)
         {
-    // Drain healing shows the source
-    Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain", $"[of] {source}");
-   }
+            // Drain healing shows the source
+            Add("-heal", target, healthFunc, $"[heal]{healAmount}", "[from] drain",
+                $"[of] {source}");
+        }
         else if (effect != null && effect.EffectType != EffectType.Format)
-  {
-     // Healing from a specific effect
-   string effectName = effect switch
-    {
-     Condition { FullName: "tox" } => "psn",
-     Condition condition => condition.FullName,
-   Item item => $"item: {item.Name}",
-   Ability ability => $"ability: {ability.Name}",
-          _ => effect.Name
-   };
-   
-  if (source != null && source != target)
-     {
-  Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}", $"[of] {source}");
-       }
-      else
-     {
-       Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
- }
-  }
+        {
+            // Healing from a specific effect
+            string effectName = effect switch
+            {
+                Condition { FullName: "tox" } => "psn",
+                Condition condition => condition.FullName,
+                Item item => $"item: {item.Name}",
+                Ability ability => $"ability: {ability.Name}",
+                _ => effect.Name
+            };
+
+            if (source != null && source != target)
+            {
+                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}",
+                    $"[of] {source}");
+            }
+            else
+            {
+                Add("-heal", target, healthFunc, $"[heal]{healAmount}", $"[from] {effectName}");
+            }
+        }
         else
- {
-  // Simple heal with no effect
-  Add("-heal", target, healthFunc, $"[heal]{healAmount}");
-      }
+        {
+            // Simple heal with no effect
+            Add("-heal", target, healthFunc, $"[heal]{healAmount}");
+        }
     }
 
     /// <summary>
@@ -466,81 +557,36 @@ public partial class Battle
 
     /// <summary>
     /// Flush all pending events to players with GUI interfaces.
-    /// Emits UpdateRequested events for each side with their respective events.
-    /// Creates events from pending log messages or sends just perspective if no new messages.
+    /// Events are already created with correct perspectives in Add().
+    /// This method just sends them.
     /// </summary>
     public void FlushEvents()
     {
         if (!DisplayUi) return;
 
-        // Determine perspective type based on current request state
-        BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
-            ? BattlePerspectiveType.TeamPreview
-            : BattlePerspectiveType.InBattle;
-
-        // Check if there are new log messages since last flush
-        bool hasNewMessages = SentLogPos < Log.Count;
-
-        // If we have pending events OR new log messages, create events and send them
-        if (PendingEvents.Count > 0 || hasNewMessages)
+        // If we have pending events, send them
+        if (PendingEvents.Count > 0)
         {
-            var eventsToSend = new List<BattleEvent>();
-
-            // Add any manually created events first
-            eventsToSend.AddRange(PendingEvents);
-
-            // Parse new log messages into events
-            if (hasNewMessages)
-            {
-                var parsedMessages = ParseLogToMessages(SentLogPos, Log.Count);
-                
-                // Get current perspective (will be updated after each message in a real impl,
-                // but for now we use the current state)
-                BattlePerspective perspective = GetPerspectiveForSide(SideId.P1, perspectiveType);
-                
-                if (parsedMessages.Count > 0)
-                {
-                    // We have messages - create events with messages
-                    foreach (BattleMessage message in parsedMessages)
-                    {
-                        eventsToSend.Add(new BattleEvent
-                        {
-                            Message = message,
-                            Perspective = perspective
-                        });
-                    }
-                }
-                else
-                {
-                    // No parseable messages (e.g., teampreview), but we still need to send perspective
-                    eventsToSend.Add(new BattleEvent
-                    {
-                        Message = null,
-                        Perspective = perspective
-                    });
-                }
-
-                // Update the sent log position
-                SentLogPos = Log.Count;
-            }
-
-            // Send events to each side's player
+            // Send events to each side's player via UpdateRequested event
             foreach (Side side in Sides)
             {
-                EmitUpdate(side.Id, new List<BattleEvent>(eventsToSend));
+                EmitUpdate(side.Id, new List<BattleEvent>(PendingEvents));
             }
 
             PendingEvents.Clear();
         }
         else
         {
-            // No pending events or messages, but we still need to send the current perspective
-            // This happens during team preview or when requesting choices without new messages
+            // No pending events - only send perspective if explicitly needed (team preview)
+            // This handles the case where no messages were added but state changed
+            BattlePerspectiveType perspectiveType = RequestState == RequestState.TeamPreview
+                ? BattlePerspectiveType.TeamPreview
+                : BattlePerspectiveType.InBattle;
+
             foreach (Side side in Sides)
             {
                 BattlePerspective perspective = GetPerspectiveForSide(side.Id, perspectiveType);
-                
-                // Create a single event with just the perspective (no message)
+
                 var events = new List<BattleEvent>
                 {
                     new BattleEvent
@@ -549,7 +595,7 @@ public partial class Battle
                         Perspective = perspective
                     }
                 };
-                
+
                 EmitUpdate(side.Id, events);
             }
         }
@@ -566,12 +612,168 @@ public partial class Battle
     }
 
     /// <summary>
+    /// Parses a single log entry into a BattleMessage.
+    /// Returns null if the message type is not recognized or doesn't need to be sent to GUI.
+    /// </summary>
+    private BattleMessage? ParseSingleLogEntry(string logEntry)
+    {
+        if (string.IsNullOrEmpty(logEntry)) return null;
+
+        string[] parts = logEntry.Split('|');
+        if (parts.Length < 2) return null;
+
+        string command = parts[1]; // parts[0] is empty due to leading |
+
+        try
+        {
+            return command switch
+            {
+                "turn" when parts.Length > 2 && int.TryParse(parts[2], out int turnNum) =>
+                    new TurnStartMessage { TurnNumber = turnNum },
+
+                "move" when parts.Length > 3 =>
+                    new MoveUsedMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        MoveName = parts[3]
+                    },
+
+                "switch" or "drag" when parts.Length > 3 =>
+                    new SwitchMessage
+                    {
+                        TrainerName = ExtractTrainerName(parts[2]),
+                        PokemonName = ExtractPokemonName(parts[2])
+                    },
+
+                "faint" when parts.Length > 2 =>
+                    new FaintMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2])
+                    },
+
+                "-damage" when parts.Length > 3 =>
+                    ParseDamageMessage(parts),
+
+                "-heal" when parts.Length > 3 =>
+                    ParseHealMessage(parts),
+
+                "-status" when parts.Length > 3 =>
+                    new StatusMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        StatusName = parts[3]
+                    },
+
+                "-supereffective" =>
+                    new EffectivenessMessage
+                    {
+                        Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
+                    },
+
+                "-resisted" =>
+                    new EffectivenessMessage
+                    {
+                        Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
+                    },
+
+                "-immune" =>
+                    new EffectivenessMessage
+                    {
+                        Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
+                    },
+
+                "-crit" =>
+                    new CriticalHitMessage(),
+
+                "-miss" when parts.Length > 2 =>
+                    new MissMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2])
+                    },
+
+                "-fail" when parts.Length > 2 =>
+                    new MoveFailMessage
+                    {
+                        Reason = parts.Length > 4
+                            ? parts[4]
+                            : (parts.Length > 3 ? parts[3] : "Unknown"),
+                        TargetPokemonName = parts.Length > 3 ? ExtractPokemonName(parts[3]) : null,
+                        TargetSideId = parts.Length > 3 ? ExtractSideId(parts[3]) : null
+                    },
+
+                "-boost" or "-unboost" when parts.Length > 4 =>
+                    ParseStatChangeMessage(parts, command == "-boost"),
+
+                "-weather" when parts.Length > 2 =>
+                    new WeatherMessage
+                    {
+                        WeatherName = parts[2],
+                        IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
+                    },
+
+                "-ability" when parts.Length > 3 =>
+                    new AbilityMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        AbilityName = parts[3],
+                        AdditionalInfo = parts.Length > 4 ? parts[4] : null
+                    },
+
+                "-item" when parts.Length > 3 =>
+                    new ItemMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        ItemName = parts[3]
+                    },
+
+                "-sidestart" when parts.Length > 3 =>
+                    new GenericMessage
+                    {
+                        Text =
+                            $"{parts[3]} raised {GetSideName(parts[2])}'s team's {GetStatNameForCondition(parts[3])}!"
+                    },
+
+                "-sideend" when parts.Length > 3 =>
+                    new GenericMessage
+                    {
+                        Text = $"{GetSideName(parts[2])}'s {parts[3]} wore off!"
+                    },
+
+                "cant" when parts.Length > 3 =>
+                    new CantMessage
+                    {
+                        PokemonName = ExtractPokemonName(parts[2]),
+                        SideId = ExtractSideId(parts[2]),
+                        Reason = parts[3]
+                    },
+
+                _ => null // Unknown or non-displayable message type
+            };
+        }
+        catch (Exception ex)
+        {
+            Debug($"Error parsing log entry '{logEntry}': {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Parses log entries from the battle log and converts them to BattleMessage objects.
     /// This allows console and GUI players to display human-readable messages.
+    /// OBSOLETE: Events are now created immediately in Add() with correct perspectives.
+    /// This method is kept for backward compatibility or debugging only.
     /// </summary>
     /// <param name="startIndex">The index in the Log to start parsing from</param>
     /// <param name="endIndex">The index in the Log to stop parsing at (exclusive)</param>
     /// <returns>A list of BattleMessage objects parsed from the log entries</returns>
+    [Obsolete(
+        "Events are now created immediately in Add() with correct perspectives. This method is kept for backward compatibility only.")]
     private List<BattleMessage> ParseLogToMessages(int startIndex, int endIndex)
     {
         var messages = new List<BattleMessage>();
@@ -627,114 +829,118 @@ public partial class Battle
                         new TurnStartMessage { TurnNumber = turnNum },
 
                     "move" when parts.Length > 3 =>
-                     new MoveUsedMessage
-        {
-          PokemonName = ExtractPokemonName(parts[2]),
-              SideId = ExtractSideId(parts[2]),
-                MoveName = parts[3]
-       },
+                        new MoveUsedMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            MoveName = parts[3]
+                        },
 
-     "switch" or "drag" when parts.Length > 3 =>
-     new SwitchMessage
-             {
-     TrainerName = ExtractTrainerName(parts[2]),
-     PokemonName = ExtractPokemonName(parts[2])
-    },
+                    "switch" or "drag" when parts.Length > 3 =>
+                        new SwitchMessage
+                        {
+                            TrainerName = ExtractTrainerName(parts[2]),
+                            PokemonName = ExtractPokemonName(parts[2])
+                        },
 
-   "faint" when parts.Length > 2 =>
-     new FaintMessage 
-     { 
-      PokemonName = ExtractPokemonName(parts[2]),
-           SideId = ExtractSideId(parts[2])
-  },
+                    "faint" when parts.Length > 2 =>
+                        new FaintMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2])
+                        },
 
-    "-damage" when parts.Length > 3 =>
-    ParseDamageMessage(parts),
+                    "-damage" when parts.Length > 3 =>
+                        ParseDamageMessage(parts),
 
- "-heal" when parts.Length > 3 =>
-  ParseHealMessage(parts),
+                    "-heal" when parts.Length > 3 =>
+                        ParseHealMessage(parts),
 
-        "-status" when parts.Length > 3 =>
-     new StatusMessage
-      {
-    PokemonName = ExtractPokemonName(parts[2]),
-SideId = ExtractSideId(parts[2]),
-     StatusName = parts[3]
-                },
+                    "-status" when parts.Length > 3 =>
+                        new StatusMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            StatusName = parts[3]
+                        },
 
-          "-supereffective" =>
-new EffectivenessMessage
- {
-                Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
-             },
+                    "-supereffective" =>
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.SuperEffective
+                        },
 
                     "-resisted" =>
-         new EffectivenessMessage
-  {
-         Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
-     },
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.NotVeryEffective
+                        },
 
-              "-immune" =>
-             new EffectivenessMessage
-   {
-     Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
-           },
+                    "-immune" =>
+                        new EffectivenessMessage
+                        {
+                            Effectiveness = EffectivenessMessage.EffectivenessType.NoEffect
+                        },
 
-          "-crit" =>
-    new CriticalHitMessage(),
+                    "-crit" =>
+                        new CriticalHitMessage(),
 
-         "-miss" when parts.Length > 2 =>
-     new MissMessage 
-           { 
-          PokemonName = ExtractPokemonName(parts[2]),
-     SideId = ExtractSideId(parts[2])
-      },
+                    "-miss" when parts.Length > 2 =>
+                        new MissMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2])
+                        },
 
-             "-fail" when parts.Length > 2 =>
-              new MoveFailMessage 
-              { 
-                  Reason = parts.Length > 4 ? parts[4] : (parts.Length > 3 ? parts[3] : "Unknown"),
-                  TargetPokemonName = parts.Length > 3 ? ExtractPokemonName(parts[3]) : null,
-                  TargetSideId = parts.Length > 3 ? ExtractSideId(parts[3]) : null
-              },
+                    "-fail" when parts.Length > 2 =>
+                        new MoveFailMessage
+                        {
+                            Reason = parts.Length > 4
+                                ? parts[4]
+                                : (parts.Length > 3 ? parts[3] : "Unknown"),
+                            TargetPokemonName =
+                                parts.Length > 3 ? ExtractPokemonName(parts[3]) : null,
+                            TargetSideId = parts.Length > 3 ? ExtractSideId(parts[3]) : null
+                        },
 
-      "-boost" or "-unboost" when parts.Length > 4 =>
-     ParseStatChangeMessage(parts, command == "-boost"),
+                    "-boost" or "-unboost" when parts.Length > 4 =>
+                        ParseStatChangeMessage(parts, command == "-boost"),
 
-  "-weather" when parts.Length > 2 =>
-            new WeatherMessage
-{
-                 WeatherName = parts[2],
-       IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
- },
+                    "-weather" when parts.Length > 2 =>
+                        new WeatherMessage
+                        {
+                            WeatherName = parts[2],
+                            IsEnding = parts.Length > 3 && parts[3] == "[upkeep]"
+                        },
 
-         "-ability" when parts.Length > 3 =>
-      new AbilityMessage
-  {
-     PokemonName = ExtractPokemonName(parts[2]),
-     SideId = ExtractSideId(parts[2]),
-           AbilityName = parts[3],
- AdditionalInfo = parts.Length > 4 ? parts[4] : null
-         },
+                    "-ability" when parts.Length > 3 =>
+                        new AbilityMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            AbilityName = parts[3],
+                            AdditionalInfo = parts.Length > 4 ? parts[4] : null
+                        },
 
-          "-item" when parts.Length > 3 =>
-      new ItemMessage
-    {
-     PokemonName = ExtractPokemonName(parts[2]),
-  SideId = ExtractSideId(parts[2]),
-         ItemName = parts[3]
-        },
+                    "-item" when parts.Length > 3 =>
+                        new ItemMessage
+                        {
+                            PokemonName = ExtractPokemonName(parts[2]),
+                            SideId = ExtractSideId(parts[2]),
+                            ItemName = parts[3]
+                        },
 
                     "-sidestart" when parts.Length > 3 =>
-                        new GenericMessage 
-                        { 
-                            Text = $"{parts[3]} raised {GetSideName(parts[2])}'s team's {GetStatNameForCondition(parts[3])}!" 
+                        new GenericMessage
+                        {
+                            Text =
+                                $"{parts[3]} raised {GetSideName(parts[2])}'s team's {GetStatNameForCondition(parts[3])}!"
                         },
 
                     "-sideend" when parts.Length > 3 =>
-                        new GenericMessage 
-                        { 
-                            Text = $"{GetSideName(parts[2])}'s {parts[3]} wore off!" 
+                        new GenericMessage
+                        {
+                            Text = $"{GetSideName(parts[2])}'s {parts[3]} wore off!"
                         },
 
                     "cant" when parts.Length > 3 =>
@@ -745,8 +951,8 @@ new EffectivenessMessage
                             Reason = parts[3]
                         },
 
- _ => null
-     };
+                    _ => null
+                };
 
                 if (message != null)
                 {
@@ -770,7 +976,7 @@ new EffectivenessMessage
         int colonIndex = part.IndexOf(':');
         if (colonIndex >= 0 && colonIndex < part.Length - 1)
         {
-      return part.Substring(colonIndex + 2).Trim(); // +2 to skip ": "
+            return part.Substring(colonIndex + 2).Trim(); // +2 to skip ": "
         }
 
         return part.Trim();
@@ -779,33 +985,34 @@ new EffectivenessMessage
     /// <summary>
     /// Extracts the SideId from a Pokemon identifier in a log entry part (format: "p1a: PokemonName")
     /// Returns null if the side cannot be determined.
-/// </summary>
+    /// </summary>
     private static SideId? ExtractSideId(string part)
     {
         if (part.StartsWith("p1"))
         {
-        return SideId.P1;
+            return SideId.P1;
         }
         else if (part.StartsWith("p2"))
         {
-      return SideId.P2;
+            return SideId.P2;
         }
+
         return null;
-  }
+    }
 
     /// <summary>
     /// Extracts a trainer name from a log entry part (format: "p1a: PokemonName")
-  /// Returns "Player 1" or "Player 2" based on the side prefix
+    /// Returns "Player 1" or "Player 2" based on the side prefix
     /// </summary>
     private string ExtractTrainerName(string part)
     {
         if (part.StartsWith("p1"))
         {
-          return Sides[0].Name;
+            return Sides[0].Name;
         }
         else if (part.StartsWith("p2"))
-      {
-        return Sides[1].Name;
+        {
+            return Sides[1].Name;
         }
 
         return "Unknown";
@@ -824,6 +1031,7 @@ new EffectivenessMessage
         {
             return Sides[1].Name;
         }
+
         return "Unknown";
     }
 
@@ -849,15 +1057,15 @@ new EffectivenessMessage
 
         string pokemonName = ExtractPokemonName(parts[2]);
         SideId? sideId = ExtractSideId(parts[2]);
-  string healthStr = parts[3];
+        string healthStr = parts[3];
 
-   // Parse health (format: "123/456" or "123/456 psn")
- string[] healthParts = healthStr.Split(' ');
+        // Parse health (format: "123/456" or "123/456 psn")
+        string[] healthParts = healthStr.Split(' ');
         string[] hpParts = healthParts[0].Split('/');
 
-    if (hpParts.Length != 2 ||
-   !int.TryParse(hpParts[0], out int currentHp) ||
-   !int.TryParse(hpParts[1], out int maxHp))
+        if (hpParts.Length != 2 ||
+            !int.TryParse(hpParts[0], out int currentHp) ||
+            !int.TryParse(hpParts[1], out int maxHp))
         {
             return new GenericMessage { Text = $"{pokemonName} took damage!" };
         }
@@ -895,14 +1103,14 @@ new EffectivenessMessage
 
         return new DamageMessage
         {
-   PokemonName = pokemonName,
-        SideId = sideId,
-       DamageAmount = damageAmount,
+            PokemonName = pokemonName,
+            SideId = sideId,
+            DamageAmount = damageAmount,
             RemainingHp = currentHp,
-      MaxHp = maxHp,
-   EffectName = effectName,
-      SourcePokemonName = sourceName
- };
+            MaxHp = maxHp,
+            EffectName = effectName,
+            SourcePokemonName = sourceName
+        };
     }
 
     /// <summary>
@@ -910,77 +1118,77 @@ new EffectivenessMessage
     /// </summary>
     private static BattleMessage? ParseHealMessage(string[] parts)
     {
-if (parts.Length < 4) return null;
+        if (parts.Length < 4) return null;
 
-   string pokemonName = ExtractPokemonName(parts[2]);
-SideId? sideId = ExtractSideId(parts[2]);
-      string healthStr = parts[3];
+        string pokemonName = ExtractPokemonName(parts[2]);
+        SideId? sideId = ExtractSideId(parts[2]);
+        string healthStr = parts[3];
 
-     // Parse health (format: "123/456")
-     string[] healthParts = healthStr.Split(' ');
+        // Parse health (format: "123/456")
+        string[] healthParts = healthStr.Split(' ');
         string[] hpParts = healthParts[0].Split('/');
 
-   if (hpParts.Length != 2 ||
-      !int.TryParse(hpParts[0], out int currentHp) ||
- !int.TryParse(hpParts[1], out int maxHp))
-      {
-    return new GenericMessage { Text = $"{pokemonName} restored HP!" };
+        if (hpParts.Length != 2 ||
+            !int.TryParse(hpParts[0], out int currentHp) ||
+            !int.TryParse(hpParts[1], out int maxHp))
+        {
+            return new GenericMessage { Text = $"{pokemonName} restored HP!" };
         }
 
         // Extract heal amount and effect name from tags
-    int healAmount = 0;
-     string? effectName = null;
-        
+        int healAmount = 0;
+        string? effectName = null;
+
         for (int i = 4; i < parts.Length; i++)
-     {
- if (parts[i].StartsWith("[heal]"))
-    {
-           string amountStr = parts[i].Substring(6); // Remove "[heal]" prefix
-          if (int.TryParse(amountStr, out int amount))
-      {
-       healAmount = amount;
-   }
- }
- else if (parts[i].StartsWith("[from]"))
+        {
+            if (parts[i].StartsWith("[heal]"))
+            {
+                string amountStr = parts[i].Substring(6); // Remove "[heal]" prefix
+                if (int.TryParse(amountStr, out int amount))
+                {
+                    healAmount = amount;
+                }
+            }
+            else if (parts[i].StartsWith("[from]"))
             {
                 effectName = parts[i].Substring(7).Trim(); // Remove "[from] " prefix
-   }
-   }
+            }
+        }
 
-     return new HealMessage
-   {
-        PokemonName = pokemonName,
-      SideId = sideId,
-   HealAmount = healAmount,
-     CurrentHp = currentHp,
-  MaxHp = maxHp,
-  EffectName = effectName
-      };
+        return new HealMessage
+        {
+            PokemonName = pokemonName,
+            SideId = sideId,
+            HealAmount = healAmount,
+            CurrentHp = currentHp,
+            MaxHp = maxHp,
+            EffectName = effectName
+        };
     }
 
     /// <summary>
     /// Parses a stat change message from log parts
     /// </summary>
-  private static BattleMessage? ParseStatChangeMessage(string[] parts, bool isBoost)
+    private static BattleMessage? ParseStatChangeMessage(string[] parts, bool isBoost)
     {
-      if (parts.Length < 5) return null;
+        if (parts.Length < 5) return null;
 
         string pokemonName = ExtractPokemonName(parts[2]);
         SideId? sideId = ExtractSideId(parts[2]);
         string statName = parts[3];
-     int stages = int.TryParse(parts[4], out int stageNum) ? stageNum : 1;
+        int stages = int.TryParse(parts[4], out int stageNum) ? stageNum : 1;
 
- if (!isBoost)
+        if (!isBoost)
         {
-   stages = -stages; // Unboost is negative
+            stages = -stages; // Unboost is negative
         }
 
-      return new StatChangeMessage
+        return new StatChangeMessage
         {
-PokemonName = pokemonName,
-        SideId = sideId,
-     StatName = statName,
-          Stages = stages
+            PokemonName = pokemonName,
+            SideId = sideId,
+            StatName = statName,
+            Stages = stages
         };
     }
 }

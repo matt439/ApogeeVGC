@@ -218,34 +218,64 @@ public class AnimationCoordinator
     private void TriggerAttackAnimationIfReady()
     {
         if (_pendingMoveAnimation == null)
+        {
+            Console.WriteLine("[AnimationCoordinator] No pending move animation");
             return;
+        }
+
+        Console.WriteLine($"[AnimationCoordinator] Trying to trigger animation for {_pendingMoveAnimation.MoveName}");
 
         // Try to find the move in the library to check if it's a contact move
         MoveId? moveId = GetMoveIdFromName(_pendingMoveAnimation.MoveName);
         if (moveId == null)
+        {
+            Console.WriteLine($"[AnimationCoordinator] Could not find MoveId for {_pendingMoveAnimation.MoveName}");
             return;
+        }
 
         Move? move = _library.Moves.GetValueOrDefault(moveId.Value);
         if (move == null)
+        {
+            Console.WriteLine($"[AnimationCoordinator] Could not find Move for MoveId {moveId.Value}");
             return;
+        }
 
         // Skip animations for status moves (Protect, Trick Room, etc.)
         if (move.Category == MoveCategory.Status)
+        {
+            Console.WriteLine($"[AnimationCoordinator] Skipping status move: {_pendingMoveAnimation.MoveName}");
             return;
+        }
 
         // Find attacker position using name and side
         string attackerKey = CreatePositionKey(_pendingMoveAnimation.PokemonName, _pendingMoveAnimation.SideId);
+        Console.WriteLine($"[AnimationCoordinator] Looking for attacker with key: {attackerKey}");
+        Console.WriteLine($"[AnimationCoordinator] Registered positions count: {_pokemonPositions.Count}");
+        foreach (var kvp in _pokemonPositions)
+        {
+            Console.WriteLine($"[AnimationCoordinator]   - {kvp.Key}: Position={kvp.Value.Position}, Slot={kvp.Value.Slot}, IsPlayer={kvp.Value.IsPlayer}");
+        }
+        
         if (!_pokemonPositions.TryGetValue(attackerKey, out var attackerInfo))
+        {
+            Console.WriteLine($"[AnimationCoordinator] Could not find attacker position for key: {attackerKey}");
             return;
+        }
 
         // Get defender position(s) - always use all opponents for proper multi-target animations
         List<Vector2> defenderPositions = GetPotentialDefenderPositions(attackerInfo.IsPlayer);
+        Console.WriteLine($"[AnimationCoordinator] Found {defenderPositions.Count} defender positions");
 
         if (defenderPositions.Count == 0)
+        {
+            Console.WriteLine("[AnimationCoordinator] No defender positions found");
             return;
+        }
 
         // Check if this is a contact move
         bool isContactMove = move.Flags.Contact ?? false;
+
+        Console.WriteLine($"[AnimationCoordinator] Queueing attack animation: isContactMove={isContactMove}, moveName={_pendingMoveAnimation.MoveName}");
 
         // Queue the attack animation to play sequentially
         _animationManager.QueueAttackAnimation(
@@ -255,6 +285,8 @@ public class AnimationCoordinator
             attackerInfo.Slot,
             attackerInfo.IsPlayer,
             _pendingMoveAnimation.MoveName);
+            
+        Console.WriteLine("[AnimationCoordinator] Attack animation queued successfully");
     }
 
     /// <summary>

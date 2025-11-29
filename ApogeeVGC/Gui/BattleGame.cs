@@ -207,6 +207,9 @@ public class BattleGame : Game
     /// </summary>
     private void ProcessBattleEvent(BattleEvent evt)
     {
+        Console.WriteLine($"[BattleGame.ProcessBattleEvent] Processing event with message type: {evt.Message?.GetType().Name ?? "null"}");
+        Console.WriteLine($"[BattleGame.ProcessBattleEvent] _animationCoordinator is null? {_animationCoordinator == null}");
+        
         // Store perspective for rendering
         lock (_stateLock)
         {
@@ -225,8 +228,12 @@ public class BattleGame : Game
                 }
             }
 
+            Console.WriteLine($"[BattleGame.ProcessBattleEvent] About to call ProcessMessage for {evt.Message.GetType().Name}");
+            
             // Process message for animations
             _animationCoordinator?.ProcessMessage(evt.Message);
+            
+            Console.WriteLine($"[BattleGame.ProcessBattleEvent] ProcessMessage called");
         }
     }
 
@@ -235,10 +242,34 @@ public class BattleGame : Game
         try
         {
             // Process events from battle thread
-            while (_choiceCoordinator.TryDequeueEvent(out BattleEvent? evt) && evt != null)
+            // Process events until an animation is triggered, then wait for completion
+            bool hasActiveAnimations = _animationCoordinator?.HasActiveAnimations() ?? false;
+            
+            if (!hasActiveAnimations)
             {
-                ProcessBattleEvent(evt);
+                // No animations running - process events until we trigger an animation
+                // This allows related messages (move used + damage) to be processed together
+                bool hadActiveAnimationsBefore = false;
+                int maxEventsPerFrame = 10; // Safety limit to prevent infinite loops
+                int eventsProcessed = 0;
+                
+                while (eventsProcessed < maxEventsPerFrame && 
+                       _choiceCoordinator.TryDequeueEvent(out BattleEvent? evt) && evt != null)
+                {
+                    ProcessBattleEvent(evt);
+                    eventsProcessed++;
+                    
+                    // Check if this event triggered an animation
+                    bool hasActiveAnimationsNow = _animationCoordinator?.HasActiveAnimations() ?? false;
+                    if (hasActiveAnimationsNow && !hadActiveAnimationsBefore)
+                    {
+                        // Animation was just triggered - stop processing events
+                        break;
+                    }
+                    hadActiveAnimationsBefore = hasActiveAnimationsNow;
+                }
             }
+            // If animations ARE active, don't process any new events until they complete
             
             // Process perspective updates (LEGACY - for team preview)
             while (_choiceCoordinator.TryDequeuePerspective(out BattlePerspective? perspective) &&
