@@ -107,14 +107,36 @@ public class QueuedDamageIndicator : QueuedAnimation
 
         indicator.Start();
         
-        // If this damage indicator has associated HP bar animation data, queue it to start
-        // after this damage indicator completes
+        // If this damage indicator has associated HP bar animation data, start it immediately
+        // This makes the HP bar animation and damage text animation play concurrently
         if (PokemonKey != null && OldHp.HasValue && NewHp.HasValue)
         {
-            Console.WriteLine($"[QueuedDamageIndicator] Queueing HP bar animation for {PokemonKey}: {OldHp} -> {NewHp}");
-            // Queue HP bar animation to start after damage indicator
-            // Note: Don't create frozen animation here - that's already handled by PreservePokemonHpBeforePerspectiveUpdate
-            AnimationManager.QueueHpBarAnimation(PokemonKey, OldHp.Value, NewHp.Value, MaxHp);
+            Console.WriteLine($"[QueuedDamageIndicator] Starting HP bar animation concurrently for {PokemonKey}: {OldHp} -> {NewHp}");
+            
+            // Get the starting HP value from any existing animation
+            int startHp = OldHp.Value;
+            var existingAnimation = AnimationManager.GetHpBarAnimation(PokemonKey);
+            if (existingAnimation != null)
+            {
+                // If there's a frozen animation, start from its current HP
+                if (!existingAnimation.IsActive)
+                {
+                    startHp = existingAnimation.CurrentHp;
+                    Console.WriteLine($"[QueuedDamageIndicator] Using frozen animation HP: {startHp}");
+                }
+                else
+                {
+                    // Animation is active - chain from its target HP
+                    startHp = existingAnimation.TargetHp;
+                    Console.WriteLine($"[QueuedDamageIndicator] Chaining from active animation target: {startHp}");
+                }
+            }
+            
+            // Create and start the HP bar animation immediately (concurrent with damage indicator)
+            var hpAnimation = new HpBarAnimation(PokemonKey, startHp, NewHp.Value, MaxHp);
+            hpAnimation.Start();
+            AnimationManager.RegisterHpBarAnimation(PokemonKey, hpAnimation);
+            Console.WriteLine($"[QueuedDamageIndicator] HP bar animation started concurrently");
         }
         
         return indicator;
@@ -186,6 +208,98 @@ public class QueuedHpBarAnimation : QueuedAnimation
         Console.WriteLine($"[QueuedHpBarAnimation] Registered HP animation for {PokemonKey}");
         
         return hpAnimation;
+    }
+}
+
+/// <summary>
+/// Queued multi-target damage indicators that all start concurrently
+/// This is used for multi-target moves like Dazzling Gleam
+/// </summary>
+public class QueuedMultiTargetDamageIndicators : QueuedAnimation
+{
+    public required List<DamageTargetInfo> Targets { get; init; }
+    public required AnimationManager AnimationManager { get; init; }
+
+    public override BattleAnimation Start()
+    {
+        Console.WriteLine($"[QueuedMultiTargetDamageIndicators] Starting {Targets.Count} damage indicators concurrently");
+        
+        // Start all damage indicators at the same time
+        foreach (var target in Targets)
+        {
+            Console.WriteLine($"[QueuedMultiTargetDamageIndicators] Starting indicator for {target.PokemonKey}");
+            
+            var indicator = DamageIndicator.CreateDamageIndicator(
+                target.DamageAmount,
+                target.MaxHp,
+                target.Position,
+                AnimationManager.Font);
+            
+            indicator.Start();
+            AnimationManager.AddDamageIndicatorToActiveList(indicator);
+            
+            // Start HP bar animation concurrently
+            int startHp = target.OldHp;
+            var existingAnimation = AnimationManager.GetHpBarAnimation(target.PokemonKey);
+            if (existingAnimation != null)
+            {
+                if (!existingAnimation.IsActive)
+                {
+                    startHp = existingAnimation.CurrentHp;
+                    Console.WriteLine($"[QueuedMultiTargetDamageIndicators] Using frozen animation HP: {startHp}");
+                }
+                else
+                {
+                    startHp = existingAnimation.TargetHp;
+                    Console.WriteLine($"[QueuedMultiTargetDamageIndicators] Chaining from active animation target: {startHp}");
+                }
+            }
+            
+            var hpAnimation = new HpBarAnimation(target.PokemonKey, startHp, target.NewHp, target.MaxHp);
+            hpAnimation.Start();
+            AnimationManager.RegisterHpBarAnimation(target.PokemonKey, hpAnimation);
+        }
+        
+        // Return a dummy completed animation since we've already started everything
+        // The actual animations are tracked separately by AnimationManager
+        var dummyAnimation = new CompletedAnimation();
+        return dummyAnimation;
+    }
+}
+
+/// <summary>
+/// Information about a single damage target for multi-target moves
+/// </summary>
+public record DamageTargetInfo
+{
+    public required string PokemonKey { get; init; }
+    public required int DamageAmount { get; init; }
+    public required int OldHp { get; init; }
+    public required int NewHp { get; init; }
+    public required int MaxHp { get; init; }
+    public required Vector2 Position { get; init; }
+}
+
+/// <summary>
+/// A dummy animation that completes immediately
+/// Used when the real work is done in the Start() method
+/// </summary>
+internal class CompletedAnimation : BattleAnimation
+{
+    public CompletedAnimation()
+    {
+        IsComplete = true;
+        IsActive = false;
+    }
+
+    public override void Update(GameTime gameTime)
+    {
+        // Already complete
+    }
+
+    public override void Render(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch, GameTime gameTime)
+    {
+        // Nothing to render
     }
 }
 

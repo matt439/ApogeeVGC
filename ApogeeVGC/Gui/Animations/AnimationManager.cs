@@ -232,6 +232,21 @@ public class AnimationManager
     }
 
     /// <summary>
+    /// Queue multiple damage indicators that will all start concurrently
+    /// Used for multi-target moves like Dazzling Gleam
+    /// </summary>
+    public void QueueMultiTargetDamageIndicators(List<DamageTargetInfo> targets)
+    {
+        var queuedIndicators = new QueuedMultiTargetDamageIndicators
+        {
+            Targets = targets,
+            AnimationManager = this
+        };
+
+        _animationQueue.Enqueue(queuedIndicators);
+    }
+
+    /// <summary>
     /// Queue a miss indicator to play sequentially
     /// </summary>
     public void QueueMissIndicator(Vector2 pokemonPosition)
@@ -319,6 +334,15 @@ public class AnimationManager
         
         // Register the new animation
         _hpBarAnimations[pokemonKey] = hpAnimation;
+    }
+
+    /// <summary>
+    /// Add a damage indicator to the active list
+    /// Used by QueuedMultiTargetDamageIndicators to start indicators concurrently
+    /// </summary>
+    internal void AddDamageIndicatorToActiveList(DamageIndicator indicator)
+    {
+        _damageIndicators.Add(indicator);
     }
 
     /// <summary>

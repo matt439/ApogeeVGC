@@ -325,10 +325,31 @@ public class PerspectiveDiffAnimationSystem
             attackerIsPlayer,
             moveMsg.MoveName);
         
-        // SECOND: Queue damage indicators for all targets (these will play after attack animation)
-        foreach (var target in targets)
+        // SECOND: Queue damage indicators for all targets
+        if (targets.Count > 1)
         {
-            QueueDamageAnimation(target);
+            // Multi-target move: queue all damage indicators as a single batch so they play concurrently
+            Console.WriteLine($"[PerspectiveDiff] Queueing {targets.Count} damage indicators as concurrent batch");
+            
+            var damageTargets = targets.Select(target => new DamageTargetInfo
+            {
+                PokemonKey = target.Key,
+                DamageAmount = -target.HpDelta,
+                OldHp = target.PreviousHp,
+                NewHp = target.CurrentHp,
+                MaxHp = target.MaxHp,
+                Position = target.Position
+            }).ToList();
+            
+            _animationManager.QueueMultiTargetDamageIndicators(damageTargets);
+        }
+        else
+        {
+            // Single target: queue normally
+            foreach (var target in targets)
+            {
+                QueueDamageAnimation(target);
+            }
         }
     }
     
