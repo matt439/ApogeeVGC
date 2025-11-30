@@ -57,16 +57,27 @@ public class PerspectiveDiffAnimationSystem
             }
         }
         
-        // 2. Process message-based indicators (effectiveness, crits, miss, etc.)
-        ProcessMessageIndicators(evt.Message);
-        
-        // 3. Detect HP changes and accumulate targets (don't queue animations yet)
-        if (_previousPerspective != null && evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
+        // 2. Detect switches BEFORE updating perspective
+        //    This ensures switch animations are queued before the new Pokemon is shown
+        if (evt.Message is SwitchMessage && _previousPerspective != null && 
+            evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
         {
-            DetectAndAccumulateDamage(_previousPerspective, evt.Perspective);
+            // Detect switches eagerly when we see a SwitchMessage
+            DetectAndQueueSwitches(_previousPerspective.PlayerSide.Active, evt.Perspective.PlayerSide.Active, true);
+            DetectAndQueueSwitches(_previousPerspective.OpponentSide.Active, evt.Perspective.OpponentSide.Active, false);
         }
         
-        // 4. If this is NOT a damage/move message, flush pending animations
+        // 3. Process message-based indicators (effectiveness, crits, miss, etc.)
+        ProcessMessageIndicators(evt.Message);
+        
+        // 4. Detect HP changes and accumulate targets (don't queue animations yet)
+        //    Skip switch detection here since we handle it eagerly above
+        if (_previousPerspective != null && evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
+        {
+            DetectAndAccumulateDamage(_previousPerspective, evt.Perspective, skipSwitchDetection: evt.Message is SwitchMessage);
+        }
+        
+        // 5. If this is NOT a damage/move message, flush pending animations
         //    This handles cases where move sequence ends without another move starting
         if (evt.Message is not (DamageMessage or MoveUsedMessage or EffectivenessMessage))
         {
@@ -78,7 +89,7 @@ public class PerspectiveDiffAnimationSystem
             }
         }
         
-        // 5. Store perspective for next comparison
+        // 6. Store perspective for next comparison
         _previousPerspective = evt.Perspective;
     }
     
@@ -130,7 +141,7 @@ public class PerspectiveDiffAnimationSystem
     /// Detect HP changes and accumulate them for the pending move
     /// Compare against move start perspective to get total damage from the move
     /// </summary>
-    private void DetectAndAccumulateDamage(BattlePerspective prev, BattlePerspective curr)
+    private void DetectAndAccumulateDamage(BattlePerspective prev, BattlePerspective curr, bool skipSwitchDetection = false)
     {
         // Use move start perspective if available (to get total damage from move, not incremental)
         // Otherwise use previous perspective (for non-damage changes like healing)
@@ -160,9 +171,12 @@ public class PerspectiveDiffAnimationSystem
             }
         }
         
-        // Detect switches on both sides
-        DetectAndQueueSwitches(prev.PlayerSide.Active, curr.PlayerSide.Active, true);
-        DetectAndQueueSwitches(prev.OpponentSide.Active, curr.OpponentSide.Active, false);
+        // Detect switches on both sides (unless already handled eagerly)
+        if (!skipSwitchDetection)
+        {
+            DetectAndQueueSwitches(prev.PlayerSide.Active, curr.PlayerSide.Active, true);
+            DetectAndQueueSwitches(prev.OpponentSide.Active, curr.OpponentSide.Active, false);
+        }
     }
     
     /// <summary>
@@ -221,9 +235,23 @@ public class PerspectiveDiffAnimationSystem
             // Different Pokemon in same slot ? switch occurred
             if (prev?.Name != curr?.Name)
             {
-                // Note: Switch animations could be queued here if needed
-                // For now, switches are instant (no animation)
-                // The HP bar system will handle showing the new Pokemon
+                // Get position for this slot
+                Vector2 position = GetPositionForSlot(slot, isPlayer);
+                
+                // Create Pokémon keys for old and new Pokémon
+                string? withdrawKey = prev != null ? CreatePositionKey(prev.Name, isPlayer) : null;
+                string? sendOutKey = curr != null ? CreatePositionKey(curr.Name, isPlayer) : null;
+                
+                string side = isPlayer ? "player" : "opponent";
+                Console.WriteLine($"[PerspectiveDiff] Switch detected in slot {slot} ({side}): {prev?.Name ?? "null"} -> {curr?.Name ?? "null"}");
+                
+                // Queue switch animation
+                _animationManager.QueueSwitchAnimation(
+                    withdrawKey,
+                    sendOutKey,
+                    position,
+                    isPlayer,
+                    slot);
             }
         }
     }
@@ -455,6 +483,25 @@ public class PerspectiveDiffAnimationSystem
         else
         {
             return (int)((position.X - 480) / 188);
+        }
+    }
+    
+    /// <summary>
+    /// Get position for a given slot
+    /// </summary>
+    private static Vector2 GetPositionForSlot(int slot, bool isPlayer)
+    {
+        if (isPlayer)
+        {
+            // Player positions: base X = 20 + (slot * 188), center Y = 400 + 64
+            int xPosition = 20 + (slot * 188);
+            return new Vector2(xPosition + 64, 400 + 64);
+        }
+        else
+        {
+            // Opponent positions: base X = 480 + (slot * 188), center Y = 80 + 64
+            int xPosition = 480 + (slot * 188);
+            return new Vector2(xPosition + 64, 80 + 64);
         }
     }
 }

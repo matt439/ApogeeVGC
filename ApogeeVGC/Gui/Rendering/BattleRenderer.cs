@@ -189,7 +189,25 @@ public class BattleRenderer(
                 PokemonSpriteSize,
                 PokemonSpriteSize);
 
-            RenderPlayerPokemonInfo(pokemon, position);
+            // Check if there's a switch animation for this slot
+            var switchAnim = _animationManager?.GetSwitchAnimation(i, true);
+            bool shouldRender = true;
+            
+            if (switchAnim != null)
+            {
+                string pokemonKey = $"{pokemon.Name}|0"; // Player is SideId.P1 (0)
+                
+                // If this is the send-out Pokemon but we're still in the withdraw phase, don't render yet
+                if (switchAnim.SendOutPokemonKey == pokemonKey && !switchAnim.IsInSendOutPhase)
+                {
+                    shouldRender = false;
+                }
+            }
+
+            if (shouldRender)
+            {
+                RenderPlayerPokemonInfo(pokemon, position);
+            }
         }
     }
 
@@ -214,7 +232,25 @@ public class BattleRenderer(
                 PokemonSpriteSize,
                 PokemonSpriteSize);
 
-            RenderOpponentPokemonInfo(pokemon, position);
+            // Check if there's a switch animation for this slot
+            var switchAnim = _animationManager?.GetSwitchAnimation(i, false);
+            bool shouldRender = true;
+            
+            if (switchAnim != null)
+            {
+                string pokemonKey = $"{pokemon.Name}|1"; // Opponent is SideId.P2 (1)
+                
+                // If this is the send-out Pokemon but we're still in the withdraw phase, don't render yet
+                if (switchAnim.SendOutPokemonKey == pokemonKey && !switchAnim.IsInSendOutPhase)
+                {
+                    shouldRender = false;
+                }
+            }
+
+            if (shouldRender)
+            {
+                RenderOpponentPokemonInfo(pokemon, position);
+            }
         }
     }
 
@@ -384,12 +420,39 @@ public class BattleRenderer(
         XnaVector2 animationOffset = _animationManager?.GetPlayerSpriteOffset(pokemon.Position) ?? XnaVector2.Zero;
         XnaVector2 adjustedPosition = position + animationOffset;
 
-        // Calculate centered position for sprite
+        // Check for switch animation
+        var switchAnim = _animationManager?.GetSwitchAnimation(pokemon.Position, true);
+        float scale = 1.0f;
+        XnaVector2 switchOffset = XnaVector2.Zero;
+        
+        if (switchAnim != null)
+        {
+            // Check which Pokémon this is (withdrawing or sending out)
+            string switchPokemonKey = $"{pokemon.Name}|0"; // Player is SideId.P1 (0)
+            
+            if (switchAnim.WithdrawPokemonKey == switchPokemonKey)
+            {
+                scale = switchAnim.GetWithdrawScale();
+                switchOffset = switchAnim.GetWithdrawOffset();
+            }
+            else if (switchAnim.SendOutPokemonKey == switchPokemonKey)
+            {
+                scale = switchAnim.GetSendOutScale();
+                switchOffset = switchAnim.GetSendOutOffset();
+            }
+        }
+        
+        adjustedPosition += switchOffset;
+
+        // Calculate centered position for sprite with scale applied
+        int scaledWidth = (int)(sprite.Width * scale);
+        int scaledHeight = (int)(sprite.Height * scale);
+        
         var spriteRect = new XnaRectangle(
-            (int)adjustedPosition.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
-            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
-            sprite.Width,
-            sprite.Height);
+            (int)adjustedPosition.X + (int)((PokemonSpriteSize - scaledWidth) / CenteringDivisor),
+            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - scaledHeight) / CenteringDivisor),
+            scaledWidth,
+            scaledHeight);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 
@@ -544,12 +607,39 @@ public class BattleRenderer(
         XnaVector2 animationOffset = _animationManager?.GetOpponentSpriteOffset(pokemon.Position) ?? XnaVector2.Zero;
         XnaVector2 adjustedPosition = position + animationOffset;
 
-        // Calculate centered position for sprite
+        // Check for switch animation
+        var switchAnim = _animationManager?.GetSwitchAnimation(pokemon.Position, false);
+        float scale = 1.0f;
+        XnaVector2 switchOffset = XnaVector2.Zero;
+        
+        if (switchAnim != null)
+        {
+            // Check which Pokémon this is (withdrawing or sending out)
+            string switchPokemonKey = $"{pokemon.Name}|1"; // Opponent is SideId.P2 (1)
+            
+            if (switchAnim.WithdrawPokemonKey == switchPokemonKey)
+            {
+                scale = switchAnim.GetWithdrawScale();
+                switchOffset = switchAnim.GetWithdrawOffset();
+            }
+            else if (switchAnim.SendOutPokemonKey == switchPokemonKey)
+            {
+                scale = switchAnim.GetSendOutScale();
+                switchOffset = switchAnim.GetSendOutOffset();
+            }
+        }
+        
+        adjustedPosition += switchOffset;
+
+        // Calculate centered position for sprite with scale applied
+        int scaledWidth = (int)(sprite.Width * scale);
+        int scaledHeight = (int)(sprite.Height * scale);
+        
         var spriteRect = new XnaRectangle(
-            (int)adjustedPosition.X + (int)((PokemonSpriteSize - sprite.Width) / CenteringDivisor),
-            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - sprite.Height) / CenteringDivisor),
-            sprite.Width,
-            sprite.Height);
+            (int)adjustedPosition.X + (int)((PokemonSpriteSize - scaledWidth) / CenteringDivisor),
+            (int)adjustedPosition.Y + (int)((PokemonSpriteSize - scaledHeight) / CenteringDivisor),
+            scaledWidth,
+            scaledHeight);
 
         spriteBatch.Draw(sprite, spriteRect, XnaColor.White);
 

@@ -19,6 +19,9 @@ public class AnimationManager
     
     // HP bar animations - track animated HP values for each Pokemon
     private readonly Dictionary<string, HpBarAnimation> _hpBarAnimations = new();
+    
+    // Switch animations - track active switch animations by slot
+    private readonly Dictionary<string, SwitchAnimation> _switchAnimations = new();
 
     /// <summary>
     /// Create a new animation manager
@@ -113,6 +116,17 @@ public class AnimationManager
             if (hpAnimation.IsComplete)
             {
                 _hpBarAnimations.Remove(hpAnimation.PokemonKey);
+            }
+        }
+        
+        // Update switch animations
+        foreach (var kvp in _switchAnimations.ToList())
+        {
+            kvp.Value.Update(gameTime);
+            
+            if (kvp.Value.IsComplete)
+            {
+                _switchAnimations.Remove(kvp.Key);
             }
         }
     }
@@ -274,6 +288,51 @@ public class AnimationManager
         };
 
         _animationQueue.Enqueue(queuedIndicator);
+    }
+
+    /// <summary>
+    /// Queue a switch animation to play sequentially
+    /// </summary>
+    /// <param name="withdrawPokemonKey">Key of Pokémon being withdrawn (null if sending out first Pokémon)</param>
+    /// <param name="sendOutPokemonKey">Key of Pokémon being sent out (null if just withdrawing fainted Pokémon)</param>
+    /// <param name="position">Position where the switch occurs</param>
+    /// <param name="isPlayer">Whether this is on the player's side</param>
+    /// <param name="slot">Slot index where the switch occurs</param>
+    public void QueueSwitchAnimation(
+        string? withdrawPokemonKey,
+        string? sendOutPokemonKey,
+        Vector2 position,
+        bool isPlayer,
+        int slot)
+    {
+        var queuedSwitch = new QueuedSwitchAnimation
+        {
+            WithdrawPokemonKey = withdrawPokemonKey,
+            SendOutPokemonKey = sendOutPokemonKey,
+            Position = position,
+            IsPlayer = isPlayer,
+            Slot = slot,
+            AnimationManager = this
+        };
+
+        _animationQueue.Enqueue(queuedSwitch);
+    }
+
+    /// <summary>
+    /// Register a switch animation when it starts from the queue
+    /// </summary>
+    internal void RegisterSwitchAnimation(string slotKey, SwitchAnimation switchAnimation)
+    {
+        _switchAnimations[slotKey] = switchAnimation;
+    }
+
+    /// <summary>
+    /// Get the active switch animation for a slot, or null if none
+    /// </summary>
+    public SwitchAnimation? GetSwitchAnimation(int slot, bool isPlayer)
+    {
+        string key = CreateSlotKey(slot, isPlayer);
+        return _switchAnimations.TryGetValue(key, out SwitchAnimation? animation) ? animation : null;
     }
 
     /// <summary>
@@ -448,12 +507,13 @@ public class AnimationManager
         _opponentSpriteOffsets.Clear();
         _animationQueue.Clear();
         _hpBarAnimations.Clear();
+        _switchAnimations.Clear();
     }
 
     /// <summary>
     /// Check if any animations are currently active or queued
     /// </summary>
-    public bool HasActiveAnimations => _activeAnimations.Count > 0 || _damageIndicators.Count > 0 || _animationQueue.HasAnimations;
+    public bool HasActiveAnimations => _activeAnimations.Count > 0 || _damageIndicators.Count > 0 || _animationQueue.HasAnimations || _switchAnimations.Count > 0;
 
     /// <summary>
     /// Create a callback to update sprite offset during contact animations
@@ -504,5 +564,13 @@ public class AnimationManager
 
         // Default: light gray
         return Color.LightGray;
+    }
+
+    /// <summary>
+    /// Create a slot key for tracking switch animations
+    /// </summary>
+    private static string CreateSlotKey(int slot, bool isPlayer)
+    {
+        return $"slot_{slot}_{(isPlayer ? "player" : "opponent")}";
     }
 }

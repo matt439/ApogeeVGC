@@ -34,4 +34,24 @@ public static class AnimationSettings
     /// Speed of projectile movement in pixels per second (default: 1000 pixels/sec)
     /// </summary>
     public static float ProjectileSpeed => 1000f * AnimationSpeedMultiplier;
+
+    /// <summary>
+    /// Duration in seconds for Pokémon withdraw animation (default: 0.4 seconds)
+    /// </summary>
+    public static float SwitchWithdrawDuration => 0.4f / AnimationSpeedMultiplier;
+
+    /// <summary>
+    /// Duration in seconds for Pokémon send-out animation (default: 0.4 seconds)
+    /// </summary>
+    public static float SwitchSendOutDuration => 0.4f / AnimationSpeedMultiplier;
+
+    /// <summary>
+    /// Distance in pixels that Pokémon moves backward during withdraw (default: 80 pixels)
+    /// </summary>
+    public static float SwitchWithdrawDistance => 80f;
+
+    /// <summary>
+    /// Distance in pixels that Pokémon moves forward during send-out (default: 80 pixels)
+    /// </summary>
+    public static float SwitchSendOutDistance => 80f;
 }

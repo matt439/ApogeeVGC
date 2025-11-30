@@ -268,6 +268,39 @@ public class QueuedMultiTargetDamageIndicators : QueuedAnimation
 }
 
 /// <summary>
+/// Queued switch animation (withdraw old Pokémon, send out new Pokémon)
+/// </summary>
+public class QueuedSwitchAnimation : QueuedAnimation
+{
+    public string? WithdrawPokemonKey { get; init; }
+    public string? SendOutPokemonKey { get; init; }
+    public required Vector2 Position { get; init; }
+    public required bool IsPlayer { get; init; }
+    public required int Slot { get; init; }
+    public required AnimationManager AnimationManager { get; init; }
+
+    public override BattleAnimation Start()
+    {
+        Console.WriteLine($"[QueuedSwitchAnimation] Starting switch animation - Withdraw: {WithdrawPokemonKey}, Send out: {SendOutPokemonKey}");
+        
+        var switchAnimation = new SwitchAnimation(
+            WithdrawPokemonKey,
+            SendOutPokemonKey,
+            Position,
+            IsPlayer,
+            Slot);
+        
+        switchAnimation.Start();
+        
+        // Register the animation with the manager so it can be queried by BattleRenderer
+        string slotKey = $"slot_{Slot}_{(IsPlayer ? "player" : "opponent")}";
+        AnimationManager.RegisterSwitchAnimation(slotKey, switchAnimation);
+        
+        return switchAnimation;
+    }
+}
+
+/// <summary>
 /// Information about a single damage target for multi-target moves
 /// </summary>
 public record DamageTargetInfo
