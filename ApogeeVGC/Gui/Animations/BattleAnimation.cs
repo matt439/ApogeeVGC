@@ -54,4 +54,14 @@ public abstract class BattleAnimation
         IsActive = false;
         IsComplete = true;
     }
+
+    /// <summary>
+    /// Freeze the animation at its current state without marking it complete
+    /// Used for holding HP bars at a specific value until a queued animation starts
+    /// </summary>
+    public virtual void Freeze()
+    {
+        IsActive = false;
+        IsComplete = false;
+    }
 }

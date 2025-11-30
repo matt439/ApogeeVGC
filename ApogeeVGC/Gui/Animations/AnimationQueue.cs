@@ -107,13 +107,14 @@ public class QueuedDamageIndicator : QueuedAnimation
 
         indicator.Start();
         
-        // If this damage indicator has associated HP bar animation data, schedule it to start
-        // AFTER this damage indicator completes, not immediately
+        // If this damage indicator has associated HP bar animation data, queue it to start
+        // after this damage indicator completes
         if (PokemonKey != null && OldHp.HasValue && NewHp.HasValue)
         {
             Console.WriteLine($"[QueuedDamageIndicator] Queueing HP bar animation for {PokemonKey}: {OldHp} -> {NewHp}");
             // Queue HP bar animation to start after damage indicator
-            AnimationManager.QueueHpBarAnimationDirectly(PokemonKey, OldHp.Value, NewHp.Value, MaxHp);
+            // Note: Don't create frozen animation here - that's already handled by PreservePokemonHpBeforePerspectiveUpdate
+            AnimationManager.QueueHpBarAnimation(PokemonKey, OldHp.Value, NewHp.Value, MaxHp);
         }
         
         return indicator;
@@ -163,8 +164,7 @@ public class QueuedCustomIndicator : QueuedAnimation
 }
 
 /// <summary>
-/// Queued HP bar animation  
-/// Note: This animation delays registration to allow frozen animations to display first
+/// Queued HP bar animation
 /// </summary>
 public class QueuedHpBarAnimation : QueuedAnimation
 {
@@ -181,14 +181,9 @@ public class QueuedHpBarAnimation : QueuedAnimation
         var hpAnimation = new HpBarAnimation(PokemonKey, OldHp, NewHp, MaxHp);
         hpAnimation.Start();
         
-        // DELAYED registration: Register on the next frame update cycle
-        // This allows the frozen animation to be displayed first
-        Task.Run(async () =>
-        {
-            await Task.Delay(16); // Wait one frame (~16ms)
-            AnimationManager.RegisterHpBarAnimation(PokemonKey, hpAnimation);
-            Console.WriteLine($"[QueuedHpBarAnimation] Registered HP animation for {PokemonKey} after delay");
-        });
+        // Immediately register the animation - frozen animations are preserved by PreservePokemonHpBeforePerspectiveUpdate
+        AnimationManager.RegisterHpBarAnimation(PokemonKey, hpAnimation);
+        Console.WriteLine($"[QueuedHpBarAnimation] Registered HP animation for {PokemonKey}");
         
         return hpAnimation;
     }

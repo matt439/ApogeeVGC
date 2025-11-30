@@ -16,8 +16,8 @@ public class AnimationCoordinator
 
     // Track pending move animations to link with damage/miss messages
     private MoveUsedMessage? _pendingMoveAnimation;
-    // Track the target of the pending move (if known)
-    private string? _pendingMoveTarget;
+    // Track the actual targets hit by the pending move (collected from damage/miss messages)
+    private readonly List<string> _pendingMoveTargets = new();
     // Track if we've already triggered the animation for the current move
     private bool _animationTriggered;
     // Key format: "PokemonName|SideId" to handle duplicate names on different sides
@@ -92,7 +92,7 @@ public class AnimationCoordinator
             // Clear pending move on turn start
             case TurnStartMessage:
                 _pendingMoveAnimation = null;
-                _pendingMoveTarget = null;
+                _pendingMoveTargets.Clear();
                 _animationTriggered = false;
                 break;
         }
@@ -106,14 +106,13 @@ public class AnimationCoordinator
         // Store this move for linking with subsequent damage/miss messages
         _pendingMoveAnimation = moveMsg;
         
-        // Extract target information if available
-        // MoveUsedMessage may contain target info in the future, for now we'll track it from damage messages
-        _pendingMoveTarget = null;
+        // Clear target list for the new move
+        _pendingMoveTargets.Clear();
         
         // Reset animation trigger flag for this new move
         _animationTriggered = false;
 
-        // Don't trigger animation yet - wait for damage/miss message to know the target
+        // Don't trigger animation yet - wait for damage/miss message to know the target(s)
         // This prevents duplicate animations
     }
 
@@ -122,13 +121,11 @@ public class AnimationCoordinator
     /// </summary>
     private void HandleDamage(DamageMessage damageMsg)
     {
-        // Trigger attack animation only once per move (on the first damage message)
-        if (_pendingMoveAnimation != null && !_animationTriggered)
+        // Add this Pokemon to the list of targets first
+        string targetKey = CreatePositionKey(damageMsg.PokemonName, damageMsg.SideId);
+        if (!_pendingMoveTargets.Contains(targetKey))
         {
-            // Don't set _pendingMoveTarget - let TriggerAttackAnimationIfReady use GetPotentialDefenderPositions
-            // This allows spread moves to target all opponents
-            TriggerAttackAnimationIfReady();
-            _animationTriggered = true; // Mark as triggered to prevent duplicate animations
+            _pendingMoveTargets.Add(targetKey);
         }
         
         // Find the damaged Pokemon's position using name and side
@@ -149,6 +146,9 @@ public class AnimationCoordinator
                 damageMsg.RemainingHp);
         }
 
+        // Don't trigger animation here - wait until all damage messages are processed
+        // Animation will be triggered by the first queued damage indicator when it starts
+
         // Note: Don't clear _pendingMoveAnimation here yet - it might hit multiple targets
         // Only clear on the next move or turn start
     }
@@ -158,11 +158,16 @@ public class AnimationCoordinator
     /// </summary>
     private void HandleMiss(MissMessage missMsg)
     {
+        // Add this Pokemon to the list of targets
+        string targetKey = CreatePositionKey(missMsg.PokemonName, missMsg.SideId);
+        if (!_pendingMoveTargets.Contains(targetKey))
+        {
+            _pendingMoveTargets.Add(targetKey);
+        }
+        
         // Trigger attack animation only once per move (on the first miss message)
         if (_pendingMoveAnimation != null && !_animationTriggered)
         {
-            // Don't set _pendingMoveTarget - let TriggerAttackAnimationIfReady use GetPotentialDefenderPositions
-            // This allows spread moves to target all opponents
             TriggerAttackAnimationIfReady();
             _animationTriggered = true; // Mark as triggered to prevent duplicate animations
         }
@@ -187,10 +192,16 @@ public class AnimationCoordinator
         // If there's a target (e.g., Protect blocked the move), trigger animation and show indicator
         if (failMsg is { TargetPokemonName: not null, TargetSideId: not null })
         {
+            // Add this Pokemon to the list of targets
+            string targetKey = CreatePositionKey(failMsg.TargetPokemonName, failMsg.TargetSideId);
+            if (!_pendingMoveTargets.Contains(targetKey))
+            {
+                _pendingMoveTargets.Add(targetKey);
+            }
+            
             // Trigger attack animation only once per move
             if (_pendingMoveAnimation != null && !_animationTriggered)
             {
-                _pendingMoveTarget = CreatePositionKey(failMsg.TargetPokemonName, failMsg.TargetSideId);
                 TriggerAttackAnimationIfReady();
                 _animationTriggered = true;
             }
@@ -265,14 +276,24 @@ public class AnimationCoordinator
             return;
         }
 
-        // Get defender position(s) - always use all opponents for proper multi-target animations
-        List<Vector2> defenderPositions = GetPotentialDefenderPositions(attackerInfo.IsPlayer);
-        Console.WriteLine($"[AnimationCoordinator] Found {defenderPositions.Count} defender positions");
+        // Get defender position(s) from the actual targets that were hit
+        List<Vector2> defenderPositions = new();
+        foreach (string targetKey in _pendingMoveTargets)
+        {
+            if (_pokemonPositions.TryGetValue(targetKey, out var targetInfo))
+            {
+                defenderPositions.Add(targetInfo.Position);
+            }
+        }
+        
+        Console.WriteLine($"[AnimationCoordinator] Found {defenderPositions.Count} actual target positions from {_pendingMoveTargets.Count} target keys");
 
         if (defenderPositions.Count == 0)
         {
-            Console.WriteLine("[AnimationCoordinator] No defender positions found");
-            return;
+            Console.WriteLine("[AnimationCoordinator] No defender positions found, falling back to all opponents");
+            // Fallback: if no targets collected yet, use all potential defenders
+            // This can happen if animation triggers on first damage message before target is added
+            defenderPositions = GetPotentialDefenderPositions(attackerInfo.IsPlayer);
         }
 
         // Check if this is a contact move
@@ -363,5 +384,18 @@ public class AnimationCoordinator
     public bool HasActiveAnimations()
     {
         return _animationManager.HasActiveAnimations;
+    }
+
+    /// <summary>
+    /// Trigger any pending attack animation if one is waiting
+    /// Call this after processing a batch of related damage/miss messages
+    /// </summary>
+    public void TriggerPendingAttackAnimation()
+    {
+        if (_pendingMoveAnimation != null && !_animationTriggered)
+        {
+            TriggerAttackAnimationIfReady();
+            _animationTriggered = true;
+        }
     }
 }

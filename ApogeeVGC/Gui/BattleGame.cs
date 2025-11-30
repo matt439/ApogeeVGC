@@ -32,6 +32,9 @@ public class BattleGame : Game
     private readonly Lock _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown;
+    
+    // Deferred events that should wait for animations to complete
+    private readonly Queue<BattleEvent> _deferredEvents = new();
 
     // Message queue for battle events
     private readonly List<BattleMessage> _messageQueue = [];
@@ -205,11 +208,24 @@ public class BattleGame : Game
 
     /// <summary>
     /// Process a battle event: store perspective and trigger animations
+    /// Returns true if the event should stop further event processing (to wait for animations)
     /// </summary>
-    private void ProcessBattleEvent(BattleEvent evt)
+    private bool ProcessBattleEvent(BattleEvent evt)
     {
         Console.WriteLine($"[BattleGame.ProcessBattleEvent] Processing event with message type: {evt.Message?.GetType().Name ?? "null"}");
         Console.WriteLine($"[BattleGame.ProcessBattleEvent] _animationCoordinator is null? {_animationCoordinator == null}");
+        
+        // Check if this is a faint/switch message that should wait for animations
+        bool hasActiveAnimations = _animationCoordinator?.HasActiveAnimations() ?? false;
+        bool shouldDefer = evt.Message is FaintMessage or SwitchMessage && hasActiveAnimations;
+        
+        if (shouldDefer)
+        {
+            // Defer this event until animations complete
+            Console.WriteLine($"[BattleGame.ProcessBattleEvent] Deferring {evt.Message?.GetType().Name} until animations complete");
+            _deferredEvents.Enqueue(evt);
+            return true; // Stop processing more events
+        }
         
         // Before processing any messages, ensure all Pokemon have frozen HP animations if perspective changed
         // Use the HP snapshot (not _currentBattlePerspective) to detect changes
@@ -238,11 +254,12 @@ public class BattleGame : Game
         }
         
         // Store perspective for rendering AFTER processing animations
-        // This ensures frozen HP bar animations are created before the perspective with new HP is stored
         lock (_stateLock)
         {
             _currentBattlePerspective = evt.Perspective;
         }
+        
+        return false; // Continue processing events
     }
     
     /// <summary>
@@ -289,9 +306,9 @@ public class BattleGame : Game
                     {
                         Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
                         _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
-                        // Immediately stop it to freeze at old HP
+                        // Immediately freeze it at old HP (not Stop, which marks it complete)
                         var frozenAnim = _animationManager.GetHpBarAnimation(key);
-                        frozenAnim?.Stop();
+                        frozenAnim?.Freeze();
                     }
                 }
             }
@@ -316,9 +333,9 @@ public class BattleGame : Game
                     {
                         Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
                         _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
-                        // Immediately stop it to freeze at old HP
+                        // Immediately freeze it at old HP (not Stop, which marks it complete)
                         var frozenAnim = _animationManager.GetHpBarAnimation(key);
-                        frozenAnim?.Stop();
+                        frozenAnim?.Freeze();
                     }
                 }
             }
@@ -343,26 +360,59 @@ public class BattleGame : Game
                     _hpSnapshotPerspective = _currentBattlePerspective;
                 }
                 
-                // Process events until we trigger an animation
-                // This allows related messages (move used + damage) to be processed together
-                bool hadActiveAnimationsBefore = false;
-                int maxEventsPerFrame = 10; // Safety limit to prevent infinite loops
-                int eventsProcessed = 0;
-                
-                while (eventsProcessed < maxEventsPerFrame && 
-                       _choiceCoordinator.TryDequeueEvent(out BattleEvent? evt) && evt != null)
+                // First, process any deferred events that were waiting for animations to complete
+                while (_deferredEvents.Count > 0)
                 {
-                    ProcessBattleEvent(evt);
-                    eventsProcessed++;
-                    
-                    // Check if this event triggered an animation
-                    bool hasActiveAnimationsNow = _animationCoordinator?.HasActiveAnimations() ?? false;
-                    if (hasActiveAnimationsNow && !hadActiveAnimationsBefore)
-                    {
-                        // Animation was just triggered - stop processing events
+                    BattleEvent deferredEvt = _deferredEvents.Dequeue();
+                    Console.WriteLine($"[BattleGame.Update] Processing deferred event: {deferredEvt.Message?.GetType().Name ?? "null"}");
+                    bool shouldStop = ProcessBattleEvent(deferredEvt);
+                    if (shouldStop)
                         break;
+                        
+                    // After processing deferred event, trigger any pending animations
+                    _animationCoordinator?.TriggerPendingAttackAnimation();
+                    
+                    // Check if animations started
+                    if (_animationCoordinator?.HasActiveAnimations() ?? false)
+                    {
+                        break; // Stop processing, wait for animations
                     }
-                    hadActiveAnimationsBefore = hasActiveAnimationsNow;
+                }
+                
+                // If no deferred events or they didn't trigger animations, process new events
+                if (!(_animationCoordinator?.HasActiveAnimations() ?? false))
+                {
+                    // Process events until we trigger an animation
+                    // This allows related messages (move used + damage) to be processed together
+                    bool hadActiveAnimationsBefore = false;
+                    int maxEventsPerFrame = 10; // Safety limit to prevent infinite loops
+                    int eventsProcessed = 0;
+                    
+                    while (eventsProcessed < maxEventsPerFrame && 
+                           _choiceCoordinator.TryDequeueEvent(out BattleEvent? evt) && evt != null)
+                    {
+                        bool shouldStop = ProcessBattleEvent(evt);
+                        eventsProcessed++;
+                        
+                        if (shouldStop)
+                        {
+                            // Event was deferred, stop processing
+                            break;
+                        }
+                        
+                        // After processing each event, trigger any pending attack animations
+                        // This ensures all damage messages have been collected before the animation starts
+                        _animationCoordinator?.TriggerPendingAttackAnimation();
+                        
+                        // Check if this event triggered an animation
+                        bool hasActiveAnimationsNow = _animationCoordinator?.HasActiveAnimations() ?? false;
+                        if (hasActiveAnimationsNow && !hadActiveAnimationsBefore)
+                        {
+                            // Animation was just triggered - stop processing events
+                            break;
+                        }
+                        hadActiveAnimationsBefore = hasActiveAnimationsNow;
+                    }
                 }
             }
             // If animations ARE active, don't process any new events until they complete
