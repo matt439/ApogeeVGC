@@ -25,10 +25,9 @@ public class BattleGame : Game
     private BattleRunner? _battleRunner;
     private MessageRenderer? _messageRenderer;
     private AnimationManager? _animationManager;
-    private AnimationCoordinator? _animationCoordinator;
+    private PerspectiveDiffAnimationSystem? _animationSystem;
 
     private BattlePerspective? _currentBattlePerspective;
-    private BattlePerspective? _hpSnapshotPerspective; // Snapshot for HP preservation across event batches
     private readonly Lock _stateLock = new();
     private bool _shouldExit;
     private bool _battleCompleteShown;
@@ -193,12 +192,12 @@ public class BattleGame : Game
         if (_defaultFont != null)
         {
             _animationManager = new AnimationManager(GraphicsDevice, _defaultFont);
-            _animationCoordinator = new AnimationCoordinator(_animationManager, library);
+            _animationSystem = new PerspectiveDiffAnimationSystem(_animationManager, library);
             
             // Connect animation manager to battle renderer
             _battleRenderer?.SetAnimationManager(_animationManager);
             
-            Console.WriteLine("[BattleGame] Animation system initialized");
+            Console.WriteLine("[BattleGame] Perspective-diff animation system initialized");
         }
 
         _battleRunner = new BattleRunner(library, battleOptions, simulator);
@@ -213,10 +212,9 @@ public class BattleGame : Game
     private bool ProcessBattleEvent(BattleEvent evt)
     {
         Console.WriteLine($"[BattleGame.ProcessBattleEvent] Processing event with message type: {evt.Message?.GetType().Name ?? "null"}");
-        Console.WriteLine($"[BattleGame.ProcessBattleEvent] _animationCoordinator is null? {_animationCoordinator == null}");
         
         // Check if this is a faint/switch message that should wait for animations
-        bool hasActiveAnimations = _animationCoordinator?.HasActiveAnimations() ?? false;
+        bool hasActiveAnimations = _animationSystem?.HasActiveAnimations() ?? false;
         bool shouldDefer = evt.Message is FaintMessage or SwitchMessage && hasActiveAnimations;
         
         if (shouldDefer)
@@ -226,11 +224,6 @@ public class BattleGame : Game
             _deferredEvents.Enqueue(evt);
             return true; // Stop processing more events
         }
-        
-        // Before processing any messages, ensure all Pokemon have frozen HP animations if perspective changed
-        // Use the HP snapshot (not _currentBattlePerspective) to detect changes
-        // This prevents the "jump" effect when perspective updates with new HP before animations are queued
-        PreservePokemonHpBeforePerspectiveUpdate(evt.Perspective);
         
         // Add message to display queue (if present)
         if (evt.Message != null)
@@ -243,17 +236,12 @@ public class BattleGame : Game
                     _messageQueue.RemoveRange(0, _messageQueue.Count - MaxMessagesDisplayed);
                 }
             }
-
-            Console.WriteLine($"[BattleGame.ProcessBattleEvent] About to call ProcessMessage for {evt.Message.GetType().Name}");
-            
-            // Process message for animations BEFORE storing perspective
-            // This ensures HP bar animations are queued with the correct old HP values
-            _animationCoordinator?.ProcessMessage(evt.Message);
-            
-            Console.WriteLine($"[BattleGame.ProcessBattleEvent] ProcessMessage called");
         }
         
-        // Store perspective for rendering AFTER processing animations
+        // Use perspective-diff animation system to detect state changes and queue animations
+        _animationSystem?.ProcessEvent(evt);
+        
+        // Store perspective for rendering
         lock (_stateLock)
         {
             _currentBattlePerspective = evt.Perspective;
@@ -262,104 +250,16 @@ public class BattleGame : Game
         return false; // Continue processing events
     }
     
-    /// <summary>
-    /// Preserve Pokemon HP values before perspective update by creating frozen animations
-    /// This prevents HP bars from jumping to new values before animations are queued
-    /// Uses _hpSnapshotPerspective instead of _currentBattlePerspective to detect changes
-    /// </summary>
-    private void PreservePokemonHpBeforePerspectiveUpdate(BattlePerspective newPerspective)
-    {
-        if (_animationManager == null)
-            return;
-            
-        // Only preserve HP during active battle (not team preview)
-        if (newPerspective.PerspectiveType != BattlePerspectiveType.InBattle)
-            return;
-        
-        // Use HP snapshot as the baseline (if it exists), otherwise use current perspective
-        BattlePerspective? baselinePerspective = _hpSnapshotPerspective ?? _currentBattlePerspective;
-        
-        if (baselinePerspective == null)
-        {
-            // First event - create snapshot
-            _hpSnapshotPerspective = newPerspective;
-            return;
-        }
-        
-        // Check each Pokemon in the new perspective and create frozen animations if HP changed from baseline
-        for (int slot = 0; slot < newPerspective.PlayerSide.Active.Count; slot++)
-        {
-            var newPokemon = newPerspective.PlayerSide.Active[slot];
-            var oldPokemon = slot < baselinePerspective.PlayerSide.Active.Count 
-                ? baselinePerspective.PlayerSide.Active[slot] 
-                : null;
-                
-            if (newPokemon != null && oldPokemon != null && newPokemon.Name == oldPokemon.Name)
-            {
-                // Same Pokemon in same slot - check if HP changed
-                if (newPokemon.Hp != oldPokemon.Hp)
-                {
-                    string key = $"{newPokemon.Name}|0"; // Player is always SideId.P1 (0)
-                    
-                    // Only create frozen animation if one doesn't already exist
-                    if (_animationManager.GetAnimatedHp(key) == null)
-                    {
-                        Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
-                        _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
-                        // Immediately freeze it at old HP (not Stop, which marks it complete)
-                        var frozenAnim = _animationManager.GetHpBarAnimation(key);
-                        frozenAnim?.Freeze();
-                    }
-                }
-            }
-        }
-        
-        for (int slot = 0; slot < newPerspective.OpponentSide.Active.Count; slot++)
-        {
-            var newPokemon = newPerspective.OpponentSide.Active[slot];
-            var oldPokemon = slot < baselinePerspective.OpponentSide.Active.Count 
-                ? baselinePerspective.OpponentSide.Active[slot] 
-                : null;
-                
-            if (newPokemon != null && oldPokemon != null && newPokemon.Name == oldPokemon.Name)
-            {
-                // Same Pokemon in same slot - check if HP changed
-                if (newPokemon.Hp != oldPokemon.Hp)
-                {
-                    string key = $"{newPokemon.Name}|1"; // Opponent is always SideId.P2 (1)
-                    
-                    // Only create frozen animation if one doesn't already exist
-                    if (_animationManager.GetAnimatedHp(key) == null)
-                    {
-                        Console.WriteLine($"[BattleGame] Creating frozen animation for {key}: {oldPokemon.Hp} HP (new perspective shows {newPokemon.Hp})");
-                        _animationManager.StartHpBarAnimation(key, oldPokemon.Hp, oldPokemon.Hp, oldPokemon.MaxHp);
-                        // Immediately freeze it at old HP (not Stop, which marks it complete)
-                        var frozenAnim = _animationManager.GetHpBarAnimation(key);
-                        frozenAnim?.Freeze();
-                    }
-                }
-            }
-        }
-    }
-
     protected override void Update(GameTime gameTime)
     {
         try
         {
             // Process events from battle thread
             // Process events until an animation is triggered, then wait for completion
-            bool hasActiveAnimations = _animationCoordinator?.HasActiveAnimations() ?? false;
+            bool hasActiveAnimations = _animationSystem?.HasActiveAnimations() ?? false;
             
             if (!hasActiveAnimations)
             {
-                // No animations running - update HP snapshot to current perspective before processing new events
-                // This ensures the next batch of events compares against the latest stable HP values
-                if (_currentBattlePerspective != null && 
-                    _currentBattlePerspective.PerspectiveType == BattlePerspectiveType.InBattle)
-                {
-                    _hpSnapshotPerspective = _currentBattlePerspective;
-                }
-                
                 // First, process any deferred events that were waiting for animations to complete
                 while (_deferredEvents.Count > 0)
                 {
@@ -368,19 +268,16 @@ public class BattleGame : Game
                     bool shouldStop = ProcessBattleEvent(deferredEvt);
                     if (shouldStop)
                         break;
-                        
-                    // After processing deferred event, trigger any pending animations
-                    _animationCoordinator?.TriggerPendingAttackAnimation();
                     
                     // Check if animations started
-                    if (_animationCoordinator?.HasActiveAnimations() ?? false)
+                    if (_animationSystem?.HasActiveAnimations() ?? false)
                     {
                         break; // Stop processing, wait for animations
                     }
                 }
                 
                 // If no deferred events or they didn't trigger animations, process new events
-                if (!(_animationCoordinator?.HasActiveAnimations() ?? false))
+                if (!(_animationSystem?.HasActiveAnimations() ?? false))
                 {
                     // Process events until we trigger an animation
                     // This allows related messages (move used + damage) to be processed together
@@ -400,12 +297,8 @@ public class BattleGame : Game
                             break;
                         }
                         
-                        // After processing each event, trigger any pending attack animations
-                        // This ensures all damage messages have been collected before the animation starts
-                        _animationCoordinator?.TriggerPendingAttackAnimation();
-                        
                         // Check if this event triggered an animation
-                        bool hasActiveAnimationsNow = _animationCoordinator?.HasActiveAnimations() ?? false;
+                        bool hasActiveAnimationsNow = _animationSystem?.HasActiveAnimations() ?? false;
                         if (hasActiveAnimationsNow && !hadActiveAnimationsBefore)
                         {
                             // Animation was just triggered - stop processing events
@@ -522,8 +415,7 @@ public class BattleGame : Game
     /// </summary>
     private void RegisterPokemonPositions(BattlePerspective perspective)
     {
-        _animationCoordinator!.ClearPokemonPositions();
-        _animationCoordinator.SetPlayerSideId(SideId.P1);
+        _animationSystem!.ClearPokemonPositions();
 
         // Register player active Pokemon
         for (int slot = 0; slot < perspective.PlayerSide.Active.Count; slot++)
@@ -533,7 +425,7 @@ public class BattleGame : Game
             {
                 int xPosition = 20 + (slot * 188);
                 var position = new Vector2(xPosition + 64, 400 + 64);
-                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, true);
+                _animationSystem.RegisterPokemonPosition(pokemon.Name, position, slot, true);
             }
         }
 
@@ -545,7 +437,7 @@ public class BattleGame : Game
             {
                 int xPosition = 480 + (slot * 188);
                 var position = new Vector2(xPosition + 64, 80 + 64);
-                _animationCoordinator.RegisterPokemonPosition(pokemon.Name, position, slot, false);
+                _animationSystem.RegisterPokemonPosition(pokemon.Name, position, slot, false);
             }
         }
     }
@@ -565,8 +457,8 @@ public class BattleGame : Game
             perspectiveToRender = _currentBattlePerspective;
         }
 
-        // Register Pokemon positions for animation coordinator
-        if (_animationCoordinator != null && perspectiveToRender != null && 
+        // Register Pokemon positions for animation system
+        if (_animationSystem != null && perspectiveToRender != null && 
             perspectiveToRender.PerspectiveType == BattlePerspectiveType.InBattle)
         {
             RegisterPokemonPositions(perspectiveToRender);
@@ -686,7 +578,7 @@ public class BattleGame : Game
         
         // Clear animations as well
         _animationManager?.Clear();
-        _animationCoordinator?.ClearPokemonPositions();
+        _animationSystem?.ClearPokemonPositions();
     }
 
     /// <summary>
