@@ -1055,18 +1055,8 @@ public partial class Battle
         SideId? sideId = ExtractSideId(parts[2]);
         string healthStr = parts[3];
 
-        // Parse health (format: "123/456" or "123/456 psn")
-        string[] healthParts = healthStr.Split(' ');
-        string[] hpParts = healthParts[0].Split('/');
-
-        if (hpParts.Length != 2 ||
-            !int.TryParse(hpParts[0], out int currentHp) ||
-            !int.TryParse(hpParts[1], out int maxHp))
-        {
-            return new GenericMessage { Text = $"{pokemonName} took damage!" };
-        }
-
-        // Extract damage amount, effect name, and source from tags
+        // Extract damage amount, effect name, and source from tags FIRST
+        // This ensures we have the damage amount even if HP parsing fails
         int damageAmount = 0;
         string? effectName = null;
         string? sourceName = null;
@@ -1091,7 +1081,27 @@ public partial class Battle
             }
         }
 
-        // Fallback: if no [dmg] tag, calculate from total HP (less accurate)
+        // Parse health (format: "123/456" or "123/456 psn")
+        string[] healthParts = healthStr.Split(' ');
+        string[] hpParts = healthParts[0].Split('/');
+
+        if (hpParts.Length != 2 ||
+            !int.TryParse(hpParts[0], out int currentHp) ||
+            !int.TryParse(hpParts[1], out int maxHp))
+        {
+            // HP parsing failed - but if we have damage amount from tag, still create a proper message
+            if (damageAmount > 0)
+            {
+                string pokemonDisplay = sideId.HasValue
+                    ? $"{pokemonName} (Side {(int)sideId.Value + 1})"
+                    : pokemonName;
+                return new GenericMessage { Text = $"{pokemonDisplay} took {damageAmount} damage!" };
+            }
+            return new GenericMessage { Text = $"{pokemonName} took damage!" };
+        }
+
+        // Fallback: if no [dmg] tag, calculate from HP difference
+        // This is less accurate when Pokemon faints (HP becomes 0)
         if (damageAmount == 0)
         {
             damageAmount = maxHp - currentHp;
