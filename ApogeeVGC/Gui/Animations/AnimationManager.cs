@@ -514,6 +514,11 @@ public class AnimationManager
     /// Check if any animations are currently active or queued
     /// </summary>
     public bool HasActiveAnimations => _activeAnimations.Count > 0 || _damageIndicators.Count > 0 || _animationQueue.HasAnimations || _switchAnimations.Count > 0;
+    
+    /// <summary>
+    /// Check if any switch animations are currently active
+    /// </summary>
+    public bool HasActiveSwitchAnimations() => _switchAnimations.Count > 0;
 
     /// <summary>
     /// Create a callback to update sprite offset during contact animations

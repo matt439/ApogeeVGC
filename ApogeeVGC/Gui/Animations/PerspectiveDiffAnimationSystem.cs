@@ -22,6 +22,9 @@ public class PerspectiveDiffAnimationSystem
     private readonly List<HpChangeInfo> _pendingDamageTargets = new(); // Accumulate targets from same move
     private readonly Dictionary<string, Vector2> _pokemonPositions = new();
     
+    // Cache fainted Pokemon so we can still animate their withdrawal
+    private readonly Dictionary<int, FaintedPokemonInfo> _recentlyFaintedPokemon = new();
+    
     /// <summary>
     /// Create a new perspective-diff animation system
     /// </summary>
@@ -36,6 +39,21 @@ public class PerspectiveDiffAnimationSystem
     /// </summary>
     public void ProcessEvent(BattleEvent evt)
     {
+        string eventMsgType = evt.Message?.GetType().Name ?? "null";
+        Console.WriteLine($"[PerspectiveDiff.ProcessEvent] ENTRY: msgType={eventMsgType}, PerspectiveType={evt.Perspective.PerspectiveType}");
+        
+        // Log opponent active list for debugging switches
+        if (evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
+        {
+            Console.Write($"[PerspectiveDiff.ProcessEvent] Opponent active: ");
+            for (int i = 0; i < evt.Perspective.OpponentSide.Active.Count; i++)
+            {
+                var p = evt.Perspective.OpponentSide.Active[i];
+                Console.Write($"[{i}]={p?.Name ?? "null"} ");
+            }
+            Console.WriteLine();
+        }
+        
         // 1. Track move context from message
         if (evt.Message is MoveUsedMessage moveMsg)
         {
@@ -57,27 +75,39 @@ public class PerspectiveDiffAnimationSystem
             }
         }
         
-        // 2. Detect switches BEFORE updating perspective
-        //    This ensures switch animations are queued before the new Pokemon is shown
-        if (evt.Message is SwitchMessage && _previousPerspective != null && 
+        // 2. Cache fainted Pokemon so we can still animate their withdrawal
+        if (evt.Message is FaintMessage faintMsg && _previousPerspective != null &&
             evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
         {
-            // Detect switches eagerly when we see a SwitchMessage
-            DetectAndQueueSwitches(_previousPerspective.PlayerSide.Active, evt.Perspective.PlayerSide.Active, true);
-            DetectAndQueueSwitches(_previousPerspective.OpponentSide.Active, evt.Perspective.OpponentSide.Active, false);
+            // Find the fainted Pokemon in the previous perspective and cache it
+            CacheFaintedPokemon(faintMsg, _previousPerspective);
         }
         
-        // 3. Process message-based indicators (effectiveness, crits, miss, etc.)
+        
+        // 4. Process message-based indicators (effectiveness, crits, miss, etc.)
         ProcessMessageIndicators(evt.Message);
         
-        // 4. Detect HP changes and accumulate targets (don't queue animations yet)
-        //    Skip switch detection here since we handle it eagerly above
+        
+        // 5. Detect HP changes and switches by comparing perspectives
+        //    Always detect switches unless explicitly skipped
         if (_previousPerspective != null && evt.Perspective.PerspectiveType == BattlePerspectiveType.InBattle)
         {
-            DetectAndAccumulateDamage(_previousPerspective, evt.Perspective, skipSwitchDetection: evt.Message is SwitchMessage);
+            // Skip switch detection for TurnStartMessage UNLESS it's the first turn
+            // (team preview switches may complete on TurnStartMessage)
+            bool skipSwitches = false;
+            if (evt.Message is TurnStartMessage)
+            {
+                // Check if this is turn 1 (team preview just finished)
+                // On turn 1, we might still have switches to detect from team preview
+                skipSwitches = _previousPerspective.TurnCounter > 0;
+            }
+            
+            string msgType = evt.Message?.GetType().Name ?? "null";
+            Console.WriteLine($"[PerspectiveDiff] Processing event msgType={msgType}, skipSwitches={skipSwitches}, turn={evt.Perspective.TurnCounter}");
+            DetectAndAccumulateDamage(_previousPerspective, evt.Perspective, skipSwitchDetection: skipSwitches);
         }
         
-        // 5. If this is NOT a damage/move message, flush pending animations
+        // 6. If this is NOT a damage/move message, flush pending animations
         //    This handles cases where move sequence ends without another move starting
         if (evt.Message is not (DamageMessage or MoveUsedMessage or EffectivenessMessage))
         {
@@ -89,7 +119,7 @@ public class PerspectiveDiffAnimationSystem
             }
         }
         
-        // 6. Store perspective for next comparison
+        // 7. Store perspective for next comparison
         _previousPerspective = evt.Perspective;
     }
     
@@ -220,6 +250,45 @@ public class PerspectiveDiffAnimationSystem
     }
     
     /// <summary>
+    /// Cache a fainted Pokemon so we can still animate its withdrawal
+    /// </summary>
+    private void CacheFaintedPokemon(FaintMessage faintMsg, BattlePerspective perspective)
+    {
+        bool isPlayer = faintMsg.SideId == SideId.P1;
+        var activeList = isPlayer ? perspective.PlayerSide.Active : perspective.OpponentSide.Active;
+        
+        string side = isPlayer ? "player" : "opponent";
+        Console.WriteLine($"[PerspectiveDiff] CacheFaintedPokemon: Looking for {faintMsg.PokemonName} on side {side}, activeList.Count={activeList.Count}");
+        
+        // Find the Pokemon in the active list
+        for (int slot = 0; slot < activeList.Count; slot++)
+        {
+            var pokemon = activeList[slot];
+            Console.WriteLine($"[PerspectiveDiff] CacheFaintedPokemon: Slot {slot} = {pokemon?.Name ?? "null"}");
+            
+            if (pokemon != null && pokemon.Name == faintMsg.PokemonName)
+            {
+                // Cache this Pokemon's info
+                int cacheKey = GetCacheKey(slot, isPlayer);
+                _recentlyFaintedPokemon[cacheKey] = new FaintedPokemonInfo
+                {
+                    PokemonName = pokemon.Name,
+                    Slot = slot,
+                    IsPlayer = isPlayer
+                };
+                
+                Console.WriteLine($"[PerspectiveDiff] Cached fainted Pokemon: {pokemon.Name} in slot {slot} ({side}), cacheKey={cacheKey}");
+                break;
+            }
+        }
+        
+        if (!_recentlyFaintedPokemon.Any(kvp => kvp.Value.PokemonName == faintMsg.PokemonName))
+        {
+            Console.WriteLine($"[PerspectiveDiff] WARNING: Failed to cache {faintMsg.PokemonName}, not found in active list!");
+        }
+    }
+    
+    /// <summary>
     /// Detect switches and queue switch animations
     /// </summary>
     private void DetectAndQueueSwitches(
@@ -239,11 +308,39 @@ public class PerspectiveDiffAnimationSystem
                 Vector2 position = GetPositionForSlot(slot, isPlayer);
                 
                 // Create Pokémon keys for old and new Pokémon
-                string? withdrawKey = prev != null ? CreatePositionKey(prev.Name, isPlayer) : null;
+                string? withdrawKey = null;
+                
+                // ALWAYS check cache first - if a Pokemon fainted, use the cached info
+                // This handles cases where _previousPerspective hasn't been updated yet
+                int cacheKey = GetCacheKey(slot, isPlayer);
+                Console.WriteLine($"[PerspectiveDiff] Checking cache for slot {slot}, isPlayer={isPlayer}, cacheKey={cacheKey}, cache count={_recentlyFaintedPokemon.Count}");
+                
+                if (_recentlyFaintedPokemon.TryGetValue(cacheKey, out FaintedPokemonInfo? faintedInfo))
+                {
+                    // Use the cached fainted Pokemon for withdraw animation
+                    // This takes priority over prev, in case perspectives haven't updated yet
+                    withdrawKey = CreatePositionKey(faintedInfo.PokemonName, isPlayer);
+                    Console.WriteLine($"[PerspectiveDiff] Using cached fainted Pokemon for withdraw: {faintedInfo.PokemonName}");
+                    
+                    // Remove from cache after using it (so we don't reuse it for future switches)
+                    _recentlyFaintedPokemon.Remove(cacheKey);
+                    Console.WriteLine($"[PerspectiveDiff] Removed from cache, remaining count: {_recentlyFaintedPokemon.Count}");
+                }
+                else if (prev != null)
+                {
+                    // Normal switch (not from faint) - use prev Pokemon
+                    withdrawKey = CreatePositionKey(prev.Name, isPlayer);
+                    Console.WriteLine($"[PerspectiveDiff] Using prev Pokemon for withdraw: {prev.Name}");
+                }
+                else
+                {
+                    Console.WriteLine($"[PerspectiveDiff] No withdraw Pokemon found (prev=null, no cache)");
+                }
+                
                 string? sendOutKey = curr != null ? CreatePositionKey(curr.Name, isPlayer) : null;
                 
                 string side = isPlayer ? "player" : "opponent";
-                Console.WriteLine($"[PerspectiveDiff] Switch detected in slot {slot} ({side}): {prev?.Name ?? "null"} -> {curr?.Name ?? "null"}");
+                Console.WriteLine($"[PerspectiveDiff] Switch detected in slot {slot} ({side}): {prev?.Name ?? "null"} -> {curr?.Name ?? "null"}, withdrawKey={withdrawKey}, sendOutKey={sendOutKey}");
                 
                 // Queue switch animation
                 _animationManager.QueueSwitchAnimation(
@@ -504,6 +601,16 @@ public class PerspectiveDiffAnimationSystem
             return new Vector2(xPosition + 64, 80 + 64);
         }
     }
+    
+    /// <summary>
+    /// Create a cache key for a slot and side
+    /// </summary>
+    private static int GetCacheKey(int slot, bool isPlayer)
+    {
+        // Use bit shifting to pack slot and side into a single int
+        // Slot in lower bits, side in high bit
+        return (slot & 0xFF) | ((isPlayer ? 1 : 0) << 8);
+    }
 }
 
 /// <summary>
@@ -520,4 +627,14 @@ internal record HpChangeInfo
     public required int HpDelta { get; init; }
     public required Vector2 Position { get; init; }
     public required string Key { get; init; }
+}
+
+/// <summary>
+/// Information about a fainted Pokemon that needs to be cached for withdrawal animation
+/// </summary>
+internal record FaintedPokemonInfo
+{
+    public required string PokemonName { get; init; }
+    public required int Slot { get; init; }
+    public required bool IsPlayer { get; init; }
 }

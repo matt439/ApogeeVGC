@@ -125,8 +125,13 @@ public class BattleRenderer(
         // Track perspective type changes
         _lastPerspectiveType = battlePerspective.PerspectiveType;
 
-        // Cache this perspective for showing fainted Pokemon
-        _previousPerspective = battlePerspective;
+        // Cache this perspective for showing fainted Pokemon ONLY if no switch animations are active
+        // This ensures we keep the old perspective (with fainted Pokemon) during withdraw animations
+        bool hasActiveSwitchAnimations = _animationManager?.HasActiveSwitchAnimations() ?? false;
+        if (!hasActiveSwitchAnimations)
+        {
+            _previousPerspective = battlePerspective;
+        }
 
         // Route to appropriate renderer based on perspective type
         switch (battlePerspective.PerspectiveType)
@@ -178,6 +183,24 @@ public class BattleRenderer(
         for (int i = 0; i < battlePerspective.PlayerSide.Active.Count; i++)
         {
             PokemonPerspective? pokemon = battlePerspective.PlayerSide.Active[i];
+            
+            // Check if there's a switch animation for this slot
+            var switchAnim = _animationManager?.GetSwitchAnimation(i, true);
+            
+            // If we're in the withdraw phase of a switch animation, show the withdrawing Pokemon
+            // This handles both cases: perspective showing null OR perspective already showing the new Pokemon
+            if (switchAnim != null && !switchAnim.IsInSendOutPhase && 
+                _previousPerspective != null && i < _previousPerspective.PlayerSide.Active.Count)
+            {
+                string currentPokemonKey = pokemon != null ? $"{pokemon.Name}|0" : "null";
+                
+                // If current perspective shows the send-out Pokemon, replace it with withdraw Pokemon
+                if (currentPokemonKey == switchAnim.SendOutPokemonKey || pokemon == null)
+                {
+                    pokemon = _previousPerspective.PlayerSide.Active[i];
+                }
+            }
+            
             if (pokemon == null) continue;
 
             int xPosition = InBattlePlayerXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
@@ -189,8 +212,6 @@ public class BattleRenderer(
                 PokemonSpriteSize,
                 PokemonSpriteSize);
 
-            // Check if there's a switch animation for this slot
-            var switchAnim = _animationManager?.GetSwitchAnimation(i, true);
             bool shouldRender = true;
             
             if (switchAnim != null)
@@ -221,6 +242,24 @@ public class BattleRenderer(
         for (int i = 0; i < battlePerspective.OpponentSide.Active.Count; i++)
         {
             PokemonPerspective? pokemon = battlePerspective.OpponentSide.Active[i];
+            
+            // Check if there's a switch animation for this slot
+            var switchAnim = _animationManager?.GetSwitchAnimation(i, false);
+            
+            // If we're in the withdraw phase of a switch animation, show the withdrawing Pokemon
+            // This handles both cases: perspective showing null OR perspective already showing the new Pokemon
+            if (switchAnim != null && !switchAnim.IsInSendOutPhase && 
+                _previousPerspective != null && i < _previousPerspective.OpponentSide.Active.Count)
+            {
+                string currentPokemonKey = pokemon != null ? $"{pokemon.Name}|1" : "null";
+                
+                // If current perspective shows the send-out Pokemon, replace it with withdraw Pokemon
+                if (currentPokemonKey == switchAnim.SendOutPokemonKey || pokemon == null)
+                {
+                    pokemon = _previousPerspective.OpponentSide.Active[i];
+                }
+            }
+            
             if (pokemon == null) continue;
 
             int xPosition = InBattleOpponentXOffset + (i * (PokemonSpriteSize + PokemonSpacing));
@@ -232,8 +271,6 @@ public class BattleRenderer(
                 PokemonSpriteSize,
                 PokemonSpriteSize);
 
-            // Check if there's a switch animation for this slot
-            var switchAnim = _animationManager?.GetSwitchAnimation(i, false);
             bool shouldRender = true;
             
             if (switchAnim != null)
