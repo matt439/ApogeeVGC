@@ -42,5 +42,10 @@ public enum AbilityId
     SheerForce,
     Illusion,
 
+    // New abilities from TS conversion
+    Adaptability,
+    Aerilate,
+    Aftermath,
+
     None,
 }

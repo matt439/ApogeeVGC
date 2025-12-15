@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Utils.Extensions;
 
 namespace ApogeeVGC.Data;
 
@@ -248,14 +249,79 @@ public record Abilities
                 OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, _, _) =>
                     !(battle.EffectState.Unnerved ?? false))),
             },
-            [AbilityId.NaturalCure] = new()
-            {
-                Id = AbilityId.NaturalCure,
-                Name = "Natural Cure",
-                Rating = 2.5,
-                Num = 30,
-                // TODO: Implement OnSwitchOut and OnCheckShow
-            },
-        };
-    }
-}
+                        [AbilityId.NaturalCure] = new()
+                        {
+                            Id = AbilityId.NaturalCure,
+                            Name = "Natural Cure",
+                            Rating = 2.5,
+                            Num = 30,
+                            // TODO: Implement OnSwitchOut and OnCheckShow
+                        },
+                        [AbilityId.Adaptability] = new()
+                        {
+                            Id = AbilityId.Adaptability,
+                            Name = "Adaptability",
+                            Num = 91,
+                            Rating = 4.0,
+                            OnModifyStab = new OnModifyStabEventInfo((battle, stab, source, target, move) =>
+                            {
+                                if ((move.ForceStab ?? false) || source.HasType(move.Type.ConvertToPokemonType()))
+                                {
+                                    if (stab == 2)
+                                    {
+                                        return 2.25;
+                                    }
+                                    return 2.0;
+                                }
+                                return new VoidReturn();
+                            }),
+                        },
+                        [AbilityId.Aerilate] = new()
+                        {
+                            Id = AbilityId.Aerilate,
+                            Name = "Aerilate",
+                            Num = 184,
+                            Rating = 4.0,
+                            //OnModifyTypePriority = -1,
+                            OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
+                                {
+                                    // Change Normal-type moves to Flying
+                                    // TODO: Add checks for specific moves like Judgment, Multi-Attack, etc.
+                                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status)
+                                    {
+                                        move.Type = MoveType.Flying;
+                                        move.TypeChangerBoosted = battle.Effect;
+                                    }
+                                },
+                                -1),
+                            //OnBasePowerPriority = 23,
+                            OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                                {
+                                    if (move.TypeChangerBoosted == battle.Effect)
+                                    {
+                                        battle.ChainModify([4915, 4096]);
+                                        return battle.FinalModify(basePower);
+                                    }
+                                    return basePower;
+                                },
+                                23),
+                        },
+                        [AbilityId.Aftermath] = new()
+                        {
+                            Id = AbilityId.Aftermath,
+                            Name = "Aftermath",
+                            Num = 106,
+                            Rating = 2.0,
+                            //OnDamagingHitOrder = 1,
+                            OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                                {
+                                    if (target.Hp == 0 && battle.CheckMoveMakesContact(move, source, target, true))
+                                    {
+                                        battle.Damage(source.BaseMaxHp / 4, source, target);
+                                    }
+                                },
+                                1),
+                        },
+                    };
+                }
+            }
