@@ -306,22 +306,95 @@ public record Abilities
                                 },
                                 23),
                         },
-                        [AbilityId.Aftermath] = new()
-                        {
-                            Id = AbilityId.Aftermath,
-                            Name = "Aftermath",
-                            Num = 106,
-                            Rating = 2.0,
-                            //OnDamagingHitOrder = 1,
-                            OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                                {
-                                    if (target.Hp == 0 && battle.CheckMoveMakesContact(move, source, target, true))
+                                    [AbilityId.Aftermath] = new()
                                     {
-                                        battle.Damage(source.BaseMaxHp / 4, source, target);
-                                    }
-                                },
-                                1),
-                        },
-                    };
-                }
-            }
+                                        Id = AbilityId.Aftermath,
+                                        Name = "Aftermath",
+                                        Num = 106,
+                                        Rating = 2.0,
+                                        //OnDamagingHitOrder = 1,
+                                        OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                                            {
+                                                if (target.Hp == 0 && battle.CheckMoveMakesContact(move, source, target, true))
+                                                {
+                                                    battle.Damage(source.BaseMaxHp / 4, source, target);
+                                                }
+                                            },
+                                            1),
+                                    },
+                                    [AbilityId.AirLock] = new()
+                                    {
+                                        Id = AbilityId.AirLock,
+                                        Name = "Air Lock",
+                                        Num = 76,
+                                        Rating = 1.5,
+                                        OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                                        {
+                                            // Air Lock does not activate when Skill Swapped or when Neutralizing Gas leaves the field
+                                            battle.Add("-ability", pokemon, "Air Lock");
+                                            // Call onStart
+                                            battle.SingleEvent(EventId.Start, battle.Effect, battle.EffectState, pokemon);
+                                        }),
+                                        OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                        {
+                                            pokemon.AbilityState.Ending = false; // Clear the ending flag
+                                            battle.EachEvent(EventId.WeatherChange, battle.Effect);
+                                        }),
+                                        OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                                        {
+                                            if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                                            psfp.Pokemon.AbilityState.Ending = true;
+                                            battle.EachEvent(EventId.WeatherChange, battle.Effect);
+                                        }),
+                                        SuppressWeather = true,
+                                    },
+                                    [AbilityId.Analytic] = new()
+                                    {
+                                        Id = AbilityId.Analytic,
+                                        Name = "Analytic",
+                                        Num = 148,
+                                        Rating = 2.5,
+                                        //OnBasePowerPriority = 21,
+                                        OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
+                                            {
+                                                bool boosted = true;
+                                                foreach (var target in battle.GetAllActive())
+                                                {
+                                                    if (target == pokemon) continue;
+                                                    if (battle.Queue.WillMove(target) != null)
+                                                    {
+                                                        boosted = false;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if (boosted)
+                                                {
+                                                    battle.Debug("Analytic boost");
+                                                    battle.ChainModify([5325, 4096]);
+                                                    return battle.FinalModify(basePower);
+                                                }
+
+                                                return basePower;
+                                            },
+                                            21),
+                                    },
+                                    [AbilityId.AngerPoint] = new()
+                                    {
+                                        Id = AbilityId.AngerPoint,
+                                        Name = "Anger Point",
+                                        Num = 83,
+                                        Rating = 1.0,
+                                        OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                                        {
+                                            if (target.Hp == 0) return BoolEmptyVoidUnion.FromEmpty();
+                                            if (move?.EffectType == EffectType.Move && target.GetMoveHitData(move).Crit)
+                                            {
+                                                battle.Boost(new SparseBoostsTable { Atk = 12 }, target, target);
+                                            }
+                                            return BoolEmptyVoidUnion.FromEmpty();
+                                        }),
+                                    },
+                                };
+                            }
+                        }
