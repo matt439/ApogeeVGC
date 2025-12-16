@@ -35,5 +35,14 @@ public enum ItemId
     BlunderPolicy,
     LoadedDice,
 
+    // Mega Stones
+    Sablenite,
+    Mawilite,
+    Aggronite,
+    Medichamite,
+    Manectite,
+    Sharpedonite,
+    Cameruptite,
+
     None,
 }
