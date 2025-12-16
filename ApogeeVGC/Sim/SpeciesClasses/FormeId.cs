@@ -23,5 +23,7 @@ public enum FormeId
             Partner,
             Starter,
             World,
+            Galar,
+            Hisui,
             None,
         }
