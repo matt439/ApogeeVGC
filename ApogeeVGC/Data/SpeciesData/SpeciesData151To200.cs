@@ -367,32 +367,420 @@ public partial record SpeciesData
                                 WeightKg = 6,
                                 Color = "Brown",
                             },
-                            [SpecieId.Furret] = new()
-                            {
-                                Id = SpecieId.Furret,
-                                Num = 162,
-                                Name = "Furret",
-                                Types = [PokemonType.Normal],
-                                Gender = GenderId.Empty,
-                                BaseStats = new StatsTable
-                                {
-                                    Hp = 85,
-                                    Atk = 76,
-                                    Def = 64,
-                                    SpA = 45,
-                                    SpD = 55,
-                                    Spe = 90,
-                                },
-                                Abilities = new SpeciesAbility
-                                {
-                                    Slot0 = AbilityId.RunAway,
-                                    Slot1 = AbilityId.KeenEye,
-                                    Hidden = AbilityId.Frisk,
-                                },
-                                HeightM = 1.8,
-                                WeightKg = 32.5,
-                                Color = "Brown",
-                            },
-                        };
-                    }
-                }
+                                        [SpecieId.Furret] = new()
+                                        {
+                                            Id = SpecieId.Furret,
+                                            Num = 162,
+                                            Name = "Furret",
+                                            Types = [PokemonType.Normal],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 85,
+                                                Atk = 76,
+                                                Def = 64,
+                                                SpA = 45,
+                                                SpD = 55,
+                                                Spe = 90,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.RunAway,
+                                                Slot1 = AbilityId.KeenEye,
+                                                Hidden = AbilityId.Frisk,
+                                            },
+                                            HeightM = 1.8,
+                                            WeightKg = 32.5,
+                                            Color = "Brown",
+                                        },
+                                        [SpecieId.Hoothoot] = new()
+                                        {
+                                            Id = SpecieId.Hoothoot,
+                                            Num = 163,
+                                            Name = "Hoothoot",
+                                            Types = [PokemonType.Normal, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 60,
+                                                Atk = 30,
+                                                Def = 30,
+                                                SpA = 36,
+                                                SpD = 56,
+                                                Spe = 50,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Insomnia,
+                                                Slot1 = AbilityId.KeenEye,
+                                                Hidden = AbilityId.TintedLens,
+                                            },
+                                            HeightM = 0.7,
+                                            WeightKg = 21.2,
+                                            Color = "Brown",
+                                        },
+                                        [SpecieId.Noctowl] = new()
+                                        {
+                                            Id = SpecieId.Noctowl,
+                                            Num = 164,
+                                            Name = "Noctowl",
+                                            Types = [PokemonType.Normal, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 100,
+                                                Atk = 50,
+                                                Def = 50,
+                                                SpA = 86,
+                                                SpD = 96,
+                                                Spe = 70,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Insomnia,
+                                                Slot1 = AbilityId.KeenEye,
+                                                Hidden = AbilityId.TintedLens,
+                                            },
+                                            HeightM = 1.6,
+                                            WeightKg = 40.8,
+                                            Color = "Brown",
+                                        },
+                                        [SpecieId.Ledyba] = new()
+                                        {
+                                            Id = SpecieId.Ledyba,
+                                            Num = 165,
+                                            Name = "Ledyba",
+                                            Types = [PokemonType.Bug, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 40,
+                                                Atk = 20,
+                                                Def = 30,
+                                                SpA = 40,
+                                                SpD = 80,
+                                                Spe = 55,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Swarm,
+                                                Slot1 = AbilityId.EarlyBird,
+                                                Hidden = AbilityId.Rattled,
+                                            },
+                                            HeightM = 1.0,
+                                            WeightKg = 10.8,
+                                            Color = "Red",
+                                        },
+                                        [SpecieId.Ledian] = new()
+                                        {
+                                            Id = SpecieId.Ledian,
+                                            Num = 166,
+                                            Name = "Ledian",
+                                            Types = [PokemonType.Bug, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 55,
+                                                Atk = 35,
+                                                Def = 50,
+                                                SpA = 55,
+                                                SpD = 110,
+                                                Spe = 85,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Swarm,
+                                                Slot1 = AbilityId.EarlyBird,
+                                                Hidden = AbilityId.IronFist,
+                                            },
+                                            HeightM = 1.4,
+                                            WeightKg = 35.6,
+                                            Color = "Red",
+                                        },
+                                        [SpecieId.Spinarak] = new()
+                                        {
+                                            Id = SpecieId.Spinarak,
+                                            Num = 167,
+                                            Name = "Spinarak",
+                                            Types = [PokemonType.Bug, PokemonType.Poison],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 40,
+                                                Atk = 60,
+                                                Def = 40,
+                                                SpA = 40,
+                                                SpD = 40,
+                                                Spe = 30,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Swarm,
+                                                Slot1 = AbilityId.Insomnia,
+                                                Hidden = AbilityId.Sniper,
+                                            },
+                                            HeightM = 0.5,
+                                            WeightKg = 8.5,
+                                            Color = "Green",
+                                        },
+                                        [SpecieId.Ariados] = new()
+                                        {
+                                            Id = SpecieId.Ariados,
+                                            Num = 168,
+                                            Name = "Ariados",
+                                            Types = [PokemonType.Bug, PokemonType.Poison],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 70,
+                                                Atk = 90,
+                                                Def = 70,
+                                                SpA = 60,
+                                                SpD = 70,
+                                                Spe = 40,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Swarm,
+                                                Slot1 = AbilityId.Insomnia,
+                                                Hidden = AbilityId.Sniper,
+                                            },
+                                            HeightM = 1.1,
+                                            WeightKg = 33.5,
+                                            Color = "Red",
+                                        },
+                                        [SpecieId.Crobat] = new()
+                                        {
+                                            Id = SpecieId.Crobat,
+                                            Num = 169,
+                                            Name = "Crobat",
+                                            Types = [PokemonType.Poison, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 85,
+                                                Atk = 90,
+                                                Def = 80,
+                                                SpA = 70,
+                                                SpD = 80,
+                                                Spe = 130,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.InnerFocus,
+                                                Hidden = AbilityId.Infiltrator,
+                                            },
+                                            HeightM = 1.8,
+                                            WeightKg = 75,
+                                            Color = "Purple",
+                                        },
+                                        [SpecieId.Chinchou] = new()
+                                        {
+                                            Id = SpecieId.Chinchou,
+                                            Num = 170,
+                                            Name = "Chinchou",
+                                            Types = [PokemonType.Water, PokemonType.Electric],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 75,
+                                                Atk = 38,
+                                                Def = 38,
+                                                SpA = 56,
+                                                SpD = 56,
+                                                Spe = 67,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.VoltAbsorb,
+                                                Slot1 = AbilityId.Illuminate,
+                                                Hidden = AbilityId.WaterAbsorb,
+                                            },
+                                            HeightM = 0.5,
+                                            WeightKg = 12,
+                                            Color = "Blue",
+                                        },
+                                        [SpecieId.Lanturn] = new()
+                                        {
+                                            Id = SpecieId.Lanturn,
+                                            Num = 171,
+                                            Name = "Lanturn",
+                                            Types = [PokemonType.Water, PokemonType.Electric],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 125,
+                                                Atk = 58,
+                                                Def = 58,
+                                                SpA = 76,
+                                                SpD = 76,
+                                                Spe = 67,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.VoltAbsorb,
+                                                Slot1 = AbilityId.Illuminate,
+                                                Hidden = AbilityId.WaterAbsorb,
+                                            },
+                                            HeightM = 1.2,
+                                            WeightKg = 22.5,
+                                            Color = "Blue",
+                                        },
+                                        [SpecieId.Pichu] = new()
+                                        {
+                                            Id = SpecieId.Pichu,
+                                            Num = 172,
+                                            Name = "Pichu",
+                                            Types = [PokemonType.Electric],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 20,
+                                                Atk = 40,
+                                                Def = 15,
+                                                SpA = 35,
+                                                SpD = 35,
+                                                Spe = 60,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Static,
+                                                Hidden = AbilityId.LightningRod,
+                                            },
+                                            HeightM = 0.3,
+                                            WeightKg = 2,
+                                            Color = "Yellow",
+                                        },
+                                        [SpecieId.PichuSpikyEared] = new()
+                                        {
+                                            Id = SpecieId.PichuSpikyEared,
+                                            Num = 172,
+                                            Name = "Pichu-Spiky-eared",
+                                            BaseSpecies = SpecieId.Pichu,
+                                            Forme = FormeId.SpikyEared,
+                                            Types = [PokemonType.Electric],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 20,
+                                                Atk = 40,
+                                                Def = 15,
+                                                SpA = 35,
+                                                SpD = 35,
+                                                Spe = 60,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Static,
+                                            },
+                                            HeightM = 0.3,
+                                            WeightKg = 2,
+                                            Color = "Yellow",
+                                        },
+                                        [SpecieId.Cleffa] = new()
+                                        {
+                                            Id = SpecieId.Cleffa,
+                                            Num = 173,
+                                            Name = "Cleffa",
+                                            Types = [PokemonType.Fairy],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 50,
+                                                Atk = 25,
+                                                Def = 28,
+                                                SpA = 45,
+                                                SpD = 55,
+                                                Spe = 15,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.CuteCharm,
+                                                Slot1 = AbilityId.MagicGuard,
+                                                Hidden = AbilityId.FriendGuard,
+                                            },
+                                            HeightM = 0.3,
+                                            WeightKg = 3,
+                                            Color = "Pink",
+                                        },
+                                        [SpecieId.Igglybuff] = new()
+                                        {
+                                            Id = SpecieId.Igglybuff,
+                                            Num = 174,
+                                            Name = "Igglybuff",
+                                            Types = [PokemonType.Normal, PokemonType.Fairy],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 90,
+                                                Atk = 30,
+                                                Def = 15,
+                                                SpA = 40,
+                                                SpD = 20,
+                                                Spe = 15,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.CuteCharm,
+                                                Slot1 = AbilityId.Competitive,
+                                                Hidden = AbilityId.FriendGuard,
+                                            },
+                                            HeightM = 0.3,
+                                            WeightKg = 1,
+                                            Color = "Pink",
+                                        },
+                                        [SpecieId.Togepi] = new()
+                                        {
+                                            Id = SpecieId.Togepi,
+                                            Num = 175,
+                                            Name = "Togepi",
+                                            Types = [PokemonType.Fairy],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 35,
+                                                Atk = 20,
+                                                Def = 65,
+                                                SpA = 40,
+                                                SpD = 65,
+                                                Spe = 20,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Hustle,
+                                                Slot1 = AbilityId.SereneGrace,
+                                                Hidden = AbilityId.SuperLuck,
+                                            },
+                                            HeightM = 0.3,
+                                            WeightKg = 1.5,
+                                            Color = "White",
+                                        },
+                                        [SpecieId.Togetic] = new()
+                                        {
+                                            Id = SpecieId.Togetic,
+                                            Num = 176,
+                                            Name = "Togetic",
+                                            Types = [PokemonType.Fairy, PokemonType.Flying],
+                                            Gender = GenderId.Empty,
+                                            BaseStats = new StatsTable
+                                            {
+                                                Hp = 55,
+                                                Atk = 40,
+                                                Def = 85,
+                                                SpA = 80,
+                                                SpD = 105,
+                                                Spe = 40,
+                                            },
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Hustle,
+                                                Slot1 = AbilityId.SereneGrace,
+                                                Hidden = AbilityId.SuperLuck,
+                                            },
+                                            HeightM = 0.6,
+                                            WeightKg = 3.2,
+                                            Color = "White",
+                                        },
+                                    };
+                                }
+                            }

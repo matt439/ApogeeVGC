@@ -165,6 +165,8 @@ public enum AbilityId
     Berserk,
     MarvelScale,
     Multiscale,
+    SuperLuck,
+    Plus,
 
     None,
 }
