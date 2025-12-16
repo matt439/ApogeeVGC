@@ -19,7 +19,7 @@ public record Library
     private readonly Moves _moves;
     private readonly Natures _natures = new();
     private readonly Rulesets _rulesets = new();
-    private readonly SpeciesData _speciesData = new();
+    private readonly SpeciesData.SpeciesData _speciesData = new();
     private readonly SpeciesFormats _speciesFormats = new();
     private readonly Tags _tags = new();
 

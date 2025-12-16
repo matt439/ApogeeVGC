@@ -3,7 +3,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 
-namespace ApogeeVGC.Data;
+namespace ApogeeVGC.Data.SpeciesData;
 
 public partial record SpeciesData
 {

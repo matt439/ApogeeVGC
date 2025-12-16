@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using ApogeeVGC.Sim.SpeciesClasses;
 
-namespace ApogeeVGC.Data;
+namespace ApogeeVGC.Data.SpeciesData;
 
 public partial record SpeciesData
 {
