@@ -28,6 +28,7 @@ public enum FormeId
     PaldeaCombat,
     PaldeaBlaze,
     PaldeaAqua,
+    Paldea,
     SpikyEared,
     None,
 }

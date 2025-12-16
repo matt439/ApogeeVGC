@@ -167,6 +167,10 @@ public enum AbilityId
     Multiscale,
     SuperLuck,
     Plus,
+    SapSipper,
+    HugePower,
+    Drizzle,
+    SpeedBoost,
 
     None,
 }
