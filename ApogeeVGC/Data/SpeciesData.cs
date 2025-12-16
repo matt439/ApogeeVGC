@@ -1725,14 +1725,399 @@ public record SpeciesData
                             Slot1 = AbilityId.MagicGuard,
                             Hidden = AbilityId.Unaware,
                         },
-                        HeightM = 1.7,
-                        WeightKg = 42.3,
-                        Color = "Pink",
-                    },
-                    [SpecieId.CalyrexIce] = new Species
-            {
-                Id = SpecieId.CalyrexIce,
-                Num = 898,
+                                    HeightM = 1.7,
+                                    WeightKg = 42.3,
+                                    Color = "Pink",
+                                },
+                                [SpecieId.Vulpix] = new Species
+                                {
+                                    Id = SpecieId.Vulpix,
+                                    Num = 37,
+                                    Name = "Vulpix",
+                                    Types = [PokemonType.Fire],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 38,
+                                        Atk = 41,
+                                        Def = 40,
+                                        SpA = 50,
+                                        SpD = 65,
+                                        Spe = 65,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.FlashFire,
+                                        Hidden = AbilityId.Drought,
+                                    },
+                                    HeightM = 0.6,
+                                    WeightKg = 9.9,
+                                    Color = "Brown",
+                                },
+                                [SpecieId.VulpixAlola] = new Species
+                                {
+                                    Id = SpecieId.VulpixAlola,
+                                    Num = 37,
+                                    Name = "Vulpix-Alola",
+                                    BaseSpecies = SpecieId.Vulpix,
+                                    Forme = FormeId.Alola,
+                                    Types = [PokemonType.Ice],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 38,
+                                        Atk = 41,
+                                        Def = 40,
+                                        SpA = 50,
+                                        SpD = 65,
+                                        Spe = 65,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.SnowCloak,
+                                        Hidden = AbilityId.SnowWarning,
+                                    },
+                                    HeightM = 0.6,
+                                    WeightKg = 9.9,
+                                    Color = "White",
+                                },
+                                [SpecieId.Ninetales] = new Species
+                                {
+                                    Id = SpecieId.Ninetales,
+                                    Num = 38,
+                                    Name = "Ninetales",
+                                    Types = [PokemonType.Fire],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 73,
+                                        Atk = 76,
+                                        Def = 75,
+                                        SpA = 81,
+                                        SpD = 100,
+                                        Spe = 100,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.FlashFire,
+                                        Hidden = AbilityId.Drought,
+                                    },
+                                    HeightM = 1.1,
+                                    WeightKg = 19.9,
+                                    Color = "Yellow",
+                                },
+                                [SpecieId.NinetalesAlola] = new Species
+                                {
+                                    Id = SpecieId.NinetalesAlola,
+                                    Num = 38,
+                                    Name = "Ninetales-Alola",
+                                    BaseSpecies = SpecieId.Ninetales,
+                                    Forme = FormeId.Alola,
+                                    Types = [PokemonType.Ice, PokemonType.Fairy],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 73,
+                                        Atk = 67,
+                                        Def = 75,
+                                        SpA = 81,
+                                        SpD = 100,
+                                        Spe = 109,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.SnowCloak,
+                                        Hidden = AbilityId.SnowWarning,
+                                    },
+                                    HeightM = 1.1,
+                                    WeightKg = 19.9,
+                                    Color = "Blue",
+                                },
+                                [SpecieId.Jigglypuff] = new Species
+                                {
+                                    Id = SpecieId.Jigglypuff,
+                                    Num = 39,
+                                    Name = "Jigglypuff",
+                                    Types = [PokemonType.Normal, PokemonType.Fairy],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 115,
+                                        Atk = 45,
+                                        Def = 20,
+                                        SpA = 45,
+                                        SpD = 25,
+                                        Spe = 20,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.CuteCharm,
+                                        Slot1 = AbilityId.Competitive,
+                                        Hidden = AbilityId.FriendGuard,
+                                    },
+                                    HeightM = 0.5,
+                                    WeightKg = 5.5,
+                                    Color = "Pink",
+                                },
+                                [SpecieId.Wigglytuff] = new Species
+                                {
+                                    Id = SpecieId.Wigglytuff,
+                                    Num = 40,
+                                    Name = "Wigglytuff",
+                                    Types = [PokemonType.Normal, PokemonType.Fairy],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 140,
+                                        Atk = 70,
+                                        Def = 45,
+                                        SpA = 85,
+                                        SpD = 50,
+                                        Spe = 45,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.CuteCharm,
+                                        Slot1 = AbilityId.Competitive,
+                                        Hidden = AbilityId.Frisk,
+                                    },
+                                    HeightM = 1,
+                                    WeightKg = 12,
+                                    Color = "Pink",
+                                },
+                                [SpecieId.Zubat] = new Species
+                                {
+                                    Id = SpecieId.Zubat,
+                                    Num = 41,
+                                    Name = "Zubat",
+                                    Types = [PokemonType.Poison, PokemonType.Flying],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 40,
+                                        Atk = 45,
+                                        Def = 35,
+                                        SpA = 30,
+                                        SpD = 40,
+                                        Spe = 55,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.InnerFocus,
+                                        Hidden = AbilityId.Infiltrator,
+                                    },
+                                    HeightM = 0.8,
+                                    WeightKg = 7.5,
+                                    Color = "Purple",
+                                },
+                                [SpecieId.Golbat] = new Species
+                                {
+                                    Id = SpecieId.Golbat,
+                                    Num = 42,
+                                    Name = "Golbat",
+                                    Types = [PokemonType.Poison, PokemonType.Flying],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 75,
+                                        Atk = 80,
+                                        Def = 70,
+                                        SpA = 65,
+                                        SpD = 75,
+                                        Spe = 90,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.InnerFocus,
+                                        Hidden = AbilityId.Infiltrator,
+                                    },
+                                    HeightM = 1.6,
+                                    WeightKg = 55,
+                                    Color = "Purple",
+                                },
+                                [SpecieId.Oddish] = new Species
+                                {
+                                    Id = SpecieId.Oddish,
+                                    Num = 43,
+                                    Name = "Oddish",
+                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 45,
+                                        Atk = 50,
+                                        Def = 55,
+                                        SpA = 75,
+                                        SpD = 65,
+                                        Spe = 30,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.Chlorophyll,
+                                        Hidden = AbilityId.RunAway,
+                                    },
+                                    HeightM = 0.5,
+                                    WeightKg = 5.4,
+                                    Color = "Blue",
+                                },
+                                [SpecieId.Gloom] = new Species
+                                {
+                                    Id = SpecieId.Gloom,
+                                    Num = 44,
+                                    Name = "Gloom",
+                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 60,
+                                        Atk = 65,
+                                        Def = 70,
+                                        SpA = 85,
+                                        SpD = 75,
+                                        Spe = 40,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.Chlorophyll,
+                                        Hidden = AbilityId.Stench,
+                                    },
+                                    HeightM = 0.8,
+                                    WeightKg = 8.6,
+                                    Color = "Blue",
+                                },
+                                [SpecieId.Vileplume] = new Species
+                                {
+                                    Id = SpecieId.Vileplume,
+                                    Num = 45,
+                                    Name = "Vileplume",
+                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 75,
+                                        Atk = 80,
+                                        Def = 85,
+                                        SpA = 110,
+                                        SpD = 90,
+                                        Spe = 50,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.Chlorophyll,
+                                        Hidden = AbilityId.EffectSpore,
+                                    },
+                                    HeightM = 1.2,
+                                    WeightKg = 18.6,
+                                    Color = "Red",
+                                },
+                                [SpecieId.Paras] = new Species
+                                {
+                                    Id = SpecieId.Paras,
+                                    Num = 46,
+                                    Name = "Paras",
+                                    Types = [PokemonType.Bug, PokemonType.Grass],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 35,
+                                        Atk = 70,
+                                        Def = 55,
+                                        SpA = 45,
+                                        SpD = 55,
+                                        Spe = 25,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.EffectSpore,
+                                        Slot1 = AbilityId.DrySkin,
+                                        Hidden = AbilityId.Damp,
+                                    },
+                                    HeightM = 0.3,
+                                    WeightKg = 5.4,
+                                    Color = "Red",
+                                },
+                                [SpecieId.Parasect] = new Species
+                                {
+                                    Id = SpecieId.Parasect,
+                                    Num = 47,
+                                    Name = "Parasect",
+                                    Types = [PokemonType.Bug, PokemonType.Grass],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 60,
+                                        Atk = 95,
+                                        Def = 80,
+                                        SpA = 60,
+                                        SpD = 80,
+                                        Spe = 30,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.EffectSpore,
+                                        Slot1 = AbilityId.DrySkin,
+                                        Hidden = AbilityId.Damp,
+                                    },
+                                    HeightM = 1,
+                                    WeightKg = 29.5,
+                                    Color = "Red",
+                                },
+                                [SpecieId.Venonat] = new Species
+                                {
+                                    Id = SpecieId.Venonat,
+                                    Num = 48,
+                                    Name = "Venonat",
+                                    Types = [PokemonType.Bug, PokemonType.Poison],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 60,
+                                        Atk = 55,
+                                        Def = 50,
+                                        SpA = 40,
+                                        SpD = 55,
+                                        Spe = 45,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.CompoundEyes,
+                                        Slot1 = AbilityId.TintedLens,
+                                        Hidden = AbilityId.RunAway,
+                                    },
+                                    HeightM = 1,
+                                    WeightKg = 30,
+                                    Color = "Purple",
+                                },
+                                [SpecieId.Venomoth] = new Species
+                                {
+                                    Id = SpecieId.Venomoth,
+                                    Num = 49,
+                                    Name = "Venomoth",
+                                    Types = [PokemonType.Bug, PokemonType.Poison],
+                                    Gender = GenderId.Empty,
+                                    BaseStats = new StatsTable
+                                    {
+                                        Hp = 70,
+                                        Atk = 65,
+                                        Def = 60,
+                                        SpA = 90,
+                                        SpD = 75,
+                                        Spe = 90,
+                                    },
+                                    Abilities = new SpeciesAbility
+                                    {
+                                        Slot0 = AbilityId.ShieldDust,
+                                        Slot1 = AbilityId.TintedLens,
+                                        Hidden = AbilityId.WonderSkin,
+                                    },
+                                    HeightM = 1.5,
+                                    WeightKg = 12.5,
+                                    Color = "Purple",
+                                },
+                                [SpecieId.CalyrexIce] = new Species
+                        {
+                            Id = SpecieId.CalyrexIce,
+                            Num = 898,
                 Name = "Calyrex-Ice",
             BaseSpecies = SpecieId.Calyrex,
             Forme = FormeId.Ice,
