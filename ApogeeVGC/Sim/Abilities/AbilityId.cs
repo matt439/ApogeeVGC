@@ -171,6 +171,8 @@ public enum AbilityId
     HugePower,
     Drizzle,
     SpeedBoost,
+    CuriousMedicine,
+    Contrary,
 
     None,
 }

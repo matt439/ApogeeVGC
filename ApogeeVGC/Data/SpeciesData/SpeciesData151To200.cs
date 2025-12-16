@@ -1315,16 +1315,170 @@ public partial record SpeciesData
                                                                 SpD = 65,
                                                                 Spe = 35,
                                                             },
-                                                            Abilities = new SpeciesAbility
+                                                                                                            Abilities = new SpeciesAbility
+                                                                                                            {
+                                                                                                                Slot0 = AbilityId.Damp,
+                                                                                                                Slot1 = AbilityId.WaterAbsorb,
+                                                                                                                Hidden = AbilityId.Unaware,
+                                                                                                            },
+                                                                                                            HeightM = 1.4,
+                                                                                                            WeightKg = 75,
+                                                                                                            Color = "Blue",
+                                                                                                        },
+                                                            [SpecieId.Espeon] = new()
                                                             {
-                                                                Slot0 = AbilityId.Damp,
-                                                                Slot1 = AbilityId.WaterAbsorb,
-                                                                Hidden = AbilityId.Unaware,
+                                                                Id = SpecieId.Espeon,
+                                                                Num = 196,
+                                                                Name = "Espeon",
+                                                                Types = [PokemonType.Psychic],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 65,
+                                                                    Atk = 65,
+                                                                    Def = 60,
+                                                                    SpA = 130,
+                                                                    SpD = 95,
+                                                                    Spe = 110,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.Synchronize,
+                                                                    Hidden = AbilityId.MagicBounce,
+                                                                },
+                                                                HeightM = 0.9,
+                                                                WeightKg = 26.5,
+                                                                Color = "Purple",
                                                             },
-                                                            HeightM = 1.4,
-                                                            WeightKg = 75,
-                                                            Color = "Blue",
-                                                        },
-                                                    };
-                                                }
-                                            }
+                                                            [SpecieId.Umbreon] = new()
+                                                            {
+                                                                Id = SpecieId.Umbreon,
+                                                                Num = 197,
+                                                                Name = "Umbreon",
+                                                                Types = [PokemonType.Dark],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 95,
+                                                                    Atk = 65,
+                                                                    Def = 110,
+                                                                    SpA = 60,
+                                                                    SpD = 130,
+                                                                    Spe = 65,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.Synchronize,
+                                                                    Hidden = AbilityId.InnerFocus,
+                                                                },
+                                                                HeightM = 1.0,
+                                                                WeightKg = 27,
+                                                                Color = "Black",
+                                                            },
+                                                            [SpecieId.Murkrow] = new()
+                                                            {
+                                                                Id = SpecieId.Murkrow,
+                                                                Num = 198,
+                                                                Name = "Murkrow",
+                                                                Types = [PokemonType.Dark, PokemonType.Flying],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 60,
+                                                                    Atk = 85,
+                                                                    Def = 42,
+                                                                    SpA = 85,
+                                                                    SpD = 42,
+                                                                    Spe = 91,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.Insomnia,
+                                                                    Slot1 = AbilityId.SuperLuck,
+                                                                    Hidden = AbilityId.Prankster,
+                                                                },
+                                                                HeightM = 0.5,
+                                                                WeightKg = 2.1,
+                                                                Color = "Black",
+                                                            },
+                                                            [SpecieId.Slowking] = new()
+                                                            {
+                                                                Id = SpecieId.Slowking,
+                                                                Num = 199,
+                                                                Name = "Slowking",
+                                                                Types = [PokemonType.Water, PokemonType.Psychic],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 95,
+                                                                    Atk = 75,
+                                                                    Def = 80,
+                                                                    SpA = 100,
+                                                                    SpD = 110,
+                                                                    Spe = 30,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.Oblivious,
+                                                                    Slot1 = AbilityId.OwnTempo,
+                                                                    Hidden = AbilityId.Regenerator,
+                                                                },
+                                                                HeightM = 2.0,
+                                                                WeightKg = 79.5,
+                                                                Color = "Pink",
+                                                            },
+                                                            [SpecieId.SlowkingGalar] = new()
+                                                            {
+                                                                Id = SpecieId.SlowkingGalar,
+                                                                Num = 199,
+                                                                Name = "Slowking-Galar",
+                                                                BaseSpecies = SpecieId.Slowking,
+                                                                Forme = FormeId.Galar,
+                                                                Types = [PokemonType.Poison, PokemonType.Psychic],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 95,
+                                                                    Atk = 65,
+                                                                    Def = 80,
+                                                                    SpA = 110,
+                                                                    SpD = 110,
+                                                                    Spe = 30,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.CuriousMedicine,
+                                                                    Slot1 = AbilityId.OwnTempo,
+                                                                    Hidden = AbilityId.Regenerator,
+                                                                },
+                                                                HeightM = 1.8,
+                                                                WeightKg = 79.5,
+                                                                Color = "Pink",
+                                                            },
+                                                            [SpecieId.Misdreavus] = new()
+                                                            {
+                                                                Id = SpecieId.Misdreavus,
+                                                                Num = 200,
+                                                                Name = "Misdreavus",
+                                                                Types = [PokemonType.Ghost],
+                                                                Gender = GenderId.Empty,
+                                                                BaseStats = new StatsTable
+                                                                {
+                                                                    Hp = 60,
+                                                                    Atk = 60,
+                                                                    Def = 60,
+                                                                    SpA = 85,
+                                                                    SpD = 85,
+                                                                    Spe = 85,
+                                                                },
+                                                                Abilities = new SpeciesAbility
+                                                                {
+                                                                    Slot0 = AbilityId.Levitate,
+                                                                },
+                                                                HeightM = 0.7,
+                                                                WeightKg = 1,
+                                                                Color = "Gray",
+                                                            },
+                                                                                                    };
+                                                                                                }
+                                                                                            }
