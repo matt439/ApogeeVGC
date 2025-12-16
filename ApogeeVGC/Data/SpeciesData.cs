@@ -373,6 +373,180 @@ public record SpeciesData
             WeightKg = 101.1,
             Color = "Blue",
         },
+        [SpecieId.Caterpie] = new Species
+        {
+            Id = SpecieId.Caterpie,
+            Num = 10,
+            Name = "Caterpie",
+            Types = [PokemonType.Bug],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 45,
+                Atk = 30,
+                Def = 35,
+                SpA = 20,
+                SpD = 20,
+                Spe = 45,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ShieldDust,
+                Hidden = AbilityId.RunAway,
+            },
+            HeightM = 0.3,
+            WeightKg = 2.9,
+            Color = "Green",
+        },
+        [SpecieId.Metapod] = new Species
+        {
+            Id = SpecieId.Metapod,
+            Num = 11,
+            Name = "Metapod",
+            Types = [PokemonType.Bug],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 50,
+                Atk = 20,
+                Def = 55,
+                SpA = 25,
+                SpD = 25,
+                Spe = 30,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ShedSkin,
+            },
+            HeightM = 0.7,
+            WeightKg = 9.9,
+            Color = "Green",
+        },
+        [SpecieId.Butterfree] = new Species
+        {
+            Id = SpecieId.Butterfree,
+            Num = 12,
+            Name = "Butterfree",
+            Types = [PokemonType.Bug, PokemonType.Flying],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 60,
+                Atk = 45,
+                Def = 50,
+                SpA = 90,
+                SpD = 80,
+                Spe = 70,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.CompoundEyes,
+                Hidden = AbilityId.TintedLens,
+            },
+            HeightM = 1.1,
+            WeightKg = 32,
+            Color = "White",
+        },
+        [SpecieId.Weedle] = new Species
+        {
+            Id = SpecieId.Weedle,
+            Num = 13,
+            Name = "Weedle",
+            Types = [PokemonType.Bug, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 40,
+                Atk = 35,
+                Def = 30,
+                SpA = 20,
+                SpD = 20,
+                Spe = 50,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ShieldDust,
+                Hidden = AbilityId.RunAway,
+            },
+            HeightM = 0.3,
+            WeightKg = 3.2,
+            Color = "Brown",
+        },
+        [SpecieId.Kakuna] = new Species
+        {
+            Id = SpecieId.Kakuna,
+            Num = 14,
+            Name = "Kakuna",
+            Types = [PokemonType.Bug, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 45,
+                Atk = 25,
+                Def = 50,
+                SpA = 25,
+                SpD = 25,
+                Spe = 35,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ShedSkin,
+            },
+            HeightM = 0.6,
+            WeightKg = 10,
+            Color = "Yellow",
+        },
+        [SpecieId.Beedrill] = new Species
+        {
+            Id = SpecieId.Beedrill,
+            Num = 15,
+            Name = "Beedrill",
+            Types = [PokemonType.Bug, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 65,
+                Atk = 90,
+                Def = 40,
+                SpA = 45,
+                SpD = 80,
+                Spe = 75,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Swarm,
+                Hidden = AbilityId.Sniper,
+            },
+            HeightM = 1,
+            WeightKg = 29.5,
+            Color = "Yellow",
+        },
+        [SpecieId.BeedrillMega] = new Species
+        {
+            Id = SpecieId.BeedrillMega,
+            Num = 15,
+            Name = "Beedrill-Mega",
+            BaseSpecies = SpecieId.Beedrill,
+            Forme = FormeId.Mega,
+            Types = [PokemonType.Bug, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 65,
+                Atk = 150,
+                Def = 40,
+                SpA = 15,
+                SpD = 80,
+                Spe = 145,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Adaptability,
+            },
+            HeightM = 1.4,
+            WeightKg = 40.5,
+            Color = "Yellow",
+        },
         [SpecieId.CalyrexIce] = new Species
         {
             Id = SpecieId.CalyrexIce,

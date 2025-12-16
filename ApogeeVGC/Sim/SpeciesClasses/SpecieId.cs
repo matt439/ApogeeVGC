@@ -16,6 +16,13 @@ public enum SpecieId
     Wartortle,
     Blastoise,
     BlastoiseMega,
+    Caterpie,
+    Metapod,
+    Butterfree,
+    Weedle,
+    Kakuna,
+    Beedrill,
+    BeedrillMega,
 
     CalyrexIce,
     Miraidon,

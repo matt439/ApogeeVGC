@@ -56,6 +56,12 @@ public enum AbilityId
             ThickFat,
             ToughClaws,
             Torrent,
+            ShieldDust,
+            RunAway,
+            ShedSkin,
+            CompoundEyes,
+            TintedLens,
+            Sniper,
 
             None,
         }
