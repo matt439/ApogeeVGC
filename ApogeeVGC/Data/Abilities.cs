@@ -55,7 +55,8 @@ public record Abilities
                     1
                 ),
                 OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
-                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo( OnTryEatItem.FromFunc((battle, _, _) =>
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, _, _) =>
                         BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false)))),
                 OnSourceAfterFaint =
                     new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
@@ -84,17 +85,18 @@ public record Abilities
                 OnStart = new OnStartEventInfo((battle, pokemon) =>
                 {
                     battle.Debug($"[HadronEngine.OnStart] HANDLER EXECUTING for {pokemon.Name}");
-                    
+
                     bool terrainSet = battle.Field.SetTerrain(
                         _library.Conditions[ConditionId.ElectricTerrain]);
-                    
+
                     battle.Debug($"[HadronEngine.OnStart] SetTerrain returned: {terrainSet}");
                     battle.Debug($"[HadronEngine.OnStart] Current terrain: {battle.Field.Terrain}");
-                    
+
                     if (!terrainSet &&
                         battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
                     {
-                        battle.Debug($"[HadronEngine.OnStart] Terrain already Electric, showing activate");
+                        battle.Debug(
+                            $"[HadronEngine.OnStart] Terrain already Electric, showing activate");
                         if (battle.DisplayUi)
                         {
                             battle.Add("-activate", pokemon, "ability: Hadron Engine");
@@ -229,6 +231,7 @@ public record Abilities
                         battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
                         return null;
                     }
+
                     return new VoidReturn();
                 }),
             },
@@ -246,155 +249,162 @@ public record Abilities
                     battle.EffectState.Unnerved = true;
                 }),
                 OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
-                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, _, _) =>
-                    !(battle.EffectState.Unnerved ?? false))),
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, _, _) =>
+                        !(battle.EffectState.Unnerved ?? false))),
             },
-                        [AbilityId.NaturalCure] = new()
+            [AbilityId.NaturalCure] = new()
+            {
+                Id = AbilityId.NaturalCure,
+                Name = "Natural Cure",
+                Rating = 2.5,
+                Num = 30,
+                // TODO: Implement OnSwitchOut and OnCheckShow
+            },
+            [AbilityId.Adaptability] = new()
+            {
+                Id = AbilityId.Adaptability,
+                Name = "Adaptability",
+                Num = 91,
+                Rating = 4.0,
+                OnModifyStab = new OnModifyStabEventInfo((battle, stab, source, target, move) =>
+                {
+                    if ((move.ForceStab ?? false) ||
+                        source.HasType(move.Type.ConvertToPokemonType()))
+                    {
+                        if (stab == 2)
                         {
-                            Id = AbilityId.NaturalCure,
-                            Name = "Natural Cure",
-                            Rating = 2.5,
-                            Num = 30,
-                            // TODO: Implement OnSwitchOut and OnCheckShow
-                        },
-                        [AbilityId.Adaptability] = new()
+                            return 2.25;
+                        }
+
+                        return 2.0;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.Aerilate] = new()
+            {
+                Id = AbilityId.Aerilate,
+                Name = "Aerilate",
+                Num = 184,
+                Rating = 4.0,
+                //OnModifyTypePriority = -1,
+                OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
+                    {
+                        // Change Normal-type moves to Flying
+                        // TODO: Add checks for specific moves like Judgment, Multi-Attack, etc.
+                        if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status)
                         {
-                            Id = AbilityId.Adaptability,
-                            Name = "Adaptability",
-                            Num = 91,
-                            Rating = 4.0,
-                            OnModifyStab = new OnModifyStabEventInfo((battle, stab, source, target, move) =>
+                            move.Type = MoveType.Flying;
+                            move.TypeChangerBoosted = battle.Effect;
+                        }
+                    },
+                    -1),
+                //OnBasePowerPriority = 23,
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                    {
+                        if (move.TypeChangerBoosted == battle.Effect)
+                        {
+                            battle.ChainModify([4915, 4096]);
+                            return battle.FinalModify(basePower);
+                        }
+
+                        return basePower;
+                    },
+                    23),
+            },
+            [AbilityId.Aftermath] = new()
+            {
+                Id = AbilityId.Aftermath,
+                Name = "Aftermath",
+                Num = 106,
+                Rating = 2.0,
+                //OnDamagingHitOrder = 1,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                    {
+                        if (target.Hp == 0 &&
+                            battle.CheckMoveMakesContact(move, source, target, true))
+                        {
+                            battle.Damage(source.BaseMaxHp / 4, source, target);
+                        }
+                    },
+                    1),
+            },
+            [AbilityId.AirLock] = new()
+            {
+                Id = AbilityId.AirLock,
+                Name = "Air Lock",
+                Num = 76,
+                Rating = 1.5,
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    // Air Lock does not activate when Skill Swapped or when Neutralizing Gas leaves the field
+                    battle.Add("-ability", pokemon, "Air Lock");
+                    // Call onStart
+                    battle.SingleEvent(EventId.Start, battle.Effect, battle.EffectState, pokemon);
+                }),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    pokemon.AbilityState.Ending = false; // Clear the ending flag
+                    battle.EachEvent(EventId.WeatherChange, battle.Effect);
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    psfp.Pokemon.AbilityState.Ending = true;
+                    battle.EachEvent(EventId.WeatherChange, battle.Effect);
+                }),
+                SuppressWeather = true,
+            },
+            [AbilityId.Analytic] = new()
+            {
+                Id = AbilityId.Analytic,
+                Name = "Analytic",
+                Num = 148,
+                Rating = 2.5,
+                //OnBasePowerPriority = 21,
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
+                    {
+                        bool boosted = true;
+                        foreach (var target in battle.GetAllActive())
+                        {
+                            if (target == pokemon) continue;
+                            if (battle.Queue.WillMove(target) != null)
                             {
-                                if ((move.ForceStab ?? false) || source.HasType(move.Type.ConvertToPokemonType()))
-                                {
-                                    if (stab == 2)
-                                    {
-                                        return 2.25;
-                                    }
-                                    return 2.0;
-                                }
-                                return new VoidReturn();
-                            }),
-                        },
-                        [AbilityId.Aerilate] = new()
-                        {
-                            Id = AbilityId.Aerilate,
-                            Name = "Aerilate",
-                            Num = 184,
-                            Rating = 4.0,
-                            //OnModifyTypePriority = -1,
-                            OnModifyType = new OnModifyTypeEventInfo((battle, move, pokemon, _) =>
-                                {
-                                    // Change Normal-type moves to Flying
-                                    // TODO: Add checks for specific moves like Judgment, Multi-Attack, etc.
-                                    if (move.Type == MoveType.Normal && move.Category != MoveCategory.Status)
-                                    {
-                                        move.Type = MoveType.Flying;
-                                        move.TypeChangerBoosted = battle.Effect;
-                                    }
-                                },
-                                -1),
-                            //OnBasePowerPriority = 23,
-                            OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
-                                {
-                                    if (move.TypeChangerBoosted == battle.Effect)
-                                    {
-                                        battle.ChainModify([4915, 4096]);
-                                        return battle.FinalModify(basePower);
-                                    }
-                                    return basePower;
-                                },
-                                23),
-                        },
-                                    [AbilityId.Aftermath] = new()
-                                    {
-                                        Id = AbilityId.Aftermath,
-                                        Name = "Aftermath",
-                                        Num = 106,
-                                        Rating = 2.0,
-                                        //OnDamagingHitOrder = 1,
-                                        OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                                            {
-                                                if (target.Hp == 0 && battle.CheckMoveMakesContact(move, source, target, true))
-                                                {
-                                                    battle.Damage(source.BaseMaxHp / 4, source, target);
-                                                }
-                                            },
-                                            1),
-                                    },
-                                    [AbilityId.AirLock] = new()
-                                    {
-                                        Id = AbilityId.AirLock,
-                                        Name = "Air Lock",
-                                        Num = 76,
-                                        Rating = 1.5,
-                                        OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
-                                        {
-                                            // Air Lock does not activate when Skill Swapped or when Neutralizing Gas leaves the field
-                                            battle.Add("-ability", pokemon, "Air Lock");
-                                            // Call onStart
-                                            battle.SingleEvent(EventId.Start, battle.Effect, battle.EffectState, pokemon);
-                                        }),
-                                        OnStart = new OnStartEventInfo((battle, pokemon) =>
-                                        {
-                                            pokemon.AbilityState.Ending = false; // Clear the ending flag
-                                            battle.EachEvent(EventId.WeatherChange, battle.Effect);
-                                        }),
-                                        OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
-                                        {
-                                            if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
-                                            psfp.Pokemon.AbilityState.Ending = true;
-                                            battle.EachEvent(EventId.WeatherChange, battle.Effect);
-                                        }),
-                                        SuppressWeather = true,
-                                    },
-                                    [AbilityId.Analytic] = new()
-                                    {
-                                        Id = AbilityId.Analytic,
-                                        Name = "Analytic",
-                                        Num = 148,
-                                        Rating = 2.5,
-                                        //OnBasePowerPriority = 21,
-                                        OnBasePower = new OnBasePowerEventInfo((battle, basePower, pokemon, _, _) =>
-                                            {
-                                                bool boosted = true;
-                                                foreach (var target in battle.GetAllActive())
-                                                {
-                                                    if (target == pokemon) continue;
-                                                    if (battle.Queue.WillMove(target) != null)
-                                                    {
-                                                        boosted = false;
-                                                        break;
-                                                    }
-                                                }
-
-                                                if (boosted)
-                                                {
-                                                    battle.Debug("Analytic boost");
-                                                    battle.ChainModify([5325, 4096]);
-                                                    return battle.FinalModify(basePower);
-                                                }
-
-                                                return basePower;
-                                            },
-                                            21),
-                                    },
-                                    [AbilityId.AngerPoint] = new()
-                                    {
-                                        Id = AbilityId.AngerPoint,
-                                        Name = "Anger Point",
-                                        Num = 83,
-                                        Rating = 1.0,
-                                        OnHit = new OnHitEventInfo((battle, target, source, move) =>
-                                        {
-                                            if (target.Hp == 0) return BoolEmptyVoidUnion.FromEmpty();
-                                            if (move?.EffectType == EffectType.Move && target.GetMoveHitData(move).Crit)
-                                            {
-                                                battle.Boost(new SparseBoostsTable { Atk = 12 }, target, target);
-                                            }
-                                            return BoolEmptyVoidUnion.FromEmpty();
-                                        }),
-                                    },
-                                };
+                                boosted = false;
+                                break;
                             }
                         }
+
+                        if (boosted)
+                        {
+                            battle.Debug("Analytic boost");
+                            battle.ChainModify([5325, 4096]);
+                            return battle.FinalModify(basePower);
+                        }
+
+                        return basePower;
+                    },
+                    21),
+            },
+            [AbilityId.AngerPoint] = new()
+            {
+                Id = AbilityId.AngerPoint,
+                Name = "Anger Point",
+                Num = 83,
+                Rating = 1.0,
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target.Hp == 0) return BoolEmptyVoidUnion.FromEmpty();
+                    if (move?.EffectType == EffectType.Move && target.GetMoveHitData(move).Crit)
+                    {
+                        battle.Boost(new SparseBoostsTable { Atk = 12 }, target, target);
+                    }
+
+                    return BoolEmptyVoidUnion.FromEmpty();
+                }),
+            },
+        };
+    }
+}
