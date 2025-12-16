@@ -161,7 +161,10 @@ public enum AbilityId
                                                     Download,
                                                     BattleArmor2,
                                                     FlameBody2,
-                                                    Immunity,
+                                                        Immunity,
+                                                        Berserk,
+                                                        MarvelScale,
+                                                        Multiscale,
 
-                                                    None,
-                                                }
+                                                        None,
+                                                    }
