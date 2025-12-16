@@ -173,6 +173,10 @@ public enum AbilityId
     SpeedBoost,
     CuriousMedicine,
     Contrary,
+    HoneyGather,
+    MagmaArmor,
+    Moody,
+    SuctionCups,
 
     None,
 }
