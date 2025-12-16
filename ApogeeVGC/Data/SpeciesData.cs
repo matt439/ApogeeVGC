@@ -2984,11 +2984,467 @@ public record SpeciesData
                                                         Slot0 = AbilityId.Chlorophyll,
                                                         Hidden = AbilityId.Gluttony,
                                                     },
-                                                    HeightM = 4.5,
-                                                    WeightKg = 125.5,
-                                                    Color = "Green",
-                                                },
-                                                [SpecieId.CalyrexIce] = new Species
+                                                        HeightM = 4.5,
+                                                        WeightKg = 125.5,
+                                                        Color = "Green",
+                                                    },
+                                                    [SpecieId.Tentacool] = new Species
+                                                    {
+                                                        Id = SpecieId.Tentacool,
+                                                        Num = 72,
+                                                        Name = "Tentacool",
+                                                        Types = [PokemonType.Water, PokemonType.Poison],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 40,
+                                                            Atk = 40,
+                                                            Def = 35,
+                                                            SpA = 50,
+                                                            SpD = 100,
+                                                            Spe = 70,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.ClearBody,
+                                                            Slot1 = AbilityId.LiquidOoze,
+                                                            Hidden = AbilityId.RainDish,
+                                                        },
+                                                        HeightM = 0.9,
+                                                        WeightKg = 45.5,
+                                                        Color = "Blue",
+                                                    },
+                                                    [SpecieId.Tentacruel] = new Species
+                                                    {
+                                                        Id = SpecieId.Tentacruel,
+                                                        Num = 73,
+                                                        Name = "Tentacruel",
+                                                        Types = [PokemonType.Water, PokemonType.Poison],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 80,
+                                                            Atk = 70,
+                                                            Def = 65,
+                                                            SpA = 80,
+                                                            SpD = 120,
+                                                            Spe = 100,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.ClearBody,
+                                                            Slot1 = AbilityId.LiquidOoze,
+                                                            Hidden = AbilityId.RainDish,
+                                                        },
+                                                        HeightM = 1.6,
+                                                        WeightKg = 55,
+                                                        Color = "Blue",
+                                                    },
+                                                    [SpecieId.Geodude] = new Species
+                                                    {
+                                                        Id = SpecieId.Geodude,
+                                                        Num = 74,
+                                                        Name = "Geodude",
+                                                        Types = [PokemonType.Rock, PokemonType.Ground],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 40,
+                                                            Atk = 80,
+                                                            Def = 100,
+                                                            SpA = 30,
+                                                            SpD = 30,
+                                                            Spe = 20,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RockHead,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.SandVeil,
+                                                        },
+                                                        HeightM = 0.4,
+                                                        WeightKg = 20,
+                                                        Color = "Brown",
+                                                    },
+                                                    [SpecieId.Geodudealola] = new Species
+                                                    {
+                                                        Id = SpecieId.Geodudealola,
+                                                        Num = 74,
+                                                        Name = "Geodude-Alola",
+                                                        BaseSpecies = SpecieId.Geodude,
+                                                        Forme = FormeId.Alola,
+                                                        Types = [PokemonType.Rock, PokemonType.Electric],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 40,
+                                                            Atk = 80,
+                                                            Def = 100,
+                                                            SpA = 30,
+                                                            SpD = 30,
+                                                            Spe = 20,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.MagnetPull,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.Galvanize,
+                                                        },
+                                                        HeightM = 0.4,
+                                                        WeightKg = 20.3,
+                                                        Color = "Gray",
+                                                    },
+                                                    [SpecieId.Graveler] = new Species
+                                                    {
+                                                        Id = SpecieId.Graveler,
+                                                        Num = 75,
+                                                        Name = "Graveler",
+                                                        Types = [PokemonType.Rock, PokemonType.Ground],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 55,
+                                                            Atk = 95,
+                                                            Def = 115,
+                                                            SpA = 45,
+                                                            SpD = 45,
+                                                            Spe = 35,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RockHead,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.SandVeil,
+                                                        },
+                                                        HeightM = 1,
+                                                        WeightKg = 105,
+                                                        Color = "Brown",
+                                                    },
+                                                    [SpecieId.GravelerAlola] = new Species
+                                                    {
+                                                        Id = SpecieId.GravelerAlola,
+                                                        Num = 75,
+                                                        Name = "Graveler-Alola",
+                                                        BaseSpecies = SpecieId.Graveler,
+                                                        Forme = FormeId.Alola,
+                                                        Types = [PokemonType.Rock, PokemonType.Electric],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 55,
+                                                            Atk = 95,
+                                                            Def = 115,
+                                                            SpA = 45,
+                                                            SpD = 45,
+                                                            Spe = 35,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.MagnetPull,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.Galvanize,
+                                                        },
+                                                        HeightM = 1,
+                                                        WeightKg = 110,
+                                                        Color = "Gray",
+                                                    },
+                                                    [SpecieId.Golem] = new Species
+                                                    {
+                                                        Id = SpecieId.Golem,
+                                                        Num = 76,
+                                                        Name = "Golem",
+                                                        Types = [PokemonType.Rock, PokemonType.Ground],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 80,
+                                                            Atk = 120,
+                                                            Def = 130,
+                                                            SpA = 55,
+                                                            SpD = 65,
+                                                            Spe = 45,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RockHead,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.SandVeil,
+                                                        },
+                                                        HeightM = 1.4,
+                                                        WeightKg = 300,
+                                                        Color = "Brown",
+                                                    },
+                                                    [SpecieId.GolemAlola] = new Species
+                                                    {
+                                                        Id = SpecieId.GolemAlola,
+                                                        Num = 76,
+                                                        Name = "Golem-Alola",
+                                                        BaseSpecies = SpecieId.Golem,
+                                                        Forme = FormeId.Alola,
+                                                        Types = [PokemonType.Rock, PokemonType.Electric],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 80,
+                                                            Atk = 120,
+                                                            Def = 130,
+                                                            SpA = 55,
+                                                            SpD = 65,
+                                                            Spe = 45,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.MagnetPull,
+                                                            Slot1 = AbilityId.Sturdy,
+                                                            Hidden = AbilityId.Galvanize,
+                                                        },
+                                                        HeightM = 1.7,
+                                                        WeightKg = 316,
+                                                        Color = "Gray",
+                                                    },
+                                                    [SpecieId.Ponyta] = new Species
+                                                    {
+                                                        Id = SpecieId.Ponyta,
+                                                        Num = 77,
+                                                        Name = "Ponyta",
+                                                        Types = [PokemonType.Fire],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 50,
+                                                            Atk = 85,
+                                                            Def = 55,
+                                                            SpA = 65,
+                                                            SpD = 65,
+                                                            Spe = 90,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RunAway,
+                                                            Slot1 = AbilityId.FlashFire,
+                                                            Hidden = AbilityId.FlameBody,
+                                                        },
+                                                        HeightM = 1,
+                                                        WeightKg = 30,
+                                                        Color = "Yellow",
+                                                    },
+                                                    [SpecieId.PonytaGalar] = new Species
+                                                    {
+                                                        Id = SpecieId.PonytaGalar,
+                                                        Num = 77,
+                                                        Name = "Ponyta-Galar",
+                                                        BaseSpecies = SpecieId.Ponyta,
+                                                        Forme = FormeId.Galar,
+                                                        Types = [PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 50,
+                                                            Atk = 85,
+                                                            Def = 55,
+                                                            SpA = 65,
+                                                            SpD = 65,
+                                                            Spe = 90,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RunAway,
+                                                            Slot1 = AbilityId.PastelVeil,
+                                                            Hidden = AbilityId.Anticipation,
+                                                        },
+                                                        HeightM = 0.8,
+                                                        WeightKg = 24,
+                                                        Color = "White",
+                                                    },
+                                                    [SpecieId.Rapidash] = new Species
+                                                    {
+                                                        Id = SpecieId.Rapidash,
+                                                        Num = 78,
+                                                        Name = "Rapidash",
+                                                        Types = [PokemonType.Fire],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 65,
+                                                            Atk = 100,
+                                                            Def = 70,
+                                                            SpA = 80,
+                                                            SpD = 80,
+                                                            Spe = 105,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RunAway,
+                                                            Slot1 = AbilityId.FlashFire,
+                                                            Hidden = AbilityId.FlameBody,
+                                                        },
+                                                        HeightM = 1.7,
+                                                        WeightKg = 95,
+                                                        Color = "Yellow",
+                                                    },
+                                                    [SpecieId.RapidashGalar] = new Species
+                                                    {
+                                                        Id = SpecieId.RapidashGalar,
+                                                        Num = 78,
+                                                        Name = "Rapidash-Galar",
+                                                        BaseSpecies = SpecieId.Rapidash,
+                                                        Forme = FormeId.Galar,
+                                                        Types = [PokemonType.Psychic, PokemonType.Fairy],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 65,
+                                                            Atk = 100,
+                                                            Def = 70,
+                                                            SpA = 80,
+                                                            SpD = 80,
+                                                            Spe = 105,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.RunAway,
+                                                            Slot1 = AbilityId.PastelVeil,
+                                                            Hidden = AbilityId.Anticipation,
+                                                        },
+                                                        HeightM = 1.7,
+                                                        WeightKg = 80,
+                                                        Color = "White",
+                                                    },
+                                                    [SpecieId.Slowpoke] = new Species
+                                                    {
+                                                        Id = SpecieId.Slowpoke,
+                                                        Num = 79,
+                                                        Name = "Slowpoke",
+                                                        Types = [PokemonType.Water, PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 90,
+                                                            Atk = 65,
+                                                            Def = 65,
+                                                            SpA = 40,
+                                                            SpD = 40,
+                                                            Spe = 15,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.Oblivious,
+                                                            Slot1 = AbilityId.OwnTempo,
+                                                            Hidden = AbilityId.Regenerator,
+                                                        },
+                                                        HeightM = 1.2,
+                                                        WeightKg = 36,
+                                                        Color = "Pink",
+                                                    },
+                                                    [SpecieId.SlowpokeGalar] = new Species
+                                                    {
+                                                        Id = SpecieId.SlowpokeGalar,
+                                                        Num = 79,
+                                                        Name = "Slowpoke-Galar",
+                                                        BaseSpecies = SpecieId.Slowpoke,
+                                                        Forme = FormeId.Galar,
+                                                        Types = [PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 90,
+                                                            Atk = 65,
+                                                            Def = 65,
+                                                            SpA = 40,
+                                                            SpD = 40,
+                                                            Spe = 15,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.Gluttony,
+                                                            Slot1 = AbilityId.OwnTempo,
+                                                            Hidden = AbilityId.Regenerator,
+                                                        },
+                                                        HeightM = 1.2,
+                                                        WeightKg = 36,
+                                                        Color = "Pink",
+                                                    },
+                                                    [SpecieId.Slowbro] = new Species
+                                                    {
+                                                        Id = SpecieId.Slowbro,
+                                                        Num = 80,
+                                                        Name = "Slowbro",
+                                                        Types = [PokemonType.Water, PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 95,
+                                                            Atk = 75,
+                                                            Def = 110,
+                                                            SpA = 100,
+                                                            SpD = 80,
+                                                            Spe = 30,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.Oblivious,
+                                                            Slot1 = AbilityId.OwnTempo,
+                                                            Hidden = AbilityId.Regenerator,
+                                                        },
+                                                        HeightM = 1.6,
+                                                        WeightKg = 78.5,
+                                                        Color = "Pink",
+                                                    },
+                                                    [SpecieId.SlowbroMega] = new Species
+                                                    {
+                                                        Id = SpecieId.SlowbroMega,
+                                                        Num = 80,
+                                                        Name = "Slowbro-Mega",
+                                                        BaseSpecies = SpecieId.Slowbro,
+                                                        Forme = FormeId.Mega,
+                                                        Types = [PokemonType.Water, PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 95,
+                                                            Atk = 75,
+                                                            Def = 180,
+                                                            SpA = 130,
+                                                            SpD = 80,
+                                                            Spe = 30,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.ShellArmor,
+                                                        },
+                                                        HeightM = 2,
+                                                        WeightKg = 120,
+                                                        Color = "Pink",
+                                                    },
+                                                    [SpecieId.SlowbroGalar] = new Species
+                                                    {
+                                                        Id = SpecieId.SlowbroGalar,
+                                                        Num = 80,
+                                                        Name = "Slowbro-Galar",
+                                                        BaseSpecies = SpecieId.Slowbro,
+                                                        Forme = FormeId.Galar,
+                                                        Types = [PokemonType.Poison, PokemonType.Psychic],
+                                                        Gender = GenderId.Empty,
+                                                        BaseStats = new StatsTable
+                                                        {
+                                                            Hp = 95,
+                                                            Atk = 100,
+                                                            Def = 95,
+                                                            SpA = 100,
+                                                            SpD = 70,
+                                                            Spe = 30,
+                                                        },
+                                                        Abilities = new SpeciesAbility
+                                                        {
+                                                            Slot0 = AbilityId.QuickDraw,
+                                                            Slot1 = AbilityId.OwnTempo,
+                                                            Hidden = AbilityId.Regenerator,
+                                                        },
+                                                        HeightM = 1.6,
+                                                        WeightKg = 70.5,
+                                                        Color = "Pink",
+                                                    },
+                                                    [SpecieId.CalyrexIce] = new Species
                                     {
                                         Id = SpecieId.CalyrexIce,
                             Num = 898,
