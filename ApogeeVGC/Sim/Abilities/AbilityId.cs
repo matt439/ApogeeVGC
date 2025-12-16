@@ -72,6 +72,16 @@ public enum AbilityId
                 Static,
                 LightningRod,
                 SurgeSurfer,
+                SandVeil,
+                SandRush,
+                SnowCloak,
+                SlushRush,
+                PoisonPoint,
+                Rivalry,
+                CuteCharm,
+                MagicGuard,
+                FriendGuard,
+                Unaware,
 
                 None,
             }
