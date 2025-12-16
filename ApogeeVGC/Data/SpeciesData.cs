@@ -3417,34 +3417,403 @@ public record SpeciesData
                                                         Color = "Pink",
                                                     },
                                                     [SpecieId.SlowbroGalar] = new Species
-                                                    {
-                                                        Id = SpecieId.SlowbroGalar,
-                                                        Num = 80,
-                                                        Name = "Slowbro-Galar",
-                                                        BaseSpecies = SpecieId.Slowbro,
-                                                        Forme = FormeId.Galar,
-                                                        Types = [PokemonType.Poison, PokemonType.Psychic],
-                                                        Gender = GenderId.Empty,
-                                                        BaseStats = new StatsTable
-                                                        {
-                                                            Hp = 95,
-                                                            Atk = 100,
-                                                            Def = 95,
-                                                            SpA = 100,
-                                                            SpD = 70,
-                                                            Spe = 30,
-                                                        },
-                                                        Abilities = new SpeciesAbility
-                                                        {
-                                                            Slot0 = AbilityId.QuickDraw,
-                                                            Slot1 = AbilityId.OwnTempo,
-                                                            Hidden = AbilityId.Regenerator,
-                                                        },
-                                                        HeightM = 1.6,
-                                                        WeightKg = 70.5,
-                                                        Color = "Pink",
-                                                    },
-                                                    [SpecieId.CalyrexIce] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.SlowbroGalar,
+                                                                                        Num = 80,
+                                                                                        Name = "Slowbro-Galar",
+                                                                                        BaseSpecies = SpecieId.Slowbro,
+                                                                                        Forme = FormeId.Galar,
+                                                                                        Types = [PokemonType.Poison, PokemonType.Psychic],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 95,
+                                                                                            Atk = 100,
+                                                                                            Def = 95,
+                                                                                            SpA = 100,
+                                                                                            SpD = 70,
+                                                                                            Spe = 30,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.QuickDraw,
+                                                                                            Slot1 = AbilityId.OwnTempo,
+                                                                                            Hidden = AbilityId.Regenerator,
+                                                                                        },
+                                                                                        HeightM = 1.6,
+                                                                                        WeightKg = 70.5,
+                                                                                        Color = "Pink",
+                                                                                    },
+                                                                                    [SpecieId.Magnemite] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Magnemite,
+                                                                                        Num = 81,
+                                                                                        Name = "Magnemite",
+                                                                                        Types = [PokemonType.Electric, PokemonType.Steel],
+                                                                                        Gender = GenderId.N,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 25,
+                                                                                            Atk = 35,
+                                                                                            Def = 70,
+                                                                                            SpA = 95,
+                                                                                            SpD = 55,
+                                                                                            Spe = 45,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.MagnetPull,
+                                                                                            Slot1 = AbilityId.Sturdy,
+                                                                                            Hidden = AbilityId.Analytic,
+                                                                                        },
+                                                                                        HeightM = 0.3,
+                                                                                        WeightKg = 6,
+                                                                                        Color = "Gray",
+                                                                                    },
+                                                                                    [SpecieId.Magneton] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Magneton,
+                                                                                        Num = 82,
+                                                                                        Name = "Magneton",
+                                                                                        Types = [PokemonType.Electric, PokemonType.Steel],
+                                                                                        Gender = GenderId.N,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 50,
+                                                                                            Atk = 60,
+                                                                                            Def = 95,
+                                                                                            SpA = 120,
+                                                                                            SpD = 70,
+                                                                                            Spe = 70,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.MagnetPull,
+                                                                                            Slot1 = AbilityId.Sturdy,
+                                                                                            Hidden = AbilityId.Analytic,
+                                                                                        },
+                                                                                        HeightM = 1,
+                                                                                        WeightKg = 60,
+                                                                                        Color = "Gray",
+                                                                                    },
+                                                                                    [SpecieId.Farfetchd] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Farfetchd,
+                                                                                        Num = 83,
+                                                                                        Name = "Farfetch\u2019d",
+                                                                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 52,
+                                                                                            Atk = 90,
+                                                                                            Def = 55,
+                                                                                            SpA = 58,
+                                                                                            SpD = 62,
+                                                                                            Spe = 60,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.KeenEye,
+                                                                                            Slot1 = AbilityId.InnerFocus,
+                                                                                            Hidden = AbilityId.Defiant,
+                                                                                        },
+                                                                                        HeightM = 0.8,
+                                                                                        WeightKg = 15,
+                                                                                        Color = "Brown",
+                                                                                    },
+                                                                                    [SpecieId.FarfetchdGalar] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.FarfetchdGalar,
+                                                                                        Num = 83,
+                                                                                        Name = "Farfetch\u2019d-Galar",
+                                                                                        BaseSpecies = SpecieId.Farfetchd,
+                                                                                        Forme = FormeId.Galar,
+                                                                                        Types = [PokemonType.Fighting],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 52,
+                                                                                            Atk = 95,
+                                                                                            Def = 55,
+                                                                                            SpA = 58,
+                                                                                            SpD = 62,
+                                                                                            Spe = 55,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.Steadfast,
+                                                                                            Hidden = AbilityId.Scrappy,
+                                                                                        },
+                                                                                        HeightM = 0.8,
+                                                                                        WeightKg = 42,
+                                                                                        Color = "Brown",
+                                                                                    },
+                                                                                    [SpecieId.Doduo] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Doduo,
+                                                                                        Num = 84,
+                                                                                        Name = "Doduo",
+                                                                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 35,
+                                                                                            Atk = 85,
+                                                                                            Def = 45,
+                                                                                            SpA = 35,
+                                                                                            SpD = 35,
+                                                                                            Spe = 75,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.RunAway,
+                                                                                            Slot1 = AbilityId.EarlyBird,
+                                                                                            Hidden = AbilityId.TangledFeet,
+                                                                                        },
+                                                                                        HeightM = 1.4,
+                                                                                        WeightKg = 39.2,
+                                                                                        Color = "Brown",
+                                                                                    },
+                                                                                    [SpecieId.Dodrio] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Dodrio,
+                                                                                        Num = 85,
+                                                                                        Name = "Dodrio",
+                                                                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 60,
+                                                                                            Atk = 110,
+                                                                                            Def = 70,
+                                                                                            SpA = 60,
+                                                                                            SpD = 60,
+                                                                                            Spe = 110,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.RunAway,
+                                                                                            Slot1 = AbilityId.EarlyBird,
+                                                                                            Hidden = AbilityId.TangledFeet,
+                                                                                        },
+                                                                                        HeightM = 1.8,
+                                                                                        WeightKg = 85.2,
+                                                                                        Color = "Brown",
+                                                                                    },
+                                                                                    [SpecieId.Seel] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Seel,
+                                                                                        Num = 86,
+                                                                                        Name = "Seel",
+                                                                                        Types = [PokemonType.Water],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 65,
+                                                                                            Atk = 45,
+                                                                                            Def = 55,
+                                                                                            SpA = 45,
+                                                                                            SpD = 70,
+                                                                                            Spe = 45,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.ThickFat,
+                                                                                            Slot1 = AbilityId.Hydration,
+                                                                                            Hidden = AbilityId.IceBody,
+                                                                                        },
+                                                                                        HeightM = 1.1,
+                                                                                        WeightKg = 90,
+                                                                                        Color = "White",
+                                                                                    },
+                                                                                    [SpecieId.Dewgong] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Dewgong,
+                                                                                        Num = 87,
+                                                                                        Name = "Dewgong",
+                                                                                        Types = [PokemonType.Water, PokemonType.Ice],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 90,
+                                                                                            Atk = 70,
+                                                                                            Def = 80,
+                                                                                            SpA = 70,
+                                                                                            SpD = 95,
+                                                                                            Spe = 70,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.ThickFat,
+                                                                                            Slot1 = AbilityId.Hydration,
+                                                                                            Hidden = AbilityId.IceBody,
+                                                                                        },
+                                                                                        HeightM = 1.7,
+                                                                                        WeightKg = 120,
+                                                                                        Color = "White",
+                                                                                    },
+                                                                                    [SpecieId.Grimer] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Grimer,
+                                                                                        Num = 88,
+                                                                                        Name = "Grimer",
+                                                                                        Types = [PokemonType.Poison],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 80,
+                                                                                            Atk = 80,
+                                                                                            Def = 50,
+                                                                                            SpA = 40,
+                                                                                            SpD = 50,
+                                                                                            Spe = 25,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.Stench,
+                                                                                            Slot1 = AbilityId.StickyHold,
+                                                                                            Hidden = AbilityId.PoisonTouch,
+                                                                                        },
+                                                                                        HeightM = 0.9,
+                                                                                        WeightKg = 30,
+                                                                                        Color = "Purple",
+                                                                                    },
+                                                                                    [SpecieId.GrimerAlola] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.GrimerAlola,
+                                                                                        Num = 88,
+                                                                                        Name = "Grimer-Alola",
+                                                                                        BaseSpecies = SpecieId.Grimer,
+                                                                                        Forme = FormeId.Alola,
+                                                                                        Types = [PokemonType.Poison, PokemonType.Dark],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 80,
+                                                                                            Atk = 80,
+                                                                                            Def = 50,
+                                                                                            SpA = 40,
+                                                                                            SpD = 50,
+                                                                                            Spe = 25,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.PoisonTouch,
+                                                                                            Slot1 = AbilityId.Gluttony,
+                                                                                            Hidden = AbilityId.PowerOfAlchemy,
+                                                                                        },
+                                                                                        HeightM = 0.7,
+                                                                                        WeightKg = 42,
+                                                                                        Color = "Green",
+                                                                                    },
+                                                                                    [SpecieId.Muk] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Muk,
+                                                                                        Num = 89,
+                                                                                        Name = "Muk",
+                                                                                        Types = [PokemonType.Poison],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 105,
+                                                                                            Atk = 105,
+                                                                                            Def = 75,
+                                                                                            SpA = 65,
+                                                                                            SpD = 100,
+                                                                                            Spe = 50,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.Stench,
+                                                                                            Slot1 = AbilityId.StickyHold,
+                                                                                            Hidden = AbilityId.PoisonTouch,
+                                                                                        },
+                                                                                        HeightM = 1.2,
+                                                                                        WeightKg = 30,
+                                                                                        Color = "Purple",
+                                                                                    },
+                                                                                    [SpecieId.MukAlola] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.MukAlola,
+                                                                                        Num = 89,
+                                                                                        Name = "Muk-Alola",
+                                                                                        BaseSpecies = SpecieId.Muk,
+                                                                                        Forme = FormeId.Alola,
+                                                                                        Types = [PokemonType.Poison, PokemonType.Dark],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 105,
+                                                                                            Atk = 105,
+                                                                                            Def = 75,
+                                                                                            SpA = 65,
+                                                                                            SpD = 100,
+                                                                                            Spe = 50,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.PoisonTouch,
+                                                                                            Slot1 = AbilityId.Gluttony,
+                                                                                            Hidden = AbilityId.PowerOfAlchemy,
+                                                                                        },
+                                                                                        HeightM = 1,
+                                                                                        WeightKg = 52,
+                                                                                        Color = "Green",
+                                                                                    },
+                                                                                    [SpecieId.Shellder] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Shellder,
+                                                                                        Num = 90,
+                                                                                        Name = "Shellder",
+                                                                                        Types = [PokemonType.Water],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 30,
+                                                                                            Atk = 65,
+                                                                                            Def = 100,
+                                                                                            SpA = 45,
+                                                                                            SpD = 25,
+                                                                                            Spe = 40,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.ShellArmor,
+                                                                                            Slot1 = AbilityId.SkillLink,
+                                                                                            Hidden = AbilityId.Overcoat,
+                                                                                        },
+                                                                                        HeightM = 0.3,
+                                                                                        WeightKg = 4,
+                                                                                        Color = "Purple",
+                                                                                    },
+                                                                                    [SpecieId.Cloyster] = new Species
+                                                                                    {
+                                                                                        Id = SpecieId.Cloyster,
+                                                                                        Num = 91,
+                                                                                        Name = "Cloyster",
+                                                                                        Types = [PokemonType.Water, PokemonType.Ice],
+                                                                                        Gender = GenderId.Empty,
+                                                                                        BaseStats = new StatsTable
+                                                                                        {
+                                                                                            Hp = 50,
+                                                                                            Atk = 95,
+                                                                                            Def = 180,
+                                                                                            SpA = 85,
+                                                                                            SpD = 45,
+                                                                                            Spe = 70,
+                                                                                        },
+                                                                                        Abilities = new SpeciesAbility
+                                                                                        {
+                                                                                            Slot0 = AbilityId.ShellArmor,
+                                                                                            Slot1 = AbilityId.SkillLink,
+                                                                                            Hidden = AbilityId.Overcoat,
+                                                                                        },
+                                                                                        HeightM = 1.5,
+                                                                                        WeightKg = 132.5,
+                                                                                        Color = "Purple",
+                                                                                    },
+                                                                                    [SpecieId.CalyrexIce] = new Species
                                     {
                                         Id = SpecieId.CalyrexIce,
                             Num = 898,

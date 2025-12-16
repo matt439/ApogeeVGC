@@ -136,11 +136,12 @@ public enum AbilityId
                             Illuminate,
                             WaterVeil,
                             Hydration,
-                                Oblivious,
-                                OwnTempo,
-                                Regenerator,
-                                QuickDraw,
-                                PastelVeil,
+                                    Oblivious,
+                                    OwnTempo,
+                                    Regenerator,
+                                    QuickDraw,
+                                    PastelVeil,
+                                    PowerOfAlchemy,
 
-                                None,
-                            }
+                                    None,
+                                }
