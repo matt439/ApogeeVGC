@@ -142,6 +142,8 @@ public enum AbilityId
                                     QuickDraw,
                                     PastelVeil,
                                     PowerOfAlchemy,
+                                    Insomnia,
+                                    Forewarn,
 
                                     None,
                                 }
