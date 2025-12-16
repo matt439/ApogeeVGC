@@ -543,15 +543,355 @@ public record SpeciesData
             {
                 Slot0 = AbilityId.Adaptability,
             },
-            HeightM = 1.4,
-            WeightKg = 40.5,
-            Color = "Yellow",
-        },
-        [SpecieId.CalyrexIce] = new Species
-        {
-            Id = SpecieId.CalyrexIce,
-            Num = 898,
-            Name = "Calyrex-Ice",
+                HeightM = 1.4,
+                WeightKg = 40.5,
+                Color = "Yellow",
+            },
+            [SpecieId.Pidgey] = new Species
+            {
+                Id = SpecieId.Pidgey,
+                Num = 16,
+                Name = "Pidgey",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 40,
+                    Atk = 45,
+                    Def = 40,
+                    SpA = 35,
+                    SpD = 35,
+                    Spe = 56,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.KeenEye,
+                    Slot1 = AbilityId.TangledFeet,
+                    Hidden = AbilityId.BigPecks,
+                },
+                HeightM = 0.3,
+                WeightKg = 1.8,
+                Color = "Brown",
+            },
+            [SpecieId.Pidgeotto] = new Species
+            {
+                Id = SpecieId.Pidgeotto,
+                Num = 17,
+                Name = "Pidgeotto",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 63,
+                    Atk = 60,
+                    Def = 55,
+                    SpA = 50,
+                    SpD = 50,
+                    Spe = 71,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.KeenEye,
+                    Slot1 = AbilityId.TangledFeet,
+                    Hidden = AbilityId.BigPecks,
+                },
+                HeightM = 1.1,
+                WeightKg = 30,
+                Color = "Brown",
+            },
+            [SpecieId.Pidgeot] = new Species
+            {
+                Id = SpecieId.Pidgeot,
+                Num = 18,
+                Name = "Pidgeot",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 83,
+                    Atk = 80,
+                    Def = 75,
+                    SpA = 70,
+                    SpD = 70,
+                    Spe = 101,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.KeenEye,
+                    Slot1 = AbilityId.TangledFeet,
+                    Hidden = AbilityId.BigPecks,
+                },
+                HeightM = 1.5,
+                WeightKg = 39.5,
+                Color = "Brown",
+            },
+            [SpecieId.PidgeotMega] = new Species
+            {
+                Id = SpecieId.PidgeotMega,
+                Num = 18,
+                Name = "Pidgeot-Mega",
+                BaseSpecies = SpecieId.Pidgeot,
+                Forme = FormeId.Mega,
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 83,
+                    Atk = 80,
+                    Def = 80,
+                    SpA = 135,
+                    SpD = 80,
+                    Spe = 121,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.NoGuard,
+                },
+                HeightM = 2.2,
+                WeightKg = 50.5,
+                Color = "Brown",
+            },
+            [SpecieId.Rattata] = new Species
+            {
+                Id = SpecieId.Rattata,
+                Num = 19,
+                Name = "Rattata",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 30,
+                    Atk = 56,
+                    Def = 35,
+                    SpA = 25,
+                    SpD = 35,
+                    Spe = 72,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.RunAway,
+                    Slot1 = AbilityId.Guts,
+                    Hidden = AbilityId.Hustle,
+                },
+                HeightM = 0.3,
+                WeightKg = 3.5,
+                Color = "Purple",
+            },
+            [SpecieId.RattataAlola] = new Species
+            {
+                Id = SpecieId.RattataAlola,
+                Num = 19,
+                Name = "Rattata-Alola",
+                BaseSpecies = SpecieId.Rattata,
+                Forme = FormeId.Alola,
+                Types = [PokemonType.Dark, PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 30,
+                    Atk = 56,
+                    Def = 35,
+                    SpA = 25,
+                    SpD = 35,
+                    Spe = 72,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Gluttony,
+                    Slot1 = AbilityId.Hustle,
+                    Hidden = AbilityId.ThickFat,
+                },
+                HeightM = 0.3,
+                WeightKg = 3.8,
+                Color = "Black",
+            },
+            [SpecieId.Raticate] = new Species
+            {
+                Id = SpecieId.Raticate,
+                Num = 20,
+                Name = "Raticate",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 55,
+                    Atk = 81,
+                    Def = 60,
+                    SpA = 50,
+                    SpD = 70,
+                    Spe = 97,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.RunAway,
+                    Slot1 = AbilityId.Guts,
+                    Hidden = AbilityId.Hustle,
+                },
+                HeightM = 0.7,
+                WeightKg = 18.5,
+                Color = "Brown",
+            },
+            [SpecieId.RaticateAlola] = new Species
+            {
+                Id = SpecieId.RaticateAlola,
+                Num = 20,
+                Name = "Raticate-Alola",
+                BaseSpecies = SpecieId.Raticate,
+                Forme = FormeId.Alola,
+                Types = [PokemonType.Dark, PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 71,
+                    Def = 70,
+                    SpA = 40,
+                    SpD = 80,
+                    Spe = 77,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Gluttony,
+                    Slot1 = AbilityId.Hustle,
+                    Hidden = AbilityId.ThickFat,
+                },
+                HeightM = 0.7,
+                WeightKg = 25.5,
+                Color = "Black",
+            },
+            [SpecieId.RaticateAlolaTotem] = new Species
+            {
+                Id = SpecieId.RaticateAlolaTotem,
+                Num = 20,
+                Name = "Raticate-Alola-Totem",
+                BaseSpecies = SpecieId.Raticate,
+                Forme = FormeId.AlolaTotem,
+                Types = [PokemonType.Dark, PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 71,
+                    Def = 70,
+                    SpA = 40,
+                    SpD = 80,
+                    Spe = 77,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ThickFat,
+                },
+                HeightM = 1.4,
+                WeightKg = 105,
+                Color = "Black",
+            },
+            [SpecieId.Spearow] = new Species
+            {
+                Id = SpecieId.Spearow,
+                Num = 21,
+                Name = "Spearow",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 40,
+                    Atk = 60,
+                    Def = 30,
+                    SpA = 31,
+                    SpD = 31,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.KeenEye,
+                    Hidden = AbilityId.Sniper,
+                },
+                HeightM = 0.3,
+                WeightKg = 2,
+                Color = "Brown",
+            },
+            [SpecieId.Fearow] = new Species
+            {
+                Id = SpecieId.Fearow,
+                Num = 22,
+                Name = "Fearow",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 65,
+                    Atk = 90,
+                    Def = 65,
+                    SpA = 61,
+                    SpD = 61,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.KeenEye,
+                    Hidden = AbilityId.Sniper,
+                },
+                HeightM = 1.2,
+                WeightKg = 38,
+                Color = "Brown",
+            },
+            [SpecieId.Ekans] = new Species
+            {
+                Id = SpecieId.Ekans,
+                Num = 23,
+                Name = "Ekans",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 35,
+                    Atk = 60,
+                    Def = 44,
+                    SpA = 40,
+                    SpD = 54,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Intimidate,
+                    Slot1 = AbilityId.ShedSkin,
+                    Hidden = AbilityId.Unnerve,
+                },
+                HeightM = 2,
+                WeightKg = 6.9,
+                Color = "Purple",
+            },
+            [SpecieId.Arbok] = new Species
+            {
+                Id = SpecieId.Arbok,
+                Num = 24,
+                Name = "Arbok",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 95,
+                    Def = 69,
+                    SpA = 65,
+                    SpD = 79,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Intimidate,
+                    Slot1 = AbilityId.ShedSkin,
+                    Hidden = AbilityId.Unnerve,
+                },
+                HeightM = 3.5,
+                WeightKg = 65,
+                Color = "Purple",
+            },
+            [SpecieId.CalyrexIce] = new Species
+            {
+                Id = SpecieId.CalyrexIce,
+                Num = 898,
+                Name = "Calyrex-Ice",
             BaseSpecies = SpecieId.Calyrex,
             Forme = FormeId.Ice,
             Types = [PokemonType.Psychic, PokemonType.Ice],

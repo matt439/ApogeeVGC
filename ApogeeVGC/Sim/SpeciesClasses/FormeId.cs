@@ -6,6 +6,8 @@ public enum FormeId
     Mega,
     MegaX,
     MegaY,
-    Gmax,
-    None,
-}
+        Gmax,
+        Alola,
+        AlolaTotem,
+        None,
+    }

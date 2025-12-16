@@ -62,6 +62,13 @@ public enum AbilityId
             CompoundEyes,
             TintedLens,
             Sniper,
+            KeenEye,
+            TangledFeet,
+            BigPecks,
+            Hustle,
+            Intimidate,
+            NoGuard,
+            Gluttony,
 
             None,
         }
