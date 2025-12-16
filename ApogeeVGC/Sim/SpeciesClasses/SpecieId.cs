@@ -3,6 +3,19 @@ namespace ApogeeVGC.Sim.SpeciesClasses;
 public enum SpecieId
 {
     Bulbasaur,
+    Ivysaur,
+    Venusaur,
+    VenusaurMega,
+    Charmander,
+    Charmeleon,
+    Charizard,
+    CharizardMegaX,
+    CharizardMegaY,
+    CharizardGmax,
+    Squirtle,
+    Wartortle,
+    Blastoise,
+    BlastoiseMega,
 
     CalyrexIce,
     Miraidon,

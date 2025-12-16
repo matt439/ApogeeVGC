@@ -35,12 +35,343 @@ public record SpeciesData
             },
             Abilities = new SpeciesAbility
             {
-                Slot0 = AbilityId.FlameBody,
-                Hidden = AbilityId.Guts,
+                Slot0 = AbilityId.Overgrow,
+                Hidden = AbilityId.Chlorophyll,
             },
             HeightM = 0.7,
             WeightKg = 6.9,
             Color = "Green",
+        },
+        [SpecieId.Ivysaur] = new Species
+        {
+            Id = SpecieId.Ivysaur,
+            Num = 2,
+            Name = "Ivysaur",
+            Types = [PokemonType.Grass, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 60,
+                Atk = 62,
+                Def = 63,
+                SpA = 80,
+                SpD = 80,
+                Spe = 60,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Overgrow,
+                Hidden = AbilityId.Chlorophyll,
+            },
+            HeightM = 1,
+            WeightKg = 13,
+            Color = "Green",
+        },
+        [SpecieId.Venusaur] = new Species
+        {
+            Id = SpecieId.Venusaur,
+            Num = 3,
+            Name = "Venusaur",
+            Types = [PokemonType.Grass, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 80,
+                Atk = 82,
+                Def = 83,
+                SpA = 100,
+                SpD = 100,
+                Spe = 80,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Overgrow,
+                Hidden = AbilityId.Chlorophyll,
+            },
+            HeightM = 2,
+            WeightKg = 100,
+            Color = "Green",
+        },
+        [SpecieId.VenusaurMega] = new Species
+        {
+            Id = SpecieId.VenusaurMega,
+            Num = 3,
+            Name = "Venusaur-Mega",
+            BaseSpecies = SpecieId.Venusaur,
+            Forme = FormeId.Mega,
+            Types = [PokemonType.Grass, PokemonType.Poison],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 80,
+                Atk = 100,
+                Def = 123,
+                SpA = 122,
+                SpD = 120,
+                Spe = 80,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ThickFat,
+            },
+            HeightM = 2.4,
+            WeightKg = 155.5,
+            Color = "Green",
+        },
+        [SpecieId.Charmander] = new Species
+        {
+            Id = SpecieId.Charmander,
+            Num = 4,
+            Name = "Charmander",
+            Types = [PokemonType.Fire],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 39,
+                Atk = 52,
+                Def = 43,
+                SpA = 60,
+                SpD = 50,
+                Spe = 65,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Blaze,
+                Hidden = AbilityId.SolarPower,
+            },
+            HeightM = 0.6,
+            WeightKg = 8.5,
+            Color = "Red",
+        },
+        [SpecieId.Charmeleon] = new Species
+        {
+            Id = SpecieId.Charmeleon,
+            Num = 5,
+            Name = "Charmeleon",
+            Types = [PokemonType.Fire],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 58,
+                Atk = 64,
+                Def = 58,
+                SpA = 80,
+                SpD = 65,
+                Spe = 80,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Blaze,
+                Hidden = AbilityId.SolarPower,
+            },
+            HeightM = 1.1,
+            WeightKg = 19,
+            Color = "Red",
+        },
+        [SpecieId.Charizard] = new Species
+        {
+            Id = SpecieId.Charizard,
+            Num = 6,
+            Name = "Charizard",
+            Types = [PokemonType.Fire, PokemonType.Flying],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 78,
+                Atk = 84,
+                Def = 78,
+                SpA = 109,
+                SpD = 85,
+                Spe = 100,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Blaze,
+                Hidden = AbilityId.SolarPower,
+            },
+            HeightM = 1.7,
+            WeightKg = 90.5,
+            Color = "Red",
+        },
+        [SpecieId.CharizardMegaX] = new Species
+        {
+            Id = SpecieId.CharizardMegaX,
+            Num = 6,
+            Name = "Charizard-Mega-X",
+            BaseSpecies = SpecieId.Charizard,
+            Forme = FormeId.MegaX,
+            Types = [PokemonType.Fire, PokemonType.Dragon],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 78,
+                Atk = 130,
+                Def = 111,
+                SpA = 130,
+                SpD = 85,
+                Spe = 100,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.ToughClaws,
+            },
+            HeightM = 1.7,
+            WeightKg = 110.5,
+            Color = "Black",
+        },
+        [SpecieId.CharizardMegaY] = new Species
+        {
+            Id = SpecieId.CharizardMegaY,
+            Num = 6,
+            Name = "Charizard-Mega-Y",
+            BaseSpecies = SpecieId.Charizard,
+            Forme = FormeId.MegaY,
+            Types = [PokemonType.Fire, PokemonType.Flying],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 78,
+                Atk = 104,
+                Def = 78,
+                SpA = 159,
+                SpD = 115,
+                Spe = 100,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Drought,
+            },
+            HeightM = 1.7,
+            WeightKg = 100.5,
+            Color = "Red",
+        },
+        [SpecieId.CharizardGmax] = new Species
+        {
+            Id = SpecieId.CharizardGmax,
+            Num = 6,
+            Name = "Charizard-Gmax",
+            BaseSpecies = SpecieId.Charizard,
+            Forme = FormeId.Gmax,
+            Types = [PokemonType.Fire, PokemonType.Flying],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 78,
+                Atk = 84,
+                Def = 78,
+                SpA = 109,
+                SpD = 85,
+                Spe = 100,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Blaze,
+                Hidden = AbilityId.SolarPower,
+            },
+            HeightM = 28,
+            WeightKg = 0,
+            Color = "Red",
+        },
+        [SpecieId.Squirtle] = new Species
+        {
+            Id = SpecieId.Squirtle,
+            Num = 7,
+            Name = "Squirtle",
+            Types = [PokemonType.Water],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 44,
+                Atk = 48,
+                Def = 65,
+                SpA = 50,
+                SpD = 64,
+                Spe = 43,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Torrent,
+                Hidden = AbilityId.RainDish,
+            },
+            HeightM = 0.5,
+            WeightKg = 9,
+            Color = "Blue",
+        },
+        [SpecieId.Wartortle] = new Species
+        {
+            Id = SpecieId.Wartortle,
+            Num = 8,
+            Name = "Wartortle",
+            Types = [PokemonType.Water],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 59,
+                Atk = 63,
+                Def = 80,
+                SpA = 65,
+                SpD = 80,
+                Spe = 58,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Torrent,
+                Hidden = AbilityId.RainDish,
+            },
+            HeightM = 1,
+            WeightKg = 22.5,
+            Color = "Blue",
+        },
+        [SpecieId.Blastoise] = new Species
+        {
+            Id = SpecieId.Blastoise,
+            Num = 9,
+            Name = "Blastoise",
+            Types = [PokemonType.Water],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 79,
+                Atk = 83,
+                Def = 100,
+                SpA = 85,
+                SpD = 105,
+                Spe = 78,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.Torrent,
+                Hidden = AbilityId.RainDish,
+            },
+            HeightM = 1.6,
+            WeightKg = 85.5,
+            Color = "Blue",
+        },
+        [SpecieId.BlastoiseMega] = new Species
+        {
+            Id = SpecieId.BlastoiseMega,
+            Num = 9,
+            Name = "Blastoise-Mega",
+            BaseSpecies = SpecieId.Blastoise,
+            Forme = FormeId.Mega,
+            Types = [PokemonType.Water],
+            Gender = GenderId.Empty,
+            BaseStats = new StatsTable
+            {
+                Hp = 79,
+                Atk = 103,
+                Def = 120,
+                SpA = 135,
+                SpD = 115,
+                Spe = 78,
+            },
+            Abilities = new SpeciesAbility
+            {
+                Slot0 = AbilityId.MegaLauncher,
+            },
+            HeightM = 1.6,
+            WeightKg = 101.1,
+            Color = "Blue",
         },
         [SpecieId.CalyrexIce] = new Species
         {

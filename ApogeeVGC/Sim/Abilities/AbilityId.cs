@@ -42,12 +42,20 @@ public enum AbilityId
     SheerForce,
     Illusion,
 
-        // New abilities from TS conversion
-        Adaptability,
-        Aerilate,
-        Aftermath,
-        AirLock,
-        Analytic,
+            // New abilities from TS conversion
+            Adaptability,
+            Aerilate,
+            Aftermath,
+            AirLock,
+            Analytic,
+            Blaze,
+            Drought,
+            MegaLauncher,
+            RainDish,
+            SolarPower,
+            ThickFat,
+            ToughClaws,
+            Torrent,
 
-        None,
-    }
+            None,
+        }
