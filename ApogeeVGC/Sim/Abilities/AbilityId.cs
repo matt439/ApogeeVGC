@@ -177,8 +177,14 @@ public enum AbilityId
             MagmaArmor,
             Moody,
             SuctionCups,
-            SandStream,
-            Unburden,
+                SandStream,
+                Unburden,
+                WindRider,
+                Pixilate,
+                PoisonHeal,
+                Truant,
+                WonderGuard,
+                Normalize,
 
-            None,
-        }
+                None,
+            }
