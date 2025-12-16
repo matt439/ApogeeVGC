@@ -2594,11 +2594,401 @@ public record SpeciesData
                                                     Slot1 = AbilityId.FlashFire,
                                                     Hidden = AbilityId.RockHead,
                                                 },
-                                                HeightM = 2,
-                                                WeightKg = 168,
-                                                Color = "Brown",
-                                            },
-                                            [SpecieId.CalyrexIce] = new Species
+                                                    HeightM = 2,
+                                                    WeightKg = 168,
+                                                    Color = "Brown",
+                                                },
+                                                [SpecieId.Poliwag] = new Species
+                                                {
+                                                    Id = SpecieId.Poliwag,
+                                                    Num = 60,
+                                                    Name = "Poliwag",
+                                                    Types = [PokemonType.Water],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 40,
+                                                        Atk = 50,
+                                                        Def = 40,
+                                                        SpA = 40,
+                                                        SpD = 40,
+                                                        Spe = 90,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.WaterAbsorb,
+                                                        Slot1 = AbilityId.Damp,
+                                                        Hidden = AbilityId.SwiftSwim,
+                                                    },
+                                                    HeightM = 0.6,
+                                                    WeightKg = 12.4,
+                                                    Color = "Blue",
+                                                },
+                                                [SpecieId.Poliwhirl] = new Species
+                                                {
+                                                    Id = SpecieId.Poliwhirl,
+                                                    Num = 61,
+                                                    Name = "Poliwhirl",
+                                                    Types = [PokemonType.Water],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 65,
+                                                        Atk = 65,
+                                                        Def = 65,
+                                                        SpA = 50,
+                                                        SpD = 50,
+                                                        Spe = 90,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.WaterAbsorb,
+                                                        Slot1 = AbilityId.Damp,
+                                                        Hidden = AbilityId.SwiftSwim,
+                                                    },
+                                                    HeightM = 1,
+                                                    WeightKg = 20,
+                                                    Color = "Blue",
+                                                },
+                                                [SpecieId.Poliwrath] = new Species
+                                                {
+                                                    Id = SpecieId.Poliwrath,
+                                                    Num = 62,
+                                                    Name = "Poliwrath",
+                                                    Types = [PokemonType.Water, PokemonType.Fighting],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 90,
+                                                        Atk = 95,
+                                                        Def = 95,
+                                                        SpA = 70,
+                                                        SpD = 90,
+                                                        Spe = 70,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.WaterAbsorb,
+                                                        Slot1 = AbilityId.Damp,
+                                                        Hidden = AbilityId.SwiftSwim,
+                                                    },
+                                                    HeightM = 1.3,
+                                                    WeightKg = 54,
+                                                    Color = "Blue",
+                                                },
+                                                [SpecieId.Abra] = new Species
+                                                {
+                                                    Id = SpecieId.Abra,
+                                                    Num = 63,
+                                                    Name = "Abra",
+                                                    Types = [PokemonType.Psychic],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 25,
+                                                        Atk = 20,
+                                                        Def = 15,
+                                                        SpA = 105,
+                                                        SpD = 55,
+                                                        Spe = 90,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Synchronize,
+                                                        Slot1 = AbilityId.InnerFocus,
+                                                        Hidden = AbilityId.MagicGuard,
+                                                    },
+                                                    HeightM = 0.9,
+                                                    WeightKg = 19.5,
+                                                    Color = "Brown",
+                                                },
+                                                [SpecieId.Kadabra] = new Species
+                                                {
+                                                    Id = SpecieId.Kadabra,
+                                                    Num = 64,
+                                                    Name = "Kadabra",
+                                                    Types = [PokemonType.Psychic],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 40,
+                                                        Atk = 35,
+                                                        Def = 30,
+                                                        SpA = 120,
+                                                        SpD = 70,
+                                                        Spe = 105,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Synchronize,
+                                                        Slot1 = AbilityId.InnerFocus,
+                                                        Hidden = AbilityId.MagicGuard,
+                                                    },
+                                                    HeightM = 1.3,
+                                                    WeightKg = 56.5,
+                                                    Color = "Brown",
+                                                },
+                                                [SpecieId.Alakazam] = new Species
+                                                {
+                                                    Id = SpecieId.Alakazam,
+                                                    Num = 65,
+                                                    Name = "Alakazam",
+                                                    Types = [PokemonType.Psychic],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 55,
+                                                        Atk = 50,
+                                                        Def = 45,
+                                                        SpA = 135,
+                                                        SpD = 95,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Synchronize,
+                                                        Slot1 = AbilityId.InnerFocus,
+                                                        Hidden = AbilityId.MagicGuard,
+                                                    },
+                                                    HeightM = 1.5,
+                                                    WeightKg = 48,
+                                                    Color = "Brown",
+                                                },
+                                                [SpecieId.AlakazamMega] = new Species
+                                                {
+                                                    Id = SpecieId.AlakazamMega,
+                                                    Num = 65,
+                                                    Name = "Alakazam-Mega",
+                                                    BaseSpecies = SpecieId.Alakazam,
+                                                    Forme = FormeId.Mega,
+                                                    Types = [PokemonType.Psychic],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 55,
+                                                        Atk = 50,
+                                                        Def = 65,
+                                                        SpA = 175,
+                                                        SpD = 105,
+                                                        Spe = 150,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Trace,
+                                                    },
+                                                    HeightM = 1.2,
+                                                    WeightKg = 48,
+                                                    Color = "Brown",
+                                                },
+                                                [SpecieId.Machop] = new Species
+                                                {
+                                                    Id = SpecieId.Machop,
+                                                    Num = 66,
+                                                    Name = "Machop",
+                                                    Types = [PokemonType.Fighting],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 70,
+                                                        Atk = 80,
+                                                        Def = 50,
+                                                        SpA = 35,
+                                                        SpD = 35,
+                                                        Spe = 35,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Guts,
+                                                        Slot1 = AbilityId.NoGuard,
+                                                        Hidden = AbilityId.Steadfast,
+                                                    },
+                                                    HeightM = 0.8,
+                                                    WeightKg = 19.5,
+                                                    Color = "Gray",
+                                                },
+                                                [SpecieId.Machoke] = new Species
+                                                {
+                                                    Id = SpecieId.Machoke,
+                                                    Num = 67,
+                                                    Name = "Machoke",
+                                                    Types = [PokemonType.Fighting],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 80,
+                                                        Atk = 100,
+                                                        Def = 70,
+                                                        SpA = 50,
+                                                        SpD = 60,
+                                                        Spe = 45,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Guts,
+                                                        Slot1 = AbilityId.NoGuard,
+                                                        Hidden = AbilityId.Steadfast,
+                                                    },
+                                                    HeightM = 1.5,
+                                                    WeightKg = 70.5,
+                                                    Color = "Gray",
+                                                },
+                                                [SpecieId.Machamp] = new Species
+                                                {
+                                                    Id = SpecieId.Machamp,
+                                                    Num = 68,
+                                                    Name = "Machamp",
+                                                    Types = [PokemonType.Fighting],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 90,
+                                                        Atk = 130,
+                                                        Def = 80,
+                                                        SpA = 65,
+                                                        SpD = 85,
+                                                        Spe = 55,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Guts,
+                                                        Slot1 = AbilityId.NoGuard,
+                                                        Hidden = AbilityId.Steadfast,
+                                                    },
+                                                    HeightM = 1.6,
+                                                    WeightKg = 130,
+                                                    Color = "Gray",
+                                                },
+                                                [SpecieId.MachampGmax] = new Species
+                                                {
+                                                    Id = SpecieId.MachampGmax,
+                                                    Num = 68,
+                                                    Name = "Machamp-Gmax",
+                                                    BaseSpecies = SpecieId.Machamp,
+                                                    Forme = FormeId.Gmax,
+                                                    Types = [PokemonType.Fighting],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 90,
+                                                        Atk = 130,
+                                                        Def = 80,
+                                                        SpA = 65,
+                                                        SpD = 85,
+                                                        Spe = 55,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Guts,
+                                                        Slot1 = AbilityId.NoGuard,
+                                                        Hidden = AbilityId.Steadfast,
+                                                    },
+                                                    HeightM = 25,
+                                                    WeightKg = 0,
+                                                    Color = "Gray",
+                                                },
+                                                [SpecieId.Bellsprout] = new Species
+                                                {
+                                                    Id = SpecieId.Bellsprout,
+                                                    Num = 69,
+                                                    Name = "Bellsprout",
+                                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 50,
+                                                        Atk = 75,
+                                                        Def = 35,
+                                                        SpA = 70,
+                                                        SpD = 30,
+                                                        Spe = 40,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Chlorophyll,
+                                                        Hidden = AbilityId.Gluttony,
+                                                    },
+                                                    HeightM = 0.7,
+                                                    WeightKg = 4,
+                                                    Color = "Green",
+                                                },
+                                                [SpecieId.Weepinbell] = new Species
+                                                {
+                                                    Id = SpecieId.Weepinbell,
+                                                    Num = 70,
+                                                    Name = "Weepinbell",
+                                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 65,
+                                                        Atk = 90,
+                                                        Def = 50,
+                                                        SpA = 85,
+                                                        SpD = 45,
+                                                        Spe = 55,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Chlorophyll,
+                                                        Hidden = AbilityId.Gluttony,
+                                                    },
+                                                    HeightM = 1,
+                                                    WeightKg = 6.4,
+                                                    Color = "Green",
+                                                },
+                                                [SpecieId.Victreebel] = new Species
+                                                {
+                                                    Id = SpecieId.Victreebel,
+                                                    Num = 71,
+                                                    Name = "Victreebel",
+                                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 80,
+                                                        Atk = 105,
+                                                        Def = 65,
+                                                        SpA = 100,
+                                                        SpD = 70,
+                                                        Spe = 70,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Chlorophyll,
+                                                        Hidden = AbilityId.Gluttony,
+                                                    },
+                                                    HeightM = 1.7,
+                                                    WeightKg = 15.5,
+                                                    Color = "Green",
+                                                },
+                                                [SpecieId.VictreebelMega] = new Species
+                                                {
+                                                    Id = SpecieId.VictreebelMega,
+                                                    Num = 71,
+                                                    Name = "Victreebel-Mega",
+                                                    BaseSpecies = SpecieId.Victreebel,
+                                                    Forme = FormeId.Mega,
+                                                    Types = [PokemonType.Grass, PokemonType.Poison],
+                                                    Gender = GenderId.Empty,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 80,
+                                                        Atk = 125,
+                                                        Def = 85,
+                                                        SpA = 135,
+                                                        SpD = 95,
+                                                        Spe = 70,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Chlorophyll,
+                                                        Hidden = AbilityId.Gluttony,
+                                                    },
+                                                    HeightM = 4.5,
+                                                    WeightKg = 125.5,
+                                                    Color = "Green",
+                                                },
+                                                [SpecieId.CalyrexIce] = new Species
                                     {
                                         Id = SpecieId.CalyrexIce,
                             Num = 898,
