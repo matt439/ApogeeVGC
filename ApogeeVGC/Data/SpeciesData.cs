@@ -883,11 +883,513 @@ public record SpeciesData
                     Slot1 = AbilityId.ShedSkin,
                     Hidden = AbilityId.Unnerve,
                 },
-                HeightM = 3.5,
-                WeightKg = 65,
-                Color = "Purple",
-            },
-            [SpecieId.CalyrexIce] = new Species
+                    HeightM = 3.5,
+                    WeightKg = 65,
+                    Color = "Purple",
+                },
+                [SpecieId.Pikachu] = new Species
+                {
+                    Id = SpecieId.Pikachu,
+                    Num = 25,
+                    Name = "Pikachu",
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.Empty,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuCosplay] = new Species
+                {
+                    Id = SpecieId.PikachuCosplay,
+                    Num = 25,
+                    Name = "Pikachu-Cosplay",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Cosplay,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuRockStar] = new Species
+                {
+                    Id = SpecieId.PikachuRockStar,
+                    Num = 25,
+                    Name = "Pikachu-Rock-Star",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.RockStar,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuBelle] = new Species
+                {
+                    Id = SpecieId.PikachuBelle,
+                    Num = 25,
+                    Name = "Pikachu-Belle",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Belle,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuPopStar] = new Species
+                {
+                    Id = SpecieId.PikachuPopStar,
+                    Num = 25,
+                    Name = "Pikachu-Pop-Star",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.PopStar,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuPhD] = new Species
+                {
+                    Id = SpecieId.PikachuPhD,
+                    Num = 25,
+                    Name = "Pikachu-PhD",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.PhD,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuLibre] = new Species
+                {
+                    Id = SpecieId.PikachuLibre,
+                    Num = 25,
+                    Name = "Pikachu-Libre",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Libre,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.F,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuOriginal] = new Species
+                {
+                    Id = SpecieId.PikachuOriginal,
+                    Num = 25,
+                    Name = "Pikachu-Original",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Original,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuHoenn] = new Species
+                {
+                    Id = SpecieId.PikachuHoenn,
+                    Num = 25,
+                    Name = "Pikachu-Hoenn",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Hoenn,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuSinnoh] = new Species
+                {
+                    Id = SpecieId.PikachuSinnoh,
+                    Num = 25,
+                    Name = "Pikachu-Sinnoh",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Sinnoh,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuUnova] = new Species
+                {
+                    Id = SpecieId.PikachuUnova,
+                    Num = 25,
+                    Name = "Pikachu-Unova",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Unova,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuKalos] = new Species
+                {
+                    Id = SpecieId.PikachuKalos,
+                    Num = 25,
+                    Name = "Pikachu-Kalos",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Kalos,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuAlola] = new Species
+                {
+                    Id = SpecieId.PikachuAlola,
+                    Num = 25,
+                    Name = "Pikachu-Alola",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Alola,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuPartner] = new Species
+                {
+                    Id = SpecieId.PikachuPartner,
+                    Num = 25,
+                    Name = "Pikachu-Partner",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Partner,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuStarter] = new Species
+                {
+                    Id = SpecieId.PikachuStarter,
+                    Num = 25,
+                    Name = "Pikachu-Starter",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Starter,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.Empty,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 45,
+                        Atk = 80,
+                        Def = 50,
+                        SpA = 75,
+                        SpD = 60,
+                        Spe = 120,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuGmax] = new Species
+                {
+                    Id = SpecieId.PikachuGmax,
+                    Num = 25,
+                    Name = "Pikachu-Gmax",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.Gmax,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.Empty,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 21,
+                    WeightKg = 0,
+                    Color = "Yellow",
+                },
+                [SpecieId.PikachuWorld] = new Species
+                {
+                    Id = SpecieId.PikachuWorld,
+                    Num = 25,
+                    Name = "Pikachu-World",
+                    BaseSpecies = SpecieId.Pikachu,
+                    Forme = FormeId.World,
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.M,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 35,
+                        Atk = 55,
+                        Def = 40,
+                        SpA = 50,
+                        SpD = 50,
+                        Spe = 90,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.4,
+                    WeightKg = 6,
+                    Color = "Yellow",
+                },
+                [SpecieId.Raichu] = new Species
+                {
+                    Id = SpecieId.Raichu,
+                    Num = 26,
+                    Name = "Raichu",
+                    Types = [PokemonType.Electric],
+                    Gender = GenderId.Empty,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 60,
+                        Atk = 90,
+                        Def = 55,
+                        SpA = 90,
+                        SpD = 80,
+                        Spe = 110,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.Static,
+                        Hidden = AbilityId.LightningRod,
+                    },
+                    HeightM = 0.8,
+                    WeightKg = 30,
+                    Color = "Yellow",
+                },
+                [SpecieId.RaichuAlola] = new Species
+                {
+                    Id = SpecieId.RaichuAlola,
+                    Num = 26,
+                    Name = "Raichu-Alola",
+                    BaseSpecies = SpecieId.Raichu,
+                    Forme = FormeId.Alola,
+                    Types = [PokemonType.Electric, PokemonType.Psychic],
+                    Gender = GenderId.Empty,
+                    BaseStats = new StatsTable
+                    {
+                        Hp = 60,
+                        Atk = 85,
+                        Def = 50,
+                        SpA = 95,
+                        SpD = 85,
+                        Spe = 110,
+                    },
+                    Abilities = new SpeciesAbility
+                    {
+                        Slot0 = AbilityId.SurgeSurfer,
+                    },
+                    HeightM = 0.7,
+                    WeightKg = 21,
+                    Color = "Brown",
+                },
+                [SpecieId.CalyrexIce] = new Species
             {
                 Id = SpecieId.CalyrexIce,
                 Num = 898,

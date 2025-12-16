@@ -66,9 +66,12 @@ public enum AbilityId
             TangledFeet,
             BigPecks,
             Hustle,
-            Intimidate,
-            NoGuard,
-            Gluttony,
+                Intimidate,
+                NoGuard,
+                Gluttony,
+                Static,
+                LightningRod,
+                SurgeSurfer,
 
-            None,
-        }
+                None,
+            }
