@@ -23,7 +23,10 @@ public enum FormeId
             Partner,
             Starter,
             World,
-            Galar,
-            Hisui,
-            None,
-        }
+                Galar,
+                Hisui,
+                PaldeaCombat,
+                PaldeaBlaze,
+                PaldeaAqua,
+                None,
+            }

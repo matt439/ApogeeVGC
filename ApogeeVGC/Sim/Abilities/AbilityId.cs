@@ -152,8 +152,11 @@ public enum AbilityId
                                         IronFist,
                                         Filter,
                                         LeafGuard,
-                                        ParentalBond,
-                                        ScreenCleaner,
+                                            ParentalBond,
+                                            ScreenCleaner,
+                                            Moxie,
+                                            Imposter,
+                                            CudChew,
 
-                                        None,
-                                    }
+                                            None,
+                                        }
