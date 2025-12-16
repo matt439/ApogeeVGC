@@ -247,6 +247,8 @@ public enum SpecieId
     Croconaw,
     Feraligatr,
     FeraligatrMega,
+    Sentret,
+    Furret,
 
     CalyrexIce,
     Miraidon,
