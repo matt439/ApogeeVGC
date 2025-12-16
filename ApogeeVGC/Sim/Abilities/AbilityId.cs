@@ -156,7 +156,12 @@ public enum AbilityId
                                             ScreenCleaner,
                                             Moxie,
                                             Imposter,
-                                            CudChew,
+                                                    CudChew,
+                                                    VoltAbsorb,
+                                                    Download,
+                                                    BattleArmor2,
+                                                    FlameBody2,
+                                                    Immunity,
 
-                                            None,
-                                        }
+                                                    None,
+                                                }
