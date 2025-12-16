@@ -147,6 +147,13 @@ public enum AbilityId
                                         Reckless,
                                         StormDrain,
                                         MistySurge,
+                                        SereneGrace,
+                                        Healer,
+                                        IronFist,
+                                        Filter,
+                                        LeafGuard,
+                                        ParentalBond,
+                                        ScreenCleaner,
 
                                         None,
                                     }
