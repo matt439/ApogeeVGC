@@ -1385,11 +1385,351 @@ public record SpeciesData
                     {
                         Slot0 = AbilityId.SurgeSurfer,
                     },
-                    HeightM = 0.7,
-                    WeightKg = 21,
-                    Color = "Brown",
-                },
-                [SpecieId.CalyrexIce] = new Species
+                        HeightM = 0.7,
+                        WeightKg = 21,
+                        Color = "Brown",
+                    },
+                    [SpecieId.Sandshrew] = new Species
+                    {
+                        Id = SpecieId.Sandshrew,
+                        Num = 27,
+                        Name = "Sandshrew",
+                        Types = [PokemonType.Ground],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 50,
+                            Atk = 75,
+                            Def = 85,
+                            SpA = 20,
+                            SpD = 30,
+                            Spe = 40,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.SandVeil,
+                            Hidden = AbilityId.SandRush,
+                        },
+                        HeightM = 0.6,
+                        WeightKg = 12,
+                        Color = "Yellow",
+                    },
+                    [SpecieId.SandshrewAlola] = new Species
+                    {
+                        Id = SpecieId.SandshrewAlola,
+                        Num = 27,
+                        Name = "Sandshrew-Alola",
+                        BaseSpecies = SpecieId.Sandshrew,
+                        Forme = FormeId.Alola,
+                        Types = [PokemonType.Ice, PokemonType.Steel],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 50,
+                            Atk = 75,
+                            Def = 90,
+                            SpA = 10,
+                            SpD = 35,
+                            Spe = 40,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.SnowCloak,
+                            Hidden = AbilityId.SlushRush,
+                        },
+                        HeightM = 0.7,
+                        WeightKg = 40,
+                        Color = "White",
+                    },
+                    [SpecieId.Sandslash] = new Species
+                    {
+                        Id = SpecieId.Sandslash,
+                        Num = 28,
+                        Name = "Sandslash",
+                        Types = [PokemonType.Ground],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 75,
+                            Atk = 100,
+                            Def = 110,
+                            SpA = 45,
+                            SpD = 55,
+                            Spe = 65,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.SandVeil,
+                            Hidden = AbilityId.SandRush,
+                        },
+                        HeightM = 1,
+                        WeightKg = 29.5,
+                        Color = "Yellow",
+                    },
+                    [SpecieId.SandslashAlola] = new Species
+                    {
+                        Id = SpecieId.SandslashAlola,
+                        Num = 28,
+                        Name = "Sandslash-Alola",
+                        BaseSpecies = SpecieId.Sandslash,
+                        Forme = FormeId.Alola,
+                        Types = [PokemonType.Ice, PokemonType.Steel],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 75,
+                            Atk = 100,
+                            Def = 120,
+                            SpA = 25,
+                            SpD = 65,
+                            Spe = 65,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.SnowCloak,
+                            Hidden = AbilityId.SlushRush,
+                        },
+                        HeightM = 1.2,
+                        WeightKg = 55,
+                        Color = "Blue",
+                    },
+                    [SpecieId.NidoranF] = new Species
+                    {
+                        Id = SpecieId.NidoranF,
+                        Num = 29,
+                        Name = "Nidoran-F",
+                        Types = [PokemonType.Poison],
+                        Gender = GenderId.F,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 55,
+                            Atk = 47,
+                            Def = 52,
+                            SpA = 40,
+                            SpD = 40,
+                            Spe = 41,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.Hustle,
+                        },
+                        HeightM = 0.4,
+                        WeightKg = 7,
+                        Color = "Blue",
+                    },
+                    [SpecieId.Nidorina] = new Species
+                    {
+                        Id = SpecieId.Nidorina,
+                        Num = 30,
+                        Name = "Nidorina",
+                        Types = [PokemonType.Poison],
+                        Gender = GenderId.F,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 70,
+                            Atk = 62,
+                            Def = 67,
+                            SpA = 55,
+                            SpD = 55,
+                            Spe = 56,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.Hustle,
+                        },
+                        HeightM = 0.8,
+                        WeightKg = 20,
+                        Color = "Blue",
+                    },
+                    [SpecieId.Nidoqueen] = new Species
+                    {
+                        Id = SpecieId.Nidoqueen,
+                        Num = 31,
+                        Name = "Nidoqueen",
+                        Types = [PokemonType.Poison, PokemonType.Ground],
+                        Gender = GenderId.F,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 90,
+                            Atk = 92,
+                            Def = 87,
+                            SpA = 75,
+                            SpD = 85,
+                            Spe = 76,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.SheerForce,
+                        },
+                        HeightM = 1.3,
+                        WeightKg = 60,
+                        Color = "Blue",
+                    },
+                    [SpecieId.NidoranM] = new Species
+                    {
+                        Id = SpecieId.NidoranM,
+                        Num = 32,
+                        Name = "Nidoran-M",
+                        Types = [PokemonType.Poison],
+                        Gender = GenderId.M,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 46,
+                            Atk = 57,
+                            Def = 40,
+                            SpA = 40,
+                            SpD = 40,
+                            Spe = 50,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.Hustle,
+                        },
+                        HeightM = 0.5,
+                        WeightKg = 9,
+                        Color = "Purple",
+                    },
+                    [SpecieId.Nidorino] = new Species
+                    {
+                        Id = SpecieId.Nidorino,
+                        Num = 33,
+                        Name = "Nidorino",
+                        Types = [PokemonType.Poison],
+                        Gender = GenderId.M,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 61,
+                            Atk = 72,
+                            Def = 57,
+                            SpA = 55,
+                            SpD = 55,
+                            Spe = 65,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.Hustle,
+                        },
+                        HeightM = 0.9,
+                        WeightKg = 19.5,
+                        Color = "Purple",
+                    },
+                    [SpecieId.Nidoking] = new Species
+                    {
+                        Id = SpecieId.Nidoking,
+                        Num = 34,
+                        Name = "Nidoking",
+                        Types = [PokemonType.Poison, PokemonType.Ground],
+                        Gender = GenderId.M,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 81,
+                            Atk = 102,
+                            Def = 77,
+                            SpA = 85,
+                            SpD = 75,
+                            Spe = 85,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.PoisonPoint,
+                            Slot1 = AbilityId.Rivalry,
+                            Hidden = AbilityId.SheerForce,
+                        },
+                        HeightM = 1.4,
+                        WeightKg = 62,
+                        Color = "Purple",
+                    },
+                    [SpecieId.Clefairy] = new Species
+                    {
+                        Id = SpecieId.Clefairy,
+                        Num = 35,
+                        Name = "Clefairy",
+                        Types = [PokemonType.Fairy],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 70,
+                            Atk = 45,
+                            Def = 48,
+                            SpA = 60,
+                            SpD = 65,
+                            Spe = 35,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.CuteCharm,
+                            Slot1 = AbilityId.MagicGuard,
+                            Hidden = AbilityId.FriendGuard,
+                        },
+                        HeightM = 0.6,
+                        WeightKg = 7.5,
+                        Color = "Pink",
+                    },
+                    [SpecieId.Clefable] = new Species
+                    {
+                        Id = SpecieId.Clefable,
+                        Num = 36,
+                        Name = "Clefable",
+                        Types = [PokemonType.Fairy],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 95,
+                            Atk = 70,
+                            Def = 73,
+                            SpA = 95,
+                            SpD = 90,
+                            Spe = 60,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.CuteCharm,
+                            Slot1 = AbilityId.MagicGuard,
+                            Hidden = AbilityId.Unaware,
+                        },
+                        HeightM = 1.3,
+                        WeightKg = 40,
+                        Color = "Pink",
+                    },
+                    [SpecieId.ClefableMega] = new Species
+                    {
+                        Id = SpecieId.ClefableMega,
+                        Num = 36,
+                        Name = "Clefable-Mega",
+                        BaseSpecies = SpecieId.Clefable,
+                        Forme = FormeId.Mega,
+                        Types = [PokemonType.Fairy, PokemonType.Flying],
+                        Gender = GenderId.Empty,
+                        BaseStats = new StatsTable
+                        {
+                            Hp = 95,
+                            Atk = 80,
+                            Def = 93,
+                            SpA = 135,
+                            SpD = 110,
+                            Spe = 70,
+                        },
+                        Abilities = new SpeciesAbility
+                        {
+                            Slot0 = AbilityId.CuteCharm,
+                            Slot1 = AbilityId.MagicGuard,
+                            Hidden = AbilityId.Unaware,
+                        },
+                        HeightM = 1.7,
+                        WeightKg = 42.3,
+                        Color = "Pink",
+                    },
+                    [SpecieId.CalyrexIce] = new Species
             {
                 Id = SpecieId.CalyrexIce,
                 Num = 898,
