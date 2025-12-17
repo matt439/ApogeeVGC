@@ -230,5 +230,11 @@ public enum AbilityId
                 // Added for Mesprit to Shaymin conversion
                 SlowStart,
 
+                // Added for Darumaka to Yamask conversion
+                ZenMode,
+                GorillaTactics,
+                Mummy,
+                WanderingSpirit,
+
                 None,
             }

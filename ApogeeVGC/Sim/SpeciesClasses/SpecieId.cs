@@ -760,6 +760,23 @@ public enum SpecieId
     Krokorok,
     Krookodile,
 
+    // Gen 5 (554-562)
+    Darumaka,
+    DarumakaGalar,
+    Darmanitan,
+    DarmanitanZen,
+    DarmanitanGalar,
+    DarmanitanGalarZen,
+    Maractus,
+    Dwebble,
+    Crustle,
+    Scraggy,
+    Scrafty,
+    ScraftyMega,
+    Sigilyph,
+    Yamask,
+    YamaskGalar,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

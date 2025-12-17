@@ -69,7 +69,12 @@ public enum FormeId
                     Steel,
                     Water,
 
-                    // Striped formes (Basculin)
-                    BlueStriped,
-                    WhiteStriped,
-                }
+                        // Striped formes (Basculin)
+                        BlueStriped,
+                        WhiteStriped,
+
+                        // Darmanitan formes
+                        Standard,
+                        Zen,
+                        GalarZen,
+                    }

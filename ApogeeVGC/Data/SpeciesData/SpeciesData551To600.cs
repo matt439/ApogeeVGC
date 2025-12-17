@@ -308,6 +308,402 @@ public partial record SpeciesData
                 Color = "Red",
                 Prevo = SpecieId.Krokorok,
             },
+            [SpecieId.Darumaka] = new()
+            {
+                Id = SpecieId.Darumaka,
+                Num = 554,
+                Name = "Darumaka",
+                Types = [PokemonType.Fire],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 90,
+                    Def = 45,
+                    SpA = 15,
+                    SpD = 45,
+                    Spe = 50,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Hustle,
+                    Hidden = AbilityId.InnerFocus,
+                },
+                HeightM = 0.6,
+                WeightKg = 37.5,
+                Color = "Red",
+            },
+            [SpecieId.DarumakaGalar] = new()
+            {
+                Id = SpecieId.DarumakaGalar,
+                Num = 554,
+                Name = "Darumaka-Galar",
+                Types = [PokemonType.Ice],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 90,
+                    Def = 45,
+                    SpA = 15,
+                    SpD = 45,
+                    Spe = 50,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Hustle,
+                    Hidden = AbilityId.InnerFocus,
+                },
+                HeightM = 0.7,
+                WeightKg = 40,
+                Color = "White",
+                BaseSpecies = SpecieId.Darumaka,
+                Forme = FormeId.Galar,
+            },
+            [SpecieId.Darmanitan] = new()
+            {
+                Id = SpecieId.Darmanitan,
+                Num = 555,
+                Name = "Darmanitan",
+                Types = [PokemonType.Fire],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 105,
+                    Atk = 140,
+                    Def = 55,
+                    SpA = 30,
+                    SpD = 55,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SheerForce,
+                    Hidden = AbilityId.ZenMode,
+                },
+                HeightM = 1.3,
+                WeightKg = 92.9,
+                Color = "Red",
+                Prevo = SpecieId.Darumaka,
+            },
+            [SpecieId.DarmanitanZen] = new()
+            {
+                Id = SpecieId.DarmanitanZen,
+                Num = 555,
+                Name = "Darmanitan-Zen",
+                Types = [PokemonType.Fire, PokemonType.Psychic],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 105,
+                    Atk = 30,
+                    Def = 105,
+                    SpA = 140,
+                    SpD = 105,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ZenMode,
+                },
+                HeightM = 1.3,
+                WeightKg = 92.9,
+                Color = "Blue",
+                BaseSpecies = SpecieId.Darmanitan,
+                Forme = FormeId.Zen,
+                ChangesFrom = FormeId.Standard,
+            },
+            [SpecieId.DarmanitanGalar] = new()
+            {
+                Id = SpecieId.DarmanitanGalar,
+                Num = 555,
+                Name = "Darmanitan-Galar",
+                Types = [PokemonType.Ice],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 105,
+                    Atk = 140,
+                    Def = 55,
+                    SpA = 30,
+                    SpD = 55,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.GorillaTactics,
+                    Hidden = AbilityId.ZenMode,
+                },
+                HeightM = 1.7,
+                WeightKg = 120,
+                Color = "White",
+                BaseSpecies = SpecieId.Darmanitan,
+                Forme = FormeId.Galar,
+                Prevo = SpecieId.DarumakaGalar,
+            },
+            [SpecieId.DarmanitanGalarZen] = new()
+            {
+                Id = SpecieId.DarmanitanGalarZen,
+                Num = 555,
+                Name = "Darmanitan-Galar-Zen",
+                Types = [PokemonType.Ice, PokemonType.Fire],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 105,
+                    Atk = 160,
+                    Def = 55,
+                    SpA = 30,
+                    SpD = 55,
+                    Spe = 135,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ZenMode,
+                },
+                HeightM = 1.7,
+                WeightKg = 120,
+                Color = "White",
+                BaseSpecies = SpecieId.Darmanitan,
+                Forme = FormeId.GalarZen,
+                ChangesFrom = FormeId.Galar,
+            },
+            [SpecieId.Maractus] = new()
+            {
+                Id = SpecieId.Maractus,
+                Num = 556,
+                Name = "Maractus",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 86,
+                    Def = 67,
+                    SpA = 106,
+                    SpD = 67,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.WaterAbsorb,
+                    Slot1 = AbilityId.Chlorophyll,
+                    Hidden = AbilityId.StormDrain,
+                },
+                HeightM = 1,
+                WeightKg = 28,
+                Color = "Green",
+            },
+            [SpecieId.Dwebble] = new()
+            {
+                Id = SpecieId.Dwebble,
+                Num = 557,
+                Name = "Dwebble",
+                Types = [PokemonType.Bug, PokemonType.Rock],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 85,
+                    SpA = 35,
+                    SpD = 35,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Sturdy,
+                    Slot1 = AbilityId.ShellArmor,
+                    Hidden = AbilityId.WeakArmor,
+                },
+                HeightM = 0.3,
+                WeightKg = 14.5,
+                Color = "Red",
+            },
+            [SpecieId.Crustle] = new()
+            {
+                Id = SpecieId.Crustle,
+                Num = 558,
+                Name = "Crustle",
+                Types = [PokemonType.Bug, PokemonType.Rock],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 105,
+                    Def = 125,
+                    SpA = 65,
+                    SpD = 75,
+                    Spe = 45,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Sturdy,
+                    Slot1 = AbilityId.ShellArmor,
+                    Hidden = AbilityId.WeakArmor,
+                },
+                HeightM = 1.4,
+                WeightKg = 200,
+                Color = "Red",
+                Prevo = SpecieId.Dwebble,
+            },
+            [SpecieId.Scraggy] = new()
+            {
+                Id = SpecieId.Scraggy,
+                Num = 559,
+                Name = "Scraggy",
+                Types = [PokemonType.Dark, PokemonType.Fighting],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 75,
+                    Def = 70,
+                    SpA = 35,
+                    SpD = 70,
+                    Spe = 48,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ShedSkin,
+                    Slot1 = AbilityId.Moxie,
+                    Hidden = AbilityId.Intimidate,
+                },
+                HeightM = 0.6,
+                WeightKg = 11.8,
+                Color = "Yellow",
+            },
+            [SpecieId.Scrafty] = new()
+            {
+                Id = SpecieId.Scrafty,
+                Num = 560,
+                Name = "Scrafty",
+                Types = [PokemonType.Dark, PokemonType.Fighting],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 65,
+                    Atk = 90,
+                    Def = 115,
+                    SpA = 45,
+                    SpD = 115,
+                    Spe = 58,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ShedSkin,
+                    Slot1 = AbilityId.Moxie,
+                    Hidden = AbilityId.Intimidate,
+                },
+                HeightM = 1.1,
+                WeightKg = 30,
+                Color = "Red",
+                Prevo = SpecieId.Scraggy,
+            },
+            [SpecieId.ScraftyMega] = new()
+            {
+                Id = SpecieId.ScraftyMega,
+                Num = 560,
+                Name = "Scrafty-Mega",
+                Types = [PokemonType.Dark, PokemonType.Fighting],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 65,
+                    Atk = 130,
+                    Def = 135,
+                    SpA = 55,
+                    SpD = 135,
+                    Spe = 68,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ShedSkin,
+                    Slot1 = AbilityId.Moxie,
+                    Hidden = AbilityId.Intimidate,
+                },
+                HeightM = 1.1,
+                WeightKg = 31,
+                Color = "Red",
+                BaseSpecies = SpecieId.Scrafty,
+                Forme = FormeId.Mega,
+            },
+            [SpecieId.Sigilyph] = new()
+            {
+                Id = SpecieId.Sigilyph,
+                Num = 561,
+                Name = "Sigilyph",
+                Types = [PokemonType.Psychic, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 72,
+                    Atk = 58,
+                    Def = 80,
+                    SpA = 103,
+                    SpD = 80,
+                    Spe = 97,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.WonderSkin,
+                    Slot1 = AbilityId.MagicGuard,
+                    Hidden = AbilityId.TintedLens,
+                },
+                HeightM = 1.4,
+                WeightKg = 14,
+                Color = "Black",
+            },
+            [SpecieId.Yamask] = new()
+            {
+                Id = SpecieId.Yamask,
+                Num = 562,
+                Name = "Yamask",
+                Types = [PokemonType.Ghost],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 38,
+                    Atk = 30,
+                    Def = 85,
+                    SpA = 55,
+                    SpD = 65,
+                    Spe = 30,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Mummy,
+                },
+                HeightM = 0.5,
+                WeightKg = 1.5,
+                Color = "Black",
+            },
+            [SpecieId.YamaskGalar] = new()
+            {
+                Id = SpecieId.YamaskGalar,
+                Num = 562,
+                Name = "Yamask-Galar",
+                Types = [PokemonType.Ground, PokemonType.Ghost],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 38,
+                    Atk = 55,
+                    Def = 85,
+                    SpA = 30,
+                    SpD = 65,
+                    Spe = 30,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.WanderingSpirit,
+                },
+                HeightM = 0.5,
+                WeightKg = 1.5,
+                Color = "Black",
+                BaseSpecies = SpecieId.Yamask,
+                Forme = FormeId.Galar,
+            },
         };
     }
 }
