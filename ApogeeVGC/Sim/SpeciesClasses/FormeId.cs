@@ -40,5 +40,10 @@ public enum FormeId
     Sandy,
     Trash,
     Sunshine,
+    Heat,
+    Wash,
+    Frost,
+    Fan,
+    Mow,
     None,
 }

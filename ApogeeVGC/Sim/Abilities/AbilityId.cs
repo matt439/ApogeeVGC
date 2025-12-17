@@ -224,5 +224,8 @@ public enum AbilityId
                 // Added for Magnezone to Gliscor conversion
                 MotorDrive,
 
+                // Added for Mamoswine to Uxie conversion
+                Sharpness,
+
                 None,
             }

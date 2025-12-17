@@ -616,6 +616,397 @@ public partial record SpeciesData
                 Color = "Purple",
                 Prevo = SpecieId.Gligar,
             },
+            [SpecieId.Mamoswine] = new()
+            {
+                Id = SpecieId.Mamoswine,
+                Num = 473,
+                Name = "Mamoswine",
+                Types = [PokemonType.Ice, PokemonType.Ground],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 110,
+                    Atk = 130,
+                    Def = 80,
+                    SpA = 70,
+                    SpD = 60,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Oblivious,
+                    Slot1 = AbilityId.SnowCloak,
+                    Hidden = AbilityId.ThickFat,
+                },
+                HeightM = 2.5,
+                WeightKg = 291,
+                Color = "Brown",
+                Prevo = SpecieId.Piloswine,
+            },
+            [SpecieId.PorygonZ] = new()
+            {
+                Id = SpecieId.PorygonZ,
+                Num = 474,
+                Name = "Porygon-Z",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 85,
+                    Atk = 80,
+                    Def = 70,
+                    SpA = 135,
+                    SpD = 75,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Adaptability,
+                    Slot1 = AbilityId.Download,
+                    Hidden = AbilityId.Analytic,
+                },
+                HeightM = 0.9,
+                WeightKg = 34,
+                Color = "Red",
+                Prevo = SpecieId.Porygon2,
+            },
+            [SpecieId.Gallade] = new()
+            {
+                Id = SpecieId.Gallade,
+                Num = 475,
+                Name = "Gallade",
+                Types = [PokemonType.Psychic, PokemonType.Fighting],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 68,
+                    Atk = 125,
+                    Def = 65,
+                    SpA = 65,
+                    SpD = 115,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Steadfast,
+                    Slot1 = AbilityId.Sharpness,
+                    Hidden = AbilityId.Justified,
+                },
+                HeightM = 1.6,
+                WeightKg = 52,
+                Color = "White",
+                Prevo = SpecieId.Kirlia,
+            },
+            [SpecieId.GalladeMega] = new()
+            {
+                Id = SpecieId.GalladeMega,
+                Num = 475,
+                Name = "Gallade-Mega",
+                Types = [PokemonType.Psychic, PokemonType.Fighting],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 68,
+                    Atk = 165,
+                    Def = 95,
+                    SpA = 65,
+                    SpD = 115,
+                    Spe = 110,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.InnerFocus,
+                },
+                HeightM = 1.6,
+                WeightKg = 56.4,
+                Color = "White",
+                BaseSpecies = SpecieId.Gallade,
+                Forme = FormeId.Mega,
+            },
+            [SpecieId.Probopass] = new()
+            {
+                Id = SpecieId.Probopass,
+                Num = 476,
+                Name = "Probopass",
+                Types = [PokemonType.Rock, PokemonType.Steel],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 55,
+                    Def = 145,
+                    SpA = 75,
+                    SpD = 150,
+                    Spe = 40,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Sturdy,
+                    Slot1 = AbilityId.MagnetPull,
+                    Hidden = AbilityId.SandForce,
+                },
+                HeightM = 1.4,
+                WeightKg = 340,
+                Color = "Gray",
+                Prevo = SpecieId.Nosepass,
+            },
+            [SpecieId.Dusknoir] = new()
+            {
+                Id = SpecieId.Dusknoir,
+                Num = 477,
+                Name = "Dusknoir",
+                Types = [PokemonType.Ghost],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 45,
+                    Atk = 100,
+                    Def = 135,
+                    SpA = 65,
+                    SpD = 135,
+                    Spe = 45,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Frisk,
+                },
+                HeightM = 2.2,
+                WeightKg = 106.6,
+                Color = "Black",
+                Prevo = SpecieId.Dusclops,
+            },
+            [SpecieId.Froslass] = new()
+            {
+                Id = SpecieId.Froslass,
+                Num = 478,
+                Name = "Froslass",
+                Types = [PokemonType.Ice, PokemonType.Ghost],
+                Gender = GenderId.F,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 80,
+                    Def = 70,
+                    SpA = 80,
+                    SpD = 70,
+                    Spe = 110,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SnowCloak,
+                    Hidden = AbilityId.CursedBody,
+                },
+                HeightM = 1.3,
+                WeightKg = 26.6,
+                Color = "White",
+                Prevo = SpecieId.Snorunt,
+            },
+            [SpecieId.FroslassMega] = new()
+            {
+                Id = SpecieId.FroslassMega,
+                Num = 478,
+                Name = "Froslass-Mega",
+                Types = [PokemonType.Ice, PokemonType.Ghost],
+                Gender = GenderId.F,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 80,
+                    Def = 70,
+                    SpA = 140,
+                    SpD = 100,
+                    Spe = 120,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SnowCloak,
+                    Hidden = AbilityId.CursedBody,
+                },
+                HeightM = 2.6,
+                WeightKg = 29.6,
+                Color = "White",
+                BaseSpecies = SpecieId.Froslass,
+                Forme = FormeId.Mega,
+            },
+            [SpecieId.Rotom] = new()
+            {
+                Id = SpecieId.Rotom,
+                Num = 479,
+                Name = "Rotom",
+                Types = [PokemonType.Electric, PokemonType.Ghost],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 50,
+                    Def = 77,
+                    SpA = 95,
+                    SpD = 77,
+                    Spe = 91,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+            },
+            [SpecieId.RotomHeat] = new()
+            {
+                Id = SpecieId.RotomHeat,
+                Num = 479,
+                Name = "Rotom-Heat",
+                Types = [PokemonType.Electric, PokemonType.Fire],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 107,
+                    SpA = 105,
+                    SpD = 107,
+                    Spe = 86,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+                BaseSpecies = SpecieId.Rotom,
+                Forme = FormeId.Heat,
+            },
+            [SpecieId.RotomWash] = new()
+            {
+                Id = SpecieId.RotomWash,
+                Num = 479,
+                Name = "Rotom-Wash",
+                Types = [PokemonType.Electric, PokemonType.Water],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 107,
+                    SpA = 105,
+                    SpD = 107,
+                    Spe = 86,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+                BaseSpecies = SpecieId.Rotom,
+                Forme = FormeId.Wash,
+            },
+            [SpecieId.RotomFrost] = new()
+            {
+                Id = SpecieId.RotomFrost,
+                Num = 479,
+                Name = "Rotom-Frost",
+                Types = [PokemonType.Electric, PokemonType.Ice],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 107,
+                    SpA = 105,
+                    SpD = 107,
+                    Spe = 86,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+                BaseSpecies = SpecieId.Rotom,
+                Forme = FormeId.Frost,
+            },
+            [SpecieId.RotomFan] = new()
+            {
+                Id = SpecieId.RotomFan,
+                Num = 479,
+                Name = "Rotom-Fan",
+                Types = [PokemonType.Electric, PokemonType.Flying],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 107,
+                    SpA = 105,
+                    SpD = 107,
+                    Spe = 86,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+                BaseSpecies = SpecieId.Rotom,
+                Forme = FormeId.Fan,
+            },
+            [SpecieId.RotomMow] = new()
+            {
+                Id = SpecieId.RotomMow,
+                Num = 479,
+                Name = "Rotom-Mow",
+                Types = [PokemonType.Electric, PokemonType.Grass],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 65,
+                    Def = 107,
+                    SpA = 105,
+                    SpD = 107,
+                    Spe = 86,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Red",
+                BaseSpecies = SpecieId.Rotom,
+                Forme = FormeId.Mow,
+            },
+            [SpecieId.Uxie] = new()
+            {
+                Id = SpecieId.Uxie,
+                Num = 480,
+                Name = "Uxie",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 75,
+                    Def = 130,
+                    SpA = 75,
+                    SpD = 130,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Yellow",
+            },
         };
     }
 }
