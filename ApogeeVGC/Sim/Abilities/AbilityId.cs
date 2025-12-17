@@ -221,5 +221,8 @@ public enum AbilityId
                 // Added for Buneary to Garchomp-Mega conversion
                 Heatproof,
 
+                // Added for Magnezone to Gliscor conversion
+                MotorDrive,
+
                 None,
             }

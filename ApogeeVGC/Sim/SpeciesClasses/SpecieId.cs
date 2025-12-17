@@ -614,6 +614,19 @@ public enum SpecieId
     AbomasnowMega,
     Weavile,
 
+    // Gen 4 (462-472)
+    Magnezone,
+    Lickilicky,
+    Rhyperior,
+    Tangrowth,
+    Electivire,
+    Magmortar,
+    Togekiss,
+    Yanmega,
+    Leafeon,
+    Glaceon,
+    Gliscor,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

@@ -323,6 +323,299 @@ public partial record SpeciesData
                 Color = "Black",
                 Prevo = SpecieId.Sneasel,
             },
+            [SpecieId.Magnezone] = new()
+            {
+                Id = SpecieId.Magnezone,
+                Num = 462,
+                Name = "Magnezone",
+                Types = [PokemonType.Electric, PokemonType.Steel],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 70,
+                    Def = 115,
+                    SpA = 130,
+                    SpD = 90,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.MagnetPull,
+                    Slot1 = AbilityId.Sturdy,
+                    Hidden = AbilityId.Analytic,
+                },
+                HeightM = 1.2,
+                WeightKg = 180,
+                Color = "Gray",
+                Prevo = SpecieId.Magneton,
+            },
+            [SpecieId.Lickilicky] = new()
+            {
+                Id = SpecieId.Lickilicky,
+                Num = 463,
+                Name = "Lickilicky",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 110,
+                    Atk = 85,
+                    Def = 95,
+                    SpA = 80,
+                    SpD = 95,
+                    Spe = 50,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.OwnTempo,
+                    Slot1 = AbilityId.Oblivious,
+                    Hidden = AbilityId.CloudNine,
+                },
+                HeightM = 1.7,
+                WeightKg = 140,
+                Color = "Pink",
+                Prevo = SpecieId.Lickitung,
+            },
+            [SpecieId.Rhyperior] = new()
+            {
+                Id = SpecieId.Rhyperior,
+                Num = 464,
+                Name = "Rhyperior",
+                Types = [PokemonType.Ground, PokemonType.Rock],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 115,
+                    Atk = 140,
+                    Def = 130,
+                    SpA = 55,
+                    SpD = 55,
+                    Spe = 40,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.LightningRod,
+                    Slot1 = AbilityId.SolidRock,
+                    Hidden = AbilityId.Reckless,
+                },
+                HeightM = 2.4,
+                WeightKg = 282.8,
+                Color = "Gray",
+                Prevo = SpecieId.Rhydon,
+            },
+            [SpecieId.Tangrowth] = new()
+            {
+                Id = SpecieId.Tangrowth,
+                Num = 465,
+                Name = "Tangrowth",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 100,
+                    Def = 125,
+                    SpA = 110,
+                    SpD = 50,
+                    Spe = 50,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Chlorophyll,
+                    Slot1 = AbilityId.LeafGuard,
+                    Hidden = AbilityId.Regenerator,
+                },
+                HeightM = 2,
+                WeightKg = 128.6,
+                Color = "Blue",
+                Prevo = SpecieId.Tangela,
+            },
+            [SpecieId.Electivire] = new()
+            {
+                Id = SpecieId.Electivire,
+                Num = 466,
+                Name = "Electivire",
+                Types = [PokemonType.Electric],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 123,
+                    Def = 67,
+                    SpA = 95,
+                    SpD = 85,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.MotorDrive,
+                    Hidden = AbilityId.VitalSpirit,
+                },
+                HeightM = 1.8,
+                WeightKg = 138.6,
+                Color = "Yellow",
+                Prevo = SpecieId.Electabuzz,
+            },
+            [SpecieId.Magmortar] = new()
+            {
+                Id = SpecieId.Magmortar,
+                Num = 467,
+                Name = "Magmortar",
+                Types = [PokemonType.Fire],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 95,
+                    Def = 67,
+                    SpA = 125,
+                    SpD = 95,
+                    Spe = 83,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.FlameBody,
+                    Hidden = AbilityId.VitalSpirit,
+                },
+                HeightM = 1.6,
+                WeightKg = 68,
+                Color = "Red",
+                Prevo = SpecieId.Magmar,
+            },
+            [SpecieId.Togekiss] = new()
+            {
+                Id = SpecieId.Togekiss,
+                Num = 468,
+                Name = "Togekiss",
+                Types = [PokemonType.Fairy, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 85,
+                    Atk = 50,
+                    Def = 95,
+                    SpA = 120,
+                    SpD = 115,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Hustle,
+                    Slot1 = AbilityId.SereneGrace,
+                    Hidden = AbilityId.SuperLuck,
+                },
+                HeightM = 1.5,
+                WeightKg = 38,
+                Color = "White",
+                Prevo = SpecieId.Togetic,
+            },
+            [SpecieId.Yanmega] = new()
+            {
+                Id = SpecieId.Yanmega,
+                Num = 469,
+                Name = "Yanmega",
+                Types = [PokemonType.Bug, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 86,
+                    Atk = 76,
+                    Def = 86,
+                    SpA = 116,
+                    SpD = 56,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SpeedBoost,
+                    Slot1 = AbilityId.TintedLens,
+                    Hidden = AbilityId.Frisk,
+                },
+                HeightM = 1.9,
+                WeightKg = 51.5,
+                Color = "Green",
+                Prevo = SpecieId.Yanma,
+            },
+            [SpecieId.Leafeon] = new()
+            {
+                Id = SpecieId.Leafeon,
+                Num = 470,
+                Name = "Leafeon",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 65,
+                    Atk = 110,
+                    Def = 130,
+                    SpA = 60,
+                    SpD = 65,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.LeafGuard,
+                    Hidden = AbilityId.Chlorophyll,
+                },
+                HeightM = 1,
+                WeightKg = 25.5,
+                Color = "Green",
+                Prevo = SpecieId.Eevee,
+            },
+            [SpecieId.Glaceon] = new()
+            {
+                Id = SpecieId.Glaceon,
+                Num = 471,
+                Name = "Glaceon",
+                Types = [PokemonType.Ice],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 65,
+                    Atk = 60,
+                    Def = 110,
+                    SpA = 130,
+                    SpD = 95,
+                    Spe = 65,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SnowCloak,
+                    Hidden = AbilityId.IceBody,
+                },
+                HeightM = 0.8,
+                WeightKg = 25.9,
+                Color = "Blue",
+                Prevo = SpecieId.Eevee,
+            },
+            [SpecieId.Gliscor] = new()
+            {
+                Id = SpecieId.Gliscor,
+                Num = 472,
+                Name = "Gliscor",
+                Types = [PokemonType.Ground, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 95,
+                    Def = 125,
+                    SpA = 45,
+                    SpD = 75,
+                    Spe = 95,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.HyperCutter,
+                    Slot1 = AbilityId.SandVeil,
+                    Hidden = AbilityId.PoisonHeal,
+                },
+                HeightM = 2,
+                WeightKg = 42.5,
+                Color = "Purple",
+                Prevo = SpecieId.Gligar,
+            },
         };
     }
 }
