@@ -602,6 +602,17 @@ public enum SpecieId
     Hippowdon,
     Skorupi,
     Drapion,
+    // Gen 4 (453-461)
+    Croagunk,
+    Toxicroak,
+    Carnivine,
+    Finneon,
+    Lumineon,
+    Mantyke,
+    Snover,
+    Abomasnow,
+    AbomasnowMega,
+    Weavile,
 
     CalyrexIce,
     Miraidon,
