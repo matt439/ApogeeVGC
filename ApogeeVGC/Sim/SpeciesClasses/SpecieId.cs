@@ -870,6 +870,15 @@ public enum SpecieId
     Hydreigon,
     Larvesta,
 
+    // Gen 5 (638-642) - Swords of Justice and Forces of Nature
+    Cobalion,
+    Terrakion,
+    Virizion,
+    Tornadus,
+    TornadusTherian,
+    Thundurus,
+    ThundurusTherian,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

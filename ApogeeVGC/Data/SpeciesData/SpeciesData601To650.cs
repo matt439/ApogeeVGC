@@ -1058,32 +1058,208 @@ public partial record SpeciesData
                     WeightKg = 28.8,
                     Color = "White",
                 },
-                            [SpecieId.Volcarona] = new()
-                            {
-                                Id = SpecieId.Volcarona,
-                                Num = 637,
-                                Name = "Volcarona",
-                                Types = [PokemonType.Bug, PokemonType.Fire],
-                                Gender = GenderId.Empty,
-                                BaseStats = new StatsTable
-                                {
-                                    Hp = 85,
-                                    Atk = 60,
-                                    Def = 65,
-                                    SpA = 135,
-                                    SpD = 105,
-                                    Spe = 100,
-                                },
-                                Abilities = new SpeciesAbility
-                                {
-                                    Slot0 = AbilityId.FlameBody,
-                                    Hidden = AbilityId.Swarm,
-                                },
-                                HeightM = 1.6,
-                                WeightKg = 46,
-                                Color = "White",
-                                Prevo = SpecieId.Larvesta,
-                            },
-                        };
-                    }
-                }
+            [SpecieId.Volcarona] = new()
+            {
+                Id = SpecieId.Volcarona,
+                Num = 637,
+                Name = "Volcarona",
+                Types = [PokemonType.Bug, PokemonType.Fire],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 85,
+                    Atk = 60,
+                    Def = 65,
+                    SpA = 135,
+                    SpD = 105,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.FlameBody,
+                    Hidden = AbilityId.Swarm,
+                },
+                HeightM = 1.6,
+                WeightKg = 46,
+                Color = "White",
+                Prevo = SpecieId.Larvesta,
+            },
+            [SpecieId.Cobalion] = new()
+            {
+                Id = SpecieId.Cobalion,
+                Num = 638,
+                Name = "Cobalion",
+                Types = [PokemonType.Steel, PokemonType.Fighting],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 91,
+                    Atk = 90,
+                    Def = 129,
+                    SpA = 90,
+                    SpD = 72,
+                    Spe = 108,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Justified,
+                },
+                HeightM = 2.1,
+                WeightKg = 250,
+                Color = "Blue",
+            },
+            [SpecieId.Terrakion] = new()
+            {
+                Id = SpecieId.Terrakion,
+                Num = 639,
+                Name = "Terrakion",
+                Types = [PokemonType.Rock, PokemonType.Fighting],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 91,
+                    Atk = 129,
+                    Def = 90,
+                    SpA = 72,
+                    SpD = 90,
+                    Spe = 108,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Justified,
+                },
+                HeightM = 1.9,
+                WeightKg = 260,
+                Color = "Gray",
+            },
+            [SpecieId.Virizion] = new()
+            {
+                Id = SpecieId.Virizion,
+                Num = 640,
+                Name = "Virizion",
+                Types = [PokemonType.Grass, PokemonType.Fighting],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 91,
+                    Atk = 90,
+                    Def = 72,
+                    SpA = 90,
+                    SpD = 129,
+                    Spe = 108,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Justified,
+                },
+                HeightM = 2,
+                WeightKg = 200,
+                Color = "Green",
+            },
+            [SpecieId.Tornadus] = new()
+            {
+                Id = SpecieId.Tornadus,
+                Num = 641,
+                Name = "Tornadus",
+                BaseForme = FormeId.Incarnate,
+                Types = [PokemonType.Flying],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 79,
+                    Atk = 115,
+                    Def = 70,
+                    SpA = 125,
+                    SpD = 80,
+                    Spe = 111,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Prankster,
+                    Hidden = AbilityId.Defiant,
+                },
+                HeightM = 1.5,
+                WeightKg = 63,
+                Color = "Green",
+            },
+            [SpecieId.TornadusTherian] = new()
+            {
+                Id = SpecieId.TornadusTherian,
+                Num = 641,
+                Name = "Tornadus-Therian",
+                BaseSpecies = SpecieId.Tornadus,
+                Forme = FormeId.Therian,
+                Types = [PokemonType.Flying],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 79,
+                    Atk = 100,
+                    Def = 80,
+                    SpA = 110,
+                    SpD = 90,
+                    Spe = 121,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Regenerator,
+                },
+                HeightM = 1.4,
+                WeightKg = 63,
+                Color = "Green",
+            },
+            [SpecieId.Thundurus] = new()
+            {
+                Id = SpecieId.Thundurus,
+                Num = 642,
+                Name = "Thundurus",
+                BaseForme = FormeId.Incarnate,
+                Types = [PokemonType.Electric, PokemonType.Flying],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 79,
+                    Atk = 115,
+                    Def = 70,
+                    SpA = 125,
+                    SpD = 80,
+                    Spe = 111,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Prankster,
+                    Hidden = AbilityId.Defiant,
+                },
+                HeightM = 1.5,
+                WeightKg = 61,
+                Color = "Blue",
+            },
+            [SpecieId.ThundurusTherian] = new()
+            {
+                Id = SpecieId.ThundurusTherian,
+                Num = 642,
+                Name = "Thundurus-Therian",
+                BaseSpecies = SpecieId.Thundurus,
+                Forme = FormeId.Therian,
+                Types = [PokemonType.Electric, PokemonType.Flying],
+                Gender = GenderId.M,
+                BaseStats = new StatsTable
+                {
+                    Hp = 79,
+                    Atk = 105,
+                    Def = 70,
+                    SpA = 145,
+                    SpD = 80,
+                    Spe = 101,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.VoltAbsorb,
+                },
+                HeightM = 3,
+                WeightKg = 61,
+                Color = "Blue",
+            },
+        };
+    }
+}

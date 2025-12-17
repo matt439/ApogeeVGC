@@ -77,4 +77,8 @@ public enum FormeId
                         Standard,
                         Zen,
                         GalarZen,
+
+                        // Forces of Nature formes
+                        Incarnate,
+                        Therian,
                     }
