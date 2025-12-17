@@ -600,6 +600,8 @@ public enum SpecieId
     LucarioMega,
     Hippopotas,
     Hippowdon,
+    Skorupi,
+    Drapion,
 
     CalyrexIce,
     Miraidon,
