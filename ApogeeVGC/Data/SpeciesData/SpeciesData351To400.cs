@@ -1334,32 +1334,393 @@ public partial record SpeciesData
                             WeightKg = 60.8,
                             Color = "Red",
                         },
-                        [SpecieId.DeoxysSpeed] = new()
-                        {
-                            Id = SpecieId.DeoxysSpeed,
-                            Num = 386,
-                            Name = "Deoxys-Speed",
-                            BaseSpecies = SpecieId.Deoxys,
-                            Forme = FormeId.Speed,
-                            Types = [PokemonType.Psychic],
-                            Gender = GenderId.N,
-                            BaseStats = new StatsTable
-                            {
-                                Hp = 50,
-                                Atk = 95,
-                                Def = 90,
-                                SpA = 95,
-                                SpD = 90,
-                                Spe = 180,
-                            },
-                            Abilities = new SpeciesAbility
-                            {
-                                Slot0 = AbilityId.Pressure,
-                            },
-                            HeightM = 1.7,
-                            WeightKg = 60.8,
-                            Color = "Red",
-                        },
-                    };
-                }
-            }
+                                    [SpecieId.DeoxysSpeed] = new()
+                                    {
+                                        Id = SpecieId.DeoxysSpeed,
+                                        Num = 386,
+                                        Name = "Deoxys-Speed",
+                                        BaseSpecies = SpecieId.Deoxys,
+                                        Forme = FormeId.Speed,
+                                        Types = [PokemonType.Psychic],
+                                        Gender = GenderId.N,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 50,
+                                            Atk = 95,
+                                            Def = 90,
+                                            SpA = 95,
+                                            SpD = 90,
+                                            Spe = 180,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Pressure,
+                                        },
+                                        HeightM = 1.7,
+                                        WeightKg = 60.8,
+                                        Color = "Red",
+                                    },
+                                    [SpecieId.Turtwig] = new()
+                                    {
+                                        Id = SpecieId.Turtwig,
+                                        Num = 387,
+                                        Name = "Turtwig",
+                                        Types = [PokemonType.Grass],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 55,
+                                            Atk = 68,
+                                            Def = 64,
+                                            SpA = 45,
+                                            SpD = 55,
+                                            Spe = 31,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Overgrow,
+                                            Hidden = AbilityId.ShellArmor,
+                                        },
+                                        HeightM = 0.4,
+                                        WeightKg = 10.2,
+                                        Color = "Green",
+                                    },
+                                    [SpecieId.Grotle] = new()
+                                    {
+                                        Id = SpecieId.Grotle,
+                                        Num = 388,
+                                        Name = "Grotle",
+                                        Types = [PokemonType.Grass],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 75,
+                                            Atk = 89,
+                                            Def = 85,
+                                            SpA = 55,
+                                            SpD = 65,
+                                            Spe = 36,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Overgrow,
+                                            Hidden = AbilityId.ShellArmor,
+                                        },
+                                        HeightM = 1.1,
+                                        WeightKg = 97,
+                                        Color = "Green",
+                                        Prevo = SpecieId.Turtwig,
+                                    },
+                                    [SpecieId.Torterra] = new()
+                                    {
+                                        Id = SpecieId.Torterra,
+                                        Num = 389,
+                                        Name = "Torterra",
+                                        Types = [PokemonType.Grass, PokemonType.Ground],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 95,
+                                            Atk = 109,
+                                            Def = 105,
+                                            SpA = 75,
+                                            SpD = 85,
+                                            Spe = 56,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Overgrow,
+                                            Hidden = AbilityId.ShellArmor,
+                                        },
+                                        HeightM = 2.2,
+                                        WeightKg = 310,
+                                        Color = "Green",
+                                        Prevo = SpecieId.Grotle,
+                                    },
+                                    [SpecieId.Chimchar] = new()
+                                    {
+                                        Id = SpecieId.Chimchar,
+                                        Num = 390,
+                                        Name = "Chimchar",
+                                        Types = [PokemonType.Fire],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 44,
+                                            Atk = 58,
+                                            Def = 44,
+                                            SpA = 58,
+                                            SpD = 44,
+                                            Spe = 61,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Blaze,
+                                            Hidden = AbilityId.IronFist,
+                                        },
+                                        HeightM = 0.5,
+                                        WeightKg = 6.2,
+                                        Color = "Brown",
+                                    },
+                                    [SpecieId.Monferno] = new()
+                                    {
+                                        Id = SpecieId.Monferno,
+                                        Num = 391,
+                                        Name = "Monferno",
+                                        Types = [PokemonType.Fire, PokemonType.Fighting],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 64,
+                                            Atk = 78,
+                                            Def = 52,
+                                            SpA = 78,
+                                            SpD = 52,
+                                            Spe = 81,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Blaze,
+                                            Hidden = AbilityId.IronFist,
+                                        },
+                                        HeightM = 0.9,
+                                        WeightKg = 22,
+                                        Color = "Brown",
+                                        Prevo = SpecieId.Chimchar,
+                                    },
+                                    [SpecieId.Infernape] = new()
+                                    {
+                                        Id = SpecieId.Infernape,
+                                        Num = 392,
+                                        Name = "Infernape",
+                                        Types = [PokemonType.Fire, PokemonType.Fighting],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 76,
+                                            Atk = 104,
+                                            Def = 71,
+                                            SpA = 104,
+                                            SpD = 71,
+                                            Spe = 108,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Blaze,
+                                            Hidden = AbilityId.IronFist,
+                                        },
+                                        HeightM = 1.2,
+                                        WeightKg = 55,
+                                        Color = "Brown",
+                                        Prevo = SpecieId.Monferno,
+                                    },
+                                    [SpecieId.Piplup] = new()
+                                    {
+                                        Id = SpecieId.Piplup,
+                                        Num = 393,
+                                        Name = "Piplup",
+                                        Types = [PokemonType.Water],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 53,
+                                            Atk = 51,
+                                            Def = 53,
+                                            SpA = 61,
+                                            SpD = 56,
+                                            Spe = 40,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Torrent,
+                                            Hidden = AbilityId.Competitive,
+                                        },
+                                        HeightM = 0.4,
+                                        WeightKg = 5.2,
+                                        Color = "Blue",
+                                    },
+                                    [SpecieId.Prinplup] = new()
+                                    {
+                                        Id = SpecieId.Prinplup,
+                                        Num = 394,
+                                        Name = "Prinplup",
+                                        Types = [PokemonType.Water],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 64,
+                                            Atk = 66,
+                                            Def = 68,
+                                            SpA = 81,
+                                            SpD = 76,
+                                            Spe = 50,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Torrent,
+                                            Hidden = AbilityId.Competitive,
+                                        },
+                                        HeightM = 0.8,
+                                        WeightKg = 23,
+                                        Color = "Blue",
+                                        Prevo = SpecieId.Piplup,
+                                    },
+                                    [SpecieId.Empoleon] = new()
+                                    {
+                                        Id = SpecieId.Empoleon,
+                                        Num = 395,
+                                        Name = "Empoleon",
+                                        Types = [PokemonType.Water, PokemonType.Steel],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 84,
+                                            Atk = 86,
+                                            Def = 88,
+                                            SpA = 111,
+                                            SpD = 101,
+                                            Spe = 60,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Torrent,
+                                            Hidden = AbilityId.Competitive,
+                                        },
+                                        HeightM = 1.7,
+                                        WeightKg = 84.5,
+                                        Color = "Blue",
+                                        Prevo = SpecieId.Prinplup,
+                                    },
+                                    [SpecieId.Starly] = new()
+                                    {
+                                        Id = SpecieId.Starly,
+                                        Num = 396,
+                                        Name = "Starly",
+                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 40,
+                                            Atk = 55,
+                                            Def = 30,
+                                            SpA = 30,
+                                            SpD = 30,
+                                            Spe = 60,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.KeenEye,
+                                            Hidden = AbilityId.Reckless,
+                                        },
+                                        HeightM = 0.3,
+                                        WeightKg = 2,
+                                        Color = "Brown",
+                                    },
+                                    [SpecieId.Staravia] = new()
+                                    {
+                                        Id = SpecieId.Staravia,
+                                        Num = 397,
+                                        Name = "Staravia",
+                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 55,
+                                            Atk = 75,
+                                            Def = 50,
+                                            SpA = 40,
+                                            SpD = 40,
+                                            Spe = 80,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Intimidate,
+                                            Hidden = AbilityId.Reckless,
+                                        },
+                                        HeightM = 0.6,
+                                        WeightKg = 15.5,
+                                        Color = "Brown",
+                                        Prevo = SpecieId.Starly,
+                                    },
+                                    [SpecieId.Staraptor] = new()
+                                    {
+                                        Id = SpecieId.Staraptor,
+                                        Num = 398,
+                                        Name = "Staraptor",
+                                        Types = [PokemonType.Normal, PokemonType.Flying],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 85,
+                                            Atk = 120,
+                                            Def = 70,
+                                            SpA = 50,
+                                            SpD = 60,
+                                            Spe = 100,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Intimidate,
+                                            Hidden = AbilityId.Reckless,
+                                        },
+                                        HeightM = 1.2,
+                                        WeightKg = 24.9,
+                                        Color = "Brown",
+                                        Prevo = SpecieId.Staravia,
+                                    },
+                                    [SpecieId.Bidoof] = new()
+                                    {
+                                        Id = SpecieId.Bidoof,
+                                        Num = 399,
+                                        Name = "Bidoof",
+                                        Types = [PokemonType.Normal],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 59,
+                                            Atk = 45,
+                                            Def = 40,
+                                            SpA = 35,
+                                            SpD = 40,
+                                            Spe = 31,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Simple,
+                                            Slot1 = AbilityId.Unaware,
+                                            Hidden = AbilityId.Moody,
+                                        },
+                                        HeightM = 0.5,
+                                        WeightKg = 20,
+                                        Color = "Brown",
+                                    },
+                                    [SpecieId.Bibarel] = new()
+                                    {
+                                        Id = SpecieId.Bibarel,
+                                        Num = 400,
+                                        Name = "Bibarel",
+                                        Types = [PokemonType.Normal, PokemonType.Water],
+                                        Gender = GenderId.Empty,
+                                        BaseStats = new StatsTable
+                                        {
+                                            Hp = 79,
+                                            Atk = 85,
+                                            Def = 60,
+                                            SpA = 55,
+                                            SpD = 60,
+                                            Spe = 71,
+                                        },
+                                        Abilities = new SpeciesAbility
+                                        {
+                                            Slot0 = AbilityId.Simple,
+                                            Slot1 = AbilityId.Unaware,
+                                            Hidden = AbilityId.Moody,
+                                        },
+                                        HeightM = 1,
+                                        WeightKg = 31.5,
+                                        Color = "Brown",
+                                        Prevo = SpecieId.Bidoof,
+                                    },
+                                };
+                            }
+                        }
