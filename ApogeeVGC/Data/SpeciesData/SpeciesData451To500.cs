@@ -1007,6 +1007,404 @@ public partial record SpeciesData
                 WeightKg = 0.3,
                 Color = "Yellow",
             },
+            [SpecieId.Mesprit] = new()
+            {
+                Id = SpecieId.Mesprit,
+                Num = 481,
+                Name = "Mesprit",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 105,
+                    Def = 105,
+                    SpA = 105,
+                    SpD = 105,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Pink",
+            },
+            [SpecieId.Azelf] = new()
+            {
+                Id = SpecieId.Azelf,
+                Num = 482,
+                Name = "Azelf",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 125,
+                    Def = 70,
+                    SpA = 125,
+                    SpD = 70,
+                    Spe = 115,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.3,
+                WeightKg = 0.3,
+                Color = "Blue",
+            },
+            [SpecieId.Dialga] = new()
+            {
+                Id = SpecieId.Dialga,
+                Num = 483,
+                Name = "Dialga",
+                Types = [PokemonType.Steel, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 120,
+                    Def = 120,
+                    SpA = 150,
+                    SpD = 100,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Telepathy,
+                },
+                HeightM = 5.4,
+                WeightKg = 683,
+                Color = "White",
+            },
+            [SpecieId.DialgaOrigin] = new()
+            {
+                Id = SpecieId.DialgaOrigin,
+                Num = 483,
+                Name = "Dialga-Origin",
+                Types = [PokemonType.Steel, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 100,
+                    Def = 120,
+                    SpA = 150,
+                    SpD = 120,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Telepathy,
+                },
+                HeightM = 7,
+                WeightKg = 850,
+                Color = "Blue",
+                BaseSpecies = SpecieId.Dialga,
+                Forme = FormeId.Origin,
+            },
+            [SpecieId.Palkia] = new()
+            {
+                Id = SpecieId.Palkia,
+                Num = 484,
+                Name = "Palkia",
+                Types = [PokemonType.Water, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 90,
+                    Atk = 120,
+                    Def = 100,
+                    SpA = 150,
+                    SpD = 120,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Telepathy,
+                },
+                HeightM = 4.2,
+                WeightKg = 336,
+                Color = "Purple",
+            },
+            [SpecieId.PalkiaOrigin] = new()
+            {
+                Id = SpecieId.PalkiaOrigin,
+                Num = 484,
+                Name = "Palkia-Origin",
+                Types = [PokemonType.Water, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 90,
+                    Atk = 100,
+                    Def = 100,
+                    SpA = 150,
+                    SpD = 120,
+                    Spe = 120,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Telepathy,
+                },
+                HeightM = 6.3,
+                WeightKg = 660,
+                Color = "Purple",
+                BaseSpecies = SpecieId.Palkia,
+                Forme = FormeId.Origin,
+            },
+            [SpecieId.Heatran] = new()
+            {
+                Id = SpecieId.Heatran,
+                Num = 485,
+                Name = "Heatran",
+                Types = [PokemonType.Fire, PokemonType.Steel],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 91,
+                    Atk = 90,
+                    Def = 106,
+                    SpA = 130,
+                    SpD = 106,
+                    Spe = 77,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.FlashFire,
+                    Hidden = AbilityId.FlameBody,
+                },
+                HeightM = 1.7,
+                WeightKg = 430,
+                Color = "Brown",
+            },
+            [SpecieId.Regigigas] = new()
+            {
+                Id = SpecieId.Regigigas,
+                Num = 486,
+                Name = "Regigigas",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 110,
+                    Atk = 160,
+                    Def = 110,
+                    SpA = 80,
+                    SpD = 110,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SlowStart,
+                },
+                HeightM = 3.7,
+                WeightKg = 420,
+                Color = "White",
+            },
+            [SpecieId.Giratina] = new()
+            {
+                Id = SpecieId.Giratina,
+                Num = 487,
+                Name = "Giratina",
+                Types = [PokemonType.Ghost, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 150,
+                    Atk = 100,
+                    Def = 120,
+                    SpA = 100,
+                    SpD = 120,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pressure,
+                    Hidden = AbilityId.Telepathy,
+                },
+                HeightM = 4.5,
+                WeightKg = 750,
+                Color = "Black",
+            },
+            [SpecieId.GiratinaOrigin] = new()
+            {
+                Id = SpecieId.GiratinaOrigin,
+                Num = 487,
+                Name = "Giratina-Origin",
+                Types = [PokemonType.Ghost, PokemonType.Dragon],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 150,
+                    Atk = 120,
+                    Def = 100,
+                    SpA = 120,
+                    SpD = 100,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 6.9,
+                WeightKg = 650,
+                Color = "Black",
+                BaseSpecies = SpecieId.Giratina,
+                Forme = FormeId.Origin,
+            },
+            [SpecieId.Cresselia] = new()
+            {
+                Id = SpecieId.Cresselia,
+                Num = 488,
+                Name = "Cresselia",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.F,
+                BaseStats = new StatsTable
+                {
+                    Hp = 120,
+                    Atk = 70,
+                    Def = 110,
+                    SpA = 75,
+                    SpD = 120,
+                    Spe = 85,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 1.5,
+                WeightKg = 85.6,
+                Color = "Yellow",
+            },
+            [SpecieId.Phione] = new()
+            {
+                Id = SpecieId.Phione,
+                Num = 489,
+                Name = "Phione",
+                Types = [PokemonType.Water],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 80,
+                    Def = 80,
+                    SpA = 80,
+                    SpD = 80,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Hydration,
+                },
+                HeightM = 0.4,
+                WeightKg = 3.1,
+                Color = "Blue",
+            },
+            [SpecieId.Manaphy] = new()
+            {
+                Id = SpecieId.Manaphy,
+                Num = 490,
+                Name = "Manaphy",
+                Types = [PokemonType.Water],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 100,
+                    Def = 100,
+                    SpA = 100,
+                    SpD = 100,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Hydration,
+                },
+                HeightM = 0.3,
+                WeightKg = 1.4,
+                Color = "Blue",
+            },
+            [SpecieId.Darkrai] = new()
+            {
+                Id = SpecieId.Darkrai,
+                Num = 491,
+                Name = "Darkrai",
+                Types = [PokemonType.Dark],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 90,
+                    Def = 90,
+                    SpA = 135,
+                    SpD = 90,
+                    Spe = 125,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.BadDreams,
+                },
+                HeightM = 1.5,
+                WeightKg = 50.5,
+                Color = "Black",
+            },
+            [SpecieId.Shaymin] = new()
+            {
+                Id = SpecieId.Shaymin,
+                Num = 492,
+                Name = "Shaymin",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 100,
+                    Def = 100,
+                    SpA = 100,
+                    SpD = 100,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.NaturalCure,
+                },
+                HeightM = 0.2,
+                WeightKg = 2.1,
+                Color = "Green",
+            },
+            [SpecieId.ShayminSky] = new()
+            {
+                Id = SpecieId.ShayminSky,
+                Num = 492,
+                Name = "Shaymin-Sky",
+                Types = [PokemonType.Grass, PokemonType.Flying],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 100,
+                    Atk = 103,
+                    Def = 75,
+                    SpA = 120,
+                    SpD = 75,
+                    Spe = 127,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SereneGrace,
+                },
+                HeightM = 0.4,
+                WeightKg = 5.2,
+                Color = "Green",
+                BaseSpecies = SpecieId.Shaymin,
+                Forme = FormeId.Sky,
+            },
         };
     }
 }

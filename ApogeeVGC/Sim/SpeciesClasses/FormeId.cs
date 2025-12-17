@@ -45,5 +45,9 @@ public enum FormeId
     Frost,
     Fan,
     Mow,
+    Origin,
+    Sky,
+    Altered,
+    Land,
     None,
 }

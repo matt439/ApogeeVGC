@@ -227,5 +227,8 @@ public enum AbilityId
                 // Added for Mamoswine to Uxie conversion
                 Sharpness,
 
+                // Added for Mesprit to Shaymin conversion
+                SlowStart,
+
                 None,
             }

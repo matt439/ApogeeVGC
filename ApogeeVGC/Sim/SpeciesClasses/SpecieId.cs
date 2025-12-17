@@ -646,6 +646,22 @@ public enum SpecieId
     Mesprit,
     Azelf,
 
+    // Gen 4 (483-492)
+    Dialga,
+    DialgaOrigin,
+    Palkia,
+    PalkiaOrigin,
+    Heatran,
+    Regigigas,
+    Giratina,
+    GiratinaOrigin,
+    Cresselia,
+    Phione,
+    Manaphy,
+    Darkrai,
+    Shaymin,
+    ShayminSky,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
@@ -654,8 +670,6 @@ public enum SpecieId
     IronHands,
 
     Calyrex,
-    ShayminSky,
-    Shaymin,
     GreninjaBond,
     RockruffDusk,
     TerapagosTerastal,
