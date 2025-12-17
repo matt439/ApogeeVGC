@@ -186,14 +186,17 @@ public enum AbilityId
         WonderGuard,
         Normalize,
 
-        // Added for Sableye to Torkoal conversion
-        PurePower,
-        Minus,
-        RoughSkin,
-        StrongJaw,
-        Simple,
-        SolidRock,
-        WhiteSmoke,
+            // Added for Sableye to Torkoal conversion
+            PurePower,
+            Minus,
+            RoughSkin,
+            StrongJaw,
+            Simple,
+            SolidRock,
+            WhiteSmoke,
 
-        None,
-    }
+            // Added for Spoink to Claydol conversion
+            ToxicBoost,
+
+            None,
+        }

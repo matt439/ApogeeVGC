@@ -859,6 +859,544 @@ public partial record SpeciesData
                 WeightKg = 80.4,
                 Color = "Brown",
             },
+            [SpecieId.Spoink] = new()
+            {
+                Id = SpecieId.Spoink,
+                Num = 325,
+                Name = "Spoink",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 25,
+                    Def = 35,
+                    SpA = 70,
+                    SpD = 80,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ThickFat,
+                    Slot1 = AbilityId.OwnTempo,
+                    Hidden = AbilityId.Gluttony,
+                },
+                HeightM = 0.7,
+                WeightKg = 30.6,
+                Color = "Black",
+            },
+            [SpecieId.Grumpig] = new()
+            {
+                Id = SpecieId.Grumpig,
+                Num = 326,
+                Name = "Grumpig",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 45,
+                    Def = 65,
+                    SpA = 90,
+                    SpD = 110,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ThickFat,
+                    Slot1 = AbilityId.OwnTempo,
+                    Hidden = AbilityId.Gluttony,
+                },
+                HeightM = 0.9,
+                WeightKg = 71.5,
+                Color = "Purple",
+                Prevo = SpecieId.Spoink,
+            },
+            [SpecieId.Spinda] = new()
+            {
+                Id = SpecieId.Spinda,
+                Num = 327,
+                Name = "Spinda",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 60,
+                    Def = 60,
+                    SpA = 60,
+                    SpD = 60,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.OwnTempo,
+                    Slot1 = AbilityId.TangledFeet,
+                    Hidden = AbilityId.Contrary,
+                },
+                HeightM = 1.1,
+                WeightKg = 5,
+                Color = "Brown",
+            },
+            [SpecieId.Trapinch] = new()
+            {
+                Id = SpecieId.Trapinch,
+                Num = 328,
+                Name = "Trapinch",
+                Types = [PokemonType.Ground],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 45,
+                    Atk = 100,
+                    Def = 45,
+                    SpA = 45,
+                    SpD = 45,
+                    Spe = 10,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.HyperCutter,
+                    Slot1 = AbilityId.ArenaTrap,
+                    Hidden = AbilityId.SheerForce,
+                },
+                HeightM = 0.7,
+                WeightKg = 15,
+                Color = "Brown",
+            },
+            [SpecieId.Vibrava] = new()
+            {
+                Id = SpecieId.Vibrava,
+                Num = 329,
+                Name = "Vibrava",
+                Types = [PokemonType.Ground, PokemonType.Dragon],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 70,
+                    Def = 50,
+                    SpA = 50,
+                    SpD = 50,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 1.1,
+                WeightKg = 15.3,
+                Color = "Green",
+                Prevo = SpecieId.Trapinch,
+            },
+            [SpecieId.Flygon] = new()
+            {
+                Id = SpecieId.Flygon,
+                Num = 330,
+                Name = "Flygon",
+                Types = [PokemonType.Ground, PokemonType.Dragon],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 100,
+                    Def = 80,
+                    SpA = 80,
+                    SpD = 80,
+                    Spe = 100,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 2,
+                WeightKg = 82,
+                Color = "Green",
+                Prevo = SpecieId.Vibrava,
+            },
+            [SpecieId.Cacnea] = new()
+            {
+                Id = SpecieId.Cacnea,
+                Num = 331,
+                Name = "Cacnea",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 85,
+                    Def = 40,
+                    SpA = 85,
+                    SpD = 40,
+                    Spe = 35,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SandVeil,
+                    Hidden = AbilityId.WaterAbsorb,
+                },
+                HeightM = 0.4,
+                WeightKg = 51.3,
+                Color = "Green",
+            },
+            [SpecieId.Cacturne] = new()
+            {
+                Id = SpecieId.Cacturne,
+                Num = 332,
+                Name = "Cacturne",
+                Types = [PokemonType.Grass, PokemonType.Dark],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 70,
+                    Atk = 115,
+                    Def = 60,
+                    SpA = 115,
+                    SpD = 60,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SandVeil,
+                    Hidden = AbilityId.WaterAbsorb,
+                },
+                HeightM = 1.3,
+                WeightKg = 77.4,
+                Color = "Green",
+                Prevo = SpecieId.Cacnea,
+            },
+            [SpecieId.Swablu] = new()
+            {
+                Id = SpecieId.Swablu,
+                Num = 333,
+                Name = "Swablu",
+                Types = [PokemonType.Normal, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 45,
+                    Atk = 40,
+                    Def = 60,
+                    SpA = 40,
+                    SpD = 75,
+                    Spe = 50,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.NaturalCure,
+                    Hidden = AbilityId.CloudNine,
+                },
+                HeightM = 0.4,
+                WeightKg = 1.2,
+                Color = "Blue",
+            },
+            [SpecieId.Altaria] = new()
+            {
+                Id = SpecieId.Altaria,
+                Num = 334,
+                Name = "Altaria",
+                Types = [PokemonType.Dragon, PokemonType.Flying],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 70,
+                    Def = 90,
+                    SpA = 70,
+                    SpD = 105,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.NaturalCure,
+                    Hidden = AbilityId.CloudNine,
+                },
+                HeightM = 1.1,
+                WeightKg = 20.6,
+                Color = "Blue",
+                Prevo = SpecieId.Swablu,
+                OtherFormes = [FormeId.Mega],
+            },
+            [SpecieId.AltariaMega] = new()
+            {
+                Id = SpecieId.AltariaMega,
+                Num = 334,
+                Name = "Altaria-Mega",
+                BaseSpecies = SpecieId.Altaria,
+                Forme = FormeId.Mega,
+                Types = [PokemonType.Dragon, PokemonType.Fairy],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 110,
+                    Def = 110,
+                    SpA = 110,
+                    SpD = 105,
+                    Spe = 80,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Pixilate,
+                },
+                HeightM = 1.5,
+                WeightKg = 20.6,
+                Color = "Blue",
+                RequiredItem = Sim.Items.ItemId.Altarianite,
+            },
+            [SpecieId.Zangoose] = new()
+            {
+                Id = SpecieId.Zangoose,
+                Num = 335,
+                Name = "Zangoose",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 73,
+                    Atk = 115,
+                    Def = 60,
+                    SpA = 60,
+                    SpD = 60,
+                    Spe = 90,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Immunity,
+                    Hidden = AbilityId.ToxicBoost,
+                },
+                HeightM = 1.3,
+                WeightKg = 40.3,
+                Color = "White",
+            },
+            [SpecieId.Seviper] = new()
+            {
+                Id = SpecieId.Seviper,
+                Num = 336,
+                Name = "Seviper",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 73,
+                    Atk = 100,
+                    Def = 60,
+                    SpA = 100,
+                    SpD = 60,
+                    Spe = 65,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.ShedSkin,
+                    Hidden = AbilityId.Infiltrator,
+                },
+                HeightM = 2.7,
+                WeightKg = 52.5,
+                Color = "Black",
+            },
+            [SpecieId.Lunatone] = new()
+            {
+                Id = SpecieId.Lunatone,
+                Num = 337,
+                Name = "Lunatone",
+                Types = [PokemonType.Rock, PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 90,
+                    Atk = 55,
+                    Def = 65,
+                    SpA = 95,
+                    SpD = 85,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 1,
+                WeightKg = 168,
+                Color = "Yellow",
+            },
+            [SpecieId.Solrock] = new()
+            {
+                Id = SpecieId.Solrock,
+                Num = 338,
+                Name = "Solrock",
+                Types = [PokemonType.Rock, PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 90,
+                    Atk = 95,
+                    Def = 85,
+                    SpA = 55,
+                    SpD = 65,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 1.2,
+                WeightKg = 154,
+                Color = "Red",
+            },
+            [SpecieId.Barboach] = new()
+            {
+                Id = SpecieId.Barboach,
+                Num = 339,
+                Name = "Barboach",
+                Types = [PokemonType.Water, PokemonType.Ground],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 48,
+                    Def = 43,
+                    SpA = 46,
+                    SpD = 41,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Oblivious,
+                    Slot1 = AbilityId.Anticipation,
+                    Hidden = AbilityId.Hydration,
+                },
+                HeightM = 0.4,
+                WeightKg = 1.9,
+                Color = "Gray",
+            },
+            [SpecieId.Whiscash] = new()
+            {
+                Id = SpecieId.Whiscash,
+                Num = 340,
+                Name = "Whiscash",
+                Types = [PokemonType.Water, PokemonType.Ground],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 110,
+                    Atk = 78,
+                    Def = 73,
+                    SpA = 76,
+                    SpD = 71,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Oblivious,
+                    Slot1 = AbilityId.Anticipation,
+                    Hidden = AbilityId.Hydration,
+                },
+                HeightM = 0.9,
+                WeightKg = 23.6,
+                Color = "Blue",
+                Prevo = SpecieId.Barboach,
+            },
+            [SpecieId.Corphish] = new()
+            {
+                Id = SpecieId.Corphish,
+                Num = 341,
+                Name = "Corphish",
+                Types = [PokemonType.Water],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 43,
+                    Atk = 80,
+                    Def = 65,
+                    SpA = 50,
+                    SpD = 35,
+                    Spe = 35,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.HyperCutter,
+                    Slot1 = AbilityId.ShellArmor,
+                    Hidden = AbilityId.Adaptability,
+                },
+                HeightM = 0.6,
+                WeightKg = 11.5,
+                Color = "Red",
+            },
+            [SpecieId.Crawdaunt] = new()
+            {
+                Id = SpecieId.Crawdaunt,
+                Num = 342,
+                Name = "Crawdaunt",
+                Types = [PokemonType.Water, PokemonType.Dark],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 63,
+                    Atk = 120,
+                    Def = 85,
+                    SpA = 90,
+                    SpD = 55,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.HyperCutter,
+                    Slot1 = AbilityId.ShellArmor,
+                    Hidden = AbilityId.Adaptability,
+                },
+                HeightM = 1.1,
+                WeightKg = 32.8,
+                Color = "Red",
+                Prevo = SpecieId.Corphish,
+            },
+            [SpecieId.Baltoy] = new()
+            {
+                Id = SpecieId.Baltoy,
+                Num = 343,
+                Name = "Baltoy",
+                Types = [PokemonType.Ground, PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 40,
+                    Atk = 40,
+                    Def = 55,
+                    SpA = 40,
+                    SpD = 70,
+                    Spe = 55,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 0.5,
+                WeightKg = 21.5,
+                Color = "Brown",
+            },
+            [SpecieId.Claydol] = new()
+            {
+                Id = SpecieId.Claydol,
+                Num = 344,
+                Name = "Claydol",
+                Types = [PokemonType.Ground, PokemonType.Psychic],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 70,
+                    Def = 105,
+                    SpA = 70,
+                    SpD = 120,
+                    Spe = 75,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Levitate,
+                },
+                HeightM = 1.5,
+                WeightKg = 108,
+                Color = "Black",
+                Prevo = SpecieId.Baltoy,
+            },
         };
     }
 }
