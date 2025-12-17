@@ -794,6 +794,21 @@ public enum SpecieId
     Cinccino,
     Gothita,
 
+    // Gen 5 (575-587)
+    Gothorita,
+    Gothitelle,
+    Solosis,
+    Duosion,
+    Reuniclus,
+    Ducklett,
+    Swanna,
+    Vanillite,
+    Vanillish,
+    Vanilluxe,
+    Deerling,
+    Sawsbuck,
+    Emolga,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
