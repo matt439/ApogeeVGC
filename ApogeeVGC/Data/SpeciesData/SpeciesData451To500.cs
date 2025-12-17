@@ -1399,12 +1399,348 @@ public partial record SpeciesData
                 {
                     Slot0 = AbilityId.SereneGrace,
                 },
-                HeightM = 0.4,
-                WeightKg = 5.2,
-                Color = "Green",
-                BaseSpecies = SpecieId.Shaymin,
-                Forme = FormeId.Sky,
-            },
-        };
-    }
-}
+                                HeightM = 0.4,
+                                WeightKg = 5.2,
+                                Color = "Green",
+                                BaseSpecies = SpecieId.Shaymin,
+                                Forme = FormeId.Sky,
+                            },
+                            [SpecieId.Arceus] = new()
+                            {
+                                Id = SpecieId.Arceus,
+                                Num = 493,
+                                Name = "Arceus",
+                                Types = [PokemonType.Normal],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                            },
+                            [SpecieId.ArceusBug] = new()
+                            {
+                                Id = SpecieId.ArceusBug,
+                                Num = 493,
+                                Name = "Arceus-Bug",
+                                Types = [PokemonType.Bug],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Bug,
+                            },
+                            [SpecieId.ArceusDark] = new()
+                            {
+                                Id = SpecieId.ArceusDark,
+                                Num = 493,
+                                Name = "Arceus-Dark",
+                                Types = [PokemonType.Dark],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Dark,
+                            },
+                            [SpecieId.ArceusDragon] = new()
+                            {
+                                Id = SpecieId.ArceusDragon,
+                                Num = 493,
+                                Name = "Arceus-Dragon",
+                                Types = [PokemonType.Dragon],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Dragon,
+                            },
+                            [SpecieId.ArceusElectric] = new()
+                            {
+                                Id = SpecieId.ArceusElectric,
+                                Num = 493,
+                                Name = "Arceus-Electric",
+                                Types = [PokemonType.Electric],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Electric,
+                            },
+                            [SpecieId.ArceusFairy] = new()
+                            {
+                                Id = SpecieId.ArceusFairy,
+                                Num = 493,
+                                Name = "Arceus-Fairy",
+                                Types = [PokemonType.Fairy],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Fairy,
+                            },
+                            [SpecieId.ArceusFighting] = new()
+                            {
+                                Id = SpecieId.ArceusFighting,
+                                Num = 493,
+                                Name = "Arceus-Fighting",
+                                Types = [PokemonType.Fighting],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Fighting,
+                            },
+                            [SpecieId.ArceusFire] = new()
+                            {
+                                Id = SpecieId.ArceusFire,
+                                Num = 493,
+                                Name = "Arceus-Fire",
+                                Types = [PokemonType.Fire],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Fire,
+                            },
+                            [SpecieId.ArceusFlying] = new()
+                            {
+                                Id = SpecieId.ArceusFlying,
+                                Num = 493,
+                                Name = "Arceus-Flying",
+                                Types = [PokemonType.Flying],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Flying,
+                            },
+                            [SpecieId.ArceusGhost] = new()
+                            {
+                                Id = SpecieId.ArceusGhost,
+                                Num = 493,
+                                Name = "Arceus-Ghost",
+                                Types = [PokemonType.Ghost],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Ghost,
+                            },
+                            [SpecieId.ArceusGrass] = new()
+                            {
+                                Id = SpecieId.ArceusGrass,
+                                Num = 493,
+                                Name = "Arceus-Grass",
+                                Types = [PokemonType.Grass],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Grass,
+                            },
+                            [SpecieId.ArceusGround] = new()
+                            {
+                                Id = SpecieId.ArceusGround,
+                                Num = 493,
+                                Name = "Arceus-Ground",
+                                Types = [PokemonType.Ground],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Ground,
+                            },
+                            [SpecieId.ArceusIce] = new()
+                            {
+                                Id = SpecieId.ArceusIce,
+                                Num = 493,
+                                Name = "Arceus-Ice",
+                                Types = [PokemonType.Ice],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 120,
+                                    Atk = 120,
+                                    Def = 120,
+                                    SpA = 120,
+                                    SpD = 120,
+                                    Spe = 120,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Multitype,
+                                },
+                                HeightM = 3.2,
+                                WeightKg = 320,
+                                Color = "White",
+                                BaseSpecies = SpecieId.Arceus,
+                                Forme = FormeId.Ice,
+                            },
+                        };
+                    }
+                }

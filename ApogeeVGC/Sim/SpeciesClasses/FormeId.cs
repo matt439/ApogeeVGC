@@ -45,9 +45,22 @@ public enum FormeId
     Frost,
     Fan,
     Mow,
-    Origin,
-    Sky,
-    Altered,
-    Land,
-    None,
-}
+        Origin,
+        Sky,
+        Altered,
+        Land,
+        None,
+
+        // Type formes (Arceus)
+        Bug,
+        Dark,
+        Dragon,
+        Electric,
+        Fairy,
+        Fighting,
+        Fire,
+        Flying,
+        Ghost,
+        Grass,
+        Ground,
+    }

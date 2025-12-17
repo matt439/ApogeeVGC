@@ -662,6 +662,21 @@ public enum SpecieId
     Shaymin,
     ShayminSky,
 
+    // Gen 4 (493) - Arceus
+    Arceus,
+    ArceusBug,
+    ArceusDark,
+    ArceusDragon,
+    ArceusElectric,
+    ArceusFairy,
+    ArceusFighting,
+    ArceusFire,
+    ArceusFlying,
+    ArceusGhost,
+    ArceusGrass,
+    ArceusGround,
+    ArceusIce,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
