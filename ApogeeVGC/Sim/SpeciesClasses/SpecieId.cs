@@ -809,6 +809,23 @@ public enum SpecieId
     Sawsbuck,
     Emolga,
 
+    // Gen 5 (588-602)
+    Karrablast,
+    Escavalier,
+    Foongus,
+    Amoonguss,
+    Frillish,
+    Jellicent,
+    Alomomola,
+    Joltik,
+    Galvantula,
+    Ferroseed,
+    Ferrothorn,
+    Klink,
+    Klang,
+    Klinklang,
+    Tynamo,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

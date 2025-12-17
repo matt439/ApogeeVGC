@@ -232,12 +232,15 @@ public enum AbilityId
 
                 // Added for Darumaka to Yamask conversion
                 ZenMode,
-                GorillaTactics,
-                Mummy,
-                WanderingSpirit,
+                    GorillaTactics,
+                    Mummy,
+                    WanderingSpirit,
 
-                // Added for Cofagrigus to Gothita conversion
-                Defeatist,
+                    // Added for Cofagrigus to Gothita conversion
+                    Defeatist,
 
-                None,
-            }
+                    // Added for Karrablast to Tynamo conversion
+                    IronBarbs,
+
+                    None,
+                }

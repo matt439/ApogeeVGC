@@ -1430,15 +1430,354 @@ public partial record SpeciesData
                                 SpD = 60,
                                 Spe = 103,
                             },
-                            Abilities = new SpeciesAbility
+                                            Abilities = new SpeciesAbility
+                                            {
+                                                Slot0 = AbilityId.Static,
+                                                Hidden = AbilityId.MotorDrive,
+                                            },
+                                            HeightM = 0.4,
+                                            WeightKg = 5,
+                                            Color = "White",
+                                        },
+                            [SpecieId.Karrablast] = new()
                             {
-                                Slot0 = AbilityId.Static,
-                                Hidden = AbilityId.MotorDrive,
+                                Id = SpecieId.Karrablast,
+                                Num = 588,
+                                Name = "Karrablast",
+                                Types = [PokemonType.Bug],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 50,
+                                    Atk = 75,
+                                    Def = 45,
+                                    SpA = 40,
+                                    SpD = 45,
+                                    Spe = 60,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Swarm,
+                                    Slot1 = AbilityId.ShedSkin,
+                                    Hidden = AbilityId.NoGuard,
+                                },
+                                HeightM = 0.5,
+                                WeightKg = 5.9,
+                                Color = "Blue",
                             },
-                            HeightM = 0.4,
-                            WeightKg = 5,
-                            Color = "White",
-                        },
-                    };
-                }
-            }
+                            [SpecieId.Escavalier] = new()
+                            {
+                                Id = SpecieId.Escavalier,
+                                Num = 589,
+                                Name = "Escavalier",
+                                Types = [PokemonType.Bug, PokemonType.Steel],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 70,
+                                    Atk = 135,
+                                    Def = 105,
+                                    SpA = 60,
+                                    SpD = 105,
+                                    Spe = 20,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Swarm,
+                                    Slot1 = AbilityId.ShellArmor,
+                                    Hidden = AbilityId.Overcoat,
+                                },
+                                HeightM = 1,
+                                WeightKg = 33,
+                                Color = "Gray",
+                                Prevo = SpecieId.Karrablast,
+                            },
+                            [SpecieId.Foongus] = new()
+                            {
+                                Id = SpecieId.Foongus,
+                                Num = 590,
+                                Name = "Foongus",
+                                Types = [PokemonType.Grass, PokemonType.Poison],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 69,
+                                    Atk = 55,
+                                    Def = 45,
+                                    SpA = 55,
+                                    SpD = 55,
+                                    Spe = 15,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.EffectSpore,
+                                    Hidden = AbilityId.Regenerator,
+                                },
+                                HeightM = 0.2,
+                                WeightKg = 1,
+                                Color = "White",
+                            },
+                            [SpecieId.Amoonguss] = new()
+                            {
+                                Id = SpecieId.Amoonguss,
+                                Num = 591,
+                                Name = "Amoonguss",
+                                Types = [PokemonType.Grass, PokemonType.Poison],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 114,
+                                    Atk = 85,
+                                    Def = 70,
+                                    SpA = 85,
+                                    SpD = 80,
+                                    Spe = 30,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.EffectSpore,
+                                    Hidden = AbilityId.Regenerator,
+                                },
+                                HeightM = 0.6,
+                                WeightKg = 10.5,
+                                Color = "White",
+                                Prevo = SpecieId.Foongus,
+                            },
+                            [SpecieId.Frillish] = new()
+                            {
+                                Id = SpecieId.Frillish,
+                                Num = 592,
+                                Name = "Frillish",
+                                Types = [PokemonType.Water, PokemonType.Ghost],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 55,
+                                    Atk = 40,
+                                    Def = 50,
+                                    SpA = 65,
+                                    SpD = 85,
+                                    Spe = 40,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.WaterAbsorb,
+                                    Slot1 = AbilityId.CursedBody,
+                                    Hidden = AbilityId.Damp,
+                                },
+                                HeightM = 1.2,
+                                WeightKg = 33,
+                                Color = "White",
+                            },
+                            [SpecieId.Jellicent] = new()
+                            {
+                                Id = SpecieId.Jellicent,
+                                Num = 593,
+                                Name = "Jellicent",
+                                Types = [PokemonType.Water, PokemonType.Ghost],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 100,
+                                    Atk = 60,
+                                    Def = 70,
+                                    SpA = 85,
+                                    SpD = 105,
+                                    Spe = 60,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.WaterAbsorb,
+                                    Slot1 = AbilityId.CursedBody,
+                                    Hidden = AbilityId.Damp,
+                                },
+                                HeightM = 2.2,
+                                WeightKg = 135,
+                                Color = "White",
+                                Prevo = SpecieId.Frillish,
+                            },
+                            [SpecieId.Alomomola] = new()
+                            {
+                                Id = SpecieId.Alomomola,
+                                Num = 594,
+                                Name = "Alomomola",
+                                Types = [PokemonType.Water],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 165,
+                                    Atk = 75,
+                                    Def = 80,
+                                    SpA = 40,
+                                    SpD = 45,
+                                    Spe = 65,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Healer,
+                                    Slot1 = AbilityId.Hydration,
+                                    Hidden = AbilityId.Regenerator,
+                                },
+                                HeightM = 1.2,
+                                WeightKg = 31.6,
+                                Color = "Pink",
+                            },
+                            [SpecieId.Joltik] = new()
+                            {
+                                Id = SpecieId.Joltik,
+                                Num = 595,
+                                Name = "Joltik",
+                                Types = [PokemonType.Bug, PokemonType.Electric],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 50,
+                                    Atk = 47,
+                                    Def = 50,
+                                    SpA = 57,
+                                    SpD = 50,
+                                    Spe = 65,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.CompoundEyes,
+                                    Slot1 = AbilityId.Unnerve,
+                                    Hidden = AbilityId.Swarm,
+                                },
+                                HeightM = 0.1,
+                                WeightKg = 0.6,
+                                Color = "Yellow",
+                            },
+                            [SpecieId.Galvantula] = new()
+                            {
+                                Id = SpecieId.Galvantula,
+                                Num = 596,
+                                Name = "Galvantula",
+                                Types = [PokemonType.Bug, PokemonType.Electric],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 70,
+                                    Atk = 77,
+                                    Def = 60,
+                                    SpA = 97,
+                                    SpD = 60,
+                                    Spe = 108,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.CompoundEyes,
+                                    Slot1 = AbilityId.Unnerve,
+                                    Hidden = AbilityId.Swarm,
+                                },
+                                HeightM = 0.8,
+                                WeightKg = 14.3,
+                                Color = "Yellow",
+                                Prevo = SpecieId.Joltik,
+                            },
+                            [SpecieId.Ferroseed] = new()
+                            {
+                                Id = SpecieId.Ferroseed,
+                                Num = 597,
+                                Name = "Ferroseed",
+                                Types = [PokemonType.Grass, PokemonType.Steel],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 44,
+                                    Atk = 50,
+                                    Def = 91,
+                                    SpA = 24,
+                                    SpD = 86,
+                                    Spe = 10,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.IronBarbs,
+                                },
+                                HeightM = 0.6,
+                                WeightKg = 18.8,
+                                Color = "Gray",
+                            },
+                            [SpecieId.Ferrothorn] = new()
+                            {
+                                Id = SpecieId.Ferrothorn,
+                                Num = 598,
+                                Name = "Ferrothorn",
+                                Types = [PokemonType.Grass, PokemonType.Steel],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 74,
+                                    Atk = 94,
+                                    Def = 131,
+                                    SpA = 54,
+                                    SpD = 116,
+                                    Spe = 20,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.IronBarbs,
+                                    Hidden = AbilityId.Anticipation,
+                                },
+                                HeightM = 1,
+                                WeightKg = 110,
+                                Color = "Gray",
+                                Prevo = SpecieId.Ferroseed,
+                            },
+                            [SpecieId.Klink] = new()
+                            {
+                                Id = SpecieId.Klink,
+                                Num = 599,
+                                Name = "Klink",
+                                Types = [PokemonType.Steel],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 40,
+                                    Atk = 55,
+                                    Def = 70,
+                                    SpA = 45,
+                                    SpD = 60,
+                                    Spe = 30,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Plus,
+                                    Slot1 = AbilityId.Minus,
+                                    Hidden = AbilityId.ClearBody,
+                                },
+                                HeightM = 0.3,
+                                WeightKg = 21,
+                                Color = "Gray",
+                            },
+                            [SpecieId.Klang] = new()
+                            {
+                                Id = SpecieId.Klang,
+                                Num = 600,
+                                Name = "Klang",
+                                Types = [PokemonType.Steel],
+                                Gender = GenderId.N,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 60,
+                                    Atk = 80,
+                                    Def = 95,
+                                    SpA = 70,
+                                    SpD = 85,
+                                    Spe = 50,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Plus,
+                                    Slot1 = AbilityId.Minus,
+                                    Hidden = AbilityId.ClearBody,
+                                },
+                                HeightM = 0.6,
+                                WeightKg = 51,
+                                Color = "Gray",
+                                Prevo = SpecieId.Klink,
+                            },
+                                    };
+                                }
+                            }
