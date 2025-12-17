@@ -30,5 +30,8 @@ public enum FormeId
     PaldeaAqua,
     Paldea,
     SpikyEared,
+    Sunny,
+    Rainy,
+    Snowy,
     None,
 }

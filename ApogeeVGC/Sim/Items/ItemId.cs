@@ -35,15 +35,18 @@ public enum ItemId
     BlunderPolicy,
     LoadedDice,
 
-        // Mega Stones
-        Sablenite,
-        Mawilite,
-        Aggronite,
-        Medichamite,
-        Manectite,
-        Sharpedonite,
-        Cameruptite,
-        Altarianite,
+            // Mega Stones
+            Sablenite,
+            Mawilite,
+            Aggronite,
+            Medichamite,
+            Manectite,
+            Sharpedonite,
+            Cameruptite,
+            Altarianite,
+            Banettite,
+            Absolite,
+            Glalitite,
 
-        None,
-    }
+            None,
+        }

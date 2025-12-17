@@ -1388,15 +1388,170 @@ public partial record SpeciesData
                     SpD = 120,
                     Spe = 75,
                 },
-                Abilities = new SpeciesAbility
-                {
-                    Slot0 = AbilityId.Levitate,
-                },
-                HeightM = 1.5,
-                WeightKg = 108,
-                Color = "Black",
-                Prevo = SpecieId.Baltoy,
-            },
-        };
-    }
-}
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.Levitate,
+                                },
+                                HeightM = 1.5,
+                                WeightKg = 108,
+                                Color = "Black",
+                                Prevo = SpecieId.Baltoy,
+                            },
+                            [SpecieId.Lileep] = new()
+                            {
+                                Id = SpecieId.Lileep,
+                                Num = 345,
+                                Name = "Lileep",
+                                Types = [PokemonType.Rock, PokemonType.Grass],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 66,
+                                    Atk = 41,
+                                    Def = 77,
+                                    SpA = 61,
+                                    SpD = 87,
+                                    Spe = 23,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.SuctionCups,
+                                    Hidden = AbilityId.StormDrain,
+                                },
+                                HeightM = 1,
+                                WeightKg = 23.8,
+                                Color = "Purple",
+                            },
+                            [SpecieId.Cradily] = new()
+                            {
+                                Id = SpecieId.Cradily,
+                                Num = 346,
+                                Name = "Cradily",
+                                Types = [PokemonType.Rock, PokemonType.Grass],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 86,
+                                    Atk = 81,
+                                    Def = 97,
+                                    SpA = 81,
+                                    SpD = 107,
+                                    Spe = 43,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.SuctionCups,
+                                    Hidden = AbilityId.StormDrain,
+                                },
+                                HeightM = 1.5,
+                                WeightKg = 60.4,
+                                Color = "Green",
+                                Prevo = SpecieId.Lileep,
+                            },
+                            [SpecieId.Anorith] = new()
+                            {
+                                Id = SpecieId.Anorith,
+                                Num = 347,
+                                Name = "Anorith",
+                                Types = [PokemonType.Rock, PokemonType.Bug],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 45,
+                                    Atk = 95,
+                                    Def = 50,
+                                    SpA = 40,
+                                    SpD = 50,
+                                    Spe = 75,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.BattleArmor,
+                                    Hidden = AbilityId.SwiftSwim,
+                                },
+                                HeightM = 0.7,
+                                WeightKg = 12.5,
+                                Color = "Gray",
+                            },
+                            [SpecieId.Armaldo] = new()
+                            {
+                                Id = SpecieId.Armaldo,
+                                Num = 348,
+                                Name = "Armaldo",
+                                Types = [PokemonType.Rock, PokemonType.Bug],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 75,
+                                    Atk = 125,
+                                    Def = 100,
+                                    SpA = 70,
+                                    SpD = 80,
+                                    Spe = 45,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.BattleArmor,
+                                    Hidden = AbilityId.SwiftSwim,
+                                },
+                                HeightM = 1.5,
+                                WeightKg = 68.2,
+                                Color = "Gray",
+                                Prevo = SpecieId.Anorith,
+                            },
+                            [SpecieId.Feebas] = new()
+                            {
+                                Id = SpecieId.Feebas,
+                                Num = 349,
+                                Name = "Feebas",
+                                Types = [PokemonType.Water],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 20,
+                                    Atk = 15,
+                                    Def = 20,
+                                    SpA = 10,
+                                    SpD = 55,
+                                    Spe = 80,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.SwiftSwim,
+                                    Slot1 = AbilityId.Oblivious,
+                                    Hidden = AbilityId.Adaptability,
+                                },
+                                HeightM = 0.6,
+                                WeightKg = 7.4,
+                                Color = "Brown",
+                            },
+                            [SpecieId.Milotic] = new()
+                            {
+                                Id = SpecieId.Milotic,
+                                Num = 350,
+                                Name = "Milotic",
+                                Types = [PokemonType.Water],
+                                Gender = GenderId.Empty,
+                                BaseStats = new StatsTable
+                                {
+                                    Hp = 95,
+                                    Atk = 60,
+                                    Def = 79,
+                                    SpA = 100,
+                                    SpD = 125,
+                                    Spe = 81,
+                                },
+                                Abilities = new SpeciesAbility
+                                {
+                                    Slot0 = AbilityId.MarvelScale,
+                                    Slot1 = AbilityId.Competitive,
+                                    Hidden = AbilityId.CuteCharm,
+                                },
+                                HeightM = 6.2,
+                                WeightKg = 162,
+                                Color = "Pink",
+                                Prevo = SpecieId.Feebas,
+                            },
+                        };
+                    }
+                }

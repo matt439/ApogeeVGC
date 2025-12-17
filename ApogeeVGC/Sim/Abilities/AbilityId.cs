@@ -198,5 +198,12 @@ public enum AbilityId
             // Added for Spoink to Claydol conversion
             ToxicBoost,
 
+            // Added for Lileep to Sealeo conversion
+            Forecast,
+            ColorChange,
+            Protean,
+            FlareBoost,
+            Refrigerate,
+
             None,
         }
