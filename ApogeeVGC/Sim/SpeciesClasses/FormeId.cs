@@ -78,7 +78,25 @@ public enum FormeId
                         Zen,
                         GalarZen,
 
-                        // Forces of Nature formes
-                        Incarnate,
-                        Therian,
-                    }
+                            // Forces of Nature formes
+                            Incarnate,
+                            Therian,
+
+                            // Kyurem formes
+                            Black,
+                            White,
+
+                            // Keldeo formes
+                            Ordinary,
+                            Resolute,
+
+                            // Meloetta formes
+                            Aria,
+                            Pirouette,
+
+                            // Genesect formes
+                            Douse,
+                            Shock,
+                            Burn,
+                            Chill,
+                        }

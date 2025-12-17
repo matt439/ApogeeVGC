@@ -242,8 +242,12 @@ public enum AbilityId
                         // Added for Karrablast to Tynamo conversion
                         IronBarbs,
 
-                        // Added for Shelmet to Braviary-Hisui conversion
-                        Mimicry,
+                            // Added for Shelmet to Braviary-Hisui conversion
+                            Mimicry,
 
-                        None,
-                    }
+                            // Added for Reshiram to Genesect conversion
+                            Turboblaze,
+                            Teravolt,
+
+                            None,
+                        }
