@@ -711,6 +711,23 @@ public enum SpecieId
     Panpour,
     Simipour,
 
+    // Gen 5 (517-530)
+    Munna,
+    Musharna,
+    Pidove,
+    Tranquill,
+    Unfezant,
+    Blitzle,
+    Zebstrika,
+    Roggenrola,
+    Boldore,
+    Gigalith,
+    Woobat,
+    Swoobat,
+    Drilbur,
+    Excadrill,
+    ExcadrillMega,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

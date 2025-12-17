@@ -655,11 +655,411 @@ public partial record SpeciesData
                                     Slot0 = AbilityId.Gluttony,
                                     Hidden = AbilityId.Torrent,
                                 },
-                                HeightM = 1,
-                                WeightKg = 29,
-                                Color = "Blue",
-                                Prevo = SpecieId.Panpour,
-                            },
-                        };
-                    }
-                }
+                                                HeightM = 1,
+                                                WeightKg = 29,
+                                                Color = "Blue",
+                                                Prevo = SpecieId.Panpour,
+                                            },
+                                            [SpecieId.Munna] = new()
+                                            {
+                                                Id = SpecieId.Munna,
+                                                Num = 517,
+                                                Name = "Munna",
+                                                Types = [PokemonType.Psychic],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 76,
+                                                    Atk = 25,
+                                                    Def = 45,
+                                                    SpA = 67,
+                                                    SpD = 55,
+                                                    Spe = 24,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Forewarn,
+                                                    Slot1 = AbilityId.Synchronize,
+                                                    Hidden = AbilityId.Telepathy,
+                                                },
+                                                HeightM = 0.6,
+                                                WeightKg = 23.3,
+                                                Color = "Pink",
+                                            },
+                                            [SpecieId.Musharna] = new()
+                                            {
+                                                Id = SpecieId.Musharna,
+                                                Num = 518,
+                                                Name = "Musharna",
+                                                Types = [PokemonType.Psychic],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 116,
+                                                    Atk = 55,
+                                                    Def = 85,
+                                                    SpA = 107,
+                                                    SpD = 95,
+                                                    Spe = 29,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Forewarn,
+                                                    Slot1 = AbilityId.Synchronize,
+                                                    Hidden = AbilityId.Telepathy,
+                                                },
+                                                HeightM = 1.1,
+                                                WeightKg = 60.5,
+                                                Color = "Pink",
+                                                Prevo = SpecieId.Munna,
+                                            },
+                                            [SpecieId.Pidove] = new()
+                                            {
+                                                Id = SpecieId.Pidove,
+                                                Num = 519,
+                                                Name = "Pidove",
+                                                Types = [PokemonType.Normal, PokemonType.Flying],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 50,
+                                                    Atk = 55,
+                                                    Def = 50,
+                                                    SpA = 36,
+                                                    SpD = 30,
+                                                    Spe = 43,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.BigPecks,
+                                                    Slot1 = AbilityId.SuperLuck,
+                                                    Hidden = AbilityId.Rivalry,
+                                                },
+                                                HeightM = 0.3,
+                                                WeightKg = 2.1,
+                                                Color = "Gray",
+                                            },
+                                            [SpecieId.Tranquill] = new()
+                                            {
+                                                Id = SpecieId.Tranquill,
+                                                Num = 520,
+                                                Name = "Tranquill",
+                                                Types = [PokemonType.Normal, PokemonType.Flying],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 62,
+                                                    Atk = 77,
+                                                    Def = 62,
+                                                    SpA = 50,
+                                                    SpD = 42,
+                                                    Spe = 65,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.BigPecks,
+                                                    Slot1 = AbilityId.SuperLuck,
+                                                    Hidden = AbilityId.Rivalry,
+                                                },
+                                                HeightM = 0.6,
+                                                WeightKg = 15,
+                                                Color = "Gray",
+                                                Prevo = SpecieId.Pidove,
+                                            },
+                                            [SpecieId.Unfezant] = new()
+                                            {
+                                                Id = SpecieId.Unfezant,
+                                                Num = 521,
+                                                Name = "Unfezant",
+                                                Types = [PokemonType.Normal, PokemonType.Flying],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 80,
+                                                    Atk = 115,
+                                                    Def = 80,
+                                                    SpA = 65,
+                                                    SpD = 55,
+                                                    Spe = 93,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.BigPecks,
+                                                    Slot1 = AbilityId.SuperLuck,
+                                                    Hidden = AbilityId.Rivalry,
+                                                },
+                                                HeightM = 1.2,
+                                                WeightKg = 29,
+                                                Color = "Gray",
+                                                Prevo = SpecieId.Tranquill,
+                                            },
+                                            [SpecieId.Blitzle] = new()
+                                            {
+                                                Id = SpecieId.Blitzle,
+                                                Num = 522,
+                                                Name = "Blitzle",
+                                                Types = [PokemonType.Electric],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 45,
+                                                    Atk = 60,
+                                                    Def = 32,
+                                                    SpA = 50,
+                                                    SpD = 32,
+                                                    Spe = 76,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.LightningRod,
+                                                    Slot1 = AbilityId.MotorDrive,
+                                                    Hidden = AbilityId.SapSipper,
+                                                },
+                                                HeightM = 0.8,
+                                                WeightKg = 29.8,
+                                                Color = "Black",
+                                            },
+                                            [SpecieId.Zebstrika] = new()
+                                            {
+                                                Id = SpecieId.Zebstrika,
+                                                Num = 523,
+                                                Name = "Zebstrika",
+                                                Types = [PokemonType.Electric],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 75,
+                                                    Atk = 100,
+                                                    Def = 63,
+                                                    SpA = 80,
+                                                    SpD = 63,
+                                                    Spe = 116,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.LightningRod,
+                                                    Slot1 = AbilityId.MotorDrive,
+                                                    Hidden = AbilityId.SapSipper,
+                                                },
+                                                HeightM = 1.6,
+                                                WeightKg = 79.5,
+                                                Color = "Black",
+                                                Prevo = SpecieId.Blitzle,
+                                            },
+                                            [SpecieId.Roggenrola] = new()
+                                            {
+                                                Id = SpecieId.Roggenrola,
+                                                Num = 524,
+                                                Name = "Roggenrola",
+                                                Types = [PokemonType.Rock],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 55,
+                                                    Atk = 75,
+                                                    Def = 85,
+                                                    SpA = 25,
+                                                    SpD = 25,
+                                                    Spe = 15,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Sturdy,
+                                                    Slot1 = AbilityId.WeakArmor,
+                                                    Hidden = AbilityId.SandForce,
+                                                },
+                                                HeightM = 0.4,
+                                                WeightKg = 18,
+                                                Color = "Blue",
+                                            },
+                                            [SpecieId.Boldore] = new()
+                                            {
+                                                Id = SpecieId.Boldore,
+                                                Num = 525,
+                                                Name = "Boldore",
+                                                Types = [PokemonType.Rock],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 70,
+                                                    Atk = 105,
+                                                    Def = 105,
+                                                    SpA = 50,
+                                                    SpD = 40,
+                                                    Spe = 20,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Sturdy,
+                                                    Slot1 = AbilityId.WeakArmor,
+                                                    Hidden = AbilityId.SandForce,
+                                                },
+                                                HeightM = 0.9,
+                                                WeightKg = 102,
+                                                Color = "Blue",
+                                                Prevo = SpecieId.Roggenrola,
+                                            },
+                                            [SpecieId.Gigalith] = new()
+                                            {
+                                                Id = SpecieId.Gigalith,
+                                                Num = 526,
+                                                Name = "Gigalith",
+                                                Types = [PokemonType.Rock],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 85,
+                                                    Atk = 135,
+                                                    Def = 130,
+                                                    SpA = 60,
+                                                    SpD = 80,
+                                                    Spe = 25,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Sturdy,
+                                                    Slot1 = AbilityId.SandStream,
+                                                    Hidden = AbilityId.SandForce,
+                                                },
+                                                HeightM = 1.7,
+                                                WeightKg = 260,
+                                                Color = "Blue",
+                                                Prevo = SpecieId.Boldore,
+                                            },
+                                            [SpecieId.Woobat] = new()
+                                            {
+                                                Id = SpecieId.Woobat,
+                                                Num = 527,
+                                                Name = "Woobat",
+                                                Types = [PokemonType.Psychic, PokemonType.Flying],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 65,
+                                                    Atk = 45,
+                                                    Def = 43,
+                                                    SpA = 55,
+                                                    SpD = 43,
+                                                    Spe = 72,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Unaware,
+                                                    Slot1 = AbilityId.Klutz,
+                                                    Hidden = AbilityId.Simple,
+                                                },
+                                                HeightM = 0.4,
+                                                WeightKg = 2.1,
+                                                Color = "Blue",
+                                            },
+                                            [SpecieId.Swoobat] = new()
+                                            {
+                                                Id = SpecieId.Swoobat,
+                                                Num = 528,
+                                                Name = "Swoobat",
+                                                Types = [PokemonType.Psychic, PokemonType.Flying],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 67,
+                                                    Atk = 57,
+                                                    Def = 55,
+                                                    SpA = 77,
+                                                    SpD = 55,
+                                                    Spe = 114,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.Unaware,
+                                                    Slot1 = AbilityId.Klutz,
+                                                    Hidden = AbilityId.Simple,
+                                                },
+                                                HeightM = 0.9,
+                                                WeightKg = 10.5,
+                                                Color = "Blue",
+                                                Prevo = SpecieId.Woobat,
+                                            },
+                                            [SpecieId.Drilbur] = new()
+                                            {
+                                                Id = SpecieId.Drilbur,
+                                                Num = 529,
+                                                Name = "Drilbur",
+                                                Types = [PokemonType.Ground],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 60,
+                                                    Atk = 85,
+                                                    Def = 40,
+                                                    SpA = 30,
+                                                    SpD = 45,
+                                                    Spe = 68,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.SandRush,
+                                                    Slot1 = AbilityId.SandForce,
+                                                    Hidden = AbilityId.MoldBreaker,
+                                                },
+                                                HeightM = 0.3,
+                                                WeightKg = 8.5,
+                                                Color = "Gray",
+                                            },
+                                            [SpecieId.Excadrill] = new()
+                                            {
+                                                Id = SpecieId.Excadrill,
+                                                Num = 530,
+                                                Name = "Excadrill",
+                                                Types = [PokemonType.Ground, PokemonType.Steel],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 110,
+                                                    Atk = 135,
+                                                    Def = 60,
+                                                    SpA = 50,
+                                                    SpD = 65,
+                                                    Spe = 88,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.SandRush,
+                                                    Slot1 = AbilityId.SandForce,
+                                                    Hidden = AbilityId.MoldBreaker,
+                                                },
+                                                HeightM = 0.7,
+                                                WeightKg = 40.4,
+                                                Color = "Gray",
+                                                Prevo = SpecieId.Drilbur,
+                                            },
+                                            [SpecieId.ExcadrillMega] = new()
+                                            {
+                                                Id = SpecieId.ExcadrillMega,
+                                                Num = 530,
+                                                Name = "Excadrill-Mega",
+                                                Types = [PokemonType.Ground, PokemonType.Steel],
+                                                Gender = GenderId.Empty,
+                                                BaseStats = new StatsTable
+                                                {
+                                                    Hp = 110,
+                                                    Atk = 165,
+                                                    Def = 100,
+                                                    SpA = 65,
+                                                    SpD = 65,
+                                                    Spe = 103,
+                                                },
+                                                Abilities = new SpeciesAbility
+                                                {
+                                                    Slot0 = AbilityId.SandRush,
+                                                    Slot1 = AbilityId.SandForce,
+                                                    Hidden = AbilityId.MoldBreaker,
+                                                },
+                                                HeightM = 0.9,
+                                                WeightKg = 60,
+                                                Color = "Gray",
+                                                BaseSpecies = SpecieId.Excadrill,
+                                                Forme = FormeId.Mega,
+                                            },
+                                        };
+                                    }
+                                }
