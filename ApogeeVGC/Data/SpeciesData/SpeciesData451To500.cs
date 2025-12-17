@@ -1733,14 +1733,144 @@ public partial record SpeciesData
                                 },
                                 Abilities = new SpeciesAbility
                                 {
-                                    Slot0 = AbilityId.Multitype,
-                                },
-                                HeightM = 3.2,
-                                WeightKg = 320,
-                                Color = "White",
-                                BaseSpecies = SpecieId.Arceus,
-                                Forme = FormeId.Ice,
-                            },
-                        };
-                    }
-                }
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Ice,
+                                                },
+                                                [SpecieId.ArceusPoison] = new()
+                                                {
+                                                    Id = SpecieId.ArceusPoison,
+                                                    Num = 493,
+                                                    Name = "Arceus-Poison",
+                                                    Types = [PokemonType.Poison],
+                                                    Gender = GenderId.N,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 120,
+                                                        Atk = 120,
+                                                        Def = 120,
+                                                        SpA = 120,
+                                                        SpD = 120,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Poison,
+                                                },
+                                                [SpecieId.ArceusPsychic] = new()
+                                                {
+                                                    Id = SpecieId.ArceusPsychic,
+                                                    Num = 493,
+                                                    Name = "Arceus-Psychic",
+                                                    Types = [PokemonType.Psychic],
+                                                    Gender = GenderId.N,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 120,
+                                                        Atk = 120,
+                                                        Def = 120,
+                                                        SpA = 120,
+                                                        SpD = 120,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Psychic,
+                                                },
+                                                [SpecieId.ArceusRock] = new()
+                                                {
+                                                    Id = SpecieId.ArceusRock,
+                                                    Num = 493,
+                                                    Name = "Arceus-Rock",
+                                                    Types = [PokemonType.Rock],
+                                                    Gender = GenderId.N,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 120,
+                                                        Atk = 120,
+                                                        Def = 120,
+                                                        SpA = 120,
+                                                        SpD = 120,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Rock,
+                                                },
+                                                [SpecieId.ArceusSteel] = new()
+                                                {
+                                                    Id = SpecieId.ArceusSteel,
+                                                    Num = 493,
+                                                    Name = "Arceus-Steel",
+                                                    Types = [PokemonType.Steel],
+                                                    Gender = GenderId.N,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 120,
+                                                        Atk = 120,
+                                                        Def = 120,
+                                                        SpA = 120,
+                                                        SpD = 120,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Steel,
+                                                },
+                                                [SpecieId.ArceusWater] = new()
+                                                {
+                                                    Id = SpecieId.ArceusWater,
+                                                    Num = 493,
+                                                    Name = "Arceus-Water",
+                                                    Types = [PokemonType.Water],
+                                                    Gender = GenderId.N,
+                                                    BaseStats = new StatsTable
+                                                    {
+                                                        Hp = 120,
+                                                        Atk = 120,
+                                                        Def = 120,
+                                                        SpA = 120,
+                                                        SpD = 120,
+                                                        Spe = 120,
+                                                    },
+                                                    Abilities = new SpeciesAbility
+                                                    {
+                                                        Slot0 = AbilityId.Multitype,
+                                                    },
+                                                    HeightM = 3.2,
+                                                    WeightKg = 320,
+                                                    Color = "White",
+                                                    BaseSpecies = SpecieId.Arceus,
+                                                    Forme = FormeId.Water,
+                                                },
+                                            };
+                                        }
+                                    }

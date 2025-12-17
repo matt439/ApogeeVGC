@@ -676,6 +676,21 @@ public enum SpecieId
     ArceusGrass,
     ArceusGround,
     ArceusIce,
+    ArceusPoison,
+    ArceusPsychic,
+    ArceusRock,
+    ArceusSteel,
+    ArceusWater,
+
+    // Gen 5 (494-500)
+    Victini,
+    Snivy,
+    Servine,
+    Serperior,
+    Tepig,
+    Pignite,
+    Emboar,
+    EmboarMega,
 
     CalyrexIce,
     Miraidon,
