@@ -37,5 +37,8 @@ public enum FormeId
     Attack,
     Defense,
     Speed,
+    Sandy,
+    Trash,
+    Sunshine,
     None,
 }

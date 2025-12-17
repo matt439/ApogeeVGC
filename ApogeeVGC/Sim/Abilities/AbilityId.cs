@@ -198,22 +198,25 @@ public enum AbilityId
             // Added for Spoink to Claydol conversion
             ToxicBoost,
 
-            // Added for Lileep to Sealeo conversion
-            Forecast,
-            ColorChange,
-            Protean,
-            FlareBoost,
-            Refrigerate,
+                // Added for Lileep to Sealeo conversion
+                Forecast,
+                ColorChange,
+                Protean,
+                FlareBoost,
+                Refrigerate,
 
-            // Added for Walrein to Deoxys conversion
-            DeepSeaTooth,
-            DeepSeaScale,
-            PrimordialSea,
-            DesolateLand,
-            DeltaStream,
-            AirLock2,
-            VictoryStar,
-            BadDreams,
+                // Added for Walrein to Deoxys conversion
+                DeepSeaTooth,
+                DeepSeaScale,
+                PrimordialSea,
+                DesolateLand,
+                DeltaStream,
+                AirLock2,
+                VictoryStar,
+                BadDreams,
 
-            None,
-        }
+                // Added for Shieldon to Drifloon conversion
+                FlowerGift,
+
+                None,
+            }
