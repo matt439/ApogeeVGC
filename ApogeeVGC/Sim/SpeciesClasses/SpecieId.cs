@@ -728,6 +728,23 @@ public enum SpecieId
     Excadrill,
     ExcadrillMega,
 
+    // Gen 5 (531-544)
+    Audino,
+    AudinoMega,
+    Timburr,
+    Gurdurr,
+    Conkeldurr,
+    Tympole,
+    Palpitoad,
+    Seismitoad,
+    Throh,
+    Sawk,
+    Sewaddle,
+    Swadloon,
+    Leavanny,
+    Venipede,
+    Whirlipede,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
