@@ -826,6 +826,23 @@ public enum SpecieId
     Klinklang,
     Tynamo,
 
+    // Gen 5 (603-615)
+    Eelektrik,
+    Eelektross,
+    EelektrossMega,
+    Elgyem,
+    Beheeyem,
+    Litwick,
+    Lampent,
+    Chandelure,
+    ChandelureMega,
+    Axew,
+    Fraxure,
+    Haxorus,
+    Cubchoo,
+    Beartic,
+    Cryogonal,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
