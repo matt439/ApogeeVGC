@@ -236,11 +236,14 @@ public enum AbilityId
                     Mummy,
                     WanderingSpirit,
 
-                    // Added for Cofagrigus to Gothita conversion
-                    Defeatist,
+                        // Added for Cofagrigus to Gothita conversion
+                        Defeatist,
 
-                    // Added for Karrablast to Tynamo conversion
-                    IronBarbs,
+                        // Added for Karrablast to Tynamo conversion
+                        IronBarbs,
 
-                    None,
-                }
+                        // Added for Shelmet to Braviary-Hisui conversion
+                        Mimicry,
+
+                        None,
+                    }

@@ -843,6 +843,33 @@ public enum SpecieId
     Beartic,
     Cryogonal,
 
+    // Gen 5 (616-628)
+    Shelmet,
+    Accelgor,
+    Stunfisk,
+    StunfiskGalar,
+    Mienfoo,
+    Mienshao,
+    Druddigon,
+    Golett,
+    Golurk,
+    Pawniard,
+    Bisharp,
+    Bouffalant,
+    Rufflet,
+    Braviary,
+    BraviaryHisui,
+
+    // Gen 5 (629-637)
+    Vullaby,
+    Mandibuzz,
+    Heatmor,
+    Durant,
+    Deino,
+    Zweilous,
+    Hydreigon,
+    Larvesta,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,
