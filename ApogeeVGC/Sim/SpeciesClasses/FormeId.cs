@@ -33,5 +33,9 @@ public enum FormeId
     Sunny,
     Rainy,
     Snowy,
+    Primal,
+    Attack,
+    Defense,
+    Speed,
     None,
 }

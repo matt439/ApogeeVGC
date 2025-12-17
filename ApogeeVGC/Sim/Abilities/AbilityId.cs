@@ -205,5 +205,15 @@ public enum AbilityId
             FlareBoost,
             Refrigerate,
 
+            // Added for Walrein to Deoxys conversion
+            DeepSeaTooth,
+            DeepSeaScale,
+            PrimordialSea,
+            DesolateLand,
+            DeltaStream,
+            AirLock2,
+            VictoryStar,
+            BadDreams,
+
             None,
         }

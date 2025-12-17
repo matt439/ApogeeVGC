@@ -47,6 +47,14 @@ public enum ItemId
             Banettite,
             Absolite,
             Glalitite,
+            Salamencite,
+            Metagrossite,
+            Latiasite,
+            Latiosite,
+
+            // Primal Orbs
+            BlueOrb,
+            RedOrb,
 
             None,
         }
