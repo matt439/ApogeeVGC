@@ -777,6 +777,23 @@ public enum SpecieId
     Yamask,
     YamaskGalar,
 
+    // Gen 5 (563-574)
+    Cofagrigus,
+    Tirtouga,
+    Carracosta,
+    Archen,
+    Archeops,
+    Trubbish,
+    Garbodor,
+    GarbodorGmax,
+    Zorua,
+    ZoruaHisui,
+    Zoroark,
+    ZoroarkHisui,
+    Minccino,
+    Cinccino,
+    Gothita,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

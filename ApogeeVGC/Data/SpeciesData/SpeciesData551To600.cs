@@ -704,6 +704,396 @@ public partial record SpeciesData
                 BaseSpecies = SpecieId.Yamask,
                 Forme = FormeId.Galar,
             },
+            [SpecieId.Cofagrigus] = new()
+            {
+                Id = SpecieId.Cofagrigus,
+                Num = 563,
+                Name = "Cofagrigus",
+                Types = [PokemonType.Ghost],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 58,
+                    Atk = 50,
+                    Def = 145,
+                    SpA = 95,
+                    SpD = 105,
+                    Spe = 30,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Mummy,
+                },
+                HeightM = 1.7,
+                WeightKg = 76.5,
+                Color = "Yellow",
+                Prevo = SpecieId.Yamask,
+            },
+            [SpecieId.Tirtouga] = new()
+            {
+                Id = SpecieId.Tirtouga,
+                Num = 564,
+                Name = "Tirtouga",
+                Types = [PokemonType.Water, PokemonType.Rock],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 54,
+                    Atk = 78,
+                    Def = 103,
+                    SpA = 53,
+                    SpD = 45,
+                    Spe = 22,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SolidRock,
+                    Slot1 = AbilityId.Sturdy,
+                    Hidden = AbilityId.SwiftSwim,
+                },
+                HeightM = 0.7,
+                WeightKg = 16.5,
+                Color = "Blue",
+            },
+            [SpecieId.Carracosta] = new()
+            {
+                Id = SpecieId.Carracosta,
+                Num = 565,
+                Name = "Carracosta",
+                Types = [PokemonType.Water, PokemonType.Rock],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 74,
+                    Atk = 108,
+                    Def = 133,
+                    SpA = 83,
+                    SpD = 65,
+                    Spe = 32,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.SolidRock,
+                    Slot1 = AbilityId.Sturdy,
+                    Hidden = AbilityId.SwiftSwim,
+                },
+                HeightM = 1.2,
+                WeightKg = 81,
+                Color = "Blue",
+                Prevo = SpecieId.Tirtouga,
+            },
+            [SpecieId.Archen] = new()
+            {
+                Id = SpecieId.Archen,
+                Num = 566,
+                Name = "Archen",
+                Types = [PokemonType.Rock, PokemonType.Flying],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 55,
+                    Atk = 112,
+                    Def = 45,
+                    SpA = 74,
+                    SpD = 45,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Defeatist,
+                },
+                HeightM = 0.5,
+                WeightKg = 9.5,
+                Color = "Yellow",
+            },
+            [SpecieId.Archeops] = new()
+            {
+                Id = SpecieId.Archeops,
+                Num = 567,
+                Name = "Archeops",
+                Types = [PokemonType.Rock, PokemonType.Flying],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 140,
+                    Def = 65,
+                    SpA = 112,
+                    SpD = 65,
+                    Spe = 110,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Defeatist,
+                },
+                HeightM = 1.4,
+                WeightKg = 32,
+                Color = "Yellow",
+                Prevo = SpecieId.Archen,
+            },
+            [SpecieId.Trubbish] = new()
+            {
+                Id = SpecieId.Trubbish,
+                Num = 568,
+                Name = "Trubbish",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 50,
+                    Atk = 50,
+                    Def = 62,
+                    SpA = 40,
+                    SpD = 62,
+                    Spe = 65,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Stench,
+                    Slot1 = AbilityId.StickyHold,
+                    Hidden = AbilityId.Aftermath,
+                },
+                HeightM = 0.6,
+                WeightKg = 31,
+                Color = "Green",
+            },
+            [SpecieId.Garbodor] = new()
+            {
+                Id = SpecieId.Garbodor,
+                Num = 569,
+                Name = "Garbodor",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 95,
+                    Def = 82,
+                    SpA = 60,
+                    SpD = 82,
+                    Spe = 75,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Stench,
+                    Slot1 = AbilityId.WeakArmor,
+                    Hidden = AbilityId.Aftermath,
+                },
+                HeightM = 1.9,
+                WeightKg = 107.3,
+                Color = "Green",
+                Prevo = SpecieId.Trubbish,
+            },
+            [SpecieId.GarbodorGmax] = new()
+            {
+                Id = SpecieId.GarbodorGmax,
+                Num = 569,
+                Name = "Garbodor-Gmax",
+                Types = [PokemonType.Poison],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 80,
+                    Atk = 95,
+                    Def = 82,
+                    SpA = 60,
+                    SpD = 82,
+                    Spe = 75,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Stench,
+                    Slot1 = AbilityId.WeakArmor,
+                    Hidden = AbilityId.Aftermath,
+                },
+                HeightM = 21,
+                WeightKg = 0,
+                Color = "Green",
+                BaseSpecies = SpecieId.Garbodor,
+                Forme = FormeId.Gmax,
+                ChangesFrom = FormeId.Standard,
+            },
+            [SpecieId.Zorua] = new()
+            {
+                Id = SpecieId.Zorua,
+                Num = 570,
+                Name = "Zorua",
+                Types = [PokemonType.Dark],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 40,
+                    Atk = 65,
+                    Def = 40,
+                    SpA = 80,
+                    SpD = 40,
+                    Spe = 65,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Illusion,
+                },
+                HeightM = 0.7,
+                WeightKg = 12.5,
+                Color = "Gray",
+            },
+            [SpecieId.ZoruaHisui] = new()
+            {
+                Id = SpecieId.ZoruaHisui,
+                Num = 570,
+                Name = "Zorua-Hisui",
+                Types = [PokemonType.Normal, PokemonType.Ghost],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 35,
+                    Atk = 60,
+                    Def = 40,
+                    SpA = 85,
+                    SpD = 40,
+                    Spe = 70,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Illusion,
+                },
+                HeightM = 0.7,
+                WeightKg = 12.5,
+                Color = "Gray",
+                BaseSpecies = SpecieId.Zorua,
+                Forme = FormeId.Hisui,
+            },
+            [SpecieId.Zoroark] = new()
+            {
+                Id = SpecieId.Zoroark,
+                Num = 571,
+                Name = "Zoroark",
+                Types = [PokemonType.Dark],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 60,
+                    Atk = 105,
+                    Def = 60,
+                    SpA = 120,
+                    SpD = 60,
+                    Spe = 105,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Illusion,
+                },
+                HeightM = 1.6,
+                WeightKg = 81.1,
+                Color = "Gray",
+                Prevo = SpecieId.Zorua,
+            },
+            [SpecieId.ZoroarkHisui] = new()
+            {
+                Id = SpecieId.ZoroarkHisui,
+                Num = 571,
+                Name = "Zoroark-Hisui",
+                Types = [PokemonType.Normal, PokemonType.Ghost],
+                Gender = GenderId.M875F125,
+                BaseStats = new StatsTable
+                {
+                    Hp = 55,
+                    Atk = 100,
+                    Def = 60,
+                    SpA = 125,
+                    SpD = 60,
+                    Spe = 110,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Illusion,
+                },
+                HeightM = 1.6,
+                WeightKg = 73,
+                Color = "Gray",
+                BaseSpecies = SpecieId.Zoroark,
+                Forme = FormeId.Hisui,
+                Prevo = SpecieId.ZoruaHisui,
+            },
+            [SpecieId.Minccino] = new()
+            {
+                Id = SpecieId.Minccino,
+                Num = 572,
+                Name = "Minccino",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.M25F75,
+                BaseStats = new StatsTable
+                {
+                    Hp = 55,
+                    Atk = 50,
+                    Def = 40,
+                    SpA = 40,
+                    SpD = 40,
+                    Spe = 75,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.CuteCharm,
+                    Slot1 = AbilityId.Technician,
+                    Hidden = AbilityId.SkillLink,
+                },
+                HeightM = 0.4,
+                WeightKg = 5.8,
+                Color = "Gray",
+            },
+            [SpecieId.Cinccino] = new()
+            {
+                Id = SpecieId.Cinccino,
+                Num = 573,
+                Name = "Cinccino",
+                Types = [PokemonType.Normal],
+                Gender = GenderId.M25F75,
+                BaseStats = new StatsTable
+                {
+                    Hp = 75,
+                    Atk = 95,
+                    Def = 60,
+                    SpA = 65,
+                    SpD = 60,
+                    Spe = 115,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.CuteCharm,
+                    Slot1 = AbilityId.Technician,
+                    Hidden = AbilityId.SkillLink,
+                },
+                HeightM = 0.5,
+                WeightKg = 7.5,
+                Color = "Gray",
+                Prevo = SpecieId.Minccino,
+            },
+            [SpecieId.Gothita] = new()
+            {
+                Id = SpecieId.Gothita,
+                Num = 574,
+                Name = "Gothita",
+                Types = [PokemonType.Psychic],
+                Gender = GenderId.M25F75,
+                BaseStats = new StatsTable
+                {
+                    Hp = 45,
+                    Atk = 30,
+                    Def = 50,
+                    SpA = 55,
+                    SpD = 65,
+                    Spe = 45,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Frisk,
+                    Slot1 = AbilityId.Competitive,
+                    Hidden = AbilityId.ShadowTag,
+                },
+                HeightM = 0.4,
+                WeightKg = 5.8,
+                Color = "Purple",
+            },
         };
     }
 }

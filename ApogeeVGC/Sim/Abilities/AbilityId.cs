@@ -236,5 +236,8 @@ public enum AbilityId
                 Mummy,
                 WanderingSpirit,
 
+                // Added for Cofagrigus to Gothita conversion
+                Defeatist,
+
                 None,
             }
