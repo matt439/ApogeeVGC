@@ -745,6 +745,21 @@ public enum SpecieId
     Venipede,
     Whirlipede,
 
+    // Gen 5 (545-553)
+    Scolipede,
+    ScolipedeMega,
+    Cottonee,
+    Whimsicott,
+    Petilil,
+    Lilligant,
+    LilligantHisui,
+    Basculin,
+    BasculinBlueStriped,
+    BasculinWhiteStriped,
+    Sandile,
+    Krokorok,
+    Krookodile,
+
     CalyrexIce,
     Miraidon,
     Ursaluna,

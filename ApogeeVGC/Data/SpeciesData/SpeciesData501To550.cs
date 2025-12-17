@@ -1452,11 +1452,66 @@ public partial record SpeciesData
                                                                     Slot1 = AbilityId.Swarm,
                                                                     Hidden = AbilityId.SpeedBoost,
                                                                 },
-                                                                HeightM = 1.2,
-                                                                WeightKg = 58.5,
-                                                                Color = "Gray",
-                                                                Prevo = SpecieId.Venipede,
-                                                            },
-                                                        };
-                                                    }
-                                                }
+                                                                                HeightM = 1.2,
+                                                                                WeightKg = 58.5,
+                                                                                Color = "Gray",
+                                                                                Prevo = SpecieId.Venipede,
+                                                                            },
+                                                                            [SpecieId.Scolipede] = new()
+                                                                            {
+                                                                                Id = SpecieId.Scolipede,
+                                                                                Num = 545,
+                                                                                Name = "Scolipede",
+                                                                                Types = [PokemonType.Bug, PokemonType.Poison],
+                                                                                Gender = GenderId.Empty,
+                                                                                BaseStats = new StatsTable
+                                                                                {
+                                                                                    Hp = 60,
+                                                                                    Atk = 100,
+                                                                                    Def = 89,
+                                                                                    SpA = 55,
+                                                                                    SpD = 69,
+                                                                                    Spe = 112,
+                                                                                },
+                                                                                Abilities = new SpeciesAbility
+                                                                                {
+                                                                                    Slot0 = AbilityId.PoisonPoint,
+                                                                                    Slot1 = AbilityId.Swarm,
+                                                                                    Hidden = AbilityId.SpeedBoost,
+                                                                                },
+                                                                                HeightM = 2.5,
+                                                                                WeightKg = 200.5,
+                                                                                Color = "Red",
+                                                                                Prevo = SpecieId.Whirlipede,
+                                                                            },
+                                                                            [SpecieId.ScolipedeMega] = new()
+                                                                            {
+                                                                                Id = SpecieId.ScolipedeMega,
+                                                                                Num = 545,
+                                                                                Name = "Scolipede-Mega",
+                                                                                Types = [PokemonType.Bug, PokemonType.Poison],
+                                                                                Gender = GenderId.Empty,
+                                                                                BaseStats = new StatsTable
+                                                                                {
+                                                                                    Hp = 60,
+                                                                                    Atk = 140,
+                                                                                    Def = 149,
+                                                                                    SpA = 75,
+                                                                                    SpD = 99,
+                                                                                    Spe = 62,
+                                                                                },
+                                                                                Abilities = new SpeciesAbility
+                                                                                {
+                                                                                    Slot0 = AbilityId.PoisonPoint,
+                                                                                    Slot1 = AbilityId.Swarm,
+                                                                                    Hidden = AbilityId.SpeedBoost,
+                                                                                },
+                                                                                HeightM = 3.2,
+                                                                                WeightKg = 230.5,
+                                                                                Color = "Red",
+                                                                                BaseSpecies = SpecieId.Scolipede,
+                                                                                Forme = FormeId.Mega,
+                                                                            },
+                                                                        };
+                                                                    }
+                                                                }

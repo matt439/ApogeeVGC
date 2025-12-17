@@ -51,21 +51,25 @@ public enum FormeId
         Land,
         None,
 
-                // Type formes (Arceus)
-                Bug,
-                Dark,
-                Dragon,
-                Electric,
-                Fairy,
-                Fighting,
-                Fire,
-                Flying,
-                Ghost,
-                Grass,
-                Ground,
-                Poison,
-                Psychic,
-                Rock,
-                Steel,
-                Water,
-            }
+                    // Type formes (Arceus)
+                    Bug,
+                    Dark,
+                    Dragon,
+                    Electric,
+                    Fairy,
+                    Fighting,
+                    Fire,
+                    Flying,
+                    Ghost,
+                    Grass,
+                    Ground,
+                    Poison,
+                    Psychic,
+                    Rock,
+                    Steel,
+                    Water,
+
+                    // Striped formes (Basculin)
+                    BlueStriped,
+                    WhiteStriped,
+                }
