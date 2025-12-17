@@ -218,5 +218,8 @@ public enum AbilityId
                 // Added for Shieldon to Drifloon conversion
                 FlowerGift,
 
+                // Added for Buneary to Garchomp-Mega conversion
+                Heatproof,
+
                 None,
             }
