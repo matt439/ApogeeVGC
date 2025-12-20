@@ -35,26 +35,33 @@ public enum ItemId
     BlunderPolicy,
     LoadedDice,
 
-            // Mega Stones
-            Sablenite,
-            Mawilite,
-            Aggronite,
-            Medichamite,
-            Manectite,
-            Sharpedonite,
-            Cameruptite,
-            Altarianite,
-            Banettite,
-            Absolite,
-            Glalitite,
-            Salamencite,
-            Metagrossite,
-            Latiasite,
-            Latiosite,
+                // Mega Stones
+                Sablenite,
+                Mawilite,
+                Aggronite,
+                Medichamite,
+                Manectite,
+                Sharpedonite,
+                Cameruptite,
+                Altarianite,
+                Banettite,
+                Absolite,
+                Glalitite,
+                Salamencite,
+                Metagrossite,
+                Latiasite,
+                Latiosite,
 
-            // Primal Orbs
-            BlueOrb,
-            RedOrb,
+                // Gen 6 Mega Stones
+                Chesnaughtite,
+                Delphoxite,
+                Greninjite,
+                Pyroarite,
+                Floettite,
 
-            None,
-        }
+                // Primal Orbs
+                BlueOrb,
+                RedOrb,
+
+                None,
+            }

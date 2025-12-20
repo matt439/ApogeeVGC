@@ -905,7 +905,6 @@ public enum SpecieId
     IronHands,
 
     Calyrex,
-    GreninjaBond,
     RockruffDusk,
     TerapagosTerastal,
     TerapagosStellar,
