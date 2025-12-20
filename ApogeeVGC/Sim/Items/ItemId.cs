@@ -58,6 +58,9 @@ public enum ItemId
                 Greninjite,
                 Pyroarite,
                 Floettite,
+                Malamarite,
+                Barbaracite,
+                Dragalgite,
 
                 // Primal Orbs
                 BlueOrb,
