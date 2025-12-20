@@ -101,12 +101,24 @@ public enum FormeId
                                 Chill,
 
                                 // Gen 6 formes
-                                Bond,
-                                Ash,
-                                Fancy,
-                                Pokeball,
-                                Eternal,
-                                Female,
-                                Shield,
-                                Blade,
-                            }
+                                    Bond,
+                                    Ash,
+                                    Fancy,
+                                    Pokeball,
+                                    Eternal,
+                                    Female,
+                                    Shield,
+                                    Blade,
+
+                                    // Gen 6/7 additional formes
+                                    Small,
+                                    Large,
+                                    Super,
+                                    Average,
+                                    Confined,
+                                    Unbound,
+                                    Neutral,
+                                    Active,
+                                    TenPercent,
+                                    Complete,
+                                }

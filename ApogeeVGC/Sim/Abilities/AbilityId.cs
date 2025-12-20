@@ -258,8 +258,16 @@ public enum AbilityId
                                 AromaVeil,
                                 SweetVeil,
                                 StanceChange,
-                                BattleBond,
-                                CheekPouch,
+                                    BattleBond,
+                                    CheekPouch,
 
-                                None,
-                            }
+                                    // Added for Gen 6/7 species (701-750)
+                                    Gooey,
+                                    FairyAura,
+                                    DarkAura,
+                                    AuraBreak,
+                                    PowerConstruct,
+                                    LongReach,
+
+                                    None,
+                                }
