@@ -324,14 +324,21 @@ public enum AbilityId
                                                                 HungerSwitch,
                                                                 SteelySpirit,
 
-                                                                // Added for Gen 8 species (876-900)
-                                                                IntrepidSword,
-                                                                DauntlessShield,
-                                                                Transistor,
-                                                                DragonsMaw,
-                                                                GrimNeigh,
-                                                                UnseenFist,
-                                                                AsOneSpectrier,
+                                                                    // Added for Gen 8 species (876-900)
+                                                                    IntrepidSword,
+                                                                    DauntlessShield,
+                                                                    Transistor,
+                                                                    DragonsMaw,
+                                                                    GrimNeigh,
+                                                                    UnseenFist,
+                                                                    AsOneSpectrier,
 
-                                                                None,
-                                                            }
+                                                                    // Added for Gen 9 species (901-925)
+                                                                    MindsEye,
+                                                                    LingeringAroma,
+                                                                    SeedSower,
+                                                                    MyceliumMight,
+                                                                    WellBakedBody,
+
+                                                                    None,
+                                                                }

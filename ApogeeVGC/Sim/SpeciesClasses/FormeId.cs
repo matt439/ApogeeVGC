@@ -155,12 +155,18 @@ public enum FormeId
                                                             F,
                                                             Hangry,
 
-                                                            // Gen 8 formes (876-900)
-                                                            Crowned,
-                                                            Hero,
-                                                            Eternamax,
-                                                            RapidStrike,
-                                                            RapidStrikeGmax,
-                                                            Dada,
-                                                            Shadow,
-                                                        }
+                                                                // Gen 8 formes (876-900)
+                                                                Crowned,
+                                                                Hero,
+                                                                Eternamax,
+                                                                RapidStrike,
+                                                                RapidStrikeGmax,
+                                                                Dada,
+                                                                Shadow,
+
+                                                                // Gen 9 formes (901+)
+                                                                Bloodmoon,
+                                                                M,
+                                                                Three,
+                                                                Four,
+                                                            }
