@@ -6,7 +6,7 @@ namespace ApogeeVGC.Sim.FormatClasses;
 
 public record Learnset : ICopyable<Learnset>
 {
-    public IReadOnlyDictionary<string, List<MoveSource>>? LearnsetData { get; init; }
+    public IReadOnlyDictionary<MoveId, List<MoveSource>>? LearnsetData { get; init; }
     public IReadOnlyList<EventInfo>? EventData { get; init; }
     public bool? EventOnly { get; init; }
     public IReadOnlyList<EventInfo>? Encounters { get; init; }
@@ -18,9 +18,9 @@ public record Learnset : ICopyable<Learnset>
         {
             LearnsetData = LearnsetData == null
                 ? null
-                : new Dictionary<string, List<MoveSource>>(
+                : new Dictionary<MoveId, List<MoveSource>>(
                     LearnsetData.Select(kvp =>
-                        new KeyValuePair<string, List<MoveSource>>(
+                        new KeyValuePair<MoveId, List<MoveSource>>(
                             kvp.Key,
                             [..kvp.Value]
                         )
