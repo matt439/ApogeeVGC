@@ -261,13 +261,22 @@ public enum AbilityId
                                     BattleBond,
                                     CheekPouch,
 
-                                    // Added for Gen 6/7 species (701-750)
-                                    Gooey,
-                                    FairyAura,
-                                    DarkAura,
-                                    AuraBreak,
-                                    PowerConstruct,
-                                    LongReach,
+                                        // Added for Gen 6/7 species (701-750)
+                                        Gooey,
+                                        FairyAura,
+                                        DarkAura,
+                                        AuraBreak,
+                                        PowerConstruct,
+                                        LongReach,
 
-                                    None,
-                                }
+                                        // Added for Gen 7 species (726-750)
+                                        Stakeout,
+                                        Battery,
+                                        LiquidVoice,
+                                        Schooling,
+                                        Merciless,
+                                        Stamina,
+                                        ToughClaws2,
+
+                                        None,
+                                    }

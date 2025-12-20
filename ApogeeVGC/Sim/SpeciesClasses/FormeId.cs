@@ -110,15 +110,26 @@ public enum FormeId
                                     Shield,
                                     Blade,
 
-                                    // Gen 6/7 additional formes
-                                    Small,
-                                    Large,
-                                    Super,
-                                    Average,
-                                    Confined,
-                                    Unbound,
-                                    Neutral,
-                                    Active,
-                                    TenPercent,
-                                    Complete,
-                                }
+                                        // Gen 6/7 additional formes
+                                        Small,
+                                        Large,
+                                        Super,
+                                        Average,
+                                        Confined,
+                                        Unbound,
+                                        Neutral,
+                                        Active,
+                                        TenPercent,
+                                        Complete,
+
+                                        // Gen 7 formes
+                                        Totem,
+                                        PomPom,
+                                        Pau,
+                                        Sensu,
+                                        Midnight,
+                                        Dusk,
+                                        Solo,
+                                        School,
+                                        Baile,
+                                    }
