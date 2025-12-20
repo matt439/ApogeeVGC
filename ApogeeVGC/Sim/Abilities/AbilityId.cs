@@ -304,10 +304,19 @@ public enum AbilityId
                                                     PrismArmor,
                                                     Neuroforce,
 
-                                                    // Added for Gen 7/8 species (801-825)
-                                                    SoulHeart,
-                                                    Libero,
-                                                    MirrorArmor,
+                                                        // Added for Gen 7/8 species (801-825)
+                                                        SoulHeart,
+                                                        Libero,
+                                                        MirrorArmor,
 
-                                                    None,
-                                                }
+                                                        // Added for Gen 8 species (826-850)
+                                                        CottonDown,
+                                                        BallFetch,
+                                                        SteamEngine,
+                                                        Ripen,
+                                                        SandSpit,
+                                                        GulpMissile,
+                                                        PunkRock,
+
+                                                        None,
+                                                    }
