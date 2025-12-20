@@ -318,11 +318,20 @@ public enum AbilityId
                                                             GulpMissile,
                                                             PunkRock,
 
-                                                            // Added for Gen 8 species (851-875)
-                                                            IceScales,
-                                                            PowerSpot,
-                                                            HungerSwitch,
-                                                            SteelySpirit,
+                                                                // Added for Gen 8 species (851-875)
+                                                                IceScales,
+                                                                PowerSpot,
+                                                                HungerSwitch,
+                                                                SteelySpirit,
 
-                                                            None,
-                                                        }
+                                                                // Added for Gen 8 species (876-900)
+                                                                IntrepidSword,
+                                                                DauntlessShield,
+                                                                Transistor,
+                                                                DragonsMaw,
+                                                                GrimNeigh,
+                                                                UnseenFist,
+                                                                AsOneSpectrier,
+
+                                                                None,
+                                                            }

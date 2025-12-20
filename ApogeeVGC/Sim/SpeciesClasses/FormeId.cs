@@ -149,9 +149,18 @@ public enum FormeId
                                                         LowKeyGmax,
                                                         Amped,
 
-                                                        // Gen 8 formes (851-875)
-                                                        Antique,
-                                                        Noice,
-                                                        F,
-                                                        Hangry,
-                                                    }
+                                                            // Gen 8 formes (851-875)
+                                                            Antique,
+                                                            Noice,
+                                                            F,
+                                                            Hangry,
+
+                                                            // Gen 8 formes (876-900)
+                                                            Crowned,
+                                                            Hero,
+                                                            Eternamax,
+                                                            RapidStrike,
+                                                            RapidStrikeGmax,
+                                                            Dada,
+                                                            Shadow,
+                                                        }
