@@ -307,16 +307,22 @@ public enum AbilityId
                                                         // Added for Gen 7/8 species (801-825)
                                                         SoulHeart,
                                                         Libero,
-                                                        MirrorArmor,
+                                                            MirrorArmor,
 
-                                                        // Added for Gen 8 species (826-850)
-                                                        CottonDown,
-                                                        BallFetch,
-                                                        SteamEngine,
-                                                        Ripen,
-                                                        SandSpit,
-                                                        GulpMissile,
-                                                        PunkRock,
+                                                            // Added for Gen 8 species (826-850)
+                                                            CottonDown,
+                                                            BallFetch,
+                                                            SteamEngine,
+                                                            Ripen,
+                                                            SandSpit,
+                                                            GulpMissile,
+                                                            PunkRock,
 
-                                                        None,
-                                                    }
+                                                            // Added for Gen 8 species (851-875)
+                                                            IceScales,
+                                                            PowerSpot,
+                                                            HungerSwitch,
+                                                            SteelySpirit,
+
+                                                            None,
+                                                        }

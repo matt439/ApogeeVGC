@@ -142,10 +142,16 @@ public enum FormeId
                                                     DawnWings,
                                                     Ultra,
 
-                                                    // Gen 8 formes (826-850)
-                                                    Gulping,
-                                                    Gorging,
-                                                    LowKey,
-                                                    LowKeyGmax,
-                                                    Amped,
-                                                }
+                                                        // Gen 8 formes (826-850)
+                                                        Gulping,
+                                                        Gorging,
+                                                        LowKey,
+                                                        LowKeyGmax,
+                                                        Amped,
+
+                                                        // Gen 8 formes (851-875)
+                                                        Antique,
+                                                        Noice,
+                                                        F,
+                                                        Hangry,
+                                                    }
