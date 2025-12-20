@@ -921,4 +921,7 @@ public enum SpecieId
     Xerneas,
     XerneasNeutral,
     XerneasActive,
+
+    // Gen 6
+    Chespin,
 }
