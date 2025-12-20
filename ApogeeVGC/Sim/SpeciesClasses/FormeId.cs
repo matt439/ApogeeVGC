@@ -164,9 +164,15 @@ public enum FormeId
                                                                 Dada,
                                                                 Shadow,
 
-                                                                // Gen 9 formes (901+)
-                                                                Bloodmoon,
-                                                                M,
-                                                                Three,
-                                                                Four,
-                                                            }
+                                                                    // Gen 9 formes (901+)
+                                                                    Bloodmoon,
+                                                                    M,
+                                                                    Three,
+                                                                    Four,
+
+                                                                    // Gen 9 formes (926-950) - Squawkabilly colors
+                                                                    Green,
+                                                                    Blue2,
+                                                                    Yellow2,
+                                                                    White2,
+                                                                }

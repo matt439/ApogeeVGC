@@ -333,12 +333,19 @@ public enum AbilityId
                                                                     UnseenFist,
                                                                     AsOneSpectrier,
 
-                                                                    // Added for Gen 9 species (901-925)
-                                                                    MindsEye,
-                                                                    LingeringAroma,
-                                                                    SeedSower,
-                                                                    MyceliumMight,
-                                                                    WellBakedBody,
+                                                                        // Added for Gen 9 species (901-925)
+                                                                        MindsEye,
+                                                                        LingeringAroma,
+                                                                        SeedSower,
+                                                                        MyceliumMight,
+                                                                        WellBakedBody,
 
-                                                                    None,
-                                                                }
+                                                                        // Added for Gen 9 species (926-950)
+                                                                        PurifyingSalt,
+                                                                        Electromorphosis,
+                                                                        AngerShell,
+                                                                        GuardDog,
+                                                                        WindPower,
+
+                                                                        None,
+                                                                    }
