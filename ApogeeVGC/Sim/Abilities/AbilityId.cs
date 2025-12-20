@@ -269,14 +269,28 @@ public enum AbilityId
                                         PowerConstruct,
                                         LongReach,
 
-                                        // Added for Gen 7 species (726-750)
-                                        Stakeout,
-                                        Battery,
-                                        LiquidVoice,
-                                        Schooling,
-                                        Merciless,
-                                        Stamina,
-                                        ToughClaws2,
+                                            // Added for Gen 7 species (726-750)
+                                            Stakeout,
+                                            Battery,
+                                            LiquidVoice,
+                                            Schooling,
+                                            Merciless,
+                                            Stamina,
+                                            ToughClaws2,
 
-                                        None,
-                                    }
+                                            // Added for Gen 7 species (751-775)
+                                            WaterBubble,
+                                            Fluffy,
+                                            QueenlyMajesty,
+                                            Triage,
+                                            Receiver,
+                                            WimpOut,
+                                            EmergencyExit,
+                                            WaterCompaction,
+                                            InnardsOut,
+                                            RKSSystem,
+                                            ShieldsDown,
+                                            Comatose,
+
+                                            None,
+                                        }

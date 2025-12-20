@@ -122,14 +122,15 @@ public enum FormeId
                                         TenPercent,
                                         Complete,
 
-                                        // Gen 7 formes
-                                        Totem,
-                                        PomPom,
-                                        Pau,
-                                        Sensu,
-                                        Midnight,
-                                        Dusk,
-                                        Solo,
-                                        School,
-                                        Baile,
-                                    }
+                                            // Gen 7 formes
+                                            Totem,
+                                            PomPom,
+                                            Pau,
+                                            Sensu,
+                                            Midnight,
+                                            Dusk,
+                                            Solo,
+                                            School,
+                                            Baile,
+                                            Meteor,
+                                        }
