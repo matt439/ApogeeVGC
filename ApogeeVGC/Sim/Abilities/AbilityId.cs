@@ -292,17 +292,22 @@ public enum AbilityId
                                                 ShieldsDown,
                                                 Comatose,
 
-                                                // Added for Gen 7 species (776-800)
-                                                Dazzling,
-                                                Steelworker,
-                                                ElectricSurge,
-                                                PsychicSurge,
-                                                GrassySurge,
-                                                FullMetalBody,
-                                                ShadowShield,
-                                                BeastBoost,
-                                                PrismArmor,
-                                                Neuroforce,
+                                                    // Added for Gen 7 species (776-800)
+                                                    Dazzling,
+                                                    Steelworker,
+                                                    ElectricSurge,
+                                                    PsychicSurge,
+                                                    GrassySurge,
+                                                    FullMetalBody,
+                                                    ShadowShield,
+                                                    BeastBoost,
+                                                    PrismArmor,
+                                                    Neuroforce,
 
-                                                None,
-                                            }
+                                                    // Added for Gen 7/8 species (801-825)
+                                                    SoulHeart,
+                                                    Libero,
+                                                    MirrorArmor,
+
+                                                    None,
+                                                }
