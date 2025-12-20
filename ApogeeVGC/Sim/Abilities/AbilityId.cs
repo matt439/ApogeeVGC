@@ -278,19 +278,31 @@ public enum AbilityId
                                             Stamina,
                                             ToughClaws2,
 
-                                            // Added for Gen 7 species (751-775)
-                                            WaterBubble,
-                                            Fluffy,
-                                            QueenlyMajesty,
-                                            Triage,
-                                            Receiver,
-                                            WimpOut,
-                                            EmergencyExit,
-                                            WaterCompaction,
-                                            InnardsOut,
-                                            RKSSystem,
-                                            ShieldsDown,
-                                            Comatose,
+                                                // Added for Gen 7 species (751-775)
+                                                WaterBubble,
+                                                Fluffy,
+                                                QueenlyMajesty,
+                                                Triage,
+                                                Receiver,
+                                                WimpOut,
+                                                EmergencyExit,
+                                                WaterCompaction,
+                                                InnardsOut,
+                                                RKSSystem,
+                                                ShieldsDown,
+                                                Comatose,
 
-                                            None,
-                                        }
+                                                // Added for Gen 7 species (776-800)
+                                                Dazzling,
+                                                Steelworker,
+                                                ElectricSurge,
+                                                PsychicSurge,
+                                                GrassySurge,
+                                                FullMetalBody,
+                                                ShadowShield,
+                                                BeastBoost,
+                                                PrismArmor,
+                                                Neuroforce,
+
+                                                None,
+                                            }
