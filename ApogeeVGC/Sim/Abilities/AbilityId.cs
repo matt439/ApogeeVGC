@@ -245,9 +245,21 @@ public enum AbilityId
                             // Added for Shelmet to Braviary-Hisui conversion
                             Mimicry,
 
-                            // Added for Reshiram to Genesect conversion
-                            Turboblaze,
-                            Teravolt,
+                                // Added for Reshiram to Genesect conversion
+                                Turboblaze,
+                                Teravolt,
 
-                            None,
-                        }
+                                // Added for Gen 6 species (651-700)
+                                Magician,
+                                GaleWings,
+                                FlowerVeil,
+                                Symbiosis,
+                                GrassPelt,
+                                AromaVeil,
+                                SweetVeil,
+                                StanceChange,
+                                BattleBond,
+                                CheekPouch,
+
+                                None,
+                            }

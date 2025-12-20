@@ -94,9 +94,19 @@ public enum FormeId
                             Aria,
                             Pirouette,
 
-                            // Genesect formes
-                            Douse,
-                            Shock,
-                            Burn,
-                            Chill,
-                        }
+                                // Genesect formes
+                                Douse,
+                                Shock,
+                                Burn,
+                                Chill,
+
+                                // Gen 6 formes
+                                Bond,
+                                Ash,
+                                Fancy,
+                                Pokeball,
+                                Eternal,
+                                Female,
+                                Shield,
+                                Blade,
+                            }
