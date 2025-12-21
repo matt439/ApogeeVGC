@@ -15,7 +15,7 @@ public record Library
     private readonly Conditions _conditions;
     private readonly Formats _formats = new();
     private readonly Items _items;
-    private readonly Learnsets _learnsets = new();
+    private readonly Lazy<Learnsets> _learnsets = new(() => new Learnsets());
     private readonly Moves _moves;
     private readonly Natures _natures = new();
     private readonly Rulesets _rulesets = new();
@@ -27,7 +27,7 @@ public record Library
     private IReadOnlyDictionary<ConditionId, Condition> ConditionsData => _conditions.ConditionsData;
     private IReadOnlyDictionary<FormatId, Format> FormatsData => _formats.FormatData;
     private IReadOnlyDictionary<ItemId, Item> ItemsData => _items.ItemsData;
-    private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.LearnsetsData;
+    private IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData => _learnsets.Value.LearnsetsData;
     private IReadOnlyDictionary<MoveId, Move> MovesData => _moves.MovesData;
     private IReadOnlyDictionary<NatureId, Nature> NaturesData => _natures.NatureData;
     private IReadOnlyDictionary<RuleId, Format> RulesetsData => _rulesets.RulesetData;

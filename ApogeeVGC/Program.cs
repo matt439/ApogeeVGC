@@ -11,7 +11,7 @@ public class Program
 
         var driver = new Driver();
         driver.Start(DriverMode.GuiVsRandomDoubles);
-        
+
         //Console.WriteLine("Press Enter key to exit...");
         //Console.ReadLine();
     }

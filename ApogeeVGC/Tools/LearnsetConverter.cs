@@ -98,69 +98,66 @@ public static partial class LearnsetConverter
     private static void GenerateMainFile(string outputDirectory, int totalFiles)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("using System.Collections.ObjectModel;");
-        sb.AppendLine("using ApogeeVGC.Sim.Abilities;");
         sb.AppendLine("using ApogeeVGC.Sim.Events;");
         sb.AppendLine("using ApogeeVGC.Sim.FormatClasses;");
         sb.AppendLine("using ApogeeVGC.Sim.Moves;");
         sb.AppendLine("using ApogeeVGC.Sim.SpeciesClasses;");
-        sb.AppendLine("using ApogeeVGC.Sim.Stats;");
         sb.AppendLine();
         sb.AppendLine("namespace ApogeeVGC.Data;");
         sb.AppendLine();
         sb.AppendLine("// Auto-generated from pokemon-showdown/data/learnsets.ts");
         sb.AppendLine("// Do not edit manually - use LearnsetConverter.ConvertToMultipleFiles() to regenerate");
         sb.AppendLine($"// Split into {totalFiles} partial files for compiler performance");
+        sb.AppendLine("// Uses lazy loading - MoveSource parsing only occurs when a species is accessed");
         sb.AppendLine("public partial record Learnsets");
         sb.AppendLine("{");
         sb.AppendLine("    public IReadOnlyDictionary<SpecieId, Learnset> LearnsetsData { get; }");
         sb.AppendLine();
         sb.AppendLine("    public Learnsets()");
         sb.AppendLine("    {");
-        sb.AppendLine("        var learnsets = new Dictionary<SpecieId, Learnset>();");
+        sb.AppendLine("        var lazyDict = new LazyLearnsetDictionary();");
 
         // Call each partial initializer
         for (int i = 1; i <= totalFiles; i++)
         {
-            sb.AppendLine($"        InitializeLearnsets{i}(learnsets);");
+            sb.AppendLine($"        RegisterLearnsets{i}(lazyDict);");
         }
 
-        sb.AppendLine("        LearnsetsData = new ReadOnlyDictionary<SpecieId, Learnset>(learnsets);");
+        sb.AppendLine("        LearnsetsData = lazyDict;");
         sb.AppendLine("    }");
         sb.AppendLine("}");
 
-        var outputPath = Path.Combine(outputDirectory, "Learnsets.cs");
+        var outputPath = Path.Combine(outputDirectory, "Learnsets", "Learnsets.cs");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         File.WriteAllText(outputPath, sb.ToString());
     }
 
     private static void GeneratePartialFile(string outputDirectory, int fileNumber, List<(string speciesId, string entryContent)> entries)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("using ApogeeVGC.Sim.Abilities;");
         sb.AppendLine("using ApogeeVGC.Sim.Events;");
-        sb.AppendLine("using ApogeeVGC.Sim.FormatClasses;");
         sb.AppendLine("using ApogeeVGC.Sim.Moves;");
         sb.AppendLine("using ApogeeVGC.Sim.SpeciesClasses;");
-        sb.AppendLine("using ApogeeVGC.Sim.Stats;");
         sb.AppendLine();
         sb.AppendLine("namespace ApogeeVGC.Data;");
         sb.AppendLine();
         sb.AppendLine($"// Auto-generated - Part {fileNumber}");
+        sb.AppendLine("// Uses lazy loading - raw string codes stored, parsed on first access");
         sb.AppendLine("public partial record Learnsets");
         sb.AppendLine("{");
-        sb.AppendLine($"    private static void InitializeLearnsets{fileNumber}(Dictionary<SpecieId, Learnset> learnsets)");
+        sb.AppendLine($"    private static void RegisterLearnsets{fileNumber}(LazyLearnsetDictionary dict)");
         sb.AppendLine("    {");
 
         foreach (var (speciesId, entryContent) in entries)
         {
-            sb.AppendLine($"        learnsets[SpecieId.{speciesId}] = new Learnset");
+            sb.AppendLine($"        dict.RegisterRawData(SpecieId.{speciesId}, new RawLearnsetData");
             sb.AppendLine("        {");
 
-            // Parse learnset
+            // Parse learnset - now outputs raw strings
             var learnsetMatch = LearnsetRegex().Match(entryContent);
             if (learnsetMatch.Success)
             {
-                ParseAndWriteLearnset(sb, learnsetMatch.Groups["moves"].Value);
+                ParseAndWriteRawLearnset(sb, learnsetMatch.Groups["moves"].Value);
             }
 
             // Parse eventData
@@ -183,14 +180,41 @@ public static partial class LearnsetConverter
                 ParseAndWriteEncounters(sb, encountersMatch.Groups["encounters"].Value);
             }
 
-            sb.AppendLine("        };");
+            sb.AppendLine("        });");
         }
 
         sb.AppendLine("    }");
         sb.AppendLine("}");
 
-        var outputPath = Path.Combine(outputDirectory, $"Learnsets.Part{fileNumber}.cs");
+        var outputPath = Path.Combine(outputDirectory, "Learnsets", $"Learnsets.Part{fileNumber}.cs");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
         File.WriteAllText(outputPath, sb.ToString());
+    }
+
+    private static void ParseAndWriteRawLearnset(StringBuilder sb, string movesContent)
+    {
+        sb.AppendLine("            LearnsetMoves = new Dictionary<MoveId, string[]>");
+        sb.AppendLine("            {");
+
+        var moveMatches = MoveEntryRegex().Matches(movesContent);
+        foreach (Match moveMatch in moveMatches)
+        {
+            var moveId = moveMatch.Groups["move"].Value;
+            var sources = moveMatch.Groups["sources"].Value;
+
+            var moveIdEnum = ConvertToMoveIdEnum(moveId);
+            if (moveIdEnum == null) continue; // Skip unknown moves
+
+            var sourcesList = ParseMoveSources(sources);
+            if (sourcesList.Count == 0) continue;
+
+            // Output raw strings instead of MoveSource.Parse calls
+            sb.Append($"                [MoveId.{moveIdEnum}] = [");
+            sb.Append(string.Join(", ", sourcesList.Select(s => $"\"{s}\"")));
+            sb.AppendLine("],");
+        }
+
+        sb.AppendLine("            },");
     }
 
     /// <summary>
