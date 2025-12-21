@@ -16,20 +16,6 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data;
 
-//public enum SpecialImmunityId
-//{
-//    Prankster,
-//    Paralysis,
-//    Burn,
-//    Trapped,
-//    Powder,
-//    Sandstorm,
-//    Hail,
-//    Freeze,
-//    Poison,
-//    Toxic,
-//}
-
 public record Conditions
 {
     public IReadOnlyDictionary<ConditionId, Condition> ConditionsData { get; }

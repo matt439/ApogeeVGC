@@ -1,11 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Events;
-using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
-using ApogeeVGC.Sim.PokemonClasses;
-using ApogeeVGC.Sim.Stats;
-using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Moves;
 
