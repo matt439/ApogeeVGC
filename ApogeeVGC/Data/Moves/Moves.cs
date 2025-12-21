@@ -9,7 +9,7 @@ using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Moves;
 
-public record Moves
+public partial record Moves
 {
     public IReadOnlyDictionary<MoveId, Move> MovesData { get; }
     private readonly Library _library;
