@@ -7,7 +7,7 @@ using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
-namespace ApogeeVGC.Data;
+namespace ApogeeVGC.Data.Moves;
 
 public record Moves
 {

@@ -16,7 +16,7 @@ public record Library
     private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Lazy<Learnsets> _learnsets = new(() => new Learnsets());
-    private readonly Moves _moves;
+    private readonly Moves.Moves _moves;
     private readonly Natures _natures = new();
     private readonly Rulesets _rulesets = new();
     private readonly SpeciesData.SpeciesData _speciesData = new();
@@ -62,7 +62,7 @@ public record Library
         _conditions = new Conditions(this);
         // Moves and items must be initialized last because they depend on other data
         _items = new Items(this);
-        _moves = new Moves(this);
+        _moves = new Moves.Moves(this);
         _abilities = new Abilities(this);
     }
 }
