@@ -356,12 +356,29 @@ public enum AbilityId
                                                                             Commander,
                                                                             RockyPayload,
 
-                                                                            // Added for Gen 9 species (976-1000)
-                                                                            ArmorTail,
-                                                                            SupremeOverlord,
-                                                                            Protosynthesis,
-                                                                            ThermalExchange,
-                                                                            GoodAsGold,
+                                                                                // Added for Gen 9 species (976-1000)
+                                                                                ArmorTail,
+                                                                                SupremeOverlord,
+                                                                                Protosynthesis,
+                                                                                ThermalExchange,
+                                                                                GoodAsGold,
 
-                                                                            None,
-                                                                        }
+                                                                                // Added for Gen 9 species (1001-1025)
+                                                                                TabletsOfRuin,
+                                                                                SwordOfRuin,
+                                                                                VesselOfRuin,
+                                                                                BeadsOfRuin,
+                                                                                OrichalcumPulse,
+                                                                                SupersweetSyrup,
+                                                                                Hospitality,
+                                                                                ToxicChain,
+                                                                                EmbodyAspectTeal,
+                                                                                EmbodyAspectWellspring,
+                                                                                EmbodyAspectHearthflame,
+                                                                                EmbodyAspectCornerstone,
+                                                                                TeraShift,
+                                                                                TeraformZero,
+                                                                                PoisonPuppeteer,
+
+                                                                                None,
+                                                                            }

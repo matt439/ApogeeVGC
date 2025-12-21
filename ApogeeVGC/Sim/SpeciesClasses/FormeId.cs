@@ -182,9 +182,25 @@ public enum FormeId
                                                                             Droopy,
                                                                             Stretchy,
 
-                                                                            // Gen 9 formes (976-1000)
-                                                                            TwoSegment,
-                                                                            ThreeSegment,
-                                                                            Chest,
-                                                                            Roaming,
-                                                                        }
+                                                                                // Gen 9 formes (976-1000)
+                                                                                TwoSegment,
+                                                                                ThreeSegment,
+                                                                                Chest,
+                                                                                Roaming,
+
+                                                                                // Gen 9 formes (1001-1025) - DLC formes
+                                                                                Counterfeit,
+                                                                                Artisan,
+                                                                                Unremarkable,
+                                                                                Masterpiece,
+                                                                                Teal,
+                                                                                Wellspring,
+                                                                                Hearthflame,
+                                                                                Cornerstone,
+                                                                                TealTera,
+                                                                                WellspringTera,
+                                                                                HearthflameTera,
+                                                                                CornerstoneTera,
+                                                                                Terastal,
+                                                                                Stellar,
+                                                                            }

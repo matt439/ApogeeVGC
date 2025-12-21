@@ -59,7 +59,7 @@ public partial class BattleActions
 
             // Add "tera" suffix or change base to tealtera
             SpecieId teraForme = ogerponSpecies == "Ogerpon"
-                ? SpecieId.OgerponTealtera
+                ? SpecieId.OgerponTealTera
                 : Enum.Parse<SpecieId>(ogerponSpecies + "Tera");
 
             pokemon.FormeChange(teraForme, null, true);

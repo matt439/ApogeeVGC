@@ -62,9 +62,14 @@ public enum ItemId
                 Barbaracite,
                 Dragalgite,
 
-                // Primal Orbs
-                BlueOrb,
-                RedOrb,
+                    // Primal Orbs
+                    BlueOrb,
+                    RedOrb,
 
-                None,
-            }
+                    // Ogerpon Masks
+                    WellspringMask,
+                    HearthflameMask,
+                    CornerstoneMask,
+
+                    None,
+                }
