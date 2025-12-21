@@ -1640,57 +1640,57 @@ public partial record SpeciesData
                 WeightKg = 82.5,
                 Color = "Purple",
             },
-                    [SpecieId.GenesectChill] = new()
-                    {
-                        Id = SpecieId.GenesectChill,
-                        Num = 649,
-                        Name = "Genesect-Chill",
-                        BaseSpecies = SpecieId.Genesect,
-                        Forme = FormeId.Chill,
-                        Types = [PokemonType.Bug, PokemonType.Steel],
-                        Gender = GenderId.N,
-                        BaseStats = new StatsTable
-                        {
-                            Hp = 71,
-                            Atk = 120,
-                            Def = 95,
-                            SpA = 120,
-                            SpD = 95,
-                            Spe = 99,
-                        },
-                        Abilities = new SpeciesAbility
-                        {
-                            Slot0 = AbilityId.Download,
-                        },
-                        HeightM = 1.5,
-                        WeightKg = 82.5,
-                        Color = "Purple",
-                    },
-                    [SpecieId.Chespin] = new()
-                    {
-                        Id = SpecieId.Chespin,
-                        Num = 650,
-                        Name = "Chespin",
-                        Types = [PokemonType.Grass],
-                        Gender = GenderId.Empty,
-                        BaseStats = new StatsTable
-                        {
-                            Hp = 56,
-                            Atk = 61,
-                            Def = 65,
-                            SpA = 48,
-                            SpD = 45,
-                            Spe = 38,
-                        },
-                        Abilities = new SpeciesAbility
-                        {
-                            Slot0 = AbilityId.Overgrow,
-                            Hidden = AbilityId.Bulletproof,
-                        },
-                        HeightM = 0.4,
-                        WeightKg = 9,
-                        Color = "Green",
-                    },
-                };
-            }
+            [SpecieId.GenesectChill] = new()
+            {
+                Id = SpecieId.GenesectChill,
+                Num = 649,
+                Name = "Genesect-Chill",
+                BaseSpecies = SpecieId.Genesect,
+                Forme = FormeId.Chill,
+                Types = [PokemonType.Bug, PokemonType.Steel],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 71,
+                    Atk = 120,
+                    Def = 95,
+                    SpA = 120,
+                    SpD = 95,
+                    Spe = 99,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Download,
+                },
+                HeightM = 1.5,
+                WeightKg = 82.5,
+                Color = "Purple",
+            },
+            [SpecieId.Chespin] = new()
+            {
+                Id = SpecieId.Chespin,
+                Num = 650,
+                Name = "Chespin",
+                Types = [PokemonType.Grass],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 56,
+                    Atk = 61,
+                    Def = 65,
+                    SpA = 48,
+                    SpD = 45,
+                    Spe = 38,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.Overgrow,
+                    Hidden = AbilityId.Bulletproof,
+                },
+                HeightM = 0.4,
+                WeightKg = 9,
+                Color = "Green",
+            },
+        };
+    }
 }

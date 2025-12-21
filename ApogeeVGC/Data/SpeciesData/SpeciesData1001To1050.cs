@@ -507,8 +507,17 @@ public partial record SpeciesData
                 WeightKg = 39.8,
                 Color = "Green",
                 Tags = [SpeciesTag.SubLegendary],
-                OtherFormes = [FormeId.Wellspring, FormeId.Hearthflame, FormeId.Cornerstone, FormeId.TealTera, FormeId.WellspringTera, FormeId.HearthflameTera, FormeId.CornerstoneTera],
-                FormeOrder = [FormeId.Teal, FormeId.Wellspring, FormeId.Hearthflame, FormeId.Cornerstone, FormeId.TealTera, FormeId.WellspringTera, FormeId.HearthflameTera, FormeId.CornerstoneTera],
+                OtherFormes =
+                [
+                    FormeId.Wellspring, FormeId.Hearthflame, FormeId.Cornerstone, FormeId.TealTera,
+                    FormeId.WellspringTera, FormeId.HearthflameTera, FormeId.CornerstoneTera
+                ],
+                FormeOrder =
+                [
+                    FormeId.Teal, FormeId.Wellspring, FormeId.Hearthflame, FormeId.Cornerstone,
+                    FormeId.TealTera, FormeId.WellspringTera, FormeId.HearthflameTera,
+                    FormeId.CornerstoneTera
+                ],
             },
             [SpecieId.OgerponWellspring] = new()
             {
