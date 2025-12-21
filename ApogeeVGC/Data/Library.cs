@@ -12,7 +12,7 @@ namespace ApogeeVGC.Data;
 public record Library
 {
     private readonly Abilities _abilities;
-    private readonly Conditions _conditions;
+    private readonly Conditions.Conditions _conditions;
     private readonly Formats _formats = new();
     private readonly Items _items;
     private readonly Lazy<Learnsets> _learnsets = new(() => new Learnsets());
@@ -59,7 +59,7 @@ public record Library
 
     public Library()
     {
-        _conditions = new Conditions(this);
+        _conditions = new Conditions.Conditions(this);
         // Moves and items must be initialized last because they depend on other data
         _items = new Items(this);
         _moves = new Moves.Moves(this);
