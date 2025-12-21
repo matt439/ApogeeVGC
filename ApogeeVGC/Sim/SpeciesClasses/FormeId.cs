@@ -170,9 +170,15 @@ public enum FormeId
                                                                     Three,
                                                                     Four,
 
-                                                                    // Gen 9 formes (926-950) - Squawkabilly colors
-                                                                    Green,
-                                                                    Blue2,
-                                                                    Yellow2,
-                                                                    White2,
-                                                                }
+                                                                        // Gen 9 formes (926-950) - Squawkabilly colors
+                                                                        Green,
+                                                                        Blue2,
+                                                                        Yellow2,
+                                                                        White2,
+
+                                                                        // Gen 9 formes (951-975)
+                                                                        Zero,
+                                                                        Curly,
+                                                                        Droopy,
+                                                                        Stretchy,
+                                                                    }

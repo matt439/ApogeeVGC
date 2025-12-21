@@ -347,5 +347,14 @@ public enum AbilityId
                                                                         GuardDog,
                                                                         WindPower,
 
+                                                                        // Added for Gen 9 species (951-975)
+                                                                        Opportunist,
+                                                                        ZeroToHero,
+                                                                        EarthEater,
+                                                                        ToxicDebris,
+                                                                        Costar,
+                                                                        Commander,
+                                                                        RockyPayload,
+
                                                                         None,
                                                                     }
