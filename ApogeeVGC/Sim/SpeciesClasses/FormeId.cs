@@ -176,9 +176,15 @@ public enum FormeId
                                                                         Yellow2,
                                                                         White2,
 
-                                                                        // Gen 9 formes (951-975)
-                                                                        Zero,
-                                                                        Curly,
-                                                                        Droopy,
-                                                                        Stretchy,
-                                                                    }
+                                                                            // Gen 9 formes (951-975)
+                                                                            Zero,
+                                                                            Curly,
+                                                                            Droopy,
+                                                                            Stretchy,
+
+                                                                            // Gen 9 formes (976-1000)
+                                                                            TwoSegment,
+                                                                            ThreeSegment,
+                                                                            Chest,
+                                                                            Roaming,
+                                                                        }

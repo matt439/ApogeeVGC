@@ -347,14 +347,21 @@ public enum AbilityId
                                                                         GuardDog,
                                                                         WindPower,
 
-                                                                        // Added for Gen 9 species (951-975)
-                                                                        Opportunist,
-                                                                        ZeroToHero,
-                                                                        EarthEater,
-                                                                        ToxicDebris,
-                                                                        Costar,
-                                                                        Commander,
-                                                                        RockyPayload,
+                                                                            // Added for Gen 9 species (951-975)
+                                                                            Opportunist,
+                                                                            ZeroToHero,
+                                                                            EarthEater,
+                                                                            ToxicDebris,
+                                                                            Costar,
+                                                                            Commander,
+                                                                            RockyPayload,
 
-                                                                        None,
-                                                                    }
+                                                                            // Added for Gen 9 species (976-1000)
+                                                                            ArmorTail,
+                                                                            SupremeOverlord,
+                                                                            Protosynthesis,
+                                                                            ThermalExchange,
+                                                                            GoodAsGold,
+
+                                                                            None,
+                                                                        }
