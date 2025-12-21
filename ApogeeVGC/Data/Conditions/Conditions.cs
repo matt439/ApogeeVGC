@@ -19,20 +19,44 @@ public partial record Conditions
         var conditions = new Dictionary<ConditionId, Condition>();
 
         // Combine all partial condition dictionaries
-        foreach (var kvp in CreateConditionsBCEF())
+        foreach (var kvp in CreateConditionsABC())
             conditions[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateConditionsLNPQ())
+        foreach (var kvp in CreateConditionsDEF())
             conditions[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateConditionsRST())
+        foreach (var kvp in CreateConditionsGHI())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsJKL())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsMNO())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsPQR())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsSTU())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsVWX())
+            conditions[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in CreateConditionsYZ())
             conditions[kvp.Key] = kvp.Value;
 
         return conditions;
     }
 
     // Partial methods to be implemented in other files
-    private partial Dictionary<ConditionId, Condition> CreateConditionsBCEF();
-    private partial Dictionary<ConditionId, Condition> CreateConditionsLNPQ();
-    private partial Dictionary<ConditionId, Condition> CreateConditionsRST();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsABC();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsDEF();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsGHI();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsJKL();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsMNO();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsPQR();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsSTU();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsVWX();
+    private partial Dictionary<ConditionId, Condition> CreateConditionsYZ();
 }

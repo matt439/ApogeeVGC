@@ -15,79 +15,10 @@ namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
 {
-    private partial Dictionary<ConditionId, Condition> CreateConditionsRST()
+    private partial Dictionary<ConditionId, Condition> CreateConditionsSTU()
     {
         return new Dictionary<ConditionId, Condition>
         {
-            [ConditionId.Recoil] = new()
-            {
-                Id = ConditionId.Recoil,
-                Name = "Recoil",
-                EffectType = EffectType.Condition,
-            },
-            [ConditionId.Reflect] = new()
-            {
-                Id = ConditionId.Reflect,
-                Name = "Reflect",
-                EffectType = EffectType.Condition,
-                AssociatedMove = MoveId.Reflect,
-                Duration = 5,
-                DurationCallback = new DurationCallbackEventInfo((_, _, source, _) =>
-                    source.HasItem(ItemId.LightClay) ? 8 : 5),
-                OnAnyModifyDamage =
-                    new OnAnyModifyDamageEventInfo((battle, _, source, target, move) =>
-                    {
-                        if (target != source &&
-                            battle.EffectState.Target is SideEffectStateTarget side &&
-                            side.Side.HasAlly(target) &&
-                            battle.GetCategory(move) == MoveCategory.Physical)
-                        {
-                            if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
-                            {
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Debug("Reflect weaken");
-                                }
-
-                                return battle.ActivePerHalf > 1
-                                    ? battle.ChainModify([2732, 4096])
-                                    : battle.ChainModify(0.5);
-                            }
-                        }
-
-                        return new VoidReturn();
-                    }),
-                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-sidestart", side, "Reflect");
-                    }
-                }),
-                //OnSideResidualOrder = 26,
-                //OnSideResidualSubOrder = 1,
-                OnSideResidual = new OnSideResidualEventInfo((_, _, _, _) => { })
-                {
-                    Order = 26,
-                    SubOrder = 1,
-                },
-                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-sideend", side, "Reflect");
-                    }
-                }),
-            },
-            [ConditionId.RevivalBlessing] = new()
-            {
-                Id = ConditionId.RevivalBlessing,
-                Name = "Revival Blessing",
-                EffectType = EffectType.Condition,
-                Duration = 1,
-                AssociatedMove = MoveId.RevivalBlessing,
-                // Note: Revival Blessing's effect is handled in Side
-            },
             [ConditionId.Sleep] = new()
             {
                 Id = ConditionId.Sleep,
