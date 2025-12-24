@@ -238,41 +238,42 @@ public partial record Conditions
                             Type = MoveType.Normal,
                             MoveSlot = new MoveSlot(),
                         };
-                                                battle.Damage(damage, pokemon, pokemon,
-                                                    BattleDamageEffect.FromIEffect(activeMove));
-                                                return false;
-                                            },
-                                            3),
-                                    },
-                                    [ConditionId.Arceus] = new()
-                                    {
-                                        Id = ConditionId.Arceus,
-                                        Name = "Arceus",
-                                        EffectType = EffectType.Condition,
-                                        //OnTypePriority = 1,
-                                        OnType = new OnTypeEventInfo((battle, types, pokemon) =>
-                                            {
-                                                // TODO: Full implementation requires Pokemon.GetAbilityId() method
-                                                // and Item.OnPlate property
-                                                var abilityId = pokemon.Ability;
-                                                if (pokemon.Transformed || (abilityId != AbilityId.Multitype && battle.Gen >= 8))
-                                                {
-                                                    return types;
-                                                }
-
-                                                PokemonType type = PokemonType.Normal;
-                                                if (abilityId == AbilityId.Multitype)
-                                                {
-                                                    var item = pokemon.GetItem();
-                                                    // OnPlate property not yet implemented on Item
-                                                    // Default to Normal type for now
-                                                    type = PokemonType.Normal;
-                                                }
-
-                                                return new PokemonType[] { type };
-                                            },
-                                            1),
-                                    },
-                                };
-                            }
+                        battle.Damage(damage, pokemon, pokemon,
+                            BattleDamageEffect.FromIEffect(activeMove));
+                        return false;
+                    },
+                    3),
+            },
+            [ConditionId.Arceus] = new()
+            {
+                Id = ConditionId.Arceus,
+                Name = "Arceus",
+                EffectType = EffectType.Condition,
+                //OnTypePriority = 1,
+                OnType = new OnTypeEventInfo((battle, types, pokemon) =>
+                    {
+                        // TODO: Full implementation requires Pokemon.GetAbilityId() method
+                        // and Item.OnPlate property
+                        var abilityId = pokemon.Ability;
+                        if (pokemon.Transformed ||
+                            (abilityId != AbilityId.Multitype && battle.Gen >= 8))
+                        {
+                            return types;
                         }
+
+                        PokemonType type = PokemonType.Normal;
+                        if (abilityId == AbilityId.Multitype)
+                        {
+                            var item = pokemon.GetItem();
+                            // OnPlate property not yet implemented on Item
+                            // Default to Normal type for now
+                            type = PokemonType.Normal;
+                        }
+
+                        return new PokemonType[] { type };
+                    },
+                    1),
+            },
+        };
+    }
+}

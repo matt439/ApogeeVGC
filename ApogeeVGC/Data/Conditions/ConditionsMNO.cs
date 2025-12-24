@@ -26,6 +26,7 @@ public partial record Conditions
                         {
                             battle.Add("cant", pokemon, "recharge");
                         }
+
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.MustRecharge]);
                         pokemon.RemoveVolatile(_library.Conditions[ConditionId.Truant]);
                         return null;
@@ -37,6 +38,7 @@ public partial record Conditions
                     {
                         battle.Add("-mustrecharge", pokemon);
                     }
+
                     return new VoidReturn();
                 }),
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Recharge),

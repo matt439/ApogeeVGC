@@ -278,186 +278,199 @@ public partial record Conditions
                     }
                 }),
                 //OnFieldResidualOrder = 27,
-                            //OnFieldResidualSubOrder = 1,
-                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                {
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-fieldend", "move: Trick Room");
-                                    }
-                                }),
-                            },
-                            [ConditionId.Sandstorm] = new()
-                            {
-                                Id = ConditionId.Sandstorm,
-                                Name = "Sandstorm",
-                                EffectType = EffectType.Weather,
-                                Duration = 5,
-                                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
-                                    source.HasItem(ItemId.SmoothRock) ? 8 : 5),
-                                // This should be applied directly to the stat before any of the other modifiers are chained
-                                // So we give it increased priority.
-                                //OnModifySpDPriority = 10,
-                                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
-                                    {
-                                        if (pokemon.HasType(PokemonType.Rock) && 
-                                            battle.Field.IsWeather(ConditionId.Sandstorm))
-                                        {
-                                            return battle.Modify(spd, 1.5);
-                                        }
-                                        return spd;
-                                    },
-                                    10),
-                                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                                {
-                                    if (!battle.DisplayUi) return;
-                                    if (effect is Ability)
-                                    {
-                                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                                        battle.Add("-weather", "Sandstorm", "[from] ability: " + effect.Name, $"[of] {source}");
-                                    }
-                                    else
-                                    {
-                                        battle.Add("-weather", "Sandstorm");
-                                    }
-                                }),
-                                //OnFieldResidualOrder = 1,
-                                    OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                                        {
-                                            if (battle.DisplayUi)
-                                            {
-                                                battle.Add("-weather", "Sandstorm", "[upkeep]");
-                                            }
-                                            if (battle.Field.IsWeather(ConditionId.Sandstorm))
-                                                {
-                                                    battle.EachEvent(EventId.Weather);
-                                                }
-                                        },
-                                        1),
-                                    OnWeather = new OnWeatherEventInfo((battle, target, _, _) =>
-                                    {
-                                        battle.Damage(target.BaseMaxHp / 16);
-                                    }),
-                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                {
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-weather", "none");
-                                    }
-                                }),
-                            },
-                            [ConditionId.Snowscape] = new()
-                            {
-                                Id = ConditionId.Snowscape,
-                                Name = "Snowscape",
-                                EffectType = EffectType.Weather,
-                                Duration = 5,
-                                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
-                                    source.HasItem(ItemId.IcyRock) ? 8 : 5),
-                                //OnModifyDefPriority = 10,
-                                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
-                                    {
-                                        if (pokemon.HasType(PokemonType.Ice) && 
-                                            battle.Field.IsWeather(ConditionId.Snowscape))
-                                        {
-                                            return battle.Modify(def, 1.5);
-                                        }
-                                        return def;
-                                    },
-                                    10),
-                                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                                {
-                                    if (!battle.DisplayUi) return;
-                                    if (effect is Ability)
-                                    {
-                                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                                        battle.Add("-weather", "Snowscape", "[from] ability: " + effect.Name, $"[of] {source}");
-                                    }
-                                    else
-                                    {
-                                        battle.Add("-weather", "Snowscape");
-                                    }
-                                }),
-                                //OnFieldResidualOrder = 1,
-                                    OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                                        {
-                                            if (battle.DisplayUi)
-                                            {
-                                                battle.Add("-weather", "Snowscape", "[upkeep]");
-                                            }
-                                            if (battle.Field.IsWeather(ConditionId.Snowscape))
-                                                {
-                                                    battle.EachEvent(EventId.Weather);
-                                                }
-                                        },
-                                        1),
-                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                {
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-weather", "none");
-                                    }
-                                }),
-                            },
-                            [ConditionId.SunnyDay] = new()
-                            {
-                                Id = ConditionId.SunnyDay,
-                                Name = "SunnyDay",
-                                EffectType = EffectType.Weather,
-                                Duration = 5,
-                                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
-                                    source.HasItem(ItemId.HeatRock) ? 8 : 5),
-                                OnWeatherModifyDamage = new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
-                                {
-                                    if (move.Id == MoveId.HydroSteam && !attacker.HasItem(ItemId.UtilityUmbrella))
-                                    {
-                                        battle.Debug("Sunny Day Hydro Steam boost");
-                                        return battle.ChainModify(1.5);
-                                    }
-                                    if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
-                                    if (move.Type == MoveType.Fire)
-                                    {
-                                        battle.Debug("Sunny Day fire boost");
-                                        return battle.ChainModify(1.5);
-                                    }
-                                    if (move.Type == MoveType.Water)
-                                    {
-                                        battle.Debug("Sunny Day water suppress");
-                                        return battle.ChainModify(0.5);
-                                    }
-                                    return new VoidReturn();
-                                }),
-                                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                                {
-                                    if (!battle.DisplayUi) return;
-                                    if (effect is Ability)
-                                    {
-                                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                                        battle.Add("-weather", "SunnyDay", "[from] ability: " + effect.Name, $"[of] {source}");
-                                    }
-                                    else
-                                    {
-                                        battle.Add("-weather", "SunnyDay");
-                                    }
-                                }),
-                                //OnFieldResidualOrder = 1,
-                                    OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                                        {
-                                            if (battle.DisplayUi)
-                                            {
-                                                battle.Add("-weather", "SunnyDay", "[upkeep]");
-                                            }
-                                            battle.EachEvent(EventId.Weather);
-                                        },
-                                        1),
-                                    OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                    {
-                                        if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-weather", "none");
-                                    }
-                                }),
-                            },
-                        };
+                //OnFieldResidualSubOrder = 1,
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-fieldend", "move: Trick Room");
                     }
-                }
+                }),
+            },
+            [ConditionId.Sandstorm] = new()
+            {
+                Id = ConditionId.Sandstorm,
+                Name = "Sandstorm",
+                EffectType = EffectType.Weather,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                    source.HasItem(ItemId.SmoothRock) ? 8 : 5),
+                // This should be applied directly to the stat before any of the other modifiers are chained
+                // So we give it increased priority.
+                //OnModifySpDPriority = 10,
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                    {
+                        if (pokemon.HasType(PokemonType.Rock) &&
+                            battle.Field.IsWeather(ConditionId.Sandstorm))
+                        {
+                            return battle.Modify(spd, 1.5);
+                        }
+
+                        return spd;
+                    },
+                    10),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (!battle.DisplayUi) return;
+                    if (effect is Ability)
+                    {
+                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
+                        battle.Add("-weather", "Sandstorm", "[from] ability: " + effect.Name,
+                            $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-weather", "Sandstorm");
+                    }
+                }),
+                //OnFieldResidualOrder = 1,
+                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-weather", "Sandstorm", "[upkeep]");
+                        }
+
+                        if (battle.Field.IsWeather(ConditionId.Sandstorm))
+                        {
+                            battle.EachEvent(EventId.Weather);
+                        }
+                    },
+                    1),
+                OnWeather = new OnWeatherEventInfo((battle, target, _, _) =>
+                {
+                    battle.Damage(target.BaseMaxHp / 16);
+                }),
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "none");
+                    }
+                }),
+            },
+            [ConditionId.Snowscape] = new()
+            {
+                Id = ConditionId.Snowscape,
+                Name = "Snowscape",
+                EffectType = EffectType.Weather,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                    source.HasItem(ItemId.IcyRock) ? 8 : 5),
+                //OnModifyDefPriority = 10,
+                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
+                    {
+                        if (pokemon.HasType(PokemonType.Ice) &&
+                            battle.Field.IsWeather(ConditionId.Snowscape))
+                        {
+                            return battle.Modify(def, 1.5);
+                        }
+
+                        return def;
+                    },
+                    10),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (!battle.DisplayUi) return;
+                    if (effect is Ability)
+                    {
+                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
+                        battle.Add("-weather", "Snowscape", "[from] ability: " + effect.Name,
+                            $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-weather", "Snowscape");
+                    }
+                }),
+                //OnFieldResidualOrder = 1,
+                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-weather", "Snowscape", "[upkeep]");
+                        }
+
+                        if (battle.Field.IsWeather(ConditionId.Snowscape))
+                        {
+                            battle.EachEvent(EventId.Weather);
+                        }
+                    },
+                    1),
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "none");
+                    }
+                }),
+            },
+            [ConditionId.SunnyDay] = new()
+            {
+                Id = ConditionId.SunnyDay,
+                Name = "SunnyDay",
+                EffectType = EffectType.Weather,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                    source.HasItem(ItemId.HeatRock) ? 8 : 5),
+                OnWeatherModifyDamage =
+                    new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
+                    {
+                        if (move.Id == MoveId.HydroSteam &&
+                            !attacker.HasItem(ItemId.UtilityUmbrella))
+                        {
+                            battle.Debug("Sunny Day Hydro Steam boost");
+                            return battle.ChainModify(1.5);
+                        }
+
+                        if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                        if (move.Type == MoveType.Fire)
+                        {
+                            battle.Debug("Sunny Day fire boost");
+                            return battle.ChainModify(1.5);
+                        }
+
+                        if (move.Type == MoveType.Water)
+                        {
+                            battle.Debug("Sunny Day water suppress");
+                            return battle.ChainModify(0.5);
+                        }
+
+                        return new VoidReturn();
+                    }),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (!battle.DisplayUi) return;
+                    if (effect is Ability)
+                    {
+                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
+                        battle.Add("-weather", "SunnyDay", "[from] ability: " + effect.Name,
+                            $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-weather", "SunnyDay");
+                    }
+                }),
+                //OnFieldResidualOrder = 1,
+                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-weather", "SunnyDay", "[upkeep]");
+                        }
+
+                        battle.EachEvent(EventId.Weather);
+                    },
+                    1),
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "none");
+                    }
+                }),
+            },
+        };
+    }
+}

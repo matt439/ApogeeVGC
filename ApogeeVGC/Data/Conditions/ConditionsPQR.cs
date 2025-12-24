@@ -329,146 +329,158 @@ public partial record Conditions
                     }
                 }),
             },
-                        [ConditionId.RevivalBlessing] = new()
+            [ConditionId.RevivalBlessing] = new()
+            {
+                Id = ConditionId.RevivalBlessing,
+                Name = "Revival Blessing",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                AssociatedMove = MoveId.RevivalBlessing,
+                // Note: Revival Blessing's effect is handled in Side
+            },
+            [ConditionId.PrimordialSea] = new()
+            {
+                Id = ConditionId.PrimordialSea,
+                Name = "PrimordialSea",
+                EffectType = EffectType.Weather,
+                Duration = 0,
+                //OnTryMovePriority = 1,
+                OnTryMove = new OnTryMoveEventInfo((battle, attacker, _, move) =>
+                    {
+                        if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status)
                         {
-                            Id = ConditionId.RevivalBlessing,
-                            Name = "Revival Blessing",
-                            EffectType = EffectType.Condition,
-                            Duration = 1,
-                            AssociatedMove = MoveId.RevivalBlessing,
-                            // Note: Revival Blessing's effect is handled in Side
-                        },
-                        [ConditionId.PrimordialSea] = new()
+                            battle.Debug("Primordial Sea fire suppress");
+                            if (battle.DisplayUi)
+                            {
+                                battle.Add("-fail", attacker, move, "[from] Primordial Sea");
+                                battle.AttrLastMove("[still]");
+                            }
+
+                            return null;
+                        }
+
+                        return new VoidReturn();
+                    },
+                    1),
+                OnWeatherModifyDamage =
+                    new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
+                    {
+                        if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                        if (move.Type == MoveType.Water)
                         {
-                            Id = ConditionId.PrimordialSea,
-                            Name = "PrimordialSea",
-                            EffectType = EffectType.Weather,
-                            Duration = 0,
-                            //OnTryMovePriority = 1,
-                            OnTryMove = new OnTryMoveEventInfo((battle, attacker, _, move) =>
-                                {
-                                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status)
-                                    {
-                                        battle.Debug("Primordial Sea fire suppress");
-                                        if (battle.DisplayUi)
-                                        {
-                                            battle.Add("-fail", attacker, move, "[from] Primordial Sea");
-                                            battle.AttrLastMove("[still]");
-                                        }
-                                        return null;
-                                    }
-                                    return new VoidReturn();
-                                },
-                                1),
-                            OnWeatherModifyDamage = new OnWeatherModifyDamageEventInfo((battle, _, attacker, defender, move) =>
-                            {
-                                if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
-                                if (move.Type == MoveType.Water)
-                                {
-                                    battle.Debug("Rain water boost");
-                                    return battle.ChainModify(1.5);
-                                }
-                                return new VoidReturn();
-                            }),
-                            OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                            {
-                                if (battle.DisplayUi)
-                                {
-                                    battle.Add("-weather", "PrimordialSea", "[from] ability: " + effect?.Name, $"[of] {source}");
-                                }
-                            }),
-                            //OnFieldResidualOrder = 1,
-                                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                                    {
-                                        if (battle.DisplayUi)
-                                        {
-                                            battle.Add("-weather", "PrimordialSea", "[upkeep]");
-                                        }
-                                        battle.EachEvent(EventId.Weather);
-                                    },
-                                    1),
-                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                {
-                                    if (battle.DisplayUi)
-                                {
-                                    battle.Add("-weather", "none");
-                                }
-                            }),
-                        },
-                        [ConditionId.RainDance] = new()
+                            battle.Debug("Rain water boost");
+                            return battle.ChainModify(1.5);
+                        }
+
+                        return new VoidReturn();
+                    }),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "PrimordialSea", "[from] ability: " + effect?.Name,
+                            $"[of] {source}");
+                    }
+                }),
+                //OnFieldResidualOrder = 1,
+                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                    {
+                        if (battle.DisplayUi)
                         {
-                            Id = ConditionId.RainDance,
-                            Name = "RainDance",
-                            EffectType = EffectType.Weather,
-                            Duration = 5,
-                            DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
-                                source.HasItem(ItemId.DampRock) ? 8 : 5),
-                            OnWeatherModifyDamage = new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
-                            {
-                                if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
-                                if (move.Type == MoveType.Water)
-                                {
-                                    battle.Debug("rain water boost");
-                                    return battle.ChainModify(1.5);
-                                }
-                                if (move.Type == MoveType.Fire)
-                                {
-                                    battle.Debug("rain fire suppress");
-                                    return battle.ChainModify(0.5);
-                                }
-                                return new VoidReturn();
-                            }),
-                            OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
-                            {
-                                if (!battle.DisplayUi) return;
-                                if (effect is Ability)
-                                {
-                                    if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                                    battle.Add("-weather", "RainDance", "[from] ability: " + effect.Name, $"[of] {source}");
-                                }
-                                else
-                                {
-                                    battle.Add("-weather", "RainDance");
-                                }
-                            }),
-                            //OnFieldResidualOrder = 1,
-                                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
-                                    {
-                                        if (battle.DisplayUi)
-                                        {
-                                            battle.Add("-weather", "RainDance", "[upkeep]");
-                                        }
-                                        battle.EachEvent(EventId.Weather);
-                                    },
-                                    1),
-                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
-                                {
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-weather", "none");
-                                }
-                            }),
-                        },
-                        [ConditionId.RolloutStorage] = new()
-                            {
-                                Id = ConditionId.RolloutStorage,
-                                Name = "RolloutStorage",
-                                EffectType = EffectType.Condition,
-                                Duration = 2,
-                                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, move) =>
-                                    {
-                                        int bp = Math.Max(1, move.BasePower);
-                                        // TODO: Track hit count in EffectState when property is available
-                                        int hitCount = 0;
-                                        bp *= (int)Math.Pow(2, hitCount);
-                                        if (source.Volatiles.ContainsKey(ConditionId.DefenseCurl))
-                                        {
-                                            bp *= 2;
-                                        }
-                                        source.RemoveVolatile(_library.Conditions[ConditionId.RolloutStorage]);
-                                        return bp;
-                                    }),
-                            },
-                    };
-                }
-            }
+                            battle.Add("-weather", "PrimordialSea", "[upkeep]");
+                        }
+
+                        battle.EachEvent(EventId.Weather);
+                    },
+                    1),
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "none");
+                    }
+                }),
+            },
+            [ConditionId.RainDance] = new()
+            {
+                Id = ConditionId.RainDance,
+                Name = "RainDance",
+                EffectType = EffectType.Weather,
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((_, source, _, _) =>
+                    source.HasItem(ItemId.DampRock) ? 8 : 5),
+                OnWeatherModifyDamage =
+                    new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
+                    {
+                        if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                        if (move.Type == MoveType.Water)
+                        {
+                            battle.Debug("rain water boost");
+                            return battle.ChainModify(1.5);
+                        }
+
+                        if (move.Type == MoveType.Fire)
+                        {
+                            battle.Debug("rain fire suppress");
+                            return battle.ChainModify(0.5);
+                        }
+
+                        return new VoidReturn();
+                    }),
+                OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                {
+                    if (!battle.DisplayUi) return;
+                    if (effect is Ability)
+                    {
+                        if (battle.Gen <= 5) battle.EffectState.Duration = 0;
+                        battle.Add("-weather", "RainDance", "[from] ability: " + effect.Name,
+                            $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-weather", "RainDance");
+                    }
+                }),
+                //OnFieldResidualOrder = 1,
+                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                    {
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-weather", "RainDance", "[upkeep]");
+                        }
+
+                        battle.EachEvent(EventId.Weather);
+                    },
+                    1),
+                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-weather", "none");
+                    }
+                }),
+            },
+            [ConditionId.RolloutStorage] = new()
+            {
+                Id = ConditionId.RolloutStorage,
+                Name = "RolloutStorage",
+                EffectType = EffectType.Condition,
+                Duration = 2,
+                OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, move) =>
+                {
+                    int bp = Math.Max(1, move.BasePower);
+                    // TODO: Track hit count in EffectState when property is available
+                    int hitCount = 0;
+                    bp *= (int)Math.Pow(2, hitCount);
+                    if (source.Volatiles.ContainsKey(ConditionId.DefenseCurl))
+                    {
+                        bp *= 2;
+                    }
+
+                    source.RemoveVolatile(_library.Conditions[ConditionId.RolloutStorage]);
+                    return bp;
+                }),
+            },
+        };
+    }
+}

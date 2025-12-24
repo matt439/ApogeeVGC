@@ -53,7 +53,8 @@ public partial record Conditions
                     if (effect is Ability)
                     {
                         if (battle.Gen <= 5) battle.EffectState.Duration = 0;
-                        battle.Add("-weather", "Hail", "[from] ability: " + effect.Name, $"[of] {source}");
+                        battle.Add("-weather", "Hail", "[from] ability: " + effect.Name,
+                            $"[of] {source}");
                     }
                     else
                     {
@@ -86,32 +87,35 @@ public partial record Conditions
                     }
                 }),
             },
-                        [ConditionId.HealReplacement] = new()
+            [ConditionId.HealReplacement] = new()
+            {
+                // This is a slot condition
+                Id = ConditionId.HealReplacement,
+                Name = "HealReplacement",
+                EffectType = EffectType.Condition,
+                OnStart = new OnStartEventInfo((battle, _, source, sourceEffect) =>
+                {
+                    battle.EffectState.SourceEffect = sourceEffect;
+                    battle.Add("-activate", source, "healreplacement");
+                    return new VoidReturn();
+                }),
+                OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
+                {
+                    if (!target.Fainted)
+                    {
+                        target.Heal(target.MaxHp);
+                        if (battle.DisplayUi)
                         {
-                            // This is a slot condition
-                            Id = ConditionId.HealReplacement,
-                            Name = "HealReplacement",
-                            EffectType = EffectType.Condition,
-                            OnStart = new OnStartEventInfo((battle, _, source, sourceEffect) =>
-                            {
-                                battle.EffectState.SourceEffect = sourceEffect;
-                                battle.Add("-activate", source, "healreplacement");
-                                return new VoidReturn();
-                            }),
-                            OnSwitchIn = new OnSwitchInEventInfo((battle, target) =>
-                            {
-                                if (!target.Fainted)
-                                {
-                                    target.Heal(target.MaxHp);
-                                    if (battle.DisplayUi)
-                                    {
-                                        battle.Add("-heal", target, target.GetHealth, 
-                                            "[from] move: " + battle.EffectState.SourceEffect?.Name, "[zeffect]");
-                                    }
-                                    target.Side.RemoveSlotCondition(target, _library.Conditions[ConditionId.HealReplacement]);
-                                }
-                            }),
-                        },
-                    };
-                }
-            }
+                            battle.Add("-heal", target, target.GetHealth,
+                                "[from] move: " + battle.EffectState.SourceEffect?.Name,
+                                "[zeffect]");
+                        }
+
+                        target.Side.RemoveSlotCondition(target,
+                            _library.Conditions[ConditionId.HealReplacement]);
+                    }
+                }),
+            },
+        };
+    }
+}
