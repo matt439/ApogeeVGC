@@ -289,4 +289,10 @@ public enum MoveId
                     HydroSteam,
                     DynamaxCannon,
                     WaterShuriken,
+
+                    // Additional moves needed for abilities
+                    Explosion,
+                    SelfDestruct,
+                    MindBlown,
+                    MistyExplosion,
                 }
