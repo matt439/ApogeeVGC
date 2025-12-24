@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -629,12 +630,359 @@ public partial record Abilities
                                 {
                                     if (!battle.CheckMoveMakesContact(move, source, target)) return;
 
-                                    if (battle.RandomChance(3, 10))
+                                                            if (battle.RandomChance(3, 10))
+                                                            {
+                                                                source.TrySetStatus(ConditionId.Burn, target);
+                                                            }
+                                                        }),
+                                                    },
+                                    [AbilityId.FairyAura] = new()
                                     {
-                                        source.TrySetStatus(ConditionId.Burn, target);
-                                    }
-                                }),
-                            },
-                        };
-                    }
-                }
+                                        Id = AbilityId.FairyAura,
+                                        Name = "Fairy Aura",
+                                        Num = 187,
+                                        Rating = 3.0,
+                                        OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                        {
+                                            if (battle.SuppressingAbility(pokemon)) return;
+                                            battle.Add("-ability", pokemon, "Fairy Aura");
+                                        }),
+                                        OnAnyBasePower = new OnAnyBasePowerEventInfo((battle, basePower, source, target, move) =>
+                                        {
+                                            if (target == source || move.Category == MoveCategory.Status || move.Type != MoveType.Fairy)
+                                                return basePower;
+
+                                            if (battle.EffectState.Target is not PokemonEffectStateTarget
+                                                {
+                                                    Pokemon: var abilityHolder
+                                                })
+                                                return basePower;
+
+                                            if (move.AuraBooster?.HasAbility(AbilityId.FairyAura) != true)
+                                                move.AuraBooster = abilityHolder;
+                                            if (move.AuraBooster != abilityHolder) return basePower;
+
+                                            battle.ChainModify(move.HasAuraBreak == true ? [3072, 4096] : [5448, 4096]);
+                                            return battle.FinalModify(basePower);
+                                        }, 20),
+                                    },
+                                    [AbilityId.Filter] = new()
+                                    {
+                                        Id = AbilityId.Filter,
+                                        Name = "Filter",
+                                        Num = 111,
+                                        Rating = 3.0,
+                                        Flags = new AbilityFlags { Breakable = true },
+                                        OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, _, target, move) =>
+                                        {
+                                            if (target.GetMoveHitData(move).TypeMod > 0)
+                                            {
+                                                battle.Debug("Filter neutralize");
+                                                battle.ChainModify(0.75);
+                                                return battle.FinalModify(damage);
+                                            }
+                                            return damage;
+                                        }),
+                                    },
+                                    [AbilityId.FlareBoost] = new()
+                                    {
+                                        Id = AbilityId.FlareBoost,
+                                        Name = "Flare Boost",
+                                        Num = 138,
+                                        Rating = 2.0,
+                                        // OnBasePowerPriority = 19
+                                        OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
+                                        {
+                                            if (attacker.Status == ConditionId.Burn && move.Category == MoveCategory.Special)
+                                            {
+                                                battle.ChainModify(1.5);
+                                                return battle.FinalModify(basePower);
+                                            }
+                                                                                        return basePower;
+                                                                                    }, 19),
+                                                                                },
+                                                        [AbilityId.FlashFire] = new()
+                                                        {
+                                                            Id = AbilityId.FlashFire,
+                                                            Name = "Flash Fire",
+                                                            Num = 18,
+                                                            Rating = 3.5,
+                                                            Flags = new AbilityFlags { Breakable = true },
+                                                            Condition = ConditionId.FlashFire,
+                                                            OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                                                            {
+                                                                if (target != source && move.Type == MoveType.Fire)
+                                                                {
+                                                                    // Note: In TS, move.accuracy is set to true here
+                                                                    // We cannot modify init-only Accuracy, but the hit will still be blocked
+                                                                    var addResult = target.AddVolatile(ConditionId.FlashFire);
+                                                                    if (addResult is BoolRelayVar { Value: false })
+                                                                    {
+                                                                        battle.Add("-immune", target, "[from] ability: Flash Fire");
+                                                                    }
+                                                                    return null;
+                                                                }
+                                                                return new VoidReturn();
+                                                            }),
+                                                            OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                                                            {
+                                                                if (pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
+                                                                {
+                                                                    pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.FlashFire]);
+                                                                }
+                                                            }),
+                                                        },
+                                                        [AbilityId.FlowerGift] = new()
+                                                        {
+                                                            Id = AbilityId.FlowerGift,
+                                                            Name = "Flower Gift",
+                                                            Num = 122,
+                                                            Rating = 1.0,
+                                                            Flags = new AbilityFlags
+                                                            {
+                                                                FailRolePlay = true,
+                                                                NoReceiver = true,
+                                                                NoEntrain = true,
+                                                                NoTrace = true,
+                                                                Breakable = true,
+                                                            },
+                                                            // TODO: Implement forme change for Cherrim
+                                                            // OnSwitchInPriority = -2
+                                                            // OnWeatherChange for forme
+                                                            // OnAllyModifyAtkPriority = 3
+                                                            OnAllyModifyAtk = new OnAllyModifyAtkEventInfo((battle, atk, pokemon, _, _) =>
+                                                            {
+                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var flowerGiftHolder })
+                                                                    return atk;
+                                                                if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return atk;
+                                                                ConditionId? weather = pokemon.EffectiveWeather();
+                                                                if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                                                                {
+                                                                    battle.ChainModify(1.5);
+                                                                    return battle.FinalModify(atk);
+                                                                }
+                                                                return atk;
+                                                            }, 3),
+                                                            // OnAllyModifySpDPriority = 4
+                                                            OnAllyModifySpD = new OnAllyModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                                                            {
+                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var flowerGiftHolder })
+                                                                    return spd;
+                                                                if (flowerGiftHolder.BaseSpecies.BaseSpecies != SpecieId.Cherrim) return spd;
+                                                                ConditionId? weather = pokemon.EffectiveWeather();
+                                                                if (weather == ConditionId.SunnyDay || weather == ConditionId.DesolateLand)
+                                                                {
+                                                                    battle.ChainModify(1.5);
+                                                                    return battle.FinalModify(spd);
+                                                                }
+                                                                return spd;
+                                                            }, 4),
+                                                        },
+                                                        [AbilityId.FlowerVeil] = new()
+                                                        {
+                                                            Id = AbilityId.FlowerVeil,
+                                                            Name = "Flower Veil",
+                                                            Num = 166,
+                                                            Rating = 0.0,
+                                                            Flags = new AbilityFlags { Breakable = true },
+                                                            OnAllyTryBoost = new OnAllyTryBoostEventInfo((battle, boost, target, source, effect) =>
+                                                            {
+                                                                if ((source != null && target == source) || !target.HasType(PokemonType.Grass)) return;
+                                                                bool showMsg = false;
+                                                                if (boost.Atk is < 0) { boost.Atk = null; showMsg = true; }
+                                                                if (boost.Def is < 0) { boost.Def = null; showMsg = true; }
+                                                                if (boost.SpA is < 0) { boost.SpA = null; showMsg = true; }
+                                                                if (boost.SpD is < 0) { boost.SpD = null; showMsg = true; }
+                                                                if (boost.Spe is < 0) { boost.Spe = null; showMsg = true; }
+                                                                if (boost.Accuracy is < 0) { boost.Accuracy = null; showMsg = true; }
+                                                                if (boost.Evasion is < 0) { boost.Evasion = null; showMsg = true; }
+                                                                if (showMsg && effect is ActiveMove { Secondaries: null })
+                                                                {
+                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
+                                                                    {
+                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
+                                                                    }
+                                                                }
+                                                            }),
+                                                            OnAllySetStatus = new OnAllySetStatusEventInfo((battle, status, target, source, effect) =>
+                                                            {
+                                                                if (!target.HasType(PokemonType.Grass) || source == null || target == source ||
+                                                                    effect == null || status.Id == ConditionId.Yawn)
+                                                                    return new VoidReturn();
+                                                                battle.Debug("interrupting setStatus with Flower Veil");
+                                                                if (effect.Name == "Synchronize" || (effect.EffectType == EffectType.Move && effect is ActiveMove { Secondaries: null }))
+                                                                {
+                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
+                                                                    {
+                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
+                                                                    }
+                                                                }
+                                                                return null;
+                                                            }),
+                                                            OnAllyTryAddVolatile = new OnAllyTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                                                            {
+                                                                if (target.HasType(PokemonType.Grass) && status.Id == ConditionId.Yawn)
+                                                                {
+                                                                    battle.Debug("Flower Veil blocking yawn");
+                                                                    if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
+                                                                    {
+                                                                        battle.Add("-block", target, "ability: Flower Veil", $"[of] {effectHolder}");
+                                                                    }
+                                                                    return null;
+                                                                }
+                                                                return new VoidReturn();
+                                                            }),
+                                                        },
+                                                        [AbilityId.Fluffy] = new()
+                                                        {
+                                                            Id = AbilityId.Fluffy,
+                                                            Name = "Fluffy",
+                                                            Num = 218,
+                                                            Rating = 3.5,
+                                                            Flags = new AbilityFlags { Breakable = true },
+                                                            OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
+                                                            {
+                                                                double mod = 1.0;
+                                                                if (move.Type == MoveType.Fire) mod *= 2;
+                                                                if (move.Flags.Contact == true) mod /= 2;
+                                                                battle.ChainModify(mod);
+                                                                return battle.FinalModify(damage);
+                                                            }),
+                                                        },
+                                                        [AbilityId.Forecast] = new()
+                                                        {
+                                                            Id = AbilityId.Forecast,
+                                                            Name = "Forecast",
+                                                            Num = 59,
+                                                            Rating = 2.0,
+                                                            Flags = new AbilityFlags
+                                                            {
+                                                                FailRolePlay = true,
+                                                                NoReceiver = true,
+                                                                NoEntrain = true,
+                                                                NoTrace = true,
+                                                            },
+                                                            // TODO: Implement forme change for Castform
+                                                            // OnSwitchInPriority = -2
+                                                            // OnWeatherChange for forme
+                                                        },
+                                                        [AbilityId.Forewarn] = new()
+                                                        {
+                                                            Id = AbilityId.Forewarn,
+                                                            Name = "Forewarn",
+                                                            Num = 108,
+                                                            Rating = 0.5,
+                                                            OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                                            {
+                                                                List<(Move Move, Pokemon Target)> warnMoves = [];
+                                                                int warnBp = 1;
+                                                                foreach (Pokemon target in pokemon.Foes())
+                                                                {
+                                                                    foreach (MoveSlot moveSlot in target.MoveSlots)
+                                                                    {
+                                                                        Move move = battle.Library.Moves[moveSlot.Id];
+                                                                        int bp = move.BasePower;
+                                                                        if (move.Ohko != null) bp = 150;
+                                                                        MoveId[] counterMoves = [MoveId.Counter, MoveId.MetalBurst, MoveId.MirrorCoat];
+                                                                        if (counterMoves.Contains(move.Id)) bp = 120;
+                                                                        if (bp == 1) bp = 80;
+                                                                        if (bp == 0 && move.Category != MoveCategory.Status) bp = 80;
+                                                                        if (bp > warnBp)
+                                                                        {
+                                                                            warnMoves = [(move, target)];
+                                                                            warnBp = bp;
+                                                                        }
+                                                                        else if (bp == warnBp)
+                                                                        {
+                                                                            warnMoves.Add((move, target));
+                                                                        }
+                                                                    }
+                                                                }
+                                                                if (warnMoves.Count == 0) return;
+                                                                var (warnMove, warnTarget) = battle.Sample(warnMoves);
+                                                                battle.Add("-activate", pokemon, "ability: Forewarn", warnMove.Name, $"[of] {warnTarget}");
+                                                            }),
+                                                        },
+                                                        [AbilityId.FriendGuard] = new()
+                                                        {
+                                                            Id = AbilityId.FriendGuard,
+                                                            Name = "Friend Guard",
+                                                            Num = 132,
+                                                            Rating = 0.0,
+                                                            Flags = new AbilityFlags { Breakable = true },
+                                                            OnAnyModifyDamage = new OnAnyModifyDamageEventInfo((battle, damage, _, target, _) =>
+                                                            {
+                                                                if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var effectTarget })
+                                                                    return damage;
+                                                                if (target != effectTarget && target.IsAlly(effectTarget))
+                                                                {
+                                                                    battle.Debug("Friend Guard weaken");
+                                                                    battle.ChainModify(0.75);
+                                                                    return battle.FinalModify(damage);
+                                                                }
+                                                                return damage;
+                                                            }),
+                                                        },
+                                                        [AbilityId.Frisk] = new()
+                                                        {
+                                                            Id = AbilityId.Frisk,
+                                                            Name = "Frisk",
+                                                            Num = 119,
+                                                            Rating = 1.5,
+                                                            OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                                            {
+                                                                foreach (Pokemon target in pokemon.Foes())
+                                                                {
+                                                                    if (target.Item != ItemId.None)
+                                                                    {
+                                                                        battle.Add("-item", target, battle.Library.Items[target.Item].Name, "[from] ability: Frisk", $"[of] {pokemon}");
+                                                                    }
+                                                                }
+                                                            }),
+                                                        },
+                                                        [AbilityId.FullMetalBody] = new()
+                                                        {
+                                                            Id = AbilityId.FullMetalBody,
+                                                            Name = "Full Metal Body",
+                                                            Num = 230,
+                                                            Rating = 2.0,
+                                                            OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                                                            {
+                                                                if (source != null && target == source) return;
+                                                                bool showMsg = false;
+                                                                if (boost.Atk is < 0) { boost.Atk = null; showMsg = true; }
+                                                                if (boost.Def is < 0) { boost.Def = null; showMsg = true; }
+                                                                if (boost.SpA is < 0) { boost.SpA = null; showMsg = true; }
+                                                                if (boost.SpD is < 0) { boost.SpD = null; showMsg = true; }
+                                                                if (boost.Spe is < 0) { boost.Spe = null; showMsg = true; }
+                                                                if (boost.Accuracy is < 0) { boost.Accuracy = null; showMsg = true; }
+                                                                if (boost.Evasion is < 0) { boost.Evasion = null; showMsg = true; }
+                                                                ConditionId? effectId = effect switch
+                                                                {
+                                                                    ActiveMove am => am.VolatileStatus ?? am.Status,
+                                                                    Condition c => c.Id,
+                                                                    _ => null
+                                                                };
+                                                                if (showMsg && effect is ActiveMove { Secondaries: null } && effectId != ConditionId.Octolock)
+                                                                {
+                                                                    battle.Add("-fail", target, "unboost", "[from] ability: Full Metal Body", $"[of] {target}");
+                                                                }
+                                                            }),
+                                                        },
+                                                        [AbilityId.FurCoat] = new()
+                                                        {
+                                                            Id = AbilityId.FurCoat,
+                                                            Name = "Fur Coat",
+                                                            Num = 169,
+                                                            Rating = 4.0,
+                                                            Flags = new AbilityFlags { Breakable = true },
+                                                            // OnModifyDefPriority = 6
+                                                            OnModifyDef = new OnModifyDefEventInfo((battle, def, _, _, _) =>
+                                                            {
+                                                                battle.ChainModify(2);
+                                                                return battle.FinalModify(def);
+                                                            }, 6),
+                                                        },
+                                                    };
+                                                }
+                                            }

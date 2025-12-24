@@ -290,9 +290,11 @@ public enum MoveId
                     DynamaxCannon,
                     WaterShuriken,
 
-                    // Additional moves needed for abilities
-                    Explosion,
-                    SelfDestruct,
-                    MindBlown,
-                    MistyExplosion,
-                }
+                        // Additional moves needed for abilities
+                        Explosion,
+                        SelfDestruct,
+                        MindBlown,
+                        MistyExplosion,
+                        Counter,
+                        MetalBurst,
+                    }

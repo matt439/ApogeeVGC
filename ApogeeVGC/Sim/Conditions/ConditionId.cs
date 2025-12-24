@@ -110,4 +110,5 @@ public enum ConditionId
                         Encore,
                         Taunt,
                         Octolock,
+                        FlashFire,
                     }
