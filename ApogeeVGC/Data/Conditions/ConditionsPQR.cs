@@ -469,8 +469,8 @@ public partial record Conditions
                 OnBasePower = new OnBasePowerEventInfo((battle, _, source, _, move) =>
                 {
                     int bp = Math.Max(1, move.BasePower);
-                    // TODO: Track hit count in EffectState when property is available
-                    int hitCount = 0;
+                    source.Volatiles.TryGetValue(ConditionId.RolloutStorage, out EffectState? rolloutState);
+                    int hitCount = rolloutState?.ContactHitCount ?? 0;
                     bp *= (int)Math.Pow(2, hitCount);
                     if (source.Volatiles.ContainsKey(ConditionId.DefenseCurl))
                     {

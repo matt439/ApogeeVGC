@@ -41,6 +41,7 @@ public class EffectState
     public bool? IsSlotCondition { get; set; }
     public PokemonType? TypeWas { get; set; }
     public bool? HasDragonType { get; set; }
+    public int? ContactHitCount { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {
