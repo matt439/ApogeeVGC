@@ -104,4 +104,5 @@ public enum ConditionId
                         Disable,
                         Encore,
                         Taunt,
+                        Octolock,
                     }

@@ -131,7 +131,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public bool? IgnorePositiveDefensive { get; init; }
     public bool? IgnorePositiveEvasion { get; init; }
     public bool? MultiAccuracy { get; init; }
-    public IntIntArrayUnion? MultiHit { get; init; }
+    public IntIntArrayUnion? MultiHit { get; set; }
     public MoveMultiHitType? MultiHitType { get; init; }
     public bool? NoDamageVariance { get; init; }
     public MoveTarget? NonGhostTarget { get; init; }

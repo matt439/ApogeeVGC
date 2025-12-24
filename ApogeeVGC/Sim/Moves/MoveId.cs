@@ -281,11 +281,12 @@ public enum MoveId
         WillOWisp,
         ZenHeadbutt,
 
-                // Additional moves needed for learnsets
-                Charm,
-                EarthPower,
-                FlashCannon,
-                Thief,
-                HydroSteam,
-                DynamaxCannon,
-            }
+                    // Additional moves needed for learnsets
+                    Charm,
+                    EarthPower,
+                    FlashCannon,
+                    Thief,
+                    HydroSteam,
+                    DynamaxCannon,
+                    WaterShuriken,
+                }

@@ -8,6 +8,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Extensions;
 using ApogeeVGC.Sim.Utils.Unions;
@@ -205,31 +206,32 @@ public partial record Abilities
 
                     return BoolVoidUnion.FromBool(true);
                 })),
-                OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
-                {
-                    battle.EffectState.CheckedAngerShell = true;
-                    if (source is null || source == target || target.Hp == 0) return;
-                    if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
-
-                    var lastAttackedBy = target.GetLastAttackedBy();
-                    if (lastAttackedBy == null) return;
-
-                    int damage = move.MultiHit != null && move.SmartTarget != true
-                        ? totalDamage.Value
-                        : lastAttackedBy.Damage;
-
-                    if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
+                OnAfterMoveSecondary =
+                    new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
                     {
-                        battle.Boost(new SparseBoostsTable
+                        battle.EffectState.CheckedAngerShell = true;
+                        if (source is null || source == target || target.Hp == 0) return;
+                        if (move.TotalDamage is not IntIntFalseUnion totalDamage) return;
+
+                        var lastAttackedBy = target.GetLastAttackedBy();
+                        if (lastAttackedBy == null) return;
+
+                        int damage = move.MultiHit != null && move.SmartTarget != true
+                            ? totalDamage.Value
+                            : lastAttackedBy.Damage;
+
+                        if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
                         {
-                            Atk = 1,
-                            SpA = 1,
-                            Spe = 1,
-                            Def = -1,
-                            SpD = -1
-                        }, target, target);
-                    }
-                }),
+                            battle.Boost(new SparseBoostsTable
+                            {
+                                Atk = 1,
+                                SpA = 1,
+                                Spe = 1,
+                                Def = -1,
+                                SpD = -1
+                            }, target, target);
+                        }
+                    }),
             },
             [AbilityId.Anticipation] = new()
             {
@@ -251,7 +253,8 @@ public partial record Abilities
 
                             // Check for super-effective or OHKO moves
                             if ((battle.Dex.GetImmunity(moveType.ConvertToMoveType(), pokemon) &&
-                                 battle.Dex.GetEffectiveness(moveType.ConvertToMoveType(), pokemon).ToModifier() > 0) ||
+                                 battle.Dex.GetEffectiveness(moveType.ConvertToMoveType(), pokemon)
+                                     .ToModifier() > 0) ||
                                 move.Ohko != null)
                             {
                                 battle.Add("-ability", pokemon, "Anticipation");
@@ -269,7 +272,10 @@ public partial record Abilities
                 Rating = 5.0,
                 OnFoeTrapPokemon = new OnFoeTrapPokemonEventInfo((battle, pokemon) =>
                 {
-                    if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var abilityHolder })
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var abilityHolder
+                        })
                         return;
                     if (!pokemon.IsAdjacent(abilityHolder)) return;
                     if (pokemon.IsGrounded() == true)
@@ -277,20 +283,25 @@ public partial record Abilities
                         pokemon.TryTrap(true);
                     }
                 }),
-                OnFoeMaybeTrapPokemon = new OnFoeMaybeTrapPokemonEventInfo((battle, pokemon, source) =>
-                {
-                    if (source == null && battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var holder })
+                OnFoeMaybeTrapPokemon =
+                    new OnFoeMaybeTrapPokemonEventInfo((battle, pokemon, source) =>
                     {
-                        source = holder;
-                    }
-                    if (source == null || !pokemon.IsAdjacent(source)) return;
+                        if (source == null && battle.EffectState.Target is PokemonEffectStateTarget
+                            {
+                                Pokemon: var holder
+                            })
+                        {
+                            source = holder;
+                        }
 
-                    // If type is unknown, negate immunity check
-                    if (pokemon.IsGrounded(!pokemon.KnownType) == true)
-                    {
-                        pokemon.MaybeTrapped = true;
-                    }
-                }),
+                        if (source == null || !pokemon.IsAdjacent(source)) return;
+
+                        // If type is unknown, negate immunity check
+                        if (pokemon.IsGrounded(!pokemon.KnownType) == true)
+                        {
+                            pokemon.MaybeTrapped = true;
+                        }
+                    }),
             },
             [AbilityId.ArmorTail] = new()
             {
@@ -303,18 +314,24 @@ public partial record Abilities
                 {
                     string[] targetAllExceptions = ["perishsong", "flowershield", "rototiller"];
                     if (move.Target == MoveTarget.FoeSide ||
-                        (move.Target == MoveTarget.All && !targetAllExceptions.Contains(move.Id.ToString().ToLower())))
+                        (move.Target == MoveTarget.All &&
+                         !targetAllExceptions.Contains(move.Id.ToString().ToLower())))
                     {
                         return new VoidReturn();
                     }
 
-                    if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var armorTailHolder })
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var armorTailHolder
+                        })
                         return new VoidReturn();
 
-                    if ((source.IsAlly(armorTailHolder) || move.Target == MoveTarget.All) && move.Priority > 0.1)
+                    if ((source.IsAlly(armorTailHolder) || move.Target == MoveTarget.All) &&
+                        move.Priority > 0.1)
                     {
                         battle.AttrLastMove("[still]");
-                        battle.Add("cant", armorTailHolder, "ability: Armor Tail", move.Name, $"[of] {target}");
+                        battle.Add("cant", armorTailHolder, "ability: Armor Tail", move.Name,
+                            $"[of] {target}");
                         return false;
                     }
 
@@ -328,32 +345,38 @@ public partial record Abilities
                 Num = 165,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                OnAllyTryAddVolatile = new OnAllyTryAddVolatileEventInfo((battle, status, target, _, effect) =>
-                {
-                    ConditionId[] blockedVolatiles =
-                    [
-                        ConditionId.Attract,
-                        ConditionId.Disable,
-                        ConditionId.Encore,
-                        ConditionId.HealBlock,
-                        ConditionId.Taunt,
-                        ConditionId.Torment
-                    ];
-
-                    if (blockedVolatiles.Contains(status.Id))
+                OnAllyTryAddVolatile =
+                    new OnAllyTryAddVolatileEventInfo((battle, status, target, _, effect) =>
                     {
-                        if (effect?.EffectType == EffectType.Move)
-                        {
-                            if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
-                            {
-                                battle.Add("-block", target, "ability: Aroma Veil", $"[of] {effectHolder}");
-                            }
-                        }
-                        return null;
-                    }
+                        ConditionId[] blockedVolatiles =
+                        [
+                            ConditionId.Attract,
+                            ConditionId.Disable,
+                            ConditionId.Encore,
+                            ConditionId.HealBlock,
+                            ConditionId.Taunt,
+                            ConditionId.Torment
+                        ];
 
-                    return new VoidReturn();
-                }),
+                        if (blockedVolatiles.Contains(status.Id))
+                        {
+                            if (effect?.EffectType == EffectType.Move)
+                            {
+                                if (battle.EffectState.Target is PokemonEffectStateTarget
+                                    {
+                                        Pokemon: var effectHolder
+                                    })
+                                {
+                                    battle.Add("-block", target, "ability: Aroma Veil",
+                                        $"[of] {effectHolder}");
+                                }
+                            }
+
+                            return null;
+                        }
+
+                        return new VoidReturn();
+                    }),
             },
             [AbilityId.AsOneGlastrier] = new()
             {
@@ -421,6 +444,203 @@ public partial record Abilities
 
                     return new VoidReturn();
                 }),
+            },
+            [AbilityId.BadDreams] = new()
+            {
+                Id = AbilityId.BadDreams,
+                Name = "Bad Dreams",
+                Num = 123,
+                Rating = 1.5,
+                // OnResidualOrder = 28, OnResidualSubOrder = 2
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.Hp == 0) return;
+                    foreach (var target in pokemon.Foes())
+                    {
+                        if (target.Status == ConditionId.Sleep ||
+                            target.HasAbility(AbilityId.Comatose))
+                        {
+                            battle.Damage(target.BaseMaxHp / 8, target, pokemon);
+                        }
+                    }
+                }, order: 28, subOrder: 2),
+            },
+            [AbilityId.BallFetch] = new()
+            {
+                Id = AbilityId.BallFetch,
+                Name = "Ball Fetch",
+                Num = 237,
+                Rating = 0.0,
+                // No in-battle effect
+            },
+            [AbilityId.Battery] = new()
+            {
+                Id = AbilityId.Battery,
+                Name = "Battery",
+                Num = 217,
+                Rating = 0.0,
+                // OnAllyBasePowerPriority = 22
+                OnAllyBasePower = new OnAllyBasePowerEventInfo(
+                    (battle, basePower, attacker, _, move) =>
+                    {
+                        if (battle.EffectState.Target is not PokemonEffectStateTarget
+                            {
+                                Pokemon: var effectHolder
+                            })
+                            return basePower;
+                        if (attacker != effectHolder && move.Category == MoveCategory.Special)
+                        {
+                            battle.Debug("Battery boost");
+                            battle.ChainModify([5325, 4096]);
+                            return battle.FinalModify(basePower);
+                        }
+
+                        return basePower;
+                    }, 22),
+            },
+            [AbilityId.BattleArmor] = new()
+            {
+                Id = AbilityId.BattleArmor,
+                Name = "Battle Armor",
+                Num = 4,
+                Rating = 1.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnCriticalHit = new OnCriticalHitEventInfo(false),
+            },
+            [AbilityId.BattleBond] = new()
+            {
+                Id = AbilityId.BattleBond,
+                Name = "Battle Bond",
+                Num = 210,
+                Rating = 3.5,
+                OnSourceAfterFaint =
+                    new OnSourceAfterFaintEventInfo((battle, _, _, source, effect) =>
+                    {
+                        if (source.BondTriggered) return;
+                        if (effect?.EffectType != EffectType.Move) return;
+                        if (source.Species.Id == SpecieId.GreninjaBond && source.Hp > 0 &&
+                            !source.Transformed && source.Side.FoePokemonLeft() > 0)
+                        {
+                            battle.Boost(new SparseBoostsTable { Atk = 1, SpA = 1, Spe = 1 },
+                                source, source, battle.Effect);
+                            battle.Add("-activate", source, "ability: Battle Bond");
+                            source.BondTriggered = true;
+                        }
+                    }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, attacker, _) =>
+                {
+                    if (move.Id == MoveId.WaterShuriken &&
+                        attacker.Species.Id == SpecieId.GreninjaAsh &&
+                        !attacker.Transformed)
+                    {
+                        move.MultiHit = 3;
+                    }
+                }),
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    CantSuppress = true,
+                },
+            },
+            [AbilityId.BeadsOfRuin] = new()
+            {
+                Id = AbilityId.BeadsOfRuin,
+                Name = "Beads of Ruin",
+                Num = 284,
+                Rating = 4.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.SuppressingAbility(pokemon)) return;
+                    battle.Add("-ability", pokemon, "Beads of Ruin");
+                }),
+                OnAnyModifySpD = new OnAnyModifySpDEventInfo((battle, spd, target, _, move) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var abilityHolder
+                        })
+                        return spd;
+                    if (target.HasAbility(AbilityId.BeadsOfRuin)) return spd;
+                    if (move.RuinedSpD?.HasAbility(AbilityId.BeadsOfRuin) != true)
+                        move.RuinedSpD = abilityHolder;
+                    if (move.RuinedSpD != abilityHolder) return spd;
+                    battle.Debug("Beads of Ruin SpD drop");
+                    battle.ChainModify(0.75);
+                    return battle.FinalModify(spd);
+                }),
+            },
+            [AbilityId.BeastBoost] = new()
+            {
+                Id = AbilityId.BeastBoost,
+                Name = "Beast Boost",
+                Num = 224,
+                Rating = 3.5,
+                OnSourceAfterFaint =
+                    new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
+                    {
+                        if (effect is null || effect.EffectType != EffectType.Move) return;
+                        var bestStat = source.GetBestStat(true, true);
+                        var boostTable = new SparseBoostsTable();
+                        boostTable.SetBoost(bestStat.ConvertToBoostId(), length);
+                        battle.Boost(boostTable, source);
+                    }),
+            },
+            [AbilityId.BigPecks] = new()
+            {
+                Id = AbilityId.BigPecks,
+                Name = "Big Pecks",
+                Num = 145,
+                Rating = 0.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    if (source != null && target == source) return;
+                    if (boost.Def is not null && boost.Def < 0)
+                    {
+                        boost.Def = null;
+                        if (effect is not ActiveMove { Secondaries: not null } &&
+                            effect is not Condition { Id: ConditionId.Octolock })
+                        {
+                            battle.Add("-fail", target, "unboost", "Defense",
+                                "[from] ability: Big Pecks", $"[of] {target}");
+                        }
+                    }
+                }),
+            },
+            [AbilityId.Blaze] = new()
+            {
+                Id = AbilityId.Blaze,
+                Name = "Blaze",
+                Num = 66,
+                Rating = 2.0,
+                // OnModifyAtkPriority = 5
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, attacker, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire && attacker.Hp <= attacker.MaxHp / 3)
+                    {
+                        battle.Debug("Blaze boost");
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(atk);
+                    }
+
+                    return atk;
+                }, 5),
+                // OnModifySpAPriority = 5
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, attacker, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire && attacker.Hp <= attacker.MaxHp / 3)
+                    {
+                        battle.Debug("Blaze boost");
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(spa);
+                    }
+
+                    return spa;
+                }, 5),
             },
             [AbilityId.ChillingNeigh] = new()
             {
