@@ -330,7 +330,6 @@ public partial record Conditions
                 NoCopy = true,
                 OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
                 {
-                    // TODO: Full Dynamax implementation requires Pokemon.Gigantamax and DynamaxLevel properties
                     pokemon.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
 
                     if (pokemon.Volatiles.TryGetValue(ConditionId.Torment, out _))

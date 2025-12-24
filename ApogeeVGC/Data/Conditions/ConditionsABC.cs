@@ -252,8 +252,6 @@ public partial record Conditions
                 //OnTypePriority = 1,
                 OnType = new OnTypeEventInfo((battle, types, pokemon) =>
                     {
-                        // TODO: Full implementation requires Pokemon.GetAbilityId() method
-                        // and Item.OnPlate property
                         var abilityId = pokemon.Ability;
                         if (pokemon.Transformed ||
                             (abilityId != AbilityId.Multitype && battle.Gen >= 8))

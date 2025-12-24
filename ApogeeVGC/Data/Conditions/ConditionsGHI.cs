@@ -107,8 +107,7 @@ public partial record Conditions
                         if (battle.DisplayUi)
                         {
                             battle.Add("-heal", target, target.GetHealth,
-                                "[from] move: " + battle.EffectState.SourceEffect?.Name,
-                                "[zeffect]");
+                                "[from] move: " + battle.EffectState.SourceEffect?.Name);
                         }
 
                         target.Side.RemoveSlotCondition(target,
