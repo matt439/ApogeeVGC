@@ -19,31 +19,31 @@ public partial record Moves
         var moves = new Dictionary<MoveId, Move>();
 
         // Combine all partial move dictionaries
-        foreach (var kvp in CreateMovesABC())
+        foreach (var kvp in CreateMovesAbc())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesDEF())
+        foreach (var kvp in CreateMovesDef())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesGHI())
+        foreach (var kvp in CreateMovesGhi())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesJKL())
+        foreach (var kvp in CreateMovesJkl())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesMNO())
+        foreach (var kvp in CreateMovesMno())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesPQR())
+        foreach (var kvp in CreateMovesPqr())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesSTU())
+        foreach (var kvp in CreateMovesStu())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesVWX())
+        foreach (var kvp in CreateMovesVwx())
             moves[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateMovesYZ())
+        foreach (var kvp in CreateMovesYz())
             moves[kvp.Key] = kvp.Value;
 
         return moves;

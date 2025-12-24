@@ -4,7 +4,7 @@ namespace ApogeeVGC.Data.Moves;
 
 public partial record Moves
 {
-    private Dictionary<MoveId, Move> CreateMovesVWX()
+    private Dictionary<MoveId, Move> CreateMovesVwx()
     {
         return new Dictionary<MoveId, Move>
         {

@@ -4,7 +4,7 @@ namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
 {
-    private partial Dictionary<ConditionId, Condition> CreateConditionsYZ()
+    private partial Dictionary<ConditionId, Condition> CreateConditionsYz()
     {
         return new Dictionary<ConditionId, Condition>
         {

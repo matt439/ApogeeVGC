@@ -663,7 +663,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -689,7 +689,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -715,7 +715,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -741,7 +741,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -767,7 +767,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -793,7 +793,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -819,7 +819,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -845,7 +845,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -871,7 +871,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -897,7 +897,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -923,7 +923,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -949,7 +949,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -975,7 +975,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -1001,7 +1001,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -1027,7 +1027,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -1053,7 +1053,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -1079,7 +1079,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,
@@ -1105,7 +1105,7 @@ public partial record SpeciesData
                 },
                 Abilities = new SpeciesAbility
                 {
-                    Slot0 = AbilityId.RKSSystem,
+                    Slot0 = AbilityId.RksSystem,
                 },
                 HeightM = 2.3,
                 WeightKg = 100.5,

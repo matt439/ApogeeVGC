@@ -288,7 +288,7 @@ public enum AbilityId
                                                 EmergencyExit,
                                                 WaterCompaction,
                                                 InnardsOut,
-                                                RKSSystem,
+                                                RksSystem,
                                                 ShieldsDown,
                                                 Comatose,
 

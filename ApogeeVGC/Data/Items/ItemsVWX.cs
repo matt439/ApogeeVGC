@@ -4,7 +4,7 @@ namespace ApogeeVGC.Data.Items;
 
 public partial record Items
 {
-    private partial Dictionary<ItemId, Item> CreateItemsVWX()
+    private partial Dictionary<ItemId, Item> CreateItemsVwx()
     {
         return new Dictionary<ItemId, Item>
         {

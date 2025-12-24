@@ -9,7 +9,7 @@ namespace ApogeeVGC.Data.Conditions;
 
 public partial record Conditions
 {
-    private partial Dictionary<ConditionId, Condition> CreateConditionsMNO()
+    private partial Dictionary<ConditionId, Condition> CreateConditionsMno()
     {
         return new Dictionary<ConditionId, Condition>
         {

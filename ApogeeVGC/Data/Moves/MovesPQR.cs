@@ -8,7 +8,7 @@ namespace ApogeeVGC.Data.Moves;
 
 public partial record Moves
 {
-    private Dictionary<MoveId, Move> CreateMovesPQR()
+    private Dictionary<MoveId, Move> CreateMovesPqr()
     {
         return new Dictionary<MoveId, Move>
         {

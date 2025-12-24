@@ -12,7 +12,7 @@ namespace ApogeeVGC.Data.Abilities;
 
 public partial record Abilities
 {
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesPQR()
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesPqr()
     {
         return new Dictionary<AbilityId, Ability>
         {

@@ -19,44 +19,44 @@ public partial record Abilities
         var abilities = new Dictionary<AbilityId, Ability>();
 
         // Combine all partial ability dictionaries
-        foreach (var kvp in CreateAbilitiesABC())
+        foreach (var kvp in CreateAbilitiesAbc())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesDEF())
+        foreach (var kvp in CreateAbilitiesDef())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesGHI())
+        foreach (var kvp in CreateAbilitiesGhi())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesJKL())
+        foreach (var kvp in CreateAbilitiesJkl())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesMNO())
+        foreach (var kvp in CreateAbilitiesMno())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesPQR())
+        foreach (var kvp in CreateAbilitiesPqr())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesSTU())
+        foreach (var kvp in CreateAbilitiesStu())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesVWX())
+        foreach (var kvp in CreateAbilitiesVwx())
             abilities[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateAbilitiesYZ())
+        foreach (var kvp in CreateAbilitiesYz())
             abilities[kvp.Key] = kvp.Value;
 
         return abilities;
     }
 
     // Partial methods to be implemented in other files
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesABC();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesDEF();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesGHI();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesJKL();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesMNO();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesPQR();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesSTU();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesVWX();
-    private partial Dictionary<AbilityId, Ability> CreateAbilitiesYZ();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesAbc();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesDef();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesGhi();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesJkl();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesMno();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesPqr();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesStu();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesVwx();
+    private partial Dictionary<AbilityId, Ability> CreateAbilitiesYz();
 }

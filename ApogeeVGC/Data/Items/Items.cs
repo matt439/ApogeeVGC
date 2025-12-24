@@ -19,44 +19,44 @@ public partial record Items
         var items = new Dictionary<ItemId, Item>();
 
         // Combine all partial item dictionaries
-        foreach (var kvp in CreateItemsABC())
+        foreach (var kvp in CreateItemsAbc())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsDEF())
+        foreach (var kvp in CreateItemsDef())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsGHI())
+        foreach (var kvp in CreateItemsGhi())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsJKL())
+        foreach (var kvp in CreateItemsJkl())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsMNO())
+        foreach (var kvp in CreateItemsMno())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsPQR())
+        foreach (var kvp in CreateItemsPqr())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsSTU())
+        foreach (var kvp in CreateItemsStu())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsVWX())
+        foreach (var kvp in CreateItemsVwx())
             items[kvp.Key] = kvp.Value;
 
-        foreach (var kvp in CreateItemsYZ())
+        foreach (var kvp in CreateItemsYz())
             items[kvp.Key] = kvp.Value;
 
         return items;
     }
 
     // Partial methods to be implemented in other files
-    private partial Dictionary<ItemId, Item> CreateItemsABC();
-    private partial Dictionary<ItemId, Item> CreateItemsDEF();
-    private partial Dictionary<ItemId, Item> CreateItemsGHI();
-    private partial Dictionary<ItemId, Item> CreateItemsJKL();
-    private partial Dictionary<ItemId, Item> CreateItemsMNO();
-    private partial Dictionary<ItemId, Item> CreateItemsPQR();
-    private partial Dictionary<ItemId, Item> CreateItemsSTU();
-    private partial Dictionary<ItemId, Item> CreateItemsVWX();
-    private partial Dictionary<ItemId, Item> CreateItemsYZ();
+    private partial Dictionary<ItemId, Item> CreateItemsAbc();
+    private partial Dictionary<ItemId, Item> CreateItemsDef();
+    private partial Dictionary<ItemId, Item> CreateItemsGhi();
+    private partial Dictionary<ItemId, Item> CreateItemsJkl();
+    private partial Dictionary<ItemId, Item> CreateItemsMno();
+    private partial Dictionary<ItemId, Item> CreateItemsPqr();
+    private partial Dictionary<ItemId, Item> CreateItemsStu();
+    private partial Dictionary<ItemId, Item> CreateItemsVwx();
+    private partial Dictionary<ItemId, Item> CreateItemsYz();
 }
