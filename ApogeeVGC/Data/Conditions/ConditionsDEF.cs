@@ -197,16 +197,212 @@ public partial record Conditions
                     {
                         target.CureStatus();
                     }
-                }),
-                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
-                {
-                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status &&
-                        move.Id != MoveId.PolarFlare)
-                    {
-                        target.CureStatus();
-                    }
-                }),
-            },
-        };
-    }
-}
+                                }),
+                                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, move) =>
+                                {
+                                    if (move.Type == MoveType.Fire && move.Category != MoveCategory.Status &&
+                                        move.Id != MoveId.PolarFlare)
+                                    {
+                                        target.CureStatus();
+                                    }
+                                }),
+                            },
+                                        [ConditionId.DesolateLand] = new()
+                                        {
+                                            Id = ConditionId.DesolateLand,
+                                            Name = "DesolateLand",
+                                            EffectType = EffectType.Weather,
+                                            Duration = 0,
+                                            //OnTryMovePriority = 1,
+                                            OnTryMove = new OnTryMoveEventInfo((battle, attacker, _, move) =>
+                                                {
+                                                    if (move.Type == MoveType.Water && move.Category != MoveCategory.Status)
+                                                    {
+                                                        battle.Debug("Desolate Land water suppress");
+                                                        if (battle.DisplayUi)
+                                                        {
+                                                            battle.Add("-fail", attacker, move, "[from] Desolate Land");
+                                                            battle.AttrLastMove("[still]");
+                                                        }
+                                                        return null;
+                                                    }
+                                                    return new VoidReturn();
+                                                },
+                                                1),
+                                            OnWeatherModifyDamage = new OnWeatherModifyDamageEventInfo((battle, _, _, defender, move) =>
+                                            {
+                                                if (defender.HasItem(ItemId.UtilityUmbrella)) return new VoidReturn();
+                                                if (move.Type == MoveType.Fire)
+                                                {
+                                                    battle.Debug("Sunny Day fire boost");
+                                                    return battle.ChainModify(1.5);
+                                                }
+                                                return new VoidReturn();
+                                            }),
+                                            OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                                            {
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-weather", "DesolateLand", "[from] ability: " + effect?.Name, $"[of] {source}");
+                                                }
+                                            }),
+                                            // Note: Freeze immunity handled elsewhere
+                                                //OnFieldResidualOrder = 1,
+                                                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                                                    {
+                                                        if (battle.DisplayUi)
+                                                        {
+                                                            battle.Add("-weather", "DesolateLand", "[upkeep]");
+                                                        }
+                                                        battle.EachEvent(EventId.Weather);
+                                                    },
+                                                    1),
+                                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                                                {
+                                                    if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-weather", "none");
+                                                }
+                                            }),
+                                        },
+                                        [ConditionId.DeltaStream] = new()
+                                        {
+                                            Id = ConditionId.DeltaStream,
+                                            Name = "DeltaStream",
+                                            EffectType = EffectType.Weather,
+                                            Duration = 0,
+                                            //OnEffectivenessPriority = -1,
+                                            OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, _, type, move) =>
+                                                {
+                                                    if (move is not null && move.EffectType == EffectType.Move && 
+                                                        move.Category != MoveCategory.Status && 
+                                                        type == PokemonType.Flying && typeMod > 0)
+                                                    {
+                                                        if (battle.DisplayUi)
+                                                        {
+                                                            battle.Add("-fieldactivate", "Delta Stream");
+                                                        }
+                                                        return 0;
+                                                    }
+                                                    return new VoidReturn();
+                                                },
+                                                -1),
+                                            OnFieldStart = new OnFieldStartEventInfo((battle, _, source, effect) =>
+                                            {
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-weather", "DeltaStream", "[from] ability: " + effect?.Name, $"[of] {source}");
+                                                }
+                                            }),
+                                            //OnFieldResidualOrder = 1,
+                                                OnFieldResidual = new OnFieldResidualEventInfo((battle, _, _, _) =>
+                                                    {
+                                                        if (battle.DisplayUi)
+                                                        {
+                                                            battle.Add("-weather", "DeltaStream", "[upkeep]");
+                                                        }
+                                                        battle.EachEvent(EventId.Weather);
+                                                    },
+                                                    1),
+                                                OnFieldEnd = new OnFieldEndEventInfo((battle, _) =>
+                                                {
+                                                    if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-weather", "none");
+                                                }
+                                            }),
+                                        },
+                                        [ConditionId.Dynamax] = new()
+                                        {
+                                            Id = ConditionId.Dynamax,
+                                            Name = "Dynamax",
+                                            EffectType = EffectType.Condition,
+                                            NoCopy = true,
+                                            OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                                            {
+                                                // TODO: Full Dynamax implementation requires Pokemon.Gigantamax and DynamaxLevel properties
+                                                pokemon.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
+
+                                                if (pokemon.Volatiles.TryGetValue(ConditionId.Torment, out _))
+                                                {
+                                                    pokemon.DeleteVolatile(ConditionId.Torment);
+                                                    if (battle.DisplayUi)
+                                                    {
+                                                        battle.Add("-end", pokemon, "Torment", "[silent]");
+                                                    }
+                                                }
+
+                                                // Handle Cramorant formes
+                                                if ((pokemon.Species.Id == SpecieId.CramorantGulping || 
+                                                     pokemon.Species.Id == SpecieId.CramorantGorging) && !pokemon.Transformed)
+                                                {
+                                                    pokemon.FormeChange(SpecieId.Cramorant);
+                                                }
+
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-start", pokemon, "Dynamax");
+                                                }
+
+                                                if (pokemon.BaseSpecies.Name == "Shedinja") return new VoidReturn();
+
+                                                // Default dynamax HP multiplier
+                                                const double ratio = 2.0;
+                                                pokemon.MaxHp = (int)Math.Floor(pokemon.MaxHp * ratio);
+                                                pokemon.Hp = (int)Math.Floor(pokemon.Hp * ratio);
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
+                                                }
+
+                                                return new VoidReturn();
+                                            }),
+                                            OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+                                            {
+                                                if (status.Id == ConditionId.Flinch) return null;
+                                                return new VoidReturn();
+                                            }),
+                                            //OnBeforeSwitchOutPriority = -1,
+                                            OnBeforeSwitchOut = new OnBeforeSwitchOutEventInfo((_, pokemon) =>
+                                                {
+                                                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.Dynamax]);
+                                                },
+                                                -1),
+                                            OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, move) =>
+                                            {
+                                                if (move.Id == MoveId.BehemothBash || move.Id == MoveId.BehemothBlade || 
+                                                    move.Id == MoveId.DynamaxCannon)
+                                                {
+                                                    return battle.ChainModify(2);
+                                                }
+                                                return new VoidReturn();
+                                            }),
+                                            //OnDragOutPriority = 2,
+                                                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+                                                    {
+                                                        if (battle.DisplayUi)
+                                                        {
+                                                            battle.Add("-block", pokemon, "Dynamax");
+                                                        }
+                                                        // Prevent drag out - handled by returning false in TryHit or similar
+                                                    },
+                                                    2),
+                                            OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                                            {
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-end", pokemon, "Dynamax");
+                                                }
+                                                if (pokemon.BaseSpecies.Name == "Shedinja") return;
+                                                // Restore HP proportionally
+                                                pokemon.Hp = pokemon.Hp / 2;
+                                                pokemon.MaxHp = pokemon.BaseMaxHp;
+                                                if (battle.DisplayUi)
+                                                {
+                                                    battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
+                                                }
+                                            }),
+                                        },
+                                    };
+                                }
+                            }

@@ -66,10 +66,16 @@ public enum ItemId
                     BlueOrb,
                     RedOrb,
 
-                    // Ogerpon Masks
-                    WellspringMask,
-                    HearthflameMask,
-                    CornerstoneMask,
+                        // Ogerpon Masks
+                        WellspringMask,
+                        HearthflameMask,
+                        CornerstoneMask,
 
-                    None,
-                }
+                        // Weather extending rocks
+                        IcyRock,
+                        DampRock,
+                        SmoothRock,
+                        HeatRock,
+
+                        None,
+                    }

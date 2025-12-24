@@ -76,6 +76,28 @@ public enum ConditionId
     SilkTrap,
     BurningBulwark,
     QuickGuard,
-    WideGuard,
-    Commanded,
-}
+        WideGuard,
+        Commanded,
+
+        // Weather conditions
+        Sandstorm,
+        Hail,
+        Snowscape,
+        DeltaStream,
+
+                    // Additional conditions
+                    Trapper,
+                    MustRecharge,
+                    FutureMove,
+                    HealReplacement,
+                    Gem,
+                    Dynamax,
+                    Arceus,
+                    Silvally,
+                    RolloutStorage,
+                    Truant,
+                    Recharge,
+                    DefenseCurl,
+                    Minimize,
+                    Torment,
+                }
