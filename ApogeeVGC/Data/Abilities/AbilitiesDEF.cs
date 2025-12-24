@@ -407,24 +407,234 @@ public partial record Abilities
                     {
                         battle.Damage(target.BaseMaxHp / 8, target, target);
                     }
-                }),
-            },
-            [AbilityId.FlameBody] = new()
-            {
-                Id = AbilityId.FlameBody,
-                Name = "Flame Body",
-                Num = 49,
-                Rating = 2.0,
-                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                {
-                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+                                }),
+                            },
+                            [AbilityId.EarlyBird] = new()
+                            {
+                                Id = AbilityId.EarlyBird,
+                                Name = "Early Bird",
+                                Num = 48,
+                                Rating = 1.5,
+                                // Implementation is in statuses.ts (Sleep condition)
+                                // Early Bird causes sleep to count down twice as fast
+                            },
+                            [AbilityId.EarthEater] = new()
+                            {
+                                Id = AbilityId.EarthEater,
+                                Name = "Earth Eater",
+                                Num = 297,
+                                Rating = 3.5,
+                                Flags = new AbilityFlags { Breakable = true },
+                                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                                {
+                                    if (target != source && move.Type == MoveType.Ground)
+                                    {
+                                        var healResult = battle.Heal(target.BaseMaxHp / 4, target);
+                                        if (healResult is FalseIntFalseUnion)
+                                        {
+                                            battle.Add("-immune", target, "[from] ability: Earth Eater");
+                                        }
+                                        return null;
+                                    }
+                                    return new VoidReturn();
+                                }),
+                                },
+                                [AbilityId.EffectSpore] = new()
+                                {
+                                    Id = AbilityId.EffectSpore,
+                                    Name = "Effect Spore",
+                                    Num = 27,
+                                    Rating = 2.0,
+                                    OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                                    {
+                                        if (battle.CheckMoveMakesContact(move, source, target) &&
+                                            source.Status == ConditionId.None &&
+                                            source.RunStatusImmunity(ConditionId.Powder))
+                                        {
+                                            int r = battle.Random(100);
+                                            if (r < 11)
+                                            {
+                                                source.SetStatus(ConditionId.Sleep, target);
+                                            }
+                                            else if (r < 21)
+                                            {
+                                                source.SetStatus(ConditionId.Paralysis, target);
+                                            }
+                                            else if (r < 30)
+                                            {
+                                                source.SetStatus(ConditionId.Poison, target);
+                                            }
+                                        }
+                                    }),
+                                },
+                                [AbilityId.ElectricSurge] = new()
+                            {
+                                Id = AbilityId.ElectricSurge,
+                                Name = "Electric Surge",
+                                Num = 226,
+                                Rating = 4.0,
+                                OnStart = new OnStartEventInfo((battle, _) =>
+                                {
+                                    battle.Field.SetTerrain(battle.Library.Conditions[ConditionId.ElectricTerrain]);
+                                }),
+                            },
+                            [AbilityId.Electromorphosis] = new()
+                            {
+                                Id = AbilityId.Electromorphosis,
+                                Name = "Electromorphosis",
+                                Num = 280,
+                                Rating = 3.0,
+                                // OnDamagingHitOrder = 1
+                                OnDamagingHit = new OnDamagingHitEventInfo((_, _, target, _, _) =>
+                                {
+                                    target.AddVolatile(ConditionId.Charge);
+                                }, 1),
+                            },
+                            [AbilityId.EmbodyAspectCornerstone] = new()
+                            {
+                                Id = AbilityId.EmbodyAspectCornerstone,
+                                Name = "Embody Aspect (Cornerstone)",
+                                Num = 304,
+                                Rating = 3.5,
+                                Flags = new AbilityFlags
+                                {
+                                    FailRolePlay = true,
+                                    NoReceiver = true,
+                                    NoEntrain = true,
+                                    NoTrace = true,
+                                    FailSkillSwap = true,
+                                    NoTransform = true,
+                                },
+                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                    {
+                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Cornerstone-Tera" &&
+                                            pokemon.Terastallized != null &&
+                                            !(battle.EffectState.Embodied ?? false))
+                                        {
+                                            battle.EffectState.Embodied = true;
+                                            battle.Boost(new SparseBoostsTable { Def = 1 }, pokemon);
+                                        }
+                                    }),
+                                },
+                                [AbilityId.EmbodyAspectHearthflame] = new()
+                            {
+                                Id = AbilityId.EmbodyAspectHearthflame,
+                                Name = "Embody Aspect (Hearthflame)",
+                                Num = 303,
+                                Rating = 3.5,
+                                Flags = new AbilityFlags
+                                {
+                                    FailRolePlay = true,
+                                    NoReceiver = true,
+                                    NoEntrain = true,
+                                    NoTrace = true,
+                                    FailSkillSwap = true,
+                                    NoTransform = true,
+                                },
+                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                    {
+                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Hearthflame-Tera" &&
+                                            pokemon.Terastallized != null &&
+                                            !(battle.EffectState.Embodied ?? false))
+                                        {
+                                            battle.EffectState.Embodied = true;
+                                            battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon);
+                                        }
+                                    }),
+                                },
+                                [AbilityId.EmbodyAspectTeal] = new()
+                            {
+                                Id = AbilityId.EmbodyAspectTeal,
+                                Name = "Embody Aspect (Teal)",
+                                Num = 301,
+                                Rating = 3.5,
+                                Flags = new AbilityFlags
+                                {
+                                    FailRolePlay = true,
+                                    NoReceiver = true,
+                                    NoEntrain = true,
+                                    NoTrace = true,
+                                    FailSkillSwap = true,
+                                    NoTransform = true,
+                                },
+                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                    {
+                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Teal-Tera" &&
+                                            pokemon.Terastallized != null &&
+                                            !(battle.EffectState.Embodied ?? false))
+                                        {
+                                            battle.EffectState.Embodied = true;
+                                            battle.Boost(new SparseBoostsTable { Spe = 1 }, pokemon);
+                                        }
+                                    }),
+                                },
+                                [AbilityId.EmbodyAspectWellspring] = new()
+                            {
+                                Id = AbilityId.EmbodyAspectWellspring,
+                                Name = "Embody Aspect (Wellspring)",
+                                Num = 302,
+                                Rating = 3.5,
+                                Flags = new AbilityFlags
+                                {
+                                    FailRolePlay = true,
+                                    NoReceiver = true,
+                                    NoEntrain = true,
+                                    NoTrace = true,
+                                    FailSkillSwap = true,
+                                    NoTransform = true,
+                                },
+                                    OnStart = new OnStartEventInfo((battle, pokemon) =>
+                                    {
+                                        if (pokemon.BaseSpecies.Name == "Ogerpon-Wellspring-Tera" &&
+                                            pokemon.Terastallized != null &&
+                                            !(battle.EffectState.Embodied ?? false))
+                                        {
+                                            battle.EffectState.Embodied = true;
+                                            battle.Boost(new SparseBoostsTable { SpD = 1 }, pokemon);
+                                        }
+                                    }),
+                                },
+                                        [AbilityId.EmergencyExit] = new()
+                                    {
+                                        Id = AbilityId.EmergencyExit,
+                                        Name = "Emergency Exit",
+                                        Num = 194,
+                                        Rating = 1.0,
+                                        OnEmergencyExit = new OnEmergencyExitEventInfo((battle, target) =>
+                                        {
+                                            if (battle.CanSwitch(target.Side) == 0 || target.ForceSwitchFlag || target.SwitchFlag.IsTrue())
+                                                return;
 
-                    if (battle.RandomChance(3, 10))
-                    {
-                        source.TrySetStatus(ConditionId.Burn, target);
+                                            // Clear all switch flags
+                                            foreach (var side in battle.Sides)
+                                            {
+                                                foreach (var active in side.Active)
+                                                {
+                                                    if (active != null)
+                                                        active.SwitchFlag = false;
+                                                }
+                                            }
+
+                                            target.SwitchFlag = true;
+                                            battle.Add("-activate", target, "ability: Emergency Exit");
+                                        }),
+                                    },
+                                    [AbilityId.FlameBody] = new()
+                            {
+                                Id = AbilityId.FlameBody,
+                                Name = "Flame Body",
+                                Num = 49,
+                                Rating = 2.0,
+                                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                                {
+                                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+
+                                    if (battle.RandomChance(3, 10))
+                                    {
+                                        source.TrySetStatus(ConditionId.Burn, target);
+                                    }
+                                }),
+                            },
+                        };
                     }
-                }),
-            },
-        };
-    }
-}
+                }

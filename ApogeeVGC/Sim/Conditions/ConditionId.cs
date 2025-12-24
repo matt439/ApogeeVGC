@@ -20,7 +20,12 @@ public enum ConditionId
     Reflect,
     LightScreen,
     ElectricTerrain,
+    GrassyTerrain,
+    MistyTerrain,
+    PsychicTerrain,
     QuarkDrive,
+    Protosynthesis,
+    Charge,
 
     Nightmare,
     LockedMove,

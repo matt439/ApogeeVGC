@@ -46,6 +46,7 @@ public class EffectState
     public bool? CheckedAngerShell { get; set; }
     public bool? CheckedBerserk { get; set; }
     public Item? Berry { get; set; }
+    public bool? Embodied { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {
