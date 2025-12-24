@@ -42,6 +42,8 @@ public class EffectState
     public PokemonType? TypeWas { get; set; }
     public bool? HasDragonType { get; set; }
     public int? ContactHitCount { get; set; }
+    public bool? CheckedAngerShell { get; set; }
+    public bool? CheckedBerserk { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {
