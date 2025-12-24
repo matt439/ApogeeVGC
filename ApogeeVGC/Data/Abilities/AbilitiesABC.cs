@@ -4,6 +4,7 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
@@ -327,7 +328,32 @@ public partial record Abilities
                 Num = 165,
                 Rating = 2.0,
                 Flags = new AbilityFlags { Breakable = true },
-                // TODO: OnAllyTryAddVolatile - blocks attract, disable, encore, healblock, taunt, torment
+                OnAllyTryAddVolatile = new OnAllyTryAddVolatileEventInfo((battle, status, target, _, effect) =>
+                {
+                    ConditionId[] blockedVolatiles =
+                    [
+                        ConditionId.Attract,
+                        ConditionId.Disable,
+                        ConditionId.Encore,
+                        ConditionId.HealBlock,
+                        ConditionId.Taunt,
+                        ConditionId.Torment
+                    ];
+
+                    if (blockedVolatiles.Contains(status.Id))
+                    {
+                        if (effect?.EffectType == EffectType.Move)
+                        {
+                            if (battle.EffectState.Target is PokemonEffectStateTarget { Pokemon: var effectHolder })
+                            {
+                                battle.Add("-block", target, "ability: Aroma Veil", $"[of] {effectHolder}");
+                            }
+                        }
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
             },
             [AbilityId.AsOneGlastrier] = new()
             {

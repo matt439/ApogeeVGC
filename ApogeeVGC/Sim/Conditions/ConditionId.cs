@@ -98,6 +98,10 @@ public enum ConditionId
                     Truant,
                     Recharge,
                     DefenseCurl,
-                    Minimize,
-                    Torment,
-                }
+                        Minimize,
+                        Torment,
+                        Attract,
+                        Disable,
+                        Encore,
+                        Taunt,
+                    }
