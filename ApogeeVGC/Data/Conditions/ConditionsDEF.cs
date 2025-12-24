@@ -322,99 +322,99 @@ public partial record Conditions
                     }
                 }),
             },
-            [ConditionId.Dynamax] = new()
-            {
-                Id = ConditionId.Dynamax,
-                Name = "Dynamax",
-                EffectType = EffectType.Condition,
-                NoCopy = true,
-                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
-                {
-                    pokemon.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
+            //[ConditionId.Dynamax] = new()
+            //{
+            //    Id = ConditionId.Dynamax,
+            //    Name = "Dynamax",
+            //    EffectType = EffectType.Condition,
+            //    NoCopy = true,
+            //    OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+            //    {
+            //        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Substitute]);
 
-                    if (pokemon.Volatiles.TryGetValue(ConditionId.Torment, out _))
-                    {
-                        pokemon.DeleteVolatile(ConditionId.Torment);
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-end", pokemon, "Torment", "[silent]");
-                        }
-                    }
+            //        if (pokemon.Volatiles.TryGetValue(ConditionId.Torment, out _))
+            //        {
+            //            pokemon.DeleteVolatile(ConditionId.Torment);
+            //            if (battle.DisplayUi)
+            //            {
+            //                battle.Add("-end", pokemon, "Torment", "[silent]");
+            //            }
+            //        }
 
-                    // Handle Cramorant formes
-                    if ((pokemon.Species.Id == SpecieId.CramorantGulping ||
-                         pokemon.Species.Id == SpecieId.CramorantGorging) && !pokemon.Transformed)
-                    {
-                        pokemon.FormeChange(SpecieId.Cramorant);
-                    }
+            //        // Handle Cramorant formes
+            //        if ((pokemon.Species.Id == SpecieId.CramorantGulping ||
+            //             pokemon.Species.Id == SpecieId.CramorantGorging) && !pokemon.Transformed)
+            //        {
+            //            pokemon.FormeChange(SpecieId.Cramorant);
+            //        }
 
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-start", pokemon, "Dynamax");
-                    }
+            //        if (battle.DisplayUi)
+            //        {
+            //            battle.Add("-start", pokemon, "Dynamax");
+            //        }
 
-                    if (pokemon.BaseSpecies.Name == "Shedinja") return new VoidReturn();
+            //        if (pokemon.BaseSpecies.Name == "Shedinja") return new VoidReturn();
 
-                    // Default dynamax HP multiplier
-                    const double ratio = 2.0;
-                    pokemon.MaxHp = (int)Math.Floor(pokemon.MaxHp * ratio);
-                    pokemon.Hp = (int)Math.Floor(pokemon.Hp * ratio);
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
-                    }
+            //        // Default dynamax HP multiplier
+            //        const double ratio = 2.0;
+            //        pokemon.MaxHp = (int)Math.Floor(pokemon.MaxHp * ratio);
+            //        pokemon.Hp = (int)Math.Floor(pokemon.Hp * ratio);
+            //        if (battle.DisplayUi)
+            //        {
+            //            battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
+            //        }
 
-                    return new VoidReturn();
-                }),
-                OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
-                {
-                    if (status.Id == ConditionId.Flinch) return null;
-                    return new VoidReturn();
-                }),
-                //OnBeforeSwitchOutPriority = -1,
-                OnBeforeSwitchOut = new OnBeforeSwitchOutEventInfo(
-                    (_, pokemon) =>
-                    {
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Dynamax]);
-                    },
-                    -1),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, move) =>
-                {
-                    if (move.Id == MoveId.BehemothBash || move.Id == MoveId.BehemothBlade ||
-                        move.Id == MoveId.DynamaxCannon)
-                    {
-                        return battle.ChainModify(2);
-                    }
+            //        return new VoidReturn();
+            //    }),
+            //    OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+            //    {
+            //        if (status.Id == ConditionId.Flinch) return null;
+            //        return new VoidReturn();
+            //    }),
+            //    //OnBeforeSwitchOutPriority = -1,
+            //    OnBeforeSwitchOut = new OnBeforeSwitchOutEventInfo(
+            //        (_, pokemon) =>
+            //        {
+            //            pokemon.RemoveVolatile(_library.Conditions[ConditionId.Dynamax]);
+            //        },
+            //        -1),
+            //    OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, _, _, _, move) =>
+            //    {
+            //        if (move.Id == MoveId.BehemothBash || move.Id == MoveId.BehemothBlade ||
+            //            move.Id == MoveId.DynamaxCannon)
+            //        {
+            //            return battle.ChainModify(2);
+            //        }
 
-                    return new VoidReturn();
-                }),
-                //OnDragOutPriority = 2,
-                OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
-                    {
-                        if (battle.DisplayUi)
-                        {
-                            battle.Add("-block", pokemon, "Dynamax");
-                        }
-                        // Prevent drag out - handled by returning false in TryHit or similar
-                    },
-                    2),
-                OnEnd = new OnEndEventInfo((battle, pokemon) =>
-                {
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-end", pokemon, "Dynamax");
-                    }
+            //        return new VoidReturn();
+            //    }),
+            //    //OnDragOutPriority = 2,
+            //    OnDragOut = new OnDragOutEventInfo((battle, pokemon, _, _) =>
+            //        {
+            //            if (battle.DisplayUi)
+            //            {
+            //                battle.Add("-block", pokemon, "Dynamax");
+            //            }
+            //            // Prevent drag out - handled by returning false in TryHit or similar
+            //        },
+            //        2),
+            //    OnEnd = new OnEndEventInfo((battle, pokemon) =>
+            //    {
+            //        if (battle.DisplayUi)
+            //        {
+            //            battle.Add("-end", pokemon, "Dynamax");
+            //        }
 
-                    if (pokemon.BaseSpecies.Name == "Shedinja") return;
-                    // Restore HP proportionally
-                    pokemon.Hp = pokemon.Hp / 2;
-                    pokemon.MaxHp = pokemon.BaseMaxHp;
-                    if (battle.DisplayUi)
-                    {
-                        battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
-                    }
-                }),
-            },
+            //        if (pokemon.BaseSpecies.Name == "Shedinja") return;
+            //        // Restore HP proportionally
+            //        pokemon.Hp = pokemon.Hp / 2;
+            //        pokemon.MaxHp = pokemon.BaseMaxHp;
+            //        if (battle.DisplayUi)
+            //        {
+            //            battle.Add("-heal", pokemon, pokemon.GetHealth, "[silent]");
+            //        }
+            //    }),
+            //},
         };
     }
 }

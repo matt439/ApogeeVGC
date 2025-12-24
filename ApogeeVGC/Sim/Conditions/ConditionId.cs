@@ -91,7 +91,7 @@ public enum ConditionId
                     FutureMove,
                     HealReplacement,
                     Gem,
-                    Dynamax,
+                    //Dynamax,
                     Arceus,
                     Silvally,
                     RolloutStorage,
