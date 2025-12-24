@@ -1,4 +1,5 @@
 ﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
@@ -44,6 +45,7 @@ public class EffectState
     public int? ContactHitCount { get; set; }
     public bool? CheckedAngerShell { get; set; }
     public bool? CheckedBerserk { get; set; }
+    public Item? Berry { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {
