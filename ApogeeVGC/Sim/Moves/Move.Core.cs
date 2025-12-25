@@ -124,7 +124,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public bool? IgnoreAbility { get; set; }
     public bool? IgnoreAccuracy { get; init; }
     public bool? IgnoreDefensive { get; init; }
-    public bool? IgnoreEvasion { get; init; }
+    public bool? IgnoreEvasion { get; set; }
     public MoveIgnoreImmunity? IgnoreImmunity { get; set; }
     public bool? IgnoreNegativeOffensive { get; init; }
     public bool? IgnoreOffensive { get; init; }
@@ -138,7 +138,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public double? SpreadModifier { get; init; }
     public bool? SleepUsable { get; init; }
     public bool? SmartTarget { get; set; }
-    public bool? TracksTarget { get; init; }
+    public bool? TracksTarget { get; set; }
     public bool? WillCrit { get; init; }
     public bool? CallsMove { get; init; }
     public bool? HasCrashDamage { get; init; }

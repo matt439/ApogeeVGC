@@ -8,7 +8,7 @@ public record MoveFlags
     public bool? Bullet { get; init; }
     public bool? CantUseTwice { get; init; }
     public bool? Charge { get; init; }
-    public bool? Contact { get; init; }
+    public bool? Contact { get; set; }
     public bool? Dance { get; init; }
     public bool? Defrost { get; init; }
     public bool? Distance { get; init; }

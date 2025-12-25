@@ -50,6 +50,8 @@ public class EffectState
     public bool? Gluttony { get; set; }
     public MoveId? ChoiceLock { get; set; }
     public bool? Busted { get; set; } // For Ice Face / Disguise
+    public bool? Libero { get; set; } // For Libero ability
+    public bool? Protean { get; set; } // For Protean ability
 
     public int? GetProperty(EffectStateKey? key)
     {

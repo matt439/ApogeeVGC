@@ -372,13 +372,13 @@ public enum AbilityId
                                                                                 SupersweetSyrup,
                                                                                 Hospitality,
                                                                                 ToxicChain,
-                                                                                EmbodyAspectTeal,
-                                                                                EmbodyAspectWellspring,
-                                                                                EmbodyAspectHearthflame,
-                                                                                EmbodyAspectCornerstone,
-                                                                                TeraShift,
-                                                                                TeraformZero,
-                                                                                PoisonPuppeteer,
+                                                                                        EmbodyAspectTeal,
+                                                                                        EmbodyAspectWellspring,
+                                                                                        EmbodyAspectHearthflame,
+                                                                                        EmbodyAspectCornerstone,
+                                                                                        TeraShift,
+                                                                                        TeraformZero,
+                                                                                        PoisonPuppeteer,
 
-                                                                                None,
-                                                                            }
+                                                                                        None,
+                                                                                    }
