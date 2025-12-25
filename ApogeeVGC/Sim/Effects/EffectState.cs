@@ -47,6 +47,8 @@ public class EffectState
     public bool? CheckedBerserk { get; set; }
     public Item? Berry { get; set; }
     public bool? Embodied { get; set; }
+    public bool? Gluttony { get; set; }
+    public MoveId? ChoiceLock { get; set; }
 
     public int? GetProperty(EffectStateKey? key)
     {
