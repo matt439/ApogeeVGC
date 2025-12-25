@@ -49,6 +49,7 @@ public class EffectState
     public bool? Embodied { get; set; }
     public bool? Gluttony { get; set; }
     public MoveId? ChoiceLock { get; set; }
+    public bool? Busted { get; set; } // For Ice Face / Disguise
 
     public int? GetProperty(EffectStateKey? key)
     {

@@ -1,5 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Moves;
@@ -572,6 +574,427 @@ public partial record Abilities
                         }
                     }
                 }),
+            },
+            // ==================== 'I' Abilities ====================
+            [AbilityId.IceBody] = new()
+            {
+                Id = AbilityId.IceBody,
+                Name = "Ice Body",
+                Num = 115,
+                Rating = 1.0,
+                OnWeather = new OnWeatherEventInfo((battle, target, _, effect) =>
+                {
+                    if (effect.Id is ConditionId.Hail or ConditionId.Snowscape)
+                    {
+                        battle.Heal(target.BaseMaxHp / 16);
+                    }
+                }),
+                OnImmunity = new OnImmunityEventInfo((_, type, _) =>
+                {
+                    // Ice Body grants immunity to hail damage - handled via return false
+                    // The immunity check is handled by the event system
+                }),
+            },
+            [AbilityId.IceFace] = new()
+            {
+                Id = AbilityId.IceFace,
+                Name = "Ice Face",
+                Num = 248,
+                Rating = 3.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    CantSuppress = true,
+                    Breakable = true,
+                    NoTransform = true,
+                },
+                // OnSwitchInPriority = -2
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { }, -2),
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]) &&
+                        pokemon.Species.Id == SpecieId.EiscueNoice)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Ice Face");
+                        battle.EffectState.Busted = false;
+                        pokemon.FormeChange(SpecieId.Eiscue, battle.Effect, true);
+                    }
+                }),
+                // OnDamagePriority = 1
+                OnDamage = new OnDamageEventInfo((battle, _, target, _, effect) =>
+                {
+                    if (effect is ActiveMove move && move.Category == MoveCategory.Physical &&
+                        target.Species.Id == SpecieId.Eiscue)
+                    {
+                        battle.Add("-activate", target, "ability: Ice Face");
+                        battle.EffectState.Busted = true;
+                        return 0;
+                    }
+
+                    return new VoidReturn();
+                }, 1),
+                OnCriticalHit = new OnCriticalHitEventInfo(
+                    (Func<Battle, Pokemon, object?, Move, BoolVoidUnion>)((_, target, _, move) =>
+                    {
+                        if (target is null) return new VoidReturn();
+                        if (move.Category != MoveCategory.Physical ||
+                            target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
+                        if (target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                            (move.Flags.BypassSub != true)) return new VoidReturn();
+                        if (move is ActiveMove activeMove && !target.RunImmunity(activeMove))
+                            return new VoidReturn();
+                        return BoolVoidUnion.FromBool(false);
+                    })),
+                OnEffectiveness = new OnEffectivenessEventInfo((battle, typeMod, target, _, move) =>
+                {
+                    if (target is null || move.Category != MoveCategory.Physical ||
+                        target.Species.Id != SpecieId.Eiscue) return new VoidReturn();
+                    bool hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                  (move.Flags.BypassSub != true) && move.Infiltrates != true;
+                    if (hitSub) return new VoidReturn();
+                    if (!target.RunImmunity(move)) return new VoidReturn();
+                    return 0;
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Species.Id == SpecieId.Eiscue &&
+                        (battle.EffectState.Busted ?? false))
+                    {
+                        pokemon.FormeChange(SpecieId.EiscueNoice, battle.Effect, true);
+                    }
+                }),
+                OnWeatherChange = new OnWeatherChangeEventInfo((battle, pokemon, _, sourceEffect) =>
+                {
+                    // Snow/hail resuming because Cloud Nine/Air Lock ended does not trigger Ice Face
+                    if (sourceEffect is Ability ability && ability.SuppressWeather == true) return;
+                    if (pokemon.Hp == 0) return;
+                    if (battle.Field.IsWeather([ConditionId.Hail, ConditionId.Snowscape]) &&
+                        pokemon.Species.Id == SpecieId.EiscueNoice)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Ice Face");
+                        battle.EffectState.Busted = false;
+                        pokemon.FormeChange(SpecieId.Eiscue, battle.Effect, true);
+                    }
+                }),
+            },
+            [AbilityId.IceScales] = new()
+            {
+                Id = AbilityId.IceScales,
+                Name = "Ice Scales",
+                Num = 246,
+                Rating = 4.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, _, _, move) =>
+                    {
+                        if (move.Category == MoveCategory.Special)
+                        {
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+
+                        return damage;
+                    }),
+            },
+            [AbilityId.Illuminate] = new()
+            {
+                Id = AbilityId.Illuminate,
+                Name = "Illuminate",
+                Num = 35,
+                Rating = 0.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    if (source != null && target == source) return;
+                    if (boost.Accuracy is < 0)
+                    {
+                        boost.Accuracy = null;
+                        if (effect is not ActiveMove { Secondaries: not null })
+                        {
+                            battle.Add("-fail", target, "unboost", "accuracy",
+                                "[from] ability: Illuminate", $"[of] {target}");
+                        }
+                    }
+                }),
+                // TODO: IgnoreEvasion is init-only on Move. Consider making it mutable or setting via MoveFlags.
+                // OnModifyMove: move.IgnoreEvasion = true;
+            },
+            [AbilityId.Illusion] = new()
+            {
+                Id = AbilityId.Illusion,
+                Name = "Illusion",
+                Num = 149,
+                Rating = 4.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                },
+                OnBeforeSwitchIn = new OnBeforeSwitchInEventInfo((_, pokemon) =>
+                {
+                    pokemon.Illusion = null;
+                    // Find a non-fainted Pokemon to the right of this Pokemon to use as illusion
+                    for (int i = pokemon.Side.Pokemon.Count - 1; i > pokemon.Position; i--)
+                    {
+                        Pokemon possibleTarget = pokemon.Side.Pokemon[i];
+                        if (!possibleTarget.Fainted)
+                        {
+                            // If Ogerpon/Terapagos is in the last slot while the Illusion Pokemon is Terastallized
+                            // Illusion will not disguise as anything
+                            if (pokemon.Terastallized == null ||
+                                (possibleTarget.Species.BaseSpecies != SpecieId.Ogerpon &&
+                                 possibleTarget.Species.BaseSpecies != SpecieId.Terapagos))
+                            {
+                                pokemon.Illusion = possibleTarget;
+                            }
+
+                            break;
+                        }
+                    }
+                }),
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (target.Illusion != null)
+                    {
+                        battle.SingleEvent(EventId.End,
+                            battle.Library.Abilities[AbilityId.Illusion],
+                            target.AbilityState, target, source, move);
+                    }
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is not PokemonSideFieldPokemon psfp) return;
+                    Pokemon pokemon = psfp.Pokemon;
+                    if (pokemon.Illusion != null)
+                    {
+                        battle.Debug("illusion cleared");
+                        pokemon.Illusion = null;
+                        var details = pokemon.GetUpdatedDetails();
+                        battle.Add("replace", pokemon, details.ToString());
+                        battle.Add("-end", pokemon, "Illusion");
+                    }
+                }),
+                OnFaint = new OnFaintEventInfo((_, pokemon, _, _) => { pokemon.Illusion = null; }),
+            },
+            [AbilityId.Immunity] = new()
+            {
+                Id = AbilityId.Immunity,
+                Name = "Immunity",
+                Num = 17,
+                Rating = 2.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Status is ConditionId.Poison or ConditionId.Toxic)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Immunity");
+                        pokemon.CureStatus();
+                    }
+                }),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                {
+                    if (status.Id is not (ConditionId.Poison or ConditionId.Toxic))
+                        return new VoidReturn();
+                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    {
+                        battle.Add("-immune", target, "[from] ability: Immunity");
+                    }
+
+                    return false;
+                }),
+            },
+            [AbilityId.Imposter] = new()
+            {
+                Id = AbilityId.Imposter,
+                Name = "Imposter",
+                Num = 150,
+                Rating = 5.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                },
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    // Imposter copies the Pokemon across from it
+                    int targetIndex = pokemon.Side.Foe.Active.Count - 1 - pokemon.Position;
+                    if (targetIndex >= 0 && targetIndex < pokemon.Side.Foe.Active.Count)
+                    {
+                        Pokemon? target = pokemon.Side.Foe.Active[targetIndex];
+                        if (target != null)
+                        {
+                            pokemon.TransformInto(target,
+                                battle.Library.Abilities[AbilityId.Imposter]);
+                        }
+                    }
+                }),
+            },
+            [AbilityId.Infiltrator] = new()
+            {
+                Id = AbilityId.Infiltrator,
+                Name = "Infiltrator",
+                Num = 151,
+                Rating = 2.5,
+                // TODO: Infiltrates is init-only on ActiveMove. Consider making it mutable.
+                // OnModifyMove: move.Infiltrates = true;
+            },
+            [AbilityId.InnardsOut] = new()
+            {
+                Id = AbilityId.InnardsOut,
+                Name = "Innards Out",
+                Num = 215,
+                Rating = 4.0,
+                // OnDamagingHitOrder = 1
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, _) =>
+                {
+                    if (target.Hp == 0)
+                    {
+                        battle.Damage(target.GetUndynamaxedHp(damage), source, target);
+                    }
+                }, 1),
+            },
+            [AbilityId.InnerFocus] = new()
+            {
+                Id = AbilityId.InnerFocus,
+                Name = "Inner Focus",
+                Num = 39,
+                Rating = 1.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryAddVolatile = new OnTryAddVolatileEventInfo((_, status, _, _, _) =>
+                {
+                    if (status.Id == ConditionId.Flinch) return null;
+                    return new VoidReturn();
+                }),
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, _, effect) =>
+                {
+                    if (effect.Name == "Intimidate" && boost.Atk != null)
+                    {
+                        boost.Atk = null;
+                        battle.Add("-fail", target, "unboost", "Attack",
+                            "[from] ability: Inner Focus", $"[of] {target}");
+                    }
+                }),
+            },
+            [AbilityId.Insomnia] = new()
+            {
+                Id = AbilityId.Insomnia,
+                Name = "Insomnia",
+                Num = 15,
+                Rating = 1.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Sleep)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Insomnia");
+                        pokemon.CureStatus();
+                    }
+                }),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                {
+                    if (status.Id != ConditionId.Sleep) return new VoidReturn();
+                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    {
+                        battle.Add("-immune", target, "[from] ability: Insomnia");
+                    }
+
+                    return false;
+                }),
+                OnTryAddVolatile = new OnTryAddVolatileEventInfo((battle, status, target, _, _) =>
+                {
+                    if (status.Id == ConditionId.Yawn)
+                    {
+                        battle.Add("-immune", target, "[from] ability: Insomnia");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.Intimidate] = new()
+            {
+                Id = AbilityId.Intimidate,
+                Name = "Intimidate",
+                Num = 22,
+                Rating = 3.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    bool activated = false;
+                    foreach (Pokemon target in pokemon.AdjacentFoes())
+                    {
+                        if (!activated)
+                        {
+                            battle.Add("-ability", pokemon, "Intimidate", "boost");
+                            activated = true;
+                        }
+
+                        if (target.Volatiles.ContainsKey(ConditionId.Substitute))
+                        {
+                            battle.Add("-immune", target);
+                        }
+                        else
+                        {
+                            battle.Boost(new SparseBoostsTable { Atk = -1 }, target, pokemon, null,
+                                true);
+                        }
+                    }
+                }),
+            },
+            [AbilityId.IntrepidSword] = new()
+            {
+                Id = AbilityId.IntrepidSword,
+                Name = "Intrepid Sword",
+                Num = 234,
+                Rating = 4.0,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.SwordBoost) return;
+                    pokemon.SwordBoost = true;
+                    battle.Boost(new SparseBoostsTable { Atk = 1 }, pokemon);
+                }),
+            },
+            [AbilityId.IronBarbs] = new()
+            {
+                Id = AbilityId.IronBarbs,
+                Name = "Iron Barbs",
+                Num = 160,
+                Rating = 2.5,
+                // OnDamagingHitOrder = 1
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target, true))
+                    {
+                        battle.Damage(source.BaseMaxHp / 8, source, target);
+                    }
+                }, 1),
+            },
+            [AbilityId.IronFist] = new()
+            {
+                Id = AbilityId.IronFist,
+                Name = "Iron Fist",
+                Num = 89,
+                Rating = 3.0,
+                // OnBasePowerPriority = 23
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                {
+                    if (move.Flags.Punch == true)
+                    {
+                        battle.Debug("Iron Fist boost");
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 23),
             },
         };
     }
