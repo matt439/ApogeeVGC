@@ -53,6 +53,7 @@ public class EffectState
     public bool? Libero { get; set; } // For Libero ability
     public bool? Protean { get; set; } // For Protean ability
     public SparseBoostsTable? Boosts { get; set; } // For Opportunist ability
+    public bool? BerryWeaken { get; set; } // For Ripen ability
 
     public int? GetProperty(EffectStateKey? key)
     {
