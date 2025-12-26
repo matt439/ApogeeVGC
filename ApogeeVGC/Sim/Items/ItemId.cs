@@ -87,18 +87,47 @@ public enum ItemId
     FocusSash,
     FriendBall,
 
+    // G items
+    GalaricaCuff,
+    GalaricaWreath,
+    GanlonBerry,
+    GoldBottleCap,
+    GrassySeed,
+    GreatBall,
+    GrepaBerry,
+    GripClaw,
+    GriseousCore,
+    GriseousOrb,
+
+    // H items
+    HabanBerry,
+    HardStone,
+    HealBall,
+    HearthflameMask,
+    HeatRock,
+    HeavyBall,
+    HeavyDutyBoots,
+    HondewBerry,
+
+    // I items
+    IapapaBerry,
+    IceStone,
+    IciclePlate,
+    IcyRock,
+    InsectPlate,
+    IronBall,
+    IronPlate,
+
     StickyBarb,
 
     BoosterEnergy,
     ToxicOrb,
     TerrainExtender,
-    IronBall,
     ProtectivePads,
 
         LeppaBerry,
         EnigmaBerry,
         FigyBerry,
-        IapapaBerry,
         MagoBerry,
         SitrusBerry,
         WikiBerry,
@@ -147,12 +176,9 @@ public enum ItemId
 
         // Ogerpon Masks
         WellspringMask,
-        HearthflameMask,
 
         // Weather extending rocks
-        IcyRock,
         SmoothRock,
-        HeatRock,
 
         None,
     }
