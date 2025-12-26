@@ -1,5 +1,6 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
@@ -36,18 +37,19 @@ public partial record Items
                 Name = "Deep Sea Scale",
                 SpriteNum = 93,
                 Fling = new FlingData { BasePower = 30 },
-                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon) =>
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
                 {
                     if (pokemon.BaseSpecies.Name == "Clamperl")
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spd);
                     }
+
                     return spd;
                 }, 2),
                 Num = 227,
                 Gen = 3,
-                IsNonstandard = "Past",
+                // IsNonstandard = "Past", // TODO: Not supported in Item class
             },
             [ItemId.DeepSeaTooth] = new()
             {
@@ -55,18 +57,19 @@ public partial record Items
                 Name = "Deep Sea Tooth",
                 SpriteNum = 94,
                 Fling = new FlingData { BasePower = 90 },
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon) =>
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon, _, _) =>
                 {
                     if (pokemon.BaseSpecies.Name == "Clamperl")
                     {
                         battle.ChainModify(2);
                         return battle.FinalModify(spa);
                     }
+
                     return spa;
                 }, 1),
                 Num = 226,
                 Gen = 3,
-                IsNonstandard = "Past",
+                // IsNonstandard = "Past", // TODO: Not supported in Item class
             },
             [ItemId.DestinyKnot] = new()
             {
@@ -100,6 +103,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // TODO: OnTakeItem - Arceus can't have this item removed
@@ -120,6 +124,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 250,
@@ -147,6 +152,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // TODO: OnTakeItem - Arceus can't have this item removed
@@ -204,7 +210,8 @@ public partial record Items
                 //OnResidualSubOrder = 3,
                 OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
                 {
-                    battle.Debug($"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
+                    battle.Debug(
+                        $"FlameOrb OnResidual: Called for {pokemon?.Name ?? "null pokemon"}");
 
                     if (pokemon == null)
                     {
@@ -221,6 +228,138 @@ public partial record Items
                     SubOrder = 3,
                 },
                 Num = 273,
+                Gen = 4,
+            },
+
+            // E items
+            [ItemId.EarthPlate] = new()
+            {
+                Id = ItemId.EarthPlate,
+                Name = "Earth Plate",
+                SpriteNum = 117,
+                // OnPlate = 'Ground', // TODO: Not relevant for Gen 9 standard play
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Ground)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 15),
+                // TODO: OnTakeItem - Arceus can't have this item removed
+                ForcedForme = "Arceus-Ground",
+                Num = 305,
+                Gen = 4,
+            },
+            [ItemId.EjectButton] = new()
+            {
+                Id = ItemId.EjectButton,
+                Name = "Eject Button",
+                SpriteNum = 118,
+                Fling = new FlingData { BasePower = 30 },
+                // TODO: OnAfterMoveSecondary - switches user out after being hit
+                // Complex switching logic that needs to check:
+                // - if source and target are different
+                // - if target has HP
+                // - if move is not Status category
+                // - if move is not a future move
+                // - if can switch
+                // - if not forced to switch
+                // - if not being called back
+                // - if not sky dropped
+                // - if not commanding/commanded
+                // - if no other pokemon has switchFlag
+                Num = 547,
+                Gen = 5,
+            },
+            [ItemId.EjectPack] = new()
+            {
+                Id = ItemId.EjectPack,
+                Name = "Eject Pack",
+                SpriteNum = 714,
+                Fling = new FlingData { BasePower = 50 },
+                // TODO: OnAfterBoost - ejects if any stat is lowered
+                // Complex logic tracking negative boosts and triggering switch
+                Num = 1119,
+                Gen = 8,
+            },
+            [ItemId.Electirizer] = new()
+            {
+                Id = ItemId.Electirizer,
+                Name = "Electirizer",
+                SpriteNum = 119,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 322,
+                Gen = 4,
+            },
+            [ItemId.ElectricSeed] = new()
+            {
+                Id = ItemId.ElectricSeed,
+                Name = "Electric Seed",
+                SpriteNum = 664,
+                Fling = new FlingData { BasePower = 10 },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.IgnoringItem() &&
+                        battle.Field.IsTerrain(ConditionId.ElectricTerrain, null))
+                    {
+                        pokemon.UseItem();
+                    }
+                }),
+                // TODO: OnTerrainChange - use item when Electric Terrain is set
+                Boosts = new SparseBoostsTable { Def = 1 },
+                Num = 881,
+                Gen = 7,
+            },
+            [ItemId.Eviolite] = new()
+            {
+                Id = ItemId.Eviolite,
+                Name = "Eviolite",
+                SpriteNum = 130,
+                Fling = new FlingData { BasePower = 40 },
+                OnModifyDef = new OnModifyDefEventInfo((battle, def, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.Nfe)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(def);
+                    }
+
+                    return def;
+                }, 2),
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.Nfe)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(spd);
+                    }
+
+                    return spd;
+                }, 2),
+                Num = 538,
+                Gen = 5,
+            },
+            [ItemId.ExpertBelt] = new()
+            {
+                Id = ItemId.ExpertBelt,
+                Name = "Expert Belt",
+                SpriteNum = 132,
+                Fling = new FlingData { BasePower = 10 },
+                OnModifyDamage =
+                    new OnModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    {
+                        if (move != null && target.GetMoveHitData(move).TypeMod > 0)
+                        {
+                            battle.ChainModify([4915, 4096]);
+                            return battle.FinalModify(damage);
+                        }
+
+                        return damage;
+                    }),
+                Num = 268,
                 Gen = 4,
             },
         };
