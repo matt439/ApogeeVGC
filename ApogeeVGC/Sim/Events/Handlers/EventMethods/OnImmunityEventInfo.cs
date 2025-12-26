@@ -1,12 +1,13 @@
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Sim.Events.Handlers.EventMethods;
 
 /// <summary>
 /// Event handler info for OnImmunity event.
-/// Triggered to check type immunity.
-/// Signature: (Battle battle, PokemonType type, Pokemon pokemon) => void
+/// Triggered to check type immunity or weather/condition immunity.
+/// Signature: (Battle battle, PokemonTypeConditionIdUnion type, Pokemon pokemon) => void
 /// </summary>
 public sealed record OnImmunityEventInfo : EventHandlerInfo
 {
@@ -17,7 +18,7 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
     /// <param name="priority">Execution priority (higher executes first)</param>
     /// <param name="usesSpeed">Whether this event uses speed-based ordering</param>
     public OnImmunityEventInfo(
-        Action<Battle, PokemonType, Pokemon> handler,
+        Action<Battle, PokemonTypeConditionIdUnion, Pokemon> handler,
         int? priority = null,
         bool usesSpeed = true)
     {
@@ -28,7 +29,7 @@ public sealed record OnImmunityEventInfo : EventHandlerInfo
         ExpectedParameterTypes =
         [
             typeof(Battle),
-            typeof(PokemonType),
+            typeof(PokemonTypeConditionIdUnion),
             typeof(Pokemon),
         ];
         ExpectedReturnType = typeof(void);

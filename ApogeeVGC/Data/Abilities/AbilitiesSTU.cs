@@ -41,8 +41,10 @@ public partial record Abilities
                 }, 21),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == "sandstorm") return false;
-                    return new VoidReturn();
+                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    {
+                        // Immune to sandstorm damage
+                    }
                 }),
             },
             [AbilityId.SandRush] = new()
@@ -62,8 +64,10 @@ public partial record Abilities
                 }),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == "sandstorm") return false;
-                    return new VoidReturn();
+                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    {
+                        // Immune to sandstorm damage
+                    }
                 }),
             },
             [AbilityId.SandSpit] = new()
@@ -97,18 +101,22 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == "sandstorm") return false;
-                    return new VoidReturn();
+                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    {
+                        // Immune to sandstorm damage
+                    }
                 }),
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    if (accuracy is not int acc) return accuracy;
-                    if (battle.Field.IsWeather(ConditionId.Sandstorm))
+                    if (accuracy is int acc)
                     {
-                        battle.Debug("Sand Veil - decreasing accuracy");
-                        battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(acc);
+                        if (battle.Field.IsWeather(ConditionId.Sandstorm))
+                        {
+                            battle.Debug("Sand Veil - decreasing accuracy");
+                            battle.ChainModify([3277, 4096]);
+                            return battle.FinalModify(acc);
+                        }
                     }
                     return accuracy;
                 }, -1),
@@ -517,18 +525,22 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type == "hail") return false;
-                    return new VoidReturn();
+                    if (type.IsConditionId && type.AsConditionId == ConditionId.Hail)
+                    {
+                        // Immune to hail damage
+                    }
                 }),
                 // OnModifyAccuracyPriority = -1
                 OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
                 {
-                    if (accuracy is not int acc) return accuracy;
-                    if (battle.Field.IsWeather(ConditionId.Hail) || battle.Field.IsWeather(ConditionId.Snowscape))
+                    if (accuracy is int acc)
                     {
-                        battle.Debug("Snow Cloak - decreasing accuracy");
-                        battle.ChainModify([3277, 4096]);
-                        return battle.FinalModify(acc);
+                        if (battle.Field.IsWeather(ConditionId.Hail) || battle.Field.IsWeather(ConditionId.Snowscape))
+                        {
+                            battle.Debug("Snow Cloak - decreasing accuracy");
+                            battle.ChainModify([3277, 4096]);
+                            return battle.FinalModify(acc);
+                        }
                     }
                     return accuracy;
                 }, -1),
