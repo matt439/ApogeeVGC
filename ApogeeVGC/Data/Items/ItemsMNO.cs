@@ -409,6 +409,176 @@ public partial record Items
                 Num = 243,
                 Gen = 2,
             },
+
+            // N items
+            [ItemId.NanabBerry] = new()
+            {
+                Id = ItemId.NanabBerry,
+                Name = "Nanab Berry",
+                SpriteNum = 302,
+                IsBerry = true,
+                NaturalGift = (90, "Water"),
+                // onEat: false - used for wild Pokemon mechanics, not relevant in Gen 9 battles
+                Num = 166,
+                Gen = 3,
+                // IsNonstandard = "Past",
+            },
+            [ItemId.NestBall] = new()
+            {
+                Id = ItemId.NestBall,
+                Name = "Nest Ball",
+                SpriteNum = 303,
+                Num = 8,
+                Gen = 3,
+                IsPokeball = true,
+            },
+            [ItemId.NetBall] = new()
+            {
+                Id = ItemId.NetBall,
+                Name = "Net Ball",
+                SpriteNum = 304,
+                Num = 6,
+                Gen = 3,
+                IsPokeball = true,
+            },
+            [ItemId.NeverMeltIce] = new()
+            {
+                Id = ItemId.NeverMeltIce,
+                Name = "Never-Melt Ice",
+                SpriteNum = 305,
+                Fling = new FlingData { BasePower = 30 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Ice)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 15),
+                Num = 246,
+                Gen = 2,
+            },
+            [ItemId.NomelBerry] = new()
+            {
+                Id = ItemId.NomelBerry,
+                Name = "Nomel Berry",
+                SpriteNum = 306,
+                IsBerry = true,
+                NaturalGift = (90, "Dragon"),
+                // onEat: false - used for Poffin/Pokeblock creation, not relevant in Gen 9 battles
+                Num = 178,
+                Gen = 3,
+                // IsNonstandard = "Past",
+            },
+            [ItemId.NormalGem] = new()
+            {
+                Id = ItemId.NormalGem,
+                Name = "Normal Gem",
+                SpriteNum = 307,
+                IsGem = true,
+                // OnSourceTryPrimaryHit - Normal Gem logic
+                // TODO: Implement gem boost logic
+                Num = 564,
+                Gen = 5,
+            },
+
+            // O items
+            [ItemId.OccaBerry] = new()
+            {
+                Id = ItemId.OccaBerry,
+                Name = "Occa Berry",
+                SpriteNum = 311,
+                IsBerry = true,
+                NaturalGift = (80, "Fire"),
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                    {
+                        if (move.Type == MoveType.Fire && target.GetMoveHitData(move).TypeMod > 0)
+                        {
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
+
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Occa Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
+                // OnEat: empty function
+                Num = 184,
+                Gen = 4,
+            },
+            [ItemId.OddIncense] = new()
+            {
+                Id = ItemId.OddIncense,
+                Name = "Odd Incense",
+                SpriteNum = 312,
+                Fling = new FlingData { BasePower = 10 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Psychic)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 15),
+                Num = 314,
+                Gen = 4,
+                // IsNonstandard = "Past",
+            },
+            [ItemId.OranBerry] = new()
+            {
+                Id = ItemId.OranBerry,
+                Name = "Oran Berry",
+                SpriteNum = 319,
+                IsBerry = true,
+                NaturalGift = (80, "Poison"),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Hp <= pokemon.MaxHp / 2)
+                    {
+                        pokemon.EatItem();
+                    }
+                }),
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    {
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, 10);
+                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+
+                        return BoolVoidUnion.FromVoid();
+                    })),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    battle.Heal(10);
+                })),
+                Num = 155,
+                Gen = 3,
+            },
+            [ItemId.OvalStone] = new()
+            {
+                Id = ItemId.OvalStone,
+                Name = "Oval Stone",
+                SpriteNum = 321,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 110,
+                Gen = 4,
+            },
+
             [ItemId.None] = new()
             {
                 Id = ItemId.None,

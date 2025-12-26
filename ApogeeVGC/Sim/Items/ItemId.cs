@@ -172,6 +172,19 @@ public enum ItemId
     MuscleBand,
     MysticWater,
 
+    // N items
+    NanabBerry,
+    NestBall,
+    NetBall,
+    NeverMeltIce,
+    NomelBerry,
+    NormalGem,
+
+    // O items
+    OccaBerry,
+    OddIncense,
+    OvalStone,
+
     StickyBarb,
 
     BoosterEnergy,
