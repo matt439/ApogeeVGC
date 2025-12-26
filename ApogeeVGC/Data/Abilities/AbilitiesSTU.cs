@@ -1,6 +1,7 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.AbilityEventMethods;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
@@ -9,6 +10,7 @@ using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.SideClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -1283,6 +1285,289 @@ public partial record Abilities
             },
 
             // ==================== 'T' Abilities ====================
+            [AbilityId.TabletsOfRuin] = new()
+            {
+                Id = AbilityId.TabletsOfRuin,
+                Name = "Tablets of Ruin",
+                Num = 284,
+                Rating = 4.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.SuppressingAbility(pokemon)) return;
+                    battle.Add("-ability", pokemon, "Tablets of Ruin");
+                }),
+                OnAnyModifyAtk = new OnAnyModifyAtkEventInfo((battle, atk, source, _, move) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var abilityHolder
+                        })
+                        return atk;
+                    if (source.HasAbility(AbilityId.TabletsOfRuin)) return atk;
+                    if (move.RuinedAtk?.HasAbility(AbilityId.TabletsOfRuin) != true)
+                        move.RuinedAtk = abilityHolder;
+                    if (move.RuinedAtk != abilityHolder) return atk;
+                    battle.Debug("Tablets of Ruin Atk drop");
+                    battle.ChainModify(0.75);
+                    return battle.FinalModify(atk);
+                }),
+            },
+            [AbilityId.TangledFeet] = new()
+            {
+                Id = AbilityId.TangledFeet,
+                Name = "Tangled Feet",
+                Num = 77,
+                Rating = 1.0,
+                Flags = new AbilityFlags { Breakable = true },
+                // OnModifyAccuracyPriority = -1
+                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, target, _, _) =>
+                {
+                    if (accuracy is int acc &&
+                        target?.Volatiles.ContainsKey(ConditionId.Confusion) == true)
+                    {
+                        battle.Debug("Tangled Feet - decreasing accuracy");
+                        battle.ChainModify(0.5);
+                        return battle.FinalModify(acc);
+                    }
+
+                    return accuracy;
+                }, -1),
+            },
+            [AbilityId.TanglingHair] = new()
+            {
+                Id = AbilityId.TanglingHair,
+                Name = "Tangling Hair",
+                Num = 221,
+                Rating = 2.0,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    if (battle.CheckMoveMakesContact(move, source, target, true))
+                    {
+                        battle.Add("-ability", target, "Tangling Hair");
+                        battle.Boost(new SparseBoostsTable { Spe = -1 }, source, target, null,
+                            true);
+                    }
+                }),
+            },
+            [AbilityId.Technician] = new()
+            {
+                Id = AbilityId.Technician,
+                Name = "Technician",
+                Num = 101,
+                Rating = 3.5,
+                // OnBasePowerPriority = 30
+                // Technician boosts moves with base power 60 or less
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, _) =>
+                {
+                    battle.Debug($"Base Power: {basePower}");
+                    if (basePower <= 60)
+                    {
+                        battle.Debug("Technician boost");
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 30),
+            },
+            [AbilityId.Telepathy] = new()
+            {
+                Id = AbilityId.Telepathy,
+                Name = "Telepathy",
+                Num = 140,
+                Rating = 0.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
+                {
+                    if (target != source && target.IsAlly(source) &&
+                        move.Category != MoveCategory.Status)
+                    {
+                        battle.Add("-activate", target, "ability: Telepathy");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.TeraformZero] = new()
+            {
+                Id = AbilityId.TeraformZero,
+                Name = "Teraform Zero",
+                Num = 309,
+                Rating = 3.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                },
+                OnAfterTerastallization = new OnAfterTerastallizationEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Id != SpecieId.TerapagosStellar) return;
+                    if (battle.Field.Weather != ConditionId.None ||
+                        battle.Field.Terrain != ConditionId.None)
+                    {
+                        battle.Add("-ability", pokemon, "Teraform Zero");
+                        battle.Field.ClearWeather();
+                        battle.Field.ClearTerrain();
+                    }
+                }),
+            },
+            [AbilityId.TeraShell] = new()
+            {
+                Id = AbilityId.TeraShell,
+                Name = "Tera Shell",
+                Num = 308,
+                Rating = 3.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    Breakable = true,
+                },
+                // Effectiveness implemented in Pokemon.RunEffectiveness
+                // Needs two checks to reset between regular moves and future attacks
+                OnAnyBeforeMove = new OnAnyBeforeMoveEventInfo((battle, _, _, _) =>
+                {
+                    battle.EffectState.Resisted = null;
+                    return new VoidReturn();
+                }),
+                OnAnyAfterMove = new OnAnyAfterMoveEventInfo((battle, _, _, _) =>
+                {
+                    battle.EffectState.Resisted = null;
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.TeraShift] = new()
+            {
+                Id = AbilityId.TeraShift,
+                Name = "Tera Shift",
+                Num = 307,
+                Rating = 3.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    CantSuppress = true,
+                    NoTransform = true,
+                },
+                // OnSwitchInPriority = 2
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Terapagos) return;
+                    if (pokemon.Species.Id != SpecieId.TerapagosTerastal)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Tera Shift");
+                        pokemon.FormeChange(SpecieId.TerapagosTerastal, battle.Effect, true);
+                    }
+                }, 2),
+            },
+            [AbilityId.Teravolt] = new()
+            {
+                Id = AbilityId.Teravolt,
+                Name = "Teravolt",
+                Num = 164,
+                Rating = 3.0,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    battle.Add("-ability", pokemon, "Teravolt");
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    move.IgnoreAbility = true;
+                }),
+            },
+            [AbilityId.ThermalExchange] = new()
+            {
+                Id = AbilityId.ThermalExchange,
+                Name = "Thermal Exchange",
+                Num = 270,
+                Rating = 2.5,
+                Flags = new AbilityFlags { Breakable = true },
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, _, _, move) =>
+                {
+                    if (move.Type == MoveType.Fire)
+                    {
+                        battle.Boost(new SparseBoostsTable { Atk = 1 });
+                    }
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Burn)
+                    {
+                        battle.Add("-activate", pokemon, "ability: Thermal Exchange");
+                        pokemon.CureStatus();
+                    }
+                }),
+                OnSetStatus = new OnSetStatusEventInfo((battle, status, target, _, effect) =>
+                {
+                    if (status.Id != ConditionId.Burn) return new VoidReturn();
+                    if (effect is ActiveMove { Status: not ConditionId.None })
+                    {
+                        battle.Add("-immune", target, "[from] ability: Thermal Exchange");
+                    }
+
+                    return false;
+                }),
+            },
+            [AbilityId.ThickFat] = new()
+            {
+                Id = AbilityId.ThickFat,
+                Name = "Thick Fat",
+                Num = 47,
+                Rating = 3.5,
+                Flags = new AbilityFlags { Breakable = true },
+                // OnSourceModifyAtkPriority = 6
+                OnSourceModifyAtk = new OnSourceModifyAtkEventInfo((battle, atk, _, _, move) =>
+                {
+                    if (move.Type is MoveType.Ice or MoveType.Fire)
+                    {
+                        battle.Debug("Thick Fat weaken");
+                        battle.ChainModify(0.5);
+                        return battle.FinalModify(atk);
+                    }
+
+                    return atk;
+                }, 6),
+                // OnSourceModifySpAPriority = 5
+                OnSourceModifySpA = new OnSourceModifySpAEventInfo((battle, spa, _, _, move) =>
+                {
+                    if (move.Type is MoveType.Ice or MoveType.Fire)
+                    {
+                        battle.Debug("Thick Fat weaken");
+                        battle.ChainModify(0.5);
+                        return battle.FinalModify(spa);
+                    }
+
+                    return spa;
+                }, 5),
+            },
+            [AbilityId.TintedLens] = new()
+            {
+                Id = AbilityId.TintedLens,
+                Name = "Tinted Lens",
+                Num = 110,
+                Rating = 4.0,
+                OnModifyDamage = new OnModifyDamageEventInfo((battle, damage, _, target, move) =>
+                {
+                    if (target.GetMoveHitData(move).TypeMod < 0)
+                    {
+                        battle.Debug("Tinted Lens boost");
+                        battle.ChainModify(2);
+                        return battle.FinalModify(damage);
+                    }
+
+                    return damage;
+                }),
+            },
             [AbilityId.Torrent] = new()
             {
                 Id = AbilityId.Torrent,
@@ -1314,18 +1599,289 @@ public partial record Abilities
                     return spa;
                 }, 5),
             },
+            [AbilityId.ToughClaws] = new()
+            {
+                Id = AbilityId.ToughClaws,
+                Name = "Tough Claws",
+                Num = 181,
+                Rating = 3.5,
+                // OnBasePowerPriority = 21
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, _, _, move) =>
+                {
+                    if (move.Flags.Contact == true)
+                    {
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 21),
+            },
+            [AbilityId.ToxicBoost] = new()
+            {
+                Id = AbilityId.ToxicBoost,
+                Name = "Toxic Boost",
+                Num = 137,
+                Rating = 3.0,
+                // OnBasePowerPriority = 19
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, attacker, _, move) =>
+                {
+                    if ((attacker.Status is ConditionId.Poison or ConditionId.Toxic) &&
+                        move.Category == MoveCategory.Physical)
+                    {
+                        battle.ChainModify(1.5);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 19),
+            },
+            [AbilityId.ToxicChain] = new()
+            {
+                Id = AbilityId.ToxicChain,
+                Name = "Toxic Chain",
+                Num = 305,
+                Rating = 4.5,
+                OnSourceDamagingHit =
+                    new OnSourceDamagingHitEventInfo((battle, _, target, source, _) =>
+                    {
+                        // Despite not being a secondary, Shield Dust / Covert Cloak block Toxic Chain's effect
+                        if (target.HasAbility(AbilityId.ShieldDust)) return;
+                        // TODO: Check for CovertCloak item
+
+                        if (battle.RandomChance(3, 10))
+                        {
+                            target.TrySetStatus(ConditionId.Toxic, source);
+                        }
+                    }),
+            },
+            [AbilityId.ToxicDebris] = new()
+            {
+                Id = AbilityId.ToxicDebris,
+                Name = "Toxic Debris",
+                Num = 295,
+                Rating = 3.5,
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                {
+                    Side side = source.IsAlly(target) ? source.Side.Foe : source.Side;
+                    EffectState? toxicSpikesData =
+                        side.GetSideConditionData(ConditionId.ToxicSpikes);
+                    if (move.Category == MoveCategory.Physical && (toxicSpikesData == null ||
+                            (toxicSpikesData.Counter ?? 0) < 2))
+                    {
+                        battle.Add("-activate", target, "ability: Toxic Debris");
+                        side.AddSideCondition(_library.Conditions[ConditionId.ToxicSpikes], target);
+                    }
+                }),
+            },
+            [AbilityId.Trace] = new()
+            {
+                Id = AbilityId.Trace,
+                Name = "Trace",
+                Num = 36,
+                Rating = 2.5,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    battle.EffectState.Seek = true;
+                    // Interaction with No Ability and Ability Shield
+                    if (pokemon.AdjacentFoes().Any(foe => foe.Ability == AbilityId.None))
+                    {
+                        battle.EffectState.Seek = false;
+                    }
+
+                    if (pokemon.HasItem(ItemId.AbilityShield))
+                    {
+                        battle.Add("-block", pokemon, "item: Ability Shield");
+                        battle.EffectState.Seek = false;
+                    }
+
+                    if (battle.EffectState.Seek == true)
+                    {
+                        battle.SingleEvent(EventId.Update, battle.Effect, battle.EffectState,
+                            pokemon);
+                    }
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (battle.EffectState.Seek != true) return;
+
+                    List<Pokemon> possibleTargets = pokemon.AdjacentFoes()
+                        .Where(target =>
+                            target.GetAbility().Flags.NoTrace != true &&
+                            target.Ability != AbilityId.None)
+                        .ToList();
+
+                    if (possibleTargets.Count == 0) return;
+
+                    Pokemon traceTarget = battle.Sample(possibleTargets);
+                    Ability ability = traceTarget.GetAbility();
+                    pokemon.SetAbility(ability.Id, traceTarget);
+                }),
+            },
+            [AbilityId.Transistor] = new()
+            {
+                Id = AbilityId.Transistor,
+                Name = "Transistor",
+                Num = 262,
+                Rating = 3.5,
+                // OnModifyAtkPriority = 5
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric)
+                    {
+                        battle.Debug("Transistor boost");
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(atk);
+                    }
+
+                    return atk;
+                }, 5),
+                // OnModifySpAPriority = 5
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, move) =>
+                {
+                    if (move.Type == MoveType.Electric)
+                    {
+                        battle.Debug("Transistor boost");
+                        battle.ChainModify([5325, 4096]);
+                        return battle.FinalModify(spa);
+                    }
+
+                    return spa;
+                }, 5),
+            },
+            [AbilityId.Triage] = new()
+            {
+                Id = AbilityId.Triage,
+                Name = "Triage",
+                Num = 205,
+                Rating = 3.5,
+                OnModifyPriority = new OnModifyPriorityEventInfo((_, priority, _, _, move) =>
+                {
+                    if (move.Flags.Heal == true)
+                    {
+                        return priority + 3;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
             [AbilityId.Truant] = new()
             {
                 Id = AbilityId.Truant,
                 Name = "Truant",
                 Num = 54,
                 Rating = -1.0,
-                // TODO: Truant requires volatile condition implementation
-                // OnStart removes truant volatile
-                // OnBeforeMove checks and adds truant volatile
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Truant]);
+                    // When switching in fresh, don't add volatile on first turn
+                    // ActiveTurns check handles this
+                }),
+                // OnBeforeMovePriority = 9
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Truant]))
+                    {
+                        battle.Add("cant", pokemon, "ability: Truant");
+                        return false;
+                    }
+
+                    pokemon.AddVolatile(ConditionId.Truant);
+                    return new VoidReturn();
+                }, 9),
+            },
+            [AbilityId.Turboblaze] = new()
+            {
+                Id = AbilityId.Turboblaze,
+                Name = "Turboblaze",
+                Num = 163,
+                Rating = 3.0,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    battle.Add("-ability", pokemon, "Turboblaze");
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    move.IgnoreAbility = true;
+                }),
             },
 
             // ==================== 'U' Abilities ====================
+            [AbilityId.Unaware] = new()
+            {
+                Id = AbilityId.Unaware,
+                Name = "Unaware",
+                Num = 109,
+                Rating = 4.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnAnyModifyBoost = new OnAnyModifyBoostEventInfo((battle, boosts, pokemon) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var unawareUser
+                        })
+                        return new VoidReturn();
+                    if (unawareUser == pokemon) return new VoidReturn();
+
+                    // When Unaware user is attacking: ignore target's Def, SpD, and Evasion boosts
+                    if (unawareUser == battle.ActivePokemon && pokemon == battle.ActiveTarget)
+                    {
+                        boosts.Def = 0;
+                        boosts.SpD = 0;
+                        boosts.Evasion = 0;
+                    }
+
+                    // When Unaware user is being attacked: ignore attacker's Atk, Def (for Body Press), SpA, and Accuracy boosts
+                    if (pokemon == battle.ActivePokemon && unawareUser == battle.ActiveTarget)
+                    {
+                        boosts.Atk = 0;
+                        boosts.Def = 0;
+                        boosts.SpA = 0;
+                        boosts.Accuracy = 0;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.Unburden] = new()
+            {
+                Id = AbilityId.Unburden,
+                Name = "Unburden",
+                Num = 84,
+                Rating = 3.5,
+                OnAfterUseItem = new OnAfterUseItemEventInfo((battle, _, pokemon) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var target
+                        })
+                        return;
+                    if (pokemon != target) return;
+                    pokemon.AddVolatile(ConditionId.Unburden);
+                }),
+                OnTakeItem = new OnTakeItemEventInfo(
+                    (Func<Battle, Item, Pokemon, Pokemon, Move?, PokemonVoidUnion>)((_, _, pokemon,
+                        _, _) =>
+                    {
+                        pokemon.AddVolatile(ConditionId.Unburden);
+                        return new VoidReturn();
+                    })),
+                OnEnd = new OnEndEventInfo((battle, pokemonUnion) =>
+                {
+                    if (pokemonUnion is PokemonSideFieldPokemon { Pokemon: var pokemon })
+                    {
+                        pokemon.RemoveVolatile(battle.Library.Conditions[ConditionId.Unburden]);
+                    }
+                }),
+                // Condition implemented in Conditions file - doubles speed when item is lost
+            },
             [AbilityId.Unnerve] = new()
             {
                 Id = AbilityId.Unnerve,
@@ -1343,6 +1899,20 @@ public partial record Abilities
                 OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(
                     OnTryEatItem.FromFunc((battle, _, _) =>
                         !(battle.EffectState.Unnerved ?? false))),
+            },
+            [AbilityId.UnseenFist] = new()
+            {
+                Id = AbilityId.UnseenFist,
+                Name = "Unseen Fist",
+                Num = 260,
+                Rating = 2.0,
+                OnModifyMove = new OnModifyMoveEventInfo((_, move, _, _) =>
+                {
+                    if (move.Flags.Contact == true)
+                    {
+                        move.Flags = move.Flags with { Protect = false };
+                    }
+                }),
             },
         };
     }

@@ -30,7 +30,7 @@ public record MoveFlags
     public bool? NoSleepTalk { get; init; }
     public bool? PledgeCombo { get; init; }
     public bool? Powder { get; init; }
-    public bool? Protect { get; init; }
+    public bool? Protect { get; set; }
     public bool? Pulse { get; init; }
     public bool? Punch { get; init; }
     public bool? Recharge { get; init; }
