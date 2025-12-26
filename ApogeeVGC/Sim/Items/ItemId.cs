@@ -185,6 +185,45 @@ public enum ItemId
     OddIncense,
     OvalStone,
 
+    // P items
+    PamtreBerry,
+    ParkBall,
+    PasshoBerry,
+    PayapaBerry,
+    PechaBerry,
+    PersimBerry,
+    PetayaBerry,
+    PinapBerry,
+    PixiePlate,
+    PlumeFossil,
+    PoisonBarb,
+    PokeBall,
+    PomegBerry,
+    PowerAnklet,
+    PowerBand,
+    PowerBelt,
+    PowerBracer,
+    PowerLens,
+    PowerWeight,
+    PremierBall,
+    PrettyFeather,
+    PrismScale,
+    Protector,
+    PsychicSeed,
+    PunchingGlove,
+
+    // Q items
+    QualotBerry,
+    QuickBall,
+    QuickClaw,
+    QuickPowder,
+
+    // R items
+    RabutaBerry,
+    RareBone,
+    RawstBerry,
+    RazorClaw,
+
     StickyBarb,
 
     BoosterEnergy,
