@@ -111,4 +111,5 @@ public enum ConditionId
                         Taunt,
                         Octolock,
                         FlashFire,
-                    }
+    ToxicSpikes,
+}
