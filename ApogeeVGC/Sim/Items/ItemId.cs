@@ -75,6 +75,18 @@ public enum ItemId
     Eviolite,
     ExpertBelt,
 
+    // F items
+    FairyFeather,
+    FastBall,
+    FireStone,
+    FistPlate,
+    FlamePlate,
+    FloatStone,
+    FlowerSweet,
+    FocusBand,
+    FocusSash,
+    FriendBall,
+
     StickyBarb,
 
     BoosterEnergy,
