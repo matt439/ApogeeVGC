@@ -55,6 +55,9 @@ public class EffectState
     public SparseBoostsTable? Boosts { get; set; } // For Opportunist ability
     public bool? BerryWeaken { get; set; } // For Ripen ability
     public bool? Seek { get; set; } // For Trace ability
+    public bool? Ready { get; set; } // For Mirror Herb and other trigger items
+    public string? LastMove { get; set; } // For Metronome item
+    public int? NumConsecutive { get; set; } // For Metronome item
 
     public int? GetProperty(EffectStateKey? key)
     {

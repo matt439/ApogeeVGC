@@ -150,6 +150,28 @@ public enum ItemId
     LustrousOrb,
     LuxuryBall,
 
+    // M items
+    Magnet,
+    MagoBerry,
+    MarangaBerry,
+    MasterBall,
+    MasterpieceTeacup,
+    MeadowPlate,
+    MentalHerb,
+    MetalAlloy,
+    MetalCoat,
+    MetalPowder,
+    Metronome,
+    MicleBerry,
+    MindPlate,
+    MiracleSeed,
+    MirrorHerb,
+    MistySeed,
+    MoonBall,
+    MoonStone,
+    MuscleBand,
+    MysticWater,
+
     StickyBarb,
 
     BoosterEnergy,
@@ -159,7 +181,6 @@ public enum ItemId
 
         EnigmaBerry,
         FigyBerry,
-        MagoBerry,
         SitrusBerry,
         WikiBerry,
         OranBerry,

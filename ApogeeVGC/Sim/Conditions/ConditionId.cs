@@ -109,9 +109,11 @@ public enum ConditionId
                         Disable,
                         Encore,
                         Taunt,
-                                                Octolock,
-                                                FlashFire,
-                            ToxicSpikes,
-                            Unburden,
-                        ZenMode,
-                        }
+                                                                Octolock,
+                                                                FlashFire,
+                                                    ToxicSpikes,
+                                                    Unburden,
+                                                ZenMode,
+                                                Metronome,
+                                                MicleBerry,
+                                                }
