@@ -273,47 +273,6 @@ public partial record Items
                 Num = 640,
                 Gen = 6,
             },
-            [ItemId.ChoiceSpecs] = new()
-            {
-                Id = ItemId.ChoiceSpecs,
-                Name = "Choice Specs",
-                SpriteNum = 70,
-                Fling = new FlingData { BasePower = 10 },
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    // Remove any existing choice lock when this Pokemon enters battle
-                    // This allows switching to reset the choice lock
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
-                    {
-                        battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
-
-                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
-                    }
-                }),
-                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
-                {
-                    pokemon.AddVolatile(ConditionId.ChoiceLock);
-
-                    // Set the locked move immediately after adding the volatile
-                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
-                    {
-                        battle.Debug(
-                            $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
-
-                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
-                    }
-                }),
-                //OnModifySpAPriority = 1,
-                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
-                {
-                    battle.ChainModify(1.5);
-                    return battle.FinalModify(spa);
-                }, 1),
-                IsChoice = true,
-                Num = 297,
-                Gen = 4,
-            },
 
             // B items
             [ItemId.BabiriBerry] = new()
@@ -499,6 +458,457 @@ public partial record Items
                 }, -2),
                 Num = 213,
                 Gen = 2,
+            },
+
+            // C items
+            [ItemId.CellBattery] = new()
+            {
+                Id = ItemId.CellBattery,
+                Name = "Cell Battery",
+                SpriteNum = 60,
+                Fling = new FlingData { BasePower = 30 },
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                {
+                    if (move.Type == MoveType.Electric)
+                    {
+                        target.UseItem();
+                    }
+                }),
+                Boosts = new SparseBoostsTable { Atk = 1 },
+                Num = 546,
+                Gen = 5,
+            },
+            [ItemId.Charcoal] = new()
+            {
+                Id = ItemId.Charcoal,
+                Name = "Charcoal",
+                SpriteNum = 61,
+                Fling = new FlingData { BasePower = 30 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Fire)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                Num = 249,
+                Gen = 2,
+            },
+            [ItemId.ChartiBerry] = new()
+            {
+                Id = ItemId.ChartiBerry,
+                Name = "Charti Berry",
+                SpriteNum = 62,
+                IsBerry = true,
+                NaturalGift = (80, "Rock"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Rock && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Charti Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 195,
+                Gen = 4,
+            },
+            [ItemId.CheriBerry] = new()
+            {
+                Id = ItemId.CheriBerry,
+                Name = "Cheri Berry",
+                SpriteNum = 63,
+                IsBerry = true,
+                NaturalGift = (80, "Fire"),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Paralysis)
+                    {
+                        pokemon.EatItem();
+                    }
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Paralysis)
+                    {
+                        pokemon.CureStatus();
+                    }
+                })),
+                Num = 149,
+                Gen = 3,
+            },
+            [ItemId.ChestoBerry] = new()
+            {
+                Id = ItemId.ChestoBerry,
+                Name = "Chesto Berry",
+                SpriteNum = 65,
+                IsBerry = true,
+                NaturalGift = (80, "Water"),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Sleep)
+                    {
+                        pokemon.EatItem();
+                    }
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    if (pokemon.Status == ConditionId.Sleep)
+                    {
+                        pokemon.CureStatus();
+                    }
+                })),
+                Num = 150,
+                Gen = 3,
+            },
+            [ItemId.ChilanBerry] = new()
+            {
+                Id = ItemId.ChilanBerry,
+                Name = "Chilan Berry",
+                SpriteNum = 66,
+                IsBerry = true,
+                NaturalGift = (80, "Normal"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Normal &&
+                        (!target.Volatiles.ContainsKey(ConditionId.Substitute) || move.Flags.BypassSub == true || (move.Infiltrates == true && battle.Gen >= 6)))
+                    {
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Chilan Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 200,
+                Gen = 4,
+            },
+            [ItemId.ChoiceBand] = new()
+            {
+                Id = ItemId.ChoiceBand,
+                Name = "Choice Band",
+                SpriteNum = 68,
+                Fling = new FlingData { BasePower = 10 },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
+                    {
+                        battle.Debug("ChoiceBand: Removing existing choicelock on switch-in");
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
+                    }
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.ChoiceLock);
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    {
+                        battle.Debug($"[ChoiceBand.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                    }
+                }),
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, _, pokemon, _) =>
+                {
+                    // TODO: Check if pokemon has dynamax volatile
+                    // if (pokemon.Volatiles.ContainsKey(ConditionId.Dynamax)) return atk;
+                    battle.ChainModify(1.5);
+                    return battle.FinalModify(atk);
+                }, 1),
+                IsChoice = true,
+                Num = 220,
+                Gen = 3,
+            },
+            [ItemId.ChoiceScarf] = new()
+            {
+                Id = ItemId.ChoiceScarf,
+                Name = "Choice Scarf",
+                SpriteNum = 69,
+                Fling = new FlingData { BasePower = 10 },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
+                    {
+                        battle.Debug("ChoiceScarf: Removing existing choicelock on switch-in");
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
+                    }
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.ChoiceLock);
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    {
+                        battle.Debug($"[ChoiceScarf.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                    }
+                }),
+                OnModifySpe = new OnModifySpeEventInfo((battle, spe, pokemon) =>
+                {
+                    // TODO: Check if pokemon has dynamax volatile
+                    // if (pokemon.Volatiles.ContainsKey(ConditionId.Dynamax)) return IntVoidUnion.FromInt(spe);
+                    battle.ChainModify(1.5);
+                    return IntVoidUnion.FromInt(battle.FinalModify(spe));
+                }),
+                IsChoice = true,
+                Num = 287,
+                Gen = 4,
+            },
+            [ItemId.ChoiceSpecs] = new()
+            {
+                Id = ItemId.ChoiceSpecs,
+                Name = "Choice Specs",
+                SpriteNum = 70,
+                Fling = new FlingData { BasePower = 10 },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    // Remove any existing choice lock when this Pokemon enters battle
+                    // This allows switching to reset the choice lock
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock))
+                    {
+                        battle.Debug("ChoiceSpecs: Removing existing choicelock on switch-in");
+
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.ChoiceLock]);
+                    }
+                }),
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, _) =>
+                {
+                    pokemon.AddVolatile(ConditionId.ChoiceLock);
+
+                    // Set the locked move immediately after adding the volatile
+                    if (pokemon.Volatiles.ContainsKey(ConditionId.ChoiceLock) &&
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move == null)
+                    {
+                        battle.Debug(
+                            $"[ChoiceSpecs.OnModifyMove] {pokemon.Name}: Setting locked move to {move.Id}");
+
+                        pokemon.Volatiles[ConditionId.ChoiceLock].Move = move.Id;
+                    }
+                }),
+                //OnModifySpAPriority = 1,
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, _, _, _) =>
+                {
+                    battle.ChainModify(1.5);
+                    return battle.FinalModify(spa);
+                }, 1),
+                IsChoice = true,
+                Num = 297,
+                Gen = 4,
+            },
+            [ItemId.ChopleBerry] = new()
+            {
+                Id = ItemId.ChopleBerry,
+                Name = "Chople Berry",
+                SpriteNum = 71,
+                IsBerry = true,
+                NaturalGift = (80, "Fighting"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Fighting && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Chople Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 189,
+                Gen = 4,
+            },
+            [ItemId.ClearAmulet] = new()
+            {
+                Id = ItemId.ClearAmulet,
+                Name = "Clear Amulet",
+                SpriteNum = 747,
+                Fling = new FlingData { BasePower = 30 },
+                OnTryBoost = new OnTryBoostEventInfo((battle, boost, target, source, effect) =>
+                {
+                    if (source != null && target == source) return;
+                    bool showMsg = false;
+
+                    var boostsCopy = new SparseBoostsTable
+                    {
+                        Atk = boost.Atk,
+                        Def = boost.Def,
+                        SpA = boost.SpA,
+                        SpD = boost.SpD,
+                        Spe = boost.Spe,
+                        Accuracy = boost.Accuracy,
+                        Evasion = boost.Evasion
+                    };
+
+                    if (boost.Atk < 0) { boostsCopy.Atk = null; showMsg = true; }
+                    if (boost.Def < 0) { boostsCopy.Def = null; showMsg = true; }
+                    if (boost.SpA < 0) { boostsCopy.SpA = null; showMsg = true; }
+                    if (boost.SpD < 0) { boostsCopy.SpD = null; showMsg = true; }
+                    if (boost.Spe < 0) { boostsCopy.Spe = null; showMsg = true; }
+                    if (boost.Accuracy < 0) { boostsCopy.Accuracy = null; showMsg = true; }
+                    if (boost.Evasion < 0) { boostsCopy.Evasion = null; showMsg = true; }
+
+                    if (showMsg && effect is Move move && move.Secondaries == null && effect.EffectStateId != ConditionId.Octolock)
+                    {
+                        battle.Add("-fail", target, "unboost", "[from] item: Clear Amulet", $"[of] {target}");
+                    }
+
+                    // Return the modified boosts
+                    boost.Atk = boostsCopy.Atk;
+                    boost.Def = boostsCopy.Def;
+                    boost.SpA = boostsCopy.SpA;
+                    boost.SpD = boostsCopy.SpD;
+                    boost.Spe = boostsCopy.Spe;
+                    boost.Accuracy = boostsCopy.Accuracy;
+                    boost.Evasion = boostsCopy.Evasion;
+                }, 1),
+                Num = 1882,
+                Gen = 9,
+            },
+            [ItemId.CobaBerry] = new()
+            {
+                Id = ItemId.CobaBerry,
+                Name = "Coba Berry",
+                SpriteNum = 76,
+                IsBerry = true,
+                NaturalGift = (80, "Flying"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Flying && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Coba Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 192,
+                Gen = 4,
+            },
+            [ItemId.ColburBerry] = new()
+            {
+                Id = ItemId.ColburBerry,
+                Name = "Colbur Berry",
+                SpriteNum = 78,
+                IsBerry = true,
+                NaturalGift = (80, "Dark"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Dark && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Colbur Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 198,
+                Gen = 4,
+            },
+            [ItemId.CornerstoneMask] = new()
+            {
+                Id = ItemId.CornerstoneMask,
+                Name = "Cornerstone Mask",
+                SpriteNum = 758,
+                Fling = new FlingData { BasePower = 60 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (user.BaseSpecies.Name.StartsWith("Ogerpon-Cornerstone"))
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                // TODO: OnTakeItem - Ogerpon can't have this item removed
+                ForcedForme = "Ogerpon-Cornerstone",
+                Num = 2406,
+                Gen = 9,
+            },
+            [ItemId.CovertCloak] = new()
+            {
+                Id = ItemId.CovertCloak,
+                Name = "Covert Cloak",
+                SpriteNum = 750,
+                Fling = new FlingData { BasePower = 30 },
+                OnModifySecondaries = new OnModifySecondariesEventInfo((battle, secondaries, _, _, _) =>
+                {
+                    battle.Debug("Covert Cloak prevent secondary");
+                    secondaries.RemoveAll(effect => effect.Self == null);
+                }),
+                Num = 1885,
+                Gen = 9,
+            },
+            [ItemId.CustapBerry] = new()
+            {
+                Id = ItemId.CustapBerry,
+                Name = "Custap Berry",
+                SpriteNum = 86,
+                IsBerry = true,
+                NaturalGift = (100, "Ghost"),
+                OnFractionalPriority = new OnFractionalPriorityEventInfo(
+                    (ModifierSourceMoveHandler)((battle, priority, source, target, move) =>
+                    {
+                        if (priority <= 0 &&
+                            (source.Hp <= source.MaxHp / 4 ||
+                             (source.Hp <= source.MaxHp / 2 &&
+                              source.HasAbility(AbilityId.Gluttony) &&
+                              source.AbilityState.Gluttony == true)))
+                        {
+                            if (source.EatItem())
+                            {
+                                battle.Add("-activate", source, "item: Custap Berry", "[consumed]");
+                                return DoubleVoidUnion.FromDouble(0.1);
+                            }
+                        }
+                        return DoubleVoidUnion.FromVoid();
+                    }), -2),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 210,
+                Gen = 4,
             },
         };
     }

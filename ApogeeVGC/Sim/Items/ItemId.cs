@@ -32,6 +32,21 @@ public enum ItemId
     BottleCap,
     BrightPowder,
 
+    // C items
+    CellBattery,
+    Charcoal,
+    ChartiBerry,
+    CheriBerry,
+    ChestoBerry,
+    ChilanBerry,
+    ChoiceBand,
+    ChoiceScarf,
+    ChopleBerry,
+    ClearAmulet,
+    CobaBerry,
+    ColburBerry,
+    CovertCloak,
+
     StickyBarb,
 
     BoosterEnergy,
