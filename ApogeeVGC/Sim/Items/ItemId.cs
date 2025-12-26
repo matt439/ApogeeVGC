@@ -2,11 +2,9 @@
 
 public enum ItemId
 {
-    Leftovers,
     ChoiceSpecs,
     FlameOrb,
     RockyHelmet,
-    LightClay,
     AssaultVest,
     AbilityShield,
     AbsorbBulb,
@@ -118,6 +116,40 @@ public enum ItemId
     IronBall,
     IronPlate,
 
+    // J items
+    JabocaBerry,
+
+    // K items
+    KasibBerry,
+    KebiaBerry,
+    KeeBerry,
+    KelpsyBerry,
+    KingsRock,
+
+    // L items
+    LaggingTail,
+    LansatBerry,
+    LaxIncense,
+    LeafStone,
+    Leek,
+    Leftovers,
+    LeppaBerry,
+    LevelBall,
+    LiechiBerry,
+    LifeOrb,
+    LightBall,
+    LightClay,
+    LoadedDice,
+    LoveBall,
+    LoveSweet,
+    LuckyPunch,
+    LumBerry,
+    LuminousMoss,
+    LureBall,
+    LustrousGlobe,
+    LustrousOrb,
+    LuxuryBall,
+
     StickyBarb,
 
     BoosterEnergy,
@@ -125,7 +157,6 @@ public enum ItemId
     TerrainExtender,
     ProtectivePads,
 
-        LeppaBerry,
         EnigmaBerry,
         FigyBerry,
         MagoBerry,
@@ -136,12 +167,10 @@ public enum ItemId
         RustedSword,
         RustedShield,
         PowerHerb,
-        JabocaBerry,
         RowapBerry,
         RedCard,
         UtilityUmbrella,
         BlunderPolicy,
-        LoadedDice,
 
         // Mega Stones
         Sablenite,
