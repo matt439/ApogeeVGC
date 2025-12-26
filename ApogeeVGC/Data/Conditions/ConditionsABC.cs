@@ -4,9 +4,11 @@ using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
+using ApogeeVGC.Sim.Events.Handlers.SideEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SpeciesClasses;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -17,6 +19,152 @@ public partial record Conditions
     {
         return new Dictionary<ConditionId, Condition>
         {
+            [ConditionId.AllySwitch] = new()
+            {
+                Id = ConditionId.AllySwitch,
+                Name = "Ally Switch",
+                Duration = 2,
+                OnRestart = new OnRestartEventInfo((battle, pokemon, _, _) =>
+                {
+                    var counter = pokemon.Volatiles[ConditionId.AllySwitch].Counter ?? 1;
+                    battle.Debug($"Ally Switch success chance: {Math.Round(100.0 / counter)}%");
+                    var success = battle.RandomChance(1, counter);
+                    if (!success)
+                    {
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.AllySwitch]);
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    if (pokemon.Volatiles[ConditionId.AllySwitch].Counter < 729) // CounterMax
+                    {
+                        pokemon.Volatiles[ConditionId.AllySwitch].Counter *= 3;
+                    }
+                    pokemon.Volatiles[ConditionId.AllySwitch].Duration = 2;
+                    return BoolVoidUnion.FromVoid();
+                }),
+            },
+            [ConditionId.AquaRing] = new()
+            {
+                Id = ConditionId.AquaRing,
+                Name = "Aqua Ring",
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Add("-start", pokemon, "Aqua Ring");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Heal(pokemon.BaseMaxHp / 16, pokemon);
+                }, 6),
+            },
+            [ConditionId.Attract] = new()
+            {
+                Id = ConditionId.Attract,
+                Name = "Attract",
+                NoCopy = true,
+                OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
+                {
+                    if (source == null) return BoolVoidUnion.FromVoid();
+                    if (!((pokemon.Gender == GenderId.M && source.Gender == GenderId.F) ||
+                          (pokemon.Gender == GenderId.F && source.Gender == GenderId.M)))
+                    {
+                        battle.Debug("incompatible gender");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    var runEventResult = battle.RunEvent(EventId.Attract, pokemon, source);
+                    if (runEventResult is BoolRelayVar { Value: false })
+                    {
+                        battle.Debug("Attract event failed");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+
+                    if (effect?.Name == "Cute Charm")
+                    {
+                        battle.Add("-start", pokemon, "Attract", "[from] ability: Cute Charm", $"[of] {source}");
+                    }
+                    else if (effect?.Name == "Destiny Knot")
+                    {
+                        battle.Add("-start", pokemon, "Attract", "[from] item: Destiny Knot", $"[of] {source}");
+                    }
+                    else
+                    {
+                        battle.Add("-start", pokemon, "Attract");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Volatiles[ConditionId.Attract].Source != null &&
+                        !pokemon.Volatiles[ConditionId.Attract].Source.IsActive &&
+                        pokemon.Volatiles.ContainsKey(ConditionId.Attract))
+                    {
+                        battle.Debug($"Removing Attract volatile on {pokemon}");
+                        pokemon.RemoveVolatile(_library.Conditions[ConditionId.Attract]);
+                    }
+                }),
+                OnBeforeMove = new OnBeforeMoveEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Add("-activate", pokemon, "move: Attract", $"[of] {pokemon.Volatiles[ConditionId.Attract].Source}");
+                    if (battle.RandomChance(1, 2))
+                    {
+                        battle.Add("cant", pokemon, "Attract");
+                        return BoolVoidUnion.FromBool(false);
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }, 2),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    battle.Add("-end", pokemon, "Attract", "[silent]");
+                }),
+            },
+            [ConditionId.AuroraVeil] = new()
+            {
+                Id = ConditionId.AuroraVeil,
+                Name = "Aurora Veil",
+                Duration = 5,
+                DurationCallback = new DurationCallbackEventInfo((battle, target, source, _) =>
+                {
+                    if (source != null && source.HasItem(ItemId.LightClay))
+                    {
+                        return 8;
+                    }
+                    return 5;
+                }),
+                OnAnyModifyDamage = new OnAnyModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (target != source && target.Side.GetSideCondition(ConditionId.AuroraVeil) != null)
+                    {
+                        if ((target.Side.GetSideCondition(ConditionId.Reflect) != null && move.Category == MoveCategory.Physical) ||
+                            (target.Side.GetSideCondition(ConditionId.LightScreen) != null && move.Category == MoveCategory.Special))
+                        {
+                            return damage;
+                        }
+                        if (!target.GetMoveHitData(move).Crit && !(move.Infiltrates ?? false))
+                        {
+                            battle.Debug("Aurora Veil weaken");
+                            if (battle.ActivePerHalf > 1) 
+                            {
+                                battle.ChainModify(2732, 4096);
+                                return damage;
+                            }
+                            battle.ChainModify(0.5);
+                            return damage;
+                        }
+                    }
+                    return damage;
+                }),
+                OnSideStart = new OnSideStartEventInfo((battle, side, _, _) =>
+                {
+                    battle.Add("-sidestart", side, "move: Aurora Veil");
+                }),
+                OnSideResidual = new OnSideResidualEventInfo((battle, side, _, _) =>
+                {
+                    // Handled by duration
+                }, 26, 10),
+                OnSideEnd = new OnSideEndEventInfo((battle, side) =>
+                {
+                    battle.Add("-sideend", side, "move: Aurora Veil");
+                }),
+            },
             [ConditionId.Burn] = new()
             {
                 Id = ConditionId.Burn,
