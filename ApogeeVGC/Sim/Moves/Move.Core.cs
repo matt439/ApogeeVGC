@@ -105,9 +105,9 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public bool? StealsBoosts { get; init; }
     public bool? StruggleRecoil { get; init; }
     public SecondaryEffect? Secondary { get; init; }
-    public SecondaryEffect[]? Secondaries { get; init; }
-    public SecondaryEffect? Self { get; init; }
-    public bool? HasSheerForce { get; init; }
+    public SecondaryEffect[]? Secondaries { get; set; }
+    public SecondaryEffect? Self { get; set; }
+    public bool? HasSheerForce { get; set; }
 
 
     // Hit effect modifiers
@@ -130,7 +130,7 @@ public partial record Move : IBasicEffect, ICopyable<Move>
     public bool? IgnoreOffensive { get; init; }
     public bool? IgnorePositiveDefensive { get; init; }
     public bool? IgnorePositiveEvasion { get; init; }
-    public bool? MultiAccuracy { get; init; }
+    public bool? MultiAccuracy { get; set; }
     public IntIntArrayUnion? MultiHit { get; set; }
     public MoveMultiHitType? MultiHitType { get; init; }
     public bool? NoDamageVariance { get; init; }

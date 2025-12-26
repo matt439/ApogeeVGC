@@ -7,6 +7,7 @@ using ApogeeVGC.Sim.Events.Handlers.PokemonEventMethods;
 using ApogeeVGC.Sim.Items;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.SideClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
 
@@ -41,7 +42,7 @@ public partial record Abilities
                 }, 21),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
                     {
                         // Immune to sandstorm damage
                     }
@@ -64,7 +65,7 @@ public partial record Abilities
                 }),
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
                     {
                         // Immune to sandstorm damage
                     }
@@ -101,7 +102,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type.IsConditionId && type.AsConditionId == ConditionId.Sandstorm)
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Sandstorm })
                     {
                         // Immune to sandstorm damage
                     }
@@ -132,7 +133,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Grass)
                     {
-                        if (!battle.Boost(new SparseBoostsTable { Atk = 1 }))
+                        if (!battle.Boost(new SparseBoostsTable { Atk = 1 }).IsTruthy())
                         {
                             battle.Add("-immune", target, "[from] ability: Sap Sipper");
                         }
@@ -203,9 +204,9 @@ public partial record Abilities
                     bool activated = false;
                     ConditionId[] screens = [ConditionId.Reflect, ConditionId.LightScreen];
                     // TODO: Add AuroraVeil when available
-                    foreach (var sideCondition in screens)
+                    foreach (ConditionId sideCondition in screens)
                     {
-                        foreach (var side in new[] { pokemon.Side }.Concat(pokemon.Side.FoeSidesWithConditions()))
+                        foreach (Side side in new[] { pokemon.Side }.Concat(pokemon.Side.FoeSidesWithConditions()))
                         {
                             if (side.GetSideCondition(sideCondition) != null)
                             {
@@ -242,7 +243,7 @@ public partial record Abilities
                 {
                     if (move.Secondaries != null)
                     {
-                        foreach (var secondary in move.Secondaries)
+                        foreach (SecondaryEffect secondary in move.Secondaries)
                         {
                             if (secondary.Chance != null)
                             {
@@ -525,7 +526,7 @@ public partial record Abilities
                 Flags = new AbilityFlags { Breakable = true },
                 OnImmunity = new OnImmunityEventInfo((_, type, _) =>
                 {
-                    if (type.IsConditionId && type.AsConditionId == ConditionId.Hail)
+                    if (type is { IsConditionId: true, AsConditionId: ConditionId.Hail })
                     {
                         // Immune to hail damage
                     }
@@ -862,7 +863,7 @@ public partial record Abilities
                     if (battle.ActiveMove == null)
                         throw new InvalidOperationException("Battle.ActiveMove is null");
                     if (pokemon.Hp == 0 || pokemon.Item == ItemId.StickyBarb) return new VoidReturn();
-                    if ((source != null && source != pokemon) || battle.ActiveMove.Id == MoveId.KnockOff)
+                    if ((source != null && source != pokemon))
                     {
                         battle.Add("-activate", pokemon, "ability: Sticky Hold");
                         return false;
@@ -881,7 +882,7 @@ public partial record Abilities
                 {
                     if (target != source && move.Type == MoveType.Water)
                     {
-                        if (!battle.Boost(new SparseBoostsTable { SpA = 1 }))
+                        if (!battle.Boost(new SparseBoostsTable { SpA = 1 }).IsTruthy())
                         {
                             battle.Add("-immune", target, "[from] ability: Storm Drain");
                         }
@@ -1137,7 +1138,7 @@ public partial record Abilities
                     if (pokemon.SwitchFlag == true) return;
                     if (battle.EffectState.Target is not PokemonEffectStateTarget { Pokemon: var source })
                         return;
-                    var myItemResult = source.TakeItem();
+                    ItemFalseUnion myItemResult = source.TakeItem();
                     if (myItemResult is not ItemItemFalseUnion { Item: var myItem }) return;
 
                     // TODO: SingleEvent TakeItem check

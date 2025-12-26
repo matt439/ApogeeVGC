@@ -9,6 +9,8 @@ public enum ItemId
     LightClay,
     AssaultVest,
 
+    StickyBarb,
+
     BoosterEnergy,
     ToxicOrb,
     TerrainExtender,
