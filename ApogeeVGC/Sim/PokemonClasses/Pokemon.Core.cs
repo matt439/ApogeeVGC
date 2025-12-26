@@ -111,6 +111,7 @@ public partial class Pokemon : IPriorityComparison
     public bool ShieldBoost { get; set; } // Gen 9 only
     public bool SyrupTriggered { get; set; } // Gen 9 only
     public List<MoveType> StellarBoostedTypes { get; set; } // Gen 9 only
+    public bool HeroMessageDisplayed { get; set; } // Gen 9 only - for Zero to Hero ability
 
     public bool IsStarted { get; set; }
     public bool DuringMove { get; set; }

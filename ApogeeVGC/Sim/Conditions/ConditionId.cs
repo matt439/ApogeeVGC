@@ -113,4 +113,5 @@ public enum ConditionId
                                                 FlashFire,
                             ToxicSpikes,
                             Unburden,
+                        ZenMode,
                         }
