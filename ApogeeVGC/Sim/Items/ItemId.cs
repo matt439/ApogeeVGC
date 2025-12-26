@@ -299,6 +299,13 @@ public enum ItemId
 
     // X items - none for Gen 9 standard
 
+    // Y items
+    YacheBerry,
+
+    // Z items
+    ZapPlate,
+    ZoomLens,
+
     BoosterEnergy,
     ToxicOrb,
     TerrainExtender,
