@@ -34,23 +34,26 @@ public partial record Items
                 Name = "Safety Goggles",
                 SpriteNum = 604,
                 Fling = new FlingData { BasePower = 80 },
-                OnImmunity = new OnImmunityEventInfo((battle, type, pokemon) =>
+                OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
                 {
-                    if (type == "sandstorm" || type == "hail" || type == "powder")
+                    if (effect is Condition condition && (condition.Id == ConditionId.Sandstorm ||
+                                                          condition.Id == ConditionId.Hail))
                     {
-                        return BoolVoidUnion.FromBool(false);
+                        return IntBoolVoidUnion.FromBool(false);
                     }
-                    return BoolVoidUnion.FromVoid();
+
+                    return IntBoolVoidUnion.FromVoid();
                 }),
                 OnTryHit = new OnTryHitEventInfo((battle, target, source, move) =>
                 {
                     if (move.Flags.Powder == true && target != source &&
-                        battle.Dex.GetImmunity("powder", target))
+                        battle.Dex.GetImmunity(ConditionId.Powder, target.Types))
                     {
                         battle.Add("-activate", target, "item: Safety Goggles", move.Name);
-                        return NullBoolUnion.FromNull();
+                        return null;
                     }
-                    return NullBoolUnion.FromVoid();
+
+                    return BoolIntEmptyVoidUnion.FromVoid();
                 }),
                 Num = 650,
                 Gen = 6,
@@ -96,10 +99,11 @@ public partial record Items
                 Name = "Scope Lens",
                 SpriteNum = 429,
                 Fling = new FlingData { BasePower = 30 },
-                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
-                {
-                    return DoubleVoidUnion.FromDouble(critRatio + 1);
-                }),
+                OnModifyCritRatio =
+                    new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
+                    {
+                        return DoubleVoidUnion.FromDouble(critRatio + 1);
+                    }),
                 Num = 232,
                 Gen = 2,
             },
@@ -116,6 +120,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 254,
@@ -135,6 +140,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 244,
@@ -147,14 +153,12 @@ public partial record Items
                 Name = "Shed Shell",
                 SpriteNum = 437,
                 Fling = new FlingData { BasePower = 10 },
-                OnTrapPokemon = new OnTrapPokemonEventInfo((battle, pokemon) =>
-                {
-                    pokemon.Trapped = false;
-                }, -10),
-                OnMaybeTrapPokemon = new OnMaybeTrapPokemonEventInfo((battle, pokemon) =>
-                {
-                    pokemon.MaybeTrapped = false;
-                }, -10),
+                OnTrapPokemon =
+                    new OnTrapPokemonEventInfo(
+                        (battle, pokemon) => { pokemon.Trapped = PokemonTrapped.False; }, -10),
+                OnMaybeTrapPokemon =
+                    new OnMaybeTrapPokemonEventInfo(
+                        (battle, pokemon) => { pokemon.MaybeTrapped = false; }, -10),
                 Num = 295,
                 Gen = 4,
             },
@@ -164,13 +168,14 @@ public partial record Items
                 Name = "Shell Bell",
                 SpriteNum = 438,
                 Fling = new FlingData { BasePower = 30 },
-                OnAfterMoveSecondarySelf = new OnAfterMoveSecondarySelfEventInfo((battle, pokemon, target, move) =>
-                {
-                    if (move.TotalDamage > 0 && !pokemon.ForceSwitchFlag)
+                OnAfterMoveSecondarySelf = new OnAfterMoveSecondarySelfEventInfo(
+                    (battle, pokemon, target, move) =>
                     {
-                        battle.Heal(move.TotalDamage / 8, pokemon);
-                    }
-                }, -1),
+                        if (move.TotalDamage.ToInt() > 0 && !pokemon.ForceSwitchFlag)
+                        {
+                            battle.Heal(move.TotalDamage.ToInt() / 8, pokemon);
+                        }
+                    }, -1),
                 Num = 253,
                 Gen = 3,
             },
@@ -191,26 +196,27 @@ public partial record Items
                 SpriteNum = 443,
                 IsBerry = true,
                 NaturalGift = (80, "Ground"),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (move.Type == MoveType.Ground && target.GetMoveHitData(move).TypeMod > 0)
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     !(move.Infiltrates == true && battle.Gen >= 6);
-                        if (hitSub) return damage;
-
-                        if (target.EatItem())
+                        if (move.Type == MoveType.Ground && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            battle.Debug("-50% reduction");
-                            battle.Add("-enditem", target, "item: Shuca Berry", "[weaken]");
-                            battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
-                        }
-                    }
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
 
-                    return damage;
-                }),
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Shuca Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
                 // OnEat: empty function
                 Num = 191,
                 Gen = 4,
@@ -228,6 +234,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 251,
@@ -246,6 +253,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 222,
@@ -265,14 +273,18 @@ public partial record Items
                         pokemon.EatItem();
                     }
                 }),
-                OnTryEatItem = new OnTryEatItemEventInfo((battle, item, pokemon) =>
-                {
-                    if (!battle.RunEvent("TryHeal", pokemon, null, battle.Effect, pokemon.BaseMaxHp / 4))
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    (Func<Battle, Item, Pokemon, BoolVoidUnion>)((battle, item, pokemon) =>
                     {
-                        return BoolVoidUnion.FromBool(false);
-                    }
-                    return BoolVoidUnion.FromVoid();
-                }),
+                        var result = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                            pokemon.BaseMaxHp / 4);
+                        if (result is BoolRelayVar boolResult && !boolResult.Value)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+
+                        return BoolVoidUnion.FromVoid();
+                    })),
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     battle.Heal(pokemon.BaseMaxHp / 4);
@@ -295,6 +307,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // OnTakeItem - Arceus can't have plates removed
@@ -344,6 +357,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 237,
@@ -365,6 +379,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // itemUser: ["Latios", "Latias"],
@@ -384,6 +399,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 247,
@@ -414,6 +430,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // OnTakeItem - Arceus can't have plates removed
@@ -435,6 +452,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // OnTakeItem - Arceus can't have plates removed
@@ -472,9 +490,13 @@ public partial record Items
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
                 {
                     var stats = new List<StatIdExceptHp>();
-                    foreach (var stat in new[] { StatIdExceptHp.Atk, StatIdExceptHp.Def, StatIdExceptHp.SpA, StatIdExceptHp.SpD, StatIdExceptHp.Spe })
+                    foreach (var stat in new[]
+                             {
+                                 StatIdExceptHp.Atk, StatIdExceptHp.Def, StatIdExceptHp.SpA,
+                                 StatIdExceptHp.SpD, StatIdExceptHp.Spe
+                             })
                     {
-                        var currentBoost = pokemon.Boosts.GetBoost(stat);
+                        var currentBoost = pokemon.Boosts.GetBoost((BoostId)stat);
                         if (currentBoost < 6)
                         {
                             stats.Add(stat);
@@ -485,7 +507,7 @@ public partial record Items
                     {
                         var randomStat = battle.Sample(stats);
                         var boost = new SparseBoostsTable();
-                        boost.SetBoost(randomStat, 2);
+                        boost.SetBoost((BoostId)randomStat, 2);
                         battle.Boost(boost);
                     }
                 })),
@@ -509,15 +531,17 @@ public partial record Items
                 Name = "Stick",
                 SpriteNum = 475,
                 Fling = new FlingData { BasePower = 60 },
-                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
-                {
-                    // Farfetch'd check
-                    if (source.Species.Name.Contains("Farfetch"))
+                OnModifyCritRatio =
+                    new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
                     {
-                        return DoubleVoidUnion.FromDouble(critRatio + 2);
-                    }
-                    return DoubleVoidUnion.FromVoid();
-                }),
+                        // Farfetch'd check
+                        if (source.Species.Name.Contains("Farfetch"))
+                        {
+                            return DoubleVoidUnion.FromDouble(critRatio + 2);
+                        }
+
+                        return DoubleVoidUnion.FromVoid();
+                    }),
                 // itemUser: ["Farfetch'd"],
                 Num = 259,
                 Gen = 2,
@@ -529,7 +553,7 @@ public partial record Items
                 Name = "Sticky Barb",
                 SpriteNum = 476,
                 Fling = new FlingData { BasePower = 80 },
-                OnResidual = new OnResidualEventInfo((battle, pokemon) =>
+                OnResidual = new OnResidualEventInfo((battle, pokemon, source, effect) =>
                 {
                     battle.Damage(pokemon.BaseMaxHp / 8, pokemon);
                 })
@@ -543,10 +567,13 @@ public partial record Items
                         battle.CheckMoveMakesContact(move, source, target))
                     {
                         var barb = target.TakeItem();
-                        if (barb == null) return; // Gen 4 Multitype
-                        source.SetItem(barb.Id);
+                        if (barb is not ItemItemFalseUnion itemUnion)
+                            return null; // Gen 4 Multitype
+                        source.SetItem(itemUnion.Item.Id);
                         // no message for Sticky Barb changing hands
                     }
+
+                    return null;
                 }),
                 Num = 288,
                 Gen = 4,
@@ -564,6 +591,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // OnTakeItem - Arceus can't have plates removed
@@ -639,26 +667,27 @@ public partial record Items
                 SpriteNum = 487,
                 IsBerry = true,
                 NaturalGift = (80, "Bug"),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (move.Type == MoveType.Bug && target.GetMoveHitData(move).TypeMod > 0)
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     !(move.Infiltrates == true && battle.Gen >= 6);
-                        if (hitSub) return damage;
-
-                        if (target.EatItem())
+                        if (move.Type == MoveType.Bug && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            battle.Debug("-50% reduction");
-                            battle.Add("-enditem", target, "item: Tanga Berry", "[weaken]");
-                            battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
-                        }
-                    }
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
 
-                    return damage;
-                }),
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Tanga Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
                 // OnEat: empty function
                 Num = 194,
                 Gen = 4,
@@ -688,7 +717,7 @@ public partial record Items
                 Name = "Thick Club",
                 SpriteNum = 491,
                 Fling = new FlingData { BasePower = 90 },
-                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon) =>
+                OnModifyAtk = new OnModifyAtkEventInfo((battle, atk, pokemon, target, move) =>
                 {
                     if (pokemon.Species.Name == "Cubone" || pokemon.Species.Name == "Marowak" ||
                         pokemon.Species.Name.StartsWith("Marowak-"))
@@ -696,6 +725,7 @@ public partial record Items
                         battle.ChainModify(2);
                         return battle.FinalModify(atk);
                     }
+
                     return atk;
                 }, 1),
                 // itemUser: ["Marowak", "Marowak-Alola", "Marowak-Alola-Totem", "Cubone"],
@@ -709,13 +739,14 @@ public partial record Items
                 Name = "Throat Spray",
                 SpriteNum = 713,
                 Fling = new FlingData { BasePower = 30 },
-                OnAfterMoveSecondarySelf = new OnAfterMoveSecondarySelfEventInfo((battle, pokemon, target, move) =>
-                {
-                    if (move.Flags.Sound == true)
+                OnAfterMoveSecondarySelf =
+                    new OnAfterMoveSecondarySelfEventInfo((battle, pokemon, target, move) =>
                     {
-                        pokemon.UseItem();
-                    }
-                }),
+                        if (move.Flags.Sound == true)
+                        {
+                            pokemon.UseItem();
+                        }
+                    }),
                 Boosts = new SparseBoostsTable { SpA = 1 },
                 Num = 1118,
                 Gen = 8,
@@ -748,7 +779,7 @@ public partial record Items
                     BasePower = 30,
                     Status = ConditionId.Toxic
                 },
-                OnResidual = new OnResidualEventInfo((battle, pokemon) =>
+                OnResidual = new OnResidualEventInfo((battle, pokemon, source, effect) =>
                 {
                     pokemon.TrySetStatus(ConditionId.Toxic, pokemon);
                 })
@@ -772,6 +803,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // OnTakeItem - Arceus can't have plates removed
@@ -794,6 +826,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 Num = 248,
