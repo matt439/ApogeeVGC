@@ -231,11 +231,9 @@ public enum ItemId
     RibbonSweet,
     RindoBerry,
     RingTarget,
-    RockyHelmet,
     RootFossil,
     RoseIncense,
     RoseliaBerry,
-    RowapBerry,
 
     // S items
     SafariBall,
@@ -287,61 +285,73 @@ public enum ItemId
 
     StickyBarb,
 
+    // V items - none for Gen 9 standard
+
+    // W items
+    WacanBerry,
+    WaterStone,
+    WeaknessPolicy,
+    WellspringMask,
+    WhiteHerb,
+    WideLens,
+    WikiBerry,
+    WiseGlasses,
+
+    // X items - none for Gen 9 standard
+
     BoosterEnergy,
     ToxicOrb,
     TerrainExtender,
     ProtectivePads,
 
-        EnigmaBerry,
-        FigyBerry,
-        SitrusBerry,
-        WikiBerry,
-        OranBerry,
-        BerryJuice,
-        RustedSword,
-        RustedShield,
-        PowerHerb,
-        RowapBerry,
-        RedCard,
-        UtilityUmbrella,
-        BlunderPolicy,
+    EnigmaBerry,
+    FigyBerry,
+    SitrusBerry,
+    OranBerry,
+    BerryJuice,
+    RustedSword,
+    RustedShield,
+    PowerHerb,
+    RowapBerry,
+    BlunderPolicy,
+    UtilityUmbrella,
 
-        // Mega Stones
-        Sablenite,
-        Mawilite,
-        Aggronite,
-        Medichamite,
-        Manectite,
-        Sharpedonite,
-        Cameruptite,
-        Altarianite,
-        Banettite,
-        Absolite,
-        Glalitite,
-        Salamencite,
-        Metagrossite,
-        Latiasite,
-        Latiosite,
+    // Mega Stones
+    Sablenite,
+    Mawilite,
+    Aggronite,
+    Medichamite,
+    Manectite,
+    Sharpedonite,
+    Cameruptite,
+    Altarianite,
+    Banettite,
+    Absolite,
+    Glalitite,
+    Salamencite,
+    Metagrossite,
+    Latiasite,
+    Latiosite,
 
-        // Gen 6 Mega Stones
-        Chesnaughtite,
-        Delphoxite,
-        Greninjite,
-        Pyroarite,
-        Floettite,
-        Malamarite,
-        Barbaracite,
-        Dragalgite,
+    // Gen 6 Mega Stones
+    Chesnaughtite,
+    Delphoxite,
+    Greninjite,
+    Pyroarite,
+    Floettite,
+    Malamarite,
+    Barbaracite,
+    Dragalgite,
 
-        // Primal Orbs
-        BlueOrb,
-        RedOrb,
+    // Primal Orbs
+    BlueOrb,
+    RedOrb,
 
-        // Ogerpon Masks
-        WellspringMask,
+    // Ogerpon Masks (already defined above in W section, so commenting out duplicate)
+    // WellspringMask,
 
-        // Weather extending rocks
-        SmoothRock,
+    // Weather extending rocks
+    SmoothRock,
 
-        None,
-    }
+    None,
+}

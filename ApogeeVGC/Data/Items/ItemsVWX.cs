@@ -1,4 +1,14 @@
+using ApogeeVGC.Sim.Abilities;
+using ApogeeVGC.Sim.BattleClasses;
+using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events;
+using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.PokemonClasses;
+using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Items;
 
@@ -8,7 +18,177 @@ public partial record Items
     {
         return new Dictionary<ItemId, Item>
         {
-            // Placeholder for items V-X
+            // V items - all are mega stones or non-standard, skipped
+
+            // W items
+            [ItemId.WacanBerry] = new()
+            {
+                Id = ItemId.WacanBerry,
+                Name = "Wacan Berry",
+                SpriteNum = 526,
+                IsBerry = true,
+                NaturalGift = (80, "Electric"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Electric && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+
+                    return damage;
+                }),
+                // OnEat: empty function
+                Num = 186,
+                Gen = 4,
+            },
+            // Skip watergem, watermemory, wateriumz - not Gen 9 standard
+            [ItemId.WaterStone] = new()
+            {
+                Id = ItemId.WaterStone,
+                Name = "Water Stone",
+                SpriteNum = 529,
+                Fling = new FlingData { BasePower = 30 },
+                Num = 84,
+                Gen = 1,
+            },
+            // Skip watmelberry, waveincense - not Gen 9 standard
+            [ItemId.WeaknessPolicy] = new()
+            {
+                Id = ItemId.WeaknessPolicy,
+                Name = "Weakness Policy",
+                SpriteNum = 609,
+                Fling = new FlingData { BasePower = 80 },
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                {
+                    if (move.Damage == 0 && move.DamageCallback == null && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        target.UseItem();
+                    }
+                }),
+                Boosts = new SparseBoostsTable { Atk = 2, SpA = 2 },
+                Num = 639,
+                Gen = 6,
+            },
+            [ItemId.WellspringMask] = new()
+            {
+                Id = ItemId.WellspringMask,
+                Name = "Wellspring Mask",
+                SpriteNum = 759,
+                Fling = new FlingData { BasePower = 60 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (user.Species.Name.StartsWith("Ogerpon-Wellspring"))
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                // TODO: Implement OnTakeItem for Ogerpon
+                ForcedForme = "Ogerpon-Wellspring",
+                // itemUser: ["Ogerpon-Wellspring"],
+                Num = 2407,
+                Gen = 9,
+            },
+            // Skip wepearberry, whippeddream - not Gen 9 standard
+            [ItemId.WhiteHerb] = new()
+            {
+                Id = ItemId.WhiteHerb,
+                Name = "White Herb",
+                SpriteNum = 535,
+                Fling = new FlingData
+                {
+                    BasePower = 10,
+                },
+                // TODO: Implement White Herb logic - clears negative stat changes
+                // onStart, onAnySwitchIn, onAnyAfterMega, onAnyAfterMove, onResidual, onUse
+                Num = 214,
+                Gen = 3,
+            },
+            [ItemId.WideLens] = new()
+            {
+                Id = ItemId.WideLens,
+                Name = "Wide Lens",
+                SpriteNum = 537,
+                Fling = new FlingData { BasePower = 10 },
+                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo((battle, accuracy, target, source, move) =>
+                {
+                    battle.ChainModify([4505, 4096]);
+                    var result = battle.FinalModify(accuracy);
+                    return DoubleVoidUnion.FromDouble(result);
+                }, -2),
+                Num = 265,
+                Gen = 4,
+            },
+            [ItemId.WikiBerry] = new()
+            {
+                Id = ItemId.WikiBerry,
+                Name = "Wiki Berry",
+                SpriteNum = 538,
+                IsBerry = true,
+                NaturalGift = (80, "Rock"),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Hp <= pokemon.MaxHp / 4 ||
+                        (pokemon.Hp <= pokemon.MaxHp / 2 &&
+                         pokemon.HasAbility(AbilityId.Gluttony) &&
+                         pokemon.AbilityState.Gluttony == true))
+                    {
+                        pokemon.EatItem();
+                    }
+                }),
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    {
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, pokemon.BaseMaxHp / 3);
+                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
+                        {
+                            return BoolVoidUnion.FromBool(false);
+                        }
+                        return BoolVoidUnion.FromVoid();
+                    })),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
+                {
+                    battle.Heal(pokemon.BaseMaxHp / 3);
+                    if (pokemon.GetNature().Minus == StatIdExceptHp.SpA)
+                    {
+                        pokemon.AddVolatile(ConditionId.Confusion);
+                    }
+                })),
+                Num = 160,
+                Gen = 3,
+            },
+            [ItemId.WiseGlasses] = new()
+            {
+                Id = ItemId.WiseGlasses,
+                Name = "Wise Glasses",
+                SpriteNum = 539,
+                Fling = new FlingData { BasePower = 10 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Category == MoveCategory.Special)
+                    {
+                        battle.ChainModify([4505, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 16),
+                Num = 267,
+                Gen = 4,
+            },
+
+            // X items - none that start with X in the standard game
         };
     }
 }
