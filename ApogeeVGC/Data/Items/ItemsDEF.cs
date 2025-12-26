@@ -1,6 +1,8 @@
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Items;
+using ApogeeVGC.Sim.Moves;
+using ApogeeVGC.Sim.Stats;
 
 namespace ApogeeVGC.Data.Items;
 
@@ -10,6 +12,184 @@ public partial record Items
     {
         return new Dictionary<ItemId, Item>
         {
+            [ItemId.DampRock] = new()
+            {
+                Id = ItemId.DampRock,
+                Name = "Damp Rock",
+                SpriteNum = 88,
+                Fling = new FlingData { BasePower = 60 },
+                Num = 285,
+                Gen = 4,
+            },
+            [ItemId.DawnStone] = new()
+            {
+                Id = ItemId.DawnStone,
+                Name = "Dawn Stone",
+                SpriteNum = 92,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 109,
+                Gen = 4,
+            },
+            [ItemId.DeepSeaScale] = new()
+            {
+                Id = ItemId.DeepSeaScale,
+                Name = "Deep Sea Scale",
+                SpriteNum = 93,
+                Fling = new FlingData { BasePower = 30 },
+                OnModifySpD = new OnModifySpDEventInfo((battle, spd, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Clamperl")
+                    {
+                        battle.ChainModify(2);
+                        return battle.FinalModify(spd);
+                    }
+                    return spd;
+                }, 2),
+                Num = 227,
+                Gen = 3,
+                IsNonstandard = "Past",
+            },
+            [ItemId.DeepSeaTooth] = new()
+            {
+                Id = ItemId.DeepSeaTooth,
+                Name = "Deep Sea Tooth",
+                SpriteNum = 94,
+                Fling = new FlingData { BasePower = 90 },
+                OnModifySpA = new OnModifySpAEventInfo((battle, spa, pokemon) =>
+                {
+                    if (pokemon.BaseSpecies.Name == "Clamperl")
+                    {
+                        battle.ChainModify(2);
+                        return battle.FinalModify(spa);
+                    }
+                    return spa;
+                }, 1),
+                Num = 226,
+                Gen = 3,
+                IsNonstandard = "Past",
+            },
+            [ItemId.DestinyKnot] = new()
+            {
+                Id = ItemId.DestinyKnot,
+                Name = "Destiny Knot",
+                SpriteNum = 95,
+                Fling = new FlingData { BasePower = 10 },
+                // TODO: OnAttract handler for mutual attraction
+                Num = 280,
+                Gen = 4,
+            },
+            [ItemId.DiveBall] = new()
+            {
+                Id = ItemId.DiveBall,
+                Name = "Dive Ball",
+                SpriteNum = 101,
+                Num = 7,
+                Gen = 3,
+                IsPokeball = true,
+            },
+            [ItemId.DracoPlate] = new()
+            {
+                Id = ItemId.DracoPlate,
+                Name = "Draco Plate",
+                SpriteNum = 105,
+                // OnPlate = 'Dragon', // TODO: Not relevant for Gen 9 standard play
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Dragon)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                // TODO: OnTakeItem - Arceus can't have this item removed
+                ForcedForme = "Arceus-Dragon",
+                Num = 311,
+                Gen = 4,
+            },
+            [ItemId.DragonFang] = new()
+            {
+                Id = ItemId.DragonFang,
+                Name = "Dragon Fang",
+                SpriteNum = 106,
+                Fling = new FlingData { BasePower = 70 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Dragon)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                Num = 250,
+                Gen = 2,
+            },
+            [ItemId.DragonScale] = new()
+            {
+                Id = ItemId.DragonScale,
+                Name = "Dragon Scale",
+                SpriteNum = 108,
+                Fling = new FlingData { BasePower = 30 },
+                Num = 235,
+                Gen = 2,
+            },
+            [ItemId.DreadPlate] = new()
+            {
+                Id = ItemId.DreadPlate,
+                Name = "Dread Plate",
+                SpriteNum = 110,
+                // OnPlate = 'Dark', // TODO: Not relevant for Gen 9 standard play
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Dark)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                // TODO: OnTakeItem - Arceus can't have this item removed
+                ForcedForme = "Arceus-Dark",
+                Num = 312,
+                Gen = 4,
+            },
+            [ItemId.DreamBall] = new()
+            {
+                Id = ItemId.DreamBall,
+                Name = "Dream Ball",
+                SpriteNum = 111,
+                Num = 576,
+                Gen = 5,
+                IsPokeball = true,
+            },
+            [ItemId.DubiousDisc] = new()
+            {
+                Id = ItemId.DubiousDisc,
+                Name = "Dubious Disc",
+                SpriteNum = 113,
+                Fling = new FlingData { BasePower = 50 },
+                Num = 324,
+                Gen = 4,
+            },
+            [ItemId.DuskBall] = new()
+            {
+                Id = ItemId.DuskBall,
+                Name = "Dusk Ball",
+                SpriteNum = 115,
+                Num = 13,
+                Gen = 4,
+                IsPokeball = true,
+            },
+            [ItemId.DuskStone] = new()
+            {
+                Id = ItemId.DuskStone,
+                Name = "Dusk Stone",
+                SpriteNum = 116,
+                Fling = new FlingData { BasePower = 80 },
+                Num = 108,
+                Gen = 4,
+            },
             [ItemId.FlameOrb] = new()
             {
                 Id = ItemId.FlameOrb,

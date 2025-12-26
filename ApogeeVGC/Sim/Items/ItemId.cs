@@ -45,7 +45,26 @@ public enum ItemId
     ClearAmulet,
     CobaBerry,
     ColburBerry,
+    CornerstoneMask,
     CovertCloak,
+    CrackedPot,
+    CustapBerry,
+
+    // D items
+    DampRock,
+    DawnStone,
+    DeepSeaScale,
+    DeepSeaTooth,
+    DestinyKnot,
+    DiveBall,
+    DracoPlate,
+    DragonFang,
+    DragonScale,
+    DreadPlate,
+    DreamBall,
+    DubiousDisc,
+    DuskBall,
+    DuskStone,
 
     StickyBarb,
 
