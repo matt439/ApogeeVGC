@@ -19,6 +19,19 @@ public enum ItemId
     AspearBerry,
     AuspiciousArmor,
 
+    // B items
+    BabiriBerry,
+    BeastBall,
+    BerrySweet,
+    BigNugget,
+    BigRoot,
+    BindingBand,
+    BlackBelt,
+    BlackGlasses,
+    BlackSludge,
+    BottleCap,
+    BrightPowder,
+
     StickyBarb,
 
     BoosterEnergy,

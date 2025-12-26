@@ -10,6 +10,7 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
+using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Items;
 
@@ -312,6 +313,192 @@ public partial record Items
                 IsChoice = true,
                 Num = 297,
                 Gen = 4,
+            },
+
+            // B items
+            [ItemId.BabiriBerry] = new()
+            {
+                Id = ItemId.BabiriBerry,
+                Name = "Babiri Berry",
+                SpriteNum = 17,
+                IsBerry = true,
+                NaturalGift = (80, "Steel"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Steel && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Babiri Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+                    return damage;
+                }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 199,
+                Gen = 4,
+            },
+            [ItemId.BeastBall] = new()
+            {
+                Id = ItemId.BeastBall,
+                Name = "Beast Ball",
+                SpriteNum = 661,
+                IsPokeball = true,
+                Num = 851,
+                Gen = 7,
+            },
+            [ItemId.BerrySweet] = new()
+            {
+                Id = ItemId.BerrySweet,
+                Name = "Berry Sweet",
+                SpriteNum = 706,
+                Fling = new FlingData { BasePower = 10 },
+                Num = 1111,
+                Gen = 8,
+            },
+            [ItemId.BigNugget] = new()
+            {
+                Id = ItemId.BigNugget,
+                Name = "Big Nugget",
+                SpriteNum = 27,
+                Fling = new FlingData { BasePower = 130 },
+                Num = 581,
+                Gen = 5,
+            },
+            [ItemId.BigRoot] = new()
+            {
+                Id = ItemId.BigRoot,
+                Name = "Big Root",
+                SpriteNum = 29,
+                Fling = new FlingData { BasePower = 10 },
+                OnTryHeal = new OnTryHealEventInfo((Func<Battle, int, Pokemon, Pokemon, IEffect, IntBoolUnion?>)((battle, damage, target, source, effect) =>
+                {
+                    var heals = new[] { "drain", "leechseed", "ingrain", "aquaring", "strengthsap" };
+                    var effectName = effect.Name.ToLower().Replace(" ", "");
+                    if (heals.Contains(effectName))
+                    {
+                        battle.ChainModify([5324, 4096]);
+                        return IntBoolUnion.FromInt(battle.FinalModify(damage));
+                    }
+                    return IntBoolUnion.FromInt(damage);
+                }), 1),
+                Num = 296,
+                Gen = 4,
+            },
+            [ItemId.BindingBand] = new()
+            {
+                Id = ItemId.BindingBand,
+                Name = "Binding Band",
+                SpriteNum = 31,
+                Fling = new FlingData { BasePower = 30 },
+                // TODO: implemented in statuses
+                Num = 544,
+                Gen = 5,
+            },
+            [ItemId.BlackBelt] = new()
+            {
+                Id = ItemId.BlackBelt,
+                Name = "Black Belt",
+                SpriteNum = 32,
+                Fling = new FlingData { BasePower = 30 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Fighting)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                Num = 241,
+                Gen = 2,
+            },
+            [ItemId.BlackGlasses] = new()
+            {
+                Id = ItemId.BlackGlasses,
+                Name = "Black Glasses",
+                SpriteNum = 35,
+                Fling = new FlingData { BasePower = 30 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Dark)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+                    return basePower;
+                }, 15),
+                Num = 240,
+                Gen = 2,
+            },
+            [ItemId.BlackSludge] = new()
+            {
+                Id = ItemId.BlackSludge,
+                Name = "Black Sludge",
+                SpriteNum = 34,
+                Fling = new FlingData { BasePower = 30 },
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.HasType(PokemonType.Poison))
+                    {
+                        battle.Heal(pokemon.BaseMaxHp / 16);
+                    }
+                    else
+                    {
+                        battle.Damage(pokemon.BaseMaxHp / 8);
+                    }
+                }, order: 5, subOrder: 4),
+                Num = 281,
+                Gen = 4,
+            },
+            [ItemId.BlueOrb] = new()
+            {
+                Id = ItemId.BlueOrb,
+                Name = "Blue Orb",
+                SpriteNum = 41,
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.IsActive && pokemon.BaseSpecies.Name == "Kyogre" && !pokemon.Transformed)
+                    {
+                        // TODO: pokemon.FormeChange("Kyogre-Primal", battle.Effect, true);
+                    }
+                }, -1),
+                // TODO: OnTakeItem - Kyogre can't have this item removed
+                IsPrimalOrb = true,
+                Num = 535,
+                Gen = 6,
+            },
+            [ItemId.BottleCap] = new()
+            {
+                Id = ItemId.BottleCap,
+                Name = "Bottle Cap",
+                SpriteNum = 696,
+                Fling = new FlingData { BasePower = 30 },
+                Num = 795,
+                Gen = 7,
+            },
+            [ItemId.BrightPowder] = new()
+            {
+                Id = ItemId.BrightPowder,
+                Name = "Bright Powder",
+                SpriteNum = 51,
+                Fling = new FlingData { BasePower = 10 },
+                OnModifyAccuracy = new OnModifyAccuracyEventInfo((battle, accuracy, _, _, _) =>
+                {
+                    battle.Debug("brightpowder - decreasing accuracy");
+                    battle.ChainModify([3686, 4096]);
+                    return battle.FinalModify(accuracy);
+                }, -2),
+                Num = 213,
+                Gen = 2,
             },
         };
     }
