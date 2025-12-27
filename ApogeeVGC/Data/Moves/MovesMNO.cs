@@ -33,6 +33,20 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,
             },
+            [MoveId.MeFirst] = new()
+            {
+                Id = MoveId.MeFirst,
+                Num = 382,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Me First",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, BypassSub = true, FailMeFirst = true, NoSleepTalk = true, NoAssist = true, FailCopycat = true, FailInstruct = true, FailMimic = true },
+                Target = MoveTarget.AdjacentFoe,
+                Type = MoveType.Normal,
+            },
             [MoveId.MagicalLeaf] = new()
             {
                 Id = MoveId.MagicalLeaf,
@@ -585,10 +599,24 @@ public partial record Moves
                     FailMimic = true,
                     FailInstruct = true,
                 },
-                // TODO: onHit - replace Mimic move slot with target's last move
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+            },
+            [MoveId.MindBlown] = new()
+            {
+                Id = MoveId.MindBlown,
+                Num = 720,
+                Accuracy = 100,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Mind Blown",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                MindBlownRecoil = true,
+                Target = MoveTarget.AllAdjacent,
+                Type = MoveType.Fire,
             },
             [MoveId.Minimize] = new()
             {
@@ -860,6 +888,63 @@ public partial record Moves
                 },
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
+            },
+            [MoveId.MuddyWater] = new()
+            {
+                Id = MoveId.MuddyWater,
+                Num = 330,
+                Accuracy = 85,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Muddy Water",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Boosts = new SparseBoostsTable { Accuracy = -1 },
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Water,
+            },
+            [MoveId.MudShot] = new()
+            {
+                Id = MoveId.MudShot,
+                Num = 341,
+                Accuracy = 95,
+                BasePower = 55,
+                Category = MoveCategory.Special,
+                Name = "Mud Shot",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
+            },
+            [MoveId.MudSlap] = new()
+            {
+                Id = MoveId.MudSlap,
+                Num = 189,
+                Accuracy = 100,
+                BasePower = 20,
+                Category = MoveCategory.Special,
+                Name = "Mud-Slap",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Accuracy = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
             },
             [MoveId.MysticalFire] = new()
             {

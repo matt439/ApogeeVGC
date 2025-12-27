@@ -340,6 +340,25 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.SecretPower] = new()
+            {
+                Id = MoveId.SecretPower,
+                Num = 290,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Secret Power",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
             [MoveId.SecretSword] = new()
             {
                 Id = MoveId.SecretSword,
@@ -736,6 +755,25 @@ public partial record Moves
                 Target = MoveTarget.Self,
                 Type = MoveType.Ground,
             },
+            [MoveId.SignalBeam] = new()
+            {
+                Id = MoveId.SignalBeam,
+                Num = 324,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Special,
+                Name = "Signal Beam",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    VolatileStatus = ConditionId.Confusion,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+            },
             [MoveId.SilkTrap] = new()
             {
                 Id = MoveId.SilkTrap,
@@ -749,10 +787,30 @@ public partial record Moves
                 Flags = new MoveFlags(),
                 StallingMove = true,
                 VolatileStatus = ConditionId.SilkTrap,
-                // TODO: onPrepareHit - stall move check
-                // TODO: onHit - add stall volatile
                 Secondary = null,
                 Target = MoveTarget.Self,
+                Type = MoveType.Bug,
+            },
+            [MoveId.SilverWind] = new()
+            {
+                Id = MoveId.SilverWind,
+                Num = 318,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Special,
+                Name = "Silver Wind",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Self = new SecondaryEffect
+                    {
+                        Boosts = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
+                    },
+                },
+                Target = MoveTarget.Normal,
                 Type = MoveType.Bug,
             },
             [MoveId.SimpleBeam] = new()
@@ -901,12 +959,25 @@ public partial record Moves
                     FailInstruct = true,
                 },
                 CritRatio = 2,
-                // TODO: onTryMove - charge turn logic
                 Secondary = new SecondaryEffect
                 {
                     Chance = 30,
                     VolatileStatus = ConditionId.Flinch,
                 },
+                Target = MoveTarget.Any,
+                Type = MoveType.Flying,
+            },
+            [MoveId.SkyDrop] = new()
+            {
+                Id = MoveId.SkyDrop,
+                Num = 507,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Physical,
+                Name = "Sky Drop",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Charge = true, Protect = true, Mirror = true, Gravity = true, Distance = true, Metronome = true, NoSleepTalk = true, NoAssist = true, FailInstruct = true },
                 Target = MoveTarget.Any,
                 Type = MoveType.Flying,
             },
@@ -1187,6 +1258,22 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
+            },
+            [MoveId.Snatch] = new()
+            {
+                Id = MoveId.Snatch,
+                Num = 289,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Snatch",
+                BasePp = 10,
+                Priority = 4,
+                Flags = new MoveFlags { BypassSub = true, NoAssist = true, FailCopycat = true },
+                // TODO: volatileStatus = 'snatch' - steals opponent's beneficial move
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Dark,
             },
             [MoveId.Snarl] = new()
             {
@@ -1536,6 +1623,22 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Grass,
+            },
+            [MoveId.SpectralThief] = new()
+            {
+                Id = MoveId.SpectralThief,
+                Num = 712,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Spectral Thief",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, BypassSub = true },
+                // TODO: stealsBoosts = true - steals target's positive stat boosts before dealing damage
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ghost,
             },
             [MoveId.SpinOut] = new()
             {
@@ -3002,6 +3105,23 @@ public partial record Moves
                 // TODO: basePowerCallback - 100 if Stellar Terastallized
                 // TODO: onModifyType - changes type based on Tera type
                 // TODO: onModifyMove - changes category if atk > spa when Terastallized, self boosts if Stellar
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TeraStarStorm] = new()
+            {
+                Id = MoveId.TeraStarStorm,
+                Num = 906,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Special,
+                Name = "Tera Starstorm",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NoSleepTalk = true, NoAssist = true, FailCopycat = true, FailMimic = true, FailInstruct = true },
+                // TODO: onModifyType - becomes Stellar type if used by Terapagos-Stellar
+                // TODO: onModifyMove - targets all adjacent foes if Stellar
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,

@@ -341,6 +341,91 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
             },
+            [MoveId.LeafStorm] = new()
+            {
+                Id = MoveId.LeafStorm,
+                Num = 437,
+                Accuracy = 90,
+                BasePower = 130,
+                Category = MoveCategory.Special,
+                Name = "Leaf Storm",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Self = new SecondaryEffect
+                {
+                    Boosts = new SparseBoostsTable { SpA = -2 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.LeechLife] = new()
+            {
+                Id = MoveId.LeechLife,
+                Num = 141,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Leech Life",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Heal = true, Metronome = true },
+                Drain = (1, 2),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+            },
+            [MoveId.Leer] = new()
+            {
+                Id = MoveId.Leer,
+                Num = 43,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Leer",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Lick] = new()
+            {
+                Id = MoveId.Lick,
+                Num = 122,
+                Accuracy = 100,
+                BasePower = 30,
+                Category = MoveCategory.Physical,
+                Name = "Lick",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ghost,
+            },
+            [MoveId.LifeDew] = new()
+            {
+                Id = MoveId.LifeDew,
+                Num = 791,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Life Dew",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true, Heal = true, BypassSub = true, Metronome = true },
+                Target = MoveTarget.Allies,
+                Type = MoveType.Water,
+            },
             [MoveId.Liquidation] = new()
             {
                 Id = MoveId.Liquidation,
@@ -464,6 +549,58 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
+            },
+            [MoveId.Lashout] = new()
+            {
+                Id = MoveId.Lashout,
+                Num = 808,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Lash Out",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.LowSweep] = new()
+            {
+                Id = MoveId.LowSweep,
+                Num = 490,
+                Accuracy = 100,
+                BasePower = 65,
+                Category = MoveCategory.Physical,
+                Name = "Low Sweep",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Spe = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.Lunge] = new()
+            {
+                Id = MoveId.Lunge,
+                Num = 679,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Lunge",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
             },
             [MoveId.LusterPurge] = new()
             {

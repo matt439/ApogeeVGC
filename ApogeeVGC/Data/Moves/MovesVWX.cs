@@ -91,6 +91,21 @@ public partial record Moves
 
             // ===== V MOVES =====
 
+            [MoveId.VacuumWave] = new()
+            {
+                Id = MoveId.VacuumWave,
+                Num = 410,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Vacuum Wave",
+                BasePp = 30,
+                Priority = 1,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
             [MoveId.Venoshock] = new()
             {
                 Id = MoveId.Venoshock,
@@ -158,6 +173,21 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Grass,
+            },
+            [MoveId.ViseGrip] = new()
+            {
+                Id = MoveId.ViseGrip,
+                Num = 11,
+                Accuracy = 100,
+                BasePower = 55,
+                Category = MoveCategory.Physical,
+                Name = "Vise Grip",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
             },
             [MoveId.VoltSwitch] = new()
             {
@@ -325,6 +355,22 @@ public partial record Moves
                 // TODO: basePowerCallback - BP * user.hp / user.maxhp
                 Secondary = null,
                 Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Water,
+            },
+            [MoveId.WaterShuriken] = new()
+            {
+                Id = MoveId.WaterShuriken,
+                Num = 594,
+                Accuracy = 100,
+                BasePower = 15,
+                Category = MoveCategory.Special,
+                Name = "Water Shuriken",
+                BasePp = 20,
+                Priority = 1,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                MultiHit = (2, 5),
+                Secondary = null,
+                Target = MoveTarget.Normal,
                 Type = MoveType.Water,
             },
             [MoveId.WaveCrash] = new()
