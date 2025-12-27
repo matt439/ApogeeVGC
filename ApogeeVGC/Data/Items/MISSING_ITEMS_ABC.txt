@@ -1,0 +1,104 @@
+// Missing Items to Add to ItemsABC.cs
+// These items should be inserted in the appropriate alphabetical positions
+
+// After Blue Orb (line ~309), before Bottle Cap:
+
+[ItemId.BlunderPolicy] = new()
+{
+    Id = ItemId.BlunderPolicy,
+    Name = "Blunder Policy",
+    SpriteNum = 716,
+    Fling = new FlingData { BasePower = 80 },
+    // TODO: Item activation located in scripts - activates when move misses
+    // Boosts Speed by 2 stages when the holder's move misses due to accuracy
+    Num = 1121,
+    Gen = 8,
+},
+
+[ItemId.BoosterEnergy] = new()
+{
+    Id = ItemId.BoosterEnergy,
+    Name = "Booster Energy",
+    SpriteNum = 745,
+    Fling = new FlingData { BasePower = 30 },
+    OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+    {
+        // Mark that OnStart has been called
+        pokemon.ItemState.Started = true;
+        // Call OnUpdate immediately
+        var item = _library.Items[ItemId.BoosterEnergy];
+        if (item.OnUpdate != null)
+        {
+            item.OnUpdate.Handler(battle, pokemon);
+        }
+    }, -2),
+    OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+    {
+        if (!pokemon.ItemState.Started || pokemon.Transformed) return;
+
+        if (pokemon.HasAbility(AbilityId.Protosynthesis) && 
+            !battle.Field.IsWeather(ConditionId.SunnyDay) && 
+            pokemon.UseItem())
+        {
+            pokemon.AddVolatile(ConditionId.Protosynthesis);
+        }
+        if (pokemon.HasAbility(AbilityId.QuarkDrive) && 
+            !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) && 
+            pokemon.UseItem())
+        {
+            pokemon.AddVolatile(ConditionId.QuarkDrive);
+        }
+    }),
+    // TODO: OnTakeItem - only Paradox Pokemon can have this removed
+    Num = 1880,
+    Gen = 9,
+},
+
+// After Cheri Berry (line ~398), before Chesto Berry:
+
+[ItemId.CherishBall] = new()
+{
+    Id = ItemId.CherishBall,
+    Name = "Cherish Ball",
+    SpriteNum = 64,
+    IsPokeball = true,
+    Num = 16,
+    Gen = 4,
+    // IsNonstandard = "Unobtainable", // Event-only but valid in Gen 9
+},
+
+// After Chilan Berry (line ~432), before Choice Band:
+
+[ItemId.ChippedPot] = new()
+{
+    Id = ItemId.ChippedPot,
+    Name = "Chipped Pot",
+    SpriteNum = 720,
+    Fling = new FlingData { BasePower = 80 },
+    Num = 1254,
+    Gen = 8,
+},
+
+// After Clear Amulet (line ~501), before Coba Berry:
+
+[ItemId.CloverSweet] = new()
+{
+    Id = ItemId.CloverSweet,
+    Name = "Clover Sweet",
+    SpriteNum = 707,
+    Fling = new FlingData { BasePower = 10 },
+    Num = 1112,
+    Gen = 8,
+},
+
+// After Covert Cloak (line ~542), before Custap Berry:
+
+[ItemId.CrackedPot] = new()
+{
+    Id = ItemId.CrackedPot,
+    Name = "Cracked Pot",
+    SpriteNum = 719,
+    Fling = new FlingData { BasePower = 80 },
+    Num = 1253,
+    Gen = 8,
+},

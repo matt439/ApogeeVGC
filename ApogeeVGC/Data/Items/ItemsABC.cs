@@ -435,6 +435,55 @@ public partial record Items
                 Num = 535,
                 Gen = 6,
             },
+            [ItemId.BlunderPolicy] = new()
+            {
+                Id = ItemId.BlunderPolicy,
+                Name = "Blunder Policy",
+                SpriteNum = 716,
+                Fling = new FlingData { BasePower = 80 },
+                // TODO: Item activation located in scripts - activates when move misses
+                // Boosts Speed by 2 stages when the holder's move misses due to accuracy
+                Num = 1121,
+                Gen = 8,
+            },
+            [ItemId.BoosterEnergy] = new()
+            {
+                Id = ItemId.BoosterEnergy,
+                Name = "Booster Energy",
+                SpriteNum = 745,
+                Fling = new FlingData { BasePower = 30 },
+                OnSwitchIn = new OnSwitchInEventInfo((battle, pokemon) =>
+                {
+                    // Mark that OnStart has been called
+                    pokemon.ItemState.Started = true;
+                    // Call OnUpdate immediately
+                    var item = _library.Items[ItemId.BoosterEnergy];
+                    if (item.OnUpdate != null)
+                    {
+                        item.OnUpdate.Handler(battle, pokemon);
+                    }
+                }, -2),
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (!pokemon.ItemState.Started || pokemon.Transformed) return;
+
+                    if (pokemon.HasAbility(AbilityId.Protosynthesis) && 
+                        !battle.Field.IsWeather(ConditionId.SunnyDay) && 
+                        pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.Protosynthesis);
+                    }
+                    if (pokemon.HasAbility(AbilityId.QuarkDrive) && 
+                        !battle.Field.IsTerrain(ConditionId.ElectricTerrain, null) && 
+                        pokemon.UseItem())
+                    {
+                        pokemon.AddVolatile(ConditionId.QuarkDrive);
+                    }
+                }),
+                // TODO: OnTakeItem - only Paradox Pokemon can have this removed
+                Num = 1880,
+                Gen = 9,
+            },
             [ItemId.BottleCap] = new()
             {
                 Id = ItemId.BottleCap,
@@ -547,10 +596,20 @@ public partial record Items
                         pokemon.CureStatus();
                     }
                 })),
-                Num = 149,
-                Gen = 3,
-            },
-            [ItemId.ChestoBerry] = new()
+                    Num = 149,
+                    Gen = 3,
+                },
+                [ItemId.CherishBall] = new()
+                {
+                    Id = ItemId.CherishBall,
+                    Name = "Cherish Ball",
+                    SpriteNum = 64,
+                    IsPokeball = true,
+                    Num = 16,
+                    Gen = 4,
+                    // IsNonstandard = "Unobtainable", // Event-only but valid in Gen 9
+                },
+                [ItemId.ChestoBerry] = new()
             {
                 Id = ItemId.ChestoBerry,
                 Name = "Chesto Berry",
@@ -597,10 +656,19 @@ public partial record Items
                     return damage;
                 }),
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
-                Num = 200,
-                Gen = 4,
-            },
-            [ItemId.ChoiceBand] = new()
+                    Num = 200,
+                    Gen = 4,
+                },
+                [ItemId.ChippedPot] = new()
+                {
+                    Id = ItemId.ChippedPot,
+                    Name = "Chipped Pot",
+                    SpriteNum = 720,
+                    Fling = new FlingData { BasePower = 80 },
+                    Num = 1254,
+                    Gen = 8,
+                },
+                [ItemId.ChoiceBand] = new()
             {
                 Id = ItemId.ChoiceBand,
                 Name = "Choice Band",
@@ -785,10 +853,19 @@ public partial record Items
                     boost.Accuracy = boostsCopy.Accuracy;
                     boost.Evasion = boostsCopy.Evasion;
                 }, 1),
-                Num = 1882,
-                Gen = 9,
-            },
-            [ItemId.CobaBerry] = new()
+                    Num = 1882,
+                    Gen = 9,
+                },
+                [ItemId.CloverSweet] = new()
+                {
+                    Id = ItemId.CloverSweet,
+                    Name = "Clover Sweet",
+                    SpriteNum = 707,
+                    Fling = new FlingData { BasePower = 10 },
+                    Num = 1112,
+                    Gen = 8,
+                },
+                [ItemId.CobaBerry] = new()
             {
                 Id = ItemId.CobaBerry,
                 Name = "Coba Berry",
@@ -879,10 +956,19 @@ public partial record Items
                     battle.Debug("Covert Cloak prevent secondary");
                     secondaries.RemoveAll(effect => effect.Self == null);
                 }),
-                Num = 1885,
-                Gen = 9,
-            },
-            [ItemId.CustapBerry] = new()
+                    Num = 1885,
+                    Gen = 9,
+                },
+                [ItemId.CrackedPot] = new()
+                {
+                    Id = ItemId.CrackedPot,
+                    Name = "Cracked Pot",
+                    SpriteNum = 719,
+                    Fling = new FlingData { BasePower = 80 },
+                    Num = 1253,
+                    Gen = 8,
+                },
+                [ItemId.CustapBerry] = new()
             {
                 Id = ItemId.CustapBerry,
                 Name = "Custap Berry",
