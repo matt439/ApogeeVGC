@@ -165,4 +165,5 @@ public enum ConditionId
                                                 SyrupBomb,
                                                 TarShot,
                                                 ThroatChop,
+                                                Uproar,
                                                 }

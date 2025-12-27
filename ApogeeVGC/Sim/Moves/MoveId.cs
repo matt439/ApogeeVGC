@@ -662,4 +662,9 @@ public enum MoveId
                             JungleHealing,
                             KnockOff,
                             KowtowCleave,
+                            UpperHand,
+                            Venoshock,
+                            VictoryDance,
+                            VineWhip,
+                            VoltTackle,
                         }
