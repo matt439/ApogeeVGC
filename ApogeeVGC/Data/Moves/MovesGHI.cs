@@ -1,6 +1,8 @@
-﻿using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
+﻿using ApogeeVGC.Sim.Conditions;
+using ApogeeVGC.Sim.Events.Handlers.MoveEventMethods;
 using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Stats;
+using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Moves;
 
@@ -10,6 +12,95 @@ public partial record Moves
     {
         return new Dictionary<MoveId, Move>
         {
+            [MoveId.GastroAcid] = new()
+            {
+                Id = MoveId.GastroAcid,
+                Num = 380,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Gastro Acid",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.GastroAcid,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
+                // TODO: onTryHit - check for Ability Shield and cantsuppress flag
+            },
+            [MoveId.GigaDrain] = new()
+            {
+                Id = MoveId.GigaDrain,
+                Num = 202,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Special,
+                Name = "Giga Drain",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Heal = true,
+                    Metronome = true,
+                },
+                Drain = (1, 2),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.GigaImpact] = new()
+            {
+                Id = MoveId.GigaImpact,
+                Num = 416,
+                Accuracy = 90,
+                BasePower = 150,
+                Category = MoveCategory.Physical,
+                Name = "Giga Impact",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Recharge = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.MustRecharge,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.GigatonHammer] = new()
+            {
+                Id = MoveId.GigatonHammer,
+                Num = 893,
+                Accuracy = 100,
+                BasePower = 160,
+                Category = MoveCategory.Physical,
+                Name = "Gigaton Hammer",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+                // TODO: cantusetwice flag - cannot be used twice in a row
+            },
             [MoveId.GlacialLance] = new()
             {
                 Id = MoveId.GlacialLance,
@@ -27,6 +118,442 @@ public partial record Moves
                 },
                 Target = MoveTarget.AllAdjacentFoes,
                 Type = MoveType.Ice,
+            },
+            [MoveId.Glaciate] = new()
+            {
+                Id = MoveId.Glaciate,
+                Num = 549,
+                Accuracy = 95,
+                BasePower = 65,
+                Category = MoveCategory.Special,
+                Name = "Glaciate",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable
+                    {
+                        Spe = -1,
+                    },
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Ice,
+            },
+            [MoveId.GlaiveRush] = new()
+            {
+                Id = MoveId.GlaiveRush,
+                Num = 862,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Glaive Rush",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.GlaiveRush,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dragon,
+            },
+            [MoveId.Glare] = new()
+            {
+                Id = MoveId.Glare,
+                Num = 137,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Glare",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Status = ConditionId.Paralysis,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.GrassKnot] = new()
+            {
+                Id = MoveId.GrassKnot,
+                Num = 447,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, _, target, _) =>
+                {
+                    int targetWeight = target.GetWeight();
+                    int bp;
+                    if (targetWeight >= 2000)
+                    {
+                        bp = 120;
+                    }
+                    else if (targetWeight >= 1000)
+                    {
+                        bp = 100;
+                    }
+                    else if (targetWeight >= 500)
+                    {
+                        bp = 80;
+                    }
+                    else if (targetWeight >= 250)
+                    {
+                        bp = 60;
+                    }
+                    else if (targetWeight >= 100)
+                    {
+                        bp = 40;
+                    }
+                    else
+                    {
+                        bp = 20;
+                    }
+
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {bp}");
+                    }
+
+                    return bp;
+                }),
+                Category = MoveCategory.Special,
+                Name = "Grass Knot",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    NonSky = true,
+                    Metronome = true,
+                },
+                // onTryHit only applies to dynamax
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.GrassPledge] = new()
+            {
+                Id = MoveId.GrassPledge,
+                Num = 520,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Grass Pledge",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    NonSky = true,
+                    Metronome = true,
+                    PledgeCombo = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+                // TODO: basePowerCallback - 150 when combined with water/fire pledge
+                // TODO: onPrepareHit - pledge combination logic
+                // TODO: onModifyMove - pledge combination effects
+            },
+            [MoveId.GrassyGlide] = new()
+            {
+                Id = MoveId.GrassyGlide,
+                Num = 803,
+                Accuracy = 100,
+                BasePower = 55,
+                Category = MoveCategory.Physical,
+                Name = "Grassy Glide",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+                // TODO: onModifyPriority - +1 priority if Grassy Terrain and user is grounded
+            },
+            [MoveId.GrassyTerrain] = new()
+            {
+                Id = MoveId.GrassyTerrain,
+                Num = 580,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Grassy Terrain",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    NonSky = true,
+                    Metronome = true,
+                },
+                // TODO: Set terrain to GrassyTerrain
+                Target = MoveTarget.All,
+                Type = MoveType.Grass,
+            },
+            [MoveId.GravApple] = new()
+            {
+                Id = MoveId.GravApple,
+                Num = 788,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Grav Apple",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable
+                    {
+                        Def = -1,
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+                // TODO: onBasePower - 1.5x if Gravity is active
+            },
+            [MoveId.Gravity] = new()
+            {
+                Id = MoveId.Gravity,
+                Num = 356,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Gravity",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    NonSky = true,
+                    Metronome = true,
+                },
+                PseudoWeather = ConditionId.Gravity,
+                Target = MoveTarget.All,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.Growl] = new()
+            {
+                Id = MoveId.Growl,
+                Num = 45,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Growl",
+                BasePp = 40,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable
+                    {
+                        Atk = -1,
+                    },
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Growth] = new()
+            {
+                Id = MoveId.Growth,
+                Num = 74,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Growth",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SelfBoost = new SparseBoostsTable
+                {
+                    Atk = 1,
+                    SpA = 1,
+                },
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+                // TODO: onModifyMove - boost becomes +2/+2 in sun
+            },
+            [MoveId.GuardSplit] = new()
+            {
+                Id = MoveId.GuardSplit,
+                Num = 470,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Guard Split",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+                // TODO: onHit - average def/spd stats between user and target
+            },
+            [MoveId.GuardSwap] = new()
+            {
+                Id = MoveId.GuardSwap,
+                Num = 385,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Guard Swap",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    BypassSub = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+                // TODO: onHit - swap def/spd boosts
+            },
+            [MoveId.Guillotine] = new()
+            {
+                Id = MoveId.Guillotine,
+                Num = 12,
+                Accuracy = 30,
+                BasePower = 0,
+                Category = MoveCategory.Physical,
+                Name = "Guillotine",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Ohko = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.GunkShot] = new()
+            {
+                Id = MoveId.GunkShot,
+                Num = 441,
+                Accuracy = 80,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Gunk Shot",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Status = ConditionId.Poison,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
+            },
+            [MoveId.Gust] = new()
+            {
+                Id = MoveId.Gust,
+                Num = 16,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Gust",
+                BasePp = 35,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Distance = true,
+                    Metronome = true,
+                    Wind = true,
+                },
+                Target = MoveTarget.Any,
+                Type = MoveType.Flying,
+            },
+            [MoveId.GyroBall] = new()
+            {
+                Id = MoveId.GyroBall,
+                Num = 360,
+                Accuracy = 100,
+                BasePower = 0,
+                BasePowerCallback = new BasePowerCallbackEventInfo((battle, pokemon, target, _) =>
+                {
+                    int targetSpeed = target.GetStat(StatIdExceptHp.Spe);
+                    int userSpeed = pokemon.GetStat(StatIdExceptHp.Spe);
+                    int power = 25 * targetSpeed / userSpeed + 1;
+                    if (power > 150) power = 150;
+                    if (battle.DisplayUi)
+                    {
+                        battle.Debug($"BP: {power}");
+                    }
+
+                    return power;
+                }),
+                Category = MoveCategory.Physical,
+                Name = "Gyro Ball",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bullet = true,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
             },
             [MoveId.HeadlongRush] = new()
             {

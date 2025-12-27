@@ -138,4 +138,7 @@ public enum ConditionId
                                                 FollowMe,
                                                 FuryCutter,
                                                 PartiallyTrappedFireSpin,
+                                                GlaiveRush,
+                                                GuardSplit,
+                                                Grudge,
                                                 }
