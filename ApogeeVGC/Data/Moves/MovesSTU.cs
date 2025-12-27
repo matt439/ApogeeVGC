@@ -2682,6 +2682,1063 @@ public partial record Moves
                 Target = MoveTarget.All,
                 Type = MoveType.Psychic,
             },
+            [MoveId.TachyonCutter] = new()
+            {
+                Id = MoveId.TachyonCutter,
+                Num = 911,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 50,
+                Category = MoveCategory.Special,
+                Name = "Tachyon Cutter",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Slicing = true,
+                },
+                MultiHit = 2,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Steel,
+            },
+            [MoveId.Tackle] = new()
+            {
+                Id = MoveId.Tackle,
+                Num = 33,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Tackle",
+                BasePp = 35,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TailGlow] = new()
+            {
+                Id = MoveId.TailGlow,
+                Num = 294,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tail Glow",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                // TODO: boosts spa +3
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Bug,
+            },
+            [MoveId.TailSlap] = new()
+            {
+                Id = MoveId.TailSlap,
+                Num = 541,
+                Accuracy = 85,
+                BasePower = 25,
+                Category = MoveCategory.Physical,
+                Name = "Tail Slap",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                MultiHit = new int[] { 2, 5 },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TailWhip] = new()
+            {
+                Id = MoveId.TailWhip,
+                Num = 39,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tail Whip",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: boosts def -1
+                Secondary = null,
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TakeDown] = new()
+            {
+                Id = MoveId.TakeDown,
+                Num = 36,
+                Accuracy = 85,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Take Down",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Recoil = new int[] { 1, 4 },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TakeHeart] = new()
+            {
+                Id = MoveId.TakeHeart,
+                Num = 850,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Take Heart",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                // TODO: onHit - boost {spa: 1, spd: 1}, cure status
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.TarShot] = new()
+            {
+                Id = MoveId.TarShot,
+                Num = 749,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tar Shot",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.TarShot,
+                // TODO: boosts spe -1
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.Taunt] = new()
+            {
+                Id = MoveId.Taunt,
+                Num = 269,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Taunt",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.Taunt,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.TearfulLook] = new()
+            {
+                Id = MoveId.TearfulLook,
+                Num = 715,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tearful Look",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: boosts atk -1, spa -1
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Teatime] = new()
+            {
+                Id = MoveId.Teatime,
+                Num = 752,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Teatime",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                // TODO: onHitField - make all Pokemon eat their berries
+                Secondary = null,
+                Target = MoveTarget.All,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TeeterDance] = new()
+            {
+                Id = MoveId.TeeterDance,
+                Num = 298,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Teeter Dance",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Dance = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.Confusion,
+                Secondary = null,
+                Target = MoveTarget.AllAdjacent,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Teleport] = new()
+            {
+                Id = MoveId.Teleport,
+                Num = 100,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Teleport",
+                BasePp = 20,
+                Priority = -6,
+                Flags = new MoveFlags
+                {
+                    Metronome = true,
+                },
+                // TODO: onTry - check if can switch
+                SelfSwitch = MoveSelfSwitch.FromSelfSwitch(),
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.TemperFlare] = new()
+            {
+                Id = MoveId.TemperFlare,
+                Num = 915,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Temper Flare",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: basePowerCallback - doubles if previous move failed
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.TeraBlast] = new()
+            {
+                Id = MoveId.TeraBlast,
+                Num = 851,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Tera Blast",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    MustPressure = true,
+                },
+                // TODO: basePowerCallback - 100 if Stellar Terastallized
+                // TODO: onModifyType - changes type based on Tera type
+                // TODO: onModifyMove - changes category if atk > spa when Terastallized, self boosts if Stellar
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TerrainPulse] = new()
+            {
+                Id = MoveId.TerrainPulse,
+                Num = 805,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Special,
+                Name = "Terrain Pulse",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Pulse = true,
+                },
+                // TODO: onModifyType - changes type based on terrain
+                // TODO: onModifyMove - doubles power on terrain
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Thief] = new()
+            {
+                Id = MoveId.Thief,
+                Num = 168,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Physical,
+                Name = "Thief",
+                BasePp = 25,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    FailMeFirst = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                },
+                // TODO: onAfterHit - steal target's item
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.Thrash] = new()
+            {
+                Id = MoveId.Thrash,
+                Num = 37,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Thrash",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    FailInstruct = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.LockedMove,
+                },
+                Secondary = null,
+                Target = MoveTarget.RandomNormal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.ThroatChop] = new()
+            {
+                Id = MoveId.ThroatChop,
+                Num = 675,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Throat Chop",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    VolatileStatus = ConditionId.ThroatChop,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.Thunder] = new()
+            {
+                Id = MoveId.Thunder,
+                Num = 87,
+                Accuracy = 70,
+                BasePower = 110,
+                Category = MoveCategory.Special,
+                Name = "Thunder",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: onModifyMove - 100% accuracy in rain, 50% in sun
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ThunderBolt] = new()
+            {
+                Id = MoveId.ThunderBolt,
+                Num = 85,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Thunderbolt",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ThunderCage] = new()
+            {
+                Id = MoveId.ThunderCage,
+                Num = 819,
+                Accuracy = 90,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Thunder Cage",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
+                VolatileStatus = ConditionId.PartiallyTrapped,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.Thunderclap] = new()
+            {
+                Id = MoveId.Thunderclap,
+                Num = 909,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Special,
+                Name = "Thunderclap",
+                BasePp = 5,
+                Priority = 1,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: onTry - fails if target isn't using a damaging move
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ThunderFang] = new()
+            {
+                Id = MoveId.ThunderFang,
+                Num = 422,
+                Accuracy = 95,
+                BasePower = 65,
+                Category = MoveCategory.Physical,
+                Name = "Thunder Fang",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bite = true,
+                },
+                Secondaries = new List<SecondaryEffect>
+                {
+                    new() { Chance = 10, Status = ConditionId.Paralysis },
+                    new() { Chance = 10, VolatileStatus = ConditionId.Flinch },
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ThunderousKick] = new()
+            {
+                Id = MoveId.ThunderousKick,
+                Num = 823,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Thunderous Kick",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.ThunderPunch] = new()
+            {
+                Id = MoveId.ThunderPunch,
+                Num = 9,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Thunder Punch",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Punch = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.ThunderShock] = new()
+            {
+                Id = MoveId.ThunderShock,
+                Num = 84,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Thunder Shock",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.Tickle] = new()
+            {
+                Id = MoveId.Tickle,
+                Num = 321,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tickle",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                // TODO: boosts atk -1, def -1
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TidyUp] = new()
+            {
+                Id = MoveId.TidyUp,
+                Num = 882,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Tidy Up",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags(),
+                // TODO: onHit - remove hazards and substitutes, boost atk +1, spe +1
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TopsyTurvy] = new()
+            {
+                Id = MoveId.TopsyTurvy,
+                Num = 576,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Topsy-Turvy",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                // TODO: onHit - invert all stat changes
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.TorchSong] = new()
+            {
+                Id = MoveId.TorchSong,
+                Num = 871,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Torch Song",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Self = new SecondaryEffect
+                    {
+                        Boosts = new SparseBoostsTable { SpA = 1 },
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.Torment] = new()
+            {
+                Id = MoveId.Torment,
+                Num = 259,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Torment",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.Torment,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.Toxic] = new()
+            {
+                Id = MoveId.Toxic,
+                Num = 92,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Toxic",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Status = ConditionId.Toxic,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
+            },
+            [MoveId.ToxicSpikes] = new()
+            {
+                Id = MoveId.ToxicSpikes,
+                Num = 390,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Toxic Spikes",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Reflectable = true,
+                    NonSky = true,
+                    Metronome = true,
+                    MustPressure = true,
+                },
+                SideCondition = ConditionId.ToxicSpikes,
+                Condition = _library.Conditions[ConditionId.ToxicSpikes],
+                Secondary = null,
+                Target = MoveTarget.FoeSide,
+                Type = MoveType.Poison,
+            },
+            [MoveId.ToxicThread] = new()
+            {
+                Id = MoveId.ToxicThread,
+                Num = 672,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Toxic Thread",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Status = ConditionId.Poison,
+                // TODO: boosts spe -1
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Poison,
+            },
+            [MoveId.TrailBlaze] = new()
+            {
+                Id = MoveId.TrailBlaze,
+                Num = 885,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Physical,
+                Name = "Trailblaze",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Self = new SecondaryEffect
+                    {
+                        Boosts = new SparseBoostsTable { Spe = 1 },
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.Transform] = new()
+            {
+                Id = MoveId.Transform,
+                Num = 144,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Transform",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    AllyAnim = true,
+                    FailEncore = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                    FailMimic = true,
+                    FailInstruct = true,
+                },
+                // TODO: onHit - transform into target
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.TriAttack] = new()
+            {
+                Id = MoveId.TriAttack,
+                Num = 161,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Tri Attack",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: secondary - 20% chance to randomly inflict burn/paralysis/freeze
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.Trick] = new()
+            {
+                Id = MoveId.Trick,
+                Num = 271,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Trick",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    AllyAnim = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                },
+                // TODO: onTryImmunity - check sticky hold
+                // TODO: onHit - swap items with target
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.TripleArrows] = new()
+            {
+                Id = MoveId.TripleArrows,
+                Num = 843,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Triple Arrows",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                CritRatio = 2,
+                Secondaries = new List<SecondaryEffect>
+                {
+                    new() { Chance = 50, Boosts = new SparseBoostsTable { Def = -1 } },
+                    new() { Chance = 30, VolatileStatus = ConditionId.Flinch },
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.TripleAxel] = new()
+            {
+                Id = MoveId.TripleAxel,
+                Num = 813,
+                Accuracy = 90,
+                BasePower = 20,
+                Category = MoveCategory.Physical,
+                Name = "Triple Axel",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: basePowerCallback - 20 * move.hit
+                MultiHit = 3,
+                Multiaccuracy = true,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ice,
+            },
+            [MoveId.TripleDive] = new()
+            {
+                Id = MoveId.TripleDive,
+                Num = 865,
+                Accuracy = 95,
+                BasePower = 30,
+                Category = MoveCategory.Physical,
+                Name = "Triple Dive",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                MultiHit = 3,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
+            [MoveId.TripleKick] = new()
+            {
+                Id = MoveId.TripleKick,
+                Num = 167,
+                Accuracy = 90,
+                BasePower = 10,
+                Category = MoveCategory.Physical,
+                Name = "Triple Kick",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: basePowerCallback - 10 * move.hit
+                MultiHit = 3,
+                Multiaccuracy = true,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.TropKick] = new()
+            {
+                Id = MoveId.TropKick,
+                Num = 688,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Trop Kick",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.TwinBeam] = new()
+            {
+                Id = MoveId.TwinBeam,
+                Num = 888,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Twin Beam",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
+                MultiHit = 2,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.Twister] = new()
+            {
+                Id = MoveId.Twister,
+                Num = 239,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Twister",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Wind = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 20,
+                    VolatileStatus = ConditionId.Flinch,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Dragon,
+            },
 
             // ===== U MOVES =====
         };

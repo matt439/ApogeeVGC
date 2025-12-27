@@ -163,4 +163,6 @@ public enum ConditionId
                                                 StockpileStorage,
                                                 StickyWeb,
                                                 SyrupBomb,
+                                                TarShot,
+                                                ThroatChop,
                                                 }

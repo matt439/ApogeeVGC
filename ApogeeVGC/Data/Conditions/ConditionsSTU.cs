@@ -471,6 +471,58 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.TarShot] = new()
+            {
+                Id = ConditionId.TarShot,
+                Name = "Tar Shot",
+                EffectType = EffectType.Condition,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    // TODO: check if terastallized, return false if so
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "Tar Shot");
+                    }
+                    return new VoidReturn();
+                }),
+                // TODO: onEffectiveness - increase Fire-type effectiveness
+            },
+            [ConditionId.ThroatChop] = new()
+            {
+                Id = ConditionId.ThroatChop,
+                Name = "Throat Chop",
+                EffectType = EffectType.Condition,
+                Duration = 2,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", target, "Throat Chop", "[silent]");
+                    }
+                    return new VoidReturn();
+                }),
+                OnDisableMove = new OnDisableMoveEventInfo((battle, pokemon) =>
+                {
+                    // TODO: disable sound moves
+                    foreach (var moveSlot in pokemon.MoveSlots)
+                    {
+                        var move = _library.Moves.MovesData[moveSlot.Id];
+                        if (move.Flags.Sound)
+                        {
+                            pokemon.DisableMove(moveSlot.Id);
+                        }
+                    }
+                }),
+                // TODO: onBeforeMove - prevent sound moves
+                //OnResidualOrder = 22,
+                OnEnd = new OnEndEventInfo((battle, target) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-end", target, "Throat Chop", "[silent]");
+                    }
+                }),
+            },
         };
     }
 }
