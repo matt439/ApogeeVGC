@@ -816,7 +816,30 @@ public partial record SpeciesData
                 WeightKg = 28,
                 Color = "Purple",
             },
-            // 877 - Morpeko (already exists in another file, adding Hangry forme)
+            // 877 - Morpeko
+            [SpecieId.Morpeko] = new()
+            {
+                Id = SpecieId.Morpeko,
+                Num = 877,
+                Name = "Morpeko",
+                Types = [PokemonType.Electric, PokemonType.Dark],
+                BaseStats = new StatsTable
+                {
+                    Hp = 58,
+                    Atk = 95,
+                    Def = 58,
+                    SpA = 70,
+                    SpD = 58,
+                    Spe = 97,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.HungerSwitch,
+                },
+                HeightM = 0.3,
+                WeightKg = 3,
+                Color = "Yellow",
+            },
             [SpecieId.MorpekoHangry] = new()
             {
                 Id = SpecieId.MorpekoHangry,
@@ -1105,11 +1128,37 @@ public partial record SpeciesData
                 Color = "Green",
             },
             // 888 - Zacian
+            [SpecieId.Zacian] = new()
+            {
+                Id = SpecieId.Zacian,
+                Num = 888,
+                Name = "Zacian",
+                Types = [PokemonType.Fairy],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 92,
+                    Atk = 120,
+                    Def = 115,
+                    SpA = 80,
+                    SpD = 115,
+                    Spe = 138,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.IntrepidSword,
+                },
+                HeightM = 2.8,
+                WeightKg = 110,
+                Color = "Blue",
+            },
             [SpecieId.ZacianHero] = new()
             {
                 Id = SpecieId.ZacianHero,
                 Num = 888,
-                Name = "Zacian",
+                Name = "Zacian-Hero",
+                BaseSpecies = SpecieId.Zacian,
+                Forme = FormeId.Hero,
                 Types = [PokemonType.Fairy],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable
@@ -1156,11 +1205,37 @@ public partial record SpeciesData
                 Color = "Blue",
             },
             // 889 - Zamazenta
+            [SpecieId.Zamazenta] = new()
+            {
+                Id = SpecieId.Zamazenta,
+                Num = 889,
+                Name = "Zamazenta",
+                Types = [PokemonType.Fighting],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 92,
+                    Atk = 120,
+                    Def = 115,
+                    SpA = 80,
+                    SpD = 115,
+                    Spe = 138,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.DauntlessShield,
+                },
+                HeightM = 2.9,
+                WeightKg = 210,
+                Color = "Red",
+            },
             [SpecieId.ZamazentaHero] = new()
             {
                 Id = SpecieId.ZamazentaHero,
                 Num = 889,
-                Name = "Zamazenta",
+                Name = "Zamazenta-Hero",
+                BaseSpecies = SpecieId.Zamazenta,
+                Forme = FormeId.Hero,
                 Types = [PokemonType.Fighting],
                 Gender = GenderId.N,
                 BaseStats = new StatsTable

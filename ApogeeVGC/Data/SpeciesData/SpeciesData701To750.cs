@@ -729,6 +729,32 @@ public partial record SpeciesData
                 WeightKg = 215.0,
                 Color = "Blue",
             },
+            [SpecieId.XerneasActive] = new()
+            {
+                Id = SpecieId.XerneasActive,
+                Num = 716,
+                Name = "Xerneas-Active",
+                BaseSpecies = SpecieId.Xerneas,
+                Forme = FormeId.Active,
+                Types = [PokemonType.Fairy],
+                Gender = GenderId.N,
+                BaseStats = new StatsTable
+                {
+                    Hp = 126,
+                    Atk = 131,
+                    Def = 95,
+                    SpA = 131,
+                    SpD = 98,
+                    Spe = 99,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.FairyAura,
+                },
+                HeightM = 3.0,
+                WeightKg = 215.0,
+                Color = "Blue",
+            },
             [SpecieId.Yveltal] = new()
             {
                 Id = SpecieId.Yveltal,
@@ -1738,6 +1764,32 @@ public partial record SpeciesData
                     Slot0 = AbilityId.KeenEye,
                     Slot1 = AbilityId.VitalSpirit,
                     Hidden = AbilityId.Steadfast,
+                },
+                HeightM = 0.5,
+                WeightKg = 9.2,
+                Color = "Brown",
+            },
+            [SpecieId.RockruffDusk] = new()
+            {
+                Id = SpecieId.RockruffDusk,
+                Num = 744,
+                Name = "Rockruff-Dusk",
+                BaseSpecies = SpecieId.Rockruff,
+                Forme = FormeId.Dusk,
+                Types = [PokemonType.Rock],
+                Gender = GenderId.Empty,
+                BaseStats = new StatsTable
+                {
+                    Hp = 45,
+                    Atk = 65,
+                    Def = 40,
+                    SpA = 30,
+                    SpD = 40,
+                    Spe = 60,
+                },
+                Abilities = new SpeciesAbility
+                {
+                    Slot0 = AbilityId.OwnTempo,
                 },
                 HeightM = 0.5,
                 WeightKg = 9.2,
