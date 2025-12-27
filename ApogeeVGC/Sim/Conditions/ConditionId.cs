@@ -57,6 +57,7 @@ public enum ConditionId
     StruggleRecoil,
     PartiallyTrapped,
     Powder,
+    RagePowder,
     Rest,
     Wish,
     TwoTurnMove,

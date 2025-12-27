@@ -1309,7 +1309,98 @@ public partial record Moves
                 Type = MoveType.Bug,
             },
 
-            // Already existing R moves from original file
+            // ===== R MOVES =====
+
+            [MoveId.RageFist] = new()
+            {
+                Id = MoveId.RageFist,
+                Num = 889,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Physical,
+                Name = "Rage Fist",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Punch = true,
+                },
+                // TODO: basePowerCallback - 50 + 50 * timesAttacked, max 350
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ghost,
+            },
+            [MoveId.RagePowder] = new()
+            {
+                Id = MoveId.RagePowder,
+                Num = 476,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Rage Powder",
+                BasePp = 20,
+                Priority = 2,
+                Flags = new MoveFlags
+                {
+                    NoAssist = true,
+                    FailCopycat = true,
+                    Powder = true,
+                },
+                VolatileStatus = ConditionId.RagePowder,
+                Condition = _library.Conditions[ConditionId.RagePowder],
+                // TODO: onTry - fail if not in doubles
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Bug,
+            },
+            [MoveId.RagingBull] = new()
+            {
+                Id = MoveId.RagingBull,
+                Num = 873,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "Raging Bull",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                },
+                // TODO: onTryHit - remove screens before hitting
+                // TODO: onModifyType - change type based on Tauros form
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RagingFury] = new()
+            {
+                Id = MoveId.RagingFury,
+                Num = 833,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Raging Fury",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.LockedMove,
+                },
+                Secondary = null,
+                Target = MoveTarget.RandomNormal,
+                Type = MoveType.Fire,
+            },
             [MoveId.RainDance] = new()
             {
                 Id = MoveId.RainDance,
@@ -1349,6 +1440,426 @@ public partial record Moves
                 Secondary = null,
                 Target = MoveTarget.AllySide,
                 Type = MoveType.Psychic,
+            },
+            [MoveId.RapidSpin] = new()
+            {
+                Id = MoveId.RapidSpin,
+                Num = 229,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Physical,
+                Name = "Rapid Spin",
+                BasePp = 40,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: onAfterHit - remove hazards and volatile statuses
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Self = new SecondaryEffect
+                    {
+                        Boosts = new SparseBoostsTable { Spe = 1 },
+                    },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RazorLeaf] = new()
+            {
+                Id = MoveId.RazorLeaf,
+                Num = 75,
+                Accuracy = 95,
+                BasePower = 55,
+                Category = MoveCategory.Physical,
+                Name = "Razor Leaf",
+                BasePp = 25,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Slicing = true,
+                },
+                CritRatio = 2,
+                Secondary = null,
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Grass,
+            },
+            [MoveId.RazorShell] = new()
+            {
+                Id = MoveId.RazorShell,
+                Num = 534,
+                Accuracy = 95,
+                BasePower = 75,
+                Category = MoveCategory.Physical,
+                Name = "Razor Shell",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Slicing = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 50,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
+            [MoveId.Recover] = new()
+            {
+                Id = MoveId.Recover,
+                Num = 105,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Recover",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Heal = true,
+                    Metronome = true,
+                },
+                Heal = [1, 2],
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+            },
+            [MoveId.ReflectType] = new()
+            {
+                Id = MoveId.ReflectType,
+                Num = 513,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Reflect Type",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    BypassSub = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                // TODO: onHit - copy target's types
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RelicSong] = new()
+            {
+                Id = MoveId.RelicSong,
+                Num = 547,
+                Accuracy = 100,
+                BasePower = 75,
+                Category = MoveCategory.Special,
+                Name = "Relic Song",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Sleep,
+                },
+                // TODO: onHit - change Meloetta forme
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RevelationDance] = new()
+            {
+                Id = MoveId.RevelationDance,
+                Num = 686,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Revelation Dance",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Dance = true,
+                    Metronome = true,
+                },
+                // TODO: onModifyType - change to user's primary type
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RisingVoltage] = new()
+            {
+                Id = MoveId.RisingVoltage,
+                Num = 804,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Special,
+                Name = "Rising Voltage",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: basePowerCallback - double power on grounded targets in Electric Terrain
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.Roar] = new()
+            {
+                Id = MoveId.Roar,
+                Num = 46,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Roar",
+                BasePp = 20,
+                Priority = -6,
+                Flags = new MoveFlags
+                {
+                    Reflectable = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                    NoAssist = true,
+                    FailCopycat = true,
+                },
+                ForceSwitch = true,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.RoarOfTime] = new()
+            {
+                Id = MoveId.RoarOfTime,
+                Num = 459,
+                Accuracy = 90,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Roar of Time",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Recharge = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.MustRecharge,
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dragon,
+            },
+            [MoveId.RockBlast] = new()
+            {
+                Id = MoveId.RockBlast,
+                Num = 350,
+                Accuracy = 90,
+                BasePower = 25,
+                Category = MoveCategory.Physical,
+                Name = "Rock Blast",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bullet = true,
+                },
+                MultiHit = new[] { 2, 5 },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.RockPolish] = new()
+            {
+                Id = MoveId.RockPolish,
+                Num = 397,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Rock Polish",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SelfBoost = new SparseBoostsTable { Spe = 2 },
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Rock,
+            },
+            [MoveId.RockSmash] = new()
+            {
+                Id = MoveId.RockSmash,
+                Num = 249,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Rock Smash",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 50,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.RockThrow] = new()
+            {
+                Id = MoveId.RockThrow,
+                Num = 88,
+                Accuracy = 90,
+                BasePower = 50,
+                Category = MoveCategory.Physical,
+                Name = "Rock Throw",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.RockWrecker] = new()
+            {
+                Id = MoveId.RockWrecker,
+                Num = 439,
+                Accuracy = 90,
+                BasePower = 150,
+                Category = MoveCategory.Physical,
+                Name = "Rock Wrecker",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Recharge = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Bullet = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.MustRecharge,
+                },
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.RolePlay] = new()
+            {
+                Id = MoveId.RolePlay,
+                Num = 272,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Role Play",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    BypassSub = true,
+                    AllyAnim = true,
+                    Metronome = true,
+                },
+                // TODO: onTryHit - fail if same ability or certain abilities
+                // TODO: onHit - copy target's ability
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.Rollout] = new()
+            {
+                Id = MoveId.Rollout,
+                Num = 205,
+                Accuracy = 90,
+                BasePower = 30,
+                Category = MoveCategory.Physical,
+                Name = "Rollout",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    FailInstruct = true,
+                    NoParentalBond = true,
+                },
+                // TODO: basePowerCallback - doubles each turn for 5 turns, 2x if Defense Curl used
+                Condition = _library.Conditions[ConditionId.Rollout],
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Rock,
+            },
+            [MoveId.Ruination] = new()
+            {
+                Id = MoveId.Ruination,
+                Num = 877,
+                Accuracy = 90,
+                BasePower = 0,
+                Category = MoveCategory.Special,
+                Name = "Ruination",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                },
+                // TODO: damageCallback - deal half of target's current HP
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
             },
         };
     }
