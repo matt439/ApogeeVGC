@@ -2806,7 +2806,7 @@ public partial record Moves
                     Mirror = true,
                     Metronome = true,
                 },
-                Recoil = new int[] { 1, 4 },
+                Recoil = (1, 4),
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
@@ -2955,7 +2955,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 // TODO: onTry - check if can switch
-                SelfSwitch = MoveSelfSwitch.FromSelfSwitch(),
+                SelfSwitch = true,
                 Secondary = null,
                 Target = MoveTarget.Self,
                 Type = MoveType.Psychic,
@@ -3212,7 +3212,7 @@ public partial record Moves
                     Metronome = true,
                     Bite = true,
                 },
-                Secondaries = new List<SecondaryEffect>
+                Secondaries = new SecondaryEffect[]
                 {
                     new() { Chance = 10, Status = ConditionId.Paralysis },
                     new() { Chance = 10, VolatileStatus = ConditionId.Flinch },
@@ -3590,7 +3590,7 @@ public partial record Moves
                     Metronome = true,
                 },
                 CritRatio = 2,
-                Secondaries = new List<SecondaryEffect>
+                Secondaries = new SecondaryEffect[]
                 {
                     new() { Chance = 50, Boosts = new SparseBoostsTable { Def = -1 } },
                     new() { Chance = 30, VolatileStatus = ConditionId.Flinch },
@@ -3618,7 +3618,7 @@ public partial record Moves
                 },
                 // TODO: basePowerCallback - 20 * move.hit
                 MultiHit = 3,
-                Multiaccuracy = true,
+                MultiAccuracy = true,
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Ice,
@@ -3664,7 +3664,7 @@ public partial record Moves
                 },
                 // TODO: basePowerCallback - 10 * move.hit
                 MultiHit = 3,
-                Multiaccuracy = true,
+                MultiAccuracy = true,
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Fighting,

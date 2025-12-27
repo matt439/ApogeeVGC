@@ -506,8 +506,8 @@ public partial record Conditions
                     // TODO: disable sound moves
                     foreach (var moveSlot in pokemon.MoveSlots)
                     {
-                        var move = _library.Moves.MovesData[moveSlot.Id];
-                        if (move.Flags.Sound)
+                        var move = _library.Moves[moveSlot.Id];
+                        if (move.Flags.Sound == true)
                         {
                             pokemon.DisableMove(moveSlot.Id);
                         }
