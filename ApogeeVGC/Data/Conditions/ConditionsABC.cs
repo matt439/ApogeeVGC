@@ -420,6 +420,55 @@ public partial record Conditions
                     },
                     1),
             },
+            [ConditionId.BanefulBunker] = new()
+            {
+                Id = ConditionId.BanefulBunker,
+                Name = "Baneful Bunker",
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.Add("-singleturn", target, "move: Protect");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: Implement full BanefulBunker logic - needs OnTryHit handler with protect logic and contact poison
+            },
+            [ConditionId.BeakBlast] = new()
+            {
+                Id = ConditionId.BeakBlast,
+                Name = "Beak Blast",
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Add("-singleturn", pokemon, "move: Beak Blast");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: Implement contact checking to burn attackers
+            },
+            [ConditionId.Bide] = new()
+            {
+                Id = ConditionId.Bide,
+                Name = "Bide",
+                Duration = 3,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    battle.Add("-start", pokemon, "move: Bide");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: Implement Bide full logic - requires OnLockMove, OnDamage tracking, OnBeforeMove
+                // This is complex logic that would need multiple event handlers and state tracking
+            },
+            [ConditionId.BurningBulwark] = new()
+            {
+                Id = ConditionId.BurningBulwark,
+                Name = "Burning Bulwark",
+                Duration = 1,
+                OnStart = new OnStartEventInfo((battle, target, _, _) =>
+                {
+                    battle.Add("-singleturn", target, "move: Protect");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: Implement full BurningBulwark logic - needs OnTryHit handler with protect logic and contact burn
+            },
         };
     }
 }
