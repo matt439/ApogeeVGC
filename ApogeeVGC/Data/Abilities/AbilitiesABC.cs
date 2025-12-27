@@ -630,8 +630,9 @@ public partial record Abilities
                 OnDamage = new OnDamageEventInfo((battle, damage, target, source, effect) =>
                 {
                     if (effect.EffectType == EffectType.Move &&
-                        !effect.Multihit &&
-                        !(effect.HasSheerForce && source != null && source.HasAbility(AbilityId.SheerForce)))
+                        effect is Move move &&
+                        move.MultiHit == null &&
+                        !(move.HasSheerForce == true && source != null && source.HasAbility(AbilityId.SheerForce)))
                     {
                         battle.EffectState.CheckedBerserk = false;
                     }
@@ -639,22 +640,22 @@ public partial record Abilities
                     {
                         battle.EffectState.CheckedBerserk = true;
                     }
-                    return new IntVoidUnion(damage);
+                    return damage;
                 }),
-                OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, pokemon, item) =>
+                OnTryEatItem = new OnTryEatItemEventInfo(OnTryEatItem.FromFunc((battle, item, pokemon) =>
                 {
                     var healingItems = new[]
                     {
                         ItemId.AguavBerry, ItemId.EnigmaBerry, ItemId.FigyBerry, ItemId.IapapaBerry,
                         ItemId.MagoBerry, ItemId.SitrusBerry, ItemId.WikiBerry, ItemId.OranBerry, ItemId.BerryJuice
                     };
-                    if (healingItems.Contains(item.Id))
-                    {
-                        return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? true);
-                    }
-                    return BoolVoidUnion.FromBool(true);
-                })),
-                OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
+                        if (healingItems.Contains(item.Id))
+                        {
+                            return BoolVoidUnion.FromBool(battle.EffectState.CheckedBerserk ?? true);
+                        }
+                        return BoolVoidUnion.FromBool(true);
+                    })),
+                    OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
                 {
                     battle.EffectState.CheckedBerserk = true;
                     if (source == null || source == target || target.Hp == 0 || move.TotalDamage == null) return;
@@ -662,7 +663,7 @@ public partial record Abilities
                     var lastAttackedBy = target.GetLastAttackedBy();
                     if (lastAttackedBy == null) return;
 
-                    int damage = move.Multihit && !move.SmartTarget ? move.TotalDamage.Value : lastAttackedBy.Damage;
+                    int damage = move.MultiHit != null && move.SmartTarget != true && move.TotalDamage is IntIntFalseUnion totalDmg ? totalDmg.Value : lastAttackedBy.Damage;
                     if (target.Hp <= target.MaxHp / 2 && target.Hp + damage > target.MaxHp / 2)
                     {
                         battle.Boost(new SparseBoostsTable { SpA = 1 }, target, target);

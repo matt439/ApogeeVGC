@@ -368,7 +368,7 @@ public partial record Moves
                 BasePp = 20,
                 Priority = 1,
                 Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
-                MultiHit = (2, 5),
+                MultiHit = new int[] { 2, 5 },
                 Secondary = null,
                 Target = MoveTarget.Normal,
                 Type = MoveType.Water,

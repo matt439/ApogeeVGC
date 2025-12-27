@@ -693,7 +693,7 @@ public partial record Moves
                 BasePp = 40,
                 Priority = 0,
                 Flags = new MoveFlags { Metronome = true },
-                SelfSwitch = "batonpass",
+                SelfSwitch = MoveSelfSwitch.FromCopyVolatile(),
                 Target = MoveTarget.Self,
                 Type = MoveType.Normal,
             },
