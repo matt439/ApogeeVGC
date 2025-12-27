@@ -2,6 +2,7 @@ using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events.Handlers.ConditionSpecific;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
+using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.Utils.Unions;
 
 namespace ApogeeVGC.Data.Conditions;
@@ -52,7 +53,21 @@ public partial record Conditions
             // No conditions needed for V moves
 
             // ===== W CONDITIONS =====
-            // No conditions needed for W moves
+
+            [ConditionId.WideGuard] = new()
+            {
+                Id = ConditionId.WideGuard,
+                Name = "Wide Guard",
+                EffectType = EffectType.Condition,
+                Duration = 1,
+                AssociatedMove = MoveId.WideGuard,
+                // TODO: OnSideStart - display wide guard message
+                // TODO: OnTryHitPriority = 4
+                // TODO: OnTryHit - block spread moves (allAdjacent, allAdjacentFoes)
+            },
+
+            // ===== X CONDITIONS =====
+            // No conditions needed for X moves
         };
     }
 }
