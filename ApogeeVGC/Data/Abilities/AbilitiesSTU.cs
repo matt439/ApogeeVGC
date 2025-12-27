@@ -1211,6 +1211,33 @@ public partial record Abilities
                     return spe;
                 }),
             },
+            [AbilityId.SwordOfRuin] = new()
+            {
+                Id = AbilityId.SwordOfRuin,
+                Name = "Sword of Ruin",
+                Num = 285,
+                Rating = 4.5,
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    if (battle.SuppressingAbility(pokemon)) return;
+                    battle.Add("-ability", pokemon, "Sword of Ruin");
+                }),
+                OnAnyModifyDef = new OnAnyModifyDefEventInfo((battle, def, target, _, move) =>
+                {
+                    if (battle.EffectState.Target is not PokemonEffectStateTarget
+                        {
+                            Pokemon: var abilityHolder
+                        })
+                        return def;
+                    if (target.HasAbility(AbilityId.SwordOfRuin)) return def;
+                    if (move.RuinedDef?.HasAbility(AbilityId.SwordOfRuin) != true)
+                        move.RuinedDef = abilityHolder;
+                    if (move.RuinedDef != abilityHolder) return def;
+                    battle.Debug("Sword of Ruin Def drop");
+                    battle.ChainModify(0.75);
+                    return battle.FinalModify(def);
+                }),
+            },
             [AbilityId.Symbiosis] = new()
             {
                 Id = AbilityId.Symbiosis,
@@ -1255,33 +1282,6 @@ public partial record Abilities
                         // Hack to make status-prevention abilities think Synchronize is a status move
                         source.TrySetStatus(status.Id, target);
                     }),
-            },
-            [AbilityId.SwordOfRuin] = new()
-            {
-                Id = AbilityId.SwordOfRuin,
-                Name = "Sword of Ruin",
-                Num = 285,
-                Rating = 4.5,
-                OnStart = new OnStartEventInfo((battle, pokemon) =>
-                {
-                    if (battle.SuppressingAbility(pokemon)) return;
-                    battle.Add("-ability", pokemon, "Sword of Ruin");
-                }),
-                OnAnyModifyDef = new OnAnyModifyDefEventInfo((battle, def, target, _, move) =>
-                {
-                    if (battle.EffectState.Target is not PokemonEffectStateTarget
-                        {
-                            Pokemon: var abilityHolder
-                        })
-                        return def;
-                    if (target.HasAbility(AbilityId.SwordOfRuin)) return def;
-                    if (move.RuinedDef?.HasAbility(AbilityId.SwordOfRuin) != true)
-                        move.RuinedDef = abilityHolder;
-                    if (move.RuinedDef != abilityHolder) return def;
-                    battle.Debug("Sword of Ruin Def drop");
-                    battle.ChainModify(0.75);
-                    return battle.FinalModify(def);
-                }),
             },
 
             // ==================== 'T' Abilities ====================

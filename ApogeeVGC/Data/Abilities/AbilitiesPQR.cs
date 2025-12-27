@@ -311,6 +311,35 @@ public partial record Abilities
                         }
                     }),
             },
+            [AbilityId.PowerConstruct] = new()
+            {
+                Id = AbilityId.PowerConstruct,
+                Name = "Power Construct",
+                Num = 211,
+                Rating = 5.0,
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    CantSuppress = true,
+                },
+                // OnResidualOrder = 29
+                OnResidual = new OnResidualEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (pokemon.BaseSpecies.BaseSpecies != SpecieId.Zygarde ||
+                        pokemon.Transformed ||
+                        pokemon.Hp == 0) return;
+                    if (pokemon.Species.Id == SpecieId.ZygardeComplete ||
+                        pokemon.Hp > pokemon.MaxHp / 2) return;
+
+                    battle.Add("-activate", pokemon, "ability: Power Construct");
+                    pokemon.FormeChange(SpecieId.ZygardeComplete, battle.Effect, true);
+                    // Note: canMegaEvo and formeRegression handled differently in C#
+                }, order: 29),
+            },
             [AbilityId.PowerOfAlchemy] = new()
             {
                 Id = AbilityId.PowerOfAlchemy,

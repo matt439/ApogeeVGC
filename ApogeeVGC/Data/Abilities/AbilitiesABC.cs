@@ -413,21 +413,67 @@ public partial record Abilities
                     CantSuppress = true,
                 },
             },
-            [AbilityId.Bulletproof] = new()
+            [AbilityId.AsOneSpectrier] = new()
             {
-                Id = AbilityId.Bulletproof,
-                Name = "Bulletproof",
-                Num = 171,
-                Rating = 3.0,
-                Flags = new AbilityFlags { Breakable = true },
-                OnTryHit = new OnTryHitEventInfo((battle, pokemon, _, move) =>
-                {
-                    if (move.Flags.Bullet == true)
+                Id = AbilityId.AsOneSpectrier,
+                Name = "As One (Spectrier)",
+                Num = 267,
+                Rating = 3.5,
+                //OnSwitchInPriority = 1,
+                OnSwitchIn = new OnSwitchInEventInfo((_, _) => { },
+                    1
+                ),
+                OnStart = new OnStartEventInfo(
+                    (battle, pokemon) =>
                     {
-                        battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
-                        return null;
-                    }
+                        if (battle.EffectState.Unnerved is true) return;
+                        if (battle.DisplayUi)
+                        {
+                            battle.Add("-ability", pokemon, "As One");
+                            battle.Add("-ability", pokemon, "Unnerve");
+                        }
 
+                        battle.EffectState.Unnerved = true;
+                    },
+                    1
+                ),
+                OnEnd = new OnEndEventInfo((battle, _) => { battle.EffectState.Unnerved = false; }),
+                OnFoeTryEatItem = new OnFoeTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, _, _) =>
+                        BoolVoidUnion.FromBool(!(battle.EffectState.Unnerved ?? false)))),
+                OnSourceAfterFaint =
+                    new OnSourceAfterFaintEventInfo((battle, length, _, source, effect) =>
+                    {
+                        if (effect is null || effect.EffectType != EffectType.Move) return;
+
+                        battle.Boost(new SparseBoostsTable { SpA = length }, source, source,
+                            _library.Abilities[AbilityId.GrimNeigh]);
+                    }),
+                Flags = new AbilityFlags
+                {
+                    FailRolePlay = true,
+                    NoReceiver = true,
+                    NoEntrain = true,
+                    NoTrace = true,
+                    FailSkillSwap = true,
+                    CantSuppress = true,
+                },
+            },
+            [AbilityId.AuraBreak] = new()
+            {
+                Id = AbilityId.AuraBreak,
+                Name = "Aura Break",
+                Num = 188,
+                Rating = 1.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnStart = new OnStartEventInfo((battle, pokemon) =>
+                {
+                    battle.Add("-ability", pokemon, "Aura Break");
+                }),
+                OnAnyTryPrimaryHit = new OnAnyTryPrimaryHitEventInfo((_, target, source, move) =>
+                {
+                    if (target == source || move.Category == MoveCategory.Status) return new VoidReturn();
+                    move.HasAuraBreak = true;
                     return new VoidReturn();
                 }),
             },
@@ -627,6 +673,35 @@ public partial record Abilities
 
                     return spa;
                 }, 5),
+            },
+            [AbilityId.Bulletproof] = new()
+            {
+                Id = AbilityId.Bulletproof,
+                Name = "Bulletproof",
+                Num = 171,
+                Rating = 3.0,
+                Flags = new AbilityFlags { Breakable = true },
+                OnTryHit = new OnTryHitEventInfo((battle, pokemon, _, move) =>
+                {
+                    if (move.Flags.Bullet == true)
+                    {
+                        battle.Add("-immune", pokemon, "[from] ability: Bulletproof");
+                        return null;
+                    }
+
+                    return new VoidReturn();
+                }),
+            },
+            [AbilityId.CheekPouch] = new()
+            {
+                Id = AbilityId.CheekPouch,
+                Name = "Cheek Pouch",
+                Num = 167,
+                Rating = 2.0,
+                OnEatItem = new OnEatItemEventInfo((battle, _, pokemon) =>
+                {
+                    battle.Heal(pokemon.BaseMaxHp / 3, pokemon);
+                }),
             },
             [AbilityId.ChillingNeigh] = new()
             {
@@ -1087,17 +1162,6 @@ public partial record Abilities
                             }
                         }
                     }
-                }),
-            },
-            [AbilityId.CheekPouch] = new()
-            {
-                Id = AbilityId.CheekPouch,
-                Name = "Cheek Pouch",
-                Num = 167,
-                Rating = 2.0,
-                OnEatItem = new OnEatItemEventInfo((battle, _, pokemon) =>
-                {
-                    battle.Heal(pokemon.BaseMaxHp / 3, pokemon);
                 }),
             },
         };

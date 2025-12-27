@@ -620,22 +620,6 @@ public partial record Abilities
                                             battle.Add("-activate", target, "ability: Emergency Exit");
                                         }),
                                     },
-                                    [AbilityId.FlameBody] = new()
-                            {
-                                Id = AbilityId.FlameBody,
-                                Name = "Flame Body",
-                                Num = 49,
-                                Rating = 2.0,
-                                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
-                                {
-                                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
-
-                                                            if (battle.RandomChance(3, 10))
-                                                            {
-                                                                source.TrySetStatus(ConditionId.Burn, target);
-                                                            }
-                                                        }),
-                                                    },
                                     [AbilityId.FairyAura] = new()
                                     {
                                         Id = AbilityId.FairyAura,
@@ -684,6 +668,22 @@ public partial record Abilities
                                             return damage;
                                         }),
                                     },
+                                    [AbilityId.FlameBody] = new()
+                            {
+                                Id = AbilityId.FlameBody,
+                                Name = "Flame Body",
+                                Num = 49,
+                                Rating = 2.0,
+                                OnDamagingHit = new OnDamagingHitEventInfo((battle, _, target, source, move) =>
+                                {
+                                    if (!battle.CheckMoveMakesContact(move, source, target)) return;
+
+                                                            if (battle.RandomChance(3, 10))
+                                                            {
+                                                                source.TrySetStatus(ConditionId.Burn, target);
+                                                            }
+                                                        }),
+                                                    },
                                     [AbilityId.FlareBoost] = new()
                                     {
                                         Id = AbilityId.FlareBoost,

@@ -124,7 +124,6 @@ public enum AbilityId
     MagnetPull,
     Galvanize,
     Scrappy,
-    HydroVeil,
     IceBody,
     Pressure,
     ClearBody,
@@ -159,10 +158,7 @@ public enum AbilityId
         CudChew,
         VoltAbsorb,
         Download,
-        BattleArmor2,
-        FlameBody2,
         Immunity,
-        Berserk,
         MarvelScale,
         Multiscale,
         SuperLuck,
@@ -206,12 +202,9 @@ public enum AbilityId
                 Refrigerate,
 
                 // Added for Walrein to Deoxys conversion
-                DeepSeaTooth,
-                DeepSeaScale,
                 PrimordialSea,
                 DesolateLand,
                 DeltaStream,
-                AirLock2,
                 VictoryStar,
                 BadDreams,
 
@@ -276,7 +269,6 @@ public enum AbilityId
                                             Schooling,
                                             Merciless,
                                             Stamina,
-                                            ToughClaws2,
 
                                                 // Added for Gen 7 species (751-775)
                                                 WaterBubble,
