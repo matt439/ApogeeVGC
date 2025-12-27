@@ -129,4 +129,13 @@ public enum ConditionId
                                                 StealthRock,
                                                 Curse,
                                                 ChillyReception,
+                                                FairyLock,
+                                                FirePledge,
+                                                WaterPledge,
+                                                GrassPledge,
+                                                Fling,
+                                                FocusPunch,
+                                                FollowMe,
+                                                FuryCutter,
+                                                PartiallyTrappedFireSpin,
                                                 }

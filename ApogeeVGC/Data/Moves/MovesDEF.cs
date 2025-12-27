@@ -1195,6 +1195,519 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Normal,
             },
+            [MoveId.FairyLock] = new()
+            {
+                Id = MoveId.FairyLock,
+                Num = 587,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Fairy Lock",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Mirror = true, BypassSub = true, Metronome = true },
+                PseudoWeather = ConditionId.FairyLock,
+                Target = MoveTarget.All,
+                Type = MoveType.Fairy,
+            },
+            [MoveId.FairyWind] = new()
+            {
+                Id = MoveId.FairyWind,
+                Num = 584,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Special,
+                Name = "Fairy Wind",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true, Wind = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fairy,
+            },
+            [MoveId.FalseSwipe] = new()
+            {
+                Id = MoveId.FalseSwipe,
+                Num = 206,
+                Accuracy = 100,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "False Swipe",
+                BasePp = 40,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+                // TODO: onDamagePriority = -20, onDamage - if damage >= target.hp return target.hp - 1
+            },
+            [MoveId.FeatherDance] = new()
+            {
+                Id = MoveId.FeatherDance,
+                Num = 297,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Feather Dance",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, Dance = true, AllyAnim = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -2 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Flying,
+            },
+            [MoveId.FellStinger] = new()
+            {
+                Id = MoveId.FellStinger,
+                Num = 565,
+                Accuracy = 100,
+                BasePower = 50,
+                Category = MoveCategory.Physical,
+                Name = "Fell Stinger",
+                BasePp = 25,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+                // TODO: onAfterMoveSecondarySelf - if target fainted, boost atk by 3
+            },
+            [MoveId.FickleBeam] = new()
+            {
+                Id = MoveId.FickleBeam,
+                Num = 907,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Fickle Beam",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dragon,
+                // TODO: onBasePower - 30% chance to double base power
+            },
+            [MoveId.FieryWrath] = new()
+            {
+                Id = MoveId.FieryWrath,
+                Num = 822,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Fiery Wrath",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 20,
+                    VolatileStatus = ConditionId.Flinch,
+                },
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Dark,
+            },
+            [MoveId.FilletAway] = new()
+            {
+                Id = MoveId.FilletAway,
+                Num = 868,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Fillet Away",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Snatch = true },
+                SelfBoost = new SparseBoostsTable { Atk = 2, SpA = 2, Spe = 2 },
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+                // TODO: onTry - fail if hp <= maxhp/2, onHit - deal maxhp/2 direct damage
+            },
+            [MoveId.FinalGambit] = new()
+            {
+                Id = MoveId.FinalGambit,
+                Num = 515,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Special,
+                Name = "Final Gambit",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Metronome = true, NoParentalBond = true },
+                SelfDestruct = MoveSelfDestruct.FromIfHit(),
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fighting,
+                // TODO: damageCallback - return pokemon.hp and faint user
+            },
+            [MoveId.FireFang] = new()
+            {
+                Id = MoveId.FireFang,
+                Num = 424,
+                Accuracy = 95,
+                BasePower = 65,
+                Category = MoveCategory.Physical,
+                Name = "Fire Fang",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true, Bite = true },
+                Secondaries = new[]
+                {
+                    new SecondaryEffect { Chance = 10, Status = ConditionId.Burn },
+                    new SecondaryEffect { Chance = 10, VolatileStatus = ConditionId.Flinch },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.FireLash] = new()
+            {
+                Id = MoveId.FireLash,
+                Num = 680,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Fire Lash",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Def = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+            },
+            [MoveId.FirePledge] = new()
+            {
+                Id = MoveId.FirePledge,
+                Num = 519,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Fire Pledge",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NonSky = true, Metronome = true, PledgeCombo = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+                // TODO: basePowerCallback - 150 when combined with grass/water pledge
+                // TODO: onPrepareHit - pledge combination logic
+                // TODO: onModifyMove - pledge combination effects
+            },
+            [MoveId.FirstImpression] = new()
+            {
+                Id = MoveId.FirstImpression,
+                Num = 660,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Physical,
+                Name = "First Impression",
+                BasePp = 10,
+                Priority = 2,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+                OnTry = new OnTryEventInfo((battle, source, _, _) =>
+                {
+                    if (source.ActiveMoveActions <= 1) return new VoidReturn();
+                    if (battle.DisplayUi)
+                    {
+                        battle.Hint("First Impression only works on your first turn out.");
+                    }
+                    return false;
+                }),
+            },
+            [MoveId.Fissure] = new()
+            {
+                Id = MoveId.Fissure,
+                Num = 90,
+                Accuracy = 30,
+                BasePower = 0,
+                Category = MoveCategory.Physical,
+                Name = "Fissure",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Ohko = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ground,
+            },
+            [MoveId.Flail] = new()
+            {
+                Id = MoveId.Flail,
+                Num = 175,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Physical,
+                Name = "Flail",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+                // TODO: basePowerCallback - varies from 20-200 based on HP ratio
+            },
+            [MoveId.FleurCannon] = new()
+            {
+                Id = MoveId.FleurCannon,
+                Num = 705,
+                Accuracy = 90,
+                BasePower = 130,
+                Category = MoveCategory.Special,
+                Name = "Fleur Cannon",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Self = new SecondaryEffect
+                {
+                    Boosts = new SparseBoostsTable { SpA = -2 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fairy,
+            },
+            [MoveId.FlipTurn] = new()
+            {
+                Id = MoveId.FlipTurn,
+                Num = 812,
+                Accuracy = 100,
+                BasePower = 60,
+                Category = MoveCategory.Physical,
+                Name = "Flip Turn",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                SelfSwitch = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Water,
+            },
+            [MoveId.FloralHealing] = new()
+            {
+                Id = MoveId.FloralHealing,
+                Num = 666,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Floral Healing",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Heal = true, AllyAnim = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fairy,
+                // TODO: onHit - heal 50% or 66.7% if grassy terrain
+            },
+            [MoveId.FlowerTrick] = new()
+            {
+                Id = MoveId.FlowerTrick,
+                Num = 870,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Flower Trick",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                WillCrit = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.FlyingPress] = new()
+            {
+                Id = MoveId.FlyingPress,
+                Num = 560,
+                Accuracy = 95,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Flying Press",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Gravity = true, Distance = true, NonSky = true, Metronome = true },
+                Target = MoveTarget.Any,
+                Type = MoveType.Fighting,
+                // TODO: onEffectiveness - add Flying type effectiveness
+            },
+            [MoveId.FollowMe] = new()
+            {
+                Id = MoveId.FollowMe,
+                Num = 266,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Follow Me",
+                BasePp = 20,
+                Priority = 2,
+                Flags = new MoveFlags { NoAssist = true, FailCopycat = true },
+                VolatileStatus = ConditionId.FollowMe,
+                Target = MoveTarget.Self,
+                Type = MoveType.Normal,
+                // TODO: onTry - check activePerHalf > 1
+            },
+            [MoveId.ForestsCurse] = new()
+            {
+                Id = MoveId.ForestsCurse,
+                Num = 571,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Forest's Curse",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Reflectable = true, Mirror = true, AllyAnim = true, Metronome = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+                // TODO: onHit - add Grass type to target
+            },
+            [MoveId.FreezeDry] = new()
+            {
+                Id = MoveId.FreezeDry,
+                Num = 573,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Special,
+                Name = "Freeze-Dry",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Freeze,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ice,
+                // TODO: onEffectiveness - if Water type, return 1 (super effective)
+            },
+            [MoveId.FreezeShock] = new()
+            {
+                Id = MoveId.FreezeShock,
+                Num = 553,
+                Accuracy = 90,
+                BasePower = 140,
+                Category = MoveCategory.Physical,
+                Name = "Freeze Shock",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Charge = true, Protect = true, Mirror = true, NoSleepTalk = true, FailInstruct = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 30,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ice,
+                // TODO: onTryMove - two-turn attack logic
+            },
+            [MoveId.FreezingGlare] = new()
+            {
+                Id = MoveId.FreezingGlare,
+                Num = 821,
+                Accuracy = 100,
+                BasePower = 90,
+                Category = MoveCategory.Special,
+                Name = "Freezing Glare",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 10,
+                    Status = ConditionId.Freeze,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Psychic,
+            },
+            [MoveId.FrenzyPlant] = new()
+            {
+                Id = MoveId.FrenzyPlant,
+                Num = 338,
+                Accuracy = 90,
+                BasePower = 150,
+                Category = MoveCategory.Special,
+                Name = "Frenzy Plant",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Recharge = true, Protect = true, Mirror = true, NonSky = true, Metronome = true },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.MustRecharge,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Grass,
+            },
+            [MoveId.FrostBreath] = new()
+            {
+                Id = MoveId.FrostBreath,
+                Num = 524,
+                Accuracy = 90,
+                BasePower = 60,
+                Category = MoveCategory.Special,
+                Name = "Frost Breath",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Metronome = true },
+                WillCrit = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ice,
+            },
+            [MoveId.FuryAttack] = new()
+            {
+                Id = MoveId.FuryAttack,
+                Num = 31,
+                Accuracy = 85,
+                BasePower = 15,
+                Category = MoveCategory.Physical,
+                Name = "Fury Attack",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true },
+                MultiHit = new[] { 2, 5 },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.FuryCutter] = new()
+            {
+                Id = MoveId.FuryCutter,
+                Num = 210,
+                Accuracy = 95,
+                BasePower = 40,
+                Category = MoveCategory.Physical,
+                Name = "Fury Cutter",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags { Contact = true, Protect = true, Mirror = true, Metronome = true, Slicing = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Bug,
+                // TODO: basePowerCallback - doubles each consecutive hit (max 160)
+            },
+            [MoveId.FusionBolt] = new()
+            {
+                Id = MoveId.FusionBolt,
+                Num = 559,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Physical,
+                Name = "Fusion Bolt",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+                // TODO: onBasePower - check if Fusion Flare was used this turn
+            },
+            [MoveId.FusionFlare] = new()
+            {
+                Id = MoveId.FusionFlare,
+                Num = 558,
+                Accuracy = 100,
+                BasePower = 100,
+                Category = MoveCategory.Special,
+                Name = "Fusion Flare",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags { Protect = true, Mirror = true, Defrost = true },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Fire,
+                // TODO: onBasePower - check if Fusion Bolt was used this turn
+            },
                                         };
                                     }
                                 }
