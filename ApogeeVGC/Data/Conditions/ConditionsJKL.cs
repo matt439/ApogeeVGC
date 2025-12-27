@@ -111,6 +111,27 @@ public partial record Conditions
                     }
                 }),
             },
+            [ConditionId.LockOn] = new()
+            {
+                Id = ConditionId.LockOn,
+                Name = "Lock-On",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.LockOn,
+                NoCopy = true, // doesn't get copied by Baton Pass
+                Duration = 2,
+                // TODO: onSourceInvulnerabilityPriority = 1
+                // TODO: onSourceInvulnerability - if move is from target to source, return 0
+                // TODO: onSourceAccuracy - if move is from target to source, return true
+            },
+            [ConditionId.LunarDance] = new()
+            {
+                Id = ConditionId.LunarDance,
+                Name = "Lunar Dance",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.LunarDance,
+                // TODO: onSwitchIn - trigger Swap event
+                // TODO: onSwap - heal HP to max, cure status, restore PP if needed
+            },
         };
     }
 }

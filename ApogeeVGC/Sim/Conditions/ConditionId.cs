@@ -142,4 +142,6 @@ public enum ConditionId
                                                 GlaiveRush,
                                                 GuardSplit,
                                                 Grudge,
+                                                LockOn,
+                                                LunarDance,
                                                 }
