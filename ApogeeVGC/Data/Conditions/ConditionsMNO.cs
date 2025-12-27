@@ -166,6 +166,22 @@ public partial record Conditions
                 }),
                 OnLockMove = new OnLockMoveEventInfo(MoveId.Recharge),
             },
+            [ConditionId.NoRetreat] = new()
+            {
+                Id = ConditionId.NoRetreat,
+                Name = "No Retreat",
+                EffectType = EffectType.Condition,
+                AssociatedMove = MoveId.NoRetreat,
+                OnStart = new OnStartEventInfo((battle, pokemon, _, _) =>
+                {
+                    if (battle.DisplayUi)
+                    {
+                        battle.Add("-start", pokemon, "move: No Retreat");
+                    }
+                    return new VoidReturn();
+                }),
+                // TODO: onTrapPokemon - trap the pokemon
+            },
             [ConditionId.None] = new()
             {
                 Id = ConditionId.None,

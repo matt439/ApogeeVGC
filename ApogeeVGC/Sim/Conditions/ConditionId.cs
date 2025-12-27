@@ -107,6 +107,7 @@ public enum ConditionId
                     Recharge,
                     DefenseCurl,
                         Minimize,
+                        NoRetreat,
                         Torment,
                         Attract,
                         AllySwitch,

@@ -914,6 +914,256 @@ public partial record Moves
                 Target = MoveTarget.Normal,
                 Type = MoveType.Psychic,
             },
+            [MoveId.NastyPlot] = new()
+            {
+                Id = MoveId.NastyPlot,
+                Num = 417,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Nasty Plot",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                SelfBoost = new SparseBoostsTable { SpA = 2 },
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Dark,
+            },
+            [MoveId.NightDaze] = new()
+            {
+                Id = MoveId.NightDaze,
+                Num = 539,
+                Accuracy = 95,
+                BasePower = 85,
+                Category = MoveCategory.Special,
+                Name = "Night Daze",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 40,
+                    Boosts = new SparseBoostsTable { Accuracy = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.NightShade] = new()
+            {
+                Id = MoveId.NightShade,
+                Num = 101,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Special,
+                Name = "Night Shade",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                // TODO: damage = level
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Ghost,
+            },
+            [MoveId.NightSlash] = new()
+            {
+                Id = MoveId.NightSlash,
+                Num = 400,
+                Accuracy = 100,
+                BasePower = 70,
+                Category = MoveCategory.Physical,
+                Name = "Night Slash",
+                BasePp = 15,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    Slicing = true,
+                },
+                CritRatio = 2,
+                Secondary = null,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dark,
+            },
+            [MoveId.NobleRoar] = new()
+            {
+                Id = MoveId.NobleRoar,
+                Num = 568,
+                Accuracy = 100,
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "Noble Roar",
+                BasePp = 30,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Reflectable = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Boosts = new SparseBoostsTable { Atk = -1, SpA = -1 },
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Normal,
+            },
+            [MoveId.NoRetreat] = new()
+            {
+                Id = MoveId.NoRetreat,
+                Num = 748,
+                Accuracy = IntTrueUnion.FromTrue(),
+                BasePower = 0,
+                Category = MoveCategory.Status,
+                Name = "No Retreat",
+                BasePp = 5,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Snatch = true,
+                    Metronome = true,
+                },
+                VolatileStatus = ConditionId.NoRetreat,
+                Condition = _library.Conditions[ConditionId.NoRetreat],
+                // TODO: onTry - fail if source already has noretreat, remove volatileStatus if already trapped
+                SelfBoost = new SparseBoostsTable { Atk = 1, Def = 1, SpA = 1, SpD = 1, Spe = 1 },
+                Secondary = null,
+                Target = MoveTarget.Self,
+                Type = MoveType.Fighting,
+            },
+            [MoveId.Nuzzle] = new()
+            {
+                Id = MoveId.Nuzzle,
+                Num = 609,
+                Accuracy = 100,
+                BasePower = 20,
+                Category = MoveCategory.Physical,
+                Name = "Nuzzle",
+                BasePp = 20,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                },
+                Secondary = new SecondaryEffect
+                {
+                    Chance = 100,
+                    Status = ConditionId.Paralysis,
+                },
+                Target = MoveTarget.Normal,
+                Type = MoveType.Electric,
+            },
+            [MoveId.OrderUp] = new()
+            {
+                Id = MoveId.OrderUp,
+                Num = 856,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Physical,
+                Name = "Order Up",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                },
+                // TODO: onAfterMoveSecondarySelf - boost based on Tatsugiri forme if user is commanded
+                Secondary = null,
+                HasSheerForce = true,
+                Target = MoveTarget.Normal,
+                Type = MoveType.Dragon,
+            },
+            [MoveId.OriginPulse] = new()
+            {
+                Id = MoveId.OriginPulse,
+                Num = 618,
+                Accuracy = 85,
+                BasePower = 110,
+                Category = MoveCategory.Special,
+                Name = "Origin Pulse",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Pulse = true,
+                },
+                Secondary = null,
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Water,
+            },
+            [MoveId.Outrage] = new()
+            {
+                Id = MoveId.Outrage,
+                Num = 200,
+                Accuracy = 100,
+                BasePower = 120,
+                Category = MoveCategory.Physical,
+                Name = "Outrage",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Contact = true,
+                    Protect = true,
+                    Mirror = true,
+                    Metronome = true,
+                    FailInstruct = true,
+                },
+                Self = new SecondaryEffect
+                {
+                    VolatileStatus = ConditionId.LockedMove,
+                },
+                Secondary = null,
+                Target = MoveTarget.RandomNormal,
+                Type = MoveType.Dragon,
+            },
+            [MoveId.Overdrive] = new()
+            {
+                Id = MoveId.Overdrive,
+                Num = 786,
+                Accuracy = 100,
+                BasePower = 80,
+                Category = MoveCategory.Special,
+                Name = "Overdrive",
+                BasePp = 10,
+                Priority = 0,
+                Flags = new MoveFlags
+                {
+                    Protect = true,
+                    Mirror = true,
+                    Sound = true,
+                    BypassSub = true,
+                },
+                Secondary = null,
+                Target = MoveTarget.AllAdjacentFoes,
+                Type = MoveType.Electric,
+            },
             [MoveId.Overheat] = new()
             {
                 Id = MoveId.Overheat,
