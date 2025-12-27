@@ -122,4 +122,8 @@ public enum ConditionId
                                                 ZenMode,
                                                 Metronome,
                                                 MicleBerry,
+                                                Spikes,
+                                                StealthRock,
+                                                Curse,
+                                                ChillyReception,
                                                 }

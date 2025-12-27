@@ -469,6 +469,58 @@ public partial record Conditions
                 }),
                 // TODO: Implement full BurningBulwark logic - needs OnTryHit handler with protect logic and contact burn
             },
+            [ConditionId.Charge] = new()
+            {
+                Id = ConditionId.Charge,
+                Name = "Charge",
+                OnStart = new OnStartEventInfo((battle, pokemon, source, effect) =>
+                {
+                    if (effect != null && (effect.Name == "Electromorphosis" || effect.Name == "Wind Power"))
+                    {
+                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
+                    }
+                    else
+                    {
+                        battle.Add("-start", pokemon, "Charge");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnRestart = new OnRestartEventInfo((battle, pokemon, source, effect) =>
+                {
+                    if (effect != null && (effect.Name == "Electromorphosis" || effect.Name == "Wind Power"))
+                    {
+                        battle.Add("-start", pokemon, "Charge", $"[from] ability: {effect.Name}");
+                    }
+                    else
+                    {
+                        battle.Add("-start", pokemon, "Charge");
+                    }
+                    return BoolVoidUnion.FromVoid();
+                }),
+                OnEnd = new OnEndEventInfo((battle, pokemon) =>
+                {
+                    battle.Add("-end", pokemon, "Charge", "[silent]");
+                }),
+                // TODO: OnBasePower - doubles Electric move power
+                // TODO: OnMoveAborted/OnAfterMove - removes charge after Electric move use
+            },
+            [ConditionId.ChillyReception] = new()
+            {
+                Id = ConditionId.ChillyReception,
+                Name = "Chilly Reception",
+                // TODO: Implement ChillyReception volatile for preparation phase
+            },
+            [ConditionId.Curse] = new()
+            {
+                Id = ConditionId.Curse,
+                Name = "Curse",
+                OnStart = new OnStartEventInfo((battle, pokemon, source, _) =>
+                {
+                    battle.Add("-start", pokemon, "Curse", $"[of] {source}");
+                    return BoolVoidUnion.FromVoid();
+                }),
+                // TODO: OnResidual - deals 1/4 max HP damage per turn
+            },
         };
     }
 }
