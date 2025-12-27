@@ -28,26 +28,28 @@ public partial record Items
                 SpriteNum = 526,
                 IsBerry = true,
                 NaturalGift = (80, "Electric"),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (move.Type == MoveType.Electric && target.GetMoveHitData(move).TypeMod > 0)
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     !(move.Infiltrates == true && battle.Gen >= 6);
-                        if (hitSub) return damage;
-
-                        if (target.EatItem())
+                        if (move.Type == MoveType.Electric &&
+                            target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            battle.Debug("-50% reduction");
-                            battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
-                            battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
-                        }
-                    }
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
 
-                    return damage;
-                }),
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Wacan Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
                 // OnEat: empty function
                 Num = 186,
                 Gen = 4,
@@ -71,7 +73,8 @@ public partial record Items
                 Fling = new FlingData { BasePower = 80 },
                 OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
                 {
-                    if (move.Damage == 0 && move.DamageCallback == null && target.GetMoveHitData(move).TypeMod > 0)
+                    if (move.Damage == 0 && move.DamageCallback == null &&
+                        target.GetMoveHitData(move).TypeMod > 0)
                     {
                         target.UseItem();
                     }
@@ -93,6 +96,7 @@ public partial record Items
                         battle.ChainModify([4915, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 15),
                 // TODO: Implement OnTakeItem for Ogerpon
@@ -122,12 +126,13 @@ public partial record Items
                 Name = "Wide Lens",
                 SpriteNum = 537,
                 Fling = new FlingData { BasePower = 10 },
-                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo((battle, accuracy, target, source, move) =>
-                {
-                    battle.ChainModify([4505, 4096]);
-                    var result = battle.FinalModify(accuracy);
-                    return DoubleVoidUnion.FromDouble(result);
-                }, -2),
+                OnSourceModifyAccuracy = new OnSourceModifyAccuracyEventInfo(
+                    (battle, accuracy, target, source, move) =>
+                    {
+                        battle.ChainModify([4505, 4096]);
+                        var result = battle.FinalModify(accuracy);
+                        return DoubleVoidUnion.FromDouble(result);
+                    }, -2),
                 Num = 265,
                 Gen = 4,
             },
@@ -151,11 +156,13 @@ public partial record Items
                 OnTryEatItem = new OnTryEatItemEventInfo(
                     OnTryEatItem.FromFunc((battle, item, pokemon) =>
                     {
-                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, pokemon.BaseMaxHp / 3);
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                            pokemon.BaseMaxHp / 3);
                         if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
                         {
                             return BoolVoidUnion.FromBool(false);
                         }
+
                         return BoolVoidUnion.FromVoid();
                     })),
                 OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) =>
@@ -182,6 +189,7 @@ public partial record Items
                         battle.ChainModify([4505, 4096]);
                         return battle.FinalModify(basePower);
                     }
+
                     return basePower;
                 }, 16),
                 Num = 267,

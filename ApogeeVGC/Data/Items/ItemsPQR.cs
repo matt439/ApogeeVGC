@@ -48,26 +48,27 @@ public partial record Items
                 SpriteNum = 329,
                 IsBerry = true,
                 NaturalGift = (80, "Water"),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (move.Type == MoveType.Water && target.GetMoveHitData(move).TypeMod > 0)
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     !(move.Infiltrates == true && battle.Gen >= 6);
-                        if (hitSub) return damage;
-
-                        if (target.EatItem())
+                        if (move.Type == MoveType.Water && target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            battle.Debug("-50% reduction");
-                            battle.Add("-enditem", target, "item: Passho Berry", "[weaken]");
-                            battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
-                        }
-                    }
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
 
-                    return damage;
-                }),
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Passho Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
                 // OnEat: empty function
                 Num = 185,
                 Gen = 4,
@@ -79,26 +80,28 @@ public partial record Items
                 SpriteNum = 330,
                 IsBerry = true,
                 NaturalGift = (80, "Psychic"),
-                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
-                {
-                    if (move.Type == MoveType.Psychic && target.GetMoveHitData(move).TypeMod > 0)
+                OnSourceModifyDamage =
+                    new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
                     {
-                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
-                                     move.Flags.BypassSub != true &&
-                                     !(move.Infiltrates == true && battle.Gen >= 6);
-                        if (hitSub) return damage;
-
-                        if (target.EatItem())
+                        if (move.Type == MoveType.Psychic &&
+                            target.GetMoveHitData(move).TypeMod > 0)
                         {
-                            battle.Debug("-50% reduction");
-                            battle.Add("-enditem", target, "item: Payapa Berry", "[weaken]");
-                            battle.ChainModify(0.5);
-                            return battle.FinalModify(damage);
-                        }
-                    }
+                            var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                         move.Flags.BypassSub != true &&
+                                         !(move.Infiltrates == true && battle.Gen >= 6);
+                            if (hitSub) return damage;
 
-                    return damage;
-                }),
+                            if (target.EatItem())
+                            {
+                                battle.Debug("-50% reduction");
+                                battle.Add("-enditem", target, "item: Payapa Berry", "[weaken]");
+                                battle.ChainModify(0.5);
+                                return battle.FinalModify(damage);
+                            }
+                        }
+
+                        return damage;
+                    }),
                 // OnEat: empty function
                 Num = 193,
                 Gen = 4,
@@ -486,7 +489,8 @@ public partial record Items
                 OnFractionalPriority = new OnFractionalPriorityEventInfo(
                     (ModifierSourceMoveHandler)((battle, priority, pokemon, target, move) =>
                     {
-                        if (move.Category == MoveCategory.Status && pokemon.HasAbility(AbilityId.MyceliumMight))
+                        if (move.Category == MoveCategory.Status &&
+                            pokemon.HasAbility(AbilityId.MyceliumMight))
                             return DoubleVoidUnion.FromVoid();
                         if (priority <= 0 && battle.RandomChance(1, 5))
                         {
@@ -572,10 +576,11 @@ public partial record Items
                 Name = "Razor Claw",
                 SpriteNum = 382,
                 Fling = new FlingData { BasePower = 80 },
-                OnModifyCritRatio = new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
-                {
-                    return DoubleVoidUnion.FromDouble(critRatio + 1);
-                }),
+                OnModifyCritRatio =
+                    new OnModifyCritRatioEventInfo((battle, critRatio, source, target, move) =>
+                    {
+                        return DoubleVoidUnion.FromDouble(critRatio + 1);
+                    }),
                 Num = 326,
                 Gen = 4,
             },

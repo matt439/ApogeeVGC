@@ -237,9 +237,9 @@ public partial record SpeciesData
                 },
                 HeightM = 1.7,
                 WeightKg = 100.5,
-                    Color = "Red",
-                },
-                [SpecieId.Squirtle] = new()
+                Color = "Red",
+            },
+            [SpecieId.Squirtle] = new()
             {
                 Id = SpecieId.Squirtle,
                 Num = 7,
@@ -1249,9 +1249,9 @@ public partial record SpeciesData
                 },
                 HeightM = 0.4,
                 WeightKg = 6,
-                    Color = "Yellow",
-                },
-                [SpecieId.PikachuWorld] = new()
+                Color = "Yellow",
+            },
+            [SpecieId.PikachuWorld] = new()
             {
                 Id = SpecieId.PikachuWorld,
                 Num = 25,

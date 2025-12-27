@@ -1,7 +1,6 @@
 using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
-using ApogeeVGC.Sim.Effects;
 using ApogeeVGC.Sim.Events;
 using ApogeeVGC.Sim.Events.Handlers.EventMethods;
 using ApogeeVGC.Sim.Events.Handlers.ItemSpecific;
@@ -10,7 +9,6 @@ using ApogeeVGC.Sim.Moves;
 using ApogeeVGC.Sim.PokemonClasses;
 using ApogeeVGC.Sim.Stats;
 using ApogeeVGC.Sim.Utils.Unions;
-using PokemonType = ApogeeVGC.Sim.PokemonClasses.PokemonType;
 
 namespace ApogeeVGC.Data.Items;
 
@@ -103,19 +101,19 @@ public partial record Items
                     //     pokemon.AddVolatile(ConditionId.Confusion);
                     // }
                 })),
-                    Num = 161,
-                    Gen = 3,
-                },
-                [ItemId.MaliciousArmor] = new()
-                {
-                    Id = ItemId.MaliciousArmor,
-                    Name = "Malicious Armor",
-                    SpriteNum = 744,
-                    Fling = new FlingData { BasePower = 30 },
-                    Num = 1861,
-                    Gen = 9,
-                },
-                [ItemId.MarangaBerry] = new()
+                Num = 161,
+                Gen = 3,
+            },
+            [ItemId.MaliciousArmor] = new()
+            {
+                Id = ItemId.MaliciousArmor,
+                Name = "Malicious Armor",
+                SpriteNum = 744,
+                Fling = new FlingData { BasePower = 30 },
+                Num = 1861,
+                Gen = 9,
+            },
+            [ItemId.MarangaBerry] = new()
             {
                 Id = ItemId.MarangaBerry,
                 Name = "Maranga Berry",
@@ -513,16 +511,17 @@ public partial record Items
                 Name = "Normal Gem",
                 SpriteNum = 307,
                 IsGem = true,
-                OnSourceTryPrimaryHit = new OnSourceTryPrimaryHitEventInfo(
-                    (battle, target, source, move) =>
+                OnSourceTryPrimaryHit =
+                    new OnSourceTryPrimaryHitEventInfo((battle, target, source, move) =>
                     {
-                        if (target == source || move.Category == MoveCategory.Status || 
-                            move.Flags.PledgeCombo == true) 
+                        if (target == source || move.Category == MoveCategory.Status ||
+                            move.Flags.PledgeCombo == true)
                             return IntBoolVoidUnion.FromVoid();
                         if (move.Type == MoveType.Normal && source.UseItem())
                         {
                             source.AddVolatile(ConditionId.Gem);
                         }
+
                         return IntBoolVoidUnion.FromVoid();
                     }),
                 Num = 564,
@@ -556,12 +555,12 @@ public partial record Items
                             }
                         }
 
-                                    return damage;
-                                }),
-                            OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
-                            Num = 184,
-                            Gen = 4,
-                        },
+                        return damage;
+                    }),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((_, _) => { })),
+                Num = 184,
+                Gen = 4,
+            },
             [ItemId.OddIncense] = new()
             {
                 Id = ItemId.OddIncense,
@@ -599,7 +598,8 @@ public partial record Items
                 OnTryEatItem = new OnTryEatItemEventInfo(
                     OnTryEatItem.FromFunc((battle, item, pokemon) =>
                     {
-                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, 10);
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                            10);
                         if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
                         {
                             return BoolVoidUnion.FromBool(false);

@@ -1,4 +1,3 @@
-using ApogeeVGC.Sim.Abilities;
 using ApogeeVGC.Sim.BattleClasses;
 using ApogeeVGC.Sim.Conditions;
 using ApogeeVGC.Sim.Effects;
@@ -282,43 +281,45 @@ public partial record Items
                 }),
                 // TODO: OnTerrainChange - use item when Electric Terrain is set
                 Boosts = new SparseBoostsTable { Def = 1 },
-                    Num = 881,
-                    Gen = 7,
-                },
-                [ItemId.EnigmaBerry] = new()
+                Num = 881,
+                Gen = 7,
+            },
+            [ItemId.EnigmaBerry] = new()
+            {
+                Id = ItemId.EnigmaBerry,
+                Name = "Enigma Berry",
+                SpriteNum = 124,
+                IsBerry = true,
+                NaturalGift = (100, "Bug"),
+                OnHit = new OnHitEventInfo((battle, target, source, move) =>
                 {
-                    Id = ItemId.EnigmaBerry,
-                    Name = "Enigma Berry",
-                    SpriteNum = 124,
-                    IsBerry = true,
-                    NaturalGift = (100, "Bug"),
-                    OnHit = new OnHitEventInfo((battle, target, source, move) =>
+                    if (move != null && target.GetMoveHitData(move).TypeMod > 0)
                     {
-                        if (move != null && target.GetMoveHitData(move).TypeMod > 0)
+                        if (target.EatItem())
                         {
-                            if (target.EatItem())
-                            {
-                                battle.Heal(target.BaseMaxHp / 4);
-                            }
+                            battle.Heal(target.BaseMaxHp / 4);
                         }
-                        return BoolEmptyVoidUnion.FromVoid();
-                    }),
-                    OnTryEatItem = new OnTryEatItemEventInfo(
-                        OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    }
+
+                    return BoolEmptyVoidUnion.FromVoid();
+                }),
+                OnTryEatItem = new OnTryEatItemEventInfo(
+                    OnTryEatItem.FromFunc((battle, item, pokemon) =>
+                    {
+                        var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect,
+                            pokemon.BaseMaxHp / 4);
+                        if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
                         {
-                            var canHeal = battle.RunEvent(EventId.TryHeal, pokemon, null, battle.Effect, 
-                                pokemon.BaseMaxHp / 4);
-                            if (canHeal is BoolRelayVar boolVar && !boolVar.Value)
-                            {
-                                return BoolVoidUnion.FromBool(false);
-                            }
-                            return BoolVoidUnion.FromVoid();
-                        })),
-                    OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) => { })),
-                    Num = 208,
-                    Gen = 3,
-                },
-                [ItemId.Eviolite] = new()
+                            return BoolVoidUnion.FromBool(false);
+                        }
+
+                        return BoolVoidUnion.FromVoid();
+                    })),
+                OnEat = new OnEatEventInfo((Action<Battle, Pokemon>)((battle, pokemon) => { })),
+                Num = 208,
+                Gen = 3,
+            },
+            [ItemId.Eviolite] = new()
             {
                 Id = ItemId.Eviolite,
                 Name = "Eviolite",
