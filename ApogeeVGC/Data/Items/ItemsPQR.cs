@@ -377,6 +377,18 @@ public partial record Items
                 Gen = 5,
             },
             // Skip primariumz - z-move
+            [ItemId.PowerHerb] = new()
+            {
+                Id = ItemId.PowerHerb,
+                Name = "Power Herb",
+                SpriteNum = 358,
+                Fling = new FlingData { BasePower = 10 },
+                // OnChargeMove - removes charge turn for moves like Solar Beam
+                // TODO: Implement this when charge moves are implemented
+                // The handler should check if the move requires charging and skip the charge turn
+                Num = 271,
+                Gen = 4,
+            },
             [ItemId.PrismScale] = new()
             {
                 Id = ItemId.PrismScale,
@@ -394,6 +406,18 @@ public partial record Items
                 Fling = new FlingData { BasePower = 80 },
                 Num = 321,
                 Gen = 4,
+            },
+            [ItemId.ProtectivePads] = new()
+            {
+                Id = ItemId.ProtectivePads,
+                Name = "Protective Pads",
+                SpriteNum = 663,
+                Fling = new FlingData { BasePower = 30 },
+                // Protective effect handled in Battle.CheckMoveMakesContact
+                // Prevents the holder from making contact with targets
+                // TODO: Implement in CheckMoveMakesContact method
+                Num = 880,
+                Gen = 7,
             },
             // Skip psychicgem, psychicmemory - not Gen 9
             [ItemId.PsychicSeed] = new()
@@ -602,6 +626,236 @@ public partial record Items
                 },
                 Num = 540,
                 Gen = 5,
+            },
+            [ItemId.RazorFang] = new()
+            {
+                Id = ItemId.RazorFang,
+                Name = "Razor Fang",
+                SpriteNum = 383,
+                Fling = new FlingData
+                {
+                    BasePower = 30,
+                    // TODO: Flinch volatile status
+                },
+                OnModifyMove = new OnModifyMoveEventInfo((battle, move, pokemon, target) =>
+                {
+                    if (move.Category != MoveCategory.Status)
+                    {
+                        // TODO: Add flinch secondary if not already present
+                        // For now, this is a placeholder - flinch needs to be implemented as a volatile
+                    }
+                }, -1),
+                Num = 327,
+                Gen = 4,
+            },
+            [ItemId.ReaperCloth] = new()
+            {
+                Id = ItemId.ReaperCloth,
+                Name = "Reaper Cloth",
+                SpriteNum = 385,
+                Fling = new FlingData { BasePower = 10 },
+                Num = 325,
+                Gen = 4,
+            },
+            [ItemId.ReBattle] = new()
+            {
+                Id = ItemId.ReBattle,
+                Name = "ReBattle",
+                SpriteNum = 0, // TODO: Find correct sprite number
+                // This is a battle-related item, needs more context from showdown
+                Num = 0, // TODO: Find correct num
+                Gen = 9,
+            },
+            [ItemId.RedCard] = new()
+            {
+                Id = ItemId.RedCard,
+                Name = "Red Card",
+                SpriteNum = 387,
+                Fling = new FlingData { BasePower = 10 },
+                OnAfterMoveSecondary = new OnAfterMoveSecondaryEventInfo((battle, target, source, move) =>
+                {
+                    if (source != null && source != target && source.Hp > 0 && target.Hp > 0 &&
+                        move != null && move.Category != MoveCategory.Status)
+                    {
+                        if (source.IsActive && battle.CanSwitch(source.Side) != 0 &&
+                            !source.ForceSwitchFlag && !target.ForceSwitchFlag)
+                        {
+                            // The item is used up even against a pokemon with Ingrain or that otherwise can't be forced out
+                            if (target.UseItem(source))
+                            {
+                                // TODO: Implement DragOut event properly
+                                source.ForceSwitchFlag = true;
+                            }
+                        }
+                    }
+                }),
+                Num = 542,
+                Gen = 5,
+            },
+            [ItemId.RepeatBall] = new()
+            {
+                Id = ItemId.RepeatBall,
+                Name = "Repeat Ball",
+                SpriteNum = 401,
+                Num = 9,
+                Gen = 3,
+                IsPokeball = true,
+            },
+            [ItemId.RibbonSweet] = new()
+            {
+                Id = ItemId.RibbonSweet,
+                Name = "Ribbon Sweet",
+                SpriteNum = 710,
+                Fling = new FlingData { BasePower = 10 },
+                Num = 1115,
+                Gen = 8,
+            },
+            [ItemId.RindoBerry] = new()
+            {
+                Id = ItemId.RindoBerry,
+                Name = "Rindo Berry",
+                SpriteNum = 409,
+                IsBerry = true,
+                NaturalGift = (80, "Grass"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Grass && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Rindo Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+
+                    return damage;
+                }),
+                // OnEat: empty function
+                Num = 187,
+                Gen = 4,
+            },
+            [ItemId.RingTarget] = new()
+            {
+                Id = ItemId.RingTarget,
+                Name = "Ring Target",
+                SpriteNum = 410,
+                Fling = new FlingData { BasePower = 10 },
+                // OnNegateImmunity: false - makes the holder's type immunities ignored
+                // TODO: Implement this in Pokemon.RunImmunity or similar
+                Num = 543,
+                Gen = 5,
+            },
+            [ItemId.RootFossil] = new()
+            {
+                Id = ItemId.RootFossil,
+                Name = "Root Fossil",
+                SpriteNum = 418,
+                Fling = new FlingData { BasePower = 100 },
+                Num = 99,
+                Gen = 3,
+                // isNonstandard: "Past"
+            },
+            [ItemId.RoseIncense] = new()
+            {
+                Id = ItemId.RoseIncense,
+                Name = "Rose Incense",
+                SpriteNum = 419,
+                Fling = new FlingData { BasePower = 10 },
+                OnBasePower = new OnBasePowerEventInfo((battle, basePower, user, target, move) =>
+                {
+                    if (move.Type == MoveType.Grass)
+                    {
+                        battle.ChainModify([4915, 4096]);
+                        return battle.FinalModify(basePower);
+                    }
+
+                    return basePower;
+                }, 15),
+                Num = 318,
+                Gen = 4,
+                // isNonstandard: "Past"
+            },
+            [ItemId.RoseliaBerry] = new()
+            {
+                Id = ItemId.RoseliaBerry,
+                Name = "Roseli Berry",
+                SpriteNum = 603,
+                IsBerry = true,
+                NaturalGift = (80, "Fairy"),
+                OnSourceModifyDamage = new OnSourceModifyDamageEventInfo((battle, damage, source, target, move) =>
+                {
+                    if (move.Type == MoveType.Fairy && target.GetMoveHitData(move).TypeMod > 0)
+                    {
+                        var hitSub = target.Volatiles.ContainsKey(ConditionId.Substitute) &&
+                                     move.Flags.BypassSub != true &&
+                                     !(move.Infiltrates == true && battle.Gen >= 6);
+                        if (hitSub) return damage;
+
+                        if (target.EatItem())
+                        {
+                            battle.Debug("-50% reduction");
+                            battle.Add("-enditem", target, "item: Roseli Berry", "[weaken]");
+                            battle.ChainModify(0.5);
+                            return battle.FinalModify(damage);
+                        }
+                    }
+
+                    return damage;
+                }),
+                // OnEat: empty function
+                Num = 686,
+                Gen = 6,
+            },
+            [ItemId.RowapBerry] = new()
+            {
+                Id = ItemId.RowapBerry,
+                Name = "Rowap Berry",
+                SpriteNum = 420,
+                IsBerry = true,
+                NaturalGift = (100, "Dark"),
+                OnDamagingHit = new OnDamagingHitEventInfo((battle, damage, target, source, move) =>
+                {
+                    if (move.Category == MoveCategory.Special && source.Hp > 0 && source.IsActive &&
+                        !source.HasAbility(AbilityId.MagicGuard))
+                    {
+                        if (target.EatItem())
+                        {
+                            var damageAmount = source.BaseMaxHp /
+                                               (target.HasAbility(AbilityId.Ripen) ? 4 : 8);
+                            battle.Damage(damageAmount, source, target);
+                        }
+                    }
+                }),
+                // OnEat: empty function
+                Num = 212,
+                Gen = 4,
+            },
+            [ItemId.RustedShield] = new()
+            {
+                Id = ItemId.RustedShield,
+                Name = "Rusted Shield",
+                SpriteNum = 699,
+                // OnTakeItem - Zamazenta can't have this item removed
+                // itemUser: ["Zamazenta-Crowned"],
+                Num = 1104,
+                Gen = 8,
+            },
+            [ItemId.RustedSword] = new()
+            {
+                Id = ItemId.RustedSword,
+                Name = "Rusted Sword",
+                SpriteNum = 698,
+                // OnTakeItem - Zacian can't have this item removed
+                // itemUser: ["Zacian-Crowned"],
+                Num = 1103,
+                Gen = 8,
             },
         };
     }

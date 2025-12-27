@@ -328,6 +328,27 @@ public partial record Items
                 Num = 851,
                 Gen = 7,
             },
+            [ItemId.BerryJuice] = new()
+            {
+                Id = ItemId.BerryJuice,
+                Name = "Berry Juice",
+                SpriteNum = 22,
+                Fling = new FlingData { BasePower = 30 },
+                OnUpdate = new OnUpdateEventInfo((battle, pokemon) =>
+                {
+                    if (pokemon.Hp <= pokemon.MaxHp / 2)
+                    {
+                        // Try to heal - RunEvent returns RelayVar which can indicate if healing is prevented
+                        if (pokemon.UseItem())
+                        {
+                            battle.Heal(20);
+                        }
+                    }
+                }),
+                Num = 43,
+                Gen = 2,
+                // isNonstandard: "Past"
+            },
             [ItemId.BerrySweet] = new()
             {
                 Id = ItemId.BerrySweet,
